@@ -24,199 +24,197 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM.Scripting.Barsik
+namespace AM.Scripting.Barsik;
+
+/// <summary>
+/// Описание одного теста Барсика.
+/// </summary>
+sealed class Test
 {
+    #region Properties
+
     /// <summary>
-    /// Описание одного теста Барсика.
+    /// Имя теста.
     /// </summary>
-    sealed class Test
+    public string Name { get; }
+
+    /// <summary>
+    /// Папка, в которой хранятся данные для теста.
+    /// </summary>
+    public string Folder { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Test
+        (
+            string folder
+        )
     {
-        #region Properties
+        Sure.NotNullNorEmpty (folder);
 
-        /// <summary>
-        /// Имя теста.
-        /// </summary>
-        public string Name { get; }
+        Folder = Path.GetFullPath (folder);
+        Name = Path.GetFileName (folder).ThrowIfNullOrEmpty();
+    }
 
-        /// <summary>
-        /// Папка, в которой хранятся данные для теста.
-        /// </summary>
-        public string Folder { get; }
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Construction
+    private string GetFullName
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Test
-            (
-                string folder
-            )
+        return Path.Combine (Folder, fileName);
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Прогон теста.
+    /// </summary>
+    public TestResult Run
+        (
+            TestContext context
+        )
+    {
+        var result = new TestResult
         {
-            Sure.NotNullNorEmpty (folder);
+            Name = Name,
+        };
 
-            Folder = Path.GetFullPath (folder);
-            Name = Path.GetFileName (folder).ThrowIfNullOrEmpty ();
+        string? expectedExceptionType = null;
+        var exceptionFileName = GetFullName (TestUtility.ExceptionFileName);
+        if (File.Exists (exceptionFileName))
+        {
+            expectedExceptionType = File.ReadAllText (exceptionFileName).Trim();
         }
 
-        #endregion
-
-        #region Private members
-
-        private string GetFullName
-            (
-                string fileName
-            )
+        try
         {
-            Sure.NotNullNorEmpty (fileName);
-
-            return Path.Combine (Folder, fileName);
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Прогон теста.
-        /// </summary>
-        public TestResult Run
-            (
-                TestContext context
-            )
-        {
-            var result = new TestResult
+            var descriptionFile = GetFullName (TestUtility.DescriptionFileName);
+            if (File.Exists (descriptionFile))
             {
-                Name = Name,
-            };
-
-            string? expectedExceptionType = null;
-            var exceptionFileName = GetFullName (TestUtility.ExceptionFileName);
-            if (File.Exists (exceptionFileName))
-            {
-                expectedExceptionType = File.ReadAllText (exceptionFileName).Trim();
+                var description = File.ReadAllText (descriptionFile).DosToUnix()!.Trim();
+                result.Description = description;
+                context.Output.Write ($"{Name,-15}: {description,-55}");
             }
 
-            try
+            var ignoreFile = GetFullName (TestUtility.IgnoreFileName);
+            if (File.Exists (ignoreFile))
             {
-                var descriptionFile = GetFullName (TestUtility.DescriptionFileName);
-                if (File.Exists (descriptionFile))
-                {
-                    var description = File.ReadAllText (descriptionFile).DosToUnix()!.Trim();
-                    result.Description = description;
-                    context.Output.Write ($"{Name,-15}: {description,-55}");
-                }
+                result.Ignored = true;
+                context.Output.WriteLine (" IGNORED");
+                goto DONE;
+            }
 
-                var ignoreFile = GetFullName (TestUtility.IgnoreFileName);
-                if (File.Exists (ignoreFile))
-                {
-                    result.Ignored = true;
-                    context.Output.WriteLine (" IGNORED");
-                    goto DONE;
-                }
+            string? expected = null;
+            var expectedFile = GetFullName (TestUtility.OutputFileName);
+            if (File.Exists (expectedFile))
+            {
+                expected = File.ReadAllText (expectedFile).DosToUnix();
+                result.Expected = expected;
+            }
 
-                string? expected = null;
-                var expectedFile = GetFullName (TestUtility.OutputFileName);
-                if (File.Exists (expectedFile))
-                {
-                    expected = File.ReadAllText (expectedFile).DosToUnix();
-                    result.Expected = expected;
-                }
+            var sourceFile = GetFullName (TestUtility.SourceFileName);
+            var sourceCode = File.ReadAllText (sourceFile).DosToUnix();
+            result.Source = sourceCode;
 
-                var sourceFile = GetFullName (TestUtility.SourceFileName);
-                var sourceCode = File.ReadAllText (sourceFile).DosToUnix();
-                result.Source = sourceCode;
+            var inputStream = TextReader.Null;
+            var inputFile = GetFullName (TestUtility.InputFileName);
+            if (File.Exists (inputFile))
+            {
+                var inputText = File.ReadAllText (inputFile).DosToUnix();
+                result.Input = inputText;
+                inputStream = new StringReader (inputText!);
+            }
 
-                var inputStream = TextReader.Null;
-                var inputFile = GetFullName (TestUtility.InputFileName);
-                if (File.Exists (inputFile))
-                {
-                    var inputText = File.ReadAllText (inputFile).DosToUnix();
-                    result.Input = inputText;
-                    inputStream = new StringReader (inputText!);
-                }
+            var outputStream = new StringWriter();
 
-                var outputStream = new StringWriter();
+            var interpreter = new Interpreter
+                (
+                    input: inputStream,
+                    output: outputStream
+                );
 
-                var interpreter = new Interpreter
-                    (
-                        input: inputStream,
-                        output: outputStream
-                    );
+            interpreter.Execute (sourceCode!);
 
-                interpreter.Execute (sourceCode!);
-
-                var actualOutput = outputStream.ToString().DosToUnix();
-                result.Output = actualOutput;
-                if (expected is not null)
-                {
-                    if (actualOutput != expected)
-                    {
-                        result.Failed = true;
-                    }
-                }
-
-                if (expectedExceptionType is not null && !result.Failed)
+            var actualOutput = outputStream.ToString().DosToUnix();
+            result.Output = actualOutput;
+            if (expected is not null)
+            {
+                if (actualOutput != expected)
                 {
                     result.Failed = true;
-                    context.Output.WriteLine();
-                    context.Output.WriteLine ($"Expected exception={exceptionFileName}, no exception thrown");
                 }
-
             }
-            catch (Exception exception)
-            {
-                Magna.TraceException (nameof (Test) + "::" + nameof (Run), exception);
 
+            if (expectedExceptionType is not null && !result.Failed)
+            {
                 result.Failed = true;
-                result.Exception = exception.ToString();
-
-                if (expectedExceptionType is not null)
-                {
-                    var actualExceptionType = exception.GetType().FullName;
-                    if (actualExceptionType != expectedExceptionType)
-                    {
-                        context.Output.WriteLine();
-                        context.Output.WriteLine
-                            (
-                                $"Expected exception={expectedExceptionType}, got={actualExceptionType}"
-                            );
-
-                        context.Output.WriteLine();
-                        context.Output.WriteLine (exception.Message);
-                    }
-                    else
-                    {
-                        result.Failed = false;
-                    }
-                }
+                context.Output.WriteLine();
+                context.Output.WriteLine ($"Expected exception={exceptionFileName}, no exception thrown");
             }
+        }
+        catch (Exception exception)
+        {
+            Magna.TraceException (nameof (Test) + "::" + nameof (Run), exception);
 
-            context.Output.WriteLine (result.Failed ? " FAILED" : " SUCCESS");
+            result.Failed = true;
+            result.Exception = exception.ToString();
 
-            if (
-                    result.Expected is not null
-                    && result.Expected != result.Output
-                    && expectedExceptionType is null
-               )
+            if (expectedExceptionType is not null)
             {
-                context.Output.WriteLine ($"\tEXPECTED <{result.Expected}>");
-                context.Output.WriteLine ($"\tACTUAL <{result.Output}>");
-                if (result.Output is not null)
+                var actualExceptionType = exception.GetType().FullName;
+                if (actualExceptionType != expectedExceptionType)
                 {
-                    TestUtility.ShowDifference (context, result.Expected, result.Output);
+                    context.Output.WriteLine();
+                    context.Output.WriteLine
+                        (
+                            $"Expected exception={expectedExceptionType}, got={actualExceptionType}"
+                        );
+
+                    context.Output.WriteLine();
+                    context.Output.WriteLine (exception.Message);
+                }
+                else
+                {
+                    result.Failed = false;
                 }
             }
-
-            DONE:
-            result.FinishTime = DateTime.Now;
-            result.Duration = result.FinishTime - result.StartTime;
-
-            return result;
         }
 
-        #endregion
+        context.Output.WriteLine (result.Failed ? " FAILED" : " SUCCESS");
+
+        if (
+                result.Expected is not null
+                && result.Expected != result.Output
+                && expectedExceptionType is null
+            )
+        {
+            context.Output.WriteLine ($"\tEXPECTED <{result.Expected}>");
+            context.Output.WriteLine ($"\tACTUAL <{result.Output}>");
+            if (result.Output is not null)
+            {
+                TestUtility.ShowDifference (context, result.Expected, result.Output);
+            }
+        }
+
+        DONE:
+        result.FinishTime = DateTime.Now;
+        result.Duration = result.FinishTime - result.StartTime;
+
+        return result;
     }
+
+    #endregion
 }

@@ -44,7 +44,10 @@ public class BarsikException
             SerializationInfo info,
             StreamingContext context
         )
-        : base(info, context
+        : base
+        (
+            info,
+            context
         )
     {
         // тело конструктора оставлено пустым
@@ -57,7 +60,10 @@ public class BarsikException
         (
             string? message
         )
-        : base(message)
+        : base
+            (
+                message
+            )
     {
         // тело конструктора оставлено пустым
     }
@@ -70,7 +76,11 @@ public class BarsikException
             string? message,
             Exception? innerException
         )
-        : base (message, innerException)
+        : base
+            (
+                message,
+                innerException
+            )
     {
         // тело конструктора оставлено пустым
     }

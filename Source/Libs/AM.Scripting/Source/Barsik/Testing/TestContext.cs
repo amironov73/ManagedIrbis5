@@ -27,44 +27,43 @@ using AM.Scripting.Barsik;
 
 #nullable enable
 
-namespace AM.Scripting.Barsik
+namespace AM.Scripting.Barsik;
+
+/// <summary>
+/// Контекст прогона тестов.
+/// </summary>
+public sealed class TestContext
 {
+    #region Properties
+
     /// <summary>
-    /// Контекст прогона тестов.
+    /// Стандартный выходной проток.
     /// </summary>
-    public sealed class TestContext
+    public TextWriter Output { get; }
+
+    /// <summary>
+    /// Выходной поток ошибок.
+    /// </summary>
+    public TextWriter Error { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public TestContext
+        (
+            TextWriter output,
+            TextWriter? error = null
+        )
     {
-        #region Properties
+        Sure.NotNull (output);
 
-        /// <summary>
-        /// Стандартный выходной проток.
-        /// </summary>
-        public TextWriter Output { get; }
-
-        /// <summary>
-        /// Выходной поток ошибок.
-        /// </summary>
-        public TextWriter Error { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public TestContext
-            (
-                TextWriter output,
-                TextWriter? error = null
-            )
-        {
-            Sure.NotNull (output);
-
-            Output = output;
-            Error = error ?? output;
-        }
-
-        #endregion
+        Output = output;
+        Error = error ?? output;
     }
+
+    #endregion
 }

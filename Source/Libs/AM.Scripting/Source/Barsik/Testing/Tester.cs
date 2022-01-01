@@ -19,80 +19,79 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Scripting.Barsik
+namespace AM.Scripting.Barsik;
+
+/// <summary>
+/// Автоматический тестировщик для Барсика.
+/// </summary>
+public class Tester
 {
+    #region Properties
+
     /// <summary>
-    /// Автоматический тестировщик для Барсика.
+    /// Контекст прогона тестов.
     /// </summary>
-    public class Tester
+    public TestContext Context { get; }
+
+    #endregion
+
+    #region Constructor
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Tester
+        (
+            TestContext context
+        )
     {
-        #region Properties
+        Sure.NotNull (context);
 
-        /// <summary>
-        /// Контекст прогона тестов.
-        /// </summary>
-        public TestContext Context { get; }
-
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Tester
-            (
-                TestContext context
-            )
-        {
-            Sure.NotNull (context);
-
-            Context = context;
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Обнаружить и выполнить тесты из указанной папки
-        /// и ее подпапок.
-        /// </summary>
-        public TestResult[] DiscoverAndRunTests
-            (
-                string folder
-            )
-        {
-            Sure.NotNullNorEmpty (folder);
-            if (!Directory.Exists (folder))
-            {
-                throw new DirectoryNotFoundException (folder);
-            }
-
-
-            var allResults = new List<TestResult>();
-            var directories = Directory.GetDirectories
-                (
-                    folder,
-                    "*",
-                    SearchOption.AllDirectories
-                );
-
-            Array.Sort (directories);
-
-            foreach (var subDir in directories)
-            {
-                if (TestUtility.IsDirectoryContainsTest (subDir))
-                {
-                    var test = new Test (subDir);
-                    var oneResult = test.Run (Context);
-                    allResults.Add (oneResult);
-                }
-            }
-
-            return allResults.ToArray();
-        }
-
-        #endregion
+        Context = context;
     }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Обнаружить и выполнить тесты из указанной папки
+    /// и ее подпапок.
+    /// </summary>
+    public TestResult[] DiscoverAndRunTests
+        (
+            string folder
+        )
+    {
+        Sure.NotNullNorEmpty (folder);
+        if (!Directory.Exists (folder))
+        {
+            throw new DirectoryNotFoundException (folder);
+        }
+
+
+        var allResults = new List<TestResult>();
+        var directories = Directory.GetDirectories
+            (
+                folder,
+                "*",
+                SearchOption.AllDirectories
+            );
+
+        Array.Sort (directories);
+
+        foreach (var subDir in directories)
+        {
+            if (TestUtility.IsDirectoryContainsTest (subDir))
+            {
+                var test = new Test (subDir);
+                var oneResult = test.Run (Context);
+                allResults.Add (oneResult);
+            }
+        }
+
+        return allResults.ToArray();
+    }
+
+    #endregion
 }
