@@ -117,5 +117,80 @@ internal sealed class IndexNode
         return result;
     }
 
+    /// <inheritdoc cref="AtomNode.Assign"/>
+    public override dynamic? Assign
+        (
+            Context context,
+            string operation,
+            dynamic? value
+        )
+    {
+        dynamic? variableValue = null;
+
+        if (operation != "=")
+        {
+            variableValue = Compute (context);
+        }
+
+        value = operation switch
+        {
+            "=" => value,
+            "+=" => variableValue + value,
+            "-=" => variableValue - value,
+            "*=" => variableValue * value,
+            "/=" => variableValue / value,
+            "%=" => variableValue % value,
+            "&=" => variableValue & value,
+            "|=" => variableValue | value,
+            "^=" => variableValue ^ value,
+            "<<=" => variableValue << value,
+            ">>=" => variableValue >> value,
+            _ => throw new Exception()
+        };
+
+        var index = _index.Compute (context);
+
+        // TODO: не вычислять дважды
+        var obj = _obj.Compute (context);
+        if (obj is null)
+        {
+            return null;
+        }
+
+        if (obj is Array array && index is int integerIndex)
+        {
+            array.SetValue (value, integerIndex);
+            return value;
+        }
+
+        var type = ((object) obj).GetType();
+        ParameterInfo[]? parameters;
+        PropertyInfo? indexer = null;
+        foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.Public))
+        {
+            parameters = property.GetIndexParameters();
+            if (parameters.Length != 0)
+            {
+                indexer = property;
+                break;
+            }
+        }
+
+        if (indexer is null)
+        {
+            return null;
+        }
+
+        var method = indexer.GetSetMethod();
+        if (method is null)
+        {
+            return null;
+        }
+
+        var result = method.Invoke (obj, new object? [] { index, value });
+
+        return value;
+    }
+
     #endregion
 }

@@ -70,9 +70,54 @@ internal sealed class VariableNode
             return value;
         }
 
-        context.Error.WriteLine ($"Variable '{Name}' not defined");
+        var type = context.FindType (Name);
+        if (type is not null)
+        {
+            return type;
+        }
+
+        context.Error.WriteLine ($"Variable or type '{Name}' not defined");
 
         return null;
+    }
+
+    /// <inheritdoc cref="AtomNode.Assign"/>
+    public override dynamic? Assign
+        (
+            Context context,
+            string operation,
+            dynamic? value
+        )
+    {
+        dynamic? variableValue = null;
+
+        if (operation != "=")
+        {
+            if (!context.TryGetVariable (Name, out variableValue))
+            {
+                context.Error.WriteLine ($"Variable {Name} not found");
+            }
+        }
+
+        value = operation switch
+        {
+            "=" => value,
+            "+=" => variableValue + value,
+            "-=" => variableValue - value,
+            "*=" => variableValue * value,
+            "/=" => variableValue / value,
+            "%=" => variableValue % value,
+            "&=" => variableValue & value,
+            "|=" => variableValue | value,
+            "^=" => variableValue ^ value,
+            "<<=" => variableValue << value,
+            ">>=" => variableValue >> value,
+            _ => throw new Exception()
+        };
+
+        context.SetVariable (Name, value);
+
+        return value;
     }
 
     #endregion

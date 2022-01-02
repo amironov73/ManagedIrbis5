@@ -119,7 +119,7 @@ public static class Builtins
         { "eval", new FunctionDescriptor ("eval", Evaluate) },
         { "exec", new FunctionDescriptor ("exec", Execute) },
         { "format", new FunctionDescriptor ("format", Format) },
-        { "have_var", new FunctionDescriptor ("have_var", HaveVariable) },
+        { "have_var", new FunctionDescriptor ("havevar", HaveVariable) },
         { "italic", new FunctionDescriptor ("italic", Italic) },
         { "len", new FunctionDescriptor ("len", Length) },
         { "max", new FunctionDescriptor ("max", Max) },

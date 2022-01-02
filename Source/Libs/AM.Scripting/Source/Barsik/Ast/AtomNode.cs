@@ -34,7 +34,7 @@ public abstract class AtomNode
     /// <summary>
     /// Присвоение значения данному узлу.
     /// </summary>
-    public virtual void Assign
+    public virtual dynamic? Assign
         (
             Context context,
             string operation,

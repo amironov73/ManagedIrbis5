@@ -34,12 +34,12 @@ internal sealed class AssignmentNode
     /// </summary>
     public AssignmentNode
         (
-            string target,
+            AtomNode target,
             string operation,
             AtomNode expression
         )
     {
-        Sure.NotNullNorEmpty (target);
+        Sure.NotNull (target);
         Sure.NotNullNorEmpty (operation);
         Sure.NotNull (expression);
 
@@ -57,7 +57,7 @@ internal sealed class AssignmentNode
 
     #region Private members
 
-    private readonly string _target;
+    private readonly AtomNode _target;
     private readonly string _operation;
     private readonly AtomNode _expression;
 
@@ -71,37 +71,10 @@ internal sealed class AssignmentNode
             Context context
         )
     {
-        var variableName = _target;
-        dynamic? variableValue = null;
-        if (_operation != "=")
-        {
-            if (!context.TryGetVariable (variableName, out variableValue))
-            {
-                context.Error.WriteLine ($"Variable {variableName} not found");
-                return null;
-            }
-        }
+        var value = _expression.Compute (context);
+        value = _target.Assign (context, _operation, value);
 
-        var computedValue = _expression.Compute (context);
-        computedValue = _operation switch
-        {
-            "=" => computedValue,
-            "+=" => variableValue + computedValue,
-            "-=" => variableValue - computedValue,
-            "*=" => variableValue * computedValue,
-            "/=" => variableValue / computedValue,
-            "%=" => variableValue % computedValue,
-            "&=" => variableValue & computedValue,
-            "|=" => variableValue | computedValue,
-            "^=" => variableValue ^ computedValue,
-            "<<=" => variableValue << computedValue,
-            ">>=" => variableValue >> computedValue,
-            _ => throw new Exception()
-        };
-
-        context.SetVariable (variableName, computedValue);
-
-        return computedValue;
+        return value;
     }
 
     #endregion

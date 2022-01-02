@@ -15,12 +15,7 @@
 #region Using directives
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-using AM.Text;
 
 #endregion
 
@@ -41,15 +36,15 @@ internal sealed class MethodNode
     /// </summary>
     public MethodNode
         (
-            string thisName,
+            AtomNode thisObject,
             string methodName,
             IEnumerable<AtomNode>? arguments
         )
     {
-        Sure.NotNullNorEmpty (thisName);
+        Sure.NotNull (thisObject);
         Sure.NotNullNorEmpty (methodName);
 
-        _thisName = thisName;
+        _thisObject = thisObject;
         _methodName = methodName;
         _arguments = new ();
         if (arguments is not null)
@@ -62,44 +57,9 @@ internal sealed class MethodNode
 
     #region Private members
 
-    private readonly string _thisName;
+    private readonly AtomNode _thisObject;
     private readonly string _methodName;
     private readonly List<AtomNode> _arguments;
-
-    private dynamic? ComputeStatic
-        (
-            Context context
-        )
-    {
-        var type = context.FindType (_thisName);
-        if (type is null)
-        {
-            context.Error.WriteLine ($"Variable or type {_thisName} not found");
-
-            return null;
-        }
-
-        var method = type
-            .GetMethods (BindingFlags.Public | BindingFlags.Static)
-            .FirstOrDefault (info => info.Name == _methodName
-                                     && info.GetParameters().Length == _arguments.Count);
-
-        if (method is null)
-        {
-            return null;
-        }
-
-        var parameters = new List<object?>();
-        foreach (var argument in _arguments)
-        {
-            var parameter = (object?) argument.Compute (context);
-            parameters.Add (parameter);
-        }
-
-        var result = method.Invoke (null, parameters.ToArray());
-
-        return result;
-    }
 
     #endregion
 
@@ -111,11 +71,7 @@ internal sealed class MethodNode
             Context context
         )
     {
-        if (!context.TryGetVariable (_thisName, out var thisValue))
-        {
-            return ComputeStatic (context);
-        }
-
+        var thisValue = _thisObject.Compute (context);
         if (thisValue is null)
         {
             return null;
@@ -133,15 +89,27 @@ internal sealed class MethodNode
             argumentTypes.Add (argType);
         }
 
-        var type = ((object) thisValue).GetType();
-        var method = type.GetMethod (_methodName, argumentTypes.ToArray());
-        method ??= type.GetMethod (_methodName);
-        if (method is null)
+        if (thisValue is Type type)
+        {
+            var staticMethod = type.GetMethod (_methodName, argumentTypes.ToArray());
+            staticMethod ??= type.GetMethod (_methodName);
+            if (staticMethod is null)
+            {
+                return null;
+            }
+
+            return staticMethod.Invoke (null, argumentValues.ToArray());
+        }
+
+        type = ((object) thisValue).GetType();
+        var instanceMethod = type.GetMethod (_methodName, argumentTypes.ToArray());
+        instanceMethod ??= type.GetMethod (_methodName);
+        if (instanceMethod is null)
         {
             return null;
         }
 
-        var result = method.Invoke (thisValue, argumentValues.ToArray());
+        var result = instanceMethod.Invoke (thisValue, argumentValues.ToArray());
 
         return result;
     }

@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable RedundantSuppressNullableWarningExpression
 
 /* Grammar.cs -- грамматика Barsik
  * Ars Magna project, http://arsmagna.ru
@@ -13,12 +14,10 @@
 
 #region Using directive
 
-using System;
 using System.Collections.Generic;
 
 using Pidgin;
 using Pidgin.Comment;
-using Pidgin.Expression;
 
 using static Pidgin.Parser;
 using static Pidgin.Parser<char>;
@@ -99,7 +98,7 @@ static class Grammar
         (
             (first, rest) => first + rest,
             Letter,
-            LetterOrDigit.ManyString()
+            (LetterOrDigit.Or (Char ('_'))).ManyString()
         );
 
     // тернарный оператор
@@ -113,7 +112,7 @@ static class Grammar
     //     select (AtomNode) new TernaryNode (condition, trueValue, falseValue);
 
     // копия
-    private static readonly Parser<char, AtomNode> Expr = Rec (() => RvalueNode.Expr);
+    private static readonly Parser<char, AtomNode> Expr = Rec (() => Rvalue.Expr);
 
     //
     // Дальше начинаются разнообразные стейтменты
@@ -199,11 +198,10 @@ static class Grammar
         from _ in Tok ("if")
         from condition in RoundBrackets (Expr)
         from thenBlock in CurlyBraces (Block)
-        //from elseIf in ElseIf.Many().Optional()
+        from elseIf in Try (ElseIf).Many().Optional()
         from elseBlock in Else.Optional()
-        //select (StatementNode)new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(),
-        //    elseBlock.GetValueOrDefault());
-        select (StatementNode)new IfNode (condition, thenBlock, null, elseBlock.GetValueOrDefault());
+        select (StatementNode)new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(),
+            elseBlock.GetValueOrDefault());
 
     private static readonly Parser<char, CatchNode> Catch =
         from _ in Tok ("catch")
