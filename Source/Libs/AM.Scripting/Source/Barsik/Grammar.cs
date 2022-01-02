@@ -102,162 +102,6 @@ static class Grammar
             LetterOrDigit.ManyString()
         );
 
-    private static readonly Parser<char, AtomNode> NullLiteral =
-        String ("null").ThenReturn ((AtomNode) new ConstantNode (null));
-
-    private static readonly Parser<char, AtomNode> BoolLiteral =
-        OneOf (String ("false"), String ("true"))
-            .Select<AtomNode> (v => new ConstantNode (v == "true"));
-
-    private static readonly Parser<char, AtomNode> CharLiteral =
-        new EscapeParser ('\'', '\\')
-            .Select (Resolve.UnescapeText)
-            .Where (v => v?.Length == 1)
-            .Select<AtomNode> (v => new ConstantNode (v![0]));
-
-    private static readonly Parser<char, AtomNode> StringLiteral =
-        new EscapeParser ('"', '\\')
-            .Select (Resolve.UnescapeText)
-            .Select<AtomNode> (v => new ConstantNode (v));
-
-    private static readonly Parser<char, AtomNode> RawStringLiteral =
-        Char ('@').Then(new EscapeParser ('"', '\\'))
-            .Select<AtomNode> (v => new ConstantNode (v));
-
-    private static readonly Parser<char, AtomNode> Int32Literal = DecimalNum
-        .Select<AtomNode> (v => new ConstantNode (v));
-
-    private static readonly Parser<char, AtomNode> Int64Literal =
-        LongNum.Before (OneOf ('L', 'l'))
-        .Select<AtomNode> (v => new ConstantNode (v));
-
-    private static readonly Parser<char, AtomNode> UInt32Literal =
-        UnsignedInt (10).Before (OneOf ('U', 'u'))
-        .Select<AtomNode> (v => new ConstantNode (v));
-
-    private static readonly Parser<char, AtomNode> UInt64Literal =
-        LongNum.Before (OneOf (String ("LU"), String ("lu"), String ("UL"), String ("ul")))
-        .Select<AtomNode> (v => new ConstantNode (v));
-
-    private static readonly Parser<char, AtomNode> Hex32Literal =
-        String ("0x").Then (UnsignedInt (16))
-            .Select<AtomNode> (v => new ConstantNode (v));
-
-    private static readonly Parser<char, AtomNode> Hex64Literal = Map
-        (
-            (_, value, _) => (AtomNode)new ConstantNode (value),
-            String ("0x").ThenReturn (0L),
-            UnsignedLong (16),
-            OneOf ('L', 'l').ThenReturn (0L)
-        );
-
-    private static readonly Parser<char, AtomNode> FloatLiteral =
-        Real.Before (OneOf ('F', 'f'))
-            .Select (v => (AtomNode) new ConstantNode ((float) v));
-
-    private static readonly Parser<char, AtomNode> DecimalLiteral =
-        Real.Before (OneOf ('M', 'm'))
-            .Select (v => (AtomNode)new ConstantNode ((decimal) v));
-
-    private static readonly Parser<char, AtomNode> DoubleLiteral =
-        Resolve.Double.Select<AtomNode> (v => new ConstantNode (v));
-
-    private static readonly Parser<char, AtomNode> Literal = OneOf (
-                Try (NullLiteral),
-                Try (BoolLiteral),
-                Try (CharLiteral),
-                Try (RawStringLiteral),
-                Try (StringLiteral),
-                Try (Hex64Literal),
-                Try (Hex32Literal),
-                Try (UInt64Literal),
-                Try (Int64Literal),
-                Try (UInt32Literal),
-                Try (DecimalLiteral),
-                Try (FloatLiteral),
-                Try (DoubleLiteral),
-                Try (Int32Literal)
-            );
-
-    private static readonly Parser<char, KeyValueNode> KeyAndValue = Map
-        (
-            (key, _, value) => new KeyValueNode (key, value),
-            Literal,
-            Tok (':'),
-            Literal
-        );
-
-    private static readonly Parser<char, AtomNode> Variable = Identifier
-        .Select<AtomNode> (name => new VariableNode (name));
-
-    // ReSharper disable RedundantSuppressNullableWarningExpression
-    private static readonly Parser<char, AtomNode> Parenthesis = Map
-            (
-                (_, inner, _) => inner,
-                Tok ('('),
-                Rec (() => Expr!),
-                Tok (')')
-            )
-        .Select<AtomNode> (inner => new ParenthesisNode (inner));
-    // ReSharper restore RedundantSuppressNullableWarningExpression
-
-    // вызов свободной функции
-    // ReSharper disable RedundantSuppressNullableWarningExpression
-    private static readonly Parser<char, AtomNode> FreeFunctionCall = Map
-        (
-            (name, args) =>
-                (AtomNode) new FreeCallNode (name, args.GetValueOrDefault()),
-            Tok (Identifier),
-            RoundBrackets (Rec (() => Expr!).Separated (Tok (',')).Optional())
-        );
-    // ReSharper restore RedundantSuppressNullableWarningExpression
-
-    private static Parser<char, Func<AtomNode, AtomNode>> Prefix (Parser<char, string> op) =>
-        op.Select<Func<AtomNode, AtomNode>> (type => inner => new PrefixNode (type, inner));
-
-    private static Parser<char, Func<AtomNode, AtomNode>> Postfix (Parser<char, string> op) =>
-         op.Select<Func<AtomNode, AtomNode>> (type => inner => new PostfixNode (type, inner));
-
-    private static OperatorTableRow<char, AtomNode> Prefix (string op) =>
-        Operator.Prefix (Prefix (String (op)));
-
-    private static OperatorTableRow<char, AtomNode> Postfix (string op) =>
-        Operator.Postfix (Postfix (String (op)));
-
-    private static Parser<char, Func<AtomNode, AtomNode, AtomNode>> Binary (Parser<char, string> op) =>
-        op.Select<Func<AtomNode, AtomNode, AtomNode>> (type => (left, right) =>
-            new BinaryNode (left, right, type));
-
-    private static OperatorTableRow<char, AtomNode> BinaryLeft (string op) =>
-        Operator.InfixL (Binary (Try (Tok (op))));
-
-    // ReSharper disable RedundantSuppressNullableWarningExpression
-    private static readonly Parser<char, AtomNode> List = Tok (Map
-        (
-            (_, items, _) => (AtomNode) new ListNode (items),
-            Tok ('['),
-            Rec (() => Expr!).Separated (Tok (',')),
-            Tok (']')
-        ));
-    // ReSharper restore RedundantSuppressNullableWarningExpression
-
-    // инициализация словаря
-    private static readonly Parser<char, AtomNode> Dictionary = Tok (Map
-        (
-            (_, items, _) => (AtomNode) new DictionaryNode (items),
-            Tok ('{'),
-            Tok (KeyAndValue).Separated (Tok (',')),
-            Tok ('}')
-        ));
-
-    // оператор new
-    private static readonly Parser<char, AtomNode> New =
-        from _ in Tok ("new")
-        from typeName in Tok (Identifier)
-        from args in
-            RoundBrackets (Rec (() => Expr!).Separated (Tok (',')).Optional())
-        select (AtomNode) new NewNode (typeName, args.GetValueOrDefault());
-
     // тернарный оператор
     // TODO устранить левую рекурсию
     // private static readonly Parser<char, AtomNode> Ternary =
@@ -268,95 +112,8 @@ static class Grammar
     //     from falseValue in Tok (Rec (() => Expr!))
     //     select (AtomNode) new TernaryNode (condition, trueValue, falseValue);
 
-    // операция присваивания
-    private static readonly Parser<char, string> Operation = OneOf
-        (
-            Tok ("="), Tok ("+="), Tok ("-="),
-            Tok ("*="), Tok ("/="), Tok ("%="), Tok ("&="),
-            Tok ("|="), Tok ("^="), Tok ("<<="), Tok (">>=")
-        );
-
-    // оператор присваивания
-    // ReSharper disable RedundantSuppressNullableWarningExpression
-    private static readonly Parser<char, AtomNode> Assignment = Map
-        (
-            (target, op, expression) =>
-                (AtomNode) new AssignmentNode (target, op, expression),
-            Tok (Identifier),
-            Operation,
-            Rec (() => Expr!)
-        );
-    // ReSharper restore RedundantSuppressNullableWarningExpression
-
-    // оператор throw
-    // ReSharper disable RedundantSuppressNullableWarningExpression
-    private static readonly Parser<char, AtomNode> Throw = Map
-        (
-            (_, operand) => (AtomNode) new ThrowNode (operand),
-            Tok ("throw"),
-            Tok (Rec (() => Expr!))
-        );
-    // ReSharper restore RedundantSuppressNullableWarningExpression
-
-    // обращение к свойству объекта
-    private static readonly Parser<char, AtomNode> _Property =
-        Tok ('.').Then (Identifier).Select<AtomNode> (v => new VariableNode (v));
-
-    private static Parser<char, Func<AtomNode, AtomNode>> Property (Parser<char, AtomNode> op) =>
-        op.Select<Func<AtomNode, AtomNode>> (type => v => new PropertyNode (v, type));
-
-    // обращение к элементу по индексу
-    // ReSharper disable RedundantSuppressNullableWarningExpression
-    private static readonly Parser<char, AtomNode> _Index =
-        Tok (Rec (() => Expr!)).Between (Tok ('['), Tok (']'))
-            .Select (v => v);
-    // ReSharper restore RedundantSuppressNullableWarningExpression
-
-    private static Parser<char, Func<AtomNode, AtomNode>> Index (Parser<char, AtomNode> op) =>
-        op.Select<Func<AtomNode, AtomNode>> (type => v => new IndexNode (v, type));
-
-    // выражение
-    private static readonly Parser<char, AtomNode> Expr = ExpressionParser.Build
-        (
-            OneOf
-                (
-                    Try (Literal),
-                    Try (New),
-                    Try (Throw),
-                    // Try (Ternary),
-                    Try (FreeFunctionCall),
-                    Try (List),
-                    Try (Dictionary),
-                    Try (Parenthesis),
-                    Try (Assignment),
-                    Try (Variable)
-                ),
-            new []
-            {
-                new []
-                {
-                    Operator.PostfixChainable
-                        (
-                            Try (Property (_Property)),
-                            Try (Index (_Index))
-                        ),
-                },
-                new [] { BinaryLeft ("*"), BinaryLeft ("/"), BinaryLeft ("%") },
-                new [] { Postfix ("++"), Postfix ("--") },
-                new [] { Prefix ("++"), Prefix ("--"), Prefix ("!"), Prefix ("-") },
-                new [] { Prefix ("!")},
-                new [] { BinaryLeft ("+"), BinaryLeft ("-") },
-                new [] { BinaryLeft ("<<"), BinaryLeft (">>") },
-                new [] { BinaryLeft ("<="), BinaryLeft (">="), BinaryLeft ("<"), BinaryLeft (">") },
-                new [] { BinaryLeft ("=="), BinaryLeft ("!=") },
-                new [] { BinaryLeft ("&") },
-                new [] { BinaryLeft ("^") },
-                new [] { BinaryLeft ("|") },
-                // TODO разобраться, почему не работает &&
-                new [] { BinaryLeft ("&&"), BinaryLeft ("and") },
-                new [] { BinaryLeft ("||"), BinaryLeft ("or") },
-            }
-        );
+    // копия
+    private static readonly Parser<char, AtomNode> Expr = Rec (() => RvalueNode.Expr);
 
     //
     // Дальше начинаются разнообразные стейтменты
@@ -370,19 +127,18 @@ static class Grammar
         .SkipMany();
 
     // блок стейтментов
-    // ReSharper disable RedundantSuppressNullableWarningExpression
     public static readonly Parser<char, IEnumerable<StatementNode>> Block = Map
         (
             (_, second) => second,
             Filler.Optional(),
             Rec (() => Statement!).SeparatedAndOptionallyTerminated (StatementDelimiter)
         );
-    // ReSharper restore RedundantSuppressNullableWarningExpression
 
-    // вычисление выражения
+    // стейтмент, вычисляющий значение выражения (костыль)
     private static readonly Parser<char, StatementNode> ExpressionStatement =
         Expr.Select<StatementNode> (v => new ExpressionNode (v));
 
+    // TODO превратить в обычную функцию
     private static readonly Parser<char, StatementNode> Print = Map
         (
             (name, expressions) =>
@@ -391,6 +147,7 @@ static class Grammar
             RoundBrackets (Tok (Expr).Separated (Tok (',')))
         );
 
+    // цикл while
     private static readonly Parser<char, StatementNode> While = Map
         (
             (_, condition, body) =>
@@ -404,11 +161,11 @@ static class Grammar
     private static readonly Parser<char, StatementNode> For =
         from _1 in Tok ("for")
         from open1 in Tok ('(')
-        from init in Tok (Assignment)
+        from init in Tok (Expr)
         from _2 in Tok (';')
         from condition in Tok (Expr)
         from _3 in Token (';')
-        from step in Tok (Assignment)
+        from step in Tok (Expr)
         from close1 in Tok (')')
         from statements in CurlyBraces (Block)
         from elseBody in Rec (() => Tok (Else!)).Optional()

@@ -9,6 +9,8 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+using System;
+
 #nullable enable
 
 namespace AM.Scripting.Barsik;
@@ -24,7 +26,24 @@ public abstract class AtomNode
     /// <summary>
     /// Вычисление значения, связанного с данным узлом.
     /// </summary>
-    public abstract dynamic? Compute (Context context);
+    public abstract dynamic? Compute
+        (
+            Context context
+        );
+
+    /// <summary>
+    /// Присвоение значения данному узлу.
+    /// </summary>
+    public virtual void Assign
+        (
+            Context context,
+            string operation,
+            dynamic? value
+        )
+    {
+        // по умолчанию узлы не поддерживают присваивания
+        throw new NotSupportedException();
+    }
 
     #endregion
 }

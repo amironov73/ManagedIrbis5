@@ -11,8 +11,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-using AM.Text;
-
 #nullable enable
 
 namespace AM.Scripting.Barsik;
@@ -21,7 +19,7 @@ namespace AM.Scripting.Barsik;
 /// Постфиксная операция, например, "<c>++</c>".
 /// </summary>
 sealed class PostfixNode
-    : AtomNode
+    : UnaryNode
 {
     #region Construction
 
@@ -44,38 +42,6 @@ sealed class PostfixNode
 
     private readonly string _type;
     private readonly AtomNode _inner;
-
-    private dynamic Increment
-        (
-            dynamic value
-        )
-    {
-        if (value is string text)
-        {
-            var number = new NumberText (text);
-            number.Increment();
-
-            return number.ToString();
-        }
-
-        return (value + 1);
-    }
-
-    private dynamic Decrement
-        (
-            dynamic value
-        )
-    {
-        if (value is string text)
-        {
-            var number = new NumberText (text);
-            number.Increment();
-
-            return number.ToString();
-        }
-
-        return (value - 1);
-    }
 
     #endregion
 
