@@ -49,51 +49,25 @@ internal sealed class SwallowParser
 
     private readonly char[] _delimiters;
 
-    #endregion
-
-    #region Parser<TToken, TResult> members
-
-    /// <inheritdoc cref="Parser{TToken,T}.TryParse"/>
-    public override bool TryParse
+    private static bool EatComments
         (
-            ref ParseState<char> state,
-            ref PooledList<Expected<char>> expecteds,
-            out Unit result
+            ref ParseState<char> state
         )
     {
-        result = Unit.Value;
-
         if (!state.HasCurrent)
         {
-            // опаньки, текст закончился, а мы этого не ждали
             return false;
         }
 
         while (state.HasCurrent)
         {
-            // state.DumpChar();
             var chr = state.Current;
-
-            // сначала пропускаем все пробелы
-            if (char.IsWhiteSpace (chr))
-            {
-                state.Advance ();
-                continue;
-            }
-
-            if (Array.IndexOf (_delimiters, chr) >= 0)
-            {
-                // мы нарвались на разделитель стейтментов
-                state.Advance ();
-                return true;
-            }
-
             if (chr == '/')
             {
                 // Возможно, это начало комментария
 
                 state.PushBookmark();
-                state.ReadChar();
+                state.ReadChar(); // съели chr
                 chr = state.ReadChar();
                 if (chr == '/')
                 {
@@ -147,16 +121,68 @@ internal sealed class SwallowParser
                 {
                     // это просто слэш, выходим из цикла
                     state.Rewind();
-                    break;
+                    return false;
                 }
             }
             else
             {
                 // это какой-то непредвиденный символ,
                 // пусть с ним разбираются другие парсеры
-                break;
+                return false;
             }
         }
+
+        return true;
+    }
+
+    #endregion
+
+    #region Parser<TToken, TResult> members
+
+    /// <inheritdoc cref="Parser{TToken,T}.TryParse"/>
+    public override bool TryParse
+        (
+            ref ParseState<char> state,
+            ref PooledList<Expected<char>> expecteds,
+            out Unit result
+        )
+    {
+        result = Unit.Value;
+
+        if (!state.HasCurrent)
+        {
+            // опаньки, текст закончился, а мы этого не ждали
+            return false;
+        }
+
+        while (state.HasCurrent)
+        {
+            // сначала пропускаем все пробелы
+            state.EatWhitespace();
+
+            // затем - комментарии
+            EatComments (ref state);
+
+            if (!state.HasCurrent)
+            {
+                // мы съели все комментарии и пробелы
+                return true;
+            }
+
+            var chr = state.Current;
+            if (!char.IsWhiteSpace (chr)
+                && Array.IndexOf (_delimiters, chr) < 0)
+            {
+                break;
+            }
+
+            // мы нарвались на разделитель стейтментов
+            // съедаем его
+            state.Advance ();
+        }
+
+        // если это не разделитель, то никаких дополнительных движений
+        // делать не нужно
 
         return true;
     }

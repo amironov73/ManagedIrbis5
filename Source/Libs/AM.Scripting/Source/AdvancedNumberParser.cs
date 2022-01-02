@@ -40,9 +40,12 @@ internal sealed class AdvancedNumberParser
         (
             int @base,
             string? prefix = null,
-            string[]? suffixes = null
+            string[]? suffixes = null,
+            bool allowSign = true
         )
     {
+        _base = @base;
+        _allowSign = allowSign;
         _prefix = prefix;
         _suffixes = suffixes;
 
@@ -69,9 +72,137 @@ internal sealed class AdvancedNumberParser
 
     #region Private members
 
+    private readonly int _base;
+    private readonly bool _allowSign;
     private readonly char[] _allowed;
     private readonly string? _prefix;
     private readonly string[]? _suffixes;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Разбор значения как 32-битного целого со знаком.
+    /// </summary>
+    public int ParseInt32
+        (
+            string text
+        )
+    {
+        int result = 0;
+        var index = 0;
+
+        while (text[index] is '-' or '+')
+        {
+            index++;
+        }
+
+        if (_prefix is not null)
+        {
+            index += _prefix.Length;
+        }
+
+        for (; index < text.Length; index++)
+        {
+            var value = Array.IndexOf (_allowed, char.ToLowerInvariant (text[index]));
+            result = result * _base + value;
+        }
+
+        if (text[0] is '-')
+        {
+            result = -result;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Разбор значения как 64-битного целого со знаком.
+    /// </summary>
+    public long ParseInt64
+        (
+            string text
+        )
+    {
+        long result = 0;
+        var index = 0;
+
+        while (text[index] is '-' or '+')
+        {
+            index++;
+        }
+
+        if (_prefix is not null)
+        {
+            index += _prefix.Length;
+        }
+
+        for (; index < text.Length; index++)
+        {
+            var value = Array.IndexOf (_allowed, char.ToLowerInvariant (text[index]));
+            result = result * _base + value;
+        }
+
+        if (text[0] is '-')
+        {
+            result = -result;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Разбор значения как 32-битного целого без знака.
+    /// </summary>
+    public uint ParseUInt32
+        (
+            string text
+        )
+    {
+        uint result = 0;
+        var index = 0;
+
+        if (_prefix is not null)
+        {
+            index += _prefix.Length;
+        }
+
+        for (; index < text.Length; index++)
+        {
+            var chr = text[index];
+            var value = (uint)Array.IndexOf (_allowed, char.ToLowerInvariant (chr));
+            result = result * ((uint)_base) + value;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Разбор значения как 64-битного целого без знака.
+    /// </summary>
+    public ulong ParseUInt64
+        (
+            string text
+        )
+    {
+        ulong result = 0;
+        var index = 0;
+
+        if (_prefix is not null)
+        {
+            index += _prefix.Length;
+        }
+
+        for (; index < text.Length; index++)
+        {
+            var chr = text[index];
+            var value = (uint)Array.IndexOf (_allowed, char.ToLowerInvariant (chr));
+            result = result * ((uint)_base) + value;
+        }
+
+        return result;
+    }
 
     #endregion
 
@@ -94,7 +225,7 @@ internal sealed class AdvancedNumberParser
             return false;
         }
 
-        if (state.Current is '-' or '+')
+        if (_allowSign && state.Current is '-' or '+')
         {
             // плюс мы не сохраняем, нет смысла
             if (state.Current is '-')
@@ -127,10 +258,24 @@ internal sealed class AdvancedNumberParser
             {
                 if (Array.IndexOf (_allowed, chr) < 0)
                 {
-                    return false;
+                    if (_suffixes is null)
+                    {
+                        return false;
+                    }
+
+                    // возможно, это суффикс
+                    break;
                 }
 
                 builder.Append (chr);
+                haveDigit = true;
+            }
+
+            if (chr == '_' && !haveDigit)
+            {
+                // подчеркивание до цифр не допускается
+                // после цифр -- можно
+                return false;
             }
 
             state.Advance ();
@@ -159,13 +304,13 @@ internal sealed class AdvancedNumberParser
                     if (suffix == current.ToString())
                     {
                         found = true;
-                        builder.Append (suffix);
                         break;
                     }
                 }
 
                 if (found)
                 {
+                    state.Advance();
                     break;
                 }
 

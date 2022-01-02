@@ -312,6 +312,86 @@ public static class Resolve
     public static readonly Parser<char, string> Remainder = new RemainderParser();
 
     /// <summary>
+    /// Продвинутое целое число (с подчеркиваниями).
+    /// </summary>
+    /// <param name="base">Основание системы счисления.</param>
+    /// <param name="prefix">Префикс, например, <c>"0x"</c> (опционально).</param>
+    /// <param name="suffixes">Суффиксы, например, <c>"l"</c> или <c>"UL"</c>
+    /// (опционально).
+    /// </param>
+    public static Parser<char, int> Int32
+        (
+            int @base = 10,
+            string? prefix = null,
+            string[]? suffixes = null
+        )
+    {
+        var parser = new AdvancedNumberParser (@base, prefix, suffixes);
+
+        return parser.Select (value => parser.ParseInt32 (value));
+    }
+
+    /// <summary>
+    /// Продвинутое целое число (с подчеркиваниями).
+    /// </summary>
+    /// <param name="base">Основание системы счисления.</param>
+    /// <param name="prefix">Префикс, например, <c>"0x"</c> (опционально).</param>
+    /// <param name="suffixes">Суффиксы, например, <c>"l"</c> или <c>"UL"</c>
+    /// (опционально).
+    /// </param>
+    public static Parser<char, long> Int64
+        (
+            int @base = 10,
+            string? prefix = null,
+            string[]? suffixes = null
+        )
+    {
+        var parser = new AdvancedNumberParser (@base, prefix, suffixes);
+
+        return parser.Select (value => parser.ParseInt64 (value));
+    }
+
+    /// <summary>
+    /// Продвинутое целое число (с подчеркиваниями).
+    /// </summary>
+    /// <param name="base">Основание системы счисления.</param>
+    /// <param name="prefix">Префикс, например, <c>"0x"</c> (опционально).</param>
+    /// <param name="suffixes">Суффиксы, например, <c>"l"</c> или <c>"UL"</c>
+    /// (опционально).
+    /// </param>
+    public static Parser<char, uint> UInt32
+        (
+            int @base = 10,
+            string? prefix = null,
+            string[]? suffixes = null
+        )
+    {
+        var parser = new AdvancedNumberParser (@base, prefix, suffixes, false);
+
+        return parser.Select (value => parser.ParseUInt32 (value));
+    }
+
+    /// <summary>
+    /// Продвинутое целое число (с подчеркиваниями).
+    /// </summary>
+    /// <param name="base">Основание системы счисления.</param>
+    /// <param name="prefix">Префикс, например, <c>"0x"</c> (опционально).</param>
+    /// <param name="suffixes">Суффиксы, например, <c>"l"</c> или <c>"UL"</c>
+    /// (опционально).
+    /// </param>
+    public static Parser<char, ulong> UInt64
+        (
+            int @base = 10,
+            string? prefix = null,
+            string[]? suffixes = null
+        )
+    {
+        var parser = new AdvancedNumberParser (@base, prefix, suffixes, false);
+
+        return parser.Select (value => parser.ParseUInt64 (value));
+    }
+
+    /// <summary>
     /// Парсер, поглощающий комментарии и пробелы.
     /// </summary>
     public static Parser<char, Unit> Swallow

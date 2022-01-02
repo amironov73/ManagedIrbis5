@@ -11,7 +11,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AM.Scripting;
 
 using Pidgin;
-using static Pidgin.Parser<char>;
 
 #nullable enable
 
@@ -171,16 +170,61 @@ public sealed class SwallowParserTest
 
     }
 
-    [Ignore]
     [TestMethod]
     [Description ("На сцену выходит разделитель")]
     public void SwallowParser_Parse_11()
     {
         var parser = Parser.LetterOrDigit.AtLeastOnceString()
             .SeparatedAndOptionallyTerminated (Resolve.Swallow (';'));
-        var result = parser.Parse ("  hello; world ");
+
+        var result = parser.Parse ("hello;world");
         Assert.IsTrue (result.Success);
         var words = result.Value.ToArray();
+        Assert.AreEqual (2, words.Length);
+        Assert.AreEqual ("hello", words[0]);
+        Assert.AreEqual ("world", words[1]);
+
+        result = parser.Parse ("hello  ;\n  world  ");
+        Assert.IsTrue (result.Success);
+        words = result.Value.ToArray();
+        Assert.AreEqual (2, words.Length);
+        Assert.AreEqual ("hello", words[0]);
+        Assert.AreEqual ("world", words[1]);
+
+    }
+
+    [TestMethod]
+    [Description ("Множественные разделители")]
+    public void SwallowParser_Parse_12()
+    {
+        var parser = Resolve.Swallow (';')
+            .Then (Parser.LetterOrDigit.AtLeastOnceString()
+            .SeparatedAndOptionallyTerminated (Resolve.Swallow (';')));
+
+        var result = parser.Parse (" hello;world");
+        Assert.IsTrue (result.Success);
+        var words = result.Value.ToArray();
+        Assert.AreEqual (2, words.Length);
+        Assert.AreEqual ("hello", words[0]);
+        Assert.AreEqual ("world", words[1]);
+
+        result = parser.Parse (";;hello;;world;;");
+        Assert.IsTrue (result.Success);
+        words = result.Value.ToArray();
+        Assert.AreEqual (2, words.Length);
+        Assert.AreEqual ("hello", words[0]);
+        Assert.AreEqual ("world", words[1]);
+
+        result = parser.Parse (" ; ; hello ; ; world ; ; ");
+        Assert.IsTrue (result.Success);
+        words = result.Value.ToArray();
+        Assert.AreEqual (2, words.Length);
+        Assert.AreEqual ("hello", words[0]);
+        Assert.AreEqual ("world", words[1]);
+
+        result = parser.Parse (" /*comment1*/ ; //comment2\n ;/*comment3*/hello//comment4\n ; ; world ; ;//comment5 ");
+        Assert.IsTrue (result.Success);
+        words = result.Value.ToArray();
         Assert.AreEqual (2, words.Length);
         Assert.AreEqual ("hello", words[0]);
         Assert.AreEqual ("world", words[1]);
