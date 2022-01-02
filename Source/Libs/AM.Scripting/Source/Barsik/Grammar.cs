@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Pidgin;
 using Pidgin.Comment;
@@ -110,18 +109,20 @@ static class Grammar
         OneOf (String ("false"), String ("true"))
             .Select<AtomNode> (v => new ConstantNode (v == "true"));
 
-    private static readonly Parser<char, AtomNode> CharLiteral = Map
-        (
-            (_, content, _) => content,
-            Char ('\''),
-            AnyCharExcept ('\''),
-            Char ('\'')
-        )
-        .Select<AtomNode> (v => new ConstantNode (v));
+    private static readonly Parser<char, AtomNode> CharLiteral =
+        new EscapeParser ('\'', '\\')
+            .Select (Resolve.UnescapeText)
+            .Where (v => v?.Length == 1)
+            .Select<AtomNode> (v => new ConstantNode (v![0]));
 
     private static readonly Parser<char, AtomNode> StringLiteral =
         new EscapeParser ('"', '\\')
-        .Select<AtomNode> (v => new ConstantNode (v));
+            .Select (Resolve.UnescapeText)
+            .Select<AtomNode> (v => new ConstantNode (v));
+
+    private static readonly Parser<char, AtomNode> RawStringLiteral =
+        Char ('@').Then(new EscapeParser ('"', '\\'))
+            .Select<AtomNode> (v => new ConstantNode (v));
 
     private static readonly Parser<char, AtomNode> Int32Literal = DecimalNum
         .Select<AtomNode> (v => new ConstantNode (v));
@@ -165,6 +166,7 @@ static class Grammar
                 Try (NullLiteral),
                 Try (BoolLiteral),
                 Try (CharLiteral),
+                Try (RawStringLiteral),
                 Try (StringLiteral),
                 Try (Hex64Literal),
                 Try (Hex32Literal),
@@ -244,7 +246,7 @@ static class Grammar
         (
             (_, items, _) => (AtomNode) new DictionaryNode (items),
             Tok ('{'),
-            KeyAndValue.Separated (Tok (',')),
+            Tok (KeyAndValue).Separated (Tok (',')),
             Tok ('}')
         ));
 

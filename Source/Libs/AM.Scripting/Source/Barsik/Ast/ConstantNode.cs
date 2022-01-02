@@ -26,19 +26,10 @@ internal sealed class ConstantNode
     /// </summary>
     public ConstantNode
         (
-            object? value,
-            bool raw = false
+            object? value
         )
     {
         _value = value;
-
-        if (value is string rawText)
-        {
-            if (!raw)
-            {
-                _value = Resolve.UnescapeText (rawText);
-            }
-        }
     }
 
     #endregion

@@ -3,10 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
 
 /* BarsikList.cs -- список объектов для Барсика
  * Ars Magna project, http://arsmagna.ru
@@ -15,6 +12,7 @@
 #region Using directives
 
 using System.Collections.Generic;
+using System.IO;
 
 #endregion
 
@@ -28,5 +26,17 @@ namespace AM.Scripting.Barsik
     public sealed class BarsikList
         : List<dynamic?>
     {
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString()
+        {
+            var output = new StringWriter();
+            BarsikUtility.PrintSequence (output, this);
+
+            return output.ToString();
+        }
+
+        #endregion
     }
 }

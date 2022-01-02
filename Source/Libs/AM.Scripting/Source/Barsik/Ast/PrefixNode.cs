@@ -98,16 +98,26 @@ sealed class PrefixNode
                 return null;
             }
 
-            var newValue = _type switch
+            dynamic? newValue = null;
+            var success = false;
+            switch (_type)
             {
-                "++" => Increment (oldValue),
-                "--" => Decrement (oldValue),
-                _ => throw new BarsikException ($"Unknown operation {_type}")
-            };
+                case "++":
+                    newValue = Increment (oldValue);
+                    success = true;
+                    break;
+                case "--":
+                    newValue = Decrement (oldValue);
+                    success = true;
+                    break;
+            }
 
-            context.SetVariable (name, newValue);
+            if (success)
+            {
+                context.SetVariable (name, newValue);
 
-            return newValue;
+                return newValue;
+            }
         }
 
         var value = _inner.Compute (context);
@@ -115,6 +125,7 @@ sealed class PrefixNode
         value = _type switch
         {
             "!" => ! BarsikUtility.ToBoolean (value),
+            "~" => ~ value,
             "-" => - value,
             _ => throw new BarsikException ($"Unknown operation {_type}")
         };
