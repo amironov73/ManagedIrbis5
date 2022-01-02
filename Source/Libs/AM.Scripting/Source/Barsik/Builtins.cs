@@ -120,6 +120,7 @@ public static class Builtins
         { "exec", new FunctionDescriptor ("exec", Execute) },
         { "format", new FunctionDescriptor ("format", Format) },
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable) },
+        { "iif", new FunctionDescriptor ("iif", Iif) },
         { "italic", new FunctionDescriptor ("italic", Italic) },
         { "len", new FunctionDescriptor ("len", Length) },
         { "max", new FunctionDescriptor ("max", Max) },
@@ -129,6 +130,7 @@ public static class Builtins
         { "readln", new FunctionDescriptor ("readln", Readln) },
         { "system", new FunctionDescriptor ("system", System) },
         { "to_bool", new FunctionDescriptor ("to_bool", ToBoolean) },
+        { "to_byte", new FunctionDescriptor ("to_byte", ToByte) },
         { "to_str", new FunctionDescriptor ("to_str", ToString) },
         { "trace", new FunctionDescriptor ("trace", Trace) },
         { "trim", new FunctionDescriptor ("trim", Trim) },
@@ -378,6 +380,25 @@ public static class Builtins
     }
 
     /// <summary>
+    /// Жалкая замена тернарному оператору.
+    /// </summary>
+    public static dynamic? Iif
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length != 3)
+        {
+            return null;
+        }
+
+        var condition = BarsikUtility.ToBoolean (Compute (context, args, 0));
+
+        return Compute (context, args, condition ? 1 : 2);
+    }
+
+    /// <summary>
     /// Выделение текста курсивом.
     /// </summary>
     public static dynamic? Italic
@@ -598,6 +619,20 @@ public static class Builtins
         var value = Compute (context, args, 0);
 
         return BarsikUtility.ToBoolean (value);
+    }
+
+    /// <summary>
+    /// Преобразование любого значения в беззнаковый байт.
+    /// </summary>
+    public static dynamic ToByte
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var value = Compute (context, args, 0);
+
+        return Convert.ToByte (value);
     }
 
     /// <summary>

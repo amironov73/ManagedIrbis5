@@ -3,7 +3,7 @@ l = "true";
 while (l != null)
 {
     l = f.ReadLine();
-    println l;
+    println (l);
 }
 
 dispose (f);

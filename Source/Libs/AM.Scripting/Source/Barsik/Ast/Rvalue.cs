@@ -6,8 +6,9 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable RedundantSuppressNullableWarningExpression
 
-/* Common.cs -- общий код для rvalue и lvalue
+/* Rvalue.cs -- общий код для rvalue и lvalue
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,8 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 using Pidgin;
 using Pidgin.Expression;
@@ -139,9 +138,9 @@ internal class Rvalue
     protected static readonly Parser<char, KeyValueNode> KeyAndValue = Map
         (
             (key, _, value) => new KeyValueNode (key, value),
-            Literal,
+            Rec (() => Expr!),
             Tok (':'),
-            Literal
+            Rec (() => Expr!)
         );
 
     protected static readonly Parser<char, AtomNode> Variable = Identifier
