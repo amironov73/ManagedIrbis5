@@ -106,6 +106,8 @@ internal sealed class SwallowParser
                         {
                             break;
                         }
+
+                        state.Advance();
                     }
 
                     state.EatChar ('\r');
@@ -139,7 +141,7 @@ internal sealed class SwallowParser
                         return false;
                     }
 
-                    break;
+                    // не надо делать break, т. к. может быть еще один комментарий
                 }
                 else
                 {

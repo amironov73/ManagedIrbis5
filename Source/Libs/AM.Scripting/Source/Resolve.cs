@@ -127,8 +127,13 @@ public static class Resolve
     /// <summary>
     /// Добавляет поглощение пробельных символов перед указанным парсером.
     /// </summary>
-    public static Parser<char, TResult> Clear<TResult> (Parser<char, TResult> parser) =>
-        new ClearParser<TResult> (parser);
+    public static Parser<char, TResult> Clear<TResult>
+        (
+            Parser<char, TResult> parser
+        )
+    {
+        return new ClearParser<TResult> (parser);
+    }
 
     /// <summary>
     /// Число плавающей точкой двойной точности.
@@ -305,6 +310,17 @@ public static class Resolve
     /// Парсер, выдающий нераспарсенный остаток текста.
     /// </summary>
     public static readonly Parser<char, string> Remainder = new RemainderParser();
+
+    /// <summary>
+    /// Парсер, поглощающий комментарии и пробелы.
+    /// </summary>
+    public static Parser<char, Unit> Swallow
+        (
+            params char[] delimiters
+        )
+    {
+        return new SwallowParser (delimiters);
+    }
 
     #endregion
 }
