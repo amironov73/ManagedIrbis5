@@ -66,12 +66,28 @@ sealed class NewNode
 
     #region AtomNode members
 
-    public override dynamic? Compute (Context context)
+    /// <inheritdoc cref="AtomNode.Compute"/>
+    public override dynamic? Compute
+        (
+            Context context
+        )
     {
-        var type = context.FindType (_typeName);
+        var typeName = _typeName;
+        if (context.TryGetVariable (typeName, out var variable))
+        {
+            // имя типа можно сохранить в переменной
+            typeName = variable;
+        }
+
+        if (string.IsNullOrEmpty (typeName))
+        {
+            return null;
+        }
+
+        var type = context.FindType (typeName);
         if (type is null)
         {
-            context.Error.WriteLine ($"Type {_typeName} not found");
+            context.Error.WriteLine ($"Type {typeName} not found");
             return null;
         }
 

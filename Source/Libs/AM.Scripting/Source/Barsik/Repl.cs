@@ -94,8 +94,7 @@ public sealed class Repl
         (
             TextReader? input = null,
             TextWriter? output = null,
-            TextWriter? error = null,
-            Dictionary<string, dynamic?>? variables = null
+            TextWriter? error = null
         )
     {
         Input = input ?? Console.In;
@@ -236,7 +235,8 @@ public sealed class Repl
                 if (Evaluate (line, out var result))
                 {
                     Context.Variables["$$"] = result;
-                    Output.WriteLine (((object?)result).ToVisibleString());
+                    BarsikUtility.PrintObject (Output, result);
+                    Output.WriteLine();
                 }
                 else
                 {

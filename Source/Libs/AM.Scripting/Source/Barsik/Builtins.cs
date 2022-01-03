@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -109,6 +110,7 @@ public static class Builtins
     /// </summary>
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
+        { "array", new FunctionDescriptor ("array", Array_) },
         { "bold", new FunctionDescriptor ("bold", Bold) },
         { "cat", new FunctionDescriptor ("cat", Cat) },
         { "chr", new FunctionDescriptor ("chr", Chr) },
@@ -116,6 +118,7 @@ public static class Builtins
         { "delete", new FunctionDescriptor ("delete", Delete, false) },
         { "dispose", new FunctionDescriptor ("dispose", Dispose) },
         { "error", new FunctionDescriptor ("error", Error) },
+        { "empty", new FunctionDescriptor ("empty", Empty) },
         { "eval", new FunctionDescriptor ("eval", Evaluate) },
         { "exec", new FunctionDescriptor ("exec", Execute) },
         { "format", new FunctionDescriptor ("format", Format) },
@@ -136,6 +139,41 @@ public static class Builtins
         { "type", new FunctionDescriptor ("type", Type) },
         { "warn", new FunctionDescriptor ("warn", Warn) },
     };
+
+    /// <summary>
+    /// Создание массива.
+    /// </summary>
+    public static dynamic? Array_
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length == 0)
+        {
+            return Array.Empty<object>();
+        }
+
+        var length = Convert.ToInt32 (Compute (context, args, 0));
+        if (length <= 0)
+        {
+            return Array.Empty<object>();
+        }
+
+        var type = typeof (object);
+        var typeName = Compute (context, args, 1) as string;
+        if (!string.IsNullOrEmpty (typeName))
+        {
+            type = context.FindType (typeName);
+            if (type is null)
+            {
+                context.Error.WriteLine ($"Can't find type {typeName}");
+                return null;
+            }
+        }
+
+        return Array.CreateInstance (type, length);
+    }
 
     /// <summary>
     /// Выделение текста жирным шрифтом.
@@ -252,6 +290,26 @@ public static class Builtins
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Определение, не пустая ли строка/массив/список/словарь.
+    /// </summary>
+    public static dynamic? Empty
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var obj = Compute (context, args, 0);
+
+        return obj switch
+        {
+            null => true,
+            string str => string.IsNullOrEmpty (str),
+            IList list => list.Count == 0,
+            _ => false
+        };
     }
 
     /// <summary>

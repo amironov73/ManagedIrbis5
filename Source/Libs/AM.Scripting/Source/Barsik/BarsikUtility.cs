@@ -72,6 +72,12 @@ public static class BarsikUtility
             return;
         }
 
+        if (value is Array array)
+        {
+            PrintArray (output, array);
+            return;
+        }
+
         var type = value.GetType();
         if (type.IsPrimitive)
         {
@@ -105,6 +111,35 @@ public static class BarsikUtility
                 output.Write (value);
                 break;
         }
+    }
+
+    /// <summary>
+    /// Вывод массива на печать.
+    /// </summary>
+    public static void PrintArray
+        (
+            TextWriter output,
+            Array? array
+        )
+    {
+        if (array is null)
+        {
+            output.Write ("(null)");
+            return;
+        }
+
+        output.Write ("[");
+        for (var i = 0; i < array.Length; i++)
+        {
+            if (i != 0)
+            {
+                output.Write (", ");
+            }
+
+            PrintObject (output, array.GetValue (i));
+        }
+
+        output.Write ("]");
     }
 
     /// <summary>

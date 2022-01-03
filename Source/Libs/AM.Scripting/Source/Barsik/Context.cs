@@ -193,6 +193,25 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
+        switch (name)
+        {
+            case "bool": return typeof (bool);
+            case "byte": return typeof (byte);
+            case "sbyte": return typeof (sbyte);
+            case "short": return typeof (short);
+            case "char": return typeof (char);
+            case "ushort": return typeof (ushort);
+            case "int": return typeof (int);
+            case "uint": return typeof (uint);
+            case "long": return typeof (long);
+            case "ulong": return typeof (ulong);
+            case "decimal": return typeof (decimal);
+            case "float": return typeof (float);
+            case "double": return typeof (double);
+            case "object": return typeof (object);
+            case "string": return typeof (string);
+        }
+
         Type? result = Type.GetType (name, false);
         if (result is not null)
         {

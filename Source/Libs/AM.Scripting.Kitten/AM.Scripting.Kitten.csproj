@@ -10,6 +10,10 @@
     <Title>ArsMagna parsing services</Title>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
   </ItemGroup>
