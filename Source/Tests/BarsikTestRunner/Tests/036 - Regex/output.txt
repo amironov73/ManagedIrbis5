@@ -1,0 +1,7 @@
+System.Text.RegularExpressions.Regex
+true
+false
+true
+false
+true
+false

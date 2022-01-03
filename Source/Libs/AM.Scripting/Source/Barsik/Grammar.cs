@@ -102,7 +102,7 @@ static class Grammar
         );
 
     // копия
-    private static readonly Parser<char, AtomNode> Expr = Rec (() => Rvalue.Expr);
+    private static readonly Parser<char, AtomNode> Expr = Rec (() => AssignmentNode.Expr);
 
     //
     // Дальше начинаются разнообразные стейтменты

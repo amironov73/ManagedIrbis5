@@ -18,6 +18,8 @@ using System.Collections;
 using System.Globalization;
 using System.IO;
 
+using AM.Text;
+
 #endregion
 
 #nullable enable
@@ -248,6 +250,24 @@ public static class BarsikUtility
             IDictionary dictionary => dictionary.Count != 0,
             _ => true
         };
+    }
+
+    /// <summary>
+    /// Преобразование значения в строку.
+    /// </summary>
+    public static string ToString
+        (
+            object? value
+        )
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        var output = new StringWriter(builder);
+        PrintObject (output, value);
+
+        var result = output.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>

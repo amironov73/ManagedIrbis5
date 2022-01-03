@@ -1,0 +1,2 @@
+﻿println ('a' * 10)
+println ("+-" * 10)

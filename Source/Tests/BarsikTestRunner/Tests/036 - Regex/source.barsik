@@ -1,0 +1,8 @@
+﻿x = /ll/
+println (x.GetType())
+println (x.IsMatch ("hello"))
+println (x.IsMatch ("halo"))
+println ("hello" ~ "ll")
+println ("halo" ~ "ll")
+println ("hello" ~ /ll/)
+println ("halo" ~ /ll/)

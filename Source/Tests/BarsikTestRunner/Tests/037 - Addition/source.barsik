@@ -1,0 +1,11 @@
+﻿x = { 1: "one", 2: "two" }
+y = { 2: "to", 3: "three" }
+println (x + y)
+
+x = [1, 2]
+y = [3, 4]
+z = x + y
+println (z)
+
+z = z + 5
+println (z)
