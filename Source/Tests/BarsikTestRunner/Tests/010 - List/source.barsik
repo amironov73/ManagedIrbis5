@@ -1,13 +1,15 @@
-﻿l = [1, 2, 3, 4, 5, 6, 7, 8];
-println (l.GetType());
-l.Add (9);
-l.Add (10);
-l.AddRange ([11, 12]);
-println (l.Count);
-println (l[0], ", ", l[1]);
-println (l);
-println ("Присваивание по индексу");
-l[0] = 111;
-l[1] = l[0] * 2;
-l[2] = l[0] * 4;
-println (l);
+﻿l = [1, 2, 3, 4, 5, 6, 7, 8]
+println (l.GetType())
+
+l.Add (9)
+l.Add (10)
+l.AddRange ([11, 12])
+println (l.Count)
+println (l[0], ", ", l[1])
+println (l)
+
+println ("Присваивание по индексу")
+l[0] = 111
+l[1] = l[0] * 2
+l[2] = l[0] * 4
+println (l)

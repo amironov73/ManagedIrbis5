@@ -105,11 +105,12 @@ static class Grammar
     //
 
     // разделитель стейтментов
-    public static readonly Parser<char, Unit> StatementDelimiter = Try (BlockComment)
-        .Or (Try (LineComment))
-        .Or (Try (Char (';')).IgnoreResult())
-        .Or (Whitespace.IgnoreResult())
-        .SkipMany();
+    public static readonly Parser<char, Unit> StatementDelimiter = new SwallowParser (';');
+    // public static readonly Parser<char, Unit> StatementDelimiter = Try (BlockComment)
+    //     .Or (Try (LineComment))
+    //     .Or (Try (Char (';')).IgnoreResult())
+    //     .Or (Whitespace.IgnoreResult())
+    //     .SkipMany();
 
     // блок стейтментов
     public static readonly Parser<char, IEnumerable<StatementNode>> Block = Map

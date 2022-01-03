@@ -134,6 +134,7 @@ public static class Builtins
         { "trace", new FunctionDescriptor ("trace", Trace) },
         { "trim", new FunctionDescriptor ("trim", Trim) },
         { "type", new FunctionDescriptor ("type", Type) },
+        { "use", new FunctionDescriptor ("use", Use) },
         { "warn", new FunctionDescriptor ("warn", Warn) },
     };
 
@@ -693,6 +694,38 @@ public static class Builtins
         }
 
         return context.FindType (typeName);
+    }
+
+    /// <summary>
+    /// Подключение/отключение пространств имен.
+    /// </summary>
+    public static dynamic Use
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        for (var i = 0; i < args.Length; i++)
+        {
+            var name = Compute (context, args, i) as string;
+            if (!string.IsNullOrWhiteSpace (name))
+            {
+                if (name.StartsWith ('-'))
+                {
+                    name = name.Substring (1);
+                    if (!string.IsNullOrEmpty (name))
+                    {
+                        context.Namespaces.Remove (name);
+                    }
+                }
+                else
+                {
+                    context.Namespaces[name] = null;
+                }
+            }
+        }
+
+        return context.Namespaces.Keys;
     }
 
     /// <summary>
