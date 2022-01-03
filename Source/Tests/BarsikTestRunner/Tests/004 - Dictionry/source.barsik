@@ -1,8 +1,8 @@
-﻿d = { 1 : "один", 2 : "два", 3 : "три" };
-println (d.Count);
-println (d[1], ", ", d[2], ", ", d[3]);
-println (d);
+﻿d = { 1 : "один", 2 : "два", 3 : "три" }
+println (d.Count)
+println (d[1], ", ", d[2], ", ", d[3])
+println (d)
 
-d.Add (4, "четыре");
-println (d.Count);
-println (d);
+d.Add (4, "четыре")
+println (d.Count)
+println (d)

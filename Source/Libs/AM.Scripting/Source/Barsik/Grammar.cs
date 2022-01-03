@@ -94,12 +94,8 @@ static class Grammar
     public static Parser<char, TResult> RoundBrackets<TResult> (Parser<char, TResult> parser) =>
         Tok (parser).Between (Tok ('('), Tok (')'));
 
-    internal static readonly Parser<char, string> Identifier = Map
-        (
-            (first, rest) => first + rest,
-            Letter,
-            (LetterOrDigit.Or (Char ('_'))).ManyString()
-        );
+    // идентификатор
+    internal static readonly Parser<char, string> Identifier = new IdentifierParser();
 
     // копия
     private static readonly Parser<char, AtomNode> Expr = Rec (() => AssignmentNode.Expr);
@@ -123,6 +119,11 @@ static class Grammar
             Rec (() => Statement!).SeparatedAndOptionallyTerminated (StatementDelimiter)
         );
 
+    // блок в фигурных скобках либо один стейтмент
+    public static readonly Parser<char, IEnumerable<StatementNode>> BlockOrSingle =
+        Try (CurlyBraces(Rec (() => Block)))
+            .Or (Rec (() => Statement!).Repeat (1));
+
     // стейтмент, вычисляющий значение выражения (костыль)
     private static readonly Parser<char, StatementNode> ExpressionStatement =
         Expr.Select<StatementNode> (v => new ExpressionNode (v));
@@ -143,7 +144,7 @@ static class Grammar
                 (StatementNode) new WhileNode (condition, body),
             Try (Tok ("while")),
             RoundBrackets (Expr),
-            CurlyBraces (Block)
+            BlockOrSingle
         );
 
     // цикл for
@@ -156,7 +157,7 @@ static class Grammar
         from _3 in Token (';')
         from step in Tok (Expr)
         from close1 in Tok (')')
-        from statements in CurlyBraces (Block)
+        from statements in BlockOrSingle
         from elseBody in Rec (() => Tok (Else!)).Optional()
         select (StatementNode) new ForNode (init, condition, step, statements,
             elseBody.GetValueOrDefault());
@@ -169,25 +170,25 @@ static class Grammar
         from _2 in Tok ("in")
         from enumerable in Tok (Expr)
         from close1 in Tok (')')
-        from statements in CurlyBraces (Block)
+        from statements in BlockOrSingle
         select (StatementNode) new ForEachNode (variableName, enumerable, statements);
 
     private static readonly Parser<char, IEnumerable<StatementNode>> Else =
         from _ in Tok ("else")
-        from statements in CurlyBraces (Block)
+        from statements in BlockOrSingle
         select statements;
 
     private static readonly Parser<char, IfNode> ElseIf =
         from _1 in Tok ("else")
         from _2 in Tok ("if")
         from condition in RoundBrackets (Expr)
-        from statements in CurlyBraces (Block)
+        from statements in BlockOrSingle
         select new IfNode (condition, statements, null, null);
 
     private static readonly Parser<char, StatementNode> If =
         from _ in Tok ("if")
         from condition in RoundBrackets (Expr)
-        from thenBlock in CurlyBraces (Block)
+        from thenBlock in BlockOrSingle
         from elseIf in Try (ElseIf).Many().Optional()
         from elseBlock in Else.Optional()
         select (StatementNode)new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(),
@@ -196,17 +197,17 @@ static class Grammar
     private static readonly Parser<char, CatchNode> Catch =
         from _ in Tok ("catch")
         from variable in RoundBrackets(Identifier)
-        from block in CurlyBraces(Block)
+        from block in BlockOrSingle
         select new CatchNode (variable, block);
 
     private static readonly Parser<char, IEnumerable<StatementNode>> Finally =
         from _ in Tok ("finally")
-        from block in CurlyBraces (Block)
+        from block in BlockOrSingle
         select block;
 
     private static readonly Parser<char, StatementNode> TryCatchFinally =
         from _ in Tok ("try")
-        from tryBlock in CurlyBraces (Block)
+        from tryBlock in BlockOrSingle
         from catchNode in Catch.Optional()
         from finallyBlock in Finally.Optional()
         select (StatementNode) new TryNode (tryBlock, catchNode.GetValueOrDefault(),
@@ -220,10 +221,10 @@ static class Grammar
     // внешний код
     private static readonly Parser<char, StatementNode> External = Map
         (
-            (_, content, _) => (StatementNode)new ExternalNode (content),
-            Char ('<'),
-            AnyCharExcept ('>').ManyString(),
-            Char ('>')
+            (_, content, _) => (StatementNode) new ExternalNode (content),
+            Char ('`'),
+            AnyCharExcept ('`').ManyString(),
+            Char ('`')
         );
 
     // определение функции
@@ -242,7 +243,7 @@ static class Grammar
         from equal in Tok ('=')
         from initialization in Expr
         from close in Tok (')')
-        from body in CurlyBraces (Block)
+        from body in BlockOrSingle
         select (StatementNode) new UsingNode (variable, initialization, body);
 
     // директива

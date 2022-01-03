@@ -5,7 +5,7 @@ while (x)
     x--;
 }
 
-for (x = 3; x; x = x - 1)
+for (x = 3; x; x--)
 {
     println (x);
 }

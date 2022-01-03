@@ -141,7 +141,7 @@ x = 1;
                      ExternalCodeHandler = Handler
                  }
              };
-             var sourceCode = "print ('{'); <Hello from inner code> print ('}');";
+             var sourceCode = "print ('{'); `Hello from inner code` print ('}');";
              interpreter.Execute (sourceCode);
              var actual = output.ToString();
              Assert.AreEqual ("{Hello from inner code}", actual);
