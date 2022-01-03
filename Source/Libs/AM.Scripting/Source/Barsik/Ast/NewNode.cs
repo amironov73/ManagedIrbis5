@@ -36,11 +36,11 @@ sealed class NewNode
     /// </summary>
     public NewNode
         (
-            string typeName,
+            AtomNode typeName,
             IEnumerable<AtomNode>? arguments
         )
     {
-        Sure.NotNullNorEmpty (typeName);
+        Sure.NotNull (typeName);
 
         if (Array.IndexOf (BarsikUtility.Keywords, typeName) >= 0)
         {
@@ -59,7 +59,7 @@ sealed class NewNode
 
     #region Private members
 
-    private readonly string _typeName;
+    private readonly AtomNode _typeName;
     private readonly List<AtomNode> _arguments;
 
     #endregion
@@ -72,22 +72,10 @@ sealed class NewNode
             Context context
         )
     {
-        var typeName = _typeName;
-        if (context.TryGetVariable (typeName, out var variable))
-        {
-            // имя типа можно сохранить в переменной
-            typeName = variable;
-        }
-
-        if (string.IsNullOrEmpty (typeName))
-        {
-            return null;
-        }
-
-        var type = context.FindType (typeName);
+        var type = context.FindType (_typeName);
         if (type is null)
         {
-            context.Error.WriteLine ($"Type {typeName} not found");
+            context.Error.WriteLine ($"Type '{_typeName}' not found");
             return null;
         }
 

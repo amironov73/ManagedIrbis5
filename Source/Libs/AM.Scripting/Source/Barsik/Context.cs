@@ -188,6 +188,40 @@ public sealed class Context
     /// </summary>
     public Type? FindType
         (
+            AtomNode node
+        )
+    {
+        Sure.NotNull (node);
+
+        if (node is VariableNode variableNode)
+        {
+            if (TryGetVariable (variableNode.Name, out var variableValue))
+            {
+                if (variableValue is string typeName1)
+                {
+                    return FindType (typeName1);
+                }
+            }
+
+            return FindType (variableNode.Name);
+        }
+
+        var value = node.Compute (this);
+        if (value is string typeName2)
+        {
+            return FindType (typeName2);
+        }
+
+        var typeName3 = BarsikUtility.ToString (value);
+
+        return FindType (typeName3);
+    }
+
+    /// <summary>
+    /// Получение типа по его имени.
+    /// </summary>
+    public Type? FindType
+        (
             string name
         )
     {

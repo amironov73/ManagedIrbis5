@@ -2,7 +2,7 @@
 
 println ("Have builder? ", have_var ("builder"));
 
-builder = new StringBuilder();
+builder = new "StringBuilder" ();
 
 println ("Have builder? ", have_var ("builder"));
 

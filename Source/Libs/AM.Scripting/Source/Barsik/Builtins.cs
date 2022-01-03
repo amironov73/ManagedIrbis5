@@ -131,9 +131,6 @@ public static class Builtins
         { "open_read", new FunctionDescriptor ("open_read", OpenRead) },
         { "readln", new FunctionDescriptor ("readln", Readln) },
         { "system", new FunctionDescriptor ("system", System) },
-        { "to_bool", new FunctionDescriptor ("to_bool", ToBoolean) },
-        { "to_byte", new FunctionDescriptor ("to_byte", ToByte) },
-        { "to_str", new FunctionDescriptor ("to_str", ToString) },
         { "trace", new FunctionDescriptor ("trace", Trace) },
         { "trim", new FunctionDescriptor ("trim", Trim) },
         { "type", new FunctionDescriptor ("type", Type) },
@@ -644,52 +641,6 @@ public static class Builtins
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Преобразование любого значения в логическое.
-    /// </summary>
-    public static dynamic ToBoolean
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        var value = Compute (context, args, 0);
-
-        return BarsikUtility.ToBoolean (value);
-    }
-
-    /// <summary>
-    /// Преобразование любого значения в беззнаковый байт.
-    /// </summary>
-    public static dynamic ToByte
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        var value = Compute (context, args, 0);
-
-        return Convert.ToByte (value);
-    }
-
-    /// <summary>
-    /// Преобразование любого значения в строку.
-    /// </summary>
-    /// <remarks>
-    /// Всегда возвращается не <c>null</c>.
-    /// Взамен <c>null</c> возвращается <see cref="string.Empty"/>.
-    /// </remarks>
-    public static dynamic ToString
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        var result = ComputeAll (context, args);
-
-        return result ?? string.Empty;
     }
 
     /// <summary>

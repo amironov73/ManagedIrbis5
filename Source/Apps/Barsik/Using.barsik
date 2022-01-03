@@ -1,14 +1,14 @@
 ﻿#u System.IO
 
-println ("Before");
+println ("Before")
 
-using (m = new MemoryStream())
+using (m = new "MemoryStream" ())
 {
-    m.WriteByte (to_byte (31));
-    m.WriteByte (to_byte (32));
-    m.WriteByte (to_byte (33));
+    m.WriteByte ((byte) 31)
+    m.WriteByte ((byte) 32)
+    m.WriteByte ((byte) 33)
 
-    println (m.Position);
+    println (m.Position)
 }
 
-println ("After");
+println ("After")

@@ -210,7 +210,7 @@ internal sealed class AssignmentNode
     // оператор new
     private static readonly Parser<char, AtomNode> New =
         from _ in Tok ("new")
-        from typeName in Tok (Identifier)
+        from typeName in Try (Tok (Rec (() => Expr!)))
         from args in
             RoundBrackets (Rec (() => Tok (Expr!)).Separated (Tok (',')).Optional())
         select (AtomNode) new NewNode (typeName, args.GetValueOrDefault());
@@ -240,6 +240,14 @@ internal sealed class AssignmentNode
             Tok ("throw"),
             Tok (Rec (() => Expr!))
         );
+
+    // преобразование типа
+    private static readonly Parser<char, AtomNode> _Cast =
+        Try (RoundBrackets (Tok (Identifier)))
+            .Select<AtomNode> (v => new VariableNode (v));
+
+    private static Parser<char, Func<AtomNode, AtomNode>> Cast (Parser<char, AtomNode> op) =>
+        op.Select<Func<AtomNode, AtomNode>> (type => v => new CastNode (type, v));
 
     // обращение к свойству объекта
     private static readonly Parser<char, AtomNode> _Property =
@@ -308,7 +316,8 @@ internal sealed class AssignmentNode
                 new [] { BinaryLeft ("*"), BinaryLeft ("/"), BinaryLeft ("%") },
                 new [] { Postfix ("++"), Postfix ("--") },
                 new [] { Prefix ("++"), Prefix ("--"), Prefix ("!"), Prefix ("-") },
-                new [] { Prefix ("!")},
+                new [] { Prefix ("!") },
+                new [] { Operator.Prefix (Cast (_Cast)) },
                 new [] { BinaryLeft ("is") },
                 new [] { BinaryLeft ("+"), BinaryLeft ("-") },
                 new [] { BinaryLeft ("<<"), BinaryLeft (">>") },
