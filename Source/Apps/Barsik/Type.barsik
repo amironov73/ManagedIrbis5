@@ -1,0 +1,2 @@
+﻿console = type ("System.Console, System.Console")
+console.WriteLine ("Hello")

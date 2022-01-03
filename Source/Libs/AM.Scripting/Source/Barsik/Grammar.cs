@@ -101,16 +101,6 @@ static class Grammar
             (LetterOrDigit.Or (Char ('_'))).ManyString()
         );
 
-    // тернарный оператор
-    // TODO устранить левую рекурсию
-    // private static readonly Parser<char, AtomNode> Ternary =
-    //     from condition in Tok (Rec (() => Expr!))
-    //     from question in Tok ('?')
-    //     from trueValue in Tok (Rec (() => Expr!))
-    //     from colon in Tok (':')
-    //     from falseValue in Tok (Rec (() => Expr!))
-    //     select (AtomNode) new TernaryNode (condition, trueValue, falseValue);
-
     // копия
     private static readonly Parser<char, AtomNode> Expr = Rec (() => Rvalue.Expr);
 

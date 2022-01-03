@@ -41,6 +41,11 @@ public sealed class FunctionDescriptor
     /// </summary>
     public Func<Context, dynamic?[], dynamic?> CallPoint { get; }
 
+    /// <summary>
+    /// Нужно ли вычислять значения аргументов перед передачей в функцию?
+    /// </summary>
+    public bool ComputeArguments { get; }
+
     #endregion
 
     #region Construction
@@ -52,11 +57,16 @@ public sealed class FunctionDescriptor
         (
             string name,
             Func<Context, dynamic?[], dynamic?> callPoint,
+            bool compute = true,
             string? description = null
         )
     {
+        Sure.NotNullNorEmpty (name);
+        Sure.NotNull (callPoint);
+
         Name = name;
         Description = description;
+        ComputeArguments = compute;
         CallPoint = callPoint;
     }
 

@@ -3,10 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable LocalizableElement
-// ReSharper disable UnusedMember.Global
 
 /* FreeCallNode.cs -- вызов свободной функции
  * Ars Magna project, http://arsmagna.ru
@@ -32,8 +29,19 @@ sealed class FreeCallNode
 {
     #region Construction
 
-    public FreeCallNode (string name, IEnumerable<AtomNode>? arguments)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="name">Имя функции.</param>
+    /// <param name="arguments">Аргументы (если есть).</param>
+    public FreeCallNode
+        (
+            string name,
+            IEnumerable<AtomNode>? arguments
+        )
     {
+        Sure.NotNullNorEmpty (name);
+
         _name = name;
         _arguments = new ();
         if (arguments is not null)
@@ -54,14 +62,20 @@ sealed class FreeCallNode
 
     #region AtomNode members
 
-    public override dynamic? Compute (Context context)
+    /// <inheritdoc cref="AtomNode.Compute"/>
+    public override dynamic? Compute
+        (
+            Context context
+        )
     {
-        _function ??= context.GetFunction (_name);
+        _function ??= context.GetFunction (_name).ThrowIfNull ();
 
         var args = new List<dynamic?>();
         foreach (var node in _arguments)
         {
-            var arg = node.Compute (context);
+            var arg = _function.ComputeArguments
+                ? node.Compute (context)
+                : node;
             args.Add (arg);
         }
 
@@ -74,6 +88,7 @@ sealed class FreeCallNode
 
     #region Object members
 
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
         var builder = StringBuilderPool.Shared.Get();

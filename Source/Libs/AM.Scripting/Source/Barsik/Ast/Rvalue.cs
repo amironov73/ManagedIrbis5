@@ -260,6 +260,15 @@ internal class Rvalue
             Tok (')')
         );
 
+    //тернарный оператор
+    private static readonly Parser<char, AtomNode> Ternary =
+        from condition in Tok (Parenthesis)
+        from question in Tok ('?')
+        from trueValue in Tok (Rec (() => Expr!))
+        from colon in Tok (':')
+        from falseValue in Tok (Rec (() => Expr!))
+        select (AtomNode) new TernaryNode (condition, trueValue, falseValue);
+
     protected static Parser<char, Func<AtomNode, AtomNode>> MethodCall (Parser<char, CallNode> op) =>
         op.Select<Func<AtomNode, AtomNode>> (call => node => new MethodNode (node, call.Name, call.Arguments));
 
@@ -271,7 +280,7 @@ internal class Rvalue
                     Try (Literal),
                     Try (New),
                     Try (Throw),
-                    // Try (Ternary),
+                    Try (Ternary),
                     Try (FreeFunctionCall),
                     Try (List),
                     Try (Dictionary),

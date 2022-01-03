@@ -1,0 +1,3 @@
+﻿console = type ("System.Console, System.Console")
+console.Write ("")
+

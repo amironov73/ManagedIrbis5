@@ -113,14 +113,13 @@ public static class Builtins
         { "cat", new FunctionDescriptor ("cat", Cat) },
         { "chr", new FunctionDescriptor ("chr", Chr) },
         { "debug", new FunctionDescriptor ("debug", Debug) },
-        { "delete", new FunctionDescriptor ("delete", Delete) },
+        { "delete", new FunctionDescriptor ("delete", Delete, false) },
         { "dispose", new FunctionDescriptor ("dispose", Dispose) },
         { "error", new FunctionDescriptor ("error", Error) },
         { "eval", new FunctionDescriptor ("eval", Evaluate) },
         { "exec", new FunctionDescriptor ("exec", Execute) },
         { "format", new FunctionDescriptor ("format", Format) },
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable) },
-        { "iif", new FunctionDescriptor ("iif", Iif) },
         { "italic", new FunctionDescriptor ("italic", Italic) },
         { "len", new FunctionDescriptor ("len", Length) },
         { "max", new FunctionDescriptor ("max", Max) },
@@ -134,6 +133,7 @@ public static class Builtins
         { "to_str", new FunctionDescriptor ("to_str", ToString) },
         { "trace", new FunctionDescriptor ("trace", Trace) },
         { "trim", new FunctionDescriptor ("trim", Trim) },
+        { "type", new FunctionDescriptor ("type", Type) },
         { "warn", new FunctionDescriptor ("warn", Warn) },
     };
 
@@ -377,25 +377,6 @@ public static class Builtins
         }
 
         return context.TryGetVariable (name, out _);
-    }
-
-    /// <summary>
-    /// Жалкая замена тернарному оператору.
-    /// </summary>
-    public static dynamic? Iif
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        if (args.Length != 3)
-        {
-            return null;
-        }
-
-        var condition = BarsikUtility.ToBoolean (Compute (context, args, 0));
-
-        return Compute (context, args, condition ? 1 : 2);
     }
 
     /// <summary>
@@ -685,6 +666,24 @@ public static class Builtins
         return string.IsNullOrEmpty (text)
             ? text
             : text.Trim();
+    }
+
+    /// <summary>
+    /// Выдача типа по его имени.
+    /// </summary>
+    public static dynamic? Type
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var typeName = Compute (context, args, 0) as string;
+        if (string.IsNullOrEmpty (typeName))
+        {
+            return null;
+        }
+
+        return context.FindType (typeName);
     }
 
     /// <summary>
