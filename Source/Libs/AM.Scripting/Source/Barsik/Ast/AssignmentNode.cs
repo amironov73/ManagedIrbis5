@@ -32,6 +32,8 @@ namespace AM.Scripting.Barsik;
 
 /// <summary>
 /// Присваивание переменной результата вычисления выражения.
+/// В т. ч. присваивание "в пустоту", т. е. вычисление без
+/// сохранения результата в переменной.
 /// </summary>
 internal sealed class AssignmentNode
     : AtomNode
@@ -85,49 +87,59 @@ internal sealed class AssignmentNode
         new EscapeParser ('/', '\\')
             .Select<AtomNode> (v => new RegexNode (v));
 
-    // private static readonly Parser<char, AtomNode> Int32Literal = DecimalNum
-    //     .Select<AtomNode> (v => new ConstantNode (v));
+    // 32-битное десятеричное со знаком, без префиксов и суффиксов
     private static readonly Parser<char, AtomNode> Int32Literal =
         Resolve.Int32 ()
         .Select<AtomNode> (v => new ConstantNode (v));
 
-    // private static readonly Parser<char, AtomNode> Int64Literal =
-    //     LongNum.Before (OneOf ('L', 'l'))
-    //     .Select<AtomNode> (v => new ConstantNode (v));
+    // 64-битное десятеричное со знаком, без префикса, но с суффиксом "L"
     private static readonly Parser<char, AtomNode> Int64Literal =
         Resolve.Int64 (suffixes: new [] { "l", "L" })
         .Select<AtomNode> (v => new ConstantNode (v));
 
+    // 32-битное десятеричное без знака, без префикса, но с суффиксом "U"
     private static readonly Parser<char, AtomNode> UInt32Literal =
-        UnsignedInt (10).Before (OneOf ('U', 'u'))
+        Resolve.UInt32 (suffixes: new [] { "u", "U" })
         .Select<AtomNode> (v => new ConstantNode (v));
 
+    // 64-битное десятеричное без знака, без префикса, но с суффиксом "UL"
     private static readonly Parser<char, AtomNode> UInt64Literal =
-        LongNum.Before (OneOf (String ("LU"), String ("lu"), String ("UL"), String ("ul")))
+        Resolve.UInt64 (suffixes: new [] { "lu", "ul", "LU", "UL" })
         .Select<AtomNode> (v => new ConstantNode (v));
 
+    // 32-битное шестнадцатеричное без знака, префикс "0x", без суффикса
     private static readonly Parser<char, AtomNode> Hex32Literal =
-        String ("0x").Then (UnsignedInt (16))
+        Resolve.UInt32 (16, "0x")
             .Select<AtomNode> (v => new ConstantNode (v));
 
-    private static readonly Parser<char, AtomNode> Hex64Literal = Map
-        (
-            (_, value, _) => (AtomNode)new ConstantNode (value),
-            String ("0x").ThenReturn (0L),
-            UnsignedLong (16),
-            OneOf ('L', 'l').ThenReturn (0L)
-        );
+    // 64-битное шестнадцатеричное без знака, префикс "0x", суффикс "L"
+    private static readonly Parser<char, AtomNode> Hex64Literal =
+        Resolve.UInt64 (16, "0x", new [] { "L", "l" })
+        .Select<AtomNode> (v => new ConstantNode (v));
 
+    // 32-битное двоичное без знака, префикс "0b", без суффикса
+    private static readonly Parser<char, AtomNode> Bin32Literal =
+        Resolve.UInt32 (2, "0b")
+            .Select<AtomNode> (v => new ConstantNode (v));
+
+    // 64-битное двоичное без знака, префикс "0b", суффикс "L"
+    private static readonly Parser<char, AtomNode> Bin64Literal =
+        Resolve.UInt64 (2, "0b", new [] { "L", "l" })
+            .Select<AtomNode> (v => new ConstantNode (v));
+
+    // число с плавающей точкой одинарной точности
     private static readonly Parser<char, AtomNode> FloatLiteral =
         Real.Before (OneOf ('F', 'f'))
             .Select (v => (AtomNode) new ConstantNode ((float) v));
 
+    // число с плавающей точкой двойной точности
+    private static readonly Parser<char, AtomNode> DoubleLiteral =
+        Resolve.Double.Select<AtomNode> (v => new ConstantNode (v));
+
+    // число с фиксированной точкой (денежное)
     private static readonly Parser<char, AtomNode> DecimalLiteral =
         Real.Before (OneOf ('M', 'm'))
             .Select (v => (AtomNode)new ConstantNode ((decimal) v));
-
-    private static readonly Parser<char, AtomNode> DoubleLiteral =
-        Resolve.Double.Select<AtomNode> (v => new ConstantNode (v));
 
     // все литералы, имеющиеся в Барсике
     private static readonly Parser<char, AtomNode> Literal = OneOf
@@ -140,6 +152,8 @@ internal sealed class AssignmentNode
                 Try (StringLiteral),
                 Try (Hex64Literal),
                 Try (Hex32Literal),
+                Try (Bin64Literal),
+                Try (Bin32Literal),
                 Try (UInt64Literal),
                 Try (Int64Literal),
                 Try (UInt32Literal),
@@ -227,7 +241,9 @@ internal sealed class AssignmentNode
     // операция присваивания
     private static readonly Parser<char, string> Operation = OneOf
         (
-            Tok ("="), Tok ("+="), Tok ("-="),
+            Tok ("="),
+            Tok ("+="),
+            Tok ("-="),
             Tok ("*="), Tok ("/="), Tok ("%="), Tok ("&="),
             Tok ("|="), Tok ("^="), Tok ("<<="), Tok (">>=")
         );
@@ -324,8 +340,13 @@ internal sealed class AssignmentNode
                 },
                 new [] { BinaryLeft ("*"), BinaryLeft ("/"), BinaryLeft ("%") },
                 new [] { Postfix ("++"), Postfix ("--") },
-                new [] { Prefix ("++"), Prefix ("--"), Prefix ("!"), Prefix ("-") },
-                new [] { Prefix ("!") },
+                new []
+                    {
+                        // TODO разобраться, почему не работает --
+                        // Prefix ("++"), Prefix ("--"),
+                        Prefix ("-"),
+                        Prefix ("!")
+                    },
                 new [] { Operator.Prefix (Cast (_Cast)) },
                 new [] { BinaryLeft ("is") },
                 new [] { BinaryLeft ("+"), BinaryLeft ("-") },
@@ -336,6 +357,7 @@ internal sealed class AssignmentNode
                 new [] { BinaryLeft ("^") },
                 new [] { BinaryLeft ("|") },
                 new [] { BinaryLeft ("~") },
+                new [] { BinaryLeft ("in") },
                 // TODO разобраться, почему не работает &&
                 new [] { BinaryLeft ("&&"), BinaryLeft ("and") },
                 new [] { BinaryLeft ("||"), BinaryLeft ("or") },

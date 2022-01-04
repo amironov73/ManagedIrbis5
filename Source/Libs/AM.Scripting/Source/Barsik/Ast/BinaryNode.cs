@@ -279,6 +279,21 @@ internal sealed class BinaryNode
     }
 
     /// <summary>
+    /// Расширенная операция "В".
+    /// </summary>
+    private static dynamic? In
+        (
+            Context context,
+            dynamic? left,
+            dynamic? right
+        )
+    {
+        context.NotUsed();
+
+        return false;
+    }
+
+    /// <summary>
     /// Равенство адресов в памяти.
     /// </summary>
     private static dynamic? StrictEquality
@@ -353,6 +368,7 @@ internal sealed class BinaryNode
             "^" => left ^ right,
             "~" => RegexMatch (context, left, right),
             "is" => Is (context, left, right),
+            "in" => In (context, left, right),
             _ => throw new Exception ($"Unknown operation '{_op}'")
         };
     }

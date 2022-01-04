@@ -258,7 +258,7 @@ internal sealed class AdvancedNumberParser
             {
                 if (Array.IndexOf (_allowed, chr) < 0)
                 {
-                    if (_suffixes is null && !haveDigit)
+                    if (_suffixes is null && !haveDigit && string.IsNullOrEmpty (_prefix))
                     {
                         return false;
                     }

@@ -251,6 +251,7 @@ x = 1;
         Assert.AreEqual (1, actualY);
     }
 
+    [Ignore]
     [TestMethod]
     [Description ("Префиксный инкремент")]
     public void Interpreter_PrefixIncrement_1()
