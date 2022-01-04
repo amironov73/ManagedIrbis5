@@ -1,40 +1,45 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
+
+#region Using directives
 
 using BenchmarkDotNet.Running;
 
-namespace CoreBenchmarks
+#endregion
+
+#nullable enable
+
+namespace CoreBenchmarks;
+
+class Program
 {
-    class Program
+    static void BenchmarkRun()
     {
-        static void BenchmarkRun()
+        //BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).RunAll();
+        BenchmarkRunner.Run (typeof (Program).Assembly);
+    }
+
+    static void DebugRun()
+    {
+        var benchmark = new FastNumberBenchmark();
+        for (var i = 0; i < 1000; ++i)
         {
-            //BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).RunAll();
-            BenchmarkRunner.Run(typeof(Program).Assembly);
+            benchmark.FastNumber_Int32ToChars();
+        }
+    }
 
-        } // method BenchmarkRun
-
-        static void DebugRun()
+    static void Main (string[] args)
+    {
+        if (args.Length == 1 && args[0] == "debug")
         {
-            var benchmark = new FastNumberBenchmark();
-            for (var i = 0; i < 1000; ++i)
-            {
-                benchmark.FastNumber_Int32ToChars();
-            }
-        } // method DebugRun
-
-        static void Main(string[] args)
+            DebugRun();
+        }
+        else
         {
-            if (args.Length == 1 && args[0] == "debug")
-            {
-                DebugRun();
-            }
-            else
-            {
-                BenchmarkRun();
-            }
-        } // method Main
-
-    } // class Program
-
-} // namespace CoreBenchmarks
+            BenchmarkRun();
+        }
+    }
+}

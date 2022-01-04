@@ -1,78 +1,87 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable IdentifierTypo
 // ReSharper disable NotAccessedField.Local
 // ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using AM.Text;
 
 using BenchmarkDotNet.Attributes;
 
-namespace CoreBenchmarks
+#endregion
+
+#nullable enable
+
+namespace CoreBenchmarks;
+
+[MemoryDiagnoser]
+// не надо делать sealed!
+public class TextNavigatorBenchmark
 {
-    [MemoryDiagnoser]
-    public class TextNavigatorBenchmark
+    private static readonly string _uPopaBylaSobaka
+        = "У попа была собака, он ее любил";
+
+    [Benchmark (Baseline = true)]
+    public int TN_ReadWord()
     {
-        private static readonly string _uPopaBylaSobaka
-            = "У попа была собака, он ее любил";
+        var navigator = new TextNavigator (_uPopaBylaSobaka);
+        var result = 0;
 
-        [Benchmark (Baseline = true)]
-        public int TN_ReadWord()
+        while (true)
         {
-            var navigator = new TextNavigator(_uPopaBylaSobaka);
-            var result = 0;
-
-            while (true)
+            var word = navigator.ReadWord();
+            if (word.IsEmpty)
             {
-                var word = navigator.ReadWord();
-                if (word.IsEmpty)
-                {
-                    break;
-                }
-
-                result += word.Length;
+                break;
             }
 
-            return result;
+            result += word.Length;
         }
 
-        [Benchmark]
-        public int VTN_ReadWord()
+        return result;
+    }
+
+    [Benchmark]
+    public int VTN_ReadWord()
+    {
+        var navigator = new ValueTextNavigator (_uPopaBylaSobaka);
+        var result = 0;
+
+        while (true)
         {
-            var navigator = new ValueTextNavigator(_uPopaBylaSobaka);
-            var result = 0;
-
-            while (true)
+            var word = navigator.ReadWord();
+            if (word.IsEmpty)
             {
-                var word = navigator.ReadWord();
-                if (word.IsEmpty)
-                {
-                    break;
-                }
-
-                result += word.Length;
+                break;
             }
 
-            return result;
+            result += word.Length;
         }
 
-        [Benchmark]
-        public int UTN_ReadWord()
+        return result;
+    }
+
+    [Benchmark]
+    public int UTN_ReadWord()
+    {
+        var navigator = new UnsafeTextNavigator (_uPopaBylaSobaka);
+        var result = 0;
+
+        while (true)
         {
-            var navigator = new UnsafeTextNavigator(_uPopaBylaSobaka);
-            var result = 0;
-
-            while (true)
+            var word = navigator.ReadWord();
+            if (word.IsEmpty)
             {
-                var word = navigator.ReadWord();
-                if (word.IsEmpty)
-                {
-                    break;
-                }
-
-                result += word.Length;
+                break;
             }
 
-            return result;
+            result += word.Length;
         }
+
+        return result;
     }
 }
