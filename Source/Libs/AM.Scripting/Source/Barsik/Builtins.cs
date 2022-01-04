@@ -130,6 +130,7 @@ public static class Builtins
         { "load", new FunctionDescriptor ("load", LoadAssembly) },
         { "max", new FunctionDescriptor ("max", Max) },
         { "min", new FunctionDescriptor ("min", Min) },
+        { "module", new FunctionDescriptor ("module", LoadModule) },
         { "now", new FunctionDescriptor ("now", Now) },
         { "open_read", new FunctionDescriptor ("open_read", OpenRead) },
         { "readln", new FunctionDescriptor ("readln", ReadLine) },
@@ -502,6 +503,8 @@ public static class Builtins
             dynamic?[] args
         )
     {
+        // TODO поиск по путям
+
         Assembly? loaded = null;
 
         for (var i = 0; i < args.Length; i++)
@@ -526,6 +529,28 @@ public static class Builtins
         }
 
         return loaded;
+    }
+
+    /// <summary>
+    /// Загрузка указанного модуля.
+    /// </summary>
+    public static dynamic? LoadModule
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        for (var i = 0; i < args.Length; i++)
+        {
+            var name = Compute (context, args, i) as string;
+            if (!string.IsNullOrWhiteSpace (name))
+            {
+                name = name.Trim();
+                context.LoadModule (name);
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 using AM.Collections;
 using AM.IO;
@@ -84,6 +85,11 @@ public sealed class Context
     /// </summary>
     public ExternalCodeHandler? ExternalCodeHandler { get; set; }
 
+    /// <summary>
+    /// Загруженные модули.
+    /// </summary>
+    public List<IBarsikModule> Modules { get; }
+
     #endregion
 
     #region Construction
@@ -107,6 +113,7 @@ public sealed class Context
         Functions = new ();
         Breakpoints = new ();
         Namespaces = new ();
+        Modules = new ();
     }
 
     #endregion
@@ -197,6 +204,11 @@ public sealed class Context
         {
             if (TryGetVariable (variableNode.Name, out var variableValue))
             {
+                if (variableValue is Type alreadyHaveType)
+                {
+                    return alreadyHaveType;
+                }
+
                 if (variableValue is string typeName1)
                 {
                     return FindType (typeName1);
@@ -294,6 +306,63 @@ public sealed class Context
         }
 
         throw new Exception ($"Function {name} not found");
+    }
+
+    /// <summary>
+    /// Загрузка модуля.
+    /// </summary>
+    public void LoadModule
+        (
+            string moduleName
+        )
+    {
+        // TODO поиск по путям
+
+        Sure.NotNullNorEmpty (moduleName);
+
+        moduleName = moduleName.Trim();
+
+        Assembly? assembly;
+        if (File.Exists (moduleName))
+        {
+            var fullPath = Path.GetFullPath (moduleName);
+            assembly = Assembly.LoadFile (fullPath);
+        }
+        else
+        {
+            assembly = Assembly.Load (moduleName);
+        }
+
+        var types = assembly.GetTypes()
+            .Where (type => type.IsAssignableTo (typeof (IBarsikModule)))
+            .ToArray();
+        foreach (var type in types)
+        {
+            var alreadyHave = false;
+            foreach (var module in Modules)
+            {
+                if (module.GetType() == type)
+                {
+                    alreadyHave = true;
+                    break;
+                }
+            }
+
+            if (alreadyHave)
+            {
+                continue;
+            }
+
+            var instance = (IBarsikModule?) Activator.CreateInstance (type);
+            if (instance is not null)
+            {
+                if (instance.AttachModule (this))
+                {
+                    Output.WriteLine ($"Module loaded: {instance}");
+                    Modules.Add (instance);
+                }
+            }
+        }
     }
 
     /// <summary>

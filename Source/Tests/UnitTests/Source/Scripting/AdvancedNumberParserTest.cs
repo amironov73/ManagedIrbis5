@@ -132,7 +132,7 @@ public sealed class AdvancedNumberParserTest
     [Description ("Неверно сформированное число: система счисления")]
     public void AdvancedNumberParser_Parse_10()
     {
-        var parser = Resolve.Int32(2).Before (End);
+        var parser = Resolve.Int32 (2).Before (End);
         Assert.ThrowsException<ParseException> (() => parser.ParseOrThrow ("123"));
         Assert.ThrowsException<ParseException> (() => parser.ParseOrThrow ("-123"));
         Assert.ThrowsException<ParseException> (() => parser.ParseOrThrow ("+123"));
@@ -142,7 +142,7 @@ public sealed class AdvancedNumberParserTest
     [Description ("Верно сформированное число: система счисления")]
     public void AdvancedNumberParser_Parse_11()
     {
-        var parser = Resolve.Int32(2).Before (End);
+        var parser = Resolve.Int32 (2).Before (End);
         Assert.AreEqual (0, parser.ParseOrThrow ("0"));
         Assert.AreEqual (1, parser.ParseOrThrow ("1"));
         Assert.AreEqual (2, parser.ParseOrThrow ("10"));
@@ -178,7 +178,7 @@ public sealed class AdvancedNumberParserTest
     [Description ("Верно сформированное число: шестнадцатеричное")]
     public void AdvancedNumberParser_Parse_12()
     {
-        var parser = Resolve.Int32(16, "0x").Before (End);
+        var parser = Resolve.Int32 (16, "0x").Before (End);
         Assert.AreEqual (0, parser.ParseOrThrow ("0x0"));
         Assert.AreEqual (1, parser.ParseOrThrow ("0x1"));
         Assert.AreEqual (16, parser.ParseOrThrow ("0x10"));
@@ -208,5 +208,18 @@ public sealed class AdvancedNumberParserTest
         Assert.AreEqual (16, parser.ParseOrThrow ("0x0_010"));
         Assert.AreEqual (17, parser.ParseOrThrow ("0x0_011"));
         Assert.AreEqual (256, parser.ParseOrThrow ("0x0_100"));
+    }
+
+    [TestMethod]
+    [Description ("Суффикс нужен, но его нет")]
+    public void AdvancedNumberParser_Parse_13()
+    {
+        var suffixes = new[] { "ul", "lu", "UL", "LU" };
+        var parser = Resolve.UInt64 (suffixes: suffixes).Before (End);
+        Assert.IsFalse (parser.Parse (string.Empty).Success);
+        Assert.IsFalse (parser.Parse ("1").Success);
+        Assert.IsFalse (parser.Parse ("-1").Success);
+        Assert.IsFalse (parser.Parse ("1_000").Success);
+        Assert.IsTrue (parser.Parse ("1_000ul").Success);
     }
 }

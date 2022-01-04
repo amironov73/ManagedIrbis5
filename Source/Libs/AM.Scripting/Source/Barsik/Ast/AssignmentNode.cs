@@ -85,11 +85,17 @@ internal sealed class AssignmentNode
         new EscapeParser ('/', '\\')
             .Select<AtomNode> (v => new RegexNode (v));
 
-    private static readonly Parser<char, AtomNode> Int32Literal = DecimalNum
+    // private static readonly Parser<char, AtomNode> Int32Literal = DecimalNum
+    //     .Select<AtomNode> (v => new ConstantNode (v));
+    private static readonly Parser<char, AtomNode> Int32Literal =
+        Resolve.Int32 ()
         .Select<AtomNode> (v => new ConstantNode (v));
 
+    // private static readonly Parser<char, AtomNode> Int64Literal =
+    //     LongNum.Before (OneOf ('L', 'l'))
+    //     .Select<AtomNode> (v => new ConstantNode (v));
     private static readonly Parser<char, AtomNode> Int64Literal =
-        LongNum.Before (OneOf ('L', 'l'))
+        Resolve.Int64 (suffixes: new [] { "l", "L" })
         .Select<AtomNode> (v => new ConstantNode (v));
 
     private static readonly Parser<char, AtomNode> UInt32Literal =
@@ -123,7 +129,9 @@ internal sealed class AssignmentNode
     private static readonly Parser<char, AtomNode> DoubleLiteral =
         Resolve.Double.Select<AtomNode> (v => new ConstantNode (v));
 
-    private static readonly Parser<char, AtomNode> Literal = OneOf (
+    // все литералы, имеющиеся в Барсике
+    private static readonly Parser<char, AtomNode> Literal = OneOf
+        (
                 Try (NullLiteral),
                 Try (BoolLiteral),
                 Try (CharLiteral),
@@ -141,6 +149,7 @@ internal sealed class AssignmentNode
                 Try (Int32Literal)
             );
 
+    // ключ и значение для словаря
     private static readonly Parser<char, KeyValueNode> KeyAndValue = Map
         (
             (key, _, value) => new KeyValueNode (key, value),

@@ -1,0 +1,5 @@
+﻿x = 1_000
+println (x.GetType(), ", ", x)
+
+x = 1_000_000_000_000_L
+println (x.GetType(), ", ", x)

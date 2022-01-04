@@ -258,7 +258,7 @@ internal sealed class AdvancedNumberParser
             {
                 if (Array.IndexOf (_allowed, chr) < 0)
                 {
-                    if (_suffixes is null)
+                    if (_suffixes is null && !haveDigit)
                     {
                         return false;
                     }
@@ -320,6 +320,11 @@ internal sealed class AdvancedNumberParser
                 }
 
                 state.Advance();
+            }
+
+            if (!found)
+            {
+                return false;
             }
         }
 
