@@ -1,0 +1,21 @@
+﻿println ('h' in "hello")
+println ('q' in "hello")
+println ("hell" in "hello")
+println ("help" in "hello")
+println ("help" in "h")
+println ("help" in 'h')
+
+list = [1, 2, 3]
+println (1 in list)
+println (4 in list)
+
+list = ["hello", "world"]
+println ("hello" in list)
+println ("help" in list)
+println (123 in list)
+
+dict = { 1: "one", 2: "two", 3: "three" }
+println (1 in dict)
+println (4 in dict)
+println ("one" in dict)
+println (list in dict)

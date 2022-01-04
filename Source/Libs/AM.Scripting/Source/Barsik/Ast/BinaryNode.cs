@@ -150,7 +150,7 @@ internal sealed class BinaryNode
                 var builder = new StringBuilder();
                 for (var i = 0; i < length; i++)
                 {
-                    builder.Append (left);
+                    builder.Append (str);
                 }
 
                 return builder.ToString();
@@ -193,8 +193,7 @@ internal sealed class BinaryNode
     /// <summary>
     /// Проверка приводимости типа.
     /// </summary>
-    /// <returns></returns>
-    private static dynamic? Is
+    private static dynamic Is
         (
             Context context,
             dynamic? left,
@@ -281,6 +280,9 @@ internal sealed class BinaryNode
     /// <summary>
     /// Расширенная операция "В".
     /// </summary>
+    /// <param name="context">Контекст.</param>
+    /// <param name="left">Что ищем.</param>
+    /// <param name="right">Где ищем.</param>
     private static dynamic? In
         (
             Context context,
@@ -289,6 +291,39 @@ internal sealed class BinaryNode
         )
     {
         context.NotUsed();
+
+        if (left is null || right is null)
+        {
+            return false;
+        }
+
+        if (right is string text)
+        {
+            if (left is char chr)
+            {
+                return text.Contains (chr);
+            }
+
+            if (left is string sub)
+            {
+                return text.Contains (sub);
+            }
+        }
+
+        if (right is Array array)
+        {
+            return Array.IndexOf (array, (object) left) >= 0;
+        }
+
+        if (right is IDictionary dictionary)
+        {
+            return dictionary.Contains ((object) left);
+        }
+
+        if (right is IList list)
+        {
+            return list.Contains ((object) left);
+        }
 
         return false;
     }
@@ -311,7 +346,7 @@ internal sealed class BinaryNode
     /// <summary>
     /// Проверка на совпадение строки с шаблоном.
     /// </summary>
-    private static dynamic? RegexMatch
+    private static dynamic RegexMatch
         (
             Context context,
             dynamic? left,
