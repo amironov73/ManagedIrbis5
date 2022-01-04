@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 
 using AM.Text;
 
@@ -124,12 +125,14 @@ public static class Builtins
         { "format", new FunctionDescriptor ("format", Format) },
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable) },
         { "italic", new FunctionDescriptor ("italic", Italic) },
+        { "include", new FunctionDescriptor ("include", Include) },
         { "len", new FunctionDescriptor ("len", Length) },
+        { "load", new FunctionDescriptor ("load", LoadAssembly) },
         { "max", new FunctionDescriptor ("max", Max) },
         { "min", new FunctionDescriptor ("min", Min) },
         { "now", new FunctionDescriptor ("now", Now) },
         { "open_read", new FunctionDescriptor ("open_read", OpenRead) },
-        { "readln", new FunctionDescriptor ("readln", Readln) },
+        { "readln", new FunctionDescriptor ("readln", ReadLine) },
         { "system", new FunctionDescriptor ("system", System) },
         { "trace", new FunctionDescriptor ("trace", Trace) },
         { "trim", new FunctionDescriptor ("trim", Trim) },
@@ -436,6 +439,33 @@ public static class Builtins
     }
 
     /// <summary>
+    /// Загрузка указанного скрипта.
+    /// </summary>
+    public static dynamic? Include
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        // TODO поиск по путям
+
+        for (var i = 0; i < args.Length; i++)
+        {
+            var name = Compute (context, args, i) as string;
+            if (!string.IsNullOrWhiteSpace (name))
+            {
+                name = name.Trim();
+
+                var sourceCode = File.ReadAllText (name);
+                var program = Grammar.ParseProgram (sourceCode);
+                program.Execute (context);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Выделение текста курсивом.
     /// </summary>
     public static dynamic? Italic
@@ -461,6 +491,41 @@ public static class Builtins
         var value = Compute (context, args, 0);
 
         return BarsikUtility.GetLength (value);
+    }
+
+    /// <summary>
+    /// Загрузка указанной сборки.
+    /// </summary>
+    public static dynamic? LoadAssembly
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        Assembly? loaded = null;
+
+        for (var i = 0; i < args.Length; i++)
+        {
+            var name = Compute (context, args, i) as string;
+            if (!string.IsNullOrWhiteSpace (name))
+            {
+                name = name.Trim();
+
+                if (File.Exists (name))
+                {
+                    var fullPath = Path.GetFullPath (name);
+                    loaded = Assembly.LoadFile (fullPath);
+                }
+                else
+                {
+                    loaded = Assembly.Load (name);
+                }
+
+                context.Output.WriteLine ($"Assembly loaded: {loaded.GetName()}");
+            }
+        }
+
+        return loaded;
     }
 
     /// <summary>
@@ -593,7 +658,7 @@ public static class Builtins
     /// <summary>
     /// Чтение данных из файла.
     /// </summary>
-    public static dynamic? Readln
+    public static dynamic? ReadLine
         (
             Context context,
             dynamic?[] args
@@ -710,6 +775,7 @@ public static class Builtins
             var name = Compute (context, args, i) as string;
             if (!string.IsNullOrWhiteSpace (name))
             {
+                name = name.Trim();
                 if (name.StartsWith ('-'))
                 {
                     name = name.Substring (1);

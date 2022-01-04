@@ -1,0 +1,10 @@
+﻿use ("System")
+println (Environment.CurrentDirectory)
+try
+{
+    include ("Subscript.barsik")
+}
+catch (ex)
+{
+    println ("Exception: ", ex.Message)
+}

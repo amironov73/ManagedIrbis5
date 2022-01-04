@@ -1,8 +1,10 @@
-﻿#u System
+﻿use ("System")
 
 x = PlatformID.Win32Windows
 println (x)
+
 x++
 println (x)
+
 x = Convert.ToInt32(x)
 println (x)

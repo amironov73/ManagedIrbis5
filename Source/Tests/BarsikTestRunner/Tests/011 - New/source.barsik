@@ -1,17 +1,15 @@
-﻿println ("Have builder? ", have_var ("builder"));
+﻿println ("Have builder? ", have_var ("builder"))
 
-builder = new "System.Text.StringBuilder" ();
-
-println ("Have builder? ", have_var ("builder"));
+builder = new "System.Text.StringBuilder" ()
+println ("Have builder? ", have_var ("builder"))
 
 for (i = 0; i < 10; i++)
 {
-    builder.Append (i);
+    builder.Append (i)
 }
 
-println ("Result is ", builder);
+println ("Result is ", builder)
 
-delete ("builder");
-
-println ("Have builder? ", have_var ("builder"));
+delete ("builder")
+println ("Have builder? ", have_var ("builder"))
 

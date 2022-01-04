@@ -247,14 +247,10 @@ static class Grammar
         from body in BlockOrSingle
         select (StatementNode) new UsingNode (variable, initialization, body);
 
-    // директива
-    private static readonly Parser<char, StatementNode> Directive =
-        Char('#').Then (Resolve.ReadLine()).Select<StatementNode> (line => new DirectiveNode (line));
 
     // обобщенный стейтмент
     private static readonly Parser<char, StatementNode> Statement = OneOf
         (
-            Try (Directive),
             Try (Tok (If)),
             Try (Tok (Return)),
             Try (Tok (TryCatchFinally)),

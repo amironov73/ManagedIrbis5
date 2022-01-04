@@ -62,31 +62,18 @@ public sealed class InterpreterTest
              Assert.AreEqual ("x is not equal y", actual);
          }
 
-        [TestMethod]
-        [Description ("Директивы")]
-        public void Interpreter_Directive_1()
-        {
-            var interpreter = new Interpreter();
-            interpreter.Execute ("#u Namespace1\nx = 1");
-            Assert.AreEqual (1, interpreter.Context.Namespaces.Count);
-            var count = interpreter.Context.Namespaces.Count;
-            Assert.AreEqual (1, count);
-            var actual = (int) (object) interpreter.Context.Variables["x"]!;
-            Assert.AreEqual (1, actual);
-        }
-
-        [TestMethod]
-        [Description ("Комментарии")]
-        public void Interpreter_Execute_5()
-        {
-            var interpreter = new Interpreter();
-            interpreter.Execute (@"// opening comment
+    [TestMethod]
+    [Description ("Комментарии")]
+    public void Interpreter_Execute_5()
+    {
+        var interpreter = new Interpreter();
+        interpreter.Execute (@"// opening comment
 x = 1;
 // closing comment
 ");
-            var actual = (int) (object) interpreter.Context.Variables["x"]!;
-            Assert.AreEqual (1, actual);
-        }
+        var actual = (int) (object) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (1, actual);
+    }
 
     [TestMethod]
     [Description ("Комментарии")]
