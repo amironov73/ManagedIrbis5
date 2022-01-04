@@ -4,6 +4,8 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Local
 // ReSharper disable StringLiteralTypo
 
+using System.Numerics;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Scripting;
@@ -221,5 +223,35 @@ public sealed class AdvancedNumberParserTest
         Assert.IsFalse (parser.Parse ("-1").Success);
         Assert.IsFalse (parser.Parse ("1_000").Success);
         Assert.IsTrue (parser.Parse ("1_000ul").Success);
+    }
+
+    [TestMethod]
+    [Description ("Целое число произвольной длины: верно сформированное")]
+    public void AdvancedNumberParser_Parse_14()
+    {
+        var suffixes = new[] { "b", "B" };
+        var parser = Resolve.BigInteger (suffixes).Before (End);
+        Assert.AreEqual (new BigInteger (1_000_000), parser.ParseOrThrow ("1_000_000b"));
+        Assert.AreEqual (new BigInteger (1_000_000), parser.ParseOrThrow ("1_000_000B"));
+        Assert.AreEqual (new BigInteger (-1_000_000), parser.ParseOrThrow ("-1_000_000b"));
+        Assert.AreEqual (new BigInteger (-1_000_000), parser.ParseOrThrow ("-1_000_000B"));
+
+        Assert.AreEqual (new BigInteger (1_000_000_000L), parser.ParseOrThrow ("1_000_000_000b"));
+        Assert.AreEqual (new BigInteger (1_000_000_000L), parser.ParseOrThrow ("1_000_000_000B"));
+        Assert.AreEqual (new BigInteger (-1_000_000_000L), parser.ParseOrThrow ("-1_000_000_000b"));
+        Assert.AreEqual (new BigInteger (-1_000_000_000L), parser.ParseOrThrow ("-1_000_000_000B"));
+    }
+
+    [TestMethod]
+    [Description ("Целое число произвольной длины: неверно сформированное")]
+    public void AdvancedNumberParser_Parse_15()
+    {
+        var suffixes = new[] { "b", "B" };
+        var parser = Resolve.BigInteger (suffixes).Before (End);
+        Assert.IsFalse (parser.Parse ("1_000_000").Success);
+        Assert.IsFalse (parser.Parse ("-1_000_000").Success);
+
+        Assert.IsFalse (parser.Parse ("1_000_000A").Success);
+        Assert.IsFalse (parser.Parse ("-1_000_000a").Success);
     }
 }

@@ -18,6 +18,7 @@
 
 using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
 
 using AM.Scripting.Barsik;
 using AM.Text;
@@ -389,6 +390,22 @@ public static class Resolve
         var parser = new AdvancedNumberParser (@base, prefix, suffixes, false);
 
         return parser.Select (value => parser.ParseUInt64 (value));
+    }
+
+    /// <summary>
+    /// Целое число произвольной длины.
+    /// </summary>
+    /// <param name="suffixes">Суффиксы, например, <c>"l"</c> или <c>"UL"</c>
+    /// (опционально).
+    /// </param>
+    public static Parser<char, BigInteger> BigInteger
+        (
+            string[]? suffixes = null
+        )
+    {
+        var parser = new AdvancedNumberParser (10, null, suffixes);
+
+        return parser.Select (System.Numerics.BigInteger.Parse);
     }
 
     /// <summary>

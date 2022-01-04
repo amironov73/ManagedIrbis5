@@ -127,6 +127,11 @@ internal sealed class AssignmentNode
         Resolve.UInt64 (2, "0b", new [] { "L", "l" })
             .Select<AtomNode> (v => new ConstantNode (v));
 
+    // целое десятеричное произвольной длины со знаком, без префикса, суффикс "B"
+    private static readonly Parser<char, AtomNode> BigIntegerLiteral =
+        Resolve.BigInteger (new[] { "b", "B" })
+            .Select<AtomNode> (v => new ConstantNode (v));
+
     // число с плавающей точкой одинарной точности
     private static readonly Parser<char, AtomNode> FloatLiteral =
         Real.Before (OneOf ('F', 'f'))
@@ -157,6 +162,7 @@ internal sealed class AssignmentNode
                 Try (UInt64Literal),
                 Try (Int64Literal),
                 Try (UInt32Literal),
+                Try (BigIntegerLiteral),
                 Try (DecimalLiteral),
                 Try (FloatLiteral),
                 Try (DoubleLiteral),
