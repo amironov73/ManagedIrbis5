@@ -254,4 +254,16 @@ public sealed class AdvancedNumberParserTest
         Assert.IsFalse (parser.Parse ("1_000_000A").Success);
         Assert.IsFalse (parser.Parse ("-1_000_000a").Success);
     }
+
+    [TestMethod]
+    [Description ("Подчеркивание сразу вслед за префиксом")]
+    public void AdvancedNumberParser_Parse_16()
+    {
+        var parser = Resolve.Int32 (16, "0x").Before (End);
+        Assert.AreEqual (0, parser.ParseOrThrow ("0x_0"));
+        Assert.AreEqual (1, parser.ParseOrThrow ("0x_1"));
+        Assert.AreEqual (16, parser.ParseOrThrow ("0x_10"));
+        Assert.AreEqual (17, parser.ParseOrThrow ("0x_11"));
+        Assert.AreEqual (256, parser.ParseOrThrow ("0x_100"));
+    }
 }

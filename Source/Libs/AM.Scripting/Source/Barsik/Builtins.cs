@@ -109,9 +109,8 @@ public static class Builtins
     /// </summary>
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
-        { "cat", new FunctionDescriptor ("cat", Cat) },
         { "chr", new FunctionDescriptor ("chr", Chr) },
-        { "debug", new FunctionDescriptor ("debug", Debug) },
+        { "debug", new FunctionDescriptor ("debug", Debug_) },
         { "delete", new FunctionDescriptor ("delete", Delete, false) },
         { "dispose", new FunctionDescriptor ("dispose", Dispose) },
         { "error", new FunctionDescriptor ("error", Error) },
@@ -126,37 +125,10 @@ public static class Builtins
         { "print", new FunctionDescriptor ("print", Print) },
         { "println", new FunctionDescriptor ("println", PrintLine) },
         { "readln", new FunctionDescriptor ("readln", ReadLine) },
-        { "trace", new FunctionDescriptor ("trace", Trace) },
+        { "trace", new FunctionDescriptor ("trace", Trace_) },
         { "trim", new FunctionDescriptor ("trim", Trim) },
         { "warn", new FunctionDescriptor ("warn", Warn) },
     };
-
-    /// <summary>
-    /// Чтение содержимого файла.
-    /// </summary>
-    public static dynamic? Cat
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        var fileName = (string?) Compute (context, args, 0);
-        if (string.IsNullOrEmpty (fileName))
-        {
-            context.Error.WriteLine ("File name is not specified");
-
-            return null;
-        }
-
-        if (!File.Exists (fileName))
-        {
-            context.Error.WriteLine ($"File '{fileName}' doesn't exist");
-
-            return null;
-        }
-
-        return File.ReadAllText (fileName);
-    }
 
     /// <summary>
     /// Символ с указанным кодом.
@@ -179,7 +151,7 @@ public static class Builtins
     /// <summary>
     /// Выдача отладочного сообщения.
     /// </summary>
-    public static dynamic? Debug
+    public static dynamic? Debug_
         (
             Context context,
             dynamic?[] args
@@ -507,7 +479,7 @@ public static class Builtins
     /// <summary>
     /// Трассировочное сообщение.
     /// </summary>
-    public static dynamic? Trace
+    public static dynamic? Trace_
         (
             Context context,
             dynamic?[] args

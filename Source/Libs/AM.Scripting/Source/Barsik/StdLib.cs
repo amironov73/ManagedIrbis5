@@ -20,6 +20,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using static AM.Scripting.Barsik.Builtins;
 
@@ -43,14 +47,29 @@ public sealed class StdLib
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
         { "array", new FunctionDescriptor ("array", Array_) },
+        { "chdir", new FunctionDescriptor ("chdir", ChangeDirectory) },
+        { "combine_path", new FunctionDescriptor ("combine_path", CombinePath) },
+        { "dir_exists", new FunctionDescriptor ("dir_exists", DirectoryExists) },
+        { "dirname", new FunctionDescriptor ("dirname", DirectoryName) },
         { "eval", new FunctionDescriptor ("eval", Evaluate) },
         { "exec", new FunctionDescriptor ("exec", Execute) },
+        { "file_exists", new FunctionDescriptor ("file_exists", FileExists) },
+        { "file_get_contents", new FunctionDescriptor ("file_get_contents", FileGetContents) },
+        { "file_put_contents", new FunctionDescriptor ("file_put_contents", FilePutContents) },
+        { "fullpath", new FunctionDescriptor ("fullpath", FullPath) },
+        { "getcwd", new FunctionDescriptor ("getcwd", GetCurrentDirectory) },
         { "host", new FunctionDescriptor ("host", Host) },
         { "include", new FunctionDescriptor ("include", Include) },
+        { "json_decode", new FunctionDescriptor ("json_decode", JsonDecode) },
+        { "json_encode", new FunctionDescriptor ("json_encode", JsonEncode) },
         { "load", new FunctionDescriptor ("load", LoadAssembly) },
         { "module", new FunctionDescriptor ("module", LoadModule) },
-        { "system", new FunctionDescriptor ("system", System) },
-        { "type", new FunctionDescriptor ("type", Type) },
+        { "readdir", new FunctionDescriptor ("readdir", ReadDirectory) },
+        { "remove", new FunctionDescriptor ("remove", RemoveFile) },
+        { "rename", new FunctionDescriptor ("rename", RenameFile) },
+        { "system", new FunctionDescriptor ("system", System_) },
+        { "tmpfile", new FunctionDescriptor ("tmpfile", TemporaryFile) },
+        { "type", new FunctionDescriptor ("type", Type_) },
         { "use", new FunctionDescriptor ("use", Use) },
     };
 
@@ -91,6 +110,101 @@ public sealed class StdLib
         }
 
         return Array.CreateInstance (type, length);
+    }
+
+    /// <summary>
+    /// Изменение текущей директории.
+    /// </summary>
+    public static dynamic? ChangeDirectory
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var path = ComputeAll (context, args);
+        if (string.IsNullOrWhiteSpace (path))
+        {
+            return null;
+        }
+
+        path = path.Trim();
+        try
+        {
+            Environment.CurrentDirectory = path;
+        }
+        catch (Exception exception)
+        {
+            context.Error.WriteLine ($"Error changing directory: {exception.Message}");
+        }
+
+        return Environment.CurrentDirectory;
+    }
+
+    /// <summary>
+    /// Создание пути по его компонентам.
+    /// </summary>
+    public static dynamic? CombinePath
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var components = new List<string>();
+        for (var i = 0; i < args.Length; i++)
+        {
+            var name = Compute (context, args, i) as string;
+            if (!string.IsNullOrWhiteSpace (name))
+            {
+                name = name.Trim();
+                if (!string.IsNullOrEmpty (name))
+                {
+                    components.Add (name);
+                }
+            }
+        }
+
+        if (components.Count == 0)
+        {
+            return null;
+        }
+
+        return Path.Combine (components.ToArray());
+    }
+
+    /// <summary>
+    /// Проверка существования папки.
+    /// </summary>
+    public static dynamic DirectoryExists
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var fileName = BarsikUtility.ToString (Compute (context, args, 0));
+        if (string.IsNullOrEmpty (fileName))
+        {
+            return false;
+        }
+
+        return Directory.Exists (fileName);
+    }
+
+    /// <summary>
+    /// Проверка существования папки.
+    /// </summary>
+    public static dynamic? DirectoryName
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var fileName = BarsikUtility.ToString (Compute (context, args, 0));
+        if (string.IsNullOrEmpty (fileName))
+        {
+            return null;
+        }
+
+        return Path.GetDirectoryName (fileName);
     }
 
     /// <summary>
@@ -155,6 +269,128 @@ public sealed class StdLib
     }
 
     /// <summary>
+    /// Проверка существования файла.
+    /// </summary>
+    public static dynamic FileExists
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var fileName = BarsikUtility.ToString (Compute (context, args, 0));
+        if (string.IsNullOrEmpty (fileName))
+        {
+            return false;
+        }
+
+        return File.Exists (fileName);
+    }
+
+    /// <summary>
+    /// Чтение всего файла как строки.
+    /// </summary>
+    public static dynamic? FileGetContents
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var fileName = BarsikUtility.ToString (Compute (context, args, 0));
+        if (string.IsNullOrEmpty (fileName))
+        {
+            return null;
+        }
+
+        try
+        {
+            var encodingName = Compute (context, args, 1) as string;
+            if (!string.IsNullOrEmpty (encodingName))
+            {
+                var encoding = Encoding.GetEncoding (encodingName);
+
+                return File.ReadAllText (fileName, encoding);
+            }
+
+            return File.ReadAllText (fileName);
+        }
+        catch (Exception exception)
+        {
+            context.Error.WriteLine ($"Error reading file {fileName}: {exception.Message}");
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Запись всего файла как одной большой строки.
+    /// </summary>
+    public static dynamic? FilePutContents
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var fileName = BarsikUtility.ToString (Compute (context, args, 0));
+        if (string.IsNullOrEmpty (fileName))
+        {
+            return null;
+        }
+
+        var contents = BarsikUtility.ToString (Compute (context, args, 1));
+
+        try
+        {
+            var encodingName = Compute (context, args, 2) as string;
+            if (!string.IsNullOrEmpty (encodingName))
+            {
+                var encoding = Encoding.GetEncoding (encodingName);
+
+                File.WriteAllText (fileName, contents, encoding);
+            }
+            else
+            {
+                File.WriteAllText (fileName, contents);
+            }
+        }
+        catch (Exception exception)
+        {
+            context.Error.WriteLine ($"Error writing file {fileName}: {exception.Message}");
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Доступ к хосту.
+    /// </summary>
+    public static dynamic? FullPath
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var fileName = ComputeAll (context, args);
+        if (string.IsNullOrEmpty (fileName))
+        {
+            return null;
+        }
+
+        return Path.GetFullPath (fileName);
+    }
+
+    /// <summary>
+    /// Получение текущей директории.
+    /// </summary>
+    public static dynamic GetCurrentDirectory
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        return Environment.CurrentDirectory;
+    }
+
+    /// <summary>
     /// Доступ к хосту.
     /// </summary>
     public static dynamic Host
@@ -191,6 +427,38 @@ public sealed class StdLib
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Декодирование JSON.
+    /// </summary>
+    public static dynamic? JsonDecode
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var json = ComputeAll (context, args);
+        if (string.IsNullOrWhiteSpace (json))
+        {
+            return null;
+        }
+
+        return JObject.Parse (json);
+    }
+
+    /// <summary>
+    /// Коодирование JSON.
+    /// </summary>
+    public static dynamic JsonEncode
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var obj = Compute (context, args, 0);
+
+        return JsonConvert.SerializeObject (obj);
     }
 
     /// <summary>
@@ -252,9 +520,84 @@ public sealed class StdLib
     }
 
     /// <summary>
+    /// Чтение списка файлов в указанной директории.
+    /// </summary>
+    public static dynamic ReadDirectory
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var path = Compute (context, args, 0) as string ?? ".";
+        var pattern = (Compute (context, args, 1) as string).EmptyToNull();
+
+        return pattern is null
+            ? Directory.GetFileSystemEntries (path)
+            : Directory.GetFileSystemEntries (path, pattern);
+    }
+
+    /// <summary>
+    /// Удаление файлов.
+    /// </summary>
+    public static dynamic? RemoveFile
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        for (var i = 0; i < args.Length; i++)
+        {
+            var path = BarsikUtility.ToString (Compute (context, args, i));
+            if (!string.IsNullOrEmpty (path))
+            {
+                try
+                {
+                    File.Delete (path);
+                }
+                catch (Exception exception)
+                {
+                    context.Error.WriteLine ($"Error removing file {path}: {exception.Message}");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Переименование файла.
+    /// </summary>
+    public static dynamic? RenameFile
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var oldName = BarsikUtility.ToString (Compute (context, args, 0));
+        var newName = BarsikUtility.ToString (Compute (context, args, 1));
+        var overwrite = BarsikUtility.ToBoolean (Compute (context, args, 2));
+        if (string.IsNullOrEmpty (oldName) || string.IsNullOrEmpty (newName))
+        {
+            return null;
+        }
+
+        try
+        {
+            File.Move (oldName, newName, overwrite);
+        }
+        catch (Exception exception)
+        {
+            context.Error.WriteLine ($"Error renaming {oldName} to {newName}: {exception.Message}");
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /// <summary>
     /// Выполнение внешней программы и получение ее выходного потока.
     /// </summary>
-    public static dynamic? System
+    public static dynamic? System_
         (
             Context context,
             dynamic?[] args
@@ -296,7 +639,19 @@ public sealed class StdLib
     /// <summary>
     /// Выдача типа по его имени.
     /// </summary>
-    public static dynamic? Type
+    public static dynamic TemporaryFile
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        return Path.GetTempFileName();
+    }
+
+    /// <summary>
+    /// Выдача типа по его имени.
+    /// </summary>
+    public static dynamic? Type_
         (
             Context context,
             dynamic?[] args

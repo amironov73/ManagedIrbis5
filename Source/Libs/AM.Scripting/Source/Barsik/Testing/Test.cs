@@ -147,7 +147,7 @@ sealed class Test
                 )
                 .WithStdLib();
 
-            interpreter.Execute (sourceCode!);
+            interpreter.ExecuteFile (sourceFile);
 
             var actualOutput = outputStream.ToString().DosToUnix();
             result.Output = actualOutput;

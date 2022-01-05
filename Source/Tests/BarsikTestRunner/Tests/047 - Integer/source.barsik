@@ -39,3 +39,15 @@ println (x.GetType(), ", ", x)
 
 x = 0b1010_0101_1010_0101_L
 println (x.GetType(), ", ", x)
+
+x = 0x_1234_5678
+println (x.GetType(), ", ", x)
+
+x = 0x_1234_5678_9ABC_L
+println (x.GetType(), ", ", x)
+
+x = 0b_1010_0101
+println (x.GetType(), ", ", x)
+
+x = 0b_1010_0101_1010_0101_L
+println (x.GetType(), ", ", x)

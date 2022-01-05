@@ -60,7 +60,7 @@ public sealed class Interpreter
         // устанавливаем значения стандартных переменных
         Context.SetVariable ("__DIR__", string.Empty);
         Context.SetVariable ("__FILE__", string.Empty);
-        Context.SetVariable ("__NET__", Environment.Version);
+        Context.SetVariable ("__DOTNET__", Environment.Version);
         Context.SetVariable ("__ROOT__", AppContext.BaseDirectory);
         Context.SetVariable ("__VER__", Assembly.GetExecutingAssembly().GetName().Version);
     }
@@ -126,6 +126,34 @@ public sealed class Interpreter
         }
 
         program.Execute (Context);
+    }
+
+    /// <summary>
+    /// Загрузка исходного кода из указанного файла
+    /// с последующим исполнением.
+    /// </summary>
+    /// <param name="fileName">Имя файла скрипта.</param>
+    public void ExecuteFile
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
+
+        try
+        {
+            var fullPath = Path.GetFullPath (fileName);
+            Context.Variables["__FILE__"] = fullPath;
+            Context.Variables["__DIR__"] = Path.GetDirectoryName (fullPath);
+
+            var sourceCode = File.ReadAllText (fileName);
+            Execute (sourceCode);
+        }
+        finally
+        {
+            Context.Variables.Remove ("__FILE__");
+            Context.Variables.Remove ("__DIR__");
+        }
     }
 
     /// <summary>

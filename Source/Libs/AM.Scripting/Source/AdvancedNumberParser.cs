@@ -258,7 +258,7 @@ internal sealed class AdvancedNumberParser
             {
                 if (Array.IndexOf (_allowed, chr) < 0)
                 {
-                    if (_suffixes is null && !haveDigit && string.IsNullOrEmpty (_prefix))
+                    if (_suffixes is null && !haveDigit)
                     {
                         return false;
                     }
@@ -273,9 +273,13 @@ internal sealed class AdvancedNumberParser
 
             if (chr == '_' && !haveDigit)
             {
-                // подчеркивание до цифр не допускается
-                // после цифр -- можно
-                return false;
+                // подчеркивание до цифр допускается
+                // только при наличии префикса
+                // после цифр -- можно всегда в любых количествах
+                if (string.IsNullOrEmpty (_prefix))
+                {
+                    return false;
+                }
             }
 
             state.Advance ();

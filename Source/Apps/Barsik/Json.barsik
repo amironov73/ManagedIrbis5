@@ -1,0 +1,6 @@
+﻿content = file_get_contents ("Test.json")
+obj = json_decode (content)
+println (obj["first"].Value)
+println (obj["second"][1].Value)
+println (obj["third"]["fourth"].Value)
+println (obj["third"]["fifth"].Value)

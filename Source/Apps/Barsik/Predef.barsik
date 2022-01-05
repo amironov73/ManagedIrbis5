@@ -1,0 +1,5 @@
+﻿println (__FILE__)
+println (__DIR__)
+println (__VER__)
+println (__DOTNET__)
+println (__ROOT__)

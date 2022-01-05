@@ -14,7 +14,6 @@
 #region Using directives
 
 using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -58,7 +57,6 @@ namespace Barsik
             {
                 var dump = false;
                 var index = 0;
-                string sourceCode;
 
                 if (args.Length == 0)
                 {
@@ -81,14 +79,12 @@ namespace Barsik
 
                     if (fileName == "-e")
                     {
-                        sourceCode = string.Join (' ', args.Skip (index + 1));
+                        var sourceCode = string.Join (' ', args.Skip (index + 1));
                         interpreter.Execute (sourceCode);
                         break;
                     }
 
-                    sourceCode = File.ReadAllText (fileName);
-                    interpreter.Execute (sourceCode);
-
+                    interpreter.ExecuteFile (fileName);
                     index++;
                 }
 
