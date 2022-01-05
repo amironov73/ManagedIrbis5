@@ -133,6 +133,17 @@ public sealed class Interpreter
         return Grammar.ParseProgram (sourceCode);
     }
 
+    /// <summary>
+    /// Подключение стандартной библиотеки.
+    /// </summary>
+    /// <returns><c>this</c>.</returns>
+    public Interpreter WithStdLib()
+    {
+        Context.AttachModule (new StdLib());
+
+        return this;
+    }
+
     #endregion
 
     #region IDisposable members

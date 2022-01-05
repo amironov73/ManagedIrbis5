@@ -144,7 +144,8 @@ sealed class Test
                 (
                     input: inputStream,
                     output: outputStream
-                );
+                )
+                .WithStdLib();
 
             interpreter.Execute (sourceCode!);
 

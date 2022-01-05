@@ -72,14 +72,14 @@ internal static class Grammar
 
     #region Private members
 
-    // блочный комментарий в стиле C/C++
+    // многострочный комментарий в стиле C/C++
     private static readonly Parser<char, Unit> BlockComment = CommentParser.SkipBlockComment
         (
             Try (String ("/*")),
             Try (String ("*/"))
         );
 
-    // строчный комментарий в стиле C/C++
+    // однострочный комментарий в стиле C/C++
     private static readonly Parser<char, Unit> LineComment = CommentParser.SkipLineComment
         (
             Try (String ("//"))

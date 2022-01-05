@@ -17,6 +17,7 @@ before_build:
 - pygount -f summary Source/Libs                       -s cs -N "*.Designer.cs" -F "obj"
 - pygount -f summary Source/Libs/AM.Core5/Source       -s cs -N "*.Designer.cs" -F "obj"
 - pygount -f summary Source/Libs/ManagedIrbis5/Source  -s cs -N "*.Designer.cs" -F "obj"
+- pygount -f summary Source/Libs/AM.Scripting/Source   -s cs -N "*.Designer.cs" -F "obj"
 - pygount -f summary Source/Tests                      -s cs -N "*.Designer.cs" -F "obj"
 - pygount -f summary Source/Apps                       -s cs -N "*.Designer.cs" -F "obj"
 - dotnet --info

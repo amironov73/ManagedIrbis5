@@ -136,6 +136,32 @@ public sealed class Context
     #region Public methods
 
     /// <summary>
+    /// Подключение модуля.
+    /// </summary>
+    public Context AttachModule
+        (
+            IBarsikModule instance
+        )
+    {
+        Sure.NotNull (instance);
+
+        // отыскиваем корневой контекст
+        var rootContext = this;
+        while (rootContext.Parent is not null)
+        {
+            rootContext = rootContext.Parent;
+        }
+
+        if (instance.AttachModule (rootContext))
+        {
+            // Output.WriteLine ($"Module loaded: {instance}");
+            Modules.Add (instance);
+        }
+
+        return this;
+    }
+
+    /// <summary>
     /// Создание контекста-потомка.
     /// </summary>
     public Context CreateChild ()
@@ -356,11 +382,7 @@ public sealed class Context
             var instance = (IBarsikModule?) Activator.CreateInstance (type);
             if (instance is not null)
             {
-                if (instance.AttachModule (this))
-                {
-                    Output.WriteLine ($"Module loaded: {instance}");
-                    Modules.Add (instance);
-                }
+                AttachModule(instance);
             }
         }
     }

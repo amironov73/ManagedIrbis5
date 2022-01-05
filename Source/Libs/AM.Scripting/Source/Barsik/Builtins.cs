@@ -18,10 +18,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 
 using AM.Text;
 
@@ -41,7 +39,7 @@ public static class Builtins
     /// <summary>
     /// Вычисление аргумента по соответствующему индексу.
     /// </summary>
-    private static object? Compute
+    public static object? Compute
         (
             Context context,
             dynamic?[] args,
@@ -71,7 +69,7 @@ public static class Builtins
     /// <summary>
     /// Вычисление всех значений в виде одной длинной строки.
     /// </summary>
-    private static string? ComputeAll
+    public static string? ComputeAll
         (
             Context context,
             dynamic?[] args
@@ -111,8 +109,6 @@ public static class Builtins
     /// </summary>
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
-        { "array", new FunctionDescriptor ("array", Array_) },
-        { "bold", new FunctionDescriptor ("bold", Bold) },
         { "cat", new FunctionDescriptor ("cat", Cat) },
         { "chr", new FunctionDescriptor ("chr", Chr) },
         { "debug", new FunctionDescriptor ("debug", Debug) },
@@ -120,78 +116,20 @@ public static class Builtins
         { "dispose", new FunctionDescriptor ("dispose", Dispose) },
         { "error", new FunctionDescriptor ("error", Error) },
         { "empty", new FunctionDescriptor ("empty", Empty) },
-        { "eval", new FunctionDescriptor ("eval", Evaluate) },
-        { "exec", new FunctionDescriptor ("exec", Execute) },
         { "format", new FunctionDescriptor ("format", Format) },
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable) },
-        { "italic", new FunctionDescriptor ("italic", Italic) },
-        { "include", new FunctionDescriptor ("include", Include) },
         { "len", new FunctionDescriptor ("len", Length) },
-        { "load", new FunctionDescriptor ("load", LoadAssembly) },
         { "max", new FunctionDescriptor ("max", Max) },
         { "min", new FunctionDescriptor ("min", Min) },
-        { "module", new FunctionDescriptor ("module", LoadModule) },
         { "now", new FunctionDescriptor ("now", Now) },
         { "open_read", new FunctionDescriptor ("open_read", OpenRead) },
         { "print", new FunctionDescriptor ("print", Print) },
         { "println", new FunctionDescriptor ("println", PrintLine) },
         { "readln", new FunctionDescriptor ("readln", ReadLine) },
-        { "system", new FunctionDescriptor ("system", System) },
         { "trace", new FunctionDescriptor ("trace", Trace) },
         { "trim", new FunctionDescriptor ("trim", Trim) },
-        { "type", new FunctionDescriptor ("type", Type) },
-        { "use", new FunctionDescriptor ("use", Use) },
         { "warn", new FunctionDescriptor ("warn", Warn) },
     };
-
-    /// <summary>
-    /// Создание массива.
-    /// </summary>
-    public static dynamic? Array_
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        if (args.Length == 0)
-        {
-            return Array.Empty<object>();
-        }
-
-        var length = Convert.ToInt32 (Compute (context, args, 0));
-        if (length <= 0)
-        {
-            return Array.Empty<object>();
-        }
-
-        var type = typeof (object);
-        var typeName = Compute (context, args, 1) as string;
-        if (!string.IsNullOrEmpty (typeName))
-        {
-            type = context.FindType (typeName);
-            if (type is null)
-            {
-                context.Error.WriteLine ($"Can't find type {typeName}");
-                return null;
-            }
-        }
-
-        return Array.CreateInstance (type, length);
-    }
-
-    /// <summary>
-    /// Выделение текста жирным шрифтом.
-    /// </summary>
-    public static dynamic? Bold
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        var value = Compute (context, args, 0);
-
-        return value is null ? null : "<b>" + value + "</b>";
-    }
 
     /// <summary>
     /// Чтение содержимого файла.
@@ -248,7 +186,7 @@ public static class Builtins
         )
     {
         var text = ComputeAll (context, args);
-        global::System.Diagnostics.Debug.WriteLine (text);
+        System.Diagnostics.Debug.WriteLine (text);
 
         return null;
     }
@@ -335,67 +273,6 @@ public static class Builtins
     }
 
     /// <summary>
-    /// Вычисление значения выражения.
-    /// </summary>
-    public static dynamic? Evaluate
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        try
-        {
-            var sourceCode = ComputeAll (context, args);
-            if (string.IsNullOrWhiteSpace (sourceCode))
-            {
-                return null;
-            }
-
-            var expression = Grammar.ParseExpression (sourceCode);
-            var result = expression.Compute (context);
-
-            return result;
-        }
-        catch (Exception exception)
-        {
-            context.Error.WriteLine (exception.Message);
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Динамическое исполнение скрипта.
-    /// </summary>
-    public static dynamic? Execute
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        try
-        {
-            var sourceCode = ComputeAll (context, args);
-            if (string.IsNullOrWhiteSpace (sourceCode))
-            {
-                return null;
-            }
-
-            var program = Interpreter.ParseProgram (sourceCode);
-            foreach (var statement in program.Statements)
-            {
-                statement.Execute (context);
-            }
-        }
-        catch (Exception exception)
-        {
-            context.Error.WriteLine (exception.Message);
-        }
-
-        return null;
-    }
-
-    /// <summary>
     /// Форматирование.
     /// </summary>
     public static dynamic Format
@@ -442,47 +319,6 @@ public static class Builtins
     }
 
     /// <summary>
-    /// Загрузка указанного скрипта.
-    /// </summary>
-    public static dynamic? Include
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        // TODO поиск по путям
-
-        for (var i = 0; i < args.Length; i++)
-        {
-            var name = Compute (context, args, i) as string;
-            if (!string.IsNullOrWhiteSpace (name))
-            {
-                name = name.Trim();
-
-                var sourceCode = File.ReadAllText (name);
-                var program = Grammar.ParseProgram (sourceCode);
-                program.Execute (context);
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Выделение текста курсивом.
-    /// </summary>
-    public static dynamic? Italic
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        var value = Compute (context, args, 0);
-
-        return value is null ? null : "<i>" + value + "</i>";
-    }
-
-    /// <summary>
     /// Вычисление длины объекта.
     /// </summary>
     public static dynamic Length
@@ -494,65 +330,6 @@ public static class Builtins
         var value = Compute (context, args, 0);
 
         return BarsikUtility.GetLength (value);
-    }
-
-    /// <summary>
-    /// Загрузка указанной сборки.
-    /// </summary>
-    public static dynamic? LoadAssembly
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        // TODO поиск по путям
-
-        Assembly? loaded = null;
-
-        for (var i = 0; i < args.Length; i++)
-        {
-            var name = Compute (context, args, i) as string;
-            if (!string.IsNullOrWhiteSpace (name))
-            {
-                name = name.Trim();
-
-                if (File.Exists (name))
-                {
-                    var fullPath = Path.GetFullPath (name);
-                    loaded = Assembly.LoadFile (fullPath);
-                }
-                else
-                {
-                    loaded = Assembly.Load (name);
-                }
-
-                context.Output.WriteLine ($"Assembly loaded: {loaded.GetName()}");
-            }
-        }
-
-        return loaded;
-    }
-
-    /// <summary>
-    /// Загрузка указанного модуля.
-    /// </summary>
-    public static dynamic? LoadModule
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        for (var i = 0; i < args.Length; i++)
-        {
-            var name = Compute (context, args, i) as string;
-            if (!string.IsNullOrWhiteSpace (name))
-            {
-                name = name.Trim();
-                context.LoadModule (name);
-            }
-        }
-
-        return null;
     }
 
     /// <summary>
@@ -728,48 +505,6 @@ public static class Builtins
     }
 
     /// <summary>
-    /// Выполнение внешней программы и получение ее выходного потока.
-    /// </summary>
-    public static dynamic? System
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        var command = (string?) Compute (context, args, 0);
-        if (string.IsNullOrWhiteSpace (command))
-        {
-            return null;
-        }
-
-        command = command.Trim();
-        var startInfo = new ProcessStartInfo (command)
-        {
-            UseShellExecute = false,
-            RedirectStandardOutput = true
-        };
-        for (var i = 1; i < args.Length; i++)
-        {
-            var value = (string?) Compute (context, args, i);
-            if (!string.IsNullOrWhiteSpace (value))
-            {
-                startInfo.ArgumentList.Add (value.Trim());
-            }
-        }
-
-        var process = Process.Start (startInfo);
-        if (process is not null)
-        {
-            var result = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            return result;
-        }
-
-        return null;
-    }
-
-    /// <summary>
     /// Трассировочное сообщение.
     /// </summary>
     public static dynamic? Trace
@@ -801,57 +536,6 @@ public static class Builtins
         return string.IsNullOrEmpty (text)
             ? text
             : text.Trim();
-    }
-
-    /// <summary>
-    /// Выдача типа по его имени.
-    /// </summary>
-    public static dynamic? Type
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        var typeName = Compute (context, args, 0) as string;
-        if (string.IsNullOrEmpty (typeName))
-        {
-            return null;
-        }
-
-        return context.FindType (typeName);
-    }
-
-    /// <summary>
-    /// Подключение/отключение пространств имен.
-    /// </summary>
-    public static dynamic Use
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        for (var i = 0; i < args.Length; i++)
-        {
-            var name = Compute (context, args, i) as string;
-            if (!string.IsNullOrWhiteSpace (name))
-            {
-                name = name.Trim();
-                if (name.StartsWith ('-'))
-                {
-                    name = name.Substring (1);
-                    if (!string.IsNullOrEmpty (name))
-                    {
-                        context.Namespaces.Remove (name);
-                    }
-                }
-                else
-                {
-                    context.Namespaces[name] = null;
-                }
-            }
-        }
-
-        return context.Namespaces.Keys;
     }
 
     /// <summary>
