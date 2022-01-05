@@ -52,7 +52,7 @@ namespace Barsik
         {
             Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
 
-            var interpreter = new Interpreter();
+            var interpreter = new Interpreter().WithStdLib();
 
             try
             {
@@ -104,7 +104,6 @@ namespace Barsik
             }
 
             return 0;
-
         }
     }
 }

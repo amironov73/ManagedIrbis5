@@ -224,7 +224,7 @@ namespace AM.Windows.Forms
             box.Text = caption;
             box.promptLabel!.Text = prompt;
             box.inputTextBox!.Text = theValue;
-            box.inputTextBox!.PasswordChar = PasswordChar;
+            // box.inputTextBox!.PasswordChar = PasswordChar;
 
             var result = box.ShowDialog();
             theValue = box.inputTextBox.Text;

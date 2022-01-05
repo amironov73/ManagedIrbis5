@@ -38,13 +38,14 @@ public sealed class StdLib
     #region Properties
 
     /// <summary>
-    /// Реестр встроенных функций.
+    /// Реестр стандартных функций.
     /// </summary>
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
         { "array", new FunctionDescriptor ("array", Array_) },
         { "eval", new FunctionDescriptor ("eval", Evaluate) },
         { "exec", new FunctionDescriptor ("exec", Execute) },
+        { "host", new FunctionDescriptor ("host", Host) },
         { "include", new FunctionDescriptor ("include", Include) },
         { "load", new FunctionDescriptor ("load", LoadAssembly) },
         { "module", new FunctionDescriptor ("module", LoadModule) },
@@ -151,6 +152,18 @@ public sealed class StdLib
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Доступ к хосту.
+    /// </summary>
+    public static dynamic Host
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        return Magna.Host;
     }
 
     /// <summary>

@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <ApplicationIcon>barsik.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>

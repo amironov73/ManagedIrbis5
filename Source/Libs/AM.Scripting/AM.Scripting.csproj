@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <Description>Ars Magna scripting services</Description>
-    <Title>ArsMagna scripting services</Title>
+    <Title>Ars Magna scripting services</Title>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

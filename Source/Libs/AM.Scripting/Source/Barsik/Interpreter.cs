@@ -16,6 +16,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 #endregion
 
@@ -55,6 +56,13 @@ public sealed class Interpreter
         error ??= Console.Error;
 
         Context = new (input, output, error);
+
+        // устанавливаем значения стандартных переменных
+        Context.SetVariable ("__DIR__", string.Empty);
+        Context.SetVariable ("__FILE__", string.Empty);
+        Context.SetVariable ("__NET__", Environment.Version);
+        Context.SetVariable ("__ROOT__", AppContext.BaseDirectory);
+        Context.SetVariable ("__VER__", Assembly.GetExecutingAssembly().GetName().Version);
     }
 
     #endregion
