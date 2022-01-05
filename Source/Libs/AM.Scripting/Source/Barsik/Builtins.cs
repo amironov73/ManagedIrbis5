@@ -133,6 +133,8 @@ public static class Builtins
         { "module", new FunctionDescriptor ("module", LoadModule) },
         { "now", new FunctionDescriptor ("now", Now) },
         { "open_read", new FunctionDescriptor ("open_read", OpenRead) },
+        { "print", new FunctionDescriptor ("print", Print) },
+        { "println", new FunctionDescriptor ("println", PrintLine) },
         { "readln", new FunctionDescriptor ("readln", ReadLine) },
         { "system", new FunctionDescriptor ("system", System) },
         { "trace", new FunctionDescriptor ("trace", Trace) },
@@ -678,6 +680,39 @@ public static class Builtins
         }
 
         return new StreamReader (fileName);
+    }
+
+    /// <summary>
+    /// Вывод данных в стандартный поток.
+    /// </summary>
+    public static dynamic? Print
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        foreach (var node in args)
+        {
+            BarsikUtility.PrintObject (context.Output, node);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Вывод данных в стандартный поток
+    /// с добавлением перевода строки.
+    /// </summary>
+    public static dynamic? PrintLine
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        Print (context, args);
+        context.Output.WriteLine();
+
+        return null;
     }
 
     /// <summary>

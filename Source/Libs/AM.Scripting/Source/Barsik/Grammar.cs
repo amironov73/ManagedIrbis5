@@ -30,8 +30,15 @@ namespace AM.Scripting.Barsik;
 
 /// <summary>
 /// Грамматика Barsik.
+/// Точнее,
+/// <list type="number">
+/// <item>общие определения (например, что есть токен),</item>
+/// <item>стейтменты, разделители стейтментов и блоки стейтментов
+/// (в т. ч. программа - тоже блок стейтментов).</item>
+/// </list>
+/// <para>Выражения см. <see cref="AssignmentNode"/>.</para>
 /// </summary>
-static class Grammar
+internal static class Grammar
 {
     #region Public methods
 
@@ -65,33 +72,41 @@ static class Grammar
 
     #region Private members
 
+    // блочный комментарий в стиле C/C++
     private static readonly Parser<char, Unit> BlockComment = CommentParser.SkipBlockComment
         (
             Try (String ("/*")),
             Try (String ("*/"))
         );
 
+    // строчный комментарий в стиле C/C++
     private static readonly Parser<char, Unit> LineComment = CommentParser.SkipLineComment
         (
             Try (String ("//"))
         );
 
+    // пространство между токенами
     private static readonly Parser<char, Unit> Filler = Try (BlockComment)
         .Or (Try (LineComment))
         .Or (Whitespace.IgnoreResult())
         .SkipMany();
 
-    public static Parser<char, T> Tok<T> (Parser<char, T> token) =>
+    // токен, возможно, отделенный от других пробелами и комментариями
+    internal static Parser<char, T> Tok<T> (Parser<char, T> token) =>
         token.Between (Filler);
 
-    public static Parser<char, char> Tok (char token) => Tok (Char (token));
+    // токен-символ
+    internal static Parser<char, char> Tok (char token) => Tok (Char (token));
 
-    public static Parser<char, string> Tok (string token) => Tok (String (token));
+    // токен-строка
+    internal static Parser<char, string> Tok (string token) => Tok (String (token));
 
-    public static Parser<char, TResult> CurlyBraces<TResult> (Parser<char, TResult> parser) =>
+    // нечто, заключенное в фигурные скобки
+    private static Parser<char, TResult> CurlyBraces<TResult> (Parser<char, TResult> parser) =>
         Tok (parser).Between (Tok ('{'), Tok ('}'));
 
-    public static Parser<char, TResult> RoundBrackets<TResult> (Parser<char, TResult> parser) =>
+    // нечто, заключенное в круглые скобки
+    internal static Parser<char, TResult> RoundBrackets<TResult> (Parser<char, TResult> parser) =>
         Tok (parser).Between (Tok ('('), Tok (')'));
 
     // идентификатор
@@ -100,17 +115,12 @@ static class Grammar
     // копия
     private static readonly Parser<char, AtomNode> Expr = Rec (() => AssignmentNode.Expr);
 
+    // разделитель стейтментов
+    internal static readonly Parser<char, Unit> StatementDelimiter = new SwallowParser (';');
+
     //
     // Дальше начинаются разнообразные стейтменты
     //
-
-    // разделитель стейтментов
-    public static readonly Parser<char, Unit> StatementDelimiter = new SwallowParser (';');
-    // public static readonly Parser<char, Unit> StatementDelimiter = Try (BlockComment)
-    //     .Or (Try (LineComment))
-    //     .Or (Try (Char (';')).IgnoreResult())
-    //     .Or (Whitespace.IgnoreResult())
-    //     .SkipMany();
 
     // блок стейтментов
     public static readonly Parser<char, IEnumerable<StatementNode>> Block = Map
@@ -128,15 +138,6 @@ static class Grammar
     // стейтмент, вычисляющий значение выражения (костыль)
     private static readonly Parser<char, StatementNode> ExpressionStatement =
         Expr.Select<StatementNode> (v => new ExpressionNode (v));
-
-    // TODO превратить в обычную функцию
-    private static readonly Parser<char, StatementNode> Print = Map
-        (
-            (name, expressions) =>
-                (StatementNode) new PrintNode (expressions, name == "println"),
-            OneOf (Try (Tok ("println")), Try (Tok ("print"))),
-            RoundBrackets (Tok (Expr).Separated (Tok (',')))
-        );
 
     // цикл while
     private static readonly Parser<char, StatementNode> While = Map
@@ -259,7 +260,6 @@ static class Grammar
             Try (Tok (FunctionDefinition)),
             Try (Tok (While)),
             Try (Tok (Using)),
-            Try (Tok (Print)),
             Try (Tok (External)),
             Try (Tok (ExpressionStatement))
         );

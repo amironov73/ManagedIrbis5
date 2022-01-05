@@ -31,9 +31,15 @@ using static AM.Scripting.Barsik.Grammar;
 namespace AM.Scripting.Barsik;
 
 /// <summary>
+/// <para>
 /// Присваивание переменной результата вычисления выражения.
 /// В т. ч. присваивание "в пустоту", т. е. вычисление без
 /// сохранения результата в переменной.
+/// </para>
+/// <para>
+/// Та часть грамматики, которая относится к выражениям.
+/// Остальное см. <see cref="Grammar"/>.
+/// </para>
 /// </summary>
 internal sealed class AssignmentNode
     : AtomNode
