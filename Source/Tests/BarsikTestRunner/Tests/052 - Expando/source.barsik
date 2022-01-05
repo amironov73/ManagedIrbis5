@@ -1,0 +1,8 @@
+﻿x = expando()
+x.hello = "world"
+x.barsik = "cool"
+
+println (x.barsik, ", ", x.hello)
+println (x.nosuch)
+println (x)
+println (json_encode (x))

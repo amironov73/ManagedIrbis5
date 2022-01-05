@@ -15,6 +15,8 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Dynamic;
 using System.Globalization;
 using System.IO;
 
@@ -48,6 +50,43 @@ public static class BarsikUtility
     #region Public methods
 
     /// <summary>
+    /// Вывод на печать Expando-объекта.
+    /// </summary>
+    public static void PrintExpando
+        (
+            TextWriter output,
+            ExpandoObject? expando
+        )
+    {
+        if (expando is null)
+        {
+            output.Write ("(null)");
+            return;
+        }
+
+        var dictionary = (IDictionary<string, object?>) expando;
+        output.Write ("{");
+
+        var keys = dictionary.Keys;
+        var first = true;
+        foreach (var key in keys)
+        {
+            if (!first)
+            {
+                output.Write (", ");
+            }
+
+            PrintObject (output, key);
+            output.Write (": ");
+            PrintObject (output, dictionary[key]);
+
+            first = false;
+        }
+
+        output.Write ("}");
+    }
+
+    /// <summary>
     /// Вывод на печать произвольного объекта.
     /// </summary>
     public static void PrintObject
@@ -71,6 +110,12 @@ public static class BarsikUtility
         if (value is string)
         {
             output.Write (value);
+            return;
+        }
+
+        if (value is ExpandoObject expando)
+        {
+            PrintExpando (output, expando);
             return;
         }
 

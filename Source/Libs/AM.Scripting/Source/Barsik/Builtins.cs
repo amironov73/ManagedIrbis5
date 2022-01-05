@@ -18,6 +18,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Globalization;
 using System.IO;
 
@@ -115,6 +116,7 @@ public static class Builtins
         { "dispose", new FunctionDescriptor ("dispose", Dispose) },
         { "error", new FunctionDescriptor ("error", Error) },
         { "empty", new FunctionDescriptor ("empty", Empty) },
+        { "expando", new FunctionDescriptor ("expando", Expando) },
         { "format", new FunctionDescriptor ("format", Format) },
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable) },
         { "len", new FunctionDescriptor ("len", Length) },
@@ -242,6 +244,19 @@ public static class Builtins
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Создание Expando-объекта.
+    /// Подходит для хранения всего подряд.
+    /// </summary>
+    public static dynamic Expando
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        return new ExpandoObject ();
     }
 
     /// <summary>

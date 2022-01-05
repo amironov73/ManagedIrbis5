@@ -15,6 +15,8 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
+using System.Dynamic;
 
 #endregion
 
@@ -54,31 +56,6 @@ internal sealed class PropertyNode
     private readonly AtomNode _obj;
     private readonly AtomNode _propertyName;
 
-    // private dynamic? ComputeStatic (Context context)
-    // {
-    //     var type = context.FindType (_objectName);
-    //     if (type is null)
-    //     {
-    //         context.Error.WriteLine ($"Variable or type {_objectName} not found");
-    //
-    //         return null;
-    //     }
-    //
-    //     var property = type.GetProperty (_propertyName);
-    //     if (property is not null)
-    //     {
-    //         return property.GetValue (null);
-    //     }
-    //
-    //     var field = type.GetField (_propertyName);
-    //     if (field is not null)
-    //     {
-    //         return field.GetValue (null);
-    //     }
-    //
-    //     return null;
-    // }
-
     #endregion
 
     #region AtomNode members
@@ -89,12 +66,6 @@ internal sealed class PropertyNode
             Context context
         )
     {
-        // if (!context.TryGetVariable (_objectName, out var obj))
-        // {
-        //     return ComputeStatic (context);
-        // }
-        //
-
         var obj = _obj.Compute (context);
         if (obj is null)
         {
@@ -131,6 +102,19 @@ internal sealed class PropertyNode
             }
 
             return null;
+        }
+
+        if (obj is ExpandoObject expando)
+        {
+            #pragma warning disable CS8619
+            ((IDictionary<string, object>) expando).TryGetValue
+                (
+                    propertyName,
+                    out var expandoResult
+                );
+            #pragma warning restore CS8619
+
+            return expandoResult;
         }
 
         type = ((object) obj).GetType();
@@ -195,6 +179,15 @@ internal sealed class PropertyNode
 
                 return value;
             }
+
+            return value;
+        }
+
+        if (obj is ExpandoObject expando)
+        {
+            #pragma warning disable CS8619
+            ((IDictionary<string, object>) expando)[propertyName] = value!;
+            #pragma warning restore CS8619
 
             return value;
         }
