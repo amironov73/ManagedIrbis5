@@ -47,6 +47,7 @@ public sealed class StdLib
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
         { "array", new FunctionDescriptor ("array", Array_) },
+        { "bon_decode", new FunctionDescriptor ("bon_decode", BonDecode) },
         { "chdir", new FunctionDescriptor ("chdir", ChangeDirectory) },
         { "combine_path", new FunctionDescriptor ("combine_path", CombinePath) },
         { "dir_exists", new FunctionDescriptor ("dir_exists", DirectoryExists) },
@@ -110,6 +111,33 @@ public sealed class StdLib
         }
 
         return Array.CreateInstance (type, length);
+    }
+
+    /// <summary>
+    /// Декодирование BON-объекта.
+    /// </summary>
+    public static dynamic? BonDecode
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var bon = ComputeAll (context, args);
+        if (string.IsNullOrWhiteSpace (bon))
+        {
+            return null;
+        }
+
+        var interpreter = context.Interpreter;
+        if (interpreter is null)
+        {
+            return null;
+        }
+
+        var atom = interpreter.Evaluate (bon);
+        var value = atom.Compute (context);
+
+        return value;
     }
 
     /// <summary>
@@ -180,7 +208,7 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
-        var fileName = BarsikUtility.ToString (Compute (context, args, 0));
+        var fileName = Compute (context, args, 0) as string;
         if (string.IsNullOrEmpty (fileName))
         {
             return false;
@@ -198,7 +226,7 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
-        var fileName = BarsikUtility.ToString (Compute (context, args, 0));
+        var fileName = Compute (context, args, 0) as string;
         if (string.IsNullOrEmpty (fileName))
         {
             return null;
@@ -277,7 +305,7 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
-        var fileName = BarsikUtility.ToString (Compute (context, args, 0));
+        var fileName = Compute (context, args, 0) as string;
         if (string.IsNullOrEmpty (fileName))
         {
             return false;
@@ -295,7 +323,7 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
-        var fileName = BarsikUtility.ToString (Compute (context, args, 0));
+        var fileName = Compute (context, args, 0) as string;
         if (string.IsNullOrEmpty (fileName))
         {
             return null;
@@ -330,13 +358,13 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
-        var fileName = BarsikUtility.ToString (Compute (context, args, 0));
+        var fileName = Compute (context, args, 0) as string;
         if (string.IsNullOrEmpty (fileName))
         {
             return null;
         }
 
-        var contents = BarsikUtility.ToString (Compute (context, args, 1));
+        var contents = Compute (context, args, 1) as string;
 
         try
         {
@@ -547,7 +575,7 @@ public sealed class StdLib
     {
         for (var i = 0; i < args.Length; i++)
         {
-            var path = BarsikUtility.ToString (Compute (context, args, i));
+            var path = Compute (context, args, i) as string;
             if (!string.IsNullOrEmpty (path))
             {
                 try
@@ -573,8 +601,8 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
-        var oldName = BarsikUtility.ToString (Compute (context, args, 0));
-        var newName = BarsikUtility.ToString (Compute (context, args, 1));
+        var oldName = Compute (context, args, 0) as string;
+        var newName = Compute (context, args, 1) as string;
         var overwrite = BarsikUtility.ToBoolean (Compute (context, args, 2));
         if (string.IsNullOrEmpty (oldName) || string.IsNullOrEmpty (newName))
         {

@@ -56,6 +56,7 @@ public sealed class Interpreter
         error ??= Console.Error;
 
         Context = new (input, output, error);
+        Context.Interpreter = this;
 
         // устанавливаем значения стандартных переменных
         Context.SetVariable ("__DIR__", string.Empty);

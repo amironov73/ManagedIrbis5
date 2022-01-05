@@ -418,7 +418,14 @@ public static class Builtins
             dynamic?[] args
         )
     {
-        return DateTime.Now;
+        var result = DateTime.Now;
+        var format = Compute (context, args, 0) as string;
+        if (!string.IsNullOrEmpty (format))
+        {
+            return result.ToString (format);
+        }
+
+        return result;
     }
 
     /// <summary>

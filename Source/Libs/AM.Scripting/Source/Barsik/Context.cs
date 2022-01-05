@@ -36,6 +36,11 @@ public sealed class Context
     #region Properties
 
     /// <summary>
+    /// Интерпретатор, к которому привязан контекст.
+    /// </summary>
+    public Interpreter? Interpreter { get; internal set; }
+
+    /// <summary>
     /// Родительский контекст.
     /// </summary>
     public Context? Parent { get; }
@@ -172,7 +177,10 @@ public sealed class Context
                 Output,
                 Error,
                 this
-            );
+            )
+            {
+                Interpreter = Interpreter
+            };
     }
 
     /// <summary>
