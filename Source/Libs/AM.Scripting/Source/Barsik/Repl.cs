@@ -15,7 +15,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 using AM.IO;
@@ -121,7 +120,7 @@ public sealed class Repl
 
     #region Private members
 
-    private void ExecuteCore
+    private ExecutionResult ExecuteCore
         (
             string line
         )
@@ -130,13 +129,14 @@ public sealed class Repl
 
         try
         {
-            Interpreter.Execute (line);
+            return Interpreter.Execute (line);
+
         }
         catch (Exception)
         {
             if (!line.Contains (';'))
             {
-                Interpreter.Execute (line + ";");
+                return Interpreter.Execute (line + ";");
             }
             else
             {
@@ -166,6 +166,10 @@ public sealed class Repl
                 result = node.Compute (Context);
                 return true;
             }
+        }
+        catch (ExitException)
+        {
+            throw;
         }
         catch
         {
@@ -214,7 +218,7 @@ public sealed class Repl
     /// <summary>
     /// Прокрутка цикла. Выход -- две пустые строки подряд.
     /// </summary>
-    public void Loop()
+    public ExecutionResult Loop()
     {
         var emptyLineCounter = 0;
 
@@ -231,24 +235,38 @@ public sealed class Repl
             }
             else
             {
-                emptyLineCounter = 0;
-                if (Evaluate (line, out var result))
+                try
                 {
-                    Context.Variables["$$"] = result;
-                    BarsikUtility.PrintObject (Output, result);
-                    Output.WriteLine();
-                }
-                else
-                {
-                    Output.ResetCounter();
-                    Execute (line);
-                    if (Output.Counter != 0)
+                    emptyLineCounter = 0;
+                    if (Evaluate (line, out var result))
                     {
+                        Context.Variables["$$"] = result;
+                        BarsikUtility.PrintObject (Output, result);
                         Output.WriteLine();
                     }
+                    else
+                    {
+                        Output.ResetCounter();
+                        Execute (line);
+                        if (Output.Counter != 0)
+                        {
+                            Output.WriteLine();
+                        }
+                    }
+                }
+                catch (ExitException exception)
+                {
+                    return new ExecutionResult
+                    {
+                        ExitRequested = true,
+                        ExitCode = exception.ExitCode,
+                        Message = exception.Message
+                    };
                 }
             }
         }
+
+        return new ExecutionResult();
     }
 
     #endregion

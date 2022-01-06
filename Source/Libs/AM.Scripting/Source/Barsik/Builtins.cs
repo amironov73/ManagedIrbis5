@@ -110,12 +110,14 @@ public static class Builtins
     /// </summary>
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
+        { "assert", new FunctionDescriptor ("assert", Assert_) },
         { "chr", new FunctionDescriptor ("chr", Chr) },
         { "debug", new FunctionDescriptor ("debug", Debug_) },
         { "delete", new FunctionDescriptor ("delete", Delete, false) },
         { "dispose", new FunctionDescriptor ("dispose", Dispose) },
-        { "error", new FunctionDescriptor ("error", Error) },
+        { "error", new FunctionDescriptor ("error", Error_) },
         { "empty", new FunctionDescriptor ("empty", Empty) },
+        { "exit", new FunctionDescriptor ("exit", Exit) },
         { "expando", new FunctionDescriptor ("expando", Expando) },
         { "format", new FunctionDescriptor ("format", Format) },
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable) },
@@ -131,6 +133,41 @@ public static class Builtins
         { "trim", new FunctionDescriptor ("trim", Trim) },
         { "warn", new FunctionDescriptor ("warn", Warn) },
     };
+
+    /// <summary>
+    /// Проверка условия.
+    /// </summary>
+    public static dynamic? Assert_
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var message = "Assertion failed";
+        var condition = true;
+
+        for (var i = 0; i < args.Length; i++)
+        {
+            var value = Compute (context, args, i);
+
+            if (value is string stringValue && !string.IsNullOrEmpty (stringValue))
+            {
+                message = stringValue;
+            }
+
+            if (value is bool boolValue)
+            {
+                condition &= boolValue;
+            }
+        }
+
+        if (!condition)
+        {
+            Exit (context, new dynamic?[] { 1, message });
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// Символ с указанным кодом.
@@ -174,6 +211,8 @@ public static class Builtins
             dynamic?[] args
         )
     {
+        // TODO сделать обработку VariableNode
+
         for (var index = 0; index < args.Length; index++)
         {
             var value = Compute (context, args, index);
@@ -231,7 +270,7 @@ public static class Builtins
     /// <summary>
     /// Выдача сообщения в поток ошибок.
     /// </summary>
-    public static dynamic? Error
+    public static dynamic? Error_
         (
             Context context,
             dynamic?[] args
@@ -244,6 +283,36 @@ public static class Builtins
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Досрочное завершение скрипта.
+    /// </summary>
+    public static dynamic Exit
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var exitCode = 0;
+        string? message = null;
+
+        for (var i = 0; i < args.Length; i++)
+        {
+            var value = Compute (context, args, i);
+
+            if (value is int intValue)
+            {
+                exitCode = intValue;
+            }
+
+            if (value is string stringValue)
+            {
+                message = stringValue;
+            }
+        }
+
+        throw new ExitException (exitCode, message);
     }
 
     /// <summary>
@@ -429,7 +498,7 @@ public static class Builtins
     }
 
     /// <summary>
-    /// Открытие файла только для чтения.
+    /// Открытие файла только для чтения в текстовом режиме.
     /// </summary>
     public static dynamic? OpenRead
         (
@@ -487,7 +556,7 @@ public static class Builtins
     }
 
     /// <summary>
-    /// Чтение данных из файла.
+    /// Чтение строки из стандартного входного потока.
     /// </summary>
     public static dynamic? ReadLine
         (
@@ -548,18 +617,6 @@ public static class Builtins
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Запись данных в файл.
-    /// </summary>
-    public static dynamic Write
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        throw new NotImplementedException();
     }
 
     #endregion

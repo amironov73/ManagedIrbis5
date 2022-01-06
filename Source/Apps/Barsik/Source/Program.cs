@@ -30,7 +30,7 @@ namespace Barsik
     /// </summary>
     class Program
     {
-        static void DoRepl
+        static ExecutionResult DoRepl
             (
                 Interpreter interpreter
             )
@@ -38,7 +38,7 @@ namespace Barsik
             var version = typeof (Interpreter).Assembly.GetName().Version;
             interpreter.Context.Output.WriteLine ($"Barsik interpreter {version}");
             interpreter.Context.Output.WriteLine ("Press ENTER twice to exit");
-            new Repl (interpreter).Loop();
+            return new Repl (interpreter).Loop();
         }
 
         /// <summary>
@@ -60,7 +60,11 @@ namespace Barsik
 
                 if (args.Length == 0)
                 {
-                    DoRepl (interpreter);
+                    var result = DoRepl (interpreter);
+                    if (result.ExitCode != 0)
+                    {
+                        interpreter.Context.Error.WriteLine (result);
+                    }
                 }
 
                 foreach (var fileName in args)
@@ -84,7 +88,17 @@ namespace Barsik
                         break;
                     }
 
-                    interpreter.ExecuteFile (fileName);
+                    var result = interpreter.ExecuteFile (fileName);
+                    if (result.ExitCode != 0)
+                    {
+                        interpreter.Context.Error.WriteLine (result);
+                    }
+
+                    if (result.ExitRequested)
+                    {
+                        break;
+                    }
+
                     index++;
                 }
 

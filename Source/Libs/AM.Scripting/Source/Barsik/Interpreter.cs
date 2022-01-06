@@ -55,8 +55,10 @@ public sealed class Interpreter
         output ??= Console.Out;
         error ??= Console.Error;
 
-        Context = new (input, output, error);
-        Context.Interpreter = this;
+        Context = new (input, output, error)
+        {
+            Interpreter = this
+        };
 
         // устанавливаем значения стандартных переменных
         Context.SetVariable ("__DIR__", string.Empty);
@@ -88,7 +90,7 @@ public sealed class Interpreter
     /// <summary>
     /// Запуск скрипта на исполнение.
     /// </summary>
-    public void Execute
+    public ExecutionResult Execute
         (
             string sourceCode
         )
@@ -126,7 +128,19 @@ public sealed class Interpreter
                 .ToList();
         }
 
-        program.Execute (Context);
+        var result = new ExecutionResult();
+        try
+        {
+            program.Execute (Context);
+        }
+        catch (ExitException exception)
+        {
+            result.ExitRequested = true;
+            result.ExitCode = exception.ExitCode;
+            result.Message = exception.Message;
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -134,13 +148,14 @@ public sealed class Interpreter
     /// с последующим исполнением.
     /// </summary>
     /// <param name="fileName">Имя файла скрипта.</param>
-    public void ExecuteFile
+    public ExecutionResult ExecuteFile
         (
             string fileName
         )
     {
         Sure.FileExists (fileName);
 
+        ExecutionResult result;
         try
         {
             var fullPath = Path.GetFullPath (fileName);
@@ -148,13 +163,15 @@ public sealed class Interpreter
             Context.Variables["__DIR__"] = Path.GetDirectoryName (fullPath);
 
             var sourceCode = File.ReadAllText (fileName);
-            Execute (sourceCode);
+            result = Execute (sourceCode);
         }
         finally
         {
             Context.Variables.Remove ("__FILE__");
             Context.Variables.Remove ("__DIR__");
         }
+
+        return result;
     }
 
     /// <summary>
