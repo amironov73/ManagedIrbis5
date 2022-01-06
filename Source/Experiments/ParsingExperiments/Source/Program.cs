@@ -23,7 +23,9 @@ static class Program
         // PidginExperimentTen.IndexingAssignment();
         // PidginExperimentEleven.TernaryOperator();
         // PidginExperimentTwelve.Directives();
-        PidginExperimentThirteen.Targets();
+        // PidginExperimentThirteen.Targets();
         // BarsikExperiment.Interprete();
+
+        EventExperimentOne.EventGames();
     }
 }
