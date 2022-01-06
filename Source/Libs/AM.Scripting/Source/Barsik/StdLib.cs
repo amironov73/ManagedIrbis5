@@ -69,9 +69,11 @@ public sealed class StdLib
         { "readdir", new FunctionDescriptor ("readdir", ReadDirectory) },
         { "remove", new FunctionDescriptor ("remove", RemoveFile) },
         { "rename", new FunctionDescriptor ("rename", RenameFile) },
+        { "subscribe", new FunctionDescriptor ("subscribe", Subscribe) },
         { "system", new FunctionDescriptor ("system", System_) },
         { "tmpfile", new FunctionDescriptor ("tmpfile", TemporaryFile) },
         { "type", new FunctionDescriptor ("type", Type_) },
+        { "unsubscribe", new FunctionDescriptor ("unsubscribe", Unsubscribe) },
         { "use", new FunctionDescriptor ("use", Use) },
     };
 
@@ -671,6 +673,42 @@ public sealed class StdLib
     }
 
     /// <summary>
+    /// Подписка на событие объекта.
+    /// </summary>
+    public static dynamic Subscribe
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length < 3)
+        {
+            throw new BarsikException ("Can't subscribe");
+        }
+
+        var target = Compute (context, args, 0);
+        if (target is null)
+        {
+            throw new BarsikException ("Can't subscribe");
+        }
+
+        var eventName = Compute (context, args, 1) as string;
+        if (string.IsNullOrEmpty (eventName))
+        {
+            throw new BarsikException ("Can't subscribe");
+        }
+
+        var handler = Compute (context, args, 2);
+        if (handler is not LambdaNode lambda)
+        {
+            // TODO поддержать также обычные функции
+            throw new BarsikException ("Can't subscribe");
+        }
+
+        return new EventPad (context, target, eventName, lambda.Adapter);
+    }
+
+    /// <summary>
     /// Выполнение внешней программы и получение ее выходного потока.
     /// </summary>
     public static dynamic? System_
@@ -740,6 +778,26 @@ public sealed class StdLib
         }
 
         return context.FindType (typeName);
+    }
+
+    /// <summary>
+    /// Отписка от нативного события.
+    /// </summary>
+    public static dynamic? Unsubscribe
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        foreach (var one in args)
+        {
+            if (one is EventPad pad)
+            {
+                pad.Unsubscribe();
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

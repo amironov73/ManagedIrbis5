@@ -1,9 +1,11 @@
 ﻿// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
 // ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InvokeAsExtensionMethod
 // ReSharper disable PropertyCanBeMadeInitOnly.Local
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -19,6 +21,62 @@ namespace UnitTests.Scripting.Barsik;
 public sealed class InterpreterTest
     : Common.CommonUnitTest
 {
+    /// <summary>
+    /// Специальный тип событий для проверки подписки из скрипта.
+    /// </summary>
+    private sealed class CanaryEventArgs
+        : EventArgs
+    {
+        public string? AdditionalData { get; }
+
+        public CanaryEventArgs
+            (
+                string? additionalData
+            )
+        {
+            AdditionalData = additionalData;
+        }
+    }
+
+    /// <summary>
+    /// Подопытный класс, к событиям которого мы будем подписываться
+    /// из Barsik-скрипта.
+    /// </summary>
+    private sealed class Canary
+    {
+        public event EventHandler? OneChanged;
+        public event EventHandler<CanaryEventArgs>? TwoChanged;
+
+        private int _one;
+        private string? _two;
+
+        public int One
+        {
+            get => _one;
+            set
+            {
+                _one = value;
+                OneChanged?.Invoke (this, EventArgs.Empty);
+            }
+        }
+
+        public string? Two
+        {
+            get => _two;
+            set
+            {
+                _two = value;
+                var eventArgs = new CanaryEventArgs (value);
+                TwoChanged?.Invoke (this, eventArgs);
+            }
+        }
+
+        public int Addition (int first, int second)
+        {
+            return first + second;
+        }
+    }
+
     [TestMethod]
     [Description ("Простое сложение двух чисел")]
     public void Interpreter_Execute_1()
@@ -358,5 +416,45 @@ z = 3;";
         interpreter.Execute ("z = a[2]");
         var actualZ = (int) (object) variables["z"]!;
         Assert.AreEqual (3, actualZ);
+    }
+
+    [TestMethod]
+    [Description ("Подписка к событию типа EventHandler")]
+    public void Interpreter_Subscribe_1()
+    {
+        var input = TextReader.Null;
+        var output = new StringWriter();
+        var interpreter = new Interpreter (input, output).WithStdLib();
+        var variables = interpreter.Context.Variables;
+        var canary = new Canary();
+        variables["canary"] = canary;
+        var script = @"lambda = func (sender, ea) { print (sender.One) }
+pad = subscribe (canary, ""OneChanged"", lambda)
+canary.One = 123
+unsubscribe (pad)
+canary.One = 321
+";
+        interpreter.Execute (script);
+        Assert.AreEqual ("123", output.ToString());
+    }
+
+    [TestMethod]
+    [Description ("Подписка к событию типа EventHandler<T>")]
+    public void Interpreter_Subscribe_2()
+    {
+        var input = TextReader.Null;
+        var output = new StringWriter();
+        var interpreter = new Interpreter (input, output).WithStdLib();
+        var variables = interpreter.Context.Variables;
+        var canary = new Canary();
+        variables["canary"] = canary;
+        var script = @"lambda = func (sender, ea) { print (sender.Two) }
+pad = subscribe (canary, ""TwoChanged"", lambda)
+canary.Two = ""сто двадцать три""
+unsubscribe (pad)
+canary.Two = ""триста двадцать один""
+";
+        interpreter.Execute (script);
+        Assert.AreEqual ("сто двадцать три", output.ToString());
     }
 }

@@ -52,6 +52,46 @@ internal sealed class LambdaNode
     #region Public methods
 
     /// <summary>
+    /// Переходник для обработки нативных событий.
+    /// </summary>
+    public dynamic? Adapter
+        (
+            Context context,
+            dynamic?[] arguments
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (arguments);
+
+        try
+        {
+            var innerContext = context.CreateChild();
+            var index = 0;
+            foreach (var argumentName in theArguments)
+            {
+                if (index >= arguments.Length)
+                {
+                    break;
+                }
+
+                innerContext.Variables[argumentName] = arguments[index];
+                ++index;
+            }
+
+            foreach (var statement in theBody)
+            {
+                statement.Execute (innerContext);
+            }
+        }
+        catch (ReturnException exception)
+        {
+            return exception.Value;
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Выполнение функции.
     /// </summary>
     public dynamic? Execute
