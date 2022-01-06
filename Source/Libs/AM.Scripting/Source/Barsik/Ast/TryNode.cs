@@ -3,10 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable LocalizableElement
-// ReSharper disable UnusedMember.Global
 
 /* TryNode.cs -- блок try-catch-finally
  * Ars Magna project, http://arsmagna.ru
@@ -26,36 +23,56 @@ namespace AM.Scripting.Barsik;
 /// <summary>
 /// Блок try-catch-finally
 /// </summary>
-sealed class TryNode
+internal sealed class TryNode
     : StatementNode
 {
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public TryNode
         (
+            SourcePosition position,
             IEnumerable<StatementNode> tryBlock,
             CatchNode? catchNode,
             IEnumerable<StatementNode>? finallyBlock
         )
+        : base (position)
     {
+        Sure.NotNull ((object?) tryBlock);
+
         _tryBlock = new (tryBlock);
         _catchBlock = new ();
         _catchVariable = null;
+        _finallyBlock = new ();
+
         if (catchNode is not null)
         {
             _catchVariable = catchNode.VariableName;
             _catchBlock.AddRange (catchNode.Block);
         }
-        _finallyBlock = new ();
+
         if (finallyBlock is not null)
         {
             _finallyBlock.AddRange (finallyBlock);
         }
     }
 
+    #endregion
+
+    #region Private members
+
     private readonly List<StatementNode> _tryBlock;
     private readonly string? _catchVariable;
     private readonly List<StatementNode> _catchBlock;
     private readonly List<StatementNode> _finallyBlock;
 
+    #endregion
+
+    #region StatementNode members
+
+    /// <inheritdoc cref="StatementNode.Execute"/>
     public override void Execute
         (
             Context context
@@ -87,4 +104,16 @@ sealed class TryNode
             }
         }
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"try ({StartPosition})";
+    }
+
+    #endregion
 }

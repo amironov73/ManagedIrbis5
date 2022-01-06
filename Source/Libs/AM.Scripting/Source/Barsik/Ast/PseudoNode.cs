@@ -3,14 +3,13 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable LocalizableElement
-// ReSharper disable UnusedMember.Global
 
 /* PseudoNode.cs -- псевдо-узел, предназначенный для функций
  * Ars Magna project, http://arsmagna.ru
  */
+
+using Pidgin;
 
 #nullable enable
 
@@ -22,4 +21,39 @@ namespace AM.Scripting.Barsik;
 internal /* not sealed */ class PseudoNode
     : StatementNode
 {
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PseudoNode()
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PseudoNode
+        (
+            SourcePosition startPosition
+        )
+        : base (startPosition)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PseudoNode
+        (
+            SourcePos position
+        )
+        : base (position)
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
 }

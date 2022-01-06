@@ -3,10 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable LocalizableElement
-// ReSharper disable UnusedMember.Global
 
 /* ExternalNode.cs -- выполнение внешнего кода
  * Ars Magna project, http://arsmagna.ru
@@ -46,8 +43,10 @@ public sealed class ExternalNode
     /// </summary>
     public ExternalNode
         (
+            SourcePosition position,
             string? code
         )
+        : base (position)
     {
         Code = code;
     }
@@ -88,6 +87,16 @@ public sealed class ExternalNode
         {
             context.Error.WriteLine (exception.Message);
         }
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"external ({StartPosition}): {Code}";
     }
 
     #endregion

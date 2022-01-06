@@ -32,13 +32,16 @@ internal sealed class WhileNode : StatementNode
     /// <summary>
     /// Конструктор.
     /// </summary>
+    /// <param name="position">Позиция в исходном тексте.</param>
     /// <param name="condition">Условие.</param>
     /// <param name="body">Тело цикла.</param>
     public WhileNode
         (
+            SourcePosition position,
             AtomNode condition,
             IEnumerable<StatementNode> body
         )
+        : base (position)
     {
         _condition = condition;
         _body = new List<StatementNode> (body);

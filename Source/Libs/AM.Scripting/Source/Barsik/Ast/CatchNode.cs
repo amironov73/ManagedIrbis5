@@ -27,17 +27,54 @@ namespace AM.Scripting.Barsik;
 /// </summary>
 sealed class CatchNode
 {
+    #region Properties
+
+    /// <summary>
+    /// Начальная позиция в исходном коде.
+    /// </summary>
+    public SourcePosition StartPosition { get; }
+
+    /// <summary>
+    /// Имя переменной, в которую помещается перехваченное исключение.
+    /// </summary>
     public string VariableName { get; }
 
+    /// <summary>
+    /// Стейтменты, задающие реакцию на исключение.
+    /// </summary>
     public IEnumerable<StatementNode> Block { get; }
 
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public CatchNode
         (
+            SourcePosition position,
             string variableName,
             IEnumerable<StatementNode> block
         )
     {
+        Sure.NotNullNorEmpty (variableName);
+        Sure.NotNull ((object?) block);
+
+        StartPosition = position;
         VariableName = variableName;
         Block = block;
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"catch ({StartPosition})";
+    }
+
+    #endregion
 }

@@ -112,7 +112,7 @@ internal static class Grammar
     // идентификатор
     internal static readonly Parser<char, string> Identifier = new IdentifierParser();
 
-    // копия
+    // копия чисто для удобства
     private static readonly Parser<char, AtomNode> Expr = Rec (() => AssignmentNode.Expr);
 
     // разделитель стейтментов
@@ -136,22 +136,26 @@ internal static class Grammar
             .Or (Rec (() => Statement!).Repeat (1));
 
     // стейтмент, вычисляющий значение выражения (костыль)
-    private static readonly Parser<char, StatementNode> ExpressionStatement =
-        Expr.Select<StatementNode> (v => new ExpressionNode (v));
+    private static readonly Parser<char, StatementNode> ExpressionStatement = Map
+        (
+            (pos, expr) => (StatementNode) new ExpressionNode (new SourcePosition (pos), expr),
+            CurrentPos,
+            Expr
+        );
 
     // цикл while
     private static readonly Parser<char, StatementNode> While = Map
         (
-            (_, condition, body) =>
-                (StatementNode) new WhileNode (condition, body),
-            Try (Tok ("while")),
+            (position, condition, body) =>
+                (StatementNode) new WhileNode (new SourcePosition (position), condition, body),
+            Tok ("while").Then (CurrentPos),
             RoundBrackets (Expr),
             BlockOrSingle
         );
 
     // цикл for
     private static readonly Parser<char, StatementNode> For =
-        from _1 in Tok ("for")
+        from position in Tok ("for").Then (CurrentPos)
         from open1 in Tok ('(')
         from init in Tok (Expr)
         from _2 in Tok (';')
@@ -161,92 +165,110 @@ internal static class Grammar
         from close1 in Tok (')')
         from statements in BlockOrSingle
         from elseBody in Rec (() => Tok (Else!)).Optional()
-        select (StatementNode) new ForNode (init, condition, step, statements,
-            elseBody.GetValueOrDefault());
+        select (StatementNode) new ForNode (new SourcePosition(position), init, condition,
+            step, statements, elseBody.GetValueOrDefault());
 
     // цикл foreach
     private static readonly Parser<char, StatementNode> ForEach =
-        from _1 in Tok ("foreach")
+        from position in Tok ("foreach").Then (CurrentPos)
         from open1 in Tok ('(')
         from variableName in Tok (Identifier)
         from _2 in Tok ("in")
         from enumerable in Tok (Expr)
         from close1 in Tok (')')
         from statements in BlockOrSingle
-        select (StatementNode) new ForEachNode (variableName, enumerable, statements);
+        select (StatementNode) new ForEachNode (new SourcePosition (position),
+            variableName, enumerable, statements);
 
+    // блок else
     private static readonly Parser<char, IEnumerable<StatementNode>> Else =
         from _ in Tok ("else")
         from statements in BlockOrSingle
         select statements;
 
+    // блок else if
     private static readonly Parser<char, IfNode> ElseIf =
-        from _1 in Tok ("else")
+        from position in Tok ("else").Then (CurrentPos)
         from _2 in Tok ("if")
         from condition in RoundBrackets (Expr)
         from statements in BlockOrSingle
-        select new IfNode (condition, statements, null, null);
+        select new IfNode (new SourcePosition (position),
+            condition, statements, null, null);
 
+    // конструкция if-then-else
     private static readonly Parser<char, StatementNode> If =
-        from _ in Tok ("if")
+        from position in Tok ("if").Then (CurrentPos)
         from condition in RoundBrackets (Expr)
         from thenBlock in BlockOrSingle
         from elseIf in Try (ElseIf).Many().Optional()
         from elseBlock in Else.Optional()
-        select (StatementNode)new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(),
+        select (StatementNode)new IfNode (new SourcePosition (position),
+            condition, thenBlock, elseIf.GetValueOrDefault(),
             elseBlock.GetValueOrDefault());
 
+    // блок catch
     private static readonly Parser<char, CatchNode> Catch =
-        from _ in Tok ("catch")
+        from position in Tok ("catch").Then (CurrentPos)
         from variable in RoundBrackets(Identifier)
         from block in BlockOrSingle
-        select new CatchNode (variable, block);
+        select new CatchNode (new SourcePosition(position), variable, block);
 
+    // блок finally
     private static readonly Parser<char, IEnumerable<StatementNode>> Finally =
         from _ in Tok ("finally")
         from block in BlockOrSingle
         select block;
 
+    // конструкция try-catch-finally
     private static readonly Parser<char, StatementNode> TryCatchFinally =
-        from _ in Tok ("try")
+        from position in Tok ("try").Then (CurrentPos)
         from tryBlock in BlockOrSingle
         from catchNode in Catch.Optional()
         from finallyBlock in Finally.Optional()
-        select (StatementNode) new TryNode (tryBlock, catchNode.GetValueOrDefault(),
+        select (StatementNode) new TryNode (new SourcePosition (position),
+            tryBlock, catchNode.GetValueOrDefault(),
             finallyBlock.GetValueOrDefault());
 
     // возврат из функции
-    private static readonly Parser<char, StatementNode> Return =
-        Tok ("return").Then (Tok (Expr).Optional())
-            .Select<StatementNode> (v => new ReturnNode (v.GetValueOrDefault()));
+    private static readonly Parser<char, StatementNode> Return = Map
+        (
+            (position, value) =>
+                (StatementNode) new ReturnNode (new SourcePosition (position),
+                    value.GetValueOrDefault()),
+            Tok ("return").Then (CurrentPos),
+            Tok (Expr).Optional()
+        );
 
     // внешний код
     private static readonly Parser<char, StatementNode> External = Map
         (
-            (_, content, _) => (StatementNode) new ExternalNode (content),
-            Char ('`'),
+            (position, content, _) =>
+                (StatementNode) new ExternalNode (new SourcePosition(position), content),
+            Char ('`').Then (CurrentPos),
             AnyCharExcept ('`').ManyString(),
             Char ('`')
         );
 
     // определение функции
     private static readonly Parser<char, StatementNode> FunctionDefinition =
-        from _ in Tok ("func")
+        from position in Tok ("func").Then (CurrentPos)
         from name in Tok (Identifier)
         from args in RoundBrackets (Identifier.Separated (Tok (',')).Optional())
         from body in CurlyBraces (Block)
-        select (StatementNode) new DefinitionNode (name, args.GetValueOrDefault(), body);
+        select (StatementNode) new DefinitionNode (new SourcePosition (position),
+            name, args.GetValueOrDefault(), body);
 
     // блок using
     private static readonly Parser<char, StatementNode> Using =
-        from _ in Tok ("using")
+        from position in Tok ("using").Then (CurrentPos)
         from open in Tok ('(')
         from variable in Tok (Identifier)
         from equal in Tok ('=')
         from initialization in Expr
         from close in Tok (')')
         from body in BlockOrSingle
-        select (StatementNode) new UsingNode (variable, initialization, body);
+        select (StatementNode) new UsingNode (new SourcePosition (position),
+            variable, initialization, body);
 
 
     // обобщенный стейтмент

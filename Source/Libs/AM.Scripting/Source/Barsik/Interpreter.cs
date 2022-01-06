@@ -103,7 +103,7 @@ public sealed class Interpreter
             if (statement is DefinitionNode node)
             {
                 haveDefinitions = true;
-                var name = node.theName;
+                var name = node.Name;
                 var definition = new FunctionDefinition
                     (
                         name,

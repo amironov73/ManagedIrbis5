@@ -18,74 +18,75 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Scripting.Barsik
+namespace AM.Scripting.Barsik;
+
+/// <summary>
+/// Цикл foreach.
+/// </summary>
+sealed class ForEachNode
+    : StatementNode
 {
+    #region Construction
+
     /// <summary>
-    /// Цикл foreach.
+    /// Конструктор.
     /// </summary>
-    sealed class ForEachNode
-        : StatementNode
+    public ForEachNode
+        (
+            SourcePosition position,
+            string variableName,
+            AtomNode enumerable,
+            IEnumerable<StatementNode>? body
+        )
+        : base (position)
     {
-        #region Construction
+        Sure.NotNullNorEmpty (variableName);
+        Sure.NotNull (enumerable);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ForEachNode
-            (
-                string variableName,
-                AtomNode enumerable,
-                IEnumerable<StatementNode>? body
-            )
+        _variableName = variableName;
+        _enumerable = enumerable;
+        _body = new ();
+        if (body is not null)
         {
-            Sure.NotNullNorEmpty (variableName);
-            Sure.NotNull (enumerable);
-
-            _variableName = variableName;
-            _enumerable = enumerable;
-            _body = new ();
-            if (body is not null)
-            {
-                _body.AddRange (body);
-            }
+            _body.AddRange (body);
         }
-
-        #endregion
-
-        #region Private members
-
-        private readonly string _variableName;
-        private readonly AtomNode _enumerable;
-        private readonly List<StatementNode> _body;
-
-        #endregion
-
-        #region StatementNode members
-
-        /// <inheritdoc cref="StatementNode.Execute"/>
-        public override void Execute
-            (
-                Context context
-            )
-        {
-            PreExecute (context);
-
-            var enumerable = _enumerable.Compute (context);
-            if (enumerable is null || enumerable is not IEnumerable)
-            {
-                return;
-            }
-
-            foreach (var value in enumerable)
-            {
-                context.Variables[_variableName] = value;
-                foreach (var statement in _body)
-                {
-                    statement.Execute (context);
-                }
-            }
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly string _variableName;
+    private readonly AtomNode _enumerable;
+    private readonly List<StatementNode> _body;
+
+    #endregion
+
+    #region StatementNode members
+
+    /// <inheritdoc cref="StatementNode.Execute"/>
+    public override void Execute
+        (
+            Context context
+        )
+    {
+        PreExecute (context);
+
+        var enumerable = _enumerable.Compute (context);
+        if (enumerable is null || enumerable is not IEnumerable)
+        {
+            return;
+        }
+
+        foreach (var value in enumerable)
+        {
+            context.Variables[_variableName] = value;
+            foreach (var statement in _body)
+            {
+                statement.Execute (context);
+            }
+        }
+    }
+
+    #endregion
 }

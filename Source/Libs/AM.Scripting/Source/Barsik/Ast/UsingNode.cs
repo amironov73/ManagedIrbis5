@@ -28,12 +28,17 @@ sealed class UsingNode
 {
     #region Construction
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public UsingNode
         (
+            SourcePosition position,
             string variableName,
             AtomNode initialization,
             IEnumerable<StatementNode> body
         )
+        : base (position)
     {
         Sure.NotNullNorEmpty (variableName);
         Sure.NotNull (initialization);
@@ -78,6 +83,16 @@ sealed class UsingNode
         }
 
         ((IDisposable) disposable).Dispose();
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"using ({StartPosition}): {_variableName} = {_initialization}";
     }
 
     #endregion

@@ -33,13 +33,18 @@ internal sealed class IfNode
 {
     #region Construction
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public IfNode
         (
+            SourcePosition position,
             AtomNode condition,
             IEnumerable<StatementNode> thenBlock,
             IEnumerable<IfNode>? elseIfBlocks,
             IEnumerable<StatementNode>? elseBlock
         )
+        : base (position)
     {
         _condition = condition;
         _thenBlock = new (thenBlock);
@@ -116,6 +121,7 @@ internal sealed class IfNode
 
     #region Object members
 
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
         var builder = StringBuilderPool.Shared.Get();

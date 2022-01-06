@@ -31,12 +31,14 @@ sealed class ForNode : StatementNode
     /// </summary>
     public ForNode
         (
+            SourcePosition position,
             AtomNode init,
             AtomNode condition,
             AtomNode step,
             IEnumerable<StatementNode>? body,
             IEnumerable<StatementNode>? elseBody
         )
+        : base (position)
     {
         // TODO сделать init-condition-step опциональными
 

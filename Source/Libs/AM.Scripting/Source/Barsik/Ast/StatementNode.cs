@@ -13,8 +13,7 @@
 
 #region Using directive
 
-using System;
-using System.Collections.Generic;
+using Pidgin;
 
 #endregion
 
@@ -28,6 +27,49 @@ namespace AM.Scripting.Barsik;
 public class StatementNode
     : AstNode
 {
+    #region Properties
+
+    /// <summary>
+    /// Позиция начального символа стейтмента в коде.
+    /// </summary>
+    public SourcePosition StartPosition { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public StatementNode()
+    {
+        StartPosition = default;
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public StatementNode
+        (
+            SourcePosition startPosition
+        )
+    {
+        StartPosition = startPosition;
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public StatementNode
+        (
+            SourcePos position
+        )
+    {
+        StartPosition = new SourcePosition (position);
+    }
+
+    #endregion
+
     #region Private members
 
     /// <summary>

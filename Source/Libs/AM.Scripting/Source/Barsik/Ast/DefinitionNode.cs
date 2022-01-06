@@ -25,25 +25,33 @@ namespace AM.Scripting.Barsik;
 internal sealed class DefinitionNode
     : PseudoNode
 {
+    #region Properties
+
+    /// <summary>
+    /// Имя функции.
+    /// </summary>
+    public string Name { get; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="theName"></param>
-    /// <param name="argumentNames"></param>
-    /// <param name="body"></param>
     public DefinitionNode
         (
+            SourcePosition position,
             string theName,
             IEnumerable<string>? argumentNames,
             IEnumerable<StatementNode>? body
         )
+        : base (position)
     {
         Sure.NotNullNorEmpty (theName);
         Sure.NotNull ((object?) body);
 
-        this.theName = theName;
+        this.Name = theName;
         theArguments = new ();
         theBody = new ();
         if (argumentNames is not null)
@@ -61,9 +69,18 @@ internal sealed class DefinitionNode
 
     #region Private members
 
-    internal readonly string theName;
     internal readonly List<string> theArguments;
     internal readonly List<StatementNode> theBody;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"func {Name} ({StartPosition})";
+    }
 
     #endregion
 }

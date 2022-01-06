@@ -36,6 +36,23 @@ internal sealed class ExpressionNode
         _inner = inner;
     }
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="startPosition">Позиция в исходном коде.</param>
+    /// <param name="inner">Вычисляемое выражение.</param>
+    public ExpressionNode
+        (
+            SourcePosition startPosition,
+            AtomNode inner
+        )
+        : base (startPosition)
+    {
+        Sure.NotNull (inner);
+
+        _inner = inner;
+    }
+
     #endregion
 
     #region Private members
@@ -65,7 +82,7 @@ internal sealed class ExpressionNode
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return $"expression: {_inner}";
+        return $"expression ({StartPosition}): {_inner}";
     }
 
     #endregion

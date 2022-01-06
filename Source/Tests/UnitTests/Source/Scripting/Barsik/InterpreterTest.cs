@@ -85,67 +85,96 @@ x = 1;
         Assert.AreEqual (1, actual);
     }
 
-         [TestMethod]
-         [Description ("Создание списка")]
-         public void Interpreter_Execute_7()
-         {
-             var interpreter = new Interpreter();
-             interpreter.Execute ("l = [];");
-             var actual = (List<dynamic?>) interpreter.Context.Variables["l"]!;
-             Assert.AreEqual (0, actual.Count);
-         }
+    [TestMethod]
+    [Description ("Создание списка")]
+    public void Interpreter_Execute_7()
+    {
+        var interpreter = new Interpreter();
+        interpreter.Execute ("l = [];");
+        var actual = (List<dynamic?>) interpreter.Context.Variables["l"]!;
+        Assert.AreEqual (0, actual.Count);
+    }
 
-         [TestMethod]
-         [Description ("Скобки")]
-         public void Interpreter_Execute_8()
-         {
-             var interpreter = new Interpreter();
-             var variables = interpreter.Context.Variables;
-             variables.Add ("x", 1);
-             variables.Add ("y", 2);
-             variables.Add ("z", 3);
-             interpreter.Execute ("r = (x + y) * z;");
-             var actual = (int) (object) interpreter.Context.Variables["r"]!;
-             Assert.AreEqual (9, actual);
-         }
+    [TestMethod]
+    [Description ("Скобки")]
+    public void Interpreter_Execute_8()
+    {
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        variables.Add ("x", 1);
+        variables.Add ("y", 2);
+        variables.Add ("z", 3);
+        interpreter.Execute ("r = (x + y) * z;");
+        var actual = (int) (object) interpreter.Context.Variables["r"]!;
+        Assert.AreEqual (9, actual);
+    }
 
-         [TestMethod]
-         [Description ("Внешний код")]
-         public void Interpreter_External_1()
-         {
-             void Handler (Context context, ExternalNode node)
-             {
-                 // самый простой нетривиальный обработчик, который я смог придумать
-                 context.Output.Write (node.Code);
-             }
+    [TestMethod]
+    [Description ("Внешний код")]
+    public void Interpreter_External_1()
+    {
+        void Handler (Context context, ExternalNode node)
+        {
+            // самый простой нетривиальный обработчик, который я смог придумать
+            context.Output.Write (node.Code);
+        }
 
-             var input = TextReader.Null;
-             var output = new StringWriter();
-             var interpreter = new Interpreter(input, output)
-             {
-                 Context =
-                 {
-                     ExternalCodeHandler = Handler
-                 }
-             };
-             var sourceCode = "print ('{'); `Hello from inner code` print ('}');";
-             interpreter.Execute (sourceCode);
-             var actual = output.ToString();
-             Assert.AreEqual ("{Hello from inner code}", actual);
-         }
-//
-//         [TestMethod]
-//         [Description ("Позиционирование стейтментов")]
-//         public void Interpreter_Positioned_1()
-//         {
-//             const string sourceCode = @"x = 1;
-// y = 2;
-// z = 3;";
-//             var program = Interpreter.Parse (sourceCode);
-//             Assert.AreEqual (1, program.Statements[0].StartPosition!.Line);
-//             Assert.AreEqual (2, program.Statements[1].StartPosition!.Line);
-//             Assert.AreEqual (3, program.Statements[2].StartPosition!.Line);
-//         }
+        var input = TextReader.Null;
+        var output = new StringWriter();
+        var interpreter = new Interpreter(input, output)
+        {
+            Context =
+            {
+                ExternalCodeHandler = Handler
+            }
+        };
+        var sourceCode = "print ('{'); `Hello from inner code` print ('}');";
+        interpreter.Execute (sourceCode);
+        var actual = output.ToString();
+        Assert.AreEqual ("{Hello from inner code}", actual);
+    }
+
+    [TestMethod]
+    [Description ("Позиционирование стейтментов: каждый стейтмент на своей строке")]
+    public void Interpreter_Positioned_1()
+    {
+        const string sourceCode = @"x = 1;
+y = 2;
+z = 3;";
+       var program = Interpreter.ParseProgram (sourceCode);
+       Assert.AreEqual (1, program.Statements[0].StartPosition.Line);
+       Assert.AreEqual (2, program.Statements[1].StartPosition.Line);
+       Assert.AreEqual (3, program.Statements[2].StartPosition.Line);
+    }
+
+    [TestMethod]
+    [Description ("Позиционирование стейтментов: несколько стейтментов на одной строке")]
+    public void Interpreter_Positioned_2()
+    {
+        const string sourceCode = @"x = 1; y = 2;
+z = 3;";
+       var program = Interpreter.ParseProgram (sourceCode);
+       Assert.AreEqual (1, program.Statements[0].StartPosition.Line);
+       Assert.AreEqual (1, program.Statements[0].StartPosition.Column);
+       Assert.AreEqual (1, program.Statements[1].StartPosition.Line);
+       Assert.AreEqual (8, program.Statements[1].StartPosition.Column);
+       Assert.AreEqual (2, program.Statements[2].StartPosition.Line);
+    }
+
+    [TestMethod]
+    [Description ("Позиционирование стейтментов: учет комментариев")]
+    public void Interpreter_Positioned_3()
+    {
+        const string sourceCode = @"x = 1;
+// комментарий
+y = 2;
+/* комментарий */
+z = 3;";
+       var program = Interpreter.ParseProgram (sourceCode);
+       Assert.AreEqual (1, program.Statements[0].StartPosition.Line);
+       Assert.AreEqual (3, program.Statements[1].StartPosition.Line);
+       Assert.AreEqual (5, program.Statements[2].StartPosition.Line);
+    }
 
     [TestMethod]
     [Description ("32=битное целое со знаком")]

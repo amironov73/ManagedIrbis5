@@ -26,8 +26,10 @@ internal sealed class ReturnNode
     /// </summary>
     public ReturnNode
         (
+            SourcePosition position,
             AtomNode? value
         )
+        : base (position)
     {
         _value = value;
     }
@@ -42,7 +44,6 @@ internal sealed class ReturnNode
 
     #region StatementNode members
 
-
     /// <inheritdoc cref="StatementNode.Execute"/>
     public override void Execute
         (
@@ -54,6 +55,15 @@ internal sealed class ReturnNode
         var value = _value?.Compute (context) ?? null;
 
         throw new ReturnException (value);
+    }
+
+    #endregion
+
+    #region Object members
+
+    public override string ToString()
+    {
+        return $"return ({StartPosition}): {_value.ToVisibleString()}";
     }
 
     #endregion
