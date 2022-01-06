@@ -65,7 +65,7 @@ internal sealed class VariableNode
             Context context
         )
     {
-        if (context.Variables.TryGetValue (Name, out var value))
+        if (context.TryGetVariable (Name, out var value))
         {
             return value;
         }

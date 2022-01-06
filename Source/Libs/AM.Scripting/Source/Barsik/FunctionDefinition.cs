@@ -30,6 +30,9 @@ sealed class FunctionDefinition
 {
     #region Construction
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public FunctionDefinition
         (
             string name,
@@ -80,6 +83,9 @@ sealed class FunctionDefinition
             dynamic?[] argumentValues
         )
     {
+        Sure.NotNull (context);
+        Sure.NotNull (argumentValues);
+
         _name.NotUsed ();
 
         try

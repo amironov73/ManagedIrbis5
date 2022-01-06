@@ -27,6 +27,12 @@ internal sealed class DefinitionNode
 {
     #region Construction
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="theName"></param>
+    /// <param name="argumentNames"></param>
+    /// <param name="body"></param>
     public DefinitionNode
         (
             string theName,
@@ -34,6 +40,9 @@ internal sealed class DefinitionNode
             IEnumerable<StatementNode>? body
         )
     {
+        Sure.NotNullNorEmpty (theName);
+        Sure.NotNull ((object?) body);
+
         this.theName = theName;
         theArguments = new ();
         theBody = new ();

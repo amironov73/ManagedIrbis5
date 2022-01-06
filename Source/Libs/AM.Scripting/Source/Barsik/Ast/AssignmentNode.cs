@@ -311,7 +311,7 @@ internal sealed class AssignmentNode
             Tok (')')
         );
 
-    //тернарный оператор
+    // тернарный оператор
     private static readonly Parser<char, AtomNode> Ternary =
         from condition in Tok (Parenthesis)
         from question in Tok ('?')
@@ -319,6 +319,13 @@ internal sealed class AssignmentNode
         from colon in Tok (':')
         from falseValue in Tok (Rec (() => Expr!))
         select (AtomNode) new TernaryNode (condition, trueValue, falseValue);
+
+    // лямбда-функция
+    private static readonly Parser<char, AtomNode> Lambda =
+        from lambda in Tok ("func")
+        from arguments in Tok (RoundBrackets (Identifier.Separated (Tok (','))))
+        from body in CurlyBraces (Block)
+        select (AtomNode)new LambdaNode (arguments, body);
 
     private static Parser<char, Func<AtomNode, AtomNode>> MethodCall (Parser<char, CallNode> op) =>
         op.Select<Func<AtomNode, AtomNode>> (call => node => new MethodNode (node, call.Name, call.Arguments));
@@ -330,6 +337,7 @@ internal sealed class AssignmentNode
                 (
                     Try (Literal),
                     Try (New),
+                    Try (Lambda),
                     Try (Throw),
                     Try (Ternary),
                     Try (FreeFunctionCall),

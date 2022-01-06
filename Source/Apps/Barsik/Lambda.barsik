@@ -1,0 +1,7 @@
+﻿x = 1 y = 2
+add = func (a, b) { return a + b }
+z = add (x, y)
+println (z)
+
+greet = func (name) { println ("Hello, ", name) }
+greet ("Barsik")

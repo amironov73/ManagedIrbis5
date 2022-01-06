@@ -68,6 +68,17 @@ sealed class FreeCallNode
             Context context
         )
     {
+        // это может быть вызов лямбды
+        if (context.TryGetVariable (_name, out var value))
+        {
+            if (value is LambdaNode lambda)
+            {
+                return lambda.Execute (context, _arguments);
+            }
+
+            throw new BarsikException ($"Unexpected variable {_name}");
+        }
+
         _function ??= context.GetFunction (_name).ThrowIfNull ();
 
         var args = new List<dynamic?>();

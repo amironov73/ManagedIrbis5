@@ -102,7 +102,7 @@ internal static class Grammar
     internal static Parser<char, string> Tok (string token) => Tok (String (token));
 
     // нечто, заключенное в фигурные скобки
-    private static Parser<char, TResult> CurlyBraces<TResult> (Parser<char, TResult> parser) =>
+    internal static Parser<char, TResult> CurlyBraces<TResult> (Parser<char, TResult> parser) =>
         Tok (parser).Between (Tok ('{'), Tok ('}'));
 
     // нечто, заключенное в круглые скобки
@@ -250,7 +250,7 @@ internal static class Grammar
 
 
     // обобщенный стейтмент
-    private static readonly Parser<char, StatementNode> Statement = OneOf
+    internal static readonly Parser<char, StatementNode> Statement = OneOf
         (
             Try (Tok (If)),
             Try (Tok (Return)),

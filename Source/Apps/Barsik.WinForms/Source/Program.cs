@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
+using AM.Scripting;
 using AM.Scripting.Barsik;
 using AM.Scripting.WinForms;
 
@@ -48,7 +49,13 @@ static class Program
         {
             var dump = false;
             var index = 0;
-            var interpreter = new Interpreter()
+            var debugWriter = new DebugTextWriter();
+            var interpreter = new Interpreter
+                    (
+                        TextReader.Null,
+                        debugWriter,
+                        debugWriter
+                    )
                 .WithStdLib()
                 .WithWinForms();
 
