@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 
 using AM.Text;
 
@@ -40,7 +41,7 @@ public static class BarsikUtility
     /// </summary>
     public static string[] Keywords { get; } =
     {
-        "and", "catch", "else", "false", "finally", "for", "foreach",
+        "and", "catch", "call", "else", "false", "finally", "for", "foreach",
         "func", "if", "in", "new", "null", "or", "print", "println",
         "return", "throw", "true", "try", "using", "while"
     };
@@ -48,6 +49,58 @@ public static class BarsikUtility
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Динамический вызов произвольного метода.
+    /// </summary>
+    /// <param name="context">Контекст интерпретатора.</param>
+    /// <param name="target">Класс или экземпляр.</param>
+    /// <param name="methodName">Имя метода.</param>
+    /// <param name="args">Аргументы (уже подготовленные).</param>
+    /// <returns>Результат вызова.</returns>
+    public static dynamic? CallAnyMethod
+        (
+            Context context,
+            object? target,
+            string methodName,
+            params object?[] args
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (target);
+        Sure.NotNullNorEmpty (methodName);
+
+        bool staticCall;
+        Type targetType;
+        if (target is Type type)
+        {
+            staticCall = true;
+            targetType = type;
+        }
+        else
+        {
+            staticCall = false;
+            targetType = target!.GetType();
+        }
+
+        var argTypes = new List<Type>();
+        foreach (var o in args)
+        {
+            var argType = o is null ? typeof (object) : o.GetType();
+            argTypes.Add (argType);
+        }
+
+        var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic;
+        bindingFlags |= staticCall ? BindingFlags.Static : BindingFlags.Instance;
+        var method = targetType.GetMethod (methodName, bindingFlags, argTypes.ToArray());
+        if (method is null)
+        {
+            context.Error.WriteLine ($"Can't find method {methodName}");
+            return null;
+        }
+
+        return method.Invoke (target, args);
+    }
 
     /// <summary>
     /// Вывод на печать Expando-объекта.

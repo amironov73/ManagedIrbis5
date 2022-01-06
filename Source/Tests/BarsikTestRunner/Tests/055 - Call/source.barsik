@@ -1,0 +1,4 @@
+﻿list = new "System.Collections.ArrayList" ()
+call (list, "Add", 1)
+list.Add (2)
+println (list)

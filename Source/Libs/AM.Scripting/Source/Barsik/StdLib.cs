@@ -48,6 +48,7 @@ public sealed class StdLib
     {
         { "array", new FunctionDescriptor ("array", Array_) },
         { "bon_decode", new FunctionDescriptor ("bon_decode", BonDecode) },
+        { "call", new FunctionDescriptor ("call", CallAnyMethod) },
         { "chdir", new FunctionDescriptor ("chdir", ChangeDirectory) },
         { "combine_path", new FunctionDescriptor ("combine_path", CombinePath) },
         { "dir_exists", new FunctionDescriptor ("dir_exists", DirectoryExists) },
@@ -138,6 +139,53 @@ public sealed class StdLib
         var value = atom.Compute (context);
 
         return value;
+    }
+
+    /// <summary>
+    /// Динамический вызов произвольного метода.
+    /// </summary>
+    public static dynamic? CallAnyMethod
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length < 2)
+        {
+            return null;
+        }
+
+        // первый аргумент - экземпляр или класс
+        var target = Compute (context, args, 0);
+        if (target is null)
+        {
+            return null;
+        }
+
+        if (target is string typeName)
+        {
+            target = context.FindType (typeName);
+            if (target is null)
+            {
+                context.Error.WriteLine ($"Can't find type {typeName}");
+                return null;
+            }
+        }
+
+        var methodName = Compute (context, args, 1) as string;
+        if (string.IsNullOrEmpty (methodName))
+        {
+            return null;
+        }
+
+        var preparedArgs = new List<object?>();
+        for (var i = 2; i < args.Length; i++)
+        {
+            var one = Compute (context, args, i);
+            preparedArgs.Add (one);
+        }
+
+        return BarsikUtility.CallAnyMethod (context, target, methodName, preparedArgs.ToArray());
     }
 
     /// <summary>
