@@ -251,7 +251,8 @@ internal static class Grammar
 
     // определение функции
     private static readonly Parser<char, StatementNode> FunctionDefinition =
-        from position in Tok ("func").Then (CurrentPos)
+        from position in CurrentPos
+        from _1 in    Tok ("func")
         from name in Tok (Identifier)
         from args in RoundBrackets (Identifier.Separated (Tok (',')).Optional())
         from body in CurlyBraces (Block)
@@ -260,7 +261,8 @@ internal static class Grammar
 
     // блок using
     private static readonly Parser<char, StatementNode> Using =
-        from position in Tok ("using").Then (CurrentPos)
+        from position in CurrentPos
+        from _1 in Tok ("using")
         from open in Tok ('(')
         from variable in Tok (Identifier)
         from equal in Tok ('=')

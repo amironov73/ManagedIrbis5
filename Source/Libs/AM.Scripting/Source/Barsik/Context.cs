@@ -98,7 +98,7 @@ public sealed class Context
     /// <summary>
     /// Загруженные сборки (чтобы не писать assembly-qualified type name).
     /// </summary>
-    public List<string> Assemblies { get; }
+    public Dictionary<string, Assembly> Assemblies { get; }
 
     #endregion
 
@@ -304,16 +304,6 @@ public sealed class Context
             return result;
         }
 
-        foreach (var ns in Namespaces.Keys)
-        {
-            var fullName = ns + "." + name;
-            result = Type.GetType (fullName, false);
-            if (result is not null)
-            {
-                return result;
-            }
-        }
-
         var topContext = GetTopContext();
         if (!name.Contains ('.'))
         {
@@ -334,8 +324,9 @@ public sealed class Context
         {
             // это не assembly-qualified name, так что попробуем
             // приписать к нему загруженные нами сборки
-            foreach (var asmName in topContext.Assemblies)
+            foreach (var asm in topContext.Assemblies.Values)
             {
+                var asmName = asm.GetName().Name;
                 var fullName = name + ", " + asmName;
                 result = Type.GetType (fullName, false);
                 if (result is not null)
@@ -431,6 +422,100 @@ public sealed class Context
     }
 
     /// <summary>
+    /// Загрузка сборки.
+    /// </summary>
+    public Assembly? LoadAssembly
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        name = name.Trim();
+        if (string.IsNullOrEmpty (name))
+        {
+            throw new BarsikException();
+        }
+
+        if (Assemblies.ContainsKey (name))
+        {
+            // уже загружено, пропускаем
+            return Assemblies [name];
+        }
+
+        var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+        foreach (var asm in allAssemblies)
+        {
+            var asmName = asm.GetName().Name;
+            if (asmName.SameString (name))
+            {
+                Assemblies.Add (name, asm);
+                return asm;
+            }
+        }
+
+        Assembly? result = null;
+        if (File.Exists (name))
+        {
+            var fullPath = Path.GetFullPath (name);
+            result = Assembly.LoadFile (fullPath);
+        }
+        else
+        {
+            try
+            {
+                result = Assembly.Load (name);
+            }
+            catch
+            {
+                // просто съедаем исключение
+            }
+        }
+
+        if (result is not null)
+        {
+            Assemblies.Add (name, result);
+            return result;
+        }
+
+        var extension = Path.GetExtension (name);
+        if (string.IsNullOrEmpty (extension))
+        {
+            name += ".dll";
+        }
+        else
+        {
+            if (extension.ToLowerInvariant () != ".dll")
+            {
+                name += ".dll";
+            }
+        }
+
+        var loadPath = Environment.GetEnvironmentVariable ("BARSIK_PATH");
+        if (!string.IsNullOrEmpty (loadPath))
+        {
+            var parts = loadPath.Split
+                (
+                    Path.PathSeparator,
+                    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+                );
+            foreach (var part in parts)
+            {
+                var fullPath = Path.GetFullPath (Path.Combine (part, name));
+                if (File.Exists (fullPath))
+                {
+                    result = Assembly.LoadFile (fullPath);
+                    Assemblies.Add (name, result);
+
+                    return result;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Загрузка модуля.
     /// </summary>
     public void LoadModule
@@ -493,6 +578,27 @@ public sealed class Context
     {
         var value = node.Compute (this);
         BarsikUtility.PrintObject (Output, value);
+    }
+
+    /// <summary>
+    /// Удаление переменной с указанным именем.
+    /// Если такой переменной не существует,
+    /// то ничего не происходит.
+    /// </summary>
+    public void RemoveVariable
+        (
+            string variableName
+        )
+    {
+        Sure.NotNullNorEmpty (variableName);
+
+        for (var ctx = this; ctx is not null; ctx = ctx.Parent)
+        {
+            if (ctx.Variables.Remove (variableName))
+            {
+                return;
+            }
+        }
     }
 
     /// <summary>

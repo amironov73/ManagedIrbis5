@@ -79,6 +79,28 @@ public sealed class StdLib
 
     #endregion
 
+    #region Private members
+
+    private static bool _Include
+        (
+            Context context,
+            string fileName
+        )
+    {
+        if (!File.Exists (fileName))
+        {
+            return false;
+        }
+
+        var sourceCode = File.ReadAllText (fileName);
+        var program = Grammar.ParseProgram (sourceCode);
+        program.Execute (context);
+
+        return true;
+    }
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
@@ -489,7 +511,7 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
-        // TODO поиск по путям
+        var includePath = Environment.GetEnvironmentVariable ("BARSIK_PATH");
 
         for (var i = 0; i < args.Length; i++)
         {
@@ -497,10 +519,31 @@ public sealed class StdLib
             if (!string.IsNullOrWhiteSpace (name))
             {
                 name = name.Trim();
+                var extension = Path.GetExtension (name);
+                if (string.IsNullOrEmpty (extension))
+                {
+                    name += ".barsik";
+                }
 
-                var sourceCode = File.ReadAllText (name);
-                var program = Grammar.ParseProgram (sourceCode);
-                program.Execute (context);
+                if (!_Include (context, name)
+                    && !Path.IsPathRooted (name)
+                    && !string.IsNullOrEmpty (includePath))
+                {
+                    var parts = includePath.Split
+                        (
+                            Path.PathSeparator,
+                            StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+                        );
+                    foreach (var part in parts)
+                    {
+                        var fullPath = Path.Combine (part, name);
+                        if (_Include (context, fullPath))
+                        {
+                            return null;
+                        }
+                    }
+                }
+
             }
         }
 
@@ -548,36 +591,18 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
-        // TODO поиск по путям
-        // TODO проверять, не загружено ли
-
         var topContext = context.GetTopContext();
-        Assembly? loaded = null;
+        Assembly? result = null;
         for (var i = 0; i < args.Length; i++)
         {
             var name = Compute (context, args, i) as string;
             if (!string.IsNullOrWhiteSpace (name))
             {
-                name = name.Trim();
-
-                if (File.Exists (name))
-                {
-                    var fullPath = Path.GetFullPath (name);
-                    loaded = Assembly.LoadFile (fullPath);
-                }
-                else
-                {
-                    loaded = Assembly.Load (name);
-                }
-
-                var assemblyName = loaded.GetName().ToString();
-                topContext.Assemblies.Add (assemblyName);
-
-                context.Output.WriteLine ($"Assembly loaded: {assemblyName}");
+                result = topContext.LoadAssembly (name);
             }
         }
 
-        return loaded;
+        return result;
     }
 
     /// <summary>

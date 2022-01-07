@@ -120,7 +120,7 @@ public static class Builtins
         { "exit", new FunctionDescriptor ("exit", Exit) },
         { "expando", new FunctionDescriptor ("expando", Expando) },
         { "format", new FunctionDescriptor ("format", Format) },
-        { "have_var", new FunctionDescriptor ("havevar", HaveVariable) },
+        { "have_var", new FunctionDescriptor ("havevar", HaveVariable, false) },
         { "len", new FunctionDescriptor ("len", Length) },
         { "max", new FunctionDescriptor ("max", Max) },
         { "min", new FunctionDescriptor ("min", Min) },
@@ -211,15 +211,28 @@ public static class Builtins
             dynamic?[] args
         )
     {
-        // TODO сделать обработку VariableNode
-
         for (var index = 0; index < args.Length; index++)
         {
-            var value = Compute (context, args, index);
-
-            if (value is string name && !string.IsNullOrEmpty (name))
+            var value = args[index];
+            if (value is VariableNode node)
             {
-                context.Variables.Remove (name);
+                // имя переменной указано без кавычек
+
+                var name = node.Name;
+                if (!string.IsNullOrEmpty (name))
+                {
+                    context.RemoveVariable (name);
+                }
+            }
+            else
+            {
+                // имя переменной указано в кавычках
+
+                value = Compute (context, args, index);
+                if (value is string name && !string.IsNullOrEmpty (name))
+                {
+                    context.RemoveVariable (value);
+                }
             }
         }
 
@@ -359,19 +372,28 @@ public static class Builtins
     /// Проверка существования переменной с указанным именем
     /// (в любом контексте).
     /// </summary>
-    public static dynamic HaveVariable
+    public static dynamic? HaveVariable
         (
             Context context,
             dynamic?[] args
         )
     {
-        var name = (string?) Compute (context, args, 0);
-        if (string.IsNullOrEmpty (name))
+        if (args.Length == 0)
         {
-            return false;
+            return null;
         }
 
-        return context.TryGetVariable (name, out _);
+        string? name;
+        if (args[0] is VariableNode node)
+        {
+            name = node.Name;
+
+            return !string.IsNullOrEmpty (name) && context.TryGetVariable (name, out _);
+        }
+
+        name = (string?) Compute (context, args, 0);
+
+        return !string.IsNullOrEmpty (name) && context.TryGetVariable (name, out _);
     }
 
     /// <summary>
@@ -413,6 +435,9 @@ public static class Builtins
 
         if (result is null)
         {
+            // среди перечисленных значений нет ни одного IComparable
+            // непонятно, как это все сравнивать, так что выдаем null
+
             return null;
         }
 
@@ -458,6 +483,9 @@ public static class Builtins
 
         if (result is null)
         {
+            // среди перечисленных значений нет ни одного IComparable
+            // непонятно, как это все сравнивать, так что выдаем null
+
             return null;
         }
 

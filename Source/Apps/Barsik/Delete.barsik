@@ -1,0 +1,7 @@
+﻿println (have_var (x))
+
+x = 123
+println (have_var (x))
+
+delete (x)
+println (have_var (x))

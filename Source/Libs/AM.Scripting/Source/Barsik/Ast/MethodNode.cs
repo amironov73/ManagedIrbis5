@@ -115,4 +115,15 @@ internal sealed class MethodNode
     }
 
     #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        var args = string.Join (", ", _arguments);
+        return $"{_thisObject} . method '{_methodName}' ({args})";
+    }
+
+    #endregion
 }
