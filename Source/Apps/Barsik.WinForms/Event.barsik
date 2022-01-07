@@ -5,19 +5,19 @@ Application.SetHighDpiMode (HighDpiMode.SystemAware)
 Application.EnableVisualStyles()
 Application.SetCompatibleTextRenderingDefault (false)
 
-using (form = new "Form" ())
+using (form = new Form())
 {
     form.Text = "Это Барсик!"
     form.Height = 100
 
-    button = new "Button" ()
+    button = new Button()
     button.Text = "Привет, Барсик!"
     button.Left = 10
     button.Top = 10
     button.Width = 110
     subscribe (button, "Click", buttonHandler)
 
-    label = new "Label" ()
+    label = new Label()
     label.Text = "Нажми на кнопку, получишь результат!"
     label.Top = 35
     label.Left = 10
@@ -31,7 +31,7 @@ using (form = new "Form" ())
 
 func buttonHandler (sender, eventArgs)
 {
-    // по совести, buttonHandler можно размещать ниже создания формы,
+    // buttonHandler можно размещать ниже создания формы, так как
     // наши функции "поднимаются" ничуть не хуже javascript'овых
     alert ("Вас приветствует обработчик событий из скрипта!")
 }

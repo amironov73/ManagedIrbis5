@@ -5,11 +5,10 @@ Application.SetHighDpiMode (HighDpiMode.SystemAware)
 Application.EnableVisualStyles()
 Application.SetCompatibleTextRenderingDefault (false)
 
-
-using (form = new "Form" ())
+using (form = new Form())
 {
     form.Text = "Интерпретатор Барсик"
-    button = new "Button" ()
+    button = new Button()
     button.Text = "Привет, Барсик!"
     button.Left = 10
     button.Top = 10

@@ -245,7 +245,7 @@ internal sealed class AssignmentNode
     // оператор new
     private static readonly Parser<char, AtomNode> New =
         from _ in Tok ("new")
-        from typeName in Tok (Rec (() => Expr!))
+        from typeName in Tok (Rec (() => SubExpr!))
         from args in
             RoundBrackets (Rec (() => Tok (Expr!)).Separated (Tok (',')))
         select (AtomNode) new NewNode (typeName, args);
@@ -336,6 +336,14 @@ internal sealed class AssignmentNode
         from arguments in Tok (RoundBrackets (Identifier.Separated (Tok (','))))
         from body in CurlyBraces (Block)
         select (AtomNode)new LambdaNode (arguments, body);
+
+    // недовыражение
+    // TODO костыль
+    internal static readonly Parser<char, AtomNode> SubExpr = OneOf
+        (
+            Try (Variable),
+            Try (Literal)
+        );
 
     // выражение
     internal static readonly Parser<char, AtomNode> Expr = ExpressionParser.Build

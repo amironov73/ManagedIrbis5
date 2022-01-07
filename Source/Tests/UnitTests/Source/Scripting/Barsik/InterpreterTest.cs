@@ -3,7 +3,9 @@
 // ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InvokeAsExtensionMethod
+// ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable UnusedMember.Local
 
 using System;
 using System.Collections.Generic;
@@ -465,6 +467,32 @@ canary.Two = ""триста двадцать один""
         var interpreter = new Interpreter();
         var variables = interpreter.Context.Variables;
         const string script = "x = new \"System.Text.StringBuilder\" ()";
+        interpreter.Execute (script);
+        var actual = (object?) variables ["x"];
+        Assert.IsNotNull (actual);
+    }
+
+    [TestMethod]
+    [Description ("Оператор new")]
+    public void Interpreter_New_2()
+    {
+        var interpreter = new Interpreter();
+        interpreter.Context.Namespaces.Add ("System.Text", null);
+        var variables = interpreter.Context.Variables;
+        const string script = "x = new StringBuilder ()";
+        interpreter.Execute (script);
+        var actual = (object?) variables ["x"];
+        Assert.IsNotNull (actual);
+    }
+
+    [TestMethod]
+    [Description ("Оператор new")]
+    public void Interpreter_New_3()
+    {
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        variables["t"] = "System.Text.StringBuilder";
+        const string script = "x = new t ()";
         interpreter.Execute (script);
         var actual = (object?) variables ["x"];
         Assert.IsNotNull (actual);
