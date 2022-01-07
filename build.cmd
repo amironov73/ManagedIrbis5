@@ -1,6 +1,6 @@
 @echo off
 
-set BUILD_VERSION=5.0.0.556
+set BUILD_VERSION=5.0.0.657
 
 if exist NuGet   rmdir /s /q NuGet
 if exist Publish rmdir /s /q Publish
