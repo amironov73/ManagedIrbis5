@@ -549,7 +549,9 @@ public sealed class StdLib
         )
     {
         // TODO поиск по путям
+        // TODO проверять, не загружено ли
 
+        var topContext = context.GetTopContext();
         Assembly? loaded = null;
         for (var i = 0; i < args.Length; i++)
         {
@@ -568,7 +570,10 @@ public sealed class StdLib
                     loaded = Assembly.Load (name);
                 }
 
-                context.Output.WriteLine ($"Assembly loaded: {loaded.GetName()}");
+                var assemblyName = loaded.GetName().ToString();
+                topContext.Assemblies.Add (assemblyName);
+
+                context.Output.WriteLine ($"Assembly loaded: {assemblyName}");
             }
         }
 
@@ -699,13 +704,19 @@ public sealed class StdLib
         }
 
         var handler = Compute (context, args, 2);
-        if (handler is not LambdaNode lambda)
+        if (handler is LambdaNode lambda)
         {
-            // TODO поддержать также обычные функции
-            throw new BarsikException ("Can't subscribe");
+            // лямбда-функция
+            return new EventPad (context, target, eventName, lambda.Adapter);
         }
 
-        return new EventPad (context, target, eventName, lambda.Adapter);
+        if (handler is FunctionDescriptor descriptor)
+        {
+            // свободная функция
+            return new EventPad (context, target, eventName, descriptor.CallPoint);
+        }
+
+        throw new BarsikException ("Can't subscribe");
     }
 
     /// <summary>
@@ -809,6 +820,7 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
+        var topContext = context.GetTopContext();
         for (var i = 0; i < args.Length; i++)
         {
             var name = Compute (context, args, i) as string;
@@ -820,12 +832,12 @@ public sealed class StdLib
                     name = name.Substring (1);
                     if (!string.IsNullOrEmpty (name))
                     {
-                        context.Namespaces.Remove (name);
+                        topContext.Namespaces.Remove (name);
                     }
                 }
                 else
                 {
-                    context.Namespaces[name] = null;
+                    topContext.Namespaces[name] = null;
                 }
             }
         }

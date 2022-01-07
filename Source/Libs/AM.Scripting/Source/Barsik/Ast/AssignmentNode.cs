@@ -245,10 +245,10 @@ internal sealed class AssignmentNode
     // оператор new
     private static readonly Parser<char, AtomNode> New =
         from _ in Tok ("new")
-        from typeName in Try (Tok (Rec (() => Expr!)))
+        from typeName in Tok (Rec (() => Expr!))
         from args in
-            RoundBrackets (Rec (() => Tok (Expr!)).Separated (Tok (',')).Optional())
-        select (AtomNode) new NewNode (typeName, args.GetValueOrDefault());
+            RoundBrackets (Rec (() => Tok (Expr!)).Separated (Tok (',')))
+        select (AtomNode) new NewNode (typeName, args);
 
     // операция присваивания
     private static readonly Parser<char, string> Operation = OneOf
@@ -335,8 +335,8 @@ internal sealed class AssignmentNode
         (
             OneOf
                 (
-                    Try (Literal),
                     Try (New),
+                    Try (Literal),
                     Try (Lambda),
                     Try (Throw),
                     Try (Ternary),

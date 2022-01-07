@@ -95,6 +95,11 @@ public sealed class Context
     /// </summary>
     public List<IBarsikModule> Modules { get; }
 
+    /// <summary>
+    /// Загруженные сборки (чтобы не писать assembly-qualified type name).
+    /// </summary>
+    public List<string> Assemblies { get; }
+
     #endregion
 
     #region Construction
@@ -119,6 +124,7 @@ public sealed class Context
         Breakpoints = new ();
         Namespaces = new ();
         Modules = new ();
+        Assemblies = new ();
     }
 
     #endregion
@@ -308,7 +314,86 @@ public sealed class Context
             }
         }
 
+        var topContext = GetTopContext();
+        if (!name.Contains ('.'))
+        {
+            // это не полное имя, так что попробуем приписать к нему
+            // различные пространства имен
+            foreach (var ns in topContext.Namespaces.Keys)
+            {
+                var fullName = ns + "." + name;
+                result = Type.GetType (fullName, false);
+                if (result is not null)
+                {
+                    return result;
+                }
+            }
+        }
+
+        if (!name.Contains (','))
+        {
+            // это не assembly-qualified name, так что попробуем
+            // приписать к нему загруженные нами сборки
+            foreach (var asmName in topContext.Assemblies)
+            {
+                var fullName = name + ", " + asmName;
+                result = Type.GetType (fullName, false);
+                if (result is not null)
+                {
+                    return result;
+                }
+
+                if (!name.Contains ('.'))
+                {
+                    // это не полное имя, так что попробуем приписать к нему
+                    // различные пространства имен
+                    foreach (var ns in topContext.Namespaces.Keys)
+                    {
+                        fullName = ns + "." + name + ", " + asmName;
+                        result = Type.GetType (fullName, false);
+                        if (result is not null)
+                        {
+                            return result;
+                        }
+                    }
+                }
+            }
+        }
+
         return null;
+    }
+
+    /// <summary>
+    /// Поиск функции с указанным именем.
+    /// Отличается тем, что не швыряется исключениями.
+    /// </summary>
+    public bool FindFunction
+        (
+            string name,
+            out FunctionDescriptor? result
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        if (Functions.TryGetValue (name, out result))
+        {
+            return true;
+        }
+
+        for (var context = Parent; context is not null; context = context.Parent)
+        {
+            if (context.Functions.TryGetValue (name, out result))
+            {
+                return true;
+            }
+        }
+
+        if (Builtins.Registry.TryGetValue (name, out result))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -321,25 +406,28 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
-        if (Functions.TryGetValue (name, out var result))
+        if (!FindFunction (name, out var result))
         {
-            return result;
+            throw new Exception ($"Function {name} not found");
         }
 
-        for (var context = Parent; context is not null; context = context.Parent)
+        return result!;
+    }
+
+    /// <summary>
+    /// Получение топового контекста, используемого как свалка
+    /// для регистрации модулей и сборок.
+    /// </summary>
+    public Context GetTopContext()
+    {
+        var result = this;
+
+        while (result.Parent is not null)
         {
-            if (context.Functions.TryGetValue (name, out result))
-            {
-                return result;
-            }
+            result = result.Parent;
         }
 
-        if (Builtins.Registry.TryGetValue (name, out result))
-        {
-            return result;
-        }
-
-        throw new Exception ($"Function {name} not found");
+        return result;
     }
 
     /// <summary>

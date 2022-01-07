@@ -76,6 +76,12 @@ internal sealed class VariableNode
             return type;
         }
 
+        if (context.FindFunction (Name, out var descriptor))
+        {
+            // это может быть именем функции
+            return descriptor;
+        }
+
         context.Error.WriteLine ($"Variable or type '{Name}' not defined");
 
         return null;

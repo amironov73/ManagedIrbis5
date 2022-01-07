@@ -1,16 +1,20 @@
-﻿app = type ("System.Windows.Forms.Application, System.Windows.Forms")
-// app.SetHighDpiMode (HighDpiMode.SystemAware)
-app.EnableVisualStyles()
-app.SetCompatibleTextRenderingDefault (false)
+﻿load ("System.Windows.Forms")
+use ("System.Windows.Forms")
 
-using (form1 = new "System.Windows.Forms.Form, System.Windows.Forms" ())
+Application.SetHighDpiMode (HighDpiMode.SystemAware)
+Application.EnableVisualStyles()
+Application.SetCompatibleTextRenderingDefault (false)
+
+
+using (form = new "Form" ())
 {
-    btn = new "System.Windows.Forms.Button, System.Windows.Forms" ()
-    btn.Text = "Hello, Barsik!"
-    btn.Left = 10
-    btn.Top = 10
-    btn.Width = 100
-    form1.Controls.Add (btn)
+    form.Text = "Интерпретатор Барсик"
+    button = new "Button" ()
+    button.Text = "Привет, Барсик!"
+    button.Left = 10
+    button.Top = 10
+    button.Width = 120
+    form.Controls.Add (button)
 
-    app.Run (form1)
+    Application.Run (form)
 }

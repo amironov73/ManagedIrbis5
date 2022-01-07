@@ -45,6 +45,13 @@ static class Program
 
         Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
 
+        if (args.Length == 0)
+        {
+            // показываем подсказку и завершаемся нафик
+            MessageBox.Show ("Usage: Barsik <file...>");
+            return 0;
+        }
+
         try
         {
             var dump = false;
