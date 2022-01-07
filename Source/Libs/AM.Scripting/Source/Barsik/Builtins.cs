@@ -122,6 +122,7 @@ public static class Builtins
         { "format", new FunctionDescriptor ("format", Format) },
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable, false) },
         { "len", new FunctionDescriptor ("len", Length) },
+        { "local", new FunctionDescriptor ("local", Local, false) },
         { "max", new FunctionDescriptor ("max", Max) },
         { "min", new FunctionDescriptor ("min", Min) },
         { "now", new FunctionDescriptor ("now", Now) },
@@ -408,6 +409,38 @@ public static class Builtins
         var value = Compute (context, args, 0);
 
         return BarsikUtility.GetLength (value);
+    }
+
+    /// <summary>
+    /// Введение локальных переменных.
+    /// </summary>
+    public static dynamic? Local
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        for (var i = 0; i < args.Length; i++)
+        {
+            if (args[i] is VariableNode node)
+            {
+                var name = node.Name;
+                if (!string.IsNullOrEmpty (name))
+                {
+                    context.Variables[name] = null;
+                }
+            }
+            else
+            {
+                var name = Compute (context, args, i) as string;
+                if (!string.IsNullOrEmpty (name))
+                {
+                    context.Variables[name] = null;
+                }
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

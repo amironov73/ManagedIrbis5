@@ -3,9 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* FunctionDefiniton.cs -- определение функции в скрипте Барсик
  * Ars Magna project, http://arsmagna.ru
@@ -114,6 +112,17 @@ sealed class FunctionDefinition
         }
 
         return null;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        var args = string.Join (",", _arguments);
+        return $"func {_name} ({args})";
     }
 
     #endregion

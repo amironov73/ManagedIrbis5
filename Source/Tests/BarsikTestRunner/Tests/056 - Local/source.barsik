@@ -1,0 +1,14 @@
+﻿x = 123
+println (x)
+
+some()
+
+println (x)
+println (have_var (y))
+
+func some ()
+{
+  local (x, y)
+  x = 321
+  y = 456
+}
