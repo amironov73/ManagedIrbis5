@@ -301,6 +301,12 @@ internal sealed class AssignmentNode
     private static Parser<char, Func<AtomNode, AtomNode>> Index (Parser<char, AtomNode> op) =>
         op.Select<Func<AtomNode, AtomNode>> (type => v => new IndexNode (v, type));
 
+    // оператор await
+    private static readonly Parser<char, AtomNode> Await =
+        Tok ("await").Then (Tok (Rec (() => Expr!)))
+            .Select<AtomNode> (v => new AwaitNode (v));
+
+    // вызов метода у объекта или класса
     private static readonly Parser<char, CallNode> _MethodCall = Map
         (
             (_, name, _, args, _) => new CallNode (name, args),
@@ -310,6 +316,10 @@ internal sealed class AssignmentNode
             Try (Rec (() => Expr!)).Separated (Tok (',')),
             Tok (')')
         );
+
+    private static Parser<char, Func<AtomNode, AtomNode>> MethodCall (Parser<char, CallNode> op) =>
+        op.Select<Func<AtomNode, AtomNode>> (call => node => new MethodNode (node, call.Name, call.Arguments));
+
 
     // тернарный оператор
     private static readonly Parser<char, AtomNode> Ternary =
@@ -327,15 +337,13 @@ internal sealed class AssignmentNode
         from body in CurlyBraces (Block)
         select (AtomNode)new LambdaNode (arguments, body);
 
-    private static Parser<char, Func<AtomNode, AtomNode>> MethodCall (Parser<char, CallNode> op) =>
-        op.Select<Func<AtomNode, AtomNode>> (call => node => new MethodNode (node, call.Name, call.Arguments));
-
     // выражение
     internal static readonly Parser<char, AtomNode> Expr = ExpressionParser.Build
         (
             OneOf
                 (
                     Try (New),
+                    Try (Await),
                     Try (Literal),
                     Try (Lambda),
                     Try (Throw),

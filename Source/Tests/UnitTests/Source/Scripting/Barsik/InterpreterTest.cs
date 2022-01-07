@@ -428,7 +428,7 @@ z = 3;";
         var variables = interpreter.Context.Variables;
         var canary = new Canary();
         variables["canary"] = canary;
-        var script = @"lambda = func (sender, ea) { print (sender.One) }
+        const string script = @"lambda = func (sender, ea) { print (sender.One) }
 pad = subscribe (canary, ""OneChanged"", lambda)
 canary.One = 123
 unsubscribe (pad)
@@ -448,7 +448,7 @@ canary.One = 321
         var variables = interpreter.Context.Variables;
         var canary = new Canary();
         variables["canary"] = canary;
-        var script = @"lambda = func (sender, ea) { print (sender.Two) }
+        const string script = @"lambda = func (sender, ea) { print (sender.Two) }
 pad = subscribe (canary, ""TwoChanged"", lambda)
 canary.Two = ""сто двадцать три""
 unsubscribe (pad)
@@ -456,5 +456,29 @@ canary.Two = ""триста двадцать один""
 ";
         interpreter.Execute (script);
         Assert.AreEqual ("сто двадцать три", output.ToString());
+    }
+
+    [TestMethod]
+    [Description ("Оператор new")]
+    public void Interpreter_New_1()
+    {
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        const string script = "x = new \"System.Text.StringBuilder\" ()";
+        interpreter.Execute (script);
+        var actual = (object?) variables ["x"];
+        Assert.IsNotNull (actual);
+    }
+
+    [TestMethod]
+    [Description ("Оператор new")]
+    public void Interpreter_Using_1()
+    {
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        const string script = "using (x = new \"System.IO.MemoryStream\" ()) {}";
+        interpreter.Execute (script);
+        // using помещает переменную во временный контекст
+        Assert.IsFalse (variables.ContainsKey ("x"));
     }
 }

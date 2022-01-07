@@ -340,7 +340,7 @@ public sealed class StdLib
     /// <summary>
     /// Динамическое исполнение скрипта.
     /// </summary>
-    public static dynamic? Execute
+    public static dynamic? Execute //-V3009
         (
             Context context,
             dynamic?[] args
@@ -424,7 +424,7 @@ public sealed class StdLib
     /// <summary>
     /// Запись всего файла как одной большой строки.
     /// </summary>
-    public static dynamic? FilePutContents
+    public static dynamic? FilePutContents //-V3009
         (
             Context context,
             dynamic?[] args
@@ -505,7 +505,7 @@ public sealed class StdLib
     /// <summary>
     /// Загрузка указанного скрипта.
     /// </summary>
-    public static dynamic? Include
+    public static dynamic? Include //-V3009
         (
             Context context,
             dynamic?[] args

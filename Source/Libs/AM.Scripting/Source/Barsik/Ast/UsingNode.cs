@@ -69,20 +69,25 @@ sealed class UsingNode
     {
         PreExecute (context);
 
-        var disposable = _initialization.Compute (context);
-        if (disposable is null)
+        var variable = _initialization.Compute (context);
+
+        var contextToUse = context;
+        if (!contextToUse.TryGetVariable (_variableName, out _))
         {
-            return;
+            var childContext = context.CreateChild();
+            childContext.Variables[_variableName] = variable;
+            contextToUse = childContext;
         }
 
-        var childContext = context.CreateChild();
-        childContext.Variables[_variableName] = disposable;
         foreach (var statement in _body)
         {
-            statement.Execute (childContext);
+            statement.Execute (contextToUse);
         }
 
-        ((IDisposable) disposable).Dispose();
+        if (variable is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 
     #endregion

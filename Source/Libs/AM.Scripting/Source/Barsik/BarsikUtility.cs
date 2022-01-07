@@ -41,9 +41,27 @@ public static class BarsikUtility
     /// </summary>
     public static string[] Keywords { get; } =
     {
-        "and", "catch", "call", "else", "false", "finally", "for", "foreach",
-        "func", "if", "in", "new", "null", "or", "print", "println",
-        "return", "throw", "true", "try", "using", "while"
+        "abstract", "and", "as", "async", "await", "base", "bool", "break",
+        "byte", "case", "catch", "char", "checked", "class", "const",
+        "continue", "decimal", "default", "delegate", "do", "double",
+        "else", "enum", "event", "explicit", "extern", "false", "finally",
+        "fixed", "float", "for", "foreach", "func", "goto", "if", "implicit",
+        "in", "int", "interface", "internal", "is", "lock", "long",
+        "namespace", "new", "null", "object", "operator", "or", "out",
+        "override", "params", "private", "protected", "public", "readonly",
+        "ref", "return", "sbyte", "sealed", "short", "sizeof", "stackalloc",
+        "static", "string", "struct", "switch", "this", "throw", "true",
+        "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort",
+        "using", "virtual", "void", "volatile", "while"
+    };
+
+    /// <summary>
+    /// Короткие имена типов.
+    /// </summary>
+    public static string[] ShortTypeNames { get; } =
+    {
+        "bool", "byte", "char", "decimal", "double", "float", "int", "long",
+        "object", "short", "string", "uint", "ulong", "ushort"
     };
 
     #endregion
@@ -341,8 +359,8 @@ public static class BarsikUtility
             short i16 => i16 != 0,
             int i32 => i32 != 0,
             long i64 => i64 != 0,
-            float f32 => f32 != 0.0f,
-            double d64 => d64 != 0.0,
+            float f32 => f32 != 0.0f, //-V3024
+            double d64 => d64 != 0.0, //-V3024
             decimal d => d != 0.0m,
             IList list => list.Count != 0,
             IDictionary dictionary => dictionary.Count != 0,
