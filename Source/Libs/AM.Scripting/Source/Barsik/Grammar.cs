@@ -109,6 +109,10 @@ internal static class Grammar
     internal static Parser<char, TResult> RoundBrackets<TResult> (Parser<char, TResult> parser) =>
         Tok (parser).Between (Tok ('('), Tok (')'));
 
+    // нечто, заключенное в угловые скобки
+    internal static Parser<char, TResult> CornerBrackets<TResult> (Parser<char, TResult> parser) =>
+        Tok (parser).Between (Tok ('<'), Tok ('>'));
+
     // идентификатор
     internal static readonly Parser<char, string> Identifier = new IdentifierParser();
 

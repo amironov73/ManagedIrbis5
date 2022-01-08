@@ -807,13 +807,31 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
+        // TODO поддержка конструкций вроде type ("System.Collections.Generic.List`1", int)
+        // т. е. с именами типов без кавычек
+
         var typeName = Compute (context, args, 0) as string;
         if (string.IsNullOrEmpty (typeName))
         {
             return null;
         }
 
-        return context.FindType (typeName);
+        if (args.Length < 2)
+        {
+            return context.FindType (typeName);
+        }
+
+        var typeArguments = new List<string>();
+        for (var i = 1; i < args.Length; i++)
+        {
+            var one = Compute (context, args, i) as string;
+            if (!string.IsNullOrEmpty (one))
+            {
+                typeArguments.Add (one);
+            }
+        }
+
+        return context.FindType (typeName, typeArguments.ToArray());
     }
 
     /// <summary>

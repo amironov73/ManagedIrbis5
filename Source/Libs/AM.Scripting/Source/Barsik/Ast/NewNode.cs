@@ -37,7 +37,8 @@ sealed class NewNode
     public NewNode
         (
             AtomNode typeName,
-            IEnumerable<AtomNode>? arguments
+            IEnumerable<AtomNode>? typeArguments,
+            IEnumerable<AtomNode>? constructorArguments
         )
     {
         Sure.NotNull (typeName);
@@ -48,10 +49,15 @@ sealed class NewNode
         }
 
         _typeName = typeName;
-        _arguments = new ();
-        if (arguments is not null)
+        _typeArguments = null;
+        if (typeArguments is not null)
         {
-            _arguments.AddRange (arguments);
+            _typeArguments = new List<AtomNode> (typeArguments);
+        }
+        _constructorArguments = new ();
+        if (constructorArguments is not null)
+        {
+            _constructorArguments.AddRange (constructorArguments);
         }
     }
 
@@ -60,7 +66,8 @@ sealed class NewNode
     #region Private members
 
     private readonly AtomNode _typeName;
-    private readonly List<AtomNode> _arguments;
+    private readonly List<AtomNode>? _typeArguments;
+    private readonly List<AtomNode> _constructorArguments;
 
     #endregion
 
@@ -72,7 +79,7 @@ sealed class NewNode
             Context context
         )
     {
-        var type = context.FindType (_typeName);
+        var type = context.FindType (_typeName, _typeArguments);
         if (type is null)
         {
             context.Error.WriteLine ($"Type '{_typeName}' not found");
@@ -80,14 +87,14 @@ sealed class NewNode
         }
 
         object? result;
-        if (_arguments.Count == 0)
+        if (_constructorArguments.Count == 0)
         {
             result = Activator.CreateInstance (type);
         }
         else
         {
             var parameters = new List<object?>();
-            foreach (var argument in _arguments)
+            foreach (var argument in _constructorArguments)
             {
                 var parameter = (object?) argument.Compute (context);
                 parameters.Add (parameter);
@@ -106,7 +113,7 @@ sealed class NewNode
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        var args = string.Join (", ", _arguments);
+        var args = string.Join (", ", _constructorArguments);
         return $"new {_typeName} ({args})";
     }
 

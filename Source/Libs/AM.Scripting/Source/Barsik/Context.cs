@@ -100,6 +100,12 @@ public sealed class Context
     /// </summary>
     public Dictionary<string, Assembly> Assemblies { get; }
 
+    /// <summary>
+    /// Опциональный префикс, используемый, например, в операторе "new"
+    /// при инициализации свойств свежесозданного объекта.
+    /// </summary>
+    public string? Prefix { get; set; }
+
     #endregion
 
     #region Construction
@@ -140,6 +146,29 @@ public sealed class Context
         {
             Output = new AttentiveWriter (Output);
         }
+    }
+
+    /// <summary>
+    /// Конструирование типа, если необходимо.
+    /// </summary>
+    private Type? ConstructType
+        (
+            Type mainType,
+            Type[]? typeArguments
+        )
+    {
+        if (typeArguments is null)
+        {
+            return mainType;
+        }
+
+        if (!mainType.IsGenericType)
+        {
+            // TODO более осмысленная реакция
+            return mainType;
+        }
+
+        return mainType.MakeGenericType (typeArguments);
     }
 
     #endregion
@@ -235,10 +264,49 @@ public sealed class Context
     /// </summary>
     public Type? FindType
         (
-            AtomNode node
+            AtomNode node,
+            IEnumerable<AtomNode>? typeArgs = null
         )
     {
         Sure.NotNull (node);
+
+        string[]? args = null;
+        if (typeArgs is not null)
+        {
+            var list = new List<string>();
+            foreach (var argNode in typeArgs)
+            {
+                if (argNode is VariableNode varNode)
+                {
+                    if (TryGetVariable (varNode.Name, out var varValue))
+                    {
+                        if (varValue is Type alreadyType)
+                        {
+                            list.Add (alreadyType.AssemblyQualifiedName.ThrowIfNullOrEmpty ());
+                        }
+                        else if (varValue is string strValue && !string.IsNullOrEmpty (strValue))
+                        {
+                            list.Add (strValue);
+                        }
+                        else
+                        {
+                            throw new BarsikException();
+                        }
+                    }
+                    else
+                    {
+                        list.Add (varNode.Name.ThrowIfNullOrEmpty ());
+                    }
+                }
+                else
+                {
+                    var one = (argNode.Compute (this) as string).ThrowIfNullOrEmpty();
+                    list.Add (one);
+                }
+            }
+
+            args = list.ToArray();
+        }
 
         if (node is VariableNode variableNode)
         {
@@ -251,7 +319,7 @@ public sealed class Context
 
                 if (variableValue is string typeName1)
                 {
-                    return FindType (typeName1);
+                    return FindType (typeName1, args);
                 }
             }
 
@@ -261,12 +329,12 @@ public sealed class Context
         var value = node.Compute (this);
         if (value is string typeName2)
         {
-            return FindType (typeName2);
+            return FindType (typeName2, args);
         }
 
         var typeName3 = BarsikUtility.ToString (value);
 
-        return FindType (typeName3);
+        return FindType (typeName3, args);
     }
 
     /// <summary>
@@ -274,7 +342,8 @@ public sealed class Context
     /// </summary>
     public Type? FindType
         (
-            string name
+            string name,
+            string[]? arguments = null
         )
     {
         Sure.NotNullNorEmpty (name);
@@ -296,12 +365,41 @@ public sealed class Context
             case "double": return typeof (double);
             case "object": return typeof (object);
             case "string": return typeof (string);
+
+            // наши псевдо-типы
+            case "list": return typeof (BarsikList);
+            case "dict": return typeof (BarsikDictionary);
         }
 
-        Type? result = Type.GetType (name, false);
+        Type[]? typeArguments = null;
+        if (arguments is not null)
+        {
+            var list = new List<Type>();
+            foreach (var oneArgument in arguments)
+            {
+                var foundType = FindType (oneArgument);
+                if (foundType is null)
+                {
+                    // TODO более осмысленная реакция на ошибку
+                    return null;
+                }
+
+                list.Add (foundType);
+            }
+
+            typeArguments = list.ToArray();
+        }
+
+        // if (typeArguments is not null && !name.Contains ('`'))
+        // {
+        //     // TODO разбирать на имя типа и сборку
+        //     name += $"`{typeArguments.Length}";
+        // }
+
+        var result = Type.GetType (name, false);
         if (result is not null)
         {
-            return result;
+            return ConstructType (result, typeArguments);
         }
 
         var topContext = GetTopContext();
@@ -315,7 +413,7 @@ public sealed class Context
                 result = Type.GetType (fullName, false);
                 if (result is not null)
                 {
-                    return result;
+                    return ConstructType (result, typeArguments);
                 }
             }
         }
@@ -331,7 +429,7 @@ public sealed class Context
                 result = Type.GetType (fullName, false);
                 if (result is not null)
                 {
-                    return result;
+                    return ConstructType (result, typeArguments);
                 }
 
                 if (!name.Contains ('.'))
@@ -344,7 +442,7 @@ public sealed class Context
                         result = Type.GetType (fullName, false);
                         if (result is not null)
                         {
-                            return result;
+                            return ConstructType (result, typeArguments);
                         }
                     }
                 }

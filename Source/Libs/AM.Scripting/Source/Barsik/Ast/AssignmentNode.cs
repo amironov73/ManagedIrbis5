@@ -246,9 +246,11 @@ internal sealed class AssignmentNode
     private static readonly Parser<char, AtomNode> New =
         from _ in Tok ("new")
         from typeName in Tok (Rec (() => SubExpr!))
+        from typeArgs in Tok (CornerBrackets (Rec (() => SubExpr!))
+            .Separated (Tok (','))).Optional()
         from args in
             RoundBrackets (Rec (() => Tok (Expr!)).Separated (Tok (',')))
-        select (AtomNode) new NewNode (typeName, args);
+        select (AtomNode) new NewNode (typeName, typeArgs.GetValueOrDefault(), args);
 
     // операция присваивания
     private static readonly Parser<char, string> Operation = OneOf
