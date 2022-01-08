@@ -26,6 +26,8 @@ static class Program
         // PidginExperimentThirteen.Targets();
         // BarsikExperiment.Interprete();
 
-        EventExperimentOne.EventGames();
+        // EventExperimentOne.EventGames();
+
+        VExperimentOne.DoExperiments();
     }
 }
