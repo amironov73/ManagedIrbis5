@@ -20,7 +20,7 @@ using System.Text;
 
 using AM.Collections;
 
-using ManagedIrbis.Scripting;
+using ManagedIrbis.Scripting.Sharping;
 
 #endregion
 

@@ -37,7 +37,7 @@ using Microsoft.CodeAnalysis.Emit;
 
 #nullable enable
 
-namespace ManagedIrbis.Scripting
+namespace ManagedIrbis.Scripting.Sharping
 {
     /// <summary>
     /// Компилятор скриптов.

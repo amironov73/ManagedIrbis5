@@ -21,7 +21,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 #nullable enable
 
-namespace ManagedIrbis.Scripting
+namespace ManagedIrbis.Scripting.Sharping
 {
     /// <summary>
     /// Опции скрипта.

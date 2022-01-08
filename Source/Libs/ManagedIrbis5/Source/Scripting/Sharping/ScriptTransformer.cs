@@ -28,7 +28,7 @@ using AM.Collections;
 
 #nullable enable
 
-namespace ManagedIrbis.Scripting
+namespace ManagedIrbis.Scripting.Sharping
 {
     /*
         Эвристика такова:

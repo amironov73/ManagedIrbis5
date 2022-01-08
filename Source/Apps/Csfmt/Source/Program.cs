@@ -18,7 +18,7 @@ using System.IO;
 using System.Text;
 
 using ManagedIrbis;
-using ManagedIrbis.Scripting;
+using ManagedIrbis.Scripting.Sharping;
 
 #endregion
 

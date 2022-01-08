@@ -19,7 +19,7 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace ManagedIrbis.Scripting
+namespace ManagedIrbis.Scripting.Sharping
 {
     /// <summary>
     /// Описание скрипта.

@@ -25,7 +25,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 #nullable enable
 
-namespace ManagedIrbis.Scripting
+namespace ManagedIrbis.Scripting.Sharping
 {
     /// <summary>
     /// Кэш скомпилированных сборок.

@@ -9,11 +9,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis;
 using ManagedIrbis.Providers;
-using ManagedIrbis.Scripting;
+using ManagedIrbis.Scripting.Sharping;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Scripting
+namespace UnitTests.ManagedIrbis.Scripting.Sharping
 {
     [TestClass]
     public sealed class ScriptingContextTest

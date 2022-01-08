@@ -25,7 +25,7 @@ using ManagedIrbis.Records;
 
 #nullable enable
 
-namespace ManagedIrbis.Scripting
+namespace ManagedIrbis.Scripting.Sharping
 {
     /// <summary>
     /// Контекст, в котором выполняется скриптованное форматирование.

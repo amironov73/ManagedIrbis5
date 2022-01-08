@@ -22,7 +22,7 @@ using System.Windows.Forms;
 
 using AM.Collections;
 
-using ManagedIrbis.Scripting;
+using ManagedIrbis.Scripting.Sharping;
 
 #endregion
 
