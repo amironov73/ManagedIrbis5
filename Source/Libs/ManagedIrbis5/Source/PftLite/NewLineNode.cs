@@ -12,8 +12,6 @@
 #region Using directives
 
 using System;
-using System.IO;
-using System.Text;
 
 #endregion
 
@@ -45,6 +43,19 @@ internal sealed class NewLineNode
     #region Private members
 
     private readonly char _mode;
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Execute"/>
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        context.Write (Environment.NewLine);
+    }
 
     #endregion
 

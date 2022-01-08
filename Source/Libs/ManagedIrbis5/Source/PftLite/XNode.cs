@@ -9,14 +9,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using System.IO;
-using System.Text;
-
-#endregion
-
 #nullable enable
 
 namespace ManagedIrbis.PftLite;
@@ -45,6 +37,19 @@ internal sealed class XNode
     #region Private members
 
     private readonly int _length;
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Execute"/>
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        context.Write (new string (' ', _length));
+    }
 
     #endregion
 

@@ -109,6 +109,25 @@ sealed class FieldNode
 
     #endregion
 
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Execute"/>
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        var group = context.CurrentGroup;
+        var record = context.Record;
+
+        if (group is null)
+        {
+            var fields = record.Fields.GetField (Tag);
+        }
+    }
+
+    #endregion
+
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>

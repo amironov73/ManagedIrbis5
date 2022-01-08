@@ -52,6 +52,19 @@ internal sealed class RepeatingNode
 
     #endregion
 
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Execute"/>
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        context.Write (_value);
+    }
+
+    #endregion
+
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>

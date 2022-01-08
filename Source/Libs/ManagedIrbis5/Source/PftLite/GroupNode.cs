@@ -11,6 +11,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -32,6 +33,31 @@ sealed class GroupNode
     /// Элементы группы.
     /// </summary>
     public List<PftNode> Items { get; } = new ();
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Execute"/>
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        context.CurrentGroup = this;
+
+        do
+        {
+            context.OutputFlag = false;
+            foreach (var node in Items)
+            {
+                node.Execute (context);
+            }
+
+        } while (context.OutputFlag);
+
+        context.CurrentGroup = null;
+    }
 
     #endregion
 

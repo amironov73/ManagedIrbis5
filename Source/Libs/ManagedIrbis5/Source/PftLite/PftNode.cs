@@ -78,6 +78,19 @@ internal abstract class PftNode
 
         #endregion
 
+        #region PftNode members
+
+        /// <inheritdoc cref="PftNode.Execute"/>
+        public override void Execute
+            (
+                PftContext context
+            )
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
         #region Object members
 
         /// <inheritdoc cref="object.ToString"/>
@@ -93,7 +106,13 @@ internal abstract class PftNode
 
     #region Public methods
 
-
+    /// <summary>
+    /// Исполнение действий, связанных с текущим узлом.
+    /// </summary>
+    public abstract void Execute
+        (
+            PftContext context
+        );
 
     #endregion
 }

@@ -9,14 +9,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using System.IO;
-using System.Text;
-
-#endregion
-
 #nullable enable
 
 namespace ManagedIrbis.PftLite;
@@ -27,6 +19,20 @@ namespace ManagedIrbis.PftLite;
 internal sealed class ConditionalNode
     : PftNode
 {
+    #region Properties
+
+    /// <summary>
+    /// Литерал находится слева от команды вывода поля.
+    /// </summary>
+    public bool LeftHand { get; set; }
+
+    /// <summary>
+    /// Поле, которому принадлежит литерал.
+    /// </summary>
+    public FieldNode? Field { get; set; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -48,12 +54,38 @@ internal sealed class ConditionalNode
 
     #endregion
 
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Execute"/>
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        if (LeftHand)
+        {
+            if (context.CurrentRepeat == 0)
+            {
+                context.Write (_value);
+            }
+        }
+        else
+        {
+            if (context.CurrentRepeat == context.RepeatCount - 1)
+            {
+                context.Write (_value);
+            }
+        }
+    }
+
+    #endregion
+
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return $"conditional: \"{_value}\"";
+        return $"conditional: \"{_value}\" {LeftHand}";
     }
 
     #endregion

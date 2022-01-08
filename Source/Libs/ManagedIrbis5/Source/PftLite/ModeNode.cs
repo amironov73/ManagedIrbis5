@@ -52,6 +52,19 @@ internal sealed class ModeNode
 
     #endregion
 
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Execute"/>
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
