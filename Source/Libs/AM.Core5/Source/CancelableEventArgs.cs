@@ -20,60 +20,59 @@ using System.Linq;
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// <see cref="T:System.EventArgs"/> for cancelable
+/// handling.
+/// </summary>
+public class CancelableEventArgs
+    : EventArgs
 {
+    #region Properties
+
     /// <summary>
-    /// <see cref="T:System.EventArgs"/> for cancelable
-    /// handling.
+    /// Gets or sets a value indicating whether
+    /// event handling must be canceled.
     /// </summary>
-    public class CancelableEventArgs
-        : EventArgs
+    /// <value><c>true</c> if cancel;
+    /// otherwise, <c>false</c>.</value>
+    public bool Cancel { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Handles the event with specified sender and handler.
+    /// </summary>
+    /// <param name="sender">The sender.</param>
+    /// <param name="handler">The handler.</param>
+    /// <returns><c>true</c> if handling was canceled,
+    /// <c>false</c> otherwise.</returns>
+    public bool Handle
+        (
+            object sender,
+            CancelableEventHandler? handler
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets a value indicating whether
-        /// event handling must be canceled.
-        /// </summary>
-        /// <value><c>true</c> if cancel;
-        /// otherwise, <c>false</c>.</value>
-        public bool Cancel { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Handles the event with specified sender and handler.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="handler">The handler.</param>
-        /// <returns><c>true</c> if handling was canceled,
-        /// <c>false</c> otherwise.</returns>
-        public bool Handle
-            (
-                object sender,
-                CancelableEventHandler? handler
-            )
+        if (handler == null)
         {
-            if (handler == null)
-            {
-                return false;
-            }
-
-            var list = handler.GetInvocationList();
-            foreach (var eventHandler in list.OfType<CancelableEventHandler>())
-            {
-                eventHandler(sender, this);
-                if (Cancel)
-                {
-                    return true;
-                }
-            }
-
             return false;
         }
 
-        #endregion
+        var list = handler.GetInvocationList();
+        foreach (var eventHandler in list.OfType<CancelableEventHandler>())
+        {
+            eventHandler(sender, this);
+            if (Cancel)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
+
+    #endregion
 }

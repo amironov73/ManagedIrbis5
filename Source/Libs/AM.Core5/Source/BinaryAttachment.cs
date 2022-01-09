@@ -22,36 +22,36 @@ using System.Diagnostics.Contracts;
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Аттачмент к исключению -- произвольные двоичные данные,
+/// прикрепляемые к исключению.
+/// </summary>
+public sealed class BinaryAttachment
 {
+    #region Properties
+
     /// <summary>
-    /// Аттачмент к исключению -- произвольные двоичные данные,
-    /// прикрепляемые к исключению.
+    /// Name of the attachment.
     /// </summary>
-    public sealed class BinaryAttachment
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Content of the attachment.
+    /// </summary>
+    public byte[]? Content { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <inheritdoc cref="object.ToString" />
+    [Pure]
+    public override string ToString()
     {
-        #region Properties
+        return $"{Name.ToVisibleString()}: {Content?.Length} bytes";
+    }
 
-        /// <summary>
-        /// Name of the attachment.
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Content of the attachment.
-        /// </summary>
-        public byte[]? Content { get; set;  }
-
-        #endregion
-
-        #region Public methods
-
-        /// <inheritdoc cref="object.ToString" />
-        [Pure]
-        public override string ToString() => $"{Name.ToVisibleString()}: {Content?.Length} bytes";
-
-        #endregion
-
-    } // class BinaryAttachment
-
-} // namespace AM
+    #endregion
+}

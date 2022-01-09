@@ -21,79 +21,76 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Базовый класс для исключений,
+/// специфичных для проекта Ars Magna.
+/// </summary>
+public class ArsMagnaException
+    : ApplicationException
 {
+    #region Properties
+
     /// <summary>
-    /// Базовый класс для исключений,
-    /// специфичных для проекта Ars Magna.
+    /// Аттачменты.
     /// </summary>
-    public class ArsMagnaException
-        : ApplicationException
+    public List<BinaryAttachment> Attachments { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ArsMagnaException()
     {
-        #region Properties
+        Attachments = new List<BinaryAttachment>();
+    }
 
-        /// <summary>
-        /// Аттачменты.
-        /// </summary>
-        public List<BinaryAttachment> Attachments { get; }
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ArsMagnaException
+        (
+            string message
+        )
+        : base (message)
+    {
+        Attachments = new List<BinaryAttachment>();
+    }
 
-        #endregion
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ArsMagnaException
+        (
+            string message,
+            Exception innerException
+        )
+        : base (message, innerException)
+    {
+        Attachments = new List<BinaryAttachment>();
+    }
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ArsMagnaException()
-        {
-            Attachments = new List<BinaryAttachment>();
-        }
+    #region Public methods
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ArsMagnaException
-            (
-                string message
-            )
-            : base(message)
-        {
-            Attachments = new List<BinaryAttachment>();
-        }
+    /// <summary>
+    /// Прикрепление контента к исключению.
+    /// </summary>
+    public ArsMagnaException Attach
+        (
+            string name,
+            byte[] content
+        )
+    {
+        Attachments.Add (new BinaryAttachment { Name = name, Content = content });
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ArsMagnaException
-            (
-                string message,
-                Exception innerException
-            )
-            : base(message, innerException)
-        {
-            Attachments = new List<BinaryAttachment>();
-        }
+        return this;
+    }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Прикрепление контента к исключению.
-        /// </summary>
-        public ArsMagnaException Attach
-            (
-                string name,
-                byte[] content
-            )
-        {
-            Attachments.Add(new BinaryAttachment { Name = name, Content = content });
-
-            return this;
-        } // method Attach
-
-        #endregion
-
-    } // class ArsMagnaException
-
-} // namespace AM
+    #endregion
+}
