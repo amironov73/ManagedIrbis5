@@ -115,7 +115,7 @@ public static class Utf8Utility
         while (length != 0)
             unchecked
             {
-                var chr = *data++;
+                var chr = *data;
                 uint delta;
 
                 if ((chr & 0x80) == 0)
@@ -145,6 +145,7 @@ public static class Utf8Utility
                 }
 
                 length -= delta;
+                data += delta;
                 ++result;
             }
 
@@ -567,12 +568,14 @@ public static class Utf8Utility
             if (uchr < 1u << 7)
             {
                 stream.WriteByte ((byte)chr);
+                return;
             }
 
             if (uchr < 1u << 11)
             {
                 stream.WriteByte ((byte)((uchr >> 6) | 0xC0u));
-                stream.WriteByte ((byte)((uchr & 0x3Fu) | 0xC8u));
+                stream.WriteByte ((byte)((uchr & 0x3Fu) | 0x80u));
+                return;
             }
 
             if (uchr < 1u << 16)
@@ -580,6 +583,7 @@ public static class Utf8Utility
                 stream.WriteByte ((byte)((uchr >> 12) | 0xE0u));
                 stream.WriteByte ((byte)(((uchr >> 6) & 0x3Fu) | 0x80u));
                 stream.WriteByte ((byte)((uchr & 0x3Fu) | 0x80u));
+                return;
             }
 
             if (uchr < 1u << 21)
