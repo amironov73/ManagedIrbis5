@@ -69,8 +69,7 @@ namespace AM
             }
 
             return new string(buffer, offset, Length - offset);
-
-        } // method Int32ToString
+        }
 
         /// <summary>
         /// Преобразование 32-битного целого числа со знаком в строку.
@@ -99,7 +98,7 @@ namespace AM
                 var end = start;
                 for (; number != 0;)
                 {
-                    number = Math.DivRem(number, 10, out var rem);
+                    (number, var rem) = Math.DivRem (number, 10);
                     *end++ = (char) ('0' + rem);
                     ++length;
                 }
@@ -121,8 +120,136 @@ namespace AM
 
                 return length;
             }
+        }
 
-        } // method Int32ToChars
+        /// <summary>
+        /// Преобразование 32-битного целого числа без знака в строку.
+        /// </summary>
+        public static unsafe int UInt32ToChars
+            (
+                uint number,
+                Span<char> buffer
+            )
+        {
+            fixed (char* start = buffer)
+            {
+                var length = 0;
+                if (number == 0)
+                {
+                    *start = '0';
+                    return 1;
+                }
+
+                var end = start;
+                for (; number != 0;)
+                {
+                    (number, var rem) = Math.DivRem (number, 10u);
+                    *end++ = (char) ('0' + rem);
+                    ++length;
+                }
+
+                var ptr1 = start;
+                var ptr2 = end - 1;
+                while (ptr1 < ptr2)
+                {
+                    var c = *ptr1;
+                    *ptr1++ = *ptr2;
+                    *ptr2-- = c;
+                }
+
+                return length;
+            }
+        }
+
+        /// <summary>
+        /// Преобразование 64-битного целого числа со знаком в строку.
+        /// </summary>
+        public static unsafe int Int64ToChars
+            (
+                long number,
+                Span<char> buffer
+            )
+        {
+            var flag = number < 0;
+            if (flag)
+            {
+                number = -number;
+            }
+
+            fixed (char* start = buffer)
+            {
+                var length = 0;
+                if (number == 0)
+                {
+                    *start = '0';
+                    return 1;
+                }
+
+                var end = start;
+                for (; number != 0;)
+                {
+                    (number, var rem) = Math.DivRem (number, 10);
+                    *end++ = (char) ('0' + rem);
+                    ++length;
+                }
+
+                if (flag)
+                {
+                    *end++ = '-';
+                    ++length;
+                }
+
+                var ptr1 = start;
+                var ptr2 = end - 1;
+                while (ptr1 < ptr2)
+                {
+                    var c = *ptr1;
+                    *ptr1++ = *ptr2;
+                    *ptr2-- = c;
+                }
+
+                return length;
+            }
+        }
+
+        /// <summary>
+        /// Преобразование 64-битного целого числа без знака в строку.
+        /// </summary>
+        public static unsafe int UInt64ToChars
+            (
+                ulong number,
+                Span<char> buffer
+            )
+        {
+            fixed (char* start = buffer)
+            {
+                var length = 0;
+                if (number == 0)
+                {
+                    *start = '0';
+                    return 1;
+                }
+
+                var end = start;
+                for (; number != 0;)
+                {
+                    (number, var rem) = Math.DivRem (number, 10u);
+                    *end++ = (char) ('0' + rem);
+                    ++length;
+                }
+
+                var ptr1 = start;
+                var ptr2 = end - 1;
+                while (ptr1 < ptr2)
+                {
+                    var c = *ptr1;
+                    *ptr1++ = *ptr2;
+                    *ptr2-- = c;
+                }
+
+                return length;
+            }
+        }
 
         /// <summary>
         /// Преобразование 32-битного целого числа со знаком в строку.

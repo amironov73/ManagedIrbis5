@@ -39,12 +39,12 @@ public ref struct ValueStringBuilder
     #region Properties
 
     /// <summary>
-    /// Емкость.
+    /// Емкость в символах.
     /// </summary>
     public int Capacity => _characters.Length;
 
     /// <summary>
-    /// Текущая длина.
+    /// Текущая длина в символах.
     /// </summary>
     public int Length
     {
@@ -55,7 +55,7 @@ public ref struct ValueStringBuilder
             Sure.AssertState (value <= _characters.Length);
             _position = value;
         }
-    } // property Length
+    }
 
     /// <summary>
     /// Сырой буфер.
@@ -207,8 +207,10 @@ public ref struct ValueStringBuilder
             int value
         )
     {
+        // int.MinValue занимает 11 символов с учетом знака
+
         var remaining = _characters.Length - _position;
-        if (remaining >= 10)
+        if (remaining >= 11)
         {
             var buffer = _characters.Slice (_position);
             var written = FastNumber.Int32ToChars (value, buffer);
@@ -216,8 +218,104 @@ public ref struct ValueStringBuilder
         }
         else
         {
-            Span<char> buffer = stackalloc char[10];
+            Span<char> buffer = stackalloc char[11];
             var written = FastNumber.Int32ToChars (value, buffer);
+            var newPosition = _position + written;
+            if (newPosition > _characters.Length)
+            {
+                Grow (written);
+            }
+
+            buffer.Slice (0, written).CopyTo (_characters.Slice (_position));
+            _position = newPosition;
+        }
+    }
+
+    /// <summary>
+    /// Добавление целого числа без знака.
+    /// </summary>
+    public unsafe void Append
+        (
+            uint value
+        )
+    {
+        // uint.MaxValue занимает 10 символов с учетом знака
+
+        var remaining = _characters.Length - _position;
+        if (remaining >= 10)
+        {
+            var buffer = _characters.Slice (_position);
+            var written = FastNumber.UInt32ToChars (value, buffer);
+            _position += written;
+        }
+        else
+        {
+            Span<char> buffer = stackalloc char[10];
+            var written = FastNumber.UInt32ToChars (value, buffer);
+            var newPosition = _position + written;
+            if (newPosition > _characters.Length)
+            {
+                Grow (written);
+            }
+
+            buffer.Slice (0, written).CopyTo (_characters.Slice (_position));
+            _position = newPosition;
+        }
+    }
+
+    /// <summary>
+    /// Добавление длинного целого числа со знаком.
+    /// </summary>
+    public unsafe void Append
+        (
+            long value
+        )
+    {
+        // long.MinValue занимает 20 символов с учетом знака
+
+        var remaining = _characters.Length - _position;
+        if (remaining >= 20)
+        {
+            var buffer = _characters.Slice (_position);
+            var written = FastNumber.Int64ToChars (value, buffer);
+            _position += written;
+        }
+        else
+        {
+            Span<char> buffer = stackalloc char[20];
+            var written = FastNumber.Int64ToChars (value, buffer);
+            var newPosition = _position + written;
+            if (newPosition > _characters.Length)
+            {
+                Grow (written);
+            }
+
+            buffer.Slice (0, written).CopyTo (_characters.Slice (_position));
+            _position = newPosition;
+        }
+    }
+
+    /// <summary>
+    /// Добавление длинного целого числа без знака.
+    /// </summary>
+    public unsafe void Append
+        (
+            ulong value
+        )
+    {
+        // ulong.MaxValue занимает 20 символов с учетом знака
+
+        var remaining = _characters.Length - _position;
+        if (remaining >= 20)
+        {
+            var buffer = _characters.Slice (_position);
+            var written = FastNumber.UInt64ToChars (value, buffer);
+            _position += written;
+        }
+        else
+        {
+            Span<char> buffer = stackalloc char[20];
+            var written = FastNumber.UInt64ToChars (value, buffer);
             var newPosition = _position + written;
             if (newPosition > _characters.Length)
             {
@@ -235,6 +333,14 @@ public ref struct ValueStringBuilder
     public void AppendLine()
     {
         Append (Environment.NewLine);
+    }
+
+    /// <summary>
+    /// Очистка.
+    /// </summary>
+    public void Clear()
+    {
+        _position = 0;
     }
 
     /// <summary>
@@ -311,7 +417,7 @@ public ref struct ValueStringBuilder
         }
 
         var remaining = _position - index;
-        _characters.Slice (index, remaining).CopyTo(_characters.Slice (index + count));
+        _characters.Slice (index, remaining).CopyTo (_characters.Slice (index + count));
         _characters.Slice (index, count).Fill (value);
         _position += count;
     }
@@ -369,7 +475,7 @@ public ref struct ValueStringBuilder
             {
                 if (appendNewLine)
                 {
-                    Append ((char)chr);
+                    Append ((char) chr);
                 }
 
                 return true;
@@ -377,7 +483,7 @@ public ref struct ValueStringBuilder
 
             if (chr != '\r')
             {
-                Append ((char)chr);
+                Append ((char) chr);
             }
 
             first = false;
@@ -429,7 +535,7 @@ public ref struct ValueStringBuilder
     {
         var index = 0;
 
-        var delta = from.Length - to.Length;
+        var delta = to.Length - from.Length;
         while (true)
         {
             var actual = _characters[index..];
@@ -448,8 +554,11 @@ public ref struct ValueStringBuilder
             else if (delta > 0)
             {
                 // двигаем хвост вправо, при необходимости увеличиваем буфер
-                EnsureCapacity (_position + delta);
-                head.Slice (to.Length).CopyTo (head.Slice (to.Length));
+                var tail = _position - found - from.Length;
+                EnsureCapacity(_position + delta);
+                head = _characters.Slice (found); // возможно, буфер увеличился!
+                head.Slice (from.Length, tail)
+                    .CopyTo (head.Slice (to.Length));
             }
 
             to.CopyTo (head);
