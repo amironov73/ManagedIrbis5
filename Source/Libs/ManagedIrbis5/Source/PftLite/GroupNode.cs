@@ -11,7 +11,6 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -46,15 +45,10 @@ sealed class GroupNode
     {
         context.CurrentGroup = this;
 
-        do
+        foreach (var node in Items)
         {
-            context.OutputFlag = false;
-            foreach (var node in Items)
-            {
-                node.Execute (context);
-            }
-
-        } while (context.OutputFlag);
+            node.Execute (context);
+        }
 
         context.CurrentGroup = null;
     }

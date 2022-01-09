@@ -296,6 +296,53 @@ public ref struct ValueStringBuilder
     }
 
     /// <summary>
+    /// Вставка символов в указанную позицию.
+    /// </summary>
+    public void Insert
+        (
+            int index,
+            char value,
+            int count
+        )
+    {
+        if (_position > _characters.Length - count)
+        {
+            Grow (count);
+        }
+
+        var remaining = _position - index;
+        _characters.Slice (index, remaining).CopyTo(_characters.Slice (index + count));
+        _characters.Slice (index, count).Fill (value);
+        _position += count;
+    }
+
+    /// <summary>
+    /// Вставка текста в указанную позицию.
+    /// </summary>
+    public void Insert
+        (
+            int index,
+            ReadOnlySpan<char> text
+        )
+    {
+        if (text.IsEmpty)
+        {
+            return;
+        }
+
+        var count = text.Length;
+        if (_position > _characters.Length - count)
+        {
+            Grow (count);
+        }
+
+        var remaining = _position - index;
+        _characters.Slice (index, remaining).CopyTo (_characters.Slice (index + count));
+        text.CopyTo (_characters.Slice (index));
+        _position += count;
+    }
+
+    /// <summary>
     /// Чтение строки непосредственно в <see cref="StringBuilder"/>.
     /// </summary>
     /// <param name="reader">Поток, из которого считывается строка.</param>
@@ -334,6 +381,81 @@ public ref struct ValueStringBuilder
             }
 
             first = false;
+        }
+    }
+
+    /// <summary>
+    /// Удаление указанного количества символов.
+    /// </summary>
+    public void Remove
+        (
+            int startIndex,
+            int length
+        )
+    {
+        Sure.NonNegative (startIndex);
+        Sure.NonNegative (length);
+
+        if (length == 0)
+        {
+            return;
+        }
+
+        if (length > _position - startIndex)
+        {
+            throw new ArgumentOutOfRangeException (nameof (length));
+        }
+
+        if (_position == length && startIndex == 0)
+        {
+            _position = 0;
+            return;
+        }
+
+        var endIndex = startIndex + length;
+        var remaining = _position - endIndex;
+        _characters.Slice (endIndex, remaining).CopyTo (_characters.Slice (startIndex));
+        _position -= length;
+    }
+
+    /// <summary>
+    /// Замена одной подстроки на другую.
+    /// </summary>
+    public void Replace
+        (
+            ReadOnlySpan<char> from,
+            ReadOnlySpan<char> to
+        )
+    {
+        var index = 0;
+
+        var delta = from.Length - to.Length;
+        while (true)
+        {
+            var actual = _characters[index..];
+            var found = actual.IndexOf (from);
+            if (found < 0)
+            {
+                return;
+            }
+
+            var head = actual.Slice (found);
+            if (delta < 0)
+            {
+                // двигаем хвост влево
+                head.Slice (from.Length).CopyTo (head.Slice (to.Length));
+            }
+            else if (delta > 0)
+            {
+                // двигаем хвост вправо, при необходимости увеличиваем буфер
+                EnsureCapacity (_position + delta);
+                head.Slice (to.Length).CopyTo (head.Slice (to.Length));
+            }
+
+            to.CopyTo (head);
+
+            index += to.Length;
+            _position += delta;
         }
     }
 

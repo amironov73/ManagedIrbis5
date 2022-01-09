@@ -9,12 +9,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-
-#endregion
-
 #nullable enable
 
 namespace ManagedIrbis.PftLite;
@@ -54,7 +48,7 @@ internal sealed class NewLineNode
             PftContext context
         )
     {
-        context.Write (Environment.NewLine);
+        context.Write ('\n');
     }
 
     #endregion

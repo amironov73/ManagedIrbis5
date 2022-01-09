@@ -109,6 +109,24 @@ sealed class FieldNode
 
     #endregion
 
+    #region Private members
+
+    private string[]? _prepared;
+
+    /// <summary>
+    /// Подготовка к расформатированию.
+    /// </summary>
+    internal int Prepare
+        (
+            PftContext context
+        )
+    {
+        _prepared = Array.Empty<string>();
+        return 0;
+    }
+
+    #endregion
+
     #region PftNode members
 
     /// <inheritdoc cref="PftNode.Execute"/>

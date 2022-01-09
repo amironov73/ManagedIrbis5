@@ -16,8 +16,6 @@
 #region Using directives
 
 using System;
-using System.IO;
-using System.Text;
 
 #endregion
 

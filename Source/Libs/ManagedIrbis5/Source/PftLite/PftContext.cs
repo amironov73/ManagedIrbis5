@@ -15,8 +15,7 @@
 
 #region Using directives
 
-using System.IO;
-using System.Text;
+using System;
 
 #endregion
 
@@ -39,17 +38,12 @@ sealed class PftContext
     /// <summary>
     /// Выходной поток.
     /// </summary>
-    public StringWriter Output { get; }
+    public PftOutput Output { get; } = new ();
 
     /// <summary>
     /// Режим вывода полей/подполей.
     /// </summary>
     public char Mode { get; set; }
-
-    /// <summary>
-    /// Преобразование в верхний регистр.
-    /// </summary>
-    public bool UpperMode { get; set; }
 
     /// <summary>
     /// Текущая группа.
@@ -71,30 +65,6 @@ sealed class PftContext
     /// </summary>
     public bool EatNextNewLine { get; set; }
 
-    /// <summary>
-    /// Был вывод?
-    /// </summary>
-    public bool OutputFlag { get; set; }
-
-    #endregion
-
-    #region Construction
-
-    /// <summary>
-    /// Конструктор по умолчанию.
-    /// </summary>
-    public PftContext()
-    {
-        _builder = new StringBuilder();
-        Output = new StringWriter (_builder);
-    }
-
-    #endregion
-
-    #region Private members
-
-    private readonly StringBuilder _builder;
-
     #endregion
 
     #region Public methods
@@ -105,9 +75,7 @@ sealed class PftContext
     public void Reset()
     {
         Mode = 'p';
-        UpperMode = false;
-        _builder.Clear();
-        OutputFlag = false;
+        Output.Reset();
         CurrentGroup = null;
         CurrentRepeat = 0;
     }
@@ -119,13 +87,10 @@ sealed class PftContext
     public void Write
         (
             char chr,
-            int length
+            int count = 1
         )
     {
-        while (--length >= 0)
-        {
-            Output.Write (chr);
-        }
+        Output.Write (chr, chr);
     }
 
     /// <summary>
@@ -133,33 +98,10 @@ sealed class PftContext
     /// </summary>
     public void Write
         (
-            string? text
+            ReadOnlySpan<char> text
         )
     {
-        if (!string.IsNullOrEmpty (text))
-        {
-            Output.Write
-                (
-                    UpperMode
-                        ? text.ToUpperInvariant()
-                        : text
-                );
-        }
-    }
-
-    /// <summary>
-    /// Вывод текста с установкой флага (если текст не пустой).
-    /// </summary>
-    public void WriteAndSetFlag
-        (
-            string? text
-        )
-    {
-        if (!string.IsNullOrEmpty (text))
-        {
-            Output.Write (text);
-            OutputFlag = true;
-        }
+        Output.Write (text);
     }
 
     #endregion
