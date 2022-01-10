@@ -77,7 +77,7 @@ public static class SourceCodeUtility
                 );
         }
 
-        result.Append ("}");
+        result.Append ('}');
 
         return result.ToString();
     }
@@ -157,7 +157,7 @@ public static class SourceCodeUtility
                 );
         }
 
-        result.Append ("}");
+        result.Append ('}');
 
         return result.ToString();
     }
@@ -194,7 +194,7 @@ public static class SourceCodeUtility
                 );
         }
 
-        result.Append ("}");
+        result.Append ('}');
 
         return result.ToString();
     }

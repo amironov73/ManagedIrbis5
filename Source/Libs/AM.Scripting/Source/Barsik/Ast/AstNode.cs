@@ -9,6 +9,15 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System;
+using System.IO;
+
+using AM.Runtime.Mere;
+
+#endregion
+
 #nullable enable
 
 namespace AM.Scripting.Barsik;
@@ -17,6 +26,28 @@ namespace AM.Scripting.Barsik;
 /// Абстрактный узел AST.
 /// </summary>
 public abstract class AstNode
+    : IMereSerializable
+
 {
-    // в классе пока нет членов
+    #region IMereSerializable members
+
+    /// <inheritdoc cref="IMereSerializable.MereSerialize"/>
+    public virtual void MereSerialize
+        (
+            BinaryWriter writer
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="IMereSerializable.MereDeserialize"/>
+    public virtual void MereDeserialize
+        (
+            BinaryReader reader
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
 }

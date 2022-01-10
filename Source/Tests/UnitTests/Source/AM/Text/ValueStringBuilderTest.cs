@@ -671,6 +671,19 @@ public unsafe class ValueStringBuilderTest
     }
 
     [TestMethod]
+    [Description ("Замена подстроки: замена несуществующей строки")]
+    public void ValueStringBuilder_Replace_6()
+    {
+        const int bufferLength = 10;
+        Span<char> buffer = stackalloc char[bufferLength];
+        var builder = new ValueStringBuilder (buffer);
+        builder.Append ("0123456789");
+
+        builder.Replace ("32", "abcdefghijklm");
+        Assert.AreEqual ("0123456789", builder.ToString());
+    }
+
+    [TestMethod]
     [Description ("Очистка")]
     public void ValueStringBuilder_Clear_1()
     {
