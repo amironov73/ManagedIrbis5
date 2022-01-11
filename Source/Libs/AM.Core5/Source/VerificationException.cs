@@ -17,46 +17,48 @@ using System;
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Сигнализирует об обнаружении ошибки при верификации объекта.
+/// </summary>
+public sealed class VerificationException
+    : ArsMagnaException
 {
+    #region Construction
+
     /// <summary>
-    /// Сигнализирует об обнаружении ошибки при верификации объекта.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class VerificationException
-        : ArsMagnaException
+    public VerificationException()
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public VerificationException()
-        {
-        }
-
-        /// <summary>
-        /// Конструктор с сообщением.
-        /// </summary>
-        public VerificationException
-            (
-                string message
-            )
-            : base(message)
-        {
-        }
-
-        /// <summary>
-        /// Конструктор с сообщением и внутренним исключением.
-        /// </summary>
-        public VerificationException
-            (
-                string message,
-                Exception innerException
-            )
-            : base(message, innerException)
-        {
-        }
-
-        #endregion
+        // пустое тело метода
     }
+
+    /// <summary>
+    /// Конструктор с сообщением.
+    /// </summary>
+    public VerificationException
+        (
+            string message
+        )
+        : base(message)
+    {
+        // пустое тело метода
+    }
+
+    /// <summary>
+    /// Конструктор с сообщением и внутренним исключением.
+    /// </summary>
+    public VerificationException
+        (
+            string message,
+            Exception innerException
+        )
+        : base(message, innerException)
+    {
+        // пустое тело метода
+    }
+
+    #endregion
 }

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 
 /* TypeMap.cs -- отображение типов при сериализации Барсик-дерева
  * Ars Magna project, http://arsmagna.ru
@@ -12,9 +13,6 @@
 #region Using directives
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 #endregion
@@ -40,16 +38,19 @@ sealed class TypeMap
     /// </summary>
     public Type? Type;
 
-    /// <summary>
-    /// Создание узла.
-    /// </summary>
-    public Func<AstNode>? Create;
+    // /// <summary>
+    // /// Создание узла.
+    // /// </summary>
+    // public Func<AstNode>? Create;
 
     #endregion
 
         #region Public members
 
-        public static readonly TypeMap[] Map =
+        /// <summary>
+        /// Известные нам типы узлов.
+        /// </summary>
+        private static readonly TypeMap[] KnownTypes =
         {
             new() { Code=1, Type=typeof (AssignmentNode) },
             new() { Code=2, Type=typeof (AwaitNode) },
@@ -87,12 +88,15 @@ sealed class TypeMap
             new() { Code=33, Type=typeof (WhileNode) },
         };
 
-        public static TypeMap? FindCode
+        /// <summary>
+        /// Поиск типа узла по его коду.
+        /// </summary>
+        public static TypeMap? FindTypeCode
             (
                 byte code
             )
         {
-            return Map.FirstOrDefault (item => item.Code == code);
+            return KnownTypes.FirstOrDefault (item => item.Code == code);
 
             // var lo = 0;
             // var hi = Map.Length - 1;
@@ -118,14 +122,17 @@ sealed class TypeMap
             // return null;
         }
 
+        /// <summary>
+        /// Поиск типа узла в таблице.
+        /// </summary>
         public static TypeMap? FindType
             (
                 Type nodeType
             )
         {
-            foreach (var entry in Map)
+            foreach (var entry in KnownTypes)
             {
-                if (ReferenceEquals(nodeType, entry.Type))
+                if (ReferenceEquals (nodeType, entry.Type))
                 {
                     return entry;
                 }
