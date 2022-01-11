@@ -1,0 +1,14 @@
+﻿<html lang="ru">
+<head>
+    <title>Привет, Барсик!</title>
+</head>
+<body>
+@{ x = 1
+y = 2
+z = x + y
+}
+    <h1>Привет!</h1>
+    <p>Барсик @__VER__</p>
+    <p>@x + @y = @z</p>
+</body>
+</html>

@@ -98,6 +98,21 @@ public sealed class Interpreter
         Sure.NotNull (sourceCode);
 
         var program = Grammar.ParseProgram (sourceCode);
+        var result = Execute(program);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Запуск скрипта на исполнение.
+    /// </summary>
+    /// <param name="program"></param>
+    public ExecutionResult Execute
+        (
+            ProgramNode program
+        )
+    {
+        Sure.NotNull (program);
 
         var haveDefinitions = false;
         foreach (var statement in program.Statements)

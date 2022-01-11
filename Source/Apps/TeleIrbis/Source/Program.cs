@@ -52,6 +52,7 @@ namespace TeleIrbis;
 
  /*
   * Куда у нас складывается лог -- в "C:\ProgramData\TeleIrbis\LogFile.txt"
+  * На *nix: "/usr/share/TeleIrbis/LogFile.txt"
   */
 
 class Program
