@@ -29,6 +29,31 @@ using Topshelf.Logging;
 
 namespace TeleIrbis;
 
+/*
+
+  Допустим, мы хотим опубликовать .NET-приложение. Раньше, в .NET 5 оно
+  спокойно публиковалось, а теперь, в эпоху .NET 6 внезапно выскакивает ошибка
+
+    Microsoft.NET.ConflictResolution.targets(112, 5): [NETSDK1152] обнаружено
+    несколько выходных файлов публикации с одним и тем же относительным путем:
+    C:\Users\amiro\.nuget\packages\nlog.config\4.7.12\contentFiles\any\any\NLog.config,
+    D:\Projects\ManagedIrbis5\Source\Apps\TeleIrbis\NLog.config.
+
+  Понятно, что самый лучший вариант здесь - разобраться, откуда у нас два файла
+  NLog.config, но если нужно решить вопрос по-быстрому, то выход таков: добавить в проект атрибут ErrorOnDuplicatePublishOutputFiles
+
+  <PropertyGroup>
+   <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+  </PropertyGroup>
+
+  Костыль, конечно, но выручает.
+
+ */
+
+ /*
+  * Куда у нас складывается лог -- в "C:\ProgramData\TeleIrbis\LogFile.txt"
+  */
+
 class Program
 {
     #region Private members
@@ -52,7 +77,7 @@ class Program
         service.RunAsNetworkService();
         service.EnableShutdown();
 
-        //service.UseNLog();
+        service.UseNLog();
 
         // Необязательная настройка восстановления после сбоев
         service.EnableServiceRecovery (recovery => { recovery.RestartService (1); });
