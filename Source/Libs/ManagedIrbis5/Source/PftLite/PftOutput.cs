@@ -33,6 +33,11 @@ internal sealed class PftOutput
     public char LastCharacter { get; private set; }
 
     /// <summary>
+    /// Текущий номер колонки (отсчет от 0).
+    /// </summary>
+    public int ColumnNumber { get; private set; }
+
+    /// <summary>
     /// Нужно ли переводить символы в верхний регистр.
     /// </summary>
     public bool UpperMode { get; set; }
@@ -53,6 +58,7 @@ internal sealed class PftOutput
     public void Reset()
     {
         _builder.Clear();
+        ColumnNumber = 0;
         UpperMode = false;
     }
 
@@ -79,6 +85,7 @@ internal sealed class PftOutput
         while (--count >= 0)
         {
             _builder.Append (chr);
+            ColumnNumber = chr == '\n' ? 0 : ColumnNumber + 1;
         }
     }
 
@@ -95,6 +102,7 @@ internal sealed class PftOutput
             var chr2 = UpperMode ? char.ToUpperInvariant (chr) : chr;
             LastCharacter = chr2;
             _builder.Append (chr2);
+            ColumnNumber = (chr2 == '\n') ? 0 : ColumnNumber + 1;
         }
     }
 

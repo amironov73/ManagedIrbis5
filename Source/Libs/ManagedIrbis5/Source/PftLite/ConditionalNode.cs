@@ -9,6 +9,13 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System;
+using System.IO;
+
+#endregion
+
 #nullable enable
 
 namespace ManagedIrbis.PftLite;
@@ -25,11 +32,6 @@ internal sealed class ConditionalNode
     /// Литерал находится слева от команды вывода поля.
     /// </summary>
     public bool LeftHand { get; set; }
-
-    /// <summary>
-    /// Поле, которому принадлежит литерал.
-    /// </summary>
-    public FieldNode? Field { get; set; }
 
     #endregion
 
@@ -76,6 +78,28 @@ internal sealed class ConditionalNode
                 context.Write (_value);
             }
         }
+    }
+
+    #endregion
+
+    #region MereSerializer members
+
+    /// <inheritdoc cref="PftNode.MereSerialize"/>
+    public override void MereSerialize
+        (
+            BinaryWriter writer
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="PftNode.MereDeserialize"/>
+    public override void MereDeserialize
+        (
+            BinaryReader reader
+        )
+    {
+        throw new NotImplementedException();
     }
 
     #endregion

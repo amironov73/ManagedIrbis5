@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
 
 /* PftNode.cs -- абстрактный узел PFT-скрипта
  * Ars Magna project, http://arsmagna.ru
@@ -83,11 +79,16 @@ internal abstract class PftNode
         #region PftNode members
 
         /// <inheritdoc cref="PftNode.Execute"/>
+        /// <exception cref="NotImplementedException">
+        /// Метод обязательно должен быть переопределен
+        /// в потомке.
+        /// </exception>
         public override void Execute
             (
                 PftContext context
             )
         {
+            // метод обязательно должен быть переопределен в потомке
             throw new NotImplementedException();
         }
 
@@ -109,20 +110,30 @@ internal abstract class PftNode
     #region IMereSerializable members
 
     /// <inheritdoc cref="IMereSerializable.MereSerialize"/>
+    /// <exception cref="NotImplementedException">
+    /// Метод обязательно должен быть переопределен
+    /// в потомке.
+    /// </exception>
     public virtual void MereSerialize
         (
             BinaryWriter writer
         )
     {
+        // метод обязательно должен быть переопределен в потомке
         throw new NotImplementedException();
     }
 
     /// <inheritdoc cref="IMereSerializable.MereDeserialize"/>
+    /// <exception cref="NotImplementedException">
+    /// Метод обязательно должен быть переопределен
+    /// в потомке.
+    /// </exception>
     public virtual void MereDeserialize
         (
             BinaryReader reader
         )
     {
+        // метод обязательно должен быть переопределен в потомке
         throw new NotImplementedException();
     }
 

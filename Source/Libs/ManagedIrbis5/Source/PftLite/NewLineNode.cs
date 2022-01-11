@@ -9,9 +9,33 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System;
+using System.IO;
+
+#endregion
+
 #nullable enable
 
 namespace ManagedIrbis.PftLite;
+
+/*
+
+  Команда '/' приводит к размещению последующих данных с начала следующей строки.
+  Однако подряд расположенные команды '/', хотя и являются синтаксически правильными,
+  но имеют тот же смысл, что и одна команда '/', т.е. команда '/' никогда не создает
+  пустых строк.
+
+  Команда '#'выполняет те же действия, что и '/', но переход на новую строку является
+  безусловным. Можно использовать комбинацию '/#' для создания одной (и только одной)
+  пустой строки.
+
+  Команда '%' подавляет все последовательно расположенные пустые строки (если они
+  имеются) между текущей строкой и последней непустой строкой. В облегченном форматтере
+  не поддерживается. Вместо '%' ничего не выводится.
+
+ */
 
 /// <summary>
 /// Перевод строки.
@@ -48,7 +72,39 @@ internal sealed class NewLineNode
             PftContext context
         )
     {
-        context.Write ('\n');
+        if (_mode == '#')
+        {
+            context.Write ('\n');
+        }
+        else if (_mode == '/')
+        {
+            if (context.Output.ColumnNumber != 0)
+            {
+                context.Write ('\n');
+            }
+        }
+    }
+
+    #endregion
+
+    #region MereSerializer members
+
+    /// <inheritdoc cref="PftNode.MereSerialize"/>
+    public override void MereSerialize
+        (
+            BinaryWriter writer
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="PftNode.MereDeserialize"/>
+    public override void MereDeserialize
+        (
+            BinaryReader reader
+        )
+    {
+        throw new NotImplementedException();
     }
 
     #endregion

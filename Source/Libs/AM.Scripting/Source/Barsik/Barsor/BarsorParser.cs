@@ -96,6 +96,7 @@ public sealed class BarsorParser
                             "}",
                             "}"
                         );
+                    navigator.ReadChar(); // доедаем закрывающий символ '}'
                     if (!source.IsEmpty)
                     {
                         var subProgram = Grammar.ParseProgram (source.ToString());

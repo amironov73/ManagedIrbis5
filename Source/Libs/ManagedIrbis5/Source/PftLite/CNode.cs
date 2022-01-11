@@ -13,13 +13,19 @@
 
 using System;
 using System.IO;
-using System.Text;
 
 #endregion
 
 #nullable enable
 
 namespace ManagedIrbis.PftLite;
+
+/*
+
+   Команда 'Cn' устанавливает n-ю позицию в строке.
+   Иными словами, это табуляция в n-ю позицию.
+
+ */
 
 /// <summary>
 /// Перемещение в указанную позицию.
@@ -54,6 +60,40 @@ internal sealed class CNode
     public override void Execute
         (
             PftContext context
+        )
+    {
+        if (context.CurrentRepeat == 0)
+        {
+            var current = context.Output.ColumnNumber;
+            if (current < _position)
+            {
+                context.Write (' ', _position - current);
+            }
+            else if (current > _position)
+            {
+                context.Write ('\n');
+                context.Write (' ', _position);
+            }
+        }
+    }
+
+    #endregion
+
+    #region MereSerializer members
+
+    /// <inheritdoc cref="PftNode.MereSerialize"/>
+    public override void MereSerialize
+        (
+            BinaryWriter writer
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="PftNode.MereDeserialize"/>
+    public override void MereDeserialize
+        (
+            BinaryReader reader
         )
     {
         throw new NotImplementedException();

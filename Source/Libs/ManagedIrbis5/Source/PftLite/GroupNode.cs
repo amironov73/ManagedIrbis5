@@ -11,7 +11,9 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 #endregion
@@ -45,12 +47,57 @@ sealed class GroupNode
     {
         context.CurrentGroup = this;
 
-        foreach (var node in Items)
+        var count = 0;
+        foreach (var item in Items)
         {
-            node.Execute (context);
+            if (item is FieldNode field)
+            {
+                count = Math.Max (count, field.Prepare (context));
+
+            }
+        }
+
+        if (count == 0)
+        {
+            context.CurrentGroup = null;
+            return;
+        }
+
+        context.RepeatCount = count;
+        for (context.CurrentRepeat = 0;
+             context.CurrentRepeat < context.RepeatCount;
+             context.CurrentRepeat++
+            )
+        {
+            foreach (var node in Items)
+            {
+                node.Execute (context);
+            }
         }
 
         context.CurrentGroup = null;
+    }
+
+    #endregion
+
+    #region MereSerializer members
+
+    /// <inheritdoc cref="PftNode.MereSerialize"/>
+    public override void MereSerialize
+        (
+            BinaryWriter writer
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="PftNode.MereDeserialize"/>
+    public override void MereDeserialize
+        (
+            BinaryReader reader
+        )
+    {
+        throw new NotImplementedException();
     }
 
     #endregion

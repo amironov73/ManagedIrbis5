@@ -60,11 +60,6 @@ sealed class PftContext
     /// </summary>
     public int RepeatCount { get; set; }
 
-    /// <summary>
-    /// Съесть следующий перевод строки?
-    /// </summary>
-    public bool EatNextNewLine { get; set; }
-
     #endregion
 
     #region Public methods
@@ -90,7 +85,7 @@ sealed class PftContext
             int count = 1
         )
     {
-        Output.Write (chr, chr);
+        Output.Write (chr, count);
     }
 
     /// <summary>

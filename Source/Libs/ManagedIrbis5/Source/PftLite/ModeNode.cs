@@ -13,13 +13,38 @@
 
 using System;
 using System.IO;
-using System.Text;
 
 #endregion
 
 #nullable enable
 
 namespace ManagedIrbis.PftLite;
+
+/*
+
+   Система может выводить данные в трех различных режимах:
+
+   * Режим проверки - в этом режиме поля выводятся в том виде,
+     в каком они хранятся в записи. При этом система не обеспечивает
+     никаких разделителей между полями или экземплярами повторяющихся полей.
+     Пользователь должен обеспечить адекватное разделение полей с помощью
+     команд размещения, литералов или повторяющихся групп. Режим обычно
+     используется для вывода записей с целью проверки правильности введенных
+     данных;
+
+   * Режим заголовка - этот режим обычно используется для печати заголовков
+     при выводе указателей и таблиц. Все управляющие символы, введенные вместе
+      с данными, такие как разделители терминов (< и >) игнорируются (за
+      исключением указанных ниже случаев), а разделители подполей заменяются
+      знаками пунктуации;
+
+   * Режим данных - этот режим похож на режим заголовка, но дополнительно
+     после каждого поля автоматически ставится точка (.), за которой следуют
+     два пробела (или просто два пробела, если поле заканчивается каким-либо
+     знаком пунктуации). Отметим, однако, что эта автоматическая пунктуация
+     подавляется, если за командой вывода поля следует суффикс-литерал.
+
+ */
 
 /// <summary>
 /// Переключение режима вывода поля/подполя.
@@ -47,7 +72,6 @@ internal sealed class ModeNode
     #region Private members
 
     private readonly char _mode;
-
     private readonly bool _upper;
 
     #endregion
@@ -58,6 +82,32 @@ internal sealed class ModeNode
     public override void Execute
         (
             PftContext context
+        )
+    {
+        if (context.CurrentRepeat == 0)
+        {
+            context.Mode = _mode;
+            context.Output.UpperMode = _upper;
+        }
+    }
+
+    #endregion
+
+    #region MereSerializer members
+
+    /// <inheritdoc cref="PftNode.MereSerialize"/>
+    public override void MereSerialize
+        (
+            BinaryWriter writer
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="PftNode.MereDeserialize"/>
+    public override void MereDeserialize
+        (
+            BinaryReader reader
         )
     {
         throw new NotImplementedException();

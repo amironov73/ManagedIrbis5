@@ -158,16 +158,7 @@ internal static class Grammar
                     result.Add (node);
                 }
 
-
-                foreach (var leftNode in stack)
-                {
-                    field.LeftHand.Add (leftNode);
-                    if (leftNode is ConditionalNode conditionalLeft)
-                    {
-                        conditionalLeft.Field = field;
-                    }
-                }
-
+                field.LeftHand.AddRange (stack);
                 stack.Clear();
                 currentField = field.Command == 'v'
                     ? field // команда вывода реального поля
@@ -207,16 +198,16 @@ internal static class Grammar
                 {
                     // разбираем правую часть
                     currentField.RightHand.Add (node);
-                    conditional.Field = currentField;
                 }
                 continue;
             }
 
-            if (node is RepeatingNode)
+            if (node is RepeatingNode repeating)
             {
                 if (currentField is null)
                 {
                     // разбираем левую часть
+                    repeating.LeftHand = true;
                     stack.Add (node);
                 }
                 else

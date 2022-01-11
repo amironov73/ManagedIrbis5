@@ -27,6 +27,15 @@ namespace ManagedIrbis.PftLite;
 internal sealed class RepeatingNode
     : PftNode
 {
+    #region Properties
+
+    /// <summary>
+    /// Литерал находится слева от команды вывода поля.
+    /// </summary>
+    public bool LeftHand { get; set; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -60,7 +69,49 @@ internal sealed class RepeatingNode
             PftContext context
         )
     {
-        context.Write (_value);
+        if (!_plus)
+        {
+            context.Write (_value);
+        }
+        else
+        {
+            if (LeftHand)
+            {
+                if (context.CurrentRepeat != 0)
+                {
+                    context.Write (_value);
+                }
+            }
+            else
+            {
+                if (context.CurrentRepeat != (context.RepeatCount - 1))
+                {
+                    context.Write (_value);
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region MereSerializer members
+
+    /// <inheritdoc cref="PftNode.MereSerialize"/>
+    public override void MereSerialize
+        (
+            BinaryWriter writer
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="PftNode.MereDeserialize"/>
+    public override void MereDeserialize
+        (
+            BinaryReader reader
+        )
+    {
+        throw new NotImplementedException();
     }
 
     #endregion

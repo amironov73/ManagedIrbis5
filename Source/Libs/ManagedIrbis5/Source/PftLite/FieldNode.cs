@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 using AM;
@@ -111,7 +112,7 @@ sealed class FieldNode
 
     #region Private members
 
-    private string[]? _prepared;
+    private string?[]? _prepared;
 
     /// <summary>
     /// Подготовка к расформатированию.
@@ -121,8 +122,72 @@ sealed class FieldNode
             PftContext context
         )
     {
-        _prepared = Array.Empty<string>();
-        return 0;
+        var fields = context.Record.Fields.GetField (Tag);
+
+        if (fields.Length == 0)
+        {
+            _prepared = Array.Empty<string>();
+            return 0;
+        }
+
+        var prepared = new List<string?> (fields.Length);
+        foreach (var field in fields)
+        {
+            if (Code == '\0')
+            {
+                prepared.Add (field.ToText());
+            }
+            else
+            {
+                prepared.Add (field.GetSubFieldValue (Code));
+            }
+        }
+
+        _prepared = prepared.ToArray();
+
+        return _prepared.Length;
+    }
+
+    private void _Execute
+        (
+            PftContext context
+        )
+    {
+        var prepared = _prepared.ThrowIfNull();
+        var value = prepared.SafeAt (context.CurrentRepeat);
+        if (string.IsNullOrEmpty (value))
+        {
+            if (Command == 'n')
+            {
+                foreach (var node in LeftHand)
+                {
+                    node.Execute (context);
+                }
+            }
+        }
+        else
+        {
+            if (Command is 'v' or 'd')
+            {
+                foreach (var node in LeftHand)
+                {
+                    node.Execute (context);
+                }
+            }
+
+            if (Command == 'v')
+            {
+                context.Write (value);
+            }
+
+            if (Command == 'v')
+            {
+                foreach (var node in RightHand)
+                {
+                    node.Execute (context);
+                }
+            }
+        }
     }
 
     #endregion
@@ -140,8 +205,49 @@ sealed class FieldNode
 
         if (group is null)
         {
-            var fields = record.Fields.GetField (Tag);
+            context.RepeatCount = Prepare (context);
+
+            if (context.RepeatCount == 0 && Command == 'n')
+            {
+                foreach (var node in LeftHand)
+                {
+                    node.Execute (context);
+                }
+            }
+
+            for (context.CurrentRepeat = 0;
+                 context.CurrentRepeat < context.RepeatCount;
+                 context.CurrentRepeat++)
+            {
+                _Execute(context);
+            }
         }
+        else
+        {
+            _Execute (context);
+        }
+    }
+
+    #endregion
+
+    #region MereSerializer members
+
+    /// <inheritdoc cref="PftNode.MereSerialize"/>
+    public override void MereSerialize
+        (
+            BinaryWriter writer
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="PftNode.MereDeserialize"/>
+    public override void MereDeserialize
+        (
+            BinaryReader reader
+        )
+    {
+        throw new NotImplementedException();
     }
 
     #endregion

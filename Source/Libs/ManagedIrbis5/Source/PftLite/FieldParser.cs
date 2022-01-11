@@ -84,7 +84,7 @@ internal sealed class FieldParser
             }
 
             code = state.ReadChar();
-            chr = state.ReadChar();
+            chr = state.HasCurrent ? state.Current : '\0';
         }
 
         var offset = 0;
