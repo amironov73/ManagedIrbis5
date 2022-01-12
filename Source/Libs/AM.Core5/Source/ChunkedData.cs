@@ -2,15 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
-// ReSharper disable UnusedType.Global
 
 /* ChunkedData.cs -- данные как список чанков
  * Ars Magna project, http://arsmagna.ru
@@ -26,45 +19,41 @@ using System.Linq;
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Данные как список чанков.
+/// </summary>
+public sealed class ChunkedData<T>
 {
+    #region Properties
+
     /// <summary>
-    /// Данные как список чанков.
+    /// Список чанков.
     /// </summary>
-    public sealed class ChunkedData<T>
+    public List<Memory<T>> Chunks { get; } = new ();
+
+    /// <summary>
+    /// Общий размер данных (байты).
+    /// </summary>
+    public int Size => Chunks.Sum (chunk => chunk.Length);
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Добавление чанка.
+    /// </summary>
+    public ChunkedData<T> Append
+        (
+            Memory<T> chunk
+        )
     {
-        #region Properties
+        Chunks.Add (chunk);
 
-        /// <summary>
-        /// Список чанков.
-        /// </summary>
-        public List<Memory<T>> Chunks { get; } = new ();
+        return this;
+    }
 
-        /// <summary>
-        /// Общий размер данных (байты).
-        /// </summary>
-        public int Size => Chunks.Sum (chunk => chunk.Length);
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавление чанка.
-        /// </summary>
-        public ChunkedData<T> Append
-            (
-                Memory<T> chunk
-            )
-        {
-            Chunks.Add (chunk);
-
-            return this;
-
-        } // method Append
-
-        #endregion
-
-    } // class ChunkeData
-
-} // namespace AM
+    #endregion
+}

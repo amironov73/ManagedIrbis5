@@ -25,233 +25,283 @@ using System.Globalization;
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Градусы, минуты, секунды.
+/// </summary>
+public struct Degree
+    : IEquatable<Degree>
 {
+    #region Properties
+
     /// <summary>
-    /// Градусы, минуты, секунды.
+    /// Градусы (целая часть).
     /// </summary>
-    public struct Degree
-        : IEquatable<Degree>
+    public int Degrees { get; set; }
+
+    /// <summary>
+    /// Минуты (целая часть).
+    /// </summary>
+    public int Minutes { get; set; }
+
+    /// <summary>
+    /// Секунды (целая и дробная части).
+    /// </summary>
+    public float Seconds { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Degree
+        (
+            double degrees
+        )
+        : this()
     {
-        #region Properties
+        var minus = degrees < 0;
 
-        /// <summary>
-        /// Градусы (целая часть).
-        /// </summary>
-        public int Degrees { get; set; }
-
-        /// <summary>
-        /// Минуты (целая часть).
-        /// </summary>
-        public int Minutes { get; set; }
-
-        /// <summary>
-        /// Секунды (целая и дробная части).
-        /// </summary>
-        public float Seconds { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Degree
-            (
-                double degrees
-            )
-            : this()
+        degrees = Math.Abs (degrees);
+        var wholeDegrees = Math.Truncate (degrees);
+        Degrees = (int)wholeDegrees;
+        if (minus)
         {
-            var minus = degrees < 0;
+            Degrees = -Degrees;
+        }
 
-            degrees = Math.Abs (degrees);
-            var wholeDegrees = Math.Truncate (degrees);
-            Degrees = (int) wholeDegrees;
-            if (minus)
-            {
-                Degrees = -Degrees;
-            }
+        var minutes = (degrees - wholeDegrees) * 60.0;
+        Minutes = (int)minutes;
 
-            var minutes = (degrees - wholeDegrees) * 60.0;
-            Minutes = (int) minutes;
+        Seconds = (float)((minutes - Minutes) * 60.0);
+    }
 
-            Seconds = (float) ((minutes - Minutes) * 60.0);
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Degree
+        (
+            int degrees,
+            int minutes,
+            float seconds
+        )
+    {
+        Degrees = degrees;
+        Minutes = minutes;
+        Seconds = seconds;
+    }
 
-        } // constructor
+    #endregion
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Degree
-            (
-                int degrees,
-                int minutes,
-                float seconds
-            )
+    #region Public methods
+
+    /// <summary>
+    /// Перевод из радиан в градусы.
+    /// </summary>
+    public static Degree FromRadians (double radians)
+    {
+        return new (radians * 180.0 / Math.PI);
+    }
+
+    /// <summary>
+    /// Преобразование в градусы без минут.
+    /// </summary>
+    public double ToDouble()
+    {
+        var minus = Degrees < 0;
+
+        var result = Math.Abs (Degrees) + Minutes / 60.0 + Seconds / 3600.0;
+        if (minus)
         {
-            Degrees = degrees;
-            Minutes = minutes;
-            Seconds = seconds;
+            result = -result;
+        }
 
-        } // constructor
+        return result;
+    }
 
-        #endregion
+    /// <summary>
+    /// Перевод в радианы.
+    /// </summary>
+    public double ToRadians()
+    {
+        return ToDouble() / 180.0 * Math.PI;
+    }
 
-        #region Public methods
+    /// <summary>
+    /// Сложение.
+    /// </summary>
+    public static Degree operator + (Degree left, Degree right)
+    {
+        return new (left.ToDouble() + right.ToDouble());
+    }
 
-        /// <summary>
-        /// Перевод из радиан в градусы.
-        /// </summary>
-        public static Degree FromRadians (double radians) => new (radians * 180.0 / Math.PI);
+    /// <summary>
+    /// Сложение.
+    /// </summary>
+    public static Degree operator + (Degree left, double right)
+    {
+        return new (left.ToDouble() + right);
+    }
 
-        /// <summary>
-        /// Преобразование в градусы без минут.
-        /// </summary>
-        public double ToDouble()
-        {
-            var minus = Degrees < 0;
+    /// <summary>
+    /// Вычитание.
+    /// </summary>
+    public static Degree operator - (Degree left, Degree right)
+    {
+        return new (left.ToDouble() - right.ToDouble());
+    }
 
-            var result = Math.Abs (Degrees) + Minutes / 60.0 + Seconds / 3600.0;
-            if (minus)
-            {
-                result = -result;
-            }
+    /// <summary>
+    /// Вычитание.
+    /// </summary>
+    public static Degree operator - (Degree left, double right)
+    {
+        return new (left.ToDouble() - right);
+    }
 
-            return result;
+    /// <summary>
+    /// Умножение.
+    /// </summary>
+    public static Degree operator * (Degree left, double right)
+    {
+        return new (left.ToDouble() * right);
+    }
 
-        } // method ToDouble
+    /// <summary>
+    /// Деление.
+    /// </summary>
+    public static Degree operator / (Degree left, double right)
+    {
+        return new (left.ToDouble() / right);
+    }
 
-        /// <summary>
-        /// Перевод в радианы.
-        /// </summary>
-        public double ToRadians() => ToDouble() / 180.0 * Math.PI;
+    /// <summary>
+    /// Равенство.
+    /// </summary>
+    public static bool operator == (Degree left, Degree right)
+    {
+        return left.ToDouble() == right.ToDouble();
+    }
 
-        /// <summary>
-        /// Сложение.
-        /// </summary>
-        public static Degree operator + (Degree left, Degree right) =>
-            new (left.ToDouble() + right.ToDouble());
+    /// <summary>
+    /// Равенство.
+    /// </summary>
+    public static bool operator == (Degree left, double right)
+    {
+        return left.ToDouble() == right;
+    }
 
-        /// <summary>
-        /// Сложение.
-        /// </summary>
-        public static Degree operator + (Degree left, double right) =>
-            new (left.ToDouble() + right);
+    /// <summary>
+    /// Неравенство.
+    /// </summary>
+    public static bool operator != (Degree left, Degree right)
+    {
+        return left.ToDouble() != right.ToDouble();
+    }
 
-        /// <summary>
-        /// Вычитание.
-        /// </summary>
-        public static Degree operator - (Degree left, Degree right) =>
-            new (left.ToDouble() - right.ToDouble());
+    /// <summary>
+    /// Неравенство.
+    /// </summary>
+    public static bool operator != (Degree left, double right)
+    {
+        return left.ToDouble() != right;
+    }
 
-        /// <summary>
-        /// Вычитание.
-        /// </summary>
-        public static Degree operator - (Degree left, double right) =>
-            new (left.ToDouble() - right);
+    /// <summary>
+    /// Меньше.
+    /// </summary>
+    public static bool operator < (Degree left, Degree right)
+    {
+        return left.ToDouble() < right.ToDouble();
+    }
 
-        /// <summary>
-        /// Умножение.
-        /// </summary>
-        public static Degree operator * (Degree left, double right) =>
-            new (left.ToDouble() * right);
+    /// <summary>
+    /// Меньше.
+    /// </summary>
+    public static bool operator < (Degree left, double right)
+    {
+        return left.ToDouble() < right;
+    }
 
-        /// <summary>
-        /// Деление.
-        /// </summary>
-        public static Degree operator / (Degree left, double right) =>
-            new (left.ToDouble() / right);
+    /// <summary>
+    /// Меньше или равно.
+    /// </summary>
+    public static bool operator <= (Degree left, Degree right)
+    {
+        return left.ToDouble() <= right.ToDouble();
+    }
 
-        /// <summary>
-        /// Равенство.
-        /// </summary>
-        public static bool operator == (Degree left, Degree right) =>
-            left.ToDouble() == right.ToDouble();
+    /// <summary>
+    /// Меньше или равно.
+    /// </summary>
+    public static bool operator <= (Degree left, double right)
+    {
+        return left.ToDouble() <= right;
+    }
 
-        /// <summary>
-        /// Равенство.
-        /// </summary>
-        public static bool operator == (Degree left, double right) =>
-            left.ToDouble() == right;
+    /// <summary>
+    /// Больше.
+    /// </summary>
+    public static bool operator > (Degree left, Degree right)
+    {
+        return left.ToDouble() > right.ToDouble();
+    }
 
-        /// <summary>
-        /// Неравенство.
-        /// </summary>
-        public static bool operator != (Degree left, Degree right) =>
-            left.ToDouble() != right.ToDouble();
+    /// <summary>
+    /// Больше.
+    /// </summary>
+    public static bool operator > (Degree left, double right)
+    {
+        return left.ToDouble() > right;
+    }
 
-        /// <summary>
-        /// Неравенство.
-        /// </summary>
-        public static bool operator != (Degree left, double right) =>
-            left.ToDouble() != right;
+    /// <summary>
+    /// Больше или равно.
+    /// </summary>
+    public static bool operator >= (Degree left, Degree right)
+    {
+        return left.ToDouble() >= right.ToDouble();
+    }
 
-        /// <summary>
-        /// Меньше.
-        /// </summary>
-        public static bool operator < (Degree left, Degree right) =>
-            left.ToDouble() < right.ToDouble();
+    /// <summary>
+    /// Больше или равно.
+    /// </summary>
+    public static bool operator >= (Degree left, double right)
+    {
+        return left.ToDouble() >= right;
+    }
 
-        /// <summary>
-        /// Меньше.
-        /// </summary>
-        public static bool operator < (Degree left, double right) =>
-            left.ToDouble() < right;
+    #endregion
 
-        /// <summary>
-        /// Меньше или равно.
-        /// </summary>
-        public static bool operator <= (Degree left, Degree right) =>
-            left.ToDouble() <= right.ToDouble();
+    #region Object members
 
-        /// <summary>
-        /// Меньше или равно.
-        /// </summary>
-        public static bool operator <= (Degree left, double right) =>
-            left.ToDouble() <= right;
+    /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
+    public bool Equals (Degree other)
+    {
+        return ToDouble() == other.ToDouble();
+    }
 
-        /// <summary>
-        /// Больше.
-        /// </summary>
-        public static bool operator > (Degree left, Degree right) =>
-            left.ToDouble() > right.ToDouble();
+    /// <inheritdoc cref="ValueType.Equals(object)"/>
+    [ExcludeFromCodeCoverage]
+    public override bool Equals (object? obj)
+    {
+        return obj is Degree other && Equals (other);
+    }
 
-        /// <summary>
-        /// Больше.
-        /// </summary>
-        public static bool operator > (Degree left, double right) =>
-            left.ToDouble() > right;
+    /// <inheritdoc cref="ValueType.GetHashCode"/>
+    [ExcludeFromCodeCoverage]
+    public override int GetHashCode()
+    {
+        return HashCode.Combine (Degrees, Minutes, Seconds);
+    }
 
-        /// <summary>
-        /// Больше или равно.
-        /// </summary>
-        public static bool operator >= (Degree left, Degree right) =>
-            left.ToDouble() >= right.ToDouble();
-
-        /// <summary>
-        /// Больше или равно.
-        /// </summary>
-        public static bool operator >= (Degree left, double right) =>
-            left.ToDouble() >= right;
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
-        public bool Equals (Degree other) => ToDouble() == other.ToDouble();
-
-        /// <inheritdoc cref="ValueType.Equals(object)"/>
-        [ExcludeFromCodeCoverage]
-        public override bool Equals (object? obj) => obj is Degree other && Equals (other);
-
-        /// <inheritdoc cref="ValueType.GetHashCode"/>
-        [ExcludeFromCodeCoverage]
-        public override int GetHashCode() => HashCode.Combine (Degrees, Minutes, Seconds);
-
-        /// <inheritdoc cref="ValueType.ToString"/>
-        public override string ToString() => string.Format
+    /// <inheritdoc cref="ValueType.ToString"/>
+    public override string ToString()
+    {
+        return string.Format
             (
                 CultureInfo.InvariantCulture,
                 "{0}\u00B0 {1}' {2:F2}\"",
@@ -259,9 +309,7 @@ namespace AM
                 Minutes,
                 Seconds
             );
+    }
 
-        #endregion
-
-    } // struct Degree
-
-} // namespace AM
+    #endregion
+}

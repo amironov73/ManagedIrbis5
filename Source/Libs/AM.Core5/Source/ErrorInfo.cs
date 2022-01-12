@@ -2,80 +2,67 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* ErrorInfo.cs -- информация об ошибке
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-
-#endregion
-
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Информация об ошибке.
+/// </summary>
+/// <typeparam name="T">Тип для кода ошибки.</typeparam>
+public class ErrorInfo<T>
+    : IErrorInfo
 {
+    #region Properties
+
     /// <summary>
-    /// Информация об ошибке.
+    /// Код ошибки.
     /// </summary>
-    /// <typeparam name="T">Тип для кода ошибки.</typeparam>
-    public class ErrorInfo<T>
-        : IErrorInfo
+    public T Code { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ErrorInfo
+        (
+            T code
+        )
     {
-        #region Properties
+        Code = code;
+        ErrorDescription = "No description";
+    }
 
-        /// <summary>
-        /// Код ошибки.
-        /// </summary>
-        public T Code { get; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ErrorInfo
+        (
+            T code,
+            string description
+        )
+    {
+        Code = code;
+        ErrorDescription = description;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region IErrorInfo members
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ErrorInfo
-            (
-                T code
-            )
-        {
-            Code = code;
-            ErrorDescription = "No description";
-        }
+    /// <inheritdoc cref="IErrorInfo.ErrorDescription"/>
+    public string ErrorDescription { get; }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ErrorInfo
-            (
-                T code,
-                string description
-            )
-        {
-            Code = code;
-            ErrorDescription = description;
-        }
-
-        #endregion
-
-        #region IErrorInfo members
-
-        /// <inheritdoc cref="IErrorInfo.ErrorDescription"/>
-        public string ErrorDescription { get; }
-
-        #endregion
-
-    } // class ErrorInfo
-
-} // namespace AM
+    #endregion
+}

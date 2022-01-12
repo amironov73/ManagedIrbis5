@@ -1,0 +1,11 @@
+﻿<html lang="ru">
+<head>
+    <title>Скобки</title>
+</head>
+<body>
+@{
+x = 100
+y = 200
+}    <p>Результат равен @(x + y)</p>
+</body>
+</html>

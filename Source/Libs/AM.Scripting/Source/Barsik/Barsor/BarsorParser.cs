@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 
 /* Barsor.cs -- аналог Blazor, только для Barsik
  * Ars Magna project, http://arsmagna.ru
@@ -84,18 +82,15 @@ public sealed class BarsorParser
         var navigator = new ValueTextNavigator (templateText);
         while (!navigator.IsEOF)
         {
-            if (navigator.PeekChar() == DirectiveStart)
+            var nextChar = navigator.PeekChar();
+            if (nextChar == DirectiveStart)
             {
                 navigator.ReadChar();
-                if (navigator.PeekChar() == '{')
+                nextChar = navigator.PeekChar();
+                if (nextChar == '{')
                 {
                     navigator.ReadChar();
-                    var source = navigator.ReadUntil
-                        (
-                            "{",
-                            "}",
-                            "}"
-                        );
+                    var source = navigator.ReadUntil ("{", "}", "}");
                     navigator.ReadChar(); // доедаем закрывающий символ '}'
                     if (!source.IsEmpty)
                     {
@@ -103,10 +98,22 @@ public sealed class BarsorParser
                         statements.AddRange (subProgram.Statements);
                     }
                 }
-                else if (navigator.PeekChar() == '@')
+                else if (nextChar == '@')
                 {
                     var statement = Print ("@");
                     statements.Add (statement);
+                }
+                else if (nextChar == '(')
+                {
+                    navigator.ReadChar();
+                    var source = navigator.ReadUntil ("(", ")", ")");
+                    navigator.ReadChar(); // доедаем закрывающий символ ')'
+                    if (!source.IsEmpty)
+                    {
+                        var expression = Grammar.ParseExpression (source.ToString());
+                        var statement = Print (expression);
+                        statements.Add (statement);
+                    }
                 }
                 else
                 {

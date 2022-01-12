@@ -15,39 +15,36 @@ using System.Diagnostics;
 
 #endregion
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Информация для события о произошедшем исключении.
+/// </summary>
+[DebuggerDisplay("{Exception} {Handled}")]
+public sealed class ExceptionEventArgs<T>
+    : EventArgs
+    where T: Exception
 {
+    #region Properties
+
     /// <summary>
-    /// Информация для события о произошедшем исключении.
+    /// Собственно исключение.
     /// </summary>
-    [DebuggerDisplay("{Exception} {Handled}")]
-    public sealed class ExceptionEventArgs<T>
-        : EventArgs
-        where T: Exception
-    {
-        #region Properties
+    public T Exception { get; }
 
-        /// <summary>
-        /// Собственно исключение.
-        /// </summary>
-        public T Exception { get; }
+    /// <summary>
+    /// Обработано?
+    /// </summary>
+    public bool Handled { get; set; }
 
-        /// <summary>
-        /// Обработано?
-        /// </summary>
-        public bool Handled { get; set; }
+    #endregion
 
-        #endregion
+    #region Construction
 
-        #region Construction
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ExceptionEventArgs (T exception) => Exception = exception;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ExceptionEventArgs (T exception) => Exception = exception;
-
-        #endregion
-
-    } // class ExceptionEventArgs
-
-} // namespace AM
+    #endregion
+}
