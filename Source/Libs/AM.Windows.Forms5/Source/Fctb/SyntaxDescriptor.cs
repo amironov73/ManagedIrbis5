@@ -1,51 +1,69 @@
-﻿using System.Collections.Generic;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
+/* SyntaxDescriptor.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System;
 
-namespace Fctb
+#endregion
+
+#nullable enable
+
+namespace Fctb;
+
+public class SyntaxDescriptor
+    : IDisposable
 {
-    public class SyntaxDescriptor: IDisposable
-    {
-        public char leftBracket = '(';
-        public char rightBracket = ')';
-        public char leftBracket2 = '{';
-        public char rightBracket2 = '}';
-        public BracketsHighlightStrategy bracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
-        public readonly List<Style> styles = new List<Style>();
-        public readonly List<RuleDesc> rules = new List<RuleDesc>();
-        public readonly List<FoldingDesc> foldings = new List<FoldingDesc>();
+    public char leftBracket = '(';
+    public char rightBracket = ')';
+    public char leftBracket2 = '{';
+    public char rightBracket2 = '}';
+    public BracketsHighlightStrategy bracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+    public readonly List<Style> styles = new List<Style>();
+    public readonly List<RuleDesc> rules = new List<RuleDesc>();
+    public readonly List<FoldingDesc> foldings = new List<FoldingDesc>();
 
-        public void Dispose()
-        {
-            foreach (var style in styles)
-                style.Dispose();
-        }
+    public void Dispose()
+    {
+        foreach (var style in styles)
+            style.Dispose();
     }
+}
 
-    public class RuleDesc
+public class RuleDesc
+{
+    Regex regex;
+    public string pattern;
+    public RegexOptions options = RegexOptions.None;
+    public Style style;
+
+    public Regex Regex
     {
-        Regex regex;
-        public string pattern;
-        public RegexOptions options = RegexOptions.None;
-        public Style style;
-
-        public Regex Regex
+        get
         {
-            get
+            if (regex == null)
             {
-                if (regex == null)
-                {
-                    regex = new Regex(pattern, SyntaxHighlighter.RegexCompiledOption | options);
-                }
-                return regex;
+                regex = new Regex (pattern, SyntaxHighlighter.RegexCompiledOption | options);
             }
+
+            return regex;
         }
     }
+}
 
-    public class FoldingDesc
-    {
-        public string startMarkerRegex;
-        public string finishMarkerRegex;
-        public RegexOptions options = RegexOptions.None;
-    }
+public class FoldingDesc
+{
+    public string startMarkerRegex;
+    public string finishMarkerRegex;
+    public RegexOptions options = RegexOptions.None;
 }

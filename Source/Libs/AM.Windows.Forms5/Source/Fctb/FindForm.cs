@@ -1,129 +1,153 @@
-﻿using System;
-using System.Windows.Forms;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
+/* FindForm.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Text.RegularExpressions;
-using System.Collections.Generic;
+using System.Windows.Forms;
 
-namespace Fctb
+#endregion
+
+#nullable enable
+
+namespace Fctb;
+
+public partial class FindForm : Form
 {
-    public partial class FindForm : Form
+    bool firstSearch = true;
+    Place startPlace;
+    SyntaxTextBox tb;
+
+    public FindForm (SyntaxTextBox tb)
     {
-        bool firstSearch = true;
-        Place startPlace;
-        FastColoredTextBox tb;
+        InitializeComponent();
+        this.tb = tb;
+    }
 
-        public FindForm(FastColoredTextBox tb)
-        {
-            InitializeComponent();
-            this.tb = tb;
-        }
+    private void btClose_Click (object sender, EventArgs e)
+    {
+        Close();
+    }
 
-        private void btClose_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
+    private void btFindNext_Click (object sender, EventArgs e)
+    {
+        FindNext (tbFind.Text);
+    }
 
-        private void btFindNext_Click(object sender, EventArgs e)
+    public virtual void FindNext (string pattern)
+    {
+        try
         {
-            FindNext(tbFind.Text);
-        }
+            var opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
+            if (!cbRegex.Checked)
+                pattern = Regex.Escape (pattern);
+            if (cbWholeWord.Checked)
+                pattern = "\\b" + pattern + "\\b";
 
-        public virtual void FindNext(string pattern)
-        {
-            try
+            //
+            var range = tb.Selection.Clone();
+            range.Normalize();
+
+            //
+            if (firstSearch)
             {
-                RegexOptions opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
-                if (!cbRegex.Checked)
-                    pattern = Regex.Escape(pattern);
-                if (cbWholeWord.Checked)
-                    pattern = "\\b" + pattern + "\\b";
-                //
-                Range range = tb.Selection.Clone();
-                range.Normalize();
-                //
-                if (firstSearch)
-                {
-                    startPlace = range.Start;
-                    firstSearch = false;
-                }
-                //
-                range.Start = range.End;
-                if (range.Start >= startPlace)
-                    range.End = new Place(tb.GetLineLength(tb.LinesCount - 1), tb.LinesCount - 1);
-                else
-                    range.End = startPlace;
-                //
-                foreach (var r in range.GetRangesByLines(pattern, opt))
-                {
-                    tb.Selection = r;
-                    tb.DoSelectionVisible();
-                    tb.Invalidate();
-                    return;
-                }
-                //
-                if (range.Start >= startPlace && startPlace > Place.Empty)
-                {
-                    tb.Selection.Start = new Place(0, 0);
-                    FindNext(pattern);
-                    return;
-                }
-                MessageBox.Show("Not found");
+                startPlace = range.Start;
+                firstSearch = false;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
 
-        private void tbFind_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == '\r')
+            //
+            range.Start = range.End;
+            if (range.Start >= startPlace)
+                range.End = new Place (tb.GetLineLength (tb.LinesCount - 1), tb.LinesCount - 1);
+            else
+                range.End = startPlace;
+
+            //
+            foreach (var r in range.GetRangesByLines (pattern, opt))
             {
-                btFindNext.PerformClick();
-                e.Handled = true;
+                tb.Selection = r;
+                tb.DoSelectionVisible();
+                tb.Invalidate();
                 return;
             }
-            if (e.KeyChar == '\x1b')
+
+            //
+            if (range.Start >= startPlace && startPlace > Place.Empty)
             {
-                Hide();
-                e.Handled = true;
+                tb.Selection.Start = new Place (0, 0);
+                FindNext (pattern);
                 return;
             }
+
+            MessageBox.Show ("Not found");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show (ex.Message);
+        }
+    }
+
+    private void tbFind_KeyPress (object sender, KeyPressEventArgs e)
+    {
+        if (e.KeyChar == '\r')
+        {
+            btFindNext.PerformClick();
+            e.Handled = true;
+            return;
         }
 
-        private void FindForm_FormClosing(object sender, FormClosingEventArgs e)
+        if (e.KeyChar == '\x1b')
         {
-            if (e.CloseReason == CloseReason.UserClosing)
-            {
-                e.Cancel = true;
-                Hide();
-            }
-            this.tb.Focus();
+            Hide();
+            e.Handled = true;
+            return;
+        }
+    }
+
+    private void FindForm_FormClosing (object sender, FormClosingEventArgs e)
+    {
+        if (e.CloseReason == CloseReason.UserClosing)
+        {
+            e.Cancel = true;
+            Hide();
         }
 
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        this.tb.Focus();
+    }
+
+    protected override bool ProcessCmdKey (ref Message msg, Keys keyData)
+    {
+        if (keyData == Keys.Escape)
         {
-            if (keyData == Keys.Escape)
-            {
-                this.Close();
-                return true;
-            }
-            return base.ProcessCmdKey(ref msg, keyData);
+            this.Close();
+            return true;
         }
 
-        protected override void OnActivated(EventArgs e)
-        {
-            tbFind.Focus();
-            ResetSerach();
-        }
+        return base.ProcessCmdKey (ref msg, keyData);
+    }
 
-        void ResetSerach()
-        {
-            firstSearch = true;
-        }
+    protected override void OnActivated (EventArgs e)
+    {
+        tbFind.Focus();
+        ResetSerach();
+    }
 
-        private void cbMatchCase_CheckedChanged(object sender, EventArgs e)
-        {
-            ResetSerach();
-        }
+    void ResetSerach()
+    {
+        firstSearch = true;
+    }
+
+    private void cbMatchCase_CheckedChanged (object sender, EventArgs e)
+    {
+        ResetSerach();
     }
 }

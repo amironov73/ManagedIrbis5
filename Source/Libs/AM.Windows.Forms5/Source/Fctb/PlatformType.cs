@@ -1,75 +1,89 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
+/* PlatformType.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Runtime.InteropServices;
 
-namespace Fctb
+#endregion
+
+#nullable enable
+
+namespace Fctb;
+
+public static class PlatformType
 {
-    public static class PlatformType
+    const ushort PROCESSOR_ARCHITECTURE_INTEL = 0;
+    const ushort PROCESSOR_ARCHITECTURE_IA64 = 6;
+    const ushort PROCESSOR_ARCHITECTURE_AMD64 = 9;
+    const ushort PROCESSOR_ARCHITECTURE_UNKNOWN = 0xFFFF;
+
+    [StructLayout (LayoutKind.Sequential)]
+    struct SYSTEM_INFO
     {
-        const ushort PROCESSOR_ARCHITECTURE_INTEL = 0;
-        const ushort PROCESSOR_ARCHITECTURE_IA64 = 6;
-        const ushort PROCESSOR_ARCHITECTURE_AMD64 = 9;
-        const ushort PROCESSOR_ARCHITECTURE_UNKNOWN = 0xFFFF;
+        public ushort wProcessorArchitecture;
+        public ushort wReserved;
+        public uint dwPageSize;
+        public IntPtr lpMinimumApplicationAddress;
+        public IntPtr lpMaximumApplicationAddress;
+        public UIntPtr dwActiveProcessorMask;
+        public uint dwNumberOfProcessors;
+        public uint dwProcessorType;
+        public uint dwAllocationGranularity;
+        public ushort wProcessorLevel;
+        public ushort wProcessorRevision;
+    };
 
-        [StructLayout(LayoutKind.Sequential)]
-        struct SYSTEM_INFO
+    [DllImport ("kernel32.dll")]
+    static extern void GetNativeSystemInfo (ref SYSTEM_INFO lpSystemInfo);
+
+    [DllImport ("kernel32.dll")]
+    static extern void GetSystemInfo (ref SYSTEM_INFO lpSystemInfo);
+
+    public static Platform GetOperationSystemPlatform()
+    {
+        var sysInfo = new SYSTEM_INFO();
+
+        // WinXP and older - use GetNativeSystemInfo
+        if (Environment.OSVersion.Version.Major > 5 ||
+            (Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1))
         {
-            public ushort wProcessorArchitecture;
-            public ushort wReserved;
-            public uint dwPageSize;
-            public IntPtr lpMinimumApplicationAddress;
-            public IntPtr lpMaximumApplicationAddress;
-            public UIntPtr dwActiveProcessorMask;
-            public uint dwNumberOfProcessors;
-            public uint dwProcessorType;
-            public uint dwAllocationGranularity;
-            public ushort wProcessorLevel;
-            public ushort wProcessorRevision;
-        };
+            GetNativeSystemInfo (ref sysInfo);
+        }
 
-        [DllImport("kernel32.dll")]
-        static extern void GetNativeSystemInfo(ref SYSTEM_INFO lpSystemInfo);
-
-        [DllImport("kernel32.dll")]
-        static extern void GetSystemInfo(ref SYSTEM_INFO lpSystemInfo);
-
-        public static Platform GetOperationSystemPlatform()
+        // else use GetSystemInfo
+        else
         {
-            var sysInfo = new SYSTEM_INFO();
+            GetSystemInfo (ref sysInfo);
+        }
 
-            // WinXP and older - use GetNativeSystemInfo
-            if (Environment.OSVersion.Version.Major > 5 ||
-                (Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1))
-            {
-                GetNativeSystemInfo(ref sysInfo);
-            }
-            // else use GetSystemInfo
-            else
-            {
-                GetSystemInfo(ref sysInfo);
-            }
+        switch (sysInfo.wProcessorArchitecture)
+        {
+            case PROCESSOR_ARCHITECTURE_IA64:
+            case PROCESSOR_ARCHITECTURE_AMD64:
+                return Platform.X64;
 
-            switch (sysInfo.wProcessorArchitecture)
-            {
-                case PROCESSOR_ARCHITECTURE_IA64:
-                case PROCESSOR_ARCHITECTURE_AMD64:
-                    return Platform.X64;
+            case PROCESSOR_ARCHITECTURE_INTEL:
+                return Platform.X86;
 
-                case PROCESSOR_ARCHITECTURE_INTEL:
-                    return Platform.X86;
-
-                default:
-                    return Platform.Unknown;
-            }
+            default:
+                return Platform.Unknown;
         }
     }
+}
 
-    public enum Platform
-    {
-        X86,
-        X64,
-        Unknown
-    }
-
+public enum Platform
+{
+    X86,
+    X64,
+    Unknown
 }
