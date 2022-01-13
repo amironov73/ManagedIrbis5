@@ -16,19 +16,14 @@
 
 #region Using directives
 
-using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 
-using AM.Scripting.Barsik;
 using AM.Text;
 
 using Pidgin;
-using Pidgin.Comment;
-using Pidgin.Expression;
 
 using static Pidgin.Parser;
-using static Pidgin.Parser<char>;
 
 #endregion
 

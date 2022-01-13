@@ -14,13 +14,14 @@
 #region Using directives
 
 using System.Globalization;
-using System.Text;
 
 using AM.Text;
 
 using Pidgin;
 
 #endregion
+
+#nullable enable
 
 namespace AM.Scripting;
 

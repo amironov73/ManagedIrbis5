@@ -20,6 +20,8 @@ using Pidgin;
 
 #endregion
 
+#nullable enable
+
 namespace AM.Scripting;
 
 /// <summary>

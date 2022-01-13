@@ -8,7 +8,11 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
+#region Using directives
+
 using Pidgin;
+
+#endregion
 
 #nullable enable
 

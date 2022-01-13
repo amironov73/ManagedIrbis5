@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>AM.Linguistics</RootNamespace>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="Dict\adjective.bin" />
+      <EmbeddedResource Include="Dict\adjective.bin" />
+      <None Remove="Dict\imperfect.bin" />
+      <EmbeddedResource Include="Dict\imperfect.bin" />
+      <None Remove="Dict\noun.bin" />
+      <EmbeddedResource Include="Dict\noun.bin" />
+      <None Remove="Dict\pronoun.bin" />
+      <EmbeddedResource Include="Dict\pronoun.bin" />
+      <None Remove="Dict\verb.bin" />
+      <EmbeddedResource Include="Dict\verb.bin" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+    </ItemGroup>
+
+</Project>
