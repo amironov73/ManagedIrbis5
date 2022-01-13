@@ -1,0 +1,18 @@
+﻿load ("System.Windows.Forms")
+load ("AM.Windows.Forms5")
+
+use ("System.Windows.Forms")
+use ("AM.Windows.Forms")
+
+using (form = new Form())
+{
+    form.Text = "Интерпретатор Барсик"
+    button = new Button()
+    button.Text = "Привет, Барсик!"
+    button.Left = 10
+    button.Top = 10
+    button.Width = 120
+    form.Controls.Add (button)
+
+    ApplicationUtility.RunNewThread (form)
+}

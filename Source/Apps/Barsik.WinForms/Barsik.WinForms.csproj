@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Libs\AM.Drawing5\AM.Drawing5.csproj" />
       <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
       <ProjectReference Include="..\..\Libs\AM.Scripting.WinForms\AM.Scripting.WinForms.csproj" />
       <ProjectReference Include="..\..\Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />

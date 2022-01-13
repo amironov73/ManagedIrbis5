@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30709.132
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{F7FE7B9E-2592-439F-A9CF-DA7D8D3DBC91}"
 EndProject
@@ -137,51 +137,53 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mnu2Tre", "Apps\Mnu2Tre\Mnu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Text2Pft", "Apps\Text2Pft\Text2Pft.csproj", "{3431CF0A-CA9F-4344-A45F-9A8816A9DBBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTerminator", "Apps\BookTerminator\BookTerminator.csproj", "{C35070F1-1F37-43AB-B413-CCE591085DC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookTerminator", "Apps\BookTerminator\BookTerminator.csproj", "{C35070F1-1F37-43AB-B413-CCE591085DC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumpTerms", "Apps\DumpTerms\DumpTerms.csproj", "{A50F12FC-35BA-4187-B75A-FA7034E694DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpTerms", "Apps\DumpTerms\DumpTerms.csproj", "{A50F12FC-35BA-4187-B75A-FA7034E694DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irbis2istu", "Apps\Irbis2istu\Irbis2istu.csproj", "{4D3E0382-B5A0-4630-86DD-2BBD0FC67A3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Irbis2istu", "Apps\Irbis2istu\Irbis2istu.csproj", "{4D3E0382-B5A0-4630-86DD-2BBD0FC67A3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IrbisCoreServer", "Apps\IrbisCoreServer\IrbisCoreServer.csproj", "{AEBE1B27-D0A1-4431-9FED-5BB149B53482}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IrbisCoreServer", "Apps\IrbisCoreServer\IrbisCoreServer.csproj", "{AEBE1B27-D0A1-4431-9FED-5BB149B53482}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Istu.UI", "Libs\Istu.UI\Istu.UI.csproj", "{32283C83-22DD-4A9E-96B1-E5ACE86ADBF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Istu.UI", "Libs\Istu.UI\Istu.UI.csproj", "{32283C83-22DD-4A9E-96B1-E5ACE86ADBF5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uslugi5", "Apps\Uslugi5\Uslugi5.csproj", "{FF6BD659-34B9-4950-8672-838B55E97082}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uslugi5", "Apps\Uslugi5\Uslugi5.csproj", "{FF6BD659-34B9-4950-8672-838B55E97082}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Csfmt", "Apps\Csfmt\Csfmt.csproj", "{1F2DB01A-6A42-4207-A1B1-7B8EF4A726A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csfmt", "Apps\Csfmt\Csfmt.csproj", "{1F2DB01A-6A42-4207-A1B1-7B8EF4A726A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GblTests", "Tests\GblTests\GblTests.csproj", "{2868E48C-1750-4090-948B-D3167673AE17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GblTests", "Tests\GblTests\GblTests.csproj", "{2868E48C-1750-4090-948B-D3167673AE17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnvironmenExperiment", "Experiments\EnvironmenExperiment\EnvironmenExperiment.csproj", "{40882C15-AAFD-4B87-A1BF-6EE2455A760C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnvironmenExperiment", "Experiments\EnvironmenExperiment\EnvironmenExperiment.csproj", "{40882C15-AAFD-4B87-A1BF-6EE2455A760C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenumberFiles", "Apps\RenumberFiles\RenumberFiles.csproj", "{D789CF22-9D79-4E95-94DA-E1CC60ECDCCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RenumberFiles", "Apps\RenumberFiles\RenumberFiles.csproj", "{D789CF22-9D79-4E95-94DA-E1CC60ECDCCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountMagazines", "Apps\CountMagazines\CountMagazines.csproj", "{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CountMagazines", "Apps\CountMagazines\CountMagazines.csproj", "{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis5.Sql", "Libs\ManagedIrbis5.Sql\ManagedIrbis5.Sql.csproj", "{6710E9F4-C270-467D-A3C6-5E9C30282DE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagedIrbis5.Sql", "Libs\ManagedIrbis5.Sql\ManagedIrbis5.Sql.csproj", "{6710E9F4-C270-467D-A3C6-5E9C30282DE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barsik", "Apps\Barsik\Barsik.csproj", "{D8190999-43FA-4677-9C79-E8300D9387D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barsik", "Apps\Barsik\Barsik.csproj", "{D8190999-43FA-4677-9C79-E8300D9387D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PartyStatus", "Apps\PartyStatus\PartyStatus.csproj", "{5BD515CD-BC62-4BEB-9F77-57C1936C966D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PartyStatus", "Apps\PartyStatus\PartyStatus.csproj", "{5BD515CD-BC62-4BEB-9F77-57C1936C966D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingMonitor", "Apps\PingMonitor\PingMonitor.csproj", "{6C3148AB-383A-4A45-9FD5-0757DD503FAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PingMonitor", "Apps\PingMonitor\PingMonitor.csproj", "{6C3148AB-383A-4A45-9FD5-0757DD503FAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViafSuggester", "Apps\ViafSuggester\ViafSuggester.csproj", "{011EEC83-7D44-4AB3-8793-5C3061072F9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ViafSuggester", "Apps\ViafSuggester\ViafSuggester.csproj", "{011EEC83-7D44-4AB3-8793-5C3061072F9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarsikTestRunner", "Tests\BarsikTestRunner\BarsikTestRunner.csproj", "{1354CA88-F178-473F-94B7-C9F98D4D8D57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarsikTestRunner", "Tests\BarsikTestRunner\BarsikTestRunner.csproj", "{1354CA88-F178-473F-94B7-C9F98D4D8D57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsingExperiments", "Experiments\ParsingExperiments\ParsingExperiments.csproj", "{C6CE5F02-6837-441C-B191-031DC98A823E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParsingExperiments", "Experiments\ParsingExperiments\ParsingExperiments.csproj", "{C6CE5F02-6837-441C-B191-031DC98A823E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Scripting.Kitten", "Libs\AM.Scripting.Kitten\AM.Scripting.Kitten.csproj", "{66C91B4C-B4E0-48BB-B9EE-7BED0945F631}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Scripting.Kitten", "Libs\AM.Scripting.Kitten\AM.Scripting.Kitten.csproj", "{66C91B4C-B4E0-48BB-B9EE-7BED0945F631}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarsikBenchmarks", "Benchmarks\BarsikBenchmarks\BarsikBenchmarks.csproj", "{29ACA6F8-E5AF-4D8D-BD04-C8F001A39DC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarsikBenchmarks", "Benchmarks\BarsikBenchmarks\BarsikBenchmarks.csproj", "{29ACA6F8-E5AF-4D8D-BD04-C8F001A39DC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barsik.WinForms", "Apps\Barsik.WinForms\Barsik.WinForms.csproj", "{02A8DB42-3FF2-482C-8C06-E9E167E19143}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barsik.WinForms", "Apps\Barsik.WinForms\Barsik.WinForms.csproj", "{02A8DB42-3FF2-482C-8C06-E9E167E19143}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Scripting.WinForms", "Libs\AM.Scripting.WinForms\AM.Scripting.WinForms.csproj", "{15E703B7-2CC8-40E6-ACE8-8FFEB77A3266}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Scripting.WinForms", "Libs\AM.Scripting.WinForms\AM.Scripting.WinForms.csproj", "{15E703B7-2CC8-40E6-ACE8-8FFEB77A3266}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarsorRunner", "Apps\BarsorRunner\BarsorRunner.csproj", "{AFA777E1-B561-47F6-8297-B7F5E6C5A1EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarsorRunner", "Apps\BarsorRunner\BarsorRunner.csproj", "{AFA777E1-B561-47F6-8297-B7F5E6C5A1EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarsikIDE", "Apps\BarsikIDE\BarsikIDE.csproj", "{273864CF-4228-4C68-B07A-C7866C3CB479}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1189,6 +1191,18 @@ Global
 		{AFA777E1-B561-47F6-8297-B7F5E6C5A1EE}.Release|x64.Build.0 = Release|Any CPU
 		{AFA777E1-B561-47F6-8297-B7F5E6C5A1EE}.Release|x86.ActiveCfg = Release|Any CPU
 		{AFA777E1-B561-47F6-8297-B7F5E6C5A1EE}.Release|x86.Build.0 = Release|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Debug|x64.Build.0 = Debug|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Debug|x86.Build.0 = Debug|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Release|Any CPU.Build.0 = Release|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Release|x64.ActiveCfg = Release|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Release|x64.Build.0 = Release|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Release|x86.ActiveCfg = Release|Any CPU
+		{273864CF-4228-4C68-B07A-C7866C3CB479}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1277,6 +1291,7 @@ Global
 		{02A8DB42-3FF2-482C-8C06-E9E167E19143} = {1E5940AA-0540-4947-8216-45E381E76C72}
 		{15E703B7-2CC8-40E6-ACE8-8FFEB77A3266} = {F7FE7B9E-2592-439F-A9CF-DA7D8D3DBC91}
 		{AFA777E1-B561-47F6-8297-B7F5E6C5A1EE} = {1E5940AA-0540-4947-8216-45E381E76C72}
+		{273864CF-4228-4C68-B07A-C7866C3CB479} = {1E5940AA-0540-4947-8216-45E381E76C72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E077767-1AE0-47E0-AEFB-59E4D7464AD4}

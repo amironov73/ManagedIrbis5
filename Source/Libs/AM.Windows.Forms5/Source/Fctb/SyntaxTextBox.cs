@@ -83,7 +83,7 @@ public class SyntaxTextBox
     public int TextHeight;
     public bool AllowInsertRemoveLines = true;
     private Brush backBrush;
-    private BaseBookmarks bookmarks;
+    private BookmarksBase bookmarks;
     private bool caretVisible;
     private Color changedLineColor;
     private int charHeight;
@@ -365,7 +365,7 @@ public class SyntaxTextBox
     /// </summary>
     [Browsable (false), DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden),
      EditorBrowsable (EditorBrowsableState.Never)]
-    public BaseBookmarks Bookmarks
+    public BookmarksBase Bookmarks
     {
         get { return bookmarks; }
         set { bookmarks = value; }

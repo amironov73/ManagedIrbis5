@@ -14,95 +14,160 @@
 using System;
 using System.Collections.Generic;
 
+using AM;
+
 #endregion
 
 #nullable enable
 
 namespace Fctb;
 
-public class LinesAccessor
+/// <summary>
+/// Обертка над строками текста.
+/// </summary>
+public sealed class LinesAccessor
     : IList<string>
 {
-    IList<Line> ts;
+    #region Construction
 
-    public LinesAccessor (IList<Line> ts)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public LinesAccessor
+        (
+            IList<Line> lines
+        )
     {
-        this.ts = ts;
+        Sure.NotNull (lines);
+
+        _lines = lines;
     }
 
-    public int IndexOf (string item)
+    #endregion
+
+    #region Private members
+
+    private readonly IList<Line> _lines;
+
+    #endregion
+
+    #region IList<T> members
+
+    /// <inheritdoc cref="IList{T}.IndexOf"/>
+    public int IndexOf
+        (
+            string item
+        )
     {
-        for (var i = 0; i < ts.Count; i++)
-            if (ts[i].Text == item)
+        for (var i = 0; i < _lines.Count; i++)
+        {
+            if (_lines[i].Text == item)
+            {
                 return i;
+            }
+        }
 
         return -1;
     }
 
-    public void Insert (int index, string item)
+    /// <inheritdoc cref="IList{T}.Insert"/>
+    public void Insert
+        (
+            int index,
+            string item
+        )
     {
         throw new NotImplementedException();
     }
 
-    public void RemoveAt (int index)
+    /// <inheritdoc cref="IList{T}.RemoveAt"/>
+    public void RemoveAt
+        (
+            int index
+        )
     {
         throw new NotImplementedException();
     }
 
+    /// <inheritdoc cref="IList{T}.this"/>
     public string this [int index]
     {
-        get { return ts[index].Text; }
-        set { throw new NotImplementedException(); }
+        get => _lines[index].Text;
+        set => throw new NotImplementedException();
     }
 
-    public void Add (string item)
+    /// <inheritdoc cref="ICollection{T}.Add"/>
+    public void Add
+        (
+            string item
+        )
     {
         throw new NotImplementedException();
     }
 
+    /// <inheritdoc cref="ICollection{T}.Clear"/>
     public void Clear()
     {
         throw new NotImplementedException();
     }
 
-    public bool Contains (string item)
+    /// <inheritdoc cref="ICollection{T}.Contains"/>
+    public bool Contains
+        (
+            string item
+        )
     {
-        for (var i = 0; i < ts.Count; i++)
-            if (ts[i].Text == item)
+        foreach (var line in _lines)
+        {
+            if (line.Text == item)
+            {
                 return true;
+            }}
 
         return false;
     }
 
-    public void CopyTo (string[] array, int arrayIndex)
+    /// <inheritdoc cref="ICollection{T}.CopyTo"/>
+    public void CopyTo
+        (
+            string[] array,
+            int arrayIndex
+        )
     {
-        for (var i = 0; i < ts.Count; i++)
-            array[i + arrayIndex] = ts[i].Text;
+        for (var i = 0; i < _lines.Count; i++)
+        {
+            array[i + arrayIndex] = _lines[i].Text;
+        }
     }
 
-    public int Count
-    {
-        get { return ts.Count; }
-    }
+    /// <inheritdoc cref="ICollection{T}.Count"/>
+    public int Count => _lines.Count;
 
-    public bool IsReadOnly
-    {
-        get { return true; }
-    }
+    /// <inheritdoc cref="ICollection{T}.IsReadOnly"/>
+    public bool IsReadOnly => true;
 
-    public bool Remove (string item)
+    /// <inheritdoc cref="ICollection{T}.Remove"/>
+    public bool Remove
+        (
+            string item
+        )
     {
         throw new NotImplementedException();
     }
 
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
     public IEnumerator<string> GetEnumerator()
     {
-        for (var i = 0; i < ts.Count; i++)
-            yield return ts[i].Text;
+        foreach (var t in _lines)
+        {
+            yield return t.Text;
+        }
     }
 
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
     }
+
+    #endregion
 }

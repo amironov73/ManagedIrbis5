@@ -5,16 +5,13 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* Bookmarks.cs --
+/* Bookmarks.cs -- коллекция закладок
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 
 #endregion
 
@@ -23,59 +20,20 @@ using System.Drawing.Drawing2D;
 namespace Fctb;
 
 /// <summary>
-/// Base class for bookmark collection
+/// Коллекция закладок.
 /// </summary>
-public abstract class BaseBookmarks : ICollection<Bookmark>, IDisposable
+public class Bookmarks
+    : BookmarksBase
 {
-    #region ICollection
-
-    public abstract void Add (Bookmark item);
-    public abstract void Clear();
-    public abstract bool Contains (Bookmark item);
-    public abstract void CopyTo (Bookmark[] array, int arrayIndex);
-    public abstract int Count { get; }
-    public abstract bool IsReadOnly { get; }
-    public abstract bool Remove (Bookmark item);
-    public abstract IEnumerator<Bookmark> GetEnumerator();
-
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
-    #endregion
-
-    #region IDisposable
-
-    public abstract void Dispose();
-
-    #endregion
-
-    #region Additional properties
-
-    public abstract void Add (int lineIndex, string bookmarkName);
-    public abstract void Add (int lineIndex);
-    public abstract bool Contains (int lineIndex);
-    public abstract bool Remove (int lineIndex);
-    public abstract Bookmark GetBookmark (int i);
-
-    #endregion
-}
-
-/// <summary>
-/// Collection of bookmarks
-/// </summary>
-public class Bookmarks : BaseBookmarks
-{
-    protected SyntaxTextBox tb;
-    protected List<Bookmark> items = new List<Bookmark>();
+    protected SyntaxTextBox _textBox;
+    protected List<Bookmark> items = new();
     protected int counter;
 
-    public Bookmarks (SyntaxTextBox tb)
+    public Bookmarks (SyntaxTextBox textBox)
     {
-        this.tb = tb;
-        tb.LineInserted += tb_LineInserted;
-        tb.LineRemoved += tb_LineRemoved;
+        this._textBox = textBox;
+        textBox.LineInserted += tb_LineInserted;
+        textBox.LineRemoved += tb_LineRemoved;
     }
 
     protected virtual void tb_LineRemoved (object sender, LineRemovedEventArgs e)
@@ -122,15 +80,15 @@ public class Bookmarks : BaseBookmarks
             }
             else if (items[i].LineIndex == e.Index - 1 && e.Count == 1)
             {
-                if (tb[e.Index - 1].StartSpacesCount == tb[e.Index - 1].Count)
+                if (_textBox[e.Index - 1].StartSpacesCount == _textBox[e.Index - 1].Count)
                     items[i].LineIndex = items[i].LineIndex + e.Count;
             }
     }
 
     public override void Dispose()
     {
-        tb.LineInserted -= tb_LineInserted;
-        tb.LineRemoved -= tb_LineRemoved;
+        _textBox.LineInserted -= tb_LineInserted;
+        _textBox.LineRemoved -= tb_LineRemoved;
     }
 
     public override IEnumerator<Bookmark> GetEnumerator()
@@ -141,12 +99,12 @@ public class Bookmarks : BaseBookmarks
 
     public override void Add (int lineIndex, string bookmarkName)
     {
-        Add (new Bookmark (tb, bookmarkName ?? "Bookmark " + counter, lineIndex));
+        Add (new Bookmark (_textBox, bookmarkName ?? "Bookmark " + counter, lineIndex));
     }
 
     public override void Add (int lineIndex)
     {
-        Add (new Bookmark (tb, "Bookmark " + counter, lineIndex));
+        Add (new Bookmark (_textBox, "Bookmark " + counter, lineIndex));
     }
 
     public override void Clear()
@@ -163,7 +121,7 @@ public class Bookmarks : BaseBookmarks
 
         items.Add (bookmark);
         counter++;
-        tb.Invalidate();
+        _textBox.Invalidate();
     }
 
     public override bool Contains (Bookmark item)
@@ -196,7 +154,7 @@ public class Bookmarks : BaseBookmarks
 
     public override bool Remove (Bookmark item)
     {
-        tb.Invalidate();
+        _textBox.Invalidate();
         return items.Remove (item);
     }
 
@@ -214,7 +172,7 @@ public class Bookmarks : BaseBookmarks
                 was = true;
             }
 
-        tb.Invalidate();
+        _textBox.Invalidate();
 
         return was;
     }
@@ -225,56 +183,5 @@ public class Bookmarks : BaseBookmarks
     public override Bookmark GetBookmark (int i)
     {
         return items[i];
-    }
-}
-
-/// <summary>
-/// Bookmark of FastColoredTextbox
-/// </summary>
-public class Bookmark
-{
-    public SyntaxTextBox TB { get; private set; }
-
-    /// <summary>
-    /// Name of bookmark
-    /// </summary>
-    public string Name { get; set; }
-
-    /// <summary>
-    /// Line index
-    /// </summary>
-    public int LineIndex { get; set; }
-
-    /// <summary>
-    /// Color of bookmark sign
-    /// </summary>
-    public Color Color { get; set; }
-
-    /// <summary>
-    /// Scroll textbox to the bookmark
-    /// </summary>
-    public virtual void DoVisible()
-    {
-        TB.Selection.Start = new Place (0, LineIndex);
-        TB.DoRangeVisible (TB.Selection, true);
-        TB.Invalidate();
-    }
-
-    public Bookmark (SyntaxTextBox tb, string name, int lineIndex)
-    {
-        this.TB = tb;
-        this.Name = name;
-        this.LineIndex = lineIndex;
-        Color = tb.BookmarkColor;
-    }
-
-    public virtual void Paint (Graphics gr, Rectangle lineRect)
-    {
-        var size = TB.CharHeight - 1;
-        using (var brush =
-               new LinearGradientBrush (new Rectangle (0, lineRect.Top, size, size), Color.White, Color, 45))
-            gr.FillEllipse (brush, 0, lineRect.Top, size, size);
-        using (var pen = new Pen (Color))
-            gr.DrawEllipse (pen, 0, lineRect.Top, size, size);
     }
 }

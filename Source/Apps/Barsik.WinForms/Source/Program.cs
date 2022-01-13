@@ -26,6 +26,8 @@ using AM.Scripting.WinForms;
 
 #endregion
 
+#nullable enable
+
 namespace Barsik.WinForms;
 
 static class Program

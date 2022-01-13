@@ -1,0 +1,15 @@
+﻿load ("System.Windows.Forms")
+use ("System.Windows.Forms")
+
+using (form = new Form())
+{
+    form.Text = "Интерпретатор Барсик"
+    button = new Button()
+    button.Text = "Привет, Барсик!"
+    button.Left = 10
+    button.Top = 10
+    button.Width = 120
+    form.Controls.Add (button)
+
+    form.ShowDialog()
+}

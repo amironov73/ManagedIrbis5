@@ -23,9 +23,17 @@ using System.Windows.Forms;
 
 namespace Fctb;
 
-public partial class Ruler : UserControl
+public partial class Ruler
+    : UserControl
 {
-    public EventHandler TargetChanged;
+    #region Events
+
+    /// <summary>
+    /// Цель поменялась.
+    /// </summary>
+    public event EventHandler? TargetChanged;
+
+    #endregion
 
     [DefaultValue (typeof (Color), "ControlLight")]
     public Color BackColor2 { get; set; }
@@ -36,28 +44,38 @@ public partial class Ruler : UserControl
     [DefaultValue (typeof (Color), "Black")]
     public Color CaretTickColor { get; set; }
 
-    SyntaxTextBox target;
+    private SyntaxTextBox? _target;
 
     [Description ("Target FastColoredTextBox")]
-    public SyntaxTextBox Target
+    public SyntaxTextBox? Target
     {
-        get { return target; }
+        get => _target;
         set
         {
-            if (target != null)
-                UnSubscribe (target);
-            target = value;
-            Subscribe (target);
+            if (_target != null)
+            {
+                UnSubscribe (_target);
+            }
+
+            _target = value;
+            Subscribe (_target);
             OnTargetChanged();
         }
     }
+
+    #region Construction
 
     public Ruler()
     {
         InitializeComponent();
 
-        SetStyle (ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint,
-            true);
+        SetStyle
+            (
+                ControlStyles.AllPaintingInWmPaint
+                | ControlStyles.OptimizedDoubleBuffer
+                | ControlStyles.UserPaint,
+                true
+            );
         MinimumSize = new Size (0, 24);
         MaximumSize = new Size (int.MaxValue / 2, 24);
 
@@ -66,82 +84,118 @@ public partial class Ruler : UserControl
         CaretTickColor = Color.Black;
     }
 
+    #endregion
+
+    #region Control members
 
     protected virtual void OnTargetChanged()
     {
-        if (TargetChanged != null)
-            TargetChanged (this, EventArgs.Empty);
+        TargetChanged?.Invoke (this, EventArgs.Empty);
     }
 
-    protected virtual void UnSubscribe (SyntaxTextBox target)
+    protected virtual void UnSubscribe
+        (
+            SyntaxTextBox target
+        )
     {
-        target.Scroll -= new ScrollEventHandler (target_Scroll);
-        target.SelectionChanged -= new EventHandler (target_SelectionChanged);
-        target.VisibleRangeChanged -= new EventHandler (target_VisibleRangeChanged);
+        target.Scroll -= target_Scroll;
+        target.SelectionChanged -= target_SelectionChanged;
+        target.VisibleRangeChanged -= target_VisibleRangeChanged;
     }
 
-    protected virtual void Subscribe (SyntaxTextBox target)
+    protected virtual void Subscribe
+        (
+            SyntaxTextBox target
+        )
     {
-        target.Scroll += new ScrollEventHandler (target_Scroll);
-        target.SelectionChanged += new EventHandler (target_SelectionChanged);
-        target.VisibleRangeChanged += new EventHandler (target_VisibleRangeChanged);
+        target.Scroll += target_Scroll;
+        target.SelectionChanged += target_SelectionChanged;
+        target.VisibleRangeChanged += target_VisibleRangeChanged;
     }
 
-    void target_VisibleRangeChanged (object sender, EventArgs e)
+    void target_VisibleRangeChanged
+        (
+            object? sender,
+            EventArgs e
+        )
     {
         Invalidate();
     }
 
-    void target_SelectionChanged (object sender, EventArgs e)
+    void target_SelectionChanged
+        (
+            object? sender,
+            EventArgs e
+        )
     {
         Invalidate();
     }
 
-    protected virtual void target_Scroll (object sender, ScrollEventArgs e)
+    protected virtual void target_Scroll
+        (
+            object? sender,
+            ScrollEventArgs e
+        )
     {
         Invalidate();
     }
 
-    protected override void OnResize (EventArgs e)
+    /// <inheritdoc cref="Control.OnResize"/>
+    protected override void OnResize
+        (
+            EventArgs e
+        )
     {
         base.OnResize (e);
         Invalidate();
     }
 
-    protected override void OnPaint (PaintEventArgs e)
+    /// <inheritdoc cref="Control.OnPaint"/>
+    protected override void OnPaint
+        (
+            PaintEventArgs e
+        )
     {
-        if (target == null)
+        if (_target is null)
+        {
             return;
+        }
 
-        var car = PointToClient (target.PointToScreen (target.PlaceToPoint (target.Selection.Start)));
+        var car = PointToClient (_target.PointToScreen (_target.PlaceToPoint (_target.Selection.Start)));
 
         var fontSize = TextRenderer.MeasureText ("W", Font);
 
         var column = 0;
-        e.Graphics.FillRectangle (
-            new LinearGradientBrush (new Rectangle (0, 0, Width, Height), BackColor, BackColor2, 270),
-            new Rectangle (0, 0, Width, Height));
+        e.Graphics.FillRectangle
+            (
+                new LinearGradientBrush (new Rectangle (0, 0, Width, Height), BackColor, BackColor2, 270),
+                new Rectangle (0, 0, Width, Height)
+            );
 
-        float columnWidth = target.CharWidth;
+        float columnWidth = _target.CharWidth;
         var sf = new StringFormat();
         sf.Alignment = StringAlignment.Center;
         sf.LineAlignment = StringAlignment.Near;
 
-        var zeroPoint = target.PositionToPoint (0);
-        zeroPoint = PointToClient (target.PointToScreen (zeroPoint));
+        var zeroPoint = _target.PositionToPoint (0);
+        zeroPoint = PointToClient (_target.PointToScreen (zeroPoint));
 
         using (var pen = new Pen (TickColor))
         using (var textBrush = new SolidBrush (ForeColor))
             for (float x = zeroPoint.X; x < Right; x += columnWidth, ++column)
             {
                 if (column % 10 == 0)
+                {
                     e.Graphics.DrawString (column.ToString(), Font, textBrush, x, 0f, sf);
+                }
 
                 e.Graphics.DrawLine (pen, (int)x, fontSize.Height + (column % 5 == 0 ? 1 : 3), (int)x, Height - 4);
             }
 
         using (var pen = new Pen (TickColor))
+        {
             e.Graphics.DrawLine (pen, new Point (car.X - 3, Height - 3), new Point (car.X + 3, Height - 3));
+        }
 
         using (var pen = new Pen (CaretTickColor))
         {
@@ -150,4 +204,6 @@ public partial class Ruler : UserControl
             e.Graphics.DrawLine (pen, new Point (car.X + 2, fontSize.Height + 3), new Point (car.X + 2, Height - 4));
         }
     }
+
+    #endregion
 }

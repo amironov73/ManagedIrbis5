@@ -1,0 +1,95 @@
+load ("System.Drawing")
+load ("System.Windows.Forms")
+
+use ("System.Drawing")
+use ("System.Windows.Forms")
+
+using (form = new Form())
+{
+    form.Text = "Калькулятор"
+
+    firstLabel = new Label()
+    firstLabel.Top = 10
+    firstLabel.Left = 10
+    firstLabel.Text = "Первый операнд"
+
+    firstOperand = new TextBox()
+    firstOperand.Top = 35
+    firstOperand.Left = 10
+    firstOperand.Text = "1111"
+
+    secondLabel = new Label()
+    secondLabel.Top = 70
+    secondLabel.Left = 10
+    secondLabel.Text = "Операция"
+
+    operation = new ComboBox()
+    operation.Top = 95
+    operation.Left = 10
+    operation.DropDownStyle = ComboBoxStyle.DropDownList;
+    operation.Items.Add ("+")
+    operation.Items.Add ("-")
+    operation.Items.Add ("*")
+    operation.Items.Add ("/")
+    operation.SelectedIndex = 0
+
+    thirdLabel = new Label()
+    thirdLabel.Top = 130
+    thirdLabel.Left = 10
+    thirdLabel.Text = "Второй операнд"
+
+    secondOperand = new TextBox()
+    secondOperand.Top = 155
+    secondOperand.Left = 10
+    secondOperand.Text = "2222"
+
+    button = new Button()
+    button.Top = 95
+    button.Left = 150
+    button.Width = 100
+    button.Text = "Вычислить"
+
+    fourthLabel = new Label()
+    fourthLabel.Top = 130
+    fourthLabel.Left = 150
+    fourthLabel.Text = "Результат"
+
+    result = new TextBox();
+    result.Top = 155
+    result.Left = 150
+    result.ReadOnly = true
+    result.BackColor = Color.Yellow
+
+    form.Controls.Add (firstLabel)
+    form.Controls.Add (firstOperand)
+    form.Controls.Add (secondLabel)
+    form.Controls.Add (operation)
+    form.Controls.Add (thirdLabel)
+    form.Controls.Add (secondOperand)
+    form.Controls.Add (button)
+    form.Controls.Add (fourthLabel)
+    form.Controls.Add (result)
+
+    subscribe (button, "Click", buttonHandler)
+
+    form.ShowDialog()
+}
+
+func buttonHandler (sender, eventArgs)
+{
+    first = int.Parse (firstOperand.Text)
+    second = int.Parse (secondOperand.Text)
+    code = operation.SelectedItem
+    calculated = first + second
+
+    if (code == "-")
+        calculated = first - second
+
+    if (code == "*")
+        calculated = first * second
+
+    if (code == "/")
+        calculated = first / second
+
+    result.Text = calculated.ToString()
+}

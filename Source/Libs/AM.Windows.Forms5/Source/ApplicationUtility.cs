@@ -23,546 +23,569 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Вспомогательные методы уровня приложения.
+/// </summary>
+public static class ApplicationUtility
 {
+    #region Private members
+
     /// <summary>
-    /// Вспомогательные методы уровня приложения.
+    /// Здесь мы считаем фоновые потоки для UI.
     /// </summary>
-    public static class ApplicationUtility
+    private static int _uiThreadCounter;
+
+    private static void DiscoverExceptions
+        (
+            Task task
+        )
     {
-        #region Private members
+        task.GetAwaiter().GetResult();
+    }
 
-        /// <summary>
-        /// Здесь мы считаем фоновые потоки для UI.
-        /// </summary>
-        private static int _uiThreadCounter;
+    private static void _RunFormInNewThread
+        (
+            object obj
+        )
+    {
+        var form = (Form) obj;
 
-        private static void DiscoverExceptions
+        form.Visible = true;
+        form.ShowDialog();
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// (Almost) non-blocking Delay.
+    /// </summary>
+    public static async Task IdleDelay
+        (
+            int milliseconds = 20
+        )
+    {
+        Sure.Positive (milliseconds, nameof (milliseconds));
+
+        await Task.Delay (milliseconds);
+    } // method IdleDelay
+
+    /// <summary>
+    /// Run some code in pseudo-async manner.
+    /// </summary>
+    public static void Run
+        (
+            Action action
+        )
+    {
+        Magna.Trace
             (
-                Task task
-            )
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": entering"
+            );
+
+        using (var task = Task.Factory.StartNew (action))
         {
-            task.GetAwaiter().GetResult();
+            WaitFor (task);
+            DiscoverExceptions (task);
         }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// (Almost) non-blocking Delay.
-        /// </summary>
-        public static async Task IdleDelay
+        Magna.Trace
             (
-                int milliseconds = 20
-            )
-        {
-            Sure.Positive(milliseconds, nameof(milliseconds));
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": leaving"
+            );
+    } // method Run
 
-            await Task.Delay(milliseconds);
+    /// <summary>
+    /// Run some code in pseudo-async manner.
+    /// </summary>
+    public static void Run<T>
+        (
+            Action<T> action,
+            T argument
+        )
+    {
+        void Interim() => action (argument);
 
-        } // method IdleDelay
-
-        /// <summary>
-        /// Run some code in pseudo-async manner.
-        /// </summary>
-        public static void Run
+        Magna.Trace
             (
-                Action action
-            )
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": entering"
+            );
+
+        using (var task = Task.Factory.StartNew (Interim))
         {
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": entering"
-                );
+            WaitFor (task);
+            DiscoverExceptions (task);
+        }
 
-            using (var task = Task.Factory.StartNew(action))
-            {
-                WaitFor(task);
-                DiscoverExceptions(task);
-            }
-
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": leaving"
-                );
-        } // method Run
-
-        /// <summary>
-        /// Run some code in pseudo-async manner.
-        /// </summary>
-        public static void Run<T>
+        Magna.Trace
             (
-                Action<T> action,
-                T argument
-            )
-        {
-            void Interim() => action(argument);
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": leaving"
+            );
+    } // method Run
 
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": entering"
-                );
+    /// <summary>
+    /// Run some code in pseudo-async manner.
+    /// </summary>
+    public static void Run<T1, T2>
+        (
+            Action<T1, T2> action,
+            T1 argument1,
+            T2 argument2
+        )
+    {
+        void Interim() => action (argument1, argument2);
 
-            using (var task = Task.Factory.StartNew(Interim))
-            {
-                WaitFor(task);
-                DiscoverExceptions(task);
-            }
-
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": leaving"
-                );
-        } // method Run
-
-        /// <summary>
-        /// Run some code in pseudo-async manner.
-        /// </summary>
-        public static void Run<T1, T2>
+        Magna.Trace
             (
-                Action<T1, T2> action,
-                T1 argument1,
-                T2 argument2
-            )
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": entering"
+            );
+
+        using (var task = Task.Factory.StartNew (Interim))
         {
-            void Interim() => action(argument1, argument2);
+            WaitFor (task);
+            DiscoverExceptions (task);
+        }
 
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": entering"
-                );
-
-            using (var task = Task.Factory.StartNew(Interim))
-            {
-                WaitFor(task);
-                DiscoverExceptions(task);
-            }
-
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": leaving"
-                );
-        } // method Run
-
-        /// <summary>
-        /// Run some code in pseudo-async manner.
-        /// </summary>
-        public static void Run<T1, T2, T3>
+        Magna.Trace
             (
-                Action<T1, T2, T3> action,
-                T1 argument1,
-                T2 argument2,
-                T3 argument3
-            )
-        {
-            void Interim() => action(argument1, argument2, argument3);
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": leaving"
+            );
+    } // method Run
 
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": entering"
-                );
+    /// <summary>
+    /// Run some code in pseudo-async manner.
+    /// </summary>
+    public static void Run<T1, T2, T3>
+        (
+            Action<T1, T2, T3> action,
+            T1 argument1,
+            T2 argument2,
+            T3 argument3
+        )
+    {
+        void Interim() => action (argument1, argument2, argument3);
 
-            using (var task = Task.Factory.StartNew(Interim))
-            {
-                WaitFor(task);
-                DiscoverExceptions(task);
-            }
-
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": leaving"
-                );
-        } // method Run
-
-        /// <summary>
-        /// Run some code in pseudo-async manner.
-        /// </summary>
-        public static TResult Run<TResult>
+        Magna.Trace
             (
-                Func<TResult> func
-            )
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": entering"
+            );
+
+        using (var task = Task.Factory.StartNew (Interim))
         {
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": entering"
-                );
+            WaitFor (task);
+            DiscoverExceptions (task);
+        }
 
-            TResult result;
-            using (var task = Task<TResult>.Factory.StartNew(func))
-            {
-                WaitFor(task);
-                DiscoverExceptions(task);
-                result = task.Result;
-            }
-
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": leaving"
-                );
-
-            return result;
-        } // method Run
-
-        /// <summary>
-        /// Run some code in pseudo-async manner.
-        /// </summary>
-        public static TResult Run<T1, TResult>
+        Magna.Trace
             (
-                Func<T1, TResult> func,
-                T1 argument
-            )
-        {
-            TResult Interim() => func(argument);
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": leaving"
+            );
+    }
 
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": entering"
-                );
-
-            TResult result;
-            using (var task = Task<TResult>.Factory.StartNew(Interim))
-            {
-                WaitFor(task);
-                DiscoverExceptions(task);
-                result = task.Result;
-            }
-
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": leaving"
-                );
-
-            return result;
-        } // methor Run
-
-        /// <summary>
-        /// Run some code in pseudo-async manner.
-        /// </summary>
-        public static TResult Run<T1, T2, TResult>
+    /// <summary>
+    /// Run some code in pseudo-async manner.
+    /// </summary>
+    public static TResult Run<TResult>
+        (
+            Func<TResult> func
+        )
+    {
+        Magna.Trace
             (
-                Func<T1, T2, TResult> func,
-                T1 argument1,
-                T2 argument2
-            )
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": entering"
+            );
+
+        TResult result;
+        using (var task = Task<TResult>.Factory.StartNew (func))
         {
-            TResult Interim() => func(argument1, argument2);
+            WaitFor (task);
+            DiscoverExceptions (task);
+            result = task.Result;
+        }
 
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": entering"
-                );
-
-            TResult result;
-            using (var task = Task<TResult>.Factory.StartNew(Interim))
-            {
-                WaitFor(task);
-                DiscoverExceptions(task);
-                result = task.Result;
-            }
-
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(Run)
-                    + ": leaving"
-                );
-
-            return result;
-        } // method Run
-
-        /// <summary>
-        /// Запускает новый UI-поток.
-        /// </summary>
-        public static Thread RunNewUiThread
+        Magna.Trace
             (
-                ThreadStart start
-            )
-        {
-            var result = new Thread(start)
-            {
-                IsBackground = true,
-                Name = "UiThread" + ++_uiThreadCounter
-            };
-            result.SetApartmentState(ApartmentState.STA);
-            result.Start();
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": leaving"
+            );
 
-            return result;
-        } // method RunNewUiThread
+        return result;
+    }
 
-        /// <summary>
-        /// Небольшое ожидание
-        /// </summary>
-        public static async Task SleepALittle()
-        {
-            Application.DoEvents();
-            await IdleDelay();
-        } // method SleepALittle
+    /// <summary>
+    /// Run some code in pseudo-async manner.
+    /// </summary>
+    public static TResult Run<T1, TResult>
+        (
+            Func<T1, TResult> func,
+            T1 argument
+        )
+    {
+        TResult Interim() => func (argument);
 
-        /// <summary>
-        /// Wait for flag.
-        /// </summary>
-        public static void WaitFor
+        Magna.Trace
             (
-                ref bool readyFlag
-            )
-        {
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": entering"
-                );
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": entering"
+            );
 
-            while (!readyFlag)
+        TResult result;
+        using (var task = Task<TResult>.Factory.StartNew (Interim))
+        {
+            WaitFor (task);
+            DiscoverExceptions (task);
+            result = task.Result;
+        }
+
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": leaving"
+            );
+
+        return result;
+    } // methor Run
+
+    /// <summary>
+    /// Run some code in pseudo-async manner.
+    /// </summary>
+    public static TResult Run<T1, T2, TResult>
+        (
+            Func<T1, T2, TResult> func,
+            T1 argument1,
+            T2 argument2
+        )
+    {
+        TResult Interim() => func (argument1, argument2);
+
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": entering"
+            );
+
+        TResult result;
+        using (var task = Task<TResult>.Factory.StartNew (Interim))
+        {
+            WaitFor (task);
+            DiscoverExceptions (task);
+            result = task.Result;
+        }
+
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (Run)
+                + ": leaving"
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Запуск формы в новом треде
+    /// </summary>
+    public static void RunNewThread
+        (
+            this Form form
+        )
+    {
+        var start = new ParameterizedThreadStart (_RunFormInNewThread);
+        var thread = new Thread (start)
+        {
+            IsBackground = true,
+            Name = "UiThread" + ++_uiThreadCounter
+        };
+        thread.SetApartmentState (ApartmentState.STA);
+        thread.Start (form);
+    }
+
+    /// <summary>
+    /// Запускает новый UI-поток.
+    /// </summary>
+    public static Thread RunNewUiThread
+        (
+            ThreadStart start
+        )
+    {
+        var result = new Thread (start)
+        {
+            IsBackground = true,
+            Name = "UiThread" + ++_uiThreadCounter
+        };
+        result.SetApartmentState (ApartmentState.STA);
+        result.Start();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Небольшое ожидание
+    /// </summary>
+    public static async Task SleepALittle()
+    {
+        Application.DoEvents();
+        await IdleDelay();
+    } // method SleepALittle
+
+    /// <summary>
+    /// Wait for flag.
+    /// </summary>
+    public static void WaitFor
+        (
+            ref bool readyFlag
+        )
+    {
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": entering"
+            );
+
+        while (!readyFlag)
+        {
+            SleepALittle().Wait();
+        }
+
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": leaving"
+            );
+    } // method WaitFor
+
+    /// <summary>
+    /// Wait for flag.
+    /// </summary>
+    public static void WaitFor
+        (
+            Func<bool> readyCheck
+        )
+    {
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": entering"
+            );
+
+        while (!readyCheck())
+        {
+            SleepALittle().Wait();
+        }
+
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": leaving"
+            );
+    } // method WaitFor
+
+    /// <summary>
+    /// Wait for flag.
+    /// </summary>
+    public static void WaitFor<T>
+        (
+            Func<T, bool> readyCheck,
+            T argument
+        )
+        where T : class
+    {
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": entering"
+            );
+
+        while (!readyCheck (argument))
+        {
+            SleepALittle().Wait();
+        }
+
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": leaving"
+            );
+    } // method WaitFor
+
+    /// <summary>
+    /// Wait for task.
+    /// </summary>
+    public static void WaitFor
+        (
+            this IAsyncResult handle
+        )
+    {
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": entering"
+            );
+
+        while (!handle.IsCompleted)
+        {
+            SleepALittle().Wait();
+        }
+
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": leaving"
+            );
+    } // method WaitFor
+
+    /// <summary>
+    /// Wait for some tasks.
+    /// </summary>
+    public static void WaitFor
+        (
+            bool waitAll,
+            params WaitHandle[] handles
+        )
+    {
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": entering"
+            );
+
+        bool complete;
+        do
+        {
+            complete = waitAll
+                ? WaitHandle.WaitAll (handles, 0)
+                : WaitHandle.WaitAny (handles, 0) >= 0;
+
+            if (!complete)
             {
                 SleepALittle().Wait();
             }
+        } while (!complete);
 
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": leaving"
-                );
-        } // method WaitFor
-
-        /// <summary>
-        /// Wait for flag.
-        /// </summary>
-        public static void WaitFor
+        Magna.Trace
             (
-                Func<bool> readyCheck
-            )
-        {
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": entering"
-                );
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": leaving"
+            );
+    } // method WaitFor
 
-            while (!readyCheck())
+    /// <summary>
+    /// Wait for some tasks.
+    /// </summary>
+    public static void WaitFor
+        (
+            bool waitAll,
+            params Task[] tasks
+        )
+    {
+        Magna.Trace
+            (
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": entering"
+            );
+
+        bool complete;
+        do
+        {
+            complete = waitAll
+                ? Task.WaitAll (tasks, 0)
+                : Task.WaitAny (tasks, 0) >= 0;
+
+            if (!complete)
             {
                 SleepALittle().Wait();
             }
+        } while (!complete);
 
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": leaving"
-                );
-        } // method WaitFor
-
-        /// <summary>
-        /// Wait for flag.
-        /// </summary>
-        public static void WaitFor<T>
+        Magna.Trace
             (
-                Func<T, bool> readyCheck,
-                T argument
-            )
-            where T : class
+                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
+                + ": leaving"
+            );
+    } // method WaitFor
+
+    /// <summary>
+    /// Determines whether secondary screen present.
+    /// </summary>
+    /// <value><c>true</c> if secondary screen present;
+    /// otherwise, <c>false</c>.</value>
+    public static bool HaveSecondaryScreen => SecondaryScreen is not null;
+
+    /// <summary>
+    /// Gets the secondary screen.
+    /// </summary>
+    /// <value>The secondary screen or <c>null</c> if none.
+    /// </value>
+    public static Screen? SecondaryScreen
+    {
+        get
         {
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": entering"
-                );
-
-            while (!readyCheck(argument))
+            foreach (var screen in Screen.AllScreens)
             {
-                SleepALittle().Wait();
-            }
-
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": leaving"
-                );
-        } // method WaitFor
-
-        /// <summary>
-        /// Wait for task.
-        /// </summary>
-        public static void WaitFor
-            (
-                this IAsyncResult handle
-            )
-        {
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": entering"
-                );
-
-            while (!handle.IsCompleted)
-            {
-                SleepALittle().Wait();
-            }
-
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": leaving"
-                );
-        } // method WaitFor
-
-        /// <summary>
-        /// Wait for some tasks.
-        /// </summary>
-        public static void WaitFor
-            (
-                bool waitAll,
-                params WaitHandle[] handles
-            )
-        {
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": entering"
-                );
-
-            bool complete;
-            do
-            {
-                complete = waitAll
-                    ? WaitHandle.WaitAll(handles, 0)
-                    : WaitHandle.WaitAny(handles, 0) >= 0;
-
-                if (!complete)
+                if (!screen.Primary)
                 {
-                    SleepALittle().Wait();
-                }
-
-            } while (!complete);
-
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": leaving"
-                );
-        } // method WaitFor
-
-        /// <summary>
-        /// Wait for some tasks.
-        /// </summary>
-        public static void WaitFor
-            (
-                bool waitAll,
-                params Task[] tasks
-            )
-        {
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": entering"
-                );
-
-            bool complete;
-            do
-            {
-                complete = waitAll
-                    ? Task.WaitAll(tasks, 0)
-                    : Task.WaitAny(tasks, 0) >= 0;
-
-                if (!complete)
-                {
-                    SleepALittle().Wait();
+                    return screen;
                 }
             }
-            while (!complete);
 
-            Magna.Trace
-                (
-                    nameof(ApplicationUtility) + "::" + nameof(WaitFor)
-                    + ": leaving"
-                );
-        } // method WaitFor
+            return null;
+        }
+    }
 
-        /// <summary>
-        /// Determines whether secondary screen present.
-        /// </summary>
-        /// <value><c>true</c> if secondary screen present;
-        /// otherwise, <c>false</c>.</value>
-        public static bool HaveSecondaryScreen => SecondaryScreen is not null;
+    /// <summary>
+    /// Moves given form window to the primary screen.
+    /// </summary>
+    public static void MoveToPrimaryScreen
+        (
+            Form form
+        )
+    {
+        MoveToScreen (Screen.PrimaryScreen, form);
+    }
 
-        /// <summary>
-        /// Gets the secondary screen.
-        /// </summary>
-        /// <value>The secondary screen or <c>null</c> if none.
-        /// </value>
-        public static Screen? SecondaryScreen
+    /// <summary>
+    /// Moves form window to given screen.
+    /// </summary>
+    public static void MoveToScreen
+        (
+            Screen screen,
+            Form form
+        )
+    {
+        form.Location = screen.WorkingArea.Location;
+    }
+
+    /// <summary>
+    /// Moves given form window to secondary screen (if present).
+    /// </summary>
+    /// <param name="form">The form.</param>
+    /// <returns><c>true</c> on success, <c>false</c>
+    /// on failure (e.g. no secondary screen present).</returns>
+    public static bool MoveToSecondaryScreen
+        (
+            Form form
+        )
+    {
+        var secondaryScreen = SecondaryScreen;
+        if (secondaryScreen != null)
         {
-            get
-            {
-                foreach (var screen in Screen.AllScreens)
-                {
-                    if (!screen.Primary)
-                    {
-                        return screen;
-                    }
-                }
-
-                return null;
-            }
+            MoveToScreen (secondaryScreen, form);
+            return true;
         }
 
-        /// <summary>
-        /// Moves given form window to the primary screen.
-        /// </summary>
-        public static void MoveToPrimaryScreen
-            (
-                Form form
-            )
-        {
-            MoveToScreen(Screen.PrimaryScreen, form);
-        }
+        return false;
+    }
 
-        /// <summary>
-        /// Moves form window to given screen.
-        /// </summary>
-        public static void MoveToScreen
-            (
-                Screen screen,
-                Form form
-            )
-        {
-            form.Location = screen.WorkingArea.Location;
-        }
-
-        /// <summary>
-        /// Moves given form window to secondary screen (if present).
-        /// </summary>
-        /// <param name="form">The form.</param>
-        /// <returns><c>true</c> on success, <c>false</c>
-        /// on failure (e.g. no secondary screen present).</returns>
-        public static bool MoveToSecondaryScreen
-            (
-                Form form
-            )
-        {
-            var secondaryScreen = SecondaryScreen;
-            if (secondaryScreen != null)
-            {
-                MoveToScreen(secondaryScreen, form);
-                return true;
-            }
-
-            return false;
-        }
-
-        #endregion
-
-    } // class ApplicationUtility
-
-} // namespace AM.Windows.Forms
+    #endregion
+}
