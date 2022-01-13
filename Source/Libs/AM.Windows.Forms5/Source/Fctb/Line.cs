@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* Line.cs --
+/* Line.cs -- строка в текстовом редакторе
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,12 +23,14 @@ using System.Drawing;
 namespace Fctb;
 
 /// <summary>
-/// Line of text
+/// Строка в текстовом редакторе
 /// </summary>
 public class Line
     : IList<Character>
 {
     protected List<Character> chars;
+
+    #region Properties
 
     public string FoldingStartMarker { get; set; }
     public string FoldingEndMarker { get; set; }
@@ -58,6 +60,8 @@ public class Line
     /// Count of needed start spaces for AutoIndent
     /// </summary>
     public int AutoIndentSpacesNeededCount { get; set; }
+
+    #endregion
 
     internal Line (int uid)
     {
@@ -206,104 +210,4 @@ public class Line
     {
         chars.AddRange (collection);
     }
-}
-
-public struct LineInfo
-{
-    List<int> cutOffPositions;
-
-    //Y coordinate of line on screen
-    internal int startY;
-
-    internal int bottomPadding;
-
-    //indent of secondary wordwrap strings (in chars)
-    internal int wordWrapIndent;
-
-    /// <summary>
-    /// Visible state
-    /// </summary>
-    public VisibleState VisibleState;
-
-    public LineInfo (int startY)
-    {
-        cutOffPositions = null;
-        VisibleState = VisibleState.Visible;
-        this.startY = startY;
-        bottomPadding = 0;
-        wordWrapIndent = 0;
-    }
-
-    /// <summary>
-    /// Positions for wordwrap cutoffs
-    /// </summary>
-    public List<int> CutOffPositions
-    {
-        get
-        {
-            if (cutOffPositions == null)
-                cutOffPositions = new List<int>();
-            return cutOffPositions;
-        }
-    }
-
-    /// <summary>
-    /// Count of wordwrap string count for this line
-    /// </summary>
-    public int WordWrapStringsCount
-    {
-        get
-        {
-            switch (VisibleState)
-            {
-                case VisibleState.Visible:
-                    if (cutOffPositions == null)
-                        return 1;
-                    else
-                        return cutOffPositions.Count + 1;
-                case VisibleState.Hidden: return 0;
-                case VisibleState.StartOfHiddenBlock: return 1;
-            }
-
-            return 0;
-        }
-    }
-
-    internal int GetWordWrapStringStartPosition (int iWordWrapLine)
-    {
-        return iWordWrapLine == 0 ? 0 : CutOffPositions[iWordWrapLine - 1];
-    }
-
-    internal int GetWordWrapStringFinishPosition (int iWordWrapLine, Line line)
-    {
-        if (WordWrapStringsCount <= 0)
-            return 0;
-        return iWordWrapLine == WordWrapStringsCount - 1 ? line.Count - 1 : CutOffPositions[iWordWrapLine] - 1;
-    }
-
-    /// <summary>
-    /// Gets index of wordwrap string for given char position
-    /// </summary>
-    public int GetWordWrapStringIndex (int iChar)
-    {
-        if (cutOffPositions == null || cutOffPositions.Count == 0) return 0;
-        for (var i = 0; i < cutOffPositions.Count; i++)
-            if (cutOffPositions[i] > /*>=*/ iChar)
-                return i;
-        return cutOffPositions.Count;
-    }
-}
-
-public enum VisibleState : byte
-{
-    Visible,
-    StartOfHiddenBlock,
-    Hidden
-}
-
-public enum IndentMarker
-{
-    None,
-    Increased,
-    Decreased
 }

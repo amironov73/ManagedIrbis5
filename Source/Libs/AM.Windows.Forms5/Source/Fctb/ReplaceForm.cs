@@ -53,7 +53,7 @@ public partial class ReplaceForm
         }
     }
 
-    public List<Range> FindAll(string pattern)
+    public List<TextRange> FindAll(string pattern)
     {
         var opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
         if (!cbRegex.Checked)
@@ -63,7 +63,7 @@ public partial class ReplaceForm
         //
         var range = tb.Selection.IsEmpty? tb.Range.Clone() : tb.Selection.Clone();
         //
-        var list = new List<Range>();
+        var list = new List<TextRange>();
         foreach (var r in range.GetRangesByLines(pattern, opt))
             list.Add(r);
 

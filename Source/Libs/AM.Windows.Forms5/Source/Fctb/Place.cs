@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 
 /* Place.cs -- положение символа в тексте
  * Ars Magna project, http://arsmagna.ru
@@ -22,94 +23,196 @@ namespace Fctb;
 /// <summary>
 /// Положение символа в тексте, состоящее из номера строки и номера колонки.
 /// </summary>
-public struct Place : IEquatable<Place>
+public struct Place
+    : IEquatable<Place>
 {
-    public int iChar;
-    public int iLine;
+    #region Fields
 
-    public Place (int iChar, int iLine)
+    /// <summary>
+    /// Номер колонки.
+    /// </summary>
+    public int Column;
+
+    /// <summary>
+    /// Номер строки.
+    /// </summary>
+    public int Line;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Пустая позиция.
+    /// </summary>
+    public static Place Empty => new ();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Place (int column, int line)
     {
-        this.iChar = iChar;
-        this.iLine = iLine;
+        Column = column;
+        Line = line;
     }
 
-    public void Offset (int dx, int dy)
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Смещение на заданную величину.
+    /// </summary>
+    public void Offset
+        (
+            int dx,
+            int dy
+        )
     {
-        iChar += dx;
-        iLine += dy;
+        Column += dx;
+        Line += dy;
     }
 
-    public bool Equals (Place other)
+    #endregion
+
+    #region IEquatable members
+
+    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    public bool Equals
+        (
+            Place other
+        )
     {
-        return iChar == other.iChar && iLine == other.iLine;
+        return Column == other.Column && Line == other.Line;
     }
 
-    public override bool Equals (object obj)
+    #endregion
+
+    #region Operators
+
+    /// <summary>
+    /// Оператор сравнения: неравенство.
+    /// </summary>
+    public static bool operator !=
+        (
+            Place place1,
+            Place place2
+        )
     {
-        return (obj is Place) && Equals ((Place)obj);
+        return !place1.Equals (place2);
     }
 
+    /// <summary>
+    /// Оператор сравнения: равенство.
+    /// </summary>
+    public static bool operator ==
+        (
+            Place place1,
+            Place place2
+        )
+    {
+        return place1.Equals (place2);
+    }
+
+    /// <summary>
+    /// Оператор сравнения: меньше.
+    /// </summary>
+    public static bool operator <
+        (
+            Place p1,
+            Place p2
+        )
+    {
+        if (p1.Line < p2.Line) return true;
+        if (p1.Line > p2.Line) return false;
+        if (p1.Column < p2.Column) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Оператор сравнения: меньше или равно.
+    /// </summary>
+    public static bool operator <=
+        (
+            Place p1,
+            Place p2
+        )
+    {
+        if (p1.Equals (p2)) return true;
+        if (p1.Line < p2.Line) return true;
+        if (p1.Line > p2.Line) return false;
+        if (p1.Column < p2.Column) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Оператор сравнения: больше.
+    /// </summary>
+    public static bool operator >
+        (
+            Place p1,
+            Place p2
+        )
+    {
+        if (p1.Line > p2.Line) return true;
+        if (p1.Line < p2.Line) return false;
+        if (p1.Column > p2.Column) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Оператор сравнения: больше или равно.
+    /// </summary>
+    public static bool operator >=
+        (
+            Place p1,
+            Place p2
+        )
+    {
+        if (p1.Equals (p2)) return true;
+        if (p1.Line > p2.Line) return true;
+        if (p1.Line < p2.Line) return false;
+        if (p1.Column > p2.Column) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Оператор сравнения.
+    /// </summary>
+    public static Place operator +
+        (
+            Place p1,
+            Place p2
+        )
+    {
+        return new Place (p1.Column + p2.Column, p1.Line + p2.Line);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
+    public override bool Equals (object? obj)
+    {
+        return (obj is Place place) && Equals (place);
+    }
+
+    /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
-        return iChar.GetHashCode() ^ iLine.GetHashCode();
+        return Column.GetHashCode() ^ Line.GetHashCode();
     }
 
-    public static bool operator != (Place p1, Place p2)
-    {
-        return !p1.Equals (p2);
-    }
-
-    public static bool operator == (Place p1, Place p2)
-    {
-        return p1.Equals (p2);
-    }
-
-    public static bool operator < (Place p1, Place p2)
-    {
-        if (p1.iLine < p2.iLine) return true;
-        if (p1.iLine > p2.iLine) return false;
-        if (p1.iChar < p2.iChar) return true;
-        return false;
-    }
-
-    public static bool operator <= (Place p1, Place p2)
-    {
-        if (p1.Equals (p2)) return true;
-        if (p1.iLine < p2.iLine) return true;
-        if (p1.iLine > p2.iLine) return false;
-        if (p1.iChar < p2.iChar) return true;
-        return false;
-    }
-
-    public static bool operator > (Place p1, Place p2)
-    {
-        if (p1.iLine > p2.iLine) return true;
-        if (p1.iLine < p2.iLine) return false;
-        if (p1.iChar > p2.iChar) return true;
-        return false;
-    }
-
-    public static bool operator >= (Place p1, Place p2)
-    {
-        if (p1.Equals (p2)) return true;
-        if (p1.iLine > p2.iLine) return true;
-        if (p1.iLine < p2.iLine) return false;
-        if (p1.iChar > p2.iChar) return true;
-        return false;
-    }
-
-    public static Place operator + (Place p1, Place p2)
-    {
-        return new Place (p1.iChar + p2.iChar, p1.iLine + p2.iLine);
-    }
-
-    public static Place Empty
-    {
-        get { return new Place(); }
-    }
-
+    /// <inheritdoc cref="ValueType.ToString"/>
     public override string ToString()
     {
-        return "(" + iChar + "," + iLine + ")";
+        return "(" + Column + "," + Line + ")";
     }
+
+    #endregion
 }

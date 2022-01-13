@@ -24,7 +24,8 @@ namespace Fctb;
 /// Insert single char
 /// </summary>
 /// <remarks>This operation includes also insertion of new line and removing char by backspace</remarks>
-public class InsertCharCommand : UndoableCommand
+public class InsertCharCommand
+    : UndoableCommand
 {
     public char c;
     char deletedChar = '\x0';
@@ -48,7 +49,7 @@ public class InsertCharCommand : UndoableCommand
         switch (c)
         {
             case '\n':
-                MergeLines (sel.Start.iLine, ts);
+                MergeLines (sel.Start.Line, ts);
                 break;
             case '\r': break;
             case '\b':
@@ -56,25 +57,25 @@ public class InsertCharCommand : UndoableCommand
                 var cc = '\x0';
                 if (deletedChar != '\x0')
                 {
-                    ts.CurrentTB.ExpandBlock (ts.CurrentTB.Selection.Start.iLine);
+                    ts.CurrentTB.ExpandBlock (ts.CurrentTB.Selection.Start.Line);
                     InsertChar (deletedChar, ref cc, ts);
                 }
 
                 break;
             case '\t':
-                ts.CurrentTB.ExpandBlock (sel.Start.iLine);
+                ts.CurrentTB.ExpandBlock (sel.Start.Line);
                 for (var i = sel.FromX; i < lastSel.FromX; i++)
-                    ts[sel.Start.iLine].RemoveAt (sel.Start.iChar);
+                    ts[sel.Start.Line].RemoveAt (sel.Start.Column);
                 ts.CurrentTB.Selection.Start = sel.Start;
                 break;
             default:
-                ts.CurrentTB.ExpandBlock (sel.Start.iLine);
-                ts[sel.Start.iLine].RemoveAt (sel.Start.iChar);
+                ts.CurrentTB.ExpandBlock (sel.Start.Line);
+                ts[sel.Start.Line].RemoveAt (sel.Start.Column);
                 ts.CurrentTB.Selection.Start = sel.Start;
                 break;
         }
 
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (sel.Start.iLine, sel.Start.iLine));
+        ts.NeedRecalc (new TextSource.TextChangedEventArgs (sel.Start.Line, sel.Start.Line));
 
         base.Undo();
     }
@@ -84,7 +85,7 @@ public class InsertCharCommand : UndoableCommand
     /// </summary>
     public override void Execute()
     {
-        ts.CurrentTB.ExpandBlock (ts.CurrentTB.Selection.Start.iLine);
+        ts.CurrentTB.ExpandBlock (ts.CurrentTB.Selection.Start.Line);
         var s = c.ToString();
         ts.OnTextChanging (ref s);
         if (s.Length == 1)
@@ -98,8 +99,8 @@ public class InsertCharCommand : UndoableCommand
             InsertLine (ts);
         InsertChar (c, ref deletedChar, ts);
 
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (ts.CurrentTB.Selection.Start.iLine,
-            ts.CurrentTB.Selection.Start.iLine));
+        ts.NeedRecalc (new TextSource.TextChangedEventArgs (ts.CurrentTB.Selection.Start.Line,
+            ts.CurrentTB.Selection.Start.Line));
         base.Execute();
     }
 
@@ -118,39 +119,39 @@ public class InsertCharCommand : UndoableCommand
                 break;
             case '\r': break;
             case '\b': //backspace
-                if (tb.Selection.Start.iChar == 0 && tb.Selection.Start.iLine == 0)
+                if (tb.Selection.Start.Column == 0 && tb.Selection.Start.Line == 0)
                     return;
-                if (tb.Selection.Start.iChar == 0)
+                if (tb.Selection.Start.Column == 0)
                 {
                     if (!ts.CurrentTB.AllowInsertRemoveLines)
                         throw new ArgumentOutOfRangeException ("Cant insert this char in ColumnRange mode");
-                    if (tb.LineInfos[tb.Selection.Start.iLine - 1].VisibleState != VisibleState.Visible)
-                        tb.ExpandBlock (tb.Selection.Start.iLine - 1);
+                    if (tb.LineInfos[tb.Selection.Start.Line - 1].VisibleState != VisibleState.Visible)
+                        tb.ExpandBlock (tb.Selection.Start.Line - 1);
                     deletedChar = '\n';
-                    MergeLines (tb.Selection.Start.iLine - 1, ts);
+                    MergeLines (tb.Selection.Start.Line - 1, ts);
                 }
                 else
                 {
-                    deletedChar = ts[tb.Selection.Start.iLine][tb.Selection.Start.iChar - 1].c;
-                    ts[tb.Selection.Start.iLine].RemoveAt (tb.Selection.Start.iChar - 1);
-                    tb.Selection.Start = new Place (tb.Selection.Start.iChar - 1, tb.Selection.Start.iLine);
+                    deletedChar = ts[tb.Selection.Start.Line][tb.Selection.Start.Column - 1].c;
+                    ts[tb.Selection.Start.Line].RemoveAt (tb.Selection.Start.Column - 1);
+                    tb.Selection.Start = new Place (tb.Selection.Start.Column - 1, tb.Selection.Start.Line);
                 }
 
                 break;
             case '\t':
-                var spaceCountNextTabStop = tb.TabLength - (tb.Selection.Start.iChar % tb.TabLength);
+                var spaceCountNextTabStop = tb.TabLength - (tb.Selection.Start.Column % tb.TabLength);
                 if (spaceCountNextTabStop == 0)
                     spaceCountNextTabStop = tb.TabLength;
 
                 for (var i = 0; i < spaceCountNextTabStop; i++)
-                    ts[tb.Selection.Start.iLine].Insert (tb.Selection.Start.iChar, new Character (' '));
+                    ts[tb.Selection.Start.Line].Insert (tb.Selection.Start.Column, new Character (' '));
 
-                tb.Selection.Start = new Place (tb.Selection.Start.iChar + spaceCountNextTabStop,
-                    tb.Selection.Start.iLine);
+                tb.Selection.Start = new Place (tb.Selection.Start.Column + spaceCountNextTabStop,
+                    tb.Selection.Start.Line);
                 break;
             default:
-                ts[tb.Selection.Start.iLine].Insert (tb.Selection.Start.iChar, new Character (c));
-                tb.Selection.Start = new Place (tb.Selection.Start.iChar + 1, tb.Selection.Start.iLine);
+                ts[tb.Selection.Start.Line].Insert (tb.Selection.Start.Column, new Character (c));
+                tb.Selection.Start = new Place (tb.Selection.Start.Column + 1, tb.Selection.Start.Line);
                 break;
         }
     }
@@ -165,9 +166,9 @@ public class InsertCharCommand : UndoableCommand
         if (ts.Count == 0)
             ts.InsertLine (0, ts.CreateLine());
         else
-            BreakLines (tb.Selection.Start.iLine, tb.Selection.Start.iChar, ts);
+            BreakLines (tb.Selection.Start.Line, tb.Selection.Start.Column, ts);
 
-        tb.Selection.Start = new Place (0, tb.Selection.Start.iLine + 1);
+        tb.Selection.Start = new Place (0, tb.Selection.Start.Line + 1);
         ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
     }
 
@@ -221,7 +222,8 @@ public class InsertCharCommand : UndoableCommand
 /// <summary>
 /// Insert text
 /// </summary>
-public class InsertTextCommand : UndoableCommand
+public class InsertTextCommand
+    : UndoableCommand
 {
     public string InsertedText;
 
@@ -271,7 +273,7 @@ public class InsertTextCommand : UndoableCommand
                 tb.Selection.Start = Place.Empty;
             }
 
-            tb.ExpandBlock (tb.Selection.Start.iLine);
+            tb.ExpandBlock (tb.Selection.Start.Line);
             var len = insertedText.Length;
             for (var i = 0; i < len; i++)
             {
@@ -299,10 +301,11 @@ public class InsertTextCommand : UndoableCommand
 /// <summary>
 /// Insert text into given ranges
 /// </summary>
-public class ReplaceTextCommand : UndoableCommand
+public class ReplaceTextCommand
+    : UndoableCommand
 {
     string insertedText;
-    List<Range> ranges;
+    List<TextRange> ranges;
     List<string> prevText = new List<string>();
 
     /// <summary>
@@ -311,15 +314,15 @@ public class ReplaceTextCommand : UndoableCommand
     /// <param name="tb">Underlaying textbox</param>
     /// <param name="ranges">List of ranges for replace</param>
     /// <param name="insertedText">Text for inserting</param>
-    public ReplaceTextCommand (TextSource ts, List<Range> ranges, string insertedText)
+    public ReplaceTextCommand (TextSource ts, List<TextRange> ranges, string insertedText)
         : base (ts)
     {
         //sort ranges by place
         ranges.Sort ((r1, r2) =>
         {
-            if (r1.Start.iLine == r2.Start.iLine)
-                return r1.Start.iChar.CompareTo (r2.Start.iChar);
-            return r1.Start.iLine.CompareTo (r2.Start.iLine);
+            if (r1.Start.Line == r2.Start.Line)
+                return r1.Start.Column.CompareTo (r2.Start.Column);
+            return r1.Start.Line.CompareTo (r2.Start.Line);
         });
 
         //
@@ -352,7 +355,7 @@ public class ReplaceTextCommand : UndoableCommand
         tb.EndUpdate();
 
         if (ranges.Count > 0)
-            ts.OnTextChanged (ranges[0].Start.iLine, ranges[ranges.Count - 1].End.iLine);
+            ts.OnTextChanged (ranges[0].Start.Line, ranges[ranges.Count - 1].End.Line);
 
         ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
     }
@@ -380,7 +383,7 @@ public class ReplaceTextCommand : UndoableCommand
         }
 
         if (ranges.Count > 0)
-            ts.OnTextChanged (ranges[0].Start.iLine, ranges[ranges.Count - 1].End.iLine);
+            ts.OnTextChanged (ranges[0].Start.Line, ranges[ranges.Count - 1].End.Line);
         tb.EndUpdate();
         tb.Selection.EndUpdate();
         ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
@@ -390,7 +393,7 @@ public class ReplaceTextCommand : UndoableCommand
 
     public override UndoableCommand Clone()
     {
-        return new ReplaceTextCommand (ts, new List<Range> (ranges), insertedText);
+        return new ReplaceTextCommand (ts, new List<TextRange> (ranges), insertedText);
     }
 
     internal static void ClearSelected (TextSource ts)
@@ -401,8 +404,8 @@ public class ReplaceTextCommand : UndoableCommand
 
         var start = tb.Selection.Start;
         var end = tb.Selection.End;
-        var fromLine = Math.Min (end.iLine, start.iLine);
-        var toLine = Math.Max (end.iLine, start.iLine);
+        var fromLine = Math.Min (end.Line, start.Line);
+        var toLine = Math.Max (end.Line, start.Line);
         var fromChar = tb.Selection.FromX;
         var toChar = tb.Selection.ToX;
         if (fromLine < 0) return;
@@ -423,7 +426,8 @@ public class ReplaceTextCommand : UndoableCommand
 /// <summary>
 /// Clear selected text
 /// </summary>
-public class ClearSelectedCommand : UndoableCommand
+public class ClearSelectedCommand
+    : UndoableCommand
 {
     string deletedText;
 
@@ -440,10 +444,10 @@ public class ClearSelectedCommand : UndoableCommand
     /// </summary>
     public override void Undo()
     {
-        ts.CurrentTB.Selection.Start = new Place (sel.FromX, Math.Min (sel.Start.iLine, sel.End.iLine));
+        ts.CurrentTB.Selection.Start = new Place (sel.FromX, Math.Min (sel.Start.Line, sel.End.Line));
         ts.OnTextChanging();
         InsertTextCommand.InsertText (deletedText, ts);
-        ts.OnTextChanged (sel.Start.iLine, sel.End.iLine);
+        ts.OnTextChanged (sel.Start.Line, sel.End.Line);
         ts.CurrentTB.Selection.Start = sel.Start;
         ts.CurrentTB.Selection.End = sel.End;
     }
@@ -463,7 +467,7 @@ public class ClearSelectedCommand : UndoableCommand
         deletedText = tb.Selection.Text;
         ClearSelected (ts);
         lastSel = new RangeInfo (tb.Selection);
-        ts.OnTextChanged (lastSel.Start.iLine, lastSel.Start.iLine);
+        ts.OnTextChanged (lastSel.Start.Line, lastSel.Start.Line);
     }
 
     internal static void ClearSelected (TextSource ts)
@@ -472,8 +476,8 @@ public class ClearSelectedCommand : UndoableCommand
 
         var start = tb.Selection.Start;
         var end = tb.Selection.End;
-        var fromLine = Math.Min (end.iLine, start.iLine);
-        var toLine = Math.Max (end.iLine, start.iLine);
+        var fromLine = Math.Min (end.Line, start.Line);
+        var toLine = Math.Max (end.Line, start.Line);
         var fromChar = tb.Selection.FromX;
         var toChar = tb.Selection.ToX;
         if (fromLine < 0) return;
@@ -505,14 +509,15 @@ public class ClearSelectedCommand : UndoableCommand
 /// <summary>
 /// Replaces text
 /// </summary>
-public class ReplaceMultipleTextCommand : UndoableCommand
+public class ReplaceMultipleTextCommand
+    : UndoableCommand
 {
     List<ReplaceRange> ranges;
     List<string> prevText = new List<string>();
 
     public class ReplaceRange
     {
-        public Range ReplacedRange { get; set; }
+        public TextRange ReplacedRange { get; set; }
         public String ReplaceText { get; set; }
     }
 
@@ -527,9 +532,9 @@ public class ReplaceMultipleTextCommand : UndoableCommand
         //sort ranges by place
         ranges.Sort ((r1, r2) =>
         {
-            if (r1.ReplacedRange.Start.iLine == r2.ReplacedRange.Start.iLine)
-                return r1.ReplacedRange.Start.iChar.CompareTo (r2.ReplacedRange.Start.iChar);
-            return r1.ReplacedRange.Start.iLine.CompareTo (r2.ReplacedRange.Start.iLine);
+            if (r1.ReplacedRange.Start.Line == r2.ReplacedRange.Start.Line)
+                return r1.ReplacedRange.Start.Column.CompareTo (r2.ReplacedRange.Start.Column);
+            return r1.ReplacedRange.Start.Line.CompareTo (r2.ReplacedRange.Start.Line);
         });
 
         //
@@ -555,7 +560,7 @@ public class ReplaceMultipleTextCommand : UndoableCommand
             ClearSelectedCommand.ClearSelected (ts);
             var prevTextIndex = ranges.Count - 1 - i;
             InsertTextCommand.InsertText (prevText[prevTextIndex], ts);
-            ts.OnTextChanged (ranges[i].ReplacedRange.Start.iLine, ranges[i].ReplacedRange.Start.iLine);
+            ts.OnTextChanged (ranges[i].ReplacedRange.Start.Line, ranges[i].ReplacedRange.Start.Line);
         }
 
         tb.Selection.EndUpdate();
@@ -581,7 +586,7 @@ public class ReplaceMultipleTextCommand : UndoableCommand
             prevText.Add (tb.Selection.Text);
             ClearSelectedCommand.ClearSelected (ts);
             InsertTextCommand.InsertText (ranges[i].ReplaceText, ts);
-            ts.OnTextChanged (ranges[i].ReplacedRange.Start.iLine, ranges[i].ReplacedRange.End.iLine);
+            ts.OnTextChanged (ranges[i].ReplacedRange.Start.Line, ranges[i].ReplacedRange.End.Line);
         }
 
         tb.Selection.EndUpdate();
@@ -599,7 +604,8 @@ public class ReplaceMultipleTextCommand : UndoableCommand
 /// <summary>
 /// Removes lines
 /// </summary>
-public class RemoveLinesCommand : UndoableCommand
+public class RemoveLinesCommand
+    : UndoableCommand
 {
     List<int> iLines;
     List<string> prevText = new List<string>();
@@ -698,10 +704,11 @@ public class RemoveLinesCommand : UndoableCommand
 /// <summary>
 /// Wrapper for multirange commands
 /// </summary>
-public class MultiRangeCommand : UndoableCommand
+public class MultiRangeCommand
+    : UndoableCommand
 {
     private UndoableCommand cmd;
-    private Range range;
+    private TextRange range;
     private List<UndoableCommand> commandsByRanges = new List<UndoableCommand>();
 
     public MultiRangeCommand (UndoableCommand command) : base (command.ts)
@@ -715,8 +722,8 @@ public class MultiRangeCommand : UndoableCommand
         commandsByRanges.Clear();
         var prevSelection = range.Clone();
         var iChar = -1;
-        var iStartLine = prevSelection.Start.iLine;
-        var iEndLine = prevSelection.End.iLine;
+        var iStartLine = prevSelection.Start.Line;
+        var iEndLine = prevSelection.End.Line;
         ts.CurrentTB.Selection.ColumnSelectionMode = false;
         ts.CurrentTB.Selection.BeginUpdate();
         ts.CurrentTB.BeginUpdate();
@@ -757,7 +764,7 @@ public class MultiRangeCommand : UndoableCommand
         var iLine = 0;
         foreach (var r in range.GetSubRanges (true))
         {
-            var line = ts.CurrentTB[r.Start.iLine];
+            var line = ts.CurrentTB[r.Start.Line];
             var lineIsEmpty = r.End < r.Start && line.StartSpacesCount == line.Count;
             if (!lineIsEmpty)
             {
@@ -765,15 +772,15 @@ public class MultiRangeCommand : UndoableCommand
                 if (r.End < r.Start && insertedText != "")
                 {
                     //add forwarding spaces
-                    insertedText = new string (' ', r.Start.iChar - r.End.iChar) + insertedText;
+                    insertedText = new string (' ', r.Start.Column - r.End.Column) + insertedText;
                     r.Start = r.End;
                 }
 
                 ts.CurrentTB.Selection = r;
                 var c = new InsertTextCommand (ts, insertedText);
                 c.Execute();
-                if (ts.CurrentTB.Selection.End.iChar > iChar)
-                    iChar = ts.CurrentTB.Selection.End.iChar;
+                if (ts.CurrentTB.Selection.End.Column > iChar)
+                    iChar = ts.CurrentTB.Selection.End.Column;
                 commandsByRanges.Add (c);
             }
 
@@ -788,8 +795,8 @@ public class MultiRangeCommand : UndoableCommand
             ts.CurrentTB.Selection = r;
             var c = cmd.Clone();
             c.Execute();
-            if (ts.CurrentTB.Selection.End.iChar > iChar)
-                iChar = ts.CurrentTB.Selection.End.iChar;
+            if (ts.CurrentTB.Selection.End.Column > iChar)
+                iChar = ts.CurrentTB.Selection.End.Column;
             commandsByRanges.Add (c);
         }
     }
@@ -824,7 +831,8 @@ public class MultiRangeCommand : UndoableCommand
 /// <summary>
 /// Remembers current selection and restore it after Undo
 /// </summary>
-public class SelectCommand : UndoableCommand
+public class SelectCommand
+    : UndoableCommand
 {
     public SelectCommand (TextSource ts) : base (ts)
     {
@@ -843,14 +851,14 @@ public class SelectCommand : UndoableCommand
     public override void Undo()
     {
         //restore selection
-        ts.CurrentTB.Selection = new Range (ts.CurrentTB, lastSel.Start, lastSel.End);
+        ts.CurrentTB.Selection = new TextRange (ts.CurrentTB, lastSel.Start, lastSel.End);
     }
 
     public override UndoableCommand Clone()
     {
         var result = new SelectCommand (ts);
         if (lastSel != null)
-            result.lastSel = new RangeInfo (new Range (ts.CurrentTB, lastSel.Start, lastSel.End));
+            result.lastSel = new RangeInfo (new TextRange (ts.CurrentTB, lastSel.Start, lastSel.End));
         return result;
     }
 }

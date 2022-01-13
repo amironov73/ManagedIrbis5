@@ -28,9 +28,10 @@ namespace Fctb;
 /// This class contains the source text (chars and styles).
 /// It stores a text lines, the manager of commands, undo/redo stack, styles.
 /// </summary>
-public class TextSource : IList<Line>, IDisposable
+public class TextSource
+    : IList<Line>, IDisposable
 {
-    readonly protected List<Line> lines = new List<Line>();
+    readonly protected List<Line> lines = new();
     protected LinesAccessor linesAccessor;
     int lastLineUniqueId;
     public CommandManager Manager { get; set; }

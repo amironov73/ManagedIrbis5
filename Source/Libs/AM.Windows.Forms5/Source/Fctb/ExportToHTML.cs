@@ -72,12 +72,12 @@ public class ExportToHTML
     public string GetHtml (SyntaxTextBox tb)
     {
         this.tb = tb;
-        var sel = new Range (tb);
+        var sel = new TextRange (tb);
         sel.SelectAll();
         return GetHtml (sel);
     }
 
-    public string GetHtml (Range r)
+    public string GetHtml (TextRange r)
     {
         this.tb = r.tb;
         var styles = new Dictionary<StyleIndex, object>();
@@ -85,7 +85,7 @@ public class ExportToHTML
         var tempSB = new StringBuilder();
         var currentStyleId = StyleIndex.None;
         r.Normalize();
-        var currentLine = r.Start.iLine;
+        var currentLine = r.Start.Line;
         styles[currentStyleId] = null;
 
         //
@@ -101,7 +101,7 @@ public class ExportToHTML
         var hasNonSpace = false;
         foreach (var p in r)
         {
-            var c = r.tb[p.iLine][p.iChar];
+            var c = r.tb[p.Line][p.Column];
             if (c.style != currentStyleId)
             {
                 Flush (sb, tempSB, currentStyleId);
@@ -109,16 +109,16 @@ public class ExportToHTML
                 styles[currentStyleId] = null;
             }
 
-            if (p.iLine != currentLine)
+            if (p.Line != currentLine)
             {
-                for (var i = currentLine; i < p.iLine; i++)
+                for (var i = currentLine; i < p.Line; i++)
                 {
                     tempSB.Append (UseBr ? "<br>" : "\r\n");
                     if (IncludeLineNumbers)
                         tempSB.AppendFormat ("<span class=lineNumber>{0}</span>  ", i + 2);
                 }
 
-                currentLine = p.iLine;
+                currentLine = p.Line;
                 hasNonSpace = false;
             }
 

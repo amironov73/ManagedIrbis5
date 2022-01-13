@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* DocumentMap.cs --
+/* DocumentMap.cs -- карта документа
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,31 +24,37 @@ using System.Windows.Forms;
 namespace Fctb;
 
 /// <summary>
-/// Shows document map of FCTB
+/// Карта документа.
 /// </summary>
-public class DocumentMap : Control
+public class DocumentMap
+    : Control
 {
-    public EventHandler TargetChanged;
+    #region Events
 
-    SyntaxTextBox target;
-    private float scale = 0.3f;
-    private bool needRepaint = true;
-    private Place startPlace = Place.Empty;
-    private bool scrollbarVisible = true;
+    /// <summary>
+    /// <see cref="Target"/> поменялся.
+    /// </summary>
+    public event EventHandler? TargetChanged;
 
-    [Description ("Target FastColoredTextBox")]
-    public SyntaxTextBox Target
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Целевой текст-бокс.
+    /// </summary>
+    public SyntaxTextBox? Target
     {
-        get { return target; }
+        get => _target;
         set
         {
-            if (target != null)
-                UnSubscribe (target);
+            if (_target != null)
+                UnSubscribe (_target);
 
-            target = value;
+            _target = value;
             if (value != null)
             {
-                Subscribe (target);
+                Subscribe (_target);
             }
 
             OnTargetChanged();
@@ -56,16 +62,16 @@ public class DocumentMap : Control
     }
 
     /// <summary>
-    /// Scale
+    /// Масштаб.
     /// </summary>
     [Description ("Scale")]
     [DefaultValue (0.3f)]
     public float Scale
     {
-        get { return scale; }
+        get => _scale;
         set
         {
-            scale = value;
+            _scale = value;
             NeedRepaint();
         }
     }
@@ -73,18 +79,24 @@ public class DocumentMap : Control
     /// <summary>
     /// Scrollbar visibility
     /// </summary>
-    [Description ("Scrollbar visibility")]
     [DefaultValue (true)]
     public bool ScrollbarVisible
     {
-        get { return scrollbarVisible; }
+        get => _scrollbarVisible;
         set
         {
-            scrollbarVisible = value;
+            _scrollbarVisible = value;
             NeedRepaint();
         }
     }
 
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public DocumentMap()
     {
         ForeColor = Color.Maroon;
@@ -94,9 +106,21 @@ public class DocumentMap : Control
         Application.Idle += Application_Idle;
     }
 
-    void Application_Idle (object sender, EventArgs e)
+    #endregion
+
+    #region Private members
+
+    private SyntaxTextBox? _target;
+    private float _scale = 0.3f;
+    private bool _needRepaint = true;
+    private Place _startPlace = Place.Empty;
+    private bool _scrollbarVisible = true;
+
+    #endregion
+
+    private void Application_Idle (object sender, EventArgs e)
     {
-        if (needRepaint)
+        if (_needRepaint)
             Invalidate();
     }
 
@@ -145,52 +169,52 @@ public class DocumentMap : Control
 
     public void NeedRepaint()
     {
-        needRepaint = true;
+        _needRepaint = true;
     }
 
     protected override void OnPaint (PaintEventArgs e)
     {
-        if (target == null)
+        if (_target == null)
             return;
 
-        var zoom = this.Scale * 100 / target.Zoom;
+        var zoom = this.Scale * 100 / _target.Zoom;
 
         if (zoom <= float.Epsilon)
             return;
 
         //calc startPlace
-        var r = target.VisibleRange;
-        if (startPlace.iLine > r.Start.iLine)
-            startPlace.iLine = r.Start.iLine;
+        var r = _target.VisibleRange;
+        if (_startPlace.Line > r.Start.Line)
+            _startPlace.Line = r.Start.Line;
         else
         {
-            var endP = target.PlaceToPoint (r.End);
-            endP.Offset (0, -(int)(ClientSize.Height / zoom) + target.CharHeight);
-            var pp = target.PointToPlace (endP);
-            if (pp.iLine > startPlace.iLine)
-                startPlace.iLine = pp.iLine;
+            var endP = _target.PlaceToPoint (r.End);
+            endP.Offset (0, -(int)(ClientSize.Height / zoom) + _target.CharHeight);
+            var pp = _target.PointToPlace (endP);
+            if (pp.Line > _startPlace.Line)
+                _startPlace.Line = pp.Line;
         }
 
-        startPlace.iChar = 0;
+        _startPlace.Column = 0;
 
         //calc scroll pos
-        var linesCount = target.Lines.Count;
-        var sp1 = (float)r.Start.iLine / linesCount;
-        var sp2 = (float)r.End.iLine / linesCount;
+        var linesCount = _target.Lines.Count;
+        var sp1 = (float)r.Start.Line / linesCount;
+        var sp2 = (float)r.End.Line / linesCount;
 
         //scale graphics
         e.Graphics.ScaleTransform (zoom, zoom);
 
         //draw text
         var size = new SizeF (ClientSize.Width / zoom, ClientSize.Height / zoom);
-        target.DrawText (e.Graphics, startPlace, size.ToSize());
+        _target.DrawText (e.Graphics, _startPlace, size.ToSize());
 
         //draw visible rect
-        var p0 = target.PlaceToPoint (startPlace);
-        var p1 = target.PlaceToPoint (r.Start);
-        var p2 = target.PlaceToPoint (r.End);
+        var p0 = _target.PlaceToPoint (_startPlace);
+        var p1 = _target.PlaceToPoint (r.Start);
+        var p2 = _target.PlaceToPoint (r.End);
         var y1 = p1.Y - p0.Y;
-        var y2 = p2.Y + target.CharHeight - p0.Y;
+        var y2 = p2.Y + _target.CharHeight - p0.Y;
 
         e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
 
@@ -203,7 +227,7 @@ public class DocumentMap : Control
         }
 
         //draw scrollbar
-        if (scrollbarVisible)
+        if (_scrollbarVisible)
         {
             e.Graphics.ResetTransform();
             e.Graphics.SmoothingMode = SmoothingMode.None;
@@ -216,7 +240,7 @@ public class DocumentMap : Control
             }
         }
 
-        needRepaint = false;
+        _needRepaint = false;
     }
 
     protected override void OnMouseDown (MouseEventArgs e)
@@ -235,34 +259,44 @@ public class DocumentMap : Control
 
     private void Scroll (Point point)
     {
-        if (target == null)
+        if (_target is null)
+        {
             return;
+        }
 
-        var zoom = this.Scale * 100 / target.Zoom;
+        var zoom = this.Scale * 100 / _target.Zoom;
 
         if (zoom <= float.Epsilon)
+        {
             return;
+        }
 
-        var p0 = target.PlaceToPoint (startPlace);
+        var p0 = _target.PlaceToPoint (_startPlace);
         p0 = new Point (0, p0.Y + (int)(point.Y / zoom));
-        var pp = target.PointToPlace (p0);
-        target.DoRangeVisible (new Range (target, pp, pp), true);
+        var pp = _target.PointToPlace (p0);
+        _target.DoRangeVisible (new TextRange (_target, pp, pp), true);
         BeginInvoke ((MethodInvoker)OnScroll);
     }
 
     private void OnScroll()
     {
         Refresh();
-        target.Refresh();
+        _target.Refresh();
     }
 
-    protected override void Dispose (bool disposing)
+    /// <inheritdoc cref="Control.Dispose(bool)"/>
+    protected override void Dispose
+        (
+            bool disposing
+        )
     {
         if (disposing)
         {
             Application.Idle -= Application_Idle;
-            if (target != null)
-                UnSubscribe (target);
+            if (_target != null)
+            {
+                UnSubscribe (_target);
+            }
         }
 
         base.Dispose (disposing);

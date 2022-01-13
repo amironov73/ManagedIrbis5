@@ -168,7 +168,7 @@ public class SyntaxHighlighter : IDisposable
     /// <summary>
     /// Highlights syntax for given language
     /// </summary>
-    public virtual void HighlightSyntax (Language language, Range range)
+    public virtual void HighlightSyntax (Language language, TextRange range)
     {
         switch (language)
         {
@@ -207,7 +207,7 @@ public class SyntaxHighlighter : IDisposable
     /// <summary>
     /// Highlights syntax for given XML description file
     /// </summary>
-    public virtual void HighlightSyntax (string XMLdescriptionFile, Range range)
+    public virtual void HighlightSyntax (string XMLdescriptionFile, TextRange range)
     {
         SyntaxDescriptor desc = null;
         if (!descByXMLfileNames.TryGetValue (XMLdescriptionFile, out desc))
@@ -563,7 +563,7 @@ public class SyntaxHighlighter : IDisposable
             return Color.FromName (s);
     }
 
-    public void HighlightSyntax (SyntaxDescriptor desc, Range range)
+    public void HighlightSyntax (SyntaxDescriptor desc, TextRange range)
     {
         //set style order
         range.tb.ClearStylesBuffer();
@@ -747,7 +747,7 @@ public class SyntaxHighlighter : IDisposable
     /// Highlights C# code
     /// </summary>
     /// <param name="range"></param>
-    public virtual void CSharpSyntaxHighlight (Range range)
+    public virtual void CSharpSyntaxHighlight (TextRange range)
     {
         range.tb.CommentPrefix = "//";
         range.tb.LeftBracket = '(';
@@ -843,7 +843,7 @@ public class SyntaxHighlighter : IDisposable
     /// Highlights VB code
     /// </summary>
     /// <param name="range"></param>
-    public virtual void VBSyntaxHighlight (Range range)
+    public virtual void VBSyntaxHighlight (TextRange range)
     {
         range.tb.CommentPrefix = "'";
         range.tb.LeftBracket = '(';
@@ -923,7 +923,7 @@ public class SyntaxHighlighter : IDisposable
     /// Highlights HTML code
     /// </summary>
     /// <param name="range"></param>
-    public virtual void HTMLSyntaxHighlight (Range range)
+    public virtual void HTMLSyntaxHighlight (TextRange range)
     {
         range.tb.CommentPrefix = null;
         range.tb.LeftBracket = '<';
@@ -1008,7 +1008,7 @@ public class SyntaxHighlighter : IDisposable
     /// Highlights XML code
     /// </summary>
     /// <param name="range"></param>
-    public virtual void XMLSyntaxHighlight (Range range)
+    public virtual void XMLSyntaxHighlight (TextRange range)
     {
         range.tb.CommentPrefix = null;
         range.tb.LeftBracket = '<';
@@ -1059,7 +1059,7 @@ public class SyntaxHighlighter : IDisposable
         XmlFolding (range);
     }
 
-    private void XmlFolding (Range range)
+    private void XmlFolding (TextRange range)
     {
         var stack = new Stack<XmlFoldingTag>();
         var id = 0;
@@ -1069,13 +1069,13 @@ public class SyntaxHighlighter : IDisposable
         foreach (var r in range.GetRanges (XMLFoldingRegex))
         {
             var tagName = r.Text;
-            var iLine = r.Start.iLine;
+            var iLine = r.Start.Line;
 
             //if it is opening tag...
             if (tagName[0] != '/')
             {
                 // ...push into stack
-                var tag = new XmlFoldingTag { Name = tagName, id = id++, startLine = r.Start.iLine };
+                var tag = new XmlFoldingTag { Name = tagName, id = id++, startLine = r.Start.Line };
                 stack.Push (tag);
 
                 // if this line has no markers - set marker
@@ -1148,7 +1148,7 @@ public class SyntaxHighlighter : IDisposable
     /// Highlights SQL code
     /// </summary>
     /// <param name="range"></param>
-    public virtual void SQLSyntaxHighlight (Range range)
+    public virtual void SQLSyntaxHighlight (TextRange range)
     {
         range.tb.CommentPrefix = "--";
         range.tb.LeftBracket = '(';
@@ -1228,7 +1228,7 @@ public class SyntaxHighlighter : IDisposable
     /// Highlights PHP code
     /// </summary>
     /// <param name="range"></param>
-    public virtual void PHPSyntaxHighlight (Range range)
+    public virtual void PHPSyntaxHighlight (TextRange range)
     {
         range.tb.CommentPrefix = "//";
         range.tb.LeftBracket = '(';
@@ -1296,7 +1296,7 @@ public class SyntaxHighlighter : IDisposable
     /// Highlights JavaScript code
     /// </summary>
     /// <param name="range"></param>
-    public virtual void JScriptSyntaxHighlight (Range range)
+    public virtual void JScriptSyntaxHighlight (TextRange range)
     {
         range.tb.CommentPrefix = "//";
         range.tb.LeftBracket = '(';
@@ -1363,7 +1363,7 @@ public class SyntaxHighlighter : IDisposable
     /// Highlights Lua code
     /// </summary>
     /// <param name="range"></param>
-    public virtual void LuaSyntaxHighlight (Range range)
+    public virtual void LuaSyntaxHighlight (TextRange range)
     {
         range.tb.CommentPrefix = "--";
         range.tb.LeftBracket = '(';
@@ -1449,7 +1449,7 @@ public class SyntaxHighlighter : IDisposable
     /// Highlights JSON code
     /// </summary>
     /// <param name="range"></param>
-    public virtual void JSONSyntaxHighlight (Range range)
+    public virtual void JSONSyntaxHighlight (TextRange range)
     {
         range.tb.LeftBracket = '[';
         range.tb.RightBracket = ']';

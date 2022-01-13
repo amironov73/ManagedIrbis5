@@ -48,12 +48,12 @@ public class ExportToRTF
     public string GetRtf (SyntaxTextBox tb)
     {
         this.tb = tb;
-        var sel = new Range (tb);
+        var sel = new TextRange (tb);
         sel.SelectAll();
         return GetRtf (sel);
     }
 
-    public string GetRtf (Range r)
+    public string GetRtf (TextRange r)
     {
         this.tb = r.tb;
         var styles = new Dictionary<StyleIndex, object>();
@@ -61,7 +61,7 @@ public class ExportToRTF
         var tempSB = new StringBuilder();
         var currentStyleId = StyleIndex.None;
         r.Normalize();
-        var currentLine = r.Start.iLine;
+        var currentLine = r.Start.Line;
         styles[currentStyleId] = null;
         colorTable.Clear();
 
@@ -74,7 +74,7 @@ public class ExportToRTF
         //
         foreach (var p in r)
         {
-            var c = r.tb[p.iLine][p.iChar];
+            var c = r.tb[p.Line][p.Column];
             if (c.style != currentStyleId)
             {
                 Flush (sb, tempSB, currentStyleId);
@@ -82,16 +82,16 @@ public class ExportToRTF
                 styles[currentStyleId] = null;
             }
 
-            if (p.iLine != currentLine)
+            if (p.Line != currentLine)
             {
-                for (var i = currentLine; i < p.iLine; i++)
+                for (var i = currentLine; i < p.Line; i++)
                 {
                     tempSB.AppendLine (@"\line");
                     if (IncludeLineNumbers)
                         tempSB.AppendFormat (@"{{\cf{1} {0}}}\tab", i + 2, lineNumberColor);
                 }
 
-                currentLine = p.iLine;
+                currentLine = p.Line;
             }
 
             switch (c.c)

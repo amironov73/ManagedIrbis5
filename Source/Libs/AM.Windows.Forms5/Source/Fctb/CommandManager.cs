@@ -200,7 +200,7 @@ internal class RangeInfo
     public Place Start { get; set; }
     public Place End { get; set; }
 
-    public RangeInfo (Range r)
+    public RangeInfo (TextRange r)
     {
         Start = r.Start;
         End = r.End;
@@ -210,9 +210,9 @@ internal class RangeInfo
     {
         get
         {
-            if (End.iLine < Start.iLine) return End.iChar;
-            if (End.iLine > Start.iLine) return Start.iChar;
-            return Math.Min (End.iChar, Start.iChar);
+            if (End.Line < Start.Line) return End.Column;
+            if (End.Line > Start.Line) return Start.Column;
+            return Math.Min (End.Column, Start.Column);
         }
     }
 }
@@ -242,20 +242,20 @@ public abstract class UndoableCommand : Command
 
     protected virtual void OnTextChanged (bool invert)
     {
-        var b = sel.Start.iLine < lastSel.Start.iLine;
+        var b = sel.Start.Line < lastSel.Start.Line;
         if (invert)
         {
             if (b)
-                ts.OnTextChanged (sel.Start.iLine, sel.Start.iLine);
+                ts.OnTextChanged (sel.Start.Line, sel.Start.Line);
             else
-                ts.OnTextChanged (sel.Start.iLine, lastSel.Start.iLine);
+                ts.OnTextChanged (sel.Start.Line, lastSel.Start.Line);
         }
         else
         {
             if (b)
-                ts.OnTextChanged (sel.Start.iLine, lastSel.Start.iLine);
+                ts.OnTextChanged (sel.Start.Line, lastSel.Start.Line);
             else
-                ts.OnTextChanged (lastSel.Start.iLine, lastSel.Start.iLine);
+                ts.OnTextChanged (lastSel.Start.Line, lastSel.Start.Line);
         }
     }
 

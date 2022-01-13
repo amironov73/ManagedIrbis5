@@ -74,32 +74,32 @@ public class Hints : ICollection<Hint>, IDisposable
     {
         if (hint.Inline)
         {
-            if (hint.Range.Start.iLine < tb.LineInfos.Count - 1)
-                hint.HostPanel.Top = tb.LineInfos[hint.Range.Start.iLine + 1].startY - hint.TopPadding -
+            if (hint.Range.Start.Line < tb.LineInfos.Count - 1)
+                hint.HostPanel.Top = tb.LineInfos[hint.Range.Start.Line + 1].startY - hint.TopPadding -
                                      hint.HostPanel.Height - tb.VerticalScroll.Value;
             else
                 hint.HostPanel.Top = tb.TextHeight + tb.Paddings.Top - hint.HostPanel.Height - tb.VerticalScroll.Value;
         }
         else
         {
-            if (hint.Range.Start.iLine > tb.LinesCount - 1) return;
-            if (hint.Range.Start.iLine == tb.LinesCount - 1)
+            if (hint.Range.Start.Line > tb.LinesCount - 1) return;
+            if (hint.Range.Start.Line == tb.LinesCount - 1)
             {
-                var y = tb.LineInfos[hint.Range.Start.iLine].startY - tb.VerticalScroll.Value + tb.CharHeight;
+                var y = tb.LineInfos[hint.Range.Start.Line].startY - tb.VerticalScroll.Value + tb.CharHeight;
 
                 if (y + hint.HostPanel.Height + 1 > tb.ClientRectangle.Bottom)
                 {
                     hint.HostPanel.Top = Math.Max (0,
-                        tb.LineInfos[hint.Range.Start.iLine].startY - tb.VerticalScroll.Value - hint.HostPanel.Height);
+                        tb.LineInfos[hint.Range.Start.Line].startY - tb.VerticalScroll.Value - hint.HostPanel.Height);
                 }
                 else
                     hint.HostPanel.Top = y;
             }
             else
             {
-                hint.HostPanel.Top = tb.LineInfos[hint.Range.Start.iLine + 1].startY - tb.VerticalScroll.Value;
+                hint.HostPanel.Top = tb.LineInfos[hint.Range.Start.Line + 1].startY - tb.VerticalScroll.Value;
                 if (hint.HostPanel.Bottom > tb.ClientRectangle.Bottom)
-                    hint.HostPanel.Top = tb.LineInfos[hint.Range.Start.iLine + 1].startY - tb.CharHeight -
+                    hint.HostPanel.Top = tb.LineInfos[hint.Range.Start.Line + 1].startY - tb.CharHeight -
                                          hint.TopPadding - hint.HostPanel.Height - tb.VerticalScroll.Value;
             }
         }
@@ -172,10 +172,10 @@ public class Hints : ICollection<Hint>, IDisposable
 
         if (hint.Inline /* || hint.Range.Start.iLine >= tb.LinesCount - 1*/)
         {
-            var li = tb.LineInfos[hint.Range.Start.iLine];
+            var li = tb.LineInfos[hint.Range.Start.Line];
             hint.TopPadding = li.bottomPadding;
             li.bottomPadding += hint.HostPanel.Height;
-            tb.LineInfos[hint.Range.Start.iLine] = li;
+            tb.LineInfos[hint.Range.Start.Line] = li;
             tb.NeedRecalc (true);
         }
 
@@ -239,7 +239,7 @@ public class Hint
     /// <summary>
     /// Linked range
     /// </summary>
-    public Range Range { get; set; }
+    public TextRange Range { get; set; }
 
     /// <summary>
     /// Backcolor
@@ -369,7 +369,7 @@ public class Hint
         Range.tb.Invalidate();
     }
 
-    private Hint (Range range, Control innerControl, string text, bool inline, bool dock)
+    private Hint (TextRange range, Control innerControl, string text, bool inline, bool dock)
     {
         this.Range = range;
         this.Inline = inline;
@@ -388,7 +388,7 @@ public class Hint
     /// <param name="text">Text for simple hint</param>
     /// <param name="inline">Inlining. If True then hint will moves apart text</param>
     /// <param name="dock">Docking. If True then hint will fill whole line</param>
-    public Hint (Range range, string text, bool inline, bool dock)
+    public Hint (TextRange range, string text, bool inline, bool dock)
         : this (range, null, text, inline, dock)
     {
     }
@@ -398,7 +398,7 @@ public class Hint
     /// </summary>
     /// <param name="range">Linked range</param>
     /// <param name="text">Text for simple hint</param>
-    public Hint (Range range, string text)
+    public Hint (TextRange range, string text)
         : this (range, null, text, true, true)
     {
     }
@@ -410,7 +410,7 @@ public class Hint
     /// <param name="innerControl">Inner control</param>
     /// <param name="inline">Inlining. If True then hint will moves apart text</param>
     /// <param name="dock">Docking. If True then hint will fill whole line</param>
-    public Hint (Range range, Control innerControl, bool inline, bool dock)
+    public Hint (TextRange range, Control innerControl, bool inline, bool dock)
         : this (range, innerControl, null, inline, dock)
     {
     }
@@ -420,7 +420,7 @@ public class Hint
     /// </summary>
     /// <param name="range">Linked range</param>
     /// <param name="innerControl">Inner control</param>
-    public Hint (Range range, Control innerControl)
+    public Hint (TextRange range, Control innerControl)
         : this (range, innerControl, null, true, true)
     {
     }

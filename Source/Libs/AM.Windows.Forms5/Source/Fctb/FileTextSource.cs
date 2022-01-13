@@ -69,8 +69,8 @@ public class FileTextSource : TextSource, IDisposable
     private void UnloadUnusedLines()
     {
         const int margin = 2000;
-        var iStartVisibleLine = CurrentTB.VisibleRange.Start.iLine;
-        var iFinishVisibleLine = CurrentTB.VisibleRange.End.iLine;
+        var iStartVisibleLine = CurrentTB.VisibleRange.Start.Line;
+        var iFinishVisibleLine = CurrentTB.VisibleRange.End.Line;
 
         var count = 0;
         for (var i = 0; i < Count; i++)

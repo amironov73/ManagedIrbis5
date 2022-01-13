@@ -33,7 +33,7 @@ public class AutocompleteMenu : ToolStripDropDown, IDisposable
 {
     AutocompleteListView listView;
     public ToolStripControlHost host;
-    public Range Fragment { get; internal set; }
+    public TextRange Fragment { get; internal set; }
 
     /// <summary>
     /// Regex pattern for serach fragment around caret
@@ -516,8 +516,8 @@ public class AutocompleteListView : UserControl, IDisposable
                 needClose = true;
             else if (!Menu.Fragment.Contains (tb.Selection.Start))
             {
-                if (tb.Selection.Start.iLine == Menu.Fragment.End.iLine &&
-                    tb.Selection.Start.iChar == Menu.Fragment.End.iChar + 1)
+                if (tb.Selection.Start.Line == Menu.Fragment.End.Line &&
+                    tb.Selection.Start.Column == Menu.Fragment.End.Column + 1)
                 {
                     //user press key at end of fragment
                     var c = tb.Selection.CharBeforeStart;
@@ -685,7 +685,7 @@ public class AutocompleteListView : UserControl, IDisposable
         }
     }
 
-    private void DoAutocomplete (AutocompleteItem item, Range fragment)
+    private void DoAutocomplete (AutocompleteItem item, TextRange fragment)
     {
         var newText = item.GetTextForReplace();
 
@@ -698,8 +698,8 @@ public class AutocompleteListView : UserControl, IDisposable
         {
             var start = tb.Selection.Start;
             var end = tb.Selection.End;
-            start.iChar = fragment.Start.iChar;
-            end.iChar = fragment.End.iChar;
+            start.Column = fragment.Start.Column;
+            end.Column = fragment.End.Column;
             tb.Selection.Start = start;
             tb.Selection.End = end;
         }

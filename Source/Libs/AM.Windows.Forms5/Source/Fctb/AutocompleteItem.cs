@@ -199,7 +199,7 @@ public class SnippetAutocompleteItem : AutocompleteItem
         //do auto indent
         if (e.Tb.AutoIndent)
         {
-            for (var iLine = p1.iLine + 1; iLine <= p2.iLine; iLine++)
+            for (var iLine = p1.Line + 1; iLine <= p2.Line; iLine++)
             {
                 e.Tb.Selection.Start = new Place (0, iLine);
                 e.Tb.DoAutoIndent (iLine);
