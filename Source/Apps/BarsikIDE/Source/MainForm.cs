@@ -119,6 +119,18 @@ namespace BarsikIDE
                 e.IsInputKey = false;
             }
         }
+        private void _saveButton_Click
+            (
+                object sender,
+                EventArgs e
+            )
+        {
+            var sourceCode = _syntaxTextBox.Text;
+            if (_saveFileDialog.ShowDialog (this) == DialogResult.OK)
+            {
+                File.WriteAllText (_saveFileDialog.FileName, sourceCode);
+            }
+        }
 
         #endregion
     }

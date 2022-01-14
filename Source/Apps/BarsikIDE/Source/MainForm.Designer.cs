@@ -45,6 +45,9 @@ namespace BarsikIDE
             this._openButton = new System.Windows.Forms.ToolStripButton();
             this._runButton = new System.Windows.Forms.ToolStripButton();
             this._openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this._saveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._saveButton = new System.Windows.Forms.ToolStripButton();
+            this._saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -172,7 +175,8 @@ namespace BarsikIDE
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._openMenuItem});
+            this._openMenuItem,
+            this._saveMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
@@ -180,7 +184,7 @@ namespace BarsikIDE
             // _openMenuItem
             // 
             this._openMenuItem.Name = "_openMenuItem";
-            this._openMenuItem.Size = new System.Drawing.Size(103, 22);
+            this._openMenuItem.Size = new System.Drawing.Size(180, 22);
             this._openMenuItem.Text = "&Open";
             this._openMenuItem.Click += new System.EventHandler(this._openButton_Click);
             // 
@@ -196,10 +200,11 @@ namespace BarsikIDE
             this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._openButton,
-            this._runButton});
+            this._runButton,
+            this._saveButton});
             this.toolStrip1.Location = new System.Drawing.Point(3, 24);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(84, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(150, 25);
             this.toolStrip1.TabIndex = 1;
             // 
             // _openButton
@@ -225,6 +230,26 @@ namespace BarsikIDE
             // _openFileDialog
             // 
             this._openFileDialog.Filter = "Barsik scripts|*.barsik|All files|*.*";
+            // 
+            // _saveMenuItem
+            // 
+            this._saveMenuItem.Name = "_saveMenuItem";
+            this._saveMenuItem.Size = new System.Drawing.Size(180, 22);
+            this._saveMenuItem.Text = "&Save";
+            // 
+            // _saveButton
+            // 
+            this._saveButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this._saveButton.Image = ((System.Drawing.Image)(resources.GetObject("_saveButton.Image")));
+            this._saveButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._saveButton.Name = "_saveButton";
+            this._saveButton.Size = new System.Drawing.Size(35, 22);
+            this._saveButton.Text = "Save";
+            this._saveButton.Click += new System.EventHandler(this._saveButton_Click);
+            // 
+            // _saveFileDialog
+            // 
+            this._saveFileDialog.Filter = "Barsik files|*.barsik|All files|*.*";
             // 
             // MainForm
             // 
@@ -273,5 +298,8 @@ namespace BarsikIDE
         private AM.Windows.Forms.LogBox _logBox;
         private Fctb.SyntaxTextBox _syntaxTextBox;
         private OpenFileDialog _openFileDialog;
+        private ToolStripMenuItem _saveMenuItem;
+        private ToolStripButton _saveButton;
+        private SaveFileDialog _saveFileDialog;
     }
 }

@@ -101,6 +101,11 @@ public sealed class Context
     public Dictionary<string, Assembly> Assemblies { get; }
 
     /// <summary>
+    /// Произвольные пользовательские данные, свяазанные с данным контекстом.
+    /// </summary>
+    public BarsikDictionary Auxiliary { get; }
+
+    /// <summary>
     /// Опциональный префикс, используемый, например, в операторе "new"
     /// при инициализации свойств свежесозданного объекта.
     /// </summary>
@@ -131,6 +136,7 @@ public sealed class Context
         Namespaces = new ();
         Modules = new ();
         Assemblies = new ();
+        Auxiliary = new ();
     }
 
     #endregion
