@@ -27,6 +27,15 @@ namespace AM.IO;
 public sealed class TempFile
     : IDisposable
 {
+    #region Events
+
+    /// <summary>
+    /// Событие, возникающее при закрытии файла.
+    /// </summary>
+    public event EventHandler? Disposing;
+
+    #endregion
+
     #region Properties
 
     /// <summary>
@@ -52,6 +61,20 @@ public sealed class TempFile
         Stream = File.Create (FullPath);
     }
 
+    /// <summary>
+    /// Конструктор с конкретным (несуществующим) файлом.
+    /// </summary>
+    public TempFile
+        (
+            string fullPath
+        )
+    {
+        Sure.NotNullNorEmpty (fullPath);
+
+        FullPath = fullPath;
+        Stream = File.Create (FullPath);
+    }
+
     #endregion
 
     #region IDisposable members
@@ -61,6 +84,7 @@ public sealed class TempFile
     {
         Stream.Dispose();
         File.Delete (FullPath);
+        Disposing?.Invoke (this, EventArgs.Empty);
     }
 
     #endregion
