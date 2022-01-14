@@ -25,7 +25,7 @@ using DevExpress.XtraPrinting;
 
 #nullable enable
 
-namespace AM.Windows.DevExpress;
+namespace AM.Windows.DevEx;
 
 /// <summary>
 /// Легко и просто рисуем на PrintingSystem.

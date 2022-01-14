@@ -24,7 +24,7 @@ using DevExpress.Spreadsheet;
 
 #nullable enable
 
-namespace AM.Windows.DevExpress;
+namespace AM.Windows.DevEx;
 
 /// <summary>
 /// Легко и просто формируем таблицу Excel

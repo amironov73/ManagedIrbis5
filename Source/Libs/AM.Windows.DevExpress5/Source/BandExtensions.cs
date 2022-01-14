@@ -22,7 +22,7 @@ using DevExpress.XtraReports.UI;
 
 #nullable enable
 
-namespace AM.Windows.DevExpress;
+namespace AM.Windows.DevEx;
 
 /// <summary>
 /// Удобные расширения для работа с полосами отчета.

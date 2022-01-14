@@ -22,7 +22,7 @@ using AM;
 using AM.AppServices;
 using AM.Linq;
 using AM.Text.Ranges;
-using AM.Windows.DevExpress;
+using AM.Windows.DevEx;
 
 using ManagedIrbis.AppServices;
 using ManagedIrbis.Magazines;

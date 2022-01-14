@@ -25,7 +25,7 @@ using DevExpress.XtraReports.UI;
 
 #nullable enable
 
-namespace AM.Windows.DevExpress;
+namespace AM.Windows.DevEx;
 
 /// <summary>
 /// Легко и просто формируем отчет силами PrintingSystem.

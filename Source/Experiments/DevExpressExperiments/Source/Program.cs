@@ -16,7 +16,7 @@
 
 using System.Drawing;
 
-using AM.Windows.DevExpress;
+using AM.Windows.DevEx;
 
 using DevExpress.Utils;
 using DevExpress.XtraPrinting;
