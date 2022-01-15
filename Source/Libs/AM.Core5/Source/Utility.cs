@@ -70,6 +70,101 @@ public static class Utility
     }
 
     /// <summary>
+    /// Очистка с последующим обнулением переменной.
+    /// </summary>
+    public static void DisposeAndNull<T>
+        (
+            ref T? obj
+        )
+        where T: class, IDisposable
+    {
+        if (obj is not null)
+        {
+            obj.Dispose();
+            obj = null;
+        }
+    }
+
+    /// <summary>
+    /// Очистка объекта после получения результата вычисления.
+    /// </summary>
+    public static TOutput DisposeAfter<TInput, TOutput>
+        (
+            this TInput disposable,
+            Func<TInput, TOutput> action
+        )
+        where TInput: IDisposable
+    {
+        using (disposable)
+        {
+            return action (disposable);
+        }
+    }
+
+    /// <summary>
+    /// Очистка объекта после получения результата вычисления.
+    /// </summary>
+    public static TOutput DisposeAfter<TInput, TOutput>
+        (
+            this TInput disposable,
+            Func<TOutput> action
+        )
+        where TInput: IDisposable
+    {
+        using (disposable)
+        {
+            return action();
+        }
+    }
+
+    /// <summary>
+    /// Очистка объекта после выполнения процедуры.
+    /// </summary>
+    public static void DisposeAfter<T>
+        (
+            this T disposable,
+            Action<T> action
+        )
+        where T: IDisposable
+    {
+        using (disposable)
+        {
+            action(disposable);
+        }
+    }
+
+    /// <summary>
+    /// Очистка объекта после выполнения процедуры.
+    /// </summary>
+    public static void DisposeAfter<T>
+        (
+            this T disposable,
+            Action action
+        )
+        where T: IDisposable
+    {
+        using (disposable)
+        {
+            action();
+        }
+    }
+
+    /// <summary>
+    /// Помещение объекта в список для очистки вместе с другими.
+    /// </summary>
+    public static T DisposeWith<T>
+        (
+            this T disposable,
+            DisposableCollection<T> disposables
+        )
+        where T: IDisposable
+    {
+        disposables.Add(disposable);
+
+        return disposable;
+    }
+
+    /// <summary>
     /// Первый день следующего месяца.
     /// </summary>
     [Pure]
@@ -2327,6 +2422,34 @@ public static class Utility
 
         return false;
     }
+
+    /// <summary>
+    /// Преобразование произвольного значения в строку
+    /// по правилам инвариантной культуры.
+    /// </summary>
+    public static string ToInvariantString (object value) =>
+        value switch
+        {
+            bool val => val.ToInvariantString(),
+            double val => val.ToInvariantString(),
+            int val => val.ToInvariantString(),
+            long val => val.ToInvariantString(),
+            TimeSpan val => val.ToInvariantString(),
+            _ => Convert.ToString (value, CultureInfo.InvariantCulture)!,
+        };
+
+    /// <summary>
+    /// Преобразование промежутка времени в строку по правилам
+    /// инвариантной культуры.
+    /// </summary>
+    public static string ToInvariantString (this TimeSpan value) =>
+        value.ToString ("c", CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Преобразование логического значения в "true" в "false".
+    /// </summary>
+    [Pure]
+    public static string ToInvariantString (this bool value) => value ? "true" : "false";
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной

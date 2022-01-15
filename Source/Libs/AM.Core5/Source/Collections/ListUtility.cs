@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
@@ -35,7 +36,8 @@ public static class ListUtility
     #region Public methods
 
     /// <summary>
-    /// Add to list if don't have yet.
+    /// Добавление в список элемента, при условии,
+    /// что этот элемент осутствует в списке.
     /// </summary>
     public static bool AddDistinct<T>
         (
@@ -43,6 +45,8 @@ public static class ListUtility
             T value
         )
     {
+        Sure.NotNull (list);
+
         return list.AddDistinct
             (
                 value,
@@ -51,7 +55,8 @@ public static class ListUtility
     }
 
     /// <summary>
-    /// Add to list if don't have yet.
+    /// Добавление в список элемента, при условии,
+    /// что этот элемент осутствует в списке.
     /// </summary>
     public static bool AddDistinct<T>
         (
@@ -60,6 +65,9 @@ public static class ListUtility
             IEqualityComparer<T> comparer
         )
     {
+        Sure.NotNull (list);
+        Sure.NotNull (comparer);
+
         if (list.ContainsValue (value, comparer))
         {
             return false;
@@ -71,7 +79,8 @@ public static class ListUtility
     }
 
     /// <summary>
-    ///
+    /// Добавление в список элемента, при условии,
+    /// что этот элемент осутствует в списке.
     /// </summary>
     public static bool AddRangeDistinct<T>
         (
@@ -80,6 +89,10 @@ public static class ListUtility
             IEqualityComparer<T> comparer
         )
     {
+        Sure.NotNull (list);
+        Sure.NotNull ((object?) values);
+        Sure.NotNull (comparer);
+
         var allAdded = true;
         foreach (var value in values)
         {
@@ -93,7 +106,151 @@ public static class ListUtility
     }
 
     /// <summary>
-    ///
+    /// Добавление в список элемента, при условии, что он не <c>null</c>.
+    /// </summary>
+    public static void AddNonNull<T>
+        (
+            this IList<T> list,
+            T? value
+        )
+        where T: class
+    {
+        Sure.NotNull (list);
+
+        if (value is not null)
+        {
+            list.Add (value);
+        }
+    }
+
+    /// <summary>
+    /// Добавление в список элемента, при условии, что он не <c>null</c>.
+    /// </summary>
+    public static void AddNonNull<T>
+        (
+            this IList<T> list,
+            IEnumerable<T?> values
+        )
+        where T: class
+    {
+        Sure.NotNull (list);
+        Sure.NotNull ((object?) values);
+
+        foreach (var value in values)
+        {
+            if (value is not null)
+            {
+                list.Add (value);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Бинарный поиск в сортированном списке.
+    /// Список должен быть отсортирован согласно
+    /// заданной операции сравнения <paramref name="compare"/>.
+    /// </summary>
+    /// <param name="list">Сортированный список.</param>
+    /// <param name="key">Искомый ключ.</param>
+    /// <param name="compare">Операция сравнения.</param>
+    /// <param name="index">В данную помещается первый индекс, по которому
+    /// можно найти искомый ключ. Если значение, возвращенное методом,
+    /// равно нулю, это указывает на то, что ключ отсутствует в списке,
+    /// то в переменную помещается индекс, в который можно было бы вставить
+    /// этот индекс с сохранением сортировки списка.</param>
+    /// <returns>Количество ключей, равных заданному <paramref name="key"/>.
+    /// Ноль означает, что ключ не найден.
+    /// </returns>
+    /// <remarks>
+    /// Заимствовано из PowerCollections.
+    /// </remarks>
+    public static int BinarySearch<TItem, TKey>
+        (
+            IReadOnlyList<TItem> list,
+            TKey key,
+            Func<TItem, TKey, int> compare,
+            out int index
+        )
+    {
+        Sure.NotNull (list);
+        Sure.NotNull (compare);
+
+        var l = 0;
+        var r = list.Count;
+        while (r > l)
+        {
+            var m = l + (r - l) / 2;
+            var middleItem = list[m];
+            var comp = compare (middleItem, key);
+            if (comp < 0)
+            {
+                // middleItem < key
+                l = m + 1;
+            }
+            else if (comp > 0)
+            {
+                r = m;
+            }
+            else
+            {
+                // Found something equal to key at m. Now we need to find the start and end of this run of equal keys.
+                int lFound = l, rFound = r, found = m;
+
+                // Find the start of the run.
+                l = lFound;
+                r = found;
+                while (r > l)
+                {
+                    m = l + (r - l) / 2;
+                    middleItem = list[m];
+                    comp = compare (middleItem, key);
+                    if (comp < 0)
+                    {
+                        // middleItem < key
+                        l = m + 1;
+                    }
+                    else
+                    {
+                        r = m;
+                    }
+                }
+
+                Debug.Assert (l == r, "l == r");
+                index = l;
+
+                // Find the end of the run.
+                l = found;
+                r = rFound;
+                while (r > l)
+                {
+                    m = l + (r - l) / 2;
+                    middleItem = list[m];
+                    comp = compare (middleItem, key);
+                    if (comp <= 0)
+                    {
+                        // middleItem <= key
+                        l = m + 1;
+                    }
+                    else
+                    {
+                        r = m;
+                    }
+                }
+
+                Debug.Assert (l == r, "l == r");
+                return l - index;
+            }
+        }
+
+        // We did not find the key. l and r must be equal.
+        Debug.Assert (l == r, "l == r");
+        index = l;
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Проверка, не содержит ли список указанного значения.
     /// </summary>
     [Pure]
     public static bool ContainsValue<TSource>
@@ -103,6 +260,9 @@ public static class ListUtility
             IEqualityComparer<TSource> comparer
         )
     {
+        Sure.NotNull ((object?) source);
+        Sure.NotNull (comparer);
+
         foreach (var local in source)
         {
             if (comparer.Equals (local, value))
@@ -123,6 +283,9 @@ public static class ListUtility
             Func<T, bool> predicate
         )
     {
+        Sure.NotNull ((object?) collection);
+        Sure.NotNull (predicate);
+
         var index = 0;
         foreach (var value in collection)
         {
@@ -146,12 +309,47 @@ public static class ListUtility
             [NotNullWhen ((false))] this IList<T>? list
         )
     {
-        if (!ReferenceEquals (list, null))
+        if (list is not null)
         {
             return list.Count == 0;
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Removes items from the list that match the specified predicate.
+    /// </summary>
+    /// <typeparam name="T">The type.</typeparam>
+    /// <param name="list">The list.</param>
+    /// <param name="predicate">The predicate that determines the items to remove.</param>
+    /// <returns>The number of items removed from the collection.</returns>
+    public static int RemoveWhere<T>
+        (
+            this IList<T> list,
+            Func<T, bool> predicate
+        )
+    {
+        Sure.NotNull (list);
+        Sure.NotNull (predicate);
+
+        var originalCount = list.Count;
+        var count = originalCount;
+        var index = 0;
+        while (index < count)
+        {
+            if (predicate (list[index]))
+            {
+                list.RemoveAt (index);
+                count--;
+            }
+            else
+            {
+                index++;
+            }
+        }
+
+        return originalCount - count;
     }
 
     /// <summary>
@@ -192,7 +390,7 @@ public static class ListUtility
         }
 
         return list;
-    } // method ThrowIfNullOrEmpty
+    }
 
     /// <summary>
     /// Throw <see cref="ArgumentNullException"/>

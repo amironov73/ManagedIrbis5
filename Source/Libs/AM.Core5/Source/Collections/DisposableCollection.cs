@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* DisposableCollection.cs -- коллекция, состоящая из disposable-элементов
  * Ars Magna project, http://arsmagna.ru
@@ -16,6 +12,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
@@ -27,14 +24,74 @@ namespace AM.Collections;
 
 /// <summary>
 /// Коллекция, состоящая из <see cref="IDisposable"/> элементов.
+/// Принимает в том числе <c>null</c>, это не приводит к ошибке.
 /// </summary>
-/// <typeparam name="T"></typeparam>
 [DebuggerDisplay ("Count = {" + nameof (Count) + "}")]
 public class DisposableCollection<T>
-    : Collection<T>,
+    : Collection<T?>,
     IDisposable
     where T : IDisposable
 {
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public DisposableCollection()
+    {
+        // пустое тело метода
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DisposableCollection
+        (
+            IList<T?> list
+        )
+        : base (list)
+    {
+        // пустое тело метода
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DisposableCollection
+        (
+            IEnumerable<T?> list
+        )
+    {
+        Sure.NotNull ((object?) list);
+
+        foreach (var disposable in list)
+        {
+            Add (disposable);
+        }
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Добавление нескольких элементов.
+    /// </summary>
+    public void AddRange
+        (
+            IEnumerable<T?> list
+        )
+    {
+        Sure.NotNull ((object?) list);
+
+        foreach (var disposable in list)
+        {
+            Add (disposable);
+        }
+    }
+
+    #endregion
+
     #region IDisposable members
 
     /// <inheritdoc cref="IDisposable.Dispose"/>
@@ -42,8 +99,8 @@ public class DisposableCollection<T>
     {
         for (var i = 0; i < Count; i++)
         {
-            IDisposable item = this[i];
-            item.Dispose();
+            var item = this[i];
+            item?.Dispose();
         }
     }
 

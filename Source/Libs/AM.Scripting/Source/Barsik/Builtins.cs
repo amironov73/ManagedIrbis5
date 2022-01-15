@@ -113,6 +113,7 @@ public static class Builtins
         { "assert", new FunctionDescriptor ("assert", Assert_) },
         { "chr", new FunctionDescriptor ("chr", Chr) },
         { "debug", new FunctionDescriptor ("debug", Debug_) },
+        { "define", new FunctionDescriptor ("define", Define, false) },
         { "delete", new FunctionDescriptor ("delete", Delete, false) },
         { "dispose", new FunctionDescriptor ("dispose", Dispose) },
         { "error", new FunctionDescriptor ("error", Error_) },
@@ -199,6 +200,47 @@ public static class Builtins
     {
         var text = ComputeAll (context, args);
         System.Diagnostics.Debug.WriteLine (text);
+
+        return null;
+    }
+
+    /// <summary>
+    /// Задание дефайна.
+    /// В отличие от переменной, дефайн не может быть пере-присвоен.
+    /// </summary>
+    public static dynamic? Define
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length < 2)
+        {
+            return null;
+        }
+
+        string? name;
+        if (args[0] is VariableNode node)
+        {
+            name = node.Name;
+        }
+        else
+        {
+            name = Compute (context, args, 0) as string;
+            if (string.IsNullOrEmpty (name))
+            {
+                return null;
+            }
+
+            name = name.Trim();
+            if (string.IsNullOrEmpty (name))
+            {
+                return null;
+            }
+        }
+
+        var value = Compute (context, args, 1);
+        context.SetDefine (name, value);
 
         return null;
     }

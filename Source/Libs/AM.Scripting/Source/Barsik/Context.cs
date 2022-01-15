@@ -710,6 +710,37 @@ public sealed class Context
     }
 
     /// <summary>
+    /// Установка значения дефайна
+    /// (с сохранением места в контексте).
+    /// </summary>
+    public void SetDefine
+        (
+            string name,
+            dynamic? value
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        Variables.Remove (name);
+        if (Defines.ContainsKey (name))
+        {
+            Defines[name] = value;
+            return;
+        }
+
+        for (var context = Parent; context is not null; context = context.Parent)
+        {
+            Variables.Remove (name);
+            if (Defines.ContainsKey (name))
+            {
+                Variables[name] = value;
+            }
+        }
+
+        Defines[name] = value;
+    }
+
+    /// <summary>
     /// Установка значения переменной
     /// (с сохранением ее места в контексте).
     /// </summary>

@@ -61,11 +61,11 @@ public sealed class Interpreter
         };
 
         // устанавливаем значения стандартных переменных
-        Context.SetVariable ("__DIR__", string.Empty);
-        Context.SetVariable ("__FILE__", string.Empty);
-        Context.SetVariable ("__DOTNET__", Environment.Version);
-        Context.SetVariable ("__ROOT__", AppContext.BaseDirectory);
-        Context.SetVariable ("__VER__", Assembly.GetExecutingAssembly().GetName().Version);
+        Context.SetDefine ("__DIR__", string.Empty);
+        Context.SetDefine ("__FILE__", string.Empty);
+        Context.SetDefine ("__DOTNET__", Environment.Version);
+        Context.SetDefine ("__ROOT__", AppContext.BaseDirectory);
+        Context.SetDefine ("__VER__", Assembly.GetExecutingAssembly().GetName().Version);
     }
 
     #endregion

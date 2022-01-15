@@ -187,6 +187,7 @@ public static class FileUtility
 
         if (File.Exists (fileName))
         {
+            File.SetAttributes (fileName, FileAttributes.Normal);
             File.Delete (fileName);
         }
     }
@@ -289,6 +290,93 @@ public static class FileUtility
             File.WriteAllBytes (fileName, Array.Empty<byte>());
         }
 
+    }
+
+    /// <summary>
+    /// Attempts to delete the file at the specified path, returning <c>true</c> if successful.
+    /// </summary>
+    public static bool TryDelete
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        // delete the file, ignoring common exceptions (e.g., file in use, insufficient permissions)
+        try
+        {
+            DeleteIfExists (fileName);
+
+            return true;
+        }
+        catch (IOException exception)
+        {
+            Magna.TraceException
+                (
+                    nameof (FileUtility) + "::" + nameof (TryDelete),
+                    exception
+                );
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            Magna.TraceException
+                (
+                    nameof (FileUtility) + "::" + nameof (TryDelete),
+                    exception
+                );
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Attempts to move the specified file to a new location, returning <c>true</c> if successful.
+    /// </summary>
+    /// <param name="sourceFileName">The name of the file to move.</param>
+    /// <param name="destinationFileName">The new path for the file.</param>
+    /// <returns><c>true</c> if the file was successfully moved, otherwise <c>false</c>.</returns>
+    /// <remarks><paramref name="destinationFileName"/> must not exist.</remarks>
+    public static bool TryMove
+        (
+            string sourceFileName,
+            string destinationFileName
+        )
+    {
+        Sure.NotNullNorEmpty (sourceFileName);
+        Sure.NotNullNorEmpty (destinationFileName);
+
+        try
+        {
+            File.Move (sourceFileName, destinationFileName);
+
+            return true;
+        }
+        catch (FileNotFoundException exception)
+        {
+            Magna.TraceException
+                (
+                    nameof (FileUtility) + "::" + nameof (TryMove),
+                    exception
+                );
+        }
+        catch (IOException exception)
+        {
+            Magna.TraceException
+                (
+                    nameof (FileUtility) + "::" + nameof (TryMove),
+                    exception
+                );
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            Magna.TraceException
+                (
+                    nameof (FileUtility) + "::" + nameof (TryMove),
+                    exception
+                );
+        }
+
+        return false;
     }
 
     #endregion
