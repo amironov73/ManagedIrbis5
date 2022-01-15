@@ -40,6 +40,7 @@
     <PackageReference Include="DevExpress.Win.RichEdit" Version="21.2.4" />
     <PackageReference Include="DevExpress.Win.SpellChecker" Version="21.2.4" />
     <PackageReference Include="DevExpress.Win.Spreadsheet" Version="21.2.4" />
+    <PackageReference Include="DevExpress.Win.Spreadsheet.ru" Version="21.2.4" />
     <PackageReference Include="DevExpress.Win.TreeList" Version="21.2.4" />
     <PackageReference Include="DevExpress.Win.VerticalGrid" Version="21.2.4" />
   </ItemGroup>

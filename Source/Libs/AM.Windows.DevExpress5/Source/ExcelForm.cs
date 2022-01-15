@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PdfForm.cs -- минимальный Acrobat
+/* ExcelForm.cs -- минимальный Excel
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,7 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using DevExpress.XtraBars;
+using DevExpress.Spreadsheet;
 using DevExpress.XtraEditors;
 
 #endregion
@@ -37,17 +37,14 @@ using DevExpress.XtraEditors;
 namespace AM.Windows.DevEx;
 
 /// <summary>
-/// Минимальный Acrobat.
+/// Минимальный Excel.
 /// </summary>
-public sealed partial class PdfForm
+public sealed partial class ExcelForm
     : XtraForm
 {
     #region Construction
 
-    /// <summary>
-    /// Конструктор.
-    /// </summary>
-    public PdfForm()
+    public ExcelForm()
     {
         InitializeComponent();
     }
@@ -57,16 +54,32 @@ public sealed partial class PdfForm
     #region Public methods
 
     /// <summary>
-    /// Загрузка текста из указанного файла.
+    /// Загрузка таблицы из указанного файла.
     /// </summary>
     public void LoadFile
         (
             string fileName
         )
     {
-        Sure.FileExists(fileName);
+        Sure.FileExists (fileName);
 
-        pdfViewer1.LoadDocument (fileName);
+        var content = File.ReadAllBytes (fileName);
+        using var stream = new MemoryStream (content);
+        _spreadsheetControl.LoadDocument (stream);
+    }
+
+    /// <summary>
+    /// Сохранение таблицы в указанный файл.
+    /// </summary>
+    public void SaveFile
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        using var stream = File.OpenWrite (fileName);
+        _spreadsheetControl.SaveDocument (stream, DocumentFormat.OpenXml);
     }
 
     #endregion
