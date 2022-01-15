@@ -51,6 +51,11 @@ public sealed class Context
     public Dictionary<string, dynamic?> Variables { get; }
 
     /// <summary>
+    /// Дефайны.
+    /// </summary>
+    public Dictionary<string, dynamic?> Defines { get; }
+
+    /// <summary>
     /// Точки останова.
     /// </summary>
     public Dictionary<StatementNode, Breakpoint> Breakpoints { get; }
@@ -128,6 +133,7 @@ public sealed class Context
     {
         Parent = parent;
         Variables = new ();
+        Defines = new ();
         Input = input;
         Output = output;
         Error = error;
@@ -157,7 +163,7 @@ public sealed class Context
     /// <summary>
     /// Конструирование типа, если необходимо.
     /// </summary>
-    private Type? ConstructType
+    private Type ConstructType
         (
             Type mainType,
             Type[]? typeArguments
@@ -254,14 +260,12 @@ public sealed class Context
         foreach (var key in keys)
         {
             var value = Variables[key];
-            if (value is null)
-            {
-                Output.WriteLine ($"{key}: (null)");
-            }
-            else
-            {
-                Output.WriteLine ($"{key}: {value.GetType().Name} = {value}");
-            }
+            Output.WriteLine
+                (
+                    value is null
+                        ? $"{key}: (null)"
+                        : $"{key}: {value.GetType().Name} = {value}"
+                );
         }
     }
 
@@ -717,6 +721,19 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
+        if (Defines.ContainsKey (name))
+        {
+            throw new BarsikException ($"Can't redefine {name}");
+        }
+
+        for (var context = Parent; context is not null; context = context.Parent)
+        {
+            if (Defines.ContainsKey (name))
+            {
+                throw new BarsikException ($"Can't redefine {name}");
+            }
+        }
+
         if (Variables.ContainsKey (name))
         {
             Variables[name] = value;
@@ -746,14 +763,16 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
-        if (Variables.TryGetValue (name, out value))
+        if (Defines.TryGetValue (name, out value)
+            || Variables.TryGetValue (name, out value))
         {
             return true;
         }
 
         for (var context = Parent; context is not null; context = context.Parent)
         {
-            if (context.Variables.TryGetValue (name, out value))
+            if (context.TryGetVariable (name, out value)
+                || context.Variables.TryGetValue (name, out value))
             {
                 return true;
             }
