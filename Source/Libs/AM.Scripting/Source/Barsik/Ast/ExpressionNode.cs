@@ -20,44 +20,47 @@ namespace AM.Scripting.Barsik;
 internal sealed class ExpressionNode
     : StatementNode
 {
+    #region Properties
+
+    /// <summary>
+    /// Вычисляемое выражение.
+    /// </summary>
+    public AtomNode Expression { get; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="inner">Вычисляемое выражение.</param>
+    /// <param name="expression">Вычисляемое выражение.</param>
     public ExpressionNode
         (
-            AtomNode inner
+            AtomNode expression
         )
     {
-        Sure.NotNull (inner);
+        Sure.NotNull (expression);
 
-        _inner = inner;
+        Expression = expression;
     }
 
     /// <summary>
     /// Конструктор.
     /// </summary>
     /// <param name="startPosition">Позиция в исходном коде.</param>
-    /// <param name="inner">Вычисляемое выражение.</param>
+    /// <param name="expression">Вычисляемое выражение.</param>
     public ExpressionNode
         (
             SourcePosition startPosition,
-            AtomNode inner
+            AtomNode expression
         )
         : base (startPosition)
     {
-        Sure.NotNull (inner);
+        Sure.NotNull (expression);
 
-        _inner = inner;
+        Expression = expression;
     }
-
-    #endregion
-
-    #region Private members
-
-    private readonly AtomNode _inner;
 
     #endregion
 
@@ -72,7 +75,7 @@ internal sealed class ExpressionNode
         PreExecute (context);
 
         // вычисленное значение игнорируем
-        _inner.Compute (context);
+        Expression.Compute (context);
     }
 
     #endregion
@@ -82,7 +85,7 @@ internal sealed class ExpressionNode
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return $"expression ({StartPosition}): {_inner}";
+        return $"expression ({StartPosition}): {Expression}";
     }
 
     #endregion

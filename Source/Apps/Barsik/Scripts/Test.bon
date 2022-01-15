@@ -1,0 +1,13 @@
+﻿func alexey()
+{
+    return "Alexey Mironov"
+}
+
+arithmetics = 5* 10 - 1
+today = now()
+
+{
+    "name": alexey(),
+    "age": arithmetics,
+    "date": today
+}

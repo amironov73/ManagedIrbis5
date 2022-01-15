@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -156,11 +157,35 @@ public sealed class StdLib
         var interpreter = context.Interpreter;
         if (interpreter is null)
         {
+            context.Error.WriteLine ("Interpreter is null");
             return null;
         }
 
-        var atom = interpreter.Evaluate (bon);
-        var value = atom.Compute (context);
+        dynamic? value;
+        var program = Grammar.ParseProgram (bon);
+        if (program.Statements.Count == 1)
+        {
+            var expression = interpreter.Evaluate (bon);
+            value = expression.Compute (context);
+        }
+        else
+        {
+            // изготавливаем укороченный вариант программы
+            var shortProgram = new ProgramNode
+                (
+                    program.Statements.SkipLast (1)
+                );
+            var last = program.Statements.Last() as ExpressionNode;
+            if (last is null)
+            {
+                // последний стейтмент должен быть выражением
+                context.Error.WriteLine ("Last statement must be expression");
+                return null;
+            }
+
+            interpreter.Execute (shortProgram);
+            value = last.Expression.Compute (context);
+        }
 
         return value;
     }

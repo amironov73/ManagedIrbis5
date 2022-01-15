@@ -10,145 +10,145 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="HelloWorld.barsik">
+      <None Update="Scripts\Bon.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\Cast.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\Chr.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\Comment.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\Delete.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\Dict.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\ElseIf.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\Empty.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\Enum.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\Eval.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\FizzBuzz.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\For.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\ForEach.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\Format.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\Func.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\HelloWorld.barsik">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Nod.barsik">
+      <None Update="Scripts\If.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Now.barsik">
+      <None Update="Scripts\In.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Prop.barsik">
+      <None Update="Scripts\Include.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Index.barsik">
+      <None Update="Scripts\Incr.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Func.barsik">
+      <None Update="Scripts\Index.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="List.barsik">
+      <None Update="Scripts\Integer.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="testall.cmd">
+      <None Update="Scripts\Is.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="ForEach.barsik">
+      <None Update="Scripts\Json.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="For.barsik">
+      <None Update="Scripts\Lambda.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Format.barsik">
+      <None Update="Scripts\Len.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="New.barsik">
+      <None Update="Scripts\List.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Dict.barsik">
+      <None Update="Scripts\Test.bon">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Enum.barsik">
+      <None Update="Scripts\Test.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Try.barsik">
+      <None Update="Scripts\Ternary.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="FizzBuzz.barsik">
+      <None Update="Scripts\System.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="ElseIf.barsik">
+      <None Update="Scripts\Subscript.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Multi.barsik">
+      <None Update="Scripts\Read.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Incr.barsik">
+      <None Update="Scripts\Predef.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Throw.barsik">
+      <None Update="Scripts\Prop.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="System.barsik">
+      <None Update="Scripts\Now.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Read.barsik">
+      <None Update="Scripts\Not.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Not.barsik">
+      <None Update="Scripts\Nod.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Max.barsik">
+      <None Update="Scripts\New.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Len.barsik">
+      <None Update="Scripts\Multi.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="If.barsik">
+      <None Update="Scripts\Max.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Comment.barsik">
+      <None Update="Scripts\Throw.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Eval.barsik">
+      <None Update="Scripts\Try.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="While.barsik">
+      <None Update="Scripts\testall.cmd">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Chr.barsik">
+      <None Update="Scripts\Type.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Using.barsik">
+      <None Update="Scripts\Using.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Ternary.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Type.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Empty.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Cast.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Include.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Subscript.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Integer.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="In.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Test.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Json.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Predef.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Bon.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Test.bon">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Lambda.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Delete.barsik">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Is.barsik">
+      <None Update="Scripts\While.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
