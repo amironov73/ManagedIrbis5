@@ -174,16 +174,16 @@ public sealed class Interpreter
         try
         {
             var fullPath = Path.GetFullPath (fileName);
-            Context.Variables["__FILE__"] = fullPath;
-            Context.Variables["__DIR__"] = Path.GetDirectoryName (fullPath);
+            Context.Defines["__FILE__"] = fullPath;
+            Context.Defines["__DIR__"] = Path.GetDirectoryName (fullPath);
 
             var sourceCode = File.ReadAllText (fileName);
             result = Execute (sourceCode);
         }
         finally
         {
-            Context.Variables.Remove ("__FILE__");
-            Context.Variables.Remove ("__DIR__");
+            Context.Defines.Remove ("__FILE__");
+            Context.Defines.Remove ("__DIR__");
         }
 
         return result;
