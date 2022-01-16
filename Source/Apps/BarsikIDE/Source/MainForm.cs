@@ -43,12 +43,27 @@ namespace BarsikIDE
     {
         #region Construction
 
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
         public MainForm()
         {
             InitializeComponent();
             _syntaxTextBox.Language = Language.CSharp;
 
-            _output = new OutputWriter(_logBox.Output);
+            _output = new OutputWriter (_logBox.Output);
+            _ResetInterpreter();
+        }
+
+        #endregion
+
+        #region Private members
+
+        private Interpreter _interpreter;
+        private readonly TextWriter _output;
+
+        private void _ResetInterpreter()
+        {
             _interpreter = new Interpreter
                 (
                     TextReader.Null,
@@ -58,13 +73,6 @@ namespace BarsikIDE
             _interpreter.WithStdLib();
             _interpreter.WithWinForms();
         }
-
-        #endregion
-
-        #region Private members
-
-        private readonly Interpreter _interpreter;
-        private readonly TextWriter _output;
 
         private void _openButton_Click
             (
@@ -91,6 +99,12 @@ namespace BarsikIDE
 
         private void RunScript()
         {
+            _logBox.Clear();
+            if (_resetCheckBox.CheckBox.Checked)
+            {
+                _ResetInterpreter();
+            }
+
             var sourceCode = _syntaxTextBox.Text.Trim();
             try
             {

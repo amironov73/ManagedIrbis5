@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* DictionaryPanel.cs --
+/* DictionaryPanel.cs -- панель для отображения терминов словаря
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,313 +22,306 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms
+namespace ManagedIrbis.WinForms;
+
+/// <summary>
+/// Панель для отображения терминов словаря.
+/// </summary>
+public partial class DictionaryPanel
+    : UserControl
 {
+    #region Events
+
     /// <summary>
-    /// Panel for dictionary entries.
+    /// Raised when the term is choosed.
     /// </summary>
-    public partial class DictionaryPanel
-        : UserControl
+    public event EventHandler? Choosed;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Adapter.
+    /// </summary>
+    public TermAdapter? Adapter { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public DictionaryPanel()
     {
-        #region Events
+        InitializeComponent();
 
-        /// <summary>
-        /// Raised when the term is choosed.
-        /// </summary>
-        public event EventHandler? Choosed;
+        _SetupGrid();
+        _SetupEvents();
+    }
 
-        #endregion
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public DictionaryPanel
+        (
+            TermAdapter adapter
+        )
+    {
+        InitializeComponent();
 
-        #region Properties
+        _SetupGrid();
+        Adapter = adapter;
+        _grid.DataSource = adapter.Source;
+        _SetupEvents();
+    }
 
-        /// <summary>
-        /// Adapter.
-        /// </summary>
-        public TermAdapter? Adapter { get; set; }
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Construction
+    private void _SetupGrid()
+    {
+        _grid.AutoGenerateColumns = false;
+        _grid.RowHeadersVisible = false;
+        _grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        _grid.AllowUserToAddRows = false;
+        _grid.AllowUserToResizeRows = false;
+        _grid.AllowUserToDeleteRows = false;
+        _grid.EnableHeadersVisualStyles = false;
+        _grid.ColumnHeadersDefaultCellStyle.SelectionBackColor
+            = _grid.ColumnHeadersDefaultCellStyle.BackColor;
+        _grid.ColumnHeadersHeightSizeMode
+            = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public DictionaryPanel()
+    private void _SetupEvents()
+    {
+        _grid.KeyDown += _grid_KeyDown;
+        _grid.KeyPress += _grid_KeyPress;
+        _grid.DoubleClick += _grid_DoubleClick;
+        _grid.MouseWheel += _grid_MouseWheel;
+        _keyBox.KeyDown += _keyBox_KeyDown;
+        _keyBox.DelayedTextChanged += _keyBox_TextChanged;
+        _keyBox.EnterPressed += _keyBox_TextChanged;
+        _keyBox.MouseWheel += _grid_MouseWheel;
+        _scrollControl.Scroll += _scrollControl_Scroll;
+        _scrollControl.MouseWheel += _grid_MouseWheel;
+    }
+
+    private void _grid_KeyPress
+        (
+            object? sender,
+            KeyPressEventArgs e
+        )
+    {
+        char keyChar = e.KeyChar;
+        if (keyChar != '\0')
         {
-            InitializeComponent();
+            _keyBox.Focus();
+            Application.DoEvents();
+            SendKeys.Send(e.KeyChar.ToString());
+        }
+    }
 
-            _SetupGrid();
-            _SetupEvents();
+    private void _grid_MouseWheel
+        (
+            object? sender,
+            MouseEventArgs e
+        )
+    {
+        if (ReferenceEquals(Adapter, null))
+        {
+            return;
         }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public DictionaryPanel
-            (
-                TermAdapter adapter
-            )
-        {
-            InitializeComponent();
+        int delta = e.Delta;
 
-            _SetupGrid();
-            Adapter = adapter;
-            _grid.DataSource = adapter.Source;
-            _SetupEvents();
+        if (delta > 0)
+        {
+            Adapter.MovePrevious();
+        }
+        else if (delta < 0)
+        {
+            Adapter.MoveNext();
+        }
+    }
+
+    private int _VisibleRowCount()
+    {
+        return _grid.DisplayedRowCount(true);
+    }
+
+    private void _grid_KeyDown
+        (
+            object? sender,
+            KeyEventArgs e
+        )
+    {
+        if (ReferenceEquals(Adapter, null))
+        {
+            return;
         }
 
-        #endregion
-
-        #region Private members
-
-        private void _SetupGrid()
+        switch (e.KeyData)
         {
-            _grid.AutoGenerateColumns = false;
-            _grid.RowHeadersVisible = false;
-            _grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            _grid.AllowUserToAddRows = false;
-            _grid.AllowUserToResizeRows = false;
-            _grid.AllowUserToDeleteRows = false;
-            _grid.EnableHeadersVisualStyles = false;
-            _grid.ColumnHeadersDefaultCellStyle.SelectionBackColor
-                = _grid.ColumnHeadersDefaultCellStyle.BackColor;
-            _grid.ColumnHeadersHeightSizeMode
-                = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-        }
-
-        private void _SetupEvents()
-        {
-            _grid.KeyDown += _grid_KeyDown;
-            _grid.KeyPress += _grid_KeyPress;
-            _grid.DoubleClick += _grid_DoubleClick;
-            _grid.MouseWheel += _grid_MouseWheel;
-            _keyBox.KeyDown += _keyBox_KeyDown;
-            _keyBox.DelayedTextChanged += _keyBox_TextChanged;
-            _keyBox.EnterPressed += _keyBox_TextChanged;
-            _keyBox.MouseWheel += _grid_MouseWheel;
-            _scrollControl.Scroll += _scrollControl_Scroll;
-            _scrollControl.MouseWheel += _grid_MouseWheel;
-        }
-
-        private void _grid_KeyPress
-            (
-                object? sender,
-                KeyPressEventArgs e
-            )
-        {
-            char keyChar = e.KeyChar;
-            if (keyChar != '\0')
-            {
-                _keyBox.Focus();
-                Application.DoEvents();
-                SendKeys.Send(e.KeyChar.ToString());
-            }
-        }
-
-        private void _grid_MouseWheel
-            (
-                object? sender,
-                MouseEventArgs e
-            )
-        {
-            if (ReferenceEquals(Adapter, null))
-            {
-                return;
-            }
-
-            int delta = e.Delta;
-
-            if (delta > 0)
-            {
-                Adapter.MovePrevious();
-            }
-            else if (delta < 0)
-            {
+            case Keys.Down:
                 Adapter.MoveNext();
-            }
+                e.Handled = true;
+                break;
+
+            case Keys.Up:
+                Adapter.MovePrevious();
+                e.Handled = true;
+                break;
+
+            case Keys.PageDown:
+                Adapter.MoveNext(_VisibleRowCount());
+                e.Handled = true;
+                break;
+
+            case Keys.PageUp:
+                Adapter.MoveNext(_VisibleRowCount());
+                e.Handled = true;
+                break;
+
+            case Keys.Enter:
+                _RaiseChoosed();
+                break;
+        }
+    }
+
+    private void _keyBox_TextChanged
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        if (ReferenceEquals(Adapter, null))
+        {
+            return;
         }
 
-        private int _VisibleRowCount()
+        string startTerm = _keyBox.Text.Trim();
+        Adapter.Fill(startTerm);
+    }
+
+    private void _keyBox_KeyDown
+        (
+            object? sender,
+            KeyEventArgs e
+        )
+    {
+        if (ReferenceEquals(Adapter, null))
         {
-            return _grid.DisplayedRowCount(true);
+            return;
         }
 
-        private void _grid_KeyDown
-            (
-                object? sender,
-                KeyEventArgs e
-            )
+        switch (e.KeyData)
         {
-            if (ReferenceEquals(Adapter, null))
-            {
-                return;
-            }
+            case Keys.Down:
+                Adapter.MoveNext();
+                e.Handled = true;
+                break;
 
-            switch (e.KeyData)
-            {
-                case Keys.Down:
-                    Adapter.MoveNext();
-                    e.Handled = true;
-                    break;
+            case Keys.Up:
+                Adapter.MovePrevious();
+                e.Handled = true;
+                break;
 
-                case Keys.Up:
-                    Adapter.MovePrevious();
-                    e.Handled = true;
-                    break;
+            case Keys.PageDown:
+                Adapter.MoveNext(_VisibleRowCount());
+                e.Handled = true;
+                break;
 
-                case Keys.PageDown:
-                    Adapter.MoveNext(_VisibleRowCount());
-                    e.Handled = true;
-                    break;
+            case Keys.PageUp:
+                Adapter.MoveNext(_VisibleRowCount());
+                e.Handled = true;
+                break;
 
-                case Keys.PageUp:
-                    Adapter.MoveNext(_VisibleRowCount());
-                    e.Handled = true;
-                    break;
+            case Keys.Enter:
+                _RaiseChoosed();
+                break;
+        }
+    }
 
-                case Keys.Enter:
-                    _RaiseChoosed();
-                    break;
-            }
+    private void _RaiseChoosed()
+    {
+        Choosed.Raise(this);
+    }
 
-        } // method _grid_KeyDown
+    private void _grid_DoubleClick
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        _RaiseChoosed();
+    }
 
-        private void _keyBox_TextChanged
-            (
-                object? sender,
-                EventArgs e
-            )
+    private void _scrollControl_Scroll
+        (
+            object? sender,
+            ScrollEventArgs e
+        )
+    {
+        if (ReferenceEquals(Adapter, null))
         {
-            if (ReferenceEquals(Adapter, null))
-            {
-                return;
-            }
-
-            string startTerm = _keyBox.Text.Trim();
-            Adapter.Fill(startTerm);
+            return;
         }
 
-        private void _keyBox_KeyDown
-            (
-                object? sender,
-                KeyEventArgs e
-            )
+        switch (e.Type)
         {
-            if (ReferenceEquals(Adapter, null))
-            {
-                return;
-            }
+            case ScrollEventType.SmallIncrement:
+                Adapter.MoveNext();
+                break;
 
-            switch (e.KeyData)
-            {
-                case Keys.Down:
-                    Adapter.MoveNext();
-                    e.Handled = true;
-                    break;
+            case ScrollEventType.SmallDecrement:
+                Adapter.MovePrevious();
+                break;
 
-                case Keys.Up:
-                    Adapter.MovePrevious();
-                    e.Handled = true;
-                    break;
+            case ScrollEventType.LargeIncrement:
+                Adapter.MoveNext(_VisibleRowCount());
+                break;
 
-                case Keys.PageDown:
-                    Adapter.MoveNext(_VisibleRowCount());
-                    e.Handled = true;
-                    break;
-
-                case Keys.PageUp:
-                    Adapter.MoveNext(_VisibleRowCount());
-                    e.Handled = true;
-                    break;
-
-                case Keys.Enter:
-                    _RaiseChoosed();
-                    break;
-            }
-
-        } // method _keyBox_KeyDown
-
-        private void _RaiseChoosed()
-        {
-            Choosed.Raise(this);
+            case ScrollEventType.LargeDecrement:
+                Adapter.MoveNext(_VisibleRowCount());
+                break;
         }
 
-        private void _grid_DoubleClick
-            (
-                object? sender,
-                EventArgs e
-            )
+    } // method _scrollControl_Scroll
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Очистка.
+    /// </summary>
+    public void Clear()
+    {
+        var adapter = Adapter;
+        if (adapter is not null)
         {
-            _RaiseChoosed();
+            adapter.Clear();
         }
+    }
 
-        private void _scrollControl_Scroll
-            (
-                object? sender,
-                ScrollEventArgs e
-            )
+    /// <summary>
+    /// Заполнение.
+    /// </summary>
+    public void Fill()
+    {
+        var adapter = Adapter;
+
+        if (adapter is not null)
         {
-            if (ReferenceEquals(Adapter, null))
-            {
-                return;
-            }
+            adapter.Fill();
+            _grid.DataSource = adapter.Source;
+            _grid.Refresh();
+        }
+    }
 
-            switch (e.Type)
-            {
-                case ScrollEventType.SmallIncrement:
-                    Adapter.MoveNext();
-                    break;
-
-                case ScrollEventType.SmallDecrement:
-                    Adapter.MovePrevious();
-                    break;
-
-                case ScrollEventType.LargeIncrement:
-                    Adapter.MoveNext(_VisibleRowCount());
-                    break;
-
-                case ScrollEventType.LargeDecrement:
-                    Adapter.MoveNext(_VisibleRowCount());
-                    break;
-            }
-
-        } // method _scrollControl_Scroll
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Очистка.
-        /// </summary>
-        public void Clear()
-        {
-            var adapter = Adapter;
-            if (adapter is not null)
-            {
-                adapter.Clear();
-            }
-
-        } // method Clear
-
-        /// <summary>
-        /// Заполнение.
-        /// </summary>
-        public void Fill()
-        {
-            var adapter = Adapter;
-
-            if (adapter is not null)
-            {
-                adapter.Fill();
-                _grid.DataSource = adapter.Source;
-                _grid.Refresh();
-            }
-
-        } // method Fill
-
-        #endregion
-
-    } // class DictionaryPanel
-
-} // namespace ManagedIrbis.WinForms
+    #endregion
+}

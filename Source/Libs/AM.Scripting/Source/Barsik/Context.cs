@@ -710,6 +710,14 @@ public sealed class Context
     }
 
     /// <summary>
+    /// Сброс состояния интерпретатора.
+    /// </summary>
+    public void Reset()
+    {
+        Variables.Clear();
+    }
+
+    /// <summary>
     /// Установка значения дефайна
     /// (с сохранением места в контексте).
     /// </summary>

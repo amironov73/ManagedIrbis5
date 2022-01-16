@@ -40,13 +40,15 @@ namespace BarsikIDE
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._saveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._runMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this._openButton = new System.Windows.Forms.ToolStripButton();
             this._runButton = new System.Windows.Forms.ToolStripButton();
-            this._openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this._saveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this._resetCheckBox = new AM.Windows.Forms.ToolStripCheckBox();
+            this._openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this._saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
@@ -184,9 +186,15 @@ namespace BarsikIDE
             // _openMenuItem
             // 
             this._openMenuItem.Name = "_openMenuItem";
-            this._openMenuItem.Size = new System.Drawing.Size(180, 22);
+            this._openMenuItem.Size = new System.Drawing.Size(103, 22);
             this._openMenuItem.Text = "&Open";
             this._openMenuItem.Click += new System.EventHandler(this._openButton_Click);
+            // 
+            // _saveMenuItem
+            // 
+            this._saveMenuItem.Name = "_saveMenuItem";
+            this._saveMenuItem.Size = new System.Drawing.Size(103, 22);
+            this._saveMenuItem.Text = "&Save";
             // 
             // _runMenuItem
             // 
@@ -201,10 +209,12 @@ namespace BarsikIDE
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._openButton,
             this._runButton,
-            this._saveButton});
+            this._saveButton,
+            this.toolStripSeparator1,
+            this._resetCheckBox});
             this.toolStrip1.Location = new System.Drawing.Point(3, 24);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(150, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(268, 25);
             this.toolStrip1.TabIndex = 1;
             // 
             // _openButton
@@ -227,16 +237,6 @@ namespace BarsikIDE
             this._runButton.Text = "Run";
             this._runButton.Click += new System.EventHandler(this._runButton_Click);
             // 
-            // _openFileDialog
-            // 
-            this._openFileDialog.Filter = "Barsik scripts|*.barsik|All files|*.*";
-            // 
-            // _saveMenuItem
-            // 
-            this._saveMenuItem.Name = "_saveMenuItem";
-            this._saveMenuItem.Size = new System.Drawing.Size(180, 22);
-            this._saveMenuItem.Text = "&Save";
-            // 
             // _saveButton
             // 
             this._saveButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -246,6 +246,35 @@ namespace BarsikIDE
             this._saveButton.Size = new System.Drawing.Size(35, 22);
             this._saveButton.Text = "Save";
             this._saveButton.Click += new System.EventHandler(this._saveButton_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // _resetCheckBox
+            // 
+            this._resetCheckBox.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // _resetCheckBox
+            // 
+            this._resetCheckBox.CheckBox.AccessibleName = "_resetCheckBox";
+            this._resetCheckBox.CheckBox.BackColor = System.Drawing.Color.Transparent;
+            this._resetCheckBox.CheckBox.Checked = true;
+            this._resetCheckBox.CheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._resetCheckBox.CheckBox.Location = new System.Drawing.Point(122, 1);
+            this._resetCheckBox.CheckBox.Name = "_resetCheckBox";
+            this._resetCheckBox.CheckBox.Size = new System.Drawing.Size(112, 22);
+            this._resetCheckBox.CheckBox.TabIndex = 0;
+            this._resetCheckBox.CheckBox.Text = "Reset interpreter";
+            this._resetCheckBox.CheckBox.UseVisualStyleBackColor = false;
+            this._resetCheckBox.Name = "_resetCheckBox";
+            this._resetCheckBox.Size = new System.Drawing.Size(112, 22);
+            this._resetCheckBox.Text = "Reset interpreter";
+            // 
+            // _openFileDialog
+            // 
+            this._openFileDialog.Filter = "Barsik scripts|*.barsik|All files|*.*";
             // 
             // _saveFileDialog
             // 
@@ -301,5 +330,7 @@ namespace BarsikIDE
         private ToolStripMenuItem _saveMenuItem;
         private ToolStripButton _saveButton;
         private SaveFileDialog _saveFileDialog;
+        private ToolStripSeparator toolStripSeparator1;
+        private AM.Windows.Forms.ToolStripCheckBox _resetCheckBox;
     }
 }

@@ -106,7 +106,6 @@ public sealed class Interpreter
     /// <summary>
     /// Запуск скрипта на исполнение.
     /// </summary>
-    /// <param name="program"></param>
     public ExecutionResult Execute
         (
             ProgramNode program
@@ -200,6 +199,14 @@ public sealed class Interpreter
         Sure.NotNull (sourceCode);
 
         return Grammar.ParseProgram (sourceCode);
+    }
+
+    /// <summary>
+    /// Сброс состояния интерпретатора.
+    /// </summary>
+    public void Reset()
+    {
+        Context.Reset();
     }
 
     /// <summary>
