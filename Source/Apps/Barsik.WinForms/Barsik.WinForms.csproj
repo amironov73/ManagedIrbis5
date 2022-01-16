@@ -16,22 +16,22 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Alert.barsik">
+      <None Update="Scripts\Alert.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Prompt.barsik">
+      <None Update="Scripts\Calc.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Confirm.barsik">
+      <None Update="Scripts\Confirm.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Hello.barsik">
+      <None Update="Scripts\Event.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Event.barsik">
+      <None Update="Scripts\Hello.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Calc.barsik">
+      <None Update="Scripts\Prompt.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

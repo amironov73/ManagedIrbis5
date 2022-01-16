@@ -1,6 +1,12 @@
-﻿println ("Have builder? ", have_var (builder))
+﻿use ("System.Text")
 
-builder = new "System.Text.StringBuilder" ()
+println ("Have builder? ", have_var (builder))
+
+builder = new StringBuilder()
+{
+    .Capacity = 10
+}
+
 println ("Have builder? ", have_var (builder))
 
 for (i = 0; i < 10; i++)

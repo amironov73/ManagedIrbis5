@@ -52,7 +52,7 @@ public static class BarsikUtility
         "ref", "return", "sbyte", "sealed", "short", "sizeof", "stackalloc",
         "static", "string", "struct", "switch", "this", "throw", "true",
         "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort",
-        "using", "virtual", "void", "volatile", "while"
+        "using", "virtual", "void", "volatile", "while", "with"
     };
 
     /// <summary>

@@ -5,23 +5,24 @@ Application.SetHighDpiMode (HighDpiMode.SystemAware)
 Application.EnableVisualStyles()
 Application.SetCompatibleTextRenderingDefault (false)
 
-using (form = new Form())
+using (form = new Form() { .Text = "Это Барсик!"; .Height = 100; })
 {
-    form.Text = "Это Барсик!"
-    form.Height = 100
-
     button = new Button()
-    button.Text = "Привет, Барсик!"
-    button.Left = 10
-    button.Top = 10
-    button.Width = 110
+    {
+        .Text = "Привет, Барсик!";
+        .Left = 10;
+        .Top = 10;
+        .Width = 110;
+    }
     subscribe (button, "Click", buttonHandler)
 
     label = new Label()
-    label.Text = "Нажми на кнопку, получишь результат!"
-    label.Top = 35
-    label.Left = 10
-    label.AutoSize = true
+    {
+        .Text = "Нажми на кнопку, получишь результат!";
+        .Top = 35;
+        .Left = 10;
+        .AutoSize = true;
+    }
 
     form.Controls.Add (button)
     form.Controls.Add (label)

@@ -1,9 +1,9 @@
-﻿f = open_read ("New.barsik");
-l = "true";
+﻿f = open_read ("New.barsik")
+l = "true"
 while (l != null)
 {
-    l = f.ReadLine();
-    println (l);
+    l = f.ReadLine()
+    println (l)
 }
 
-dispose (f);
+dispose (f)

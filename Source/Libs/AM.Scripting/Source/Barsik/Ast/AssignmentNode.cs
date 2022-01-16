@@ -250,7 +250,9 @@ internal sealed class AssignmentNode
             .Separated (Tok (','))).Optional()
         from args in
             RoundBrackets (Rec (() => Tok (Expr!)).Separated (Tok (',')))
-        select (AtomNode) new NewNode (typeName, typeArgs.GetValueOrDefault(), args);
+        from initialization in Tok (CurlyBraces (Block)).Optional()
+        select (AtomNode) new NewNode (typeName, typeArgs.GetValueOrDefault(), args,
+                initialization.GetValueOrDefault());
 
     // операция присваивания
     private static readonly Parser<char, string> Operation = OneOf

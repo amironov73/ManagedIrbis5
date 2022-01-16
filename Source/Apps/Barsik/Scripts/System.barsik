@@ -1,2 +1,2 @@
-x = system ("cmd", "/c", "dir");
-print (x);
+x = system ("cmd", "/c", "dir")
+print (x)

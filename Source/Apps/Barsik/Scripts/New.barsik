@@ -2,7 +2,11 @@
 
 println ("Have builder? ", have_var ("builder"))
 
-builder = new "StringBuilder" ()
+builder = new StringBuilder()
+{
+    .Capacity = 10
+}
+
 println ("Have builder? ", have_var ("builder"))
 
 for (i = 0; i < 10; i = i + 1)

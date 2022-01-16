@@ -38,7 +38,8 @@ sealed class NewNode
         (
             AtomNode typeName,
             IEnumerable<AtomNode>? typeArguments,
-            IEnumerable<AtomNode>? constructorArguments
+            IEnumerable<AtomNode>? constructorArguments,
+            IEnumerable<StatementNode>? initialization
         )
     {
         Sure.NotNull (typeName);
@@ -50,14 +51,21 @@ sealed class NewNode
 
         _typeName = typeName;
         _typeArguments = null;
+        _initialization = null;
         if (typeArguments is not null)
         {
             _typeArguments = new List<AtomNode> (typeArguments);
         }
+
         _constructorArguments = new ();
         if (constructorArguments is not null)
         {
             _constructorArguments.AddRange (constructorArguments);
+        }
+
+        if (initialization is not null)
+        {
+            _initialization = new List<StatementNode> (initialization);
         }
     }
 
@@ -68,6 +76,7 @@ sealed class NewNode
     private readonly AtomNode _typeName;
     private readonly List<AtomNode>? _typeArguments;
     private readonly List<AtomNode> _constructorArguments;
+    private readonly List<StatementNode>? _initialization;
 
     #endregion
 
@@ -101,6 +110,28 @@ sealed class NewNode
             }
 
             result = Activator.CreateInstance (type, parameters.ToArray());
+        }
+
+        if (_initialization is not null)
+        {
+            var previousCenter = context.With;
+            var centerName = "$" + Guid.NewGuid().ToString("N");
+            context.SetVariable (centerName, result);
+            var center = new VariableNode (centerName);
+            context.With = center;
+
+            try
+            {
+                foreach (var statement in _initialization)
+                {
+                    statement.Execute (context);
+                }
+            }
+            finally
+            {
+                context.With = previousCenter;
+                context.RemoveVariable (centerName);
+            }
         }
 
         return result;

@@ -1,17 +1,17 @@
 try
 {
-    throw ("Hello, exception");
+    throw ("Hello, exception")
 }
 catch (e)
 {
-    println (e.Message);
+    println (e.Message)
 }
 
 try
 {
-    throw 123;
+    throw 123
 }
 catch (e)
 {
-    println (e.Message);
+    println (e.Message)
 }

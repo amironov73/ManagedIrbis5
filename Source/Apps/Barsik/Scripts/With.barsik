@@ -5,7 +5,7 @@ builder.Append ("Hello")
 with (builder)
 {
     .Capacity = 10; // точка с запятой тут нужна!
-    .Length = 0
+    .Length = 0;
 }
 
 println (builder.Capacity)
