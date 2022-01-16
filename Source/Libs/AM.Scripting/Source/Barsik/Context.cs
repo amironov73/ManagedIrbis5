@@ -114,7 +114,7 @@ public sealed class Context
     /// Опциональный префикс, используемый, например, в операторе "new"
     /// при инициализации свойств свежесозданного объекта.
     /// </summary>
-    public string? Prefix { get; set; }
+    public AtomNode? With { get; set; }
 
     #endregion
 

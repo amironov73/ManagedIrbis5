@@ -276,6 +276,23 @@ internal static class Grammar
         select (StatementNode) new UsingNode (new SourcePosition (position),
             variable, initialization, body);
 
+    // with-присваивание
+    private static readonly Parser<char, StatementNode> WithAssignment =
+        from position in CurrentPos
+        from _1 in Tok ('.')
+        from property in Tok (Identifier)
+        from _2 in Tok ('=')
+        from expression in Tok (Expr)
+        select (StatementNode)new WithAssignmentNode (new SourcePosition (position),
+            new VariableNode (property), expression);
+
+    // блок with
+    private static readonly Parser<char, StatementNode> With =
+        from position in CurrentPos
+        from _1 in Tok ("with")
+        from center in RoundBrackets (Tok (Expr))
+        from body in BlockOrSingle
+        select (StatementNode)new WithNode (new SourcePosition (position), center, body);
 
     // обобщенный стейтмент
     internal static readonly Parser<char, StatementNode> Statement = OneOf
@@ -288,6 +305,8 @@ internal static class Grammar
             Try (Tok (FunctionDefinition)),
             Try (Tok (While)),
             Try (Tok (Using)),
+            Try (Tok (With)),
+            Try (Tok (WithAssignment)),
             Try (Tok (External)),
             Try (Tok (ExpressionStatement))
         );

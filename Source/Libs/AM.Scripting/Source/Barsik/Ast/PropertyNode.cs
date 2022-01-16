@@ -72,7 +72,7 @@ internal sealed class PropertyNode
             return null;
         }
 
-        string? propertyName = null;
+        string? propertyName;
         if (_propertyName is VariableNode variableNode)
         {
             propertyName = variableNode.Name;
@@ -147,7 +147,7 @@ internal sealed class PropertyNode
             return null;
         }
 
-        string? propertyName = null;
+        string? propertyName;
         if (_propertyName is VariableNode variableNode)
         {
             propertyName = variableNode.Name;
