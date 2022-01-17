@@ -1,0 +1,35 @@
+﻿create_connection()
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    return
+}
+
+println ("Connected")
+
+version = server_version()
+println ("Server version: ", version)
+
+maxMfn = max_mfn()
+println ("Max MFN=", maxMfn)
+
+processes = list_processes()
+println ("Processes: ", len (processes))
+
+users = list_users()
+println ("Users: ", len (users))
+
+found = search ("K=бетон")
+println ("Found: ", found)
+
+maxIndex = min (10, len (found))
+for (i = 0; i < maxIndex; i++)
+{
+    rec = read_record (found[i])
+    println (rec.Mfn, " ", len (rec.Fields))
+    println (fm (200, 'a'))
+}
+
+disconnect()
+println ("Disconnected")

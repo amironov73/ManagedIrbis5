@@ -689,6 +689,27 @@ public sealed class Context
     }
 
     /// <summary>
+    /// Удаление дефайна с указанным именем.
+    /// Если такого дефайна не существует,
+    /// то ничего не происходит.
+    /// </summary>
+    public void RemoveDefine
+        (
+            string defineName
+        )
+    {
+        Sure.NotNullNorEmpty (defineName);
+
+        for (var ctx = this; ctx is not null; ctx = ctx.Parent)
+        {
+            if (ctx.Defines.Remove (defineName))
+            {
+                return;
+            }
+        }
+    }
+
+    /// <summary>
     /// Удаление переменной с указанным именем.
     /// Если такой переменной не существует,
     /// то ничего не происходит.

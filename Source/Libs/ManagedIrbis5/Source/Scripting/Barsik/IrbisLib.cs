@@ -22,6 +22,11 @@ using System.Diagnostics;
 using AM;
 using AM.Scripting.Barsik;
 
+using ManagedIrbis.Client;
+using ManagedIrbis.Fields;
+using ManagedIrbis.Providers;
+using ManagedIrbis.Records;
+
 using static AM.Scripting.Barsik.Builtins;
 
 #endregion
@@ -39,9 +44,14 @@ public sealed class IrbisLib
     #region Constants
 
     /// <summary>
-    /// Имя переменной, хранящей текущее подключение.
+    /// Имя дефайна, хранящего текущее подключение.
     /// </summary>
-    public const string ConnectionVariableName = "connection";
+    public const string ConnectionDefineName = "connection";
+
+    /// <summary>
+    /// Имя дефайна, хранящего текущую запись.
+    /// </summary>
+    public const string RecordDefineName = "record";
 
     #endregion
 
@@ -61,7 +71,10 @@ public sealed class IrbisLib
         { "database_info", new FunctionDescriptor ("database_info", DatabaseInfo) },
         { "database_stat", new FunctionDescriptor ("database_stat", Disconnect) },
         { "disconnect", new FunctionDescriptor ("disconnect", Disconnect) },
+        { "fm", new FunctionDescriptor ("fm", FM) },
+        { "fma", new FunctionDescriptor ("fma", FMA) },
         { "format_record", new FunctionDescriptor ("format_record", FormatRecord) },
+        { "is_connected", new FunctionDescriptor ("is_connected", IsConnected) },
         { "list_files", new FunctionDescriptor ("list_processes", ListProcesses) },
         { "list_processes", new FunctionDescriptor ("list_files", ListFiles) },
         { "list_users", new FunctionDescriptor ("list_users", ListUsers) },
@@ -90,9 +103,9 @@ public sealed class IrbisLib
     {
         connection = null!;
 
-        if (!context.TryGetVariable (ConnectionVariableName, out var value))
+        if (!context.TryGetVariable (ConnectionDefineName, out var value))
         {
-            context.Error.WriteLine ($"Variable {ConnectionVariableName} not found");
+            context.Error.WriteLine ($"Variable {ConnectionDefineName} not found");
             return false;
         }
 
@@ -102,7 +115,32 @@ public sealed class IrbisLib
             return true;
         }
 
-        context.Error.WriteLine ($"Bad value of {ConnectionVariableName}: {value}");
+        context.Error.WriteLine ($"Bad value of {ConnectionDefineName}: {value}");
+
+        return false;
+    }
+
+    private static bool TryGetRecord
+        (
+            Context context,
+            out Record record
+        )
+    {
+        record = null!;
+
+        if (!context.TryGetVariable (RecordDefineName, out var value))
+        {
+            context.Error.WriteLine ($"Variable {RecordDefineName} not found");
+            return false;
+        }
+
+        if (value is Record rec)
+        {
+            record = rec;
+            return true;
+        }
+
+        context.Error.WriteLine ($"Bad value of {RecordDefineName}: {value}");
 
         return false;
     }
@@ -141,7 +179,7 @@ public sealed class IrbisLib
         if (!TryGetConnection (context, out var connection))
         {
             connection = ConnectionFactory.Shared.CreateSyncConnection();
-            context.SetVariable (ConnectionVariableName, connection);
+            context.SetVariable (ConnectionDefineName, connection);
         }
 
         if (connection.Connected)
@@ -182,7 +220,7 @@ public sealed class IrbisLib
             result.ParseConnectionString (connectionString);
         }
 
-        context.SetVariable (ConnectionVariableName, result);
+        context.SetVariable (ConnectionDefineName, result);
 
         return result;
     }
@@ -281,10 +319,10 @@ public sealed class IrbisLib
             dynamic?[] args
         )
     {
-        if (!TryGetConnection (context, out var connection))
+        if (TryGetConnection (context, out var connection))
         {
             connection.Disconnect();
-            context.RemoveVariable (ConnectionVariableName);
+            context.RemoveDefine (ConnectionDefineName);
         }
 
         return null;
@@ -305,6 +343,79 @@ public sealed class IrbisLib
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Простой доступ к полям записи.
+    /// </summary>
+    public static dynamic? FM
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetRecord (context, out var record))
+        {
+            return null;
+        }
+
+        var firstArg = Compute (context, args, 0);
+        var secondArg = Compute (context, args, 1);
+        if (firstArg is int tag)
+        {
+            if (secondArg is char code)
+            {
+                return record.FM (tag, code);
+            }
+            return record.FM (tag);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Простой доступ к полям записи.
+    /// </summary>
+    public static dynamic? FMA
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetRecord (context, out var record))
+        {
+            return null;
+        }
+
+        var firstArg = Compute (context, args, 0);
+        var secondArg = Compute (context, args, 1);
+        if (firstArg is int tag)
+        {
+            if (secondArg is char code)
+            {
+                return record.FMA (tag, code);
+            }
+            return record.FMA (tag);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Мы подключены к серверу.
+    /// </summary>
+    public static dynamic? IsConnected
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return false;
+        }
+
+        return connection.Connected;
     }
 
     /// <summary>
@@ -422,9 +533,15 @@ public sealed class IrbisLib
             return null;
         }
 
-        // TODO implement
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is int mfn)
+        {
+            var record = connection.ReadRecord (mfn);
+            context.SetDefine (RecordDefineName, record);
+            return record;
+        }
 
-        return new Record();
+        return null;
     }
 
     /// <summary>
@@ -475,6 +592,12 @@ public sealed class IrbisLib
             return null;
         }
 
+        var expression = Compute (context, args, 0) as string;
+        if (!string.IsNullOrEmpty (expression))
+        {
+            return connection.Search (expression);
+        }
+
         return null;
     }
 
@@ -511,9 +634,7 @@ public sealed class IrbisLib
             return null;
         }
 
-        // TODO implement
-
-        return new ServerVersion();
+        return connection.GetServerVersion();
     }
 
     /// <summary>
@@ -591,6 +712,10 @@ public sealed class IrbisLib
         {
             context.Functions[descriptor.Key] = descriptor.Value;
         }
+
+        var assembly = typeof (IrbisLib).Assembly;
+        StdLib.LoadAssembly (context, new[] { assembly.GetName().Name });
+        StdLib.Use (context, new[] { "ManagedIrbis" });
 
         return true;
     }
