@@ -8,7 +8,7 @@
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
-/* MainForm.cs -- главная форма программы
+/* MainForm.cs -- РіР»Р°РІРЅР°СЏ С„РѕСЂРјР° РїСЂРѕРіСЂР°РјРјС‹
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,11 +18,8 @@
 
 using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
-using AM.Scripting;
 using AM.Scripting.Barsik;
 using AM.Scripting.WinForms;
 using AM.Text.Output;
@@ -36,7 +33,7 @@ using Fctb;
 namespace BarsikIDE
 {
     /// <summary>
-    /// Главная форма программы.
+    /// Р“Р»Р°РІРЅР°СЏ С„РѕСЂРјР° РїСЂРѕРіСЂР°РјРјС‹.
     /// </summary>
     public partial class MainForm
         : Form
@@ -44,7 +41,7 @@ namespace BarsikIDE
         #region Construction
 
         /// <summary>
-        /// Конструктор.
+        /// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ.
         /// </summary>
         public MainForm()
         {
@@ -59,7 +56,7 @@ namespace BarsikIDE
 
         #region Private members
 
-        private Interpreter _interpreter;
+        private Interpreter _interpreter = null!;
         private readonly TextWriter _output;
 
         private void _ResetInterpreter()

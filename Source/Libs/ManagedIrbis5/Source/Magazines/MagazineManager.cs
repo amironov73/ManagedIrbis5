@@ -89,9 +89,23 @@ namespace ManagedIrbis.Magazines
                 bool alternative = false
             )
         {
+            var searchExpression = alternative ? "VRL=J" : "TJ=$";
+
+            return GetAllMagazines (searchExpression);
+        }
+
+        /// <summary>
+        /// Получение перечня всех журналов из базы.
+        /// </summary>
+        public MagazineInfo[] GetAllMagazines
+            (
+                string searchExpression
+            )
+        {
+            Sure.NotNullNorEmpty (searchExpression);
+
             var result = new List<MagazineInfo>();
 
-            var searchExpression = alternative ? "VRL=J" : "TJ=$";
             var batch = BatchRecordReader.Search
                 (
                     Connection,
@@ -178,7 +192,7 @@ namespace ManagedIrbis.Magazines
                 return null;
             }
 
-            return MagazineIssueInfo.Parse(record);
+            return MagazineIssueInfo.Parse (record);
         }
 
         /// <summary>
@@ -204,7 +218,7 @@ namespace ManagedIrbis.Magazines
                 return null;
             }
 
-            return MagazineIssueInfo.Parse(record);
+            return MagazineIssueInfo.Parse (record);
         }
 
         /// <summary>

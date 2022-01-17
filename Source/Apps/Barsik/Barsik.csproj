@@ -56,7 +56,7 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Scripts\HelloWorld.barsik">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Scripts\If.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
