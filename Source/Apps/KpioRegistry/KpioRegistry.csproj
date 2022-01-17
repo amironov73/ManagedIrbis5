@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Libs\AM.Windows.DevExpress5\AM.Windows.DevExpress5.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DevExpress.Document.Processor" Version="21.2.4" />
+        <PackageReference Include="DevExpress.Printing.Core" Version="21.2.4" />
+        <PackageReference Include="DevExpress.RichEdit.Core" Version="21.2.4" />
+        <PackageReference Include="DevExpress.Win" Version="21.2.4" />
+        <PackageReference Include="DevExpress.Win.BonusSkins" Version="21.2.4" />
+    </ItemGroup>
+
+</Project>
