@@ -25,9 +25,9 @@ using System.Runtime.CompilerServices;
 
 namespace AM.Linguistics.Hunspell.Infrastructure
 {
-    ref struct SimulatedCString
+    internal ref struct SimulatedCString
     {
-        public SimulatedCString(string text)
+        public SimulatedCString (string text)
         {
             buffer = text.ToCharArray();
             cachedSpan = buffer.AsSpan();
@@ -40,7 +40,7 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         private Span<char> cachedSpan;
         private bool cacheRequiresRefresh;
 
-        public char this[int index]
+        public char this [int index]
         {
             get => index < 0 || index >= buffer.Length ? '\0' : buffer[index];
             set
@@ -53,51 +53,42 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         public int BufferLength
         {
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
             get => buffer.Length;
         }
 
-        public void WriteChars(string text, int destinationIndex)
+        public void WriteChars (string text, int destinationIndex)
         {
             ResetCache();
 
             var neededLength = text.Length + destinationIndex;
-            if (buffer.Length < neededLength)
-            {
-                Array.Resize(ref buffer, neededLength);
-            }
+            if (buffer.Length < neededLength) Array.Resize (ref buffer, neededLength);
 
-            text.CopyTo(0, buffer, destinationIndex, text.Length);
+            text.CopyTo (0, buffer, destinationIndex, text.Length);
         }
 
-        public void WriteChars(ReadOnlySpan<char> text, int destinationIndex)
+        public void WriteChars (ReadOnlySpan<char> text, int destinationIndex)
         {
             ResetCache();
 
             var neededLength = text.Length + destinationIndex;
-            if (buffer.Length < neededLength)
-            {
-                Array.Resize(ref buffer, neededLength);
-            }
+            if (buffer.Length < neededLength) Array.Resize (ref buffer, neededLength);
 
-            text.CopyTo(buffer.AsSpan(destinationIndex));
+            text.CopyTo (buffer.AsSpan (destinationIndex));
         }
 
-        public void Assign(string text)
+        public void Assign (string text)
         {
 #if DEBUG
-            if (text == null) throw new ArgumentNullException(nameof(text));
-            if (text.Length > buffer.Length) throw new ArgumentOutOfRangeException(nameof(text));
+            if (text == null) throw new ArgumentNullException (nameof (text));
+            if (text.Length > buffer.Length) throw new ArgumentOutOfRangeException (nameof (text));
 #endif
             ResetCache();
 
-            text.CopyTo(0, buffer, 0, text.Length);
+            text.CopyTo (0, buffer, 0, text.Length);
 
-            if (text.Length < buffer.Length)
-            {
-                Array.Clear(buffer, text.Length, buffer.Length - text.Length);
-            }
+            if (text.Length < buffer.Length) Array.Clear (buffer, text.Length, buffer.Length - text.Length);
         }
 
         public void Destroy()
@@ -106,15 +97,17 @@ namespace AM.Linguistics.Hunspell.Infrastructure
             buffer = null;
         }
 
-        public override string ToString() =>
-            cachedString ?? (cachedString = GetTerminatedSpan().ToString());
+        public override string ToString()
+        {
+            return cachedString ?? (cachedString = GetTerminatedSpan().ToString());
+        }
 
         public Span<char> GetTerminatedSpan()
         {
             if (cacheRequiresRefresh)
             {
                 cacheRequiresRefresh = false;
-                cachedSpan = buffer.AsSpan(0, FindTerminatedLength());
+                cachedSpan = buffer.AsSpan (0, FindTerminatedLength());
             }
 
             return cachedSpan;
@@ -127,11 +120,11 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         }
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
         private int FindTerminatedLength()
         {
-            var length = Array.IndexOf(buffer, '\0');
+            var length = Array.IndexOf (buffer, '\0');
             return length < 0 ? buffer.Length : length;
         }
     }

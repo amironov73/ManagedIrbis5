@@ -27,16 +27,20 @@ namespace AM.Linguistics.Hunspell;
 
 public sealed class SingleReplacementSet : ArrayWrapper<SingleReplacement>
 {
-    public static readonly SingleReplacementSet Empty = TakeArray(Array.Empty<SingleReplacement>());
+    public static readonly SingleReplacementSet Empty = TakeArray (Array.Empty<SingleReplacement>());
 
-    public static SingleReplacementSet Create(IEnumerable<SingleReplacement> replacements) =>
-        replacements == null ? Empty : TakeArray(replacements.ToArray());
+    public static SingleReplacementSet Create (IEnumerable<SingleReplacement> replacements)
+    {
+        return replacements == null ? Empty : TakeArray (replacements.ToArray());
+    }
 
-    internal static SingleReplacementSet TakeArray(SingleReplacement[] replacements) =>
-        replacements == null ? Empty : new SingleReplacementSet(replacements);
+    internal static SingleReplacementSet TakeArray (SingleReplacement[] replacements)
+    {
+        return replacements == null ? Empty : new SingleReplacementSet (replacements);
+    }
 
-    private SingleReplacementSet(SingleReplacement[] replacements)
-        : base(replacements)
+    private SingleReplacementSet (SingleReplacement[] replacements)
+        : base (replacements)
     {
     }
 }

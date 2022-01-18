@@ -51,11 +51,13 @@ namespace AM.Linguistics.Hunspell
             /// </summary>
             public AffixEntryOptions Options { get; set; }
 
-            public AffixEntryGroup<TEntry> ToGroup() =>
-                new AffixEntryGroup<TEntry>(AFlag, Options, AffixEntryCollection<TEntry>.Create(Entries));
+            public AffixEntryGroup<TEntry> ToGroup()
+            {
+                return new (AFlag, Options, AffixEntryCollection<TEntry>.Create (Entries));
+            }
         }
 
-        public AffixEntryGroup(FlagValue aFlag, AffixEntryOptions options, AffixEntryCollection<TEntry> entries)
+        public AffixEntryGroup (FlagValue aFlag, AffixEntryOptions options, AffixEntryCollection<TEntry> entries)
         {
             Entries = entries;
             AFlag = aFlag;
@@ -84,19 +86,16 @@ namespace AM.Linguistics.Hunspell
         public bool AllowCross
         {
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-            get => EnumEx.HasFlag(Options, AffixEntryOptions.CrossProduct);
+            get => EnumEx.HasFlag (Options, AffixEntryOptions.CrossProduct);
         }
 
         internal Affix<TEntry>[] CreateAffixes()
         {
             var source = Entries.items;
             var result = new Affix<TEntry>[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                result[i] = Affix<TEntry>.Create(source[i], this);
-            }
+            for (var i = 0; i < source.Length; i++) result[i] = Affix<TEntry>.Create (source[i], this);
 
             return result;
         }

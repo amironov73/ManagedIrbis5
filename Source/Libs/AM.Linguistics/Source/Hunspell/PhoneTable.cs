@@ -27,14 +27,20 @@ namespace AM.Linguistics.Hunspell;
 
 public sealed class PhoneTable : ArrayWrapper<PhoneticEntry>
 {
-    public static readonly PhoneTable Empty = TakeArray(Array.Empty<PhoneticEntry>());
+    public static readonly PhoneTable Empty = TakeArray (Array.Empty<PhoneticEntry>());
 
-    public static PhoneTable Create(IEnumerable<PhoneticEntry> entries) => entries == null ? Empty : TakeArray(entries.ToArray());
+    public static PhoneTable Create (IEnumerable<PhoneticEntry> entries)
+    {
+        return entries == null ? Empty : TakeArray (entries.ToArray());
+    }
 
-    internal static PhoneTable TakeArray(PhoneticEntry[] entries) => entries == null ? Empty : new PhoneTable(entries);
+    internal static PhoneTable TakeArray (PhoneticEntry[] entries)
+    {
+        return entries == null ? Empty : new PhoneTable (entries);
+    }
 
-    private PhoneTable(PhoneticEntry[] entries)
-        : base(entries)
+    private PhoneTable (PhoneticEntry[] entries)
+        : base (entries)
     {
     }
 }

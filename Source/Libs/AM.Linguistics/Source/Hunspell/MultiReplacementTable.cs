@@ -37,20 +37,28 @@ namespace AM.Linguistics.Hunspell
         IReadOnlyDictionary<string, MultiReplacementEntry>
 #endif
     {
-        public static readonly MultiReplacementTable Empty = TakeDictionary(new Dictionary<string, MultiReplacementEntry>(0));
+        public static readonly MultiReplacementTable Empty =
+            TakeDictionary (new Dictionary<string, MultiReplacementEntry> (0));
 
-        public static MultiReplacementTable Create(IEnumerable<KeyValuePair<string, MultiReplacementEntry>> replacements) =>
-            replacements == null ? Empty : TakeDictionary(replacements.ToDictionary(s => s.Key, s => s.Value));
+        public static MultiReplacementTable Create (
+            IEnumerable<KeyValuePair<string, MultiReplacementEntry>> replacements)
+        {
+            return replacements == null ? Empty : TakeDictionary (replacements.ToDictionary (s => s.Key, s => s.Value));
+        }
 
-        internal static MultiReplacementTable TakeDictionary(Dictionary<string, MultiReplacementEntry> replacements) =>
-            replacements == null ? Empty : new MultiReplacementTable(replacements);
+        internal static MultiReplacementTable TakeDictionary (Dictionary<string, MultiReplacementEntry> replacements)
+        {
+            return replacements == null ? Empty : new MultiReplacementTable (replacements);
+        }
 
-        private MultiReplacementTable(Dictionary<string, MultiReplacementEntry> replacements) =>
+        private MultiReplacementTable (Dictionary<string, MultiReplacementEntry> replacements)
+        {
             this.replacements = replacements;
+        }
 
         private Dictionary<string, MultiReplacementEntry> replacements;
 
-        public MultiReplacementEntry this[string key] => replacements[key];
+        public MultiReplacementEntry this [string key] => replacements[key];
 
         public int Count => replacements.Count;
 
@@ -60,17 +68,20 @@ namespace AM.Linguistics.Hunspell
 
         public IEnumerable<MultiReplacementEntry> Values => replacements.Values;
 
-        public bool ContainsKey(string key) => replacements.ContainsKey(key);
+        public bool ContainsKey (string key)
+        {
+            return replacements.ContainsKey (key);
+        }
 
-        public bool TryGetValue(string key, out MultiReplacementEntry value) => replacements.TryGetValue(key, out value);
+        public bool TryGetValue (string key, out MultiReplacementEntry value)
+        {
+            return replacements.TryGetValue (key, out value);
+        }
 
-        internal bool TryConvert(string text, out string converted)
+        internal bool TryConvert (string text, out string converted)
         {
 #if DEBUG
-            if (text == null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
+            if (text == null) throw new ArgumentNullException (nameof (text));
 #endif
 
             var appliedConversion = false;
@@ -81,27 +92,27 @@ namespace AM.Linguistics.Hunspell
             }
             else
             {
-                var convertedBuilder = StringBuilderPool.Get(text.Length);
+                var convertedBuilder = StringBuilderPool.Get (text.Length);
 
                 for (var i = 0; i < text.Length; i++)
                 {
-                    var replacementEntry = FindLargestMatchingConversion(text.AsSpan(i));
+                    var replacementEntry = FindLargestMatchingConversion (text.AsSpan (i));
                     if (replacementEntry != null)
                     {
-                        var replacementText = replacementEntry.ExtractReplacementText(text.Length - i, i == 0);
-                        if (!string.IsNullOrEmpty(replacementText))
+                        var replacementText = replacementEntry.ExtractReplacementText (text.Length - i, i == 0);
+                        if (!string.IsNullOrEmpty (replacementText))
                         {
-                            convertedBuilder.Append(replacementText);
+                            convertedBuilder.Append (replacementText);
                             i += replacementEntry.Pattern.Length - 1;
                             appliedConversion = true;
                             continue;
                         }
                     }
 
-                    convertedBuilder.Append(text[i]);
+                    convertedBuilder.Append (text[i]);
                 }
 
-                converted = StringBuilderPool.GetStringAndReturn(convertedBuilder);
+                converted = StringBuilderPool.GetStringAndReturn (convertedBuilder);
             }
 
             return appliedConversion;
@@ -113,23 +124,29 @@ namespace AM.Linguistics.Hunspell
         /// <param name="text">The text to find a matching input conversion for.</param>
         /// <returns>The best matching input conversion.</returns>
         /// <seealso cref="MultiReplacementEntry"/>
-        internal MultiReplacementEntry FindLargestMatchingConversion(ReadOnlySpan<char> text)
+        internal MultiReplacementEntry FindLargestMatchingConversion (ReadOnlySpan<char> text)
         {
             for (var searchLength = text.Length; searchLength > 0; searchLength--)
-            {
-                if (replacements.TryGetValue(text.Slice(0, searchLength).ToString(), out MultiReplacementEntry entry))
-                {
+                if (replacements.TryGetValue (text.Slice (0, searchLength).ToString(), out var entry))
                     return entry;
-                }
-            }
 
             return null;
         }
 
-        internal Dictionary<string, MultiReplacementEntry>.Enumerator GetEnumerator() => replacements.GetEnumerator();
+        internal Dictionary<string, MultiReplacementEntry>.Enumerator GetEnumerator()
+        {
+            return replacements.GetEnumerator();
+        }
 
-        IEnumerator<KeyValuePair<string, MultiReplacementEntry>> IEnumerable<KeyValuePair<string, MultiReplacementEntry>>.GetEnumerator() => replacements.GetEnumerator();
+        IEnumerator<KeyValuePair<string, MultiReplacementEntry>>
+            IEnumerable<KeyValuePair<string, MultiReplacementEntry>>.GetEnumerator()
+        {
+            return replacements.GetEnumerator();
+        }
 
-        IEnumerator IEnumerable.GetEnumerator() => replacements.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return replacements.GetEnumerator();
+        }
     }
 }

@@ -27,8 +27,8 @@ namespace AM.Linguistics.Hunspell
 {
     public sealed class SingleReplacement : ReplacementEntry
     {
-        public SingleReplacement(string pattern, string outString, ReplacementValueType type)
-            : base(pattern)
+        public SingleReplacement (string pattern, string outString, ReplacementValueType type)
+            : base (pattern)
         {
             OutString = outString;
             Type = type;
@@ -46,10 +46,10 @@ namespace AM.Linguistics.Hunspell
 
         public override string Isol => this[ReplacementValueType.Isol];
 
-        public override string this[ReplacementValueType type]
+        public override string this [ReplacementValueType type]
         {
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
             get => Type == type ? OutString : null;
         }

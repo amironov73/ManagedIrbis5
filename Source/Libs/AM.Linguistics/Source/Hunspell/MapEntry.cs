@@ -27,14 +27,20 @@ namespace AM.Linguistics.Hunspell;
 
 public sealed class MapEntry : ArrayWrapper<string>
 {
-    public static readonly MapEntry Empty = TakeArray(Array.Empty<string>());
+    public static readonly MapEntry Empty = TakeArray (Array.Empty<string>());
 
-    public static MapEntry Create(IEnumerable<string> values) => values == null ? Empty : TakeArray(values.ToArray());
+    public static MapEntry Create (IEnumerable<string> values)
+    {
+        return values == null ? Empty : TakeArray (values.ToArray());
+    }
 
-    internal static MapEntry TakeArray(string[] values) => values == null ? Empty : new MapEntry(values);
+    internal static MapEntry TakeArray (string[] values)
+    {
+        return values == null ? Empty : new MapEntry (values);
+    }
 
-    private MapEntry(string[] values)
-        : base(values)
+    private MapEntry (string[] values)
+        : base (values)
     {
     }
 }

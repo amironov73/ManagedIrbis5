@@ -15,7 +15,7 @@
 
 namespace AM.Linguistics.Hunspell;
 
-enum CapitalizationType : byte
+internal enum CapitalizationType : byte
 {
     /// <summary>
     /// No letters capitalized.

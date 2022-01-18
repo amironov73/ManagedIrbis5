@@ -49,35 +49,23 @@ public interface IHunspellLineReader
 
 public static class HunspellLineReaderExtensions
 {
-    public static async Task<IEnumerable<string>> ReadLinesAsync(this IHunspellLineReader reader)
+    public static async Task<IEnumerable<string>> ReadLinesAsync (this IHunspellLineReader reader)
     {
-        if (reader == null)
-        {
-            throw new ArgumentNullException(nameof(reader));
-        }
+        if (reader == null) throw new ArgumentNullException (nameof (reader));
 
         var lines = new List<string>();
 
         string line;
-        while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
-        {
-            lines.Add(line);
-        }
+        while ((line = await reader.ReadLineAsync().ConfigureAwait (false)) != null) lines.Add (line);
 
         return lines;
     }
 
-    public static IEnumerable<string> ReadLines(this IHunspellLineReader reader)
+    public static IEnumerable<string> ReadLines (this IHunspellLineReader reader)
     {
-        if (reader == null)
-        {
-            throw new ArgumentNullException(nameof(reader));
-        }
+        if (reader == null) throw new ArgumentNullException (nameof (reader));
 
         string line;
-        while ((line = reader.ReadLine()) != null)
-        {
-            yield return line;
-        }
+        while ((line = reader.ReadLine()) != null) yield return line;
     }
 }

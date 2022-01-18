@@ -124,9 +124,9 @@ namespace AM.Linguistics.Hunspell;
 public abstract class AffixEntry
 {
 #if !NO_INLINE
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-    protected AffixEntry(
+    protected AffixEntry (
         string strip,
         string affixText,
         CharacterConditionGroup conditions,
@@ -172,17 +172,17 @@ public abstract class AffixEntry
     public abstract string Key { get; }
 
 #if !NO_INLINE
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-    public bool ContainsContClass(FlagValue flag) => ContClass.Contains(flag);
+    public bool ContainsContClass (FlagValue flag) => ContClass.Contains (flag);
 
 #if !NO_INLINE
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-    public bool ContainsAnyContClass(FlagValue a, FlagValue b) => ContClass.ContainsAny(a,b);
+    public bool ContainsAnyContClass (FlagValue a, FlagValue b) => ContClass.ContainsAny (a, b);
 
 #if !NO_INLINE
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-    public bool ContainsAnyContClass(FlagValue a, FlagValue b, FlagValue c) => ContClass.ContainsAny(a, b, c);
+    public bool ContainsAnyContClass (FlagValue a, FlagValue b, FlagValue c) => ContClass.ContainsAny (a, b, c);
 }

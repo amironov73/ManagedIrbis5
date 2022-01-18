@@ -25,7 +25,7 @@ namespace AM.Linguistics.Hunspell;
 
 public sealed class PatternEntry
 {
-    public PatternEntry(string pattern, string pattern2, string pattern3, FlagValue condition, FlagValue condition2)
+    public PatternEntry (string pattern, string pattern2, string pattern3, FlagValue condition, FlagValue condition2)
     {
         Pattern = pattern ?? string.Empty;
         Pattern2 = pattern2 ?? string.Empty;
@@ -44,7 +44,9 @@ public sealed class PatternEntry
 
     public FlagValue Condition2 { get; }
 
-    internal bool Pattern3DoesNotMatch(string word, int offset) =>
-        Pattern3.Length == 0
-        || !word.AsSpan(offset).StartsWith(Pattern3.AsSpan()); 
+    internal bool Pattern3DoesNotMatch (string word, int offset)
+    {
+        return Pattern3.Length == 0
+               || !word.AsSpan (offset).StartsWith (Pattern3.AsSpan());
+    }
 }

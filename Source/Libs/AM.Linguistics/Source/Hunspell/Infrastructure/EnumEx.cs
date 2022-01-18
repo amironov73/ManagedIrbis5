@@ -13,16 +13,27 @@
 
 #nullable enable
 
-namespace AM.Linguistics.Hunspell.Infrastructure
+namespace AM.Linguistics.Hunspell.Infrastructure;
+
+internal static class EnumEx
 {
-    static class EnumEx
+    public static bool HasFlag (this AffixConfigOptions value, AffixConfigOptions flag)
     {
-        public static bool HasFlag(this AffixConfigOptions value, AffixConfigOptions flag) => (value & flag) == flag;
+        return (value & flag) == flag;
+    }
 
-        public static bool HasFlag(this WordEntryOptions value, WordEntryOptions flag) => (value & flag) == flag;
+    public static bool HasFlag (this WordEntryOptions value, WordEntryOptions flag)
+    {
+        return (value & flag) == flag;
+    }
 
-        public static bool HasFlag(this AffixEntryOptions value, AffixEntryOptions flag) => (value & flag) == flag;
+    public static bool HasFlag (this AffixEntryOptions value, AffixEntryOptions flag)
+    {
+        return (value & flag) == flag;
+    }
 
-        public static bool HasFlag(this SpellCheckResultType value, SpellCheckResultType flag) => (value & flag) == flag;
+    public static bool HasFlag (this SpellCheckResultType value, SpellCheckResultType flag)
+    {
+        return (value & flag) == flag;
     }
 }

@@ -21,18 +21,18 @@ using System.Collections.Generic;
 
 namespace AM.Linguistics.Hunspell.Infrastructure;
 
-sealed class Deduper<T>
+internal sealed class Deduper<T>
 {
-    public Deduper(IEqualityComparer<T> comparer)
+    public Deduper (IEqualityComparer<T> comparer)
     {
-        lookup = new Dictionary<T, T>(comparer);
+        lookup = new Dictionary<T, T> (comparer);
     }
 
     private readonly Dictionary<T, T> lookup;
 
-    public T GetEqualOrAdd(T item)
+    public T GetEqualOrAdd (T item)
     {
-        if (lookup.TryGetValue(item, out T existing))
+        if (lookup.TryGetValue (item, out var existing))
         {
             return existing;
         }
@@ -43,11 +43,8 @@ sealed class Deduper<T>
         }
     }
 
-    public void Add(T item)
+    public void Add (T item)
     {
-        if (!lookup.ContainsKey(item))
-        {
-            lookup[item] = item;
-        }
+        if (!lookup.ContainsKey (item)) lookup[item] = item;
     }
 }

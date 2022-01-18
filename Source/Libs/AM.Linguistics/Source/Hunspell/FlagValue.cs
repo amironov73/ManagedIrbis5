@@ -40,57 +40,57 @@ namespace AM.Linguistics.Hunspell
         private const char ZeroValue = '\0';
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static implicit operator int(FlagValue flag) => flag.value;
+        public static implicit operator int (FlagValue flag) => flag.value;
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static implicit operator char(FlagValue flag) => flag.value;
+        public static implicit operator char (FlagValue flag) => flag.value;
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static bool operator !=(FlagValue a, FlagValue b) => a.value != b.value;
+        public static bool operator != (FlagValue a, FlagValue b) => a.value != b.value;
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static bool operator ==(FlagValue a, FlagValue b) => a.value == b.value;
+        public static bool operator == (FlagValue a, FlagValue b) => a.value == b.value;
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static bool operator >=(FlagValue a, FlagValue b) => a.value >= b.value;
+        public static bool operator >= (FlagValue a, FlagValue b) => a.value >= b.value;
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static bool operator <=(FlagValue a, FlagValue b) => a.value <= b.value;
+        public static bool operator <= (FlagValue a, FlagValue b) => a.value <= b.value;
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static bool operator >(FlagValue a, FlagValue b) => a.value > b.value;
+        public static bool operator > (FlagValue a, FlagValue b) => a.value > b.value;
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static bool operator <(FlagValue a, FlagValue b) => a.value < b.value;
+        public static bool operator < (FlagValue a, FlagValue b) => a.value < b.value;
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        internal static FlagValue Create(char high, char low) => new FlagValue(unchecked((char)((high << 8) | low)));
+        internal static FlagValue Create (char high, char low) => new (unchecked ((char)((high << 8) | low)));
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static bool TryParseFlag(string text, FlagMode mode, out FlagValue value) =>
-            TryParseFlag(text.AsSpan(), mode, out value);
+        public static bool TryParseFlag (string text, FlagMode mode, out FlagValue value) =>
+            TryParseFlag (text.AsSpan(), mode, out value);
 
-        internal static bool TryParseFlag(ReadOnlySpan<char> text, FlagMode mode, out FlagValue value)
+        internal static bool TryParseFlag (ReadOnlySpan<char> text, FlagMode mode, out FlagValue value)
         {
             if (text.IsEmpty)
             {
@@ -101,27 +101,28 @@ namespace AM.Linguistics.Hunspell
             switch (mode)
             {
                 case FlagMode.Char:
-                    value = new FlagValue(text[0]);
+                    value = new FlagValue (text[0]);
                     return true;
                 case FlagMode.Long:
                     var a = text[0];
                     value = text.Length >= 2
-                        ? Create(a, text[1])
-                        : new FlagValue(a);
+                        ? Create (a, text[1])
+                        : new FlagValue (a);
                     return true;
                 case FlagMode.Num:
-                    return TryParseNumberFlag(text, out value);
+                    return TryParseNumberFlag (text, out value);
                 case FlagMode.Uni:
                 default:
                     throw new NotSupportedException();
             }
         }
 
-        private static bool TryParseNumberFlag(ReadOnlySpan<char> text, out FlagValue value)
+        private static bool TryParseNumberFlag (ReadOnlySpan<char> text, out FlagValue value)
         {
-            if (!text.IsEmpty && IntEx.TryParseInvariant(text, out int integerValue) && integerValue >= char.MinValue && integerValue <= char.MaxValue)
+            if (!text.IsEmpty && IntEx.TryParseInvariant (text, out var integerValue) &&
+                integerValue >= char.MinValue && integerValue <= char.MaxValue)
             {
-                value = new FlagValue(unchecked((char)integerValue));
+                value = new FlagValue (unchecked ((char)integerValue));
                 return true;
             }
 
@@ -129,63 +130,51 @@ namespace AM.Linguistics.Hunspell
             return false;
         }
 
-        internal static FlagValue[] ParseFlagsInOrder(ReadOnlySpan<char> text, FlagMode mode)
+        internal static FlagValue[] ParseFlagsInOrder (ReadOnlySpan<char> text, FlagMode mode)
         {
             switch (mode)
             {
-                case FlagMode.Char: return text.IsEmpty ? Array.Empty<FlagValue>() : ConvertCharsToFlagsInOrder(text);
-                case FlagMode.Long: return ParseLongFlagsInOrder(text);
-                case FlagMode.Num: return ParseNumberFlagsInOrder(text).ToArray();
+                case FlagMode.Char: return text.IsEmpty ? Array.Empty<FlagValue>() : ConvertCharsToFlagsInOrder (text);
+                case FlagMode.Long: return ParseLongFlagsInOrder (text);
+                case FlagMode.Num: return ParseNumberFlagsInOrder (text).ToArray();
                 default: throw new NotSupportedException();
             }
         }
 
-        public static FlagSet ParseFlags(string text, FlagMode mode) =>
-            ParseFlags(text.AsSpan(), mode);
+        public static FlagSet ParseFlags (string text, FlagMode mode)
+        {
+            return ParseFlags (text.AsSpan(), mode);
+        }
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        internal static FlagSet ParseFlags(ReadOnlySpan<char> text, FlagMode mode) =>
-            FlagSet.TakeArray(ParseFlagsInOrder(text, mode));
+        internal static FlagSet ParseFlags (ReadOnlySpan<char> text, FlagMode mode) =>
+            FlagSet.TakeArray (ParseFlagsInOrder (text, mode));
 
-        private static FlagValue[] ParseLongFlagsInOrder(ReadOnlySpan<char> text)
+        private static FlagValue[] ParseLongFlagsInOrder (ReadOnlySpan<char> text)
         {
-            if (text.IsEmpty)
-            {
-                return Array.Empty<FlagValue>();
-            }
+            if (text.IsEmpty) return Array.Empty<FlagValue>();
 
             var flags = new FlagValue[(text.Length + 1) / 2];
             var flagWriteIndex = 0;
             var lastIndex = text.Length - 1;
             for (var i = 0; i < lastIndex; i += 2, flagWriteIndex++)
-            {
-                flags[flagWriteIndex] = Create(text[i], text[i + 1]);
-            }
+                flags[flagWriteIndex] = Create (text[i], text[i + 1]);
 
-            if (flagWriteIndex < flags.Length)
-            {
-                flags[flagWriteIndex] = new FlagValue(text[lastIndex]);
-            }
+            if (flagWriteIndex < flags.Length) flags[flagWriteIndex] = new FlagValue (text[lastIndex]);
 
             return flags;
         }
 
-        private static List<FlagValue> ParseNumberFlagsInOrder(ReadOnlySpan<char> text)
+        private static List<FlagValue> ParseNumberFlagsInOrder (ReadOnlySpan<char> text)
         {
-            if (text.IsEmpty)
-            {
-                return new List<FlagValue>(0);
-            }
+            if (text.IsEmpty) return new List<FlagValue> (0);
 
             var flags = new List<FlagValue>();
-            text.Split(',', (part, _) =>
+            text.Split (',', (part, _) =>
             {
-                if (TryParseNumberFlag(part, out var value))
-                {
-                    flags.Add(value);
-                }
+                if (TryParseNumberFlag (part, out var value)) flags.Add (value);
 
                 return true;
             });
@@ -193,35 +182,32 @@ namespace AM.Linguistics.Hunspell
             return flags;
         }
 
-        private static FlagValue[] ConvertCharsToFlagsInOrder(ReadOnlySpan<char> text)
+        private static FlagValue[] ConvertCharsToFlagsInOrder (ReadOnlySpan<char> text)
         {
             var values = new FlagValue[text.Length];
-            for (var i = 0; i < values.Length; i++)
-            {
-                values[i] = new FlagValue(text[i]);
-            }
+            for (var i = 0; i < values.Length; i++) values[i] = new FlagValue (text[i]);
 
             return values;
         }
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public FlagValue(char value) =>
+        public FlagValue (char value) =>
             this.value = value;
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public FlagValue(int value) =>
-            this.value = checked((char)value);
+        public FlagValue (int value) =>
+            this.value = checked ((char)value);
 
         private readonly char value;
 
         public bool HasValue
         {
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
             get => value != ZeroValue;
         }
@@ -229,7 +215,7 @@ namespace AM.Linguistics.Hunspell
         public bool IsZero
         {
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
             get => value == ZeroValue;
         }
@@ -237,52 +223,58 @@ namespace AM.Linguistics.Hunspell
         public bool IsWildcard
         {
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
             get => value == '*' || value == '?';
         }
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public bool Equals(FlagValue other) => other.value == value;
+        public bool Equals (FlagValue other) => other.value == value;
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public bool Equals(int other) => other == value;
+        public bool Equals (int other) => other == value;
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public bool Equals(char other) => other == value;
+        public bool Equals (char other) => other == value;
 
-        public override bool Equals(object obj)
+        public override bool Equals (object obj)
         {
-            if (obj is FlagValue flagValue)
-            {
-                return Equals(flagValue);
-            }
-            if (obj is int intValue)
-            {
-                return Equals(intValue);
-            }
-            if (obj is char charValue)
-            {
-                return Equals(charValue);
-            }
+            if (obj is FlagValue flagValue) return Equals (flagValue);
+            if (obj is int intValue) return Equals (intValue);
+            if (obj is char charValue) return Equals (charValue);
 
             return false;
         }
 
-        public override int GetHashCode() => value.GetHashCode();
+        public override int GetHashCode()
+        {
+            return value.GetHashCode();
+        }
 
-        public int CompareTo(FlagValue other) => value.CompareTo(other.value);
+        public int CompareTo (FlagValue other)
+        {
+            return value.CompareTo (other.value);
+        }
 
-        public int CompareTo(int other) => ((int)value).CompareTo(other);
+        public int CompareTo (int other)
+        {
+            return ((int)value).CompareTo (other);
+        }
 
-        public int CompareTo(char other) => value.CompareTo(other);
+        public int CompareTo (char other)
+        {
+            return value.CompareTo (other);
+        }
 
-        public override string ToString() => ((int)value).ToString(CultureInfo.InvariantCulture);
+        public override string ToString()
+        {
+            return ((int)value).ToString (CultureInfo.InvariantCulture);
+        }
     }
 }

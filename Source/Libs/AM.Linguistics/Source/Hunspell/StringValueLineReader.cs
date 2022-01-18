@@ -26,7 +26,7 @@ namespace AM.Linguistics.Hunspell;
 
 public sealed class StringValueLineReader : IHunspellLineReader
 {
-    public StringValueLineReader(string text)
+    public StringValueLineReader (string text)
     {
         content = text;
     }
@@ -39,21 +39,21 @@ public sealed class StringValueLineReader : IHunspellLineReader
 
     public string ReadLine()
     {
-        if (content == null || position >= content.Length)
-        {
-            return null;
-        }
+        if (content == null || position >= content.Length) return null;
 
         var startPosition = position;
 
         for (; position < content.Length && !content[position].IsLineBreakChar(); ++position) ;
-            
-        var result = content.Substring(startPosition, position - startPosition);
+
+        var result = content.Substring (startPosition, position - startPosition);
 
         for (; position < content.Length && content[position].IsLineBreakChar(); position++) ;
 
         return result;
     }
 
-    public Task<string> ReadLineAsync() => Task.FromResult(ReadLine());
+    public Task<string> ReadLineAsync()
+    {
+        return Task.FromResult (ReadLine());
+    }
 }

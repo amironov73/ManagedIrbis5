@@ -27,14 +27,18 @@ namespace AM.Linguistics.Hunspell;
 
 public sealed class WarningList : ArrayWrapper<string>
 {
-    public static WarningList Create(IEnumerable<string> warnings) =>
-        warnings == null ? TakeArray(null) : TakeArray(warnings.ToArray());
+    public static WarningList Create (IEnumerable<string> warnings)
+    {
+        return warnings == null ? TakeArray (null) : TakeArray (warnings.ToArray());
+    }
 
-    internal static WarningList TakeArray(string[] warnings) =>
-        new WarningList(warnings ?? Array.Empty<string>());
+    internal static WarningList TakeArray (string[] warnings)
+    {
+        return new (warnings ?? Array.Empty<string>());
+    }
 
-    private WarningList(string[] warnings)
-        : base(warnings)
+    private WarningList (string[] warnings)
+        : base (warnings)
     {
     }
 }

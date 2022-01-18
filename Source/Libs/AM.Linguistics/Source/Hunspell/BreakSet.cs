@@ -25,40 +25,58 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class BreakSet : ArrayWrapper<string>
+public sealed class BreakSet
+    : ArrayWrapper<string>
 {
-    public static readonly BreakSet Empty = TakeArray(Array.Empty<string>());
+    public static readonly BreakSet Empty = TakeArray (Array.Empty<string>());
 
-    internal static BreakSet TakeArray(string[] breaks) => breaks == null ? Empty : new BreakSet(breaks);
+    internal static BreakSet TakeArray (string[] breaks)
+    {
+        return breaks == null ? Empty : new BreakSet (breaks);
+    }
 
-    public static BreakSet Create(List<string> breaks) => breaks == null ? Empty : TakeArray(breaks.ToArray());
+    public static BreakSet Create (List<string> breaks)
+    {
+        return breaks == null ? Empty : TakeArray (breaks.ToArray());
+    }
 
-    public static BreakSet Create(IEnumerable<string> breaks) => breaks == null ? Empty : TakeArray(breaks.ToArray());
+    public static BreakSet Create (IEnumerable<string> breaks)
+    {
+        return breaks == null ? Empty : TakeArray (breaks.ToArray());
+    }
 
-    private BreakSet(string[] breaks)
-        : base(breaks)
+    #region Constructions
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    private BreakSet
+        (
+            string[] breaks
+        )
+        : base (breaks)
     {
     }
+
+    #endregion
 
     /// <summary>
     /// Calculate break points for recursion limit.
     /// </summary>
-    internal int FindRecursionLimit(string scw)
+    internal int FindRecursionLimit (string scw)
     {
-        int nbr = 0;
+        var nbr = 0;
 
-        if (!string.IsNullOrEmpty(scw))
-        {
+        if (!string.IsNullOrEmpty (scw))
             foreach (var breakEntry in items)
             {
-                int pos = 0;
-                while ((pos = scw.IndexOf(breakEntry, pos, StringComparison.Ordinal)) >= 0)
+                var pos = 0;
+                while ((pos = scw.IndexOf (breakEntry, pos, StringComparison.Ordinal)) >= 0)
                 {
                     nbr++;
                     pos += breakEntry.Length;
                 }
             }
-        }
 
         return nbr;
     }

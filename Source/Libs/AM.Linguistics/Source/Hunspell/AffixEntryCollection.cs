@@ -28,18 +28,24 @@ namespace AM.Linguistics.Hunspell;
 public sealed class AffixEntryCollection<TEntry> : ArrayWrapper<TEntry>
     where TEntry : AffixEntry
 {
-    public static readonly AffixEntryCollection<TEntry> Empty = TakeArray(Array.Empty<TEntry>());
+    public static readonly AffixEntryCollection<TEntry> Empty = TakeArray (Array.Empty<TEntry>());
 
-    public static AffixEntryCollection<TEntry> Create(List<TEntry> entries) =>
-        entries == null ? Empty : TakeArray(entries.ToArray());
+    public static AffixEntryCollection<TEntry> Create (List<TEntry> entries)
+    {
+        return entries == null ? Empty : TakeArray (entries.ToArray());
+    }
 
-    public static AffixEntryCollection<TEntry> Create(IEnumerable<TEntry> entries) =>
-        entries == null ? Empty : TakeArray(entries.ToArray());
+    public static AffixEntryCollection<TEntry> Create (IEnumerable<TEntry> entries)
+    {
+        return entries == null ? Empty : TakeArray (entries.ToArray());
+    }
 
-    internal static AffixEntryCollection<TEntry> TakeArray(TEntry[] entries) =>
-        entries == null ? Empty : new AffixEntryCollection<TEntry>(entries);
+    internal static AffixEntryCollection<TEntry> TakeArray (TEntry[] entries)
+    {
+        return entries == null ? Empty : new AffixEntryCollection<TEntry> (entries);
+    }
 
-    private AffixEntryCollection(TEntry[] entries) : base(entries)
+    private AffixEntryCollection (TEntry[] entries) : base (entries)
     {
     }
 }

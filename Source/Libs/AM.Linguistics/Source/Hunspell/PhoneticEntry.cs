@@ -17,7 +17,7 @@ namespace AM.Linguistics.Hunspell;
 
 public sealed class PhoneticEntry
 {
-    public PhoneticEntry(string rule, string replace)
+    public PhoneticEntry (string rule, string replace)
     {
         Rule = rule ?? string.Empty;
         Replace = replace ?? string.Empty;

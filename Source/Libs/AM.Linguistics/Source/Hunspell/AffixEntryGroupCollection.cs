@@ -28,15 +28,19 @@ namespace AM.Linguistics.Hunspell;
 public sealed class AffixEntryGroupCollection<TEntry> : ArrayWrapper<AffixEntryGroup<TEntry>>
     where TEntry : AffixEntry
 {
-    public static readonly AffixEntryGroupCollection<TEntry> Empty = TakeArray(Array.Empty<AffixEntryGroup<TEntry>>());
+    public static readonly AffixEntryGroupCollection<TEntry> Empty = TakeArray (Array.Empty<AffixEntryGroup<TEntry>>());
 
-    private AffixEntryGroupCollection(AffixEntryGroup<TEntry>[] entries) : base(entries)
+    private AffixEntryGroupCollection (AffixEntryGroup<TEntry>[] entries) : base (entries)
     {
     }
 
-    internal static AffixEntryGroupCollection<TEntry> TakeArray(AffixEntryGroup<TEntry>[] entries) =>
-        entries == null ? Empty : new AffixEntryGroupCollection<TEntry>(entries);
+    internal static AffixEntryGroupCollection<TEntry> TakeArray (AffixEntryGroup<TEntry>[] entries)
+    {
+        return entries == null ? Empty : new AffixEntryGroupCollection<TEntry> (entries);
+    }
 
-    public static AffixEntryGroupCollection<TEntry> Create(IEnumerable<AffixEntryGroup<TEntry>> entries) =>
-        entries == null ? Empty : TakeArray(entries.ToArray());
+    public static AffixEntryGroupCollection<TEntry> Create (IEnumerable<AffixEntryGroup<TEntry>> entries)
+    {
+        return entries == null ? Empty : TakeArray (entries.ToArray());
+    }
 }

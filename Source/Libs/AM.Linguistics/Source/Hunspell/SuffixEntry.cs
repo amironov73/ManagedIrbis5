@@ -28,15 +28,15 @@ namespace AM.Linguistics.Hunspell
     public sealed class SuffixEntry : AffixEntry
     {
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public SuffixEntry(
+        public SuffixEntry (
             string strip,
             string affixText,
             CharacterConditionGroup conditions,
             MorphSet morph,
             FlagSet contClass)
-            : base(strip, affixText, conditions, morph, contClass)
+            : base (strip, affixText, conditions, morph, contClass)
         {
             Key = affixText.GetReversed();
         }

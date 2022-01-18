@@ -26,14 +26,16 @@ using System.Runtime.CompilerServices;
 
 namespace AM.Linguistics.Hunspell.Infrastructure
 {
-    static class IntEx
+    internal static class IntEx
     {
         private static readonly NumberFormatInfo InvariantNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
 
-        public static bool TryParseInvariant(string text, out int value) =>
-            int.TryParse(text, NumberStyles.Integer, InvariantNumberFormat, out value);
+        public static bool TryParseInvariant (string text, out int value)
+        {
+            return int.TryParse (text, NumberStyles.Integer, InvariantNumberFormat, out value);
+        }
 
-        public static bool TryParseInvariant(ReadOnlySpan<char> text, out int value)
+        public static bool TryParseInvariant (ReadOnlySpan<char> text, out int value)
         {
             text = text.Trim();
             if (text.IsEmpty)
@@ -46,7 +48,7 @@ namespace AM.Linguistics.Hunspell.Infrastructure
             if (text[0] == '-')
             {
                 isNegative = true;
-                text = text.Slice(1);
+                text = text.Slice (1);
             }
 
             if (text.IsEmpty)
@@ -55,36 +57,29 @@ namespace AM.Linguistics.Hunspell.Infrastructure
                 return false;
             }
 
-            if (!TryParseInvariant(text[text.Length - 1], out value))
-            {
-                return false;
-            }
+            if (!TryParseInvariant (text[text.Length - 1], out value)) return false;
 
             for (int i = text.Length - 2, multiplier = 10; i >= 0; i--, multiplier *= 10)
             {
-                if (!TryParseInvariant(text[i], out int digit))
-                {
-                    return false;
-                }
+                if (!TryParseInvariant (text[i], out var digit)) return false;
 
-                value += (multiplier * digit);
+                value += multiplier * digit;
             }
 
-            if (isNegative)
-            {
-                value = -value;
-            }
+            if (isNegative) value = -value;
 
             return true;
         }
 
-        public static int? TryParseInvariant(ReadOnlySpan<char> text) =>
-            TryParseInvariant(text, out int value) ? value : default(int?);
+        public static int? TryParseInvariant (ReadOnlySpan<char> text)
+        {
+            return TryParseInvariant (text, out var value) ? value : default (int?);
+        }
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static bool InversePostfixIncrement(ref bool b)
+        public static bool InversePostfixIncrement (ref bool b)
         {
             if (b)
             {
@@ -97,7 +92,7 @@ namespace AM.Linguistics.Hunspell.Infrastructure
             }
         }
 
-        private static bool TryParseInvariant(char character, out int value)
+        private static bool TryParseInvariant (char character, out int value)
         {
             if (character >= '0' && character <= '9')
             {

@@ -27,34 +27,39 @@ namespace AM.Linguistics.Hunspell;
 
 public sealed class CompoundRule : ArrayWrapper<FlagValue>
 {
-    public static readonly CompoundRule Empty = TakeArray(Array.Empty<FlagValue>());
+    public static readonly CompoundRule Empty = TakeArray (Array.Empty<FlagValue>());
 
-    public static CompoundRule Create(List<FlagValue> values) => values == null ? Empty : TakeArray(values.ToArray());
+    public static CompoundRule Create (List<FlagValue> values)
+    {
+        return values == null ? Empty : TakeArray (values.ToArray());
+    }
 
-    public static CompoundRule Create(IEnumerable<FlagValue> values) => values == null ? Empty : TakeArray(values.ToArray());
+    public static CompoundRule Create (IEnumerable<FlagValue> values)
+    {
+        return values == null ? Empty : TakeArray (values.ToArray());
+    }
 
-    internal static CompoundRule TakeArray(FlagValue[] values) => values == null ? Empty : new CompoundRule(values);
+    internal static CompoundRule TakeArray (FlagValue[] values)
+    {
+        return values == null ? Empty : new CompoundRule (values);
+    }
 
-    private CompoundRule(FlagValue[] values)
-        : base(values)
+    private CompoundRule (FlagValue[] values)
+        : base (values)
     {
     }
 
-    public bool IsWildcard(int index)
+    public bool IsWildcard (int index)
     {
         var value = this[index];
         return value == '*' || value == '?';
     }
 
-    internal bool ContainsRuleFlagForEntry(WordEntryDetail details)
+    internal bool ContainsRuleFlagForEntry (WordEntryDetail details)
     {
         foreach (var flag in items)
-        {
-            if (!flag.IsWildcard && details.ContainsFlag(flag))
-            {
+            if (!flag.IsWildcard && details.ContainsFlag (flag))
                 return true;
-            }
-        }
 
         return false;
     }

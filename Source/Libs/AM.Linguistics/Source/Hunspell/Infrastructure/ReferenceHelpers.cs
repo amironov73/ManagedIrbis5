@@ -23,12 +23,12 @@ using System.Runtime.CompilerServices;
 
 namespace AM.Linguistics.Hunspell.Infrastructure
 {
-    static class ReferenceHelpers
+    internal static class ReferenceHelpers
     {
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void Swap<T>(ref T a, ref T b)
+        public static void Swap<T> (ref T a, ref T b)
         {
             var tmp = a;
             a = b;
@@ -36,9 +36,9 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         }
 
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public static T Steal<T>(ref T item) where T : class
+        public static T Steal<T> (ref T item) where T : class
         {
             var value = item;
             item = null;

@@ -21,13 +21,19 @@ using System.IO;
 
 namespace AM.Linguistics.Hunspell.Infrastructure;
 
-static class FileStreamEx
+internal static class FileStreamEx
 {
     private const int DefaultBufferSize = 4096;
 
-    public static FileStream OpenReadFileStream(string filePath) =>
-        new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.SequentialScan);
+    public static FileStream OpenReadFileStream (string filePath)
+    {
+        return new (filePath, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize,
+            FileOptions.SequentialScan);
+    }
 
-    public static FileStream OpenAsyncReadFileStream(string filePath) =>
-        new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, FileOptions.Asynchronous | FileOptions.SequentialScan);
+    public static FileStream OpenAsyncReadFileStream (string filePath)
+    {
+        return new (filePath, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize,
+            FileOptions.Asynchronous | FileOptions.SequentialScan);
+    }
 }

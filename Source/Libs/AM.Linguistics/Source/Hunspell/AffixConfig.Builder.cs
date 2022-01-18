@@ -53,15 +53,16 @@ namespace AM.Linguistics.Hunspell
 
             public Builder()
             {
-                FlagSetDeduper = new Deduper<FlagSet>(FlagSet.DefaultComparer);
-                FlagSetDeduper.Add(FlagSet.Empty);
-                MorphSetDeduper = new Deduper<MorphSet>(MorphSet.DefaultComparer);
-                MorphSetDeduper.Add(MorphSet.Empty);
-                CharacterConditionGroupDeduper = new Deduper<CharacterConditionGroup>(CharacterConditionGroup.DefaultComparer);
-                CharacterConditionGroupDeduper.Add(CharacterConditionGroup.Empty);
-                CharacterConditionGroupDeduper.Add(CharacterConditionGroup.AllowAnySingleCharacter);
+                FlagSetDeduper = new Deduper<FlagSet> (FlagSet.DefaultComparer);
+                FlagSetDeduper.Add (FlagSet.Empty);
+                MorphSetDeduper = new Deduper<MorphSet> (MorphSet.DefaultComparer);
+                MorphSetDeduper.Add (MorphSet.Empty);
+                CharacterConditionGroupDeduper =
+                    new Deduper<CharacterConditionGroup> (CharacterConditionGroup.DefaultComparer);
+                CharacterConditionGroupDeduper.Add (CharacterConditionGroup.Empty);
+                CharacterConditionGroupDeduper.Add (CharacterConditionGroup.AllowAnySingleCharacter);
                 StringDeduper = new StringDeduper();
-                StringDeduper.Add(string.Empty);
+                StringDeduper.Add (string.Empty);
             }
 
             /// <summary>
@@ -373,14 +374,17 @@ namespace AM.Linguistics.Hunspell
             /// <summary>
             /// A list of the warnings that were produced while reading or building an <see cref="AffixConfig"/>.
             /// </summary>
-            public List<string> Warnings = new List<string>();
+            public List<string> Warnings = new ();
 
             /// <summary>
             /// Constructs a <see cref="AffixConfig"/> based on the values set in the builder.
             /// </summary>
             /// <returns>A constructed affix config.</returns>
             /// <seealso cref="AffixConfig"/>
-            public AffixConfig ToImmutable() => ToImmutable(destructive: false);
+            public AffixConfig ToImmutable()
+            {
+                return ToImmutable (false);
+            }
 
             /// <summary>
             /// Constructs a <see cref="AffixConfig"/> based on the values set in the builder
@@ -392,31 +396,39 @@ namespace AM.Linguistics.Hunspell
             /// This method can leave the builder in an invalid state
             /// but provides better performance for file reads.
             /// </remarks>
-            public AffixConfig MoveToImmutable() => ToImmutable(destructive: true);
-
-            private AffixConfig ToImmutable(bool destructive)
+            public AffixConfig MoveToImmutable()
             {
-                var culture = CultureInfo.ReadOnly(Culture ?? CultureInfo.InvariantCulture);
+                return ToImmutable (true);
+            }
+
+            private AffixConfig ToImmutable (bool destructive)
+            {
+                var culture = CultureInfo.ReadOnly (Culture ?? CultureInfo.InvariantCulture);
 
                 var config = new AffixConfig
                 {
                     Options = Options,
                     FlagMode = FlagMode,
-                    KeyString = Dedup(KeyString ?? DefaultKeyString),
-                    TryString = Dedup(TryString ?? string.Empty),
-                    Language = Dedup(Language ?? string.Empty),
+                    KeyString = Dedup (KeyString ?? DefaultKeyString),
+                    TryString = Dedup (TryString ?? string.Empty),
+                    Language = Dedup (Language ?? string.Empty),
                     Culture = culture,
-                    IsHungarian = string.Equals(culture?.TwoLetterISOLanguageName, "HU", StringComparison.OrdinalIgnoreCase),
-                    IsGerman = string.Equals(culture?.TwoLetterISOLanguageName, "DE", StringComparison.OrdinalIgnoreCase),
-                    IsLanguageWithDashUsage = !string.IsNullOrEmpty(TryString) && TryString.AsSpan().ContainsAny('-', 'a'),
+                    IsHungarian = string.Equals (culture?.TwoLetterISOLanguageName, "HU",
+                        StringComparison.OrdinalIgnoreCase),
+                    IsGerman = string.Equals (culture?.TwoLetterISOLanguageName, "DE",
+                        StringComparison.OrdinalIgnoreCase),
+                    IsLanguageWithDashUsage =
+                        !string.IsNullOrEmpty (TryString) && TryString.AsSpan().ContainsAny ('-', 'a'),
                     CultureUsesDottedI =
-                        string.Equals(culture?.TwoLetterISOLanguageName, "AZ", StringComparison.OrdinalIgnoreCase)
-                        || string.Equals(culture?.TwoLetterISOLanguageName, "TR", StringComparison.OrdinalIgnoreCase)
+                        string.Equals (culture?.TwoLetterISOLanguageName, "AZ", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals (culture?.TwoLetterISOLanguageName, "TR", StringComparison.OrdinalIgnoreCase)
 #if !NO_ISO3_LANG
-                        || string.Equals(culture?.ThreeLetterISOLanguageName, "CRH", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals (culture?.ThreeLetterISOLanguageName, "CRH",
+                            StringComparison.OrdinalIgnoreCase)
 #endif
-                        || string.Equals(culture?.TwoLetterISOLanguageName, "CRH", StringComparison.OrdinalIgnoreCase), // wikipedia says: this is an ISO2 code
-                    StringComparer = new CulturedStringComparer(culture),
+                        || string.Equals (culture?.TwoLetterISOLanguageName, "CRH",
+                            StringComparison.OrdinalIgnoreCase), // wikipedia says: this is an ISO2 code
+                    StringComparer = new CulturedStringComparer (culture),
                     CompoundFlag = CompoundFlag,
                     CompoundBegin = CompoundBegin,
                     CompoundEnd = CompoundEnd,
@@ -446,20 +458,22 @@ namespace AM.Linguistics.Hunspell
                     CompoundVowels = CompoundVowels ?? CharacterSet.Empty,
                     WordChars = WordChars ?? CharacterSet.Empty,
                     IgnoredChars = IgnoredChars ?? CharacterSet.Empty,
-                    Version = Version == null ? null : Dedup(Version),
-                    BreakPoints = BreakSet.Create(BreakPoints),
-                    CompoundRules = CompoundRuleSet.Create(CompoundRules),
-                    Replacements = SingleReplacementSet.Create(Replacements),
-                    CompoundPatterns = PatternSet.Create(CompoundPatterns),
-                    RelatedCharacterMap = MapTable.Create(RelatedCharacterMap),
-                    Phone = PhoneTable.Create(Phone),
-                    Warnings = WarningList.Create(Warnings)
+                    Version = Version == null ? null : Dedup (Version),
+                    BreakPoints = BreakSet.Create (BreakPoints),
+                    CompoundRules = CompoundRuleSet.Create (CompoundRules),
+                    Replacements = SingleReplacementSet.Create (Replacements),
+                    CompoundPatterns = PatternSet.Create (CompoundPatterns),
+                    RelatedCharacterMap = MapTable.Create (RelatedCharacterMap),
+                    Phone = PhoneTable.Create (Phone),
+                    Warnings = WarningList.Create (Warnings)
                 };
 
                 if (destructive)
                 {
-                    config.InputConversions = MultiReplacementTable.TakeDictionary(ReferenceHelpers.Steal(ref InputConversions));
-                    config.OutputConversions = MultiReplacementTable.TakeDictionary(ReferenceHelpers.Steal(ref OutputConversions));
+                    config.InputConversions =
+                        MultiReplacementTable.TakeDictionary (ReferenceHelpers.Steal (ref InputConversions));
+                    config.OutputConversions =
+                        MultiReplacementTable.TakeDictionary (ReferenceHelpers.Steal (ref OutputConversions));
 
                     config.aliasF = AliasF ?? new List<FlagSet>();
                     AliasF = null;
@@ -468,18 +482,18 @@ namespace AM.Linguistics.Hunspell
                 }
                 else
                 {
-                    config.InputConversions = MultiReplacementTable.Create(InputConversions);
-                    config.OutputConversions = MultiReplacementTable.Create(OutputConversions);
+                    config.InputConversions = MultiReplacementTable.Create (InputConversions);
+                    config.OutputConversions = MultiReplacementTable.Create (OutputConversions);
 
                     config.aliasF = AliasF == null ? new List<FlagSet>() : AliasF.ToList();
                     config.aliasM = AliasM == null ? new List<MorphSet>() : AliasM.ToList();
                 }
 
-                config.Prefixes = PrefixCollection.Create(Prefixes);
+                config.Prefixes = PrefixCollection.Create (Prefixes);
 
-                config.Suffixes = SuffixCollection.Create(Suffixes);
+                config.Suffixes = SuffixCollection.Create (Suffixes);
 
-                config.ContClasses = FlagSet.Union(config.Prefixes.ContClasses, config.Suffixes.ContClasses);
+                config.ContClasses = FlagSet.Union (config.Prefixes.ContClasses, config.Suffixes.ContClasses);
 
                 return config;
             }
@@ -489,86 +503,75 @@ namespace AM.Linguistics.Hunspell
             /// </summary>
             /// <param name="options">Various bit options to enable.</param>
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-            public void EnableOptions(AffixConfigOptions options) =>
+            public void EnableOptions (AffixConfigOptions options) =>
                 Options |= options;
 
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-            public FlagSet Dedup(FlagSet values)
+            public FlagSet Dedup (FlagSet values)
             {
 #if DEBUG
-                if (values == null)
-                {
-                    throw new ArgumentNullException(nameof(values));
-                }
+                if (values == null) throw new ArgumentNullException (nameof (values));
 #endif
-                return FlagSetDeduper.GetEqualOrAdd(values);
+                return FlagSetDeduper.GetEqualOrAdd (values);
             }
 
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-            internal string Dedup(ReadOnlySpan<char> value) =>
-                StringDeduper.GetEqualOrAdd(value.ToString());
+            internal string Dedup (ReadOnlySpan<char> value) =>
+                StringDeduper.GetEqualOrAdd (value.ToString());
 
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-            public string Dedup(string value)
+            public string Dedup (string value)
             {
 #if DEBUG
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
+                if (value == null) throw new ArgumentNullException (nameof (value));
 #endif
-                return StringDeduper.GetEqualOrAdd(value);
+                return StringDeduper.GetEqualOrAdd (value);
             }
 
-            public string[] DedupInPlace(string[] values)
+            public string[] DedupInPlace (string[] values)
             {
                 if (values != null)
-                {
                     for (var i = 0; i < values.Length; i++)
                     {
-                        ref string value = ref values[i];
-                        if (value != null)
-                        {
-                            value = StringDeduper.GetEqualOrAdd(value);
-                        }
+                        ref var value = ref values[i];
+                        if (value != null) value = StringDeduper.GetEqualOrAdd (value);
                     }
-                }
 
                 return values;
             }
 
-            internal string[] DedupIntoArray(List<string> values)
+            internal string[] DedupIntoArray (List<string> values)
             {
-                if (values == null || values.Count == 0)
-                {
-                    return Array.Empty<string>();
-                }
+                if (values == null || values.Count == 0) return Array.Empty<string>();
 
                 var result = new string[values.Count];
-                for (var i = 0; i < result.Length; i++)
-                {
-                    result[i] = StringDeduper.GetEqualOrAdd(values[i]);
-                }
+                for (var i = 0; i < result.Length; i++) result[i] = StringDeduper.GetEqualOrAdd (values[i]);
 
                 return result;
             }
 
-            public MorphSet Dedup(MorphSet value) =>
-                value == null ? null : MorphSetDeduper.GetEqualOrAdd(value);
+            public MorphSet Dedup (MorphSet value)
+            {
+                return value == null ? null : MorphSetDeduper.GetEqualOrAdd (value);
+            }
 
-            public CharacterConditionGroup Dedup(CharacterConditionGroup value) =>
-                CharacterConditionGroupDeduper.GetEqualOrAdd(value);
+            public CharacterConditionGroup Dedup (CharacterConditionGroup value)
+            {
+                return CharacterConditionGroupDeduper.GetEqualOrAdd (value);
+            }
 
-            public void LogWarning(string warning) =>
-                Warnings.Add(warning);
+            public void LogWarning (string warning)
+            {
+                Warnings.Add (warning);
+            }
         }
     }
 }

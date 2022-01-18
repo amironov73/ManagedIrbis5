@@ -22,43 +22,33 @@ using System.Text;
 
 namespace AM.Linguistics.Hunspell.Infrastructure;
 
-static class EncodingEx
+internal static class EncodingEx
 {
-    public static Encoding GetEncodingByName(ReadOnlySpan<char> encodingName)
+    public static Encoding GetEncodingByName (ReadOnlySpan<char> encodingName)
     {
-        if (encodingName.IsEmpty)
-        {
-            return null;
-        }
+        if (encodingName.IsEmpty) return null;
 
-        if (encodingName.Equals("UTF8", StringComparison.OrdinalIgnoreCase) || encodingName.Equals("UTF-8", StringComparison.OrdinalIgnoreCase))
-        {
-            return Encoding.UTF8;
-        }
+        if (encodingName.Equals ("UTF8", StringComparison.OrdinalIgnoreCase) ||
+            encodingName.Equals ("UTF-8", StringComparison.OrdinalIgnoreCase)) return Encoding.UTF8;
 
         var encodingNameString = encodingName.ToString();
         try
         {
-            return Encoding.GetEncoding(encodingNameString);
+            return Encoding.GetEncoding (encodingNameString);
         }
         catch (ArgumentException)
         {
-            return GetEncodingByAlternateNames(encodingNameString);
+            return GetEncodingByAlternateNames (encodingNameString);
         }
     }
 
-    private static Encoding GetEncodingByAlternateNames(string encodingName)
+    private static Encoding GetEncodingByAlternateNames (string encodingName)
     {
-        var spaceIndex = encodingName.IndexOf(' ');
-        if (spaceIndex > 0)
-        {
-            return GetEncodingByName(encodingName.AsSpan(0, spaceIndex));
-        }
+        var spaceIndex = encodingName.IndexOf (' ');
+        if (spaceIndex > 0) return GetEncodingByName (encodingName.AsSpan (0, spaceIndex));
 
-        if (encodingName.Length >= 4 && encodingName.StartsWith("ISO") && encodingName[3] != '-')
-        {
-            return GetEncodingByName(encodingName.Insert(3, "-").AsSpan());
-        }
+        if (encodingName.Length >= 4 && encodingName.StartsWith ("ISO") && encodingName[3] != '-')
+            return GetEncodingByName (encodingName.Insert (3, "-").AsSpan());
 
         return null;
     }

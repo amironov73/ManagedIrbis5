@@ -26,22 +26,22 @@ namespace AM.Linguistics.Hunspell
     public sealed class PrefixEntry : AffixEntry
     {
 #if !NO_INLINE
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
-        public PrefixEntry(
+        public PrefixEntry (
             string strip,
             string affixText,
             CharacterConditionGroup conditions,
             MorphSet morph,
             FlagSet contClass)
-            : base(strip, affixText, conditions, morph, contClass)
+            : base (strip, affixText, conditions, morph, contClass)
         {
         }
 
         public sealed override string Key
         {
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
             get => Append;
         }

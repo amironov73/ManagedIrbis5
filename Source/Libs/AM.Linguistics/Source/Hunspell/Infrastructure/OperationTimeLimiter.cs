@@ -21,24 +21,28 @@ using System;
 
 namespace AM.Linguistics.Hunspell.Infrastructure;
 
-class OperationTimeLimiter
+internal class OperationTimeLimiter
 {
-    public static OperationTimeLimiter Create(int timeLimitInMs, int queriesToTriggerCheck) =>
-        new OperationTimeLimiter(
+    public static OperationTimeLimiter Create (int timeLimitInMs, int queriesToTriggerCheck)
+    {
+        return new (
             Environment.TickCount,
             queriesToTriggerCheck,
             timeLimitInMs);
+    }
 
-    public static OperationTimeLimiter Create(int timeLimitInMs) =>
-        Create(timeLimitInMs, 0);
+    public static OperationTimeLimiter Create (int timeLimitInMs)
+    {
+        return Create (timeLimitInMs, 0);
+    }
 
-    private OperationTimeLimiter(
+    private OperationTimeLimiter (
         long operationStartTime,
         int queriesToTriggerCheck,
         int timeLimitInMs)
     {
 #if DEBUG
-        if (queriesToTriggerCheck < 0) throw new ArgumentOutOfRangeException(nameof(queriesToTriggerCheck));
+        if (queriesToTriggerCheck < 0) throw new ArgumentOutOfRangeException (nameof (queriesToTriggerCheck));
 #endif
 
         OperationStartTime = operationStartTime;
@@ -63,13 +67,9 @@ class OperationTimeLimiter
         if (!HasExpired)
         {
             if (QueryCounter == 0)
-            {
                 HandleQueryCounterTrigger();
-            }
             else
-            {
                 QueryCounter--;
-            }
         }
 
         return HasExpired;
@@ -85,10 +85,7 @@ class OperationTimeLimiter
     private void HandleQueryCounterTrigger()
     {
         var currentTicks = Environment.TickCount - OperationStartTime;
-        if (currentTicks > TimeLimitInMs)
-        {
-            HasExpired = true;
-        }
+        if (currentTicks > TimeLimitInMs) HasExpired = true;
 
         QueryCounter = QueriesToTriggerCheck;
     }

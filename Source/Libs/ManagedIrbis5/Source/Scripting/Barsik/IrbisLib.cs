@@ -24,6 +24,7 @@ using AM.Scripting.Barsik;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Fields;
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 using ManagedIrbis.Records;
 
@@ -174,7 +175,7 @@ public sealed class IrbisLib
     #region Public methods
 
     /// <summary>
-    /// Актуализация.
+    /// Актуализация записей.
     /// </summary>
     public static dynamic? Actualize
         (
@@ -185,6 +186,17 @@ public sealed class IrbisLib
         if (!TryGetConnection (context, out var connection))
         {
             return null;
+        }
+
+        var parameters = new ActualizeRecordParameters();
+        for (var i = 0; i < args.Length; i++)
+        {
+            var value = Compute (context, args, i);
+            if (value is int mfn)
+            {
+                parameters.Mfn = mfn;
+                connection.ActualizeRecord (parameters);
+            }
         }
 
         return null;
@@ -259,12 +271,24 @@ public sealed class IrbisLib
             dynamic?[] args
         )
     {
-        if (!TryGetConnection (context, out var connection))
+        if (args.Length < 1
+            || !TryGetConnection (context, out var connection))
         {
             return null;
         }
 
-        return null;
+        var parameters = new CreateDatabaseParameters();
+        var database = Compute (context, args, 0) as string;
+        if (string.IsNullOrEmpty (database))
+        {
+            return false;
+        }
+
+        parameters.Database = database;
+        parameters.Description = Compute (context, args, 1) as string;
+        parameters.ReaderAccess = BarsikUtility.ToBoolean (Compute (context, args, 2));
+
+        return connection.CreateDatabase (parameters);
     }
 
     /// <summary>

@@ -59,21 +59,21 @@ namespace AM.Linguistics.Hunspell
             private set
             {
                 options = value;
-                ComplexPrefixes = EnumEx.HasFlag(options, AffixConfigOptions.ComplexPrefixes);
-                CompoundMoreSuffixes = EnumEx.HasFlag(options, AffixConfigOptions.CompoundMoreSuffixes);
-                CheckCompoundDup = EnumEx.HasFlag(options, AffixConfigOptions.CheckCompoundDup);
-                CheckCompoundRep = EnumEx.HasFlag(options, AffixConfigOptions.CheckCompoundRep);
-                CheckCompoundTriple = EnumEx.HasFlag(options, AffixConfigOptions.CheckCompoundTriple);
-                SimplifiedTriple = EnumEx.HasFlag(options, AffixConfigOptions.SimplifiedTriple);
-                CheckCompoundCase = EnumEx.HasFlag(options, AffixConfigOptions.CheckCompoundCase);
-                CheckNum = EnumEx.HasFlag(options, AffixConfigOptions.CheckNum);
-                OnlyMaxDiff = EnumEx.HasFlag(options, AffixConfigOptions.OnlyMaxDiff);
-                NoSplitSuggestions = EnumEx.HasFlag(options, AffixConfigOptions.NoSplitSuggestions);
-                FullStrip = EnumEx.HasFlag(options, AffixConfigOptions.FullStrip);
-                SuggestWithDots = EnumEx.HasFlag(options, AffixConfigOptions.SuggestWithDots);
-                ForbidWarn = EnumEx.HasFlag(options, AffixConfigOptions.ForbidWarn);
-                CheckSharps = EnumEx.HasFlag(options, AffixConfigOptions.CheckSharps);
-                SimplifiedCompound = EnumEx.HasFlag(options, AffixConfigOptions.SimplifiedCompound);
+                ComplexPrefixes = EnumEx.HasFlag (options, AffixConfigOptions.ComplexPrefixes);
+                CompoundMoreSuffixes = EnumEx.HasFlag (options, AffixConfigOptions.CompoundMoreSuffixes);
+                CheckCompoundDup = EnumEx.HasFlag (options, AffixConfigOptions.CheckCompoundDup);
+                CheckCompoundRep = EnumEx.HasFlag (options, AffixConfigOptions.CheckCompoundRep);
+                CheckCompoundTriple = EnumEx.HasFlag (options, AffixConfigOptions.CheckCompoundTriple);
+                SimplifiedTriple = EnumEx.HasFlag (options, AffixConfigOptions.SimplifiedTriple);
+                CheckCompoundCase = EnumEx.HasFlag (options, AffixConfigOptions.CheckCompoundCase);
+                CheckNum = EnumEx.HasFlag (options, AffixConfigOptions.CheckNum);
+                OnlyMaxDiff = EnumEx.HasFlag (options, AffixConfigOptions.OnlyMaxDiff);
+                NoSplitSuggestions = EnumEx.HasFlag (options, AffixConfigOptions.NoSplitSuggestions);
+                FullStrip = EnumEx.HasFlag (options, AffixConfigOptions.FullStrip);
+                SuggestWithDots = EnumEx.HasFlag (options, AffixConfigOptions.SuggestWithDots);
+                ForbidWarn = EnumEx.HasFlag (options, AffixConfigOptions.ForbidWarn);
+                CheckSharps = EnumEx.HasFlag (options, AffixConfigOptions.CheckSharps);
+                SimplifiedCompound = EnumEx.HasFlag (options, AffixConfigOptions.SimplifiedCompound);
             }
         }
 
@@ -351,7 +351,7 @@ namespace AM.Linguistics.Hunspell
         /// </summary>
         /// <remarks>
         /// Similar to <see cref="NoSuggest"/>, but it forbids to use the word
-	    /// in ngram based(more, than 1-character distance) suggestions.
+        /// in ngram based(more, than 1-character distance) suggestions.
         /// </remarks>
         /// <seealso cref="NoSuggest"/>
         public FlagValue NoNgramSuggest { get; private set; }
@@ -602,7 +602,7 @@ namespace AM.Linguistics.Hunspell
         public bool IsAliasF
         {
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
             get => aliasF != null && aliasF.Count != 0;
         }
@@ -620,7 +620,7 @@ namespace AM.Linguistics.Hunspell
         public bool IsAliasM
         {
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
             get => aliasM != null && aliasM.Count != 0;
         }
@@ -863,12 +863,12 @@ namespace AM.Linguistics.Hunspell
         public bool HasCompound
         {
 #if !NO_INLINE
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl (MethodImplOptions.AggressiveInlining)]
 #endif
             get => CompoundFlag.HasValue || CompoundBegin.HasValue || CompoundRules.HasItems;
         }
 
-        public bool TryGetAliasF(int number, out FlagSet result)
+        public bool TryGetAliasF (int number, out FlagSet result)
         {
             if (number <= 0 || number > aliasF.Count)
             {
@@ -880,7 +880,7 @@ namespace AM.Linguistics.Hunspell
             return true;
         }
 
-        public bool TryGetAliasM(int number, out MorphSet result)
+        public bool TryGetAliasM (int number, out MorphSet result)
         {
             if (number <= 0 || number > aliasM.Count)
             {

@@ -26,9 +26,9 @@ namespace AM.Linguistics.Hunspell.Infrastructure;
 public class ArrayWrapper<T>
     : IReadOnlyList<T>
 {
-    protected ArrayWrapper(T[] items)
+    protected ArrayWrapper (T[] items)
     {
-        this.items = items ?? throw new ArgumentNullException(nameof(items));
+        this.items = items ?? throw new ArgumentNullException (nameof (items));
         IsEmpty = items.Length == 0;
     }
 
@@ -38,17 +38,26 @@ public class ArrayWrapper<T>
 
     public bool HasItems => !IsEmpty;
 
-    public ref readonly T this[int index] => ref items[index];
+    public ref readonly T this [int index] => ref items[index];
 
     public int Count => items.Length;
 
-    T IReadOnlyList<T>.this[int index] => items[index];
+    T IReadOnlyList<T>.this [int index] => items[index];
 
-    public ReadOnlySpan<T>.Enumerator GetEnumerator() => new ReadOnlySpan<T>(items).GetEnumerator();
+    public ReadOnlySpan<T>.Enumerator GetEnumerator()
+    {
+        return new ReadOnlySpan<T> (items).GetEnumerator();
+    }
 
-    IEnumerator<T> IEnumerable<T>.GetEnumerator() => ((IEnumerable<T>)items).GetEnumerator();
+    IEnumerator<T> IEnumerable<T>.GetEnumerator()
+    {
+        return ((IEnumerable<T>)items).GetEnumerator();
+    }
 
-    IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return items.GetEnumerator();
+    }
 
     public class ArrayWrapperComparer<TValue, TCollection> :
         IEqualityComparer<TCollection>
@@ -62,20 +71,17 @@ public class ArrayWrapper<T>
 
         private readonly ArrayComparer<TValue> arrayComparer;
 
-        public bool Equals(TCollection x, TCollection y)
+        public bool Equals (TCollection x, TCollection y)
         {
-            if (x == null)
-            {
-                return y == null;
-            }
-            if (y == null)
-            {
-                return false;
-            }
+            if (x == null) return y == null;
+            if (y == null) return false;
 
-            return arrayComparer.Equals(x.items, y.items);
+            return arrayComparer.Equals (x.items, y.items);
         }
 
-        public int GetHashCode(TCollection obj) => obj == null ? 0 : arrayComparer.GetHashCode(obj.items);
+        public int GetHashCode (TCollection obj)
+        {
+            return obj == null ? 0 : arrayComparer.GetHashCode (obj.items);
+        }
     }
 }
