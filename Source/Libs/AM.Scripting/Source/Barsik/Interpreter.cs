@@ -158,6 +158,26 @@ public sealed class Interpreter
     }
 
     /// <summary>
+    /// Выполнение файла <code>autoexec.barsik</code>,
+    /// при условии, что он есть в директории приложения.
+    /// </summary>
+    public ExecutionResult? ExecuteAutoexec()
+    {
+        var executablePath = AppContext.BaseDirectory;
+
+        // ReSharper disable StringLiteralTypo
+        var autoexec = Path.Combine (executablePath, "autoexec.barsik");
+        // ReSharper restore StringLiteralTypo
+
+        if (File.Exists (autoexec))
+        {
+            return ExecuteFile (autoexec);
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Загрузка исходного кода из указанного файла
     /// с последующим исполнением.
     /// </summary>

@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <RootNamespace>AM.Linguistics</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
