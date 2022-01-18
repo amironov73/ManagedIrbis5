@@ -71,9 +71,11 @@ public sealed class IrbisLib
         { "database_info", new FunctionDescriptor ("database_info", DatabaseInfo) },
         { "database_stat", new FunctionDescriptor ("database_stat", Disconnect) },
         { "disconnect", new FunctionDescriptor ("disconnect", Disconnect) },
+        { "error_description", new FunctionDescriptor ("error_description", ErrorDescription) },
         { "fm", new FunctionDescriptor ("fm", FM) },
         { "fma", new FunctionDescriptor ("fma", FMA) },
         { "format_record", new FunctionDescriptor ("format_record", FormatRecord) },
+        { "get_connection_string", new FunctionDescriptor ("get_connection_string", GetConnectionString) },
         { "is_connected", new FunctionDescriptor ("is_connected", IsConnected) },
         { "list_files", new FunctionDescriptor ("list_processes", ListProcesses) },
         { "list_processes", new FunctionDescriptor ("list_files", ListFiles) },
@@ -95,17 +97,25 @@ public sealed class IrbisLib
 
     #region Private members
 
+    /// <summary>
+    /// Отыскиваем текущее подключение к серверу.
+    /// Ругаемся, если не находим или находим что-то не то.
+    /// </summary>
     private static bool TryGetConnection
         (
             Context context,
-            out SyncConnection connection
+            out SyncConnection connection,
+            bool verbose = true
         )
     {
         connection = null!;
 
         if (!context.TryGetVariable (ConnectionDefineName, out var value))
         {
-            context.Error.WriteLine ($"Variable {ConnectionDefineName} not found");
+            if (verbose)
+            {
+                context.Error.WriteLine ($"Variable {ConnectionDefineName} not found");
+            }
             return false;
         }
 
@@ -115,22 +125,33 @@ public sealed class IrbisLib
             return true;
         }
 
-        context.Error.WriteLine ($"Bad value of {ConnectionDefineName}: {value}");
+        if (verbose)
+        {
+            context.Error.WriteLine ($"Bad value of {ConnectionDefineName}: {value}");
+        }
 
         return false;
     }
 
+    /// <summary>
+    /// Отыскиваем текущую запись.
+    /// Ругаемся, если не находим или находим что-то не то.
+    /// </summary>
     private static bool TryGetRecord
         (
             Context context,
-            out Record record
+            out Record record,
+            bool verbose = true
         )
     {
         record = null!;
 
         if (!context.TryGetVariable (RecordDefineName, out var value))
         {
-            context.Error.WriteLine ($"Variable {RecordDefineName} not found");
+            if (verbose)
+            {
+                context.Error.WriteLine ($"Variable {RecordDefineName} not found");
+            }
             return false;
         }
 
@@ -140,7 +161,10 @@ public sealed class IrbisLib
             return true;
         }
 
-        context.Error.WriteLine ($"Bad value of {RecordDefineName}: {value}");
+        if (verbose)
+        {
+            context.Error.WriteLine ($"Bad value of {RecordDefineName}: {value}");
+        }
 
         return false;
     }
@@ -176,7 +200,7 @@ public sealed class IrbisLib
             dynamic?[] args
         )
     {
-        if (!TryGetConnection (context, out var connection))
+        if (!TryGetConnection (context, out var connection, false))
         {
             connection = ConnectionFactory.Shared.CreateSyncConnection();
             context.SetVariable (ConnectionDefineName, connection);
@@ -187,7 +211,8 @@ public sealed class IrbisLib
             return true;
         }
 
-        var connectionString = Compute (context, args, 0) as string;
+        var connectionString = Compute (context, args, 0) as string
+            ?? GetConnectionString (context, args) as string;
         if (!string.IsNullOrEmpty (connectionString))
         {
             connection.ParseConnectionString (connectionString);
@@ -331,6 +356,23 @@ public sealed class IrbisLib
     /// <summary>
     /// Форматирование записи.
     /// </summary>
+    public static dynamic? ErrorDescription
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        return IrbisException.GetErrorDescription (connection.LastError);
+    }
+
+    /// <summary>
+    /// Форматирование записи.
+    /// </summary>
     public static dynamic? FormatRecord
         (
             Context context,
@@ -399,6 +441,19 @@ public sealed class IrbisLib
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Простой доступ к полям записи.
+    /// </summary>
+    public static dynamic? GetConnectionString
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        return ConnectionUtility.GetConfiguredConnectionString (Magna.Configuration)
+            ?? ConnectionUtility.GetStandardConnectionString();;
     }
 
     /// <summary>
