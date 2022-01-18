@@ -199,6 +199,14 @@ public sealed class Interpreter
             var sourceCode = File.ReadAllText (fileName);
             result = Execute (sourceCode);
         }
+        catch (ReturnException exception)
+        {
+            result = new ExecutionResult
+            {
+                ExitCode = exception.Value, // TODO конвертировать в Int32
+                Message = exception.Message
+            };
+        }
         finally
         {
             Context.Defines.Remove ("__FILE__");

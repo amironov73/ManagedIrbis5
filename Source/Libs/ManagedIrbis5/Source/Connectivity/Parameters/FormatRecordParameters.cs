@@ -11,6 +11,7 @@
 
 #region Using directives
 
+using AM;
 using AM.Collections;
 
 #endregion
@@ -23,6 +24,7 @@ namespace ManagedIrbis.Infrastructure
     /// Параметры форматирования записи на ИРБИС-сервере.
     /// </summary>
     public sealed class FormatRecordParameters
+        : IVerifiable
     {
         #region Properties
 
@@ -61,6 +63,30 @@ namespace ManagedIrbis.Infrastructure
         /// Записи подлежащие форматированию.
         /// </summary>
         public Record[]? Records { get; set; }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<FormatRecordParameters> (this, throwOnError);
+
+            verifier.NotNullNorEmpty (Format);
+            verifier.Assert
+                (
+                    Mfn != 0
+                    || !Mfns.IsNullOrEmpty()
+                    || Record is not null
+                    || Records.IsNullOrEmpty()
+                );
+
+            return verifier.Result;
+        }
 
         #endregion
     }

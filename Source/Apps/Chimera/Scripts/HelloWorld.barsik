@@ -11,17 +11,27 @@ println ("Connected")
 version = server_version()
 println ("Server version: ", version)
 
+databaseName = connection.Database
+println ("Database: ", databaseName)
+
+// very costly operation
+// dbInfo = database_info()
+// println (dbInfo)
+
 maxMfn = max_mfn()
 println ("Max MFN=", maxMfn)
 
 processes = list_processes()
 println ("Processes: ", len (processes))
 
+files = list_files ("2.IBIS.*.mnu")
+println ("Files: ", len (files))
+
 users = list_users()
 println ("Users: ", len (users))
 
 found = search ("K=бетон")
-println ("Found: ", found)
+println ("Found: ", len (found))
 
 maxIndex = min (10, len (found))
 for (i = 0; i < maxIndex; i++)
@@ -29,6 +39,9 @@ for (i = 0; i < maxIndex; i++)
     rec = read_record (found[i])
     println (rec.Mfn, " ", len (rec.Fields))
     println (fm (200, 'a'))
+    ` v700^a, ", " v700^b " "d700,
+    v200^a, " : " v200^e, " / " v200^f`
+    println()
 }
 
 disconnect()

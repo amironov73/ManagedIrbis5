@@ -34,18 +34,18 @@ namespace ManagedIrbis
     /// <summary>
     /// Параметры запроса терминов.
     /// </summary>
-    [XmlRoot("terms")]
+    [XmlRoot ("terms")]
     public sealed class TermParameters
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Properties
 
         /// <summary>
         /// Имя базы данных.
         /// </summary>
-        [XmlAttribute("database")]
-        [JsonPropertyName("database")]
+        [XmlAttribute ("database")]
+        [JsonPropertyName ("database")]
         public string? Database { get; set; }
 
         /// <summary>
@@ -53,29 +53,29 @@ namespace ManagedIrbis
         /// По умолчанию 0 - максимально возможное.
         /// Ограничение текущей реализации MAX_PACKET.
         /// </summary>
-        [XmlAttribute("number")]
-        [JsonPropertyName("number")]
+        [XmlAttribute ("number")]
+        [JsonPropertyName ("number")]
         public int NumberOfTerms { get; set; }
 
         /// <summary>
         /// Термины в обратном порядке?
         /// </summary>
-        [XmlAttribute("reverse")]
-        [JsonPropertyName("reverse")]
+        [XmlAttribute ("reverse")]
+        [JsonPropertyName ("reverse")]
         public bool ReverseOrder { get; set; }
 
         /// <summary>
         /// Стартовый термин.
         /// </summary>
-        [XmlAttribute("start")]
-        [JsonPropertyName("start")]
+        [XmlAttribute ("start")]
+        [JsonPropertyName ("start")]
         public string? StartTerm { get; set; }
 
         /// <summary>
         /// Опциональная спецификация формата.
         /// </summary>
-        [XmlAttribute("format")]
-        [JsonPropertyName("format")]
+        [XmlAttribute ("format")]
+        [JsonPropertyName ("format")]
         public string? Format { get; set; }
 
         #endregion
@@ -87,7 +87,7 @@ namespace ManagedIrbis
         /// </summary>
         public TermParameters Clone()
         {
-            return (TermParameters) MemberwiseClone();
+            return (TermParameters)MemberwiseClone();
         }
 
         /// <summary>
@@ -100,15 +100,14 @@ namespace ManagedIrbis
                 IConnectionSettings connection,
                 TQuery query
             )
-            where TQuery: IQuery
+            where TQuery : IQuery
         {
-            var database = Database.ThrowIfNull(nameof(Database));
+            var database = Database.ThrowIfNull (nameof (Database));
 
-            query.AddAnsi(database);
-            query.AddUtf(StartTerm);
-            query.Add(NumberOfTerms);
-            query.AddFormat(Format);
-
+            query.AddAnsi (database);
+            query.AddUtf (StartTerm);
+            query.Add (NumberOfTerms);
+            query.AddFormat (Format);
         } // method Encode
 
         #endregion
@@ -135,11 +134,11 @@ namespace ManagedIrbis
             )
         {
             writer
-                .WriteNullable(Database)
-                .WritePackedInt32(NumberOfTerms)
-                .WriteNullable(StartTerm)
-                .WriteNullable(Format)
-                .Write(ReverseOrder);
+                .WriteNullable (Database)
+                .WritePackedInt32 (NumberOfTerms)
+                .WriteNullable (StartTerm)
+                .WriteNullable (Format)
+                .Write (ReverseOrder);
         }
 
         #endregion
@@ -169,10 +168,11 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => StartTerm.ToVisibleString();
+        public override string ToString()
+        {
+            return StartTerm.ToVisibleString();
+        }
 
         #endregion
-
-    } // class TermParameters
-
-} // namespace ManagedIrbis
+    }
+}

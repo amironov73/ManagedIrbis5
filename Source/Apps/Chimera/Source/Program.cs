@@ -25,98 +25,97 @@ using ManagedIrbis.Scripting.Barsik;
 
 #nullable enable
 
-namespace Barsik
+namespace Chimera;
+
+/// <summary>
+/// Вся логика программы в одном классе.
+/// </summary>
+class Program
 {
-    /// <summary>
-    /// Вся логика программы в одном классе.
-    /// </summary>
-    class Program
+    static ExecutionResult DoRepl
+        (
+            Interpreter interpreter
+        )
     {
-        static ExecutionResult DoRepl
-            (
-                Interpreter interpreter
-            )
+        var version = typeof (Interpreter).Assembly.GetName().Version;
+        interpreter.Context.Output.WriteLine ($"Barsik interpreter {version}");
+        interpreter.Context.Output.WriteLine ("Press ENTER twice to exit");
+        return new Repl (interpreter).Loop();
+    }
+
+    /// <summary>
+    /// Точка входа в программу.
+    /// </summary>
+    static int Main
+        (
+            string[] args
+        )
+    {
+        Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+
+        var interpreter = new Interpreter().WithStdLib();
+        interpreter.Context.AttachModule (new IrbisLib());
+
+        try
         {
-            var version = typeof (Interpreter).Assembly.GetName().Version;
-            interpreter.Context.Output.WriteLine ($"Barsik interpreter {version}");
-            interpreter.Context.Output.WriteLine ("Press ENTER twice to exit");
-            return new Repl (interpreter).Loop();
-        }
+            var dump = false;
+            var index = 0;
 
-        /// <summary>
-        /// Точка входа в программу.
-        /// </summary>
-        static int Main
-            (
-                string[] args
-            )
-        {
-            Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
-
-            var interpreter = new Interpreter().WithStdLib();
-            interpreter.Context.AttachModule (new IrbisLib());
-
-            try
+            if (args.Length == 0)
             {
-                var dump = false;
-                var index = 0;
-
-                if (args.Length == 0)
+                var result = DoRepl (interpreter);
+                if (result.ExitCode != 0)
                 {
-                    var result = DoRepl (interpreter);
-                    if (result.ExitCode != 0)
-                    {
-                        interpreter.Context.Error.WriteLine (result);
-                    }
-                }
-
-                foreach (var fileName in args)
-                {
-                    if (fileName == "-d")
-                    {
-                        dump = true;
-                        continue;
-                    }
-
-                    if (fileName == "-r")
-                    {
-                        DoRepl (interpreter);
-                        continue;
-                    }
-
-                    if (fileName == "-e")
-                    {
-                        var sourceCode = string.Join (' ', args.Skip (index + 1));
-                        interpreter.Execute (sourceCode);
-                        break;
-                    }
-
-                    var result = interpreter.ExecuteFile (fileName);
-                    if (result.ExitCode != 0)
-                    {
-                        interpreter.Context.Error.WriteLine (result);
-                    }
-
-                    if (result.ExitRequested)
-                    {
-                        break;
-                    }
-
-                    index++;
-                }
-
-                if (dump)
-                {
-                    interpreter.Context.DumpVariables();
+                    interpreter.Context.Error.WriteLine (result);
                 }
             }
-            catch (Exception exception)
+
+            foreach (var fileName in args)
             {
-                Console.Error.WriteLine (exception);
-                return 1;
+                if (fileName == "-d")
+                {
+                    dump = true;
+                    continue;
+                }
+
+                if (fileName == "-r")
+                {
+                    DoRepl (interpreter);
+                    continue;
+                }
+
+                if (fileName == "-e")
+                {
+                    var sourceCode = string.Join (' ', args.Skip (index + 1));
+                    interpreter.Execute (sourceCode);
+                    break;
+                }
+
+                var result = interpreter.ExecuteFile (fileName);
+                if (result.ExitCode != 0)
+                {
+                    interpreter.Context.Error.WriteLine (result);
+                }
+
+                if (result.ExitRequested)
+                {
+                    break;
+                }
+
+                index++;
             }
 
-            return 0;
+            if (dump)
+            {
+                interpreter.Context.DumpVariables();
+            }
         }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine (exception);
+            return 1;
+        }
+
+        return 0;
     }
 }
