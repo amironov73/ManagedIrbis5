@@ -45,6 +45,21 @@ public class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Натуральная дробь")]
+    public void NumberText_Construction_4()
+    {
+        var number = new NumberText ("2/3");
+        Assert.AreEqual (2, number.Length);
+        Assert.IsFalse (number.HavePrefix (0));
+        Assert.IsTrue (number.HaveValue (0));
+        Assert.IsTrue (number.HavePrefix (1));
+        Assert.IsTrue (number.HaveValue (1));
+        Assert.AreEqual (2L, number.GetValue (0));
+        Assert.AreEqual (3L, number.GetValue (1));
+        Assert.AreEqual ("/", number.GetPrefix (1).ToString());
+    }
+
+    [TestMethod]
     public void NumberText_Enumeration_1()
     {
         var number = new NumberText();

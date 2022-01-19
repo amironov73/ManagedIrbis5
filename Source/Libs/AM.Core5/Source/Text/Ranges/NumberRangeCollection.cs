@@ -54,10 +54,7 @@ public sealed class NumberRangeCollection
     /// <summary>
     /// Gets the collection item count.
     /// </summary>
-    public int Count
-    {
-        get { return _items.Count; }
-    }
+    public int Count => _items.Count;
 
     /// <summary>
     /// Разделитель диапазонов.

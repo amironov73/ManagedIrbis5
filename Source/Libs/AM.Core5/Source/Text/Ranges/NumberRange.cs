@@ -32,7 +32,6 @@ namespace AM.Text.Ranges;
 /// <summary>
 /// Range of numbers containing non-numeric fragments.
 /// </summary>
-[DebuggerDisplay ("{" + nameof (Start) + "} - {" + nameof (Stop) + "}")]
 public sealed class NumberRange
     : IEnumerable<NumberText>,
     IHandmadeSerializable,
@@ -49,7 +48,7 @@ public sealed class NumberRange
     /// <summary>
     /// Delimiters or minus sign.
     /// </summary>
-    public static char[] DelimitersOrMinus { get; } = { ' ', '\t', '\r', '\n', ',', ';', '-' };
+    public static char[] DelimitersOrMinus { get; } = { ' ', '\t', '\r', '\n', ',', ';', '-', '/' };
 
     /// <summary>
     /// Start value.
@@ -160,7 +159,8 @@ public sealed class NumberRange
         }
 
         navigator.SkipWhitespace();
-        if (navigator.PeekChar() == '-')
+        var peekChar = navigator.PeekChar();
+        if (peekChar is '-' or '/')
         {
             navigator.ReadChar();
             navigator.SkipWhitespace();
@@ -177,7 +177,7 @@ public sealed class NumberRange
             }
 
             result = new NumberRange (start, stop);
-        } // if
+        }
 
         else
         {

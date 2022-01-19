@@ -63,6 +63,11 @@ public sealed class Repl
     public Interpreter Interpreter { get; }
 
     /// <summary>
+    /// Выводить ли результат вычисления выражения?
+    /// </summary>
+    public bool Echo { get; set; }
+
+    /// <summary>
     /// Контекст вычислений.
     /// </summary>
     public Context Context => Interpreter.Context;
@@ -100,6 +105,7 @@ public sealed class Repl
         output = new AttentiveWriter (output ?? Console.Out);
         error ??= Console.Error;
         Interpreter = new Interpreter (Input, output, error);
+        Echo = true;
     }
 
     /// <summary>
@@ -114,6 +120,7 @@ public sealed class Repl
         interpreter.Context.MakeAttentive();
         Interpreter = interpreter;
         Input = input ?? Console.In;
+        Echo = true;
     }
 
     #endregion
@@ -196,13 +203,23 @@ public sealed class Repl
             var trimmed = sourceCode.Trim();
             switch (trimmed)
             {
+                case "#a":
+                    // TODO вывести список загруженных сборок
+                    break;
+
+                case "#e":
+                    Echo = !Echo;
+                    var onoff = Echo ? "on" : "off";
+                    Interpreter.Context.Output.WriteLine ($"Echo is {onoff} now");
+                    break;
+
                 case "#v":
                     Interpreter.Context.DumpVariables();
                     break;
 
-                // case "#u":
-                //     Interpreter.Context.DumpNamespaces();
-                //     break;
+                case "#u":
+                    Interpreter.Context.DumpNamespaces();
+                    break;
 
                 default:
                     ExecuteCore (sourceCode);
@@ -238,11 +255,20 @@ public sealed class Repl
                 try
                 {
                     emptyLineCounter = 0;
+                    var suppressEcho = false;
+                    if (line.StartsWith ('@'))
+                    {
+                        suppressEcho = true;
+                        line = line.Substring (1);
+                    }
                     if (Evaluate (line, out var result))
                     {
                         Context.Variables["$$"] = result;
-                        BarsikUtility.PrintObject (Output, result);
-                        Output.WriteLine();
+                        if (Echo != suppressEcho)
+                        {
+                            BarsikUtility.PrintObject (Output, result);
+                            Output.WriteLine();
+                        }
                     }
                     else
                     {

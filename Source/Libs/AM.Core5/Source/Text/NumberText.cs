@@ -568,6 +568,7 @@ public sealed class NumberText
             {
                 if (char.IsDigit (code))
                 {
+                    str = text.Slice (start, offset - start);
                     start = offset;
                     number = text.Slice (start, 1);
                     textPart = false;
