@@ -88,6 +88,12 @@ sealed class NewNode
             Context context
         )
     {
+        var interpreter = context.GetTopContext().Interpreter.ThrowIfNull();
+        if (!interpreter.AllowNewOperator)
+        {
+            throw new BarsikException ("Operator NEW is not allowed");
+        }
+
         var type = context.FindType (_typeName, _typeArguments);
         if (type is null)
         {

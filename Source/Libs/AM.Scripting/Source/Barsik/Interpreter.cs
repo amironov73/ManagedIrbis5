@@ -14,6 +14,7 @@
 #region Using directive
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -37,6 +38,31 @@ public sealed class Interpreter
     /// </summary>
     public Context Context { get; }
 
+    /// <summary>
+    /// Разрешение использовать оператор <c>new</c>.
+    /// </summary>
+    public bool AllowNewOperator { get; set; }
+
+    /// <summary>
+    /// Загруженные модули.
+    /// </summary>
+    public List<IBarsikModule> Modules { get; }
+
+    /// <summary>
+    /// Загруженные сборки (чтобы не писать assembly-qualified type name).
+    /// </summary>
+    public Dictionary<string, Assembly> Assemblies { get; }
+
+    /// <summary>
+    /// Обработчик внешнего кода.
+    /// </summary>
+    public ExternalCodeHandler? ExternalCodeHandler { get; set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные, свяазанные с данным интерпретатором.
+    /// </summary>
+    public BarsikDictionary Auxiliary { get; }
+
     #endregion
 
     #region Construction
@@ -54,6 +80,10 @@ public sealed class Interpreter
         input ??= Console.In;
         output ??= Console.Out;
         error ??= Console.Error;
+        AllowNewOperator = true;
+        Modules = new ();
+        Assemblies = new ();
+        Auxiliary = new ();
 
         Context = new (input, output, error)
         {
@@ -147,6 +177,12 @@ public sealed class Interpreter
         {
             program.Execute (Context);
         }
+        catch (ReturnException exception)
+        {
+            result.ExitRequested = true;
+            result.ExitCode = BarsikUtility.ToInt32 (exception.Value);
+            result.Message = exception.Message;
+        }
         catch (ExitException exception)
         {
             result.ExitRequested = true;
@@ -203,7 +239,17 @@ public sealed class Interpreter
         {
             result = new ExecutionResult
             {
-                ExitCode = exception.Value, // TODO конвертировать в Int32
+                ExitRequested = true,
+                ExitCode = BarsikUtility.ToInt32 (exception.Value),
+                Message = exception.Message
+            };
+        }
+        catch (ExitException exception)
+        {
+            result = new ExecutionResult
+            {
+                ExitRequested = true,
+                ExitCode = exception.ExitCode,
                 Message = exception.Message
             };
         }

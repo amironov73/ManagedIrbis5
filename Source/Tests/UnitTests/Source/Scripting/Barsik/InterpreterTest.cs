@@ -181,13 +181,8 @@ x = 1;
 
         var input = TextReader.Null;
         var output = new StringWriter();
-        var interpreter = new Interpreter(input, output)
-        {
-            Context =
-            {
-                ExternalCodeHandler = Handler
-            }
-        };
+        var interpreter = new Interpreter (input, output);
+        interpreter.ExternalCodeHandler = Handler;
         var sourceCode = "print ('{'); `Hello from inner code` print ('}');";
         interpreter.Execute (sourceCode);
         var actual = output.ToString();

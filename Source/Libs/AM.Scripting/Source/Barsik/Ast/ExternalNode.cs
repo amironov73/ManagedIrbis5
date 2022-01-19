@@ -63,16 +63,8 @@ public sealed class ExternalNode
     {
         PreExecute (context);
 
-        ExternalCodeHandler? handler = null;
-        for (var ctx = context; ctx is not null; ctx = ctx.Parent)
-        {
-            handler = ctx.ExternalCodeHandler;
-            if (handler is not null)
-            {
-                break;
-            }
-        }
-
+        var interpreter = context.GetTopContext().Interpreter.ThrowIfNull();
+        var handler = interpreter.ExternalCodeHandler;
         if (handler is null)
         {
             context.Error.WriteLine ("Missing external code handler");

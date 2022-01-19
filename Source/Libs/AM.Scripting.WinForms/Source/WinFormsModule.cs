@@ -149,11 +149,12 @@ public sealed class WinFormsModule
     /// <inheritdoc cref="IBarsikModule.AttachModule"/>
     public bool AttachModule
         (
-            Context context
+            Interpreter interpreter
         )
     {
-        Sure.NotNull (context);
+        Sure.NotNull (interpreter);
 
+        var context = interpreter.Context.ThrowIfNull();
         foreach (var descriptor in Registry)
         {
             context.Functions[descriptor.Key] = descriptor.Value;
@@ -165,11 +166,12 @@ public sealed class WinFormsModule
     /// <inheritdoc cref="IBarsikModule.DetachModule"/>
     public void DetachModule
         (
-            Context context
+            Interpreter interpreter
         )
     {
-        Sure.NotNull (context);
+        Sure.NotNull (interpreter);
 
+        var context = interpreter.Context.ThrowIfNull();
         foreach (var descriptor in Registry)
         {
             context.Functions.Remove (descriptor.Key);

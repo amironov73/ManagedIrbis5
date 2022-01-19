@@ -17,6 +17,8 @@ using AM.Scripting.Barsik;
 
 using ManagedIrbis.Scripting.Barsik;
 
+using Microsoft.Extensions.Caching.Memory;
+
 #endregion
 
 #nullable enable
@@ -28,6 +30,14 @@ namespace ManagedIrbis.PftLite;
 /// </summary>
 public static class LiteHandler
 {
+    #region Private members
+
+    private static readonly IMemoryCache _cache = new MemoryCache (new MemoryCacheOptions());
+
+    #endregion
+
+    #region Public methods
+
     /// <summary>
     /// Собственно обработчик.
     /// </summary>
@@ -48,12 +58,15 @@ public static class LiteHandler
             return;
         }
 
-        // TODO кешировать форматы
-
-        var formatter = new LiteFormatter();
         try
         {
-            formatter.SetFormat (format.Trim());
+            if (!_cache.TryGetValue (format, out LiteFormatter formatter))
+            {
+                formatter = new LiteFormatter();
+                formatter.SetFormat (format.Trim());
+                _cache.Set (format, formatter, TimeSpan.FromMinutes (5));
+            }
+
             var result = formatter.FormatRecord (record);
             context.Output.Write (result);
 
@@ -63,4 +76,6 @@ public static class LiteHandler
             context.Error.WriteLine (exception.Message);
         }
     }
+
+    #endregion
 }

@@ -77,6 +77,8 @@ public sealed class IrbisLib
         { "fma", new FunctionDescriptor ("fma", FMA) },
         { "format_record", new FunctionDescriptor ("format_record", FormatRecord) },
         { "get_connection_string", new FunctionDescriptor ("get_connection_string", GetConnectionString) },
+        { "get_field", new FunctionDescriptor ("get_field", GetField) },
+        { "have_field", new FunctionDescriptor ("have_field", HaveField) },
         { "is_connected", new FunctionDescriptor ("is_connected", IsConnected) },
         { "list_files", new FunctionDescriptor ("list_processes", ListFiles) },
         { "list_processes", new FunctionDescriptor ("list_files", ListProcesses) },
@@ -520,6 +522,64 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Проверка наличия поля.
+    /// </summary>
+    public static dynamic HaveField
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetRecord (context, out var record))
+        {
+            return false;
+        }
+
+        for (var i = 0; i < args.Length; i++)
+        {
+            var value = Compute (context, args, i);
+            if (value is int tag)
+            {
+                if (record.HaveField (tag))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Получение поля.
+    /// </summary>
+    public static dynamic? GetField
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetRecord (context, out var record))
+        {
+            return null;
+        }
+
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is int tag)
+        {
+            var secondArg = Compute (context, args, 1);
+            if (secondArg is int occurrence)
+            {
+                return record.GetField (tag, occurrence);
+            }
+
+            return record.GetField (tag);
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Мы подключены к серверу.
     /// </summary>
     public static dynamic IsConnected
@@ -913,11 +973,12 @@ public sealed class IrbisLib
     /// <inheritdoc cref="IBarsikModule.AttachModule"/>
     public bool AttachModule
         (
-            Context context
+            Interpreter interpreter
         )
     {
-        Sure.NotNull (context);
+        Sure.NotNull (interpreter);
 
+        var context = interpreter.Context.ThrowIfNull();
         foreach (var descriptor in Registry)
         {
             context.Functions[descriptor.Key] = descriptor.Value;
@@ -926,7 +987,7 @@ public sealed class IrbisLib
         var assembly = typeof (IrbisLib).Assembly;
         StdLib.LoadAssembly (context, new dynamic?[] { assembly.GetName().Name });
         StdLib.Use (context, new dynamic?[] { "ManagedIrbis" });
-        context.ExternalCodeHandler = LiteHandler.ExternalCodeHandler;
+        interpreter.ExternalCodeHandler = LiteHandler.ExternalCodeHandler;
 
         return true;
     }
@@ -934,12 +995,13 @@ public sealed class IrbisLib
     /// <inheritdoc cref="IBarsikModule.DetachModule"/>
     public void DetachModule
         (
-            Context context
+            Interpreter interpreter
         )
     {
-        Sure.NotNull (context);
+        Sure.NotNull (interpreter);
 
-        context.ExternalCodeHandler = null;
+        var context = interpreter.Context.ThrowIfNull();
+        interpreter.ExternalCodeHandler = null;
         foreach (var descriptor in Registry)
         {
             context.Functions.Remove (descriptor.Key);

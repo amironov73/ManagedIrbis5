@@ -91,26 +91,6 @@ public sealed class Context
     public Dictionary<string, object?> Namespaces { get; }
 
     /// <summary>
-    /// Обработчик внешнего кода.
-    /// </summary>
-    public ExternalCodeHandler? ExternalCodeHandler { get; set; }
-
-    /// <summary>
-    /// Загруженные модули.
-    /// </summary>
-    public List<IBarsikModule> Modules { get; }
-
-    /// <summary>
-    /// Загруженные сборки (чтобы не писать assembly-qualified type name).
-    /// </summary>
-    public Dictionary<string, Assembly> Assemblies { get; }
-
-    /// <summary>
-    /// Произвольные пользовательские данные, свяазанные с данным контекстом.
-    /// </summary>
-    public BarsikDictionary Auxiliary { get; }
-
-    /// <summary>
     /// Опциональный префикс, используемый, например, в операторе "new"
     /// при инициализации свойств свежесозданного объекта.
     /// </summary>
@@ -140,9 +120,6 @@ public sealed class Context
         Functions = new ();
         Breakpoints = new ();
         Namespaces = new ();
-        Modules = new ();
-        Assemblies = new ();
-        Auxiliary = new ();
     }
 
     #endregion
@@ -197,17 +174,11 @@ public sealed class Context
     {
         Sure.NotNull (instance);
 
-        // отыскиваем корневой контекст
-        var rootContext = this;
-        while (rootContext.Parent is not null)
-        {
-            rootContext = rootContext.Parent;
-        }
-
-        if (instance.AttachModule (rootContext))
+        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+        if (instance.AttachModule (interpreter))
         {
             // Output.WriteLine ($"Module loaded: {instance}");
-            Modules.Add (instance);
+            interpreter.Modules.Add (instance);
         }
 
         return this;
@@ -413,6 +384,7 @@ public sealed class Context
         }
 
         var topContext = GetTopContext();
+        var interpreter = topContext.Interpreter.ThrowIfNull();
         if (!name.Contains ('.'))
         {
             // это не полное имя, так что попробуем приписать к нему
@@ -432,7 +404,7 @@ public sealed class Context
         {
             // это не assembly-qualified name, так что попробуем
             // приписать к нему загруженные нами сборки
-            foreach (var asm in topContext.Assemblies.Values)
+            foreach (var asm in interpreter.Assemblies.Values)
             {
                 var asmName = asm.GetName().Name;
                 var fullName = name + ", " + asmName;
@@ -545,10 +517,11 @@ public sealed class Context
             throw new BarsikException();
         }
 
-        if (Assemblies.ContainsKey (name))
+        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+        if (interpreter.Assemblies.ContainsKey (name))
         {
             // уже загружено, пропускаем
-            return Assemblies [name];
+            return interpreter.Assemblies [name];
         }
 
         var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -557,7 +530,7 @@ public sealed class Context
             var asmName = asm.GetName().Name;
             if (asmName.SameString (name))
             {
-                Assemblies.Add (name, asm);
+                interpreter.Assemblies.Add (name, asm);
                 return asm;
             }
         }
@@ -582,7 +555,7 @@ public sealed class Context
 
         if (result is not null)
         {
-            Assemblies.Add (name, result);
+            interpreter.Assemblies.Add (name, result);
             return result;
         }
 
@@ -613,7 +586,7 @@ public sealed class Context
                 if (File.Exists (fullPath))
                 {
                     result = Assembly.LoadFile (fullPath);
-                    Assemblies.Add (name, result);
+                    interpreter.Assemblies.Add (name, result);
 
                     return result;
                 }
@@ -635,9 +608,8 @@ public sealed class Context
 
         Sure.NotNullNorEmpty (moduleName);
 
-        moduleName = moduleName.Trim();
-
         Assembly? assembly;
+        moduleName = moduleName.Trim();
         if (File.Exists (moduleName))
         {
             var fullPath = Path.GetFullPath (moduleName);
@@ -648,13 +620,14 @@ public sealed class Context
             assembly = Assembly.Load (moduleName);
         }
 
+        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
         var types = assembly.GetTypes()
             .Where (type => type.IsAssignableTo (typeof (IBarsikModule)))
             .ToArray();
         foreach (var type in types)
         {
             var alreadyHave = false;
-            foreach (var module in Modules)
+            foreach (var module in interpreter.Modules)
             {
                 if (module.GetType() == type)
                 {
@@ -671,7 +644,7 @@ public sealed class Context
             var instance = (IBarsikModule?) Activator.CreateInstance (type);
             if (instance is not null)
             {
-                AttachModule(instance);
+                AttachModule (instance);
             }
         }
     }

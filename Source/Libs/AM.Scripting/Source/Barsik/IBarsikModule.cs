@@ -40,12 +40,12 @@ public interface IBarsikModule
     Version Version { get; }
 
     /// <summary>
-    /// Инициализация модуля в контексте интерпретатора.
+    /// Инициализация модуля в интерпретаторе.
     /// </summary>
-    bool AttachModule (Context context);
+    bool AttachModule (Interpreter interpreter);
 
     /// <summary>
-    /// Освобождение (деинициализация) модуля в контексте интерпретатора.
+    /// Освобождение (деинициализация) модуля в интерпретаторе.
     /// </summary>
-    void DetachModule (Context context);
+    void DetachModule (Interpreter interpreter);
 }

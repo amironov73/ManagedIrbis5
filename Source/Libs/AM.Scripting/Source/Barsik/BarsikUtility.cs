@@ -357,14 +357,46 @@ public static class BarsikUtility
             sbyte sb => sb != 0,
             byte b => b != 0,
             short i16 => i16 != 0,
+            ushort u16 => u16 != 0,
             int i32 => i32 != 0,
+            uint u32 => u32 != 0,
             long i64 => i64 != 0,
+            ulong u64 => u64 != 0,
             float f32 => f32 != 0.0f, //-V3024
             double d64 => d64 != 0.0, //-V3024
             decimal d => d != 0.0m,
             IList list => list.Count != 0,
             IDictionary dictionary => dictionary.Count != 0,
             _ => true
+        };
+    }
+
+    /// <summary>
+    /// Преобразование любого значения в целое со знаком.
+    /// </summary>
+    public static int ToInt32
+        (
+            object? value
+        )
+    {
+        return value switch
+        {
+            null => 0,
+            true => 1,
+            false => 0,
+            string text => text.SafeToInt32(),
+            sbyte sb => sb,
+            byte b => b,
+            short i16 => i16,
+            ushort u16 => u16,
+            int i32 => i32,
+            uint u32 => unchecked ((int) u32),
+            long i64 => unchecked ((int) i64),
+            ulong u64 => unchecked ((int) u64),
+            float f32 => unchecked ((int) f32),
+            double d64 => unchecked ((int) d64),
+            decimal d => (int) d,
+            _ => 0
         };
     }
 
