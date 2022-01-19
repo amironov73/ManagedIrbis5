@@ -1,0 +1,46 @@
+﻿create_connection()
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    return
+}
+
+read_record (1)
+
+//==============================
+
+workList = fm (920)
+
+// унифицированный заголовок формы
+// print_suffix (fm (503, 'a'), ".")
+
+// из общей части: основные сведения
+common = get_field (461)
+
+// первый автор
+firstAuthor = get_field (700)
+if (firstAuthor)
+{
+    put (sub_field (firstAuthor, 'a'))
+    if (have_subfield ('g'))
+        out_prefix (sub_field (firstAuthor, 'g'), ", ")
+    else
+        out_prefix (sub_field (firstAuthor, 'b'), ", ")
+    add_dot()
+    println()
+}
+
+title = get_field (200)
+if (title)
+{
+    out_suffix (sub_field (title, 'v'), ": ") // обозначение и номер тома
+    put (sub_field (title, 'a')) // заглавие тома
+    out_prefix (sub_field (title, 'e'), " : ") // сведения, относящиеся к заглавию
+    out_prefix (sub_field (title, 'f'), " / ") // первые сведения об ответственности
+    out_prefix (sub_field (title, 'g'), " ; ") // последующие сведения об ответственности
+}
+
+//==============================
+
+disconnect()

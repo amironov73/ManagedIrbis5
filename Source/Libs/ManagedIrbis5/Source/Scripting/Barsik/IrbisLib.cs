@@ -64,6 +64,8 @@ public sealed class IrbisLib
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
         { "actualize", new FunctionDescriptor ("actualize", Actualize) },
+        { "add_dot", new FunctionDescriptor ("add_dot", AddDot) },
+        { "add_separator", new FunctionDescriptor ("add_separator", AddSeparator) },
         { "connect", new FunctionDescriptor ("connect", Connect) },
         { "create_connection", new FunctionDescriptor ("create_connection", CreateConnection) },
         { "create_database", new FunctionDescriptor ("create_database", CreateDatabase) },
@@ -78,19 +80,26 @@ public sealed class IrbisLib
         { "format_record", new FunctionDescriptor ("format_record", FormatRecord) },
         { "get_connection_string", new FunctionDescriptor ("get_connection_string", GetConnectionString) },
         { "get_field", new FunctionDescriptor ("get_field", GetField) },
+        { "get_fields", new FunctionDescriptor ("get_fields", GetFields) },
         { "have_field", new FunctionDescriptor ("have_field", HaveField) },
+        { "have_subfield", new FunctionDescriptor ("have_subfield", HaveSubfield) },
         { "is_connected", new FunctionDescriptor ("is_connected", IsConnected) },
         { "list_files", new FunctionDescriptor ("list_processes", ListFiles) },
         { "list_processes", new FunctionDescriptor ("list_files", ListProcesses) },
         { "list_users", new FunctionDescriptor ("list_users", ListUsers) },
         { "max_mfn", new FunctionDescriptor ("max_mfn", MaxMfn) },
         { "ping", new FunctionDescriptor ("ping", Ping) },
+        { "out_prefix", new FunctionDescriptor ("out_prefix", PrintPrefix) },
+        { "out_prefix_suffix", new FunctionDescriptor ("out_prefix_suffix", PrintPrefixSuffix) },
+        { "out_suffix", new FunctionDescriptor ("out_suffix", PrintSuffix) },
+        { "put", new FunctionDescriptor ("put", Out) },
         { "read_record", new FunctionDescriptor ("read_record", ReadRecord) },
         { "read_terms", new FunctionDescriptor ("read_terms", ReadTerms) },
         { "read_text_file", new FunctionDescriptor ("read_text_file", ReadTextFile) },
         { "search", new FunctionDescriptor ("search", Search) },
         { "server_stat", new FunctionDescriptor ("server_stat", ServerStat) },
         { "server_version", new FunctionDescriptor ("server_version", ServerVersion) },
+        { "sub_field", new FunctionDescriptor ("sub_field", GetSubfield) },
         { "truncate_database", new FunctionDescriptor ("truncate_database", TruncateDatabase) },
         { "unlock_database", new FunctionDescriptor ("unlock_database", UnlockDatabase) },
         { "write_record", new FunctionDescriptor ("write_record", WriteRecord) },
@@ -200,6 +209,36 @@ public sealed class IrbisLib
                 connection.ActualizeRecord (parameters);
             }
         }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Добавление точки.
+    /// </summary>
+    public static dynamic? AddDot
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        // TODO реализовать
+        context.Output.Write (". ");
+
+        return null;
+    }
+
+    /// <summary>
+    /// Добавление разделителя областей описания.
+    /// </summary>
+    public static dynamic? AddSeparator
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        // TODO реализовать
+        context.Output.Write (". - ");
 
         return null;
     }
@@ -551,7 +590,26 @@ public sealed class IrbisLib
     }
 
     /// <summary>
-    /// Получение поля.
+    /// Проверка наличия подполя.
+    /// </summary>
+    public static dynamic HaveSubfield
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is Field field
+            && Compute (context, args, 1) is char code)
+        {
+            // TODO сделать поддержку множественных подполей
+            return field.HaveSubField (code);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Получение одного (как правило, нулевого) повторения поля.
     /// </summary>
     public static dynamic? GetField
         (
@@ -574,6 +632,51 @@ public sealed class IrbisLib
             }
 
             return record.GetField (tag);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение всех повторений перечисленных полей.
+    /// </summary>
+    public static dynamic GetFields
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetRecord (context, out var record))
+        {
+            return Array.Empty<Field>();
+        }
+
+        var result = new BarsikList();
+        for (var i = 0; i < args.Length; i++)
+        {
+            var value = Compute (context, args, i);
+            if (value is int tag)
+            {
+                result.AddRange (record.Fields.GetField (tag));
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Получение указанного подполя.
+    /// </summary>
+    public static dynamic? GetSubfield
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is Field field
+            && Compute (context, args, 1) is char code)
+        {
+            return field.GetFirstSubFieldValue (code);
         }
 
         return null;
@@ -683,6 +786,27 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Простой вывод на печать (проще, чем <code>print</code>).
+    /// </summary>
+    public static dynamic? Out
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        for (var i = 0; i < args.Length; i++)
+        {
+            var value = Compute (context, args, i);
+            if (value is not null)
+            {
+                context.Output.Write (value);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Проверка подключения к серверу.
     /// Напоминание серверу о себе.
     /// </summary>
@@ -711,6 +835,71 @@ public sealed class IrbisLib
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Вывод на печать с префиксом.
+    /// </summary>
+    public static dynamic? PrintPrefix
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (BarsikUtility.ToBoolean (firstArg))
+        {
+            var secondArg = Compute (context, args, 1);
+            BarsikUtility.PrintObject (context.Output, secondArg);
+            BarsikUtility.PrintObject (context.Output, firstArg);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Вывод на печать с префиксом и суффиксом.
+    /// </summary>
+    public static dynamic? PrintPrefixSuffix
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (BarsikUtility.ToBoolean (firstArg))
+        {
+            var secondArg = Compute (context, args, 1);
+            BarsikUtility.PrintObject (context.Output, secondArg);
+
+            BarsikUtility.PrintObject (context.Output, firstArg);
+
+            var thirdArg = Compute (context, args, 2);
+            BarsikUtility.PrintObject (context.Output, thirdArg);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Вывод на печать с суффиксом.
+    /// </summary>
+    public static dynamic? PrintSuffix
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (BarsikUtility.ToBoolean (firstArg))
+        {
+            BarsikUtility.PrintObject (context.Output, firstArg);
+
+            var secondArg = Compute (context, args, 1);
+            BarsikUtility.PrintObject (context.Output, secondArg);
+        }
+
+        return null;
     }
 
     /// <summary>
