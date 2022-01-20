@@ -108,6 +108,8 @@ internal sealed class OutputBuffer
             {
                 break;
             }
+
+            --length;
         }
 
         if (length != _builder.Length)

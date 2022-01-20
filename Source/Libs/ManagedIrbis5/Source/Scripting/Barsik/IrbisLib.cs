@@ -59,6 +59,11 @@ public sealed class IrbisLib
     /// </summary>
     public const string OutputDefineName = "$output";
 
+    /// <summary>
+    /// Имя дефайна, отслеживающего вывод в группе.
+    /// </summary>
+    public const string MarkDefineName = "$mark";
+
     #endregion
 
     #region Properties
@@ -71,6 +76,7 @@ public sealed class IrbisLib
         { "actualize", new FunctionDescriptor ("actualize", Actualize) },
         { "add_dot", new FunctionDescriptor ("add_dot", AddDot) },
         { "add_separator", new FunctionDescriptor ("add_separator", AddSeparator) },
+        { "carriage_return", new FunctionDescriptor ("carriage_return", NewLine) },
         { "clear_output", new FunctionDescriptor ("clear_output", ClearOutput) },
         { "connect", new FunctionDescriptor ("connect", Connect) },
         { "create_connection", new FunctionDescriptor ("create_connection", CreateConnection) },
@@ -89,6 +95,7 @@ public sealed class IrbisLib
         { "get_connection_string", new FunctionDescriptor ("get_connection_string", GetConnectionString) },
         { "get_field", new FunctionDescriptor ("get_field", GetField) },
         { "get_fields", new FunctionDescriptor ("get_fields", GetFields) },
+        { "get_mark", new FunctionDescriptor ("get_mark", GetMark) },
         { "have_field", new FunctionDescriptor ("have_field", HaveField) },
         { "have_subfield", new FunctionDescriptor ("have_subfield", HaveSubfield) },
         { "is_connected", new FunctionDescriptor ("is_connected", IsConnected) },
@@ -96,12 +103,12 @@ public sealed class IrbisLib
         { "list_processes", new FunctionDescriptor ("list_files", ListProcesses) },
         { "list_users", new FunctionDescriptor ("list_users", ListUsers) },
         { "max_mfn", new FunctionDescriptor ("max_mfn", MaxMfn) },
-        { "new_line", new FunctionDescriptor ("new_line", NewLine) },
         { "ping", new FunctionDescriptor ("ping", Ping) },
+        { "put_d", new FunctionDescriptor ("put_d", PutDelimited) },
         { "put_p", new FunctionDescriptor ("put_p", PutPrefix) },
         { "put_ps", new FunctionDescriptor ("put_ps", PutPrefixSuffix) },
         { "put_s", new FunctionDescriptor ("put_s", PrintSuffix) },
-        { "put", new FunctionDescriptor ("put", Out) },
+        { "put", new FunctionDescriptor ("put", Put) },
         { "read_record", new FunctionDescriptor ("read_record", ReadRecord) },
         { "read_terms", new FunctionDescriptor ("read_terms", ReadTerms) },
         { "read_text_file", new FunctionDescriptor ("read_text_file", ReadTextFile) },
@@ -111,6 +118,7 @@ public sealed class IrbisLib
         { "search_read", new FunctionDescriptor ("search_read", SearchRead) },
         { "server_stat", new FunctionDescriptor ("server_stat", ServerStat) },
         { "server_version", new FunctionDescriptor ("server_version", ServerVersion) },
+        { "set_mark", new FunctionDescriptor ("set_mark", SetMark) },
         { "sub_field", new FunctionDescriptor ("sub_field", GetSubfield) },
         { "truncate_database", new FunctionDescriptor ("truncate_database", TruncateDatabase) },
         { "unlock_database", new FunctionDescriptor ("unlock_database", UnlockDatabase) },
@@ -229,6 +237,34 @@ public sealed class IrbisLib
         return false;
     }
 
+    /// <summary>
+    /// Вывод с поглощением лишних пробелов.
+    /// </summary>
+    private static void _Put
+        (
+            Context context,
+            OutputBuffer output,
+            object? value
+        )
+    {
+        var lastChar = output.GetLastChar();
+
+        if (char.IsWhiteSpace (lastChar))
+        {
+            var text = value?.ToString();
+            if (!string.IsNullOrEmpty (text))
+            {
+                context.SetDefine (MarkDefineName, true);
+                output.Write (text.TrimStart());
+            }
+        }
+        else
+        {
+            context.SetDefine (MarkDefineName, true);
+            output.Write (value);
+        }
+    }
+
     #endregion
 
     #region Public methods
@@ -275,7 +311,7 @@ public sealed class IrbisLib
             var lastChar = output.GetLastChar();
             if (Array.IndexOf (_delimiters, lastChar) < 0)
             {
-                output.Write (". ");
+                _Put (context, output, ". ");
             }
         }
 
@@ -296,7 +332,7 @@ public sealed class IrbisLib
             var lastChar = output.GetLastChar();
             if (lastChar != '-')
             {
-                output.Write (lastChar == '.' ? " - " : ". - ");
+                _Put (context, output, lastChar == '.' ? " - " : ". - ");
             }
         }
 
@@ -673,6 +709,20 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Получение отметки о выводе в группе.
+    /// </summary>
+    public static dynamic? GetMark
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        context.TryGetVariable (MarkDefineName, out var result);
+
+        return result;
+    }
+
+    /// <summary>
     /// Проверка наличия поля.
     /// </summary>
     public static dynamic HaveField
@@ -790,10 +840,20 @@ public sealed class IrbisLib
             dynamic?[] args
         )
     {
-        if (Compute (context, args, 0) is Field field
-            && Compute (context, args, 1) is char code)
+        if (Compute (context, args, 0) is Field field)
         {
-            return field.GetFirstSubFieldValue (code);
+            for (var i = 1; i < args.Length; i++)
+            {
+                if (Compute (context, args, i) is char code)
+                {
+                    var result = field.GetFirstSubFieldValue (code);
+
+                    if (!string.IsNullOrEmpty (result))
+                    {
+                        return result;
+                    }
+                }
+            }
         }
 
         return null;
@@ -884,6 +944,56 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Чтение записи.
+    /// Запись НЕ помещается в <code>record</code>.
+    /// </summary>
+    public static dynamic? LoadRecord
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 0) is SearchParameters parameters)
+        {
+            return connection.Search (parameters);
+        }
+
+        var mfnList = new List<int>();
+        for (var i = 0; i < args.Length; i++)
+        {
+            var value = Compute (context, args, i);
+            if (value is int mfn)
+            {
+                mfnList.Add (mfn);
+            }
+        }
+
+        if (mfnList.Count == 1)
+        {
+            var record = connection.ReadRecord (mfnList[0]);
+            context.SetDefine (RecordDefineName, record);
+            return record;
+        }
+
+        if (mfnList.Count > 1)
+        {
+            var result = connection.ReadRecords (connection.Database!, mfnList);
+            if (!result.IsNullOrEmpty())
+            {
+                context.SetDefine (RecordDefineName, result[0]);
+                return result;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Получение максимального MFN.
     /// </summary>
     public static dynamic? MaxMfn
@@ -921,33 +1031,6 @@ public sealed class IrbisLib
     }
 
     /// <summary>
-    /// Простой вывод на печать (проще, чем <code>print</code>).
-    /// Отслеживает точки и пробелы.
-    /// </summary>
-    public static dynamic? Out
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        if (!TryGetOutput (context, out var output))
-        {
-            return null;
-        }
-
-        for (var i = 0; i < args.Length; i++)
-        {
-            var value = Compute (context, args, i);
-            if (value is not null)
-            {
-                output.Write (value);
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
     /// Проверка подключения к серверу.
     /// Напоминание серверу о себе.
     /// </summary>
@@ -979,6 +1062,65 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Простой вывод на печать (проще, чем <code>print</code>).
+    /// Отслеживает точки и пробелы.
+    /// </summary>
+    public static dynamic? Put
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetOutput (context, out var output))
+        {
+            return null;
+        }
+
+        for (var i = 0; i < args.Length; i++)
+        {
+            var value = Compute (context, args, i);
+            if (value is not null)
+            {
+                _Put(context, output, value);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Вывод на печать с разделителями.
+    /// </summary>
+    public static dynamic PutDelimited
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (TryGetOutput (context, out var output))
+        {
+            var delimeter = Compute (context, args, 0) as string;
+            var first = true;
+            for (var i = 1; i < args.Length; i++)
+            {
+                var value = Compute (context, args, i);
+                if (BarsikUtility.ToBoolean (value))
+                {
+                    if (!first)
+                    {
+                        output.Write (delimeter);
+                    }
+
+                    output.Write (value);
+                    first = false;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Вывод на печать с префиксом.
     /// </summary>
     public static dynamic PutPrefix
@@ -993,8 +1135,8 @@ public sealed class IrbisLib
             if (BarsikUtility.ToBoolean (firstArg))
             {
                 var secondArg = Compute (context, args, 1);
-                BarsikUtility.PrintObject (output.Writer, secondArg);
-                BarsikUtility.PrintObject (output.Writer, firstArg);
+                _Put (context, output, secondArg);
+                _Put (context, output, firstArg);
 
                 return true;
             }
@@ -1018,12 +1160,12 @@ public sealed class IrbisLib
             if (BarsikUtility.ToBoolean (firstArg))
             {
                 var secondArg = Compute (context, args, 1);
-                BarsikUtility.PrintObject (output.Writer, secondArg);
+                _Put (context, output, secondArg);
 
-                BarsikUtility.PrintObject (output.Writer, firstArg);
+                _Put (context, output, firstArg);
 
                 var thirdArg = Compute (context, args, 2);
-                BarsikUtility.PrintObject (output.Writer, thirdArg);
+                _Put (context, output, thirdArg);
 
                 return true;
             }
@@ -1046,10 +1188,10 @@ public sealed class IrbisLib
             var firstArg = Compute (context, args, 0);
             if (BarsikUtility.ToBoolean (firstArg))
             {
-                BarsikUtility.PrintObject (output.Writer, firstArg);
+                _Put (context, output, firstArg);
 
                 var secondArg = Compute (context, args, 1);
-                BarsikUtility.PrintObject (output.Writer, secondArg);
+                _Put (context, output, secondArg);
 
                 return true;
             }
@@ -1060,6 +1202,7 @@ public sealed class IrbisLib
 
     /// <summary>
     /// Чтение записи.
+    /// Запись помещается в <code>record</code>.
     /// </summary>
     public static dynamic? ReadRecord
         (
@@ -1072,11 +1215,6 @@ public sealed class IrbisLib
         if (!TryGetConnection (context, out var connection))
         {
             return null;
-        }
-
-        if (Compute (context, args, 0) is SearchParameters parameters)
-        {
-            return connection.Search (parameters);
         }
 
         var mfnList = new List<int>();
@@ -1323,6 +1461,21 @@ public sealed class IrbisLib
         }
 
         return connection.GetServerVersion();
+    }
+
+    /// <summary>
+    /// Установка метки о начале вывода в группе.
+    /// </summary>
+    public static dynamic? SetMark
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var value = BarsikUtility.ToBoolean (Compute (context, args, 0));
+        context.SetDefine (MarkDefineName, value);
+
+        return null;
     }
 
     /// <summary>

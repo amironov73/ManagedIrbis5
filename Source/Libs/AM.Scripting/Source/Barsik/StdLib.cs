@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -602,8 +603,22 @@ public sealed class StdLib
         var list = new List<string>();
         for (var i = 1; i < args.Length; i++)
         {
-            var value = BarsikUtility.ToString (Compute (context, args, i));
-            list.Add (value);
+            var value = Compute (context, args, i);
+            if (value is string s)
+            {
+                list.Add (s);
+            }
+            else if (value is IList l)
+            {
+                foreach (var one in l)
+                {
+                    list.Add (BarsikUtility.ToString (one));
+                }
+            }
+            else
+            {
+                list.Add (BarsikUtility.ToString (value));
+            }
         }
 
         return string.Join (separator, list);

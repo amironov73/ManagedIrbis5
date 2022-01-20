@@ -1,15 +1,17 @@
-﻿// печать разного рода рубрик
+﻿/// <summary>
+/// Печать разного рода рубрик.
+/// </summary>
 func print_subjects (tag, subjName)
 {
     subjects = get_fields (tag)
     if (subjects)
     {
-        new_line()
+        carriage_return()
         i = 1
         foreach (subj in subjects)
         {
             if (i == 1) put (subjName, ": ") else put (" ")
-            put (i, '.')
+            put (i, ". ")
             put (sub_field (subj, 'a'))
             put_p (sub_field (subj, 'b'), " - ")
             put_p (sub_field (subj, 'c'), " - ")
@@ -28,26 +30,95 @@ if (!is_connected())
     return
 }
 
-read_record (2509957)
+read_record (2509079)
 
 //==============================
 
 workList = fm (920)
 
-// из общей части: основные сведения
-common = get_field (461)
+; // авторы, редакторы общей части
+authors = get_fields (961)
+foreach (author in authors)
+{
+    // автор - заголовок описания?
+    if (sub_field (author, 'z'))
+    {
+        put (sub_field (author, 'a')) // фамилия
+        put_p (sub_field (author, 'd'), " ") // римские цифры
+        put_p (sub_field (author, 'g', 'b'), ", ") // инициалы и их расширение
+        if (have_subfield (author, '1', 'c', 'f'))
+        {
+            // 1 - неотъемлемая часть имени
+            // с - дополнения к именам, кроме дат
+            // f - годы жизни
+            put (" (")
+            put_d ("; ", sub_field (author, 'c'), sub_field (author, 'f'))
+            put (")")
+        }
 
-// первый автор
+        add_dot()
+        carriage_return()
+    }
+}
+
+; // из общей части: основные сведения
+commons = get_fields (461)
+first = true
+foreach (common in commons)
+{
+    if (!first and have_subfield (common, 'c'))
+        add_dot()
+    put (sub_field (common, 'c')) // заглавие
+    first = false
+}
+
+foreach (common in commons)
+{
+    put_p (sub_field (common, 'e'), " : ") // сведения, относящиеся к заглавию
+    put_p (sub_field (common, 'f'), " / ") // сведения об ответственности
+}
+
+; // города и издательства общей части
+first = true
+foreach (common in commons)
+{
+    d = ""
+    if (first)
+        add_separator()
+    else
+        d = " ; "
+    if (!sub_field (common, '?')) // города не выводить
+        put_p (sub_field (common, 'd'), d) // город
+    put_p (sub_field (common, 'g'), " : ") // издательство
+    first = false
+}
+
+; // годы общей части
+foreach (common in commons)
+{
+    start = sub_field (common, 'h') // начало издания
+    stop = sub_field (common, 'z') // окончание издания
+    put_p (start, ", ")
+    if (stop and stop != start)
+    {
+        put_p (stop, " - ")
+    }
+}
+
+if (commons)
+{
+    add_dot()
+    carriage_return()
+}
+
+; // первый автор
 firstAuthor = get_field (700)
 if (firstAuthor)
 {
     put (sub_field (firstAuthor, 'a'))
-    if (have_subfield ('g'))
-        put_p (sub_field (firstAuthor, 'g'), ", ")
-    else
-        put_p (sub_field (firstAuthor, 'b'), ", ")
+    put_p (sub_field (firstAuthor, 'g', 'b'), ", ")
     add_dot()
-    new_line()
+    carriage_return ()
 }
 
 // область заглавия
@@ -58,8 +129,7 @@ if (title)
     put   (sub_field (title, 'a'))        // заглавие тома
 
     parallel = get_field (510) // параллельное заглавие
-    if (parallel)
-        put_p (sub_field (parallel, 'd'), " = ");
+    put_p (sub_field (parallel, 'd'), " = ");
 
     put_p (sub_field (title, 'e'), " : ") // сведения, относящиеся к заглавию
 
@@ -94,9 +164,11 @@ imprint = get_field (210)
 if (imprint)
 {
     add_separator()
+    set_mark()
     put (sub_field (imprint, 'a'))          // место издания
     put_p (sub_field (imprint, 'c'), " : ") // издательство
-    put_p (sub_field (imprint, 'd'), ", ")  // год издания
+    d = (get_mark()) ? ", " : "";
+    put_p (sub_field (imprint, 'd'), d)  // год издания
 }
 
 ; // физические характеристики
@@ -191,6 +263,35 @@ if (issn and issn != "XXXX-XXXX" and issn != "ХХХХ-ХХХХ")
     add_dot()
 }
 
+; // Страна издания
+countries = fma (102)
+if (countries)
+{
+    add_separator()
+    put ((len (countries) != 1) ? "Страны: " : "Страна: ")
+    put (join (", ", countries))
+}
+
+; // Язык документа
+languages = fma (101)
+if (languages)
+{
+    add_separator()
+    put ((len (countries) != 1) ? "Языки: " : "Язык: ")
+    put (join (", ", languages))
+}
+
+; // вид содержания, средства доступа и характеристика содержания
+vs = get_fields (203)
+foreach (one in vs)
+{
+    add_separator()
+    put (sub_field (one, 'a'))
+    put_ps (sub_field (one, 'o'), " (", ")")
+    put_p (sub_field (one, 'c'), " : ")
+    add_dot()
+}
+
 ; // предметные рубрики
 print_subjects (606, "Рубрики")
 
@@ -201,9 +302,23 @@ print_subjects (607, "Географические рубрики")
 keywords = fma (610)
 if (keywords)
 {
-    new_line()
+    carriage_return()
     put ("Ключевые слова: ")
     put (join (", ", keywords))
+}
+
+; // экземпляры
+exemplars = get_fields (910)
+if (exemplars)
+{
+    carriage_return()
+    put ("Экземпляры:")
+}
+
+foreach (one in exemplars)
+{
+    carriage_return()
+    put_d (" - ", sub_field (one, 'b'), sub_field (one, 'd'))
 }
 
 flush_output()
