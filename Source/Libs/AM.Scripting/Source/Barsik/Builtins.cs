@@ -122,6 +122,7 @@ public static class Builtins
         { "expando", new FunctionDescriptor ("expando", Expando) },
         { "format", new FunctionDescriptor ("format", Format) },
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable, false) },
+        { "iif", new FunctionDescriptor ("iif", Iif) },
         { "len", new FunctionDescriptor ("len", Length) },
         { "local", new FunctionDescriptor ("local", Local, false) },
         { "max", new FunctionDescriptor ("max", Max) },
@@ -409,6 +410,27 @@ public static class Builtins
         var result = string.Format (CultureInfo.InvariantCulture, format, other.ToArray());
 
         return result;
+    }
+
+    /// <summary>
+    /// Возврат первого непустого аргумента
+    /// </summary>
+    public static dynamic? Iif
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        for (var i = 0; i < args.Length; i++)
+        {
+            var value = Compute (context, args, i);
+            if (BarsikUtility.ToBoolean (value))
+            {
+                return value;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

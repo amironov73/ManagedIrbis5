@@ -1,4 +1,26 @@
-﻿create_connection()
+﻿// печать разного рода рубрик
+func print_subjects (tag, subjName)
+{
+    subjects = get_fields (tag)
+    if (subjects)
+    {
+        new_line()
+        i = 1
+        foreach (subj in subjects)
+        {
+            if (i == 1) put (subjName, ": ") else put (" ")
+            put (i, '.')
+            put (sub_field (subj, 'a'))
+            put_p (sub_field (subj, 'b'), " - ")
+            put_p (sub_field (subj, 'c'), " - ")
+            put_p (sub_field (subj, 'd'), " - ")
+            i++
+            add_dot()
+        }
+    }
+}
+
+create_connection()
 connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
 if (!is_connected())
 {
@@ -6,7 +28,7 @@ if (!is_connected())
     return
 }
 
-read_record (1)
+read_record (2509957)
 
 //==============================
 
@@ -25,7 +47,7 @@ if (firstAuthor)
     else
         put_p (sub_field (firstAuthor, 'b'), ", ")
     add_dot()
-    println()
+    new_line()
 }
 
 // область заглавия
@@ -34,7 +56,25 @@ if (title)
 {
     put_s (sub_field (title, 'v'), ": ")  // обозначение и номер тома
     put   (sub_field (title, 'a'))        // заглавие тома
+
+    parallel = get_field (510) // параллельное заглавие
+    if (parallel)
+        put_p (sub_field (parallel, 'd'), " = ");
+
     put_p (sub_field (title, 'e'), " : ") // сведения, относящиеся к заглавию
+
+    theIssue = get_field (923) // что за проблема с "issue"???
+    if (theIssue)
+    {
+        if (put_p (sub_field (theIssue, 'h'), " ") // обозначение второй единицы деления
+            or put_p (sub_field (theIssue, 'i'), " ")) // заглавие второй единицы деления
+            add_dot()
+
+        if (put_p (sub_field (theIssue, 'k'), " ") // обозначение третьей единицы деления
+            or put_p (sub_field (theIssue, 'l'), " ")) // заглавие третьей единицы деления
+            add_dot()
+    }
+
     put_p (sub_field (title, 'f'), " / ") // первые сведения об ответственности
     put_p (sub_field (title, 'g'), " ; ") // последующие сведения об ответственности
 }
@@ -49,12 +89,12 @@ if (edition)
 
 ; // область специфических сведений
 
-// Выходные данные
+; // Выходные данные
 imprint = get_field (210)
 if (imprint)
 {
-    add_dot()
-    put_p (sub_field (imprint, 'a'), " - ") // место издания
+    add_separator()
+    put (sub_field (imprint, 'a'))          // место издания
     put_p (sub_field (imprint, 'c'), " : ") // издательство
     put_p (sub_field (imprint, 'd'), ", ")  // год издания
 }
@@ -63,9 +103,10 @@ if (imprint)
 physical = get_field (215)
 if (physical)
 {
-    add_dot()
-    put_p (sub_field (physical, 'a'), " - ") // объем
-    put_p (sub_field (physical, '1'), " ")   // единица измерения
+    add_separator()
+    put (sub_field (physical, 'a')) // объем
+    unit = iif (sub_field (physical, '1'), "с.") // единица измерения
+    put_p (unit, " ")
     put_p (sub_field (physical, 'c'), " : ") // иллюстрации
 }
 
@@ -91,6 +132,81 @@ if (mag)
     put (sub_field (mag, 's'))
     add_dot()
 }
+
+; // библиография
+bibliography = fma (320)
+foreach (bib in bibliography)
+{
+    add_separator()
+    put (bib)
+}
+
+; // серия
+series = get_fields (225)
+foreach (one in series)
+{
+    add_separator()
+    put ("(")
+    put (sub_field (one, 'a')) // наименование серии
+    put_p (sub_field (one, 'd'), " = ") // параллельное наименование серии
+    put_p (sub_field (one, 'e'), " : ") // сведения, относящиеся к наименованию серии
+    put_p (sub_field (one, 'f'), " / ") // сведения об ответственности
+    put_p (sub_field (one, 'x'), ". - ISSN ") // ISSN
+    put_p (sub_field (one, 'v'), " ; ") // номер выпуска
+
+    put (").")
+}
+
+; // ISBN и цена
+isbn = get_fields (10)
+foreach (one in isbn)
+{
+    price = sub_field (one, 'd')
+    if (price)
+    {
+        add_separator()
+        currency = iif (sub_field (one, 'c'), "руб.")
+        put_s (price, " " + currency)
+    }
+
+    foreach (code in ['a', 'e', 'n'])
+    {
+        isbn1 = sub_field (one, code)
+        if (isbn1)
+        {
+            add_separator()
+            put_p (isbn1, "ISBN ")
+        }
+    }
+
+    add_dot()
+}
+
+; // ISSN
+issn = fm (11, 'a')
+if (issn and issn != "XXXX-XXXX" and issn != "ХХХХ-ХХХХ")
+{
+    add_separator()
+    put (issn)
+    add_dot()
+}
+
+; // предметные рубрики
+print_subjects (606, "Рубрики")
+
+; // географические рубрики
+print_subjects (607, "Географические рубрики")
+
+; // ключевые слова
+keywords = fma (610)
+if (keywords)
+{
+    new_line()
+    put ("Ключевые слова: ")
+    put (join (", ", keywords))
+}
+
+flush_output()
 
 //==============================
 
