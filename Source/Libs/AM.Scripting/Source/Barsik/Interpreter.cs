@@ -128,7 +128,7 @@ public sealed class Interpreter
         Sure.NotNull (sourceCode);
 
         var program = Grammar.ParseProgram (sourceCode);
-        var result = Execute(program);
+        var result = Execute(program, Context);
 
         return result;
     }
@@ -138,11 +138,13 @@ public sealed class Interpreter
     /// </summary>
     public ExecutionResult Execute
         (
-            ProgramNode program
+            ProgramNode program,
+            Context? context = null
         )
     {
         Sure.NotNull (program);
 
+        context ??= Context;
         var haveDefinitions = false;
         foreach (var statement in program.Statements)
         {
@@ -161,7 +163,7 @@ public sealed class Interpreter
                         name,
                         definition.CreateCallPoint()
                     );
-                Context.Functions[name] = descriptor;
+                context.Functions[name] = descriptor;
             }
         }
 
@@ -175,7 +177,7 @@ public sealed class Interpreter
         var result = new ExecutionResult();
         try
         {
-            program.Execute (Context);
+            program.Execute (context);
         }
         catch (ReturnException exception)
         {

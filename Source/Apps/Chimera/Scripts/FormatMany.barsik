@@ -1,0 +1,30 @@
+﻿connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    return
+}
+
+//==============================
+
+func formatOne (mfn)
+{
+    clear_output()
+    read_record (mfn)
+    println (mfn)
+    require ("Brief.barsik")
+    flush_output()
+}
+
+//==============================
+
+for (mfn = 699_900; mfn < 710_000; mfn++)
+{
+    formatOne (mfn)
+    println()
+    println()
+}
+
+//==============================
+
+disconnect()

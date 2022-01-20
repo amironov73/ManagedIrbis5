@@ -17,6 +17,7 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -27,6 +28,8 @@ using AM.Scripting.Barsik;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.PftLite;
 using ManagedIrbis.Providers;
+
+using Microsoft.Extensions.Logging;
 
 using static AM.Scripting.Barsik.Builtins;
 
@@ -68,6 +71,19 @@ public sealed class IrbisLib
 
     #region Properties
 
+    // TODO добавить аналоги операторов глобальной корректировки
+    // Оператор ADD
+    // Оператор REP
+    // Оператор CHA/CHAC
+    // Оператор DEL
+    // Оператор UNDOR (откат)
+
+    // TODO добавить пакетные режимы чтения
+    // batch_format
+    // batch_read
+    // batch_search
+    // batch_write
+
     /// <summary>
     /// Реестр стандартных функций.
     /// </summary>
@@ -102,6 +118,7 @@ public sealed class IrbisLib
         { "list_files", new FunctionDescriptor ("list_processes", ListFiles) },
         { "list_processes", new FunctionDescriptor ("list_files", ListProcesses) },
         { "list_users", new FunctionDescriptor ("list_users", ListUsers) },
+        { "load_record", new FunctionDescriptor ("load_record", LoadRecord) },
         { "max_mfn", new FunctionDescriptor ("max_mfn", MaxMfn) },
         { "ping", new FunctionDescriptor ("ping", Ping) },
         { "put_d", new FunctionDescriptor ("put_d", PutDelimited) },
@@ -116,6 +133,7 @@ public sealed class IrbisLib
         { "search_count", new FunctionDescriptor ("search_count", SearchCount) },
         { "search_format", new FunctionDescriptor ("search_format", SearchFormat) },
         { "search_read", new FunctionDescriptor ("search_read", SearchRead) },
+        { "search_read_one", new FunctionDescriptor ("search_read_one", SearchReadOneRecord) },
         { "server_stat", new FunctionDescriptor ("server_stat", ServerStat) },
         { "server_version", new FunctionDescriptor ("server_version", ServerVersion) },
         { "set_mark", new FunctionDescriptor ("set_mark", SetMark) },
@@ -332,7 +350,8 @@ public sealed class IrbisLib
             var lastChar = output.GetLastChar();
             if (lastChar != '-')
             {
-                _Put (context, output, lastChar == '.' ? " - " : ". - ");
+                var needDot = Array.IndexOf (_delimiters, lastChar) < 0;
+                _Put (context, output, needDot ? ". - " : " - ");
             }
         }
 
@@ -368,6 +387,7 @@ public sealed class IrbisLib
     {
         if (!TryGetConnection (context, out var connection, false))
         {
+            // если соединения ещё нет, создаем его
             connection = ConnectionFactory.Shared.CreateSyncConnection();
             context.SetVariable (ConnectionDefineName, connection);
         }
@@ -377,6 +397,7 @@ public sealed class IrbisLib
             return true;
         }
 
+        // TODO предусмотреть более сложную логику получения строки
         var connectionString = Compute (context, args, 0) as string
             ?? GetConnectionString (context, args) as string;
         if (!string.IsNullOrEmpty (connectionString))
@@ -388,12 +409,12 @@ public sealed class IrbisLib
         {
             var errorMessage = IrbisException.GetErrorDescription (connection.LastError);
             context.Error.WriteLine ($"Can't connect: {errorMessage}");
-            Magna.Error ($"Can't connect to '{connectionString}': {errorMessage}");
+            Magna.Logger.LogError ("Can't connect to {ConnectionString}", connectionString);
 
             return false;
         }
 
-        Magna.Trace ($"Connected to: {connectionString}");
+        Magna.Logger.LogTrace ("Connected to: {ConnectionString}", connectionString);
 
         return true;
     }
@@ -632,6 +653,7 @@ public sealed class IrbisLib
     {
         if (TryGetOutput (context, out var output))
         {
+            // TODO очистка от двойных точек и разделителей подполей
             context.Output.Write (output.ToString());
             output.Clear();
         }
@@ -648,13 +670,25 @@ public sealed class IrbisLib
             dynamic?[] args
         )
     {
-        if (!TryGetRecord (context, out var record))
+        Record? record;
+        var firstArg = Compute (context, args, 0);
+        var index = 1;
+
+        if (firstArg is Record record2)
         {
-            return null;
+            record = record2;
+            firstArg = Compute (context, args, 1);
+            index = 2;
+        }
+        else
+        {
+            if (!TryGetRecord (context, out record))
+            {
+                return null;
+            }
         }
 
-        var firstArg = Compute (context, args, 0);
-        var secondArg = Compute (context, args, 1);
+        var secondArg = Compute (context, args, index);
         if (firstArg is int tag)
         {
             if (secondArg is char code)
@@ -784,15 +818,27 @@ public sealed class IrbisLib
             dynamic?[] args
         )
     {
-        if (!TryGetRecord (context, out var record))
+        Record? record;
+        var firstArg = Compute (context, args, 0);
+        var index = 1;
+
+        if (firstArg is Record record2)
         {
-            return null;
+            record = record2;
+            firstArg = Compute (context, args, 1);
+            index = 2;
+        }
+        else
+        {
+            if (!TryGetRecord (context, out record))
+            {
+                return null;
+            }
         }
 
-        var firstArg = Compute (context, args, 0);
         if (firstArg is int tag)
         {
-            var secondArg = Compute (context, args, 1);
+            var secondArg = Compute (context, args, index);
             if (secondArg is int occurrence)
             {
                 return record.GetField (tag, occurrence);
@@ -958,11 +1004,6 @@ public sealed class IrbisLib
             return null;
         }
 
-        if (Compute (context, args, 0) is SearchParameters parameters)
-        {
-            return connection.Search (parameters);
-        }
-
         var mfnList = new List<int>();
         for (var i = 0; i < args.Length; i++)
         {
@@ -976,7 +1017,6 @@ public sealed class IrbisLib
         if (mfnList.Count == 1)
         {
             var record = connection.ReadRecord (mfnList[0]);
-            context.SetDefine (RecordDefineName, record);
             return record;
         }
 
@@ -985,7 +1025,6 @@ public sealed class IrbisLib
             var result = connection.ReadRecords (connection.Database!, mfnList);
             if (!result.IsNullOrEmpty())
             {
-                context.SetDefine (RecordDefineName, result[0]);
                 return result;
             }
         }
@@ -1212,35 +1251,16 @@ public sealed class IrbisLib
     {
         context.SetDefine (RecordDefineName, null);
 
-        if (!TryGetConnection (context, out var connection))
+        var result = LoadRecord (context, args);
+        if (result is Record record)
         {
-            return null;
-        }
-
-        var mfnList = new List<int>();
-        for (var i = 0; i < args.Length; i++)
-        {
-            var value = Compute (context, args, i);
-            if (value is int mfn)
-            {
-                mfnList.Add (mfn);
-            }
-        }
-
-        if (mfnList.Count == 1)
-        {
-            var record = connection.ReadRecord (mfnList[0]);
             context.SetDefine (RecordDefineName, record);
-            return record;
         }
-
-        if (mfnList.Count > 1)
+        else if (result is IList list)
         {
-            var result = connection.ReadRecords (connection.Database!, mfnList);
-            if (!result.IsNullOrEmpty())
+            if (list.Count != 0)
             {
-                context.SetDefine (RecordDefineName, result[0]);
-                return result;
+                context.SetDefine (RecordDefineName, list[0]);
             }
         }
 
@@ -1424,6 +1444,30 @@ public sealed class IrbisLib
             && !string.IsNullOrEmpty (expression))
         {
             return connection.SearchRead (expression);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Поиск по словарю с последующей загрузкой записей (именно одной!).
+    /// Запись НЕ помещается в <code>record</code>.
+    /// </summary>
+    public static dynamic? SearchReadOneRecord
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 0) is string expression
+            && !string.IsNullOrEmpty (expression))
+        {
+            return connection.SearchReadOneRecord (expression);
         }
 
         return null;

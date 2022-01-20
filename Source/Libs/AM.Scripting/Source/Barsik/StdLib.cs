@@ -64,7 +64,7 @@ public sealed class StdLib
         { "fullpath", new FunctionDescriptor ("fullpath", FullPath) },
         { "getcwd", new FunctionDescriptor ("getcwd", GetCurrentDirectory) },
         { "host", new FunctionDescriptor ("host", Host) },
-        { "include", new FunctionDescriptor ("include", Include) },
+        { "require", new FunctionDescriptor ("require", Include) },
         { "join", new FunctionDescriptor ("join", Join) },
         { "json_decode", new FunctionDescriptor ("json_decode", JsonDecode) },
         { "json_encode", new FunctionDescriptor ("json_encode", JsonEncode) },
@@ -91,14 +91,22 @@ public sealed class StdLib
             string fileName
         )
     {
-        if (!File.Exists (fileName))
+        var topContext = context.GetTopContext();
+        if (!topContext._inclusions.TryGetValue (fileName, out var program))
         {
-            return false;
+            if (!File.Exists (fileName))
+            {
+                return false;
+            }
+
+            var sourceCode = File.ReadAllText (fileName);
+            program = Grammar.ParseProgram (sourceCode);
+            topContext._inclusions[fileName] = program;
         }
 
-        var sourceCode = File.ReadAllText (fileName);
-        var program = Grammar.ParseProgram (sourceCode);
-        program.Execute (context);
+        var interpreter = topContext.Interpreter.ThrowIfNull();
+        // TODO отрабатывать ExitException
+        interpreter.Execute (program, context);
 
         return true;
     }
@@ -186,7 +194,7 @@ public sealed class StdLib
                 return null;
             }
 
-            interpreter.Execute (shortProgram);
+            interpreter.Execute (shortProgram, context);
             value = last.Expression.Compute (context);
         }
 
@@ -576,6 +584,16 @@ public sealed class StdLib
                         {
                             return null;
                         }
+                    }
+                }
+
+                // пытаемся загрузить файл рядом со скриптом
+                if (context.TryGetVariable ("__DIR__", out var scriptDir))
+                {
+                    var fullPath = Path.Combine (scriptDir, name);
+                    if (_Include (context, fullPath))
+                    {
+                        return null;
                     }
                 }
 

@@ -120,11 +120,17 @@ public sealed class Context
         Functions = new ();
         Breakpoints = new ();
         Namespaces = new ();
+        _inclusions = new ();
     }
 
     #endregion
 
     #region Private members
+
+    /// <summary>
+    /// Здесь запоминаются вложенные скрипты.
+    /// </summary>
+    internal readonly Dictionary<string, ProgramNode> _inclusions;
 
     /// <summary>
     /// Делаем контекст внимательным к выводу текста.

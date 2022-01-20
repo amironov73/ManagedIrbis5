@@ -22,16 +22,6 @@ func print_subjects (tag, subjName)
     }
 }
 
-create_connection()
-connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
-if (!is_connected())
-{
-    error ("Not connected")
-    return
-}
-
-read_record (2509079)
-
 //==============================
 
 workList = fm (920)
@@ -182,29 +172,6 @@ if (physical)
     put_p (sub_field (physical, 'c'), " : ") // иллюстрации
 }
 
-; // составная часть документа (статья в журнале)
-mag = get_field (463)
-if (mag)
-{
-    put (" // ")
-    put (sub_field (mag, 'c'))
-    put_p (sub_field (mag, 'e'), " : ") // сведения, относящиеся к заглавию
-    add_separator()
-    put (sub_field (mag, 'j')) // год издания
-    add_separator()
-    put (sub_field (mag, 'v')) // обозначение и номер первой единицы деления
-    if (have_subfield (mag, 'a'))
-    {
-        put (sub_field (mag, 'a'))
-        add_separator()
-    }
-    put (sub_field (mag, 'i'))
-    add_separator()
-    put ("С. ")
-    put (sub_field (mag, 's'))
-    add_dot()
-}
-
 ; // библиография
 bibliography = fma (320)
 foreach (bib in bibliography)
@@ -227,6 +194,73 @@ foreach (one in series)
     put_p (sub_field (one, 'v'), " ; ") // номер выпуска
 
     put (").")
+}
+
+; // выпуск журнала
+if (workList == "NJ")
+{
+    rr = search_read_one ("I=" + fm (933))
+    if (rr)
+    {
+        mag = get_field (rr, 200)
+        if (mag)
+        {
+            put (sub_field (mag, 'a'))
+            put_p (sub_field (mag, 'e'), " : ")
+            put_p (sub_field (mag, 'f'), " / ")
+            put_p (sub_field (mag, 'g'), " ; ")
+            put_p (fm (934), ". - ")
+            put_p (fm (935), ". - Т. ")
+            put_p (fm (936), ". - № ")
+            put_ps (fm (931, 'c'), " (", ")") // дата выхода
+            put_p (fm (rr, 110, 'x'), ". - Периодичность: ")
+            put_p (fm (rr, 11, 'a'), ". - ISSN ")
+            add_dot()
+        }
+    }
+}
+
+; // составная часть документа (статья в журнале)
+mag = get_field (463)
+if (mag)
+{
+    put (" // ")
+    put (sub_field (mag, 'c')) // заглавие журнала/газеты
+    put_p (sub_field (mag, 'e'), " : ") // сведения, относящиеся к заглавию
+    add_separator()
+    put (sub_field (mag, 'j')) // год издания
+    add_separator()
+    put (sub_field (mag, 'v')) // обозначение и номер первой единицы деления
+    if (have_subfield (mag, 'a'))
+    {
+        put (sub_field (mag, 'a'))
+        add_separator()
+    }
+    put (sub_field (mag, 'h')) // обозначение и номер второй единицы деления
+    put (sub_field (mag, 'i'))
+    add_separator()
+    put (iif (sub_field (mag, '1'), "С.")) // единица измерения
+    put (sub_field (mag, 's')) // местоположение
+    put_p (sub_field (mag, '0'), " : ") // иллюстрации
+    if (have_field (963))
+    {
+        add_separator()
+        put_p (fm (963, 'i'), "ISSN ")
+    }
+    else
+    {
+        rr = search_read_one ("I=" + sub_field (mag, 'w'))
+        if (rr)
+        {
+            issn = fm (rr, 11, 'a')
+            if (issn)
+            {
+                add_separator()
+                put_p (issn, "ISSN ")
+            }
+        }
+    }
+    add_dot()
 }
 
 ; // ISBN и цена
@@ -277,7 +311,7 @@ languages = fma (101)
 if (languages)
 {
     add_separator()
-    put ((len (countries) != 1) ? "Языки: " : "Язык: ")
+    put ((len (languages) != 1) ? "Языки: " : "Язык: ")
     put (join (", ", languages))
 }
 
@@ -307,6 +341,17 @@ if (keywords)
     put (join (", ", keywords))
 }
 
+; // аннотация
+first = true
+foreach (annotation in fma (331))
+{
+    carriage_return()
+    if (first)
+        put ("Аннотация: ")
+    put (annotation)
+    first = false
+}
+
 ; // экземпляры
 exemplars = get_fields (910)
 if (exemplars)
@@ -321,8 +366,3 @@ foreach (one in exemplars)
     put_d (" - ", sub_field (one, 'b'), sub_field (one, 'd'))
 }
 
-flush_output()
-
-//==============================
-
-disconnect()
