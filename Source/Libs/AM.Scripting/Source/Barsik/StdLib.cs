@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 
@@ -63,6 +64,7 @@ public sealed class StdLib
         { "getcwd", new FunctionDescriptor ("getcwd", GetCurrentDirectory) },
         { "host", new FunctionDescriptor ("host", Host) },
         { "include", new FunctionDescriptor ("include", Include) },
+        { "join", new FunctionDescriptor ("join", Join) },
         { "json_decode", new FunctionDescriptor ("json_decode", JsonDecode) },
         { "json_encode", new FunctionDescriptor ("json_encode", JsonEncode) },
         { "load", new FunctionDescriptor ("load", LoadAssembly) },
@@ -428,6 +430,13 @@ public sealed class StdLib
 
         try
         {
+            if (fileName.StartsWith ("http:") || fileName.StartsWith ("https:"))
+            {
+                var client = new HttpClient();
+
+                return client.GetByteArrayAsync (fileName).GetAwaiter().GetResult();
+            }
+
             var encodingName = Compute (context, args, 1) as string;
             if (!string.IsNullOrEmpty (encodingName))
             {
@@ -573,6 +582,31 @@ public sealed class StdLib
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Декодирование JSON.
+    /// </summary>
+    public static dynamic? Join
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length < 2)
+        {
+            return null;
+        }
+
+        var separator = BarsikUtility.ToString (Compute (context, args, 0));
+        var list = new List<string>();
+        for (var i = 1; i < args.Length; i++)
+        {
+            var value = BarsikUtility.ToString (Compute (context, args, i));
+            list.Add (value);
+        }
+
+        return string.Join (separator, list);
     }
 
     /// <summary>

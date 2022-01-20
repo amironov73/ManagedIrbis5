@@ -12,9 +12,6 @@ read_record (1)
 
 workList = fm (920)
 
-// унифицированный заголовок формы
-// print_suffix (fm (503, 'a'), ".")
-
 // из общей части: основные сведения
 common = get_field (461)
 
@@ -24,21 +21,75 @@ if (firstAuthor)
 {
     put (sub_field (firstAuthor, 'a'))
     if (have_subfield ('g'))
-        out_prefix (sub_field (firstAuthor, 'g'), ", ")
+        put_p (sub_field (firstAuthor, 'g'), ", ")
     else
-        out_prefix (sub_field (firstAuthor, 'b'), ", ")
+        put_p (sub_field (firstAuthor, 'b'), ", ")
     add_dot()
     println()
 }
 
+// область заглавия
 title = get_field (200)
 if (title)
 {
-    out_suffix (sub_field (title, 'v'), ": ") // обозначение и номер тома
-    put (sub_field (title, 'a')) // заглавие тома
-    out_prefix (sub_field (title, 'e'), " : ") // сведения, относящиеся к заглавию
-    out_prefix (sub_field (title, 'f'), " / ") // первые сведения об ответственности
-    out_prefix (sub_field (title, 'g'), " ; ") // последующие сведения об ответственности
+    put_s (sub_field (title, 'v'), ": ")  // обозначение и номер тома
+    put   (sub_field (title, 'a'))        // заглавие тома
+    put_p (sub_field (title, 'e'), " : ") // сведения, относящиеся к заглавию
+    put_p (sub_field (title, 'f'), " / ") // первые сведения об ответственности
+    put_p (sub_field (title, 'g'), " ; ") // последующие сведения об ответственности
+}
+
+; // сведения об издании
+edition = get_field (205)
+if (edition)
+{
+    add_separator()
+    put (sub_field (edition, 'a'))
+}
+
+; // область специфических сведений
+
+// Выходные данные
+imprint = get_field (210)
+if (imprint)
+{
+    add_dot()
+    put_p (sub_field (imprint, 'a'), " - ") // место издания
+    put_p (sub_field (imprint, 'c'), " : ") // издательство
+    put_p (sub_field (imprint, 'd'), ", ")  // год издания
+}
+
+; // физические характеристики
+physical = get_field (215)
+if (physical)
+{
+    add_dot()
+    put_p (sub_field (physical, 'a'), " - ") // объем
+    put_p (sub_field (physical, '1'), " ")   // единица измерения
+    put_p (sub_field (physical, 'c'), " : ") // иллюстрации
+}
+
+; // составная часть документа (статья в журнале)
+mag = get_field (463)
+if (mag)
+{
+    put (" // ")
+    put (sub_field (mag, 'c'))
+    put_p (sub_field (mag, 'e'), " : ") // сведения, относящиеся к заглавию
+    add_separator()
+    put (sub_field (mag, 'j')) // год издания
+    add_separator()
+    put (sub_field (mag, 'v')) // обозначение и номер первой единицы деления
+    if (have_subfield (mag, 'a'))
+    {
+        put (sub_field (mag, 'a'))
+        add_separator()
+    }
+    put (sub_field (mag, 'i'))
+    add_separator()
+    put ("С. ")
+    put (sub_field (mag, 's'))
+    add_dot()
 }
 
 //==============================

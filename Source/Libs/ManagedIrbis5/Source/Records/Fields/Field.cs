@@ -87,12 +87,12 @@ namespace ManagedIrbis;
 /// <summary>
 /// Поле библиографической записи.
 /// </summary>
-[XmlRoot("field")]
+[XmlRoot ("field")]
 public class Field
     : IHandmadeSerializable,
-      IReadOnly<Field>,
-      IEnumerable<SubField>,
-      IVerifiable
+        IReadOnly<Field>,
+        IEnumerable<SubField>,
+        IVerifiable
 {
     #region Constants
 
@@ -152,10 +152,8 @@ public class Field
                     CreateValueSubField().Value = value;
                 }
             }
-
-        } // set
-
-    } // property Value
+        }
+    }
 
     /// <summary>
     /// Список подполей.
@@ -198,8 +196,7 @@ public class Field
     public Field()
     {
         Subfields = new SubFieldCollection { Field = this };
-
-    } // constructor
+    }
 
     /// <summary>
     /// Конструктор.
@@ -216,8 +213,7 @@ public class Field
     {
         Tag = tag;
         Value = value;
-
-    } // constructor
+    }
 
     /// <summary>
     /// Конструктор.
@@ -231,8 +227,7 @@ public class Field
     {
         Tag = tag;
         Add (subfield1);
-
-    } // constructor
+    }
 
     /// <summary>
     /// Конструктор.
@@ -248,8 +243,7 @@ public class Field
         Tag = tag;
         Add (subfield1);
         Add (subfield2);
-
-    } // constructor
+    }
 
     /// <summary>
     /// Конструктор.
@@ -267,8 +261,7 @@ public class Field
         Add (subfield1);
         Add (subfield2);
         Add (subfield3);
-
-    } // constructor
+    }
 
     /// <summary>
     /// Конструктор.
@@ -284,8 +277,7 @@ public class Field
     {
         Tag = tag;
         Subfields.AddRange (subfields);
-
-    } // constructor
+    }
 
     /// <summary>
     /// Конструктор.
@@ -303,8 +295,7 @@ public class Field
     {
         Tag = tag;
         Add (new SubField (code1, value1));
-
-    } // constructor
+    }
 
     /// <summary>
     /// Конструктор.
@@ -327,8 +318,7 @@ public class Field
         Tag = tag;
         Add (new SubField (code1, value1));
         Add (new SubField (code2, value2));
-
-    } // constructor
+    }
 
     /// <summary>
     /// Конструктор.
@@ -356,8 +346,7 @@ public class Field
         Add (new SubField (code1, value1));
         Add (new SubField (code2, value2));
         Add (new SubField (code3, value3));
-
-    } // constructor
+    }
 
     #endregion
 
@@ -377,12 +366,11 @@ public class Field
         {
             var code = subfields[i][0];
             var value = subfields[i + 1];
-            result.Subfields.Add (new SubField(code, value));
+            result.Subfields.Add (new SubField (code, value));
         }
 
         return result;
-
-    } // method WithSubFields
+    }
 
     /// <summary>
     /// Добавление подполя в конец списка подполей.
@@ -397,8 +385,7 @@ public class Field
         Subfields.Add (subfield);
 
         return this;
-
-    } // method Add
+    }
 
     /// <summary>
     /// Добавление подполя в конец списка подполей.
@@ -415,13 +402,19 @@ public class Field
         Subfields.Add (new SubField (code, value));
 
         return this;
-
-    } // method Add
+    }
 
     /// <summary>
     /// Добавление подполя в конец списка подполей.
     /// </summary>
-    public Field Add (char code, bool value) => Add (code, value ? "1" : "0");
+    public Field Add
+        (
+            char code,
+            bool value
+        )
+    {
+        return Add (code, value ? "1" : "0");
+    }
 
     /// <summary>
     /// Добавление подполя в конец списка подполей.
@@ -444,8 +437,7 @@ public class Field
         Add (code, text);
 
         return this;
-
-    } // method Add
+    }
 
     /// <summary>
     /// Добавление подполя в конец списка подполей.
@@ -462,8 +454,7 @@ public class Field
         Subfields.Add (new SubField (code, value));
 
         return this;
-
-    } // method Add
+    }
 
     /// <summary>
     /// Добавление поля, если переданное значение не равно 0.
@@ -480,8 +471,7 @@ public class Field
         }
 
         return this;
-
-    } // method AddNonEmpty
+    }
 
     /// <summary>
     /// Добавление поля, если переданное значение не равно 0.
@@ -498,8 +488,7 @@ public class Field
         }
 
         return this;
-
-    } // method AddNonEmpty
+    }
 
     /// <summary>
     /// Добавление поля, если переданное значение не равно 0.
@@ -516,8 +505,7 @@ public class Field
         }
 
         return this;
-
-    } // method AddNonEmpty
+    }
 
     /// <summary>
     /// Добавление поля, если переданная дата имеет смысл
@@ -538,8 +526,7 @@ public class Field
         }
 
         return this;
-
-    } // method AddNonEmpty
+    }
 
     /// <summary>
     /// Добавление подполя в конец списка подполей
@@ -567,8 +554,7 @@ public class Field
         }
 
         return this;
-
-    } // method AddNonEmpty
+    }
 
     /// <summary>
     /// Добавление подполя в конец списка подполей
@@ -597,8 +583,7 @@ public class Field
         }
 
         return this;
-
-    } // method AddNonEmpty
+    }
 
     /// <summary>
     /// Добавление нескольких полей согласно спецификации кодов.
@@ -620,12 +605,10 @@ public class Field
                     ++index;
                 }
             }
-
-        } // if
+        }
 
         return this;
-
-    } // method AddRange
+    }
 
     /// <summary>
     /// Добавление нескольких полей.
@@ -644,12 +627,10 @@ public class Field
                     Add (subField);
                 }
             }
-
-        } // if
+        }
 
         return this;
-
-    } // method AddRange
+    }
 
     /// <summary>
     /// Присваивание одного поля другому.
@@ -666,8 +647,7 @@ public class Field
         }
 
         return this;
-
-    } // method AssignFrom
+    }
 
     /// <summary>
     /// Очистка списка подполей. Остальные свойства остаются.
@@ -678,8 +658,7 @@ public class Field
         Subfields.Clear();
 
         return this;
-
-    } // method Clear
+    }
 
     /// <summary>
     /// Сравнение двух полей.
@@ -729,8 +708,7 @@ public class Field
         }
 
         return result;
-
-    } // method Compare
+    }
 
     /// <summary>
     /// Если нет подполя, выделенного для хранения
@@ -757,8 +735,7 @@ public class Field
         }
 
         return result;
-
-    } // method CreateValueSubField
+    }
 
     /// <summary>
     /// Получаем подполе, выделенное для хранения
@@ -778,8 +755,7 @@ public class Field
         }
 
         return null;
-
-    } // method GetValueSubField
+    }
 
     /// <summary>
     /// Клонирование поля.
@@ -794,8 +770,7 @@ public class Field
         }
 
         return result;
-
-    } // method Clone
+    }
 
     /// <summary>
     /// Декодирование строки.
@@ -814,8 +789,7 @@ public class Field
         Tag = line.Slice (0, index).ParseInt32();
         line = line.Slice (index + 1);
         DecodeBody (line);
-
-    } // method Decode
+    }
 
     /// <summary>
     /// Декодирование тела поля.
@@ -876,8 +850,7 @@ public class Field
 
             throw;
         }
-
-    } // method DecodeBody
+    }
 
     /// <summary>
     /// Получение первого подполя с указанным кодом.
@@ -914,8 +887,7 @@ public class Field
         }
 
         return null;
-
-    } // method GetFirstSubField
+    }
 
     /// <summary>
     /// Перечисление подполей с указанным кодом.
@@ -954,8 +926,7 @@ public class Field
                 yield return subfield;
             }
         }
-
-    } // method EnumerateSubFields
+    } // method EnumerateSubField
 
     /// <summary>
     /// Получение всех подполей с указанным кодом.
@@ -1151,7 +1122,11 @@ public class Field
     /// <param name="code">Искомый код подполя.</param>
     /// <param name="value">Новое значение подполя.</param>
     /// <returns>this</returns>
-    public Field SetSubFieldValue (char code, int value)
+    public Field SetSubFieldValue
+        (
+            char code,
+            int value
+        )
     {
         return SetSubFieldValue (code, value.ToInvariantString());
     }
@@ -1162,7 +1137,11 @@ public class Field
     /// <param name="code">Искомый код подполя.</param>
     /// <param name="value">Новое значение подполя.</param>
     /// <returns>this</returns>
-    public Field SetSubFieldValue (char code, long value)
+    public Field SetSubFieldValue
+        (
+            char code,
+            long value
+        )
     {
         return SetSubFieldValue (code, value.ToInvariantString());
     }
@@ -1173,7 +1152,11 @@ public class Field
     /// <param name="code">Искомый код подполя.</param>
     /// <param name="value">Новое значение подполя.</param>
     /// <returns>this</returns>
-    public Field SetSubFieldValue (char code, DateTime value)
+    public Field SetSubFieldValue
+        (
+            char code,
+            DateTime value
+        )
     {
         return SetSubFieldValue (code, IrbisDate.ConvertDateToString (value));
     }
@@ -1184,7 +1167,11 @@ public class Field
     /// <param name="code">Искомый код подполя.</param>
     /// <param name="value">Новое значение подполя.</param>
     /// <returns>this</returns>
-    public Field SetSubFieldValue (char code, int? value)
+    public Field SetSubFieldValue
+        (
+            char code,
+            int? value
+        )
     {
         return SetSubFieldValue (code, value?.ToInvariantString());
     }
@@ -1195,7 +1182,11 @@ public class Field
     /// <param name="code">Искомый код подполя.</param>
     /// <param name="value">Новое значение подполя.</param>
     /// <returns>this</returns>
-    public Field SetSubFieldValue (char code, long? value)
+    public Field SetSubFieldValue
+        (
+            char code,
+            long? value
+        )
     {
         return SetSubFieldValue (code, value?.ToInvariantString());
     }
@@ -1206,7 +1197,11 @@ public class Field
     /// <param name="code">Искомый код подполя.</param>
     /// <param name="value">Новое значение подполя.</param>
     /// <returns>this</returns>
-    public Field SetSubFieldValue (char code, DateTime? value)
+    public Field SetSubFieldValue
+        (
+            char code,
+            DateTime? value
+        )
     {
         return SetSubFieldValue (code, value.HasValue ? IrbisDate.ConvertDateToString (value.Value) : null);
     }
@@ -1319,7 +1314,7 @@ public class Field
     {
         SubField? subfield;
 
-        while ((subfield = GetFirstSubField(code)) is not null)
+        while ((subfield = GetFirstSubField (code)) is not null)
         {
             Subfields.Remove (subfield);
         }
@@ -1364,7 +1359,7 @@ public class Field
         )
     {
         Tag = reader.ReadPackedInt32();
-        Subfields.RestoreFromStream(reader);
+        Subfields.RestoreFromStream (reader);
     }
 
     /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
@@ -1373,10 +1368,10 @@ public class Field
             BinaryWriter writer
         )
     {
-        Sure.NotNull(writer, nameof(writer));
+        Sure.NotNull (writer, nameof (writer));
 
-        writer.WritePackedInt32(Tag);
-        Subfields.SaveToStream(writer);
+        writer.WritePackedInt32 (Tag);
+        Subfields.SaveToStream (writer);
     }
 
     #endregion
@@ -1412,7 +1407,7 @@ public class Field
     {
         if (ReadOnly)
         {
-            Magna.Error(nameof(ThrowIfReadOnly));
+            Magna.Error (nameof (ThrowIfReadOnly));
 
             throw new ReadOnlyException();
         }
@@ -1477,11 +1472,11 @@ public class Field
             );
         var builder = StringBuilderPool.Shared.Get();
         builder.EnsureCapacity (length);
-        builder.Append(Tag.ToInvariantString())
-            .Append('#');
+        builder.Append (Tag.ToInvariantString())
+            .Append ('#');
         foreach (var subfield in Subfields)
         {
-            builder.Append(subfield);
+            builder.Append (subfield);
         }
 
         var result = builder.ToString();

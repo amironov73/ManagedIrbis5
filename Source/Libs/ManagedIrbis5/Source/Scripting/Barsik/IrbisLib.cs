@@ -89,14 +89,17 @@ public sealed class IrbisLib
         { "list_users", new FunctionDescriptor ("list_users", ListUsers) },
         { "max_mfn", new FunctionDescriptor ("max_mfn", MaxMfn) },
         { "ping", new FunctionDescriptor ("ping", Ping) },
-        { "out_prefix", new FunctionDescriptor ("out_prefix", PrintPrefix) },
-        { "out_prefix_suffix", new FunctionDescriptor ("out_prefix_suffix", PrintPrefixSuffix) },
-        { "out_suffix", new FunctionDescriptor ("out_suffix", PrintSuffix) },
+        { "put_p", new FunctionDescriptor ("put_p", PutPrefix) },
+        { "put_ps", new FunctionDescriptor ("put_ps", PutPrefixSuffix) },
+        { "put_s", new FunctionDescriptor ("put_s", PrintSuffix) },
         { "put", new FunctionDescriptor ("put", Out) },
         { "read_record", new FunctionDescriptor ("read_record", ReadRecord) },
         { "read_terms", new FunctionDescriptor ("read_terms", ReadTerms) },
         { "read_text_file", new FunctionDescriptor ("read_text_file", ReadTextFile) },
         { "search", new FunctionDescriptor ("search", Search) },
+        { "search_count", new FunctionDescriptor ("search_count", SearchCount) },
+        { "search_format", new FunctionDescriptor ("search_format", SearchFormat) },
+        { "search_read", new FunctionDescriptor ("search_read", SearchRead) },
         { "server_stat", new FunctionDescriptor ("server_stat", ServerStat) },
         { "server_version", new FunctionDescriptor ("server_version", ServerVersion) },
         { "sub_field", new FunctionDescriptor ("sub_field", GetSubfield) },
@@ -598,11 +601,16 @@ public sealed class IrbisLib
             dynamic?[] args
         )
     {
-        if (Compute (context, args, 0) is Field field
-            && Compute (context, args, 1) is char code)
+        if (Compute (context, args, 0) is Field field)
         {
-            // TODO сделать поддержку множественных подполей
-            return field.HaveSubField (code);
+            for (var i = 1; i < args.Length; i++)
+            {
+                if (Compute (context, args, i) is char code
+                    && field.HaveSubField (code))
+                {
+                    return true;
+                }
+            }
         }
 
         return false;
@@ -840,7 +848,7 @@ public sealed class IrbisLib
     /// <summary>
     /// Вывод на печать с префиксом.
     /// </summary>
-    public static dynamic? PrintPrefix
+    public static dynamic PutPrefix
         (
             Context context,
             dynamic?[] args
@@ -852,15 +860,17 @@ public sealed class IrbisLib
             var secondArg = Compute (context, args, 1);
             BarsikUtility.PrintObject (context.Output, secondArg);
             BarsikUtility.PrintObject (context.Output, firstArg);
+
+            return true;
         }
 
-        return null;
+        return false;
     }
 
     /// <summary>
     /// Вывод на печать с префиксом и суффиксом.
     /// </summary>
-    public static dynamic? PrintPrefixSuffix
+    public static dynamic PutPrefixSuffix
         (
             Context context,
             dynamic?[] args
@@ -876,15 +886,17 @@ public sealed class IrbisLib
 
             var thirdArg = Compute (context, args, 2);
             BarsikUtility.PrintObject (context.Output, thirdArg);
+
+            return true;
         }
 
-        return null;
+        return false;
     }
 
     /// <summary>
     /// Вывод на печать с суффиксом.
     /// </summary>
-    public static dynamic? PrintSuffix
+    public static dynamic PrintSuffix
         (
             Context context,
             dynamic?[] args
@@ -897,9 +909,11 @@ public sealed class IrbisLib
 
             var secondArg = Compute (context, args, 1);
             BarsikUtility.PrintObject (context.Output, secondArg);
+
+            return true;
         }
 
-        return null;
+        return false;
     }
 
     /// <summary>
@@ -1050,6 +1064,86 @@ public sealed class IrbisLib
         if (!string.IsNullOrEmpty (expression))
         {
             return connection.Search (expression);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Поиск по словарю с выдачей количества найденных записей.
+    /// </summary>
+    public static dynamic? SearchCount
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 0) is string expression
+            && !string.IsNullOrEmpty (expression))
+        {
+            return connection.SearchCount (expression);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Поиск по словарю с последующим расформатированием записей.
+    /// </summary>
+    public static dynamic? SearchFormat
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 0) is string expression
+            && !string.IsNullOrEmpty (expression)
+            && Compute (context, args, 1) is string format
+            && !string.IsNullOrEmpty (format))
+        {
+            var parameters = new SearchParameters()
+            {
+                Expression = expression,
+                Format = format
+            };
+            var result = connection.Search (parameters);
+            if (result is not null)
+            {
+                return FoundItem.ToText (result);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Поиск по словарю с последующей загрузкой записей.
+    /// </summary>
+    public static dynamic? SearchRead
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 0) is string expression
+            && !string.IsNullOrEmpty (expression))
+        {
+            return connection.SearchRead (expression);
         }
 
         return null;
