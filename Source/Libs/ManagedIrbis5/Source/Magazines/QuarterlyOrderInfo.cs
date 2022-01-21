@@ -171,16 +171,24 @@ public sealed class QuarterlyOrderInfo
     /// <summary>
     /// Применение данных к указанному полю библиографической записи.
     /// </summary>
-    public Field ApplyTo (Field field) => field
-        .SetSubFieldValue ('q', Period)
-        .SetSubFieldValue ('n', NumberOfIssues)
-        .SetSubFieldValue ('a', FirstIssue)
-        .SetSubFieldValue ('b', LastIssue)
-        .SetSubFieldValue ('y', TotalPrice)
-        .SetSubFieldValue ('e', IssuePrice)
-        .SetSubFieldValue ('v', Currency)
-        .SetSubFieldValue ('d', PeriodicityCode)
-        .SetSubFieldValue ('x', PeriodicityNumber);
+    public Field ApplyTo
+        (
+            Field field
+        )
+    {
+        Sure.NotNull (field);
+
+        return field
+            .SetSubFieldValue ('q', Period)
+            .SetSubFieldValue ('n', NumberOfIssues)
+            .SetSubFieldValue ('a', FirstIssue)
+            .SetSubFieldValue ('b', LastIssue)
+            .SetSubFieldValue ('y', TotalPrice)
+            .SetSubFieldValue ('e', IssuePrice)
+            .SetSubFieldValue ('v', Currency)
+            .SetSubFieldValue ('d', PeriodicityCode)
+            .SetSubFieldValue ('x', PeriodicityNumber);
+    }
 
     /// <summary>
     /// Разбор указанного поля библиографической записи.

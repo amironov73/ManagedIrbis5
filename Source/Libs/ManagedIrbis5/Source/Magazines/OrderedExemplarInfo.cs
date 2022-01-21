@@ -223,6 +223,33 @@ public sealed class OrderedExemplarInfo
     #region Public methods
 
     /// <summary>
+    /// Применение данных к указанному полю библиографической записи.
+    /// </summary>
+    public Field ApplyTo
+        (
+            Field field
+        )
+    {
+        return field
+            .SetSubFieldValue ('q', Year)
+            .SetSubFieldValue ('a', Status)
+            .SetSubFieldValue ('b', Complect)
+            .SetSubFieldValue ('j', StartingNumber)
+            .SetSubFieldValue ('d', Place)
+            .SetSubFieldValue ('v', StorageDuration)
+            .SetSubFieldValue ('n', Amount)
+            .SetSubFieldValue ('f', Channel)
+            .SetSubFieldValue ('e', Price)
+            .SetSubFieldValue ('+', Recalc)
+            .SetSubFieldValue ('1', FirstPoint)
+            .SetSubFieldValue ('2', SecondPoint)
+            .SetSubFieldValue ('3', ThirdPoint)
+            .SetSubFieldValue ('4', FourthPoint)
+            .SetSubFieldValue ('5', FifthPoint);
+    }
+
+
+    /// <summary>
     /// Разбор поля библиографической записи.
     /// </summary>
     public static OrderedExemplarInfo ParseField
