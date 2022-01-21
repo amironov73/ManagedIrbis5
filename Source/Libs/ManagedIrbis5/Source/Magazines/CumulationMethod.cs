@@ -10,26 +10,25 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace ManagedIrbis.Magazines
+namespace ManagedIrbis.Magazines;
+
+/// <summary>
+/// Метод кумуляции выпусков журналов/газет.
+/// </summary>
+public enum CumulationMethod
 {
     /// <summary>
-    /// Метод кумуляции выпусков журналов/газет.
+    /// Только по годам.
     /// </summary>
-    public enum CumulationMethod
-    {
-        /// <summary>
-        /// Только по годам.
-        /// </summary>
-        Year,
+    Year,
 
-        /// <summary>
-        /// По годам и месту хранения.
-        /// </summary>
-        Place,
+    /// <summary>
+    /// По годам и месту хранения.
+    /// </summary>
+    Place,
 
-        /// <summary>
-        /// По годам, месту хранения и номеру комплекта.
-        /// </summary>
-        Number
-    }
+    /// <summary>
+    /// По годам, месту хранения и номеру комплекта.
+    /// </summary>
+    Number
 }
