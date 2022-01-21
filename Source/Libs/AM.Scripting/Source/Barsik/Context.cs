@@ -120,7 +120,11 @@ public sealed class Context
         Functions = new ();
         Breakpoints = new ();
         Namespaces = new ();
-        _inclusions = new ();
+
+        var comparer = OperatingSystem.IsWindows()
+            ? StringComparer.InvariantCultureIgnoreCase
+            : StringComparer.InvariantCulture;
+        _inclusions = new (comparer);
     }
 
     #endregion
@@ -578,24 +582,15 @@ public sealed class Context
             }
         }
 
-        var loadPath = Environment.GetEnvironmentVariable ("BARSIK_PATH");
-        if (!string.IsNullOrEmpty (loadPath))
+        foreach (var part in interpreter.Pathes)
         {
-            var parts = loadPath.Split
-                (
-                    Path.PathSeparator,
-                    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
-                );
-            foreach (var part in parts)
+            var fullPath = Path.GetFullPath (Path.Combine (part, name));
+            if (File.Exists (fullPath))
             {
-                var fullPath = Path.GetFullPath (Path.Combine (part, name));
-                if (File.Exists (fullPath))
-                {
-                    result = Assembly.LoadFile (fullPath);
-                    interpreter.Assemblies.Add (name, result);
+                result = Assembly.LoadFile (fullPath);
+                interpreter.Assemblies.Add (name, result);
 
-                    return result;
-                }
+                return result;
             }
         }
 
@@ -610,47 +605,38 @@ public sealed class Context
             string moduleName
         )
     {
-        // TODO поиск по путям
+        // TODO добавить выгрузку модулей
 
         Sure.NotNullNorEmpty (moduleName);
 
-        Assembly? assembly;
-        moduleName = moduleName.Trim();
-        if (File.Exists (moduleName))
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
-            var fullPath = Path.GetFullPath (moduleName);
-            assembly = Assembly.LoadFile (fullPath);
-        }
-        else
-        {
-            assembly = Assembly.Load (moduleName);
-        }
-
-        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
-        var types = assembly.GetTypes()
-            .Where (type => type.IsAssignableTo (typeof (IBarsikModule)))
-            .ToArray();
-        foreach (var type in types)
-        {
-            var alreadyHave = false;
-            foreach (var module in interpreter.Modules)
+            var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+            var types = assembly.GetTypes()
+                .Where (type => type.IsAssignableTo (typeof (IBarsikModule)))
+                .ToArray();
+            foreach (var type in types)
             {
-                if (module.GetType() == type)
+                var alreadyHave = false;
+                foreach (var module in interpreter.Modules)
                 {
-                    alreadyHave = true;
-                    break;
+                    if (module.GetType() == type)
+                    {
+                        alreadyHave = true;
+                        break;
+                    }
                 }
-            }
 
-            if (alreadyHave)
-            {
-                continue;
-            }
+                if (alreadyHave)
+                {
+                    continue;
+                }
 
-            var instance = (IBarsikModule?) Activator.CreateInstance (type);
-            if (instance is not null)
-            {
-                AttachModule (instance);
+                var instance = (IBarsikModule?) Activator.CreateInstance (type);
+                if (instance is not null)
+                {
+                    AttachModule (instance);
+                }
             }
         }
     }

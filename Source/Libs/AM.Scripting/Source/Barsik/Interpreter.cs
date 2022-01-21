@@ -63,6 +63,12 @@ public sealed class Interpreter
     /// </summary>
     public BarsikDictionary Auxiliary { get; }
 
+    /// <summary>
+    /// Пути для поиска скриптов, модулей  и т. д.
+    /// Инициализируется значением переменной окружения "BARSIK_PATH".
+    /// </summary>
+    public List<string> Pathes { get; }
+
     #endregion
 
     #region Construction
@@ -90,7 +96,15 @@ public sealed class Interpreter
             Interpreter = this
         };
 
+        var path = Environment.GetEnvironmentVariable ("BARSIK_PATH") ?? string.Empty;
+        Pathes = new (path.Split
+            (
+                Path.PathSeparator,
+                StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+            ));
+
         // устанавливаем значения стандартных переменных
+        Context.SetDefine ("__NAME__", string.Empty);
         Context.SetDefine ("__DIR__", string.Empty);
         Context.SetDefine ("__FILE__", string.Empty);
         Context.SetDefine ("__DOTNET__", Environment.Version);
@@ -231,6 +245,7 @@ public sealed class Interpreter
         try
         {
             var fullPath = Path.GetFullPath (fileName);
+            Context.Defines["__NAME__"] = "__MAIN__";
             Context.Defines["__FILE__"] = fullPath;
             Context.Defines["__DIR__"] = Path.GetDirectoryName (fullPath);
 
@@ -257,8 +272,9 @@ public sealed class Interpreter
         }
         finally
         {
-            Context.Defines.Remove ("__FILE__");
-            Context.Defines.Remove ("__DIR__");
+            Context.Defines["__NAME__"] = string.Empty;
+            Context.Defines["__FILE__"] = string.Empty;
+            Context.Defines["__DIR__"] = string.Empty;
         }
 
         return result;

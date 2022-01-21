@@ -58,10 +58,18 @@ public sealed class StdLib
         { "dirname", new FunctionDescriptor ("dirname", DirectoryName) },
         { "eval", new FunctionDescriptor ("eval", Evaluate) },
         { "exec", new FunctionDescriptor ("exec", Execute) },
+        { "fflush", new FunctionDescriptor ("flush", Fflush) },
+        { "fgets", new FunctionDescriptor ("fgets", Fgets) },
         { "file_exists", new FunctionDescriptor ("file_exists", FileExists) },
         { "file_get_contents", new FunctionDescriptor ("file_get_contents", FileGetContents) },
         { "file_put_contents", new FunctionDescriptor ("file_put_contents", FilePutContents) },
+        { "fopen", new FunctionDescriptor ("fopen", Fopen) },
+        { "fputs", new FunctionDescriptor ("fputs", Fputs) },
+        { "fread", new FunctionDescriptor ("fread", Fread) },
+        { "feek", new FunctionDescriptor ("fseek", Fseek) },
+        { "ftell", new FunctionDescriptor ("ftell", Ftell) },
         { "fullpath", new FunctionDescriptor ("fullpath", FullPath) },
+        { "fwrite", new FunctionDescriptor ("fwrite", Fwrite) },
         { "getcwd", new FunctionDescriptor ("getcwd", GetCurrentDirectory) },
         { "host", new FunctionDescriptor ("host", Host) },
         { "require", new FunctionDescriptor ("require", Include) },
@@ -405,6 +413,40 @@ public sealed class StdLib
     }
 
     /// <summary>
+    /// Сброс кэша на диск.
+    /// </summary>
+    public static dynamic? Fflush
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is Stream stream)
+        {
+            stream.Flush();
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Чтение строки из потока.
+    /// </summary>
+    public static dynamic? Fgets
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is TextReader reader)
+        {
+            return reader.ReadLine();
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Проверка существования файла.
     /// </summary>
     public static dynamic FileExists
@@ -504,6 +546,135 @@ public sealed class StdLib
     }
 
     /// <summary>
+    /// Открытие файла.
+    /// </summary>
+    public static dynamic? Fopen
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var fileName = Compute (context, args, 0) as string;
+        var mode = Compute (context, args, 1) as string;
+        if (string.IsNullOrEmpty (fileName) || string.IsNullOrEmpty (mode))
+        {
+            return null;
+        }
+
+        var encoding = Compute (context, args, 2) as Encoding ?? Encoding.UTF8;
+        if (mode.Contains ('t'))
+        {
+            // текстовый режим
+            if (mode.Contains ('r'))
+            {
+                return new StreamReader (fileName, encoding);
+            }
+
+            var append = mode.Contains ('a');
+
+            return new StreamWriter (fileName, append, encoding);
+        }
+
+        if (mode.Contains ('+'))
+        {
+            return File.Open (fileName, FileMode.Open, FileAccess.ReadWrite);
+        }
+
+        if (mode.Contains ('r'))
+        {
+            return File.OpenRead (fileName);
+        }
+
+        return File.OpenWrite (fileName);
+    }
+
+    /// <summary>
+    /// Запись строки в поток.
+    /// </summary>
+    public static dynamic? Fputs
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is TextWriter writer
+            && Compute (context, args, 1) is string text)
+        {
+            writer.Write (text);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Чтение из файла.
+    /// </summary>
+    public static dynamic? Fread
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is Stream stream
+            && Compute (context, args, 1) is int count and > 0)
+        {
+            var buffer = new byte[count];
+            var read = stream.Read (buffer, 0, count);
+            if (read < 0)
+            {
+                return null;
+            }
+
+            if (read == 0)
+            {
+                return Array.Empty<byte>();
+            }
+
+            var result = new byte[read];
+            Array.Copy (buffer, result, read);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Позиционирование в файле.
+    /// </summary>
+    public static dynamic? Fseek
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is Stream stream
+            && Compute (context, args, 1) is long offset
+            && Compute (context, args, 2) is int origin)
+        {
+            return stream.Seek (offset, (SeekOrigin) origin);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение текущей позиции в файле.
+    /// </summary>
+    public static dynamic? Ftell
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is Stream stream)
+        {
+            return stream.Position;
+        }
+
+        return null;
+    }
+
+
+    /// <summary>
     /// Доступ к хосту.
     /// </summary>
     public static dynamic? FullPath
@@ -519,6 +690,33 @@ public sealed class StdLib
         }
 
         return Path.GetFullPath (fileName);
+    }
+
+    /// <summary>
+    /// Запись в файл.
+    /// </summary>
+    public static dynamic? Fwrite
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is Stream stream
+            && Compute (context, args, 1) is ICollection<byte> bytes)
+        {
+            if (bytes is byte[] array)
+            {
+                stream.Write (array, 0, array.Length);
+            }
+            else
+            {
+                var buffer = new byte[bytes.Count];
+                bytes.CopyTo (buffer, 0);
+                stream.Write (buffer, 0, buffer.Length);
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -554,8 +752,6 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
-        var includePath = Environment.GetEnvironmentVariable ("BARSIK_PATH");
-
         for (var i = 0; i < args.Length; i++)
         {
             var name = Compute (context, args, i) as string;
@@ -569,15 +765,10 @@ public sealed class StdLib
                 }
 
                 if (!_Include (context, name)
-                    && !Path.IsPathRooted (name)
-                    && !string.IsNullOrEmpty (includePath))
+                    && !Path.IsPathRooted (name))
                 {
-                    var parts = includePath.Split
-                        (
-                            Path.PathSeparator,
-                            StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
-                        );
-                    foreach (var part in parts)
+                    var interpreter = context.GetTopContext().Interpreter.ThrowIfNull();
+                    foreach (var part in interpreter.Pathes)
                     {
                         var fullPath = Path.Combine (part, name);
                         if (_Include (context, fullPath))
@@ -962,17 +1153,20 @@ public sealed class StdLib
             if (!string.IsNullOrWhiteSpace (name))
             {
                 name = name.Trim();
-                if (name.StartsWith ('-'))
+                if (!string.IsNullOrEmpty (name))
                 {
-                    name = name.Substring (1);
-                    if (!string.IsNullOrEmpty (name))
+                    if (name.StartsWith ('-'))
                     {
-                        topContext.Namespaces.Remove (name);
+                        name = name.Substring (1);
+                        if (!string.IsNullOrEmpty (name))
+                        {
+                            topContext.Namespaces.Remove (name);
+                        }
                     }
-                }
-                else
-                {
-                    topContext.Namespaces[name] = null;
+                    else
+                    {
+                        topContext.Namespaces[name] = null;
+                    }
                 }
             }
         }

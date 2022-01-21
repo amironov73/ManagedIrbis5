@@ -20,7 +20,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
-using System.IO;
 
 using AM.Text;
 
@@ -128,7 +127,6 @@ public static class Builtins
         { "max", new FunctionDescriptor ("max", Max) },
         { "min", new FunctionDescriptor ("min", Min) },
         { "now", new FunctionDescriptor ("now", Now) },
-        { "open_read", new FunctionDescriptor ("open_read", OpenRead) },
         { "print", new FunctionDescriptor ("print", Print) },
         { "println", new FunctionDescriptor ("println", PrintLine) },
         { "readln", new FunctionDescriptor ("readln", ReadLine) },
@@ -489,7 +487,8 @@ public static class Builtins
             if (args[i] is VariableNode node)
             {
                 var name = node.Name;
-                if (!string.IsNullOrEmpty (name))
+                if (!string.IsNullOrEmpty (name)
+                    && !context.Variables.ContainsKey (name))
                 {
                     context.Variables[name] = null;
                 }
@@ -497,7 +496,8 @@ public static class Builtins
             else
             {
                 var name = Compute (context, args, i) as string;
-                if (!string.IsNullOrEmpty (name))
+                if (!string.IsNullOrEmpty (name)
+                    && !context.Variables.ContainsKey (name))
                 {
                     context.Variables[name] = null;
                 }
@@ -541,12 +541,10 @@ public static class Builtins
         index++;
         while (index < args.Length)
         {
-            if (args[index] is IComparable comparable)
+            if (args[index] is IComparable comparable
+                && result.CompareTo (comparable) < 0)
             {
-                if (result.CompareTo (comparable) < 0)
-                {
-                    result = comparable;
-                }
+                result = comparable;
             }
 
             index++;
@@ -589,12 +587,10 @@ public static class Builtins
         index++;
         while (index < args.Length)
         {
-            if (args[index] is IComparable comparable)
+            if (args[index] is IComparable comparable
+                && result.CompareTo (comparable) > 0)
             {
-                if (result.CompareTo (comparable) > 0)
-                {
-                    result = comparable;
-                }
+                result = comparable;
             }
 
             index++;
@@ -620,31 +616,6 @@ public static class Builtins
         }
 
         return result;
-    }
-
-    /// <summary>
-    /// Открытие файла только для чтения в текстовом режиме.
-    /// </summary>
-    public static dynamic? OpenRead
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        var fileName = (string?) Compute (context, args, 0);
-        if (string.IsNullOrWhiteSpace (fileName))
-        {
-            context.Error.WriteLine ("No file name specified");
-            return null;
-        }
-
-        if (!File.Exists (fileName))
-        {
-            context.Error.WriteLine ($"File {fileName} doesn't exist");
-            return null;
-        }
-
-        return new StreamReader (fileName);
     }
 
     /// <summary>
