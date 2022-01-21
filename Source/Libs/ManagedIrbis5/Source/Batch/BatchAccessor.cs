@@ -37,352 +37,351 @@ using ManagedIrbis.ImportExport;
 
 #nullable enable
 
-namespace ManagedIrbis.Batch
+namespace ManagedIrbis.Batch;
+
+/// <summary>
+/// Чтение записей большими блоками в параллель.
+/// </summary>
+public sealed class BatchAccessor
 {
+    #region Properties
+
     /// <summary>
-    /// Чтение записей большими блоками в параллель.
+    /// Throw <see cref="IrbisException"/>
+    /// when empty record received/decoded.
     /// </summary>
-    public sealed class BatchAccessor
+    public static bool ThrowOnEmptyRecord { get; set; }
+
+    /// <summary>
+    /// Connection.
+    /// </summary>
+    public ISyncProvider Connection { get; }
+
+    #endregion
+
+    #region Construction
+
+    static BatchAccessor()
     {
-        #region Properties
+        ThrowOnEmptyRecord = true;
+    }
 
-        /// <summary>
-        /// Throw <see cref="IrbisException"/>
-        /// when empty record received/decoded.
-        /// </summary>
-        public static bool ThrowOnEmptyRecord { get; set; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public BatchAccessor
+        (
+            ISyncProvider connection
+        )
+    {
+        Sure.NotNull (connection);
 
-        /// <summary>
-        /// Connection.
-        /// </summary>
-        public ISyncProvider Connection { get; }
+        Connection = connection;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Private members
 
-        static BatchAccessor()
+    private static void _ThrowIfEmptyRecord
+        (
+            Record record,
+            string line
+        )
+    {
+        if (ThrowOnEmptyRecord && record.Fields.Count == 0)
         {
-            ThrowOnEmptyRecord = true;
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public BatchAccessor
-            (
-                ISyncProvider connection
-            )
-        {
-            Sure.NotNull (connection);
-
-            Connection = connection;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private static void _ThrowIfEmptyRecord
-            (
-                Record record,
-                string line
-            )
-        {
-            if (ThrowOnEmptyRecord && record.Fields.Count == 0)
-            {
-                Magna.Error
-                    (
-                        nameof(BatchAccessor) + "::" + nameof(_ThrowIfEmptyRecord)
-                        + ": empty record detected"
-                    );
-
-                /*
-                byte[] bytes = Encoding.UTF8.GetBytes(line);
-                string dump = IrbisNetworkUtility.DumpBytes(bytes);
-                */
-                var message = "Empty record detected in BatchAccessor";
-                var exception = new IrbisException(message);
-                /*
-                var attachment = new BinaryAttachment
-                    (
-                        "response",
-                        bytes
-                    );
-                exception.Attach(attachment);
-
-                */
-                throw exception;
-            }
-        }
-
-        private BlockingCollection<Record>? _records;
-
-        private void _ParseRecord
-            (
-                string line,
-                string database
-            )
-        {
-            if (!string.IsNullOrEmpty(line))
-            {
-                var result = new Record
-                {
-                    Database = database
-                };
-
-                result = ProtocolText.ParseResponseForAllFormat
-                    (
-                        line,
-                        result
-                    );
-
-                if (!ReferenceEquals(result, null))
-                {
-                    _ThrowIfEmptyRecord(result, line);
-
-                    if (!result.Deleted)
-                    {
-                        result.Modified = false;
-                        _records?.Add(result);
-                    }
-                }
-            }
-        } // method _ParseRecord
-
-        private void _ParseRecord<T>
-            (
-                string line,
-                string database,
-                Func<Record, T> func,
-                BlockingCollection<T> collection
-            )
-        {
-            if (!string.IsNullOrEmpty(line))
-            {
-                var record = new Record
-                {
-                    Database = database
-                };
-
-                record = ProtocolText.ParseResponseForAllFormat
-                    (
-                        line,
-                        record
-                    );
-
-                if (!ReferenceEquals(record, null))
-                {
-                    if (!record.Deleted)
-                    {
-                        T result = func(record);
-
-                        collection.Add(result);
-                    }
-                }
-            }
-        } // method _ParseRecord
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Параллельное чтение множества записей.
-        /// </summary>
-        public Record[] ReadRecords
-            (
-                string? database,
-                IEnumerable<int> mfnList
-            )
-        {
-            Sure.NotNull (database ??= Connection.Database);
-
-            int[] array = mfnList.ToArray();
-
-            if (array.Length == 0)
-            {
-                return Array.Empty<Record>();
-            }
+            Magna.Error
+                (
+                    nameof (BatchAccessor) + "::" + nameof (_ThrowIfEmptyRecord)
+                    + ": empty record detected"
+                );
 
             /*
-
-            if (array.Length == 1)
-            {
-                int mfn = array[0];
-
-                Record record = Connection.ReadRecord
-                    (
-                        database,
-                        mfn,
-                        false,
-                        null
-                    );
-
-                return new[] { record };
-            }
-
-            using (_records = new BlockingCollection<Record>(array.Length))
-            {
-                int[][] slices = array.Chunk(1000).ToArray();
-
-                foreach (int[] slice in slices)
-                {
-                    if (slice.Length == 1)
-                    {
-                        Record record = Connection.ReadRecord
-                            (
-                                database: database,
-                                mfn: slice[0],
-                                lockFlag: false,
-                                format: null
-                            );
-
-                        _records.Add(record);
-                    }
-                    else
-                    {
-                        FormatCommand command = new FormatCommand
-                        {
-                            Database = database,
-                            FormatSpecification = IrbisFormat.All
-                        };
-                        command.MfnList.AddRange(slice);
-
-                        Connection.ExecuteCommand(command);
-
-                        string[] lines = command.FormatResult
-                            .ThrowIfNullOrEmpty(nameof(command.FormatResult));
-
-                        Debug.Assert
-                            (
-                                lines.Length == slice.Length,
-                                Resources.BatchAccessor_SomeRecordsNotRetrieved
-                            );
-
-                        Parallel.ForEach
-                            (
-                                lines,
-                                line => _ParseRecord(line, database)
-                            );
-                    }
-                }
-
-                _records.CompleteAdding();
-
-                return _records.ToArray();
-            }
+            byte[] bytes = Encoding.UTF8.GetBytes(line);
+            string dump = IrbisNetworkUtility.DumpBytes(bytes);
+            */
+            var message = "Empty record detected in BatchAccessor";
+            var exception = new IrbisException (message);
+            /*
+            var attachment = new BinaryAttachment
+                (
+                    "response",
+                    bytes
+                );
+            exception.Attach(attachment);
 
             */
+            throw exception;
+        }
+    }
 
+    private BlockingCollection<Record>? _records;
+
+    private void _ParseRecord
+        (
+            string line,
+            string database
+        )
+    {
+        if (!string.IsNullOrEmpty (line))
+        {
+            var result = new Record
+            {
+                Database = database
+            };
+
+            result = ProtocolText.ParseResponseForAllFormat
+                (
+                    line,
+                    result
+                );
+
+            if (!ReferenceEquals (result, null))
+            {
+                _ThrowIfEmptyRecord (result, line);
+
+                if (!result.Deleted)
+                {
+                    result.Modified = false;
+                    _records?.Add (result);
+                }
+            }
+        }
+    }
+
+    private void _ParseRecord<T>
+        (
+            string line,
+            string database,
+            Func<Record, T> func,
+            BlockingCollection<T> collection
+        )
+    {
+        if (!string.IsNullOrEmpty (line))
+        {
+            var record = new Record
+            {
+                Database = database
+            };
+
+            record = ProtocolText.ParseResponseForAllFormat
+                (
+                    line,
+                    record
+                );
+
+            if (!ReferenceEquals (record, null))
+            {
+                if (!record.Deleted)
+                {
+                    T result = func (record);
+
+                    collection.Add (result);
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Параллельное чтение множества записей.
+    /// </summary>
+    public Record[] ReadRecords
+        (
+            string? database,
+            IEnumerable<int> mfnList
+        )
+    {
+        Sure.NotNull (database ??= Connection.Database);
+
+        int[] array = mfnList.ToArray();
+
+        if (array.Length == 0)
+        {
             return Array.Empty<Record>();
         }
 
-        /// <summary>
-        /// Read and transform multiple records.
-        /// </summary>
-        public T[] ReadRecords<T>
-            (
-                string? database,
-                IEnumerable<int> mfnList,
-                Func<Record, T> func
-            )
+        /*
+
+        if (array.Length == 1)
         {
-            (database ??= Connection.Database).ThrowIfNull();
+            int mfn = array[0];
 
-            int[] array = mfnList.ToArray();
+            Record record = Connection.ReadRecord
+                (
+                    database,
+                    mfn,
+                    false,
+                    null
+                );
 
-            if (array.Length == 0)
+            return new[] { record };
+        }
+
+        using (_records = new BlockingCollection<Record>(array.Length))
+        {
+            int[][] slices = array.Chunk(1000).ToArray();
+
+            foreach (int[] slice in slices)
             {
-                return Array.Empty<T>();
-            }
-
-            /*
-
-            if (array.Length == 1)
-            {
-                int mfn = array[0];
-
-                Record record = Connection.ReadRecord
-                    (
-                        database: database,
-                        mfn: mfn,
-                        lockFlag: false,
-                        format: null
-                    );
-
-                T result1 = func(record);
-
-                return new[] { result1 };
-            }
-
-            using (BlockingCollection<T> collection
-                = new BlockingCollection<T>(array.Length))
-            {
-
-                int[][] slices = array.Chunk(1000).ToArray();
-
-                foreach (int[] slice in slices)
+                if (slice.Length == 1)
                 {
-                    if (slice.Length == 1)
-                    {
-                        Record record = Connection.ReadRecord
-                            (
-                                database,
-                                slice[0],
-                                false,
-                                null
-                            );
+                    Record record = Connection.ReadRecord
+                        (
+                            database: database,
+                            mfn: slice[0],
+                            lockFlag: false,
+                            format: null
+                        );
 
-                        _records.Add(record);
-                    }
-                    else
-                    {
-                        FormatCommand command = new FormatCommand
-                        {
-                            Database = database,
-                            FormatSpecification = IrbisFormat.All
-                        };
-                        command.MfnList.AddRange(slice);
-
-                        Connection.ExecuteCommand(command);
-
-                        string[] lines = command.FormatResult
-                            .ThrowIfNullOrEmpty(nameof(command.FormatResult));
-
-                        Debug.Assert
-                            (
-                                lines.Length == slice.Length,
-                                Resources.BatchAccessor_SomeRecordsNotRetrieved
-                            );
-
-                        Parallel.ForEach
-                            (
-                                lines,
-                                line => _ParseRecord
-                                    (
-                                        line,
-                                        database,
-                                        func,
-
-                                        // ReSharper disable once AccessToDisposedClosure
-                                        collection
-                                    )
-                            );
-                    }
+                    _records.Add(record);
                 }
+                else
+                {
+                    FormatCommand command = new FormatCommand
+                    {
+                        Database = database,
+                        FormatSpecification = IrbisFormat.All
+                    };
+                    command.MfnList.AddRange(slice);
 
-                collection.CompleteAdding();
+                    Connection.ExecuteCommand(command);
 
-                return collection.ToArray();
+                    string[] lines = command.FormatResult
+                        .ThrowIfNullOrEmpty(nameof(command.FormatResult));
 
+                    Debug.Assert
+                        (
+                            lines.Length == slice.Length,
+                            Resources.BatchAccessor_SomeRecordsNotRetrieved
+                        );
+
+                    Parallel.ForEach
+                        (
+                            lines,
+                            line => _ParseRecord(line, database)
+                        );
+                }
             }
 
-            */
+            _records.CompleteAdding();
 
+            return _records.ToArray();
+        }
+
+        */
+
+        return Array.Empty<Record>();
+    }
+
+    /// <summary>
+    /// Read and transform multiple records.
+    /// </summary>
+    public T[] ReadRecords<T>
+        (
+            string? database,
+            IEnumerable<int> mfnList,
+            Func<Record, T> func
+        )
+    {
+        (database ??= Connection.Database).ThrowIfNull();
+
+        int[] array = mfnList.ToArray();
+
+        if (array.Length == 0)
+        {
             return Array.Empty<T>();
         }
 
-        #endregion
+        /*
+
+        if (array.Length == 1)
+        {
+            int mfn = array[0];
+
+            Record record = Connection.ReadRecord
+                (
+                    database: database,
+                    mfn: mfn,
+                    lockFlag: false,
+                    format: null
+                );
+
+            T result1 = func(record);
+
+            return new[] { result1 };
+        }
+
+        using (BlockingCollection<T> collection
+            = new BlockingCollection<T>(array.Length))
+        {
+
+            int[][] slices = array.Chunk(1000).ToArray();
+
+            foreach (int[] slice in slices)
+            {
+                if (slice.Length == 1)
+                {
+                    Record record = Connection.ReadRecord
+                        (
+                            database,
+                            slice[0],
+                            false,
+                            null
+                        );
+
+                    _records.Add(record);
+                }
+                else
+                {
+                    FormatCommand command = new FormatCommand
+                    {
+                        Database = database,
+                        FormatSpecification = IrbisFormat.All
+                    };
+                    command.MfnList.AddRange(slice);
+
+                    Connection.ExecuteCommand(command);
+
+                    string[] lines = command.FormatResult
+                        .ThrowIfNullOrEmpty(nameof(command.FormatResult));
+
+                    Debug.Assert
+                        (
+                            lines.Length == slice.Length,
+                            Resources.BatchAccessor_SomeRecordsNotRetrieved
+                        );
+
+                    Parallel.ForEach
+                        (
+                            lines,
+                            line => _ParseRecord
+                                (
+                                    line,
+                                    database,
+                                    func,
+
+                                    // ReSharper disable once AccessToDisposedClosure
+                                    collection
+                                )
+                        );
+                }
+            }
+
+            collection.CompleteAdding();
+
+            return collection.ToArray();
+
+        }
+
+        */
+
+        return Array.Empty<T>();
     }
+
+    #endregion
 }

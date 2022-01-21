@@ -28,378 +28,377 @@ using ManagedIrbis.Pft.Infrastructure.Unifors;
 
 #nullable enable
 
-namespace ManagedIrbis.Fields
+namespace ManagedIrbis.Fields;
+
+/// <summary>
+/// Общая информация о книге.
+/// </summary>
+public sealed class BookInfo
 {
+    #region Properties
+
     /// <summary>
-    /// Общая информация о книге.
+    /// Provider.
     /// </summary>
-    public sealed class BookInfo
+    public ISyncProvider Provider { get; private set; }
+
+    /// <summary>
+    /// Record.
+    /// </summary>
+    public Record Record { get; private set; }
+
+    /// <summary>
+    /// Количество экземпляров.
+    /// </summary>
+    public int Amount => _ExecuteScript (_amountScript).SafeToInt32();
+
+    /// <summary>
+    /// Первый автор.
+    /// </summary>
+    public AuthorInfo? FirstAuthor
     {
-        #region Properties
-
-        /// <summary>
-        /// Provider.
-        /// </summary>
-        public ISyncProvider Provider { get; private set; }
-
-        /// <summary>
-        /// Record.
-        /// </summary>
-        public Record Record { get; private set; }
-
-        /// <summary>
-        /// Количество экземпляров.
-        /// </summary>
-        public int Amount => _ExecuteScript(_amountScript).SafeToInt32();
-
-        /// <summary>
-        /// Первый автор.
-        /// </summary>
-        public AuthorInfo? FirstAuthor
+        get
         {
-            get
+            AuthorInfo? result = null;
+            var field700 = Record.Fields.GetFirstField (700);
+            if (!ReferenceEquals (field700, null))
             {
-                AuthorInfo? result = null;
-                var field700 = Record.Fields.GetFirstField(700);
-                if (!ReferenceEquals(field700, null))
-                {
-                    result = AuthorInfo.ParseField700(field700);
-                }
-
-                return result;
+                result = AuthorInfo.ParseField700 (field700);
             }
-        }
-
-        /// <summary>
-        /// Авторы.
-        /// </summary>
-        public AuthorInfo[] Authors => AuthorInfo.ParseRecord(Record, AuthorInfo.AllKnownTags);
-
-        /// <summary>
-        /// Библиографическое описание.
-        /// </summary>
-        public string Description
-        {
-            get
-            {
-                var result = Record.Description
-                             ?? _ExecuteScript(_descriptionScript);
-                result = UniforPlusS.DecodeTitle("1" + result);
-
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// Характер документа (первый из).
-        /// </summary>
-        public string? DocumentCharacter => Record.FM(900, 'c');
-
-        /// <summary>
-        /// Тип документа.
-        /// </summary>
-        public string? DocumentType => Record.FM(900, 't');
-
-        /// <summary>
-        /// Электронный ресурс?
-        /// </summary>
-        public bool Electronic
-        {
-            get
-            {
-                // Электронными считаются:
-                // 1. Те, у которых проставлен тип документа L
-                // 2. Те, у которых единица измерения r, j или o
-                // 3. Те, к которым прикреплен файл, и это не обложка
-
-                var documentType = DocumentType;
-                if (documentType.IsOneOf("l", "m"))
-                {
-                    return true;
-                }
-
-                var measureUnit = Record.FM(215, '1').FirstChar();
-                if (measureUnit.IsOneOf('r', 'j', 'o'))
-                {
-                    return true;
-                }
-
-                var all951 = Record.Fields.GetField(951);
-                foreach (var v951 in all951)
-                {
-                    var v951h = v951.GetFirstSubFieldValue('h');
-                    if (!v951h.IsOneOf("02", "02a", "02b"))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Экземпляры.
-        /// </summary>
-        public ExemplarInfo[] Exemplars => ExemplarInfo.ParseRecord(Record);
-
-        /// <summary>
-        /// Число экземпляров.
-        /// </summary>
-        public int ExemplarCount
-        {
-            get
-            {
-                var result = 0;
-                foreach (var exemplar in Exemplars)
-                {
-                    var status = exemplar.Status;
-                    if (status != "0"
-                        && status != "1"
-                        && status != "5"
-                        && status != "9")
-                    {
-                        continue;
-                    }
-
-                    var amount = exemplar.Amount.SafeToInt32();
-                    if (amount == 0)
-                    {
-                        amount = 1;
-                    }
-
-                    result += amount;
-                }
-
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// Документ на иностранном языке?
-        /// </summary>
-        public bool Foreign
-        {
-            get
-            {
-                var languages = Languages;
-                if (languages.Length == 0)
-                {
-                    return false;
-                }
-
-                return !languages[0].SameString("rus");
-            }
-        }
-
-        /// <summary>
-        /// Языки документа
-        /// </summary>
-        public string[] Languages =>
-            Record.FMA(101);
-
-        /// <summary>
-        /// Первая ссылка на внешний ресурс.
-        /// </summary>
-        public string Link =>
-            _ExecuteScript(_linkScript);
-
-        /// <summary>
-        /// Количество страниц.
-        /// </summary>
-        public int Pages => CountPages(Volume);
-
-        /// <summary>
-        /// Цена, общая для всех экземпляров.
-        /// </summary>
-        public decimal Price => Record.FM(10, 'd').SafeToDecimal();
-
-        /// <summary>
-        /// Издательства.
-        /// </summary>
-        public string[] Publishers
-        {
-            get
-            {
-                var result = new List<string>();
-                result.AddRange(Record.FMA(210, 'c'));
-                result.AddRange(Record.FMA(461, 'g'));
-                return result.ToArray();
-            }
-        }
-
-        /// <summary>
-        /// Область заглавия.
-        /// </summary>
-        public TitleInfo Title
-        {
-            get
-            {
-                var result = TitleInfo.ParseRecord(Record);
-
-                return result[0];
-            }
-        }
-
-        /// <summary>
-        /// Заголовок.
-        /// </summary>
-        public string TitleText => _ExecuteScript(_titleScript);
-
-        /// <summary>
-        /// Счётчик выдач.
-        /// </summary>
-        public int UsageCount => Record.FM(999).SafeToInt32();
-
-        /// <summary>
-        /// Объем издания (цифры).
-        /// </summary>
-        public string? Volume => Record.FM(215, 'a');
-
-        /// <summary>
-        /// Рабочий лист.
-        /// </summary>
-        public string? Worksheet => Record.FM(920);
-
-        /// <summary>
-        /// Год издания.
-        /// </summary>
-        public int Year
-        {
-            get
-            {
-                var record = Record;
-                var result = record.FM(210, 'd');
-                if (result.IsEmpty())
-                {
-                    result = record.FM(461, 'h');
-                }
-
-                if (result.IsEmpty())
-                {
-                    result = record.FM(461, 'z');
-                }
-
-                if (result.IsEmpty())
-                {
-                    result = record.FM(463, 'j');
-                }
-
-                if (result.IsEmpty())
-                {
-                    result = record.FM(934);
-                }
-
-                if (result.IsEmpty())
-                {
-                    return 0;
-                }
-
-                // TODO: реализовать оптимально
-
-                var match = Regex.Match(result, @"\d{4}");
-                if (match.Success)
-                {
-                    result = match.Value;
-                }
-
-                return result.SafeToInt32();
-
-            } // get
-
-        } // property Year
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BookInfo
-            (
-                ISyncProvider provider,
-                Record record
-            )
-        {
-            Provider = provider;
-            Record = record;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private static string _amountScript = "f(rsum((if p(v910) then if '0159': v910^a then '1' fi, if 'CU': v910^a then v910^1 fi, ';' fi)),0,0)";
-
-        private static string _descriptionScript = "@brief";
-
-        private static string _linkScript = "(if p(v951^i) then if not v951^h:'02' then v951^i, break, fi, fi)";
-
-        private static string _titleScript = "if p(v461) then v461^c, v461^2, \" : \"v461^e, '. ' fi, v200^v\". \", v200^a, v200^b, \" : \"v200^e, &uf('!')";
-
-        private string _ExecuteScript
-            (
-                string script
-            )
-        {
-            var formatter = new PftFormatter();
-            formatter.SetProvider(Provider);
-            formatter.ParseProgram(script);
-            var result = formatter.FormatRecord(Record);
 
             return result;
         }
+    }
 
-        #endregion
+    /// <summary>
+    /// Авторы.
+    /// </summary>
+    public AuthorInfo[] Authors => AuthorInfo.ParseRecord (Record, AuthorInfo.AllKnownTags);
 
-        #region Public methods
-
-        /// <summary>
-        /// Count pages.
-        /// </summary>
-        public static int CountPages
-            (
-                ReadOnlySpan<char> text
-            )
+    /// <summary>
+    /// Библиографическое описание.
+    /// </summary>
+    public string Description
+    {
+        get
         {
-            if (text.IsEmpty)
+            var result = Record.Description
+                         ?? _ExecuteScript (_descriptionScript);
+            result = UniforPlusS.DecodeTitle ("1" + result);
+
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Характер документа (первый из).
+    /// </summary>
+    public string? DocumentCharacter => Record.FM (900, 'c');
+
+    /// <summary>
+    /// Тип документа.
+    /// </summary>
+    public string? DocumentType => Record.FM (900, 't');
+
+    /// <summary>
+    /// Электронный ресурс?
+    /// </summary>
+    public bool Electronic
+    {
+        get
+        {
+            // Электронными считаются:
+            // 1. Те, у которых проставлен тип документа L
+            // 2. Те, у которых единица измерения r, j или o
+            // 3. Те, к которым прикреплен файл, и это не обложка
+
+            var documentType = DocumentType;
+            if (documentType.IsOneOf ("l", "m"))
             {
-                return 0;
+                return true;
             }
 
-            text = text.Trim();
-            if (text.IsEmpty)
+            var measureUnit = Record.FM (215, '1').FirstChar();
+            if (measureUnit.IsOneOf ('r', 'j', 'o'))
             {
-                return 0;
+                return true;
             }
 
+            var all951 = Record.Fields.GetField (951);
+            foreach (var v951 in all951)
+            {
+                var v951h = v951.GetFirstSubFieldValue ('h');
+                if (!v951h.IsOneOf ("02", "02a", "02b"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Экземпляры.
+    /// </summary>
+    public ExemplarInfo[] Exemplars => ExemplarInfo.ParseRecord (Record);
+
+    /// <summary>
+    /// Число экземпляров.
+    /// </summary>
+    public int ExemplarCount
+    {
+        get
+        {
             var result = 0;
+            foreach (var exemplar in Exemplars)
+            {
+                var status = exemplar.Status;
+                if (status != "0"
+                    && status != "1"
+                    && status != "5"
+                    && status != "9")
+                {
+                    continue;
+                }
+
+                var amount = exemplar.Amount.SafeToInt32();
+                if (amount == 0)
+                {
+                    amount = 1;
+                }
+
+                result += amount;
+            }
+
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Документ на иностранном языке?
+    /// </summary>
+    public bool Foreign
+    {
+        get
+        {
+            var languages = Languages;
+            if (languages.Length == 0)
+            {
+                return false;
+            }
+
+            return !languages[0].SameString ("rus");
+        }
+    }
+
+    /// <summary>
+    /// Языки документа
+    /// </summary>
+    public string[] Languages =>
+        Record.FMA (101);
+
+    /// <summary>
+    /// Первая ссылка на внешний ресурс.
+    /// </summary>
+    public string Link =>
+        _ExecuteScript (_linkScript);
+
+    /// <summary>
+    /// Количество страниц.
+    /// </summary>
+    public int Pages => CountPages (Volume);
+
+    /// <summary>
+    /// Цена, общая для всех экземпляров.
+    /// </summary>
+    public decimal Price => Record.FM (10, 'd').SafeToDecimal();
+
+    /// <summary>
+    /// Издательства.
+    /// </summary>
+    public string[] Publishers
+    {
+        get
+        {
+            var result = new List<string>();
+            result.AddRange (Record.FMA (210, 'c'));
+            result.AddRange (Record.FMA (461, 'g'));
+            return result.ToArray();
+        }
+    }
+
+    /// <summary>
+    /// Область заглавия.
+    /// </summary>
+    public TitleInfo Title
+    {
+        get
+        {
+            var result = TitleInfo.ParseRecord (Record);
+
+            return result[0];
+        }
+    }
+
+    /// <summary>
+    /// Заголовок.
+    /// </summary>
+    public string TitleText => _ExecuteScript (_titleScript);
+
+    /// <summary>
+    /// Счётчик выдач.
+    /// </summary>
+    public int UsageCount => Record.FM (999).SafeToInt32();
+
+    /// <summary>
+    /// Объем издания (цифры).
+    /// </summary>
+    public string? Volume => Record.FM (215, 'a');
+
+    /// <summary>
+    /// Рабочий лист.
+    /// </summary>
+    public string? Worksheet => Record.FM (920);
+
+    /// <summary>
+    /// Год издания.
+    /// </summary>
+    public int Year
+    {
+        get
+        {
+            var record = Record;
+            var result = record.FM (210, 'd');
+            if (result.IsEmpty())
+            {
+                result = record.FM (461, 'h');
+            }
+
+            if (result.IsEmpty())
+            {
+                result = record.FM (461, 'z');
+            }
+
+            if (result.IsEmpty())
+            {
+                result = record.FM (463, 'j');
+            }
+
+            if (result.IsEmpty())
+            {
+                result = record.FM (934);
+            }
+
+            if (result.IsEmpty())
+            {
+                return 0;
+            }
 
             // TODO: реализовать оптимально
 
-            var matches = Regex.Matches
-                (
-                    text.ToString(),
-                    @"[ivxlcm]+",
-                    RegexOptions.IgnoreCase
-                );
-            foreach (Match match in matches)
+            var match = Regex.Match (result, @"\d{4}");
+            if (match.Success)
             {
-                var value = UniforPlus9.ToArabicNumber(match.Value);
-                result += value;
+                result = match.Value;
             }
 
-            matches = Regex.Matches(text.ToString(), @"[0-9]+");
-            foreach (Match match in matches)
-            {
-                var value = FastNumber.ParseInt32(match.Value);
-                result += value;
-            }
+            return result.SafeToInt32();
+        } // get
+    } // property Year
 
-            return result;
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public BookInfo
+        (
+            ISyncProvider provider,
+            Record record
+        )
+    {
+        Provider = provider;
+        Record = record;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private static string _amountScript =
+        "f(rsum((if p(v910) then if '0159': v910^a then '1' fi, if 'CU': v910^a then v910^1 fi, ';' fi)),0,0)";
+
+    private static string _descriptionScript = "@brief";
+
+    private static string _linkScript = "(if p(v951^i) then if not v951^h:'02' then v951^i, break, fi, fi)";
+
+    private static string _titleScript =
+        "if p(v461) then v461^c, v461^2, \" : \"v461^e, '. ' fi, v200^v\". \", v200^a, v200^b, \" : \"v200^e, &uf('!')";
+
+    private string _ExecuteScript
+        (
+            string script
+        )
+    {
+        var formatter = new PftFormatter();
+        formatter.SetProvider (Provider);
+        formatter.ParseProgram (script);
+        var result = formatter.FormatRecord (Record);
+
+        return result;
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Count pages.
+    /// </summary>
+    public static int CountPages
+        (
+            ReadOnlySpan<char> text
+        )
+    {
+        if (text.IsEmpty)
+        {
+            return 0;
         }
 
-        #endregion
+        text = text.Trim();
+        if (text.IsEmpty)
+        {
+            return 0;
+        }
+
+        var result = 0;
+
+        // TODO: реализовать оптимально
+
+        var matches = Regex.Matches
+            (
+                text.ToString(),
+                @"[ivxlcm]+",
+                RegexOptions.IgnoreCase
+            );
+        foreach (Match match in matches)
+        {
+            var value = UniforPlus9.ToArabicNumber (match.Value);
+            result += value;
+        }
+
+        matches = Regex.Matches (text.ToString(), @"[0-9]+");
+        foreach (Match match in matches)
+        {
+            var value = FastNumber.ParseInt32 (match.Value);
+            result += value;
+        }
+
+        return result;
     }
+
+    #endregion
 }

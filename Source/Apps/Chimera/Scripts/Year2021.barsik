@@ -1,0 +1,49 @@
+﻿//
+// Простая программа, подсчитывающая число экземпляров
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+total = 0
+allBooks = batch_search ("NKSU=2021/$")
+
+foreach (book in allBooks)
+{
+    exemplars = get_exemplars (book)
+    // println (fm (book, 200, 'a'), " => ", len (exemplars))
+
+    bool allNew = true
+    foreach (exemplar in exemplars)
+    {
+        print (".")
+        // println (exemplar.Number, " => ", exemplar.KsuNumber1)
+        thisKsu = exemplar.KsuNumber1
+        if (thisKsu)
+        {
+            // println (exemplar.Number, " => ", thisKsu)
+            if (!thisKsu.StartsWith ("2021"))
+                allNew = false
+        }
+    }
+
+    if (allNew)
+    {
+        total += len (exemplars)
+    }
+}
+
+//=================================
+
+println()
+println ("=> ", total)
+
+//=================================
+
+disconnect()

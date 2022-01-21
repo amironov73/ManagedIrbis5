@@ -25,6 +25,8 @@ using AM;
 using AM.Collections;
 using AM.Scripting.Barsik;
 
+using ManagedIrbis.Batch;
+using ManagedIrbis.Fields;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.PftLite;
 using ManagedIrbis.Providers;
@@ -78,11 +80,8 @@ public sealed class IrbisLib
     // Оператор DEL
     // Оператор UNDOR (откат)
 
-    // TODO добавить пакетные режимы чтения
-    // batch_format
-    // batch_read
-    // batch_search
-    // batch_write
+    // TODO добавить работу с читателями
+    // parse_reader
 
     /// <summary>
     /// Реестр стандартных функций.
@@ -91,13 +90,19 @@ public sealed class IrbisLib
     {
         { "actualize", new FunctionDescriptor ("actualize", Actualize) },
         { "add_dot", new FunctionDescriptor ("add_dot", AddDot) },
+        { "add_field", new FunctionDescriptor ("add_field", AddField) },
         { "add_separator", new FunctionDescriptor ("add_separator", AddSeparator) },
+        { "batch_format", new FunctionDescriptor ("batch_format", BatchFormat) },
+        { "batch_read", new FunctionDescriptor ("batch_read", BatchRead) },
+        { "batch_search", new FunctionDescriptor ("batch_search", BatchSearch) },
+        { "batch_write", new FunctionDescriptor ("batch_write", BatchWrite) },
         { "carriage_return", new FunctionDescriptor ("carriage_return", NewLine) },
         { "clear_output", new FunctionDescriptor ("clear_output", ClearOutput) },
         { "connect", new FunctionDescriptor ("connect", Connect) },
         { "create_connection", new FunctionDescriptor ("create_connection", CreateConnection) },
         { "create_database", new FunctionDescriptor ("create_database", CreateDatabase) },
         { "create_dictionary", new FunctionDescriptor ("create_dictionary", CreateDictionary) },
+        { "create_record", new FunctionDescriptor ("create_record", CreateRecord) },
         { "delete_database", new FunctionDescriptor ("delete_database", DeleteDatabase) },
         { "database_info", new FunctionDescriptor ("database_info", DatabaseInfo) },
         { "database_stat", new FunctionDescriptor ("database_stat", Disconnect) },
@@ -109,6 +114,7 @@ public sealed class IrbisLib
         { "fma", new FunctionDescriptor ("fma", FMA) },
         { "format_record", new FunctionDescriptor ("format_record", FormatRecord) },
         { "get_connection_string", new FunctionDescriptor ("get_connection_string", GetConnectionString) },
+        { "get_exemplars", new FunctionDescriptor ("get_exemplars", GetExemplars) },
         { "get_field", new FunctionDescriptor ("get_field", GetField) },
         { "get_fields", new FunctionDescriptor ("get_fields", GetFields) },
         { "get_mark", new FunctionDescriptor ("get_mark", GetMark) },
@@ -120,6 +126,7 @@ public sealed class IrbisLib
         { "list_users", new FunctionDescriptor ("list_users", ListUsers) },
         { "load_record", new FunctionDescriptor ("load_record", LoadRecord) },
         { "max_mfn", new FunctionDescriptor ("max_mfn", MaxMfn) },
+        { "parse_book", new FunctionDescriptor ("parse_book", ParseBook) },
         { "ping", new FunctionDescriptor ("ping", Ping) },
         { "put_d", new FunctionDescriptor ("put_d", PutDelimited) },
         { "put_p", new FunctionDescriptor ("put_p", PutPrefix) },
@@ -337,6 +344,32 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Добавление поля в текущую библиографическую запись.
+    /// </summary>
+    public static dynamic? AddField
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetRecord (context, out var record))
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 0) is int tag and > 0
+            && Compute (context, args, 1) is string value)
+        {
+            var result = new Field (tag, value);
+            record.Add (result);
+
+            return result;
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Добавление разделителя областей описания.
     /// </summary>
     public static dynamic? AddSeparator
@@ -356,6 +389,140 @@ public sealed class IrbisLib
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Пакетное форматирование записей.
+    /// </summary>
+    public static dynamic? BatchFormat
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        var database = connection.EnsureDatabase();
+        var format = Compute (context, args, 0) as string;
+        if (string.IsNullOrEmpty (format))
+        {
+            return null;
+        }
+
+        var secondArg = Compute (context, args, 1);
+        if (secondArg is IEnumerable<int> range)
+        {
+            return new BatchRecordFormatter (connection, database, format, 500, range);
+        }
+
+        if (secondArg is string expression
+            && !string.IsNullOrEmpty (expression))
+        {
+            return BatchRecordFormatter.Search (connection, database, format, expression, 500);
+        }
+
+        if (secondArg is true)
+        {
+            return BatchRecordFormatter.WholeDatabase (connection, database, format, 500);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Пакетное чтение записей.
+    /// </summary>
+    public static dynamic? BatchRead
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is IEnumerable<int> range)
+        {
+            return new BatchRecordReader (connection, range, database: connection.Database);
+        }
+
+        if (firstArg is true)
+        {
+            return BatchRecordReader.WholeDatabase (connection, connection.Database);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Пакетный поиск с загрузкой найденных записей.
+    /// </summary>
+    public static dynamic? BatchSearch
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is string expression
+            && !string.IsNullOrEmpty (expression))
+        {
+            return BatchRecordReader.Search (connection, expression, connection.Database);
+        }
+
+        if (firstArg is IEnumerable<int> range)
+        {
+            return new BatchRecordReader (connection, range, database: connection.Database);
+        }
+
+        if (firstArg is true)
+        {
+            return BatchRecordReader.WholeDatabase (connection, connection.Database);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Пакетное сохранение записей на сервере.
+    /// </summary>
+    public static dynamic? BatchWrite
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        var database = connection.EnsureDatabase();
+        if (Compute (context, args, 0) is string database2
+            && !string.IsNullOrEmpty (database2)
+            )
+        {
+            database = database2;
+        }
+
+        var capacity = 500;
+        if (Compute (context, args, 1) is int capacity2 and > 0)
+        {
+            capacity = capacity2;
+        }
+
+        return new BatchRecordWriter (connection, database, capacity);
     }
 
     /// <summary>
@@ -486,6 +653,21 @@ public sealed class IrbisLib
         var databaseName = Compute (context, args, 0) as string;
 
         return connection.CreateDictionary (databaseName);
+    }
+
+    /// <summary>
+    /// Создание новой библиографической записи.
+    /// </summary>
+    public static dynamic CreateRecord
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var result = new Record();
+        context.SetDefine (RecordDefineName, result);
+
+        return result;
     }
 
     /// <summary>
@@ -810,6 +992,33 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Получение экземпляров для текущей или указанной записи.
+    /// </summary>
+    public static dynamic? GetExemplars
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        Record? record = null;
+        if (Compute (context, args, 0) is Record record1)
+        {
+            record = record1;
+        }
+        else if (TryGetRecord (context, out Record record2))
+        {
+            record = record2;
+        }
+
+        if (record is null)
+        {
+            return null;
+        }
+
+        return ExemplarInfo.ParseRecord (record);
+    }
+
+    /// <summary>
     /// Получение одного (как правило, нулевого) повторения поля.
     /// </summary>
     public static dynamic? GetField
@@ -1067,6 +1276,38 @@ public sealed class IrbisLib
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Разбор книги по косточкам.
+    /// </summary>
+    public static dynamic? ParseBook
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        Record? record = null;
+        if (Compute (context, args, 0) is Record record2)
+        {
+            record = record2;
+        }
+        else if (TryGetRecord (context, out var record3))
+        {
+            record = record3;
+        }
+
+        if (record is null)
+        {
+            return null;
+        }
+
+        return new BookInfo (connection, record);
     }
 
     /// <summary>

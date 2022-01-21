@@ -1,0 +1,31 @@
+﻿//
+// Применение пакетного сохранения записей
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=SANDBOX;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+using (writer = batch_write())
+{
+    for (i = 0; i < 10; i++)
+    {
+        nowt = now ("T")
+
+        create_record()
+        add_field (920, "PAZK")
+        add_field (200, "^aЗаглавие " + nowt + "^eПодзаголовочные")
+        add_field (700, "^aМиронов^bА. В.")
+        add_field (910, "^a0^b123456^dФКХ")
+        writer.Append (record)
+    }
+}
+
+//=================================
+
+disconnect()

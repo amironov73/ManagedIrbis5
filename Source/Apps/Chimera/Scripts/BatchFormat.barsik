@@ -1,0 +1,21 @@
+﻿//
+// Применение пакетного форматирования записей
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+allBooks = batch_format ("@brief", "NKSU=2021/1")
+
+foreach (book in allBooks)
+    println (book)
+
+//=================================
+
+disconnect()
