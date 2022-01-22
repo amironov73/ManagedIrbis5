@@ -7,22 +7,11 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
+// ReSharper disable VirtualMemberCallInConstructor
 
-/* FastList.cs --
+/* FastList.cs -- список элементов
  * Ars Magna project, http://arsmagna.ru
  */
-
-//
-//  THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
-//  KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-//  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
-//  PURPOSE.
-//
-//  License: GNU Lesser General Public License (LGPLv3)
-//
-//  Email: pavel_torgashov@ukr.net.
-//
-//  Copyright (C) Pavel Torgashov, 2014.
 
 #region Using directives
 
@@ -31,9 +20,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 #endregion
@@ -42,6 +28,9 @@ using System.Windows.Forms;
 
 namespace AM.Windows.Forms;
 
+/// <summary>
+/// Список элементов.
+/// </summary>
 [DefaultEvent ("ItemTextNeeded")]
 [ToolboxItem (true)]
 public class FastList
@@ -49,6 +38,9 @@ public class FastList
 {
     #region Construction
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public FastList()
     {
         if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
@@ -71,7 +63,7 @@ public class FastList
         Invalidate();
     }
 
-    public void Build (ICollection list)
+    public void Build (ICollection? list)
     {
         if (list == null)
             ItemCount = 0;
@@ -81,10 +73,13 @@ public class FastList
 
     #region Overrided methods
 
+    /// <inheritdoc cref="FastListBase.CheckItem"/>
     public override bool CheckItem (int itemIndex)
     {
         if (GetItemChecked (itemIndex))
+        {
             return true;
+        }
 
         Invalidate();
 
@@ -100,55 +95,57 @@ public class FastList
         return false;
     }
 
-    protected override bool IsItemHeightFixed
-    {
-        get { return ItemHeightNeeded == null; }
-    }
+    /// <inheritdoc cref="FastListBase.IsItemHeightFixed"/>
+    protected override bool IsItemHeightFixed => ItemHeightNeeded is null;
 
     #endregion Overrided methods
 
     #region Events
 
-    public event EventHandler<IntItemEventArgs> ItemHeightNeeded;
-    public event EventHandler<IntItemEventArgs> ItemIndentNeeded;
-    public event EventHandler<StringItemEventArgs> ItemTextNeeded;
-    public event EventHandler<BoolItemEventArgs> ItemCheckStateNeeded;
-    public event EventHandler<ImageItemEventArgs> ItemIconNeeded;
-    public event EventHandler<BoolItemEventArgs> ItemCheckBoxVisibleNeeded;
-    public event EventHandler<ColorItemEventArgs> ItemBackColorNeeded;
-    public event EventHandler<ColorItemEventArgs> ItemForeColorNeeded;
-    public event EventHandler<BoolItemEventArgs> ItemExpandedNeeded;
-    public event EventHandler<BoolItemEventArgs> CanUnselectItemNeeded;
-    public event EventHandler<BoolItemEventArgs> CanSelectItemNeeded;
-    public event EventHandler<BoolItemEventArgs> CanUncheckItemNeeded;
-    public event EventHandler<BoolItemEventArgs> CanCheckItemNeeded;
-    public event EventHandler<BoolItemEventArgs> CanExpandItemNeeded;
-    public event EventHandler<BoolItemEventArgs> CanCollapseItemNeeded;
-    public event EventHandler<BoolItemEventArgs> CanEditItemNeeded;
+    /// <summary>
+    /// Запрос высоты элемента.
+    /// </summary>
+    public event EventHandler<IntItemEventArgs>? ItemHeightNeeded;
+    public event EventHandler<IntItemEventArgs>? ItemIndentNeeded;
+    public event EventHandler<StringItemEventArgs>? ItemTextNeeded;
+    public event EventHandler<BoolItemEventArgs>? ItemCheckStateNeeded;
+    public event EventHandler<ImageItemEventArgs>? ItemIconNeeded;
+    public event EventHandler<BoolItemEventArgs>? ItemCheckBoxVisibleNeeded;
+    public event EventHandler<ColorItemEventArgs>? ItemBackColorNeeded;
+    public event EventHandler<ColorItemEventArgs>? ItemForeColorNeeded;
+    public event EventHandler<BoolItemEventArgs>? ItemExpandedNeeded;
+    public event EventHandler<BoolItemEventArgs>? CanUnselectItemNeeded;
+    public event EventHandler<BoolItemEventArgs>? CanSelectItemNeeded;
+    public event EventHandler<BoolItemEventArgs>? CanUncheckItemNeeded;
+    public event EventHandler<BoolItemEventArgs>? CanCheckItemNeeded;
+    public event EventHandler<BoolItemEventArgs>? CanExpandItemNeeded;
+    public event EventHandler<BoolItemEventArgs>? CanCollapseItemNeeded;
+    public event EventHandler<BoolItemEventArgs>? CanEditItemNeeded;
 
-    public event EventHandler<ItemCheckedStateChangedEventArgs> ItemCheckedStateChanged;
-    public event EventHandler<ItemExpandedStateChangedEventArgs> ItemExpandedStateChanged;
-    public event EventHandler<ItemSelectedStateChangedEventArgs> ItemSelectedStateChanged;
-    public event EventHandler<ItemTextPushedEventArgs> ItemTextPushed;
+    public event EventHandler<ItemCheckedStateChangedEventArgs>? ItemCheckedStateChanged;
+    public event EventHandler<ItemExpandedStateChangedEventArgs>? ItemExpandedStateChanged;
+    public event EventHandler<ItemSelectedStateChangedEventArgs>? ItemSelectedStateChanged;
+    public event EventHandler<ItemTextPushedEventArgs>? ItemTextPushed;
 
-    public event EventHandler<PaintItemContentEventArgs> PaintItem;
-    public event EventHandler ScrollbarsUpdated;
+    public event EventHandler<PaintItemContentEventArgs>? PaintItem;
+    public event EventHandler? ScrollbarsUpdated;
 
     /// <summary>
     /// Occurs when user start to drag items
     /// </summary>
-    public event EventHandler<ItemDragEventArgs> ItemDrag;
+    public event EventHandler<ItemDragEventArgs>? ItemDrag;
 
     /// <summary>
     /// Occurs when user drag object over node
     /// </summary>
-    public event EventHandler<DragOverItemEventArgs> DragOverItem;
+    public event EventHandler<DragOverItemEventArgs>? DragOverItem;
 
     /// <summary>
     /// Occurs when user drop object on given item
     /// </summary>
-    public event EventHandler<DragOverItemEventArgs> DropOverItem;
+    public event EventHandler<DragOverItemEventArgs>? DropOverItem;
 
+    /// <inheritdoc cref="FastListBase.GetItemHeight"/>
     protected override int GetItemHeight (int itemIndex)
     {
         return GetIntItemProperty (itemIndex, ItemHeightNeeded, ItemHeightDefault);
@@ -309,20 +306,20 @@ public class FastList
             base.DrawItem (gr, info);
     }
 
-    protected override void OnDragOverItem (DragOverItemEventArgs e)
+    protected override void OnDragOverItem (DragOverItemEventArgs eventArgs)
     {
-        base.OnDragOverItem (e);
+        base.OnDragOverItem (eventArgs);
 
         if (DragOverItem != null)
-            DragOverItem (this, e);
+            DragOverItem (this, eventArgs);
     }
 
-    protected override void OnDropOverItem (DragOverItemEventArgs e)
+    protected override void OnDropOverItem (DragOverItemEventArgs eventArgs)
     {
         if (DropOverItem != null)
-            DropOverItem (this, e);
+            DropOverItem (this, eventArgs);
 
-        base.OnDropOverItem (e);
+        base.OnDropOverItem (eventArgs);
     }
 
     protected override void OnScrollbarsUpdated()
@@ -342,9 +339,9 @@ public class FastList
     private ImageItemEventArgs imageArg = new ImageItemEventArgs();
     private ColorItemEventArgs colorArg = new ColorItemEventArgs();
 
-    int GetIntItemProperty (int itemIndex, EventHandler<IntItemEventArgs> handler, int defaultValue)
+    int GetIntItemProperty (int itemIndex, EventHandler<IntItemEventArgs>? handler, int defaultValue)
     {
-        if (handler != null)
+        if (handler is not null)
         {
             intArg.ItemIndex = itemIndex;
             intArg.Result = defaultValue;
@@ -355,9 +352,9 @@ public class FastList
         return defaultValue;
     }
 
-    string GetStringItemProperty (int itemIndex, EventHandler<StringItemEventArgs> handler, string defaultValue)
+    string GetStringItemProperty (int itemIndex, EventHandler<StringItemEventArgs>? handler, string defaultValue)
     {
-        if (handler != null)
+        if (handler is not null)
         {
             stringArg.ItemIndex = itemIndex;
             stringArg.Result = defaultValue;
@@ -368,9 +365,9 @@ public class FastList
         return defaultValue;
     }
 
-    bool GetBoolItemProperty (int itemIndex, EventHandler<BoolItemEventArgs> handler, bool defaultValue)
+    bool GetBoolItemProperty (int itemIndex, EventHandler<BoolItemEventArgs>? handler, bool defaultValue)
     {
-        if (handler != null)
+        if (handler is not null)
         {
             boolArg.ItemIndex = itemIndex;
             boolArg.Result = defaultValue;
@@ -381,9 +378,9 @@ public class FastList
         return defaultValue;
     }
 
-    Image GetImageItemProperty (int itemIndex, EventHandler<ImageItemEventArgs> handler, Image defaultValue)
+    Image GetImageItemProperty (int itemIndex, EventHandler<ImageItemEventArgs>? handler, Image defaultValue)
     {
-        if (handler != null)
+        if (handler is not null)
         {
             imageArg.ItemIndex = itemIndex;
             imageArg.Result = defaultValue;
@@ -394,9 +391,9 @@ public class FastList
         return defaultValue;
     }
 
-    Color GetColorItemProperty (int itemIndex, EventHandler<ColorItemEventArgs> handler, Color defaultValue)
+    Color GetColorItemProperty (int itemIndex, EventHandler<ColorItemEventArgs>? handler, Color defaultValue)
     {
-        if (handler != null)
+        if (handler is not null)
         {
             colorArg.ItemIndex = itemIndex;
             colorArg.Result = defaultValue;

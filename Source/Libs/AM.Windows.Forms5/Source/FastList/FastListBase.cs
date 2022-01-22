@@ -4,25 +4,15 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
+// ReSharper disable VirtualMemberCallInConstructor
 
-/* FastListBase.cs --
+/* FastListBase.cs -- базовый класс для списка и дерева
  * Ars Magna project, http://arsmagna.ru
  */
-
-//
-//  THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
-//  KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-//  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
-//  PURPOSE.
-//
-//  License: GNU Lesser General Public License (LGPLv3)
-//
-//  Email: pavel_torgashov@ukr.net.
-//
-//  Copyright (C) Pavel Torgashov, 2014-2015.
 
 #region Using directives
 
@@ -31,7 +21,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Linq;
@@ -42,110 +31,246 @@ using System.Linq;
 
 namespace AM.Windows.Forms;
 
+/// <summary>
+/// Базовый класс для списка и дерева.
+/// </summary>
 [ToolboxItem (false)]
-public class FastListBase : UserControl
+public class FastListBase
+    : UserControl
 {
-    private readonly List<int> yOfItems = new List<int>();
-    private ToolTip tt;
-    private int itemCount;
-    protected int currentHotTrackingIndex;
-    private bool showScrollBar;
-    private Size localAutoScrollMinSize;
+    #region Properties
 
-    [Browsable (false)] public HashSet<int> SelectedItemIndexes { get; private set; }
+    /// <summary>
+    /// Индексы выбранных элементов.
+    /// </summary>
+    [Browsable (false)]
+    public HashSet<int> SelectedItemIndexes { get; }
+
+    /// <summary>
+    /// Индекс первого выбранного элемента.
+    /// </summary>
+    [Browsable (false)]
+    public int SelectedItemIndex => SelectedItemIndexes.FirstOrDefault (-1);
 
     [Browsable (false)]
-    public int SelectedItemIndex
-    {
-        get { return SelectedItemIndexes.Count == 0 ? -1 : SelectedItemIndexes.First(); }
-    }
+    public HashSet<int> CheckedItemIndex { get; }
 
-    [Browsable (false)] public HashSet<int> CheckedItemIndex { get; private set; }
+    /// <summary>
+    /// Показывать тултипы?
+    /// </summary>
+    [DefaultValue (true)]
+    public bool ShowToolTips { get; set; }
 
-    [DefaultValue (true)] public bool ShowToolTips { get; set; }
-    [DefaultValue (17)] public virtual int ItemHeightDefault { get; set; }
-    [DefaultValue (StringAlignment.Near)] public virtual StringAlignment ItemLineAlignmentDefault { get; set; }
-    [DefaultValue (10)] public virtual int ItemIndentDefault { get; set; }
+    /// <summary>
+    /// Высота элемента по умолчанию.
+    /// </summary>
+    [DefaultValue (17)]
+    public virtual int ItemHeightDefault { get; set; }
 
+    /// <summary>
+    /// Выравнивание элемента по горизонтали по умолчанию.
+    /// </summary>
+    [DefaultValue (StringAlignment.Near)]
+    public virtual StringAlignment ItemLineAlignmentDefault { get; set; }
+
+    /// <summary>
+    /// Отступ элемента по умолчанию.
+    /// </summary>
+    [DefaultValue (10)]
+    public virtual int ItemIndentDefault { get; set; }
+
+    /// <summary>
+    /// Размер иконки в пикселах.
+    /// </summary>
     [DefaultValue (typeof (Size), "16, 16")]
     public Size IconSize { get; set; }
 
-    [Browsable (false)] public bool IsEditMode { get; set; }
+    /// <summary>
+    /// В настоящее время происходит редактирование элемента?
+    /// </summary>
+    [Browsable (false)]
+    public bool IsEditMode { get; set; }
 
+    /// <summary>
+    /// Только для чтения?
+    /// </summary>
     [Browsable (true), DefaultValue (false)]
     public bool Readonly { get; set; }
 
-    [DefaultValue (false)] public bool ShowIcons { get; set; }
-    [DefaultValue (false)] public bool ShowCheckBoxes { get; set; }
-    [DefaultValue (false)] public bool ShowExpandBoxes { get; set; }
-    [DefaultValue (true)] public bool ShowEmptyExpandBoxes { get; set; }
+    /// <summary>
+    /// Показывать иконки?
+    /// </summary>
+    [DefaultValue (false)]
+    public bool ShowIcons { get; set; }
+
+    /// <summary>
+    /// Показывать чекбоксы?
+    /// </summary>
+    [DefaultValue (false)]
+    public bool ShowCheckBoxes { get; set; }
+
+    /// <summary>
+    /// Показывать чекбоксы, позволяющие раскрыть узел?
+    /// </summary>
+    [DefaultValue (false)]
+    public bool ShowExpandBoxes { get; set; }
+
+    /// <summary>
+    /// Показывать пустые боксы для раскрытия?
+    /// </summary>
+    [DefaultValue (true)]
+    public bool ShowEmptyExpandBoxes { get; set; }
+
+    /// <summary>
+    /// Картинка для отмеченного чекбокса.
+    /// </summary>
     public virtual Image ImageCheckBoxOn { get; set; }
+
+    /// <summary>
+    /// Картинка для неотмеченного текстбокса.
+    /// </summary>
     public virtual Image ImageCheckBoxOff { get; set; }
+
+    /// <summary>
+    /// Картинка для схлопнутого региона.
+    /// </summary>
     public virtual Image ImageCollapse { get; set; }
+
+    /// <summary>
+    /// Картинка для развернутого региона.
+    /// </summary>
     public virtual Image ImageExpand { get; set; }
+
+    /// <summary>
+    /// Картинка для пустого развернутого региона.
+    /// </summary>
     public virtual Image ImageEmptyExpand { get; set; }
+
+    /// <summary>
+    /// Картинка по умолчанию.
+    /// </summary>
     public virtual Image ImageDefaultIcon { get; set; }
 
+    /// <summary>
+    /// Цвет выделенных элементов.
+    /// </summary>
     [DefaultValue (typeof (Color), "33, 53, 80")]
     public Color SelectionColor { get; set; }
 
-    [DefaultValue (100)] public int SelectionColorOpaque { get; set; }
-    [DefaultValue (false)] public bool MultiSelect { get; set; }
+    /// <summary>
+    /// Уровень непрозрачности.
+    /// </summary>
+    [DefaultValue (100)]
+    public int SelectionColorOpaque { get; set; }
+
+    /// <summary>
+    /// Разрешить множественное выделение?
+    /// </summary>
+    [DefaultValue (false)]
+    public bool MultiSelect { get; set; }
     [DefaultValue (2)] public int ItemInterval { get; set; }
     [DefaultValue (false)] public bool FullItemSelect { get; set; }
     [DefaultValue (false)] public bool AllowDragItems { get; set; }
-    [DefaultValue (true)] public bool AllowSelectItems { get; set; }
-    [DefaultValue (false)] public bool HotTracking { get; set; }
 
+    /// <summary>
+    /// Разрешено выбирать элементы?
+    /// </summary>
+    [DefaultValue (true)]
+    public bool AllowSelectItems { get; set; }
+
+    /// <summary>
+    /// "Горячее отслеживание" элементов разрешено?
+    /// </summary>
+    [DefaultValue (false)]
+    public bool HotTracking { get; set; }
+
+    /// <summary>
+    /// Цвет "горячих" элементов.
+    /// </summary>
     [DefaultValue (typeof (Color), "255, 192, 128")]
     public Color HotTrackingColor { get; set; }
 
+    /// <summary>
+    /// Показывать скроллбар?
+    /// </summary>
     [Browsable (true)]
     [DefaultValue (true)]
     [Description ("Scollbar visibility.")]
     public bool ShowScrollBar
     {
-        get { return showScrollBar; }
+        get => _showScrollBar;
         set
         {
-            if (value == showScrollBar) return;
-            showScrollBar = value;
+            if (value == _showScrollBar) return;
+            _showScrollBar = value;
             buildNeeded = true;
             Invalidate();
         }
     }
 
-    [Browsable (false)]
-    public override bool AutoScroll
+    /// <summary>
+    /// Количество элементов.
+    /// </summary>
+    public virtual int ItemCount
     {
-        get { return true; }
+        get => _itemCount;
+        set
+        {
+            _itemCount = value;
+            if (!IsHandleCreated)
+            {
+                BuildNeeded();
+            }
+            else
+            {
+                Build();
+            }
+        }
     }
 
+    /// <inheritdoc cref="ScrollableControl.AutoScroll"/>
+    [Browsable (false)]
+    public override bool AutoScroll => true;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public FastListBase()
     {
-        SetStyle (
-            ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint |
-            ControlStyles.ResizeRedraw | ControlStyles.Selectable, true);
+        SetStyle
+            (
+                ControlStyles.AllPaintingInWmPaint
+                | ControlStyles.OptimizedDoubleBuffer
+                | ControlStyles.UserPaint
+                | ControlStyles.ResizeRedraw
+                | ControlStyles.Selectable,
+                true
+            );
 
-        tt = new ToolTip() { UseAnimation = false };
+        _toolTip = new ToolTip() { UseAnimation = false };
 
         SelectedItemIndexes = new HashSet<int>();
         CheckedItemIndex = new HashSet<int>();
-        InitDefaultProperties();
+        InitPropertiesWithDefaultValues();
     }
 
-    protected virtual void InitDefaultProperties()
+    #endregion
+
+    #region Private members
+
+    /// <summary>
+    /// Инициализация свойств значениями по умолчанию.
+    /// </summary>
+    protected virtual void InitPropertiesWithDefaultValues()
     {
         IconSize = new Size (16, 16);
         ItemHeightDefault = 17;
         VerticalScroll.SmallChange = ItemHeightDefault;
 
-        // ImageCheckBoxOn = Resources.checkbox_yes;
-        // ImageCheckBoxOff = Resources.checkbox_no;
-        // ImageCollapse = Resources.collapse;
-        // ImageExpand = Resources.expand;
-        // ImageEmptyExpand = Resources.empty;
-        // ImageDefaultIcon = Resources.default_icon;
         SelectionColor = Color.FromArgb (33, 53, 80);
         SelectionColorOpaque = 100;
         ItemInterval = 2;
@@ -155,29 +280,29 @@ public class FastListBase : UserControl
         AllowSelectItems = true;
         ShowEmptyExpandBoxes = true;
         HotTrackingColor = Color.FromArgb (255, 192, 128);
-        showScrollBar = true;
+        _showScrollBar = true;
     }
 
-    public virtual int ItemCount
-    {
-        get { return itemCount; }
-        set
-        {
-            itemCount = value;
-            if (IsHandleCreated)
-                Build();
-            else
-                BuildNeeded();
-        }
-    }
+    private readonly List<int> _yOfItems = new ();
+    private readonly ToolTip _toolTip;
+    private int _itemCount;
+    protected int currentHotTrackingIndex;
+    private bool _showScrollBar;
+    private Size _localAutoScrollMinSize;
+
+    #endregion
 
     #region Drag&Drop
 
-    private DragOverItemEventArgs lastDragAndDropEffect;
+    private DragOverItemEventArgs? _lastDragAndDropEffect;
 
-    protected override void OnDragOver (DragEventArgs e)
+    /// <inheritdoc cref="Control.OnDragOver"/>
+    protected override void OnDragOver
+        (
+            DragEventArgs eventArgs
+        )
     {
-        var p = new Point (e.X, e.Y);
+        var p = new Point (eventArgs.X, eventArgs.Y);
         p = PointToClient (p);
 
         var itemIndex = YToIndexAround (p.Y + VerticalScroll.Value);
@@ -190,17 +315,14 @@ public class FastListBase : UserControl
             textRect = new Rectangle (info.X_Text, rect.Y, info.X_EndText - info.X_Text + 1, rect.Height);
         }
 
-        var ea = new DragOverItemEventArgs (e.Data, e.KeyState, p.X, p.Y, e.AllowedEffect, e.Effect, rect, textRect)
+        var ea = new DragOverItemEventArgs (eventArgs.Data, eventArgs.KeyState, p.X, p.Y, eventArgs.AllowedEffect, eventArgs.Effect, rect, textRect)
             { ItemIndex = itemIndex };
 
         OnDragOverItem (ea);
 
-        if (ea.Effect != DragDropEffects.None)
-            lastDragAndDropEffect = ea;
-        else
-            lastDragAndDropEffect = null;
+        _lastDragAndDropEffect = ea.Effect != DragDropEffects.None ? ea : null;
 
-        e.Effect = ea.Effect;
+        eventArgs.Effect = ea.Effect;
 
         //scroll
         if (ea.ItemIndex >= 0 && ea.ItemIndex < ItemCount && itemIndex != ea.ItemIndex)
@@ -213,9 +335,13 @@ public class FastListBase : UserControl
         else
         {
             if (p.Y <= Padding.Top + ItemHeightDefault / 2)
+            {
                 ScrollUp();
+            }
             else if (p.Y >= ClientSize.Height - Padding.Bottom - +ItemHeightDefault / 2)
+            {
                 ScrollDown();
+            }
         }
 
         Invalidate();
@@ -223,33 +349,48 @@ public class FastListBase : UserControl
         //base.OnDragOver(e);
     }
 
-    protected virtual void OnDragOverItem (DragOverItemEventArgs e)
+    /// <summary>
+    /// Мышь тащится над элементом списка.
+    /// </summary>
+    protected virtual void OnDragOverItem
+        (
+            DragOverItemEventArgs eventArgs
+        )
     {
-        if (e.Y < e.ItemRect.Y + e.ItemRect.Height / 2)
-            e.InsertEffect = InsertEffect.InsertBefore;
-        else
-            e.InsertEffect = InsertEffect.InsertAfter;
+        eventArgs.InsertEffect = eventArgs.Y < eventArgs.ItemRect.Y + eventArgs.ItemRect.Height / 2
+            ? InsertEffect.InsertBefore
+            : InsertEffect.InsertAfter;
     }
 
+    /// <inheritdoc cref="Control.OnDragDrop"/>
     protected override void OnDragDrop (DragEventArgs e)
     {
         base.OnDragDrop (e);
 
-        if (lastDragAndDropEffect != null)
-            OnDropOverItem (lastDragAndDropEffect);
+        if (_lastDragAndDropEffect != null)
+        {
+            OnDropOverItem (_lastDragAndDropEffect);
+        }
 
-        lastDragAndDropEffect = null;
+        _lastDragAndDropEffect = null;
         Invalidate();
     }
 
-    protected virtual void OnDropOverItem (DragOverItemEventArgs e)
+    /// <summary>
+    /// Мышь отпустили над элементом списка.
+    /// </summary>
+    protected virtual void OnDropOverItem
+        (
+            DragOverItemEventArgs eventArgs
+        )
     {
+        // пустое тело метода
     }
 
     protected override void OnDragLeave (EventArgs e)
     {
         base.OnDragLeave (e);
-        lastDragAndDropEffect = null;
+        _lastDragAndDropEffect = null;
         Invalidate();
     }
 
@@ -272,8 +413,8 @@ public class FastListBase : UserControl
             res = Rectangle.FromLTRB (ClientRectangle.Left + Padding.Left, y, ClientRectangle.Right - Padding.Right,
                 y + h);
 
-            if (index >= itemCount)
-                res.Offset (0, (index - itemCount + 1) * ItemHeightDefault);
+            if (index >= _itemCount)
+                res.Offset (0, (index - _itemCount + 1) * ItemHeightDefault);
         }
 
         res.Offset (-HorizontalScroll.Value, -VerticalScroll.Value);
@@ -495,50 +636,75 @@ public class FastListBase : UserControl
         }
 
         if (ShowExpandBoxes)
+        {
             if (e.Button == MouseButtons.Left && item.X_ExpandBox <= e.Location.X && item.X_CheckBox > e.Location.X)
             {
                 //Expand
                 OnExpandBoxClick (item);
                 Invalidate();
             }
+        }
     }
 
-    protected virtual void OnMouseSelectItem (MouseEventArgs e, VisibleItemInfo item)
+    /// <summary>
+    /// Выделение элемента мышью.
+    /// </summary>
+    protected virtual void OnMouseSelectItem
+        (
+            MouseEventArgs eventArgs,
+            VisibleItemInfo item
+        )
     {
         if (MultiSelect)
         {
-            startMouseSelectArea = e.Location;
+            startMouseSelectArea = eventArgs.Location;
             startMouseSelectArea.Offset (HorizontalScroll.Value, VerticalScroll.Value);
-            mouseCanSelectArea = item.X_EndText < e.Location.X || !AllowDragItems;
+            mouseCanSelectArea = item.X_EndText < eventArgs.Location.X || !AllowDragItems;
 
-            if (Control.ModifierKeys == Keys.Control)
+            if (ModifierKeys == Keys.Control)
             {
                 if (SelectedItemIndexes.Contains (item.ItemIndex) && SelectedItemIndexes.Count > 1)
+                {
                     UnselectItem (item.ItemIndex);
+                }
                 else
+                {
                     SelectItem (item.ItemIndex, false);
+                }
 
                 startDiapasonSelectedItemIndex = -1;
             }
             else if (Control.ModifierKeys == Keys.Shift)
             {
                 if (SelectedItemIndexes.Count == 1)
+                {
                     startDiapasonSelectedItemIndex = SelectedItemIndexes.First();
+                }
 
                 if (startDiapasonSelectedItemIndex >= 0)
+                {
                     SelectItems (Math.Min (startDiapasonSelectedItemIndex, item.ItemIndex),
                         Math.Max (startDiapasonSelectedItemIndex, item.ItemIndex));
+                }
             }
         }
 
-        if (!MultiSelect || Control.ModifierKeys == Keys.None)
+        if (!MultiSelect || ModifierKeys == Keys.None)
+        {
             if (!SelectedItemIndexes.Contains (item.ItemIndex) || SelectedItemIndexes.Count > 1)
+            {
                 SelectItem (item.ItemIndex, true);
+            }
+        }
 
         Invalidate();
     }
 
-    protected override void OnMouseMove (MouseEventArgs e)
+    /// <inheritdoc cref="Control.OnMouseMove"/>
+    protected override void OnMouseMove
+        (
+            MouseEventArgs e
+        )
     {
         base.OnMouseMove (e);
 
@@ -604,14 +770,14 @@ public class FastListBase : UserControl
 
             if (info != null && info.X_EndText == info.X_End)
             {
-                if (tt.Tag != info.Text && ShowToolTips)
-                    tt.Show (info.Text, this, info.X_Text - 3, info.Y - 2, 2000);
-                tt.Tag = info.Text;
+                if (_toolTip.Tag != info.Text && ShowToolTips)
+                    _toolTip.Show (info.Text, this, info.X_Text - 3, info.Y - 2, 2000);
+                _toolTip.Tag = info.Text;
             }
             else
             {
-                tt.Tag = null;
-                tt.Hide (this);
+                _toolTip.Tag = null;
+                _toolTip.Hide (this);
             }
         }
     }
@@ -620,26 +786,40 @@ public class FastListBase : UserControl
     {
     }
 
-    protected override void OnMouseUp (MouseEventArgs e)
+    /// <inheritdoc cref="Control.OnMouseUp"/>
+    protected override void OnMouseUp
+        (
+            MouseEventArgs e
+        )
     {
         base.OnMouseUp (e);
 
         var item = PointToItemInfo (e.Location);
 
         if (item != null)
+        {
             if (AllowSelectItems)
+            {
                 if (e.Button == MouseButtons.Left && item.X_Icon <= e.Location.X)
                 {
                     if (AllowDragItems && MultiSelect && mouseSelectArea == Rectangle.Empty)
+                    {
                         OnMouseSelectItem (e, item);
+                    }
                 }
+            }
+        }
 
         mouseCanSelectArea = false;
 
         Invalidate();
     }
 
-    protected override void OnMouseDoubleClick (MouseEventArgs e)
+    /// <inheritdoc cref="Control.OnMouseDoubleClick"/>
+    protected override void OnMouseDoubleClick
+        (
+            MouseEventArgs e
+        )
     {
         base.OnMouseDoubleClick (e);
 
@@ -648,13 +828,19 @@ public class FastListBase : UserControl
         var item = PointToItemInfo (e.Location);
 
         if (item != null)
+        {
             if (e.Button == MouseButtons.Left && item.X_Icon <= e.Location.X)
             {
                 if (GetItemExpanded (item.ItemIndex))
+                {
                     CollapseItem (item.ItemIndex);
+                }
                 else
+                {
                     ExpandItem (item.ItemIndex);
+                }
             }
+        }
     }
 
     #endregion mouse
@@ -755,36 +941,62 @@ public class FastListBase : UserControl
         return false;
     }
 
+    /// <summary>
+    /// Снятие отметки со всех элементов.
+    /// </summary>
+    /// <returns>Признак успешного выполнения операции.</returns>
     public virtual bool UncheckAll()
     {
         foreach (var i in CheckedItemIndex)
+        {
             if (!CanUncheckItem (i))
+            {
                 return false;
+            }
+        }
 
         var list = new List<int> (CheckedItemIndex);
 
         CheckedItemIndex.Clear();
 
         foreach (var i in list)
+        {
             OnItemUnchecked (i);
+        }
 
         Invalidate();
 
         return true;
     }
 
-    protected virtual void OnItemChecked (int itemIndex)
+    /// <summary>
+    /// Элемент по указанному индексу был отмечен.
+    /// </summary>
+    protected virtual void OnItemChecked
+        (
+            int itemIndex
+        )
     {
+        // пустое тело метода
     }
 
-    protected virtual void OnItemUnchecked (int itemIndex)
+    /// <summary>
+    /// С элемента по указанному индексу была снята отметка.
+    /// </summary>
+    protected virtual void OnItemUnchecked
+        (
+            int itemIndex
+        )
     {
+        // пустое тело метода
     }
 
     protected virtual void CheckSelected()
     {
         foreach (var i in SelectedItemIndexes)
+        {
             CheckItem (i);
+        }
     }
 
     protected virtual void UncheckSelected()
@@ -951,6 +1163,7 @@ public class FastListBase : UserControl
 
     #region Paint
 
+    /// <inheritdoc cref="Control.OnPaint"/>
     protected override void OnPaint (PaintEventArgs e)
     {
         //was build request
@@ -964,10 +1177,10 @@ public class FastListBase : UserControl
         e.Graphics.SetClip (ClientRectMinusPaddings);
         DrawItems (e.Graphics);
 
-        if (lastDragAndDropEffect == null)
+        if (_lastDragAndDropEffect == null)
             DrawMouseSelectedArea (e.Graphics);
         else
-            DrawDragOverInsertEffect (e.Graphics, lastDragAndDropEffect);
+            DrawDragOverInsertEffect (e.Graphics, _lastDragAndDropEffect);
 
         base.OnPaint (e);
 
@@ -1064,7 +1277,7 @@ public class FastListBase : UserControl
     {
         DrawItemBackgound (gr, info);
 
-        if (lastDragAndDropEffect == null) //do not draw selection when drag&drop over the control
+        if (_lastDragAndDropEffect == null) //do not draw selection when drag&drop over the control
             if (!IsEditMode) //do not draw selection when edit mode
                 if (SelectedItemIndexes.Contains (info.ItemIndex))
                     DrawSelection (gr, info);
@@ -1129,37 +1342,41 @@ public class FastListBase : UserControl
     /// <summary>
     /// Draws Expand box, Check box and Icon of the Item
     /// </summary>
-    public virtual void DrawItemIcons (Graphics gr, VisibleItemInfo info)
+    public virtual void DrawItemIcons
+        (
+            Graphics graphics,
+            VisibleItemInfo info
+        )
     {
         if (info.ExpandBoxType > 0)
         {
-            var img = (Bitmap)(info.ExpandBoxType == 2
+            var img = (Bitmap?)(info.ExpandBoxType == 2
                 ? ImageEmptyExpand
                 : (info.Expanded ? ImageCollapse : ImageExpand));
             if (img != null)
             {
-                img.SetResolution (gr.DpiX, gr.DpiY);
-                gr.DrawImage (img, info.X_ExpandBox, info.Y + 1);
+                img.SetResolution (graphics.DpiX, graphics.DpiY);
+                graphics.DrawImage (img, info.X_ExpandBox, info.Y + 1);
             }
         }
 
         if (info.CheckBoxVisible)
         {
-            var img = (Bitmap)(GetItemChecked (info.ItemIndex) ? ImageCheckBoxOn : ImageCheckBoxOff);
+            var img = (Bitmap?)(GetItemChecked (info.ItemIndex) ? ImageCheckBoxOn : ImageCheckBoxOff);
             if (img != null)
             {
-                img.SetResolution (gr.DpiX, gr.DpiY);
-                gr.DrawImage (img, info.X_CheckBox, info.Y + 1);
+                img.SetResolution (graphics.DpiX, graphics.DpiY);
+                graphics.DrawImage (img, info.X_CheckBox, info.Y + 1);
             }
         }
 
         if (ShowIcons && info.Icon != null)
         {
-            var img = (Bitmap)info.Icon;
+            var img = (Bitmap?)info.Icon;
             if (img != null)
             {
-                img.SetResolution (gr.DpiX, gr.DpiY);
-                gr.DrawImage (img, info.X_Icon, info.Y + 1);
+                img.SetResolution (graphics.DpiX, graphics.DpiY);
+                graphics.DrawImage (img, info.X_Icon, info.Y + 1);
             }
         }
     }
@@ -1196,10 +1413,10 @@ public class FastListBase : UserControl
 
     #region Coordinates
 
-    protected virtual bool IsItemHeightFixed
-    {
-        get { return true; }
-    }
+    /// <summary>
+    /// Высота элементов фиксированная?
+    /// </summary>
+    protected virtual bool IsItemHeightFixed => true;
 
     /// <summary>
     /// Absolute Y coordinate of the control to item index
@@ -1222,7 +1439,7 @@ public class FastListBase : UserControl
         }
         else
         {
-            i = yOfItems.BinarySearch (y + 1);
+            i = _yOfItems.BinarySearch (y + 1);
             if (i < 0)
             {
                 i = ~i;
@@ -1236,12 +1453,14 @@ public class FastListBase : UserControl
         return i;
     }
 
-    protected virtual int GetItemY (int index)
+    protected virtual int GetItemY
+        (
+            int index
+        )
     {
-        if (IsItemHeightFixed)
-            return Padding.Top + index * (ItemHeightDefault + ItemInterval);
-        else
-            return yOfItems[index];
+        return IsItemHeightFixed
+            ? Padding.Top + index * (ItemHeightDefault + ItemInterval)
+            : _yOfItems[index];
     }
 
     protected int YToIndexAround (int y)
@@ -1257,7 +1476,7 @@ public class FastListBase : UserControl
         }
         else
         {
-            i = yOfItems.BinarySearch (y + 1);
+            i = _yOfItems.BinarySearch (y + 1);
             if (i < 0)
             {
                 i = ~i;
@@ -1306,10 +1525,21 @@ public class FastListBase : UserControl
     /// </summary>
     public class VisibleItemInfo
     {
+        /// <summary>
+        /// Индекс элемента.
+        /// </summary>
         public int ItemIndex;
         public int Y;
+
+        /// <summary>
+        /// Высота элемента.
+        /// </summary>
         public int Height;
-        public string Text;
+
+        /// <summary>
+        /// Текст, соответствующий элементу.
+        /// </summary>
+        public string? Text;
         public int X;
         public int X_ExpandBox;
         public int X_CheckBox;
@@ -1319,31 +1549,43 @@ public class FastListBase : UserControl
         public int X_End;
         public bool CheckBoxVisible;
         public int ExpandBoxType;
-        public Image Icon;
+        public Image? Icon;
         public bool Expanded;
+
+        /// <summary>
+        /// Цвет текста.
+        /// </summary>
         public Color ForeColor;
+
+        /// <summary>
+        /// Цвет фона.
+        /// </summary>
         public Color BackColor;
+
+        /// <summary>
+        /// Выравнивание по горизонтали.
+        /// </summary>
         public StringAlignment LineAlignment = StringAlignment.Near;
 
-        public Rectangle FullRect
-        {
-            get { return new Rectangle (X, Y, X_End - X + 1, Height); }
-        }
+        /// <summary>
+        /// Полный прямоугольник.
+        /// </summary>
+        public Rectangle FullRect => new (X, Y, X_End - X + 1, Height);
 
-        public Rectangle Rect
-        {
-            get { return new Rectangle (X_ExpandBox, Y, X_EndText - X + 1, Height); }
-        }
+        /// <summary>
+        /// Описывающй прямоугольник.
+        /// </summary>
+        public Rectangle Rect => new (X_ExpandBox, Y, X_EndText - X + 1, Height);
 
-        public Rectangle TextAndIconRect
-        {
-            get { return new Rectangle (X_Icon, Y, X_EndText - X_Icon + 1, Height); }
-        }
+        /// <summary>
+        /// Прямоугольник, соответствующий тексту и иконке.
+        /// </summary>
+        public Rectangle TextAndIconRect => new (X_Icon, Y, X_EndText - X_Icon + 1, Height);
 
-        public Rectangle TextRect
-        {
-            get { return new Rectangle (X_Text, Y, X_EndText - X_Text + 1, Height); }
-        }
+        /// <summary>
+        /// Прямоугольник, соответствующий тексту.
+        /// </summary>
+        public Rectangle TextRect => new (X_Text, Y, X_EndText - X_Text + 1, Height);
 
         public virtual void Calc (FastListBase list, int itemIndex, Graphics gr)
         {
@@ -1387,30 +1629,33 @@ public class FastListBase : UserControl
 
     #region Build
 
+    /// <summary>
+    /// Построение списка элементов.
+    /// </summary>
     protected virtual void Build()
     {
-        yOfItems.Clear();
+        _yOfItems.Clear();
 
         int y = Padding.Top;
 
         if (!IsItemHeightFixed)
         {
-            for (int i = 0; i < itemCount; i++)
+            for (int i = 0; i < _itemCount; i++)
             {
-                yOfItems.Add (y);
+                _yOfItems.Add (y);
                 y += GetItemHeight (i) + ItemInterval;
             }
 
-            yOfItems.Add (y);
+            _yOfItems.Add (y);
         }
         else
         {
-            y += itemCount * (ItemHeightDefault + ItemInterval);
+            y += _itemCount * (ItemHeightDefault + ItemInterval);
         }
 
 
-        SelectedItemIndexes.RemoveWhere (i => i >= itemCount);
-        CheckedItemIndex.RemoveWhere (i => i >= itemCount);
+        SelectedItemIndexes.RemoveWhere (i => i >= _itemCount);
+        CheckedItemIndex.RemoveWhere (i => i >= _itemCount);
 
         AutoScrollMinSize = new Size (AutoScrollMinSize.Width, y + Padding.Bottom + 2);
         Invalidate();
@@ -1418,6 +1663,9 @@ public class FastListBase : UserControl
 
     bool buildNeeded;
 
+    /// <summary>
+    /// Установка признака "требуется перестроение элементов".
+    /// </summary>
     public virtual void BuildNeeded()
     {
         buildNeeded = true;
@@ -1427,82 +1675,179 @@ public class FastListBase : UserControl
 
     #region Get item info methods
 
-    protected virtual int GetItemHeight (int itemIndex)
+    /// <summary>
+    /// Получение высоты элемента по его индексу.
+    /// </summary>
+    protected virtual int GetItemHeight
+        (
+            int itemIndex
+        )
     {
         return ItemHeightDefault;
     }
 
-    public virtual int GetItemIndent (int itemIndex)
+    /// <summary>
+    /// Получение отступа элемента по его индексу.
+    /// </summary>
+    public virtual int GetItemIndent
+        (
+            int itemIndex
+        )
     {
         return ItemIndentDefault;
     }
 
-    protected virtual string GetItemText (int itemIndex)
+    /// <summary>
+    /// Получение текста элемента по его индексу.
+    /// </summary>
+    protected virtual string GetItemText
+        (
+            int itemIndex
+        )
     {
         return string.Empty;
     }
 
-    protected virtual void OnItemTextPushed (int itemIndex, string text)
+    /// <summary>
+    /// Реакция на изменение текста в элементе.
+    /// </summary>
+    protected virtual void OnItemTextPushed
+        (
+            int itemIndex,
+            string text
+        )
     {
         Invalidate();
     }
 
-    protected virtual bool GetItemCheckBoxVisible (int itemIndex)
+    /// <summary>
+    /// Получение видимости чекбокса для элемента.
+    /// </summary>
+    protected virtual bool GetItemCheckBoxVisible
+        (
+            int itemIndex
+        )
     {
         return ShowCheckBoxes;
     }
 
-    protected virtual bool GetItemChecked (int itemIndex)
+    /// <summary>
+    /// Получение состояния отметки для элемента по его индексу.
+    /// </summary>
+    protected virtual bool GetItemChecked
+        (
+            int itemIndex
+        )
     {
         return CheckedItemIndex.Contains (itemIndex);
     }
 
-    protected virtual Image GetItemIcon (int itemIndex)
+    /// <summary>
+    /// Получение иконки для элемента по его индексу.
+    /// </summary>
+    protected virtual Image? GetItemIcon
+        (
+            int itemIndex
+        )
     {
         return null;
     }
 
-    protected virtual StringAlignment GetItemLineAlignment (int itemIndex)
+    /// <summary>
+    /// Получение выравнивания для элемента по его индексу.
+    /// </summary>
+    protected virtual StringAlignment GetItemLineAlignment
+        (
+            int itemIndex
+        )
     {
         return StringAlignment.Near;
     }
 
-    protected virtual Color GetItemBackColor (int itemIndex)
+    /// <summary>
+    /// Получение цвета фона элемента по его индексу.
+    /// </summary>
+    protected virtual Color GetItemBackColor
+        (
+            int itemIndex
+        )
     {
         return Color.Empty;
     }
 
-    protected virtual Color GetItemForeColor (int itemIndex)
+    /// <summary>
+    /// Получение цвета текста элемента по его индексу.
+    /// </summary>
+    protected virtual Color GetItemForeColor
+        (
+            int itemIndex
+        )
     {
         return ForeColor;
     }
 
-    protected virtual bool GetItemExpanded (int itemIndex)
+    /// <summary>
+    /// Получение состояния элемента "свернут/развернут" по его индексу.
+    /// </summary>
+    protected virtual bool GetItemExpanded
+        (
+            int itemIndex
+        )
     {
         return false;
     }
 
-    protected virtual bool CanUnselectItem (int itemIndex)
+    /// <summary>
+    /// Можно ли снять выделение с указанного элемента?
+    /// </summary>
+    protected virtual bool CanUnselectItem
+        (
+            int itemIndex
+        )
     {
         return true;
     }
 
-    protected virtual bool CanSelectItem (int itemIndex)
+    /// <summary>
+    /// Получение возможности выделения элемента по его индексу.
+    /// </summary>
+    protected virtual bool CanSelectItem
+        (
+            int itemIndex
+        )
     {
         return AllowSelectItems;
     }
 
-    protected virtual bool CanUncheckItem (int itemIndex)
+    /// <summary>
+    /// Получение возможности снятия выделения с элемента по его индексу.
+    /// </summary>
+    protected virtual bool CanUncheckItem
+        (
+            int itemIndex
+        )
     {
         return true;
     }
 
-    protected virtual bool CanCheckItem (int itemIndex)
+    /// <summary>
+    /// Получение возможности отметки элемента по его индексу.
+    /// </summary>
+    protected virtual bool CanCheckItem
+        (
+            int itemIndex
+        )
     {
         return true;
     }
 
-    protected virtual bool CanExpandItem (int itemIndex)
+    /// <summary>
+    /// Получение возможности разворачивания элемента по его индексу.
+    /// </summary>
+    protected virtual bool CanExpandItem
+        (
+            int itemIndex
+        )
     {
         return true;
     }
@@ -1521,21 +1866,33 @@ public class FastListBase : UserControl
 
     #region Scroll
 
+    /// <summary>
+    /// Скроллинг вверх.
+    /// </summary>
     protected virtual void ScrollUp()
     {
         OnScrollVertical (VerticalScroll.Value - VerticalScroll.SmallChange);
     }
 
+    /// <summary>
+    /// Скроллинг вниз.
+    /// </summary>
     protected virtual void ScrollDown()
     {
         OnScrollVertical (VerticalScroll.Value + VerticalScroll.SmallChange);
     }
 
+    /// <summary>
+    /// Скроллинг на одну страницу вверх.
+    /// </summary>
     protected virtual void ScrollPageUp()
     {
         OnScrollVertical (VerticalScroll.Value - VerticalScroll.LargeChange);
     }
 
+    /// <summary>
+    /// Скроллинг на одну страницу вниз.
+    /// </summary>
     protected virtual void ScrollPageDown()
     {
         OnScrollVertical (VerticalScroll.Value + VerticalScroll.LargeChange);
@@ -1545,7 +1902,7 @@ public class FastListBase : UserControl
     {
         set
         {
-            if (showScrollBar)
+            if (_showScrollBar)
             {
                 if (!base.AutoScroll)
                     base.AutoScroll = true;
@@ -1561,17 +1918,11 @@ public class FastListBase : UserControl
                 HorizontalScroll.Visible = false;
                 VerticalScroll.Maximum = Math.Max (0, value.Height - ClientSize.Height);
                 HorizontalScroll.Maximum = Math.Max (0, value.Width - ClientSize.Width);
-                localAutoScrollMinSize = value;
+                _localAutoScrollMinSize = value;
             }
         }
 
-        get
-        {
-            if (showScrollBar)
-                return base.AutoScrollMinSize;
-            else
-                return localAutoScrollMinSize;
-        }
+        get => _showScrollBar ? base.AutoScrollMinSize : _localAutoScrollMinSize;
     }
 
     /// <summary>
@@ -1589,7 +1940,9 @@ public class FastListBase : UserControl
             AutoScrollMinSize = AutoScrollMinSize;
 
         if (IsHandleCreated)
-            BeginInvoke ((MethodInvoker)OnScrollbarsUpdated);
+        {
+            BeginInvoke ((MethodInvoker) OnScrollbarsUpdated);
+        }
     }
 
     protected virtual void OnScrollbarsUpdated()
@@ -1601,22 +1954,28 @@ public class FastListBase : UserControl
     private const int SB_ENDSCROLL = 0x8;
     private const int WM_MOUSEWHEEL = 0x20A;
 
+    /// <inheritdoc cref="UserControl.WndProc"/>
     protected override void WndProc (ref Message m)
     {
         if (m.Msg == WM_HSCROLL || m.Msg == WM_VSCROLL)
+        {
             if (m.WParam.ToInt32() != SB_ENDSCROLL)
             {
                 Focus();
                 Invalidate();
             }
+        }
 
         if (m.Msg == WM_MOUSEWHEEL)
         {
             //var step = 3 * ItemHeightDefault * Math.Sign(-m.WParam.ToInt64());
             var step = -3 * ItemHeightDefault * Math.Sign ((short)(m.WParam.ToInt64() >> 16));
             if (VerticalScroll.Visible)
+            {
                 OnScroll (new ScrollEventArgs (ScrollEventType.ThumbPosition, VerticalScroll.Value + step,
                     ScrollOrientation.VerticalScroll));
+            }
+
             Focus();
             return;
         }
@@ -1624,7 +1983,14 @@ public class FastListBase : UserControl
         base.WndProc (ref m);
     }
 
-    public void ScrollToRectangle (Rectangle rect)
+    /// <summary>
+    /// Скроллинг вплоть до указанного прямоугольника.
+    /// </summary>
+    /// <param name="rect"></param>
+    public void ScrollToRectangle
+        (
+            Rectangle rect
+        )
     {
         rect = new Rectangle (rect.X - HorizontalScroll.Value, rect.Y - VerticalScroll.Value, rect.Width, rect.Height);
 
@@ -1656,22 +2022,37 @@ public class FastListBase : UserControl
         }
     }
 
-    public void ScrollToItem (int itemIndex)
+    /// <summary>
+    /// Скроллинг вплоть до элемента с указанным индексом.
+    /// </summary>
+    public void ScrollToItem
+        (
+            int itemIndex
+        )
     {
         if (itemIndex < 0 || itemIndex >= ItemCount)
+        {
             return;
+        }
 
         var y = GetItemY (itemIndex);
         var height = GetItemHeight (itemIndex);
         ScrollToRectangle (new Rectangle (0, y, ClientRectangle.Width, height));
     }
 
-    public void OnScrollVertical (int newVerticalScrollBarValue)
+    /// <summary>
+    /// Вертикальный скроллинг.
+    /// </summary>
+    public void OnScrollVertical
+        (
+            int newVerticalScrollBarValue
+        )
     {
         OnScroll (new ScrollEventArgs (ScrollEventType.ThumbPosition, newVerticalScrollBarValue,
             ScrollOrientation.VerticalScroll));
     }
 
+    /// <inheritdoc cref="ScrollableControl.OnScroll"/>
     protected override void OnScroll (ScrollEventArgs se)
     {
         if (se.ScrollOrientation == ScrollOrientation.VerticalScroll)
@@ -1688,8 +2069,19 @@ public class FastListBase : UserControl
 
     #region Edit
 
+    /// <summary>
+    /// Индекс редактируемого элемента.
+    /// </summary>
     protected int EditItemIndex;
-    protected Control EditControl;
+
+    /// <summary>
+    /// Текущий редактор для элемента.
+    /// </summary>
+    protected Control? EditControl;
+
+    /// <summary>
+    /// Счетчик режима обновления.
+    /// </summary>
     protected int editUpdating = 0;
 
     public virtual void OnStartEdit (int itemIndex, string startValue = null)
@@ -1734,35 +2126,52 @@ public class FastListBase : UserControl
         Invalidate();
     }
 
+    /// <summary>
+    /// Окончание редактирования.
+    /// </summary>
     public virtual void OnEndEdit()
     {
-        string val = null;
+        string? val = null;
 
         if (EditControl != null)
+        {
             val = EditControl.Text;
+        }
 
         OnEndEdit (val);
     }
 
-    public virtual void OnEndEdit (string newValue)
+    /// <summary>
+    /// Окончание редактирования.
+    /// </summary>
+    /// <param name="newValue">Новое значение.</param>
+    public virtual void OnEndEdit
+        (
+            string? newValue
+        )
     {
         if (editUpdating > 0)
+        {
             return;
+        }
 
         try
         {
             editUpdating++;
 
-            if (newValue != null)
+            if (newValue is not null)
+            {
                 OnItemTextPushed (EditItemIndex, newValue);
+            }
 
-            if (EditControl != null)
+            if (EditControl is not null)
+            {
                 EditControl.Parent = null;
+            }
 
             EditControl = null;
             IsEditMode = false;
 
-            //mouseCanSelect = false;
             Invalidate();
         }
         finally
@@ -1775,7 +2184,11 @@ public class FastListBase : UserControl
 
     #region Routines
 
-    protected override void OnGotFocus (EventArgs e)
+    /// <inheritdoc cref="Control.OnGotFocus"/>
+    protected override void OnGotFocus
+        (
+            EventArgs e
+        )
     {
         base.OnGotFocus (e);
         Invalidate();
@@ -1785,44 +2198,27 @@ public class FastListBase : UserControl
 
     #region ISupportInitialize
 
+    /// <summary>
+    /// В настоящий момент происходит инициализация?
+    /// </summary>
     protected bool IsInitializing;
 
+    /// <summary>
+    /// Начало инициализации.
+    /// </summary>
     public void BeginInit()
     {
         IsInitializing = true;
     }
 
+    /// <summary>
+    /// Окончание инициализации.
+    /// </summary>
     public void EndInit()
     {
         IsInitializing = false;
         ItemCount = ItemCount;
     }
 
-    #endregion ISupportInitialize
-}
-
-public class DragOverItemEventArgs : DragEventArgs
-{
-    public int ItemIndex { get; set; }
-    public InsertEffect InsertEffect { get; set; }
-    public Rectangle ItemRect { get; private set; }
-    public Rectangle TextRect { get; private set; }
-    public object Tag { get; set; }
-
-    public DragOverItemEventArgs (IDataObject data, int keyState, int x, int y, DragDropEffects allowedEffects,
-        DragDropEffects effect, Rectangle itemRect, Rectangle textRect)
-        : base (data, keyState, x, y, allowedEffects, effect)
-    {
-        this.ItemRect = itemRect;
-        this.TextRect = textRect;
-    }
-}
-
-public enum InsertEffect
-{
-    None,
-    InsertBefore,
-    InsertAfter,
-    Replace,
-    AddAsChild
+    #endregion
 }
