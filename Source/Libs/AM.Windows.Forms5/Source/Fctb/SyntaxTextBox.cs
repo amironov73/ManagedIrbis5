@@ -1908,7 +1908,7 @@ public class SyntaxTextBox
     /// </summary>
     [Browsable (true)]
     [Description ("It occurs if user click on the hint.")]
-    public event EventHandler<HintClickEventArgs> HintClick;
+    public event EventHandler<HintClickEventArgs>? HintClick;
 
     /// <summary>
     /// TextChanged event.
@@ -1922,13 +1922,13 @@ public class SyntaxTextBox
     /// Fake event for correct data binding
     /// </summary>
     [Browsable (false)]
-    internal event EventHandler BindingTextChanged;
+    internal event EventHandler? BindingTextChanged;
 
     /// <summary>
     /// Occurs when user paste text from clipboard
     /// </summary>
     [Description ("Occurs when user paste text from clipboard")]
-    public event EventHandler<TextChangingEventArgs> Pasting;
+    public event EventHandler<TextChangingEventArgs>? Pasting;
 
     /// <summary>
     /// TextChanging event.
@@ -1936,7 +1936,7 @@ public class SyntaxTextBox
     /// </summary>
     [Browsable (true)]
     [Description ("It occurs before insert, delete, clear, undo and redo operations.")]
-    public event EventHandler<TextChangingEventArgs> TextChanging;
+    public event EventHandler<TextChangingEventArgs>? TextChanging;
 
     /// <summary>
     /// SelectionChanged event.
@@ -1944,7 +1944,7 @@ public class SyntaxTextBox
     /// </summary>
     [Browsable (true)]
     [Description ("It occurs after changing of selection.")]
-    public event EventHandler SelectionChanged;
+    public event EventHandler? SelectionChanged;
 
     /// <summary>
     /// VisibleRangeChanged event.
@@ -1952,7 +1952,7 @@ public class SyntaxTextBox
     /// </summary>
     [Browsable (true)]
     [Description ("It occurs after changing of visible range.")]
-    public event EventHandler VisibleRangeChanged;
+    public event EventHandler? VisibleRangeChanged;
 
     /// <summary>
     /// TextChangedDelayed event.
@@ -1960,10 +1960,8 @@ public class SyntaxTextBox
     /// This event occurs with a delay relative to TextChanged, and fires only once.
     /// </summary>
     [Browsable (true)]
-    [Description (
-            "It occurs after insert, delete, clear, undo and redo operations. This event occurs with a delay relative to TextChanged, and fires only once."
-        )]
-    public event EventHandler<TextChangedEventArgs> TextChangedDelayed;
+    [Description ("It occurs after insert, delete, clear, undo and redo operations. This event occurs with a delay relative to TextChanged, and fires only once.")]
+    public event EventHandler<TextChangedEventArgs>? TextChangedDelayed;
 
     /// <summary>
     /// SelectionChangedDelayed event.
@@ -1971,10 +1969,8 @@ public class SyntaxTextBox
     /// This event occurs with a delay relative to SelectionChanged, and fires only once.
     /// </summary>
     [Browsable (true)]
-    [Description (
-            "It occurs after changing of selection. This event occurs with a delay relative to SelectionChanged, and fires only once."
-        )]
-    public event EventHandler SelectionChangedDelayed;
+    [Description ("It occurs after changing of selection. This event occurs with a delay relative to SelectionChanged, and fires only once.")]
+    public event EventHandler? SelectionChangedDelayed;
 
     /// <summary>
     /// VisibleRangeChangedDelayed event.
@@ -1982,17 +1978,15 @@ public class SyntaxTextBox
     /// This event occurs with a delay relative to VisibleRangeChanged, and fires only once.
     /// </summary>
     [Browsable (true)]
-    [Description (
-            "It occurs after changing of visible range. This event occurs with a delay relative to VisibleRangeChanged, and fires only once."
-        )]
-    public event EventHandler VisibleRangeChangedDelayed;
+    [Description ("It occurs after changing of visible range. This event occurs with a delay relative to VisibleRangeChanged, and fires only once.")]
+    public event EventHandler? VisibleRangeChangedDelayed;
 
     /// <summary>
     /// It occurs when user click on VisualMarker.
     /// </summary>
     [Browsable (true)]
     [Description ("It occurs when user click on VisualMarker.")]
-    public event EventHandler<VisualMarkerEventArgs> VisualMarkerClick;
+    public event EventHandler<VisualMarkerEventArgs>? VisualMarkerClick;
 
     /// <summary>
     /// It occurs when visible char is enetering (alphabetic, digit, punctuation, DEL, BACKSPACE)
@@ -2000,42 +1994,42 @@ public class SyntaxTextBox
     /// <remarks>Set Handle to True for cancel key</remarks>
     [Browsable (true)]
     [Description ("It occurs when visible char is enetering (alphabetic, digit, punctuation, DEL, BACKSPACE).")]
-    public event KeyPressEventHandler KeyPressing;
+    public event KeyPressEventHandler? KeyPressing;
 
     /// <summary>
     /// It occurs when visible char is enetered (alphabetic, digit, punctuation, DEL, BACKSPACE)
     /// </summary>
     [Browsable (true)]
     [Description ("It occurs when visible char is enetered (alphabetic, digit, punctuation, DEL, BACKSPACE).")]
-    public event KeyPressEventHandler KeyPressed;
+    public event KeyPressEventHandler? KeyPressed;
 
     /// <summary>
     /// It occurs when calculates AutoIndent for new line
     /// </summary>
     [Browsable (true)]
     [Description ("It occurs when calculates AutoIndent for new line.")]
-    public event EventHandler<AutoIndentEventArgs> AutoIndentNeeded;
+    public event EventHandler<AutoIndentEventArgs>? AutoIndentNeeded;
 
     /// <summary>
     /// It occurs when line background is painting
     /// </summary>
     [Browsable (true)]
     [Description ("It occurs when line background is painting.")]
-    public event EventHandler<PaintLineEventArgs> PaintLine;
+    public event EventHandler<PaintLineEventArgs>? PaintLine;
 
     /// <summary>
     /// Occurs when line was inserted/added
     /// </summary>
     [Browsable (true)]
     [Description ("Occurs when line was inserted/added.")]
-    public event EventHandler<LineInsertedEventArgs> LineInserted;
+    public event EventHandler<LineInsertedEventArgs>? LineInserted;
 
     /// <summary>
     /// Occurs when line was removed
     /// </summary>
     [Browsable (true)]
     [Description ("Occurs when line was removed.")]
-    public event EventHandler<LineRemovedEventArgs> LineRemoved;
+    public event EventHandler<LineRemovedEventArgs>? LineRemoved;
 
     /// <summary>
     /// Occurs when current highlighted folding area is changed.
@@ -2044,7 +2038,7 @@ public class SyntaxTextBox
     /// <remarks></remarks>
     [Browsable (true)]
     [Description ("Occurs when current highlighted folding area is changed.")]
-    public event EventHandler<EventArgs> FoldingHighlightChanged;
+    public event EventHandler<EventArgs>? FoldingHighlightChanged;
 
     /// <summary>
     /// Occurs when undo/redo stack is changed
@@ -2052,14 +2046,14 @@ public class SyntaxTextBox
     /// <remarks></remarks>
     [Browsable (true)]
     [Description ("Occurs when undo/redo stack is changed.")]
-    public event EventHandler<EventArgs> UndoRedoStateChanged;
+    public event EventHandler<EventArgs>? UndoRedoStateChanged;
 
     /// <summary>
     /// Occurs when component was zoomed
     /// </summary>
     [Browsable (true)]
     [Description ("Occurs when component was zoomed.")]
-    public event EventHandler ZoomChanged;
+    public event EventHandler? ZoomChanged;
 
 
     /// <summary>
@@ -2067,22 +2061,21 @@ public class SyntaxTextBox
     /// </summary>
     [Browsable (true)]
     [Description ("Occurs when user pressed key, that specified as CustomAction.")]
-    public event EventHandler<CustomActionEventArgs> CustomAction;
+    public event EventHandler<CustomActionEventArgs>? CustomAction;
 
     /// <summary>
     /// Occurs when scroolbars are updated
     /// </summary>
     [Browsable (true)]
     [Description ("Occurs when scroolbars are updated.")]
-    public event EventHandler ScrollbarsUpdated;
+    public event EventHandler? ScrollbarsUpdated;
 
     /// <summary>
     /// Occurs when custom wordwrap is needed
     /// </summary>
     [Browsable (true)]
     [Description ("Occurs when custom wordwrap is needed.")]
-    public event EventHandler<WordWrapNeededEventArgs> WordWrapNeeded;
-
+    public event EventHandler<WordWrapNeededEventArgs>? WordWrapNeeded;
 
     /// <summary>
     /// Returns list of styles of given place

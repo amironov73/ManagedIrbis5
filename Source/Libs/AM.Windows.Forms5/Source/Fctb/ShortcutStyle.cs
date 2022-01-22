@@ -68,9 +68,15 @@ public class ShortcutStyle
         graphics.DrawPath (borderPen, GetRoundedRectangle (rect, 1));
 
         //add visual marker for handle mouse events
-        AddVisualMarker (range.tb,
-            new StyleVisualMarker (
-                new Rectangle (p.X - range.tb.CharWidth, p.Y, range.tb.CharWidth, range.tb.CharHeight), this));
+        AddVisualMarker
+            (
+                range.tb,
+                new StyleVisualMarker
+                    (
+                        new Rectangle (p.X - range.tb.CharWidth, p.Y, range.tb.CharWidth, range.tb.CharHeight),
+                        this
+                    )
+            );
     }
 
     #endregion

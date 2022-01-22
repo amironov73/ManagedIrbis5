@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -47,39 +48,43 @@ namespace AM.Windows.Forms.Animation;
 [ProvideProperty ("Decoration", typeof (Control))]
 public class Animator : Component, IExtenderProvider
 {
-    IContainer components = null;
-    protected List<QueueItem> queue = new List<QueueItem>();
-    private Thread thread;
+    private IContainer? _components = null;
+    protected List<QueueItem> queue = new ();
+    private Thread? _thread;
+
+    #region Events
 
     /// <summary>
     /// Occurs when animation of the control is completed
     /// </summary>
-    public event EventHandler<AnimationCompletedEventArg> AnimationCompleted;
+    public event EventHandler<AnimationCompletedEventArg>? AnimationCompleted;
 
     /// <summary>
     /// Ocuurs when all animations are completed
     /// </summary>
-    public event EventHandler AllAnimationsCompleted;
+    public event EventHandler? AllAnimationsCompleted;
 
     /// <summary>
     /// Occurs when needed transform matrix
     /// </summary>
-    public event EventHandler<TransfromNeededEventArg> TransfromNeeded;
+    public event EventHandler<TransfromNeededEventArg>? TransfromNeeded;
 
     /// <summary>
     /// Occurs when needed non-linear transformation
     /// </summary>
-    public event EventHandler<NonLinearTransfromNeededEventArg> NonLinearTransfromNeeded;
+    public event EventHandler<NonLinearTransfromNeededEventArg>? NonLinearTransfromNeeded;
 
     /// <summary>
     /// Occurs when user click on the animated control
     /// </summary>
-    public event EventHandler<MouseEventArgs> MouseDown;
+    public event EventHandler<MouseEventArgs>? MouseDown;
 
     /// <summary>
     /// Occurs when frame of animation is painting
     /// </summary>
-    public event EventHandler<PaintEventArgs> FramePainted;
+    public event EventHandler<PaintEventArgs>? FramePainted;
+
+    #endregion
 
     /// <summary>
     /// Max time of animation (ms)
@@ -131,16 +136,32 @@ public class Animator : Component, IExtenderProvider
         }
     }
 
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public Animator()
     {
         Init();
     }
 
-    public Animator (IContainer container)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="container"></param>
+    public Animator
+        (
+            IContainer container
+        )
     {
+        Sure.NotNull (container);
+
         container.Add (this);
         Init();
     }
+
+    #endregion
 
     protected virtual void Init()
     {
@@ -152,15 +173,15 @@ public class Animator : Component, IExtenderProvider
         Disposed += new EventHandler (Animator_Disposed);
 
         //main working thread
-        thread = new Thread (Work);
-        thread.IsBackground = true;
-        thread.Start();
+        _thread = new Thread (Work);
+        _thread.IsBackground = true;
+        _thread.Start();
     }
 
     void Animator_Disposed (object sender, EventArgs e)
     {
         ClearQueue();
-        thread.Abort();
+        _thread.Abort();
     }
 
     void Work()
@@ -247,10 +268,10 @@ public class Animator : Component, IExtenderProvider
     {
         var toRemove = new List<QueueItem>();
 
-        lock (requests)
+        lock (_requests)
         {
             var dict = new Dictionary<Control, QueueItem>();
-            foreach (var item in requests)
+            foreach (var item in _requests)
                 if (item.control != null)
                 {
                     if (dict.ContainsKey (item.control))
@@ -269,7 +290,7 @@ public class Animator : Component, IExtenderProvider
             }
 
             foreach (var item in toRemove)
-                requests.Remove (item);
+                _requests.Remove (item);
         }
     }
 
@@ -325,43 +346,57 @@ public class Animator : Component, IExtenderProvider
     {
         switch (animationType)
         {
-            case AnimationType.Custom: break;
+            case AnimationType.Custom:
+                break;
+
             case AnimationType.Rotate:
                 DefaultAnimation = Animation.Rotate;
                 break;
+
             case AnimationType.HorizSlide:
                 DefaultAnimation = Animation.HorizSlide;
                 break;
+
             case AnimationType.VertSlide:
                 DefaultAnimation = Animation.VertSlide;
                 break;
+
             case AnimationType.Scale:
                 DefaultAnimation = Animation.Scale;
                 break;
+
             case AnimationType.ScaleAndRotate:
                 DefaultAnimation = Animation.ScaleAndRotate;
                 break;
+
             case AnimationType.HorizSlideAndRotate:
                 DefaultAnimation = Animation.HorizSlideAndRotate;
                 break;
+
             case AnimationType.ScaleAndHorizSlide:
                 DefaultAnimation = Animation.ScaleAndHorizSlide;
                 break;
+
             case AnimationType.Transparent:
                 DefaultAnimation = Animation.Transparent;
                 break;
+
             case AnimationType.Leaf:
                 DefaultAnimation = Animation.Leaf;
                 break;
+
             case AnimationType.Mosaic:
                 DefaultAnimation = Animation.Mosaic;
                 break;
+
             case AnimationType.Particles:
                 DefaultAnimation = Animation.Particles;
                 break;
+
             case AnimationType.VertBlind:
                 DefaultAnimation = Animation.VertBlind;
                 break;
+
             case AnimationType.HorizBlind:
                 DefaultAnimation = Animation.HorizBlind;
                 break;
@@ -380,7 +415,12 @@ public class Animator : Component, IExtenderProvider
     /// <param name="control">Target control</param>
     /// <param name="parallel">Allows to animate it same time as other animations</param>
     /// <param name="animation">Personal animation</param>
-    public void Show (Control control, bool parallel = false, Animation animation = null)
+    public void Show
+        (
+            Control control,
+            bool parallel = false,
+            Animation? animation = null
+        )
     {
         AddToQueue (control, AnimateMode.Show, parallel, animation);
     }
@@ -391,7 +431,12 @@ public class Animator : Component, IExtenderProvider
     /// <param name="control">Target control</param>
     /// <param name="parallel">Allows to animate it same time as other animations</param>
     /// <param name="animation">Personal animation</param>
-    public void ShowSync (Control control, bool parallel = false, Animation animation = null)
+    public void ShowSync
+        (
+            Control control,
+            bool parallel = false,
+            Animation? animation = null
+        )
     {
         Show (control, parallel, animation);
         WaitAnimation (control);
@@ -403,7 +448,12 @@ public class Animator : Component, IExtenderProvider
     /// <param name="control">Target control</param>
     /// <param name="parallel">Allows to animate it same time as other animations</param>
     /// <param name="animation">Personal animation</param>
-    public void Hide (Control control, bool parallel = false, Animation animation = null)
+    public void Hide
+        (
+            Control control,
+            bool parallel = false,
+            Animation? animation = null
+        )
     {
         AddToQueue (control, AnimateMode.Hide, parallel, animation);
     }
@@ -414,7 +464,12 @@ public class Animator : Component, IExtenderProvider
     /// <param name="control">Target control</param>
     /// <param name="parallel">Allows to animate it same time as other animations</param>
     /// <param name="animation">Personal animation</param>
-    public void HideSync (Control control, bool parallel = false, Animation animation = null)
+    public void HideSync
+        (
+            Control control,
+            bool parallel = false,
+            Animation? animation = null
+        )
     {
         Hide (control, parallel, animation);
         WaitAnimation (control);
@@ -427,8 +482,13 @@ public class Animator : Component, IExtenderProvider
     /// <param name="parallel">Allows to animate it same time as other animations</param>
     /// <param name="animation">Personal animation</param>
     /// <param name="clipRectangle">Clip rectangle for animation</param>
-    public void BeginUpdateSync (Control control, bool parallel = false, Animation animation = null,
-        Rectangle clipRectangle = default (Rectangle))
+    public void BeginUpdateSync
+        (
+            Control control,
+            bool parallel = false,
+            Animation? animation = null,
+            Rectangle clipRectangle = default
+        )
     {
         AddToQueue (control, AnimateMode.BeginUpdate, parallel, animation, clipRectangle);
 
@@ -468,7 +528,10 @@ public class Animator : Component, IExtenderProvider
     /// Upadates control view with animation and waits while animation will be completed. It requires to call BeginUpdate before.
     /// </summary>
     /// <param name="control">Target control</param>
-    public void EndUpdateSync (Control control)
+    public void EndUpdateSync
+        (
+            Control control
+        )
     {
         EndUpdate (control);
         WaitAnimation (control);
@@ -480,7 +543,9 @@ public class Animator : Component, IExtenderProvider
     public void WaitAllAnimations()
     {
         while (!IsCompleted)
+        {
             Application.DoEvents();
+        }
     }
 
     /// <summary>
@@ -507,9 +572,12 @@ public class Animator : Component, IExtenderProvider
         }
     }
 
-    List<QueueItem> requests = new List<QueueItem>();
+    readonly List<QueueItem> _requests = new ();
 
-    void OnCompleted (QueueItem item)
+    void OnCompleted
+        (
+            QueueItem item
+        )
     {
         if (item.controller != null)
         {
@@ -530,8 +598,15 @@ public class Animator : Component, IExtenderProvider
     /// <param name="mode">Animation mode</param>
     /// <param name="parallel">Allows to animate it same time as other animations</param>
     /// <param name="animation">Personal animation</param>
-    public void AddToQueue (Control control, AnimateMode mode, bool parallel = true, Animation animation = null,
-        Rectangle clipRectangle = default (Rectangle))
+    /// <param name="clipRectangle"></param>
+    public void AddToQueue
+        (
+            Control control,
+            AnimateMode mode,
+            bool parallel = true,
+            Animation? animation = null,
+            Rectangle clipRectangle = default
+        )
     {
         if (animation == null)
             animation = DefaultAnimation;
@@ -572,8 +647,8 @@ public class Animator : Component, IExtenderProvider
         //add to queue
         lock (queue)
             queue.Add (item);
-        lock (requests)
-            requests.Add (item);
+        lock (_requests)
+            _requests.Add (item);
     }
 
     private AnimationController CreateDoubleBitmap (Control control, AnimateMode mode, Animation animation,
@@ -664,16 +739,17 @@ public class Animator : Component, IExtenderProvider
             OnAllAnimationsCompleted();
     }
 
-    protected virtual void OnAnimationCompleted (AnimationCompletedEventArg e)
+    protected virtual void OnAnimationCompleted
+        (
+            AnimationCompletedEventArg e
+        )
     {
-        if (AnimationCompleted != null)
-            AnimationCompleted (this, e);
+        AnimationCompleted?.Invoke (this, e);
     }
 
     protected virtual void OnAllAnimationsCompleted()
     {
-        if (AllAnimationsCompleted != null)
-            AllAnimationsCompleted (this, EventArgs.Empty);
+        AllAnimationsCompleted?.Invoke (this, EventArgs.Empty);
     }
 
     #region Nested type: QueueItem
@@ -760,7 +836,8 @@ public enum DecorationType
 }
 
 
-public class AnimationCompletedEventArg : EventArgs
+public class AnimationCompletedEventArg
+    : EventArgs
 {
     public Animation Animation { get; set; }
     public Control Control { get; internal set; }

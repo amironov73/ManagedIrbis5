@@ -58,26 +58,32 @@ public class TextRange
         get
         {
             if (ColumnSelectionMode)
+            {
                 return Start.Column == End.Column;
+            }
+
             return Start == End;
         }
     }
 
-    private bool columnSelectionMode;
-
     /// <summary>
     /// Column selection mode
     /// </summary>
-    public bool ColumnSelectionMode
-    {
-        get { return columnSelectionMode; }
-        set { columnSelectionMode = value; }
-    }
+    public bool ColumnSelectionMode { get; set; }
+
+    #region Construction
 
     /// <summary>
-    /// Constructor
+    /// Конструктор.
     /// </summary>
-    public TextRange (SyntaxTextBox tb, int iStartChar, int iStartLine, int iEndChar, int iEndLine)
+    public TextRange
+        (
+            SyntaxTextBox tb,
+            int iStartChar,
+            int iStartLine,
+            int iEndChar,
+            int iEndLine
+        )
         : this (tb)
     {
         start = new Place (iStartChar, iStartLine);
@@ -85,9 +91,14 @@ public class TextRange
     }
 
     /// <summary>
-    /// Constructor
+    /// Конструктор.
     /// </summary>
-    public TextRange (SyntaxTextBox tb, Place start, Place end)
+    public TextRange
+        (
+            SyntaxTextBox tb,
+            Place start,
+            Place end
+        )
         : this (tb)
     {
         this.start = start;
@@ -95,14 +106,22 @@ public class TextRange
     }
 
     /// <summary>
-    /// Constructor. Creates range of the line
+    /// Конструктор.
     /// </summary>
-    public TextRange (SyntaxTextBox tb, int iLine)
+    public TextRange
+        (
+            SyntaxTextBox tb,
+            int iLine
+        )
         : this (tb)
     {
         start = new Place (0, iLine);
         end = new Place (tb[iLine].Count, iLine);
     }
+
+    #endregion
+
+    #region Public methods
 
     public bool Contains (Place place)
     {
@@ -120,7 +139,7 @@ public class TextRange
             e = temp;
         }
 
-        if (columnSelectionMode)
+        if (ColumnSelectionMode)
         {
             if (place.Column < s.Column || place.Column > e.Column) return false;
         }
@@ -1498,12 +1517,12 @@ public class TextRange
         }
 
         var rect = Bounds;
-        for (var y = rect.iStartLine; y <= rect.iEndLine; y++)
+        for (var y = rect.StartLine; y <= rect.EndLine; y++)
         {
-            if (rect.iStartChar > tb[y].Count && !includeEmpty)
+            if (rect.StartChar > tb[y].Count && !includeEmpty)
                 continue;
 
-            var r = new TextRange (tb, rect.iStartChar, y, Math.Min (rect.iEndChar, tb[y].Count), y);
+            var r = new TextRange (tb, rect.StartChar, y, Math.Min (rect.EndChar, tb[y].Count), y);
             yield return r;
         }
     }
@@ -1535,7 +1554,7 @@ public class TextRange
                 {
                     //check previous and next chars
                     var line = tb[start.Line];
-                    if (columnSelectionMode)
+                    if (ColumnSelectionMode)
                     {
                         foreach (var sr in GetSubRanges (false))
                         {
@@ -1678,10 +1697,10 @@ public class TextRange
         if (range.Start.Line != range.End.Line)
             return new TextRange (tb, Start, Start);
         var rect = Bounds;
-        if (range.Start.Line < rect.iStartLine || range.Start.Line > rect.iEndLine)
+        if (range.Start.Line < rect.StartLine || range.Start.Line > rect.EndLine)
             return new TextRange (tb, Start, Start);
 
-        return new TextRange (tb, rect.iStartChar, range.Start.Line, rect.iEndChar, range.Start.Line)
+        return new TextRange (tb, rect.StartChar, range.Start.Line, rect.EndChar, range.Start.Line)
             .GetIntersectionWith (range);
     }
 
@@ -1689,8 +1708,8 @@ public class TextRange
     {
         var boundes = Bounds;
         var endOfLines = true;
-        for (var iLine = boundes.iStartLine; iLine <= boundes.iEndLine; iLine++)
-            if (boundes.iEndChar < tb[iLine].Count)
+        for (var iLine = boundes.StartLine; iLine <= boundes.EndLine; iLine++)
+            if (boundes.EndChar < tb[iLine].Count)
             {
                 endOfLines = false;
                 break;
@@ -1714,12 +1733,12 @@ public class TextRange
     private IEnumerable<Place> GetEnumerator_ColumnSelectionMode()
     {
         var bounds = Bounds;
-        if (bounds.iStartLine < 0) yield break;
+        if (bounds.StartLine < 0) yield break;
 
         //
-        for (var y = bounds.iStartLine; y <= bounds.iEndLine; y++)
+        for (var y = bounds.StartLine; y <= bounds.EndLine; y++)
         {
-            for (var x = bounds.iStartChar; x < bounds.iEndChar; x++)
+            for (var x = bounds.StartChar; x < bounds.EndChar; x++)
             {
                 if (x < tb[y].Count)
                     yield return new Place (x, y);
@@ -1733,18 +1752,18 @@ public class TextRange
         {
             var sb = new StringBuilder();
             var bounds = Bounds;
-            if (bounds.iStartLine < 0) return "";
+            if (bounds.StartLine < 0) return "";
 
             //
-            for (var y = bounds.iStartLine; y <= bounds.iEndLine; y++)
+            for (var y = bounds.StartLine; y <= bounds.EndLine; y++)
             {
-                for (var x = bounds.iStartChar; x < bounds.iEndChar; x++)
+                for (var x = bounds.StartChar; x < bounds.EndChar; x++)
                 {
                     if (x < tb[y].Count)
                         sb.Append (tb[y][x].c);
                 }
 
-                if (bounds.iEndLine != bounds.iStartLine && y != bounds.iEndLine)
+                if (bounds.EndLine != bounds.StartLine && y != bounds.EndLine)
                     sb.AppendLine();
             }
 
@@ -1755,19 +1774,19 @@ public class TextRange
     private int Length_ColumnSelectionMode (bool withNewLines)
     {
         var bounds = Bounds;
-        if (bounds.iStartLine < 0) return 0;
+        if (bounds.StartLine < 0) return 0;
         var cnt = 0;
 
         //
-        for (var y = bounds.iStartLine; y <= bounds.iEndLine; y++)
+        for (var y = bounds.StartLine; y <= bounds.EndLine; y++)
         {
-            for (var x = bounds.iStartChar; x < bounds.iEndChar; x++)
+            for (var x = bounds.StartChar; x < bounds.EndChar; x++)
             {
                 if (x < tb[y].Count)
                     cnt++;
             }
 
-            if (withNewLines && bounds.iEndLine != bounds.iStartLine && y != bounds.iEndLine)
+            if (withNewLines && bounds.EndLine != bounds.StartLine && y != bounds.EndLine)
                 cnt += Environment.NewLine.Length;
         }
 
@@ -1798,20 +1817,6 @@ public class TextRange
     }
 
     #endregion
-}
 
-public struct RangeRect
-{
-    public RangeRect (int iStartLine, int iStartChar, int iEndLine, int iEndChar)
-    {
-        this.iStartLine = iStartLine;
-        this.iStartChar = iStartChar;
-        this.iEndLine = iEndLine;
-        this.iEndChar = iEndChar;
-    }
-
-    public int iStartLine;
-    public int iStartChar;
-    public int iEndLine;
-    public int iEndChar;
+    #endregion
 }

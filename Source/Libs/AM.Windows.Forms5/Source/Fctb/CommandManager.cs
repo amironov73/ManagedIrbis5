@@ -14,6 +14,7 @@
 using System.Collections.Generic;
 using System;
 
+using AM;
 using AM.Collections;
 
 #endregion
@@ -24,21 +25,46 @@ namespace Fctb;
 
 public class CommandManager
 {
+    #region Events
+
+    public event EventHandler? RedoCompleted = delegate { };
+
+    #endregion
+
+    #region Properties
+
     public static int MaxHistoryLength = 200;
 
     LimitedStack<UndoableCommand> history;
+
     Stack<UndoableCommand> redoStack = new Stack<UndoableCommand>();
+
     public TextSource TextSource { get; private set; }
+
     public bool UndoRedoStackIsEnabled { get; set; }
 
-    public event EventHandler RedoCompleted = delegate { };
+    #endregion
 
-    public CommandManager (TextSource ts)
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public CommandManager
+        (
+            TextSource ts
+        )
     {
+        Sure.NotNull (ts);
+
         history = new LimitedStack<UndoableCommand> (MaxHistoryLength);
         TextSource = ts;
         UndoRedoStackIsEnabled = true;
     }
+
+    #endregion
+
+    #region Public methods
 
     public virtual void ExecuteCommand (Command cmd)
     {
@@ -169,30 +195,22 @@ public class CommandManager
         }
 
         //call event
-        RedoCompleted (this, EventArgs.Empty);
+        RedoCompleted?.Invoke (this, EventArgs.Empty);
 
         //redo command after autoUndoable command
         if (cmd.autoUndo)
+        {
             Redo();
+        }
 
         TextSource.CurrentTB.OnUndoRedoStateChanged();
     }
 
-    public bool UndoEnabled
-    {
-        get { return history.Count > 0; }
-    }
+    public bool UndoEnabled => history.Count > 0;
 
-    public bool RedoEnabled
-    {
-        get { return redoStack.Count > 0; }
-    }
-}
+    public bool RedoEnabled => redoStack.Count > 0;
 
-public abstract class Command
-{
-    public TextSource ts;
-    public abstract void Execute();
+    #endregion
 }
 
 internal class RangeInfo
@@ -215,49 +233,4 @@ internal class RangeInfo
             return Math.Min (End.Column, Start.Column);
         }
     }
-}
-
-public abstract class UndoableCommand : Command
-{
-    internal RangeInfo sel;
-    internal RangeInfo lastSel;
-    internal bool autoUndo;
-
-    public UndoableCommand (TextSource ts)
-    {
-        this.ts = ts;
-        sel = new RangeInfo (ts.CurrentTB.Selection);
-    }
-
-    public virtual void Undo()
-    {
-        OnTextChanged (true);
-    }
-
-    public override void Execute()
-    {
-        lastSel = new RangeInfo (ts.CurrentTB.Selection);
-        OnTextChanged (false);
-    }
-
-    protected virtual void OnTextChanged (bool invert)
-    {
-        var b = sel.Start.Line < lastSel.Start.Line;
-        if (invert)
-        {
-            if (b)
-                ts.OnTextChanged (sel.Start.Line, sel.Start.Line);
-            else
-                ts.OnTextChanged (sel.Start.Line, lastSel.Start.Line);
-        }
-        else
-        {
-            if (b)
-                ts.OnTextChanged (sel.Start.Line, lastSel.Start.Line);
-            else
-                ts.OnTextChanged (lastSel.Start.Line, lastSel.Start.Line);
-        }
-    }
-
-    public abstract UndoableCommand Clone();
 }

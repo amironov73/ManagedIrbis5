@@ -110,47 +110,47 @@ public class FastTree
 
     #region Events
 
-    public event EventHandler<IntNodeEventArgs> NodeHeightNeeded;
-    public event EventHandler<StringNodeEventArgs> NodeTextNeeded;
-    public event EventHandler<BoolNodeEventArgs> NodeCheckStateNeeded;
-    public event EventHandler<ImageNodeEventArgs> NodeIconNeeded;
-    public event EventHandler<StringAlignmentNodeEventArgs> NodeLineAlignmentNeeded;
-    public event EventHandler<BoolNodeEventArgs> NodeCheckBoxVisibleNeeded;
-    public event EventHandler<ColorNodeEventArgs> NodeBackColorNeeded;
-    public event EventHandler<IntNodeEventArgs> NodeIndentNeeded;
-    public event EventHandler<ColorNodeEventArgs> NodeForeColorNeeded;
-    public event EventHandler<BoolNodeEventArgs> NodeVisibilityNeeded;
-    public event EventHandler<BoolNodeEventArgs> CanUnselectNodeNeeded;
-    public event EventHandler<BoolNodeEventArgs> CanSelectNodeNeeded;
-    public event EventHandler<BoolNodeEventArgs> CanUncheckNodeNeeded;
-    public event EventHandler<BoolNodeEventArgs> CanCheckNodeNeeded;
-    public event EventHandler<BoolNodeEventArgs> CanExpandNodeNeeded;
-    public event EventHandler<BoolNodeEventArgs> CanCollapseNodeNeeded;
-    public event EventHandler<BoolNodeEventArgs> CanEditNodeNeeded;
+    public event EventHandler<IntNodeEventArgs>? NodeHeightNeeded;
+    public event EventHandler<StringNodeEventArgs>? NodeTextNeeded;
+    public event EventHandler<BoolNodeEventArgs>? NodeCheckStateNeeded;
+    public event EventHandler<ImageNodeEventArgs>? NodeIconNeeded;
+    public event EventHandler<StringAlignmentNodeEventArgs>? NodeLineAlignmentNeeded;
+    public event EventHandler<BoolNodeEventArgs>? NodeCheckBoxVisibleNeeded;
+    public event EventHandler<ColorNodeEventArgs>? NodeBackColorNeeded;
+    public event EventHandler<IntNodeEventArgs>? NodeIndentNeeded;
+    public event EventHandler<ColorNodeEventArgs>? NodeForeColorNeeded;
+    public event EventHandler<BoolNodeEventArgs>? NodeVisibilityNeeded;
+    public event EventHandler<BoolNodeEventArgs>? CanUnselectNodeNeeded;
+    public event EventHandler<BoolNodeEventArgs>? CanSelectNodeNeeded;
+    public event EventHandler<BoolNodeEventArgs>? CanUncheckNodeNeeded;
+    public event EventHandler<BoolNodeEventArgs>? CanCheckNodeNeeded;
+    public event EventHandler<BoolNodeEventArgs>? CanExpandNodeNeeded;
+    public event EventHandler<BoolNodeEventArgs>? CanCollapseNodeNeeded;
+    public event EventHandler<BoolNodeEventArgs>? CanEditNodeNeeded;
 
-    public event EventHandler<NodeCheckedStateChangedEventArgs> NodeCheckedStateChanged;
-    public event EventHandler<NodeExpandedStateChangedEventArgs> NodeExpandedStateChanged;
-    public event EventHandler<NodeSelectedStateChangedEventArgs> NodeSelectedStateChanged;
-    public event EventHandler<NodeTextPushedEventArgs> NodeTextPushed;
+    public event EventHandler<NodeCheckedStateChangedEventArgs>? NodeCheckedStateChanged;
+    public event EventHandler<NodeExpandedStateChangedEventArgs>? NodeExpandedStateChanged;
+    public event EventHandler<NodeSelectedStateChangedEventArgs>? NodeSelectedStateChanged;
+    public event EventHandler<NodeTextPushedEventArgs>? NodeTextPushed;
 
-    public event EventHandler<PaintNodeContentEventArgs> PaintNode;
+    public event EventHandler<PaintNodeContentEventArgs>? PaintNode;
 
-    public event EventHandler<NodeChildrenNeededEventArgs> NodeChildrenNeeded;
+    public event EventHandler<NodeChildrenNeededEventArgs>? NodeChildrenNeeded;
 
     /// <summary>
     /// Occurs when user start to drag node
     /// </summary>
-    public event EventHandler<NodeDragEventArgs> NodeDrag;
+    public event EventHandler<NodeDragEventArgs>? NodeDrag;
 
     /// <summary>
     /// Occurs when user drag object over node
     /// </summary>
-    public event EventHandler<DragOverItemEventArgs> DragOverNode;
+    public event EventHandler<DragOverItemEventArgs>? DragOverNode;
 
     /// <summary>
     /// Occurs when user drop object on given node
     /// </summary>
-    public event EventHandler<DragOverItemEventArgs> DropOverNode;
+    public event EventHandler<DragOverItemEventArgs>? DropOverNode;
 
     protected virtual bool GetNodeVisibility(object node)
     {
