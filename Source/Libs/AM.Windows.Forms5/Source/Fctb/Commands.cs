@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/*
+/* Commands.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -420,89 +420,6 @@ public class ReplaceTextCommand
             ts.RemoveLine (fromLine + 1, toLine - fromLine - 1);
             InsertCharCommand.MergeLines (fromLine, ts);
         }
-    }
-}
-
-/// <summary>
-/// Clear selected text
-/// </summary>
-public class ClearSelectedCommand
-    : UndoableCommand
-{
-    string deletedText;
-
-    /// <summary>
-    /// Construstor
-    /// </summary>
-    /// <param name="tb">Underlaying textbox</param>
-    public ClearSelectedCommand (TextSource ts) : base (ts)
-    {
-    }
-
-    /// <summary>
-    /// Undo operation
-    /// </summary>
-    public override void Undo()
-    {
-        ts.CurrentTB.Selection.Start = new Place (sel.FromX, Math.Min (sel.Start.Line, sel.End.Line));
-        ts.OnTextChanging();
-        InsertTextCommand.InsertText (deletedText, ts);
-        ts.OnTextChanged (sel.Start.Line, sel.End.Line);
-        ts.CurrentTB.Selection.Start = sel.Start;
-        ts.CurrentTB.Selection.End = sel.End;
-    }
-
-    /// <summary>
-    /// Execute operation
-    /// </summary>
-    public override void Execute()
-    {
-        var tb = ts.CurrentTB;
-
-        string temp = null;
-        ts.OnTextChanging (ref temp);
-        if (temp == "")
-            throw new ArgumentOutOfRangeException();
-
-        deletedText = tb.Selection.Text;
-        ClearSelected (ts);
-        lastSel = new RangeInfo (tb.Selection);
-        ts.OnTextChanged (lastSel.Start.Line, lastSel.Start.Line);
-    }
-
-    internal static void ClearSelected (TextSource ts)
-    {
-        var tb = ts.CurrentTB;
-
-        var start = tb.Selection.Start;
-        var end = tb.Selection.End;
-        var fromLine = Math.Min (end.Line, start.Line);
-        var toLine = Math.Max (end.Line, start.Line);
-        var fromChar = tb.Selection.FromX;
-        var toChar = tb.Selection.ToX;
-        if (fromLine < 0) return;
-
-        //
-        if (fromLine == toLine)
-            ts[fromLine].RemoveRange (fromChar, toChar - fromChar);
-        else
-        {
-            ts[fromLine].RemoveRange (fromChar, ts[fromLine].Count - fromChar);
-            ts[toLine].RemoveRange (0, toChar);
-            ts.RemoveLine (fromLine + 1, toLine - fromLine - 1);
-            InsertCharCommand.MergeLines (fromLine, ts);
-        }
-
-        //
-        tb.Selection.Start = new Place (fromChar, fromLine);
-
-        //
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (fromLine, toLine));
-    }
-
-    public override UndoableCommand Clone()
-    {
-        return new ClearSelectedCommand (ts);
     }
 }
 

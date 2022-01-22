@@ -4,8 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable VirtualMemberCallInConstructor
 
-/* AutocompleteItem.cs --
+/* AutocompleteItem.cs -- элемент меню автокомплита
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,269 +22,153 @@ using System.Drawing;
 namespace Fctb;
 
 /// <summary>
-/// Item of autocomplete menu
+/// Элемент меню автокомплита.
 /// </summary>
 public class AutocompleteItem
 {
-    public string Text;
-    public int ImageIndex = -1;
-    public object Tag;
-    string toolTipTitle;
-    string toolTipText;
-    string menuText;
-    public AutocompleteMenu Parent { get; internal set; }
-
-
-    public AutocompleteItem()
-    {
-    }
-
-    public AutocompleteItem (string text)
-    {
-        Text = text;
-    }
-
-    public AutocompleteItem (string text, int imageIndex)
-        : this (text)
-    {
-        this.ImageIndex = imageIndex;
-    }
-
-    public AutocompleteItem (string text, int imageIndex, string menuText)
-        : this (text, imageIndex)
-    {
-        this.menuText = menuText;
-    }
-
-    public AutocompleteItem (string text, int imageIndex, string menuText, string toolTipTitle, string toolTipText)
-        : this (text, imageIndex, menuText)
-    {
-        this.toolTipTitle = toolTipTitle;
-        this.toolTipText = toolTipText;
-    }
-
-    /// <summary>
-    /// Returns text for inserting into Textbox
-    /// </summary>
-    public virtual string GetTextForReplace()
-    {
-        return Text;
-    }
-
-    /// <summary>
-    /// Compares fragment text with this item
-    /// </summary>
-    public virtual CompareResult Compare (string fragmentText)
-    {
-        if (Text.StartsWith (fragmentText, StringComparison.InvariantCultureIgnoreCase) &&
-            Text != fragmentText)
-            return CompareResult.VisibleAndSelected;
-
-        return CompareResult.Hidden;
-    }
-
-    /// <summary>
-    /// Returns text for display into popup menu
-    /// </summary>
-    public override string ToString()
-    {
-        return menuText ?? Text;
-    }
-
-    /// <summary>
-    /// This method is called after item inserted into text
-    /// </summary>
-    public virtual void OnSelected (AutocompleteMenu popupMenu, SelectedEventArgs e)
-    {
-        ;
-    }
+    #region Properties
 
     /// <summary>
     /// Title for tooltip.
     /// </summary>
     /// <remarks>Return null for disable tooltip for this item</remarks>
-    public virtual string ToolTipTitle
-    {
-        get { return toolTipTitle; }
-        set { toolTipTitle = value; }
-    }
+    public virtual string? ToolTipTitle { get; set; }
 
     /// <summary>
     /// Tooltip text.
     /// </summary>
     /// <remarks>For display tooltip text, ToolTipTitle must be not null</remarks>
-    public virtual string ToolTipText
-    {
-        get { return toolTipText; }
-        set { toolTipText = value; }
-    }
+    public virtual string? ToolTipText { get; set; }
 
     /// <summary>
     /// Menu text. This text is displayed in the drop-down menu.
     /// </summary>
-    public virtual string MenuText
-    {
-        get { return menuText; }
-        set { menuText = value; }
-    }
+    public virtual string? MenuText { get; set; }
 
     /// <summary>
     /// Fore color of text of item
     /// </summary>
     public virtual Color ForeColor
     {
-        get { return Color.Transparent; }
-        set { throw new NotImplementedException ("Override this property to change color"); }
+        get => Color.Transparent;
+        set => throw new NotImplementedException ("Override this property to change color");
     }
 
+
     /// <summary>
-    /// Back color of item
+    /// Цвет фона.
     /// </summary>
     public virtual Color BackColor
     {
-        get { return Color.Transparent; }
-        set { throw new NotImplementedException ("Override this property to change color"); }
+        get => Color.Transparent;
+        set => throw new NotImplementedException ("Override this property to change color");
     }
-}
-
-public enum CompareResult
-{
-    /// <summary>
-    /// Item do not appears
-    /// </summary>
-    Hidden,
 
     /// <summary>
-    /// Item appears
+    /// Родительский элемент.
     /// </summary>
-    Visible,
+    public AutocompleteMenu? Parent { get; internal set; }
 
     /// <summary>
-    /// Item appears and will selected
+    /// Отображаемый текст.
     /// </summary>
-    VisibleAndSelected
-}
+    public string? Text { get; set; }
 
-/// <summary>
-/// Autocomplete item for code snippets
-/// </summary>
-/// <remarks>Snippet can contain special char ^ for caret position.</remarks>
-public class SnippetAutocompleteItem : AutocompleteItem
-{
-    public SnippetAutocompleteItem (string snippet)
+    /// <summary>
+    /// Индекс иконки.
+    /// </summary>
+    public int ImageIndex { get; set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    public object? Tag { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public AutocompleteItem()
     {
-        Text = snippet.Replace ("\r", "");
-        ToolTipTitle = "Code snippet:";
-        ToolTipText = Text;
+        ImageIndex = -1;
     }
 
-    public override string ToString()
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public AutocompleteItem
+        (
+            string? text,
+            int imageIndex = -1,
+            string? menuText = null,
+            string? toolTipTitle = null,
+            string? toolTipText = null
+        )
     {
-        return MenuText ?? Text.Replace ("\n", " ").Replace ("^", "");
+        Text = text;
+        ImageIndex = imageIndex;
+        MenuText = menuText;
+        ToolTipTitle = toolTipTitle;
+        ToolTipText = toolTipText;
     }
 
-    public override string GetTextForReplace()
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Returns text for inserting into Textbox
+    /// </summary>
+    public virtual string GetTextForReplace()
     {
-        return Text;
-    }
-
-    public override void OnSelected (AutocompleteMenu popupMenu, SelectedEventArgs e)
-    {
-        e.Tb.BeginUpdate();
-        e.Tb.Selection.BeginUpdate();
-
-        //remember places
-        var p1 = popupMenu.Fragment.Start;
-        var p2 = e.Tb.Selection.Start;
-
-        //do auto indent
-        if (e.Tb.AutoIndent)
-        {
-            for (var iLine = p1.Line + 1; iLine <= p2.Line; iLine++)
-            {
-                e.Tb.Selection.Start = new Place (0, iLine);
-                e.Tb.DoAutoIndent (iLine);
-            }
-        }
-
-        e.Tb.Selection.Start = p1;
-
-        //move caret position right and find char ^
-        while (e.Tb.Selection.CharBeforeStart != '^')
-            if (!e.Tb.Selection.GoRightThroughFolded())
-                break;
-
-        //remove char ^
-        e.Tb.Selection.GoLeft (true);
-        e.Tb.InsertText ("");
-
-        //
-        e.Tb.Selection.EndUpdate();
-        e.Tb.EndUpdate();
+        return Text ?? string.Empty;
     }
 
     /// <summary>
     /// Compares fragment text with this item
     /// </summary>
-    public override CompareResult Compare (string fragmentText)
+    public virtual CompareResult Compare
+        (
+            string fragmentText
+        )
     {
-        if (Text.StartsWith (fragmentText, StringComparison.InvariantCultureIgnoreCase) &&
+        if (Text!.StartsWith (fragmentText, StringComparison.InvariantCultureIgnoreCase) &&
             Text != fragmentText)
-            return CompareResult.Visible;
-
-        return CompareResult.Hidden;
-    }
-}
-
-/// <summary>
-/// This autocomplete item appears after dot
-/// </summary>
-public class MethodAutocompleteItem : AutocompleteItem
-{
-    string firstPart;
-    string lowercaseText;
-
-    public MethodAutocompleteItem (string text)
-        : base (text)
-    {
-        lowercaseText = Text.ToLower();
-    }
-
-    public override CompareResult Compare (string fragmentText)
-    {
-        var i = fragmentText.LastIndexOf ('.');
-        if (i < 0)
-            return CompareResult.Hidden;
-        var lastPart = fragmentText.Substring (i + 1);
-        firstPart = fragmentText.Substring (0, i);
-
-        if (lastPart == "") return CompareResult.Visible;
-        if (Text.StartsWith (lastPart, StringComparison.InvariantCultureIgnoreCase))
+        {
             return CompareResult.VisibleAndSelected;
-        if (lowercaseText.Contains (lastPart.ToLower()))
-            return CompareResult.Visible;
+        }
 
         return CompareResult.Hidden;
     }
 
-    public override string GetTextForReplace()
+    /// <summary>
+    /// This method is called after item inserted into text
+    /// </summary>
+    public virtual void OnSelected
+        (
+            AutocompleteMenu popupMenu,
+            SelectedEventArgs e
+        )
     {
-        return firstPart + "." + Text;
-    }
-}
-
-/// <summary>
-/// This Item does not check correspondence to current text fragment.
-/// SuggestItem is intended for dynamic menus.
-/// </summary>
-public class SuggestItem : AutocompleteItem
-{
-    public SuggestItem (string text, int imageIndex) : base (text, imageIndex)
-    {
+        // пустое тело метода
     }
 
-    public override CompareResult Compare (string fragmentText)
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
     {
-        return CompareResult.Visible;
+        return MenuText ?? Text ?? string.Empty;
     }
+
+    #endregion
 }

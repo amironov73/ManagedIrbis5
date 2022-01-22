@@ -28,45 +28,42 @@ namespace AM.Windows.Forms.Animation;
 /// PointFConverter
 /// Thanks for Jay Riggs
 /// </summary>
-public class PointFConverter : ExpandableObjectConverter
+public sealed class PointFConverter
+    : ExpandableObjectConverter
 {
-    /// <summary>
-    /// Creates a new instance of PointFConverter
-    /// </summary>
-    public PointFConverter()
+    /// <inheritdoc cref="TypeConverter.CanConvertFrom(System.ComponentModel.ITypeDescriptorContext?,System.Type)"/>
+    public override bool CanConvertFrom
+        (
+            ITypeDescriptorContext? context,
+            Type sourceType
+        )
     {
+        return sourceType == typeof (string) || base.CanConvertFrom (context, sourceType);
     }
 
-    /// <summary>
-    /// Boolean, true if the source type is a string
-    /// </summary>
-    public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+    /// <inheritdoc cref="TypeConverter.ConvertFrom(System.ComponentModel.ITypeDescriptorContext?,System.Globalization.CultureInfo?,object)"/>
+    public override object? ConvertFrom
+        (
+            ITypeDescriptorContext? context,
+            System.Globalization.CultureInfo? culture,
+            object value
+        )
     {
-        if (sourceType == typeof(string)) return true;
-        return base.CanConvertFrom(context, sourceType);
-    }
-
-    /// <summary>
-    /// Converts the specified string into a PointF
-    /// </summary>
-    public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
-    {
-        if (value is string)
+        if (value is string text)
         {
             try
             {
-                string s = (string)value;
-                string[] converterParts = s.Split(',');
-                float x = 0;
-                float y = 0;
+                var converterParts = text.Split (',');
+                float x;
+                float y;
                 if (converterParts.Length > 1)
                 {
-                    x = float.Parse(converterParts[0].Trim().Trim('{', 'X', 'x','='));
-                    y = float.Parse(converterParts[1].Trim().Trim('}', 'Y', 'y','='));
+                    x = float.Parse (converterParts[0].Trim().Trim ('{', 'X', 'x', '='));
+                    y = float.Parse (converterParts[1].Trim().Trim ('}', 'Y', 'y', '='));
                 }
                 else if (converterParts.Length == 1)
                 {
-                    x = float.Parse(converterParts[0].Trim());
+                    x = float.Parse (converterParts[0].Trim());
                     y = 0;
                 }
                 else
@@ -74,29 +71,35 @@ public class PointFConverter : ExpandableObjectConverter
                     x = 0F;
                     y = 0F;
                 }
-                return new PointF(x, y);
+
+                return new PointF (x, y);
             }
             catch
             {
-                throw new ArgumentException("Cannot convert [" + value.ToString() + "] to pointF");
+                throw new ArgumentException ("Cannot convert [" + text + "] to pointF");
             }
         }
-        return base.ConvertFrom(context, culture, value);
+
+        return base.ConvertFrom (context, culture, value);
     }
 
-    /// <summary>
-    /// Converts the PointF into a string
-    /// </summary>
-    public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
+    /// <inheritdoc cref="TypeConverter.ConvertTo(System.ComponentModel.ITypeDescriptorContext?,System.Globalization.CultureInfo?,object?,System.Type)"/>
+    public override object? ConvertTo
+        (
+            ITypeDescriptorContext? context,
+            System.Globalization.CultureInfo? culture,
+            object? value,
+            Type destinationType
+        )
     {
-        if (destinationType == typeof(string))
+        if (destinationType == typeof (string))
         {
-            if (value.GetType() == typeof(PointF))
+            if (value is PointF pt)
             {
-                PointF pt = (PointF)value;
-                return string.Format("{{X={0}, Y={1}}}", pt.X, pt.Y);
+                return $"{{X={pt.X}, Y={pt.Y}}}";
             }
         }
-        return base.ConvertTo(context, culture, value, destinationType);
+
+        return base.ConvertTo (context, culture, value, destinationType);
     }
 }
