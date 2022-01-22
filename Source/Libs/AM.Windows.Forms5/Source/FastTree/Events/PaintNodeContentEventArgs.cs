@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* PaintNodeContentEventArgs.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,8 +27,19 @@ public class PaintNodeContentEventArgs
 {
     #region Properties
 
+    /// <summary>
+    /// Канва.
+    /// </summary>
     public Graphics Graphics;
+
+    /// <summary>
+    /// Информация об элементе.
+    /// </summary>
     public FastListBase.VisibleItemInfo Info;
+
+    /// <summary>
+    /// Элемент.
+    /// </summary>
     public object Node;
 
     #endregion

@@ -4,13 +4,14 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* NodeTextPushedEventArgs.cs --
+/* PaintItemContentEventArgs.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+using System.Drawing;
 
 #endregion
 
@@ -21,20 +22,20 @@ namespace AM.Windows.Forms;
 /// <summary>
 ///
 /// </summary>
-public class NodeTextPushedEventArgs
+public sealed class PaintItemContentEventArgs
     : EventArgs
 {
-    #region Propeties
+    #region Properties
 
     /// <summary>
-    /// Узел.
+    /// Канва для отрисовки.
     /// </summary>
-    public object Node;
+    public Graphics Graphics;
 
     /// <summary>
-    /// Текст.
+    /// Информация об элементе.
     /// </summary>
-    public string Text;
+    public FastListBase.VisibleItemInfo Info;
 
     #endregion
 }

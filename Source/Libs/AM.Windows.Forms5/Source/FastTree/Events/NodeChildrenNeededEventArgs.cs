@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* NodeChildrenNeededEventArgs.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,6 +25,17 @@ namespace AM.Windows.Forms;
 public class NodeChildrenNeededEventArgs
     : EventArgs
 {
+    #region Properties
+
+    /// <summary>
+    /// Узел.
+    /// </summary>
     public object Node { get; internal set; }
+
+    /// <summary>
+    /// Потомки.
+    /// </summary>
     public IEnumerable Children { get; set; }
+
+    #endregion
 }

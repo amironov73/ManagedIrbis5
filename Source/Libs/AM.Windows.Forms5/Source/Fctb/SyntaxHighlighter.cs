@@ -25,10 +25,15 @@ using System.Xml;
 
 namespace Fctb;
 
-public class SyntaxHighlighter : IDisposable
+/// <summary>
+/// Умеет раскрашивать текст в соответствии с синтаксисом языка программирования.
+/// </summary>
+public class SyntaxHighlighter
+    : IDisposable
 {
     //styles
     protected static readonly Platform platformType = PlatformType.GetOperationSystemPlatform();
+
     public readonly Style BlueBoldStyle = new TextStyle (Brushes.Blue, null, FontStyle.Bold);
     public readonly Style BlueStyle = new TextStyle (Brushes.Blue, null, FontStyle.Regular);
     public readonly Style BoldStyle = new TextStyle (null, null, FontStyle.Bold | FontStyle.Underline);
@@ -42,8 +47,7 @@ public class SyntaxHighlighter : IDisposable
     public readonly Style BlackStyle = new TextStyle (Brushes.Black, null, FontStyle.Regular);
 
     //
-    protected readonly Dictionary<string, SyntaxDescriptor> descByXMLfileNames =
-        new Dictionary<string, SyntaxDescriptor>();
+    protected readonly Dictionary<string, SyntaxDescriptor> descByXMLfileNames = new ();
 
     protected readonly List<Style> resilientStyles = new List<Style> (5);
 
@@ -168,38 +172,48 @@ public class SyntaxHighlighter : IDisposable
     /// <summary>
     /// Highlights syntax for given language
     /// </summary>
-    public virtual void HighlightSyntax (Language language, TextRange range)
+    public virtual void HighlightSyntax
+        (
+            Language language,
+            TextRange range
+        )
     {
         switch (language)
         {
             case Language.CSharp:
                 CSharpSyntaxHighlight (range);
                 break;
+
             case Language.VB:
                 VBSyntaxHighlight (range);
                 break;
+
             case Language.HTML:
                 HTMLSyntaxHighlight (range);
                 break;
+
             case Language.XML:
                 XMLSyntaxHighlight (range);
                 break;
+
             case Language.SQL:
                 SQLSyntaxHighlight (range);
                 break;
+
             case Language.PHP:
                 PHPSyntaxHighlight (range);
                 break;
+
             case Language.JS:
                 JScriptSyntaxHighlight (range);
                 break;
+
             case Language.Lua:
                 LuaSyntaxHighlight (range);
                 break;
+
             case Language.JSON:
                 JSONSyntaxHighlight (range);
-                break;
-            default:
                 break;
         }
     }
@@ -207,25 +221,33 @@ public class SyntaxHighlighter : IDisposable
     /// <summary>
     /// Highlights syntax for given XML description file
     /// </summary>
-    public virtual void HighlightSyntax (string XMLdescriptionFile, TextRange range)
+    public virtual void HighlightSyntax
+        (
+            string xmLdescriptionFile,
+            TextRange range
+        )
     {
-        SyntaxDescriptor desc = null;
-        if (!descByXMLfileNames.TryGetValue (XMLdescriptionFile, out desc))
+        SyntaxDescriptor? desc = null;
+        if (!descByXMLfileNames.TryGetValue (xmLdescriptionFile, out desc))
         {
             var doc = new XmlDocument();
-            var file = XMLdescriptionFile;
+            var file = xmLdescriptionFile;
             if (!File.Exists (file))
                 file = Path.Combine (AppDomain.CurrentDomain.BaseDirectory, Path.GetFileName (file));
 
             doc.LoadXml (File.ReadAllText (file));
             desc = ParseXmlDescription (doc);
-            descByXMLfileNames[XMLdescriptionFile] = desc;
+            descByXMLfileNames[xmLdescriptionFile] = desc;
         }
 
         HighlightSyntax (desc, range);
     }
 
-    public virtual void AutoIndentNeeded (object sender, AutoIndentEventArgs args)
+    public virtual void AutoIndentNeeded
+        (
+            object sender,
+            AutoIndentEventArgs args
+        )
     {
         var tb = (sender as SyntaxTextBox);
         var language = tb.Language;
@@ -234,33 +256,42 @@ public class SyntaxHighlighter : IDisposable
             case Language.CSharp:
                 CSharpAutoIndentNeeded (sender, args);
                 break;
+
             case Language.VB:
                 VBAutoIndentNeeded (sender, args);
                 break;
+
             case Language.HTML:
                 HTMLAutoIndentNeeded (sender, args);
                 break;
+
             case Language.XML:
                 XMLAutoIndentNeeded (sender, args);
                 break;
+
             case Language.SQL:
                 SQLAutoIndentNeeded (sender, args);
                 break;
+
             case Language.PHP:
                 PHPAutoIndentNeeded (sender, args);
                 break;
+
             case Language.JS:
                 CSharpAutoIndentNeeded (sender, args);
                 break; //JS like C#
+
             case Language.Lua:
                 LuaAutoIndentNeeded (sender, args);
-                break;
-            default:
                 break;
         }
     }
 
-    protected void PHPAutoIndentNeeded (object sender, AutoIndentEventArgs args)
+    protected void PHPAutoIndentNeeded
+        (
+            object sender,
+            AutoIndentEventArgs args
+        )
     {
         /*
         FastColoredTextBox tb = sender as FastColoredTextBox;
@@ -293,13 +324,21 @@ public class SyntaxHighlighter : IDisposable
             }
     }
 
-    protected void SQLAutoIndentNeeded (object sender, AutoIndentEventArgs args)
+    protected void SQLAutoIndentNeeded
+        (
+            object sender,
+            AutoIndentEventArgs args
+        )
     {
         var tb = sender as SyntaxTextBox;
         tb.CalcAutoIndentShiftByCodeFolding (sender, args);
     }
 
-    protected void HTMLAutoIndentNeeded (object sender, AutoIndentEventArgs args)
+    protected void HTMLAutoIndentNeeded
+        (
+            object sender,
+            AutoIndentEventArgs args
+        )
     {
         var tb = sender as SyntaxTextBox;
         tb.CalcAutoIndentShiftByCodeFolding (sender, args);

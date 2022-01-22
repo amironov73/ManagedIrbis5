@@ -1482,7 +1482,7 @@ public class SyntaxTextBox
     {
         get
         {
-            var exporter = new ExportToHTML();
+            var exporter = new ExportToHtml();
             exporter.UseNbsp = false;
             exporter.UseStyleTag = false;
             exporter.UseBr = false;
@@ -1499,7 +1499,7 @@ public class SyntaxTextBox
     {
         get
         {
-            var exporter = new ExportToRTF();
+            var exporter = new ExportToRtf();
             return exporter.GetRtf (this);
         }
     }
@@ -2566,7 +2566,7 @@ public class SyntaxTextBox
 
     protected virtual void OnCreateClipboardData (DataObject data)
     {
-        var exp = new ExportToHTML();
+        var exp = new ExportToHtml();
         exp.UseBr = false;
         exp.UseNbsp = false;
         exp.UseStyleTag = true;
@@ -2574,7 +2574,7 @@ public class SyntaxTextBox
 
         data.SetData (DataFormats.UnicodeText, true, Selection.Text);
         data.SetData (DataFormats.Html, PrepareHtmlForClipboard (html));
-        data.SetData (DataFormats.Rtf, new ExportToRTF().GetRtf (Selection.Clone()));
+        data.SetData (DataFormats.Rtf, new ExportToRtf().GetRtf (Selection.Clone()));
     }
 
     [DllImport ("user32.dll")]
@@ -7565,7 +7565,7 @@ public class SyntaxTextBox
     public virtual void Print (TextRange range, PrintDialogSettings settings)
     {
         //prepare export with wordwrapping
-        var exporter = new ExportToHTML();
+        var exporter = new ExportToHtml();
         exporter.UseBr = true;
         exporter.UseForwardNbsp = true;
         exporter.UseNbsp = true;

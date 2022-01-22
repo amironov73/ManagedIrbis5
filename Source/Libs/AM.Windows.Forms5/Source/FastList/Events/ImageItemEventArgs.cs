@@ -4,13 +4,13 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* NodeTextPushedEventArgs.cs --
+/* ImageItemEventargs.cs -- аргумент события, позволяющий вычислить изображение
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
+using System.Drawing;
 
 #endregion
 
@@ -19,22 +19,10 @@ using System;
 namespace AM.Windows.Forms;
 
 /// <summary>
-///
+/// Аргумент события, позволяющий вычислить изображение.
 /// </summary>
-public class NodeTextPushedEventArgs
-    : EventArgs
+public sealed class ImageItemEventArgs
+    : GenericItemResultEventArgs<Image>
 {
-    #region Propeties
-
-    /// <summary>
-    /// Узел.
-    /// </summary>
-    public object Node;
-
-    /// <summary>
-    /// Текст.
-    /// </summary>
-    public string Text;
-
-    #endregion
+    // пустое тело класса
 }

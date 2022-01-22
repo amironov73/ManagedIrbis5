@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/*
+/* ExportToRtf.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,7 +25,7 @@ namespace Fctb;
 /// Exports colored text as RTF
 /// </summary>
 /// <remarks>At this time only TextStyle renderer is supported. Other styles are not exported.</remarks>
-public class ExportToRTF
+public class ExportToRtf
 {
     /// <summary>
     /// Includes line numbers
@@ -37,13 +37,20 @@ public class ExportToRTF
     /// </summary>
     public bool UseOriginalFont { get; set; }
 
-    SyntaxTextBox tb;
+    SyntaxTextBox? tb;
     Dictionary<Color, int> colorTable = new Dictionary<Color, int>();
 
-    public ExportToRTF()
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ExportToRtf()
     {
         UseOriginalFont = true;
     }
+
+    #endregion
 
     public string GetRtf (SyntaxTextBox tb)
     {

@@ -95,14 +95,14 @@ public class TextStyle : Style
 
         if (BackgroundBrush is SolidBrush)
         {
-            var s = ExportToHTML.GetColorAsString ((BackgroundBrush as SolidBrush).Color);
+            var s = ExportToHtml.GetColorAsString ((BackgroundBrush as SolidBrush).Color);
             if (s != "")
                 result += "background-color:" + s + ";";
         }
 
         if (ForeBrush is SolidBrush)
         {
-            var s = ExportToHTML.GetColorAsString ((ForeBrush as SolidBrush).Color);
+            var s = ExportToHtml.GetColorAsString ((ForeBrush as SolidBrush).Color);
             if (s != "")
                 result += "color:" + s + ";";
         }

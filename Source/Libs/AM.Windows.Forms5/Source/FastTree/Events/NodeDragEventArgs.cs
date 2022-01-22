@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* NodeDragEventArgs.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,5 +25,12 @@ namespace AM.Windows.Forms;
 public class NodeDragEventArgs
     : EventArgs
 {
+    #region Properties
+
+    /// <summary>
+    /// Узлы.
+    /// </summary>
     public HashSet<object> Nodes;
+
+    #endregion
 }

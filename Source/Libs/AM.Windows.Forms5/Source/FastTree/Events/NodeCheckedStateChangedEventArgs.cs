@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* NodeCheckedStateChangedEventArgs.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

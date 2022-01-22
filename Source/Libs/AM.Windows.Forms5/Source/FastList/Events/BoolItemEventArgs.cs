@@ -4,37 +4,19 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* NodeTextPushedEventArgs.cs --
+/* BoolItemEventArgs.cs -- аргумент события, позволяющий вычислить булево значение
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-
-#endregion
 
 #nullable enable
 
 namespace AM.Windows.Forms;
 
 /// <summary>
-///
+/// Аргумент события, позволяющий вычислить булево значение
 /// </summary>
-public class NodeTextPushedEventArgs
-    : EventArgs
+public sealed class BoolItemEventArgs
+    : GenericItemResultEventArgs<bool>
 {
-    #region Propeties
-
-    /// <summary>
-    /// Узел.
-    /// </summary>
-    public object Node;
-
-    /// <summary>
-    /// Текст.
-    /// </summary>
-    public string Text;
-
-    #endregion
+    // пустое тело класса
 }

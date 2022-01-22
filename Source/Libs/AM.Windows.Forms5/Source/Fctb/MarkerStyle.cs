@@ -78,7 +78,7 @@ public class MarkerStyle
 
         if (BackgroundBrush is SolidBrush solidBrush)
         {
-            var s = ExportToHTML.GetColorAsString (solidBrush.Color);
+            var s = ExportToHtml.GetColorAsString (solidBrush.Color);
             if (s != string.Empty)
             {
                 result += "background-color:" + s + ";";

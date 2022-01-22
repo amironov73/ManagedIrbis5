@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/*
+/* ExportToHtml.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,7 +25,7 @@ namespace Fctb;
 /// Exports colored text as HTML
 /// </summary>
 /// <remarks>At this time only TextStyle renderer is supported. Other styles is not exported.</remarks>
-public class ExportToHTML
+public class ExportToHtml
 {
     public string LineNumbersCSS = "<style type=\"text/css\"> .lineNumber{font-family : monospace; font-size : small; font-style : normal; font-weight : normal; color : Teal; background-color : ThreedFace;} </style>";
 
@@ -59,15 +59,22 @@ public class ExportToHTML
     /// </summary>
     public bool IncludeLineNumbers { get; set; }
 
-    SyntaxTextBox tb;
+    private SyntaxTextBox? tb;
 
-    public ExportToHTML()
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ExportToHtml()
     {
         UseNbsp = true;
         UseOriginalFont = true;
         UseStyleTag = true;
         UseBr = true;
     }
+
+    #endregion
 
     public string GetHtml (SyntaxTextBox tb)
     {

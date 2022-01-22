@@ -4,13 +4,14 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* NodeTextPushedEventArgs.cs --
+/* ItemDragEventArgs.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 
 #endregion
 
@@ -21,20 +22,15 @@ namespace AM.Windows.Forms;
 /// <summary>
 ///
 /// </summary>
-public class NodeTextPushedEventArgs
+public sealed class ItemDragEventArgs
     : EventArgs
 {
-    #region Propeties
+    #region Properties
 
     /// <summary>
-    /// Узел.
+    /// Индексы элементов.
     /// </summary>
-    public object Node;
-
-    /// <summary>
-    /// Текст.
-    /// </summary>
-    public string Text;
+    public HashSet<int> ItemIndex;
 
     #endregion
 }

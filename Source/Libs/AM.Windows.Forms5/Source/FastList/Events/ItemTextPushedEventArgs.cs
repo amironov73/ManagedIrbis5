@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* NodeTextPushedEventArgs.cs --
+/* ItemTextPushedEventArgs.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,15 +21,15 @@ namespace AM.Windows.Forms;
 /// <summary>
 ///
 /// </summary>
-public class NodeTextPushedEventArgs
+public class ItemTextPushedEventArgs
     : EventArgs
 {
-    #region Propeties
+    #region Properties
 
     /// <summary>
-    /// Узел.
+    /// Индекс элемента.
     /// </summary>
-    public object Node;
+    public int ItemIndex;
 
     /// <summary>
     /// Текст.

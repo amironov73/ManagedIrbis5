@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* NodeSelectedStateChangedEventArgs.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,6 +24,17 @@ namespace AM.Windows.Forms;
 public class NodeSelectedStateChangedEventArgs
     : EventArgs
 {
+    #region Properties
+
+    /// <summary>
+    /// Узел.
+    /// </summary>
     public object Node;
+
+    /// <summary>
+    /// Состояние: узел выбран?
+    /// </summary>
     public bool Selected;
+
+    #endregion
 }
