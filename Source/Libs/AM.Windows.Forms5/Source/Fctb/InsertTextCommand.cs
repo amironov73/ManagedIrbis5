@@ -61,7 +61,7 @@ public sealed class InsertTextCommand
             TextSource ts
         )
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
         try
         {
             tb.Selection.BeginUpdate();
@@ -101,8 +101,8 @@ public sealed class InsertTextCommand
     /// </summary>
     public override void Undo()
     {
-        ts.CurrentTB.Selection.Start = sel.Start;
-        ts.CurrentTB.Selection.End = lastSel.Start;
+        ts.CurrentTextBox.Selection.Start = sel.Start;
+        ts.CurrentTextBox.Selection.End = lastSel.Start;
         ts.OnTextChanging();
         ClearSelectedCommand.ClearSelected (ts);
         base.Undo();

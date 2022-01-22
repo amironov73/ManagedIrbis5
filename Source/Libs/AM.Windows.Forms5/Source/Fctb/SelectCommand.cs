@@ -47,7 +47,7 @@ public class SelectCommand
     public override void Execute()
     {
         //remember selection
-        lastSel = new RangeInfo (ts.CurrentTB.Selection);
+        lastSel = new RangeInfo (ts.CurrentTextBox.Selection);
     }
 
     /// <inheritdoc cref="UndoableCommand.OnTextChanged"/>
@@ -62,7 +62,7 @@ public class SelectCommand
     public override void Undo()
     {
         //restore selection
-        ts.CurrentTB.Selection = new TextRange (ts.CurrentTB, lastSel.Start, lastSel.End);
+        ts.CurrentTextBox.Selection = new TextRange (ts.CurrentTextBox, lastSel.Start, lastSel.End);
     }
 
     /// <inheritdoc cref="UndoableCommand.Clone"/>
@@ -71,7 +71,7 @@ public class SelectCommand
         var result = new SelectCommand (ts);
         if (lastSel != null)
         {
-            result.lastSel = new RangeInfo (new TextRange (ts.CurrentTB, lastSel.Start, lastSel.End));
+            result.lastSel = new RangeInfo (new TextRange (ts.CurrentTextBox, lastSel.Start, lastSel.End));
         }
 
         return result;

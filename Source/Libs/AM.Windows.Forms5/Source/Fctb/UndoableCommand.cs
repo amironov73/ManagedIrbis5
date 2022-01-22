@@ -31,7 +31,7 @@ public abstract class UndoableCommand
         )
     {
         this.ts = ts;
-        sel = new RangeInfo (ts.CurrentTB.Selection);
+        sel = new RangeInfo (ts.CurrentTextBox.Selection);
     }
 
     #endregion
@@ -39,7 +39,7 @@ public abstract class UndoableCommand
     #region Private members
 
     internal RangeInfo sel;
-    internal RangeInfo lastSel;
+    internal RangeInfo? lastSel;
     internal bool autoUndo;
 
     #endregion
@@ -57,7 +57,7 @@ public abstract class UndoableCommand
     /// <inheritdoc cref="Command.Execute"/>
     public override void Execute()
     {
-        lastSel = new RangeInfo (ts.CurrentTB.Selection);
+        lastSel = new RangeInfo (ts.CurrentTextBox.Selection);
         OnTextChanged (false);
     }
 

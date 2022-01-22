@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* TextSource.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -18,6 +19,8 @@ using System.Collections;
 using System.Drawing;
 using System.IO;
 
+using AM;
+
 #endregion
 
 #nullable enable
@@ -31,11 +34,54 @@ namespace Fctb;
 public class TextSource
     : IList<Line>, IDisposable
 {
+    #region Events
+
+    /// <summary>
+    /// Occurs when line was inserted/added
+    /// </summary>
+    public event EventHandler<LineInsertedEventArgs>? LineInserted;
+
+    /// <summary>
+    /// Occurs when line was removed
+    /// </summary>
+    public event EventHandler<LineRemovedEventArgs>? LineRemoved;
+
+    /// <summary>
+    /// Occurs when text was changed
+    /// </summary>
+    public event EventHandler<TextChangedEventArgs>? TextChanged;
+
+    /// <summary>
+    /// Occurs when recalc is needed
+    /// </summary>
+    public event EventHandler<TextChangedEventArgs>? RecalcNeeded;
+
+    /// <summary>
+    /// Occurs when recalc wordwrap is needed
+    /// </summary>
+    public event EventHandler<TextChangedEventArgs>? RecalcWordWrap;
+
+    /// <summary>
+    /// Occurs before text changing
+    /// </summary>
+    public event EventHandler<TextChangingEventArgs>? TextChanging;
+
+    /// <summary>
+    /// Occurs after CurrentTB was changed
+    /// </summary>
+    public event EventHandler? CurrentTBChanged;
+
+    #endregion
+
     readonly protected List<Line> lines = new();
+
     protected LinesAccessor linesAccessor;
+
     int lastLineUniqueId;
+
     public CommandManager Manager { get; set; }
-    SyntaxTextBox currentTB;
+
+    SyntaxTextBox _currentTextBox;
 
     /// <summary>
     /// Styles
@@ -43,51 +89,19 @@ public class TextSource
     public readonly Style[] Styles;
 
     /// <summary>
-    /// Occurs when line was inserted/added
-    /// </summary>
-    public event EventHandler<LineInsertedEventArgs> LineInserted;
-
-    /// <summary>
-    /// Occurs when line was removed
-    /// </summary>
-    public event EventHandler<LineRemovedEventArgs> LineRemoved;
-
-    /// <summary>
-    /// Occurs when text was changed
-    /// </summary>
-    public event EventHandler<TextChangedEventArgs> TextChanged;
-
-    /// <summary>
-    /// Occurs when recalc is needed
-    /// </summary>
-    public event EventHandler<TextChangedEventArgs> RecalcNeeded;
-
-    /// <summary>
-    /// Occurs when recalc wordwrap is needed
-    /// </summary>
-    public event EventHandler<TextChangedEventArgs> RecalcWordWrap;
-
-    /// <summary>
-    /// Occurs before text changing
-    /// </summary>
-    public event EventHandler<TextChangingEventArgs> TextChanging;
-
-    /// <summary>
-    /// Occurs after CurrentTB was changed
-    /// </summary>
-    public event EventHandler CurrentTBChanged;
-
-    /// <summary>
     /// Current focused FastColoredTextBox
     /// </summary>
-    public SyntaxTextBox CurrentTB
+    public SyntaxTextBox CurrentTextBox
     {
-        get { return currentTB; }
+        get { return _currentTextBox; }
         set
         {
-            if (currentTB == value)
+            if (_currentTextBox == value)
+            {
                 return;
-            currentTB = value;
+            }
+
+            _currentTextBox = value;
             OnCurrentTBChanged();
         }
     }
@@ -95,7 +109,9 @@ public class TextSource
     public virtual void ClearIsChanged()
     {
         foreach (var line in lines)
+        {
             line.IsChanged = false;
+        }
     }
 
     public virtual Line CreateLine()
@@ -105,8 +121,7 @@ public class TextSource
 
     private void OnCurrentTBChanged()
     {
-        if (CurrentTBChanged != null)
-            CurrentTBChanged (this, EventArgs.Empty);
+        CurrentTBChanged?.Invoke (this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -115,9 +130,11 @@ public class TextSource
     /// </summary>
     public TextStyle DefaultStyle { get; set; }
 
-    public TextSource (SyntaxTextBox currentTB)
+    #region Construction
+
+    public TextSource (SyntaxTextBox currentTextBox)
     {
-        this.CurrentTB = currentTB;
+        this.CurrentTextBox = currentTextBox;
         linesAccessor = new LinesAccessor (this);
         Manager = new CommandManager (this);
 
@@ -129,15 +146,11 @@ public class TextSource
         InitDefaultStyle();
     }
 
+    #endregion
+
     public virtual void InitDefaultStyle()
     {
         DefaultStyle = new TextStyle (null, null, FontStyle.Regular);
-    }
-
-    public virtual Line this [int i]
-    {
-        get { return lines[i]; }
-        set { throw new NotImplementedException(); }
     }
 
     public virtual bool IsLineLoaded (int iLine)
@@ -168,39 +181,72 @@ public class TextSource
         return lines.BinarySearch (item, comparer);
     }
 
+    /// <summary>
+    /// Генерация уникального идентификатора строки.
+    /// </summary>
+    /// <returns></returns>
     public virtual int GenerateUniqueLineId()
     {
         return lastLineUniqueId++;
     }
 
-    public virtual void InsertLine (int index, Line line)
+    /// <summary>
+    /// Вставка строки.
+    /// </summary>
+    public virtual void InsertLine
+        (
+            int index,
+            Line line
+        )
     {
         lines.Insert (index, line);
         OnLineInserted (index);
     }
 
-    public virtual void OnLineInserted (int index)
+    /// <summary>
+    /// Реакция на вставленную строку.
+    /// </summary>
+    public virtual void OnLineInserted
+        (
+            int index
+        )
     {
         OnLineInserted (index, 1);
     }
 
-    public virtual void OnLineInserted (int index, int count)
+    /// <summary>
+    /// Реакция на вставленные строки.
+    /// </summary>
+    public virtual void OnLineInserted
+        (
+            int index,
+            int count
+        )
     {
-        if (LineInserted != null)
-            LineInserted (this, new LineInsertedEventArgs (index, count));
+        LineInserted?.Invoke (this, new LineInsertedEventArgs (index, count));
     }
 
-    public virtual void RemoveLine (int index)
+    /// <summary>
+    /// Удаление строки по указанному индексу.
+    /// </summary>
+    public virtual void RemoveLine
+        (
+            int index
+        )
     {
         RemoveLine (index, 1);
     }
 
-    public virtual bool IsNeedBuildRemovedLineIds
-    {
-        get { return LineRemoved != null; }
-    }
+    public virtual bool IsNeedBuildRemovedLineIds => LineRemoved != null;
 
-    public virtual void RemoveLine (int index, int count)
+    /// <summary>
+    /// Удаление строк по указанному индексу.
+    /// </summary>
+    public virtual void RemoveLine
+        (
+            int index,
+            int count
+        )
     {
         var removedLineIds = new List<int>();
 
@@ -216,17 +262,32 @@ public class TextSource
         OnLineRemoved (index, count, removedLineIds);
     }
 
-    public virtual void OnLineRemoved (int index, int count, List<int> removedLineIds)
+    /// <summary>
+    /// Реакция на удаление строк.
+    /// </summary>
+    public virtual void OnLineRemoved
+        (
+            int index,
+            int count,
+            List<int> removedLineIds
+        )
     {
         if (count > 0)
-            if (LineRemoved != null)
-                LineRemoved (this, new LineRemovedEventArgs (index, count, removedLineIds));
+        {
+            LineRemoved?.Invoke (this, new LineRemovedEventArgs (index, count, removedLineIds));
+        }
     }
 
-    public virtual void OnTextChanged (int fromLine, int toLine)
+    /// <summary>
+    /// Реакция на изменение текста.
+    /// </summary>
+    public virtual void OnTextChanged
+        (
+            int fromLine,
+            int toLine
+        )
     {
-        if (TextChanged != null)
-            TextChanged (this, new TextChangedEventArgs (Math.Min (fromLine, toLine), Math.Max (fromLine, toLine)));
+        TextChanged?.Invoke (this, new TextChangedEventArgs (Math.Min (fromLine, toLine), Math.Max (fromLine, toLine)));
     }
 
     public class TextChangedEventArgs : EventArgs
@@ -241,87 +302,34 @@ public class TextSource
         }
     }
 
-    public virtual int IndexOf (Line item)
-    {
-        return lines.IndexOf (item);
-    }
-
-    public virtual void Insert (int index, Line item)
-    {
-        InsertLine (index, item);
-    }
-
-    public virtual void RemoveAt (int index)
-    {
-        RemoveLine (index);
-    }
-
-    public virtual void Add (Line item)
-    {
-        InsertLine (Count, item);
-    }
-
-    public virtual void Clear()
-    {
-        RemoveLine (0, Count);
-    }
-
-    public virtual bool Contains (Line item)
-    {
-        return lines.Contains (item);
-    }
-
-    public virtual void CopyTo (Line[] array, int arrayIndex)
-    {
-        lines.CopyTo (array, arrayIndex);
-    }
-
-    /// <summary>
-    /// Lines count
-    /// </summary>
-    public virtual int Count
-    {
-        get { return lines.Count; }
-    }
-
-    public virtual bool IsReadOnly
-    {
-        get { return false; }
-    }
-
-    public virtual bool Remove (Line item)
-    {
-        var i = IndexOf (item);
-        if (i >= 0)
-        {
-            RemoveLine (i);
-            return true;
-        }
-        else
-            return false;
-    }
-
     public virtual void NeedRecalc (TextChangedEventArgs args)
     {
-        if (RecalcNeeded != null)
-            RecalcNeeded (this, args);
+        RecalcNeeded?.Invoke (this, args);
     }
 
     public virtual void OnRecalcWordWrap (TextChangedEventArgs args)
     {
-        if (RecalcWordWrap != null)
-            RecalcWordWrap (this, args);
+        RecalcWordWrap?.Invoke (this, args);
     }
 
+    /// <summary>
+    /// Реакция на изменение текста.
+    /// </summary>
     public virtual void OnTextChanging()
     {
-        string temp = null;
+        string? temp = null;
         OnTextChanging (ref temp);
     }
 
-    public virtual void OnTextChanging (ref string text)
+    /// <summary>
+    /// Реакция на изменение текста.
+    /// </summary>
+    public virtual void OnTextChanging
+        (
+            ref string? text
+        )
     {
-        if (TextChanging != null)
+        if (TextChanging is not null)
         {
             var args = new TextChangingEventArgs() { InsertingText = text };
             TextChanging (this, args);
@@ -333,34 +341,165 @@ public class TextSource
         ;
     }
 
-    public virtual int GetLineLength (int i)
+    /// <summary>
+    /// Получение длины строки с указанным индексом.
+    /// </summary>
+    public virtual int GetLineLength (int index)
     {
-        return lines[i].Count;
+        return lines[index].Count;
     }
 
-    public virtual bool LineHasFoldingStartMarker (int iLine)
+    /// <summary>
+    /// Строка имеет маркер начала свертывания?
+    /// </summary>
+    public virtual bool LineHasFoldingStartMarker
+        (
+            int index
+        )
     {
-        return !string.IsNullOrEmpty (lines[iLine].FoldingStartMarker);
+        return !string.IsNullOrEmpty (lines[index].FoldingStartMarker);
     }
 
-    public virtual bool LineHasFoldingEndMarker (int iLine)
+    /// <summary>
+    /// Строка имеет маркер конца свертывания?
+    /// </summary>
+    public virtual bool LineHasFoldingEndMarker
+        (
+            int index
+        )
     {
-        return !string.IsNullOrEmpty (lines[iLine].FoldingEndMarker);
+        return !string.IsNullOrEmpty (lines[index].FoldingEndMarker);
     }
 
+
+    /// <summary>
+    /// Сохранение в файл.
+    /// </summary>
+    public virtual void SaveToFile
+        (
+            string fileName,
+            Encoding encoding
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+        Sure.NotNull (encoding);
+
+        using var writer = new StreamWriter (fileName, false, encoding);
+        for (var i = 0; i < Count - 1; i++)
+        {
+            writer.WriteLine (lines[i].Text);
+        }
+
+        writer.Write (lines[Count - 1].Text);
+    }
+
+    #region IList<T> members
+
+    /// <inheritdoc cref="IList{T}.this"/>
+    public virtual Line this [int i]
+    {
+        get => lines[i];
+        set => throw new NotSupportedException();
+    }
+
+    /// <inheritdoc cref="IList{T}.IndexOf"/>
+    public virtual int IndexOf
+        (
+            Line item
+        )
+    {
+        Sure.NotNull (item);
+
+        return lines.IndexOf (item);
+    }
+
+    /// <inheritdoc cref="IList{T}.Insert"/>
+    public virtual void Insert
+        (
+            int index,
+            Line item
+        )
+    {
+        Sure.NotNull (item);
+
+        InsertLine (index, item);
+    }
+
+    /// <inheritdoc cref="IList{T}.RemoveAt"/>
+    public virtual void RemoveAt
+        (
+            int index
+        )
+    {
+        RemoveLine (index);
+    }
+
+    #endregion
+
+    #region ICollection members
+
+    /// <inheritdoc cref="ICollection{T}.Add"/>
+    public virtual void Add
+        (
+            Line item
+        )
+    {
+        Sure.NotNull (item);
+
+        InsertLine (Count, item);
+    }
+
+    /// <inheritdoc cref="ICollection{T}.Clear"/>
+    public virtual void Clear()
+    {
+        RemoveLine (0, Count);
+    }
+
+    /// <inheritdoc cref="ICollection{T}.Contains"/>
+    public virtual bool Contains (Line item)
+    {
+        return lines.Contains (item);
+    }
+
+    /// <inheritdoc cref="ICollection{T}.CopyTo"/>
+    public virtual void CopyTo (Line[] array, int arrayIndex)
+    {
+        lines.CopyTo (array, arrayIndex);
+    }
+
+    /// <inheritdoc cref="ICollection{T}.Count"/>
+    public virtual int Count => lines.Count;
+
+    /// <inheritdoc cref="ICollection{T}.IsReadOnly"/>
+    public virtual bool IsReadOnly => false;
+
+    /// <inheritdoc cref="ICollection{T}.Remove"/>
+    public virtual bool Remove
+        (
+            Line item
+        )
+    {
+        Sure.NotNull (item);
+
+        var i = IndexOf (item);
+        if (i >= 0)
+        {
+            RemoveLine (i);
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public virtual void Dispose()
     {
-        ;
+        // пустое тело метода
     }
 
-    public virtual void SaveToFile (string fileName, Encoding enc)
-    {
-        using (var sw = new StreamWriter (fileName, false, enc))
-        {
-            for (var i = 0; i < Count - 1; i++)
-                sw.WriteLine (lines[i].Text);
-
-            sw.Write (lines[Count - 1].Text);
-        }
-    }
+    #endregion
 }

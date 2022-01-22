@@ -24,7 +24,8 @@ namespace Fctb;
 /// Базовый класс для коллекции закладок.
 /// </summary>
 public abstract class BookmarksBase
-    : ICollection<Bookmark>, IDisposable
+    : ICollection<Bookmark>,
+    IDisposable
 {
     #region ICollection members
 
@@ -68,10 +69,29 @@ public abstract class BookmarksBase
 
     #region Additional properties
 
-    public abstract void Add (int lineIndex, string bookmarkName);
+    /// <summary>
+    /// Добавление закладки.
+    /// </summary>
+    public abstract void Add (int lineIndex, string? bookmarkName);
+
+    /// <summary>
+    /// Добавление закладки.
+    /// </summary>
     public abstract void Add (int lineIndex);
+
+    /// <summary>
+    /// Поиск закладки.
+    /// </summary>
     public abstract bool Contains (int lineIndex);
+
+    /// <summary>
+    /// Удаление закладки.
+    /// </summary>
     public abstract bool Remove (int lineIndex);
+
+    /// <summary>
+    /// Получение закладки по индексу.
+    /// </summary>
     public abstract Bookmark GetBookmark (int i);
 
     #endregion

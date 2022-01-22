@@ -80,7 +80,7 @@ public abstract class Style
 
     public static Size GetSizeOfRange (TextRange range)
     {
-        return new Size ((range.End.Column - range.Start.Column) * range.tb.CharWidth, range.tb.CharHeight);
+        return new Size ((range.End.Column - range.Start.Column) * range._textBox.CharWidth, range._textBox.CharHeight);
     }
 
     public static GraphicsPath GetRoundedRectangle (Rectangle rect, int d)
@@ -114,8 +114,8 @@ public abstract class Style
     /// Returns RTF descriptor for export to RTF
     /// </summary>
     /// <returns></returns>
-    public virtual RTFStyleDescriptor GetRTF()
+    public virtual RtfStyleDescriptor GetRTF()
     {
-        return new RTFStyleDescriptor();
+        return new RtfStyleDescriptor();
     }
 }

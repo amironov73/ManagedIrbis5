@@ -53,7 +53,7 @@ public sealed class ReplaceTextCommand
         //
         this._ranges = ranges;
         this._insertedText = insertedText;
-        lastSel = sel = new RangeInfo (ts.CurrentTB.Selection);
+        lastSel = sel = new RangeInfo (ts.CurrentTextBox.Selection);
     }
 
     #endregion
@@ -69,7 +69,7 @@ public sealed class ReplaceTextCommand
             TextSource ts
         )
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
 
         tb.Selection.Normalize();
 
@@ -102,7 +102,7 @@ public sealed class ReplaceTextCommand
     /// </summary>
     public override void Undo()
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
 
         ts.OnTextChanging();
         tb.BeginUpdate();
@@ -133,7 +133,7 @@ public sealed class ReplaceTextCommand
     /// </summary>
     public override void Execute()
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
         _prevText.Clear();
 
         ts.OnTextChanging (ref _insertedText);

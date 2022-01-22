@@ -5,32 +5,41 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* VisibleState.cs --
+/* RtfStyleDescriptor.cs -- описывает RTF-стиль
  * Ars Magna project, http://arsmagna.ru
  */
+
+#region Using directives
+
+using System.Drawing;
+
+#endregion
 
 #nullable enable
 
 namespace Fctb;
 
 /// <summary>
-///
+/// Описывает RTF-стиль.
 /// </summary>
-public enum VisibleState
-    : byte
+public sealed class RtfStyleDescriptor
 {
-    /// <summary>
-    ///
-    /// </summary>
-    Visible,
+    #region Properties
 
     /// <summary>
-    ///
+    /// Цвет текста.
     /// </summary>
-    StartOfHiddenBlock,
+    public Color ForeColor { get; set; }
 
     /// <summary>
-    ///
+    /// Цвет фона.
     /// </summary>
-    Hidden
+    public Color BackColor { get; set; }
+
+    /// <summary>
+    /// Дополнительные теги.
+    /// </summary>
+    public string? AdditionalTags { get; set; }
+
+    #endregion
 }

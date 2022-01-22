@@ -39,7 +39,7 @@ public class MultiRangeCommand
         : base (command.ts)
     {
         _cmd = command;
-        _range = ts.CurrentTB.Selection.Clone();
+        _range = ts.CurrentTextBox.Selection.Clone();
     }
 
     #endregion
@@ -60,7 +60,7 @@ public class MultiRangeCommand
         var iLine = 0;
         foreach (var r in _range.GetSubRanges (true))
         {
-            var line = ts.CurrentTB[r.Start.Line];
+            var line = ts.CurrentTextBox[r.Start.Line];
             var lineIsEmpty = r.End < r.Start && line.StartSpacesCount == line.Count;
             if (!lineIsEmpty)
             {
@@ -72,12 +72,12 @@ public class MultiRangeCommand
                     r.Start = r.End;
                 }
 
-                ts.CurrentTB.Selection = r;
+                ts.CurrentTextBox.Selection = r;
                 var c = new InsertTextCommand (ts, insertedText);
                 c.Execute();
-                if (ts.CurrentTB.Selection.End.Column > iChar)
+                if (ts.CurrentTextBox.Selection.End.Column > iChar)
                 {
-                    iChar = ts.CurrentTB.Selection.End.Column;
+                    iChar = ts.CurrentTextBox.Selection.End.Column;
                 }
 
                 _commandsByRanges.Add (c);
@@ -94,11 +94,11 @@ public class MultiRangeCommand
     {
         foreach (var r in _range.GetSubRanges (false))
         {
-            ts.CurrentTB.Selection = r;
+            ts.CurrentTextBox.Selection = r;
             var c = _cmd.Clone();
             c.Execute();
-            if (ts.CurrentTB.Selection.End.Column > iChar)
-                iChar = ts.CurrentTB.Selection.End.Column;
+            if (ts.CurrentTextBox.Selection.End.Column > iChar)
+                iChar = ts.CurrentTextBox.Selection.End.Column;
             _commandsByRanges.Add (c);
         }
     }
@@ -115,10 +115,10 @@ public class MultiRangeCommand
         var iChar = -1;
         var iStartLine = prevSelection.Start.Line;
         var iEndLine = prevSelection.End.Line;
-        ts.CurrentTB.Selection.ColumnSelectionMode = false;
-        ts.CurrentTB.Selection.BeginUpdate();
-        ts.CurrentTB.BeginUpdate();
-        ts.CurrentTB.AllowInsertRemoveLines = false;
+        ts.CurrentTextBox.Selection.ColumnSelectionMode = false;
+        ts.CurrentTextBox.Selection.BeginUpdate();
+        ts.CurrentTextBox.BeginUpdate();
+        ts.CurrentTextBox.AllowInsertRemoveLines = false;
         try
         {
             if (_cmd is InsertTextCommand)
@@ -140,26 +140,26 @@ public class MultiRangeCommand
         }
         finally
         {
-            ts.CurrentTB.AllowInsertRemoveLines = true;
-            ts.CurrentTB.EndUpdate();
+            ts.CurrentTextBox.AllowInsertRemoveLines = true;
+            ts.CurrentTextBox.EndUpdate();
 
-            ts.CurrentTB.Selection = _range;
+            ts.CurrentTextBox.Selection = _range;
             if (iChar >= 0)
             {
-                ts.CurrentTB.Selection.Start = new Place (iChar, iStartLine);
-                ts.CurrentTB.Selection.End = new Place (iChar, iEndLine);
+                ts.CurrentTextBox.Selection.Start = new Place (iChar, iStartLine);
+                ts.CurrentTextBox.Selection.End = new Place (iChar, iEndLine);
             }
 
-            ts.CurrentTB.Selection.ColumnSelectionMode = true;
-            ts.CurrentTB.Selection.EndUpdate();
+            ts.CurrentTextBox.Selection.ColumnSelectionMode = true;
+            ts.CurrentTextBox.Selection.EndUpdate();
         }
     }
 
     /// <inheritdoc cref="UndoableCommand.Undo"/>
     public override void Undo()
     {
-        ts.CurrentTB.BeginUpdate();
-        ts.CurrentTB.Selection.BeginUpdate();
+        ts.CurrentTextBox.BeginUpdate();
+        ts.CurrentTextBox.Selection.BeginUpdate();
         try
         {
             for (var i = _commandsByRanges.Count - 1; i >= 0; i--)
@@ -167,14 +167,14 @@ public class MultiRangeCommand
         }
         finally
         {
-            ts.CurrentTB.Selection.EndUpdate();
-            ts.CurrentTB.EndUpdate();
+            ts.CurrentTextBox.Selection.EndUpdate();
+            ts.CurrentTextBox.EndUpdate();
         }
 
-        ts.CurrentTB.Selection = _range.Clone();
-        ts.CurrentTB.OnTextChanged (_range);
-        ts.CurrentTB.OnSelectionChanged();
-        ts.CurrentTB.Selection.ColumnSelectionMode = true;
+        ts.CurrentTextBox.Selection = _range.Clone();
+        ts.CurrentTextBox.OnTextChanged (_range);
+        ts.CurrentTextBox.OnSelectionChanged();
+        ts.CurrentTextBox.Selection.ColumnSelectionMode = true;
     }
 
     /// <inheritdoc cref="UndoableCommand.Clone"/>

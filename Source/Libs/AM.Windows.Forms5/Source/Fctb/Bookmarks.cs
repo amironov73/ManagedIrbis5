@@ -13,6 +13,8 @@
 
 using System.Collections.Generic;
 
+using AM;
+
 #endregion
 
 #nullable enable
@@ -25,20 +27,53 @@ namespace Fctb;
 public class Bookmarks
     : BookmarksBase
 {
-    protected SyntaxTextBox _textBox;
-    protected List<Bookmark> items = new();
-    protected int counter;
+    #region Construction
 
-    public Bookmarks (SyntaxTextBox textBox)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Bookmarks
+        (
+            SyntaxTextBox textBox
+        )
     {
-        this._textBox = textBox;
+        Sure.NotNull (textBox);
+
+        this.textBox = textBox;
         textBox.LineInserted += tb_LineInserted;
         textBox.LineRemoved += tb_LineRemoved;
     }
 
-    protected virtual void tb_LineRemoved (object sender, LineRemovedEventArgs e)
+    #endregion
+
+    #region Private members
+
+    /// <summary>
+    /// Текстбокс.
+    /// </summary>
+    protected SyntaxTextBox textBox;
+
+    /// <summary>
+    /// Закладки.
+    /// </summary>
+    protected List<Bookmark> items = new();
+
+    /// <summary>
+    /// Счетчик.
+    /// </summary>
+    protected int counter;
+
+    /// <summary>
+    /// Реакция на удаленную строку.
+    /// </summary>
+    protected virtual void tb_LineRemoved
+        (
+            object? sender,
+            LineRemovedEventArgs e
+        )
     {
         for (var i = 0; i < Count; i++)
+        {
             if (items[i].LineIndex >= e.Index)
             {
                 if (items[i].LineIndex >= e.Index + e.Count)
@@ -69,110 +104,164 @@ public class Bookmarks
                 //items.RemoveAt(i);
                 //i--;
             }
+        }
     }
 
-    protected virtual void tb_LineInserted (object sender, LineInsertedEventArgs e)
+    /// <summary>
+    /// Реакция на вставленную строку
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    protected virtual void tb_LineInserted
+        (
+            object? sender,
+            LineInsertedEventArgs e
+        )
     {
         for (var i = 0; i < Count; i++)
+        {
             if (items[i].LineIndex >= e.Index)
             {
                 items[i].LineIndex = items[i].LineIndex + e.Count;
             }
             else if (items[i].LineIndex == e.Index - 1 && e.Count == 1)
             {
-                if (_textBox[e.Index - 1].StartSpacesCount == _textBox[e.Index - 1].Count)
+                if (textBox[e.Index - 1].StartSpacesCount == textBox[e.Index - 1].Count)
                     items[i].LineIndex = items[i].LineIndex + e.Count;
             }
+        }
     }
 
-    public override void Dispose()
-    {
-        _textBox.LineInserted -= tb_LineInserted;
-        _textBox.LineRemoved -= tb_LineRemoved;
-    }
+    #endregion
 
+    #region IEnumerable<T> members
+
+    /// <inheritdoc cref="BookmarksBase.GetEnumerator"/>
     public override IEnumerator<Bookmark> GetEnumerator()
     {
-        foreach (var item in items)
-            yield return item;
+        return items.GetEnumerator();
     }
 
-    public override void Add (int lineIndex, string bookmarkName)
-    {
-        Add (new Bookmark (_textBox, bookmarkName ?? "Bookmark " + counter, lineIndex));
-    }
+    #endregion
 
-    public override void Add (int lineIndex)
-    {
-        Add (new Bookmark (_textBox, "Bookmark " + counter, lineIndex));
-    }
+    #region BookmarksBase members
 
+    /// <inheritdoc cref="BookmarksBase.Clear"/>
     public override void Clear()
     {
         items.Clear();
         counter = 0;
     }
 
+    /// <inheritdoc cref="BookmarksBase.Add(Fctb.Bookmark)"/>
     public override void Add (Bookmark bookmark)
     {
         foreach (var bm in items)
+        {
             if (bm.LineIndex == bookmark.LineIndex)
+            {
                 return;
+            }
+        }
 
         items.Add (bookmark);
         counter++;
-        _textBox.Invalidate();
+        textBox.Invalidate();
     }
 
-    public override bool Contains (Bookmark item)
+    /// <inheritdoc cref="BookmarksBase.Contains(Fctb.Bookmark)"/>
+    public override bool Contains
+        (
+            Bookmark item
+        )
     {
         return items.Contains (item);
     }
 
-    public override bool Contains (int lineIndex)
+    /// <inheritdoc cref="BookmarksBase.Add(int,string)"/>
+    public override void Add
+        (
+            int lineIndex,
+            string? bookmarkName
+        )
+    {
+        Add (new Bookmark (textBox, bookmarkName ?? "Bookmark " + counter, lineIndex));
+    }
+
+    /// <inheritdoc cref="BookmarksBase.Add(int)"/>
+    public override void Add
+        (
+            int lineIndex
+        )
+    {
+        Add (new Bookmark (textBox, "Bookmark " + counter, lineIndex));
+    }
+
+    /// <inheritdoc cref="BookmarksBase.Contains(int)"/>
+    public override bool Contains
+        (
+            int lineIndex
+        )
     {
         foreach (var item in items)
+        {
             if (item.LineIndex == lineIndex)
+            {
                 return true;
+            }
+        }
+
         return false;
     }
 
-    public override void CopyTo (Bookmark[] array, int arrayIndex)
+    /// <inheritdoc cref="BookmarksBase.CopyTo"/>
+    public override void CopyTo
+        (
+            Bookmark[] array,
+            int arrayIndex
+        )
     {
         items.CopyTo (array, arrayIndex);
     }
 
-    public override int Count
-    {
-        get { return items.Count; }
-    }
+    /// <inheritdoc cref="BookmarksBase.Count"/>
+    public override int Count => items.Count;
 
-    public override bool IsReadOnly
-    {
-        get { return false; }
-    }
+    /// <inheritdoc cref="BookmarksBase.IsReadOnly"/>
+    public override bool IsReadOnly => false;
 
-    public override bool Remove (Bookmark item)
+    /// <inheritdoc cref="BookmarksBase.Remove(Fctb.Bookmark)"/>
+    public override bool Remove
+        (
+            Bookmark item
+        )
     {
-        _textBox.Invalidate();
+        Sure.NotNull (item);
+
+        textBox.Invalidate();
         return items.Remove (item);
     }
 
-    /// <summary>
-    /// Removes bookmark by line index
-    /// </summary>
-    public override bool Remove (int lineIndex)
+    #endregion
+
+    /// <inheritdoc cref="BookmarksBase.Remove(int)"/>
+    public override bool Remove
+        (
+            int lineIndex
+        )
     {
         var was = false;
         for (var i = 0; i < Count; i++)
+        {
             if (items[i].LineIndex == lineIndex)
             {
                 items.RemoveAt (i);
                 i--;
                 was = true;
             }
+        }
 
-        _textBox.Invalidate();
+        textBox.Invalidate();
 
         return was;
     }
@@ -184,4 +273,17 @@ public class Bookmarks
     {
         return items[i];
     }
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="BookmarksBase.Dispose"/>
+    public override void Dispose()
+    {
+        textBox.LineInserted -= tb_LineInserted;
+        textBox.LineRemoved -= tb_LineRemoved;
+    }
+
+    #endregion
+
+
 }

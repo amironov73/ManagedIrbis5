@@ -61,31 +61,31 @@ public class FoldedBlockStyle
             //find first non space symbol
             for (var i = range.Start.Column; i < range.End.Column; i++)
             {
-                if (range.tb[range.Start.Line][i].c != ' ')
+                if (range._textBox[range.Start.Line][i].c != ' ')
                 {
                     break;
                 }
 
-                firstNonSpaceSymbolX += range.tb.CharWidth;
+                firstNonSpaceSymbolX += range._textBox.CharWidth;
             }
 
             //create marker
-            range.tb.AddVisualMarker (new FoldedAreaMarker (range.Start.Line,
+            range._textBox.AddVisualMarker (new FoldedAreaMarker (range.Start.Line,
                 new Rectangle (firstNonSpaceSymbolX, position.Y,
-                    position.X + (range.End.Column - range.Start.Column) * range.tb.CharWidth - firstNonSpaceSymbolX,
-                    range.tb.CharHeight)));
+                    position.X + (range.End.Column - range.Start.Column) * range._textBox.CharWidth - firstNonSpaceSymbolX,
+                    range._textBox.CharHeight)));
         }
         else
         {
             //draw '...'
-            using (var f = new Font (range.tb.Font, FontStyle))
+            using (var f = new Font (range._textBox.Font, FontStyle))
             {
-                graphics.DrawString ("...", f, ForeBrush, range.tb.LeftIndent, position.Y - 2);
+                graphics.DrawString ("...", f, ForeBrush, range._textBox.LeftIndent, position.Y - 2);
             }
 
             //create marker
-            range.tb.AddVisualMarker (new FoldedAreaMarker (range.Start.Line,
-                new Rectangle (range.tb.LeftIndent + 2, position.Y, 2 * range.tb.CharHeight, range.tb.CharHeight)));
+            range._textBox.AddVisualMarker (new FoldedAreaMarker (range.Start.Line,
+                new Rectangle (range._textBox.LeftIndent + 2, position.Y, 2 * range._textBox.CharHeight, range._textBox.CharHeight)));
         }
     }
 

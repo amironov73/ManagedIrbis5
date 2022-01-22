@@ -463,7 +463,7 @@ public class AutocompleteListView
             var args2 = new SelectedEventArgs()
             {
                 Item = item,
-                Tb = Menu.Fragment.tb
+                Tb = Menu.Fragment._textBox
             };
             item.OnSelected (Menu, args2);
             Menu.OnSelected (args2);
@@ -483,7 +483,7 @@ public class AutocompleteListView
         var newText = item.GetTextForReplace();
 
         //replace text of fragment
-        var tb = fragment.tb;
+        var tb = fragment._textBox;
 
         tb.BeginAutoUndo();
         tb.TextSource.Manager.ExecuteCommand (new SelectCommand (tb.TextSource));

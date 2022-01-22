@@ -50,7 +50,7 @@ public sealed class ClearSelectedCommand
             TextSource ts
         )
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
 
         var start = tb.Selection.Start;
         var end = tb.Selection.End;
@@ -87,12 +87,12 @@ public sealed class ClearSelectedCommand
     /// </summary>
     public override void Undo()
     {
-        ts.CurrentTB.Selection.Start = new Place (sel.FromX, Math.Min (sel.Start.Line, sel.End.Line));
+        ts.CurrentTextBox.Selection.Start = new Place (sel.FromX, Math.Min (sel.Start.Line, sel.End.Line));
         ts.OnTextChanging();
         InsertTextCommand.InsertText (_deletedText, ts);
         ts.OnTextChanged (sel.Start.Line, sel.End.Line);
-        ts.CurrentTB.Selection.Start = sel.Start;
-        ts.CurrentTB.Selection.End = sel.End;
+        ts.CurrentTextBox.Selection.Start = sel.Start;
+        ts.CurrentTextBox.Selection.End = sel.End;
     }
 
     /// <summary>
@@ -100,7 +100,7 @@ public sealed class ClearSelectedCommand
     /// </summary>
     public override void Execute()
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
 
         string temp = null;
         ts.OnTextChanging (ref temp);

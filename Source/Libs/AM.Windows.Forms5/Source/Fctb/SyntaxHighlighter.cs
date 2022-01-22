@@ -605,21 +605,21 @@ public class SyntaxHighlighter
     public void HighlightSyntax (SyntaxDescriptor desc, TextRange range)
     {
         //set style order
-        range.tb.ClearStylesBuffer();
+        range._textBox.ClearStylesBuffer();
         for (var i = 0; i < desc.styles.Count; i++)
-            range.tb.Styles[i] = desc.styles[i];
+            range._textBox.Styles[i] = desc.styles[i];
 
         // add resilient styles
         var l = desc.styles.Count;
         for (var i = 0; i < resilientStyles.Count; i++)
-            range.tb.Styles[l + i] = resilientStyles[i];
+            range._textBox.Styles[l + i] = resilientStyles[i];
 
         //brackets
-        var oldBrackets = RememberBrackets (range.tb);
-        range.tb.LeftBracket = desc.leftBracket;
-        range.tb.RightBracket = desc.rightBracket;
-        range.tb.LeftBracket2 = desc.leftBracket2;
-        range.tb.RightBracket2 = desc.rightBracket2;
+        var oldBrackets = RememberBrackets (range._textBox);
+        range._textBox.LeftBracket = desc.leftBracket;
+        range._textBox.RightBracket = desc.rightBracket;
+        range._textBox.LeftBracket2 = desc.leftBracket2;
+        range._textBox.RightBracket2 = desc.rightBracket2;
 
         //clear styles of range
         range.ClearStyle (desc.styles.ToArray());
@@ -636,7 +636,7 @@ public class SyntaxHighlighter
             range.SetFoldingMarkers (folding.startMarkerRegex, folding.finishMarkerRegex, folding.options);
 
         //
-        RestoreBrackets (range.tb, oldBrackets);
+        RestoreBrackets (range._textBox, oldBrackets);
     }
 
     protected void RestoreBrackets (SyntaxTextBox tb, char[] oldBrackets)
@@ -788,14 +788,14 @@ public class SyntaxHighlighter
     /// <param name="range"></param>
     public virtual void CSharpSyntaxHighlight (TextRange range)
     {
-        range.tb.CommentPrefix = "//";
-        range.tb.LeftBracket = '(';
-        range.tb.RightBracket = ')';
-        range.tb.LeftBracket2 = '{';
-        range.tb.RightBracket2 = '}';
-        range.tb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+        range._textBox.CommentPrefix = "//";
+        range._textBox.LeftBracket = '(';
+        range._textBox.RightBracket = ')';
+        range._textBox.LeftBracket2 = '{';
+        range._textBox.RightBracket2 = '}';
+        range._textBox.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
 
-        range.tb.AutoIndentCharsPatterns
+        range._textBox.AutoIndentCharsPatterns
             = @"
 ^\s*[\w\.]+(\s\w+)?\s*(?<range>=)\s*(?<range>[^;=]+);
 ^\s*(case|default)\s*[^:]*(?<range>:)\s*(?<range>[^;]+);
@@ -884,13 +884,13 @@ public class SyntaxHighlighter
     /// <param name="range"></param>
     public virtual void VBSyntaxHighlight (TextRange range)
     {
-        range.tb.CommentPrefix = "'";
-        range.tb.LeftBracket = '(';
-        range.tb.RightBracket = ')';
-        range.tb.LeftBracket2 = '\x0';
-        range.tb.RightBracket2 = '\x0';
+        range._textBox.CommentPrefix = "'";
+        range._textBox.LeftBracket = '(';
+        range._textBox.RightBracket = ')';
+        range._textBox.LeftBracket2 = '\x0';
+        range._textBox.RightBracket2 = '\x0';
 
-        range.tb.AutoIndentCharsPatterns
+        range._textBox.AutoIndentCharsPatterns
             = @"
 ^\s*[\w\.\(\)]+\s*(?<range>=)\s*(?<range>.+)
 ";
@@ -964,12 +964,12 @@ public class SyntaxHighlighter
     /// <param name="range"></param>
     public virtual void HTMLSyntaxHighlight (TextRange range)
     {
-        range.tb.CommentPrefix = null;
-        range.tb.LeftBracket = '<';
-        range.tb.RightBracket = '>';
-        range.tb.LeftBracket2 = '(';
-        range.tb.RightBracket2 = ')';
-        range.tb.AutoIndentCharsPatterns = @"";
+        range._textBox.CommentPrefix = null;
+        range._textBox.LeftBracket = '<';
+        range._textBox.RightBracket = '>';
+        range._textBox.LeftBracket2 = '(';
+        range._textBox.RightBracket2 = ')';
+        range._textBox.AutoIndentCharsPatterns = @"";
 
         //clear style of changed range
         range.ClearStyle (CommentStyle, TagBracketStyle, TagNameStyle, AttributeStyle, AttributeValueStyle,
@@ -1049,12 +1049,12 @@ public class SyntaxHighlighter
     /// <param name="range"></param>
     public virtual void XMLSyntaxHighlight (TextRange range)
     {
-        range.tb.CommentPrefix = null;
-        range.tb.LeftBracket = '<';
-        range.tb.RightBracket = '>';
-        range.tb.LeftBracket2 = '(';
-        range.tb.RightBracket2 = ')';
-        range.tb.AutoIndentCharsPatterns = @"";
+        range._textBox.CommentPrefix = null;
+        range._textBox.LeftBracket = '<';
+        range._textBox.RightBracket = '>';
+        range._textBox.LeftBracket2 = '(';
+        range._textBox.RightBracket2 = ')';
+        range._textBox.AutoIndentCharsPatterns = @"";
 
         //clear style of changed range
         range.ClearStyle (CommentStyle, XmlTagBracketStyle, XmlTagNameStyle, XmlAttributeStyle, XmlAttributeValueStyle,
@@ -1102,7 +1102,7 @@ public class SyntaxHighlighter
     {
         var stack = new Stack<XmlFoldingTag>();
         var id = 0;
-        var fctb = range.tb;
+        var fctb = range._textBox;
 
         //extract opening and closing tags (exclude open-close tags: <TAG/>)
         foreach (var r in range.GetRanges (XMLFoldingRegex))
@@ -1189,13 +1189,13 @@ public class SyntaxHighlighter
     /// <param name="range"></param>
     public virtual void SQLSyntaxHighlight (TextRange range)
     {
-        range.tb.CommentPrefix = "--";
-        range.tb.LeftBracket = '(';
-        range.tb.RightBracket = ')';
-        range.tb.LeftBracket2 = '\x0';
-        range.tb.RightBracket2 = '\x0';
+        range._textBox.CommentPrefix = "--";
+        range._textBox.LeftBracket = '(';
+        range._textBox.RightBracket = ')';
+        range._textBox.LeftBracket2 = '\x0';
+        range._textBox.RightBracket2 = '\x0';
 
-        range.tb.AutoIndentCharsPatterns = @"";
+        range._textBox.AutoIndentCharsPatterns = @"";
 
         //clear style of changed range
         range.ClearStyle (CommentStyle, StringStyle, NumberStyle, VariableStyle, StatementsStyle, KeywordStyle,
@@ -1269,18 +1269,18 @@ public class SyntaxHighlighter
     /// <param name="range"></param>
     public virtual void PHPSyntaxHighlight (TextRange range)
     {
-        range.tb.CommentPrefix = "//";
-        range.tb.LeftBracket = '(';
-        range.tb.RightBracket = ')';
-        range.tb.LeftBracket2 = '{';
-        range.tb.RightBracket2 = '}';
-        range.tb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+        range._textBox.CommentPrefix = "//";
+        range._textBox.LeftBracket = '(';
+        range._textBox.RightBracket = ')';
+        range._textBox.LeftBracket2 = '{';
+        range._textBox.RightBracket2 = '}';
+        range._textBox.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
 
         //clear style of changed range
         range.ClearStyle (StringStyle, CommentStyle, NumberStyle, VariableStyle, KeywordStyle, KeywordStyle2,
             KeywordStyle3);
 
-        range.tb.AutoIndentCharsPatterns
+        range._textBox.AutoIndentCharsPatterns
             = @"
 ^\s*\$[\w\.\[\]\'\""]+\s*(?<range>=)\s*(?<range>[^;]+);
 ";
@@ -1337,14 +1337,14 @@ public class SyntaxHighlighter
     /// <param name="range"></param>
     public virtual void JScriptSyntaxHighlight (TextRange range)
     {
-        range.tb.CommentPrefix = "//";
-        range.tb.LeftBracket = '(';
-        range.tb.RightBracket = ')';
-        range.tb.LeftBracket2 = '{';
-        range.tb.RightBracket2 = '}';
-        range.tb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+        range._textBox.CommentPrefix = "//";
+        range._textBox.LeftBracket = '(';
+        range._textBox.RightBracket = ')';
+        range._textBox.LeftBracket2 = '{';
+        range._textBox.RightBracket2 = '}';
+        range._textBox.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
 
-        range.tb.AutoIndentCharsPatterns
+        range._textBox.AutoIndentCharsPatterns
             = @"
 ^\s*[\w\.]+(\s\w+)?\s*(?<range>=)\s*(?<range>[^;]+);
 ";
@@ -1404,14 +1404,14 @@ public class SyntaxHighlighter
     /// <param name="range"></param>
     public virtual void LuaSyntaxHighlight (TextRange range)
     {
-        range.tb.CommentPrefix = "--";
-        range.tb.LeftBracket = '(';
-        range.tb.RightBracket = ')';
-        range.tb.LeftBracket2 = '{';
-        range.tb.RightBracket2 = '}';
-        range.tb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+        range._textBox.CommentPrefix = "--";
+        range._textBox.LeftBracket = '(';
+        range._textBox.RightBracket = ')';
+        range._textBox.LeftBracket2 = '{';
+        range._textBox.RightBracket2 = '}';
+        range._textBox.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
 
-        range.tb.AutoIndentCharsPatterns
+        range._textBox.AutoIndentCharsPatterns
             = @"
 ^\s*[\w\.]+(\s\w+)?\s*(?<range>=)\s*(?<range>.+)
 ";
@@ -1490,13 +1490,13 @@ public class SyntaxHighlighter
     /// <param name="range"></param>
     public virtual void JSONSyntaxHighlight (TextRange range)
     {
-        range.tb.LeftBracket = '[';
-        range.tb.RightBracket = ']';
-        range.tb.LeftBracket2 = '{';
-        range.tb.RightBracket2 = '}';
-        range.tb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+        range._textBox.LeftBracket = '[';
+        range._textBox.RightBracket = ']';
+        range._textBox.LeftBracket2 = '{';
+        range._textBox.RightBracket2 = '}';
+        range._textBox.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
 
-        range.tb.AutoIndentCharsPatterns
+        range._textBox.AutoIndentCharsPatterns
             = @"
 ^\s*[\w\.]+(\s\w+)?\s*(?<range>=)\s*(?<range>[^;]+);
 ";

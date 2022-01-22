@@ -61,7 +61,7 @@ public class MarkerStyle
         if (BackgroundBrush != null)
         {
             var rect = new Rectangle (position.X, position.Y,
-                (range.End.Column - range.Start.Column) * range.tb.CharWidth, range.tb.CharHeight);
+                (range.End.Column - range.Start.Column) * range._textBox.CharWidth, range._textBox.CharHeight);
             if (rect.Width == 0)
             {
                 return;

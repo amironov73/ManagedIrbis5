@@ -72,7 +72,7 @@ public class CommandManager
             return;
 
         //multirange ?
-        if (cmd.ts.CurrentTB.Selection.ColumnSelectionMode)
+        if (cmd.ts.CurrentTextBox.Selection.ColumnSelectionMode)
             if (cmd is UndoableCommand)
 
                 //make wrapper
@@ -105,7 +105,7 @@ public class CommandManager
         redoStack.Clear();
 
         //
-        TextSource.CurrentTB.OnUndoRedoStateChanged();
+        TextSource.CurrentTextBox.OnUndoRedoStateChanged();
     }
 
     public void Undo()
@@ -136,7 +136,7 @@ public class CommandManager
                 Undo();
         }
 
-        TextSource.CurrentTB.OnUndoRedoStateChanged();
+        TextSource.CurrentTextBox.OnUndoRedoStateChanged();
     }
 
     protected int disabledCommands = 0;
@@ -170,7 +170,7 @@ public class CommandManager
     {
         history.Clear();
         redoStack.Clear();
-        TextSource.CurrentTB.OnUndoRedoStateChanged();
+        TextSource.CurrentTextBox.OnUndoRedoStateChanged();
     }
 
     internal void Redo()
@@ -182,10 +182,10 @@ public class CommandManager
         try
         {
             cmd = redoStack.Pop();
-            if (TextSource.CurrentTB.Selection.ColumnSelectionMode)
-                TextSource.CurrentTB.Selection.ColumnSelectionMode = false;
-            TextSource.CurrentTB.Selection.Start = cmd.sel.Start;
-            TextSource.CurrentTB.Selection.End = cmd.sel.End;
+            if (TextSource.CurrentTextBox.Selection.ColumnSelectionMode)
+                TextSource.CurrentTextBox.Selection.ColumnSelectionMode = false;
+            TextSource.CurrentTextBox.Selection.Start = cmd.sel.Start;
+            TextSource.CurrentTextBox.Selection.End = cmd.sel.End;
             cmd.Execute();
             history.Push (cmd);
         }
@@ -203,7 +203,7 @@ public class CommandManager
             Redo();
         }
 
-        TextSource.CurrentTB.OnUndoRedoStateChanged();
+        TextSource.CurrentTextBox.OnUndoRedoStateChanged();
     }
 
     public bool UndoEnabled => history.Count > 0;

@@ -2108,7 +2108,7 @@ public class SyntaxTextBox
 
     private void SetAsCurrentTB()
     {
-        TextSource.CurrentTB = this;
+        TextSource.CurrentTextBox = this;
     }
 
     protected virtual void InitTextSource (TextSource ts)
@@ -2156,7 +2156,7 @@ public class SyntaxTextBox
 
     private void ts_TextChanging (object sender, TextChangingEventArgs e)
     {
-        if (TextSource.CurrentTB == this)
+        if (TextSource.CurrentTextBox == this)
         {
             var text = e.InsertingText;
             OnTextChanging (ref text);
@@ -2217,7 +2217,7 @@ public class SyntaxTextBox
             needRecalc = true;
 
         Invalidate();
-        if (TextSource.CurrentTB == this)
+        if (TextSource.CurrentTextBox == this)
             OnTextChanged (e.iFromLine, e.iToLine);
     }
 

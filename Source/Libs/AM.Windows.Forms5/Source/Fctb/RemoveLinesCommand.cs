@@ -44,7 +44,7 @@ public sealed class RemoveLinesCommand
 
         //
         this._iLines = iLines;
-        lastSel = sel = new RangeInfo (ts.CurrentTB.Selection);
+        lastSel = sel = new RangeInfo (ts.CurrentTextBox.Selection);
     }
 
     #endregion
@@ -61,7 +61,7 @@ public sealed class RemoveLinesCommand
     /// <inheritdoc cref="UndoableCommand.Undo"/>
     public override void Undo()
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
 
         ts.OnTextChanging();
 
@@ -100,7 +100,7 @@ public sealed class RemoveLinesCommand
     /// </summary>
     public override void Execute()
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
         _prevText.Clear();
 
         ts.OnTextChanging();

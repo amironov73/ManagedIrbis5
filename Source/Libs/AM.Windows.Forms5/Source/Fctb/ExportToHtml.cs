@@ -15,6 +15,8 @@ using System.Text;
 using System.Drawing;
 using System.Collections.Generic;
 
+using AM;
+
 #endregion
 
 #nullable enable
@@ -27,7 +29,12 @@ namespace Fctb;
 /// <remarks>At this time only TextStyle renderer is supported. Other styles is not exported.</remarks>
 public class ExportToHtml
 {
-    public string LineNumbersCSS = "<style type=\"text/css\"> .lineNumber{font-family : monospace; font-size : small; font-style : normal; font-weight : normal; color : Teal; background-color : ThreedFace;} </style>";
+    #region Properties
+
+    /// <summary>
+    /// CSS для нумерации строк.
+    /// </summary>
+    public string lineNumbersCss = "<style type=\"text/css\"> .lineNumber{font-family : monospace; font-size : small; font-style : normal; font-weight : normal; color : Teal; background-color : ThreedFace;} </style>";
 
     /// <summary>
     /// Use nbsp; instead space
@@ -55,11 +62,11 @@ public class ExportToHtml
     public bool UseBr { get; set; }
 
     /// <summary>
-    /// Includes line numbers
+    /// Нумерация строк нужна?
     /// </summary>
     public bool IncludeLineNumbers { get; set; }
 
-    private SyntaxTextBox? tb;
+    #endregion
 
     #region Construction
 
@@ -76,107 +83,14 @@ public class ExportToHtml
 
     #endregion
 
-    public string GetHtml (SyntaxTextBox tb)
-    {
-        this.tb = tb;
-        var sel = new TextRange (tb);
-        sel.SelectAll();
-        return GetHtml (sel);
-    }
+    #region Private members
 
-    public string GetHtml (TextRange r)
-    {
-        this.tb = r.tb;
-        var styles = new Dictionary<StyleIndex, object>();
-        var sb = new StringBuilder();
-        var tempSB = new StringBuilder();
-        var currentStyleId = StyleIndex.None;
-        r.Normalize();
-        var currentLine = r.Start.Line;
-        styles[currentStyleId] = null;
+    private SyntaxTextBox? _textBox;
 
-        //
-        if (UseOriginalFont)
-            sb.AppendFormat ("<font style=\"font-family: {0}, monospace; font-size: {1}pt; line-height: {2}px;\">",
-                r.tb.Font.Name, r.tb.Font.SizeInPoints, r.tb.CharHeight);
-
-        //
-        if (IncludeLineNumbers)
-            tempSB.AppendFormat ("<span class=lineNumber>{0}</span>  ", currentLine + 1);
-
-        //
-        var hasNonSpace = false;
-        foreach (var p in r)
-        {
-            var c = r.tb[p.Line][p.Column];
-            if (c.style != currentStyleId)
-            {
-                Flush (sb, tempSB, currentStyleId);
-                currentStyleId = c.style;
-                styles[currentStyleId] = null;
-            }
-
-            if (p.Line != currentLine)
-            {
-                for (var i = currentLine; i < p.Line; i++)
-                {
-                    tempSB.Append (UseBr ? "<br>" : "\r\n");
-                    if (IncludeLineNumbers)
-                        tempSB.AppendFormat ("<span class=lineNumber>{0}</span>  ", i + 2);
-                }
-
-                currentLine = p.Line;
-                hasNonSpace = false;
-            }
-
-            switch (c.c)
-            {
-                case ' ':
-                    if ((hasNonSpace || !UseForwardNbsp) && !UseNbsp)
-                        goto default;
-
-                    tempSB.Append ("&nbsp;");
-                    break;
-                case '<':
-                    tempSB.Append ("&lt;");
-                    break;
-                case '>':
-                    tempSB.Append ("&gt;");
-                    break;
-                case '&':
-                    tempSB.Append ("&amp;");
-                    break;
-                default:
-                    hasNonSpace = true;
-                    tempSB.Append (c.c);
-                    break;
-            }
-        }
-
-        Flush (sb, tempSB, currentStyleId);
-
-        if (UseOriginalFont)
-            sb.Append ("</font>");
-
-        //build styles
-        if (UseStyleTag)
-        {
-            tempSB.Length = 0;
-            tempSB.Append ("<style type=\"text/css\">");
-            foreach (var styleId in styles.Keys)
-                tempSB.AppendFormat (".fctb{0}{{ {1} }}\r\n", GetStyleName (styleId), GetCss (styleId));
-            tempSB.Append ("</style>");
-
-            sb.Insert (0, tempSB.ToString());
-        }
-
-        if (IncludeLineNumbers)
-            sb.Insert (0, LineNumbersCSS);
-
-        return sb.ToString();
-    }
-
-    private string GetCss (StyleIndex styleIndex)
+    private string GetCss
+        (
+            StyleIndex styleIndex
+        )
     {
         var styles = new List<Style>();
 
@@ -184,17 +98,17 @@ public class ExportToHtml
         TextStyle textStyle = null;
         var mask = 1;
         var hasTextStyle = false;
-        for (var i = 0; i < tb.Styles.Length; i++)
+        for (var i = 0; i < _textBox.Styles.Length; i++)
         {
-            if (tb.Styles[i] != null && ((int)styleIndex & mask) != 0)
-                if (tb.Styles[i].IsExportable)
+            if (_textBox.Styles[i] != null && ((int)styleIndex & mask) != 0)
+                if (_textBox.Styles[i].IsExportable)
                 {
-                    var style = tb.Styles[i];
+                    var style = _textBox.Styles[i];
                     styles.Add (style);
 
                     var isTextStyle = style is TextStyle;
                     if (isTextStyle)
-                        if (!hasTextStyle || tb.AllowSeveralTextStyleDrawing)
+                        if (!hasTextStyle || _textBox.AllowSeveralTextStyleDrawing)
                         {
                             hasTextStyle = true;
                             textStyle = style as TextStyle;
@@ -210,7 +124,7 @@ public class ExportToHtml
         if (!hasTextStyle)
         {
             //draw by default renderer
-            result = tb.DefaultStyle.GetCSS();
+            result = _textBox.DefaultStyle.GetCSS();
         }
         else
         {
@@ -227,35 +141,191 @@ public class ExportToHtml
         return result;
     }
 
-    public static string GetColorAsString (Color color)
-    {
-        if (color == Color.Transparent)
-            return "";
-        return string.Format ("#{0:x2}{1:x2}{2:x2}", color.R, color.G, color.B);
-    }
-
-    string GetStyleName (StyleIndex styleIndex)
+    private string GetStyleName
+        (
+            StyleIndex styleIndex
+        )
     {
         return styleIndex.ToString().Replace (" ", "").Replace (",", "");
     }
 
-    private void Flush (StringBuilder sb, StringBuilder tempSB, StyleIndex currentStyle)
+    private void Flush
+        (
+            StringBuilder builder,
+            StringBuilder temporary,
+            StyleIndex currentStyle
+        )
     {
         //find textRenderer
-        if (tempSB.Length == 0)
+        if (temporary.Length == 0)
+        {
             return;
+        }
+
         if (UseStyleTag)
-            sb.AppendFormat ("<font class=fctb{0}>{1}</font>", GetStyleName (currentStyle), tempSB.ToString());
+        {
+            builder.AppendFormat ("<font class=fctb{0}>{1}</font>", GetStyleName (currentStyle), temporary);
+        }
         else
         {
             var css = GetCss (currentStyle);
             if (css != "")
-                sb.AppendFormat ("<font style=\"{0}\">", css);
-            sb.Append (tempSB.ToString());
+            {
+                builder.AppendFormat ("<font style=\"{0}\">", css);
+            }
+
+            builder.Append (temporary.ToString());
             if (css != "")
-                sb.Append ("</font>");
+            {
+                builder.Append ("</font>");
+            }
         }
 
-        tempSB.Length = 0;
+        temporary.Clear();
     }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение HTML из текста.
+    /// </summary>
+    public string GetHtml
+        (
+            SyntaxTextBox textBox
+        )
+    {
+        Sure.NotNull (textBox);
+
+        _textBox = textBox;
+        var sel = new TextRange (textBox);
+        sel.SelectAll();
+        return GetHtml (sel);
+    }
+
+    /// <summary>
+    /// Получение HTML из текста.
+    /// </summary>
+    public string GetHtml
+        (
+            TextRange textRange
+        )
+    {
+        Sure.NotNull (textRange);
+
+        _textBox = textRange._textBox;
+        var styles = new Dictionary<StyleIndex, object>();
+        var builder = new StringBuilder();
+        var temporary = new StringBuilder();
+        var currentStyleId = StyleIndex.None;
+        textRange.Normalize();
+        var currentLine = textRange.Start.Line;
+        styles[currentStyleId] = null;
+
+        //
+        if (UseOriginalFont)
+        {
+            builder.AppendFormat ("<font style=\"font-family: {0}, monospace; font-size: {1}pt; line-height: {2}px;\">",
+                textRange._textBox.Font.Name, textRange._textBox.Font.SizeInPoints, textRange._textBox.CharHeight);
+        }
+
+        //
+        if (IncludeLineNumbers)
+        {
+            temporary.AppendFormat ("<span class=lineNumber>{0}</span>  ", currentLine + 1);
+        }
+
+        //
+        var hasNonSpace = false;
+        foreach (var p in textRange)
+        {
+            var c = textRange._textBox[p.Line][p.Column];
+            if (c.style != currentStyleId)
+            {
+                Flush (builder, temporary, currentStyleId);
+                currentStyleId = c.style;
+                styles[currentStyleId] = null;
+            }
+
+            if (p.Line != currentLine)
+            {
+                for (var i = currentLine; i < p.Line; i++)
+                {
+                    temporary.Append (UseBr ? "<br>" : "\r\n");
+                    if (IncludeLineNumbers)
+                        temporary.AppendFormat ("<span class=lineNumber>{0}</span>  ", i + 2);
+                }
+
+                currentLine = p.Line;
+                hasNonSpace = false;
+            }
+
+            switch (c.c)
+            {
+                case ' ':
+                    if ((hasNonSpace || !UseForwardNbsp) && !UseNbsp)
+                        goto default;
+
+                    temporary.Append ("&nbsp;");
+                    break;
+
+                case '<':
+                    temporary.Append ("&lt;");
+                    break;
+
+                case '>':
+                    temporary.Append ("&gt;");
+                    break;
+
+                case '&':
+                    temporary.Append ("&amp;");
+                    break;
+
+                default:
+                    hasNonSpace = true;
+                    temporary.Append (c.c);
+                    break;
+            }
+        }
+
+        Flush (builder, temporary, currentStyleId);
+
+        if (UseOriginalFont)
+            builder.Append ("</font>");
+
+        //build styles
+        if (UseStyleTag)
+        {
+            temporary.Length = 0;
+            temporary.Append ("<style type=\"text/css\">");
+            foreach (var styleId in styles.Keys)
+                temporary.AppendFormat (".fctb{0}{{ {1} }}\r\n", GetStyleName (styleId), GetCss (styleId));
+            temporary.Append ("</style>");
+
+            builder.Insert (0, temporary.ToString());
+        }
+
+        if (IncludeLineNumbers)
+        {
+            builder.Insert (0, lineNumbersCss);
+        }
+
+        return builder.ToString();
+    }
+
+    /// <summary>
+    /// Цвет в формате HTML.
+    /// </summary>
+    public static string GetColorAsString
+        (
+            Color color
+        )
+    {
+        return color == Color.Transparent
+            ? string.Empty
+            : $"#{color.R:x2}{color.G:x2}{color.B:x2}";
+    }
+
+    #endregion
 }

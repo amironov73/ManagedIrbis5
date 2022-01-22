@@ -85,7 +85,7 @@ public class SelectionStyle
         {
             graphics.SmoothingMode = SmoothingMode.None;
             var rect = new Rectangle (position.X, position.Y,
-                (range.End.Column - range.Start.Column) * range.tb.CharWidth, range.tb.CharHeight);
+                (range.End.Column - range.Start.Column) * range._textBox.CharWidth, range._textBox.CharHeight);
             if (rect.Width == 0)
             {
                 return;
@@ -99,8 +99,8 @@ public class SelectionStyle
                 //draw text
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-                var r = new TextRange (range.tb, range.Start.Column, range.Start.Line,
-                    Math.Min (range.tb[range.End.Line].Count, range.End.Column), range.End.Line);
+                var r = new TextRange (range._textBox, range.Start.Column, range.Start.Line,
+                    Math.Min (range._textBox[range.End.Line].Count, range.End.Column), range.End.Line);
 
                 using var style = new TextStyle (ForegroundBrush, null, FontStyle.Regular);
                 style.Draw (graphics, new Point (position.X, position.Y - 1), r);

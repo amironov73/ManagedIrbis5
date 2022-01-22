@@ -57,12 +57,12 @@ public sealed class InsertCharCommand
             TextSource ts
         )
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
 
         switch (c)
         {
             case '\n':
-                if (!ts.CurrentTB.AllowInsertRemoveLines)
+                if (!ts.CurrentTextBox.AllowInsertRemoveLines)
                     throw new ArgumentOutOfRangeException ("Cant insert this char in ColumnRange mode");
                 if (ts.Count == 0)
                     InsertLine (ts);
@@ -77,7 +77,7 @@ public sealed class InsertCharCommand
                     return;
                 if (tb.Selection.Start.Column == 0)
                 {
-                    if (!ts.CurrentTB.AllowInsertRemoveLines)
+                    if (!ts.CurrentTextBox.AllowInsertRemoveLines)
                         throw new ArgumentOutOfRangeException ("Cant insert this char in ColumnRange mode");
                     if (tb.LineInfos[tb.Selection.Start.Line - 1].VisibleState != VisibleState.Visible)
                         tb.ExpandBlock (tb.Selection.Start.Line - 1);
@@ -134,30 +134,30 @@ public sealed class InsertCharCommand
                 break;
 
             case '\b':
-                ts.CurrentTB.Selection.Start = lastSel.Start;
+                ts.CurrentTextBox.Selection.Start = lastSel.Start;
                 var cc = '\x0';
                 if (deletedChar != '\x0')
                 {
-                    ts.CurrentTB.ExpandBlock (ts.CurrentTB.Selection.Start.Line);
+                    ts.CurrentTextBox.ExpandBlock (ts.CurrentTextBox.Selection.Start.Line);
                     InsertChar (deletedChar, ref cc, ts);
                 }
 
                 break;
 
             case '\t':
-                ts.CurrentTB.ExpandBlock (sel.Start.Line);
+                ts.CurrentTextBox.ExpandBlock (sel.Start.Line);
                 for (var i = sel.FromX; i < lastSel.FromX; i++)
                 {
                     ts[sel.Start.Line].RemoveAt (sel.Start.Column);
                 }
 
-                ts.CurrentTB.Selection.Start = sel.Start;
+                ts.CurrentTextBox.Selection.Start = sel.Start;
                 break;
 
             default:
-                ts.CurrentTB.ExpandBlock (sel.Start.Line);
+                ts.CurrentTextBox.ExpandBlock (sel.Start.Line);
                 ts[sel.Start.Line].RemoveAt (sel.Start.Column);
-                ts.CurrentTB.Selection.Start = sel.Start;
+                ts.CurrentTextBox.Selection.Start = sel.Start;
                 break;
         }
 
@@ -171,7 +171,7 @@ public sealed class InsertCharCommand
     /// </summary>
     public override void Execute()
     {
-        ts.CurrentTB.ExpandBlock (ts.CurrentTB.Selection.Start.Line);
+        ts.CurrentTextBox.ExpandBlock (ts.CurrentTextBox.Selection.Start.Line);
         var s = c.ToString();
         ts.OnTextChanging (ref s);
         if (s.Length == 1)
@@ -185,14 +185,14 @@ public sealed class InsertCharCommand
             InsertLine (ts);
         InsertChar (c, ref deletedChar, ts);
 
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (ts.CurrentTB.Selection.Start.Line,
-            ts.CurrentTB.Selection.Start.Line));
+        ts.NeedRecalc (new TextSource.TextChangedEventArgs (ts.CurrentTextBox.Selection.Start.Line,
+            ts.CurrentTextBox.Selection.Start.Line));
         base.Execute();
     }
 
     internal static void InsertLine (TextSource ts)
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
 
         if (!tb.Multiline && tb.LinesCount > 0)
             return;
@@ -211,7 +211,7 @@ public sealed class InsertCharCommand
     /// </summary>
     internal static void MergeLines (int i, TextSource ts)
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
 
         if (i + 1 >= ts.Count)
             return;

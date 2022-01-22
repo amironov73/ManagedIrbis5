@@ -60,20 +60,20 @@ public class ShortcutStyle
         )
     {
         //get last char coordinates
-        var p = range.tb.PlaceToPoint (range.End);
+        var p = range._textBox.PlaceToPoint (range.End);
 
         //draw small square under char
-        var rect = new Rectangle (p.X - 5, p.Y + range.tb.CharHeight - 2, 4, 3);
+        var rect = new Rectangle (p.X - 5, p.Y + range._textBox.CharHeight - 2, 4, 3);
         graphics.FillPath (Brushes.White, GetRoundedRectangle (rect, 1));
         graphics.DrawPath (borderPen, GetRoundedRectangle (rect, 1));
 
         //add visual marker for handle mouse events
         AddVisualMarker
             (
-                range.tb,
+                range._textBox,
                 new StyleVisualMarker
                     (
-                        new Rectangle (p.X - range.tb.CharWidth, p.Y, range.tb.CharWidth, range.tb.CharHeight),
+                        new Rectangle (p.X - range._textBox.CharWidth, p.Y, range._textBox.CharWidth, range._textBox.CharHeight),
                         this
                     )
             );

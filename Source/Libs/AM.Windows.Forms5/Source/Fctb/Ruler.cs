@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* Ruler.cs --
+/* Ruler.cs -- линейка
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,6 +23,9 @@ using System.Windows.Forms;
 
 namespace Fctb;
 
+/// <summary>
+/// Линейка.
+/// </summary>
 public partial class Ruler
     : UserControl
 {
@@ -65,6 +68,9 @@ public partial class Ruler
 
     #region Construction
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public Ruler()
     {
         InitializeComponent();
@@ -182,6 +188,7 @@ public partial class Ruler
 
         using (var pen = new Pen (TickColor))
         using (var textBrush = new SolidBrush (ForeColor))
+        {
             for (float x = zeroPoint.X; x < Right; x += columnWidth, ++column)
             {
                 if (column % 10 == 0)
@@ -191,6 +198,7 @@ public partial class Ruler
 
                 e.Graphics.DrawLine (pen, (int)x, fontSize.Height + (column % 5 == 0 ? 1 : 3), (int)x, Height - 4);
             }
+        }
 
         using (var pen = new Pen (TickColor))
         {

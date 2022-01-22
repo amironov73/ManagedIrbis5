@@ -60,7 +60,7 @@ public sealed class ReplaceMultipleTextCommand
 
         //
         this._ranges = ranges;
-        lastSel = sel = new RangeInfo (ts.CurrentTB.Selection);
+        lastSel = sel = new RangeInfo (ts.CurrentTextBox.Selection);
     }
 
     #endregion
@@ -79,7 +79,7 @@ public sealed class ReplaceMultipleTextCommand
     /// </summary>
     public override void Undo()
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
 
         ts.OnTextChanging();
 
@@ -105,7 +105,7 @@ public sealed class ReplaceMultipleTextCommand
     /// </summary>
     public override void Execute()
     {
-        var tb = ts.CurrentTB;
+        var tb = ts.CurrentTextBox;
         _prevText.Clear();
 
         ts.OnTextChanging();

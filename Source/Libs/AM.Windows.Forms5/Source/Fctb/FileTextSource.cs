@@ -43,8 +43,8 @@ public class FileTextSource : TextSource, IDisposable
     /// </summary>
     public event EventHandler<LinePushedEventArgs> LinePushed;
 
-    public FileTextSource (SyntaxTextBox currentTB)
-        : base (currentTB)
+    public FileTextSource (SyntaxTextBox currentTextBox)
+        : base (currentTextBox)
     {
         timer.Interval = 10000;
         timer.Tick += new EventHandler (timer_Tick);
@@ -69,8 +69,8 @@ public class FileTextSource : TextSource, IDisposable
     private void UnloadUnusedLines()
     {
         const int margin = 2000;
-        var iStartVisibleLine = CurrentTB.VisibleRange.Start.Line;
-        var iFinishVisibleLine = CurrentTB.VisibleRange.End.Line;
+        var iStartVisibleLine = CurrentTextBox.VisibleRange.Start.Line;
+        var iFinishVisibleLine = CurrentTextBox.VisibleRange.End.Line;
 
         var count = 0;
         for (var i = 0; i < Count; i++)
@@ -186,13 +186,13 @@ public class FileTextSource : TextSource, IDisposable
         OnLineInserted (0, Count);
 
         //load first lines for calc width of the text
-        var linesCount = Math.Min (lines.Count, CurrentTB.ClientRectangle.Height / CurrentTB.CharHeight);
+        var linesCount = Math.Min (lines.Count, CurrentTextBox.ClientRectangle.Height / CurrentTextBox.CharHeight);
         for (var i = 0; i < linesCount; i++)
             LoadLineFromSourceFile (i);
 
         //
         NeedRecalc (new TextChangedEventArgs (0, linesCount - 1));
-        if (CurrentTB.WordWrap)
+        if (CurrentTextBox.WordWrap)
             OnRecalcWordWrap (new TextChangedEventArgs (0, linesCount - 1));
     }
 
@@ -281,7 +281,7 @@ public class FileTextSource : TextSource, IDisposable
     /// </summary>
     public string SaveEOL { get; set; }
 
-    public override void SaveToFile (string fileName, Encoding enc)
+    public override void SaveToFile (string fileName, Encoding encoding)
     {
         //
         var newLinePos = new List<int> (Count);
@@ -292,7 +292,7 @@ public class FileTextSource : TextSource, IDisposable
 
         var sr = new StreamReader (fs, fileEncoding);
         using (var tempFs = new FileStream (tempFileName, FileMode.Create))
-        using (var sw = new StreamWriter (tempFs, enc))
+        using (var sw = new StreamWriter (tempFs, encoding))
         {
             sw.Flush();
 
@@ -348,7 +348,7 @@ public class FileTextSource : TextSource, IDisposable
         //binding to new file
         sourceFileLinePositions = newLinePos;
         fs = new FileStream (fileName, FileMode.Open);
-        this.fileEncoding = enc;
+        this.fileEncoding = encoding;
     }
 
     private string ReadLine (StreamReader sr, int i)
@@ -408,7 +408,7 @@ public class FileTextSource : TextSource, IDisposable
             line.Add (new Character (c));
         base.lines[i] = line;
 
-        if (CurrentTB.WordWrap)
+        if (CurrentTextBox.WordWrap)
             OnRecalcWordWrap (new TextChangedEventArgs (i, i));
     }
 
@@ -429,28 +429,28 @@ public class FileTextSource : TextSource, IDisposable
         base.Clear();
     }
 
-    public override int GetLineLength (int i)
+    public override int GetLineLength (int index)
     {
-        if (base.lines[i] == null)
+        if (base.lines[index] == null)
             return 0;
         else
-            return base.lines[i].Count;
+            return base.lines[index].Count;
     }
 
-    public override bool LineHasFoldingStartMarker (int iLine)
+    public override bool LineHasFoldingStartMarker (int index)
     {
-        if (lines[iLine] == null)
+        if (lines[index] == null)
             return false;
         else
-            return !string.IsNullOrEmpty (lines[iLine].FoldingStartMarker);
+            return !string.IsNullOrEmpty (lines[index].FoldingStartMarker);
     }
 
-    public override bool LineHasFoldingEndMarker (int iLine)
+    public override bool LineHasFoldingEndMarker (int index)
     {
-        if (lines[iLine] == null)
+        if (lines[index] == null)
             return false;
         else
-            return !string.IsNullOrEmpty (lines[iLine].FoldingEndMarker);
+            return !string.IsNullOrEmpty (lines[index].FoldingEndMarker);
     }
 
     public override void Dispose()

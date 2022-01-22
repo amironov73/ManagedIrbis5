@@ -47,20 +47,20 @@ public class TextStyle : Style
         //draw background
         if (BackgroundBrush != null)
             graphics.FillRectangle (BackgroundBrush, position.X, position.Y,
-                (range.End.Column - range.Start.Column) * range.tb.CharWidth, range.tb.CharHeight);
+                (range.End.Column - range.Start.Column) * range._textBox.CharWidth, range._textBox.CharHeight);
 
         //draw chars
-        using (var f = new Font (range.tb.Font, FontStyle))
+        using (var f = new Font (range._textBox.Font, FontStyle))
         {
-            var line = range.tb[range.Start.Line];
-            float dx = range.tb.CharWidth;
-            float y = position.Y + range.tb.LineInterval / 2;
-            float x = position.X - range.tb.CharWidth / 3;
+            var line = range._textBox[range.Start.Line];
+            float dx = range._textBox.CharWidth;
+            float y = position.Y + range._textBox.LineInterval / 2;
+            float x = position.X - range._textBox.CharWidth / 3;
 
             if (ForeBrush == null)
-                ForeBrush = new SolidBrush (range.tb.ForeColor);
+                ForeBrush = new SolidBrush (range._textBox.ForeColor);
 
-            if (range.tb.ImeAllowed)
+            if (range._textBox.ImeAllowed)
             {
                 //IME mode
                 for (var i = range.Start.Column; i < range.End.Column; i++)
@@ -68,8 +68,8 @@ public class TextStyle : Style
                     var size = SyntaxTextBox.GetCharSize (f, line[i].c);
 
                     var gs = graphics.Save();
-                    var k = size.Width > range.tb.CharWidth + 1 ? range.tb.CharWidth / size.Width : 1;
-                    graphics.TranslateTransform (x, y + (1 - k) * range.tb.CharHeight / 2);
+                    var k = size.Width > range._textBox.CharWidth + 1 ? range._textBox.CharWidth / size.Width : 1;
+                    graphics.TranslateTransform (x, y + (1 - k) * range._textBox.CharHeight / 2);
                     graphics.ScaleTransform (k, (float)Math.Sqrt (k));
                     graphics.DrawString (line[i].c.ToString(), f, ForeBrush, 0, 0, stringFormat);
                     graphics.Restore (gs);
@@ -119,9 +119,9 @@ public class TextStyle : Style
         return result;
     }
 
-    public override RTFStyleDescriptor GetRTF()
+    public override RtfStyleDescriptor GetRTF()
     {
-        var result = new RTFStyleDescriptor();
+        var result = new RtfStyleDescriptor();
 
         if (BackgroundBrush is SolidBrush)
             result.BackColor = (BackgroundBrush as SolidBrush).Color;
