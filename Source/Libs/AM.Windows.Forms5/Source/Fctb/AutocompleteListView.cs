@@ -332,8 +332,8 @@ public class AutocompleteListView
 
         if (!Menu.Visible)
         {
-            if (tb.HotkeysMapping.ContainsKey (e.KeyData) &&
-                tb.HotkeysMapping[e.KeyData] == FCTBAction.AutocompleteMenu)
+            if (tb.HotkeyMapping.ContainsKey (e.KeyData) &&
+                tb.HotkeyMapping[e.KeyData] == ActionCode.AutocompleteMenu)
             {
                 DoAutocomplete();
                 e.Handled = true;

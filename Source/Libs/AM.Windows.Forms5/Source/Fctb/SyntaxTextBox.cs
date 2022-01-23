@@ -227,8 +227,8 @@ public class SyntaxTextBox
         textAreaBorder = TextAreaBorderType.None;
         textAreaBorderColor = Color.Black;
         _macroManager = new MacroManager (this);
-        HotkeysMapping = new HotkeysMapping();
-        HotkeysMapping.InitDefault();
+        HotkeyMapping = new HotkeyMapping();
+        HotkeyMapping.InitDefault();
         WordWrapAutoIndent = true;
         FoldedBlocks = new Dictionary<int, int>();
         AutoCompleteBrackets = false;
@@ -856,13 +856,13 @@ public class SyntaxTextBox
     /// Hotkeys. Do not use this property in your code, use HotkeysMapping property.
     /// </summary>
     [Description ("Here you can change hotkeys for FastColoredTextBox.")]
-    [Editor (typeof (HotkeysEditor), typeof (UITypeEditor))]
+    [Editor (typeof (HotkeyEditor), typeof (UITypeEditor))]
     [DefaultValue (
         "Tab=IndentIncrease, Escape=ClearHints, PgUp=GoPageUp, PgDn=GoPageDown, End=GoEnd, Home=GoHome, Left=GoLeft, Up=GoUp, Right=GoRight, Down=GoDown, Ins=ReplaceMode, Del=DeleteCharRight, F3=FindNext, Shift+Tab=IndentDecrease, Shift+PgUp=GoPageUpWithSelection, Shift+PgDn=GoPageDownWithSelection, Shift+End=GoEndWithSelection, Shift+Home=GoHomeWithSelection, Shift+Left=GoLeftWithSelection, Shift+Up=GoUpWithSelection, Shift+Right=GoRightWithSelection, Shift+Down=GoDownWithSelection, Shift+Ins=Paste, Shift+Del=Cut, Ctrl+Back=ClearWordLeft, Ctrl+Space=AutocompleteMenu, Ctrl+End=GoLastLine, Ctrl+Home=GoFirstLine, Ctrl+Left=GoWordLeft, Ctrl+Up=ScrollUp, Ctrl+Right=GoWordRight, Ctrl+Down=ScrollDown, Ctrl+Ins=Copy, Ctrl+Del=ClearWordRight, Ctrl+0=ZoomNormal, Ctrl+A=SelectAll, Ctrl+B=BookmarkLine, Ctrl+C=Copy, Ctrl+E=MacroExecute, Ctrl+F=FindDialog, Ctrl+G=GoToDialog, Ctrl+H=ReplaceDialog, Ctrl+I=AutoIndentChars, Ctrl+M=MacroRecord, Ctrl+N=GoNextBookmark, Ctrl+R=Redo, Ctrl+U=UpperCase, Ctrl+V=Paste, Ctrl+X=Cut, Ctrl+Z=Undo, Ctrl+Add=ZoomIn, Ctrl+Subtract=ZoomOut, Ctrl+OemMinus=NavigateBackward, Ctrl+Shift+End=GoLastLineWithSelection, Ctrl+Shift+Home=GoFirstLineWithSelection, Ctrl+Shift+Left=GoWordLeftWithSelection, Ctrl+Shift+Right=GoWordRightWithSelection, Ctrl+Shift+B=UnbookmarkLine, Ctrl+Shift+C=CommentSelected, Ctrl+Shift+N=GoPrevBookmark, Ctrl+Shift+U=LowerCase, Ctrl+Shift+OemMinus=NavigateForward, Alt+Back=Undo, Alt+Up=MoveSelectedLinesUp, Alt+Down=MoveSelectedLinesDown, Alt+F=FindChar, Alt+Shift+Left=GoLeft_ColumnSelectionMode, Alt+Shift+Up=GoUp_ColumnSelectionMode, Alt+Shift+Right=GoRight_ColumnSelectionMode, Alt+Shift+Down=GoDown_ColumnSelectionMode")]
     public string Hotkeys
     {
-        get { return HotkeysMapping.ToString(); }
-        set { HotkeysMapping = HotkeysMapping.Parse (value); }
+        get { return HotkeyMapping.ToString(); }
+        set { HotkeyMapping = HotkeyMapping.Parse (value); }
     }
 
     /// <summary>
@@ -870,7 +870,7 @@ public class SyntaxTextBox
     /// </summary>
     [Browsable (false)]
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-    public HotkeysMapping HotkeysMapping { get; set; }
+    public HotkeyMapping HotkeyMapping { get; set; }
 
     /// <summary>
     /// Default text style
@@ -3640,7 +3640,7 @@ public class SyntaxTextBox
     {
         if ((keyData & Keys.Alt) > 0)
         {
-            if (HotkeysMapping.ContainsKey (keyData))
+            if (HotkeyMapping.ContainsKey (keyData))
             {
                 ProcessKey (keyData);
                 return true;
@@ -3650,10 +3650,10 @@ public class SyntaxTextBox
         return base.ProcessDialogKey (keyData);
     }
 
-    static Dictionary<FCTBAction, bool> scrollActions = new Dictionary<FCTBAction, bool>()
+    static Dictionary<ActionCode, bool> scrollActions = new Dictionary<ActionCode, bool>()
     {
-        { FCTBAction.ScrollDown, true }, { FCTBAction.ScrollUp, true }, { FCTBAction.ZoomOut, true },
-        { FCTBAction.ZoomIn, true }, { FCTBAction.ZoomNormal, true }
+        { ActionCode.ScrollDown, true }, { ActionCode.ScrollUp, true }, { ActionCode.ZoomOut, true },
+        { ActionCode.ZoomIn, true }, { ActionCode.ZoomNormal, true }
     };
 
     /// <summary>
@@ -3668,13 +3668,13 @@ public class SyntaxTextBox
 
 
         if (_macroManager != null)
-            if (!HotkeysMapping.ContainsKey (keyData) || (HotkeysMapping[keyData] != FCTBAction.MacroExecute &&
-                                                          HotkeysMapping[keyData] != FCTBAction.MacroRecord))
+            if (!HotkeyMapping.ContainsKey (keyData) || (HotkeyMapping[keyData] != ActionCode.MacroExecute &&
+                                                          HotkeyMapping[keyData] != ActionCode.MacroRecord))
                 _macroManager.ProcessKey (keyData);
 
-        if (HotkeysMapping.ContainsKey (keyData))
+        if (HotkeyMapping.ContainsKey (keyData))
         {
-            var act = HotkeysMapping[keyData];
+            var act = HotkeyMapping[keyData];
             DoAction (act);
             if (scrollActions.ContainsKey (act))
                 return true;
@@ -3707,93 +3707,93 @@ public class SyntaxTextBox
         return false;
     }
 
-    private void DoAction (FCTBAction action)
+    private void DoAction (ActionCode action)
     {
         switch (action)
         {
-            case FCTBAction.ZoomIn:
+            case ActionCode.ZoomIn:
                 ChangeFontSize (2);
                 break;
-            case FCTBAction.ZoomOut:
+            case ActionCode.ZoomOut:
                 ChangeFontSize (-2);
                 break;
-            case FCTBAction.ZoomNormal:
+            case ActionCode.ZoomNormal:
                 RestoreFontSize();
                 break;
-            case FCTBAction.ScrollDown:
+            case ActionCode.ScrollDown:
                 DoScrollVertical (1, -1);
                 break;
 
-            case FCTBAction.ScrollUp:
+            case ActionCode.ScrollUp:
                 DoScrollVertical (1, 1);
                 break;
 
-            case FCTBAction.GoToDialog:
+            case ActionCode.GoToDialog:
                 ShowGoToDialog();
                 break;
 
-            case FCTBAction.FindDialog:
+            case ActionCode.FindDialog:
                 ShowFindDialog();
                 break;
 
-            case FCTBAction.FindChar:
+            case ActionCode.FindChar:
                 findCharMode = true;
                 break;
 
-            case FCTBAction.FindNext:
+            case ActionCode.FindNext:
                 if (findForm == null || findForm.tbFind.Text == "")
                     ShowFindDialog();
                 else
                     findForm.FindNext (findForm.tbFind.Text);
                 break;
 
-            case FCTBAction.ReplaceDialog:
+            case ActionCode.ReplaceDialog:
                 ShowReplaceDialog();
                 break;
 
-            case FCTBAction.Copy:
+            case ActionCode.Copy:
                 Copy();
                 break;
 
-            case FCTBAction.CommentSelected:
+            case ActionCode.CommentSelected:
                 CommentSelected();
                 break;
 
-            case FCTBAction.Cut:
+            case ActionCode.Cut:
                 if (!Selection.ReadOnly)
                     Cut();
                 break;
 
-            case FCTBAction.Paste:
+            case ActionCode.Paste:
                 if (!Selection.ReadOnly)
                     Paste();
                 break;
 
-            case FCTBAction.SelectAll:
+            case ActionCode.SelectAll:
                 Selection.SelectAll();
                 break;
 
-            case FCTBAction.Undo:
+            case ActionCode.Undo:
                 if (!ReadOnly)
                     Undo();
                 break;
 
-            case FCTBAction.Redo:
+            case ActionCode.Redo:
                 if (!ReadOnly)
                     Redo();
                 break;
 
-            case FCTBAction.LowerCase:
+            case ActionCode.LowerCase:
                 if (!Selection.ReadOnly)
                     LowerCase();
                 break;
 
-            case FCTBAction.UpperCase:
+            case ActionCode.UpperCase:
                 if (!Selection.ReadOnly)
                     UpperCase();
                 break;
 
-            case FCTBAction.IndentDecrease:
+            case ActionCode.IndentDecrease:
                 if (!Selection.ReadOnly)
                 {
                     var sel = Selection.Clone();
@@ -3814,7 +3814,7 @@ public class SyntaxTextBox
 
                 break;
 
-            case FCTBAction.IndentIncrease:
+            case ActionCode.IndentIncrease:
                 if (!Selection.ReadOnly)
                 {
                     var sel = Selection.Clone();
@@ -3841,36 +3841,36 @@ public class SyntaxTextBox
 
                 break;
 
-            case FCTBAction.AutoIndentChars:
+            case ActionCode.AutoIndentChars:
                 if (!Selection.ReadOnly)
                     DoAutoIndentChars (Selection.Start.Line);
                 break;
 
-            case FCTBAction.NavigateBackward:
+            case ActionCode.NavigateBackward:
                 NavigateBackward();
                 break;
 
-            case FCTBAction.NavigateForward:
+            case ActionCode.NavigateForward:
                 NavigateForward();
                 break;
 
-            case FCTBAction.UnbookmarkLine:
+            case ActionCode.UnbookmarkLine:
                 UnbookmarkLine (Selection.Start.Line);
                 break;
 
-            case FCTBAction.BookmarkLine:
+            case ActionCode.BookmarkLine:
                 BookmarkLine (Selection.Start.Line);
                 break;
 
-            case FCTBAction.GoNextBookmark:
+            case ActionCode.GoNextBookmark:
                 GotoNextBookmark (Selection.Start.Line);
                 break;
 
-            case FCTBAction.GoPrevBookmark:
+            case ActionCode.GoPrevBookmark:
                 GotoPrevBookmark (Selection.Start.Line);
                 break;
 
-            case FCTBAction.ClearWordLeft:
+            case ActionCode.ClearWordLeft:
                 if (OnKeyPressing ('\b')) //KeyPress event processed key
                     break;
                 if (!Selection.ReadOnly)
@@ -3885,12 +3885,12 @@ public class SyntaxTextBox
                 OnKeyPressed ('\b');
                 break;
 
-            case FCTBAction.ReplaceMode:
+            case ActionCode.ReplaceMode:
                 if (!ReadOnly)
                     isReplaceMode = !isReplaceMode;
                 break;
 
-            case FCTBAction.DeleteCharRight:
+            case ActionCode.DeleteCharRight:
                 if (!Selection.ReadOnly)
                 {
                     if (OnKeyPressing ((char)0xff)) //KeyPress event processed key
@@ -3925,7 +3925,7 @@ public class SyntaxTextBox
 
                 break;
 
-            case FCTBAction.ClearWordRight:
+            case ActionCode.ClearWordRight:
                 if (OnKeyPressing ((char)0xff)) //KeyPress event processed key
                     break;
                 if (!Selection.ReadOnly)
@@ -3940,156 +3940,156 @@ public class SyntaxTextBox
                 OnKeyPressed ((char)0xff);
                 break;
 
-            case FCTBAction.GoWordLeft:
+            case ActionCode.GoWordLeft:
                 Selection.GoWordLeft (false);
                 break;
 
-            case FCTBAction.GoWordLeftWithSelection:
+            case ActionCode.GoWordLeftWithSelection:
                 Selection.GoWordLeft (true);
                 break;
 
-            case FCTBAction.GoLeft:
+            case ActionCode.GoLeft:
                 Selection.GoLeft (false);
                 break;
 
-            case FCTBAction.GoLeftWithSelection:
+            case ActionCode.GoLeftWithSelection:
                 Selection.GoLeft (true);
                 break;
 
-            case FCTBAction.GoLeft_ColumnSelectionMode:
+            case ActionCode.GoLeftColumnSelectionMode:
                 CheckAndChangeSelectionType();
                 if (Selection.ColumnSelectionMode)
                     Selection.GoLeft_ColumnSelectionMode();
                 Invalidate();
                 break;
 
-            case FCTBAction.GoWordRight:
+            case ActionCode.GoWordRight:
                 Selection.GoWordRight (false, true);
                 break;
 
-            case FCTBAction.GoWordRightWithSelection:
+            case ActionCode.GoWordRightWithSelection:
                 Selection.GoWordRight (true, true);
                 break;
 
-            case FCTBAction.GoRight:
+            case ActionCode.GoRight:
                 Selection.GoRight (false);
                 break;
 
-            case FCTBAction.GoRightWithSelection:
+            case ActionCode.GoRightWithSelection:
                 Selection.GoRight (true);
                 break;
 
-            case FCTBAction.GoRight_ColumnSelectionMode:
+            case ActionCode.GoRightColumnSelectionMode:
                 CheckAndChangeSelectionType();
                 if (Selection.ColumnSelectionMode)
                     Selection.GoRight_ColumnSelectionMode();
                 Invalidate();
                 break;
 
-            case FCTBAction.GoUp:
+            case ActionCode.GoUp:
                 Selection.GoUp (false);
                 ScrollLeft();
                 break;
 
-            case FCTBAction.GoUpWithSelection:
+            case ActionCode.GoUpWithSelection:
                 Selection.GoUp (true);
                 ScrollLeft();
                 break;
 
-            case FCTBAction.GoUp_ColumnSelectionMode:
+            case ActionCode.GoUpColumnSelectionMode:
                 CheckAndChangeSelectionType();
                 if (Selection.ColumnSelectionMode)
                     Selection.GoUp_ColumnSelectionMode();
                 Invalidate();
                 break;
 
-            case FCTBAction.MoveSelectedLinesUp:
+            case ActionCode.MoveSelectedLinesUp:
                 if (!Selection.ColumnSelectionMode)
                     MoveSelectedLinesUp();
                 break;
 
-            case FCTBAction.GoDown:
+            case ActionCode.GoDown:
                 Selection.GoDown (false);
                 ScrollLeft();
                 break;
 
-            case FCTBAction.GoDownWithSelection:
+            case ActionCode.GoDownWithSelection:
                 Selection.GoDown (true);
                 ScrollLeft();
                 break;
 
-            case FCTBAction.GoDown_ColumnSelectionMode:
+            case ActionCode.GoDownColumnSelectionMode:
                 CheckAndChangeSelectionType();
                 if (Selection.ColumnSelectionMode)
                     Selection.GoDown_ColumnSelectionMode();
                 Invalidate();
                 break;
 
-            case FCTBAction.MoveSelectedLinesDown:
+            case ActionCode.MoveSelectedLinesDown:
                 if (!Selection.ColumnSelectionMode)
                     MoveSelectedLinesDown();
                 break;
-            case FCTBAction.GoPageUp:
+            case ActionCode.GoPageUp:
                 Selection.GoPageUp (false);
                 ScrollLeft();
                 break;
 
-            case FCTBAction.GoPageUpWithSelection:
+            case ActionCode.GoPageUpWithSelection:
                 Selection.GoPageUp (true);
                 ScrollLeft();
                 break;
 
-            case FCTBAction.GoPageDown:
+            case ActionCode.GoPageDown:
                 Selection.GoPageDown (false);
                 ScrollLeft();
                 break;
 
-            case FCTBAction.GoPageDownWithSelection:
+            case ActionCode.GoPageDownWithSelection:
                 Selection.GoPageDown (true);
                 ScrollLeft();
                 break;
 
-            case FCTBAction.GoFirstLine:
+            case ActionCode.GoFirstLine:
                 Selection.GoFirst (false);
                 break;
 
-            case FCTBAction.GoFirstLineWithSelection:
+            case ActionCode.GoFirstLineWithSelection:
                 Selection.GoFirst (true);
                 break;
 
-            case FCTBAction.GoHome:
+            case ActionCode.GoHome:
                 GoHome (false);
                 ScrollLeft();
                 break;
 
-            case FCTBAction.GoHomeWithSelection:
+            case ActionCode.GoHomeWithSelection:
                 GoHome (true);
                 ScrollLeft();
                 break;
 
-            case FCTBAction.GoLastLine:
+            case ActionCode.GoLastLine:
                 Selection.GoLast (false);
                 break;
 
-            case FCTBAction.GoLastLineWithSelection:
+            case ActionCode.GoLastLineWithSelection:
                 Selection.GoLast (true);
                 break;
 
-            case FCTBAction.GoEnd:
+            case ActionCode.GoEnd:
                 Selection.GoEnd (false);
                 break;
 
-            case FCTBAction.GoEndWithSelection:
+            case ActionCode.GoEndWithSelection:
                 Selection.GoEnd (true);
                 break;
 
-            case FCTBAction.ClearHints:
+            case ActionCode.ClearHints:
                 ClearHints();
                 if (MacroManager != null)
                     MacroManager.IsRecording = false;
                 break;
 
-            case FCTBAction.MacroRecord:
+            case ActionCode.MacroRecord:
                 if (MacroManager != null)
                 {
                     if (MacroManager.AllowMacroRecordingByUser)
@@ -4100,7 +4100,7 @@ public class SyntaxTextBox
 
                 break;
 
-            case FCTBAction.MacroExecute:
+            case ActionCode.MacroExecute:
                 if (MacroManager != null)
                 {
                     MacroManager.IsRecording = false;
@@ -4108,26 +4108,26 @@ public class SyntaxTextBox
                 }
 
                 break;
-            case FCTBAction.CustomAction1:
-            case FCTBAction.CustomAction2:
-            case FCTBAction.CustomAction3:
-            case FCTBAction.CustomAction4:
-            case FCTBAction.CustomAction5:
-            case FCTBAction.CustomAction6:
-            case FCTBAction.CustomAction7:
-            case FCTBAction.CustomAction8:
-            case FCTBAction.CustomAction9:
-            case FCTBAction.CustomAction10:
-            case FCTBAction.CustomAction11:
-            case FCTBAction.CustomAction12:
-            case FCTBAction.CustomAction13:
-            case FCTBAction.CustomAction14:
-            case FCTBAction.CustomAction15:
-            case FCTBAction.CustomAction16:
-            case FCTBAction.CustomAction17:
-            case FCTBAction.CustomAction18:
-            case FCTBAction.CustomAction19:
-            case FCTBAction.CustomAction20:
+            case ActionCode.CustomAction1:
+            case ActionCode.CustomAction2:
+            case ActionCode.CustomAction3:
+            case ActionCode.CustomAction4:
+            case ActionCode.CustomAction5:
+            case ActionCode.CustomAction6:
+            case ActionCode.CustomAction7:
+            case ActionCode.CustomAction8:
+            case ActionCode.CustomAction9:
+            case ActionCode.CustomAction10:
+            case ActionCode.CustomAction11:
+            case ActionCode.CustomAction12:
+            case ActionCode.CustomAction13:
+            case ActionCode.CustomAction14:
+            case ActionCode.CustomAction15:
+            case ActionCode.CustomAction16:
+            case ActionCode.CustomAction17:
+            case ActionCode.CustomAction18:
+            case ActionCode.CustomAction19:
+            case ActionCode.CustomAction20:
                 OnCustomAction (new CustomActionEventArgs (action));
                 break;
         }
@@ -8844,9 +8844,9 @@ public class HintClickEventArgs : EventArgs
 /// </summary>
 public class CustomActionEventArgs : EventArgs
 {
-    public FCTBAction Action { get; private set; }
+    public ActionCode Action { get; private set; }
 
-    public CustomActionEventArgs (FCTBAction action)
+    public CustomActionEventArgs (ActionCode action)
     {
         Action = action;
     }

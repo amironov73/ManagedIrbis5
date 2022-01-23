@@ -4,8 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 
-/* HotkeyEditorForm.cs --
+/* HotkeyEditorForm.cs -- форма для редактирования горячих клавиш
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,22 +18,40 @@ using System.ComponentModel;
 using System.Text;
 using System.Windows.Forms;
 
+using AM;
+
 #endregion
 
 #nullable enable
 
 namespace Fctb;
 
-public partial class HotkeysEditorForm : Form
+/// <summary>
+/// Форма для редактирования горячих клавиш.
+/// </summary>
+public sealed partial class HotkeysEditorForm
+    : Form
 {
-    BindingList<HotkeyWrapper> wrappers = new ();
+    #region Constructions
 
-    public HotkeysEditorForm (HotkeysMapping hotkeys)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public HotkeysEditorForm
+        (
+            HotkeyMapping hotkey
+        )
     {
         InitializeComponent();
-        BuildWrappers (hotkeys);
-        dgv.DataSource = wrappers;
+        BuildWrappers (hotkey);
+        dgv.DataSource = _wrappers;
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly BindingList<HotkeyWrapper> _wrappers = new ();
 
     int CompereKeys (Keys key1, Keys key2)
     {
@@ -43,72 +62,96 @@ public partial class HotkeysEditorForm : Form
         return res;
     }
 
-    private void BuildWrappers (HotkeysMapping hotkeys)
+    private void BuildWrappers
+        (
+            HotkeyMapping mapping
+        )
     {
-        var keys = new List<Keys> (hotkeys.Keys);
+        var keys = new List<Keys> (mapping.Keys);
         keys.Sort (CompereKeys);
 
-        wrappers.Clear();
+        _wrappers.Clear();
         foreach (var k in keys)
-            wrappers.Add (new HotkeyWrapper (k, hotkeys[k]));
+        {
+            _wrappers.Add (new HotkeyWrapper (k, mapping[k]));
+        }
     }
 
-    /// <summary>
-    /// Returns edited hotkey map
-    /// </summary>
-    /// <returns></returns>
-    public HotkeysMapping GetHotkeys()
+    private void btAdd_Click
+        (
+            object sender,
+            EventArgs e
+        )
     {
-        var result = new HotkeysMapping();
-        foreach (var w in wrappers)
-            result[w.ToKeyData()] = w.Action;
-
-        return result;
+        _wrappers.Add (new HotkeyWrapper (Keys.None, ActionCode.None));
     }
 
-    private void btAdd_Click (object sender, EventArgs e)
+    private void dgv_RowsAdded
+        (
+            object sender,
+            DataGridViewRowsAddedEventArgs e
+        )
     {
-        wrappers.Add (new HotkeyWrapper (Keys.None, FCTBAction.None));
-    }
-
-    private void dgv_RowsAdded (object sender, DataGridViewRowsAddedEventArgs e)
-    {
-        var cell = (dgv[0, e.RowIndex] as DataGridViewComboBoxCell);
+        var cell = (dgv[0, e.RowIndex] as DataGridViewComboBoxCell).ThrowIfNull ();
         if (cell.Items.Count == 0)
-            foreach (var item in new string[]
+        {
+            foreach (var item in new []
                      {
                          "", "Ctrl", "Ctrl + Shift", "Ctrl + Alt", "Shift", "Shift + Alt", "Alt", "Ctrl + Shift + Alt"
                      })
+            {
                 cell.Items.Add (item);
+            }
+        }
 
-        cell = (dgv[1, e.RowIndex] as DataGridViewComboBoxCell);
+        cell = (dgv[1, e.RowIndex] as DataGridViewComboBoxCell).ThrowIfNull ();
         if (cell.Items.Count == 0)
+        {
             foreach (var item in Enum.GetValues (typeof (Keys)))
+            {
                 cell.Items.Add (item);
+            }
+        }
 
-        cell = (dgv[2, e.RowIndex] as DataGridViewComboBoxCell);
+        cell = (dgv[2, e.RowIndex] as DataGridViewComboBoxCell).ThrowIfNull ();
         if (cell.Items.Count == 0)
-            foreach (var item in Enum.GetValues (typeof (FCTBAction)))
+        {
+            foreach (var item in Enum.GetValues (typeof (ActionCode)))
+            {
                 cell.Items.Add (item);
+            }
+        }
     }
 
-    private void btResore_Click (object sender, EventArgs e)
+    private void btResore_Click
+        (
+            object sender,
+            EventArgs e
+        )
     {
-        var h = new HotkeysMapping();
+        var h = new HotkeyMapping();
         h.InitDefault();
         BuildWrappers (h);
     }
 
-    private void btRemove_Click (object sender, EventArgs e)
+    private void btRemove_Click
+        (
+            object sender,
+            EventArgs e
+        )
     {
         for (var i = dgv.RowCount - 1; i >= 0; i--)
             if (dgv.Rows[i].Selected)
                 dgv.Rows.RemoveAt (i);
     }
 
-    private void HotkeysEditorForm_FormClosing (object sender, FormClosingEventArgs e)
+    private void HotkeysEditorForm_FormClosing
+        (
+            object sender,
+            FormClosingEventArgs e
+        )
     {
-        if (DialogResult == System.Windows.Forms.DialogResult.OK)
+        if (DialogResult == DialogResult.OK)
         {
             var actions = GetUnAssignedActions();
             if (!string.IsNullOrEmpty (actions))
@@ -116,85 +159,58 @@ public partial class HotkeysEditorForm : Form
                 if (MessageBox.Show (
                         "Some actions are not assigned!\r\nActions: " + actions +
                         "\r\nPress Yes to save and exit, press No to continue editing", "Some actions is not assigned",
-                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == System.Windows.Forms.DialogResult.No)
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                {
                     e.Cancel = true;
+                }
             }
         }
     }
 
     private string GetUnAssignedActions()
     {
-        var sb = new StringBuilder();
-        var dic = new Dictionary<FCTBAction, FCTBAction>();
+        var builder = new StringBuilder();
+        var dictionary = new Dictionary<ActionCode, ActionCode>();
 
-        foreach (var w in wrappers)
-            dic[w.Action] = w.Action;
+        foreach (var w in _wrappers)
+        {
+            dictionary[w.Action] = w.Action;
+        }
 
-        foreach (var item in Enum.GetValues (typeof (FCTBAction)))
-            if ((FCTBAction)item != FCTBAction.None)
-                if (!((FCTBAction)item).ToString().StartsWith ("CustomAction"))
+        foreach (var item in Enum.GetValues (typeof (ActionCode)))
+        {
+            if ((ActionCode)item != ActionCode.None
+                && !((ActionCode)item).ToString().StartsWith ("CustomAction"))
+            {
+                if (!dictionary.ContainsKey ((ActionCode)item))
                 {
-                    if (!dic.ContainsKey ((FCTBAction)item))
-                        sb.Append (item + ", ");
+                    builder.Append (item + ", ");
                 }
-
-        return sb.ToString().TrimEnd (' ', ',');
-    }
-}
-
-internal class HotkeyWrapper
-{
-    public HotkeyWrapper (Keys keyData, FCTBAction action)
-    {
-        var a = new KeyEventArgs (keyData);
-        Ctrl = a.Control;
-        Shift = a.Shift;
-        Alt = a.Alt;
-
-        Key = a.KeyCode;
-        Action = action;
-    }
-
-    public Keys ToKeyData()
-    {
-        var res = Key;
-        if (Ctrl) res |= Keys.Control;
-        if (Alt) res |= Keys.Alt;
-        if (Shift) res |= Keys.Shift;
-
-        return res;
-    }
-
-    bool Ctrl;
-    bool Shift;
-    bool Alt;
-
-    public string Modifiers
-    {
-        get
-        {
-            var res = "";
-            if (Ctrl) res += "Ctrl + ";
-            if (Shift) res += "Shift + ";
-            if (Alt) res += "Alt + ";
-
-            return res.Trim (' ', '+');
-        }
-        set
-        {
-            if (value == null)
-            {
-                Ctrl = Alt = Shift = false;
-            }
-            else
-            {
-                Ctrl = value.Contains ("Ctrl");
-                Shift = value.Contains ("Shift");
-                Alt = value.Contains ("Alt");
             }
         }
+
+        return builder.ToString().TrimEnd (' ', ',');
     }
 
-    public Keys Key { get; set; }
-    public FCTBAction Action { get; set; }
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Returns edited hotkey map
+    /// </summary>
+    /// <returns></returns>
+    public HotkeyMapping GetHotkeys()
+    {
+        var result = new HotkeyMapping();
+        foreach (var w in _wrappers)
+        {
+            result[w.ToKeyData()] = w.Action;
+        }
+
+        return result;
+    }
+
+    #endregion
+
 }
