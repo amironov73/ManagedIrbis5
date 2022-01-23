@@ -23,25 +23,47 @@ using AM.Collections;
 
 namespace Fctb;
 
+/// <summary>
+///
+/// </summary>
 public class CommandManager
 {
     #region Events
 
+    /// <summary>
+    ///
+    /// </summary>
     public event EventHandler? RedoCompleted = delegate { };
 
     #endregion
 
     #region Properties
 
-    public static int MaxHistoryLength = 200;
+    /// <summary>
+    ///
+    /// </summary>
+    public static int maxHistoryLength = 200;
 
-    LimitedStack<UndoableCommand> history;
-
-    Stack<UndoableCommand> redoStack = new Stack<UndoableCommand>();
-
+    /// <summary>
+    ///
+    /// </summary>
     public TextSource TextSource { get; private set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public bool UndoRedoStackIsEnabled { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public bool UndoEnabled => _history.Count > 0;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public bool RedoEnabled => _redoStack.Count > 0;
+
 
     #endregion
 
@@ -52,94 +74,39 @@ public class CommandManager
     /// </summary>
     public CommandManager
         (
-            TextSource ts
+            TextSource textSource
         )
     {
-        Sure.NotNull (ts);
+        Sure.NotNull (textSource);
 
-        history = new LimitedStack<UndoableCommand> (MaxHistoryLength);
-        TextSource = ts;
+        _history = new LimitedStack<UndoableCommand> (maxHistoryLength);
+        TextSource = textSource;
         UndoRedoStackIsEnabled = true;
     }
 
     #endregion
 
-    #region Public methods
+    #region Private members
 
-    public virtual void ExecuteCommand (Command cmd)
-    {
-        if (disabledCommands > 0)
-            return;
+    /// <summary>
+    ///
+    /// </summary>
+    private int _autoUndoCommands;
 
-        //multirange ?
-        if (cmd.ts.CurrentTextBox.Selection.ColumnSelectionMode)
-            if (cmd is UndoableCommand)
+    /// <summary>
+    ///
+    /// </summary>
+    readonly LimitedStack<UndoableCommand> _history;
 
-                //make wrapper
-                cmd = new MultiRangeCommand ((UndoableCommand)cmd);
+    /// <summary>
+    ///
+    /// </summary>
+    private readonly Stack<UndoableCommand> _redoStack = new ();
 
-
-        if (cmd is UndoableCommand)
-        {
-            //if range is ColumnRange, then create wrapper
-            (cmd as UndoableCommand).autoUndo = autoUndoCommands > 0;
-            history.Push (cmd as UndoableCommand);
-        }
-
-        try
-        {
-            cmd.Execute();
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            //OnTextChanging cancels enter of the text
-            if (cmd is UndoableCommand)
-                history.Pop();
-        }
-
-        //
-        if (!UndoRedoStackIsEnabled)
-            ClearHistory();
-
-        //
-        redoStack.Clear();
-
-        //
-        TextSource.CurrentTextBox.OnUndoRedoStateChanged();
-    }
-
-    public void Undo()
-    {
-        if (history.Count > 0)
-        {
-            var cmd = history.Pop();
-
-            //
-            BeginDisableCommands(); //prevent text changing into handlers
-            try
-            {
-                cmd.Undo();
-            }
-            finally
-            {
-                EndDisableCommands();
-            }
-
-            //
-            redoStack.Push (cmd);
-        }
-
-        //undo next autoUndo command
-        if (history.Count > 0)
-        {
-            if (history.Peek().autoUndo)
-                Undo();
-        }
-
-        TextSource.CurrentTextBox.OnUndoRedoStateChanged();
-    }
-
-    protected int disabledCommands = 0;
+    /// <summary>
+    ///
+    /// </summary>
+    protected int disabledCommands;
 
     private void EndDisableCommands()
     {
@@ -151,43 +118,28 @@ public class CommandManager
         disabledCommands++;
     }
 
-    int autoUndoCommands = 0;
-
-    public void EndAutoUndoCommands()
-    {
-        autoUndoCommands--;
-        if (autoUndoCommands == 0)
-            if (history.Count > 0)
-                history.Peek().autoUndo = false;
-    }
-
-    public void BeginAutoUndoCommands()
-    {
-        autoUndoCommands++;
-    }
-
     internal void ClearHistory()
     {
-        history.Clear();
-        redoStack.Clear();
+        _history.Clear();
+        _redoStack.Clear();
         TextSource.CurrentTextBox.OnUndoRedoStateChanged();
     }
 
     internal void Redo()
     {
-        if (redoStack.Count == 0)
+        if (_redoStack.Count == 0)
             return;
         UndoableCommand cmd;
         BeginDisableCommands(); //prevent text changing into handlers
         try
         {
-            cmd = redoStack.Pop();
+            cmd = _redoStack.Pop();
             if (TextSource.CurrentTextBox.Selection.ColumnSelectionMode)
                 TextSource.CurrentTextBox.Selection.ColumnSelectionMode = false;
             TextSource.CurrentTextBox.Selection.Start = cmd.sel.Start;
             TextSource.CurrentTextBox.Selection.End = cmd.sel.End;
             cmd.Execute();
-            history.Push (cmd);
+            _history.Push (cmd);
         }
         finally
         {
@@ -206,31 +158,137 @@ public class CommandManager
         TextSource.CurrentTextBox.OnUndoRedoStateChanged();
     }
 
-    public bool UndoEnabled => history.Count > 0;
-
-    public bool RedoEnabled => redoStack.Count > 0;
-
     #endregion
-}
 
-internal class RangeInfo
-{
-    public Place Start { get; set; }
-    public Place End { get; set; }
+    #region Public methods
 
-    public RangeInfo (TextRange r)
+    /// <summary>
+    ///
+    /// </summary>
+    public virtual void ExecuteCommand
+        (
+            Command command
+        )
     {
-        Start = r.Start;
-        End = r.End;
+        Sure.NotNull (command);
+
+        if (disabledCommands > 0)
+        {
+            return;
+        }
+
+        //multirange ?
+        if (command.textSource.CurrentTextBox.Selection.ColumnSelectionMode)
+        {
+            if (command is UndoableCommand undoableCommand)
+            {
+                //make wrapper
+                command = new MultiRangeCommand (undoableCommand);
+            }
+        }
+
+
+        if (command is UndoableCommand undoableCommand1)
+        {
+            //if range is ColumnRange, then create wrapper
+            undoableCommand1.autoUndo = _autoUndoCommands > 0;
+            _history.Push (undoableCommand1);
+        }
+
+        try
+        {
+            command.Execute();
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            //OnTextChanging cancels enter of the text
+            if (command is UndoableCommand)
+            {
+                _history.Pop();
+            }
+        }
+
+        //
+        if (!UndoRedoStackIsEnabled)
+        {
+            ClearHistory();
+        }
+
+        //
+        _redoStack.Clear();
+
+        //
+        TextSource.CurrentTextBox.OnUndoRedoStateChanged();
     }
 
-    internal int FromX
+    /// <summary>
+    ///
+    /// </summary>
+    public void Undo()
     {
-        get
+        if (_history.Count > 0)
         {
-            if (End.Line < Start.Line) return End.Column;
-            if (End.Line > Start.Line) return Start.Column;
-            return Math.Min (End.Column, Start.Column);
+            var command = _history.Pop();
+
+            //
+            BeginDisableCommands(); //prevent text changing into handlers
+            try
+            {
+                if (command != null)
+                {
+                    command.Undo();
+                }
+            }
+            finally
+            {
+                EndDisableCommands();
+            }
+
+            //
+            if (command != null)
+            {
+                _redoStack.Push (command);
+            }
+        }
+
+        //undo next autoUndo command
+        if (_history.Count > 0)
+        {
+            if (_history.Peek()!.autoUndo)
+            {
+                Undo();
+            }
+        }
+
+        TextSource.CurrentTextBox.OnUndoRedoStateChanged();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void EndAutoUndoCommands()
+    {
+        _autoUndoCommands--;
+        if (_autoUndoCommands == 0)
+        {
+            if (_history.Count > 0)
+            {
+                var command = _history.Peek();
+                if (command != null)
+                {
+                    command.autoUndo = false;
+                }
+            }
         }
     }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void BeginAutoUndoCommands()
+    {
+        _autoUndoCommands++;
+    }
+
+    #endregion
 }

@@ -30,12 +30,12 @@ public sealed class ClearSelectedCommand
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="tb">Underlaying textbox</param>
+    /// <param name="textSource">Underlaying textbox</param>
     public ClearSelectedCommand
         (
-            TextSource ts
+            TextSource textSource
         )
-        : base (ts)
+        : base (textSource)
     {
     }
 
@@ -87,12 +87,12 @@ public sealed class ClearSelectedCommand
     /// </summary>
     public override void Undo()
     {
-        ts.CurrentTextBox.Selection.Start = new Place (sel.FromX, Math.Min (sel.Start.Line, sel.End.Line));
-        ts.OnTextChanging();
-        InsertTextCommand.InsertText (_deletedText, ts);
-        ts.OnTextChanged (sel.Start.Line, sel.End.Line);
-        ts.CurrentTextBox.Selection.Start = sel.Start;
-        ts.CurrentTextBox.Selection.End = sel.End;
+        textSource.CurrentTextBox.Selection.Start = new Place (sel.FromX, Math.Min (sel.Start.Line, sel.End.Line));
+        textSource.OnTextChanging();
+        InsertTextCommand.InsertText (_deletedText!, textSource);
+        textSource.OnTextChanged (sel.Start.Line, sel.End.Line);
+        textSource.CurrentTextBox.Selection.Start = sel.Start;
+        textSource.CurrentTextBox.Selection.End = sel.End;
     }
 
     /// <summary>
@@ -100,22 +100,22 @@ public sealed class ClearSelectedCommand
     /// </summary>
     public override void Execute()
     {
-        var tb = ts.CurrentTextBox;
+        var tb = textSource.CurrentTextBox;
 
         string temp = null;
-        ts.OnTextChanging (ref temp);
+        textSource.OnTextChanging (ref temp);
         if (temp == "")
             throw new ArgumentOutOfRangeException();
 
         _deletedText = tb.Selection.Text;
-        ClearSelected (ts);
+        ClearSelected (textSource);
         lastSel = new RangeInfo (tb.Selection);
-        ts.OnTextChanged (lastSel.Start.Line, lastSel.Start.Line);
+        textSource.OnTextChanged (lastSel.Start.Line, lastSel.Start.Line);
     }
 
     public override UndoableCommand Clone()
     {
-        return new ClearSelectedCommand (ts);
+        return new ClearSelectedCommand (textSource);
     }
 
     #endregion

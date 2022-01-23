@@ -30,12 +30,12 @@ public class SelectCommand
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="ts"></param>
+    /// <param name="textSource"></param>
     public SelectCommand
         (
-            TextSource ts
+            TextSource textSource
         )
-        : base (ts)
+        : base (textSource)
     {
     }
 
@@ -47,7 +47,7 @@ public class SelectCommand
     public override void Execute()
     {
         //remember selection
-        lastSel = new RangeInfo (ts.CurrentTextBox.Selection);
+        lastSel = new RangeInfo (textSource.CurrentTextBox.Selection);
     }
 
     /// <inheritdoc cref="UndoableCommand.OnTextChanged"/>
@@ -62,16 +62,16 @@ public class SelectCommand
     public override void Undo()
     {
         //restore selection
-        ts.CurrentTextBox.Selection = new TextRange (ts.CurrentTextBox, lastSel.Start, lastSel.End);
+        textSource.CurrentTextBox.Selection = new TextRange (textSource.CurrentTextBox, lastSel.Start, lastSel.End);
     }
 
     /// <inheritdoc cref="UndoableCommand.Clone"/>
     public override UndoableCommand Clone()
     {
-        var result = new SelectCommand (ts);
+        var result = new SelectCommand (textSource);
         if (lastSel != null)
         {
-            result.lastSel = new RangeInfo (new TextRange (ts.CurrentTextBox, lastSel.Start, lastSel.End));
+            result.lastSel = new RangeInfo (new TextRange (textSource.CurrentTextBox, lastSel.Start, lastSel.End));
         }
 
         return result;

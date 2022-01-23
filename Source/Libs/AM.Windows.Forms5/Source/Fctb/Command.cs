@@ -9,6 +9,8 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#pragma warning disable CS8618 // nullable warning
+
 #nullable enable
 
 namespace Fctb;
@@ -20,7 +22,10 @@ public abstract class Command
 {
     #region Properties
 
-    public TextSource ts;
+    /// <summary>
+    /// Текстбокс.
+    /// </summary>
+    public TextSource textSource;
 
     #endregion
 

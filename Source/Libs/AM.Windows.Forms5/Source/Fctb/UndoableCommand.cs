@@ -24,14 +24,14 @@ public abstract class UndoableCommand
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="ts"></param>
+    /// <param name="textSource"></param>
     protected UndoableCommand
         (
-            TextSource ts
+            TextSource textSource
         )
     {
-        this.ts = ts;
-        sel = new RangeInfo (ts.CurrentTextBox.Selection);
+        this.textSource = textSource;
+        sel = new RangeInfo (textSource.CurrentTextBox.Selection);
     }
 
     #endregion
@@ -57,7 +57,7 @@ public abstract class UndoableCommand
     /// <inheritdoc cref="Command.Execute"/>
     public override void Execute()
     {
-        lastSel = new RangeInfo (ts.CurrentTextBox.Selection);
+        lastSel = new RangeInfo (textSource.CurrentTextBox.Selection);
         OnTextChanged (false);
     }
 
@@ -73,11 +73,11 @@ public abstract class UndoableCommand
         var b = sel.Start.Line < lastSel.Start.Line;
         if (invert)
         {
-            ts.OnTextChanged (sel.Start.Line, b ? sel.Start.Line : lastSel.Start.Line);
+            textSource.OnTextChanged (sel.Start.Line, b ? sel.Start.Line : lastSel.Start.Line);
         }
         else
         {
-            ts.OnTextChanged (b ? sel.Start.Line : lastSel.Start.Line, lastSel.Start.Line);
+            textSource.OnTextChanged (b ? sel.Start.Line : lastSel.Start.Line, lastSel.Start.Line);
         }
     }
 

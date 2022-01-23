@@ -31,16 +31,16 @@ public sealed class ReplaceTextCommand
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="ts">Underlaying textbox</param>
+    /// <param name="textSource">Underlaying textbox</param>
     /// <param name="ranges">List of ranges for replace</param>
     /// <param name="insertedText">Text for inserting</param>
     public ReplaceTextCommand
         (
-            TextSource ts,
+            TextSource textSource,
             List<TextRange> ranges,
             string insertedText
         )
-        : base (ts)
+        : base (textSource)
     {
         //sort ranges by place
         ranges.Sort ((r1, r2) =>
@@ -53,7 +53,7 @@ public sealed class ReplaceTextCommand
         //
         this._ranges = ranges;
         this._insertedText = insertedText;
-        lastSel = sel = new RangeInfo (ts.CurrentTextBox.Selection);
+        lastSel = sel = new RangeInfo (textSource.CurrentTextBox.Selection);
     }
 
     #endregion
@@ -102,9 +102,9 @@ public sealed class ReplaceTextCommand
     /// </summary>
     public override void Undo()
     {
-        var tb = ts.CurrentTextBox;
+        var tb = textSource.CurrentTextBox;
 
-        ts.OnTextChanging();
+        textSource.OnTextChanging();
         tb.BeginUpdate();
 
         tb.Selection.BeginUpdate();
@@ -113,8 +113,8 @@ public sealed class ReplaceTextCommand
             tb.Selection.Start = _ranges[i].Start;
             for (var j = 0; j < _insertedText.Length; j++)
                 tb.Selection.GoRight (true);
-            ClearSelected (ts);
-            InsertTextCommand.InsertText (_prevText[_prevText.Count - i - 1], ts);
+            ClearSelected (textSource);
+            InsertTextCommand.InsertText (_prevText[_prevText.Count - i - 1], textSource);
         }
 
         tb.Selection.EndUpdate();
@@ -122,10 +122,10 @@ public sealed class ReplaceTextCommand
 
         if (_ranges.Count > 0)
         {
-            ts.OnTextChanged (_ranges[0].Start.Line, _ranges[^1].End.Line);
+            textSource.OnTextChanged (_ranges[0].Start.Line, _ranges[^1].End.Line);
         }
 
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
+        textSource.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
     }
 
     /// <summary>
@@ -133,10 +133,10 @@ public sealed class ReplaceTextCommand
     /// </summary>
     public override void Execute()
     {
-        var tb = ts.CurrentTextBox;
+        var tb = textSource.CurrentTextBox;
         _prevText.Clear();
 
-        ts.OnTextChanging (ref _insertedText);
+        textSource.OnTextChanging (ref _insertedText);
 
         tb.Selection.BeginUpdate();
         tb.BeginUpdate();
@@ -145,21 +145,21 @@ public sealed class ReplaceTextCommand
             tb.Selection.Start = _ranges[i].Start;
             tb.Selection.End = _ranges[i].End;
             _prevText.Add (tb.Selection.Text);
-            ClearSelected (ts);
+            ClearSelected (textSource);
             if (_insertedText != string.Empty)
             {
-                InsertTextCommand.InsertText (_insertedText, ts);
+                InsertTextCommand.InsertText (_insertedText, textSource);
             }
         }
 
         if (_ranges.Count > 0)
         {
-            ts.OnTextChanged (_ranges[0].Start.Line, _ranges[^1].End.Line);
+            textSource.OnTextChanged (_ranges[0].Start.Line, _ranges[^1].End.Line);
         }
 
         tb.EndUpdate();
         tb.Selection.EndUpdate();
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
+        textSource.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
 
         lastSel = new RangeInfo (tb.Selection);
     }
@@ -167,7 +167,7 @@ public sealed class ReplaceTextCommand
     /// <inheritdoc cref="UndoableCommand.Clone"/>
     public override UndoableCommand Clone()
     {
-        return new ReplaceTextCommand (ts, new List<TextRange> (_ranges), _insertedText);
+        return new ReplaceTextCommand (textSource, new List<TextRange> (_ranges), _insertedText);
     }
 
     #endregion

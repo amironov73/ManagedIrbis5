@@ -41,14 +41,14 @@ public sealed class ReplaceMultipleTextCommand
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="ts">Underlaying textsource</param>
+    /// <param name="textSource">Underlaying textsource</param>
     /// <param name="ranges">List of ranges for replace</param>
     public ReplaceMultipleTextCommand
         (
-            TextSource ts,
+            TextSource textSource,
             List<ReplaceRange> ranges
         )
-        : base (ts)
+        : base (textSource)
     {
         //sort ranges by place
         ranges.Sort ((r1, r2) =>
@@ -60,7 +60,7 @@ public sealed class ReplaceMultipleTextCommand
 
         //
         this._ranges = ranges;
-        lastSel = sel = new RangeInfo (ts.CurrentTextBox.Selection);
+        lastSel = sel = new RangeInfo (textSource.CurrentTextBox.Selection);
     }
 
     #endregion
@@ -79,9 +79,9 @@ public sealed class ReplaceMultipleTextCommand
     /// </summary>
     public override void Undo()
     {
-        var tb = ts.CurrentTextBox;
+        var tb = textSource.CurrentTextBox;
 
-        ts.OnTextChanging();
+        textSource.OnTextChanging();
 
         tb.Selection.BeginUpdate();
         for (var i = 0; i < _ranges.Count; i++)
@@ -89,15 +89,15 @@ public sealed class ReplaceMultipleTextCommand
             tb.Selection.Start = _ranges[i].ReplacedRange.Start;
             for (var j = 0; j < _ranges[i].ReplaceText.Length; j++)
                 tb.Selection.GoRight (true);
-            ClearSelectedCommand.ClearSelected (ts);
+            ClearSelectedCommand.ClearSelected (textSource);
             var prevTextIndex = _ranges.Count - 1 - i;
-            InsertTextCommand.InsertText (_prevText[prevTextIndex], ts);
-            ts.OnTextChanged (_ranges[i].ReplacedRange.Start.Line, _ranges[i].ReplacedRange.Start.Line);
+            InsertTextCommand.InsertText (_prevText[prevTextIndex], textSource);
+            textSource.OnTextChanged (_ranges[i].ReplacedRange.Start.Line, _ranges[i].ReplacedRange.Start.Line);
         }
 
         tb.Selection.EndUpdate();
 
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
+        textSource.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
     }
 
     /// <summary>
@@ -105,10 +105,10 @@ public sealed class ReplaceMultipleTextCommand
     /// </summary>
     public override void Execute()
     {
-        var tb = ts.CurrentTextBox;
+        var tb = textSource.CurrentTextBox;
         _prevText.Clear();
 
-        ts.OnTextChanging();
+        textSource.OnTextChanging();
 
         tb.Selection.BeginUpdate();
         for (var i = _ranges.Count - 1; i >= 0; i--)
@@ -116,13 +116,13 @@ public sealed class ReplaceMultipleTextCommand
             tb.Selection.Start = _ranges[i].ReplacedRange.Start;
             tb.Selection.End = _ranges[i].ReplacedRange.End;
             _prevText.Add (tb.Selection.Text);
-            ClearSelectedCommand.ClearSelected (ts);
-            InsertTextCommand.InsertText (_ranges[i].ReplaceText, ts);
-            ts.OnTextChanged (_ranges[i].ReplacedRange.Start.Line, _ranges[i].ReplacedRange.End.Line);
+            ClearSelectedCommand.ClearSelected (textSource);
+            InsertTextCommand.InsertText (_ranges[i].ReplaceText, textSource);
+            textSource.OnTextChanged (_ranges[i].ReplacedRange.Start.Line, _ranges[i].ReplacedRange.End.Line);
         }
 
         tb.Selection.EndUpdate();
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
+        textSource.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
 
         lastSel = new RangeInfo (tb.Selection);
     }
@@ -130,7 +130,7 @@ public sealed class ReplaceMultipleTextCommand
     /// <inheritdoc cref="UndoableCommand.Clone"/>
     public override UndoableCommand Clone()
     {
-        return new ReplaceMultipleTextCommand (ts, new List<ReplaceRange> (_ranges));
+        return new ReplaceMultipleTextCommand (textSource, new List<ReplaceRange> (_ranges));
     }
 
     #endregion

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* AutocompleteMenu.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -29,9 +30,36 @@ namespace Fctb;
 public class AutocompleteMenu
     : ToolStripDropDown
 {
-    AutocompleteListView _listView;
+    #region Events
+
+    /// <summary>
+    /// User selects item
+    /// </summary>
+    public event EventHandler<SelectingEventArgs>? Selecting;
+
+    /// <summary>
+    /// It fires after item inserting
+    /// </summary>
+    public event EventHandler<SelectedEventArgs>? Selected;
+
+    /// <summary>
+    /// Occurs when popup menu is opening
+    /// </summary>
+    public new event EventHandler<CancelEventArgs>? Opening;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
     public ToolStripControlHost host;
-    public TextRange Fragment { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public TextRange? Fragment { get; internal set; }
 
     /// <summary>
     /// Regex pattern for serach fragment around caret
@@ -44,27 +72,12 @@ public class AutocompleteMenu
     public int MinFragmentLength { get; set; }
 
     /// <summary>
-    /// User selects item
-    /// </summary>
-    public event EventHandler<SelectingEventArgs> Selecting;
-
-    /// <summary>
-    /// It fires after item inserting
-    /// </summary>
-    public event EventHandler<SelectedEventArgs> Selected;
-
-    /// <summary>
-    /// Occurs when popup menu is opening
-    /// </summary>
-    public new event EventHandler<CancelEventArgs> Opening;
-
-    /// <summary>
     /// Allow TAB for select menu item
     /// </summary>
     public bool AllowTabKey
     {
-        get { return _listView.AllowTabKey; }
-        set { _listView.AllowTabKey = value; }
+        get => _listView.AllowTabKey;
+        set => _listView.AllowTabKey = value;
     }
 
     /// <summary>
@@ -72,8 +85,8 @@ public class AutocompleteMenu
     /// </summary>
     public int AppearInterval
     {
-        get { return _listView.AppearInterval; }
-        set { _listView.AppearInterval = value; }
+        get => _listView.AppearInterval;
+        set => _listView.AppearInterval = value;
     }
 
     /// <summary>
@@ -100,8 +113,8 @@ public class AutocompleteMenu
     [DefaultValue (typeof (Color), "Orange")]
     public Color SelectedColor
     {
-        get { return _listView.SelectedColor; }
-        set { _listView.SelectedColor = value; }
+        get => _listView.SelectedColor;
+        set => _listView.SelectedColor = value;
     }
 
     /// <summary>
@@ -110,11 +123,71 @@ public class AutocompleteMenu
     [DefaultValue (typeof (Color), "Red")]
     public Color HoveredColor
     {
-        get { return _listView.HoveredColor; }
-        set { _listView.HoveredColor = value; }
+        get => _listView.HoveredColor;
+        set => _listView.HoveredColor = value;
     }
 
-    public AutocompleteMenu (SyntaxTextBox tb)
+    /// <summary>
+    ///
+    /// </summary>
+    public new Font Font
+    {
+        get => _listView.Font;
+        set => _listView.Font = value;
+    }
+
+    /// <summary>
+    /// Minimal size of menu
+    /// </summary>
+    public new Size MinimumSize
+    {
+        get => Items.MinimumSize;
+        set => Items.MinimumSize = value;
+    }
+
+    /// <summary>
+    /// Image list of menu
+    /// </summary>
+    public new ImageList? ImageList
+    {
+        get => Items.ImageList;
+        set => Items.ImageList = value;
+    }
+
+    /// <summary>
+    /// Tooltip duration (ms)
+    /// </summary>
+    public int ToolTipDuration
+    {
+        get => Items.ToolTipDuration;
+        set => Items.ToolTipDuration = value;
+    }
+
+    /// <summary>
+    /// Tooltip
+    /// </summary>
+    public ToolTip ToolTip
+    {
+        get => Items.toolTip!;
+        set => Items.toolTip = value;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public new AutocompleteListView Items => _listView;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public AutocompleteMenu
+        (
+            SyntaxTextBox tb
+        )
     {
         // create a new popup and add the list view to it
         AutoClose = false;
@@ -135,106 +208,103 @@ public class AutocompleteMenu
         MinFragmentLength = 2;
     }
 
-    public new Font Font
+    #endregion
+
+    #region Private members
+
+    private readonly AutocompleteListView _listView;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args"></param>
+    internal new void OnOpening
+        (
+            CancelEventArgs args
+        )
     {
-        get { return _listView.Font; }
-        set { _listView.Font = value; }
+        Opening?.Invoke (this, args);
     }
 
-    new internal void OnOpening (CancelEventArgs args)
-    {
-        if (Opening != null)
-            Opening (this, args);
-    }
-
+    /// <summary>
+    ///
+    /// </summary>
     public new void Close()
     {
-        _listView.toolTip.Hide (_listView);
+        _listView.toolTip?.Hide (_listView);
         base.Close();
     }
 
-    internal void CalcSize()
-    {
-        host.Size = _listView.Size;
-        Size = new System.Drawing.Size (_listView.Size.Width + 4, _listView.Size.Height + 4);
-    }
-
+    /// <summary>
+    ///
+    /// </summary>
     public virtual void OnSelecting()
     {
         _listView.OnSelecting();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="shift"></param>
     public void SelectNext (int shift)
     {
         _listView.SelectNext (shift);
     }
 
-    internal void OnSelecting (SelectingEventArgs args)
+    internal void CalcSize()
     {
-        if (Selecting != null)
-            Selecting (this, args);
+        host.Size = _listView.Size;
+        Size = new Size (_listView.Size.Width + 4, _listView.Size.Height + 4);
     }
 
-    public void OnSelected (SelectedEventArgs args)
+    internal void OnSelecting
+        (
+            SelectingEventArgs args
+        )
     {
-        if (Selected != null)
-            Selected (this, args);
+        Selecting?.Invoke (this, args);
     }
 
-    public new AutocompleteListView Items
+    /// <inheritdoc cref="ToolStripDropDown.Dispose(bool)"/>
+    protected override void Dispose
+        (
+            bool disposing
+        )
     {
-        get { return _listView; }
+        base.Dispose (disposing);
+        if (_listView is { IsDisposed: false })
+        {
+            _listView.Dispose();
+        }
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void OnSelected
+        (
+            SelectedEventArgs args
+        )
+    {
+        Selected?.Invoke (this, args);
     }
 
     /// <summary>
     /// Shows popup menu immediately
     /// </summary>
     /// <param name="forced">If True - MinFragmentLength will be ignored</param>
-    public void Show (bool forced)
+    public void Show
+        (
+            bool forced
+        )
     {
         Items.DoAutocomplete (forced);
     }
 
-    /// <summary>
-    /// Minimal size of menu
-    /// </summary>
-    public new Size MinimumSize
-    {
-        get { return Items.MinimumSize; }
-        set { Items.MinimumSize = value; }
-    }
-
-    /// <summary>
-    /// Image list of menu
-    /// </summary>
-    public new ImageList ImageList
-    {
-        get { return Items.ImageList; }
-        set { Items.ImageList = value; }
-    }
-
-    /// <summary>
-    /// Tooltip duration (ms)
-    /// </summary>
-    public int ToolTipDuration
-    {
-        get { return Items.ToolTipDuration; }
-        set { Items.ToolTipDuration = value; }
-    }
-
-    /// <summary>
-    /// Tooltip
-    /// </summary>
-    public ToolTip ToolTip
-    {
-        get { return Items.toolTip; }
-        set { Items.toolTip = value; }
-    }
-
-    protected override void Dispose (bool disposing)
-    {
-        base.Dispose (disposing);
-        if (_listView != null && !_listView.IsDisposed)
-            _listView.Dispose();
-    }
+    #endregion
 }

@@ -30,21 +30,21 @@ public sealed class RemoveLinesCommand
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="ts">Underlaying textbox</param>
+    /// <param name="textSource">Underlaying textbox</param>
     /// <param name="iLines">List of ranges for replace</param>
     public RemoveLinesCommand
         (
-            TextSource ts,
+            TextSource textSource,
             List<int> iLines
         )
-        : base (ts)
+        : base (textSource)
     {
         //sort iLines
         iLines.Sort();
 
         //
         this._iLines = iLines;
-        lastSel = sel = new RangeInfo (ts.CurrentTextBox.Selection);
+        lastSel = sel = new RangeInfo (textSource.CurrentTextBox.Selection);
     }
 
     #endregion
@@ -61,9 +61,9 @@ public sealed class RemoveLinesCommand
     /// <inheritdoc cref="UndoableCommand.Undo"/>
     public override void Undo()
     {
-        var tb = ts.CurrentTextBox;
+        var tb = textSource.CurrentTextBox;
 
-        ts.OnTextChanging();
+        textSource.OnTextChanging();
 
         tb.Selection.BeginUpdate();
 
@@ -72,27 +72,27 @@ public sealed class RemoveLinesCommand
         {
             var iLine = _iLines[i];
 
-            tb.Selection.Start = iLine < ts.Count
+            tb.Selection.Start = iLine < textSource.Count
                 ? new Place (0, iLine)
-                : new Place (ts[^1].Count, ts.Count - 1);
+                : new Place (textSource[^1].Count, textSource.Count - 1);
 
-            InsertCharCommand.InsertLine (ts);
+            InsertCharCommand.InsertLine (textSource);
             tb.Selection.Start = new Place (0, iLine);
             var text = _prevText[_prevText.Count - i - 1];
-            InsertTextCommand.InsertText (text, ts);
-            ts[iLine].IsChanged = true;
-            if (iLine < ts.Count - 1)
-                ts[iLine + 1].IsChanged = true;
+            InsertTextCommand.InsertText (text, textSource);
+            textSource[iLine].IsChanged = true;
+            if (iLine < textSource.Count - 1)
+                textSource[iLine + 1].IsChanged = true;
             else
-                ts[iLine - 1].IsChanged = true;
+                textSource[iLine - 1].IsChanged = true;
             if (text.Trim() != string.Empty)
-                ts.OnTextChanged (iLine, iLine);
+                textSource.OnTextChanged (iLine, iLine);
         }
 
         //tb.EndUpdate();
         tb.Selection.EndUpdate();
 
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
+        textSource.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
     }
 
     /// <summary>
@@ -100,25 +100,25 @@ public sealed class RemoveLinesCommand
     /// </summary>
     public override void Execute()
     {
-        var tb = ts.CurrentTextBox;
+        var tb = textSource.CurrentTextBox;
         _prevText.Clear();
 
-        ts.OnTextChanging();
+        textSource.OnTextChanging();
 
         tb.Selection.BeginUpdate();
         for (var i = _iLines.Count - 1; i >= 0; i--)
         {
             var iLine = _iLines[i];
 
-            _prevText.Add (ts[iLine].Text); //backward
-            ts.RemoveLine (iLine);
+            _prevText.Add (textSource[iLine].Text); //backward
+            textSource.RemoveLine (iLine);
 
             //ts.OnTextChanged(ranges[i].Start.iLine, ranges[i].End.iLine);
         }
 
         tb.Selection.Start = new Place (0, 0);
         tb.Selection.EndUpdate();
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
+        textSource.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
 
         lastSel = new RangeInfo (tb.Selection);
     }
@@ -126,7 +126,7 @@ public sealed class RemoveLinesCommand
     /// <inheritdoc cref="UndoableCommand.Clone" />
     public override UndoableCommand Clone()
     {
-        return new RemoveLinesCommand (ts, new List<int> (_iLines));
+        return new RemoveLinesCommand (textSource, new List<int> (_iLines));
     }
 
     #endregion

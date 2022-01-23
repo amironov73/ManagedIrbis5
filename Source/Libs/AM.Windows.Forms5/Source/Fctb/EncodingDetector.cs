@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/*
+/* Encoding
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,130 +16,189 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using AM;
+
 #endregion
 
 #nullable enable
 
 namespace Fctb;
 
+/// <summary>
+/// Очередная попытка угадать кодировку текстового файла.
+/// </summary>
 public static class EncodingDetector
 {
-    const long _defaultHeuristicSampleSize = 0x10000; //completely arbitrary - inappropriate for high numbers of files / high speed requirements
+    #region Constants
 
-    public static Encoding DetectTextFileEncoding (string InputFilename)
+    //completely arbitrary - inappropriate for high numbers of files / high speed requirements
+    private const long HeuristicSampleSize = 0x10000;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    public static Encoding? DetectTextFileEncoding
+        (
+            string filename
+        )
     {
-        using (var textfileStream = File.OpenRead (InputFilename))
-        {
-            return DetectTextFileEncoding (textfileStream, _defaultHeuristicSampleSize);
-        }
+        Sure.FileExists (filename);
+
+        using var stream = File.OpenRead (filename);
+
+        return DetectTextFileEncoding (stream);
     }
 
-    public static Encoding DetectTextFileEncoding (FileStream InputFileStream, long HeuristicSampleSize)
+    /// <summary>
+    ///
+    /// </summary>
+    public static Encoding? DetectTextFileEncoding
+        (
+            FileStream stream,
+            long sampleSize = HeuristicSampleSize
+        )
     {
-        var uselessBool = false;
-        return DetectTextFileEncoding (InputFileStream, _defaultHeuristicSampleSize, out uselessBool);
+        return DetectTextFileEncoding (stream, HeuristicSampleSize, out _);
     }
 
-    public static Encoding DetectTextFileEncoding (FileStream InputFileStream, long HeuristicSampleSize,
-        out bool HasBOM)
+    /// <summary>
+    ///
+    /// </summary>
+    public static Encoding? DetectTextFileEncoding
+        (
+            FileStream stream,
+            long sampleSize,
+            out bool hasBom
+        )
     {
-        Encoding encodingFound = null;
+        var originalPos = stream.Position;
 
-        var originalPos = InputFileStream.Position;
-
-        InputFileStream.Position = 0;
-
+        stream.Position = 0;
 
         //First read only what we need for BOM detection
-        var bomBytes = new byte[InputFileStream.Length > 4 ? 4 : InputFileStream.Length];
-        InputFileStream.Read (bomBytes, 0, bomBytes.Length);
+        var bomBytes = new byte[stream.Length > 4 ? 4 : stream.Length];
+        stream.Read (bomBytes, 0, bomBytes.Length);
 
-        encodingFound = DetectBOMBytes (bomBytes);
+        var encodingFound = DetectBOMBytes (bomBytes);
 
         if (encodingFound != null)
         {
-            InputFileStream.Position = originalPos;
-            HasBOM = true;
+            stream.Position = originalPos;
+            hasBom = true;
             return encodingFound;
         }
 
-
         //BOM Detection failed, going for heuristics now.
         //  create sample byte array and populate it
-        var sampleBytes = new byte[HeuristicSampleSize > InputFileStream.Length
-            ? InputFileStream.Length
-            : HeuristicSampleSize];
+        var sampleBytes = new byte[sampleSize > stream.Length
+            ? stream.Length
+            : sampleSize];
         Array.Copy (bomBytes, sampleBytes, bomBytes.Length);
-        if (InputFileStream.Length > bomBytes.Length)
-            InputFileStream.Read (sampleBytes, bomBytes.Length, sampleBytes.Length - bomBytes.Length);
-        InputFileStream.Position = originalPos;
+        if (stream.Length > bomBytes.Length)
+            stream.Read (sampleBytes, bomBytes.Length, sampleBytes.Length - bomBytes.Length);
+        stream.Position = originalPos;
 
         //test byte array content
         encodingFound = DetectUnicodeInByteSampleByHeuristics (sampleBytes);
 
-        HasBOM = false;
+        hasBom = false;
+
         return encodingFound;
     }
 
-    public static Encoding DetectBOMBytes (byte[] BOMBytes)
+    /// <summary>
+    ///
+    /// </summary>
+    public static Encoding? DetectBOMBytes
+        (
+            byte[] bomBytes
+        )
     {
-        if (BOMBytes.Length < 2)
+        if (bomBytes.Length < 2)
+        {
             return null;
+        }
 
-        if (BOMBytes[0] == 0xff
-            && BOMBytes[1] == 0xfe
-            && (BOMBytes.Length < 4
-                || BOMBytes[2] != 0
-                || BOMBytes[3] != 0
+        if (bomBytes[0] == 0xff
+            && bomBytes[1] == 0xfe
+            && (bomBytes.Length < 4
+                || bomBytes[2] != 0
+                || bomBytes[3] != 0
             )
            )
             return Encoding.Unicode;
 
-        if (BOMBytes[0] == 0xfe
-            && BOMBytes[1] == 0xff
+        if (bomBytes[0] == 0xfe
+            && bomBytes[1] == 0xff
            )
+        {
             return Encoding.BigEndianUnicode;
+        }
 
-        if (BOMBytes.Length < 3)
+        if (bomBytes.Length < 3)
+        {
             return null;
+        }
 
-        if (BOMBytes[0] == 0xef && BOMBytes[1] == 0xbb && BOMBytes[2] == 0xbf)
+        if (bomBytes[0] == 0xef && bomBytes[1] == 0xbb && bomBytes[2] == 0xbf)
+        {
             return Encoding.UTF8;
+        }
 
-        if (BOMBytes[0] == 0x2b && BOMBytes[1] == 0x2f && BOMBytes[2] == 0x76)
+        if (bomBytes[0] == 0x2b && bomBytes[1] == 0x2f && bomBytes[2] == 0x76)
+        {
+#pragma warning disable CS0618 // use obsolete symbol
             return Encoding.UTF7;
+#pragma warning restore CS0618
+        }
 
-        if (BOMBytes.Length < 4)
+        if (bomBytes.Length < 4)
+        {
             return null;
+        }
 
-        if (BOMBytes[0] == 0xff && BOMBytes[1] == 0xfe && BOMBytes[2] == 0 && BOMBytes[3] == 0)
+        if (bomBytes[0] == 0xff && bomBytes[1] == 0xfe && bomBytes[2] == 0 && bomBytes[3] == 0)
+        {
             return Encoding.UTF32;
+        }
 
-        if (BOMBytes[0] == 0 && BOMBytes[1] == 0 && BOMBytes[2] == 0xfe && BOMBytes[3] == 0xff)
+        if (bomBytes[0] == 0 && bomBytes[1] == 0 && bomBytes[2] == 0xfe && bomBytes[3] == 0xff)
+        {
             return Encoding.GetEncoding (12001);
+        }
 
         return null;
     }
 
-    public static Encoding DetectUnicodeInByteSampleByHeuristics (byte[] SampleBytes)
+    /// <summary>
+    ///
+    /// </summary>
+    public static Encoding? DetectUnicodeInByteSampleByHeuristics
+        (
+            byte[] sampleBytes
+        )
     {
         long oddBinaryNullsInSample = 0;
         long evenBinaryNullsInSample = 0;
-        long suspiciousUTF8SequenceCount = 0;
-        long suspiciousUTF8BytesTotal = 0;
-        long likelyUSASCIIBytesInSample = 0;
+        long suspiciousUtf8SequenceCount = 0;
+        long suspiciousUtf8BytesTotal = 0;
+        long likelyAsciiBytesInSample = 0;
 
         //Cycle through, keeping count of binary null positions, possible UTF-8
         //  sequences from upper ranges of Windows-1252, and probable US-ASCII
         //  character counts.
 
         long currentPos = 0;
-        var skipUTF8Bytes = 0;
+        var skipUtf8Bytes = 0;
 
-        while (currentPos < SampleBytes.Length)
+        while (currentPos < sampleBytes.Length)
         {
             //binary null distribution
-            if (SampleBytes[currentPos] == 0)
+            if (sampleBytes[currentPos] == 0)
             {
                 if (currentPos % 2 == 0)
                     evenBinaryNullsInSample++;
@@ -148,24 +207,24 @@ public static class EncodingDetector
             }
 
             //likely US-ASCII characters
-            if (IsCommonUSASCIIByte (SampleBytes[currentPos]))
-                likelyUSASCIIBytesInSample++;
+            if (IsCommonAsciiByte (sampleBytes[currentPos]))
+                likelyAsciiBytesInSample++;
 
             //suspicious sequences (look like UTF-8)
-            if (skipUTF8Bytes == 0)
+            if (skipUtf8Bytes == 0)
             {
-                var lengthFound = DetectSuspiciousUTF8SequenceLength (SampleBytes, currentPos);
+                var lengthFound = DetectSuspiciousUTF8SequenceLength (sampleBytes, currentPos);
 
                 if (lengthFound > 0)
                 {
-                    suspiciousUTF8SequenceCount++;
-                    suspiciousUTF8BytesTotal += lengthFound;
-                    skipUTF8Bytes = lengthFound - 1;
+                    suspiciousUtf8SequenceCount++;
+                    suspiciousUtf8BytesTotal += lengthFound;
+                    skipUtf8Bytes = lengthFound - 1;
                 }
             }
             else
             {
-                skipUTF8Bytes--;
+                skipUtf8Bytes--;
             }
 
             currentPos++;
@@ -177,8 +236,8 @@ public static class EncodingDetector
         //  The thresholds here used (less than 20% nulls where you expect non-nulls, and more than
         //  60% nulls where you do expect nulls) are completely arbitrary.
 
-        if (((evenBinaryNullsInSample * 2.0) / SampleBytes.Length) < 0.2
-            && ((oddBinaryNullsInSample * 2.0) / SampleBytes.Length) > 0.6
+        if (((evenBinaryNullsInSample * 2.0) / sampleBytes.Length) < 0.2
+            && ((oddBinaryNullsInSample * 2.0) / sampleBytes.Length) > 0.6
            )
             return Encoding.Unicode;
 
@@ -189,8 +248,8 @@ public static class EncodingDetector
         //  The thresholds here used (less than 20% nulls where you expect non-nulls, and more than
         //  60% nulls where you do expect nulls) are completely arbitrary.
 
-        if (((oddBinaryNullsInSample * 2.0) / SampleBytes.Length) < 0.2
-            && ((evenBinaryNullsInSample * 2.0) / SampleBytes.Length) > 0.6
+        if (((oddBinaryNullsInSample * 2.0) / sampleBytes.Length) < 0.2
+            && ((evenBinaryNullsInSample * 2.0) / sampleBytes.Length) > 0.6
            )
             return Encoding.BigEndianUnicode;
 
@@ -199,8 +258,8 @@ public static class EncodingDetector
         //  using regexp, in his w3c.org unicode FAQ entry:
         //  http://www.w3.org/International/questions/qa-forms-utf-8
         //  adapted here for C#.
-        var potentiallyMangledString = Encoding.ASCII.GetString (SampleBytes);
-        var UTF8Validator = new Regex (@"\A("
+        var potentiallyMangledString = Encoding.ASCII.GetString (sampleBytes);
+        var utf8Validator = new Regex (@"\A("
                                        + @"[\x09\x0A\x0D\x20-\x7E]"
                                        + @"|[\xC2-\xDF][\x80-\xBF]"
                                        + @"|\xE0[\xA0-\xBF][\x80-\xBF]"
@@ -210,7 +269,7 @@ public static class EncodingDetector
                                        + @"|[\xF1-\xF3][\x80-\xBF]{3}"
                                        + @"|\xF4[\x80-\x8F][\x80-\xBF]{2}"
                                        + @")*\z");
-        if (UTF8Validator.IsMatch (potentiallyMangledString))
+        if (utf8Validator.IsMatch (potentiallyMangledString))
         {
             //Unfortunately, just the fact that it CAN be UTF-8 doesn't tell you much about probabilities.
             //If all the characters are in the 0-127 range, no harm done, most western charsets are same as UTF-8 in these ranges.
@@ -232,13 +291,13 @@ public static class EncodingDetector
             //   approx 40%, so the chances of hitting this threshold by accident in random data are
             //   VERY low).
 
-            if ((suspiciousUTF8SequenceCount * 500000.0 / SampleBytes.Length >= 1) //suspicious sequences
+            if ((suspiciousUtf8SequenceCount * 500000.0 / sampleBytes.Length >= 1) //suspicious sequences
                 && (
 
                     //all suspicious, so cannot evaluate proportion of US-Ascii
-                    SampleBytes.Length - suspiciousUTF8BytesTotal == 0
+                    sampleBytes.Length - suspiciousUtf8BytesTotal == 0
                     ||
-                    likelyUSASCIIBytesInSample * 1.0 / (SampleBytes.Length - suspiciousUTF8BytesTotal) >= 0.8
+                    likelyAsciiBytesInSample * 1.0 / (sampleBytes.Length - suspiciousUtf8BytesTotal) >= 0.8
                 )
                )
                 return Encoding.UTF8;
@@ -247,133 +306,148 @@ public static class EncodingDetector
         return null;
     }
 
-    private static bool IsCommonUSASCIIByte (byte testByte)
+    #endregion
+
+    #region Private members
+
+    private static bool IsCommonAsciiByte
+        (
+            byte testByte
+        )
     {
         if (testByte == 0x0A //lf
             || testByte == 0x0D //cr
             || testByte == 0x09 //tab
-            || (testByte >= 0x20 && testByte <= 0x2F) //common punctuation
-            || (testByte >= 0x30 && testByte <= 0x39) //digits
-            || (testByte >= 0x3A && testByte <= 0x40) //common punctuation
-            || (testByte >= 0x41 && testByte <= 0x5A) //capital letters
-            || (testByte >= 0x5B && testByte <= 0x60) //common punctuation
-            || (testByte >= 0x61 && testByte <= 0x7A) //lowercase letters
-            || (testByte >= 0x7B && testByte <= 0x7E) //common punctuation
+            || testByte is >= 0x20 and <= 0x2F //common punctuation
+            || testByte is >= 0x30 and <= 0x39 //digits
+            || testByte is >= 0x3A and <= 0x40 //common punctuation
+            || testByte is >= 0x41 and <= 0x5A //capital letters
+            || testByte is >= 0x5B and <= 0x60 //common punctuation
+            || testByte is >= 0x61 and <= 0x7A //lowercase letters
+            || testByte is >= 0x7B and <= 0x7E //common punctuation
            )
+        {
             return true;
-        else
-            return false;
+        }
+
+        return false;
     }
 
-    private static int DetectSuspiciousUTF8SequenceLength (byte[] SampleBytes, long currentPos)
+    private static int DetectSuspiciousUTF8SequenceLength
+        (
+            byte[] sampleBytes,
+            long currentPos
+        )
     {
         var lengthFound = 0;
 
-        if (SampleBytes.Length >= currentPos + 1
-            && SampleBytes[currentPos] == 0xC2
+        if (sampleBytes.Length >= currentPos + 1
+            && sampleBytes[currentPos] == 0xC2
            )
         {
-            if (SampleBytes[currentPos + 1] == 0x81
-                || SampleBytes[currentPos + 1] == 0x8D
-                || SampleBytes[currentPos + 1] == 0x8F
+            if (sampleBytes[currentPos + 1] == 0x81
+                || sampleBytes[currentPos + 1] == 0x8D
+                || sampleBytes[currentPos + 1] == 0x8F
                )
                 lengthFound = 2;
-            else if (SampleBytes[currentPos + 1] == 0x90
-                     || SampleBytes[currentPos + 1] == 0x9D
+            else if (sampleBytes[currentPos + 1] == 0x90
+                     || sampleBytes[currentPos + 1] == 0x9D
                     )
                 lengthFound = 2;
-            else if (SampleBytes[currentPos + 1] >= 0xA0
-                     && SampleBytes[currentPos + 1] <= 0xBF
-                    )
-                lengthFound = 2;
-        }
-        else if (SampleBytes.Length >= currentPos + 1
-                 && SampleBytes[currentPos] == 0xC3
-                )
-        {
-            if (SampleBytes[currentPos + 1] >= 0x80
-                && SampleBytes[currentPos + 1] <= 0xBF
-               )
-                lengthFound = 2;
-        }
-        else if (SampleBytes.Length >= currentPos + 1
-                 && SampleBytes[currentPos] == 0xC5
-                )
-        {
-            if (SampleBytes[currentPos + 1] == 0x92
-                || SampleBytes[currentPos + 1] == 0x93
-               )
-                lengthFound = 2;
-            else if (SampleBytes[currentPos + 1] == 0xA0
-                     || SampleBytes[currentPos + 1] == 0xA1
-                    )
-                lengthFound = 2;
-            else if (SampleBytes[currentPos + 1] == 0xB8
-                     || SampleBytes[currentPos + 1] == 0xBD
-                     || SampleBytes[currentPos + 1] == 0xBE
+            else if (sampleBytes[currentPos + 1] >= 0xA0
+                     && sampleBytes[currentPos + 1] <= 0xBF
                     )
                 lengthFound = 2;
         }
-        else if (SampleBytes.Length >= currentPos + 1
-                 && SampleBytes[currentPos] == 0xC6
+        else if (sampleBytes.Length >= currentPos + 1
+                 && sampleBytes[currentPos] == 0xC3
                 )
         {
-            if (SampleBytes[currentPos + 1] == 0x92)
-                lengthFound = 2;
-        }
-        else if (SampleBytes.Length >= currentPos + 1
-                 && SampleBytes[currentPos] == 0xCB
-                )
-        {
-            if (SampleBytes[currentPos + 1] == 0x86
-                || SampleBytes[currentPos + 1] == 0x9C
+            if (sampleBytes[currentPos + 1] >= 0x80
+                && sampleBytes[currentPos + 1] <= 0xBF
                )
                 lengthFound = 2;
         }
-        else if (SampleBytes.Length >= currentPos + 2
-                 && SampleBytes[currentPos] == 0xE2
+        else if (sampleBytes.Length >= currentPos + 1
+                 && sampleBytes[currentPos] == 0xC5
                 )
         {
-            if (SampleBytes[currentPos + 1] == 0x80)
+            if (sampleBytes[currentPos + 1] == 0x92
+                || sampleBytes[currentPos + 1] == 0x93
+               )
+                lengthFound = 2;
+            else if (sampleBytes[currentPos + 1] == 0xA0
+                     || sampleBytes[currentPos + 1] == 0xA1
+                    )
+                lengthFound = 2;
+            else if (sampleBytes[currentPos + 1] == 0xB8
+                     || sampleBytes[currentPos + 1] == 0xBD
+                     || sampleBytes[currentPos + 1] == 0xBE
+                    )
+                lengthFound = 2;
+        }
+        else if (sampleBytes.Length >= currentPos + 1
+                 && sampleBytes[currentPos] == 0xC6
+                )
+        {
+            if (sampleBytes[currentPos + 1] == 0x92)
+                lengthFound = 2;
+        }
+        else if (sampleBytes.Length >= currentPos + 1
+                 && sampleBytes[currentPos] == 0xCB
+                )
+        {
+            if (sampleBytes[currentPos + 1] == 0x86
+                || sampleBytes[currentPos + 1] == 0x9C
+               )
+                lengthFound = 2;
+        }
+        else if (sampleBytes.Length >= currentPos + 2
+                 && sampleBytes[currentPos] == 0xE2
+                )
+        {
+            if (sampleBytes[currentPos + 1] == 0x80)
             {
-                if (SampleBytes[currentPos + 2] == 0x93
-                    || SampleBytes[currentPos + 2] == 0x94
+                if (sampleBytes[currentPos + 2] == 0x93
+                    || sampleBytes[currentPos + 2] == 0x94
                    )
                     lengthFound = 3;
-                if (SampleBytes[currentPos + 2] == 0x98
-                    || SampleBytes[currentPos + 2] == 0x99
-                    || SampleBytes[currentPos + 2] == 0x9A
+                if (sampleBytes[currentPos + 2] == 0x98
+                    || sampleBytes[currentPos + 2] == 0x99
+                    || sampleBytes[currentPos + 2] == 0x9A
                    )
                     lengthFound = 3;
-                if (SampleBytes[currentPos + 2] == 0x9C
-                    || SampleBytes[currentPos + 2] == 0x9D
-                    || SampleBytes[currentPos + 2] == 0x9E
+                if (sampleBytes[currentPos + 2] == 0x9C
+                    || sampleBytes[currentPos + 2] == 0x9D
+                    || sampleBytes[currentPos + 2] == 0x9E
                    )
                     lengthFound = 3;
-                if (SampleBytes[currentPos + 2] == 0xA0
-                    || SampleBytes[currentPos + 2] == 0xA1
-                    || SampleBytes[currentPos + 2] == 0xA2
+                if (sampleBytes[currentPos + 2] == 0xA0
+                    || sampleBytes[currentPos + 2] == 0xA1
+                    || sampleBytes[currentPos + 2] == 0xA2
                    )
                     lengthFound = 3;
-                if (SampleBytes[currentPos + 2] == 0xA6)
+                if (sampleBytes[currentPos + 2] == 0xA6)
                     lengthFound = 3;
-                if (SampleBytes[currentPos + 2] == 0xB0)
+                if (sampleBytes[currentPos + 2] == 0xB0)
                     lengthFound = 3;
-                if (SampleBytes[currentPos + 2] == 0xB9
-                    || SampleBytes[currentPos + 2] == 0xBA
+                if (sampleBytes[currentPos + 2] == 0xB9
+                    || sampleBytes[currentPos + 2] == 0xBA
                    )
                     lengthFound = 3;
             }
-            else if (SampleBytes[currentPos + 1] == 0x82
-                     && SampleBytes[currentPos + 2] == 0xAC
+            else if (sampleBytes[currentPos + 1] == 0x82
+                     && sampleBytes[currentPos + 2] == 0xAC
                     )
                 lengthFound = 3;
-            else if (SampleBytes[currentPos + 1] == 0x84
-                     && SampleBytes[currentPos + 2] == 0xA2
+            else if (sampleBytes[currentPos + 1] == 0x84
+                     && sampleBytes[currentPos + 2] == 0xA2
                     )
                 lengthFound = 3;
         }
 
         return lengthFound;
     }
+
+    #endregion
 }

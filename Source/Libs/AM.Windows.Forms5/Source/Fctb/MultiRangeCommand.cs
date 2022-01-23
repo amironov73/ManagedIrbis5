@@ -36,10 +36,10 @@ public class MultiRangeCommand
         (
             UndoableCommand command
         )
-        : base (command.ts)
+        : base (command.textSource)
     {
         _cmd = command;
-        _range = ts.CurrentTextBox.Selection.Clone();
+        _range = textSource.CurrentTextBox.Selection.Clone();
     }
 
     #endregion
@@ -60,7 +60,7 @@ public class MultiRangeCommand
         var iLine = 0;
         foreach (var r in _range.GetSubRanges (true))
         {
-            var line = ts.CurrentTextBox[r.Start.Line];
+            var line = textSource.CurrentTextBox[r.Start.Line];
             var lineIsEmpty = r.End < r.Start && line.StartSpacesCount == line.Count;
             if (!lineIsEmpty)
             {
@@ -72,12 +72,12 @@ public class MultiRangeCommand
                     r.Start = r.End;
                 }
 
-                ts.CurrentTextBox.Selection = r;
-                var c = new InsertTextCommand (ts, insertedText);
+                textSource.CurrentTextBox.Selection = r;
+                var c = new InsertTextCommand (textSource, insertedText);
                 c.Execute();
-                if (ts.CurrentTextBox.Selection.End.Column > iChar)
+                if (textSource.CurrentTextBox.Selection.End.Column > iChar)
                 {
-                    iChar = ts.CurrentTextBox.Selection.End.Column;
+                    iChar = textSource.CurrentTextBox.Selection.End.Column;
                 }
 
                 _commandsByRanges.Add (c);
@@ -94,11 +94,11 @@ public class MultiRangeCommand
     {
         foreach (var r in _range.GetSubRanges (false))
         {
-            ts.CurrentTextBox.Selection = r;
+            textSource.CurrentTextBox.Selection = r;
             var c = _cmd.Clone();
             c.Execute();
-            if (ts.CurrentTextBox.Selection.End.Column > iChar)
-                iChar = ts.CurrentTextBox.Selection.End.Column;
+            if (textSource.CurrentTextBox.Selection.End.Column > iChar)
+                iChar = textSource.CurrentTextBox.Selection.End.Column;
             _commandsByRanges.Add (c);
         }
     }
@@ -115,10 +115,10 @@ public class MultiRangeCommand
         var iChar = -1;
         var iStartLine = prevSelection.Start.Line;
         var iEndLine = prevSelection.End.Line;
-        ts.CurrentTextBox.Selection.ColumnSelectionMode = false;
-        ts.CurrentTextBox.Selection.BeginUpdate();
-        ts.CurrentTextBox.BeginUpdate();
-        ts.CurrentTextBox.AllowInsertRemoveLines = false;
+        textSource.CurrentTextBox.Selection.ColumnSelectionMode = false;
+        textSource.CurrentTextBox.Selection.BeginUpdate();
+        textSource.CurrentTextBox.BeginUpdate();
+        textSource.CurrentTextBox.AllowInsertRemoveLines = false;
         try
         {
             if (_cmd is InsertTextCommand)
@@ -140,26 +140,26 @@ public class MultiRangeCommand
         }
         finally
         {
-            ts.CurrentTextBox.AllowInsertRemoveLines = true;
-            ts.CurrentTextBox.EndUpdate();
+            textSource.CurrentTextBox.AllowInsertRemoveLines = true;
+            textSource.CurrentTextBox.EndUpdate();
 
-            ts.CurrentTextBox.Selection = _range;
+            textSource.CurrentTextBox.Selection = _range;
             if (iChar >= 0)
             {
-                ts.CurrentTextBox.Selection.Start = new Place (iChar, iStartLine);
-                ts.CurrentTextBox.Selection.End = new Place (iChar, iEndLine);
+                textSource.CurrentTextBox.Selection.Start = new Place (iChar, iStartLine);
+                textSource.CurrentTextBox.Selection.End = new Place (iChar, iEndLine);
             }
 
-            ts.CurrentTextBox.Selection.ColumnSelectionMode = true;
-            ts.CurrentTextBox.Selection.EndUpdate();
+            textSource.CurrentTextBox.Selection.ColumnSelectionMode = true;
+            textSource.CurrentTextBox.Selection.EndUpdate();
         }
     }
 
     /// <inheritdoc cref="UndoableCommand.Undo"/>
     public override void Undo()
     {
-        ts.CurrentTextBox.BeginUpdate();
-        ts.CurrentTextBox.Selection.BeginUpdate();
+        textSource.CurrentTextBox.BeginUpdate();
+        textSource.CurrentTextBox.Selection.BeginUpdate();
         try
         {
             for (var i = _commandsByRanges.Count - 1; i >= 0; i--)
@@ -167,14 +167,14 @@ public class MultiRangeCommand
         }
         finally
         {
-            ts.CurrentTextBox.Selection.EndUpdate();
-            ts.CurrentTextBox.EndUpdate();
+            textSource.CurrentTextBox.Selection.EndUpdate();
+            textSource.CurrentTextBox.EndUpdate();
         }
 
-        ts.CurrentTextBox.Selection = _range.Clone();
-        ts.CurrentTextBox.OnTextChanged (_range);
-        ts.CurrentTextBox.OnSelectionChanged();
-        ts.CurrentTextBox.Selection.ColumnSelectionMode = true;
+        textSource.CurrentTextBox.Selection = _range.Clone();
+        textSource.CurrentTextBox.OnTextChanged (_range);
+        textSource.CurrentTextBox.OnSelectionChanged();
+        textSource.CurrentTextBox.Selection.ColumnSelectionMode = true;
     }
 
     /// <inheritdoc cref="UndoableCommand.Clone"/>

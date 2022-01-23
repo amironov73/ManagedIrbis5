@@ -26,7 +26,8 @@ namespace Fctb;
 /// This class contains the source text (chars and styles).
 /// It stores a text lines, the manager of commands, undo/redo stack, styles.
 /// </summary>
-public class FileTextSource : TextSource, IDisposable
+public class FileTextSource
+    : TextSource
 {
     List<int> sourceFileLinePositions = new List<int>();
     FileStream fs;

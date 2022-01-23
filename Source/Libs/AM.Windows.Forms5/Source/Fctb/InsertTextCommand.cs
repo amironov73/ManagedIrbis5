@@ -39,14 +39,14 @@ public sealed class InsertTextCommand
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="ts">Underlaying textbox</param>
+    /// <param name="textSource">Underlaying textbox</param>
     /// <param name="insertedText">Text for inserting</param>
     public InsertTextCommand
         (
-            TextSource ts,
+            TextSource textSource,
             string insertedText
         )
-        : base (ts)
+        : base (textSource)
     {
         InsertedText = insertedText;
     }
@@ -101,10 +101,10 @@ public sealed class InsertTextCommand
     /// </summary>
     public override void Undo()
     {
-        ts.CurrentTextBox.Selection.Start = sel.Start;
-        ts.CurrentTextBox.Selection.End = lastSel.Start;
-        ts.OnTextChanging();
-        ClearSelectedCommand.ClearSelected (ts);
+        textSource.CurrentTextBox.Selection.Start = sel.Start;
+        textSource.CurrentTextBox.Selection.End = lastSel.Start;
+        textSource.OnTextChanging();
+        ClearSelectedCommand.ClearSelected (textSource);
         base.Undo();
     }
 
@@ -113,15 +113,15 @@ public sealed class InsertTextCommand
     /// </summary>
     public override void Execute()
     {
-        ts.OnTextChanging (ref InsertedText);
-        InsertText (InsertedText, ts);
+        textSource.OnTextChanging (ref InsertedText);
+        InsertText (InsertedText, textSource);
         base.Execute();
     }
 
     /// <inheritdoc cref="UndoableCommand.Clone"/>
     public override UndoableCommand Clone()
     {
-        return new InsertTextCommand (ts, InsertedText);
+        return new InsertTextCommand (textSource, InsertedText);
     }
 
     #endregion

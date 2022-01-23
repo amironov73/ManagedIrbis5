@@ -34,14 +34,14 @@ public sealed class InsertCharCommand
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="ts">Underlaying textbox</param>
+    /// <param name="textSource">Underlaying textbox</param>
     /// <param name="c">Inserting char</param>
     public InsertCharCommand
         (
-            TextSource ts,
+            TextSource textSource,
             char c
         )
-        : base (ts)
+        : base (textSource)
     {
         this.c = c;
     }
@@ -123,45 +123,45 @@ public sealed class InsertCharCommand
     /// </summary>
     public override void Undo()
     {
-        ts.OnTextChanging();
+        textSource.OnTextChanging();
         switch (c)
         {
             case '\n':
-                MergeLines (sel.Start.Line, ts);
+                MergeLines (sel.Start.Line, textSource);
                 break;
 
             case '\r':
                 break;
 
             case '\b':
-                ts.CurrentTextBox.Selection.Start = lastSel.Start;
+                textSource.CurrentTextBox.Selection.Start = lastSel.Start;
                 var cc = '\x0';
                 if (deletedChar != '\x0')
                 {
-                    ts.CurrentTextBox.ExpandBlock (ts.CurrentTextBox.Selection.Start.Line);
-                    InsertChar (deletedChar, ref cc, ts);
+                    textSource.CurrentTextBox.ExpandBlock (textSource.CurrentTextBox.Selection.Start.Line);
+                    InsertChar (deletedChar, ref cc, textSource);
                 }
 
                 break;
 
             case '\t':
-                ts.CurrentTextBox.ExpandBlock (sel.Start.Line);
+                textSource.CurrentTextBox.ExpandBlock (sel.Start.Line);
                 for (var i = sel.FromX; i < lastSel.FromX; i++)
                 {
-                    ts[sel.Start.Line].RemoveAt (sel.Start.Column);
+                    textSource[sel.Start.Line].RemoveAt (sel.Start.Column);
                 }
 
-                ts.CurrentTextBox.Selection.Start = sel.Start;
+                textSource.CurrentTextBox.Selection.Start = sel.Start;
                 break;
 
             default:
-                ts.CurrentTextBox.ExpandBlock (sel.Start.Line);
-                ts[sel.Start.Line].RemoveAt (sel.Start.Column);
-                ts.CurrentTextBox.Selection.Start = sel.Start;
+                textSource.CurrentTextBox.ExpandBlock (sel.Start.Line);
+                textSource[sel.Start.Line].RemoveAt (sel.Start.Column);
+                textSource.CurrentTextBox.Selection.Start = sel.Start;
                 break;
         }
 
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (sel.Start.Line, sel.Start.Line));
+        textSource.NeedRecalc (new TextSource.TextChangedEventArgs (sel.Start.Line, sel.Start.Line));
 
         base.Undo();
     }
@@ -171,9 +171,9 @@ public sealed class InsertCharCommand
     /// </summary>
     public override void Execute()
     {
-        ts.CurrentTextBox.ExpandBlock (ts.CurrentTextBox.Selection.Start.Line);
+        textSource.CurrentTextBox.ExpandBlock (textSource.CurrentTextBox.Selection.Start.Line);
         var s = c.ToString();
-        ts.OnTextChanging (ref s);
+        textSource.OnTextChanging (ref s);
         if (s.Length == 1)
             c = s[0];
 
@@ -181,12 +181,12 @@ public sealed class InsertCharCommand
             throw new ArgumentOutOfRangeException();
 
 
-        if (ts.Count == 0)
-            InsertLine (ts);
-        InsertChar (c, ref deletedChar, ts);
+        if (textSource.Count == 0)
+            InsertLine (textSource);
+        InsertChar (c, ref deletedChar, textSource);
 
-        ts.NeedRecalc (new TextSource.TextChangedEventArgs (ts.CurrentTextBox.Selection.Start.Line,
-            ts.CurrentTextBox.Selection.Start.Line));
+        textSource.NeedRecalc (new TextSource.TextChangedEventArgs (textSource.CurrentTextBox.Selection.Start.Line,
+            textSource.CurrentTextBox.Selection.Start.Line));
         base.Execute();
     }
 
@@ -250,7 +250,7 @@ public sealed class InsertCharCommand
     /// <inheritdoc cref="UndoableCommand.Clone"/>
     public override UndoableCommand Clone()
     {
-        return new InsertCharCommand (ts, c);
+        return new InsertCharCommand (textSource, c);
     }
 
     #endregion

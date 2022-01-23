@@ -95,12 +95,12 @@ public class ExportToHtml
         var styles = new List<Style>();
 
         //find text renderer
-        TextStyle textStyle = null;
+        TextStyle? textStyle = null;
         var mask = 1;
         var hasTextStyle = false;
-        for (var i = 0; i < _textBox.Styles.Length; i++)
+        for (var i = 0; i < _textBox!.Styles.Length; i++)
         {
-            if (_textBox.Styles[i] != null && ((int)styleIndex & mask) != 0)
+            if (_textBox.Styles[i] != null && ((int) styleIndex & mask) != 0)
                 if (_textBox.Styles[i].IsExportable)
                 {
                     var style = _textBox.Styles[i];
@@ -121,22 +121,16 @@ public class ExportToHtml
         //add TextStyle css
         var result = "";
 
-        if (!hasTextStyle)
-        {
-            //draw by default renderer
-            result = _textBox.DefaultStyle.GetCSS();
-        }
-        else
-        {
-            result = textStyle.GetCSS();
-        }
+        result = !hasTextStyle ? _textBox.DefaultStyle.GetCSS() : textStyle.GetCSS();
 
         //add no TextStyle css
         foreach (var style in styles)
-
-//            if (style != textStyle)
-            if (!(style is TextStyle))
+        {
+            if (style is not TextStyle)
+            {
                 result += style.GetCSS();
+            }
+        }
 
         return result;
     }
@@ -215,7 +209,7 @@ public class ExportToHtml
         Sure.NotNull (textRange);
 
         _textBox = textRange._textBox;
-        var styles = new Dictionary<StyleIndex, object>();
+        var styles = new Dictionary<StyleIndex, object?>();
         var builder = new StringBuilder();
         var temporary = new StringBuilder();
         var currentStyleId = StyleIndex.None;

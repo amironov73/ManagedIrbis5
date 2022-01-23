@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* DocumentMap.cs -- карта документа
  * Ars Magna project, http://arsmagna.ru
@@ -16,6 +17,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+
+using AM;
 
 #endregion
 
@@ -54,7 +57,10 @@ public class DocumentMap
             _target = value;
             if (value != null)
             {
-                Subscribe (_target);
+                if (_target != null)
+                {
+                    Subscribe (_target);
+                }
             }
 
             OnTargetChanged();
@@ -66,7 +72,7 @@ public class DocumentMap
     /// </summary>
     [Description ("Scale")]
     [DefaultValue (0.3f)]
-    public float Scale
+    public new float Scale
     {
         get => _scale;
         set
@@ -100,9 +106,14 @@ public class DocumentMap
     public DocumentMap()
     {
         ForeColor = Color.Maroon;
-        SetStyle (
-            ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint |
-            ControlStyles.ResizeRedraw, true);
+        SetStyle
+            (
+                ControlStyles.AllPaintingInWmPaint
+                | ControlStyles.OptimizedDoubleBuffer
+                | ControlStyles.UserPaint
+                | ControlStyles.ResizeRedraw,
+                true
+            );
         Application.Idle += Application_Idle;
     }
 
@@ -116,66 +127,139 @@ public class DocumentMap
     private Place _startPlace = Place.Empty;
     private bool _scrollbarVisible = true;
 
-    #endregion
-
-    private void Application_Idle (object sender, EventArgs e)
+    private void Application_Idle
+        (
+            object? sender,
+            EventArgs e
+        )
     {
         if (_needRepaint)
+        {
             Invalidate();
+        }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnTargetChanged()
     {
         NeedRepaint();
 
-        if (TargetChanged != null)
-            TargetChanged (this, EventArgs.Empty);
+        TargetChanged?.Invoke (this, EventArgs.Empty);
     }
 
-    protected virtual void UnSubscribe (SyntaxTextBox target)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="target"></param>
+    protected virtual void UnSubscribe
+        (
+            SyntaxTextBox target
+        )
     {
-        target.Scroll -= new ScrollEventHandler (Target_Scroll);
-        target.SelectionChangedDelayed -= new EventHandler (Target_SelectionChanged);
-        target.VisibleRangeChanged -= new EventHandler (Target_VisibleRangeChanged);
+        Sure.NotNull (target);
+
+        target.Scroll -= Target_Scroll;
+        target.SelectionChangedDelayed -= Target_SelectionChanged;
+        target.VisibleRangeChanged -= Target_VisibleRangeChanged;
     }
 
-    protected virtual void Subscribe (SyntaxTextBox target)
+    private void OnScroll()
     {
-        target.Scroll += new ScrollEventHandler (Target_Scroll);
-        target.SelectionChangedDelayed += new EventHandler (Target_SelectionChanged);
-        target.VisibleRangeChanged += new EventHandler (Target_VisibleRangeChanged);
+        Refresh();
+        _target?.Refresh();
     }
 
-    protected virtual void Target_VisibleRangeChanged (object sender, EventArgs e)
+    /// <inheritdoc cref="Control.Dispose(bool)"/>
+    protected override void Dispose
+        (
+            bool disposing
+        )
+    {
+        if (disposing)
+        {
+            Application.Idle -= Application_Idle;
+            if (_target != null)
+            {
+                UnSubscribe (_target);
+            }
+        }
+
+        base.Dispose (disposing);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected virtual void Subscribe
+        (
+            SyntaxTextBox target
+        )
+    {
+        Sure.NotNull (target);
+
+        target.Scroll += Target_Scroll;
+        target.SelectionChangedDelayed += Target_SelectionChanged;
+        target.VisibleRangeChanged += Target_VisibleRangeChanged;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected virtual void Target_VisibleRangeChanged
+        (
+            object? sender,
+            EventArgs e
+        )
     {
         NeedRepaint();
     }
 
-    protected virtual void Target_SelectionChanged (object sender, EventArgs e)
+    /// <summary>
+    ///
+    /// </summary>
+    protected virtual void Target_SelectionChanged
+        (
+            object? sender,
+            EventArgs e
+        )
     {
         NeedRepaint();
     }
 
-    protected virtual void Target_Scroll (object sender, ScrollEventArgs e)
+    /// <summary>
+    ///
+    /// </summary>
+    protected virtual void Target_Scroll
+        (
+            object? sender,
+            ScrollEventArgs e
+        )
     {
         NeedRepaint();
     }
 
-    protected override void OnResize (EventArgs e)
+    /// <inheritdoc cref="Control.OnResize"/>
+    protected override void OnResize
+        (
+            EventArgs e
+        )
     {
         base.OnResize (e);
         NeedRepaint();
     }
 
-    public void NeedRepaint()
-    {
-        _needRepaint = true;
-    }
-
-    protected override void OnPaint (PaintEventArgs e)
+    /// <inheritdoc cref="Control.OnPaint"/>
+    protected override void OnPaint
+        (
+            PaintEventArgs e
+        )
     {
         if (_target == null)
+        {
             return;
+        }
 
         var zoom = this.Scale * 100 / _target.Zoom;
 
@@ -232,32 +316,47 @@ public class DocumentMap
             e.Graphics.ResetTransform();
             e.Graphics.SmoothingMode = SmoothingMode.None;
 
-            using (var brush = new SolidBrush (Color.FromArgb (200, ForeColor)))
-            {
-                var rect = new RectangleF (ClientSize.Width - 3, ClientSize.Height * sp1, 2,
-                    ClientSize.Height * (sp2 - sp1));
-                e.Graphics.FillRectangle (brush, rect);
-            }
+            using var brush = new SolidBrush (Color.FromArgb (200, ForeColor));
+            var rect = new RectangleF (ClientSize.Width - 3, ClientSize.Height * sp1, 2,
+                ClientSize.Height * (sp2 - sp1));
+            e.Graphics.FillRectangle (brush, rect);
         }
 
         _needRepaint = false;
     }
 
-    protected override void OnMouseDown (MouseEventArgs e)
+    /// <inheritdoc cref="Control.OnMouseDown"/>
+    protected override void OnMouseDown
+        (
+            MouseEventArgs e
+        )
     {
-        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        if (e.Button == MouseButtons.Left)
+        {
             Scroll (e.Location);
+        }
+
         base.OnMouseDown (e);
     }
 
-    protected override void OnMouseMove (MouseEventArgs e)
+    /// <inheritdoc cref="Control.OnMouseMove"/>
+    protected override void OnMouseMove
+        (
+            MouseEventArgs e
+        )
     {
-        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        if (e.Button == MouseButtons.Left)
+        {
             Scroll (e.Location);
+        }
+
         base.OnMouseMove (e);
     }
 
-    private void Scroll (Point point)
+    private void Scroll
+        (
+            Point point
+        )
     {
         if (_target is null)
         {
@@ -278,27 +377,18 @@ public class DocumentMap
         BeginInvoke ((MethodInvoker)OnScroll);
     }
 
-    private void OnScroll()
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void NeedRepaint()
     {
-        Refresh();
-        _target.Refresh();
+        _needRepaint = true;
     }
 
-    /// <inheritdoc cref="Control.Dispose(bool)"/>
-    protected override void Dispose
-        (
-            bool disposing
-        )
-    {
-        if (disposing)
-        {
-            Application.Idle -= Application_Idle;
-            if (_target != null)
-            {
-                UnSubscribe (_target);
-            }
-        }
+    #endregion
 
-        base.Dispose (disposing);
-    }
 }

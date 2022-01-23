@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/*
+/* Character.cs -- символ и его стиль
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,24 +14,38 @@
 namespace Fctb;
 
 /// <summary>
-/// Char and style
+/// Символ и его стиль.
 /// </summary>
 public struct Character
 {
+    #region Properties
+
     /// <summary>
-    /// Unicode character
+    /// Unicode-символ.
     /// </summary>
     public char c;
 
     /// <summary>
-    /// Style bit mask
+    /// Битовая маска стилей.
     /// </summary>
     /// <remarks>Bit 1 in position n means that this char will rendering by FastColoredTextBox.Styles[n]</remarks>
     public StyleIndex style;
 
-    public Character (char c)
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Character
+        (
+            char c
+        )
     {
         this.c = c;
         style = StyleIndex.None;
     }
+
+    #endregion
 }
