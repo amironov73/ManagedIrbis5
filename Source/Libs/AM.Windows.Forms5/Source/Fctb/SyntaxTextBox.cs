@@ -179,7 +179,7 @@ public class SyntaxTextBox
         _scrollBars = true;
         AcceptsTab = true;
         AcceptsReturn = true;
-        caretVisible = true;
+        _caretVisible = true;
         CaretColor = Color.Black;
         WideCaret = false;
         Paddings = new Padding (0, 0, 0, 0);
@@ -235,11 +235,11 @@ public class SyntaxTextBox
 
     private BookmarksBase bookmarks;
 
-    private bool caretVisible;
+    private bool _caretVisible;
 
-    private Color changedLineColor;
+    private Color _changedLineColor;
 
-    private int charHeight;
+    private int _charHeight;
 
     private Color currentLineColor;
 
@@ -247,15 +247,18 @@ public class SyntaxTextBox
 
     private TextRange? _delayedTextChangedRange;
 
-    private string descriptionFile;
+    private string _descriptionFile;
 
-    private int endFoldingLine = -1;
+    private int _endFoldingLine = -1;
 
-    private Color foldingIndicatorColor;
+    private Color _foldingIndicatorColor;
 
-    protected Dictionary<int, int> foldingPairs = new Dictionary<int, int>();
+    /// <summary>
+    ///
+    /// </summary>
+    protected Dictionary<int, int> foldingPairs = new ();
 
-    private bool handledChar;
+    private bool _handledChar;
 
     private bool highlightFoldingIndicator;
 
@@ -487,10 +490,10 @@ public class SyntaxTextBox
     [Description ("Shows or hides the caret")]
     public bool CaretVisible
     {
-        get { return caretVisible; }
+        get { return _caretVisible; }
         set
         {
-            caretVisible = value;
+            _caretVisible = value;
             Invalidate();
         }
     }
@@ -566,10 +569,10 @@ public class SyntaxTextBox
         "Background color for highlighting of changed lines. Set to Color.Transparent to hide changed line highlighting")]
     public Color ChangedLineColor
     {
-        get { return changedLineColor; }
+        get { return _changedLineColor; }
         set
         {
-            changedLineColor = value;
+            _changedLineColor = value;
             Invalidate();
         }
     }
@@ -594,10 +597,10 @@ public class SyntaxTextBox
     [Browsable (false)]
     public int CharHeight
     {
-        get { return charHeight; }
+        get { return _charHeight; }
         set
         {
-            charHeight = value;
+            _charHeight = value;
             NeedRecalc();
             OnCharSizeChanged();
         }
@@ -862,10 +865,10 @@ public class SyntaxTextBox
     [Description ("Color of folding area indicator.")]
     public Color FoldingIndicatorColor
     {
-        get { return foldingIndicatorColor; }
+        get { return _foldingIndicatorColor; }
         set
         {
-            foldingIndicatorColor = value;
+            _foldingIndicatorColor = value;
             Invalidate();
         }
     }
@@ -1147,10 +1150,10 @@ public class SyntaxTextBox
         )]
     public string DescriptionFile
     {
-        get => descriptionFile;
+        get => _descriptionFile;
         set
         {
-            descriptionFile = value;
+            _descriptionFile = value;
             Invalidate();
         }
     }
@@ -1212,7 +1215,7 @@ public class SyntaxTextBox
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
     public int EndFoldingLine
     {
-        get { return endFoldingLine; }
+        get { return _endFoldingLine; }
     }
 
     /// <summary>
@@ -1975,8 +1978,8 @@ public class SyntaxTextBox
 
     protected virtual void OnCharSizeChanged()
     {
-        VerticalScroll.SmallChange = charHeight;
-        VerticalScroll.LargeChange = 10 * charHeight;
+        VerticalScroll.SmallChange = _charHeight;
+        VerticalScroll.LargeChange = 10 * _charHeight;
         HorizontalScroll.SmallChange = CharWidth;
     }
 
@@ -3703,11 +3706,11 @@ public class SyntaxTextBox
         if (Focused) //???
             lastModifiers = e.Modifiers;
 
-        handledChar = false;
+        _handledChar = false;
 
         if (e.Handled)
         {
-            handledChar = true;
+            _handledChar = true;
             return;
         }
 
@@ -3764,7 +3767,7 @@ public class SyntaxTextBox
                 return true;
             if (keyData == Keys.Tab || keyData == (Keys.Tab | Keys.Shift))
             {
-                handledChar = true;
+                _handledChar = true;
                 return true;
             }
         }
@@ -4529,7 +4532,7 @@ public class SyntaxTextBox
     /// </summary>
     public virtual bool ProcessKey (char c, Keys modifiers)
     {
-        if (handledChar)
+        if (_handledChar)
             return true;
 
         if (_macroManager != null)
@@ -5430,15 +5433,15 @@ public class SyntaxTextBox
         e.Graphics.SmoothingMode = SmoothingMode.None;
 
         //draw folding indicator
-        if ((_startFoldingLine >= 0 || endFoldingLine >= 0) && Selection.Start == Selection.End)
-            if (endFoldingLine < LineInfos.Count)
+        if ((_startFoldingLine >= 0 || _endFoldingLine >= 0) && Selection.Start == Selection.End)
+            if (_endFoldingLine < LineInfos.Count)
             {
                 //folding indicator
                 var startFoldingY = (_startFoldingLine >= 0 ? LineInfos[_startFoldingLine].startY : 0) -
                     VerticalScroll.Value + CharHeight / 2;
-                var endFoldingY = (endFoldingLine >= 0
-                    ? LineInfos[endFoldingLine].startY +
-                      (LineInfos[endFoldingLine].WordWrapStringsCount - 1) * CharHeight
+                var endFoldingY = (_endFoldingLine >= 0
+                    ? LineInfos[_endFoldingLine].startY +
+                      (LineInfos[_endFoldingLine].WordWrapStringsCount - 1) * CharHeight
                     : TextHeight + CharHeight) - VerticalScroll.Value + CharHeight;
 
                 using (var indicatorPen = new Pen (Color.FromArgb (100, FoldingIndicatorColor), 4))
@@ -5610,7 +5613,7 @@ public class SyntaxTextBox
                 if (r.IsEmpty)
                 {
                     p1.Offset (1, -1);
-                    gr.DrawLines (pen, new[] { p1, new Point (p1.X, p1.Y + charHeight + 2) });
+                    gr.DrawLines (pen, new[] { p1, new Point (p1.X, p1.Y + _charHeight + 2) });
                 }
                 else
                 {
@@ -5620,15 +5623,15 @@ public class SyntaxTextBox
                         new[]
                         {
                             new Point (p1.X + CharWidth / 2, p1.Y), p1,
-                            new Point (p1.X, p1.Y + charHeight + 2),
-                            new Point (p1.X + CharWidth / 2, p1.Y + charHeight + 2)
+                            new Point (p1.X, p1.Y + _charHeight + 2),
+                            new Point (p1.X + CharWidth / 2, p1.Y + _charHeight + 2)
                         });
                     gr.DrawLines (pen,
                         new[]
                         {
                             new Point (p2.X - CharWidth / 2, p2.Y), p2,
-                            new Point (p2.X, p2.Y + charHeight + 2),
-                            new Point (p2.X - CharWidth / 2, p2.Y + charHeight + 2)
+                            new Point (p2.X, p2.Y + _charHeight + 2),
+                            new Point (p2.X - CharWidth / 2, p2.Y + _charHeight + 2)
                         });
                 }
             }
@@ -6495,11 +6498,11 @@ public class SyntaxTextBox
 
         //
         var prevStartFoldingLine = _startFoldingLine;
-        var prevEndFoldingLine = endFoldingLine;
+        var prevEndFoldingLine = _endFoldingLine;
 
         //
         _startFoldingLine = -1;
-        endFoldingLine = -1;
+        _endFoldingLine = -1;
         var counter = 0;
         for (var i = Selection.Start.Line; i >= Math.Max (Selection.Start.Line - maxLinesForFolding, 0); i--)
         {
@@ -6526,12 +6529,12 @@ public class SyntaxTextBox
         if (_startFoldingLine >= 0)
         {
             //find end of block
-            endFoldingLine = FindEndOfFoldingBlock (_startFoldingLine, maxLinesForFolding);
-            if (endFoldingLine == _startFoldingLine)
-                endFoldingLine = -1;
+            _endFoldingLine = FindEndOfFoldingBlock (_startFoldingLine, maxLinesForFolding);
+            if (_endFoldingLine == _startFoldingLine)
+                _endFoldingLine = -1;
         }
 
-        if (_startFoldingLine != prevStartFoldingLine || endFoldingLine != prevEndFoldingLine)
+        if (_startFoldingLine != prevStartFoldingLine || _endFoldingLine != prevEndFoldingLine)
         {
             OnFoldingHighlightChanged();
         }
@@ -8476,7 +8479,7 @@ window.status = ""#print"";
             var p = PointToClient (new Point (e.X, e.Y));
             Selection.Start = PointToPlace (p);
             if (p.Y < 6 && VerticalScroll.Visible && VerticalScroll.Value > 0)
-                VerticalScroll.Value = Math.Max (0, VerticalScroll.Value - charHeight);
+                VerticalScroll.Value = Math.Max (0, VerticalScroll.Value - _charHeight);
 
             DoCaretVisible();
             Invalidate();
