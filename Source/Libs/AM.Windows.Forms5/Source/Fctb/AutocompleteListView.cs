@@ -20,457 +20,294 @@ using System.Drawing.Drawing2D;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
+using AM;
+
 #endregion
 
 #nullable enable
 
 namespace Fctb;
 
+/// <summary>
+///
+/// </summary>
+// ReSharper disable RedundantNameQualifier
 [System.ComponentModel.ToolboxItem (false)]
+// ReSharper restore RedundantNameQualifier
 public class AutocompleteListView
-    : UserControl, IDisposable
+    : UserControl
 {
-    public event EventHandler FocusedItemIndexChanged;
+    #region Events
 
-    internal List<AutocompleteItem> visibleItems;
-    IEnumerable<AutocompleteItem> sourceItems = new List<AutocompleteItem>();
-    int focussedItemIndex = 0;
-    int hoveredItemIndex = -1;
+    /// <summary>
+    ///
+    /// </summary>
+    public event EventHandler? FocusedItemIndexChanged;
 
-    private int ItemHeight
-    {
-        get { return Font.Height + 2; }
-    }
+    #endregion
 
-    AutocompleteMenu Menu
-    {
-        get { return Parent as AutocompleteMenu; }
-    }
+    #region Properties
 
-    int oldItemCount = 0;
-    SyntaxTextBox tb;
-    internal ToolTip toolTip = new ToolTip();
-    System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+    /// <summary>
+    ///
+    /// </summary>
+    public ImageList? ImageList { get; set; }
 
-    internal bool AllowTabKey { get; set; }
-    public ImageList ImageList { get; set; }
-
-    internal int AppearInterval
-    {
-        get { return timer.Interval; }
-        set { timer.Interval = value; }
-    }
-
-    internal int ToolTipDuration { get; set; }
-    internal Size MaxToolTipSize { get; set; }
-
-    internal bool AlwaysShowTooltip
-    {
-        get { return toolTip.ShowAlways; }
-        set { toolTip.ShowAlways = value; }
-    }
-
+    /// <summary>
+    ///
+    /// </summary>
     public Color SelectedColor { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public Color HoveredColor { get; set; }
 
-    public int FocussedItemIndex
+    /// <summary>
+    ///
+    /// </summary>
+    public int FocusedItemIndex
     {
-        get { return focussedItemIndex; }
+        get => _focusedItemIndex;
         set
         {
-            if (focussedItemIndex != value)
+            if (_focusedItemIndex != value)
             {
-                focussedItemIndex = value;
-                if (FocusedItemIndexChanged != null)
-                    FocusedItemIndexChanged (this, EventArgs.Empty);
+                _focusedItemIndex = value;
+                FocusedItemIndexChanged?.Invoke (this, EventArgs.Empty);
             }
         }
     }
 
-    public AutocompleteItem FocussedItem
+    /// <summary>
+    ///
+    /// </summary>
+    public AutocompleteItem? FocusedItem
     {
-        get
-        {
-            if (FocussedItemIndex >= 0 && focussedItemIndex < visibleItems.Count)
-                return visibleItems[focussedItemIndex];
-            return null;
-        }
-        set { FocussedItemIndex = visibleItems.IndexOf (value); }
+        get => FocusedItemIndex >= 0 && _focusedItemIndex < visibleItems.Count
+                ? visibleItems[_focusedItemIndex]
+                : null;
+        set => FocusedItemIndex = visibleItems.IndexOf (value!);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    public int Count => visibleItems.Count;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     internal AutocompleteListView
         (
-            SyntaxTextBox tb
+            SyntaxTextBox textBox
         )
     {
-        SetStyle (ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint,
-            true);
+        Sure.NotNull (textBox);
+
+        SetStyle
+            (
+                ControlStyles.AllPaintingInWmPaint
+                | ControlStyles.OptimizedDoubleBuffer
+                | ControlStyles.UserPaint,
+                true
+            );
         base.Font = new Font (FontFamily.GenericSansSerif, 9);
         visibleItems = new List<AutocompleteItem>();
         VerticalScroll.SmallChange = ItemHeight;
         MaximumSize = new Size (Size.Width, 180);
-        toolTip.ShowAlways = false;
+        if (toolTip != null)
+        {
+            toolTip.ShowAlways = false;
+            toolTip.Popup += toolTip_Popup;
+        }
+
         AppearInterval = 500;
-        timer.Tick += new EventHandler (timer_Tick);
+        _timer.Tick += timer_Tick;
         SelectedColor = Color.Orange;
         HoveredColor = Color.Red;
         ToolTipDuration = 3000;
-        toolTip.Popup += ToolTip_Popup;
 
-        this.tb = tb;
+        _textBox = textBox;
 
-        tb.KeyDown += new KeyEventHandler (tb_KeyDown);
-        tb.SelectionChanged += new EventHandler (tb_SelectionChanged);
-        tb.KeyPressed += new KeyPressEventHandler (tb_KeyPressed);
+        textBox.KeyDown += tb_KeyDown;
+        textBox.SelectionChanged += textBox_SelectionChanged;
+        textBox.KeyPressed += textBox_KeyPressed;
 
-        var form = tb.FindForm();
+        var form = textBox.FindForm();
         if (form != null)
         {
-            form.LocationChanged += delegate { SafetyClose(); };
-            form.ResizeBegin += delegate { SafetyClose(); };
-            form.FormClosing += delegate { SafetyClose(); };
-            form.LostFocus += delegate { SafetyClose(); };
+            form.LocationChanged += delegate { SafeClose(); };
+            form.ResizeBegin += delegate { SafeClose(); };
+            form.FormClosing += delegate { SafeClose(); };
+            form.LostFocus += delegate { SafeClose(); };
         }
 
-        tb.LostFocus += (o, e) =>
+        textBox.LostFocus += (_, _) =>
         {
-            if (Menu != null && !Menu.IsDisposed)
-                if (!Menu.Focused)
-                    SafetyClose();
+            if (Menu is { IsDisposed: false, Focused: false })
+            {
+                SafeClose();
+            }
         };
 
-        tb.Scroll += delegate { SafetyClose(); };
+        textBox.Scroll += (_, _) => SafeClose();
 
-        this.VisibleChanged += (o, e) =>
+        this.VisibleChanged += (_, _) =>
         {
-            if (this.Visible)
+            if (Visible)
+            {
                 DoSelectedVisible();
+            }
         };
     }
 
-    private void ToolTip_Popup (object sender, PopupEventArgs e)
+    #endregion
+
+    #region Private members
+
+    private readonly SyntaxTextBox _textBox;
+
+    internal List<AutocompleteItem> visibleItems;
+
+    private IEnumerable<AutocompleteItem> _sourceItems = new List<AutocompleteItem>();
+
+    private int _focusedItemIndex;
+
+    private int _hoveredItemIndex = -1;
+
+    private int _oldItemCount;
+
+    private int ItemHeight => Font.Height + 2;
+
+    AutocompleteMenu? Menu => Parent as AutocompleteMenu;
+
+    internal ToolTip? toolTip = new ();
+
+    private readonly Timer _timer = new ();
+
+    internal bool AllowTabKey { get; set; }
+
+    internal int ToolTipDuration { get; set; }
+
+    internal Size MaxToolTipSize { get; set; }
+
+    internal int AppearInterval
     {
-        if (MaxToolTipSize.Height > 0 && MaxToolTipSize.Width > 0)
-            e.ToolTipSize = MaxToolTipSize;
+        get => _timer.Interval;
+        set => _timer.Interval = value;
     }
 
-    protected override void Dispose (bool disposing)
+    internal bool AlwaysShowTooltip
     {
-        if (toolTip != null)
-        {
-            toolTip.Popup -= ToolTip_Popup;
-            toolTip.Dispose();
-        }
-
-        if (tb != null)
-        {
-            tb.KeyDown -= tb_KeyDown;
-            tb.KeyPressed -= tb_KeyPressed;
-            tb.SelectionChanged -= tb_SelectionChanged;
-        }
-
-        if (timer != null)
-        {
-            timer.Stop();
-            timer.Tick -= timer_Tick;
-            timer.Dispose();
-        }
-
-        base.Dispose (disposing);
+        get => toolTip!.ShowAlways;
+        set => toolTip!.ShowAlways = value;
     }
 
-    void SafetyClose()
+    private void AdjustScroll()
     {
-        if (Menu != null && !Menu.IsDisposed)
-            Menu.Close();
-    }
-
-    void tb_KeyPressed (object sender, KeyPressEventArgs e)
-    {
-        var backspaceORdel = e.KeyChar == '\b' || e.KeyChar == 0xff;
-
-        /*
-        if (backspaceORdel)
-            prevSelection = tb.Selection.Start;*/
-
-        if (Menu.Visible && !backspaceORdel)
-            DoAutocomplete (false);
-        else
-            ResetTimer (timer);
-    }
-
-    void timer_Tick (object sender, EventArgs e)
-    {
-        timer.Stop();
-        DoAutocomplete (false);
-    }
-
-    void ResetTimer (System.Windows.Forms.Timer timer)
-    {
-        timer.Stop();
-        timer.Start();
-    }
-
-    internal void DoAutocomplete()
-    {
-        DoAutocomplete (false);
-    }
-
-    internal void DoAutocomplete (bool forced)
-    {
-        if (!Menu.Enabled)
-        {
-            Menu.Close();
-            return;
-        }
-
-        visibleItems.Clear();
-        FocussedItemIndex = 0;
-        VerticalScroll.Value = 0;
-
-        //some magic for update scrolls
-        AutoScrollMinSize -= new Size (1, 0);
-        AutoScrollMinSize += new Size (1, 0);
-
-        //get fragment around caret
-        var fragment = tb.Selection.GetFragment (Menu.SearchPattern);
-        var text = fragment.Text;
-
-        //calc screen point for popup menu
-        var point = tb.PlaceToPoint (fragment.End);
-        point.Offset (2, tb.CharHeight);
-
-        //
-        if (forced || (text.Length >= Menu.MinFragmentLength
-                       && tb.Selection.IsEmpty /*pops up only if selected range is empty*/
-                       && (tb.Selection.Start > fragment.Start ||
-                           text.Length == 0 /*pops up only if caret is after first letter*/)))
-        {
-            Menu.Fragment = fragment;
-            var foundSelected = false;
-
-            //build popup menu
-            foreach (var item in sourceItems)
-            {
-                item.Parent = Menu;
-                var res = item.Compare (text);
-                if (res != CompareResult.Hidden)
-                    visibleItems.Add (item);
-                if (res == CompareResult.VisibleAndSelected && !foundSelected)
-                {
-                    foundSelected = true;
-                    FocussedItemIndex = visibleItems.Count - 1;
-                }
-            }
-
-            if (foundSelected)
-            {
-                AdjustScroll();
-                DoSelectedVisible();
-            }
-        }
-
-        //show popup menu
-        if (Count > 0)
-        {
-            if (!Menu.Visible)
-            {
-                var args = new CancelEventArgs();
-                Menu.OnOpening (args);
-                if (!args.Cancel)
-                    Menu.Show (tb, point);
-            }
-
-            DoSelectedVisible();
-            Invalidate();
-        }
-        else
-            Menu.Close();
-    }
-
-    void tb_SelectionChanged (object sender, EventArgs e)
-    {
-        /*
-        FastColoredTextBox tb = sender as FastColoredTextBox;
-
-        if (Math.Abs(prevSelection.iChar - tb.Selection.Start.iChar) > 1 ||
-                    prevSelection.iLine != tb.Selection.Start.iLine)
-            Menu.Close();
-        prevSelection = tb.Selection.Start;*/
-        if (Menu.Visible)
-        {
-            var needClose = false;
-
-            if (!tb.Selection.IsEmpty)
-                needClose = true;
-            else if (!Menu.Fragment.Contains (tb.Selection.Start))
-            {
-                if (tb.Selection.Start.Line == Menu.Fragment.End.Line &&
-                    tb.Selection.Start.Column == Menu.Fragment.End.Column + 1)
-                {
-                    //user press key at end of fragment
-                    var c = tb.Selection.CharBeforeStart;
-                    if (!Regex.IsMatch (c.ToString(), Menu.SearchPattern)) //check char
-                        needClose = true;
-                }
-                else
-                    needClose = true;
-            }
-
-            if (needClose)
-                Menu.Close();
-        }
-    }
-
-    void tb_KeyDown (object sender, KeyEventArgs e)
-    {
-        var tb = sender as SyntaxTextBox;
-
-        if (Menu.Visible)
-            if (ProcessKey (e.KeyCode, e.Modifiers))
-                e.Handled = true;
-
-        if (!Menu.Visible)
-        {
-            if (tb.HotkeyMapping.ContainsKey (e.KeyData) &&
-                tb.HotkeyMapping[e.KeyData] == ActionCode.AutocompleteMenu)
-            {
-                DoAutocomplete();
-                e.Handled = true;
-            }
-            else
-            {
-                if (e.KeyCode == Keys.Escape && timer.Enabled)
-                    timer.Stop();
-            }
-        }
-    }
-
-    void AdjustScroll()
-    {
-        if (oldItemCount == visibleItems.Count)
+        if (_oldItemCount == visibleItems.Count)
             return;
 
         var needHeight = ItemHeight * visibleItems.Count + 1;
         Height = Math.Min (needHeight, MaximumSize.Height);
-        Menu.CalcSize();
+        Menu?.CalcSize();
 
         AutoScrollMinSize = new Size (0, needHeight);
-        oldItemCount = visibleItems.Count;
+        _oldItemCount = visibleItems.Count;
     }
 
-    protected override void OnPaint (PaintEventArgs e)
-    {
-        AdjustScroll();
-
-        var itemHeight = ItemHeight;
-        var startI = VerticalScroll.Value / itemHeight - 1;
-        var finishI = (VerticalScroll.Value + ClientSize.Height) / itemHeight + 1;
-        startI = Math.Max (startI, 0);
-        finishI = Math.Min (finishI, visibleItems.Count);
-        var y = 0;
-        var leftPadding = 18;
-        for (var i = startI; i < finishI; i++)
-        {
-            y = i * itemHeight - VerticalScroll.Value;
-
-            var item = visibleItems[i];
-
-            if (item.BackColor != Color.Transparent)
-                using (var brush = new SolidBrush (item.BackColor))
-                    e.Graphics.FillRectangle (brush, 1, y, ClientSize.Width - 1 - 1, itemHeight - 1);
-
-            if (ImageList != null && visibleItems[i].ImageIndex >= 0)
-                e.Graphics.DrawImage (ImageList.Images[item.ImageIndex], 1, y);
-
-            if (i == FocussedItemIndex)
-                using (var selectedBrush = new LinearGradientBrush (new Point (0, y - 3), new Point (0, y + itemHeight),
-                           Color.Transparent, SelectedColor))
-                using (var pen = new Pen (SelectedColor))
-                {
-                    e.Graphics.FillRectangle (selectedBrush, leftPadding, y, ClientSize.Width - 1 - leftPadding,
-                        itemHeight - 1);
-                    e.Graphics.DrawRectangle (pen, leftPadding, y, ClientSize.Width - 1 - leftPadding, itemHeight - 1);
-                }
-
-            if (i == hoveredItemIndex)
-                using (var pen = new Pen (HoveredColor))
-                    e.Graphics.DrawRectangle (pen, leftPadding, y, ClientSize.Width - 1 - leftPadding, itemHeight - 1);
-
-            using (var brush = new SolidBrush (item.ForeColor != Color.Transparent ? item.ForeColor : ForeColor))
-                e.Graphics.DrawString (item.ToString(), Font, brush, leftPadding, y);
-        }
-    }
-
-    protected override void OnScroll (ScrollEventArgs se)
+    /// <inheritdoc cref="ScrollableControl.OnScroll"/>
+    protected override void OnScroll
+        (
+            ScrollEventArgs se
+        )
     {
         base.OnScroll (se);
         Invalidate();
     }
 
-    protected override void OnMouseClick (MouseEventArgs e)
+    /// <inheritdoc cref="Control.OnMouseClick"/>
+    protected override void OnMouseClick
+        (
+            MouseEventArgs e
+        )
     {
         base.OnMouseClick (e);
 
-        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        if (e.Button == MouseButtons.Left)
         {
-            FocussedItemIndex = PointToItemIndex (e.Location);
+            FocusedItemIndex = PointToItemIndex (e.Location);
             DoSelectedVisible();
             Invalidate();
         }
     }
 
+    /// <inheritdoc cref="Control.OnMouseDoubleClick"/>
     protected override void OnMouseDoubleClick (MouseEventArgs e)
     {
         base.OnMouseDoubleClick (e);
-        FocussedItemIndex = PointToItemIndex (e.Location);
+        FocusedItemIndex = PointToItemIndex (e.Location);
         Invalidate();
         OnSelecting();
     }
 
     internal virtual void OnSelecting()
     {
-        if (FocussedItemIndex < 0 || FocussedItemIndex >= visibleItems.Count)
+        if (FocusedItemIndex < 0 || FocusedItemIndex >= visibleItems.Count)
+        {
             return;
-        tb.TextSource.Manager.BeginAutoUndoCommands();
+        }
+
+        _textBox.TextSource.Manager.BeginAutoUndoCommands();
         try
         {
-            var item = FocussedItem;
+            var item = FocusedItem;
             var args = new SelectingEventArgs()
             {
-                Item = item,
-                SelectedIndex = FocussedItemIndex
+                Item = item!,
+                SelectedIndex = FocusedItemIndex
             };
 
-            Menu.OnSelecting (args);
+            Menu?.OnSelecting (args);
 
             if (args.Cancel)
             {
-                FocussedItemIndex = args.SelectedIndex;
+                FocusedItemIndex = args.SelectedIndex;
                 Invalidate();
                 return;
             }
 
             if (!args.Handled)
             {
-                var fragment = Menu.Fragment;
-                DoAutocomplete (item, fragment);
+                var fragment = Menu?.Fragment;
+                if (fragment != null)
+                {
+                    DoAutocomplete (item!, fragment);
+                }
             }
 
-            Menu.Close();
+            Menu?.Close();
 
             //
-            var args2 = new SelectedEventArgs()
+            if (Menu != null)
             {
-                Item = item,
-                Tb = Menu.Fragment._textBox
-            };
-            item.OnSelected (Menu, args2);
-            Menu.OnSelected (args2);
+                var args2 = new SelectedEventArgs()
+                {
+                    Item = item!,
+                    Tb = Menu.Fragment._textBox
+                };
+                item?.OnSelected (Menu, args2);
+                Menu.OnSelected (args2);
+            }
         }
         finally
         {
-            tb.TextSource.Manager.EndAutoUndoCommands();
+            _textBox.TextSource.Manager.EndAutoUndoCommands();
         }
     }
 
@@ -508,12 +345,56 @@ public class AutocompleteListView
         tb.Focus();
     }
 
-    int PointToItemIndex (Point p)
+    private void SetToolTip
+        (
+            AutocompleteItem autocompleteItem
+        )
+    {
+        var title = autocompleteItem.ToolTipTitle;
+        var text = autocompleteItem.ToolTipText;
+
+        if (string.IsNullOrEmpty (title))
+        {
+            toolTip!.ToolTipTitle = null;
+            toolTip.SetToolTip (this, null);
+            return;
+        }
+
+        if (Parent != null)
+        {
+            IWin32Window window = Parent ?? this;
+            var location = (PointToScreen (Location).X + MaxToolTipSize.Width + 105) <
+                           Screen.FromControl (Parent!).WorkingArea.Right
+                ? new Point (Right + 5, 0)
+                : new Point (Left - 105 - MaximumSize.Width, 0);
+
+            if (string.IsNullOrEmpty (text))
+            {
+                toolTip!.ToolTipTitle = null;
+                toolTip.Show (title, window, location.X, location.Y, ToolTipDuration);
+            }
+            else
+            {
+                toolTip!.ToolTipTitle = title;
+                toolTip.Show (text, window, location.X, location.Y, ToolTipDuration);
+            }
+        }
+    }
+
+    private int PointToItemIndex
+        (
+            Point p
+        )
     {
         return (p.Y + VerticalScroll.Value) / ItemHeight;
     }
 
-    protected override bool ProcessCmdKey (ref Message msg, Keys keyData)
+    /// <inheritdoc cref="ContainerControl.ProcessCmdKey"/>
+    protected override bool ProcessCmdKey
+        (
+            ref Message msg,
+            Keys keyData
+        )
     {
         ProcessKey (keyData, Keys.None);
 
@@ -552,12 +433,15 @@ public class AutocompleteListView
 
                 case Keys.Tab:
                     if (!AllowTabKey)
+                    {
                         break;
+                    }
+
                     OnSelecting();
                     return true;
 
                 case Keys.Escape:
-                    Menu.Close();
+                    Menu?.Close();
                     return true;
             }
         }
@@ -565,83 +449,371 @@ public class AutocompleteListView
         return false;
     }
 
-    public void SelectNext (int shift)
-    {
-        FocussedItemIndex = Math.Max (0, Math.Min (FocussedItemIndex + shift, visibleItems.Count - 1));
-        DoSelectedVisible();
-
-        //
-        Invalidate();
-    }
-
     private void DoSelectedVisible()
     {
-        if (FocussedItem != null)
-            SetToolTip (FocussedItem);
+        if (FocusedItem != null)
+            SetToolTip (FocusedItem);
 
-        var y = FocussedItemIndex * ItemHeight - VerticalScroll.Value;
+        var y = FocusedItemIndex * ItemHeight - VerticalScroll.Value;
         if (y < 0)
-            VerticalScroll.Value = FocussedItemIndex * ItemHeight;
+        {
+            VerticalScroll.Value = FocusedItemIndex * ItemHeight;
+        }
+
         if (y > ClientSize.Height - ItemHeight)
-            VerticalScroll.Value = Math.Min (VerticalScroll.Maximum,
-                FocussedItemIndex * ItemHeight - ClientSize.Height + ItemHeight);
+        {
+            VerticalScroll.Value = Math.Min
+                (
+                    VerticalScroll.Maximum,
+                    FocusedItemIndex * ItemHeight - ClientSize.Height + ItemHeight
+                );
+        }
 
         //some magic for update scrolls
         AutoScrollMinSize -= new Size (1, 0);
         AutoScrollMinSize += new Size (1, 0);
     }
 
-    private void SetToolTip (AutocompleteItem autocompleteItem)
+    /// <inheritdoc cref="Control.OnPaint"/>
+    protected override void OnPaint
+        (
+            PaintEventArgs e
+        )
     {
-        var title = autocompleteItem.ToolTipTitle;
-        var text = autocompleteItem.ToolTipText;
+        AdjustScroll();
 
-        if (string.IsNullOrEmpty (title))
+        var itemHeight = ItemHeight;
+        var startI = VerticalScroll.Value / itemHeight - 1;
+        var finishI = (VerticalScroll.Value + ClientSize.Height) / itemHeight + 1;
+        startI = Math.Max (startI, 0);
+        finishI = Math.Min (finishI, visibleItems.Count);
+        var leftPadding = 18;
+        for (var i = startI; i < finishI; i++)
         {
-            toolTip.ToolTipTitle = null;
-            toolTip.SetToolTip (this, null);
+            var y = i * itemHeight - VerticalScroll.Value;
+
+            var item = visibleItems[i];
+
+            if (item.BackColor != Color.Transparent)
+            {
+                using var brush = new SolidBrush (item.BackColor);
+                e.Graphics.FillRectangle (brush, 1, y, ClientSize.Width - 1 - 1, itemHeight - 1);
+            }
+
+            if (ImageList != null && visibleItems[i].ImageIndex >= 0)
+            {
+                e.Graphics.DrawImage (ImageList.Images[item.ImageIndex], 1, y);
+            }
+
+            if (i == FocusedItemIndex)
+            {
+                using var selectedBrush = new LinearGradientBrush (new Point (0, y - 3), new Point (0, y + itemHeight),
+                    Color.Transparent, SelectedColor);
+                using var pen = new Pen (SelectedColor);
+                e.Graphics.FillRectangle (selectedBrush, leftPadding, y, ClientSize.Width - 1 - leftPadding,
+                    itemHeight - 1);
+                e.Graphics.DrawRectangle (pen, leftPadding, y, ClientSize.Width - 1 - leftPadding, itemHeight - 1);
+            }
+
+            if (i == _hoveredItemIndex)
+            {
+                using var pen = new Pen (HoveredColor);
+                e.Graphics.DrawRectangle (pen, leftPadding, y, ClientSize.Width - 1 - leftPadding, itemHeight - 1);
+            }
+
+            using (var brush = new SolidBrush (item.ForeColor != Color.Transparent ? item.ForeColor : ForeColor))
+            {
+                e.Graphics.DrawString (item.ToString(), Font, brush, leftPadding, y);
+            }
+        }
+    }
+
+    private void tb_KeyDown
+        (
+            object? sender,
+            KeyEventArgs e
+        )
+    {
+        var textBox =(SyntaxTextBox) sender!;
+
+        if (Menu!.Visible)
+        {
+            if (ProcessKey (e.KeyCode, e.Modifiers))
+            {
+                e.Handled = true;
+            }
+        }
+
+        if (!Menu.Visible)
+        {
+            if (textBox.HotkeyMapping.ContainsKey (e.KeyData) &&
+                textBox.HotkeyMapping[e.KeyData] == ActionCode.AutocompleteMenu)
+            {
+                DoAutocomplete();
+                e.Handled = true;
+            }
+            else
+            {
+                if (e.KeyCode == Keys.Escape && _timer.Enabled)
+                {
+                    _timer.Stop();
+                }
+            }
+        }
+    }
+
+    private void toolTip_Popup
+        (
+            object? sender,
+            PopupEventArgs e
+        )
+    {
+        if (MaxToolTipSize.Height > 0 && MaxToolTipSize.Width > 0)
+        {
+            e.ToolTipSize = MaxToolTipSize;
+        }
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="disposing"></param>
+    protected override void Dispose
+        (
+            bool disposing
+        )
+    {
+        if (toolTip != null)
+        {
+            toolTip.Popup -= toolTip_Popup;
+            toolTip.Dispose();
+        }
+
+        if (_textBox != null)
+        {
+            _textBox.KeyDown -= tb_KeyDown;
+            _textBox.KeyPressed -= textBox_KeyPressed;
+            _textBox.SelectionChanged -= textBox_SelectionChanged;
+        }
+
+        if (_timer != null)
+        {
+            _timer.Stop();
+            _timer.Tick -= timer_Tick;
+            _timer.Dispose();
+        }
+
+        base.Dispose (disposing);
+    }
+
+    private void SafeClose()
+    {
+        if (Menu is { IsDisposed: false })
+        {
+            Menu.Close();
+        }
+    }
+
+    private void textBox_KeyPressed
+        (
+            object? sender,
+            KeyPressEventArgs e
+        )
+    {
+        var backspaceORdel = e.KeyChar == '\b' || e.KeyChar == 0xff;
+
+        if (Menu is { Visible: true } && !backspaceORdel)
+        {
+            DoAutocomplete();
+        }
+        else
+        {
+            ResetTimer (_timer);
+        }
+    }
+
+    private void timer_Tick
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        _timer.Stop();
+        DoAutocomplete();
+    }
+
+    private void ResetTimer
+        (
+            Timer timer
+        )
+    {
+        timer.Stop();
+        timer.Start();
+    }
+
+    internal void DoAutocomplete
+        (
+            bool forced = false
+        )
+    {
+        if (Menu is { Enabled: false })
+        {
+            Menu.Close();
             return;
         }
 
-        if (this.Parent != null)
+        visibleItems.Clear();
+        FocusedItemIndex = 0;
+        VerticalScroll.Value = 0;
+
+        //some magic for update scrolls
+        AutoScrollMinSize -= new Size (1, 0);
+        AutoScrollMinSize += new Size (1, 0);
+
+        //get fragment around caret
+        var fragment = _textBox.Selection.GetFragment (Menu!.SearchPattern);
+        var text = fragment.Text;
+
+        //calc screen point for popup menu
+        var point = _textBox.PlaceToPoint (fragment.End);
+        point.Offset (2, _textBox.CharHeight);
+
+        //
+        if (forced || (text.Length >= Menu.MinFragmentLength
+                       && _textBox.Selection.IsEmpty /*pops up only if selected range is empty*/
+                       && (_textBox.Selection.Start > fragment.Start ||
+                           text.Length == 0 /*pops up only if caret is after first letter*/)))
         {
-            IWin32Window window = this.Parent ?? this;
-            Point location;
+            Menu.Fragment = fragment;
+            var foundSelected = false;
 
-            if ((this.PointToScreen (this.Location).X + MaxToolTipSize.Width + 105) <
-                Screen.FromControl (this.Parent).WorkingArea.Right)
-                location = new Point (Right + 5, 0);
-            else
-                location = new Point (Left - 105 - MaximumSize.Width, 0);
-
-            if (string.IsNullOrEmpty (text))
+            //build popup menu
+            foreach (var item in _sourceItems)
             {
-                toolTip.ToolTipTitle = null;
-                toolTip.Show (title, window, location.X, location.Y, ToolTipDuration);
+                item.Parent = Menu;
+                var res = item.Compare (text);
+                if (res != CompareResult.Hidden)
+                    visibleItems.Add (item);
+                if (res == CompareResult.VisibleAndSelected && !foundSelected)
+                {
+                    foundSelected = true;
+                    FocusedItemIndex = visibleItems.Count - 1;
+                }
             }
-            else
+
+            if (foundSelected)
             {
-                toolTip.ToolTipTitle = title;
-                toolTip.Show (text, window, location.X, location.Y, ToolTipDuration);
+                AdjustScroll();
+                DoSelectedVisible();
+            }
+        }
+
+        //show popup menu
+        if (Count > 0)
+        {
+            if (!Menu.Visible)
+            {
+                var args = new CancelEventArgs();
+                Menu.OnOpening (args);
+                if (!args.Cancel)
+                    Menu.Show (_textBox, point);
+            }
+
+            DoSelectedVisible();
+            Invalidate();
+        }
+        else
+        {
+            Menu.Close();
+        }
+    }
+
+    private void textBox_SelectionChanged
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        if (Menu is { Visible: true })
+        {
+            var needClose = false;
+
+            if (!_textBox.Selection.IsEmpty)
+            {
+                needClose = true;
+            }
+            else if (!Menu.Fragment.Contains (_textBox.Selection.Start))
+            {
+                if (_textBox.Selection.Start.Line == Menu.Fragment.End.Line &&
+                    _textBox.Selection.Start.Column == Menu.Fragment.End.Column + 1)
+                {
+                    //user press key at end of fragment
+                    var c = _textBox.Selection.CharBeforeStart;
+                    if (!Regex.IsMatch (c.ToString(), Menu.SearchPattern)) //check char
+                    {
+                        needClose = true;
+                    }
+                }
+                else
+                {
+                    needClose = true;
+                }
+            }
+
+            if (needClose)
+            {
+                Menu.Close();
             }
         }
     }
 
-    public int Count
-    {
-        get { return visibleItems.Count; }
-    }
+    #endregion
 
-    public void SetAutocompleteItems (ICollection<string> items)
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void SetAutocompleteItems
+        (
+            ICollection<string> items
+        )
     {
         var list = new List<AutocompleteItem> (items.Count);
         foreach (var item in items)
+        {
             list.Add (new AutocompleteItem (item));
+        }
+
         SetAutocompleteItems (list);
     }
 
-    public void SetAutocompleteItems (IEnumerable<AutocompleteItem> items)
+    /// <summary>
+    ///
+    /// </summary>
+    public void SetAutocompleteItems
+        (
+            IEnumerable<AutocompleteItem> items
+        )
     {
-        sourceItems = items;
+        _sourceItems = items;
     }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void SelectNext
+        (
+            int shift
+        )
+    {
+        FocusedItemIndex = Math.Max (0, Math.Min (FocusedItemIndex + shift, visibleItems.Count - 1));
+        DoSelectedVisible();
+
+        //
+        Invalidate();
+    }
+
+    #endregion
+
 }

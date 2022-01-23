@@ -27,8 +27,7 @@ namespace Fctb;
 /// </summary>
 [Browsable (false)]
 public class AutocompleteMenu
-    : ToolStripDropDown,
-    IDisposable
+    : ToolStripDropDown
 {
     AutocompleteListView _listView;
     public ToolStripControlHost host;
@@ -82,8 +81,8 @@ public class AutocompleteMenu
     /// </summary>
     public Size MaxTooltipSize
     {
-        get { return _listView.MaxToolTipSize; }
-        set { _listView.MaxToolTipSize = value; }
+        get => _listView.MaxToolTipSize;
+        set => _listView.MaxToolTipSize = value;
     }
 
     /// <summary>
@@ -91,8 +90,8 @@ public class AutocompleteMenu
     /// </summary>
     public bool AlwaysShowTooltip
     {
-        get { return _listView.AlwaysShowTooltip; }
-        set { _listView.AlwaysShowTooltip = value; }
+        get => _listView.AlwaysShowTooltip;
+        set => _listView.AlwaysShowTooltip = value;
     }
 
     /// <summary>
