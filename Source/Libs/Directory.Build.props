@@ -45,4 +45,9 @@
         <None Include="..\..\Common\arsmagna-icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
+    <!-- Enable Microsoft SourceLink -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+    </ItemGroup>
+
 </Project>
