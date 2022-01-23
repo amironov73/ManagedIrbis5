@@ -73,7 +73,7 @@ public class TextSource
 
     #endregion
 
-    readonly protected List<Line> lines = new();
+    readonly protected List<Line?> lines = new();
 
     protected LinesAccessor linesAccessor;
 

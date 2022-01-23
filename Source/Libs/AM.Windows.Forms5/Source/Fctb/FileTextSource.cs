@@ -29,43 +29,55 @@ namespace Fctb;
 public class FileTextSource
     : TextSource
 {
-    List<int> sourceFileLinePositions = new List<int>();
-    FileStream fs;
-    Encoding fileEncoding;
-    System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+    #region Events
 
     /// <summary>
     /// Occurs when need to display line in the textbox
     /// </summary>
-    public event EventHandler<LineNeededEventArgs> LineNeeded;
+    public event EventHandler<LineNeededEventArgs>? LineNeeded;
 
     /// <summary>
     /// Occurs when need to save line in the file
     /// </summary>
-    public event EventHandler<LinePushedEventArgs> LinePushed;
+    public event EventHandler<LinePushedEventArgs>? LinePushed;
 
-    public FileTextSource (SyntaxTextBox currentTextBox)
+    #endregion
+
+    #region Propeties
+
+
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public FileTextSource
+        (
+            SyntaxTextBox currentTextBox
+        )
         : base (currentTextBox)
     {
-        timer.Interval = 10000;
-        timer.Tick += new EventHandler (timer_Tick);
-        timer.Enabled = true;
+        _timer.Interval = 10000;
+        _timer.Tick += timer_Tick;
+        _timer.Enabled = true;
 
         SaveEOL = Environment.NewLine;
     }
 
-    void timer_Tick (object sender, EventArgs e)
-    {
-        timer.Enabled = false;
-        try
-        {
-            UnloadUnusedLines();
-        }
-        finally
-        {
-            timer.Enabled = true;
-        }
-    }
+    #endregion
+
+    #region Private members
+
+    private List<int> _sourceFileLinePositions = new ();
+
+    private FileStream _stream;
+
+    private Encoding _encoding;
+
+    private readonly System.Windows.Forms.Timer _timer = new ();
 
     private void UnloadUnusedLines()
     {
@@ -75,39 +87,66 @@ public class FileTextSource
 
         var count = 0;
         for (var i = 0; i < Count; i++)
+        {
             if (base.lines[i] != null && !base.lines[i].IsChanged && Math.Abs (i - iFinishVisibleLine) > margin)
             {
-                base.lines[i] = null;
+                lines[i] = null;
                 count++;
             }
-#if debug
-            Console.WriteLine("UnloadUnusedLines: " + count);
-#endif
+        }
     }
 
-    public void OpenFile (string fileName, Encoding enc)
+    void timer_Tick
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        _timer.Enabled = false;
+        try
+        {
+            UnloadUnusedLines();
+        }
+        finally
+        {
+            _timer.Enabled = true;
+        }
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Открытие файла.
+    /// </summary>
+    public void OpenFile
+        (
+            string fileName,
+            Encoding encoding
+        )
     {
         Clear();
 
-        if (fs != null)
-            fs.Dispose();
+        if (_stream != null)
+            _stream.Dispose();
 
         SaveEOL = Environment.NewLine;
 
         //read lines of file
-        fs = new FileStream (fileName, FileMode.Open);
-        var length = fs.Length;
+        _stream = new FileStream (fileName, FileMode.Open);
+        var length = _stream.Length;
 
         //read signature
-        enc = DefineEncoding (enc, fs);
-        var shift = DefineShift (enc);
+        encoding = DefineEncoding (encoding, _stream);
+        var shift = DefineShift (encoding);
 
         //first line
-        sourceFileLinePositions.Add ((int)fs.Position);
+        _sourceFileLinePositions.Add ((int)_stream.Position);
         base.lines.Add (null);
 
         //other lines
-        sourceFileLinePositions.Capacity = (int)(length / 7 + 1000);
+        _sourceFileLinePositions.Capacity = (int)(length / 7 + 1000);
 
         //int prev = 0;
         //while(fs.Position < length)
@@ -137,20 +176,20 @@ public class FileTextSource
 
         var prev = 0;
         var prevPos = 0;
-        var br = new BinaryReader (fs, enc);
-        while (fs.Position < length)
+        var br = new BinaryReader (_stream, encoding);
+        while (_stream.Position < length)
         {
-            prevPos = (int)fs.Position;
+            prevPos = (int)_stream.Position;
             var b = br.ReadChar();
 
             if (b == 10) // \n
             {
-                sourceFileLinePositions.Add ((int)fs.Position);
+                _sourceFileLinePositions.Add ((int)_stream.Position);
                 base.lines.Add (null);
             }
             else if (prev == 13) // \r (Mac format)
             {
-                sourceFileLinePositions.Add ((int)prevPos);
+                _sourceFileLinePositions.Add ((int)prevPos);
                 base.lines.Add (null);
                 SaveEOL = "\r";
             }
@@ -160,7 +199,7 @@ public class FileTextSource
 
         if (prev == 13)
         {
-            sourceFileLinePositions.Add ((int)prevPos);
+            _sourceFileLinePositions.Add ((int)prevPos);
             base.lines.Add (null);
         }
 
@@ -177,12 +216,12 @@ public class FileTextSource
 
         var temp2 = new int[100];
         c = base.lines.Count;
-        sourceFileLinePositions.AddRange (temp2);
-        sourceFileLinePositions.TrimExcess();
-        sourceFileLinePositions.RemoveRange (c, temp.Length);
+        _sourceFileLinePositions.AddRange (temp2);
+        _sourceFileLinePositions.TrimExcess();
+        _sourceFileLinePositions.RemoveRange (c, temp.Length);
 
 
-        fileEncoding = enc;
+        _encoding = encoding;
 
         OnLineInserted (0, Count);
 
@@ -196,6 +235,8 @@ public class FileTextSource
         if (CurrentTextBox.WordWrap)
             OnRecalcWordWrap (new TextChangedEventArgs (0, linesCount - 1));
     }
+
+    #endregion
 
     private int DefineShift (Encoding enc)
     {
@@ -264,17 +305,17 @@ public class FileTextSource
 
     public void CloseFile()
     {
-        if (fs != null)
+        if (_stream != null)
             try
             {
-                fs.Dispose();
+                _stream.Dispose();
             }
             catch
             {
                 ;
             }
 
-        fs = null;
+        _stream = null;
     }
 
     /// <summary>
@@ -291,7 +332,7 @@ public class FileTextSource
         var dir = Path.GetDirectoryName (fileName);
         var tempFileName = Path.Combine (dir, Path.GetFileNameWithoutExtension (fileName) + ".tmp");
 
-        var sr = new StreamReader (fs, fileEncoding);
+        var sr = new StreamReader (_stream, _encoding);
         using (var tempFs = new FileStream (tempFileName, FileMode.Create))
         using (var sw = new StreamWriter (tempFs, encoding))
         {
@@ -337,7 +378,7 @@ public class FileTextSource
 
         //deattach from source file
         sr.Dispose();
-        fs.Dispose();
+        _stream.Dispose();
 
         //delete target file
         if (File.Exists (fileName))
@@ -347,18 +388,18 @@ public class FileTextSource
         File.Move (tempFileName, fileName);
 
         //binding to new file
-        sourceFileLinePositions = newLinePos;
-        fs = new FileStream (fileName, FileMode.Open);
-        this.fileEncoding = encoding;
+        _sourceFileLinePositions = newLinePos;
+        _stream = new FileStream (fileName, FileMode.Open);
+        this._encoding = encoding;
     }
 
     private string ReadLine (StreamReader sr, int i)
     {
         string line;
-        var filePos = sourceFileLinePositions[i];
+        var filePos = _sourceFileLinePositions[i];
         if (filePos < 0)
             return "";
-        fs.Seek (filePos, SeekOrigin.Begin);
+        _stream.Seek (filePos, SeekOrigin.Begin);
         sr.DiscardBufferedData();
         line = sr.ReadLine();
         return line;
@@ -388,8 +429,8 @@ public class FileTextSource
     private void LoadLineFromSourceFile (int i)
     {
         var line = CreateLine();
-        fs.Seek (sourceFileLinePositions[i], SeekOrigin.Begin);
-        var sr = new StreamReader (fs, fileEncoding);
+        _stream.Seek (_sourceFileLinePositions[i], SeekOrigin.Begin);
+        var sr = new StreamReader (_stream, _encoding);
 
         var s = sr.ReadLine();
         if (s == null)
@@ -415,13 +456,13 @@ public class FileTextSource
 
     public override void InsertLine (int index, Line line)
     {
-        sourceFileLinePositions.Insert (index, -1);
+        _sourceFileLinePositions.Insert (index, -1);
         base.InsertLine (index, line);
     }
 
     public override void RemoveLine (int index, int count)
     {
-        sourceFileLinePositions.RemoveRange (index, count);
+        _sourceFileLinePositions.RemoveRange (index, count);
         base.RemoveLine (index, count);
     }
 
@@ -438,14 +479,22 @@ public class FileTextSource
             return base.lines[index].Count;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public override bool LineHasFoldingStartMarker (int index)
     {
         if (lines[index] == null)
+        {
             return false;
-        else
-            return !string.IsNullOrEmpty (lines[index].FoldingStartMarker);
+        }
+
+        return !string.IsNullOrEmpty (lines[index].FoldingStartMarker);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public override bool LineHasFoldingEndMarker (int index)
     {
         if (lines[index] == null)
@@ -456,59 +505,16 @@ public class FileTextSource
 
     public override void Dispose()
     {
-        if (fs != null)
-            fs.Dispose();
+        if (_stream != null)
+            _stream.Dispose();
 
-        timer.Dispose();
+        _timer.Dispose();
     }
 
     internal void UnloadLine (int iLine)
     {
         if (lines[iLine] != null && !lines[iLine].IsChanged)
             lines[iLine] = null;
-    }
-}
-
-public class LineNeededEventArgs : EventArgs
-{
-    public string SourceLineText { get; private set; }
-    public int DisplayedLineIndex { get; private set; }
-
-    /// <summary>
-    /// This text will be displayed in textbox
-    /// </summary>
-    public string DisplayedLineText { get; set; }
-
-    public LineNeededEventArgs (string sourceLineText, int displayedLineIndex)
-    {
-        this.SourceLineText = sourceLineText;
-        this.DisplayedLineIndex = displayedLineIndex;
-        this.DisplayedLineText = sourceLineText;
-    }
-}
-
-public class LinePushedEventArgs : EventArgs
-{
-    public string SourceLineText { get; private set; }
-    public int DisplayedLineIndex { get; private set; }
-
-    /// <summary>
-    /// This property contains only changed text.
-    /// If text of line is not changed, this property contains null.
-    /// </summary>
-    public string DisplayedLineText { get; private set; }
-
-    /// <summary>
-    /// This text will be saved in the file
-    /// </summary>
-    public string SavedText { get; set; }
-
-    public LinePushedEventArgs (string sourceLineText, int displayedLineIndex, string displayedLineText)
-    {
-        this.SourceLineText = sourceLineText;
-        this.DisplayedLineIndex = displayedLineIndex;
-        this.DisplayedLineText = displayedLineText;
-        this.SavedText = displayedLineText;
     }
 }
 

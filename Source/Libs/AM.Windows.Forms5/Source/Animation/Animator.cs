@@ -353,12 +353,12 @@ public class Animator : Component, IExtenderProvider
                 DefaultAnimation = Animation.Rotate;
                 break;
 
-            case AnimationType.HorizSlide:
-                DefaultAnimation = Animation.HorizSlide;
+            case AnimationType.HorizontalSlide:
+                DefaultAnimation = Animation.HorizontalSlide;
                 break;
 
-            case AnimationType.VertSlide:
-                DefaultAnimation = Animation.VertSlide;
+            case AnimationType.VerticalSlide:
+                DefaultAnimation = Animation.VerticalSlide;
                 break;
 
             case AnimationType.Scale:
@@ -369,12 +369,12 @@ public class Animator : Component, IExtenderProvider
                 DefaultAnimation = Animation.ScaleAndRotate;
                 break;
 
-            case AnimationType.HorizSlideAndRotate:
-                DefaultAnimation = Animation.HorizSlideAndRotate;
+            case AnimationType.HorizontalSlideAndRotate:
+                DefaultAnimation = Animation.HorizontalSlideAndRotate;
                 break;
 
-            case AnimationType.ScaleAndHorizSlide:
-                DefaultAnimation = Animation.ScaleAndHorizSlide;
+            case AnimationType.ScaleAndHorizontalSlide:
+                DefaultAnimation = Animation.ScaleAndHorizontalSlide;
                 break;
 
             case AnimationType.Transparent:
@@ -393,11 +393,11 @@ public class Animator : Component, IExtenderProvider
                 DefaultAnimation = Animation.Particles;
                 break;
 
-            case AnimationType.VertBlind:
-                DefaultAnimation = Animation.VertBlind;
+            case AnimationType.VerticalBlind:
+                DefaultAnimation = Animation.VerticalBlind;
                 break;
 
-            case AnimationType.HorizBlind:
+            case AnimationType.HorizontalBlind:
                 DefaultAnimation = Animation.HorizBlind;
                 break;
         }
@@ -655,8 +655,8 @@ public class Animator : Component, IExtenderProvider
         Rectangle clipRect)
     {
         var controller = new AnimationController (control, mode, animation, TimeStep, clipRect);
-        controller.TransfromNeeded += OnTransformNeeded;
-        controller.NonLinearTransfromNeeded += OnNonLinearTransfromNeeded;
+        controller.TransformNeeded += OnTransformNeeded;
+        controller.NonLinearTransformNeeded += OnNonLinearTransformNeeded;
         controller.MouseDown += OnMouseDown;
         controller.DoubleBitmap.Cursor = Cursor;
         controller.FramePainted += OnFramePainted;
@@ -687,7 +687,7 @@ public class Animator : Component, IExtenderProvider
         }
     }
 
-    protected virtual void OnNonLinearTransfromNeeded (object sender, NonLinearTransfromNeededEventArg e)
+    protected virtual void OnNonLinearTransformNeeded (object sender, NonLinearTransfromNeededEventArg e)
     {
         if (NonLinearTransfromNeeded != null)
             NonLinearTransfromNeeded (this, e);

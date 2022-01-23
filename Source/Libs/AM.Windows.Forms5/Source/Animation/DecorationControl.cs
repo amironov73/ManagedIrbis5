@@ -15,6 +15,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -26,53 +27,114 @@ using System.Windows.Forms;
 
 namespace AM.Windows.Forms.Animation;
 
-class DecorationControl
+internal class DecorationControl
     : UserControl
 {
+    #region Events
+
+    /// <summary>
+    ///
+    /// </summary>
+    public event EventHandler<NonLinearTransfromNeededEventArg>? NonLinearTransformNeeded;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
     public DecorationType DecorationType { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public Control DecoratedControl { get; set; }
-    public Padding Padding { get;set;}
+
+    /// <summary>
+    ///
+    /// </summary>
+    public new Padding Padding { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public Bitmap CtrlBmp { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public byte[] CtrlPixels { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public int CtrlStride { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public Bitmap Frame { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public float CurrentTime { get; set; }
-    Timer tm;
 
-    public DecorationControl(DecorationType type, Control decoratedControl)
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    public DecorationControl
+        (
+            DecorationType type,
+            Control decoratedControl
+        )
     {
-        this.DecorationType = type;
-        this.DecoratedControl = decoratedControl;
+        DecorationType = type;
+        DecoratedControl = decoratedControl;
 
-        decoratedControl.VisibleChanged += new EventHandler(control_VisibleChanged);
-        decoratedControl.ParentChanged += new EventHandler(control_VisibleChanged);
-        decoratedControl.LocationChanged += new EventHandler(control_VisibleChanged);
+        decoratedControl.VisibleChanged += control_VisibleChanged;
+        decoratedControl.ParentChanged += control_VisibleChanged;
+        decoratedControl.LocationChanged += control_VisibleChanged;
 
-        decoratedControl.Paint += new PaintEventHandler(decoratedControl_Paint);
+        decoratedControl.Paint += decoratedControl_Paint;
 
-        SetStyle(ControlStyles.Selectable, false);
-        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint, true);
+        SetStyle (ControlStyles.Selectable, false);
+        SetStyle (ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint,
+            true);
 
         //BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
         InitPadding();
 
-        tm = new Timer();
-        tm.Interval = 100;
-        tm.Tick += new EventHandler(tm_Tick);
-        tm.Enabled = true;
+        _timer = new Timer();
+        _timer.Interval = 100;
+        _timer.Tick += _timer_Tick;
+        _timer.Enabled = true;
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly Timer _timer;
+
+    private bool _isSnapshotNow;
 
     private void InitPadding()
     {
-        switch(DecorationType)
+        switch (DecorationType)
         {
             case DecorationType.BottomMirror:
-                Padding = new Padding(0, 0, 0, 20);
+                Padding = new Padding (0, 0, 0, 20);
                 break;
         }
     }
 
-    void tm_Tick(object sender, EventArgs e)
+    private void _timer_Tick (object sender, EventArgs e)
     {
         switch (DecorationType)
         {
@@ -83,9 +145,13 @@ class DecorationControl
         }
     }
 
-    void decoratedControl_Paint(object sender, PaintEventArgs e)
+    private void decoratedControl_Paint
+        (
+            object? sender,
+            PaintEventArgs e
+        )
     {
-        if (!isSnapshotNow)
+        if (!_isSnapshotNow)
         {
             /*
             if (Frame != null)
@@ -101,130 +167,170 @@ class DecorationControl
         }
     }
 
-    protected override void OnPaint(PaintEventArgs e)
+    /// <inheritdoc cref="Control.OnPaint"/>
+    protected override void OnPaint
+        (
+            PaintEventArgs e
+        )
     {
-        CtrlBmp = GetForeground(DecoratedControl);
-        CtrlPixels = GetPixels(CtrlBmp);
-
-        if (Frame != null)
-            Frame.Dispose();
-        Frame = OnNonLinearTransfromNeeded();
+        CtrlBmp = GetForeground (DecoratedControl);
+        CtrlPixels = GetPixels (CtrlBmp);
 
         if (Frame != null)
         {
-            e.Graphics.DrawImage(Frame, Point.Empty);
+            Frame.Dispose();
+        }
+
+        Frame = OnNonLinearTransformNeeded();
+        if (Frame != null)
+        {
+            e.Graphics.DrawImage (Frame, Point.Empty);
         }
     }
 
-    void control_VisibleChanged(object sender, EventArgs e)
+    private void control_VisibleChanged
+        (
+            object? sender,
+            EventArgs e
+        )
     {
         Init();
     }
 
     private void Init()
     {
-        this.Parent = DecoratedControl.Parent;
-        this.Visible = DecoratedControl.Visible;
-        this.Location = new Point(DecoratedControl.Left - Padding.Left, DecoratedControl.Top - Padding.Top);
+        Parent = DecoratedControl.Parent;
+        Visible = DecoratedControl.Visible;
+        Location = new Point (DecoratedControl.Left - Padding.Left, DecoratedControl.Top - Padding.Top);
 
 
         if (Parent != null)
         {
-            var i = Parent.Controls.GetChildIndex(DecoratedControl);
-            Parent.Controls.SetChildIndex(this, i + 1);
+            var i = Parent.Controls.GetChildIndex (DecoratedControl);
+            Parent.Controls.SetChildIndex (this, i + 1);
         }
 
-        var newSize = new Size(DecoratedControl.Width + Padding.Left + Padding.Right, DecoratedControl.Height + Padding.Top + Padding.Bottom);
-        if(newSize != Size)
+        var newSize = new Size (DecoratedControl.Width + Padding.Left + Padding.Right,
+            DecoratedControl.Height + Padding.Top + Padding.Bottom);
+        if (newSize != Size)
         {
-            this.Size = newSize;
+            Size = newSize;
         }
     }
 
-    bool isSnapshotNow = false;
-
-    protected virtual Bitmap GetForeground(Control ctrl)
+    protected virtual Bitmap GetForeground (Control ctrl)
     {
-        Bitmap bmp = new Bitmap(this.Width, this.Height);
+        Bitmap bmp = new Bitmap (Width, Height);
 
         if (!ctrl.IsDisposed)
         {
-            isSnapshotNow = true;
-            ctrl.DrawToBitmap(bmp, new Rectangle(Padding.Left, Padding.Top, ctrl.Width, ctrl.Height));
-            isSnapshotNow = false;
+            _isSnapshotNow = true;
+            ctrl.DrawToBitmap (bmp, new Rectangle (Padding.Left, Padding.Top, ctrl.Width, ctrl.Height));
+            _isSnapshotNow = false;
         }
+
         return bmp;
     }
 
-    byte[] GetPixels(Bitmap bmp)
+    byte[] GetPixels (Bitmap bmp)
     {
         const int bytesPerPixel = 4;
         PixelFormat pxf = PixelFormat.Format32bppArgb;
-        Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-        BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadOnly, pxf);
+        Rectangle rect = new Rectangle (0, 0, bmp.Width, bmp.Height);
+        BitmapData bmpData = bmp.LockBits (rect, ImageLockMode.ReadOnly, pxf);
         IntPtr ptr = bmpData.Scan0;
         int numBytes = bmp.Width * bmp.Height * bytesPerPixel;
         byte[] argbValues = new byte[numBytes];
-        Marshal.Copy(ptr, argbValues, 0, numBytes);
+        Marshal.Copy (ptr, argbValues, 0, numBytes);
+
         //Marshal.Copy(argbValues, 0, ptr, numBytes);
-        bmp.UnlockBits(bmpData);
+        bmp.UnlockBits (bmpData);
         return argbValues;
     }
 
-    public event EventHandler<NonLinearTransfromNeededEventArg> NonLinearTransfromNeeded;
-
-    protected virtual Bitmap OnNonLinearTransfromNeeded()
+    protected virtual Bitmap? OnNonLinearTransformNeeded()
     {
-        Bitmap bmp = null;
+        Bitmap? bmp = null;
         if (CtrlBmp == null)
+        {
             return null;
+        }
 
         try
         {
-            bmp = new Bitmap(Width, Height);
+            bmp = new Bitmap (Width, Height);
 
             const int bytesPerPixel = 4;
             PixelFormat pxf = PixelFormat.Format32bppArgb;
-            Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-            BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadWrite, pxf);
+            Rectangle rect = new Rectangle (0, 0, bmp.Width, bmp.Height);
+            BitmapData bmpData = bmp.LockBits (rect, ImageLockMode.ReadWrite, pxf);
             IntPtr ptr = bmpData.Scan0;
             int numBytes = bmp.Width * bmp.Height * bytesPerPixel;
             byte[] argbValues = new byte[numBytes];
 
-            Marshal.Copy(ptr, argbValues, 0, numBytes);
+            Marshal.Copy (ptr, argbValues, 0, numBytes);
 
-            var e = new NonLinearTransfromNeededEventArg() { CurrentTime = CurrentTime, ClientRectangle = ClientRectangle, Pixels = argbValues, Stride = bmpData.Stride, SourcePixels = CtrlPixels, SourceClientRectangle = new Rectangle(Padding.Left, Padding.Top, DecoratedControl.Width, DecoratedControl.Height), SourceStride = CtrlStride };
+            var e = new NonLinearTransfromNeededEventArg()
+            {
+                CurrentTime = CurrentTime, ClientRectangle = ClientRectangle, Pixels = argbValues,
+                Stride = bmpData.Stride, SourcePixels = CtrlPixels,
+                SourceClientRectangle = new Rectangle
+                    (
+                        Padding.Left,
+                        Padding.Top,
+                        DecoratedControl.Width,
+                        DecoratedControl.Height
+                    ),
+                SourceStride = CtrlStride
+            };
 
             try
             {
-                if (NonLinearTransfromNeeded != null)
-                    NonLinearTransfromNeeded(this, e);
+                if (NonLinearTransformNeeded != null)
+                {
+                    NonLinearTransformNeeded (this, e);
+                }
                 else
+                {
                     e.UseDefaultTransform = true;
+                }
 
                 if (e.UseDefaultTransform)
                 {
                     switch (DecorationType)
                     {
-                        case DecorationType.BottomMirror: TransfromHelper.DoBottomMirror(e); break;
+                        case DecorationType.BottomMirror:
+                            TransformHelper.DoBottomMirror (e);
+                            break;
                     }
                 }
-            }catch{}
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine (exception.Message);
+            }
 
-            Marshal.Copy(argbValues, 0, ptr, numBytes);
-            bmp.UnlockBits(bmpData);
+            Marshal.Copy (argbValues, 0, ptr, numBytes);
+            bmp.UnlockBits (bmpData);
         }
-        catch
+        catch (Exception exception)
         {
+            Debug.WriteLine (exception.Message);
         }
 
         return bmp;
     }
 
-    protected override void Dispose(bool disposing)
+    /// <inheritdoc cref="ContainerControl.Dispose(bool)"/>
+    protected override void Dispose
+        (
+            bool disposing
+        )
     {
-        tm.Stop();
-        tm.Dispose();
-        base.Dispose(disposing);
+        _timer.Stop();
+        _timer.Dispose();
+        base.Dispose (disposing);
     }
+
+    #endregion
 }

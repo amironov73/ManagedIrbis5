@@ -4,38 +4,18 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* SyntaxTextBox.cs -- контрол для отображения текста с подсветкой синтаксиса
  * Ars Magna project, http://arsmagna.ru
  */
-
-//
-//  THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
-//  KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-//  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
-//  PURPOSE.
-//
-//  License: GNU Lesser General Public License (LGPLv3)
-//
-//  Email: pavel_torgashov@ukr.net
-//
-//  Copyright (C) Pavel Torgashov, 2011-2016.
-
-// #define debug
-
-// -------------------------------------------------------------------------------
-// By default the FastColoredTextbox supports no more 16 styles at the same time.
-// This restriction saves memory.
-// However, you can to compile FCTB with 32 styles supporting.
-// Uncomment following definition if you need 32 styles instead of 16:
-//
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Drawing2D;
@@ -65,6 +45,8 @@ public class SyntaxTextBox
     : UserControl,
     ISupportInitialize
 {
+    #region Constants
+
     internal const int minLeftIndent = 8;
     private const int maxBracketSearchIterations = 1000;
     private const int maxLinesForFolding = 3000;
@@ -74,77 +56,66 @@ public class SyntaxTextBox
     private const int WM_VSCROLL = 0x115;
     private const int SB_ENDSCROLL = 0x8;
 
-    public readonly List<LineInfo> LineInfos = new List<LineInfo>();
-    private readonly TextRange selection;
-    private readonly Timer timer = new Timer();
-    private readonly Timer timer2 = new Timer();
-    private readonly Timer timer3 = new Timer();
-    private readonly List<VisualMarker> visibleMarkers = new List<VisualMarker>();
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public readonly List<LineInfo> LineInfos = new();
+
+    /// <summary>
+    ///
+    /// </summary>
     public int TextHeight;
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool AllowInsertRemoveLines = true;
-    private Brush backBrush;
-    private BookmarksBase bookmarks;
-    private bool caretVisible;
-    private Color changedLineColor;
-    private int charHeight;
-    private Color currentLineColor;
-    private Cursor defaultCursor;
-    private TextRange delayedTextChangedRange;
-    private string descriptionFile;
-    private int endFoldingLine = -1;
-    private Color foldingIndicatorColor;
-    protected Dictionary<int, int> foldingPairs = new Dictionary<int, int>();
-    private bool handledChar;
-    private bool highlightFoldingIndicator;
-    private Hints hints;
-    private Color indentBackColor;
-    private bool isChanged;
-    private bool isLineSelect;
-    private bool isReplaceMode;
-    private Language language;
-    private Keys lastModifiers;
-    private Point lastMouseCoord;
-    private DateTime lastNavigatedDateTime;
-    private TextRange leftBracketPosition;
-    private TextRange leftBracketPosition2;
-    private int leftPadding;
-    private int lineInterval;
-    private Color lineNumberColor;
-    private uint lineNumberStartValue;
-    private LineNumberFormatting lineNumberFormatting;
-    private int lineSelectFrom;
-    private TextSource lines;
-    private IntPtr m_hImc;
-    private int maxLineLength;
-    private bool mouseIsDrag;
-    private bool mouseIsDragDrop;
-    private bool multiline;
-    protected bool needRecalc;
-    protected bool needRecalcWordWrap;
-    private Point needRecalcWordWrapInterval;
-    private bool needRecalcFoldingLines;
-    private bool needRiseSelectionChangedDelayed;
-    private bool needRiseTextChangedDelayed;
-    private bool needRiseVisibleRangeChangedDelayed;
-    private Color paddingBackColor;
-    private int preferredLineWidth;
-    private TextRange rightBracketPosition;
-    private TextRange rightBracketPosition2;
-    private bool scrollBars;
-    private Color selectionColor;
-    private Color serviceLinesColor;
-    private bool showFoldingLines;
-    private bool showLineNumbers;
-    private SyntaxTextBox sourceTextBox;
-    private int startFoldingLine = -1;
-    private int updating;
-    private TextRange updatingRange;
-    private TextRange visibleRange;
-    private bool wordWrap;
-    private WordWrapMode wordWrapMode = WordWrapMode.WordWrapControlWidth;
-    private int reservedCountOfLineNumberChars = 1;
-    private int zoom = 100;
-    private Size localAutoScrollMinSize;
+
+    public char[] AutoCompleteBracketsList
+    {
+        get => _autoCompleteBracketsList;
+        set => _autoCompleteBracketsList = value;
+    }
+
+    /// <summary>
+    /// AutoComplete brackets
+    /// </summary>
+    [DefaultValue (false)]
+    [Description ("AutoComplete brackets.")]
+    public bool AutoCompleteBrackets { get; set; }
+
+    /// <summary>
+    /// Colors of some service visual markers
+    /// </summary>
+    [Browsable (true)]
+    [Description ("Colors of some service visual markers.")]
+    [TypeConverter (typeof (ExpandableObjectConverter))]
+    public ServiceColors ServiceColors { get; set; }
+
+    /// <summary>
+    /// Contains UniqueId of start lines of folded blocks
+    /// </summary>
+    /// <remarks>This dictionary remembers folding state of blocks.
+    /// It is needed to restore child folding after user collapsed/expanded top-level folding block.</remarks>
+    [Browsable (false)]
+    public Dictionary<int, int> FoldedBlocks { get; private set; }
+
+    /// <summary>
+    /// Strategy of search of brackets to highlighting
+    /// </summary>
+    [DefaultValue (typeof (BracketsHighlightStrategy), "Strategy1")]
+    [Description ("Strategy of search of brackets to highlighting.")]
+    public BracketsHighlightStrategy BracketsHighlightStrategy { get; set; }
+
+
+
+    #endregion
+
+    #region Construction
 
     /// <summary>
     /// Constructor
@@ -170,7 +141,7 @@ public class SyntaxTextBox
         InitTextSource (CreateTextSource());
         if (lines.Count == 0)
             lines.InsertLine (0, lines.CreateLine());
-        selection = new TextRange (this) { Start = new Place (0, 0) };
+        _selection = new TextRange (this) { Start = new Place (0, 0) };
 
         //default settings
         Cursor = Cursors.IBeam;
@@ -205,7 +176,7 @@ public class SyntaxTextBox
         CommentPrefix = "//";
         lineNumberStartValue = 1;
         multiline = true;
-        scrollBars = true;
+        _scrollBars = true;
         AcceptsTab = true;
         AcceptsReturn = true;
         caretVisible = true;
@@ -221,7 +192,7 @@ public class SyntaxTextBox
         bookmarks = new Bookmarks (this);
         BookmarkColor = Color.PowderBlue;
         ToolTip = new ToolTip();
-        timer3.Interval = 500;
+        _timer3.Interval = 500;
         hints = new Hints (this);
         SelectionHighlightingForLineBreaksEnabled = true;
         textAreaBorder = TextAreaBorderType.None;
@@ -240,49 +211,159 @@ public class SyntaxTextBox
 
         //
         base.AutoScroll = true;
-        timer.Tick += timer_Tick;
-        timer2.Tick += timer2_Tick;
-        timer3.Tick += timer3_Tick;
+        _timer1.Tick += timer_Tick;
+        _timer2.Tick += timer2_Tick;
+        _timer3.Tick += timer3_Tick;
         middleClickScrollingTimer.Tick += middleClickScrollingTimer_Tick;
     }
 
-    private char[] autoCompleteBracketsList = { '(', ')', '{', '}', '[', ']', '"', '"', '\'', '\'' };
+    #endregion
 
-    public char[] AutoCompleteBracketsList
-    {
-        get { return autoCompleteBracketsList; }
-        set { autoCompleteBracketsList = value; }
-    }
+    #region Private members
 
-    /// <summary>
-    /// AutoComplete brackets
-    /// </summary>
-    [DefaultValue (false)]
-    [Description ("AutoComplete brackets.")]
-    public bool AutoCompleteBrackets { get; set; }
+    private readonly TextRange _selection;
 
-    /// <summary>
-    /// Colors of some service visual markers
-    /// </summary>
-    [Browsable (true)]
-    [Description ("Colors of some service visual markers.")]
-    [TypeConverter (typeof (ExpandableObjectConverter))]
-    public ServiceColors ServiceColors { get; set; }
+    private readonly Timer _timer1 = new();
 
-    /// <summary>
-    /// Contains UniqueId of start lines of folded blocks
-    /// </summary>
-    /// <remarks>This dictionary remembers folding state of blocks.
-    /// It is needed to restore child folding after user collapsed/expanded top-level folding block.</remarks>
-    [Browsable (false)]
-    public Dictionary<int, int> FoldedBlocks { get; private set; }
+    private readonly Timer _timer2 = new();
 
-    /// <summary>
-    /// Strategy of search of brackets to highlighting
-    /// </summary>
-    [DefaultValue (typeof (BracketsHighlightStrategy), "Strategy1")]
-    [Description ("Strategy of search of brackets to highlighting.")]
-    public BracketsHighlightStrategy BracketsHighlightStrategy { get; set; }
+    private readonly Timer _timer3 = new();
+
+    private readonly List<VisualMarker> visibleMarkers = new List<VisualMarker>();
+
+    private Brush backBrush;
+
+    private BookmarksBase bookmarks;
+
+    private bool caretVisible;
+
+    private Color changedLineColor;
+
+    private int charHeight;
+
+    private Color currentLineColor;
+
+    private Cursor defaultCursor;
+
+    private TextRange? _delayedTextChangedRange;
+
+    private string descriptionFile;
+
+    private int endFoldingLine = -1;
+
+    private Color foldingIndicatorColor;
+
+    protected Dictionary<int, int> foldingPairs = new Dictionary<int, int>();
+
+    private bool handledChar;
+
+    private bool highlightFoldingIndicator;
+
+    private Hints hints;
+
+    private Color indentBackColor;
+
+    private bool isChanged;
+
+    private bool isLineSelect;
+
+    private bool isReplaceMode;
+
+    private Language language;
+
+    private Keys lastModifiers;
+
+    private Point lastMouseCoord;
+
+    private DateTime lastNavigatedDateTime;
+
+    private TextRange leftBracketPosition;
+
+    private TextRange leftBracketPosition2;
+
+    private int leftPadding;
+
+    private int lineInterval;
+
+    private Color lineNumberColor;
+
+    private uint lineNumberStartValue;
+
+    private LineNumberFormatting lineNumberFormatting;
+
+    private int lineSelectFrom;
+
+    private TextSource lines;
+
+    private IntPtr m_hImc;
+
+    private int maxLineLength;
+
+    private bool mouseIsDrag;
+
+    private bool mouseIsDragDrop;
+
+    private bool multiline;
+
+    protected bool needRecalc;
+
+    protected bool needRecalcWordWrap;
+
+    private Point needRecalcWordWrapInterval;
+
+    private bool needRecalcFoldingLines;
+
+    private bool needRiseSelectionChangedDelayed;
+
+    private bool needRiseTextChangedDelayed;
+
+    private bool needRiseVisibleRangeChangedDelayed;
+
+    private Color paddingBackColor;
+
+    private int preferredLineWidth;
+
+    private TextRange rightBracketPosition;
+
+    private TextRange rightBracketPosition2;
+
+    private bool _scrollBars;
+
+    private Color selectionColor;
+
+    private Color serviceLinesColor;
+
+    private bool _showFoldingLines;
+
+    private bool _showLineNumbers;
+
+    private SyntaxTextBox sourceTextBox;
+
+    private int _startFoldingLine = -1;
+
+    private int _updating;
+
+    private TextRange? _updatingRange;
+
+    private TextRange? _visibleRange;
+
+    private bool _wordWrap;
+
+    private WordWrapMode wordWrapMode = WordWrapMode.WordWrapControlWidth;
+
+    private int reservedCountOfLineNumberChars = 1;
+
+    private int _zoom = 100;
+
+    private Size localAutoScrollMinSize;
+
+    private char[] _autoCompleteBracketsList = { '(', ')', '{', '}', '[', ']', '"', '"', '\'', '\'' };
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
 
     /// <summary>
     /// Automatically shifts secondary wordwrap lines on the shift amount of the first line
@@ -341,8 +422,8 @@ public class SyntaxTextBox
     [Description ("Delay(ms) of ToolTip.")]
     public int ToolTipDelay
     {
-        get { return timer3.Interval; }
-        set { timer3.Interval = value; }
+        get { return _timer3.Interval; }
+        set { _timer3.Interval = value; }
     }
 
     /// <summary>
@@ -590,10 +671,10 @@ public class SyntaxTextBox
     [Description ("Shows line numbers.")]
     public bool ShowLineNumbers
     {
-        get { return showLineNumbers; }
+        get { return _showLineNumbers; }
         set
         {
-            showLineNumbers = value;
+            _showLineNumbers = value;
             NeedRecalc();
             Invalidate();
         }
@@ -606,10 +687,10 @@ public class SyntaxTextBox
     [Description ("Shows vertical lines between folding start line and folding end line.")]
     public bool ShowFoldingLines
     {
-        get { return showFoldingLines; }
+        get { return _showFoldingLines; }
         set
         {
-            showFoldingLines = value;
+            _showFoldingLines = value;
             Invalidate();
         }
     }
@@ -835,7 +916,7 @@ public class SyntaxTextBox
         "This property draws vertical line after defined char position. Set to 0 for disable drawing of vertical line.")]
     public int PreferredLineWidth
     {
-        get { return preferredLineWidth; }
+        get => preferredLineWidth;
         set
         {
             preferredLineWidth = value;
@@ -847,22 +928,18 @@ public class SyntaxTextBox
     /// Styles
     /// </summary>
     [Browsable (false)]
-    public Style[] Styles
-    {
-        get { return lines.Styles; }
-    }
+    public Style[] Styles => lines.Styles;
 
     /// <summary>
     /// Hotkeys. Do not use this property in your code, use HotkeysMapping property.
     /// </summary>
     [Description ("Here you can change hotkeys for FastColoredTextBox.")]
     [Editor (typeof (HotkeyEditor), typeof (UITypeEditor))]
-    [DefaultValue (
-        "Tab=IndentIncrease, Escape=ClearHints, PgUp=GoPageUp, PgDn=GoPageDown, End=GoEnd, Home=GoHome, Left=GoLeft, Up=GoUp, Right=GoRight, Down=GoDown, Ins=ReplaceMode, Del=DeleteCharRight, F3=FindNext, Shift+Tab=IndentDecrease, Shift+PgUp=GoPageUpWithSelection, Shift+PgDn=GoPageDownWithSelection, Shift+End=GoEndWithSelection, Shift+Home=GoHomeWithSelection, Shift+Left=GoLeftWithSelection, Shift+Up=GoUpWithSelection, Shift+Right=GoRightWithSelection, Shift+Down=GoDownWithSelection, Shift+Ins=Paste, Shift+Del=Cut, Ctrl+Back=ClearWordLeft, Ctrl+Space=AutocompleteMenu, Ctrl+End=GoLastLine, Ctrl+Home=GoFirstLine, Ctrl+Left=GoWordLeft, Ctrl+Up=ScrollUp, Ctrl+Right=GoWordRight, Ctrl+Down=ScrollDown, Ctrl+Ins=Copy, Ctrl+Del=ClearWordRight, Ctrl+0=ZoomNormal, Ctrl+A=SelectAll, Ctrl+B=BookmarkLine, Ctrl+C=Copy, Ctrl+E=MacroExecute, Ctrl+F=FindDialog, Ctrl+G=GoToDialog, Ctrl+H=ReplaceDialog, Ctrl+I=AutoIndentChars, Ctrl+M=MacroRecord, Ctrl+N=GoNextBookmark, Ctrl+R=Redo, Ctrl+U=UpperCase, Ctrl+V=Paste, Ctrl+X=Cut, Ctrl+Z=Undo, Ctrl+Add=ZoomIn, Ctrl+Subtract=ZoomOut, Ctrl+OemMinus=NavigateBackward, Ctrl+Shift+End=GoLastLineWithSelection, Ctrl+Shift+Home=GoFirstLineWithSelection, Ctrl+Shift+Left=GoWordLeftWithSelection, Ctrl+Shift+Right=GoWordRightWithSelection, Ctrl+Shift+B=UnbookmarkLine, Ctrl+Shift+C=CommentSelected, Ctrl+Shift+N=GoPrevBookmark, Ctrl+Shift+U=LowerCase, Ctrl+Shift+OemMinus=NavigateForward, Alt+Back=Undo, Alt+Up=MoveSelectedLinesUp, Alt+Down=MoveSelectedLinesDown, Alt+F=FindChar, Alt+Shift+Left=GoLeft_ColumnSelectionMode, Alt+Shift+Up=GoUp_ColumnSelectionMode, Alt+Shift+Right=GoRight_ColumnSelectionMode, Alt+Shift+Down=GoDown_ColumnSelectionMode")]
+    [DefaultValue ("Tab=IndentIncrease, Escape=ClearHints, PgUp=GoPageUp, PgDn=GoPageDown, End=GoEnd, Home=GoHome, Left=GoLeft, Up=GoUp, Right=GoRight, Down=GoDown, Ins=ReplaceMode, Del=DeleteCharRight, F3=FindNext, Shift+Tab=IndentDecrease, Shift+PgUp=GoPageUpWithSelection, Shift+PgDn=GoPageDownWithSelection, Shift+End=GoEndWithSelection, Shift+Home=GoHomeWithSelection, Shift+Left=GoLeftWithSelection, Shift+Up=GoUpWithSelection, Shift+Right=GoRightWithSelection, Shift+Down=GoDownWithSelection, Shift+Ins=Paste, Shift+Del=Cut, Ctrl+Back=ClearWordLeft, Ctrl+Space=AutocompleteMenu, Ctrl+End=GoLastLine, Ctrl+Home=GoFirstLine, Ctrl+Left=GoWordLeft, Ctrl+Up=ScrollUp, Ctrl+Right=GoWordRight, Ctrl+Down=ScrollDown, Ctrl+Ins=Copy, Ctrl+Del=ClearWordRight, Ctrl+0=ZoomNormal, Ctrl+A=SelectAll, Ctrl+B=BookmarkLine, Ctrl+C=Copy, Ctrl+E=MacroExecute, Ctrl+F=FindDialog, Ctrl+G=GoToDialog, Ctrl+H=ReplaceDialog, Ctrl+I=AutoIndentChars, Ctrl+M=MacroRecord, Ctrl+N=GoNextBookmark, Ctrl+R=Redo, Ctrl+U=UpperCase, Ctrl+V=Paste, Ctrl+X=Cut, Ctrl+Z=Undo, Ctrl+Add=ZoomIn, Ctrl+Subtract=ZoomOut, Ctrl+OemMinus=NavigateBackward, Ctrl+Shift+End=GoLastLineWithSelection, Ctrl+Shift+Home=GoFirstLineWithSelection, Ctrl+Shift+Left=GoWordLeftWithSelection, Ctrl+Shift+Right=GoWordRightWithSelection, Ctrl+Shift+B=UnbookmarkLine, Ctrl+Shift+C=CommentSelected, Ctrl+Shift+N=GoPrevBookmark, Ctrl+Shift+U=LowerCase, Ctrl+Shift+OemMinus=NavigateForward, Alt+Back=Undo, Alt+Up=MoveSelectedLinesUp, Alt+Down=MoveSelectedLinesDown, Alt+F=FindChar, Alt+Shift+Left=GoLeft_ColumnSelectionMode, Alt+Shift+Up=GoUp_ColumnSelectionMode, Alt+Shift+Right=GoRight_ColumnSelectionMode, Alt+Shift+Down=GoDown_ColumnSelectionMode")]
     public string Hotkeys
     {
-        get { return HotkeyMapping.ToString(); }
-        set { HotkeyMapping = HotkeyMapping.Parse (value); }
+        get => HotkeyMapping.ToString();
+        set => HotkeyMapping = HotkeyMapping.Parse (value);
     }
 
     /// <summary>
@@ -880,8 +957,8 @@ public class SyntaxTextBox
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
     public TextStyle DefaultStyle
     {
-        get { return lines.DefaultStyle; }
-        set { lines.DefaultStyle = value; }
+        get => lines.DefaultStyle;
+        set => lines.DefaultStyle = value;
     }
 
     /// <summary>
@@ -972,7 +1049,7 @@ public class SyntaxTextBox
                    (!Selection.ColumnSelectionMode) &&
                    Selection.Start.Column < lines[Selection.Start.Line].Count;
         }
-        set { isReplaceMode = value; }
+        set => isReplaceMode = value;
     }
 
     /// <summary>
@@ -1017,8 +1094,8 @@ public class SyntaxTextBox
     [Description ("Minimal delay(ms) for delayed events (except TextChangedDelayed).")]
     public int DelayedEventsInterval
     {
-        get { return timer.Interval; }
-        set { timer.Interval = value; }
+        get => _timer1.Interval;
+        set => _timer1.Interval = value;
     }
 
     /// <summary>
@@ -1029,8 +1106,8 @@ public class SyntaxTextBox
     [Description ("Minimal delay(ms) for TextChangedDelayed event.")]
     public int DelayedTextChangedInterval
     {
-        get { return timer2.Interval; }
-        set { timer2.Interval = value; }
+        get => _timer2.Interval;
+        set => _timer2.Interval = value;
     }
 
     /// <summary>
@@ -1070,7 +1147,7 @@ public class SyntaxTextBox
         )]
     public string DescriptionFile
     {
-        get { return descriptionFile; }
+        get => descriptionFile;
         set
         {
             descriptionFile = value;
@@ -1125,7 +1202,7 @@ public class SyntaxTextBox
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
     public int StartFoldingLine
     {
-        get { return startFoldingLine; }
+        get { return _startFoldingLine; }
     }
 
     /// <summary>
@@ -1199,12 +1276,13 @@ public class SyntaxTextBox
     {
         get
         {
-            if (visibleRange != null)
-                return visibleRange;
-            return GetRange (
-                    PointToPlace (new Point (LeftIndent, 0)),
-                    PointToPlace (new Point (ClientSize.Width, ClientSize.Height))
-                );
+            return _visibleRange != null
+                ? _visibleRange
+                : GetRange
+                    (
+                        PointToPlace (new Point (LeftIndent, 0)),
+                        PointToPlace (new Point (ClientSize.Width, ClientSize.Height))
+                    );
         }
     }
 
@@ -1214,16 +1292,16 @@ public class SyntaxTextBox
     [Browsable (false)]
     public TextRange Selection
     {
-        get { return selection; }
+        get { return _selection; }
         set
         {
-            if (value == selection)
+            if (value == _selection)
                 return;
 
-            selection.BeginUpdate();
-            selection.Start = value.Start;
-            selection.End = value.End;
-            selection.EndUpdate();
+            _selection.BeginUpdate();
+            _selection.Start = value.Start;
+            _selection.End = value.End;
+            _selection.EndUpdate();
             Invalidate();
         }
     }
@@ -1260,11 +1338,11 @@ public class SyntaxTextBox
     [Description ("Scollbars visibility.")]
     public bool ShowScrollBars
     {
-        get { return scrollBars; }
+        get { return _scrollBars; }
         set
         {
-            if (value == scrollBars) return;
-            scrollBars = value;
+            if (value == _scrollBars) return;
+            _scrollBars = value;
             needRecalc = true;
             Invalidate();
         }
@@ -1310,12 +1388,12 @@ public class SyntaxTextBox
     [Description ("WordWrap.")]
     public bool WordWrap
     {
-        get { return wordWrap; }
+        get { return _wordWrap; }
         set
         {
-            if (wordWrap == value) return;
-            wordWrap = value;
-            if (wordWrap)
+            if (_wordWrap == value) return;
+            _wordWrap = value;
+            if (_wordWrap)
                 Selection.ColumnSelectionMode = false;
             NeedRecalc (false, true);
 
@@ -1588,7 +1666,7 @@ public class SyntaxTextBox
         //
         //if (wordWrap)
         //    RecalcWordWrap(0, Lines.Count - 1);
-        NeedRecalc (false, wordWrap);
+        NeedRecalc (false, _wordWrap);
 
         //
         Invalidate();
@@ -1598,7 +1676,7 @@ public class SyntaxTextBox
     {
         set
         {
-            if (scrollBars)
+            if (_scrollBars)
             {
                 if (!base.AutoScroll)
                     base.AutoScroll = true;
@@ -1626,7 +1704,7 @@ public class SyntaxTextBox
 
         get
         {
-            if (scrollBars)
+            if (_scrollBars)
                 return base.AutoScrollMinSize;
             else
 
@@ -1831,7 +1909,7 @@ public class SyntaxTextBox
 
     private void timer3_Tick (object sender, EventArgs e)
     {
-        timer3.Stop();
+        _timer3.Stop();
         OnToolTip();
     }
 
@@ -1878,7 +1956,7 @@ public class SyntaxTextBox
         needRecalcFoldingLines = true;
 
         needRiseVisibleRangeChangedDelayed = true;
-        ResetTimer (timer);
+        ResetTimer (_timer1);
         if (VisibleRangeChanged != null)
             VisibleRangeChanged (this, new EventArgs());
     }
@@ -2326,16 +2404,16 @@ public class SyntaxTextBox
 
     private void timer2_Tick (object sender, EventArgs e)
     {
-        timer2.Enabled = false;
+        _timer2.Enabled = false;
         if (needRiseTextChangedDelayed)
         {
             needRiseTextChangedDelayed = false;
-            if (delayedTextChangedRange == null)
+            if (_delayedTextChangedRange == null)
                 return;
-            delayedTextChangedRange = Range.GetIntersectionWith (delayedTextChangedRange);
-            delayedTextChangedRange.Expand();
-            OnTextChangedDelayed (delayedTextChangedRange);
-            delayedTextChangedRange = null;
+            _delayedTextChangedRange = Range.GetIntersectionWith (_delayedTextChangedRange);
+            _delayedTextChangedRange.Expand();
+            OnTextChangedDelayed (_delayedTextChangedRange);
+            _delayedTextChangedRange = null;
         }
     }
 
@@ -2346,7 +2424,7 @@ public class SyntaxTextBox
 
     private void timer_Tick (object sender, EventArgs e)
     {
-        timer.Enabled = false;
+        _timer1.Enabled = false;
         if (needRiseSelectionChangedDelayed)
         {
             needRiseSelectionChangedDelayed = false;
@@ -2473,15 +2551,21 @@ public class SyntaxTextBox
     /// <summary>
     /// Shows find dialog
     /// </summary>
-    public virtual void ShowFindDialog (string findText)
+    public virtual void ShowFindDialog
+        (
+            string? findText
+        )
     {
-        if (findForm == null)
-            findForm = new FindForm (this);
+        findForm ??= new FindForm (this);
 
         if (findText != null)
+        {
             findForm.tbFind.Text = findText;
+        }
         else if (!Selection.IsEmpty && Selection.Start.Line == Selection.End.Line)
+        {
             findForm.tbFind.Text = Selection.Text;
+        }
 
         findForm.tbFind.SelectAll();
         findForm.Show();
@@ -2822,7 +2906,7 @@ public class SyntaxTextBox
                     InsertVirtualSpaces();
 
             lines.Manager.ExecuteCommand (new InsertTextCommand (TextSource, text));
-            if (updating <= 0 && jumpToCaret)
+            if (_updating <= 0 && jumpToCaret)
                 DoCaretVisible();
         }
         finally
@@ -3201,7 +3285,7 @@ public class SyntaxTextBox
     {
         //adjust AutoScrollMinSize
         minWidth = LeftIndent + (maxLineLength) * CharWidth + 2 + Paddings.Left + Paddings.Right;
-        if (wordWrap)
+        if (_wordWrap)
             switch (WordWrapMode)
             {
                 case WordWrapMode.WordWrapControlWidth:
@@ -3262,7 +3346,7 @@ public class SyntaxTextBox
 
     private int GetMaxLineWordWrapedWidth()
     {
-        if (wordWrap)
+        if (_wordWrap)
             switch (wordWrapMode)
             {
                 case WordWrapMode.WordWrapControlWidth:
@@ -3304,7 +3388,7 @@ public class SyntaxTextBox
         for (var iLine = fromLine; iLine <= toLine; iLine++)
             if (lines.IsLineLoaded (iLine))
             {
-                if (!wordWrap)
+                if (!_wordWrap)
                     LineInfos[iLine].CutOffPositions.Clear();
                 else
                 {
@@ -3611,7 +3695,7 @@ public class SyntaxTextBox
 
     protected override void OnKeyDown (KeyEventArgs e)
     {
-        if (middleClickScrollingActivated)
+        if (_middleClickScrollingActivated)
             return;
 
         base.OnKeyDown (e);
@@ -4421,7 +4505,7 @@ public class SyntaxTextBox
 
     protected override bool ProcessMnemonic (char charCode)
     {
-        if (middleClickScrollingActivated)
+        if (_middleClickScrollingActivated)
             return false;
 
         if (Focused)
@@ -4720,17 +4804,17 @@ public class SyntaxTextBox
         if (AutoCompleteBrackets)
         {
             if (!Selection.ColumnSelectionMode)
-                for (var i = 1; i < autoCompleteBracketsList.Length; i += 2)
-                    if (c == autoCompleteBracketsList[i] && c == Selection.CharAfterStart)
+                for (var i = 1; i < _autoCompleteBracketsList.Length; i += 2)
+                    if (c == _autoCompleteBracketsList[i] && c == Selection.CharAfterStart)
                     {
                         Selection.GoRight();
                         return true;
                     }
 
-            for (var i = 0; i < autoCompleteBracketsList.Length; i += 2)
-                if (c == autoCompleteBracketsList[i])
+            for (var i = 0; i < _autoCompleteBracketsList.Length; i += 2)
+                if (c == _autoCompleteBracketsList[i])
                 {
-                    InsertBrackets (autoCompleteBracketsList[i], autoCompleteBracketsList[i + 1]);
+                    InsertBrackets (_autoCompleteBracketsList[i], _autoCompleteBracketsList[i + 1]);
                     return true;
                 }
         }
@@ -4915,15 +4999,23 @@ public class SyntaxTextBox
         {
             args.Shift = -TabLength;
             args.ShiftNextLines = -TabLength;
-            return;
         }
     }
 
 
-    protected int GetMinStartSpacesCount (int fromLine, int toLine)
+    /// <summary>
+    ///
+    /// </summary>
+    protected int GetMinStartSpacesCount
+        (
+            int fromLine,
+            int toLine
+        )
     {
         if (fromLine > toLine)
+        {
             return 0;
+        }
 
         var result = int.MaxValue;
         for (var i = fromLine; i <= toLine; i++)
@@ -4936,6 +5028,9 @@ public class SyntaxTextBox
         return result;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected int GetMaxStartSpacesCount (int fromLine, int toLine)
     {
         if (fromLine > toLine)
@@ -4972,12 +5067,18 @@ public class SyntaxTextBox
         Invalidate();
     }
 
+    /// <inheritdoc cref="Control.IsInputKey"/>
     protected override bool IsInputKey (Keys keyData)
     {
         if ((keyData == Keys.Tab || keyData == (Keys.Shift | Keys.Tab)) && !AcceptsTab)
+        {
             return false;
+        }
+
         if (keyData == Keys.Enter && !AcceptsReturn)
+        {
             return false;
+        }
 
         if ((keyData & Keys.Alt) == Keys.None)
         {
@@ -5029,9 +5130,13 @@ public class SyntaxTextBox
     protected override void OnPaintBackground (PaintEventArgs e)
     {
         if (BackBrush == null)
+        {
             base.OnPaintBackground (e);
+        }
         else
+        {
             e.Graphics.FillRectangle (BackBrush, ClientRectangle);
+        }
     }
 
     /// <summary>
@@ -5108,9 +5213,6 @@ public class SyntaxTextBox
 
         if (needRecalcFoldingLines)
             RecalcFoldingLines();
-#if debug
-            var sw = Stopwatch.StartNew();
-#endif
         visibleMarkers.Clear();
         e.Graphics.SmoothingMode = SmoothingMode.None;
 
@@ -5252,7 +5354,7 @@ public class SyntaxTextBox
             }
 
             //create markers
-            var markerSize = (int)(defaultMarkerSize * zoom / 100f);
+            var markerSize = (int)(defaultMarkerSize * _zoom / 100f);
             var markerRadius = markerSize / 2;
             if (lineInfo.VisibleState == VisibleState.StartOfHiddenBlock)
                 visibleMarkers.Add (new ExpandFoldingMarker (iLine,
@@ -5328,11 +5430,11 @@ public class SyntaxTextBox
         e.Graphics.SmoothingMode = SmoothingMode.None;
 
         //draw folding indicator
-        if ((startFoldingLine >= 0 || endFoldingLine >= 0) && Selection.Start == Selection.End)
+        if ((_startFoldingLine >= 0 || endFoldingLine >= 0) && Selection.Start == Selection.End)
             if (endFoldingLine < LineInfos.Count)
             {
                 //folding indicator
-                var startFoldingY = (startFoldingLine >= 0 ? LineInfos[startFoldingLine].startY : 0) -
+                var startFoldingY = (_startFoldingLine >= 0 ? LineInfos[_startFoldingLine].startY : 0) -
                     VerticalScroll.Value + CharHeight / 2;
                 var endFoldingY = (endFoldingLine >= 0
                     ? LineInfos[endFoldingLine].startY +
@@ -5393,7 +5495,7 @@ public class SyntaxTextBox
         if (MacroManager.IsRecording)
             DrawRecordingHint (e.Graphics);
 
-        if (middleClickScrollingActivated)
+        if (_middleClickScrollingActivated)
             DrawMiddleClickScrolling (e.Graphics);
 
         //dispose resources
@@ -5404,31 +5506,31 @@ public class SyntaxTextBox
         paddingBrush.Dispose();
 
         //
-#if debug
-            sw.Stop();
-            Console.WriteLine("OnPaint: "+ sw.ElapsedMilliseconds);
-#endif
-
-        //
         base.OnPaint (e);
     }
 
     private void DrawMarkers (PaintEventArgs e, Pen servicePen)
     {
-        foreach (var m in visibleMarkers)
+        foreach (var marker in visibleMarkers)
         {
-            if (m is CollapseFoldingMarker)
+            if (marker is CollapseFoldingMarker)
+            {
                 using (var bk = new SolidBrush (ServiceColors.CollapseMarkerBackColor))
                 using (var fore = new Pen (ServiceColors.CollapseMarkerForeColor))
                 using (var border = new Pen (ServiceColors.CollapseMarkerBorderColor))
-                    (m as CollapseFoldingMarker).Draw (e.Graphics, border, bk, fore);
-            else if (m is ExpandFoldingMarker)
+                    (marker as CollapseFoldingMarker).Draw (e.Graphics, border, bk, fore);
+            }
+            else if (marker is ExpandFoldingMarker)
+            {
                 using (var bk = new SolidBrush (ServiceColors.ExpandMarkerBackColor))
                 using (var fore = new Pen (ServiceColors.ExpandMarkerForeColor))
                 using (var border = new Pen (ServiceColors.ExpandMarkerBorderColor))
-                    (m as ExpandFoldingMarker).Draw (e.Graphics, border, bk, fore);
+                    (marker as ExpandFoldingMarker).Draw (e.Graphics, border, bk, fore);
+            }
             else
-                m.Draw (e.Graphics, servicePen);
+            {
+                marker.Draw (e.Graphics, servicePen);
+            }
         }
     }
 
@@ -5455,7 +5557,7 @@ public class SyntaxTextBox
         graphics.Restore (state);
         using (var font = new Font (FontFamily.GenericSansSerif, 8f))
             graphics.DrawString ("Recording...", font, Brushes.Red, new PointF (rect.Left + h, rect.Top));
-        System.Threading.Timer tm = null;
+        System.Threading.Timer? tm = null;
         tm = new System.Threading.Timer (
             (o) =>
             {
@@ -5533,6 +5635,9 @@ public class SyntaxTextBox
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void DrawFoldingLines (PaintEventArgs e, int startLine, int endLine)
     {
         e.Graphics.SmoothingMode = SmoothingMode.None;
@@ -5566,6 +5671,9 @@ public class SyntaxTextBox
                 }
     }
 
+    /// <summary>
+    /// /
+    /// </summary>
     private void DrawLineChars (Graphics gr, int firstChar, int lastChar, int iLine, int iWordWrapLine, int startX,
         int y)
     {
@@ -5652,36 +5760,41 @@ public class SyntaxTextBox
         }
     }
 
+    /// <inheritdoc cref="Control.OnEnter"/>
     protected override void OnEnter (EventArgs e)
     {
         base.OnEnter (e);
         mouseIsDrag = false;
         mouseIsDragDrop = false;
-        draggedRange = null;
+        _draggedRange = null;
     }
 
+    /// <inheritdoc cref="Control.OnMouseUp"/>
     protected override void OnMouseUp (MouseEventArgs e)
     {
         base.OnMouseUp (e);
         isLineSelect = false;
 
-        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        if (e.Button == MouseButtons.Left && mouseIsDragDrop)
         {
-            if (mouseIsDragDrop)
-                OnMouseClickText (e);
+            OnMouseClickText (e);
         }
     }
 
+    /// <inheritdoc cref="UserControl.OnMouseDown"/>
     protected override void OnMouseDown (MouseEventArgs e)
     {
         base.OnMouseDown (e);
 
-        if (middleClickScrollingActivated)
+        if (_middleClickScrollingActivated)
         {
             DeactivateMiddleClickScrollingMode();
             mouseIsDrag = false;
             if (e.Button == System.Windows.Forms.MouseButtons.Middle)
+            {
                 RestoreScrollsAfterMiddleClickScrollingMode();
+            }
+
             return;
         }
 
@@ -5699,14 +5812,14 @@ public class SyntaxTextBox
             {
                 mouseIsDrag = false;
                 mouseIsDragDrop = false;
-                draggedRange = null;
+                _draggedRange = null;
                 OnMarkerClick (e, marker);
                 return;
             }
 
             mouseIsDrag = true;
             mouseIsDragDrop = false;
-            draggedRange = null;
+            _draggedRange = null;
             isLineSelect = (e.Location.X < LeftIndentLine);
 
             if (!isLineSelect)
@@ -5717,7 +5830,7 @@ public class SyntaxTextBox
                 {
                     mouseIsDrag = false;
                     mouseIsDragDrop = false;
-                    draggedRange = null;
+                    _draggedRange = null;
 
                     SelectWord (p);
                     return;
@@ -5781,6 +5894,9 @@ public class SyntaxTextBox
         return;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void CheckAndChangeSelectionType()
     {
         //change selection type to ColumnSelectionMode
@@ -5796,6 +5912,7 @@ public class SyntaxTextBox
         }
     }
 
+    /// <inheritdoc cref="ScrollableControl.OnMouseWheel"/>
     protected override void OnMouseWheel (MouseEventArgs e)
     {
         Invalidate();
@@ -5861,10 +5978,9 @@ public class SyntaxTextBox
     {
         try
         {
-            using (var key = Registry.CurrentUser.OpenSubKey (@"Control Panel\Desktop", false))
-            {
-                return Convert.ToInt32 (key.GetValue ("WheelScrollLines"));
-            }
+            using var key = Registry.CurrentUser.OpenSubKey (@"Control Panel\Desktop", false);
+
+            return Convert.ToInt32 (key.GetValue ("WheelScrollLines"));
         }
         catch
         {
@@ -5873,17 +5989,21 @@ public class SyntaxTextBox
         }
     }
 
-    public void ChangeFontSize (int step)
+    /// <summary>
+    ///
+    /// </summary>
+    public void ChangeFontSize
+        (
+            int step
+        )
     {
         var points = Font.SizeInPoints;
-        using (var gr = Graphics.FromHwnd (Handle))
-        {
-            var dpi = gr.DpiY;
-            var newPoints = points + step * 72f / dpi;
-            if (newPoints < 1f) return;
-            var k = newPoints / originalFont.SizeInPoints;
-            Zoom = (int)Math.Round (100 * k);
-        }
+        using var gr = Graphics.FromHwnd (Handle);
+        var dpi = gr.DpiY;
+        var newPoints = points + step * 72f / dpi;
+        if (newPoints < 1f) return;
+        var k = newPoints / originalFont.SizeInPoints;
+        Zoom = (int)Math.Round (100 * k);
     }
 
     /// <summary>
@@ -5892,29 +6012,34 @@ public class SyntaxTextBox
     [Browsable (false)]
     public int Zoom
     {
-        get { return zoom; }
+        get => _zoom;
         set
         {
-            zoom = value;
-            DoZoom (zoom / 100f);
+            _zoom = value;
+            DoZoom (_zoom / 100f);
             OnZoomChanged();
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnZoomChanged()
     {
-        if (ZoomChanged != null)
-            ZoomChanged (this, EventArgs.Empty);
+        ZoomChanged?.Invoke (this, EventArgs.Empty);
     }
 
-    private void DoZoom (float koeff)
+    private void DoZoom
+        (
+            float coefficient
+        )
     {
         //remember first displayed line
         var iLine = YtoLineIndex (VerticalScroll.Value);
 
         //
         var points = originalFont.SizeInPoints;
-        points *= koeff;
+        points *= coefficient;
 
         if (points < 1f || points > 300f) return;
 
@@ -5934,6 +6059,7 @@ public class SyntaxTextBox
         OnVisibleRangeChanged();
     }
 
+    /// <inheritdoc cref="Control.OnMouseLeave"/>
     protected override void OnMouseLeave (EventArgs e)
     {
         base.OnMouseLeave (e);
@@ -5941,29 +6067,33 @@ public class SyntaxTextBox
         CancelToolTip();
     }
 
-    protected TextRange draggedRange;
+    protected TextRange? _draggedRange;
 
-    protected override void OnMouseMove (MouseEventArgs e)
+    /// <inheritdoc cref="Control.OnMouseMove"/>
+    protected override void OnMouseMove
+        (
+            MouseEventArgs e
+        )
     {
         base.OnMouseMove (e);
 
-        if (middleClickScrollingActivated)
+        if (_middleClickScrollingActivated)
             return;
 
         if (lastMouseCoord != e.Location)
         {
             //restart tooltip timer
             CancelToolTip();
-            timer3.Start();
+            _timer3.Start();
         }
 
         lastMouseCoord = e.Location;
 
         if (e.Button == MouseButtons.Left && mouseIsDragDrop)
         {
-            draggedRange = Selection.Clone();
+            _draggedRange = Selection.Clone();
             DoDragDrop (SelectedText, DragDropEffects.Copy);
-            draggedRange = null;
+            _draggedRange = null;
             return;
         }
 
@@ -6031,7 +6161,7 @@ public class SyntaxTextBox
 
     private void CancelToolTip()
     {
-        timer3.Stop();
+        _timer3.Stop();
         if (ToolTip != null && !string.IsNullOrEmpty (ToolTip.GetToolTip (this)))
         {
             ToolTip.Hide (this);
@@ -6039,13 +6169,19 @@ public class SyntaxTextBox
         }
     }
 
-    protected override void OnMouseDoubleClick (MouseEventArgs e)
+    /// <inheritdoc cref="Control.OnMouseDoubleClick"/>
+    protected override void OnMouseDoubleClick
+        (
+            MouseEventArgs e
+        )
     {
         base.OnMouseDoubleClick (e);
 
         var m = FindVisualMarkerForPoint (e.Location);
         if (m != null)
+        {
             OnMarkerDoubleClick (m);
+        }
     }
 
     private void SelectWord (Place p)
@@ -6090,9 +6226,6 @@ public class SyntaxTextBox
     /// <returns>Line and char position</returns>
     public Place PointToPlace (Point point)
     {
-#if debug
-            var sw = Stopwatch.StartNew();
-#endif
         point.Offset (HorizontalScroll.Value, VerticalScroll.Value);
         point.Offset (-LeftIndent - Paddings.Left, 0);
         var iLine = YtoLineIndex (point.Y);
@@ -6145,10 +6278,6 @@ public class SyntaxTextBox
         if (x > lines[iLine].Count)
             x = lines[iLine].Count;
 
-#if debug
-            Console.WriteLine("PointToPlace: " + sw.ElapsedMilliseconds);
-#endif
-
         return new Place (x, iLine);
     }
 
@@ -6175,23 +6304,24 @@ public class SyntaxTextBox
     /// <summary>
     /// Fires TextChanging event
     /// </summary>
-    public virtual void OnTextChanging (ref string text)
+    public virtual void OnTextChanging (ref string? text)
     {
         ClearBracketsPositions();
-
         if (TextChanging != null)
         {
             var args = new TextChangingEventArgs { InsertingText = text };
             TextChanging (this, args);
             text = args.InsertingText;
             if (args.Cancel)
+            {
                 text = string.Empty;
+            }
         }
     }
 
     public virtual void OnTextChanging()
     {
-        string temp = null;
+        string? temp = null;
         OnTextChanging (ref temp);
     }
 
@@ -6229,9 +6359,9 @@ public class SyntaxTextBox
     /// </summary>
     public void BeginUpdate()
     {
-        if (updating == 0)
-            updatingRange = null;
-        updating++;
+        if (_updating == 0)
+            _updatingRange = null;
+        _updating++;
     }
 
     /// <summary>
@@ -6239,15 +6369,14 @@ public class SyntaxTextBox
     /// </summary>
     public void EndUpdate()
     {
-        updating--;
+        _updating--;
 
-        if (updating == 0 && updatingRange != null)
+        if (_updating == 0 && _updatingRange != null)
         {
-            updatingRange.Expand();
-            OnTextChanged (updatingRange);
+            _updatingRange.Expand();
+            OnTextChanged (_updatingRange);
         }
     }
-
 
     /// <summary>
     /// Fires TextChanged event
@@ -6258,27 +6387,32 @@ public class SyntaxTextBox
         args.ChangedRange.Normalize();
 
         //
-        if (updating > 0)
+        if (_updating > 0)
         {
-            if (updatingRange == null)
-                updatingRange = args.ChangedRange.Clone();
+            if (_updatingRange == null)
+            {
+                _updatingRange = args.ChangedRange.Clone();
+            }
             else
             {
-                if (updatingRange.Start.Line > args.ChangedRange.Start.Line)
-                    updatingRange.Start = new Place (0, args.ChangedRange.Start.Line);
-                if (updatingRange.End.Line < args.ChangedRange.End.Line)
-                    updatingRange.End = new Place (lines[args.ChangedRange.End.Line].Count,
+                if (_updatingRange.Start.Line > args.ChangedRange.Start.Line)
+                {
+                    _updatingRange.Start = new Place (0, args.ChangedRange.Start.Line);
+                }
+
+                if (_updatingRange.End.Line < args.ChangedRange.End.Line)
+                {
+                    _updatingRange.End = new Place (lines[args.ChangedRange.End.Line].Count,
                         args.ChangedRange.End.Line);
-                updatingRange = updatingRange.GetIntersectionWith (Range);
+                }
+
+                _updatingRange = _updatingRange.GetIntersectionWith (Range);
             }
 
             return;
         }
 
         //
-#if debug
-            var sw = Stopwatch.StartNew();
-#endif
         CancelToolTip();
         ClearHints();
         IsChanged = true;
@@ -6287,40 +6421,35 @@ public class SyntaxTextBox
         ClearFoldingState (args.ChangedRange);
 
         //
-        if (wordWrap)
+        if (_wordWrap)
+        {
             RecalcWordWrap (args.ChangedRange.Start.Line, args.ChangedRange.End.Line);
+        }
 
         //
         base.OnTextChanged (args);
 
         //dalayed event stuffs
-        if (delayedTextChangedRange == null)
-            delayedTextChangedRange = args.ChangedRange.Clone();
-        else
-            delayedTextChangedRange = delayedTextChangedRange.GetUnionWith (args.ChangedRange);
+        _delayedTextChangedRange = _delayedTextChangedRange == null
+            ? args.ChangedRange.Clone()
+            : _delayedTextChangedRange.GetUnionWith (args.ChangedRange);
 
         needRiseTextChangedDelayed = true;
-        ResetTimer (timer2);
+        ResetTimer (_timer2);
 
         //
         OnSyntaxHighlight (args);
 
         //
-        if (TextChanged != null)
-            TextChanged (this, args);
+        TextChanged?.Invoke (this, args);
 
         //
-        if (BindingTextChanged != null)
-            BindingTextChanged (this, EventArgs.Empty);
+        BindingTextChanged?.Invoke (this, EventArgs.Empty);
 
         //
         base.OnTextChanged (EventArgs.Empty);
 
         //
-#if debug
-            Console.WriteLine("OnTextChanged: " + sw.ElapsedMilliseconds);
-#endif
-
         OnVisibleRangeChanged();
     }
 
@@ -6347,24 +6476,15 @@ public class SyntaxTextBox
     /// </summary>
     public virtual void OnSelectionChanged()
     {
-#if debug
-            var sw = Stopwatch.StartNew();
-#endif
-
         //find folding markers for highlighting
         if (HighlightFoldingIndicator)
             HighlightFoldings();
 
         //
         needRiseSelectionChangedDelayed = true;
-        ResetTimer (timer);
+        ResetTimer (_timer1);
 
-        if (SelectionChanged != null)
-            SelectionChanged (this, new EventArgs());
-
-#if debug
-            Console.WriteLine("OnSelectionChanged: "+ sw.ElapsedMilliseconds);
-#endif
+        SelectionChanged?.Invoke (this, new EventArgs());
     }
 
     //find folding markers for highlighting
@@ -6374,11 +6494,11 @@ public class SyntaxTextBox
             return;
 
         //
-        var prevStartFoldingLine = startFoldingLine;
+        var prevStartFoldingLine = _startFoldingLine;
         var prevEndFoldingLine = endFoldingLine;
 
         //
-        startFoldingLine = -1;
+        _startFoldingLine = -1;
         endFoldingLine = -1;
         var counter = 0;
         for (var i = Selection.Start.Line; i >= Math.Max (Selection.Start.Line - maxLinesForFolding, 0); i--)
@@ -6394,7 +6514,7 @@ public class SyntaxTextBox
                 counter--;
                 if (counter == -1) //found start folding
                 {
-                    startFoldingLine = i;
+                    _startFoldingLine = i;
                     break;
                 }
             }
@@ -6403,32 +6523,45 @@ public class SyntaxTextBox
                 counter++;
         }
 
-        if (startFoldingLine >= 0)
+        if (_startFoldingLine >= 0)
         {
             //find end of block
-            endFoldingLine = FindEndOfFoldingBlock (startFoldingLine, maxLinesForFolding);
-            if (endFoldingLine == startFoldingLine)
+            endFoldingLine = FindEndOfFoldingBlock (_startFoldingLine, maxLinesForFolding);
+            if (endFoldingLine == _startFoldingLine)
                 endFoldingLine = -1;
         }
 
-        if (startFoldingLine != prevStartFoldingLine || endFoldingLine != prevEndFoldingLine)
+        if (_startFoldingLine != prevStartFoldingLine || endFoldingLine != prevEndFoldingLine)
+        {
             OnFoldingHighlightChanged();
+        }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnFoldingHighlightChanged()
     {
         if (FoldingHighlightChanged != null)
             FoldingHighlightChanged (this, EventArgs.Empty);
     }
 
-    protected override void OnGotFocus (EventArgs e)
+    /// <inheritdoc cref="Control.OnGotFocus"/>
+    protected override void OnGotFocus
+        (
+            EventArgs e
+        )
     {
         SetAsCurrentTB();
         base.OnGotFocus (e);
         Invalidate();
     }
 
-    protected override void OnLostFocus (EventArgs e)
+    /// <inheritdoc cref="Control.OnLostFocus"/>
+    protected override void OnLostFocus
+        (
+            EventArgs e
+        )
     {
         lastModifiers = Keys.None;
         DeactivateMiddleClickScrollingMode();
@@ -6445,11 +6578,16 @@ public class SyntaxTextBox
     {
         if (point.Line < 0 || point.Line >= lines.Count ||
             point.Column >= lines[point.Line].Count + Environment.NewLine.Length)
+        {
             return -1;
+        }
 
         var result = 0;
         for (var i = 0; i < point.Line; i++)
+        {
             result += lines[i].Count + Environment.NewLine.Length;
+        }
+
         result += point.Column;
 
         return result;
@@ -6552,59 +6690,81 @@ public class SyntaxTextBox
 
         //
         foreach (var r in range.GetRanges (regexPattern, RegexOptions.None))
+        {
             yield return r;
+        }
     }
 
     /// <summary>
     /// Finds ranges for given regex pattern
     /// </summary>
     /// <param name="regexPattern">Regex pattern</param>
+    /// <param name="options"></param>
     /// <returns>Enumeration of ranges</returns>
-    public IEnumerable<TextRange> GetRanges (string regexPattern, RegexOptions options)
+    public IEnumerable<TextRange> GetRanges
+        (
+            string regexPattern,
+            RegexOptions options
+        )
     {
         var range = new TextRange (this);
         range.SelectAll();
 
         //
         foreach (var r in range.GetRanges (regexPattern, options))
+        {
             yield return r;
+        }
     }
 
     /// <summary>
     /// Get text of given line
     /// </summary>
-    /// <param name="iLine">Line index</param>
+    /// <param name="lineIndex">Line index</param>
     /// <returns>Text</returns>
-    public string GetLineText (int iLine)
+    public string GetLineText
+        (
+            int lineIndex
+        )
     {
-        if (iLine < 0 || iLine >= lines.Count)
-            throw new ArgumentOutOfRangeException ("Line index out of range");
-        var sb = new StringBuilder (lines[iLine].Count);
-        foreach (var c in lines[iLine])
-            sb.Append (c.c);
-        return sb.ToString();
+        if (lineIndex < 0 || lineIndex >= lines.Count)
+        {
+            throw new ArgumentOutOfRangeException (nameof (lineIndex), "Line index out of range");
+        }
+
+        var builder = new StringBuilder (lines[lineIndex].Count);
+        foreach (var c in lines[lineIndex])
+        {
+            builder.Append (c.c);
+        }
+
+        return builder.ToString();
     }
 
     /// <summary>
     /// Exapnds folded block
     /// </summary>
-    /// <param name="iLine">Start line</param>
-    public virtual void ExpandFoldedBlock (int iLine)
+    /// <param name="lineIndex">Start line</param>
+    public virtual void ExpandFoldedBlock (int lineIndex)
     {
-        if (iLine < 0 || iLine >= lines.Count)
-            throw new ArgumentOutOfRangeException ("Line index out of range");
+        if (lineIndex < 0 || lineIndex >= lines.Count)
+        {
+            throw new ArgumentOutOfRangeException (nameof (lineIndex), "Line index out of range");
+        }
 
         //find all hidden lines afetr iLine
-        var end = iLine;
+        var end = lineIndex;
         for (; end < LinesCount - 1; end++)
         {
             if (LineInfos[end + 1].VisibleState != VisibleState.Hidden)
+            {
                 break;
+            }
         }
 
-        ExpandBlock (iLine, end);
+        ExpandBlock (lineIndex, end);
 
-        FoldedBlocks.Remove (this[iLine].UniqueId); //remove folded state for this line
+        FoldedBlocks.Remove (this[lineIndex].UniqueId); //remove folded state for this line
         AdjustFolding();
     }
 
@@ -6614,12 +6774,15 @@ public class SyntaxTextBox
     public virtual void AdjustFolding()
     {
         //collapse folded blocks
-        for (var iLine = 0; iLine < LinesCount; iLine++)
-            if (LineInfos[iLine].VisibleState == VisibleState.Visible)
-                if (FoldedBlocks.ContainsKey (this[iLine].UniqueId))
-                    CollapseFoldingBlock (iLine);
+        for (var lineIndex = 0; lineIndex < LinesCount; lineIndex++)
+        {
+            if (LineInfos[lineIndex].VisibleState == VisibleState.Visible
+                && FoldedBlocks.ContainsKey (this[lineIndex].UniqueId))
+            {
+                CollapseFoldingBlock (lineIndex);
+            }
+        }
     }
-
 
     /// <summary>
     /// Expand collapsed block
@@ -6643,25 +6806,33 @@ public class SyntaxTextBox
     public void ExpandBlock (int iLine)
     {
         if (LineInfos[iLine].VisibleState == VisibleState.Visible)
+        {
             return;
+        }
 
         for (var i = iLine; i < LinesCount; i++)
+        {
             if (LineInfos[i].VisibleState == VisibleState.Visible)
-                break;
-            else
             {
-                SetVisibleState (i, VisibleState.Visible);
-                needRecalc = true;
+                break;
             }
 
+            SetVisibleState (i, VisibleState.Visible);
+            needRecalc = true;
+        }
+
         for (var i = iLine - 1; i >= 0; i--)
+        {
             if (LineInfos[i].VisibleState == VisibleState.Visible)
+            {
                 break;
+            }
             else
             {
                 SetVisibleState (i, VisibleState.Visible);
                 needRecalc = true;
             }
+        }
 
         Invalidate();
         OnVisibleRangeChanged();
@@ -6673,6 +6844,7 @@ public class SyntaxTextBox
     public virtual void CollapseAllFoldingBlocks()
     {
         for (var i = 0; i < LinesCount; i++)
+        {
             if (lines.LineHasFoldingStartMarker (i))
             {
                 var iFinish = FindEndOfFoldingBlock (i);
@@ -6682,6 +6854,7 @@ public class SyntaxTextBox
                     i = iFinish;
                 }
             }
+        }
 
         OnVisibleRangeChanged();
         UpdateScrollbars();
@@ -7369,13 +7542,13 @@ public class SyntaxTextBox
     /// <summary>
     /// Returns range between brackets (or null if not found)
     /// </summary>
-    public TextRange GetBracketsRange (Place placeInsideBrackets, char leftBracket, char rightBracket, bool includeBrackets)
+    public TextRange? GetBracketsRange (Place placeInsideBrackets, char leftBracket, char rightBracket, bool includeBrackets)
     {
         var startRange = new TextRange (this, placeInsideBrackets, placeInsideBrackets);
         var range = startRange.Clone();
 
-        TextRange leftBracketPosition = null;
-        TextRange rightBracketPosition = null;
+        TextRange? leftBracketPosition = null;
+        TextRange? rightBracketPosition = null;
 
         var counter = 0;
         var maxIterations = maxBracketSearchIterations;
@@ -7516,10 +7689,6 @@ public class SyntaxTextBox
 
     public virtual void OnSyntaxHighlight (TextChangedEventArgs args)
     {
-#if debug
-            Stopwatch sw = Stopwatch.StartNew();
-#endif
-
         TextRange range;
 
         switch (HighlightingRangeType)
@@ -7542,10 +7711,6 @@ public class SyntaxTextBox
             else
                 SyntaxHighlighter.HighlightSyntax (Language, range);
         }
-
-#if debug
-            Console.WriteLine("OnSyntaxHighlight: "+ sw.ElapsedMilliseconds);
-#endif
     }
 
     private void InitializeComponent()
@@ -7562,7 +7727,11 @@ public class SyntaxTextBox
     /// <summary>
     /// Prints range of text
     /// </summary>
-    public virtual void Print (TextRange range, PrintDialogSettings settings)
+    public virtual void Print
+        (
+            TextRange range,
+            PrintDialogSettings settings
+        )
     {
         //prepare export with wordwrapping
         var exporter = new ExportToHtml();
@@ -7579,7 +7748,7 @@ public class SyntaxTextBox
             return;
 
         //change visible range
-        visibleRange = range;
+        _visibleRange = range;
         try
         {
             //call handlers for VisibleRange
@@ -7591,7 +7760,7 @@ public class SyntaxTextBox
         finally
         {
             //restore visible range
-            visibleRange = null;
+            _visibleRange = null;
         }
 
         //generate HTML
@@ -7614,12 +7783,19 @@ public class SyntaxTextBox
         wb.Navigate (tempFile);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual string PrepareHtmlText (string s)
     {
         return s.Replace ("<", "&lt;").Replace (">", "&gt;").Replace ("&", "&amp;");
     }
 
-    private void wb_StatusTextChanged (object sender, EventArgs e)
+    private void wb_StatusTextChanged
+        (
+            object? sender,
+            EventArgs e
+        )
     {
         var wb = sender as WebBrowser;
         if (wb.StatusText.Contains ("#print"))
@@ -7705,8 +7881,8 @@ window.status = ""#print"";
         {
             if (SyntaxHighlighter != null)
                 SyntaxHighlighter.Dispose();
-            timer.Dispose();
-            timer2.Dispose();
+            _timer1.Dispose();
+            _timer2.Dispose();
             middleClickScrollingTimer.Dispose();
 
             if (findForm != null)
@@ -8000,17 +8176,17 @@ window.status = ""#print"";
             return;
 
         // Abort, if dragged range contains target place
-        if ((draggedRange != null) && (draggedRange.Contains (place) == true))
+        if ((_draggedRange != null) && (_draggedRange.Contains (place) == true))
             return;
 
         // Determine, if the dragged string should be copied or moved
         var copyMode =
-            (draggedRange == null) || // drag from outside
-            (draggedRange.ReadOnly) || // dragged range is read only
+            (_draggedRange == null) || // drag from outside
+            (_draggedRange.ReadOnly) || // dragged range is read only
             ((ModifierKeys & Keys.Control) != Keys.None);
 
         //drag from outside?
-        if (draggedRange == null)
+        if (_draggedRange == null)
         {
             Selection.BeginUpdate();
 
@@ -8030,16 +8206,16 @@ window.status = ""#print"";
         Selection.BeginUpdate();
 
         //remember dragged selection for undo/redo
-        Selection = draggedRange;
+        Selection = _draggedRange;
         lines.Manager.ExecuteCommand (new SelectCommand (lines));
 
         //
-        if (draggedRange.ColumnSelectionMode)
+        if (_draggedRange.ColumnSelectionMode)
         {
-            draggedRange.Normalize();
+            _draggedRange.Normalize();
             insertRange =
                 new TextRange (this, place,
-                        new Place (place.Column, place.Line + draggedRange.End.Line - draggedRange.Start.Line))
+                        new Place (place.Column, place.Line + _draggedRange.End.Line - _draggedRange.Start.Line))
                     { ColumnSelectionMode = true };
             for (var i = LinesCount; i <= insertRange.End.Line; i++)
             {
@@ -8050,12 +8226,12 @@ window.status = ""#print"";
 
         if (!insertRange.ReadOnly)
         {
-            if (place < draggedRange.Start)
+            if (place < _draggedRange.Start)
             {
                 // Delete dragged range if not in copy mode
                 if (copyMode == false)
                 {
-                    Selection = draggedRange;
+                    Selection = _draggedRange;
                     ClearSelected();
                 }
 
@@ -8077,7 +8253,7 @@ window.status = ""#print"";
                 // Delete dragged range if not in copy mode
                 if (copyMode == false)
                 {
-                    Selection = draggedRange;
+                    Selection = _draggedRange;
                     ClearSelected();
                 }
 
@@ -8087,23 +8263,23 @@ window.status = ""#print"";
             }
 
             // Select inserted text
-            if (!draggedRange.ColumnSelectionMode)
+            if (!_draggedRange.ColumnSelectionMode)
             {
                 Selection = new TextRange (this, place, caretPositionAfterInserting);
             }
             else
             {
-                draggedRange.Normalize();
+                _draggedRange.Normalize();
                 Selection = new TextRange (this, place,
-                        new Place (place.Column + draggedRange.End.Column - draggedRange.Start.Column,
-                            place.Line + draggedRange.End.Line - draggedRange.Start.Line))
+                        new Place (place.Column + _draggedRange.End.Column - _draggedRange.Start.Column,
+                            place.Line + _draggedRange.End.Line - _draggedRange.Start.Line))
                     { ColumnSelectionMode = true };
             }
         }
 
         Selection.EndUpdate();
         EndAutoUndo();
-        draggedRange = null;
+        _draggedRange = null;
     }
 
     protected virtual void DoDragDrop (Place place, string text)
@@ -8115,16 +8291,16 @@ window.status = ""#print"";
             return;
 
         // Abort, if dragged range contains target place
-        if ((draggedRange != null) && (draggedRange.Contains (place) == true))
+        if ((_draggedRange != null) && (_draggedRange.Contains (place) == true))
             return;
 
         // Determine, if the dragged string should be copied or moved
         var copyMode =
-            (draggedRange == null) || // drag from outside
-            (draggedRange.ReadOnly) || // dragged range is read only
+            (_draggedRange == null) || // drag from outside
+            (_draggedRange.ReadOnly) || // dragged range is read only
             ((ModifierKeys & Keys.Control) != Keys.None);
 
-        if (draggedRange == null) //drag from outside
+        if (_draggedRange == null) //drag from outside
         {
             Selection.BeginUpdate();
 
@@ -8138,22 +8314,22 @@ window.status = ""#print"";
         }
         else //drag from me
         {
-            if (!draggedRange.Contains (place))
+            if (!_draggedRange.Contains (place))
             {
                 BeginAutoUndo();
 
                 //remember dragged selection for undo/redo
-                Selection = draggedRange;
+                Selection = _draggedRange;
                 lines.Manager.ExecuteCommand (new SelectCommand (lines));
 
                 //
-                if (draggedRange.ColumnSelectionMode)
+                if (_draggedRange.ColumnSelectionMode)
                 {
-                    draggedRange.Normalize();
+                    _draggedRange.Normalize();
                     insertRange =
                         new TextRange (this, place,
                                 new Place (place.Column,
-                                    place.Line + draggedRange.End.Line - draggedRange.Start.Line))
+                                    place.Line + _draggedRange.End.Line - _draggedRange.Start.Line))
                             { ColumnSelectionMode = true };
                     for (var i = LinesCount; i <= insertRange.End.Line; i++)
                     {
@@ -8164,12 +8340,12 @@ window.status = ""#print"";
 
                 if (!insertRange.ReadOnly)
                 {
-                    if (place < draggedRange.Start)
+                    if (place < _draggedRange.Start)
                     {
                         // Delete dragged range if not in copy mode
                         if (copyMode == false)
                         {
-                            Selection = draggedRange;
+                            Selection = _draggedRange;
                             ClearSelected();
                         }
 
@@ -8188,7 +8364,7 @@ window.status = ""#print"";
                         // Delete dragged range if not in copy mode
                         if (copyMode == false)
                         {
-                            Selection = draggedRange;
+                            Selection = _draggedRange;
                             ClearSelected();
                         }
                     }
@@ -8199,17 +8375,17 @@ window.status = ""#print"";
                 var endPosition = Selection.Start;
 
                 // Correct selection
-                var dR = (draggedRange.End > draggedRange.Start) // dragged selection
-                    ? this.GetRange (draggedRange.Start, draggedRange.End)
-                    : this.GetRange (draggedRange.End, draggedRange.Start);
+                var dR = (_draggedRange.End > _draggedRange.Start) // dragged selection
+                    ? this.GetRange (_draggedRange.Start, _draggedRange.End)
+                    : this.GetRange (_draggedRange.End, _draggedRange.Start);
                 var tP = place; // targetPlace
                 int tS_S_Line; // targetSelection.Start.iLine
                 int tS_S_Char; // targetSelection.Start.iChar
                 int tS_E_Line; // targetSelection.End.iLine
                 int tS_E_Char; // targetSelection.End.iChar
-                if ((place > draggedRange.Start) && (copyMode == false))
+                if ((place > _draggedRange.Start) && (copyMode == false))
                 {
-                    if (draggedRange.ColumnSelectionMode == false)
+                    if (_draggedRange.ColumnSelectionMode == false)
                     {
                         // Normal selection mode:
 
@@ -8254,7 +8430,7 @@ window.status = ""#print"";
 
 
                 // Select inserted text
-                if (!draggedRange.ColumnSelectionMode)
+                if (!_draggedRange.ColumnSelectionMode)
                     Selection = new TextRange (this, startPosition, endPosition);
                 else
                 {
@@ -8285,13 +8461,14 @@ window.status = ""#print"";
                 EndAutoUndo();
             }
 
-            this.selection.Inverse();
+            this._selection.Inverse();
             OnSelectionChanged();
         }
 
-        draggedRange = null;
+        _draggedRange = null;
     }
 
+    /// <inheritdoc cref="Control.OnDragOver"/>
     protected override void OnDragOver (DragEventArgs e)
     {
         if (e.Data.GetDataPresent (DataFormats.Text))
@@ -8308,6 +8485,7 @@ window.status = ""#print"";
         base.OnDragOver (e);
     }
 
+    /// <inheritdoc cref="Control.OnDragLeave"/>
     protected override void OnDragLeave (EventArgs e)
     {
         IsDragDrop = false;
@@ -8318,9 +8496,9 @@ window.status = ""#print"";
 
     #region MiddleClickScrolling
 
-    private bool middleClickScrollingActivated;
-    private Point middleClickScrollingOriginPoint;
-    private Point middleClickScrollingOriginScroll;
+    private bool _middleClickScrollingActivated;
+    private Point _middleClickScrollingOriginPoint;
+    private Point _middleClickScrollingOriginScroll;
     private readonly Timer middleClickScrollingTimer = new Timer();
     private ScrollDirection middleClickScollDirection = ScrollDirection.None;
 
@@ -8330,14 +8508,14 @@ window.status = ""#print"";
     /// <param name="e">MouseEventArgs</param>
     private void ActivateMiddleClickScrollingMode (MouseEventArgs e)
     {
-        if (!middleClickScrollingActivated)
+        if (!_middleClickScrollingActivated)
         {
             if ((!HorizontalScroll.Visible) && (!VerticalScroll.Visible))
                 if (ShowScrollBars)
                     return;
-            middleClickScrollingActivated = true;
-            middleClickScrollingOriginPoint = e.Location;
-            middleClickScrollingOriginScroll = new Point (HorizontalScroll.Value, VerticalScroll.Value);
+            _middleClickScrollingActivated = true;
+            _middleClickScrollingOriginPoint = e.Location;
+            _middleClickScrollingOriginScroll = new Point (HorizontalScroll.Value, VerticalScroll.Value);
             middleClickScrollingTimer.Interval = 50;
             middleClickScrollingTimer.Enabled = true;
             Capture = true;
@@ -8355,9 +8533,9 @@ window.status = ""#print"";
     /// </summary>
     private void DeactivateMiddleClickScrollingMode()
     {
-        if (middleClickScrollingActivated)
+        if (_middleClickScrollingActivated)
         {
-            middleClickScrollingActivated = false;
+            _middleClickScrollingActivated = false;
             middleClickScrollingTimer.Enabled = false;
             Capture = false;
             base.Cursor = defaultCursor;
@@ -8375,13 +8553,13 @@ window.status = ""#print"";
     {
         var xea = new ScrollEventArgs (ScrollEventType.ThumbPosition,
             HorizontalScroll.Value,
-            middleClickScrollingOriginScroll.X,
+            _middleClickScrollingOriginScroll.X,
             ScrollOrientation.HorizontalScroll);
         OnScroll (xea);
 
         var yea = new ScrollEventArgs (ScrollEventType.ThumbPosition,
             VerticalScroll.Value,
-            middleClickScrollingOriginScroll.Y,
+            _middleClickScrollingOriginScroll.Y,
             ScrollOrientation.VerticalScroll);
         OnScroll (yea);
     }
@@ -8396,7 +8574,7 @@ window.status = ""#print"";
         if (IsDisposed)
             return;
 
-        if (!middleClickScrollingActivated)
+        if (!_middleClickScrollingActivated)
             return;
 
         var currentMouseLocation = PointToClient (Cursor.Position);
@@ -8404,8 +8582,8 @@ window.status = ""#print"";
         Capture = true;
 
         // Calculate angle and distance between current position point and origin point
-        var distanceX = this.middleClickScrollingOriginPoint.X - currentMouseLocation.X;
-        var distanceY = this.middleClickScrollingOriginPoint.Y - currentMouseLocation.Y;
+        var distanceX = this._middleClickScrollingOriginPoint.X - currentMouseLocation.X;
+        var distanceY = this._middleClickScrollingOriginPoint.Y - currentMouseLocation.Y;
 
         if (!VerticalScroll.Visible && ShowScrollBars) distanceY = 0;
         if (!HorizontalScroll.Visible && ShowScrollBars) distanceX = 0;
@@ -8514,7 +8692,7 @@ window.status = ""#print"";
             Color.FromArgb (100, (byte)~this.BackColor.R, (byte)~this.BackColor.G, (byte)~this.BackColor.B);
         using (var inverseColorBrush = new SolidBrush (inverseColor))
         {
-            var p = middleClickScrollingOriginPoint;
+            var p = _middleClickScrollingOriginPoint;
 
             var state = gr.Save();
 
@@ -8569,18 +8747,6 @@ window.status = ""#print"";
     }
 
     #endregion
-}
-
-public class PaintLineEventArgs : PaintEventArgs
-{
-    public PaintLineEventArgs (int iLine, Rectangle rect, Graphics gr, Rectangle clipRect) : base (gr, clipRect)
-    {
-        LineIndex = iLine;
-        LineRect = rect;
-    }
-
-    public int LineIndex { get; private set; }
-    public Rectangle LineRect { get; private set; }
 }
 
 public class LineInsertedEventArgs : EventArgs
@@ -8696,45 +8862,6 @@ public enum WordWrapMode
     /// Custom wrap (by event WordWrapNeeded)
     /// </summary>
     Custom
-}
-
-public class PrintDialogSettings
-{
-    public PrintDialogSettings()
-    {
-        ShowPrintPreviewDialog = true;
-        Title = "";
-        Footer = "";
-        Header = "";
-    }
-
-    public bool ShowPageSetupDialog { get; set; }
-    public bool ShowPrintDialog { get; set; }
-    public bool ShowPrintPreviewDialog { get; set; }
-
-    /// <summary>
-    /// Title of page. If you want to print Title on the page, insert code &amp;w in Footer or Header.
-    /// </summary>
-    public string Title { get; set; }
-
-    /// <summary>
-    /// Footer of page.
-    /// Here you can use special codes: &amp;w (Window title), &amp;D, &amp;d (Date), &amp;t(), &amp;4 (Time), &amp;p (Current page number), &amp;P (Total number of pages),  &amp;&amp; (A single ampersand), &amp;b (Right justify text, Center text. If &amp;b occurs once, then anything after the &amp;b is right justified. If &amp;b occurs twice, then anything between the two &amp;b is centered, and anything after the second &amp;b is right justified).
-    /// More detailed see <see cref="http://msdn.microsoft.com/en-us/library/aa969429(v=vs.85).aspx">here</see>
-    /// </summary>
-    public string Footer { get; set; }
-
-    /// <summary>
-    /// Header of page
-    /// Here you can use special codes: &amp;w (Window title), &amp;D, &amp;d (Date), &amp;t(), &amp;4 (Time), &amp;p (Current page number), &amp;P (Total number of pages),  &amp;&amp; (A single ampersand), &amp;b (Right justify text, Center text. If &amp;b occurs once, then anything after the &amp;b is right justified. If &amp;b occurs twice, then anything between the two &amp;b is centered, and anything after the second &amp;b is right justified).
-    /// More detailed see <see cref="http://msdn.microsoft.com/en-us/library/aa969429(v=vs.85).aspx">here</see>
-    /// </summary>
-    public string Header { get; set; }
-
-    /// <summary>
-    /// Prints line numbers
-    /// </summary>
-    public bool IncludeLineNumbers { get; set; }
 }
 
 public class AutoIndentEventArgs : EventArgs
