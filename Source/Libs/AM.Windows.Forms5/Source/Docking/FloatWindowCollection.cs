@@ -17,39 +17,38 @@ using System.Collections.ObjectModel;
 
 #nullable enable
 
-namespace AM.Windows.Forms.Docking
+namespace AM.Windows.Forms.Docking;
+
+public class FloatWindowCollection : ReadOnlyCollection<FloatWindow>
 {
-    public class FloatWindowCollection : ReadOnlyCollection<FloatWindow>
+    internal FloatWindowCollection()
+        : base (new List<FloatWindow>())
     {
-        internal FloatWindowCollection()
-            : base(new List<FloatWindow>())
-        {
-        }
+    }
 
-        internal int Add(FloatWindow fw)
-        {
-            if (Items.Contains(fw))
-                return Items.IndexOf(fw);
+    internal int Add (FloatWindow fw)
+    {
+        if (Items.Contains (fw))
+            return Items.IndexOf (fw);
 
-            Items.Add(fw);
-            return Count - 1;
-        }
+        Items.Add (fw);
+        return Count - 1;
+    }
 
-        internal void Dispose()
-        {
-            for (int i=Count - 1; i>=0; i--)
-                this[i].Close();
-        }
+    internal void Dispose()
+    {
+        for (int i = Count - 1; i >= 0; i--)
+            this[i].Close();
+    }
 
-        internal void Remove(FloatWindow fw)
-        {
-            Items.Remove(fw);
-        }
+    internal void Remove (FloatWindow fw)
+    {
+        Items.Remove (fw);
+    }
 
-        internal void BringWindowToFront(FloatWindow fw)
-        {
-            Items.Remove(fw);
-            Items.Add(fw);
-        }
+    internal void BringWindowToFront (FloatWindow fw)
+    {
+        Items.Remove (fw);
+        Items.Add (fw);
     }
 }

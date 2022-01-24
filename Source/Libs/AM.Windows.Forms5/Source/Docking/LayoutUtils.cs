@@ -16,13 +16,12 @@ using System.Drawing;
 
 #nullable enable
 
-namespace AM.Windows.Forms.Docking
+namespace AM.Windows.Forms.Docking;
+
+public static class LayoutUtils
 {
-    public static class LayoutUtils
+    public static bool IsZeroWidthOrHeight (Rectangle rectangle)
     {
-        public static bool IsZeroWidthOrHeight(Rectangle rectangle)
-        {
-            return (rectangle.Width == 0 || rectangle.Height == 0);
-        }
+        return (rectangle.Width == 0 || rectangle.Height == 0);
     }
 }

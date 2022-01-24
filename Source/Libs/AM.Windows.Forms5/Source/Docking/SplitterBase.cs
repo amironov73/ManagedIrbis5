@@ -18,68 +18,67 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms.Docking
+namespace AM.Windows.Forms.Docking;
+
+[ToolboxItem (false)]
+public class SplitterBase : Control
 {
-    [ToolboxItem(false)]
-    public class SplitterBase : Control
+    public SplitterBase()
     {
-        public SplitterBase()
+        SetStyle (ControlStyles.Selectable, false);
+    }
+
+    public override DockStyle Dock
+    {
+        get { return base.Dock; }
+        set
         {
-            SetStyle(ControlStyles.Selectable, false);
+            SuspendLayout();
+            base.Dock = value;
+
+            if (Dock == DockStyle.Left || Dock == DockStyle.Right)
+                Width = SplitterSize;
+            else if (Dock == DockStyle.Top || Dock == DockStyle.Bottom)
+                Height = SplitterSize;
+            else
+                Bounds = Rectangle.Empty;
+
+            if (Dock == DockStyle.Left || Dock == DockStyle.Right)
+                Cursor = Cursors.VSplit;
+            else if (Dock == DockStyle.Top || Dock == DockStyle.Bottom)
+                Cursor = Cursors.HSplit;
+            else
+                Cursor = Cursors.Default;
+
+            ResumeLayout();
         }
+    }
 
-        public override DockStyle Dock
-        {
-            get	{	return base.Dock;	}
-            set
-            {
-                SuspendLayout();
-                base.Dock = value;
+    protected virtual int SplitterSize
+    {
+        get { return 0; }
+    }
 
-                if (Dock == DockStyle.Left || Dock == DockStyle.Right)
-                    Width = SplitterSize;
-                else if (Dock == DockStyle.Top || Dock == DockStyle.Bottom)
-                    Height = SplitterSize;
-                else
-                    Bounds = Rectangle.Empty;
+    protected override void OnMouseDown (MouseEventArgs e)
+    {
+        base.OnMouseDown (e);
 
-                if (Dock == DockStyle.Left || Dock == DockStyle.Right)
-                    Cursor = Cursors.VSplit;
-                else if (Dock == DockStyle.Top || Dock == DockStyle.Bottom)
-                    Cursor = Cursors.HSplit;
-                else
-                    Cursor = Cursors.Default;
-                    
-                ResumeLayout();
-            }
-        }
+        if (e.Button != MouseButtons.Left)
+            return;
 
-        protected virtual int SplitterSize
-        {
-            get	{	return 0;	}
-        }
+        StartDrag();
+    }
 
-        protected override void OnMouseDown(MouseEventArgs e)
-        {
-            base.OnMouseDown(e);
+    protected virtual void StartDrag()
+    {
+    }
 
-            if (e.Button != MouseButtons.Left)
-                return;
+    protected override void WndProc (ref Message m)
+    {
+        // eat the WM_MOUSEACTIVATE message
+        if (m.Msg == (int)Win32.Msgs.WM_MOUSEACTIVATE)
+            return;
 
-            StartDrag();
-        }
-
-        protected virtual void StartDrag()
-        {
-        }
-
-        protected override void WndProc(ref Message m)
-        {
-            // eat the WM_MOUSEACTIVATE message
-            if (m.Msg == (int)Win32.Msgs.WM_MOUSEACTIVATE)
-                return;
-
-            base.WndProc(ref m);
-        }
+        base.WndProc (ref m);
     }
 }

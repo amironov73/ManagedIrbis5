@@ -16,26 +16,25 @@ using System.Resources;
 
 #nullable enable
 
-namespace AM.Windows.Forms.Docking
+namespace AM.Windows.Forms.Docking;
+
+internal static class ResourceHelper
 {
-    internal static class ResourceHelper
+    private static ResourceManager _resourceManager = null;
+
+    private static ResourceManager ResourceManager
     {
-        private static ResourceManager _resourceManager = null;
-
-        private static ResourceManager ResourceManager
+        get
         {
-            get
-            {
-                if (_resourceManager == null)
-                    _resourceManager = new ResourceManager("WeifenLuo.WinFormsUI.Docking.Strings", typeof(ResourceHelper).Assembly);
-                return _resourceManager;
-            }
-
+            if (_resourceManager == null)
+                _resourceManager = new ResourceManager ("WeifenLuo.WinFormsUI.Docking.Strings",
+                    typeof (ResourceHelper).Assembly);
+            return _resourceManager;
         }
+    }
 
-        public static string GetString(string name)
-        {
-            return ResourceManager.GetString(name);
-        }
+    public static string GetString (string name)
+    {
+        return ResourceManager.GetString (name);
     }
 }

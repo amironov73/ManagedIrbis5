@@ -35,6 +35,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Remove="Properties\XPThemes.manifest" />
+    <EmbeddedResource Include="Properties\XPThemes.manifest" />
   </ItemGroup>
 
   <ItemGroup>

@@ -19,123 +19,124 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Windows.Forms.Docking
+namespace AM.Windows.Forms.Docking;
+
+[ProvideProperty ("EnableVSStyle", typeof (ToolStrip))]
+public partial class VisualStudioToolStripExtender : Component, IExtenderProvider
 {
-    [ProvideProperty("EnableVSStyle", typeof(ToolStrip))]
-    public partial class VisualStudioToolStripExtender : Component, IExtenderProvider
+    private class ToolStripProperties
     {
-        private class ToolStripProperties
+        private VsVersion version = VsVersion.Unknown;
+        private readonly ToolStrip strip;
+        private readonly Dictionary<ToolStripItem, string> menuText = new Dictionary<ToolStripItem, string>();
+
+
+        public ToolStripProperties (ToolStrip toolstrip)
         {
-            private VsVersion version = VsVersion.Unknown;
-            private readonly ToolStrip strip;
-            private readonly Dictionary<ToolStripItem, string> menuText = new Dictionary<ToolStripItem, string>();
-            
+            if (toolstrip == null) throw new ArgumentNullException (nameof (toolstrip));
+            strip = toolstrip;
 
-            public ToolStripProperties(ToolStrip toolstrip)
+            if (strip is MenuStrip)
+                SaveMenuStripText();
+        }
+
+        public VsVersion VsVersion
+        {
+            get { return this.version; }
+            set
             {
-                if (toolstrip == null) throw new ArgumentNullException(nameof(toolstrip));
-                strip = toolstrip;
-
-                if (strip is MenuStrip)
-                    SaveMenuStripText();
-            }
-
-            public VsVersion VsVersion 
-            {
-                get { return this.version; }
-                set
-                {
-                    this.version = value;
-                    UpdateMenuText(this.version == VsVersion.Vs2012 || this.version == VsVersion.Vs2013);
-                }
-            }
-
-            private void SaveMenuStripText()
-            {
-                foreach (ToolStripItem item in strip.Items)
-                    menuText.Add(item, item.Text);
-            }
-
-            public void UpdateMenuText(bool caps)
-            {
-                foreach (ToolStripItem item in menuText.Keys)
-                {
-                    var text = menuText[item];
-                    item.Text = caps ? text.ToUpper() : text;
-                }
+                this.version = value;
+                UpdateMenuText (this.version == VsVersion.Vs2012 || this.version == VsVersion.Vs2013);
             }
         }
 
-        private readonly Dictionary<ToolStrip, ToolStripProperties> strips = new Dictionary<ToolStrip, ToolStripProperties>();
-
-        public VisualStudioToolStripExtender()
+        private void SaveMenuStripText()
         {
-            InitializeComponent();
+            foreach (ToolStripItem item in strip.Items)
+                menuText.Add (item, item.Text);
         }
 
-        public VisualStudioToolStripExtender(IContainer container)
+        public void UpdateMenuText (bool caps)
         {
-            container.Add(this);
-
-            InitializeComponent();
-        }
-
-        #region IExtenderProvider Members
-
-        public bool CanExtend(object extendee)
-        {
-            return extendee is ToolStrip;
-        }
-
-        #endregion
-
-        public ToolStripRenderer DefaultRenderer { get; set; }
-
-        [DefaultValue(false)]
-        public VsVersion GetStyle(ToolStrip strip)
-        {
-            if (strips.ContainsKey(strip))
-                return strips[strip].VsVersion;
-
-            return VsVersion.Unknown;
-        }
-
-        public void SetStyle(ToolStrip strip, VsVersion version, ThemeBase theme)
-        {
-            ToolStripProperties properties = null;
-
-            if (!strips.ContainsKey(strip))
+            foreach (ToolStripItem item in menuText.Keys)
             {
-                properties = new ToolStripProperties(strip) { VsVersion = version };
-                strips.Add(strip, properties);
+                var text = menuText[item];
+                item.Text = caps ? text.ToUpper() : text;
             }
-            else
-            {
-                properties = strips[strip];
-            }
-
-            if (theme == null)
-            {
-                if (DefaultRenderer != null)
-                    strip.Renderer = DefaultRenderer;
-            }
-            else
-            {
-                theme.ApplyTo(strip);
-            }
-            properties.VsVersion = version;
         }
+    }
 
-        public enum VsVersion
+    private readonly Dictionary<ToolStrip, ToolStripProperties> strips =
+        new Dictionary<ToolStrip, ToolStripProperties>();
+
+    public VisualStudioToolStripExtender()
+    {
+        InitializeComponent();
+    }
+
+    public VisualStudioToolStripExtender (IContainer container)
+    {
+        container.Add (this);
+
+        InitializeComponent();
+    }
+
+    #region IExtenderProvider Members
+
+    public bool CanExtend (object extendee)
+    {
+        return extendee is ToolStrip;
+    }
+
+    #endregion
+
+    public ToolStripRenderer DefaultRenderer { get; set; }
+
+    [DefaultValue (false)]
+    public VsVersion GetStyle (ToolStrip strip)
+    {
+        if (strips.ContainsKey (strip))
+            return strips[strip].VsVersion;
+
+        return VsVersion.Unknown;
+    }
+
+    public void SetStyle (ToolStrip strip, VsVersion version, ThemeBase theme)
+    {
+        ToolStripProperties properties = null;
+
+        if (!strips.ContainsKey (strip))
         {
-            Unknown,
-            Vs2003,
-            Vs2005,
-            Vs2008,
-            Vs2010,
-            Vs2012,
-            Vs2013,
-            Vs2015
+            properties = new ToolStripProperties (strip) { VsVersion = version };
+            strips.Add (strip, properties);
         }
+        else
+        {
+            properties = strips[strip];
+        }
+
+        if (theme == null)
+        {
+            if (DefaultRenderer != null)
+                strip.Renderer = DefaultRenderer;
+        }
+        else
+        {
+            theme.ApplyTo (strip);
+        }
+
+        properties.VsVersion = version;
+    }
+
+    public enum VsVersion
+    {
+        Unknown,
+        Vs2003,
+        Vs2005,
+        Vs2008,
+        Vs2010,
+        Vs2012,
+        Vs2013,
+        Vs2015
     }
 }

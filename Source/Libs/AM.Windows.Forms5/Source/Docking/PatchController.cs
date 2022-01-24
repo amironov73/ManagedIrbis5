@@ -11,46 +11,49 @@
 #region Using directives
 
 using Microsoft.Win32;
+
 using System;
 using System.Configuration;
+
 using AM.Windows.Forms.Docking.Configuration;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms.Docking
+namespace AM.Windows.Forms.Docking;
+
+public static class PatchController
 {
-    public static class PatchController
+    public static bool? EnableAll { private get; set; }
+
+    public static void Reset()
     {
-        public static bool? EnableAll { private get; set; }
-
-        public static void Reset()
-        {
-            EnableAll = _highDpi = _memoryLeakFix
-                = _nestedDisposalFix = _focusLostFix = _contentOrderFix
+        EnableAll = _highDpi = _memoryLeakFix
+            = _nestedDisposalFix = _focusLostFix = _contentOrderFix
                 = _fontInheritanceFix = _activeXFix = _displayingPaneFix
-                = _activeControlFix = _floatSplitterFix = _activateOnDockFix
-                = _selectClosestOnClose = _perScreenDpi = null;
-        }
+                    = _activeControlFix = _floatSplitterFix = _activateOnDockFix
+                        = _selectClosestOnClose = _perScreenDpi = null;
+    }
 
-#region Copy this section to create new option, and then comment it to show what needs to be modified.
-        //*
-        private static bool? _highDpi;
+    #region Copy this section to create new option, and then comment it to show what needs to be modified.
 
-        public static bool? EnableHighDpi
+    //*
+    private static bool? _highDpi;
+
+    public static bool? EnableHighDpi
+    {
+        get
         {
-            get
+            if (_highDpi != null)
             {
-                if (_highDpi != null)
-                {
-                    return _highDpi;
-                }
+                return _highDpi;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _highDpi = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _highDpi = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -63,74 +66,73 @@ namespace AM.Windows.Forms.Docking
                     return _highDpi = section.EnableHighDpi;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableHighDpi");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _highDpi = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableHighDpi");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _highDpi = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableHighDpi");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _highDpi = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _highDpi = true;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableHighDpi");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _highDpi = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _highDpi = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableHighDpi");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _highDpi = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableHighDpi");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _highDpi = enable;
+                        }
+                    }
+                }
+            }
+
+            return _highDpi = true;
         }
-        // */
-#endregion
 
-        private static bool? _memoryLeakFix;
+        set { _highDpi = value; }
+    }
 
-        public static bool? EnableMemoryLeakFix
+    // */
+
+    #endregion
+
+    private static bool? _memoryLeakFix;
+
+    public static bool? EnableMemoryLeakFix
+    {
+        get
         {
-            get
+            if (_memoryLeakFix != null)
             {
-                if (_memoryLeakFix != null)
-                {
-                    return _memoryLeakFix;
-                }
+                return _memoryLeakFix;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _memoryLeakFix = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _memoryLeakFix = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -143,72 +145,69 @@ namespace AM.Windows.Forms.Docking
                     return _memoryLeakFix = section.EnableMemoryLeakFix;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableMemoryLeakFix");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _memoryLeakFix = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableMemoryLeakFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _memoryLeakFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableMemoryLeakFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _memoryLeakFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _memoryLeakFix = true;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableMemoryLeakFix");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _memoryLeakFix = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _memoryLeakFix = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableMemoryLeakFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _memoryLeakFix = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableMemoryLeakFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _memoryLeakFix = enable;
+                        }
+                    }
+                }
+            }
+
+            return _memoryLeakFix = true;
         }
 
-        private static bool? _focusLostFix;
+        set { _memoryLeakFix = value; }
+    }
 
-        public static bool? EnableMainWindowFocusLostFix
+    private static bool? _focusLostFix;
+
+    public static bool? EnableMainWindowFocusLostFix
+    {
+        get
         {
-            get
+            if (_focusLostFix != null)
             {
-                if (_focusLostFix != null)
-                {
-                    return _focusLostFix;
-                }
+                return _focusLostFix;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _focusLostFix = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _focusLostFix = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -221,72 +220,69 @@ namespace AM.Windows.Forms.Docking
                     return _focusLostFix = section.EnableMainWindowFocusLostFix;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableMainWindowFocusLostFix");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _focusLostFix = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableMainWindowFocusLostFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _focusLostFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableMainWindowFocusLostFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _focusLostFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _focusLostFix = true;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableMainWindowFocusLostFix");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _focusLostFix = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _focusLostFix = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableMainWindowFocusLostFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _focusLostFix = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableMainWindowFocusLostFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _focusLostFix = enable;
+                        }
+                    }
+                }
+            }
+
+            return _focusLostFix = true;
         }
 
-        private static bool? _nestedDisposalFix;
+        set { _focusLostFix = value; }
+    }
 
-        public static bool? EnableNestedDisposalFix
+    private static bool? _nestedDisposalFix;
+
+    public static bool? EnableNestedDisposalFix
+    {
+        get
         {
-            get
+            if (_nestedDisposalFix != null)
             {
-                if (_nestedDisposalFix != null)
-                {
-                    return _nestedDisposalFix;
-                }
+                return _nestedDisposalFix;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _nestedDisposalFix = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _nestedDisposalFix = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -299,72 +295,69 @@ namespace AM.Windows.Forms.Docking
                     return _nestedDisposalFix = section.EnableNestedDisposalFix;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableNestedDisposalFix");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _nestedDisposalFix = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableNestedDisposalFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _nestedDisposalFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableNestedDisposalFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _nestedDisposalFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _nestedDisposalFix = true;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableNestedDisposalFix");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _focusLostFix = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _nestedDisposalFix = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableNestedDisposalFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _nestedDisposalFix = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableNestedDisposalFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _nestedDisposalFix = enable;
+                        }
+                    }
+                }
+            }
+
+            return _nestedDisposalFix = true;
         }
 
-        private static bool? _fontInheritanceFix;
+        set { _focusLostFix = value; }
+    }
 
-        public static bool? EnableFontInheritanceFix
+    private static bool? _fontInheritanceFix;
+
+    public static bool? EnableFontInheritanceFix
+    {
+        get
         {
-            get
+            if (_fontInheritanceFix != null)
             {
-                if (_fontInheritanceFix != null)
-                {
-                    return _fontInheritanceFix;
-                }
+                return _fontInheritanceFix;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _fontInheritanceFix = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _fontInheritanceFix = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -377,72 +370,69 @@ namespace AM.Windows.Forms.Docking
                     return _fontInheritanceFix = section.EnableFontInheritanceFix;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableFontInheritanceFix");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _fontInheritanceFix = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableFontInheritanceFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _fontInheritanceFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableFontInheritanceFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _fontInheritanceFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _fontInheritanceFix = true;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableFontInheritanceFix");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _fontInheritanceFix = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _fontInheritanceFix = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableFontInheritanceFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _fontInheritanceFix = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableFontInheritanceFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _fontInheritanceFix = enable;
+                        }
+                    }
+                }
+            }
+
+            return _fontInheritanceFix = true;
         }
 
-        private static bool? _contentOrderFix;
+        set { _fontInheritanceFix = value; }
+    }
 
-        public static bool? EnableContentOrderFix
+    private static bool? _contentOrderFix;
+
+    public static bool? EnableContentOrderFix
+    {
+        get
         {
-            get
+            if (_contentOrderFix != null)
             {
-                if (_contentOrderFix != null)
-                {
-                    return _contentOrderFix;
-                }
+                return _contentOrderFix;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _contentOrderFix = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _contentOrderFix = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -455,72 +445,69 @@ namespace AM.Windows.Forms.Docking
                     return _contentOrderFix = section.EnableContentOrderFix;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableContentOrderFix");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _contentOrderFix = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableContentOrderFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _contentOrderFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableContentOrderFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _contentOrderFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _contentOrderFix = true;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableContentOrderFix");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _contentOrderFix = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _contentOrderFix = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableContentOrderFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _contentOrderFix = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableContentOrderFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _contentOrderFix = enable;
+                        }
+                    }
+                }
+            }
+
+            return _contentOrderFix = true;
         }
 
-        private static bool? _activeXFix;
+        set { _contentOrderFix = value; }
+    }
 
-        public static bool? EnableActiveXFix
+    private static bool? _activeXFix;
+
+    public static bool? EnableActiveXFix
+    {
+        get
         {
-            get
+            if (_activeXFix != null)
             {
-                if (_activeXFix != null)
-                {
-                    return _activeXFix;
-                }
+                return _activeXFix;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _activeXFix = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _activeXFix = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -533,72 +520,69 @@ namespace AM.Windows.Forms.Docking
                     return _activeXFix = section.EnableActiveXFix;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableActiveXFix");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _activeXFix = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableActiveXFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _activeXFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableActiveXFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _activeXFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _activeXFix = false; // not enabled by default as it has side effect.
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableActiveXFix");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _activeXFix = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _activeXFix = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableActiveXFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _activeXFix = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableActiveXFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _activeXFix = enable;
+                        }
+                    }
+                }
+            }
+
+            return _activeXFix = false; // not enabled by default as it has side effect.
         }
 
-        private static bool? _displayingPaneFix;
+        set { _activeXFix = value; }
+    }
 
-        public static bool? EnableDisplayingPaneFix
+    private static bool? _displayingPaneFix;
+
+    public static bool? EnableDisplayingPaneFix
+    {
+        get
         {
-            get
+            if (_displayingPaneFix != null)
             {
-                if (_displayingPaneFix != null)
-                {
-                    return _displayingPaneFix;
-                }
+                return _displayingPaneFix;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _displayingPaneFix = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _displayingPaneFix = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -611,72 +595,69 @@ namespace AM.Windows.Forms.Docking
                     return _displayingPaneFix = section.EnableDisplayingPaneFix;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableDisplayingPaneFix");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _displayingPaneFix = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableDisplayingPaneFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _displayingPaneFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableDisplayingPaneFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _displayingPaneFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _displayingPaneFix = true;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableDisplayingPaneFix");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _displayingPaneFix = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _displayingPaneFix = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableDisplayingPaneFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _displayingPaneFix = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableDisplayingPaneFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _displayingPaneFix = enable;
+                        }
+                    }
+                }
+            }
+
+            return _displayingPaneFix = true;
         }
 
-        private static bool? _activeControlFix;
+        set { _displayingPaneFix = value; }
+    }
 
-        public static bool? EnableActiveControlFix
+    private static bool? _activeControlFix;
+
+    public static bool? EnableActiveControlFix
+    {
+        get
         {
-            get
+            if (_activeControlFix != null)
             {
-                if (_activeControlFix != null)
-                {
-                    return _activeControlFix;
-                }
+                return _activeControlFix;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _activeControlFix = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _activeControlFix = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -689,72 +670,69 @@ namespace AM.Windows.Forms.Docking
                     return _activeControlFix = section.EnableActiveControlFix;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableActiveControlFix");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _activeControlFix = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableActiveControlFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _activeControlFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableActiveControlFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _activeControlFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _activeControlFix = true;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableActiveControlFix");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _activeControlFix = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _activeControlFix = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableActiveControlFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _activeControlFix = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableActiveControlFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _activeControlFix = enable;
+                        }
+                    }
+                }
+            }
+
+            return _activeControlFix = true;
         }
 
-        private static bool? _floatSplitterFix;
+        set { _activeControlFix = value; }
+    }
 
-        public static bool? EnableFloatSplitterFix
+    private static bool? _floatSplitterFix;
+
+    public static bool? EnableFloatSplitterFix
+    {
+        get
         {
-            get
+            if (_floatSplitterFix != null)
             {
-                if (_floatSplitterFix != null)
-                {
-                    return _floatSplitterFix;
-                }
+                return _floatSplitterFix;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _floatSplitterFix = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _floatSplitterFix = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -767,72 +745,69 @@ namespace AM.Windows.Forms.Docking
                     return _floatSplitterFix = section.EnableFloatSplitterFix;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableFloatSplitterFix");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _floatSplitterFix = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableFloatSplitterFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _floatSplitterFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableFloatSplitterFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _floatSplitterFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _floatSplitterFix = true;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableFloatSplitterFix");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _floatSplitterFix = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _floatSplitterFix = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableFloatSplitterFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _floatSplitterFix = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableFloatSplitterFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _floatSplitterFix = enable;
+                        }
+                    }
+                }
+            }
+
+            return _floatSplitterFix = true;
         }
 
-        private static bool? _activateOnDockFix;
+        set { _floatSplitterFix = value; }
+    }
 
-        public static bool? EnableActivateOnDockFix
+    private static bool? _activateOnDockFix;
+
+    public static bool? EnableActivateOnDockFix
+    {
+        get
         {
-            get
+            if (_activateOnDockFix != null)
             {
-                if (_activateOnDockFix != null)
-                {
-                    return _activateOnDockFix;
-                }
+                return _activateOnDockFix;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _activateOnDockFix = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _activateOnDockFix = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -845,72 +820,69 @@ namespace AM.Windows.Forms.Docking
                     return _activateOnDockFix = section.EnableActivateOnDockFix;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableActivateOnDockFix");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _activateOnDockFix = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableActivateOnDockFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _activateOnDockFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableActivateOnDockFix");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _activateOnDockFix = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _activateOnDockFix = true;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableActivateOnDockFix");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _activateOnDockFix = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _activateOnDockFix = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableActivateOnDockFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _activateOnDockFix = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableActivateOnDockFix");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _activateOnDockFix = enable;
+                        }
+                    }
+                }
+            }
+
+            return _activateOnDockFix = true;
         }
 
-        private static bool? _selectClosestOnClose;
+        set { _activateOnDockFix = value; }
+    }
 
-        public static bool? EnableSelectClosestOnClose
+    private static bool? _selectClosestOnClose;
+
+    public static bool? EnableSelectClosestOnClose
+    {
+        get
         {
-            get
+            if (_selectClosestOnClose != null)
             {
-                if (_selectClosestOnClose != null)
-                {
-                    return _selectClosestOnClose;
-                }
+                return _selectClosestOnClose;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _selectClosestOnClose = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _selectClosestOnClose = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -923,72 +895,69 @@ namespace AM.Windows.Forms.Docking
                     return _selectClosestOnClose = section.EnableSelectClosestOnClose;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnableSelectClosestOnClose");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _selectClosestOnClose = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableSelectClosestOnClose");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _selectClosestOnClose = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnableSelectClosestOnClose");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _selectClosestOnClose = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _selectClosestOnClose = true;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnableSelectClosestOnClose");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _selectClosestOnClose = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _selectClosestOnClose = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableSelectClosestOnClose");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _selectClosestOnClose = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnableSelectClosestOnClose");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _selectClosestOnClose = enable;
+                        }
+                    }
+                }
+            }
+
+            return _selectClosestOnClose = true;
         }
 
-        private static bool? _perScreenDpi;
+        set { _selectClosestOnClose = value; }
+    }
 
-        public static bool? EnablePerScreenDpi
+    private static bool? _perScreenDpi;
+
+    public static bool? EnablePerScreenDpi
+    {
+        get
         {
-            get
+            if (_perScreenDpi != null)
             {
-                if (_perScreenDpi != null)
-                {
-                    return _perScreenDpi;
-                }
+                return _perScreenDpi;
+            }
 
-                if (EnableAll != null)
-                {
-                    return _perScreenDpi = EnableAll;
-                }
+            if (EnableAll != null)
+            {
+                return _perScreenDpi = EnableAll;
+            }
 #if NET35 || NET40
                 var section = ConfigurationManager.GetSection("dockPanelSuite") as PatchSection;
                 if (section != null)
@@ -1001,55 +970,51 @@ namespace AM.Windows.Forms.Docking
                     return _perScreenDpi = section.EnablePerScreenDpi;
                 }
 #endif
-                var environment = Environment.GetEnvironmentVariable("DPS_EnablePerScreenDpi");
-                if (!string.IsNullOrEmpty(environment))
-                {
-                    var enable = false;
-                    if (bool.TryParse(environment, out enable))
-                    {
-                        return _perScreenDpi = enable;
-                    }
-                }
-
-                {
-                    var key = Registry.CurrentUser.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnablePerScreenDpi");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _perScreenDpi = enable;
-                            }
-                        }
-                    }
-                }
-
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"Software\DockPanelSuite");
-                    if (key != null)
-                    {
-                        var pair = key.GetValue("EnablePerScreenDpi");
-                        if (pair != null)
-                        {
-                            var enable = false;
-                            if (bool.TryParse(pair.ToString(), out enable))
-                            {
-                                return _perScreenDpi = enable;
-                            }
-                        }
-                    }
-                }
-
-                return _perScreenDpi = false;
-            }
-
-            set
+            var environment = Environment.GetEnvironmentVariable ("DPS_EnablePerScreenDpi");
+            if (!string.IsNullOrEmpty (environment))
             {
-                _perScreenDpi = value;
+                var enable = false;
+                if (bool.TryParse (environment, out enable))
+                {
+                    return _perScreenDpi = enable;
+                }
             }
+
+            {
+                var key = Registry.CurrentUser.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnablePerScreenDpi");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _perScreenDpi = enable;
+                        }
+                    }
+                }
+            }
+
+            {
+                var key = Registry.LocalMachine.OpenSubKey (@"Software\DockPanelSuite");
+                if (key != null)
+                {
+                    var pair = key.GetValue ("EnablePerScreenDpi");
+                    if (pair != null)
+                    {
+                        var enable = false;
+                        if (bool.TryParse (pair.ToString(), out enable))
+                        {
+                            return _perScreenDpi = enable;
+                        }
+                    }
+                }
+            }
+
+            return _perScreenDpi = false;
         }
+
+        set { _perScreenDpi = value; }
     }
 }

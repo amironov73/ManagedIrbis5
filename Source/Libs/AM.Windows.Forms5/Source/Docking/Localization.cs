@@ -17,46 +17,45 @@ using System.ComponentModel;
 
 #nullable enable
 
-namespace AM.Windows.Forms.Docking
+namespace AM.Windows.Forms.Docking;
+
+[AttributeUsage (AttributeTargets.All)]
+internal sealed class LocalizedDescriptionAttribute : DescriptionAttribute
 {
-    [AttributeUsage(AttributeTargets.All)]
-    internal sealed class LocalizedDescriptionAttribute : DescriptionAttribute
+    private bool m_initialized = false;
+
+    public LocalizedDescriptionAttribute (string key) : base (key)
     {
-        private bool m_initialized = false;
-
-        public LocalizedDescriptionAttribute(string key) : base(key)
-        {
-        }
-
-        public override string Description
-        {
-            get
-            {    
-                if (!m_initialized)
-                {
-                    string key = base.Description;
-                    DescriptionValue = ResourceHelper.GetString(key);
-                    if (DescriptionValue == null)
-                        DescriptionValue = String.Empty;
-
-                    m_initialized = true;
-                }
-
-                return DescriptionValue;
-            }
-        }
     }
 
-    [AttributeUsage(AttributeTargets.All)]
-    internal sealed class LocalizedCategoryAttribute : CategoryAttribute
+    public override string Description
     {
-        public LocalizedCategoryAttribute(string key) : base(key)
+        get
         {
-        }
+            if (!m_initialized)
+            {
+                string key = base.Description;
+                DescriptionValue = ResourceHelper.GetString (key);
+                if (DescriptionValue == null)
+                    DescriptionValue = String.Empty;
 
-        protected override string GetLocalizedString(string value)
-        {
-            return ResourceHelper.GetString(value);
+                m_initialized = true;
+            }
+
+            return DescriptionValue;
         }
+    }
+}
+
+[AttributeUsage (AttributeTargets.All)]
+internal sealed class LocalizedCategoryAttribute : CategoryAttribute
+{
+    public LocalizedCategoryAttribute (string key) : base (key)
+    {
+    }
+
+    protected override string GetLocalizedString (string value)
+    {
+        return ResourceHelper.GetString (value);
     }
 }

@@ -16,12 +16,11 @@ using System.Drawing;
 
 #nullable enable
 
-namespace AM.Windows.Forms.Docking
+namespace AM.Windows.Forms.Docking;
+
+public interface IPaintingService
 {
-    public interface IPaintingService
-    {
-        Pen GetPen(Color color, int thickness = 1);
-        SolidBrush GetBrush(Color color);
-        void CleanUp();
-    }
+    Pen GetPen (Color color, int thickness = 1);
+    SolidBrush GetBrush (Color color);
+    void CleanUp();
 }
