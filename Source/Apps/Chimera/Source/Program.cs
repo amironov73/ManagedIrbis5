@@ -17,7 +17,10 @@ using System;
 using System.Linq;
 using System.Text;
 
+using AM;
 using AM.Scripting.Barsik;
+
+using Istu.OldModel;
 
 using ManagedIrbis.Scripting.Barsik;
 
@@ -53,8 +56,11 @@ class Program
     {
         Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
 
+        Magna.Initialize (args);
+
         var interpreter = new Interpreter().WithStdLib();
         interpreter.Context.AttachModule (new IrbisLib());
+        interpreter.Context.AttachModule (new IstuLib());
 
         try
         {

@@ -6,6 +6,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
+      <ProjectReference Include="..\..\Libs\Istu5\Istu5.csproj" />
     </ItemGroup>
 
     <ItemGroup>
