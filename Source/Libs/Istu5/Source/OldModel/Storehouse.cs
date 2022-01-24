@@ -17,6 +17,8 @@
 
 using System;
 
+using AM;
+
 using Istu.OldModel.Implementation;
 using Istu.OldModel.Interfaces;
 
@@ -28,87 +30,104 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-namespace Istu.OldModel
+namespace Istu.OldModel;
+
+/// <summary>
+/// Программный интерфейс книговыдачи.
+/// </summary>
+public sealed class Storehouse
+    : IServiceProvider
 {
+    #region Construction
+
     /// <summary>
-    /// Программный интерфейс книговыдачи.
+    /// Конструктор.
     /// </summary>
-    public sealed class Storehouse
-        : IServiceProvider
+    public Storehouse
+        (
+            IServiceProvider serviceProvider,
+            IConfiguration configuration,
+            string? connectionString = null
+        )
     {
-        #region Construction
+        _serviceProvider = serviceProvider;
+        _configuration = configuration;
+        _logger = serviceProvider.GetRequiredService<ILogger<Storehouse>>();
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Storehouse
-            (
-                IServiceProvider serviceProvider,
-                IConfiguration configuration,
-                string? connectionString = null
-            )
+        _logger.LogTrace (nameof (Storehouse) + "::Constructor");
+
+        _kladovkaConnectionString = connectionString ?? _configuration["kladovka"];
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IConfiguration _configuration;
+    private readonly string _kladovkaConnectionString;
+    private readonly ILogger _logger;
+
+    /// <summary>
+    /// Глобальный экземпляр.
+    /// </summary>
+    private static Storehouse? _instance;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение (возможно, нового) экземпляра.
+    /// </summary>
+    public static Storehouse GetInstance()
+    {
+        if (_instance is null)
         {
-            _serviceProvider = serviceProvider;
-            _configuration = configuration;
-            _logger = serviceProvider.GetRequiredService<ILogger<Storehouse>>();
-
-            _logger.LogTrace (nameof (Storehouse) + "::Constructor");
-
-            _kladovkaConnectionString = connectionString ?? _configuration["kladovka"];
+            var serviceProvider = Magna.Host.Services;
+            var configuration = Magna.Configuration;
+            _instance = new Storehouse (serviceProvider, configuration);
         }
 
-        #endregion
+        return _instance!;
+    }
 
-        #region Private members
+    /// <summary>
+    /// Создание менеджера посещений.
+    /// </summary>
+    public IAttendanceManager CreateAttendanceManager() => new AttendanceManager (this);
 
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IConfiguration _configuration;
-        private readonly string _kladovkaConnectionString;
-        private readonly ILogger _logger;
+    /// <summary>
+    /// Создание менеджера книговыдачи.
+    /// </summary>
+    public ILoanManager CreateLoanManager() => new LoanManager (this);
 
-        #endregion
+    /// <summary>
+    /// Создание менеджера операторов.
+    /// </summary>
+    public IOperatorManager CreateOperatorManager() => new OperatorManager (this);
 
-        #region Public methods
+    /// <summary>
+    /// Создание менеджера заказов.
+    /// </summary>
+    public IOrderManager CreateOrderManager() => new OrderManager (this);
 
-        /// <summary>
-        /// Создание менеджера посещений.
-        /// </summary>
-        public IAttendanceManager CreateAttendanceManager() => new AttendanceManager (this);
+    /// <summary>
+    /// Создание менеджера читателей.
+    /// </summary>
+    public IReaderManager CreateReaderManager() => new ReaderManager (this);
 
-        /// <summary>
-        /// Создание менеджера книговыдачи.
-        /// </summary>
-        public ILoanManager CreateLoanManager() => new LoanManager (this);
+    /// <summary>
+    /// Подключается к базе <c>kladovka</c>.
+    /// </summary>
+    public DataConnection GetKladovka() => IstuUtility.GetMsSqlConnection (_kladovkaConnectionString);
 
-        /// <summary>
-        /// Создание менеджера операторов.
-        /// </summary>
-        public IOperatorManager CreateOperatorManager() => new OperatorManager (this);
+    #endregion
 
-        /// <summary>
-        /// Создание менеджера заказов.
-        /// </summary>
-        public IOrderManager CreateOrderManager() => new OrderManager (this);
+    #region IServiceProvider members
 
-        /// <summary>
-        /// Создание менеджера читателей.
-        /// </summary>
-        public IReaderManager CreateReaderManager() => new ReaderManager (this);
+    /// <inheritdoc cref="IServiceProvider.GetService"/>
+    public object? GetService (Type serviceType) => _serviceProvider.GetService (serviceType);
 
-        /// <summary>
-        /// Подключается к базе <c>kladovka</c>.
-        /// </summary>
-        public DataConnection GetKladovka() => IstuUtility.GetMsSqlConnection (_kladovkaConnectionString);
-
-        #endregion
-
-        #region IServiceProvider members
-
-        /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService (Type serviceType) => _serviceProvider.GetService (serviceType);
-
-        #endregion
-
-    } // class Storehouse
-
-} // namespace Istu.OldModel
+    #endregion
+}

@@ -178,6 +178,7 @@ public sealed class IrbisLib
             {
                 context.Error.WriteLine ($"Variable {ConnectionDefineName} not found");
             }
+
             return false;
         }
 
@@ -526,7 +527,7 @@ public sealed class IrbisLib
     }
 
     /// <summary>
-    /// Добавление разделителя областей описания.
+    /// Очистка вывовода.
     /// </summary>
     public static dynamic? ClearOutput
         (
@@ -1869,7 +1870,6 @@ public sealed class IrbisLib
         {
             context.Functions.Remove (descriptor.Key);
         }
-
     }
 
     #endregion

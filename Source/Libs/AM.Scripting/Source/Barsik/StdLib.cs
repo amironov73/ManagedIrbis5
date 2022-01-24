@@ -25,6 +25,8 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 
+using Microsoft.Extensions.Caching.Memory;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -42,6 +44,15 @@ namespace AM.Scripting.Barsik;
 public sealed class StdLib
     : IBarsikModule
 {
+    #region Constants
+
+    /// <summary>
+    /// Имя дефайна, хранящего кэш.
+    /// </summary>
+    public const string CacheDefineName = "$cache";
+
+    #endregion
+
     #region Properties
 
     /// <summary>
@@ -70,6 +81,7 @@ public sealed class StdLib
         { "ftell", new FunctionDescriptor ("ftell", Ftell) },
         { "fullpath", new FunctionDescriptor ("fullpath", FullPath) },
         { "fwrite", new FunctionDescriptor ("fwrite", Fwrite) },
+        { "get_cache", new FunctionDescriptor ("get_cache", GetCache) },
         { "getcwd", new FunctionDescriptor ("getcwd", GetCurrentDirectory) },
         { "host", new FunctionDescriptor ("host", Host) },
         { "require", new FunctionDescriptor ("require", Include) },
@@ -78,6 +90,7 @@ public sealed class StdLib
         { "json_encode", new FunctionDescriptor ("json_encode", JsonEncode) },
         { "load", new FunctionDescriptor ("load", LoadAssembly) },
         { "module", new FunctionDescriptor ("module", LoadModule) },
+        { "put_cache", new FunctionDescriptor ("put_cache", PutCache) },
         { "readdir", new FunctionDescriptor ("readdir", ReadDirectory) },
         { "remove", new FunctionDescriptor ("remove", RemoveFile) },
         { "rename", new FunctionDescriptor ("rename", RenameFile) },
@@ -92,6 +105,42 @@ public sealed class StdLib
     #endregion
 
     #region Private members
+
+    /// <summary>
+    /// Отыскиваем кэш.
+    /// Ругаемся, если не находим или находим что-то не то.
+    /// </summary>
+    private static bool TryGetCache
+        (
+            Context context,
+            out IMemoryCache cache,
+            bool verbose = true
+        )
+    {
+        cache = null!;
+
+        if (!context.TryGetVariable (CacheDefineName, out var value))
+        {
+            if (verbose)
+            {
+                context.Error.WriteLine ($"Variable {CacheDefineName} not found");
+            }
+            return false;
+        }
+
+        if (value is IMemoryCache memoryCache)
+        {
+            cache = memoryCache;
+            return true;
+        }
+
+        if (verbose)
+        {
+            context.Error.WriteLine ($"Bad value of {CacheDefineName}: {value}");
+        }
+
+        return false;
+    }
 
     private static bool _Include
         (
@@ -720,6 +769,28 @@ public sealed class StdLib
     }
 
     /// <summary>
+    /// Получение значения из кэша.
+    /// </summary>
+    public static dynamic? GetCache
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetCache (context, out var cache))
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 0) is { } key)
+        {
+            return cache.Get (key);
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Получение текущей директории.
     /// </summary>
     public static dynamic GetCurrentDirectory
@@ -904,6 +975,41 @@ public sealed class StdLib
             {
                 name = name.Trim();
                 context.LoadModule (name);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Помещение значения в кэш.
+    /// </summary>
+    public static dynamic? PutCache
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length < 2)
+        {
+            return null;
+        }
+
+        if (!TryGetCache (context, out var cache))
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 0) is { } key)
+        {
+            var value = Compute (context, args, 1);
+            if (Compute (context, args, 2) is int expiration)
+            {
+                cache.Set (key, value, TimeSpan.FromMilliseconds (expiration));
+            }
+            else
+            {
+                cache.Set (key, value);
             }
         }
 

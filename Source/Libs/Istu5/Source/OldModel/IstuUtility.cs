@@ -32,95 +32,97 @@ using Microsoft.Extensions.DependencyInjection;
 
 #nullable enable
 
-namespace Istu.OldModel
+namespace Istu.OldModel;
+
+/// <summary>
+/// Вспомогательные методы для работы с базой книговыдачи.
+/// </summary>
+public static class IstuUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Вспомогательные методы для работы с базой книговыдачи.
+    /// Добавление сервисов книговыдачи.
     /// </summary>
-    public static class IstuUtility
+    public static IServiceCollection AddOldModel
+        (
+            this IServiceCollection services
+        )
     {
-        #region Public methods
+        services.AddTransient<Storehouse>();
 
-        /// <summary>
-        /// Добавление сервисов книговыдачи.
-        /// </summary>
-        public static IServiceCollection AddOldModel
-            (
-                this IServiceCollection services
-            )
+        services.AddTransient<IAttendanceManager, AttendanceManager>();
+        services.AddTransient<IOperatorManager, OperatorManager>();
+        services.AddTransient<IReaderManager, ReaderManager>();
+        services.AddTransient<ILoanManager, LoanManager>();
+        services.AddTransient<IOrderManager, OrderManager>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Подключается к MSSQL.
+    /// </summary>
+    public static DataConnection GetMsSqlConnection
+        (
+            string connectionString
+        )
+    {
+        try
         {
-            services.AddTransient<Storehouse>();
+            var result = SqlServerTools.CreateDataConnection (connectionString);
 
-            services.AddTransient<IAttendanceManager, AttendanceManager>();
-            services.AddTransient<IOperatorManager, OperatorManager>();
-            services.AddTransient<IReaderManager, ReaderManager>();
-            services.AddTransient<ILoanManager, LoanManager>();
-            services.AddTransient<IOrderManager, OrderManager>();
-
-            return services;
-        } // method AddOldModel
-
-        /// <summary>
-        /// Подключается к MSSQL.
-        /// </summary>
-        public static DataConnection GetMsSqlConnection
-            (
-                string connectionString
-            )
+            return result;
+        }
+        catch (Exception exception)
         {
-            try
-            {
-                var result = SqlServerTools.CreateDataConnection (connectionString);
+            Magna.TraceException (nameof (IstuUtility) + "::" + nameof (GetMsSqlConnection), exception);
+            throw;
+        }
+    }
 
-                return result;
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException (nameof (IstuUtility) + "::" + nameof (GetMsSqlConnection), exception);
-                throw;
-            }
-        } // method GetDatabaseConnection
+    /// <summary>
+    /// Получает таблицу <c>attendance</c>.
+    /// </summary>
+    public static ITable<Attendance> GetAttendances (this DataConnection connection) =>
+        connection.GetTable<Attendance>();
 
-        /// <summary>
-        /// Получает таблицу <c>attendance</c>.
-        /// </summary>
-        public static ITable<Attendance> GetAttendances (this DataConnection connection) =>
-            connection.GetTable<Attendance>();
+    /// <summary>
+    /// Получает таблицу <c>operators</c>.
+    /// </summary>
+    public static ITable<Operator> GetOperators (this DataConnection connection) =>
+        connection.GetTable<Operator>();
 
-        /// <summary>
-        /// Получает таблицу <c>operators</c>.
-        /// </summary>
-        public static ITable<Operator> GetOperators (this DataConnection connection) =>
-            connection.GetTable<Operator>();
+    /// <summary>
+    /// Получает таблицу <c>orders</c>.
+    /// </summary>
+    public static ITable<Order> GetOrders (this DataConnection connection) =>
+        connection.GetTable<Order>();
 
-        /// <summary>
-        /// Получает таблицу <c>orders</c>.
-        /// </summary>
-        public static ITable<Order> GetOrders (this DataConnection connection) =>
-            connection.GetTable<Order>();
+    /// <summary>
+    /// Получает таблицу <c>readers</c>.
+    /// </summary>
+    public static ITable<Reader> GetReaders (this DataConnection connection) =>
+        connection.GetTable<Reader>();
 
-        /// <summary>
-        /// Получает таблицу <c>readers</c>.
-        /// </summary>
-        public static ITable<Reader> GetReaders (this DataConnection connection) =>
-            connection.GetTable<Reader>();
+    /// <summary>
+    /// Получает таблицу <c>podsob</c>.
+    /// </summary>
+    public static ITable<Podsob> GetPodsob (this DataConnection connection) =>
+        connection.GetTable<Podsob>();
 
-        /// <summary>
-        /// Получает таблицу <c>podsob</c>.
-        /// </summary>
-        public static ITable<Podsob> GetPodsob (this DataConnection connection) =>
-            connection.GetTable<Podsob>();
+    /// <summary>
+    /// Получает таблицу <c>translator</c>.
+    /// </summary>
+    public static ITable<Translator> GetTranslator (this DataConnection connection) =>
+        connection.GetTable<Translator>();
 
-        /// <summary>
-        /// Получает таблицу <c>translator</c>.
-        /// </summary>
-        public static ITable<Translator> GetTranslator (this DataConnection connection) =>
-            connection.GetTable<Translator>();
-
-        /// <summary>
-        /// Перечень известных событий книговыдачи.
-        /// </summary>
-        public static string[] KnownAttendanceEvents() => new[]
+    /// <summary>
+    /// Перечень известных событий книговыдачи.
+    /// </summary>
+    public static string[] KnownAttendanceEvents()
+    {
+        return new[]
         {
             "Возврат",
             "Выдача",
@@ -131,12 +133,15 @@ namespace Istu.OldModel
             "СМС",
             "Списание"
         };
+    }
 
-        /// <summary>
-        /// Перевод кода типа посещения в человеко-читаемый формат.
-        /// См. поле <c>type</c> в таблице <c>Attendance</c>.
-        /// </summary>
-        public static string TranslateAttendanceCode (char code) => code switch
+    /// <summary>
+    /// Перевод кода типа посещения в человеко-читаемый формат.
+    /// См. поле <c>type</c> в таблице <c>Attendance</c>.
+    /// </summary>
+    public static string TranslateAttendanceCode (char code)
+    {
+        return code switch
         {
             'a' or 'A' => "Посещение",
             'g' or 'G' => "Выдача",
@@ -147,10 +152,8 @@ namespace Istu.OldModel
             '1' => "Регистрация",
             's' or 'S' => "СМС",
             _ => code.ToString()
-        }; // switch
+        };
+    }
 
-        #endregion
-
-    } // class IstuUtility
-
-} // namespace Istu.OldModel
+    #endregion
+}
