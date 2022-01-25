@@ -1,0 +1,9 @@
+﻿func doubler (x)
+{
+    return x * 2
+}
+
+source = [1, 2, 3, 10, 11, 12, 20, 21, 22]
+result = map (doubler, source)
+
+println (result)

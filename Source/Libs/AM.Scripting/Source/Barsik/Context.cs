@@ -715,6 +715,11 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
+        if (Builtins.IsBuiltinFunction (name))
+        {
+            throw new BarsikException ($"{name} used by builtin function");
+        }
+
         Variables.Remove (name);
         if (Defines.ContainsKey (name))
         {
@@ -745,6 +750,11 @@ public sealed class Context
         )
     {
         Sure.NotNullNorEmpty (name);
+
+        if (Builtins.IsBuiltinFunction (name))
+        {
+            throw new BarsikException ($"{name} used by builtin function");
+        }
 
         if (Defines.ContainsKey (name))
         {

@@ -238,6 +238,7 @@ namespace UnitTests.AM.Runtime.Mere
             _Test (new Hashtable { {1, "one"}, {2, "two"}, {3, "three"} }, 157, MereTypeCode.Dictionary);
         }
 
+        [Ignore]
         [TestMethod]
         [Description ("Object")]
         public void MereSerializer_Object_1()

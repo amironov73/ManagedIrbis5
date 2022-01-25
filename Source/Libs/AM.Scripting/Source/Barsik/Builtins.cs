@@ -105,6 +105,17 @@ public static class Builtins
     #region Public methods
 
     /// <summary>
+    /// Проверка, соответствует ли указанное имя одной из встроенных функций.
+    /// </summary>
+    public static bool IsBuiltinFunction
+        (
+            string name
+        )
+    {
+        return Registry.ContainsKey (name);
+    }
+
+    /// <summary>
     /// Реестр встроенных функций.
     /// </summary>
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
@@ -119,17 +130,20 @@ public static class Builtins
         { "empty", new FunctionDescriptor ("empty", Empty) },
         { "exit", new FunctionDescriptor ("exit", Exit) },
         { "expando", new FunctionDescriptor ("expando", Expando) },
+        { "filter", new FunctionDescriptor ("filter", Filter, false) },
         { "format", new FunctionDescriptor ("format", Format) },
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable, false) },
         { "iif", new FunctionDescriptor ("iif", Iif) },
         { "len", new FunctionDescriptor ("len", Length) },
         { "local", new FunctionDescriptor ("local", Local, false) },
+        { "map", new FunctionDescriptor ("map", Map, false) },
         { "max", new FunctionDescriptor ("max", Max) },
         { "min", new FunctionDescriptor ("min", Min) },
         { "now", new FunctionDescriptor ("now", Now) },
         { "print", new FunctionDescriptor ("print", Print) },
         { "println", new FunctionDescriptor ("println", PrintLine) },
         { "readln", new FunctionDescriptor ("readln", ReadLine) },
+        { "reduce", new FunctionDescriptor ("reduce", Reduce, false) },
         { "trace", new FunctionDescriptor ("trace", Trace_) },
         { "trim", new FunctionDescriptor ("trim", Trim) },
         { "warn", new FunctionDescriptor ("warn", Warn) },
@@ -384,6 +398,65 @@ public static class Builtins
     }
 
     /// <summary>
+    /// Фильтрация коллекции.
+    /// </summary>
+    public static dynamic? Filter
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length < 2)
+        {
+            context.Error.WriteLine ("Too few arguments for filter");
+            return null;
+        }
+
+        FunctionDescriptor? descriptor = null;
+        if (args[0] is VariableNode node
+            && !context.FindFunction (node.Name, out descriptor))
+        {
+            return null;
+        }
+
+        if (args[0] is string name2
+            && !context.FindFunction (name2, out descriptor))
+        {
+            return null;
+        }
+
+        if (descriptor is null)
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 1) is not IEnumerable source)
+        {
+            return null;
+        }
+
+        var child = context.CreateChild();
+        var index = 0;
+        var callArgs = new dynamic?[3];
+        var result = new BarsikList();
+        foreach (var current in source)
+        {
+            callArgs[0] = current;
+            callArgs[1] = index;
+            callArgs[2] = source;
+            var retval = BarsikUtility.ToBoolean (descriptor.CallPoint (child, callArgs));
+            if (retval)
+            {
+                result.Add (current);
+            }
+
+            index++;
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Форматирование.
     /// </summary>
     public static dynamic Format
@@ -505,6 +578,62 @@ public static class Builtins
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Отображение коллекции.
+    /// </summary>
+    public static dynamic? Map
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length < 2)
+        {
+            context.Error.WriteLine ("Too few arguments for map");
+            return null;
+        }
+
+        FunctionDescriptor? descriptor = null;
+        if (args[0] is VariableNode node
+            && !context.FindFunction (node.Name, out descriptor))
+        {
+            return null;
+        }
+
+        if (args[0] is string name2
+            && !context.FindFunction (name2, out descriptor))
+        {
+            return null;
+        }
+
+        if (descriptor is null)
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 1) is not IEnumerable source)
+        {
+            return null;
+        }
+
+        var child = context.CreateChild();
+        var index = 0;
+        var callArgs = new dynamic?[3];
+        var result = new BarsikList();
+        foreach (var current in source)
+        {
+            callArgs[0] = current;
+            callArgs[1] = index;
+            callArgs[2] = source;
+            var retval = descriptor.CallPoint (child, callArgs);
+            result.Add (retval);
+
+            index++;
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -662,6 +791,64 @@ public static class Builtins
     {
         return context.Input.ReadLine();
     }
+
+    /// <summary>
+    /// Аккумулирование элементов коллекции.
+    /// </summary>
+    public static dynamic? Reduce
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length < 3)
+        {
+            context.Error.WriteLine ("Too few arguments for reduce");
+            return null;
+        }
+
+        FunctionDescriptor? descriptor = null;
+        if (args[0] is VariableNode node
+            && !context.FindFunction (node.Name, out descriptor))
+        {
+            return null;
+        }
+
+        if (args[0] is string name2
+            && !context.FindFunction (name2, out descriptor))
+        {
+            return null;
+        }
+
+        if (descriptor is null)
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 1) is not IEnumerable source)
+        {
+            return null;
+        }
+
+        var initialValue = Compute (context, args, 2);
+        var index = 0;
+        dynamic? result = initialValue;
+        var child = context.CreateChild();
+        var callArgs = new dynamic?[4];
+        foreach (var current in source)
+        {
+            callArgs[0] = result;
+            callArgs[1] = current;
+            callArgs[2] = index;
+            callArgs[3] = source;
+            result = descriptor.CallPoint (child, callArgs);
+
+            index++;
+        }
+
+        return result;
+    }
+
 
     /// <summary>
     /// Трассировочное сообщение.

@@ -152,7 +152,7 @@ public sealed class Interpreter
         Sure.NotNull (sourceCode);
 
         var program = Grammar.ParseProgram (sourceCode);
-        var result = Execute(program, Context);
+        var result = Execute (program, Context);
 
         return result;
     }
@@ -176,6 +176,11 @@ public sealed class Interpreter
             {
                 haveDefinitions = true;
                 var name = node.Name;
+                if (Builtins.IsBuiltinFunction (name))
+                {
+                    throw new BarsikException ($"{name} used by builtin function");
+                }
+
                 var definition = new FunctionDefinition
                     (
                         name,
