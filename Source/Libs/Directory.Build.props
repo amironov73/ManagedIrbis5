@@ -2,6 +2,12 @@
 
 <Project>
 
+    <!-- NuGet related stuff -->
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <PackageIcon>arsmagna-icon.png</PackageIcon>
+    </PropertyGroup>
+
     <!-- Assembly version and strong name -->
     <Import Project="..\Common\ArsMagna.targets" />
 
@@ -26,28 +32,16 @@
         <DefineConstants>COREAPP;CONTRACTS_FULL</DefineConstants>
     </PropertyGroup>
 
-    <!-- NuGet related stuff -->
-    <PropertyGroup>
-        <IsPackable>true</IsPackable>
-        <Product>Ars Magna</Product>
-        <PackageVersion>5.0.0</PackageVersion>
-        <Company>Ars Magna Project</Company>
-        <Authors>Alexey Mironov</Authors>
-        <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
-        <PackageIcon>arsmagna-icon.png</PackageIcon>
-    </PropertyGroup>
-
     <!-- Icon for the NuGet package -->
     <ItemGroup>
         <None Include="..\..\Common\arsmagna-icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
-    <!-- Enable Microsoft SourceLink -->
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+        <PackageReference Include="Nerdbank.GitVersioning">
+            <Version>3.4.255</Version>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
     </ItemGroup>
 
 </Project>

@@ -2,12 +2,35 @@
 
 <Project>
 
+  <!-- NuGet related stuff -->
+
   <PropertyGroup>
-    <Version>5.0.0.556</Version>
-    <AssemblyVersion>5.0.0.556</AssemblyVersion>
-    <PackageVersion>5.0.0.556</PackageVersion>
-    <InformationalVersion>5.0.0.556</InformationalVersion>
+    <IsPackable>false</IsPackable>
+    <Product>Ars Magna</Product>
+    <PackageVersion>5.0.0</PackageVersion>
+    <Company>Ars Magna Project</Company>
+    <Authors>Alexey Mironov</Authors>
+    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
+
+  <!-- Enable Microsoft SourceLink -->
+
+  <PropertyGroup>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+  </ItemGroup>
 
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>

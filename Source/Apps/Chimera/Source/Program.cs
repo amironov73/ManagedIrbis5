@@ -40,7 +40,7 @@ class Program
             Interpreter interpreter
         )
     {
-        var version = typeof (Interpreter).Assembly.GetName().Version;
+        var version = Interpreter.FileVersion;
         interpreter.Context.Output.WriteLine ($"Barsik interpreter {version}");
         interpreter.Context.Output.WriteLine ("Press ENTER twice to exit");
         return new Repl (interpreter).Loop();

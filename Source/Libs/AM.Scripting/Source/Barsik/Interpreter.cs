@@ -34,6 +34,16 @@ public sealed class Interpreter
     #region Properties
 
     /// <summary>
+    /// Версия API.
+    /// </summary>
+    public static string AssemblyVersion = ThisAssembly.AssemblyVersion;
+
+    /// <summary>
+    /// Версия сборки.
+    /// </summary>
+    public static string FileVersion = ThisAssembly.AssemblyFileVersion;
+
+    /// <summary>
     /// Контекст исполнения программы.
     /// </summary>
     public Context Context { get; }

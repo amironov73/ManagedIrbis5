@@ -83,6 +83,16 @@ public sealed class Magna
     #region Properites
 
     /// <summary>
+    /// Файловая версия сборки.
+    /// </summary>
+    public static string FileVersion = ThisAssembly.AssemblyFileVersion;
+
+    /// <summary>
+    /// Версия сборки.
+    /// </summary>
+    public static string AssemblyVersion = ThisAssembly.AssemblyVersion;
+
+    /// <summary>
     /// Хост приложения.
     /// </summary>
     public static IHost Host { get; internal set; } = new HostBuilder().Build();
