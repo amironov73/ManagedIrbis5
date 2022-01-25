@@ -199,8 +199,7 @@ internal sealed class AssignmentNode
     // вызов свободной функции
     private static readonly Parser<char, AtomNode> FreeFunctionCall = Map
         (
-            (name, args) =>
-                (AtomNode) new FreeCallNode (name, args.GetValueOrDefault()),
+            (name, args) => (AtomNode) new FreeCallNode (name, args.GetValueOrDefault()),
             Tok (Identifier),
             RoundBrackets (Rec (() => Expr!).Separated (Tok (',')).Optional())
         );

@@ -1,0 +1,8 @@
+﻿func summator (x, y)
+{
+    sum = x + y
+    println (x, " + ", y, " = ", sum)
+}
+
+apply ("summator", [1, 2])
+apply (summator, [1, 2])

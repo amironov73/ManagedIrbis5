@@ -120,7 +120,9 @@ public static class Builtins
     /// </summary>
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
+        { "apply", new FunctionDescriptor ("apply", Apply, false) },
         { "assert", new FunctionDescriptor ("assert", Assert_) },
+        { "bind", new FunctionDescriptor ("bind", Bind) },
         { "chr", new FunctionDescriptor ("chr", Chr) },
         { "debug", new FunctionDescriptor ("debug", Debug_) },
         { "define", new FunctionDescriptor ("define", Define, false) },
@@ -148,6 +150,53 @@ public static class Builtins
         { "trim", new FunctionDescriptor ("trim", Trim) },
         { "warn", new FunctionDescriptor ("warn", Warn) },
     };
+
+    /// <summary>
+    /// Применение функции.
+    /// </summary>
+    public static dynamic? Apply
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length < 1)
+        {
+            context.Error.WriteLine ("Too few arguments for apply");
+            return null;
+        }
+
+        FunctionDescriptor? descriptor = null;
+        if (args[0] is VariableNode node
+            && !context.FindFunction (node.Name, out descriptor))
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 0) is string name2
+            && !context.FindFunction (name2, out descriptor))
+        {
+            return null;
+        }
+
+        if (descriptor is null)
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 1) is not IEnumerable source)
+        {
+            return null;
+        }
+
+        var applyArgs = new List<dynamic?>();
+        foreach (var arg in source)
+        {
+            applyArgs.Add (arg);
+        }
+
+        return descriptor.CallPoint (context, applyArgs.ToArray());
+    }
 
     /// <summary>
     /// Проверка условия.
@@ -180,6 +229,56 @@ public static class Builtins
         {
             Exit (context, new dynamic?[] { 1, message });
         }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Метод bind() создаёт новую функцию, для которой (все или часть) аргументы
+    /// зафиксированы указанными значениями.
+    /// </summary>
+    public static dynamic? Bind
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length < 1)
+        {
+            context.Error.WriteLine ("Too few arguments for apply");
+            return null;
+        }
+
+        FunctionDescriptor? descriptor = null;
+        if (args[0] is VariableNode node
+            && !context.FindFunction (node.Name, out descriptor))
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 0) is string name2
+            && !context.FindFunction (name2, out descriptor))
+        {
+            return null;
+        }
+
+        if (descriptor is null)
+        {
+            return null;
+        }
+
+        if (Compute (context, args, 1) is not IEnumerable source)
+        {
+            return null;
+        }
+
+        var applyArgs = new List<dynamic?>();
+        foreach (var arg in source)
+        {
+            applyArgs.Add (arg);
+        }
+
+        // TODO реализовать вызов
 
         return null;
     }
@@ -419,7 +518,7 @@ public static class Builtins
             return null;
         }
 
-        if (args[0] is string name2
+        if (Compute (context, args, 0) is string name2
             && !context.FindFunction (name2, out descriptor))
         {
             return null;
@@ -602,7 +701,7 @@ public static class Builtins
             return null;
         }
 
-        if (args[0] is string name2
+        if (Compute (context, args, 0) is string name2
             && !context.FindFunction (name2, out descriptor))
         {
             return null;
@@ -814,7 +913,7 @@ public static class Builtins
             return null;
         }
 
-        if (args[0] is string name2
+        if (Compute (context, args, 0) is string name2
             && !context.FindFunction (name2, out descriptor))
         {
             return null;
