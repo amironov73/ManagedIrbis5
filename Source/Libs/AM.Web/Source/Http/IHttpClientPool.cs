@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/* IHttpClientPool.cs --
+/* IHttpClientPool.cs -- интерфейс пула
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -33,7 +33,7 @@ public interface IHttpClientPool
     /// </summary>
     /// <param name="builder">The builder to get a client for.</param>
     /// <returns>A <see cref="HttpClient"/> from the pool.</returns>
-    HttpClient Get(IRequestBuilder builder);
+    HttpClient Get (IRequestBuilder builder);
 
     /// <summary>
     /// Clears the pool, in case you need to.

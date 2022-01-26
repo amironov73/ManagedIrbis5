@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -31,19 +32,72 @@ namespace AM.Web;
 internal class HttpBuilder
     : IRequestBuilder
 {
-    public HttpSettings? Settings { get; }
-    public HttpRequestMessage Message { get; }
-    public bool LogErrors { get; set; } = true;
-    public IEnumerable<HttpStatusCode> IgnoredResponseStatuses { get; set; } = Enumerable.Empty<HttpStatusCode>();
-    public TimeSpan Timeout { get; set; }
-    public IWebProxy Proxy { get; set; }
-    public bool BufferResponse { get; set; } = true;
-    public IHttpClientPool ClientPool { get; set; }
-    public event EventHandler<HttpExceptionArgs> BeforeExceptionLog;
-    private readonly string _callerName, _callerFile;
-    private readonly int _callerLine;
+    #region Events
 
-    public HttpBuilder (string uri, HttpSettings? settings, string callerName, string callerFile, int callerLine)
+    /// <summary>
+    ///
+    /// </summary>
+    public event EventHandler<HttpExceptionArgs>? BeforeExceptionLog;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    ///
+    /// </summary>
+    public HttpSettings? Settings { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public HttpRequestMessage Message { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public bool LogErrors { get; set; } = true;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public IEnumerable<HttpStatusCode> IgnoredResponseStatuses { get; set; } = Enumerable.Empty<HttpStatusCode>();
+
+    /// <summary>
+    ///
+    /// </summary>
+    public TimeSpan Timeout { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public IWebProxy? Proxy { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public bool BufferResponse { get; set; } = true;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public IHttpClientPool? ClientPool { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    public HttpBuilder
+        (
+            string uri,
+            HttpSettings? settings,
+            string callerName,
+            string callerFile,
+            int callerLine
+        )
     {
         Message = new HttpRequestMessage
         {
@@ -57,14 +111,19 @@ internal class HttpBuilder
         _callerLine = callerLine;
     }
 
-    public void OnBeforeExceptionLog (HttpExceptionArgs args)
-    {
-        BeforeExceptionLog?.Invoke (this, args);
-    }
+    #endregion
 
-    internal void AddExceptionData (Exception ex)
+    #region Private members
+
+    private readonly string _callerName, _callerFile;
+    private readonly int _callerLine;
+
+    internal void AddExceptionData
+        (
+            Exception? ex
+        )
     {
-        if (ex == null)
+        if (ex is null)
         {
             return;
         }
@@ -80,8 +139,9 @@ internal class HttpBuilder
                         ServicePointManager.DefaultConnectionLimit);
             }
         }
-        catch
+        catch (Exception exception)
         {
+            Debug.WriteLine (exception.Message);
         }
 
         ex.AddLoggedData ("Caller.Name", _callerName)
@@ -89,8 +149,37 @@ internal class HttpBuilder
             .AddLoggedData ("Caller.Line", _callerLine.ToString());
     }
 
-    public IRequestBuilder<T> WithHandler<T> (Func<HttpResponseMessage, Task<T>> handler) =>
-        new HttpBuilder<T> (this, handler);
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="args"></param>
+    public void OnBeforeExceptionLog
+        (
+            HttpExceptionArgs args
+        )
+    {
+        BeforeExceptionLog?.Invoke (this, args);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public IRequestBuilder<T> WithHandler<T>
+        (
+            Func<HttpResponseMessage, Task<T>> handler
+        )
+    {
+        return new HttpBuilder<T> (this, handler);
+    }
+
+    #endregion
 }
 
 internal class HttpBuilder<T> : IRequestBuilder<T>

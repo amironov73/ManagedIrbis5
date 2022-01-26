@@ -35,8 +35,8 @@ public static partial class ExtensionsForHttp
     /// </summary>
     /// <param name="builder">The builder we're working on.</param>
     /// <returns>A typed request builder for chaining.</returns>
-    public static IRequestBuilder<bool> ExpectHttpSuccess(this IRequestBuilder builder) =>
-        builder.WithHandler(responseMessage => Task.FromResult(responseMessage.IsSuccessStatusCode));
+    public static IRequestBuilder<bool> ExpectHttpSuccess (this IRequestBuilder builder) =>
+        builder.WithHandler (responseMessage => Task.FromResult (responseMessage.IsSuccessStatusCode));
 
     // /// <summary>
     // /// <para>Holds handlers for ExpectJson(T) calls, so we don't re-create them in the common "default Options" case.</para>
@@ -103,19 +103,19 @@ public static partial class ExtensionsForHttp
     /// </summary>
     /// <param name="builder">The builder we're working on.</param>
     /// <returns>A typed request builder for chaining.</returns>
-    public static IRequestBuilder<byte[]> ExpectByteArray(this IRequestBuilder builder) =>
-        builder.WithHandler(responseMessage => responseMessage.Content.ReadAsByteArrayAsync());
+    public static IRequestBuilder<byte[]> ExpectByteArray (this IRequestBuilder builder) =>
+        builder.WithHandler (responseMessage => responseMessage.Content.ReadAsByteArrayAsync());
 
     /// <summary>
     /// Sets the response handler for this request to return the response as a <see cref="string"/>.
     /// </summary>
     /// <param name="builder">The builder we're working on.</param>
     /// <returns>A typed request builder for chaining.</returns>
-    public static IRequestBuilder<string> ExpectString(this IRequestBuilder builder) =>
-        builder.WithHandler(async responseMessage =>
+    public static IRequestBuilder<string> ExpectString (this IRequestBuilder builder) =>
+        builder.WithHandler (async responseMessage =>
         {
             using (var responseStream = await responseMessage.Content.ReadAsStreamAsync())
-            using (var streamReader = new StreamReader(responseStream))
+            using (var streamReader = new StreamReader (responseStream))
             {
                 return await streamReader.ReadToEndAsync();
             }

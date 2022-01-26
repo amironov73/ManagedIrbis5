@@ -26,5 +26,7 @@ namespace AM.Web;
 /// <summary>
 /// Extensions for intellisense - intentionally itself hidden from Intellisense
 /// </summary>
-[EditorBrowsable(EditorBrowsableState.Never)] // Hide from intellisense
-public static partial class ExtensionsForHttp { }
+[EditorBrowsable (EditorBrowsableState.Never)] // Hide from intellisense
+public static partial class ExtensionsForHttp
+{
+}

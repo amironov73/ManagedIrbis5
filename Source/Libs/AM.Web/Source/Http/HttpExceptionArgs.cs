@@ -43,7 +43,7 @@ public class HttpExceptionArgs
     /// </summary>
     public bool AbortLogging { get; set; }
 
-    internal HttpExceptionArgs(IRequestBuilder builder, Exception ex)
+    internal HttpExceptionArgs (IRequestBuilder builder, Exception ex)
     {
         Builder = builder;
         Error = ex;

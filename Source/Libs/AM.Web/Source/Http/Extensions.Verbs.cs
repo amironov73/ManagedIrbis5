@@ -34,8 +34,9 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder used for this request.</param>
     /// <param name="cancellationToken">The cancellation token for stopping the request.</param>
     /// <returns>A <see cref="HttpCallResponse{T}"/> to consume.</returns>
-    public static Task<HttpCallResponse<T>> DeleteAsync<T>(this IRequestBuilder<T> builder, CancellationToken cancellationToken = default) =>
-        Http.SendAsync(builder, HttpMethod.Delete, cancellationToken);
+    public static Task<HttpCallResponse<T>> DeleteAsync<T> (this IRequestBuilder<T> builder,
+        CancellationToken cancellationToken = default) =>
+        Http.SendAsync (builder, HttpMethod.Delete, cancellationToken);
 
     /// <summary>
     /// Issue the request as a GET.
@@ -44,8 +45,9 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder used for this request.</param>
     /// <param name="cancellationToken">The cancellation token for stopping the request.</param>
     /// <returns>A <see cref="HttpCallResponse{T}"/> to consume.</returns>
-    public static Task<HttpCallResponse<T>> GetAsync<T>(this IRequestBuilder<T> builder, CancellationToken cancellationToken = default) =>
-        Http.SendAsync(builder, HttpMethod.Get, cancellationToken);
+    public static Task<HttpCallResponse<T>> GetAsync<T> (this IRequestBuilder<T> builder,
+        CancellationToken cancellationToken = default) =>
+        Http.SendAsync (builder, HttpMethod.Get, cancellationToken);
 
     /// <summary>
     /// Issue the request as a HEAD.
@@ -54,8 +56,9 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder used for this request.</param>
     /// <param name="cancellationToken">The cancellation token for stopping the request.</param>
     /// <returns>A <see cref="HttpCallResponse{T}"/> to consume.</returns>
-    public static Task<HttpCallResponse<T>> HeadAsync<T>(this IRequestBuilder<T> builder, CancellationToken cancellationToken = default) =>
-        Http.SendAsync(builder, HttpMethod.Head, cancellationToken);
+    public static Task<HttpCallResponse<T>> HeadAsync<T> (this IRequestBuilder<T> builder,
+        CancellationToken cancellationToken = default) =>
+        Http.SendAsync (builder, HttpMethod.Head, cancellationToken);
 
     /// <summary>
     /// Issue the request as a POST.
@@ -64,8 +67,9 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder used for this request.</param>
     /// <param name="cancellationToken">The cancellation token for stopping the request.</param>
     /// <returns>A <see cref="HttpCallResponse{T}"/> to consume.</returns>
-    public static Task<HttpCallResponse<T>> PostAsync<T>(this IRequestBuilder<T> builder, CancellationToken cancellationToken = default) =>
-        Http.SendAsync(builder, HttpMethod.Post, cancellationToken);
+    public static Task<HttpCallResponse<T>> PostAsync<T> (this IRequestBuilder<T> builder,
+        CancellationToken cancellationToken = default) =>
+        Http.SendAsync (builder, HttpMethod.Post, cancellationToken);
 
     /// <summary>
     /// Issue the request as a PUT.
@@ -74,8 +78,9 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder used for this request.</param>
     /// <param name="cancellationToken">The cancellation token for stopping the request.</param>
     /// <returns>A <see cref="HttpCallResponse{T}"/> to consume.</returns>
-    public static Task<HttpCallResponse<T>> PutAsync<T>(this IRequestBuilder<T> builder, CancellationToken cancellationToken = default) =>
-        Http.SendAsync(builder, HttpMethod.Put, cancellationToken);
+    public static Task<HttpCallResponse<T>> PutAsync<T> (this IRequestBuilder<T> builder,
+        CancellationToken cancellationToken = default) =>
+        Http.SendAsync (builder, HttpMethod.Put, cancellationToken);
 
     /// <summary>
     /// Issue the request as a PATCH.
@@ -84,6 +89,7 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder used for this request.</param>
     /// <param name="cancellationToken">The cancellation token for stopping the request.</param>
     /// <returns>A <see cref="HttpCallResponse{T}"/> to consume.</returns>
-    public static Task<HttpCallResponse<T>> PatchAsync<T>(this IRequestBuilder<T> builder, CancellationToken cancellationToken = default) =>
-        Http.SendAsync(builder, new HttpMethod("PATCH"), cancellationToken);
+    public static Task<HttpCallResponse<T>> PatchAsync<T> (this IRequestBuilder<T> builder,
+        CancellationToken cancellationToken = default) =>
+        Http.SendAsync (builder, new HttpMethod ("PATCH"), cancellationToken);
 }
