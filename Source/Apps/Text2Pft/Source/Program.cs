@@ -20,7 +20,6 @@
 using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.IO;
 
@@ -33,8 +32,19 @@ using ManagedIrbis.Pft;
 
 namespace Text2Pft;
 
-class Program
+internal static class Program
 {
+    private static readonly Argument<string> _inputArgument = new ("text-file")
+    {
+        Arity = ArgumentArity.ExactlyOne,
+        Description = "имя текстового файла, например, ticket.html"
+    };
+    private static readonly Argument<string> _outputArgument = new ("pft-file")
+    {
+        Arity = ArgumentArity.ExactlyOne,
+        Description = "имя PFT-файла (будет перезаписан!), например, ticket.pft"
+    };
+
     static void Run
         (
             ParseResult parseResult
@@ -42,9 +52,9 @@ class Program
     {
         try
         {
-            var inputName = parseResult.ValueForArgument<string> ("text-file")
+            var inputName = parseResult.GetValueForArgument (_inputArgument)
                 .ThrowIfNullOrEmpty();
-            var outputName = parseResult.ValueForArgument<string> ("pft-file")
+            var outputName = parseResult.GetValueForArgument (_outputArgument)
                 .ThrowIfNullOrEmpty();
             var encoding = IrbisEncoding.Ansi;
 
@@ -75,23 +85,13 @@ class Program
             string[] args
         )
     {
-        var inputArgument = new Argument<string> ("text-file")
-        {
-            Arity = ArgumentArity.ExactlyOne,
-            Description = "имя текстового файла, например, ticket.html"
-        };
-        var outputArgument = new Argument<string> ("pft-file")
-        {
-            Arity = ArgumentArity.ExactlyOne,
-            Description = "имя PFT-файла (будет перезаписан!), например, ticket.pft"
-        };
         var rootCommand = new RootCommand ("Mnu2Tre")
         {
-            inputArgument,
-            outputArgument
+            _inputArgument,
+            _outputArgument
         };
         rootCommand.Description = "Создание PFT по текстовому файлу";
-        rootCommand.Handler = CommandHandler.Create<ParseResult> (Run);
+        rootCommand.SetHandler ((Action<ParseResult>) Run);
 
         new CommandLineBuilder (rootCommand)
             .UseDefaults()

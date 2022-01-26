@@ -20,7 +20,6 @@
 using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 
 using AM;
@@ -33,57 +32,57 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace CheckIniFile
+namespace CheckIniFile;
+
+class Program
 {
-    class Program
+    private static readonly Argument<string> _fileArgument = new ("ini-file")
     {
-        static void Run
-            (
-                ParseResult parseResult
-            )
+        Arity = ArgumentArity.ExactlyOne,
+        Description = "имя клиентского INI-файла, например, cirbisc.ini"
+    };
+
+    static void Run
+        (
+            ParseResult parseResult
+        )
+    {
+        try
         {
-            try
-            {
-                var fileName = parseResult.ValueForArgument<string>("ini-file")
-                    .ThrowIfNullOrEmpty();
-                var encoding = IrbisEncoding.Ansi;
+            var fileName = parseResult.GetValueForArgument (_fileArgument)
+                .ThrowIfNullOrEmpty();
+            var encoding = IrbisEncoding.Ansi;
 
-                using var iniFile = new IniFile(fileName, encoding);
-                var lm = new ClientLM();
-                var result = lm.CheckHash(iniFile);
+            using var iniFile = new IniFile(fileName, encoding);
+            var lm = new ClientLM();
+            var result = lm.CheckHash(iniFile);
 
-                Console.WriteLine($"{fileName}: {result}");
+            Console.WriteLine($"{fileName}: {result}");
 
-                Environment.ExitCode = result ? 0 : 1;
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-                Environment.ExitCode = 2;
-            }
+            Environment.ExitCode = result ? 0 : 1;
         }
-
-        static void Main
-            (
-                string[] args
-            )
+        catch (Exception exception)
         {
-            var fileArgument = new Argument<string>("ini-file")
-            {
-                Arity = ArgumentArity.ExactlyOne,
-                Description = "имя клиентского INI-файла, например, cirbisc.ini"
-            };
-            var rootCommand = new RootCommand("CheckIniFile")
-            {
-                fileArgument
-            };
-            rootCommand.Description = "Проверка в клиентском INI-файле АБИС ИРБИС64";
-            rootCommand.Handler = CommandHandler.Create<ParseResult>(Run);
-
-            new CommandLineBuilder(rootCommand)
-                .UseDefaults()
-                .Build()
-                .Invoke(args);
+            Console.WriteLine(exception);
+            Environment.ExitCode = 2;
         }
+    }
+
+    static void Main
+        (
+            string[] args
+        )
+    {
+        var rootCommand = new RootCommand("CheckIniFile")
+        {
+            _fileArgument
+        };
+        rootCommand.Description = "Проверка в клиентском INI-файле АБИС ИРБИС64";
+        rootCommand.SetHandler ((Action<ParseResult>) Run);
+
+        new CommandLineBuilder(rootCommand)
+            .UseDefaults()
+            .Build()
+            .Invoke(args);
     }
 }

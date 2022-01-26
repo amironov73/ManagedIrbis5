@@ -435,40 +435,40 @@ internal class Program : IrbisApplication
 
             var result = new ScriptOptions();
 
-            var references = parseResult.ValueForOption (refOption);
+            var references = parseResult.GetValueForOption (refOption);
             if (references is not null)
             {
                 result.References.AddRange (references);
             }
 
-            var defines = parseResult.ValueForOption (defineOption);
+            var defines = parseResult.GetValueForOption (defineOption);
             if (defines is not null)
             {
                 result.Defines.AddRange (defines);
             }
 
-            var usings = parseResult.ValueForOption (usingOption);
+            var usings = parseResult.GetValueForOption (usingOption);
             if (usings is not null)
             {
                 result.Usings.AddRange (usings);
             }
 
-            var inputs = parseResult.ValueForArgument (inputArg);
+            var inputs = parseResult.GetValueForArgument (inputArg);
             if (inputs is not null)
             {
                 result.InputFiles.AddRange (inputs);
             }
 
-            var outputName = parseResult.ValueForOption (outputOption);
+            var outputName = parseResult.GetValueForOption (outputOption);
             if (!string.IsNullOrEmpty (outputName))
             {
                 result.OutputName = outputName;
             }
 
-            result.ApplicationMode = parseResult.ValueForOption (applicationOption);
-            result.CompileOnly = parseResult.ValueForOption (compileOption);
-            result.ExecuteOnly = parseResult.ValueForOption (executeOption);
-            result.ShowApplicationCode = parseResult.ValueForOption (showOption);
+            result.ApplicationMode = parseResult.GetValueForOption (applicationOption);
+            result.CompileOnly = parseResult.GetValueForOption (compileOption);
+            result.ExecuteOnly = parseResult.GetValueForOption (executeOption);
+            result.ShowApplicationCode = parseResult.GetValueForOption (showOption);
 
             return result;
         }
