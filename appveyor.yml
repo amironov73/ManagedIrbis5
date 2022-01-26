@@ -21,14 +21,13 @@ before_build:
 - pygount -f summary Source/Tests                      -s cs -N "*.Designer.cs" -F "obj"
 - pygount -f summary Source/Apps                       -s cs -N "*.Designer.cs" -F "obj"
 - dotnet --info
-- dotnet restore Source\Utils\Utils.sln
-- dotnet build --no-restore --configuration Release Source\Utils\Utils.sln
+- dotnet tool install --tool-path . nbgv
+- nbgv cloud
+- dotnet build --configuration Release Source\Utils\Utils-windows.sln
 
 build_script:
-- dotnet restore                                    Source\ManagedIrbis5-windows.sln
-- dotnet restore                                    Source\TinyClient.sln
-- dotnet build --no-restore --configuration Release Source\ManagedIrbis5-windows.sln
-- dotnet build --no-restore --configuration Release Source\TinyClient.sln
+- dotnet build --configuration Release Source\ManagedIrbis5-windows.sln
+- dotnet build --configuration Release Source\TinyClient.sln
 
 test_script:
 - dotnet test --no-restore --no-build --configuration Release --settings sequential.runsettings Source\ManagedIrbis5-windows.sln
@@ -36,10 +35,10 @@ test_script:
 - dotnet run  --no-restore --no-build --configuration Release --project                         Source\Tests\BarsikTestRunner\BarsikTestRunner.csproj
 
 after_build:
-- dotnet pack    --no-restore --no-build --configuration Release --include-symbols --include-source --output NuGet   Source\ManagedIrbis5-publish.sln
-- dotnet pack    --no-restore --no-build --configuration Release --include-symbols --include-source --output NuGet   Source\Libs\TinyClient\TinyClient.csproj
-- dotnet publish --no-restore --no-build --configuration Release                                    --output Publish Source\ManagedIrbis5-publish.sln
-- dotnet publish --no-restore --no-build --configuration Release                                    --output Publish Source\Libs\TinyClient\TinyClient.csproj
+- dotnet pack    --no-restore --no-build --configuration Release --output NuGet   Source\ManagedIrbis5-publish.sln
+- dotnet pack    --no-restore --no-build --configuration Release --output NuGet   Source\Libs\TinyClient\TinyClient.csproj
+- dotnet publish --no-restore --no-build --configuration Release --output Publish Source\ManagedIrbis5-publish.sln
+- dotnet publish --no-restore --no-build --configuration Release --output Publish Source\Libs\TinyClient\TinyClient.csproj
 
 artifacts:
   - path: 'NuGet\'
