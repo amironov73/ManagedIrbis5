@@ -11,7 +11,7 @@ dotnet build                           --configuration Release                  
 dotnet test    --no-restore --no-build --configuration Release                  Source/ManagedIrbis5.sln                              || exit
 dotnet run     --no-restore --no-build --configuration Release --project        Source/Tests/PftTests/PftTests.csproj                 || exit
 dotnet run     --no-restore --no-build --configuration Release --project        Source/Tests/BarsikTestRunner/BarsikTestRunner.csproj || exit
-dotnet pack    --no-restore --no-build --configuration Release --output NuGet   Source/ManagedIrbis5-publish.sln                      || exit
-dotnet publish --no-restore --no-build --configuration Release --output Publish Source/ManagedIrbis5-publish.sln                      || exit
+dotnet pack    --no-restore --no-build --configuration Release --output NuGet   Source/ManagedIrbis5-publish.sln
+dotnet publish --no-restore --no-build --configuration Release --output Publish Source/ManagedIrbis5-publish.sln
 
 echo ALL DONE
