@@ -26,18 +26,30 @@ using System.Text;
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+///
+/// </summary>
+public class _
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public class _
-    {
-        #region Public methods
+    #region Properties
 
 
-        #endregion
+    #endregion
 
-    } // class
+    #region Construction
 
-} // namespace
+
+    #endregion
+
+    #region Private members
+
+
+    #endregion
+
+    #region Public methods
+
+
+    #endregion
+}
