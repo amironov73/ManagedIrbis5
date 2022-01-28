@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* BarcodeContext.cs -- контекст для вывода штрих-кода
  * Ars Magna project, http://arsmagna.ru
@@ -22,37 +18,34 @@ using System.Drawing;
 
 #nullable enable
 
-namespace AM.Drawing.Barcodes
+namespace AM.Drawing.Barcodes;
+
+/// <summary>
+/// Контекст для вывода штрих-кода.
+/// </summary>
+public class BarcodeContext
 {
+    #region Properties
+
     /// <summary>
-    /// Контекст для вывода штрих-кода.
+    /// Устройство для вывода.
     /// </summary>
-    public class BarcodeContext
-    {
-        #region Properties
+    public Graphics? Graphics { get; set; }
 
-        /// <summary>
-        /// Устройство для вывода.
-        /// </summary>
-        public Graphics? Graphics { get; set; }
+    /// <summary>
+    /// Позиция штрих-кода на устройстве.
+    /// </summary>
+    public RectangleF Bounds { get; set; }
 
-        /// <summary>
-        /// Позиция штрих-кода на устройстве.
-        /// </summary>
-        public RectangleF Bounds { get; set; }
+    /// <summary>
+    /// Данные для вывода.
+    /// </summary>
+    public BarcodeData? Data { get; set; }
 
-        /// <summary>
-        /// Данные для вывода.
-        /// </summary>
-        public BarcodeData? Data { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public IServiceProvider? ServiceProvider { get; set; }
 
-        /// <summary>
-        ///
-        /// </summary>
-        public IServiceProvider? ServiceProvider { get; set; }
-
-        #endregion
-
-    } // class BarcodeContext
-
-} // namespace AM.Drawing.Barcodes
+    #endregion
+}

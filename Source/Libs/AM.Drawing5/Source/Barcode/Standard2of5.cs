@@ -19,91 +19,86 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM.Drawing.Barcodes
+namespace AM.Drawing.Barcodes;
+
+/// <summary>
+/// Штрих-код "2 из 5"
+/// </summary>
+public sealed class Standard2of5
+    : LinearBarcodeBase
 {
-    /// <summary>
-    /// Штрих-код "2 из 5"
-    /// </summary>
-    public sealed class Standard2of5
-        : LinearBarcodeBase
+    #region Private members
+
+    private static readonly string[] _patterns =
     {
-        #region Private members
+        "10101110111010",
+        "11101010101110",
+        "10111010101110",
+        "11101110101010",
+        "10101110101110",
+        "11101011101010",
+        "10111011101010",
+        "10101011101110",
+        "11101010111010",
+        "10111010111010"
+    };
 
-        private static readonly string[] _patterns =
+    #endregion
+
+    #region LinearBarcodeBase members
+
+    /// <inheritdoc cref="LinearBarcodeBase.Encode"/>
+    public override string Encode
+        (
+            BarcodeData data
+        )
+    {
+        var text = data.Message.ThrowIfNull();
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (8 + 7 + text.Length * 14);
+
+        builder.Append ("11011010");
+
+        foreach (var c in text)
         {
-            "10101110111010",
-            "11101010101110",
-            "10111010101110",
-            "11101110101010",
-            "10101110101110",
-            "11101011101010",
-            "10111011101010",
-            "10101011101110",
-            "11101010111010",
-            "10111010111010"
-        };
+            var digit = c - '0';
+            builder.Append (_patterns[digit]);
+        }
 
-        #endregion
+        builder.Append ("1101011");
 
-        #region LinearBarcodeBase members
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-        /// <inheritdoc cref="LinearBarcodeBase.Encode"/>
-        public override string Encode
-            (
-                BarcodeData data
-            )
+        return result;
+    }
+
+    /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
+    public override bool Verify
+        (
+            BarcodeData data
+        )
+    {
+        var message = data.Message;
+
+        if (string.IsNullOrWhiteSpace (message))
         {
-            var text = data.Message.ThrowIfNull();
-            var builder = StringBuilderPool.Shared.Get();
-            builder.EnsureCapacity (8 + 7 + text.Length * 14);
+            return false;
+        }
 
-            builder.Append ("11011010");
-
-            foreach (var c in text)
-            {
-                var digit = c - '0';
-                builder.Append (_patterns[digit]);
-            }
-
-            builder.Append ("1101011");
-
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
-
-        } // method Encode
-
-        /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
-        public override bool Verify
-            (
-                BarcodeData data
-            )
+        foreach (var c in message)
         {
-            var message = data.Message;
-
-            if (string.IsNullOrWhiteSpace(message))
+            if (!char.IsDigit (c))
             {
                 return false;
             }
+        }
 
-            foreach (var c in message)
-            {
-                if (!char.IsDigit(c))
-                {
-                    return false;
-                }
-            }
+        return true;
+    }
 
-            return true;
+    /// <inheritdoc cref="LinearBarcodeBase.Symbology"/>
+    public override string Symbology => "Standard 2 of 5";
 
-        } // method Verify
-
-        /// <inheritdoc cref="LinearBarcodeBase.Symbology"/>
-        public override string Symbology { get; } = "Standard 2 of 5";
-
-        #endregion
-
-    } // class Standard2of5
-
-} // namespace AM.Drawing.Barcodes
+    #endregion
+}

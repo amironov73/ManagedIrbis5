@@ -19,80 +19,76 @@ using System.Drawing;
 
 #nullable enable
 
-namespace AM.Drawing.Barcodes
+namespace AM.Drawing.Barcodes;
+
+/// <summary>
+/// Базовый класс для обычных одномерных штрихкодов.
+/// </summary>
+public abstract class LinearBarcodeBase
+    : IBarcode
 {
+    #region Properties
+
     /// <summary>
-    /// Базовый класс для обычных одномерных штрихкодов.
+    /// Множитель для ширины полос.
     /// </summary>
-    public abstract class LinearBarcodeBase
-        : IBarcode
+    public float Weight { get; set; } = 3.0f;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Кодирование штрих-кода в последовательность нулей и единиц.
+    /// </summary>
+    public abstract string Encode
+        (
+            BarcodeData data
+        );
+
+    /// <summary>
+    /// Проверка, пригодны ли данные для штрих-кода.
+    /// </summary>
+    public abstract bool Verify
+        (
+            BarcodeData data
+        );
+
+    #endregion
+
+    #region IBarcode members
+
+    /// <inheritdoc cref="IBarcode.Symbology"/>
+    public abstract string Symbology { get; }
+
+    /// <inheritdoc cref="IBarcode.DrawBarcode"/>
+    public virtual void DrawBarcode
+        (
+            BarcodeContext context
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Множитель для ширины полос.
-        /// </summary>
-        public float Weight { get; set; } = 3.0f;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Кодирование штрих-кода в последовательность нулей и единиц.
-        /// </summary>
-        public abstract string Encode
-            (
-                BarcodeData data
-            );
-
-        /// <summary>
-        /// Проверка, пригодны ли данные для штрих-кода.
-        /// </summary>
-        public abstract bool Verify
-            (
-                BarcodeData data
-            );
-
-        #endregion
-
-        #region IBarcode members
-
-        /// <inheritdoc cref="IBarcode.Symbology"/>
-        public abstract string Symbology { get; }
-
-        /// <inheritdoc cref="IBarcode.DrawBarcode"/>
-        public virtual void DrawBarcode
-            (
-                BarcodeContext context
-            )
+        var data = context.Data;
+        if (data is null || !Verify (data))
         {
-            var data = context.Data;
-            if (data is null || !Verify (data))
-            {
-                return;
-            }
+            return;
+        }
 
-            var encoded = Encode (data);
-            encoded = "00" + encoded + "00";
-            var graphics = context.Graphics.ThrowIfNull();
-            var bounds = context.Bounds;
-            using var fore = new SolidBrush (data.ForeColor);
-            using var back = new SolidBrush (data.BackColor);
-            var position = bounds.Left;
+        var encoded = Encode (data);
+        encoded = "00" + encoded + "00";
+        var graphics = context.Graphics.ThrowIfNull();
+        var bounds = context.Bounds;
+        using var fore = new SolidBrush (data.ForeColor);
+        using var back = new SolidBrush (data.BackColor);
+        var position = bounds.Left;
 
-            foreach (var c in encoded)
-            {
-                var rect = new RectangleF (position, bounds.Top, Weight, bounds.Height);
-                var brush = c == '0' ? back : fore;
-                graphics.FillRectangle (brush, rect);
-                position += Weight;
-            }
+        foreach (var c in encoded)
+        {
+            var rect = new RectangleF (position, bounds.Top, Weight, bounds.Height);
+            var brush = c == '0' ? back : fore;
+            graphics.FillRectangle (brush, rect);
+            position += Weight;
+        }
+    }
 
-        } // method DrawBarcode
-
-        #endregion
-
-    } // class LinearBarcodeBase
-
-} // namespace AM.Drawing.Barcodes
+    #endregion
+}

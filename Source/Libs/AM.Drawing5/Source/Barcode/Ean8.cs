@@ -19,115 +19,110 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM.Drawing.Barcodes
+namespace AM.Drawing.Barcodes;
+
+/// <summary>
+/// EAN 8
+/// </summary>
+public sealed class Ean8
+    : LinearBarcodeBase
 {
-    /// <summary>
-    /// EAN 8
-    /// </summary>
-    public sealed class Ean8
-        : LinearBarcodeBase
+    #region Private members
+
+    private static readonly string[] _codesA =
     {
-        #region Private members
+        "0001101",
+        "0011001",
+        "0010011",
+        "0111101",
+        "0100011",
+        "0110001",
+        "0101111",
+        "0111011",
+        "0110111",
+        "0001011"
+    };
 
-        private static readonly string[] _codesA =
+    private readonly string[] _codesB =
+    {
+        "1110010",
+        "1100110",
+        "1101100",
+        "1000010",
+        "1011100",
+        "1001110",
+        "1010000",
+        "1000100",
+        "1001000",
+        "1110100"
+    };
+
+    #endregion
+
+    #region LinearBarcodeBase methods
+
+    /// <inheritdoc cref="LinearBarcodeBase.Encode"/>
+    public override string Encode
+        (
+            BarcodeData data
+        )
+    {
+        var text = data.Message.ThrowIfNull();
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (3 * 3 + 7 * 8);
+
+        builder.Append ("101"); // открывающая последовательность
+
+        var half = text.Length / 2;
+
+        for (var i = 0; i < half; i++)
         {
-            "0001101",
-            "0011001",
-            "0010011",
-            "0111101",
-            "0100011",
-            "0110001",
-            "0101111",
-            "0111011",
-            "0110111",
-            "0001011"
-        };
+            var c = text[i] - '0';
+            builder.Append (_codesA[c]);
+        }
 
-        private readonly string[] _codesB =
+        builder.Append ("01010"); // разделитель
+
+        for (var i = half; i < text.Length; i++)
         {
-            "1110010",
-            "1100110",
-            "1101100",
-            "1000010",
-            "1011100",
-            "1001110",
-            "1010000",
-            "1000100",
-            "1001000",
-            "1110100"
-        };
+            var c = text[i] - '0';
+            builder.Append (_codesB[c]);
+        }
 
-        #endregion
+        builder.Append ("101"); // закрывающая последовательность
 
-        #region LinearBarcodeBase methods
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-        /// <inheritdoc cref="LinearBarcodeBase.Encode"/>
-        public override string Encode
-            (
-                BarcodeData data
-            )
+        return result;
+    }
+
+    /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
+    public override bool Verify
+        (
+            BarcodeData data
+        )
+    {
+        var message = data.Message;
+
+        if (string.IsNullOrWhiteSpace (message))
         {
-            var text = data.Message.ThrowIfNull();
-            var builder = StringBuilderPool.Shared.Get();
-            builder.EnsureCapacity (3 * 3 + 7 * 8);
+            return false;
+        }
 
-            builder.Append ("101"); // открывающая последовательность
-
-            var half = text.Length / 2;
-
-            for (var i = 0; i < half; i++)
-            {
-                var c = text[i] - '0';
-                builder.Append (_codesA[c]);
-            }
-
-            builder.Append ("01010"); // разделитель
-
-            for (var i = half; i < text.Length; i++)
-            {
-                var c = text[i] - '0';
-                builder.Append (_codesB[c]);
-            }
-
-            builder.Append ("101"); // закрывающая последовательность
-
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
-
-        } // method Encode
-
-        /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
-        public override bool Verify
-            (
-                BarcodeData data
-            )
+        foreach (var c in message)
         {
-            var message = data.Message;
-
-            if (string.IsNullOrWhiteSpace(message))
+            if (!char.IsDigit (c))
             {
                 return false;
             }
+        }
 
-            foreach (var c in message)
-            {
-                if (!char.IsDigit(c))
-                {
-                    return false;
-                }
-            }
+        return true;
+    }
 
-            return true;
+    /// <inheritdoc cref="IBarcode.Symbology"/>
+    public override string Symbology { get; } = "EAN13";
 
-        } // method Verify
-
-        /// <inheritdoc cref="IBarcode.Symbology"/>
-        public override string Symbology { get; } = "EAN13";
-
-        #endregion
-
-    } // class Ean8
-
-} // namespace AM.Drawing.Barcodes
+    #endregion
+}
