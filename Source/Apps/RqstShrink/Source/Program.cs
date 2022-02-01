@@ -35,7 +35,7 @@ using static System.Console;
 
 namespace RqstShrink;
 
-internal class Program
+internal static class Program
 {
     private static int Main (string[] args)
     {
@@ -59,9 +59,8 @@ internal class Program
             }
 
             var rootCommand = new RootCommand ("RqstShrink");
-            var csArgument = new Argument ("cs")
+            var csArgument = new Argument<string> ("cs")
             {
-                ArgumentType = typeof (string),
                 Arity = ArgumentArity.ZeroOrOne,
                 Description = "Connection string"
             };
@@ -70,7 +69,7 @@ internal class Program
             rootCommand.AddOption (exprOption);
             var builder = new CommandLineBuilder (rootCommand).Build();
             var parseResult = builder.Parse (args);
-            var csValue = parseResult.ValueForArgument<string> (csArgument);
+            var csValue = parseResult.GetValueForArgument (csArgument);
             if (!string.IsNullOrEmpty (csValue))
             {
                 connectionString = csValue;
@@ -90,7 +89,7 @@ internal class Program
                 var maxMfn = connection.GetMaxMfn();
 
                 var expression = config.GetValue<string> ("Expression");
-                var expressionValue = parseResult.ValueForOption<string> (exprOption);
+                var expressionValue = parseResult.GetValueForOption<string> (exprOption);
                 if (!string.IsNullOrEmpty (expressionValue))
                 {
                     expression = expressionValue;

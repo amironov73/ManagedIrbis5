@@ -28,8 +28,11 @@ namespace AM.Web;
 /// <summary>
 /// An exception from an <see cref="Http"/> call.
 /// </summary>
-public class HttpClientException : Exception
+public class HttpClientException
+    : Exception
 {
+    #region Properties
+
     /// <summary>
     /// The status code, if known, for this exception.
     /// </summary>
@@ -38,26 +41,95 @@ public class HttpClientException : Exception
     /// <summary>
     /// The requested URI, if known, for this exception.
     /// </summary>
-    public Uri Uri { get; }
+    public Uri? Uri { get; }
 
-    internal HttpClientException() { }
-    internal HttpClientException(string message) : base(message) { }
-    internal HttpClientException(string message, Exception innerException) : base(message, innerException) { }
-    internal HttpClientException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+    #endregion
 
-    internal HttpClientException(string message, HttpStatusCode statusCode, Uri uri) : base(message)
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    internal HttpClientException()
+    {
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    internal HttpClientException
+        (
+            string message
+        )
+        : base (message)
+    {
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    internal HttpClientException
+        (
+            string message,
+            Exception innerException
+        )
+        : base (message, innerException)
+    {
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    internal HttpClientException
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
+    {
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    internal HttpClientException
+        (
+            string message,
+            HttpStatusCode statusCode,
+            Uri uri
+        )
+        : base (message)
     {
         StatusCode = statusCode;
         Uri = uri;
     }
 
-    internal HttpClientException(string message, Uri uri) : base(message)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    internal HttpClientException
+        (
+            string message,
+            Uri? uri
+        )
+        : base (message)
     {
         Uri = uri;
     }
 
-    internal HttpClientException(string message, Uri uri, Exception innerException) : base(message, innerException)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    internal HttpClientException
+        (
+            string message,
+            Uri uri,
+            Exception innerException
+        )
+        : base (message, innerException)
     {
         Uri = uri;
     }
+
+    #endregion
 }

@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
@@ -36,37 +35,26 @@ namespace AM.Web;
 /// </summary>
 public static class Http
 {
+    #region Properties
+
     /// <summary>
     /// Current global settings for <see cref="Http"/>.
     /// </summary>
     public static HttpSettings DefaultSettings { get; } = new ();
 
-    /// <summary>
-    /// Gets a new request at the specified URL.
-    /// </summary>
-    /// <param name="uri">The URI we're making a request to (this client takes care of .internal itself).</param>
-    /// <param name="settings">(Optional) The specific <see cref="HttpSettings"/> to use for this request.</param>
-    /// <param name="callerName">The caller member name, auto-populated by the compiler for debugging info.</param>
-    /// <param name="callerFile">The caller file path, auto-populated by the compiler for debugging info.</param>
-    /// <param name="callerLine">The caller file line number, auto-populated by the compiler for debugging info.</param>
-    /// <returns>A chaining builder for your request.</returns>
-    public static IRequestBuilder Request
-        (
-            string uri,
-            HttpSettings? settings = null,
-            [CallerMemberName] string? callerName = null,
-            [CallerFilePath] string? callerFile = null,
-            [CallerLineNumber] int callerLine = 0
-        )
-    {
-        return new HttpBuilder (uri, settings, callerName, callerFile, callerLine);
-    }
+    #endregion
+
+    #region Private members
 
     private static readonly FieldInfo stackTraceString =
         typeof (Exception).GetField ("_stackTraceString", BindingFlags.Instance | BindingFlags.NonPublic);
 
-    internal static async Task<HttpCallResponse<T>> SendAsync<T> (IRequestBuilder<T> builder, HttpMethod method,
-        CancellationToken cancellationToken = default)
+    internal static async Task<HttpCallResponse<T>> SendAsync<T>
+        (
+            IRequestBuilder<T> builder,
+            HttpMethod method,
+            CancellationToken cancellationToken = default
+        )
     {
         // default to global settings
         var settings = builder.GetSettings();
@@ -76,8 +64,8 @@ public static class Http
         var request = builder.Inner.Message;
         request.Method = method;
 
-        Exception exception = null;
-        HttpResponseMessage response = null;
+        Exception? exception;
+        HttpResponseMessage? response = null;
         try
         {
             using (settings.ProfileRequest?.Invoke (request))
@@ -149,4 +137,31 @@ public static class Http
 
         return result;
     }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Gets a new request at the specified URL.
+    /// </summary>
+    /// <param name="uri">The URI we're making a request to (this client takes care of .internal itself).</param>
+    /// <param name="settings">(Optional) The specific <see cref="HttpSettings"/> to use for this request.</param>
+    /// <param name="callerName">The caller member name, auto-populated by the compiler for debugging info.</param>
+    /// <param name="callerFile">The caller file path, auto-populated by the compiler for debugging info.</param>
+    /// <param name="callerLine">The caller file line number, auto-populated by the compiler for debugging info.</param>
+    /// <returns>A chaining builder for your request.</returns>
+    public static IRequestBuilder Request
+        (
+            string uri,
+            HttpSettings? settings = null,
+            [CallerMemberName] string? callerName = null,
+            [CallerFilePath] string? callerFile = null,
+            [CallerLineNumber] int callerLine = 0
+        )
+    {
+        return new HttpBuilder (uri, settings, callerName!, callerFile!, callerLine);
+    }
+
+    #endregion
 }

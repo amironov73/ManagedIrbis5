@@ -45,4 +45,11 @@
         <None Include="..\..\Common\arsmagna-icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Nerdbank.GitVersioning">
+            <Version>3.4.255</Version>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
 </Project>

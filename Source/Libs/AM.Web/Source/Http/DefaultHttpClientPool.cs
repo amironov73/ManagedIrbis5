@@ -53,10 +53,10 @@ public class DefaultHttpClientPool
         {
             UseCookies = false
         };
-        var serverCertificateCustomValidationCallback = Settings?.ServerCertificateCustomValidationCallback;
+        var serverCertificateCustomValidationCallback = Settings.ServerCertificateCustomValidationCallback;
         if (serverCertificateCustomValidationCallback != null)
         {
-            handler.ServerCertificateCustomValidationCallback = serverCertificateCustomValidationCallback;
+            handler.ServerCertificateCustomValidationCallback = serverCertificateCustomValidationCallback!;
         }
 
         if (options.Proxy != null)

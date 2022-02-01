@@ -38,7 +38,7 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder we're working on.</param>
     /// <param name="content">The <see cref="HttpContent"/> to use.</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder SendContent(this IRequestBuilder builder, HttpContent content)
+    public static IRequestBuilder SendContent (this IRequestBuilder builder, HttpContent content)
     {
         builder.Message.Content = content;
         return builder;
@@ -50,14 +50,15 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder we're working on.</param>
     /// <param name="form">The <see cref="NameValueCollection"/> (e.g. FormCollection) to use.</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder SendForm(this IRequestBuilder builder, NameValueCollection form)
+    public static IRequestBuilder SendForm (this IRequestBuilder builder, NameValueCollection form)
     {
         var content = new MultipartFormDataContent();
-        foreach(var formKey in form.AllKeys)
+        foreach (var formKey in form.AllKeys)
         {
-            content.Add(new StringContent(form[formKey] ?? string.Empty), formKey);
+            content.Add (new StringContent (form[formKey] ?? string.Empty), formKey);
         }
-        return SendContent(builder, content);
+
+        return SendContent (builder, content);
     }
 
     /// <summary>
@@ -66,8 +67,8 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder we're working on.</param>
     /// <param name="html">The raw HTML string to use.</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder SendHtml(this IRequestBuilder builder, string html) =>
-        SendContent(builder, new StringContent(html, Encoding.UTF8, "text/html"));
+    public static IRequestBuilder SendHtml (this IRequestBuilder builder, string html) =>
+        SendContent (builder, new StringContent (html, Encoding.UTF8, "text/html"));
 
     // /// <summary>
     // /// Adds JSON (Jil-serialized) content as the body for this request.
@@ -93,8 +94,8 @@ public static partial class ExtensionsForHttp
     /// <param name="builder">The builder we're working on.</param>
     /// <param name="text">The raw text string to use.</param>
     /// <returns>The request builder for chaining.</returns>
-    public static IRequestBuilder SendPlaintext(this IRequestBuilder builder, string text) =>
-        SendContent(builder, new StringContent(text, Encoding.UTF8, "application/x-www-form-urlencoded"));
+    public static IRequestBuilder SendPlaintext (this IRequestBuilder builder, string text) =>
+        SendContent (builder, new StringContent (text, Encoding.UTF8, "application/x-www-form-urlencoded"));
 
     // /// <summary>
     // /// Adds protobuf-serialized content as the body for this request.

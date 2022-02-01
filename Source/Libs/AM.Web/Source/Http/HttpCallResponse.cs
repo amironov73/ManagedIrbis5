@@ -30,6 +30,8 @@ namespace AM.Web;
 /// </summary>
 public class HttpCallResponse
 {
+    #region Properties
+
     /// <summary>
     /// Whether the call was successful.
     /// </summary>
@@ -38,34 +40,42 @@ public class HttpCallResponse
     /// <summary>
     /// The URL of the request.
     /// </summary>
-    public string RequestUri => RawRequest?.RequestUri?.AbsoluteUri;
+    public string? RequestUri => RawRequest?.RequestUri?.AbsoluteUri;
 
     /// <summary>
     /// The raw <see cref="HttpRequestMessage"/> attempted.
     /// </summary>
-    public HttpRequestMessage RawRequest { get; }
+    public HttpRequestMessage? RawRequest { get; }
 
     /// <summary>
     /// The raw <see cref="HttpResponseMessage"/> to the request.
     /// </summary>
-    public HttpResponseMessage RawResponse { get; }
+    public HttpResponseMessage? RawResponse { get; }
 
     /// <summary>
     /// The error that occured on the request, if any.
     /// </summary>
-    public Exception Error { get; }
+    public Exception? Error { get; }
 
     /// <summary>
     /// The status code of the response.
     /// </summary>
     public HttpStatusCode? StatusCode => RawResponse?.StatusCode;
 
+    #endregion
+
+    #region Construction
+
     /// <summary>
     /// Creates a new <see cref="HttpCallResponse"/>, when an error was thrown.
     /// </summary>
     /// <param name="request">The request message that was attempted.</param>
     /// <param name="error">The error that was thrown.</param>
-    protected HttpCallResponse (HttpRequestMessage request, Exception error)
+    protected HttpCallResponse
+        (
+            HttpRequestMessage request,
+            Exception error
+        )
     {
         RawRequest = request;
         Success = false;
@@ -76,7 +86,10 @@ public class HttpCallResponse
     /// Creates a new <see cref="HttpCallResponse"/> from a response.
     /// </summary>
     /// <param name="response">The response to create the <see cref="HttpCallResponse"/> from.</param>
-    protected HttpCallResponse (HttpResponseMessage response)
+    protected HttpCallResponse
+        (
+            HttpResponseMessage response
+        )
     {
         Success = response.IsSuccessStatusCode;
         RawResponse = response;
@@ -88,11 +101,20 @@ public class HttpCallResponse
     /// </summary>
     /// <param name="response">The response to create the <see cref="HttpCallResponse"/> from.</param>
     /// <param name="error">The error that was thrown.</param>
-    protected HttpCallResponse (HttpResponseMessage response, Exception error) : this (response)
+    protected HttpCallResponse
+        (
+            HttpResponseMessage response,
+            Exception error
+        )
+        : this (response)
     {
         Success = false;
         Error = error;
     }
+
+    #endregion
+
+    #region Public methods
 
     /// <summary>
     /// Creates a new <see cref="HttpCallResponse{T}"/> from a typed request.
@@ -101,7 +123,11 @@ public class HttpCallResponse
     /// <param name="request">The request to create the response wrapper from.</param>
     /// <param name="error">The error that was thrown, if any.</param>
     /// <returns>The created <see cref="HttpCallResponse{T}"/>.</returns>
-    public static HttpCallResponse<T> Create<T> (HttpRequestMessage request, Exception? error = null)
+    public static HttpCallResponse<T> Create<T>
+        (
+            HttpRequestMessage request,
+            Exception? error = null
+        )
     {
         error = (error ??
                  new HttpClientException ("Failed to send request for " + request.RequestUri, request.RequestUri))
@@ -119,14 +145,18 @@ public class HttpCallResponse
     /// <param name="response">The response to create the response wrapper from.</param>
     /// <param name="error">The error that was thrown, if any.</param>
     /// <returns>The created <see cref="HttpCallResponse{T}"/>.</returns>
-    public static HttpCallResponse<T> Create<T> (HttpResponseMessage response, Exception error)
+    public static HttpCallResponse<T> Create<T>
+        (
+            HttpResponseMessage response,
+            Exception error
+        )
     {
         // Add these regardless of source
         error.AddLoggedData ("Response.Code", ((int)response.StatusCode).ToString())
             .AddLoggedData ("Response.Status", response.StatusCode.ToString())
             .AddLoggedData ("Response.ReasonPhrase", response.ReasonPhrase)
             .AddLoggedData ("Response.ContentType", response.Content.Headers.ContentType)
-            .AddLoggedData ("Request.URI", response.RequestMessage.RequestUri);
+            .AddLoggedData ("Request.URI", response.RequestMessage?.RequestUri);
 
         return new HttpCallResponse<T> (response, error);
     }
@@ -138,20 +168,35 @@ public class HttpCallResponse
     /// <param name="response">The response to create the response wrapper from.</param>
     /// <param name="data">The (deserialized, if necessary) payload returned on the request.</param>
     /// <returns>The created <see cref="HttpCallResponse{T}"/>.</returns>
-    public static HttpCallResponse<T> Create<T> (HttpResponseMessage response, T data) =>
-        new HttpCallResponse<T> (response, data);
+    public static HttpCallResponse<T> Create<T>
+        (
+            HttpResponseMessage response,
+            T data
+        )
+    {
+        return new HttpCallResponse<T> (response, data);
+    }
+
+    #endregion
 }
 
 /// <summary>
 /// A typed version of <see cref="HttpCallResponse"/> which has a payload.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class HttpCallResponse<T> : HttpCallResponse
+public class HttpCallResponse<T>
+    : HttpCallResponse
 {
+    #region Properties
+
     /// <summary>
     /// The response payload.
     /// </summary>
     public T Data { get; }
+
+    #endregion
+
+    #region Construction
 
     /// <summary>
     /// Creates a new <see cref="HttpCallResponse{T}"/> from a typed request response.
@@ -159,7 +204,12 @@ public class HttpCallResponse<T> : HttpCallResponse
     /// <param name="response">The response to create the response wrapper from.</param>
     /// <param name="data">The (deserialized, if necessary) payload returned on the request.</param>
     /// <returns>The created <see cref="HttpCallResponse{T}"/>.</returns>
-    public HttpCallResponse (HttpResponseMessage response, T data) : base (response)
+    public HttpCallResponse
+        (
+            HttpResponseMessage response,
+            T data
+        )
+        : base (response)
     {
         Data = data;
     }
@@ -170,8 +220,14 @@ public class HttpCallResponse<T> : HttpCallResponse
     /// <param name="request">The request to create the response wrapper from.</param>
     /// <param name="error">The error that was thrown, if any.</param>
     /// <returns>The created <see cref="HttpCallResponse{T}"/>.</returns>
-    public HttpCallResponse (HttpRequestMessage request, Exception error) : base (request, error)
+    public HttpCallResponse
+        (
+            HttpRequestMessage request,
+            Exception error
+        )
+        : base (request, error)
     {
+        Data = default!;
     }
 
     /// <summary>
@@ -180,7 +236,15 @@ public class HttpCallResponse<T> : HttpCallResponse
     /// <param name="response">The response to create the response wrapper from.</param>
     /// <param name="error">The error that was thrown, if any.</param>
     /// <returns>The created <see cref="HttpCallResponse{T}"/>.</returns>
-    public HttpCallResponse (HttpResponseMessage response, Exception error) : base (response, error)
+    public HttpCallResponse
+        (
+            HttpResponseMessage response,
+            Exception error
+        )
+        : base (response, error)
     {
+        Data = default!;
     }
+
+    #endregion
 }

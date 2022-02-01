@@ -21,4 +21,11 @@
         <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Nerdbank.GitVersioning">
+            <Version>3.4.255</Version>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
 </Project>

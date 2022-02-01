@@ -14,9 +14,9 @@
 
 #region Using directives
 
+using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.IO;
 
@@ -29,7 +29,7 @@ using ManagedIrbis.Trees;
 
 namespace Tre2Mnu;
 
-class Program
+internal static class Program
 {
     static void ProcessMenu
         (
@@ -65,7 +65,7 @@ class Program
             }
         };
         rootCommand.Description = "Создание MNU-файла по TRE-файлу";
-        rootCommand.Handler = CommandHandler.Create<string, string> (ProcessMenu);
+        rootCommand.SetHandler ((Action <string, string>) ProcessMenu);
 
         new CommandLineBuilder (rootCommand)
             .UseDefaults()

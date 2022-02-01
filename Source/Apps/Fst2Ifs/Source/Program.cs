@@ -20,7 +20,6 @@
 using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.IO;
 
@@ -32,68 +31,68 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace Fst2Ifs
-{
-    class Program
-    {
+namespace Fst2Ifs;
 
-        static void Run
-            (
-                ParseResult parseResult
-            )
+class Program
+{
+    private static readonly Argument<string> _inputArgument = new ("fst-file")
+    {
+        Arity = ArgumentArity.ExactlyOne,
+        Description = "имя FST-файла, например, ibis.fst"
+    };
+
+    private static readonly Argument<string> _outputArgument = new ("ifs-file")
+    {
+        Arity = ArgumentArity.ExactlyOne,
+        Description = "имя IFS-файла (будет перезаписан!), например, ibis.ifs"
+    };
+
+    static void Run
+        (
+            ParseResult parseResult
+        )
+    {
+        try
         {
+            var inputName = parseResult.GetValueForArgument (_inputArgument)
+                .ThrowIfNullOrEmpty();
+            var outputName = parseResult.GetValueForArgument (_outputArgument)
+                .ThrowIfNullOrEmpty();
+            var encoding = IrbisEncoding.Ansi;
+
+            var reader = new StreamReader (inputName, encoding);
+            var writer = new StreamWriter (outputName, false, encoding);
+
             try
             {
-                var inputName = parseResult.ValueForArgument<string>("fst-file")
-                    .ThrowIfNullOrEmpty();
-                var outputName = parseResult.ValueForArgument<string>("ifs-file")
-                    .ThrowIfNullOrEmpty();
-                var encoding = IrbisEncoding.Ansi;
-
-                var reader = new StreamReader(inputName, encoding);
-                var writer = new StreamWriter(outputName, false, encoding);
-
-                try
-                {
-                    using var transformer = new FstTransformer(reader, writer);
-                    transformer.TransformFile();
-                }
-                catch (Exception exception)
-                {
-                    Console.Error.WriteLine(exception.Message);
-                    Environment.ExitCode = 1;
-                }
+                using var transformer = new FstTransformer (reader, writer);
+                transformer.TransformFile();
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception);
+                Console.Error.WriteLine (exception.Message);
+                Environment.ExitCode = 1;
             }
         }
-
-        static void Main(string[] args)
+        catch (Exception exception)
         {
-            var inputArgument = new Argument<string>("fst-file")
-            {
-                Arity = ArgumentArity.ExactlyOne,
-                Description = "имя FST-файла, например, ibis.fst"
-            };
-            var outputArgument = new Argument<string>("ifs-file")
-            {
-                Arity = ArgumentArity.ExactlyOne,
-                Description = "имя IFS-файла (будет перезаписан!), например, ibis.ifs"
-            };
-            var rootCommand = new RootCommand("Fst2Ifs")
-            {
-                inputArgument,
-                outputArgument
-            };
-            rootCommand.Description = "Создание таблицы актуализации по таблице инверсии";
-            rootCommand.Handler = CommandHandler.Create<ParseResult>(Run);
-
-            new CommandLineBuilder(rootCommand)
-                .UseDefaults()
-                .Build()
-                .Invoke(args);
+            Console.WriteLine (exception);
         }
+    }
+
+    static void Main (string[] args)
+    {
+        var rootCommand = new RootCommand ("Fst2Ifs")
+        {
+            _inputArgument,
+            _outputArgument
+        };
+        rootCommand.Description = "Создание таблицы актуализации по таблице инверсии";
+        rootCommand.SetHandler ((Action<ParseResult>)Run);
+
+        new CommandLineBuilder (rootCommand)
+            .UseDefaults()
+            .Build()
+            .Invoke (args);
     }
 }

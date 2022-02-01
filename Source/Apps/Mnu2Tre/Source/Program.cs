@@ -20,7 +20,6 @@
 using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
-using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 
 using AM;
@@ -31,82 +30,79 @@ using ManagedIrbis.Trees;
 
 #endregion
 
-namespace Mnu2Tre
+namespace Mnu2Tre;
+
+class Program
 {
-    class Program
+    private static readonly Argument<string> _inputArgument = new ("mnu-file")
     {
-        static void Run
-            (
-                ParseResult parseResult
-            )
+        Arity = ArgumentArity.ExactlyOne,
+        Description = "имя MNU-файла, например, ii.mnu"
+    };
+
+    private static readonly Argument<string> _outputArgument = new ("tre-file")
+    {
+        Arity = ArgumentArity.ExactlyOne,
+        Description = "имя TRE-файла (будет перезаписан!), например, ii.tre"
+    };
+
+    static void Run
+        (
+            ParseResult parseResult
+        )
+    {
+        try
         {
+            var inputName = parseResult.GetValueForArgument (_inputArgument)
+                .ThrowIfNullOrEmpty();
+            var outputName = parseResult.GetValueForArgument (_outputArgument)
+                .ThrowIfNullOrEmpty();
+
             try
             {
-                var inputName = parseResult.ValueForArgument<string> ("mnu-file")
-                    .ThrowIfNullOrEmpty ();
-                var outputName = parseResult.ValueForArgument<string> ("tre-file")
-                    .ThrowIfNullOrEmpty ();
-
-                try
-                {
-                    var menu = MenuFile.ParseLocalFile
-                        (
-                            inputName,
-                            IrbisEncoding.Ansi
-                        );
-                    var tree = menu.ToTree();
-                    tree.SaveToLocalFile
-                        (
-                            outputName,
-                            IrbisEncoding.Ansi
-                        );
-                }
-                catch (Exception exception)
-                {
-                    Console.Error.WriteLine (exception.Message);
-                    Environment.ExitCode = 1;
-                }
+                var menu = MenuFile.ParseLocalFile
+                    (
+                        inputName,
+                        IrbisEncoding.Ansi
+                    );
+                var tree = menu.ToTree();
+                tree.SaveToLocalFile
+                    (
+                        outputName,
+                        IrbisEncoding.Ansi
+                    );
             }
             catch (Exception exception)
             {
-                Console.WriteLine (exception);
+                Console.Error.WriteLine (exception.Message);
+                Environment.ExitCode = 1;
             }
-
-        } // method Run
-
-        /// <summary>
-        /// Точка входа в программу.
-        /// </summary>
-        public static void Main
-            (
-                string[] args
-            )
+        }
+        catch (Exception exception)
         {
-            var inputArgument = new Argument<string> ("mnu-file")
-            {
-                Arity = ArgumentArity.ExactlyOne,
-                Description = "имя MNU-файла, например, ii.mnu"
-            };
-            var outputArgument = new Argument<string> ("tre-file")
-            {
-                Arity = ArgumentArity.ExactlyOne,
-                Description = "имя TRE-файла (будет перезаписан!), например, ii.tre"
-            };
-            var rootCommand = new RootCommand ("Mnu2Tre")
-            {
-                inputArgument,
-                outputArgument
-            };
-            rootCommand.Description = "Создание дерева по файлу меню";
-            rootCommand.Handler = CommandHandler.Create<ParseResult> (Run);
+            Console.WriteLine (exception);
+        }
+    }
 
-            new CommandLineBuilder (rootCommand)
-                .UseDefaults()
-                .Build()
-                .Invoke (args);
+    /// <summary>
+    /// Точка входа в программу.
+    /// </summary>
+    public static void Main
+        (
+            string[] args
+        )
+    {
+        var rootCommand = new RootCommand ("Mnu2Tre")
+        {
+            _inputArgument,
+            _outputArgument
+        };
+        rootCommand.Description = "Создание дерева по файлу меню";
+        rootCommand.SetHandler ((Action<ParseResult>)Run);
 
-        } // method Main
-
-    } // class Program
-
-} // namespace Mnu2Tre
+        new CommandLineBuilder (rootCommand)
+            .UseDefaults()
+            .Build()
+            .Invoke (args);
+    }
+}
