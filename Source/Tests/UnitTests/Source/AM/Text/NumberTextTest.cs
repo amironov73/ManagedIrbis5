@@ -60,6 +60,24 @@ public class NumberTextTest
     }
 
     [TestMethod]
+    [Description ("Хвост, возникающий из-за скобок")]
+    public void NumberText_Construction_5()
+    {
+        var number = new NumberText ("1(15)");
+        Assert.AreEqual (3, number.Length);
+        Assert.IsFalse (number.HavePrefix (0));
+        Assert.IsTrue (number.HaveValue (0));
+        Assert.IsTrue (number.HavePrefix (1));
+        Assert.IsTrue (number.HaveValue (1));
+        Assert.IsTrue (number.HavePrefix (2));
+        Assert.IsTrue (number.HaveValue (0));
+        Assert.AreEqual (1L, number.GetValue (0));
+        Assert.AreEqual (15L, number.GetValue (1));
+        Assert.AreEqual ("(", number.GetPrefix (1).ToString());
+        Assert.AreEqual (")", number.GetPrefix (2).ToString());
+    }
+
+    [TestMethod]
     public void NumberText_Enumeration_1()
     {
         var number = new NumberText();

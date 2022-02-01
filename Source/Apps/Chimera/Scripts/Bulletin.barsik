@@ -1,0 +1,29 @@
+﻿//
+// Поиск журналов
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=PERIO;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+allMagazines = batch_search ("I=Б916052/1934/$")
+
+first = true
+foreach (magazine in allMagazines)
+{
+    if (!first)
+        print (',')
+
+    number = fm (magazine, 936)
+    print (number)
+    first = false
+}
+
+//=================================
+
+disconnect()

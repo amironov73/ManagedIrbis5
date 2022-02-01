@@ -591,7 +591,7 @@ public sealed class NumberText
                     _chunks.AddLast (chunk);
                     start = offset;
                     number = default;
-                    str = default;
+                    str = text.Slice (start, 1);
                     textPart = true;
                 }
             }

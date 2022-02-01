@@ -143,6 +143,24 @@ public class NumberRangeCollectionTest
     }
 
     [TestMethod]
+    [Description ("Кумуляция выпусков Бюллетеня Министерства образования за 1934 год")]
+    public void NumberRangeCollection_Cumulate_2()
+    {
+        var numbers = new[]
+        {
+            "1 (15)", "2 (16)", "3 (17)", "4/5 (18/19)", "6/7 (20/21)",
+            "8 (22)", "9 (23)", "10 (24)", "11 (25)", "12/13 (26/27)",
+            "14 (28)", "15 (29)", "16 (30)", "17 (31)", "18 (32)",
+            "19 (33)", "20/21 (34/35)", "22 (36)"
+        };
+
+        var cumulated = NumberRangeCollection.Cumulate (numbers);
+        var expected = "1 (15),2 (16),3 (17),4/5 (18/19),6/7 (20/21),8 (22),9 (23),10 (24),11 (25),12/13 (26/27),14 (28),15 (29),16 (30),17 (31),18 (32),19 (33),20/21 (34/35),22 (36)";
+        var actual = cumulated.ToString();
+        Assert.AreEqual (expected, actual);
+    }
+
+    [TestMethod]
     public void NumberRangeCollection_Enumerate_1()
     {
         var collection = NumberRangeCollection.Parse ("1-10");
