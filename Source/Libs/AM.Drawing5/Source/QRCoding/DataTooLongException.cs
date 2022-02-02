@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* DataTooLongException.cs -- исключение, возбуждаемое при превышении допустимой длины данных
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,17 +21,50 @@ using System;
 
 #nullable enable
 
-namespace AM.Drawing.QRCoding
-{
-    public class DataTooLongException : Exception
-    {
-        public DataTooLongException(string eccLevel, string encodingMode, int maxSizeByte) : base(
-            $"The given payload exceeds the maximum size of the QR code standard. The maximum size allowed for the choosen paramters (ECC level={eccLevel}, EncodingMode={encodingMode}) is {maxSizeByte} byte."
-        ){}
+namespace AM.Drawing.QRCoding;
 
-        public DataTooLongException(string eccLevel, string encodingMode, int version, int maxSizeByte) : base(
-            $"The given payload exceeds the maximum size of the QR code standard. The maximum size allowed for the choosen paramters (ECC level={eccLevel}, EncodingMode={encodingMode}, FixedVersion={version}) is {maxSizeByte} byte."
+/// <summary>
+/// Исключение, возбуждаемое при превышении допустимой длины данных.
+/// </summary>
+public sealed class DataTooLongException
+    : ApplicationException
+{
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DataTooLongException
+        (
+            string eccLevel,
+            string encodingMode,
+            int maxSizeByte
         )
-        { }
+        : base
+            (
+                $"The given payload exceeds the maximum size of the QR code standard. The maximum size allowed for the choosen paramters (ECC level={eccLevel}, EncodingMode={encodingMode}) is {maxSizeByte} byte."
+            )
+    {
+        // пустое тело конструктора
     }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DataTooLongException
+        (
+            string eccLevel,
+            string encodingMode,
+            int version,
+            int maxSizeByte
+        )
+        : base
+            (
+                $"The given payload exceeds the maximum size of the QR code standard. The maximum size allowed for the choosen paramters (ECC level={eccLevel}, EncodingMode={encodingMode}, FixedVersion={version}) is {maxSizeByte} byte."
+            )
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
 }
