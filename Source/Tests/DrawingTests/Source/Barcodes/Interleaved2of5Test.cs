@@ -12,35 +12,34 @@ using AM.Drawing.Barcodes;
 
 #nullable enable
 
-namespace UnitTests.AM.Drawing.Barcodes
+namespace UnitTests.AM.Drawing.Barcodes;
+
+[TestClass]
+public class Interleaved2of5Test
 {
-    [TestClass]
-    public class Interleaved2of5Test
+    [TestMethod]
+    public void Interleaved2of5_DrawBarcode_1()
     {
-        [TestMethod]
-        public void Interleaved2of5_DrawBarcode_1()
+        using var image = new Bitmap (300, 100);
+        using var graphics = Graphics.FromImage (image);
+        graphics.Clear (Color.Lime);
+
+        var barcode = new Interleaved2of5();
+        var data = new BarcodeData
         {
-            using var image = new Bitmap(300, 100);
-            using var graphics = Graphics.FromImage(image);
-            graphics.Clear(Color.Lime);
+            Message = "02128506"
+        };
+        var bounds = new RectangleF (0, 0, image.Width, image.Height);
+        bounds.Inflate (-5, -5);
+        var context = new BarcodeContext
+        {
+            Graphics = graphics,
+            Data = data,
+            Bounds = bounds
+        };
+        barcode.DrawBarcode (context);
 
-            var barcode = new Interleaved2of5();
-            var data = new BarcodeData
-            {
-                Message = "02128506"
-            };
-            var bounds = new RectangleF(0, 0, image.Width, image.Height);
-            bounds.Inflate(-5, - 5);
-            var context = new BarcodeContext
-            {
-                Graphics = graphics,
-                Data = data,
-                Bounds = bounds
-            };
-            barcode.DrawBarcode(context);
-
-            graphics.Dispose();
-            image.Save("Interleaved2of5.bmp");
-        }
+        graphics.Dispose();
+        image.Save ("Interleaved2of5.bmp");
     }
 }

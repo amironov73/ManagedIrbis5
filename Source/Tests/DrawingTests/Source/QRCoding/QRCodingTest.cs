@@ -31,7 +31,7 @@ public sealed class QRCodingTest
     public void QRCoding_CreateQrCode_1()
     {
         var generator = new QRCodeGenerator();
-        var url = new PayloadGenerator.Url ("https://mironov.online");
+        var url = new Url ("https://mironov.online");
         var message = url.ToString();
         var data = generator.CreateQrCode (message, QRCodeGenerator.ECCLevel.Q);
         var qrCode = new QRCode (data);

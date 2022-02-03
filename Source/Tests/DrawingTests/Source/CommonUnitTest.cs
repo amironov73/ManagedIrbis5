@@ -12,39 +12,39 @@ using System.Linq;
 
 #nullable enable
 
-namespace DrawingTests
+namespace DrawingTests;
+
+public class CommonUnitTest
 {
-    public class CommonUnitTest
+    protected static void ShowDifference
+        (
+            string expected,
+            string actual
+        )
     {
-        protected static void ShowDifference
-            (
-                string expected,
-                string actual
-            )
+        int index = 0;
+        while (index < expected.Length && index < actual.Length)
         {
-            int index = 0;
-            while (index < expected.Length && index < actual.Length)
+            if (expected[index] != actual[index])
             {
-                if (expected[index] != actual[index])
-                {
-                    break;
-                }
-
-                ++index;
+                break;
             }
 
-            if (index == expected.Length && index == actual.Length)
-            {
-                return;
-            }
-
-            if (expected.Length != actual.Length)
-            {
-                Console.WriteLine($"Expected length={expected.Length}, actual length={actual.Length}");
-            }
-            Console.WriteLine($"Difference at index {index}");
-            Console.WriteLine($"Expected: {expected.Substring(index)}");
-            Console.WriteLine($"Actual  : {actual.Substring(index)}");
+            ++index;
         }
+
+        if (index == expected.Length && index == actual.Length)
+        {
+            return;
+        }
+
+        if (expected.Length != actual.Length)
+        {
+            Console.WriteLine ($"Expected length={expected.Length}, actual length={actual.Length}");
+        }
+
+        Console.WriteLine ($"Difference at index {index}");
+        Console.WriteLine ($"Expected: {expected.Substring (index)}");
+        Console.WriteLine ($"Actual  : {actual.Substring (index)}");
     }
 }
