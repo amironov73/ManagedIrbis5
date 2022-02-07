@@ -18,4 +18,8 @@
     <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Source\AM\Memory\Collections" />
+  </ItemGroup>
+
 </Project>

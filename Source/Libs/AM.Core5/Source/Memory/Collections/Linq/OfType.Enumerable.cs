@@ -15,80 +15,79 @@
 
 #nullable enable
 
-namespace AM.Memory.Collections.Linq
-{
-    internal class OfTypeExprEnumerable<T> : IPoolingEnumerable<T>
-    {
-        private int _count;
-        
-        private IPoolingEnumerable _src;
+namespace AM.Memory.Collections.Linq;
 
-        public OfTypeExprEnumerable<T> Init(IPoolingEnumerable src)
+internal class OfTypeExprEnumerable<T> : IPoolingEnumerable<T>
+{
+    private int _count;
+
+    private IPoolingEnumerable _src;
+
+    public OfTypeExprEnumerable<T> Init (IPoolingEnumerable src)
+    {
+        _src = src;
+        _count = 0;
+        return this;
+    }
+
+    public IPoolingEnumerator<T> GetEnumerator()
+    {
+        _count++;
+        return Pool<OfTypeExprEnumerator>.Get().Init (_src.GetEnumerator(), this);
+    }
+
+    private void Dispose()
+    {
+        if (_count == 0) return;
+        _count--;
+        if (_count == 0)
+        {
+            _src = default;
+            Pool<OfTypeExprEnumerable<T>>.Return (this);
+        }
+    }
+
+    internal class OfTypeExprEnumerator : IPoolingEnumerator<T>
+    {
+        private IPoolingEnumerator _src;
+        private OfTypeExprEnumerable<T> _parent;
+
+        public OfTypeExprEnumerator Init (IPoolingEnumerator src, OfTypeExprEnumerable<T> parent)
         {
             _src = src;
-            _count = 0;
+            _parent = parent;
             return this;
         }
 
-        public IPoolingEnumerator<T> GetEnumerator()
+        public bool MoveNext()
         {
-            _count++;
-            return Pool<OfTypeExprEnumerator>.Get().Init(_src.GetEnumerator(), this);
+            do
+            {
+                var next = _src.MoveNext();
+                if (!next) return false;
+            } while (!(_src.Current is T));
+
+            return true;
         }
 
-        private void Dispose()
+        public void Reset()
         {
-            if(_count == 0) return;
-            _count--;
-            if (_count == 0)
-            {
-                _src = default;
-                Pool<OfTypeExprEnumerable<T>>.Return(this);
-            }
+            _src.Reset();
         }
 
-        internal class OfTypeExprEnumerator : IPoolingEnumerator<T>
+        object IPoolingEnumerator.Current => Current;
+
+        public T Current => (T)_src.Current;
+
+        public void Dispose()
         {
-            private IPoolingEnumerator _src;
-            private OfTypeExprEnumerable<T> _parent;
-        	
-            public OfTypeExprEnumerator Init(IPoolingEnumerator src, OfTypeExprEnumerable<T> parent)
-            {
-                _src = src;
-                _parent = parent;
-                return this;
-            }
-
-            public bool MoveNext()
-            {
-                do
-                {
-                    var next = _src.MoveNext();
-                    if (!next) return false;
-                } while (!(_src.Current is T));
-
-                return true;
-            }
-
-            public void Reset()
-            {
-                _src.Reset();
-            }
-
-            object IPoolingEnumerator.Current => Current;
-
-            public T Current => (T)_src.Current;
-
-            public void Dispose()
-            {
-                _parent?.Dispose();
-                _parent = null;
-                _src?.Dispose();
-                _src = default;
-                Pool<OfTypeExprEnumerator>.Return(this);
-            }
+            _parent?.Dispose();
+            _parent = null;
+            _src?.Dispose();
+            _src = default;
+            Pool<OfTypeExprEnumerator>.Return (this);
         }
-
-        IPoolingEnumerator IPoolingEnumerable.GetEnumerator() => GetEnumerator();
     }
+
+    IPoolingEnumerator IPoolingEnumerable.GetEnumerator() => GetEnumerator();
 }

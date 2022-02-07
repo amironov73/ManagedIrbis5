@@ -21,34 +21,33 @@ using System.Buffers;
 
 #nullable enable
 
-namespace AM.Memory.Collections.Specialized
+namespace AM.Memory.Collections.Specialized;
+
+internal abstract class PoolingNodeBase<T> : IPoolingNode<T>
 {
-	internal abstract class PoolingNodeBase<T> : IPoolingNode<T>
-	{
-		protected IMemoryOwner<T> _buf;
+    protected IMemoryOwner<T> _buf;
 
-		public int Length => _buf.Memory.Length;
+    public int Length => _buf.Memory.Length;
 
-		public virtual T this[int index]
-		{
-			get => _buf.Memory.Span[index];
-			set => _buf.Memory.Span[index] = value;
-		}
+    public virtual T this [int index]
+    {
+        get => _buf.Memory.Span[index];
+        set => _buf.Memory.Span[index] = value;
+    }
 
-		public virtual void Dispose()
-		{
-			_buf.Dispose();
-			_buf = null;
-			Next = null;
-		}
+    public virtual void Dispose()
+    {
+        _buf.Dispose();
+        _buf = null;
+        Next = null;
+    }
 
-		public IPoolingNode<T> Next { get; set; }
+    public IPoolingNode<T> Next { get; set; }
 
-		public abstract IPoolingNode<T> Init(int capacity);
+    public abstract IPoolingNode<T> Init (int capacity);
 
-		public void Clear()
-		{
-			_buf.Memory.Span.Clear();
-		}
-	}
+    public void Clear()
+    {
+        _buf.Memory.Span.Clear();
+    }
 }

@@ -9,18 +9,17 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace AM.Memory.Collections
+namespace AM.Memory.Collections;
+
+public interface IPoolingEnumerator<out T> : IPoolingEnumerator
 {
-    public interface IPoolingEnumerator<out T> : IPoolingEnumerator
-    {
-        // <summary>Gets the element in the collection at the current position of the enumerator.</summary>
-        /// <returns>The element in the collection at the current position of the enumerator.</returns>
-        new T Current { get; }
-    }
+    // <summary>Gets the element in the collection at the current position of the enumerator.</summary>
+    /// <returns>The element in the collection at the current position of the enumerator.</returns>
+    new T Current { get; }
 }

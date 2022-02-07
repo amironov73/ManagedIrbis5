@@ -21,82 +21,109 @@ using System;
 
 #nullable enable
 
-namespace AM.Memory.Collections.Linq
+namespace AM.Memory.Collections.Linq;
+
+public static partial class PoolingEnumerable
 {
-    public static partial class PoolingEnumerable
+    public static T Single<T> (this IPoolingEnumerable<T> source)
     {
-        public static T Single<T>(this IPoolingEnumerable<T> source)
+        var wasFound = false;
+        var element = default (T);
+        var enumerator = source.GetEnumerator();
+        while (enumerator.MoveNext())
         {
-            var wasFound = false;
-            var element = default(T);
-            var enumerator = source.GetEnumerator();
-            while (enumerator.MoveNext())
+            if (wasFound)
+            {
+                enumerator.Dispose();
+                throw new InvalidOperationException ("Sequence should contain only one element");
+            }
+
+            wasFound = true;
+            element = enumerator.Current;
+        }
+
+        enumerator.Dispose();
+        return element;
+    }
+
+    public static T Single<T> (this IPoolingEnumerable<T> source, Func<T, bool> condition)
+    {
+        var wasFound = false;
+        var element = default (T);
+        var enumerator = source.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            if (condition (enumerator.Current))
             {
                 if (wasFound)
                 {
                     enumerator.Dispose();
-                    throw new InvalidOperationException("Sequence should contain only one element");
+                    throw new InvalidOperationException ("Sequence should contain only one element");
                 }
 
                 wasFound = true;
                 element = enumerator.Current;
             }
-            enumerator.Dispose();
-            return element;
         }
-        
-        public static T Single<T>(this IPoolingEnumerable<T> source, Func<T, bool> condition)
-        {
-            var wasFound = false;
-            var element = default(T);
-            var enumerator = source.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                if (condition(enumerator.Current))
-                {
-                    if (wasFound)
-                    {
-                        enumerator.Dispose();
-                        throw new InvalidOperationException("Sequence should contain only one element");
-                    }
 
-                    wasFound = true;
-                    element = enumerator.Current;
-                }
-            }
-            enumerator.Dispose();
-            return element;
-        }
-		
-        public static T Single<T, TContext>(this IPoolingEnumerable<T> source, TContext context, Func<TContext, T, bool> condition)
-        {
-            var wasFound = false;
-            var element = default(T);
-            var enumerator = source.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                if (condition(context, enumerator.Current))
-                {
-                    if (wasFound)
-                    {
-                        enumerator.Dispose();
-                        throw new InvalidOperationException("Sequence should contain only one element");
-                    }
+        enumerator.Dispose();
+        return element;
+    }
 
-                    wasFound = true;
-                    element = enumerator.Current;
-                }
-            }
-            enumerator.Dispose();
-            return element;
-        }
-        
-        public static T SingleOrDefault<T>(this IPoolingEnumerable<T> source)
+    public static T Single<T, TContext> (this IPoolingEnumerable<T> source, TContext context,
+        Func<TContext, T, bool> condition)
+    {
+        var wasFound = false;
+        var element = default (T);
+        var enumerator = source.GetEnumerator();
+        while (enumerator.MoveNext())
         {
-            var wasFound = false;
-            var element = default(T);
-            var enumerator = source.GetEnumerator();
-            while (enumerator.MoveNext())
+            if (condition (context, enumerator.Current))
+            {
+                if (wasFound)
+                {
+                    enumerator.Dispose();
+                    throw new InvalidOperationException ("Sequence should contain only one element");
+                }
+
+                wasFound = true;
+                element = enumerator.Current;
+            }
+        }
+
+        enumerator.Dispose();
+        return element;
+    }
+
+    public static T SingleOrDefault<T> (this IPoolingEnumerable<T> source)
+    {
+        var wasFound = false;
+        var element = default (T);
+        var enumerator = source.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            if (wasFound)
+            {
+                enumerator.Dispose();
+                return default;
+            }
+
+            wasFound = true;
+            element = enumerator.Current;
+        }
+
+        enumerator.Dispose();
+        return element;
+    }
+
+    public static T SingleOrDefault<T> (this IPoolingEnumerable<T> source, Func<T, bool> condition)
+    {
+        var wasFound = false;
+        var element = default (T);
+        var enumerator = source.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            if (condition (enumerator.Current))
             {
                 if (wasFound)
                 {
@@ -107,54 +134,34 @@ namespace AM.Memory.Collections.Linq
                 wasFound = true;
                 element = enumerator.Current;
             }
-            enumerator.Dispose();
-            return element;
         }
-        
-        public static T SingleOrDefault<T>(this IPoolingEnumerable<T> source, Func<T, bool> condition)
-        {
-            var wasFound = false;
-            var element = default(T);
-            var enumerator = source.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                if (condition(enumerator.Current))
-                {
-                    if (wasFound)
-                    {
-                        enumerator.Dispose();
-                        return default;
-                    }
 
-                    wasFound = true;
-                    element = enumerator.Current;
-                }
-            }
-            enumerator.Dispose();
-            return element;
-        }
-		
-        public static T SingleOrDefault<T, TContext>(this IPoolingEnumerable<T> source, TContext context, Func<TContext, T, bool> condition)
-        {
-            var wasFound = false;
-            var element = default(T);
-            var enumerator = source.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                if (condition(context, enumerator.Current))
-                {
-                    if (wasFound)
-                    {
-                        enumerator.Dispose();
-                        return default;
-                    }
+        enumerator.Dispose();
+        return element;
+    }
 
-                    wasFound = true;
-                    element = enumerator.Current;
+    public static T SingleOrDefault<T, TContext> (this IPoolingEnumerable<T> source, TContext context,
+        Func<TContext, T, bool> condition)
+    {
+        var wasFound = false;
+        var element = default (T);
+        var enumerator = source.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            if (condition (context, enumerator.Current))
+            {
+                if (wasFound)
+                {
+                    enumerator.Dispose();
+                    return default;
                 }
+
+                wasFound = true;
+                element = enumerator.Current;
             }
-            enumerator.Dispose();
-            return element;
         }
+
+        enumerator.Dispose();
+        return element;
     }
 }

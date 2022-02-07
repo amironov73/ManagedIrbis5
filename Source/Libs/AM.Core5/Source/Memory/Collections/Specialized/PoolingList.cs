@@ -15,22 +15,21 @@
 
 #nullable enable
 
-namespace AM.Memory.Collections.Specialized
-{
-	public sealed class PoolingList<T> : PoolingListBase<T>
-	{
-		public PoolingList() => Init();
+namespace AM.Memory.Collections.Specialized;
 
-		public PoolingList<T> Init()
-		{
-			_root = Pool.GetBuffer<IPoolingNode<T>>(PoolsDefaults.DefaultPoolBucketSize);
-			_ver = 0;
-			return this;
-		}
-		
-		protected override IPoolingNode<T> CreateNodeHolder()
-		{
-			return Pool<PoolingNode<T>>.Get().Init(PoolsDefaults.DefaultPoolBucketSize);
-		}
-	}
+public sealed class PoolingList<T> : PoolingListBase<T>
+{
+    public PoolingList() => Init();
+
+    public PoolingList<T> Init()
+    {
+        _root = Pool.GetBuffer<IPoolingNode<T>> (PoolsDefaults.DefaultPoolBucketSize);
+        _ver = 0;
+        return this;
+    }
+
+    protected override IPoolingNode<T> CreateNodeHolder()
+    {
+        return Pool<PoolingNode<T>>.Get().Init (PoolsDefaults.DefaultPoolBucketSize);
+    }
 }

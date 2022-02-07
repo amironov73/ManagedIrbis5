@@ -22,57 +22,56 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Memory.Collections.Linq
+namespace AM.Memory.Collections.Linq;
+
+internal sealed class GenericPoolingEnumerator<T> : IPoolingEnumerator<T>
 {
-	internal sealed class GenericPoolingEnumerator<T> : IPoolingEnumerator<T>
-	{
-		private IEnumerator<T> _source;
-    
-		public GenericPoolingEnumerator<T> Init(IEnumerator<T> source)
-		{
-			_source = source;
-			return this;
-		}
+    private IEnumerator<T> _source;
 
-		public bool MoveNext() => _source.MoveNext();
+    public GenericPoolingEnumerator<T> Init (IEnumerator<T> source)
+    {
+        _source = source;
+        return this;
+    }
 
-		public void Reset() => _source.Reset();
-		
-		object IPoolingEnumerator.Current => Current;
+    public bool MoveNext() => _source.MoveNext();
 
-		public T Current => _source.Current;
-    
-		public void Dispose()
-		{
-			_source.Dispose();
-			_source = default;
-			Pool<GenericPoolingEnumerator<T>>.Return(this);
-		}
-	}
+    public void Reset() => _source.Reset();
 
-	internal sealed class GenericEnumerator<T> : IEnumerator<T>
-	{
-		private IPoolingEnumerator<T> _source;
-    
-		public GenericEnumerator<T> Init(IPoolingEnumerator<T> source)
-		{
-			_source = source;
-			return this;
-		}
+    object IPoolingEnumerator.Current => Current;
 
-		public bool MoveNext() => _source.MoveNext();
+    public T Current => _source.Current;
 
-		public void Reset() => _source.Reset();
-		
-		object IEnumerator.Current => Current;
+    public void Dispose()
+    {
+        _source.Dispose();
+        _source = default;
+        Pool<GenericPoolingEnumerator<T>>.Return (this);
+    }
+}
 
-		public T Current => _source.Current;
-    
-		public void Dispose()
-		{
-			_source.Dispose();
-			_source = default;
-			Pool<GenericEnumerator<T>>.Return(this);
-		}
-	}
+internal sealed class GenericEnumerator<T> : IEnumerator<T>
+{
+    private IPoolingEnumerator<T> _source;
+
+    public GenericEnumerator<T> Init (IPoolingEnumerator<T> source)
+    {
+        _source = source;
+        return this;
+    }
+
+    public bool MoveNext() => _source.MoveNext();
+
+    public void Reset() => _source.Reset();
+
+    object IEnumerator.Current => Current;
+
+    public T Current => _source.Current;
+
+    public void Dispose()
+    {
+        _source.Dispose();
+        _source = default;
+        Pool<GenericEnumerator<T>>.Return (this);
+    }
 }

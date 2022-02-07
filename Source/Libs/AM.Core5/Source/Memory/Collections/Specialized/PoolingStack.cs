@@ -15,13 +15,12 @@
 
 #nullable enable
 
-namespace AM.Memory.Collections.Specialized
+namespace AM.Memory.Collections.Specialized;
+
+public class PoolingStack<T> : PoolingStackBase<T>
 {
-	public class PoolingStack<T> : PoolingStackBase<T>
-	{
-		protected override IPoolingNode<T> CreateNodeHolder()
-		{
-			return Pool<PoolingNode<T>>.Get().Init(PoolsDefaults.DefaultPoolBucketSize);
-		}
-	}
+    protected override IPoolingNode<T> CreateNodeHolder()
+    {
+        return Pool<PoolingNode<T>>.Get().Init (PoolsDefaults.DefaultPoolBucketSize);
+    }
 }

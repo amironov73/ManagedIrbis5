@@ -15,12 +15,11 @@
 
 #nullable enable
 
-namespace AM.Memory.Collections.Specialized
-{
-	public abstract class IdealHashObjectBase
-	{ 
-		internal int IdealHashCode { get; set; }
+namespace AM.Memory.Collections.Specialized;
 
-		public override int GetHashCode() => IdealHashCode;
-	}
+public abstract class IdealHashObjectBase
+{
+    internal int IdealHashCode { get; set; }
+
+    public override int GetHashCode() => IdealHashCode;
 }

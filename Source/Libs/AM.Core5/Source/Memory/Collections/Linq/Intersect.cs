@@ -23,24 +23,25 @@ using AM.Memory.Collections.Specialized;
 
 #nullable enable
 
-namespace AM.Memory.Collections.Linq
-{
-    public static partial class PoolingEnumerable
-    {
-        public static IPoolingEnumerable<T> Intersect<T>(this IPoolingEnumerable<T> source, IPoolingEnumerable<T> intersectWith)
-        {
-            var second = Pool<PoolingDictionary<T, int>>.Get().Init(0);
-            foreach (var item in intersectWith) second[item] = 1;
-            
-            return Pool<IntersectExprEnumerable<T>>.Get().Init(source, second);
-        } 
-        
-        public static IPoolingEnumerable<T> Intersect<T>(this IPoolingEnumerable<T> source, IPoolingEnumerable<T> intersectWith, IEqualityComparer<T> comparer)
-        {
-            var second = Pool<PoolingDictionary<T, int>>.Get().Init(0);
-            foreach (var item in intersectWith) second[item] = 1;
+namespace AM.Memory.Collections.Linq;
 
-            return Pool<IntersectExprEnumerable<T>>.Get().Init(source, second, comparer);
-        }
+public static partial class PoolingEnumerable
+{
+    public static IPoolingEnumerable<T> Intersect<T> (this IPoolingEnumerable<T> source,
+        IPoolingEnumerable<T> intersectWith)
+    {
+        var second = Pool<PoolingDictionary<T, int>>.Get().Init (0);
+        foreach (var item in intersectWith) second[item] = 1;
+
+        return Pool<IntersectExprEnumerable<T>>.Get().Init (source, second);
+    }
+
+    public static IPoolingEnumerable<T> Intersect<T> (this IPoolingEnumerable<T> source,
+        IPoolingEnumerable<T> intersectWith, IEqualityComparer<T> comparer)
+    {
+        var second = Pool<PoolingDictionary<T, int>>.Get().Init (0);
+        foreach (var item in intersectWith) second[item] = 1;
+
+        return Pool<IntersectExprEnumerable<T>>.Get().Init (source, second, comparer);
     }
 }

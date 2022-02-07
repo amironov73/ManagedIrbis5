@@ -21,16 +21,15 @@ using System;
 
 #nullable enable
 
-namespace AM.Memory.Collections.Specialized
+namespace AM.Memory.Collections.Specialized;
+
+public interface IPoolingNode<T> : IDisposable
 {
-	public interface IPoolingNode<T> : IDisposable
-	{
-		public IPoolingNode<T> Next { get; set; }
+    public IPoolingNode<T> Next { get; set; }
 
-		T this[int index] { get; set; }
+    T this [int index] { get; set; }
 
-		IPoolingNode<T> Init(int capacity);
-		
-		void Clear();
-	}
+    IPoolingNode<T> Init (int capacity);
+
+    void Clear();
 }

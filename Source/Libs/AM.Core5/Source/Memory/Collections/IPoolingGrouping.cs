@@ -9,16 +9,15 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace AM.Memory.Collections
+namespace AM.Memory.Collections;
+
+public interface IPoolingGrouping<out TKey, out TElement> : IPoolingEnumerable<TElement>
 {
-    public interface IPoolingGrouping<out TKey, out TElement> : IPoolingEnumerable<TElement>
-    {
-        TKey Key { get; }
-    }
+    TKey Key { get; }
 }

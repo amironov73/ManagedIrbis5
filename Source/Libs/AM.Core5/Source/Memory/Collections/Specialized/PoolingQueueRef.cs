@@ -15,13 +15,12 @@
 
 #nullable enable
 
-namespace AM.Memory.Collections.Specialized
+namespace AM.Memory.Collections.Specialized;
+
+public sealed class PoolingQueueRef<T> : PoolingQueue<T> where T : class
 {
-	public sealed class PoolingQueueRef<T> : PoolingQueue<T> where T : class
-	{
-		protected override IPoolingNode<T> CreateNodeHolder()
-		{
-			return (IPoolingNode<T>) Pool<PoolingNodeCanon<T>>.Get().Init(PoolsDefaults.DefaultPoolBucketSize);
-		}
-	}
+    protected override IPoolingNode<T> CreateNodeHolder()
+    {
+        return (IPoolingNode<T>)Pool<PoolingNodeCanon<T>>.Get().Init (PoolsDefaults.DefaultPoolBucketSize);
+    }
 }
