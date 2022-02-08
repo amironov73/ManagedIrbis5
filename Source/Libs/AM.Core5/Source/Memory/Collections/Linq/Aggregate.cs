@@ -9,13 +9,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Aggregate.cs -- агрегация
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+using System.Linq;
 
 #endregion
 
@@ -23,50 +24,46 @@ using System;
 
 namespace AM.Memory.Collections.Linq;
 
+/// <summary>
+/// Набор расширений для <see cref="IPoolingEnumerable{T}"/>
+/// </summary>
 public static partial class PoolingEnumerable
 {
-    public static TSource Aggregate<TSource> (this IPoolingEnumerable<TSource> source,
-        Func<TSource, TSource, TSource> func)
+    /// <inheritdoc cref="Enumerable.Aggregate{TSource}"/>
+    public static TSource Aggregate<TSource>
+        (
+            this IPoolingEnumerable<TSource> source,
+            Func<TSource, TSource, TSource> func
+        )
     {
-        if (source == null)
+        Sure.NotNull (source);
+        Sure.NotNull (func);
+
+        using var enumerator = source.GetEnumerator();
+        if (!enumerator.MoveNext())
         {
-            throw new ArgumentNullException (nameof (source));
+            throw new InvalidOperationException ("Sequence contains no elements");
         }
 
-        if (func == null)
+        var result = enumerator.Current;
+        while (enumerator.MoveNext())
         {
-            throw new ArgumentNullException (nameof (func));
+            result = func (result, enumerator.Current);
         }
 
-        using (var enumerator = source.GetEnumerator())
-        {
-            if (!enumerator.MoveNext())
-            {
-                throw new InvalidOperationException ("Sequence contains no elements");
-            }
-
-            var result = enumerator.Current;
-            while (enumerator.MoveNext())
-            {
-                result = func (result, enumerator.Current);
-            }
-
-            return result;
-        }
+        return result;
     }
 
-    public static TAccumulate Aggregate<TSource, TAccumulate> (this IPoolingEnumerable<TSource> source,
-        TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func)
+    /// <inheritdoc cref="Enumerable.Aggregate{TSource}"/>
+    public static TAccumulate Aggregate<TSource, TAccumulate>
+        (
+            this IPoolingEnumerable<TSource> source,
+            TAccumulate seed,
+            Func<TAccumulate, TSource, TAccumulate> func
+        )
     {
-        if (source == null)
-        {
-            throw new ArgumentNullException (nameof (source));
-        }
-
-        if (func == null)
-        {
-            throw new ArgumentNullException (nameof (func));
-        }
+        Sure.NotNull (source);
+        Sure.NotNull (func);
 
         var result = seed;
         foreach (var element in source)
@@ -77,23 +74,18 @@ public static partial class PoolingEnumerable
         return result;
     }
 
-    public static TResult Aggregate<TSource, TAccumulate, TResult> (this IPoolingEnumerable<TSource> source,
-        TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector)
+    /// <inheritdoc cref="Enumerable.Aggregate{TSource}"/>
+    public static TResult Aggregate<TSource, TAccumulate, TResult>
+        (
+            this IPoolingEnumerable<TSource> source,
+            TAccumulate seed,
+            Func<TAccumulate, TSource, TAccumulate> func,
+            Func<TAccumulate, TResult> resultSelector
+        )
     {
-        if (source == null)
-        {
-            throw new ArgumentNullException (nameof (source));
-        }
-
-        if (func == null)
-        {
-            throw new ArgumentNullException (nameof (func));
-        }
-
-        if (resultSelector == null)
-        {
-            throw new ArgumentNullException (nameof (resultSelector));
-        }
+        Sure.NotNull (source);
+        Sure.NotNull (func);
+        Sure.NotNull (resultSelector);
 
         var result = seed;
         foreach (var element in source)

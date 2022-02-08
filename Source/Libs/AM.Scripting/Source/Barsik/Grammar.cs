@@ -52,7 +52,7 @@ internal static class Grammar
     {
         Sure.NotNull (sourceCode);
 
-        return Pgm.ParseOrThrow (sourceCode);
+        return WholeProgram.ParseOrThrow (sourceCode);
     }
 
     /// <summary>
@@ -100,6 +100,15 @@ internal static class Grammar
 
     // токен-строка
     internal static Parser<char, string> Tok (string token) => Tok (String (token));
+
+    // точный токен
+    internal static Parser<char, string> Xok (string token) => new StrictParser (token);
+
+    internal static Parser<char, string> Sok (string token) => Tok (new StrictParser (token));
+
+    // точный токен
+    internal static Parser<char, string> Sok (string token, string unexpected) =>
+        Tok (new StrictParser (token, unexpected));
 
     // нечто, заключенное в фигурные скобки
     internal static Parser<char, TResult> CurlyBraces<TResult> (Parser<char, TResult> parser) =>
@@ -152,14 +161,14 @@ internal static class Grammar
         (
             (position, condition, body) =>
                 (StatementNode) new WhileNode (new SourcePosition (position), condition, body),
-            Tok ("while").Then (CurrentPos),
+            Sok ("while").Then (CurrentPos),
             RoundBrackets (Expr),
             BlockOrSingle
         );
 
     // цикл for
     private static readonly Parser<char, StatementNode> For =
-        from position in Tok ("for").Then (CurrentPos)
+        from position in Sok ("for").Then (CurrentPos)
         from open1 in Tok ('(')
         from init in Tok (Expr)
         from _2 in Tok (';')
@@ -174,10 +183,10 @@ internal static class Grammar
 
     // цикл foreach
     private static readonly Parser<char, StatementNode> ForEach =
-        from position in Tok ("foreach").Then (CurrentPos)
+        from position in Sok ("foreach").Then (CurrentPos)
         from open1 in Tok ('(')
         from variableName in Tok (Identifier)
-        from _2 in Tok ("in")
+        from _2 in Sok ("in")
         from enumerable in Tok (Expr)
         from close1 in Tok (')')
         from statements in BlockOrSingle
@@ -186,14 +195,14 @@ internal static class Grammar
 
     // блок else
     private static readonly Parser<char, IEnumerable<StatementNode>> Else =
-        from _ in Tok ("else")
+        from _ in Sok ("else")
         from statements in BlockOrSingle
         select statements;
 
     // блок else if
     private static readonly Parser<char, IfNode> ElseIf =
-        from position in Tok ("else").Then (CurrentPos)
-        from _2 in Tok ("if")
+        from position in Sok ("else").Then (CurrentPos)
+        from _2 in Sok ("if")
         from condition in RoundBrackets (Expr)
         from statements in BlockOrSingle
         select new IfNode (new SourcePosition (position),
@@ -201,7 +210,7 @@ internal static class Grammar
 
     // конструкция if-then-else
     private static readonly Parser<char, StatementNode> If =
-        from position in Tok ("if").Then (CurrentPos)
+        from position in Sok ("if").Then (CurrentPos)
         from condition in RoundBrackets (Expr)
         from thenBlock in BlockOrSingle
         from elseIf in Try (ElseIf).Many().Optional()
@@ -212,20 +221,20 @@ internal static class Grammar
 
     // блок catch
     private static readonly Parser<char, CatchNode> Catch =
-        from position in Tok ("catch").Then (CurrentPos)
+        from position in Sok ("catch").Then (CurrentPos)
         from variable in RoundBrackets(Identifier)
         from block in BlockOrSingle
         select new CatchNode (new SourcePosition(position), variable, block);
 
     // блок finally
     private static readonly Parser<char, IEnumerable<StatementNode>> Finally =
-        from _ in Tok ("finally")
+        from _ in Sok ("finally")
         from block in BlockOrSingle
         select block;
 
     // конструкция try-catch-finally
     private static readonly Parser<char, StatementNode> TryCatchFinally =
-        from position in Tok ("try").Then (CurrentPos)
+        from position in Sok ("try").Then (CurrentPos)
         from tryBlock in BlockOrSingle
         from catchNode in Catch.Optional()
         from finallyBlock in Finally.Optional()
@@ -239,7 +248,7 @@ internal static class Grammar
             (position, value) =>
                 (StatementNode) new ReturnNode (new SourcePosition (position),
                     value.GetValueOrDefault()),
-            Tok ("return").Then (CurrentPos),
+            Sok ("return").Then (CurrentPos),
             Tok (Expr).Optional()
         );
 
@@ -256,7 +265,7 @@ internal static class Grammar
     // определение функции
     private static readonly Parser<char, StatementNode> FunctionDefinition =
         from position in CurrentPos
-        from _1 in    Tok ("func")
+        from _1 in Sok ("func")
         from name in Tok (Identifier)
         from args in RoundBrackets (Identifier.Separated (Tok (',')).Optional())
         from body in CurlyBraces (Block)
@@ -266,7 +275,7 @@ internal static class Grammar
     // блок using
     private static readonly Parser<char, StatementNode> Using =
         from position in CurrentPos
-        from _1 in Tok ("using")
+        from _1 in Sok ("using")
         from open in Tok ('(')
         from variable in Tok (Identifier)
         from equal in Tok ('=')
@@ -289,7 +298,7 @@ internal static class Grammar
     // блок with
     private static readonly Parser<char, StatementNode> With =
         from position in CurrentPos
-        from _1 in Tok ("with")
+        from _1 in Sok ("with")
         from center in RoundBrackets (Tok (Expr))
         from body in BlockOrSingle
         select (StatementNode)new WithNode (new SourcePosition (position), center, body);
@@ -315,7 +324,7 @@ internal static class Grammar
     // Собственно программа
     //
 
-    private static readonly Parser<char, ProgramNode> Pgm =
+    private static readonly Parser<char, ProgramNode> WholeProgram =
         Block.Before (End)
             .Select (s => new ProgramNode (s));
 

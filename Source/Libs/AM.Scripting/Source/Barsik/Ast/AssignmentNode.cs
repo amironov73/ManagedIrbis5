@@ -68,10 +68,10 @@ internal sealed class AssignmentNode
     #endregion
 
     private static readonly Parser<char, AtomNode> NullLiteral =
-        String ("null").ThenReturn ((AtomNode) new ConstantNode (null));
+        Xok ("null").ThenReturn ((AtomNode) new ConstantNode (null));
 
     private static readonly Parser<char, AtomNode> BoolLiteral =
-        OneOf (String ("false"), String ("true"))
+        OneOf (Xok ("false"), Xok ("true"))
             .Select<AtomNode> (v => new ConstantNode (v == "true"));
 
     private static readonly Parser<char, AtomNode> CharLiteral =
@@ -211,17 +211,20 @@ internal sealed class AssignmentNode
         op.Select<Func<AtomNode, AtomNode>> (type => inner => new PostfixNode (type, inner));
 
     private static OperatorTableRow<char, AtomNode> Prefix (string op) =>
-        Operator.Prefix (Prefix (String (op)));
+        Operator.Prefix (Prefix (Xok (op)));
 
     private static OperatorTableRow<char, AtomNode> Postfix (string op) =>
-        Operator.Postfix (Postfix (String (op)));
+        Operator.Postfix (Postfix (Xok (op)));
 
     private static Parser<char, Func<AtomNode, AtomNode, AtomNode>> Binary (Parser<char, string> op) =>
         op.Select<Func<AtomNode, AtomNode, AtomNode>> (type => (left, right) =>
             new BinaryNode (left, right, type));
 
     private static OperatorTableRow<char, AtomNode> BinaryLeft (string op) =>
-        Operator.InfixL (Binary (Try (Tok (op))));
+        Operator.InfixL (Binary (Try (Sok (op))));
+
+    private static OperatorTableRow<char, AtomNode> BinaryLeft (string op, string unexpected) =>
+        Operator.InfixL (Binary (Try (new StrictParser (op, unexpected))));
 
     // инициализация списка
     private static readonly Parser<char, AtomNode> List = Tok (Map
@@ -335,7 +338,7 @@ internal sealed class AssignmentNode
 
     // лямбда-функция
     private static readonly Parser<char, AtomNode> Lambda =
-        from lambda in Tok ("func")
+        from lambda in Sok ("func")
         from arguments in Tok (RoundBrackets (Identifier.Separated (Tok (','))))
         from body in CurlyBraces (Block)
         select (AtomNode)new LambdaNode (arguments, body);

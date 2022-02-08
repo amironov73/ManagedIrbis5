@@ -9,13 +9,15 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* AnyAll.cs -- методы Any и All
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 #endregion
 
@@ -25,7 +27,11 @@ namespace AM.Memory.Collections.Linq;
 
 public static partial class PoolingEnumerable
 {
-    public static bool Any<T> (this IPoolingEnumerable<T> source)
+    /// <inheritdoc cref="Enumerable.Any{TSource}(IEnumerable{TSource})"/>
+    public static bool Any<T>
+        (
+            this IPoolingEnumerable<T> source
+        )
     {
         var enumerator = source.GetEnumerator();
         var hasItems = enumerator.MoveNext();
@@ -33,8 +39,16 @@ public static partial class PoolingEnumerable
         return hasItems;
     }
 
-    public static bool Any<T> (this IPoolingEnumerable<T> source, Func<T, bool> condition)
+    /// <inheritdoc cref="Enumerable.Any{TSource}(IEnumerable{TSource})"/>
+    public static bool Any<T>
+        (
+            this IPoolingEnumerable<T> source,
+            Func<T, bool> condition
+        )
     {
+        Sure.NotNull (source);
+        Sure.NotNull (condition);
+
         var enumerator = source.GetEnumerator();
         while (enumerator.MoveNext())
         {
@@ -49,9 +63,17 @@ public static partial class PoolingEnumerable
         return false;
     }
 
-    public static bool Any<T, TContext> (this IPoolingEnumerable<T> source, TContext context,
-        Func<TContext, T, bool> condition)
+    /// <inheritdoc cref="Enumerable.Any{TSource}(IEnumerable{TSource})"/>
+    public static bool Any<T, TContext>
+        (
+            this IPoolingEnumerable<T> source,
+            TContext? context,
+            Func<TContext?, T, bool> condition
+        )
     {
+        Sure.NotNull (source);
+        Sure.NotNull (condition);
+
         var enumerator = source.GetEnumerator();
         while (enumerator.MoveNext())
         {
@@ -63,11 +85,20 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
+
         return false;
     }
 
-    public static bool All<T> (this IPoolingEnumerable<T> source, Func<T, bool> condition)
+    /// <inheritdoc cref="Enumerable.All{TSource}"/>
+    public static bool All<T>
+        (
+            this IPoolingEnumerable<T> source,
+            Func<T, bool> condition
+        )
     {
+        Sure.NotNull (source);
+        Sure.NotNull (condition);
+
         var enumerator = source.GetEnumerator();
         while (enumerator.MoveNext())
         {
@@ -79,12 +110,21 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
+
         return true;
     }
 
-    public static bool All<T, TContext> (this IPoolingEnumerable<T> source, TContext context,
-        Func<TContext, T, bool> condition)
+    /// <inheritdoc cref="Enumerable.All{TSource}"/>
+    public static bool All<T, TContext>
+        (
+            this IPoolingEnumerable<T> source,
+            TContext? context,
+            Func<TContext?, T, bool> condition
+        )
     {
+        Sure.NotNull (source);
+        Sure.NotNull (condition);
+
         var enumerator = source.GetEnumerator();
         while (enumerator.MoveNext())
         {
@@ -96,6 +136,7 @@ public static partial class PoolingEnumerable
         }
 
         enumerator.Dispose();
+
         return true;
     }
 }
