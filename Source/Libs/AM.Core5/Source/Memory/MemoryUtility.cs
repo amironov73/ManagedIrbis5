@@ -26,12 +26,22 @@ namespace AM.Memory;
 internal static class MemoryUtility
 {
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    internal static int GetMaxSizeForBucket (int binIndex) => 16 << binIndex;
+    internal static int GetMaxSizeForBucket (int binIndex)
+    {
+        return 16 << binIndex;
+    }
 
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    internal static int GetBucket (int size)
+    internal static int GetBucket
+        (
+            int size
+        )
     {
-        if (size == 128 /*default chunk size*/) return 7;
+        if (size == 128 /*default chunk size*/)
+        {
+            return 7;
+        }
+
         size--;
         var length = 0;
         while (size >= 16)

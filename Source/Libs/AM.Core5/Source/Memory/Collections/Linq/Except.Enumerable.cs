@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,11 +29,15 @@ internal class ExceptExprEnumerable<T> : IPoolingEnumerable<T>
 {
     private int _count;
     private IPoolingEnumerable<T> _src;
-    private IEqualityComparer<T> _comparer;
+    private IEqualityComparer<T>? _comparer;
     private PoolingDictionary<T, int> _except;
 
-    public ExceptExprEnumerable<T> Init (IPoolingEnumerable<T> src, PoolingDictionary<T, int> except,
-        IEqualityComparer<T> comparer = default)
+    public ExceptExprEnumerable<T> Init
+        (
+            IPoolingEnumerable<T> src,
+            PoolingDictionary<T, int> except,
+            IEqualityComparer<T>? comparer = default
+        )
     {
         _src = src;
         _except = except;

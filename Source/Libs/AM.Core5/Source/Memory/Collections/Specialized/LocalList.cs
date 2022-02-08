@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -121,7 +121,7 @@ public struct LocalList<T> : IList<T>
     }
 
     /// <summary>
-    /// Removes first occurrence of given item 
+    /// Removes first occurrence of given item
     /// </summary>
     public bool Remove (T item)
     {
@@ -280,12 +280,14 @@ public struct LocalList<T> : IList<T>
         }
     }
 
+    /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
         return (_items.GetHashCode() * 37) & _other.GetHashCode();
     }
 
-    public override bool Equals (object obj)
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
+    public override bool Equals (object? obj)
     {
         return obj is LocalList<T> other && Equals (other);
     }

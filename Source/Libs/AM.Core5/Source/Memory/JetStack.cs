@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* JetStack.cs --
@@ -26,39 +27,103 @@ namespace AM.Memory;
 
 internal class JetStack<T>
 {
+    #region Nested structs
+
+    // PERF: the struct wrapper avoids array-covariance-checks
+    // from the runtime when assigning to elements of the array.
+    private struct ObjectWrapper
+    {
+        public T Element;
+    }
+
+    #endregion
+
+    #region Constants
+
+    private const int DefaultCapacity = 4;
+
+    #endregion
+
+    #region Properties
+
+    public int Count => _size;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public JetStack()
+    {
+        _array = new ObjectWrapper[DefaultCapacity];
+        _firstItem = default!;
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    // Create a stack with a specific initial capacity.  The initial capacity
+    // must be a non-negative number.
+    public JetStack
+        (
+            int capacity
+        )
+    {
+        _array = new ObjectWrapper[capacity];
+        _firstItem = default!;
+    }
+
+    #endregion
+
+    #region Private members
+
     private ObjectWrapper[] _array;
 
     private int _size;
     private T _firstItem;
 
-    private const int DefaultCapacity = 4;
-
-    public JetStack()
+    // Non-inline from Stack.Push to improve its code quality as uncommon path
+    [MethodImpl (MethodImplOptions.NoInlining)]
+    private void PushWithResize (T item)
     {
-        _array = new ObjectWrapper[DefaultCapacity];
+        Array.Resize (ref _array, _array.Length << 1);
+        _array[_size].Element = item;
+        _size++;
     }
 
-    // Create a stack with a specific initial capacity.  The initial capacity
-    // must be a non-negative number.
-    public JetStack (int capacity)
-    {
-        _array = new ObjectWrapper[capacity];
-    }
+    #endregion
 
-    public int Count => _size;
-
+    /// <summary>
+    ///
+    /// </summary>
     // Removes all Objects from the Stack.
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
-        Array.Clear (_array, 0,
-            _size); // Don't need to doc this but we clear the elements so that the gc can reclaim the references.
+        // Don't need to doc this but we clear the elements so that the gc can reclaim the references
+        Array.Clear
+            (
+                _array,
+                0,
+                _size
+            );
         _size = 0;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public T Peek() => _array[_size - 1].Element;
+    public T Peek()
+    {
+        return _array[_size - 1].Element;
+    }
 
+    /// <summary>
+    ///
+    /// </summary>
     // Pops an item from the top of the stack.  If the stack is empty, Pop
     // throws an InvalidOperationException.
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
@@ -74,9 +139,15 @@ internal class JetStack<T>
         return _array[--_size].Element;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     // Pushes an item to the top of the stack.
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public void Push (T item)
+    public void Push
+        (
+            T item
+        )
     {
         if (_firstItem == null)
         {
@@ -92,20 +163,5 @@ internal class JetStack<T>
         {
             _array[_size++].Element = item;
         }
-    }
-
-    // Non-inline from Stack.Push to improve its code quality as uncommon path
-    [MethodImpl (MethodImplOptions.NoInlining)]
-    private void PushWithResize (T item)
-    {
-        Array.Resize (ref _array, _array.Length << 1);
-        _array[_size].Element = item;
-        _size++;
-    }
-
-    // PERF: the struct wrapper avoids array-covariance-checks from the runtime when assigning to elements of the array.
-    private struct ObjectWrapper
-    {
-        public T Element;
     }
 }

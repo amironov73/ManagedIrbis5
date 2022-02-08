@@ -43,14 +43,18 @@ public sealed class BucketsBasedCrossThreadsArrayPool<T>
 
     static BucketsBasedCrossThreadsArrayPool()
     {
-        for (var i = 0; i < _pool.Length; i++) _pool[i] = new Queue<T[]>();
+        for (var i = 0; i < _pool.Length; i++)
+        {
+            _pool[i] = new Queue<T[]>();
+        }
     }
 
     #endregion
 
     #region Private members
 
-    [ThreadStatic] private static BucketsBasedCrossThreadsArrayPool<T>? _shared;
+    [ThreadStatic]
+    private static BucketsBasedCrossThreadsArrayPool<T>? _shared;
 
     private static readonly Queue<T[]>[] _pool = new Queue<T[]>[24];
 
@@ -66,23 +70,26 @@ public sealed class BucketsBasedCrossThreadsArrayPool<T>
     {
         var queueIndex = MemoryUtility.GetBucket (minimumLength);
         var queue = _pool[queueIndex];
-        T[] arr;
+        T[] result;
 
         if (queue.Count == 0)
         {
             var length = MemoryUtility.GetMaxSizeForBucket (queueIndex);
-            arr = new T[length];
-            return arr;
+            result = new T[length];
+            return result;
         }
 
-        arr = queue.Dequeue();
-        return arr;
+        result = queue.Dequeue();
+        return result;
     }
 
     /// <summary>
     /// Возврат объекта.
     /// </summary>
-    public void Return (T[] array)
+    public void Return
+        (
+            T[] array
+        )
     {
         _pool[MemoryUtility.GetBucket (array.Length)].Enqueue (array);
     }

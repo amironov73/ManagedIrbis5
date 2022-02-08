@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* IPoolingEnumerator_T.cs -- интерфейс типизированного перечислителя
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,9 +17,16 @@
 
 namespace AM.Memory.Collections;
 
-public interface IPoolingEnumerator<out T> : IPoolingEnumerator
+/// <summary>
+/// Интерфейс типизированного перечислителя.
+/// </summary>
+/// <typeparam name="T">Тип перечисляемых элементов.</typeparam>
+public interface IPoolingEnumerator<out T>
+    : IPoolingEnumerator
 {
-    // <summary>Gets the element in the collection at the current position of the enumerator.</summary>
-    /// <returns>The element in the collection at the current position of the enumerator.</returns>
+    /// <summary>Gets the element in the collection
+    /// at the current position of the enumerator.</summary>
+    /// <returns>The element in the collection at the current
+    /// position of the enumerator.</returns>
     new T Current { get; }
 }

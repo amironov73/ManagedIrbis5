@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* IPoolingNode.cs -- интерфейс контейнера для хранения элемента коллекции
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,13 +23,30 @@ using System;
 
 namespace AM.Memory.Collections.Specialized;
 
-public interface IPoolingNode<T> : IDisposable
+/// <summary>
+/// Интерфейс контейнера для хранения элемента коллекции.
+/// </summary>
+/// <typeparam name="T">Тип хранимого элемента.</typeparam>
+public interface IPoolingNode<T>
+    : IDisposable
 {
-    public IPoolingNode<T> Next { get; set; }
+    /// <summary>
+    /// Контейнер со следующим элементом.
+    /// </summary>
+    public IPoolingNode<T>? Next { get; set; }
 
+    /// <summary>
+    /// Обращение по индексу.
+    /// </summary>
     T this [int index] { get; set; }
 
+    /// <summary>
+    /// Инициализация.
+    /// </summary>
     IPoolingNode<T> Init (int capacity);
 
+    /// <summary>
+    /// Очистка.
+    /// </summary>
     void Clear();
 }

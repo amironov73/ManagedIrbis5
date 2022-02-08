@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -32,10 +32,12 @@ internal class IntersectExprEnumerable<T> : IPoolingEnumerable<T>
     private IEqualityComparer<T> _comparer;
     private PoolingDictionary<T, int> _second;
 
-    public IntersectExprEnumerable<T> Init (
-        IPoolingEnumerable<T> src,
-        PoolingDictionary<T, int> second,
-        IEqualityComparer<T> comparer = default)
+    public IntersectExprEnumerable<T> Init
+        (
+            IPoolingEnumerable<T> src,
+            PoolingDictionary<T, int> second,
+            IEqualityComparer<T>? comparer = default
+        )
     {
         _src = src;
         _count = 0;

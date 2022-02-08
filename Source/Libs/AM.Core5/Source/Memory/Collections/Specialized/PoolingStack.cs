@@ -7,9 +7,10 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolingStack.cs -- стек, хранящий свои элементы в пуле
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,10 +18,20 @@
 
 namespace AM.Memory.Collections.Specialized;
 
-public class PoolingStack<T> : PoolingStackBase<T>
+/// <summary>
+/// Стек, хранящий свои элементы в пуле.
+/// </summary>
+/// <typeparam name="T">Тип элементов стека.</typeparam>
+public class PoolingStack<T>
+    : PoolingStackBase<T>
 {
+    #region PoolingStackBase members
+
+    /// <inheritdoc cref="PoolingStackBase{T}.CreateNodeHolder"/>
     protected override IPoolingNode<T> CreateNodeHolder()
     {
         return Pool<PoolingNode<T>>.Get().Init (PoolsDefaults.DefaultPoolBucketSize);
     }
+
+    #endregion
 }

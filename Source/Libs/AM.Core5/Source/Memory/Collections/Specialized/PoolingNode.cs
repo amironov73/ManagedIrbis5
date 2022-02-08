@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,7 +17,8 @@
 
 namespace AM.Memory.Collections.Specialized;
 
-internal sealed class PoolingNode<T> : PoolingNodeBase<T>
+internal sealed class PoolingNode<T>
+    : PoolingNodeBase<T>
 {
     public override void Dispose()
     {

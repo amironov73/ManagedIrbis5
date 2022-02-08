@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -50,7 +50,7 @@ public partial class PoolingDictionary<TKey, TValue> :
     }
 
     private IEqualityComparer<TKey> _comparer;
-    private PoolingList<int> _buckets;
+    private PoolingList<int>? _buckets;
     private PoolingList<Entry> _entries;
     private int _freeList;
     private int _version;
@@ -62,7 +62,11 @@ public partial class PoolingDictionary<TKey, TValue> :
 
     public PoolingDictionary() => Init();
 
-    public PoolingDictionary<TKey, TValue> Init (int capacity = 0, IEqualityComparer<TKey> comparer = default)
+    public PoolingDictionary<TKey, TValue> Init
+        (
+            int capacity = 0,
+            IEqualityComparer<TKey>? comparer = default
+        )
     {
         if (_buckets != default)
         {

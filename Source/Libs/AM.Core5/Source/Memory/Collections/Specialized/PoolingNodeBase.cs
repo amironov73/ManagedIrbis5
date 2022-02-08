@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolingNodeBase.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,8 @@ using System.Buffers;
 
 namespace AM.Memory.Collections.Specialized;
 
-internal abstract class PoolingNodeBase<T> : IPoolingNode<T>
+internal abstract class PoolingNodeBase<T>
+    : IPoolingNode<T>
 {
     protected IMemoryOwner<T> _buf;
 
@@ -42,7 +43,7 @@ internal abstract class PoolingNodeBase<T> : IPoolingNode<T>
         Next = null;
     }
 
-    public IPoolingNode<T> Next { get; set; }
+    public IPoolingNode<T>? Next { get; set; }
 
     public abstract IPoolingNode<T> Init (int capacity);
 

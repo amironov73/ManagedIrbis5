@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* IPoolingEnumerable_T.cs -- интерфейс типизированной перечисляемой коллекции
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,9 +17,13 @@
 
 namespace AM.Memory.Collections;
 
-public interface IPoolingEnumerable<out T> : IPoolingEnumerable
+/// <summary>
+/// Интерфейс типизированной перечисляемой коллекции.
+/// </summary>
+public interface IPoolingEnumerable<out T>
+    : IPoolingEnumerable
 {
-    // <summary>Returns an enumerator that iterates through the collection.</summary>
+    /// <summary>Returns an enumerator that iterates through the collection.</summary>
     /// <returns>An enumerator that can be used to iterate through the collection.</returns>
     new IPoolingEnumerator<T> GetEnumerator();
 }

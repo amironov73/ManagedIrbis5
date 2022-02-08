@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,7 +25,7 @@ using System.Collections.Generic;
 namespace AM.Memory.Collections.Specialized;
 
 /// <summary>
-/// 	Contains 8 elements as struct fields as Maximum. Use it when you have guaranteed count of elements <= 8
+/// Contains 8 elements as struct fields as Maximum. Use it when you have guaranteed count of elements &#8804; 8
 /// </summary>
 public struct LongLocalList<T>
 {
@@ -142,12 +142,14 @@ public struct LongLocalList<T>
         }
     }
 
+    /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
         return _items.GetHashCode();
     }
 
-    public override bool Equals (object obj)
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
+    public override bool Equals (object? obj)
     {
         return obj is LongLocalList<T> other && Equals (other);
     }

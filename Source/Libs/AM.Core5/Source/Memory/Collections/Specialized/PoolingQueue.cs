@@ -9,13 +9,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolingQueue.cs -- очередь, хранящая свои элементы в пуле
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 #endregion
@@ -24,36 +25,62 @@ using System.Runtime.CompilerServices;
 
 namespace AM.Memory.Collections.Specialized;
 
-public abstract class PoolingQueue<T> : IDisposable
+/// <summary>
+/// Очередь, хранящая свои элементы в пуле.
+/// </summary>
+/// <typeparam name="T">Тип элементов очереди.</typeparam>
+public abstract class PoolingQueue<T>
+    : IDisposable
 {
-    private IPoolingNode<T> _enqueueTo;
-    private IPoolingNode<T> _dequeueFrom;
-    private int _enqueueIndex, _dequeueIndex;
+    #region Properties
 
+    /// <summary>
+    /// Очередь пуста?
+    /// </summary>
+    public bool IsEmpty => Count == 0;
+
+    /// <summary>
+    /// Количество элементов в очереди.
+    /// </summary>
+    public int Count { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
     protected PoolingQueue()
     {
         Count = 0;
         _enqueueIndex = 0;
         _dequeueIndex = 0;
-        _enqueueTo = _dequeueFrom = null;
+        _enqueueTo = _dequeueFrom = default;
     }
 
-    public bool IsEmpty => Count == 0;
+    #endregion
 
-    public int Count { get; private set; }
+    #region Private members
 
-    public void Dispose()
-    {
-        Clear();
-    }
+    private IPoolingNode<T>? _enqueueTo;
+    private IPoolingNode<T>? _dequeueFrom;
+    private int _enqueueIndex, _dequeueIndex;
 
+    #endregion
+
+    #region Public methods
+
+    /// <inheritdoc cref="Queue{T}.Enqueue"/>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void Enqueue (T obj)
     {
-        if (Count == 0 && _enqueueTo == null)
+        if (Count == 0 && _enqueueTo is null)
+        {
             _enqueueTo = _dequeueFrom = CreateNodeHolder();
+        }
 
-        _enqueueTo[_enqueueIndex] = obj;
+        _enqueueTo![_enqueueIndex] = obj;
         _enqueueIndex++;
         Count++;
 
@@ -66,6 +93,9 @@ public abstract class PoolingQueue<T> : IDisposable
         }
     }
 
+    /// <summary>
+    /// Создание холдера для элемента.
+    /// </summary>
     protected abstract IPoolingNode<T> CreateNodeHolder();
 
     /// <summary>
@@ -75,11 +105,14 @@ public abstract class PoolingQueue<T> : IDisposable
     ///     true if element found or false otherwise
     /// </returns>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public bool TryDequeue (out T val)
+    public bool TryDequeue
+        (
+            out T val
+        )
     {
         if (IsEmpty)
         {
-            val = default;
+            val = default!;
             return false;
         }
 
@@ -96,10 +129,13 @@ public abstract class PoolingQueue<T> : IDisposable
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public T Dequeue()
     {
-        if (IsEmpty) throw new IndexOutOfRangeException();
+        if (IsEmpty)
+        {
+            throw new IndexOutOfRangeException();
+        }
 
-        var obj = _dequeueFrom[_dequeueIndex];
-        _dequeueFrom[_dequeueIndex] = default;
+        var obj = _dequeueFrom![_dequeueIndex];
+        _dequeueFrom[_dequeueIndex] = default!;
 
         _dequeueIndex++;
         Count--;
@@ -134,10 +170,11 @@ public abstract class PoolingQueue<T> : IDisposable
         return obj;
     }
 
+    /// <inheritdoc cref="Queue{T}.Clear"/>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
-        while (_enqueueTo != null)
+        while (_enqueueTo is not null)
         {
             var next = _enqueueTo.Next;
             _enqueueTo.Dispose();
@@ -146,4 +183,16 @@ public abstract class PoolingQueue<T> : IDisposable
 
         _dequeueFrom = null;
     }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        Clear();
+    }
+
+    #endregion
 }

@@ -24,7 +24,7 @@ using System.Runtime.CompilerServices;
 namespace AM.Memory;
 
 /// <summary>
-/// Пул поверх стека
+/// Пул поверх стека.
 /// </summary>
 public class JetPool<T>
     where T : class, new()

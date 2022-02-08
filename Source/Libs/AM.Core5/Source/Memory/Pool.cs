@@ -26,6 +26,9 @@ using Microsoft.Extensions.ObjectPool;
 
 namespace AM.Memory;
 
+/// <summary>
+///
+/// </summary>
 public static class Pool<T>
     where T : class, new()
 {

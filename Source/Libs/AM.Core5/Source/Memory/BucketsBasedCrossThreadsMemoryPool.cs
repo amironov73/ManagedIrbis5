@@ -52,18 +52,41 @@ namespace AM.Memory;
 ///  </code>
 public sealed class BucketsBasedCrossThreadsMemoryPool<T>
 {
-    private BucketsBasedCrossThreadsArrayPool<T> _pool;
+    #region Properties
 
-    [ThreadStatic] private static BucketsBasedCrossThreadsMemoryPool<T> _mempool;
-
-    internal BucketsBasedCrossThreadsArrayPool<T> _arraysPool => _pool ??= new BucketsBasedCrossThreadsArrayPool<T>();
-
+    /// <summary>
+    /// Общий пул.
+    /// </summary>
     public static BucketsBasedCrossThreadsMemoryPool<T> Shared =>
-        _mempool ??= new BucketsBasedCrossThreadsMemoryPool<T>();
+        _mempool ??= new ();
 
+    #endregion
+
+    #region Private members
+
+    private BucketsBasedCrossThreadsArrayPool<T>? _pool;
+
+    [ThreadStatic]
+    private static BucketsBasedCrossThreadsMemoryPool<T>? _mempool;
+
+    internal BucketsBasedCrossThreadsArrayPool<T> _arraysPool =>
+        _pool ??= new ();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Займ.
+    /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public CountdownMemoryOwner<T> Rent (int minBufferSize = -1)
+    public CountdownMemoryOwner<T> Rent
+        (
+            int minBufferSize = -1
+        )
     {
         return Pool<CountdownMemoryOwner<T>>.Get().Init (_arraysPool.Rent (minBufferSize), minBufferSize);
     }
+
+    #endregion
 }

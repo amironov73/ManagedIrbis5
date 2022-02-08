@@ -35,24 +35,37 @@ namespace AM.Memory;
 public sealed class CountdownMemoryOwner<T>
     : IMemoryOwner<T>
 {
-    private int _length;
-    private int _offset;
-    private int _owners;
-    private T[] _arr;
-    private CountdownMemoryOwner<T> _parent;
-    private Memory<T> _memory;
+    #region Properties
 
+    /// <summary>
+    /// Владеемая память.
+    /// </summary>
     public Memory<T> Memory
     {
         [MethodImpl (MethodImplOptions.AggressiveInlining)]
-        get => _memory;
-
-        private set => _memory = value;
+        get;
+        private set;
     }
 
+    #endregion
+
+    #region Private members
+
+    private int _length;
+    private int _offset;
+    private int _owners;
+    private T[]? _arr;
+    private CountdownMemoryOwner<T>? _parent;
+
+
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    internal CountdownMemoryOwner<T> Init (CountdownMemoryOwner<T> parent, int offset, int length,
-        bool defaultOwner = true)
+    internal CountdownMemoryOwner<T> Init
+        (
+            CountdownMemoryOwner<T> parent,
+            int offset,
+            int length,
+            bool defaultOwner = true
+        )
     {
         _owners = defaultOwner ? 1 : 0;
         _offset = offset;
@@ -64,7 +77,11 @@ public sealed class CountdownMemoryOwner<T>
     }
 
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    internal CountdownMemoryOwner<T> Init (T[] array, int length)
+    internal CountdownMemoryOwner<T> Init
+        (
+            T[] array,
+            int length
+        )
     {
         _owners = 1;
         _offset = 0;
@@ -72,12 +89,25 @@ public sealed class CountdownMemoryOwner<T>
         _parent = default;
         _arr = array;
         Memory = _arr.AsMemory (0, _length);
+
         return this;
     }
 
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Ручное добавление владельца.
+    /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void AddOwner() => _owners++;
 
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void Dispose()
     {
@@ -90,13 +120,15 @@ public sealed class CountdownMemoryOwner<T>
         if (_parent != default)
         {
             _parent.Dispose();
-            _parent = null;
+            _parent = default;
         }
         else
         {
-            ArrayPool<T>.Shared.Return (_arr);
+            ArrayPool<T>.Shared.Return (_arr!);
         }
 
         Pool<CountdownMemoryOwner<T>>.Return (this);
     }
+
+    #endregion
 }

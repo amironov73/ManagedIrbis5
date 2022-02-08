@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* IPoolingGrouping.cs -- интерфейс группировки элементов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,7 +17,16 @@
 
 namespace AM.Memory.Collections;
 
-public interface IPoolingGrouping<out TKey, out TElement> : IPoolingEnumerable<TElement>
+/// <summary>
+/// Интерфейс группировки элементов.
+/// </summary>
+/// <typeparam name="TKey">Тип ключа.</typeparam>
+/// <typeparam name="TElement">Тип группируемых элементов.</typeparam>
+public interface IPoolingGrouping<out TKey, out TElement>
+    : IPoolingEnumerable<TElement>
 {
+    /// <summary>
+    /// Ключ -- общий для всей группы элемент.
+    /// </summary>
     TKey Key { get; }
 }

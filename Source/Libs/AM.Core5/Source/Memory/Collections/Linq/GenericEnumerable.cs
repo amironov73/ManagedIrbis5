@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* GenericEnumerable.cs -- обычные перечисляемые коллекции
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,21 +24,27 @@ using System.Collections.Generic;
 
 namespace AM.Memory.Collections.Linq;
 
-internal class GenericPoolingEnumerable<T> : IPoolingEnumerable<T>
+internal class GenericPoolingEnumerable<T>
+    : IPoolingEnumerable<T>
 {
-    private IEnumerable<T> _enumerable;
+    private IEnumerable<T>? _enumerable;
 
-    public GenericPoolingEnumerable<T> Init (IEnumerable<T> enumerable)
+    public GenericPoolingEnumerable<T> Init
+        (
+            IEnumerable<T> enumerable
+        )
     {
         _enumerable = enumerable;
+
         return this;
     }
 
     public IPoolingEnumerator<T> GetEnumerator()
     {
-        var enumerator = _enumerable.GetEnumerator();
+        var enumerator = _enumerable.ThrowIfNull ().GetEnumerator();
         _enumerable = default;
         Pool<GenericPoolingEnumerable<T>>.Return (this);
+
         return Pool<GenericPoolingEnumerator<T>>.Get().Init (enumerator);
     }
 
@@ -48,21 +54,29 @@ internal class GenericPoolingEnumerable<T> : IPoolingEnumerable<T>
     }
 }
 
-internal class GenericEnumerable<T> : IEnumerable<T>
+internal class GenericEnumerable<T>
+    : IEnumerable<T>
 {
-    private IPoolingEnumerable<T> _enumerable;
+    private IPoolingEnumerable<T>? _enumerable;
 
-    public GenericEnumerable<T> Init (IPoolingEnumerable<T> enumerable)
+    #region Public methods
+
+    public GenericEnumerable<T> Init
+        (
+            IPoolingEnumerable<T> enumerable
+        )
     {
         _enumerable = enumerable;
+
         return this;
     }
 
     public IEnumerator<T> GetEnumerator()
     {
-        var enumerator = _enumerable.GetEnumerator();
+        var enumerator = _enumerable.ThrowIfNull ().GetEnumerator();
         _enumerable = default;
         Pool<GenericEnumerable<T>>.Return (this);
+
         return Pool<GenericEnumerator<T>>.Get().Init (enumerator);
     }
 
@@ -70,4 +84,6 @@ internal class GenericEnumerable<T> : IEnumerable<T>
     {
         return GetEnumerator();
     }
+
+    #endregion
 }

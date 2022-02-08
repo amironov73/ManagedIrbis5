@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolingList.cs -- список, хранящий свои элементы в пуле
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,17 +17,41 @@
 
 namespace AM.Memory.Collections.Specialized;
 
-public sealed class PoolingList<T> : PoolingListBase<T>
+/// <summary>
+/// Список, хранящий свои элементы в пуле.
+/// </summary>
+/// <typeparam name="T">Тип элементов списка.</typeparam>
+public sealed class PoolingList<T>
+    : PoolingListBase<T>
 {
-    public PoolingList() => Init();
+    #region Construction
 
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PoolingList()
+    {
+        Init();
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Инициализация.
+    /// </summary>
     public PoolingList<T> Init()
     {
         _root = Pool.GetBuffer<IPoolingNode<T>> (PoolsDefaults.DefaultPoolBucketSize);
         _ver = 0;
+
         return this;
     }
 
+    #endregion
+
+    /// <inheritdoc cref="PoolingListBase{T}.CreateNodeHolder"/>
     protected override IPoolingNode<T> CreateNodeHolder()
     {
         return Pool<PoolingNode<T>>.Get().Init (PoolsDefaults.DefaultPoolBucketSize);

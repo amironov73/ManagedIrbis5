@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -30,16 +30,21 @@ internal class DistinctExprEnumerable<T, TItem> : IPoolingEnumerable<T>
 {
     private int _count;
     private IPoolingEnumerator<T> _parent;
-    private IEqualityComparer<TItem> _comparer;
+    private IEqualityComparer<TItem>? _comparer;
     private Func<T, TItem> _selector;
 
-    public DistinctExprEnumerable<T, TItem> Init (IPoolingEnumerator<T> parent, Func<T, TItem> selector,
-        IEqualityComparer<TItem> comparer = default)
+    public DistinctExprEnumerable<T, TItem> Init
+        (
+            IPoolingEnumerator<T> parent,
+            Func<T, TItem> selector,
+            IEqualityComparer<TItem>? comparer = default
+        )
     {
         _parent = parent;
         _selector = selector;
         _comparer = comparer;
         _count = 0;
+
         return this;
     }
 

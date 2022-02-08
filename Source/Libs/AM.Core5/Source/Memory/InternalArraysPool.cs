@@ -26,28 +26,58 @@ namespace AM.Memory;
 
 internal sealed class InternalArraysPool
 {
+    #region Constants
+
     private const int MinBufferSize = 128;
 
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Займ.
+    /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static CountdownMemoryOwner<byte> Rent (int length)
+    public static CountdownMemoryOwner<byte> Rent
+        (
+            int length
+        )
     {
         return Rent<byte> (length);
     }
 
+    /// <summary>
+    /// Займ.
+    /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static CountdownMemoryOwner<T> Rent<T> (int length, bool noDefaultOwner = false)
+    public static CountdownMemoryOwner<T> Rent<T>
+        (
+            int length,
+            bool noDefaultOwner = false
+        )
     {
         var realLength = length;
         var allocLength = length > MinBufferSize ? length : MinBufferSize;
         var owner = BucketsBasedCrossThreadsMemoryPool<T>.Shared.Rent (allocLength);
+
         return owner.AsCountdown (0, realLength, noDefaultOwner);
     }
 
+    /// <summary>
+    /// Займ.
+    /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static CountdownMemoryOwner<T> RentFrom<T> (ReadOnlySpan<T> source, bool noDefaultOwner = false)
+    public static CountdownMemoryOwner<T> RentFrom<T>
+        (
+            ReadOnlySpan<T> source,
+            bool noDefaultOwner = false
+        )
     {
-        var mem = Rent<T> (source.Length, noDefaultOwner);
-        source.CopyTo (mem.Memory.Span);
-        return mem;
+        var result = Rent<T> (source.Length, noDefaultOwner);
+        source.CopyTo (result.Memory.Span);
+
+        return result;
     }
+
+    #endregion
 }
