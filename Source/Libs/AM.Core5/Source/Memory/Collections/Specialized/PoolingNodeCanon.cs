@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolingNodeCanon.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,12 +17,13 @@
 
 namespace AM.Memory.Collections.Specialized;
 
-internal sealed class PoolingNodeCanon<T> : PoolingNodeBase<object>, IPoolingNode<T> where T : class
+internal sealed class PoolingNodeCanon<T>
+    : PoolingNodeBase<object>, IPoolingNode<T> where T : class
 {
-    IPoolingNode<T> IPoolingNode<T>.Next
+    IPoolingNode<T>? IPoolingNode<T>.Next
     {
-        get => (IPoolingNode<T>)Next;
-        set => Next = (IPoolingNode<object>)value;
+        get => (IPoolingNode<T>?) Next;
+        set => Next = (IPoolingNode<object>?) value;
     }
 
     T IPoolingNode<T>.this [int index]

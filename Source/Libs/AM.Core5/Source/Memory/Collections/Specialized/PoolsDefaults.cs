@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* PoolsDefaults.cs -- настройки пулов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,9 +17,23 @@
 
 namespace AM.Memory.Collections.Specialized;
 
+/// <summary>
+/// Настройки пулов.
+/// </summary>
 public static class PoolsDefaults
 {
+    /// <summary>
+    ///
+    /// </summary>
     public const int DefaultPoolBucketDegree = 7;
+
+    /// <summary>
+    ///
+    /// </summary>
     public const int DefaultPoolBucketSize = 1 << DefaultPoolBucketDegree;
+
+    /// <summary>
+    ///
+    /// </summary>
     public const int DefaultPoolBucketMask = DefaultPoolBucketSize - 1;
 }

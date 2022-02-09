@@ -13,6 +13,7 @@
 #region Using directives
 
 using System;
+using System.Linq;
 
 using AM;
 
@@ -57,8 +58,15 @@ public sealed class BbkSection
         new ("32.9", "З9", "Телевидение. Радио- и оптическая локация. Радионавигация. Автоматика и телемеханика. Вычислительная техника. Программирование. Другие отрасли радиоэлектроники"),
         new ("33", "И", "Горное дело"),
         new ("34", "К", "Технология металлов. Машиностроение. Приборостроение"),
-        new ("35", "Л", "Химическая технология. Химические производства. Пищевые производства"),
-        new ("36", "Л", "Пищевые производства"),
+        new ("35.1", "Л1", "Химическая технология в целом"),
+        new ("35.2", "Л2", "Технология неорганических веществ в целом"),
+        new ("35.3", "Л3", "Удобрения. Пестициды. Электрохимические производства"),
+        new ("35.4", "Л4", "Силикатные производства. Абразивные материалы"),
+        new ("35.5", "Л5", "Технология органических веществ"),
+        new ("35.6", "Л6", "Органический синтез"),
+        new ("35.7", "Л7", "Высокомолекулярные соединения"),
+        new ("36.8", "Л8", "Пищевые производства 1"),
+        new ("36.9", "Л9", "Пищевые производства 2"),
         new ("37", "М", "Технология древесины. Производства легкой промышленности. Домоводство. Бытовые услуги. Полиграфическое производство. Фотокинотехника"),
         new ("38", "Н", "Строительство"),
         new ("39", "О", "Транспорт"),
@@ -111,17 +119,17 @@ public sealed class BbkSection
     /// <summary>
     /// Деление в ББК для массовых библиотек (они же средние таблицы) (арабские цифры).
     /// </summary>
-    public string? PublicLibrary { get; set; }
+    public string? PublicLibrary { get; }
 
     /// <summary>
     /// Деление в ББК для научных библиотек (они же полные таблицы) (кириллица).
     /// </summary>
-    public string? ScienceLibrary { get; set; }
+    public string? ScienceLibrary { get; }
 
     /// <summary>
     /// Формулировка.
     /// </summary>
-    public string? Wording { get; set; }
+    public string? Wording { get; }
 
     #endregion
 
@@ -248,6 +256,44 @@ public sealed class BbkSection
     }
 
     /// <summary>
+    /// Проверка правильности таблицы соответствия.
+    /// </summary>
+    public static bool SelfCheck
+        (
+            bool throwOnError = true
+        )
+    {
+        var result = true;
+
+        foreach (var section in Conformity)
+        {
+            // пустые строки недопустимы
+            if (string.IsNullOrWhiteSpace (section.PublicLibrary)
+                || string.IsNullOrWhiteSpace (section.ScienceLibrary)
+                || string.IsNullOrWhiteSpace (section.Wording))
+            {
+                result = false;
+                break;
+            }
+
+            // каждый индекс должен быть лишь один раз
+            if (Conformity.Count (s => s.PublicLibrary == section.PublicLibrary) != 1
+                || Conformity.Count (s => s.ScienceLibrary == section.ScienceLibrary) != 1)
+            {
+                result = false;
+                break;
+            }
+        }
+
+        if (!result && throwOnError)
+        {
+            throw new IrbisException();
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Преобразование ББК для научных библиотек (с буквами)
     /// в ББК для массовых библиотек (с цифрами).
     /// </summary>
@@ -258,6 +304,8 @@ public sealed class BbkSection
         )
     {
         Sure.NotNullNorEmpty (index);
+
+        // TODO добавление точки при необходимости
 
         foreach (var section in Conformity)
         {
@@ -283,12 +331,14 @@ public sealed class BbkSection
     {
         Sure.NotNullNorEmpty (index);
 
+        // TODO убирание точки при необходимости
+
         foreach (var section in Conformity)
         {
             var prefix = section.PublicLibrary.ThrowIfNullOrEmpty();
             if (index.StartsWith (prefix))
             {
-                return section.PublicLibrary + index[prefix.Length..];
+                return section.ScienceLibrary + index[prefix.Length..];
             }
         }
 
