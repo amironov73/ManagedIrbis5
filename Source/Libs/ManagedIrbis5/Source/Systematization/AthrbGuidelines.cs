@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* AthrbGuidelines.cs --
+/* AthrbGuidelines.cs -- методические рекомендации / описания в базе ATHRB, поле 300
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,53 +21,54 @@ using ManagedIrbis.Mapping;
 
 #nullable enable
 
-namespace ManagedIrbis.Systematization
+namespace ManagedIrbis.Systematization;
+
+/// <summary>
+/// Методические рекомендации / описания в базе ATHRB.
+/// Поле 300.
+/// </summary>
+public sealed class AthrbGuidelines
 {
+    #region Properties
+
     /// <summary>
     /// Методические рекомендации / описания.
-    /// Поле 300.
+    /// Подполе a.
     /// </summary>
-    public sealed class AthrbGuidelines
+    [SubField ('a')]
+    public string? Guidelines { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Parse the field.
+    /// </summary>
+    public static AthrbGuidelines Parse
+        (
+            Field field
+        )
     {
-        #region Properties
+        Sure.NotNull (field);
 
-        /// <summary>
-        /// Методические рекомендации / описания.
-        /// Подполе a.
-        /// </summary>
-        [SubField ('a')]
-        public string? Guidelines { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Parse the field.
-        /// </summary>
-        public static AthrbGuidelines Parse
-            (
-                Field field
-            )
+        var result = new AthrbGuidelines
         {
-            var result = new AthrbGuidelines
-            {
-                Guidelines = field.GetFirstSubFieldValue ('a')
-            };
+            Guidelines = field.GetFirstSubFieldValue ('a')
+        };
 
-            return result;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Guidelines.ToVisibleString();
-        }
-
-        #endregion
+        return result;
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Guidelines.ToVisibleString();
+    }
+
+    #endregion
 }

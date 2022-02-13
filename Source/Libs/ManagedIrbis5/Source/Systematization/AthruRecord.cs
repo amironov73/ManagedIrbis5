@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* AthruRecord.cs --
+/* AthruRecord.cs -- запись в базе ATHRU
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -32,143 +32,142 @@ using ManagedIrbis.Mapping;
 
 #nullable enable
 
-namespace ManagedIrbis.Systematization
-{
-    /// <summary>
-    /// Запись в базе данных ATHRU.
-    /// </summary>
-    [XmlRoot ("athru")]
-    public sealed class AthruRecord
-        : IHandmadeSerializable,
+namespace ManagedIrbis.Systematization;
+
+/// <summary>
+/// Запись в базе данных ATHRU.
+/// </summary>
+[XmlRoot ("athru")]
+public sealed class AthruRecord
+    : IHandmadeSerializable,
         IVerifiable
+{
+    #region Properties
+
+    /// <summary>
+    /// Основной заголовок рубрики.
+    /// Поле 210.
+    /// </summary>
+    [Field (210)]
+    [XmlElement ("main-heading")]
+    [JsonPropertyName ("mainHeading")]
+    [Description ("Основной заголовок рубрики")]
+    public AthrbHeading? MainHeading { get; set; }
+
+    /// <summary>
+    /// Связанные заголовки рубрики.
+    /// Поле 510.
+    /// </summary>
+    [Field (510)]
+    [XmlElement ("linked-heading")]
+    [JsonPropertyName ("linkedHeading")]
+    [Description ("Связанные заголовки рубрики")]
+    public AthrbHeading[]? LinkedHeadings { get; set; }
+
+    /// <summary>
+    /// Методические указания / описания.
+    /// Поле 300.
+    /// </summary>
+    [Field (300)]
+    [XmlElement ("guidelines")]
+    [JsonPropertyName ("guidelines")]
+    [Description ("Методические указания")]
+    public AthrbGuidelines[]? Guidelines { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Разбор библиографической записи.
+    /// </summary>
+    public static AthrbRecord ParseRecord
+        (
+            Record record
+        )
     {
-        #region Properties
+        Sure.NotNull (record);
 
-        /// <summary>
-        /// Основной заголовок рубрики.
-        /// Поле 210.
-        /// </summary>
-        [Field (210)]
-        [XmlElement ("main-heading")]
-        [JsonPropertyName ("mainHeading")]
-        [Description ("Основной заголовок рубрики")]
-        public AthrbHeading? MainHeading { get; set; }
-
-        /// <summary>
-        /// Связанные заголовки рубрики.
-        /// Поле 510.
-        /// </summary>
-        [Field (510)]
-        [XmlElement ("linked-heading")]
-        [JsonPropertyName ("linkedHeading")]
-        [Description ("Связанные заголовки рубрики")]
-        public AthrbHeading[]? LinkedHeadings { get; set; }
-
-        /// <summary>
-        /// Методические указания / описания.
-        /// Поле 300.
-        /// </summary>
-        [Field (300)]
-        [XmlElement ("guidelines")]
-        [JsonPropertyName ("guidelines")]
-        [Description ("Методические указания")]
-        public AthrbGuidelines[]? Guidelines { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Разбор библиографической записи.
-        /// </summary>
-        public static AthrbRecord ParseRecord
-            (
-                Record record
-            )
+        var result = new AthrbRecord
         {
-            Sure.NotNull (record);
+            MainHeading = AthrbHeading.Parse (record.Fields.GetFirstField (210)),
 
-            var result = new AthrbRecord
-            {
-                MainHeading = AthrbHeading.Parse (record.Fields.GetFirstField (210)),
+            LinkedHeadings = record.Fields
+                .GetField (510)
+                .Select (AthrbHeading.Parse)
+                .NonNullItems()
+                .ToArray(),
 
-                LinkedHeadings = record.Fields
-                    .GetField (510)
-                    .Select (AthrbHeading.Parse)
-                    .NonNullItems()
-                    .ToArray(),
+            Guidelines = record.Fields
+                .GetField (300)
+                .Select (AthrbGuidelines.Parse)
+                .ToArray()
+        };
 
-                Guidelines = record.Fields
-                    .GetField (300)
-                    .Select (AthrbGuidelines.Parse)
-                    .ToArray()
-            };
-
-            return result;
-        }
-
-        /// <summary>
-        /// Преобразование информации в библиографическую запись.
-        /// </summary>
-        public Record ToRecord()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Sure.NotNull (reader);
-
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            Sure.NotNull (writer);
-
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<AthruRecord> (this, throwOnError);
-
-            verifier
-                .NotNull (MainHeading);
-
-            return verifier.Result;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return MainHeading.ToVisibleString();
-        }
-
-        #endregion
+        return result;
     }
+
+    /// <summary>
+    /// Преобразование информации в библиографическую запись.
+    /// </summary>
+    public Record ToRecord()
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<AthruRecord> (this, throwOnError);
+
+        verifier
+            .NotNull (MainHeading);
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return MainHeading.ToVisibleString();
+    }
+
+    #endregion
 }

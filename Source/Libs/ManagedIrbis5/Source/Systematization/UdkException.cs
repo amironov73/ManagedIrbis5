@@ -19,46 +19,45 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis.Systematization
+namespace ManagedIrbis.Systematization;
+
+/// <summary>
+/// Исключение, возникающее при работе с УДК.
+/// </summary>
+public sealed class UdkException
+    : IrbisException
 {
+    #region Construciton
+
     /// <summary>
-    /// Исключение, возникающее при работе с УДК.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class UdkException
-        : IrbisException
+    public UdkException()
     {
-        #region Construciton
+    }
 
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public UdkException()
-        {
-        }
+    #endregion
 
-        #endregion
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public UdkException
+        (
+            string message
+        )
+        : base (message)
+    {
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public UdkException
-            (
-                string message
-            )
-            : base (message)
-        {
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public UdkException
-            (
-                string message,
-                Exception innerException
-            )
-            : base (message, innerException)
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public UdkException
+        (
+            string message,
+            Exception innerException
+        )
+        : base (message, innerException)
+    {
     }
 }

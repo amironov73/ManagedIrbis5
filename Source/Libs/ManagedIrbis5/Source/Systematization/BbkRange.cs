@@ -23,159 +23,159 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Systematization
+namespace ManagedIrbis.Systematization;
+
+/// <summary>
+/// Интервал индексов ББК вроде такого:
+/// 84.3/5
+/// </summary>
+public sealed class BbkRange
 {
+    #region Properties
+
     /// <summary>
-    /// Интервал индексов ББК вроде такого:
-    /// 84.3/5
+    /// Начальное значение индекса.
     /// </summary>
-    public sealed class BbkRange
+    public string FirstIndex { get; }
+
+    /// <summary>
+    /// Оригинальное значение (со слешем).
+    /// </summary>
+    public string OriginalIndex { get; }
+
+    /// <summary>
+    /// Конечное значение индекса.
+    /// </summary>
+    public string LastIndex { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public BbkRange
+        (
+            string originalIndex
+        )
     {
-        #region Properties
+        OriginalIndex = originalIndex;
 
-        /// <summary>
-        /// Начальное значение индекса.
-        /// </summary>
-        public string FirstIndex { get; }
-
-        /// <summary>
-        /// Оригинальное значение (со слешем).
-        /// </summary>
-        public string OriginalIndex { get; }
-
-        /// <summary>
-        /// Конечное значение индекса.
-        /// </summary>
-        public string LastIndex { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BbkRange
-            (
-                string originalIndex
-            )
+        var slashPosition = OriginalIndex.IndexOf ('/');
+        if (slashPosition < 0)
         {
-            OriginalIndex = originalIndex;
+            FirstIndex = OriginalIndex;
+            LastIndex = OriginalIndex;
+            return;
+        }
 
-            var slashPosition = OriginalIndex.IndexOf ('/');
-            if (slashPosition < 0)
-            {
-                FirstIndex = OriginalIndex;
-                LastIndex = OriginalIndex;
-                return;
-            }
-
-            if (slashPosition == 0)
-            {
-                Magna.Error
-                    (
-                        "BbkRange::Constructor: "
-                        + "index can't start with /: "
-                        + originalIndex
-                    );
-
-                throw new BbkException
-                    (
-                        "Индекс не может начинаться со слеша"
-                    );
-            }
-
-            if (OriginalIndex.LastIndexOf ('/') != slashPosition)
-            {
-                Magna.Error
-                    (
-                        "BbkRange::Constructor: "
-                        + "more than one /: "
-                        + originalIndex
-                    );
-
-                throw new BbkException ("Индекс не может содержать "
-                                        + "больше одного слэша");
-            }
-
-            var totalLength = OriginalIndex.Length;
-            var suffixLength = totalLength - slashPosition - 1;
-            if (suffixLength == 0)
-            {
-                Magna.Error
-                    (
-                        "BbkRange::Constructor: "
-                        + "index can't end with /: "
-                        + originalIndex
-                    );
-
-                throw new BbkException ("Индекс не может "
-                                        + "заканчиваться слэшом");
-            }
-
-            var prefixLenght = slashPosition - suffixLength;
-            if (prefixLenght < 0)
-            {
-                Magna.Error
-                    (
-                        "BbkRange::Constructor: "
-                        + "prefix is shorter than suffix: "
-                        + originalIndex
-                    );
-
-                throw new BbkException ("Префикс короче суффикса!");
-            }
-
-            FirstIndex = OriginalIndex.Substring
+        if (slashPosition == 0)
+        {
+            Magna.Error
                 (
-                    0,
-                    slashPosition
+                    "BbkRange::Constructor: "
+                    + "index can't start with /: "
+                    + originalIndex
                 );
-            LastIndex = OriginalIndex.Substring
-                            (
-                                0,
-                                prefixLenght
-                            )
-                        + OriginalIndex.Substring
-                            (
-                                slashPosition + 1,
-                                suffixLength
-                            );
+
+            throw new BbkException
+                (
+                    "Индекс не может начинаться со слеша"
+                );
         }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Получение списка всех индексов из диапазона.
-        /// </summary>
-        public string[] GetAllIndexes()
+        if (OriginalIndex.LastIndexOf ('/') != slashPosition)
         {
-            var result = new List<string>();
+            Magna.Error
+                (
+                    "BbkRange::Constructor: "
+                    + "more than one /: "
+                    + originalIndex
+                );
 
-            NumberText first = FirstIndex;
-            NumberText last = LastIndex;
-            NumberText current = first.Clone();
-            while (current <= last)
-            {
-                result.Add (current.ToString());
-                current = current.Increment();
-            }
-
-            return result.ToArray();
+            throw new BbkException ("Индекс не может содержать "
+                                    + "больше одного слэша");
         }
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
+        var totalLength = OriginalIndex.Length;
+        var suffixLength = totalLength - slashPosition - 1;
+        if (suffixLength == 0)
         {
-            return OriginalIndex;
+            Magna.Error
+                (
+                    "BbkRange::Constructor: "
+                    + "index can't end with /: "
+                    + originalIndex
+                );
+
+            throw new BbkException ("Индекс не может "
+                                    + "заканчиваться слэшом");
         }
 
-        #endregion
+        var prefixLenght = slashPosition - suffixLength;
+        if (prefixLenght < 0)
+        {
+            Magna.Error
+                (
+                    "BbkRange::Constructor: "
+                    + "prefix is shorter than suffix: "
+                    + originalIndex
+                );
+
+            throw new BbkException ("Префикс короче суффикса!");
+        }
+
+        FirstIndex = OriginalIndex.Substring
+            (
+                0,
+                slashPosition
+            );
+
+        LastIndex = OriginalIndex.Substring
+            (
+                0,
+                prefixLenght
+            )
+            + OriginalIndex.Substring
+            (
+                slashPosition + 1,
+                suffixLength
+            );
     }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение списка всех индексов из диапазона.
+    /// </summary>
+    public string[] GetAllIndexes()
+    {
+        var result = new List<string>();
+
+        NumberText first = FirstIndex;
+        NumberText last = LastIndex;
+        NumberText current = first.Clone();
+        while (current <= last)
+        {
+            result.Add (current.ToString());
+            current = current.Increment();
+        }
+
+        return result.ToArray();
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return OriginalIndex;
+    }
+
+    #endregion
 }

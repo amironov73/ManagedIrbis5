@@ -21,46 +21,45 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Systematization
+namespace ManagedIrbis.Systematization;
+
+/// <summary>
+/// Исключение, возникающее при работе с ББК.
+/// </summary>
+public sealed class BbkException
+    : ArsMagnaException
 {
+    #region Construction
+
     /// <summary>
-    /// Исключение, возникающее при работе с ББК.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class BbkException
-        : ArsMagnaException
+    public BbkException()
     {
-        #region Construction
+    }
 
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public BbkException()
-        {
-        }
+    #endregion
 
-        #endregion
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public BbkException
+        (
+            string message
+        )
+        : base (message)
+    {
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public BbkException
-            (
-                string message
-            )
-            : base (message)
-        {
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public BbkException
-            (
-                string message,
-                Exception innerException
-            )
-            : base (message, innerException)
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public BbkException
+        (
+            string message,
+            Exception innerException
+        )
+        : base (message, innerException)
+    {
     }
 }

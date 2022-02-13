@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* AthrbHeading.cs --
+/* AthrbHeading.cs -- заголовок рубрики в базе ATHRB, поля 210 и 510
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,100 +21,99 @@ using ManagedIrbis.Mapping;
 
 #nullable enable
 
-namespace ManagedIrbis.Systematization
+namespace ManagedIrbis.Systematization;
+
+/// <summary>
+/// Заголовок рубрики в базе ATHRB.
+/// Поля 210 и 510.
+/// </summary>
+public sealed class AthrbHeading
 {
+    #region Properties
+
     /// <summary>
-    /// Заголовок рубрики в базе ATHRB.
-    /// Поля 210 и 510.
+    /// Основной заголовок рубрики.
+    /// Подполе a.
     /// </summary>
-    public sealed class AthrbHeading
+    [SubField ('a')]
+    public string? Heading { get; set; }
+
+    /// <summary>
+    /// Код рубрики.
+    /// Подполе b.
+    /// </summary>
+    [SubField ('b')]
+    public string? Code1 { get; set; }
+
+    /// <summary>
+    /// Код рубрики.
+    /// Подполе c.
+    /// </summary>
+    [SubField ('c')]
+    public string? Code2 { get; set; }
+
+    /// <summary>
+    /// Код рубрики.
+    /// Подполе d.
+    /// </summary>
+    [SubField ('d')]
+    public string? Code3 { get; set; }
+
+    /// <summary>
+    /// Код рубрики.
+    /// Подполе e.
+    /// </summary>
+    [SubField ('e')]
+    public string? Code4 { get; set; }
+
+    /// <summary>
+    /// Код рубрики.
+    /// Подполе f.
+    /// </summary>
+    [SubField ('f')]
+    public string? Code5 { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Parse the field.
+    /// </summary>
+    public static AthrbHeading? Parse
+        (
+            Field? field
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Основной заголовок рубрики.
-        /// Подполе a.
-        /// </summary>
-        [SubField ('a')]
-        public string? Heading { get; set; }
-
-        /// <summary>
-        /// Код рубрики.
-        /// Подполе b.
-        /// </summary>
-        [SubField ('b')]
-        public string? Code1 { get; set; }
-
-        /// <summary>
-        /// Код рубрики.
-        /// Подполе c.
-        /// </summary>
-        [SubField ('c')]
-        public string? Code2 { get; set; }
-
-        /// <summary>
-        /// Код рубрики.
-        /// Подполе d.
-        /// </summary>
-        [SubField ('d')]
-        public string? Code3 { get; set; }
-
-        /// <summary>
-        /// Код рубрики.
-        /// Подполе e.
-        /// </summary>
-        [SubField ('e')]
-        public string? Code4 { get; set; }
-
-        /// <summary>
-        /// Код рубрики.
-        /// Подполе f.
-        /// </summary>
-        [SubField ('f')]
-        public string? Code5 { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Parse the field.
-        /// </summary>
-        public static AthrbHeading? Parse
-            (
-                Field? field
-            )
+        if (ReferenceEquals (field, null))
         {
-            if (ReferenceEquals (field, null))
-            {
-                return null;
-            }
-
-            // TODO: реализовать эффективно
-
-            var result = new AthrbHeading
-            {
-                Heading = field.GetFirstSubFieldValue ('a'),
-                Code1 = field.GetFirstSubFieldValue ('b'),
-                Code2 = field.GetFirstSubFieldValue ('c'),
-                Code3 = field.GetFirstSubFieldValue ('d'),
-                Code4 = field.GetFirstSubFieldValue ('e'),
-                Code5 = field.GetFirstSubFieldValue ('f'),
-            };
-
-            return result;
+            return null;
         }
 
-        #endregion
+        // TODO: реализовать эффективно
 
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
+        var result = new AthrbHeading
         {
-            return Heading.ToVisibleString();
-        }
+            Heading = field.GetFirstSubFieldValue ('a'),
+            Code1 = field.GetFirstSubFieldValue ('b'),
+            Code2 = field.GetFirstSubFieldValue ('c'),
+            Code3 = field.GetFirstSubFieldValue ('d'),
+            Code4 = field.GetFirstSubFieldValue ('e'),
+            Code5 = field.GetFirstSubFieldValue ('f'),
+        };
 
-        #endregion
+        return result;
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Heading.ToVisibleString();
+    }
+
+    #endregion
 }
