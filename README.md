@@ -10,76 +10,74 @@ Currently supports:
 * .NET SDK 6.0.100 and higher
 
 ```c#
-using System;
-using System.Threading.Tasks;
-
+using System;                                   
 using ManagedIrbis;
-
 using static System.Console;
 
-#nullable enable
-
-internal class Program
+try
 {
-    private static async Task<int> Main(string[] args)
+    await using var connection = ConnectionFactory.Shared.CreateAsyncConnection();
+
+    connection.Host = args.Length == 0 ? "127.0.0.1" : args[0];
+    connection.Username = "librarian";
+    connection.Password = "secret";
+
+    var success = await connection.ConnectAsync();
+    if (!success)
     {
-        try
-        {
-            using var connection = ConnectionFactory.Shared.CreateAsyncConnection();
-
-            connection.Host = "127.0.0.1";
-            connection.Username = "librarian";
-            connection.Password = "secret";
-
-            var success = await connection.ConnectAsync();
-            if (!success)
-            {
-                Error.WriteLine ("Can't connect");
-                return 1;
-            }
-
-            WriteLine ("Successfully connected");
-
-            var version = await connection.GetServerVersionAsync();
-            WriteLine (version);
-
-            var processes = await connection.ListProcessesAsync();
-            WriteLine ("Processes: " + string.Join<ProcessInfo> (" | ", processes));
-
-            var maxMfn = await connection.GetMaxMfnAsync();
-            WriteLine ($"Max MFN={maxMfn}");
-
-            var found = await connection.SearchAsync (Search.Keyword("бетон$"));
-            WriteLine ("Found: " + string.Join<int>(", ", found));
-
-            await connection.NopAsync();
-            WriteLine ("NOP");
-
-            var record = await connection.ReadRecordAsync(1);
-            WriteLine ($"ReadRecord={record?.FM (200, 'a')}");
-
-            var formatted = await connection.FormatRecordAsync ("@brief", 1);
-            WriteLine ($"Formatted={formatted}");
-
-            var files = await connection.ListFilesAsync ("2.IBIS.*.mnu");
-            WriteLine ("Files: " + string.Join(",", files));
-
-            var fileText = await connection.ReadTextFileAsync ("2.IBIS.brief.pft");
-            WriteLine ($"BRIEF: {fileText}");
-            WriteLine();
-
-            await connection.DisposeAsync();
-            WriteLine ("Successfully disconnected");
-        }
-        catch (Exception exception)
-        {
-            WriteLine (exception);
-            return 1;
-        }
-
-        return 0;
+        // не получилось подключиться, жалуемся и завершаемся
+        await Error.WriteLineAsync ("Can't connect");
+        await Error.WriteLineAsync (IrbisException.GetErrorDescription (connection.LastError));
+        return 1;
     }
+
+    await Out.WriteLineAsync ("Successfully connected");
+
+    // Ищем все книги, автором которых является А. С. Пушкин
+    // Обратите внимание на двойные кавычки в тексте запроса
+    var found = await connection.SearchAsync
+        (
+            "\"A=ПУШКИН$\""
+        );
+
+    await Out.WriteLineAsync ($"Найдено записей: {found.Length}");
+
+    // Чтобы не распечатывать все найденные записи,
+    // отберем только 10 первых
+    foreach (var mfn in found[..10])
+    {
+        // Получаем запись из базы данных
+        var record = await connection.ReadRecordAsync (mfn);
+
+        if (record is not null)
+        {
+            // Извлекаем из записи интересующее нас поле и подполе
+            var title = record.FM (200, 'a');
+            await Out.WriteLineAsync ($"Title: {title}");
+        }
+
+        // Форматируем запись средствами сервера
+        var description = await connection.FormatRecordAsync
+            (
+                "@brief",
+                mfn
+            );
+        await Out.WriteLineAsync ($"Биб. описание: {description}");
+
+        await Out.WriteLineAsync(); // Добавляем пустую строку
+    }
+
+    // Отключаемся от сервера
+    await connection.DisposeAsync();
+    await Out.WriteLineAsync ("Successfully disconnected");
 }
+catch (Exception exception)
+{
+    await Error.WriteLineAsync (exception.ToString());
+    return 1;
+}
+
+return 0;
 ```
 
 ### Build status

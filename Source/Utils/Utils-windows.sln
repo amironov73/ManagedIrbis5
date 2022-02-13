@@ -1,27 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MachineInfo", "MachineInfo\MachineInfo.csproj", "{D523974C-EF3D-43A1-9541-533284714EC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MachineInfo", "MachineInfo\MachineInfo.csproj", "{D523974C-EF3D-43A1-9541-533284714EC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatchVersion", "PatchVersion\PatchVersion.csproj", "{069893E0-850B-4EC7-84CF-7BBF8C16AA91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PatchVersion", "PatchVersion\PatchVersion.csproj", "{069893E0-850B-4EC7-84CF-7BBF8C16AA91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniCall", "UniCall\UniCall.csproj", "{853C883A-B295-4ADF-9CCF-268C3DFB1CBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniCall", "UniCall\UniCall.csproj", "{853C883A-B295-4ADF-9CCF-268C3DFB1CBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bin2sharp", "Bin2sharp\Bin2sharp.csproj", "{9AC6E370-44A2-4638-90F0-CE6EA59CCA39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bin2sharp", "Bin2sharp\Bin2sharp.csproj", "{9AC6E370-44A2-4638-90F0-CE6EA59CCA39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsgBox", "MsgBox\MsgBox.csproj", "{57538117-23D1-4911-B0ED-85EE0AB233C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsgBox", "MsgBox\MsgBox.csproj", "{57538117-23D1-4911-B0ED-85EE0AB233C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deamble", "Deamble\Deamble.csproj", "{83133F5B-2183-48AA-8BC0-5B83E051E8BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deamble", "Deamble\Deamble.csproj", "{83133F5B-2183-48AA-8BC0-5B83E051E8BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PasteHtml", "PasteHtml\PasteHtml.csproj", "{E87826FE-42A5-42B2-B580-D2D644AF659C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D523974C-EF3D-43A1-9541-533284714EC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -48,5 +47,15 @@ Global
 		{83133F5B-2183-48AA-8BC0-5B83E051E8BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83133F5B-2183-48AA-8BC0-5B83E051E8BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83133F5B-2183-48AA-8BC0-5B83E051E8BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E87826FE-42A5-42B2-B580-D2D644AF659C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E87826FE-42A5-42B2-B580-D2D644AF659C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E87826FE-42A5-42B2-B580-D2D644AF659C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E87826FE-42A5-42B2-B580-D2D644AF659C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F807EDE8-28C5-4A5C-8580-ADBDBF5EFB24}
 	EndGlobalSection
 EndGlobal
