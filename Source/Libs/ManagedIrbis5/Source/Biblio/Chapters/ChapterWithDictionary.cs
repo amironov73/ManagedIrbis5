@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ChapterWithDictionary.cs --
+/* ChapterWithDictionary.cs -- глава со словарем
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -31,385 +31,383 @@ using ManagedIrbis.Reports;
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+///
+/// </summary>
+public class ChapterWithDictionary
+    : BiblioChapter
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Dictionary.
     /// </summary>
-    public class ChapterWithDictionary
-        : BiblioChapter
+    public BiblioDictionary Dictionary { get; private set; }
+
+    /// <summary>
+    /// Dictionary.
+    /// </summary>
+    public TermCollection Terms { get; private set; }
+
+    /// <summary>
+    /// OrderBy expression.
+    /// </summary>
+    [JsonPropertyName ("orderBy")]
+    public string? OrderByClause { get; set; }
+
+    /// <summary>
+    /// Select expression.
+    /// </summary>
+    [JsonPropertyName ("select")]
+    public string? SelectClause { get; set; }
+
+    /// <summary>
+    /// Extended format.
+    /// </summary>
+    [JsonPropertyName ("extended")]
+    public string? ExtendedFormat { get; set; }
+
+    /// <summary>
+    /// Entries to exclude.
+    /// </summary>
+    [JsonPropertyName ("exclude")]
+    public List<string> ExcludeList { get; private set; }
+
+    /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
+    public override bool IsServiceChapter => true;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ChapterWithDictionary()
     {
-        #region Properties
+        Dictionary = new BiblioDictionary();
+        Terms = new TermCollection();
+        ExcludeList = new List<string>();
+    }
 
-        /// <summary>
-        /// Dictionary.
-        /// </summary>
-        public BiblioDictionary Dictionary { get; private set; }
+    #endregion
 
-        /// <summary>
-        /// Dictionary.
-        /// </summary>
-        public TermCollection Terms { get; private set; }
+    #region Private members
 
-        /// <summary>
-        /// OrderBy expression.
-        /// </summary>
-        [JsonPropertyName("orderBy")]
-        public string? OrderByClause { get; set; }
+    private static char[] _charactersToTrim = { '[', ']' };
 
-        /// <summary>
-        /// Select expression.
-        /// </summary>
-        [JsonPropertyName("select")]
-        public string? SelectClause { get; set; }
+    private static char[] _lineDelimiters = { '\r', '\n', '\u001F' };
 
-        /// <summary>
-        /// Extended format.
-        /// </summary>
-        [JsonPropertyName("extended")]
-        public string? ExtendedFormat { get; set; }
+    private void _ChapterToTerms
+        (
+            BiblioContext context,
+            BiblioChapter chapter
+        )
+    {
+        var log = context.Log;
+        var processor = context.Processor.ThrowIfNull();
 
-        /// <summary>
-        /// Entries to exclude.
-        /// </summary>
-        [JsonPropertyName("exclude")]
-        public List<string> ExcludeList { get; private set; }
-
-        /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
-        public override bool IsServiceChapter => true;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ChapterWithDictionary()
+        var settings = Settings;
+        if (!ReferenceEquals (settings, null))
         {
-            Dictionary = new BiblioDictionary();
-            Terms = new TermCollection();
-            ExcludeList = new List<string>();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private static char[] _charactersToTrim = { '[', ']' };
-
-        private static char[] _lineDelimiters = { '\r', '\n', '\u001F' };
-
-        private void _ChapterToTerms
-            (
-                BiblioContext context,
-                BiblioChapter chapter
-            )
-        {
-            var log = context.Log;
-            var processor = context.Processor.ThrowIfNull();
-
-            var settings = Settings;
-            if (!ReferenceEquals(settings, null))
+            var pattern = settings.GetSetting ("chapterFilter");
+            if (!string.IsNullOrEmpty (pattern))
             {
-                var pattern = settings.GetSetting("chapterFilter");
-                if (!string.IsNullOrEmpty(pattern))
+                var title = chapter.Title;
+                if (!ReferenceEquals (title, null))
                 {
-                    var title = chapter.Title;
-                    if (!ReferenceEquals(title, null))
+                    if (!Regex.IsMatch (title, pattern))
                     {
-                        if (!Regex.IsMatch(title, pattern))
-                        {
-                            log.WriteLine("Filtered");
+                        log.WriteLine ("Filtered");
 
-                            return;
-                        }
+                        return;
                     }
                 }
             }
+        }
 
-            var items = chapter.Items;
-            if (!ReferenceEquals(items, null)
-                && items.Count != 0)
+        var items = chapter.Items;
+        if (!ReferenceEquals (items, null)
+            && items.Count != 0)
+        {
+            log.WriteLine ("Gather terms from chapter {0}", chapter);
+
+            var mfns = items.Select (i => i.Record?.Mfn ?? 0)
+                .Where (mfn => mfn > 0)
+                .ToArray();
+            if (mfns.Length == 0)
             {
-                log.WriteLine("Gather terms from chapter {0}", chapter);
+                goto DONE;
+            }
 
-                var mfns = items.Select(i => i.Record?.Mfn ?? 0)
-                    .Where(mfn => mfn > 0)
-                    .ToArray();
-                if (mfns.Length == 0)
+            if (mfns.Length != items.Count)
+            {
+                throw new IrbisException();
+            }
+
+            var termCount = 0;
+            using (var formatter
+                   = processor.AcquireFormatter (context))
+            {
+                var select = SelectClause.ThrowIfNull();
+                var format = processor.GetText (context, select).ThrowIfNull();
+                formatter.ParseProgram (format);
+
+                var formatted = formatter.FormatRecords (mfns);
+                var formatted2 = new string[mfns.Length];
+
+                var extendedFormat = ExtendedFormat;
+                if (!string.IsNullOrEmpty (extendedFormat))
                 {
-                    goto DONE;
-                }
-
-                if (mfns.Length != items.Count)
-                {
-                    throw new IrbisException();
-                }
-
-                var termCount = 0;
-                using (var formatter
-                    = processor.AcquireFormatter(context))
-                {
-                    var select = SelectClause.ThrowIfNull();
-                    var format = processor.GetText(context, select).ThrowIfNull();
-                    formatter.ParseProgram(format);
-
-                    var formatted = formatter.FormatRecords(mfns);
-                    var formatted2 = new string[mfns.Length];
-
-                    var extendedFormat = ExtendedFormat;
-                    if (!string.IsNullOrEmpty(extendedFormat))
-                    {
-                        extendedFormat = processor.GetText
+                    extendedFormat = processor.GetText
                             (
                                 context,
                                 extendedFormat
                             )
-                            .ThrowIfNull (nameof (extendedFormat));
-                        formatter.ParseProgram (extendedFormat);
-                        formatted2 = formatter.FormatRecords(mfns);
-                    }
+                        .ThrowIfNull (nameof (extendedFormat));
+                    formatter.ParseProgram (extendedFormat);
+                    formatted2 = formatter.FormatRecords (mfns);
+                }
 
-                    for (var i = 0; i < items.Count; i++)
+                for (var i = 0; i < items.Count; i++)
+                {
+                    if (!string.IsNullOrEmpty (formatted[i]))
                     {
-                        if (!string.IsNullOrEmpty(formatted[i]))
+                        var lines = formatted[i]
+                            .Split (_lineDelimiters)
+                            .TrimLines()
+                            .TrimLines (_charactersToTrim)
+                            .NonEmptyLines()
+                            .Distinct()
+                            .ToArray();
+                        var lines2 = new string[lines.Length];
+                        if (!string.IsNullOrEmpty (formatted2[i]))
                         {
-                            var lines = formatted[i]
-                                .Split(_lineDelimiters)
+                            lines2 = formatted2[i]
+                                .Split (_lineDelimiters)
                                 .TrimLines()
-                                .TrimLines(_charactersToTrim)
+                                .TrimLines (_charactersToTrim)
                                 .NonEmptyLines()
                                 .Distinct()
                                 .ToArray();
-                            var lines2 = new string[lines.Length];
-                            if (!string.IsNullOrEmpty(formatted2[i]))
-                            {
-                                lines2 = formatted2[i]
-                                    .Split(_lineDelimiters)
-                                    .TrimLines()
-                                    .TrimLines(_charactersToTrim)
-                                    .NonEmptyLines()
-                                    .Distinct()
-                                    .ToArray();
-                            }
-                            for (var j = 0; j < lines.Length && j < lines2.Length; j++)
-                            {
-                                var line1 = lines[j];
-                                var line2 = lines2[j];
-                                if (!ExcludeList.Contains(line1))
-                                {
-                                    var term = new BiblioTerm
-                                    {
-                                        Title = line1,
-                                        Extended = line2,
-                                        Dictionary = Terms,
-                                        Item = items[i]
-                                    };
-                                    Terms.Add(term);
-                                    termCount++;
-                                }
-                            }
                         }
-                    }
-                }
 
-                log.WriteLine(" done");
-                log.WriteLine("Term count: {0}", termCount);
-            }
-
-            DONE:
-
-            foreach (var child in chapter.Children)
-            {
-                _ChapterToTerms(context, child);
-            }
-        }
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region BiblioChapter members
-
-        /// <inheritdoc cref="BiblioChapter.BuildDictionary" />
-        public override void BuildDictionary
-            (
-                BiblioContext context
-            )
-        {
-            var log = context.Log;
-            log.WriteLine("Begin build dictionary {0}", this);
-
-            foreach (var term in Terms)
-            {
-                var title = term.Title.ThrowIfNull();
-                var item = term.Item;
-                if (ReferenceEquals(item, null))
-                {
-                    continue;
-                }
-                Dictionary.Add(title, item.Number);
-            }
-
-            log.WriteLine("End build dictionary {0}", this);
-        }
-
-        /// <inheritdoc cref="BiblioChapter.GatherTerms" />
-        public override void GatherTerms
-            (
-                BiblioContext context
-            )
-        {
-            var log = context.Log;
-            log.WriteLine("Begin gather terms {0}", this);
-
-            if (Active)
-            {
-                try
-                {
-                    var document = context.Document;
-
-                    foreach (var chapter in document.Chapters)
-                    {
-                        _ChapterToTerms(context, chapter);
-                    }
-
-                }
-                catch (Exception exception)
-                {
-                    log.WriteLine("Exception: {0}", exception);
-                    throw;
-                }
-            }
-
-
-            log.WriteLine("End gather terms {0}", this);
-        }
-
-        /// <inheritdoc cref="BiblioChapter.Render" />
-        public override void Render
-            (
-                BiblioContext context
-            )
-        {
-            var log = context.Log;
-            log.WriteLine("Begin render {0}", this);
-
-            var processor = context.Processor.ThrowIfNull();
-            var report = processor.Report.ThrowIfNull();
-
-            report.Body.Add(new NewPageBand());
-            RenderTitle(context);
-
-            var keys = Dictionary.Keys.ToArray();
-            var items = keys.Select(k => CleanOrder(k)).ToArray();
-            Array.Sort(items, keys); //-V3066
-            var builder = new StringBuilder();
-            foreach (var key in keys)
-            {
-                log.Write(".");
-                builder.Clear();
-                var entry = Dictionary[key];
-                var band = new ParagraphBand();
-                report.Body.Add(band);
-
-                var title = entry.Title;
-                if (string.IsNullOrEmpty(title))
-                {
-                    continue;
-                }
-                if (!string.IsNullOrEmpty(ExtendedFormat))
-                {
-                    var maxLength = 0;
-                    string? longest = null;
-                    foreach (var term in Terms)
-                    {
-                        if (term.Title == title)
+                        for (var j = 0; j < lines.Length && j < lines2.Length; j++)
                         {
-                            var candidate = term.Extended;
-                            if (!string.IsNullOrEmpty(candidate))
+                            var line1 = lines[j];
+                            var line2 = lines2[j];
+                            if (!ExcludeList.Contains (line1))
                             {
-                                var length = candidate.Length;
-                                if (length > maxLength)
+                                var term = new BiblioTerm
                                 {
-                                    maxLength = length;
-                                    longest = candidate;
-                                }
+                                    Title = line1,
+                                    Extended = line2,
+                                    Dictionary = Terms,
+                                    Item = items[i]
+                                };
+                                Terms.Add (term);
+                                termCount++;
                             }
                         }
-                    }
-                    if (!string.IsNullOrEmpty(longest)
-                        && longest.StartsWith(title))
-                    {
-                        title = longest;
-                    }
-                }
-
-                builder.Append(title);
-                builder.Append(" {\\i ");
-                var refs = entry.References
-                    .Where(item => item > 0)
-                    .ToArray();
-                Array.Sort(refs);
-                var first = true;
-                foreach (var reference in refs)
-                {
-                    if (!first)
-                    {
-                        builder.Append(", ");
-                    }
-                    builder.Append(reference);
-                    first = false;
-                }
-                builder.Append('}');
-
-                var description = builder.ToString();
-                if (!string.IsNullOrEmpty(description))
-                {
-                    // TODO implement properly!!!
-                    var encoded = RichText.Encode3(builder.ToString(), UnicodeRange.Russian, "\\f2");
-                    if (!string.IsNullOrEmpty(encoded))
-                    {
-                        band.Cells.Add(new SimpleTextCell(encoded));
                     }
                 }
             }
 
-            log.WriteLine(" done");
-
-            RenderChildren(context);
-
-            log.WriteLine("End render {0}", this);
+            log.WriteLine (" done");
+            log.WriteLine ("Term count: {0}", termCount);
         }
 
-        #endregion
+        DONE:
 
-        #region IVerifiable mebers
-
-        /// <inheritdoc cref="BiblioChapter.Verify" />
-        public override bool Verify
-            (
-                bool throwOnError
-            )
+        foreach (var child in chapter.Children)
         {
-            var verifier
-                = new Verifier<ChapterWithDictionary>(this, throwOnError);
+            _ChapterToTerms (context, child);
+        }
+    }
 
-            verifier
-                .Assert(base.Verify(throwOnError))
-                .VerifySubObject(Terms, "Dictionary");
+    #endregion
 
-            return verifier.Result;
+    #region Public methods
+
+    #endregion
+
+    #region BiblioChapter members
+
+    /// <inheritdoc cref="BiblioChapter.BuildDictionary" />
+    public override void BuildDictionary
+        (
+            BiblioContext context
+        )
+    {
+        var log = context.Log;
+        log.WriteLine ("Begin build dictionary {0}", this);
+
+        foreach (var term in Terms)
+        {
+            var title = term.Title.ThrowIfNull();
+            var item = term.Item;
+            if (ReferenceEquals (item, null))
+            {
+                continue;
+            }
+
+            Dictionary.Add (title, item.Number);
         }
 
-        #endregion
-
-        #region Object members
-
-        #endregion
+        log.WriteLine ("End build dictionary {0}", this);
     }
-}
 
+    /// <inheritdoc cref="BiblioChapter.GatherTerms" />
+    public override void GatherTerms
+        (
+            BiblioContext context
+        )
+    {
+        var log = context.Log;
+        log.WriteLine ("Begin gather terms {0}", this);
+
+        if (Active)
+        {
+            try
+            {
+                var document = context.Document;
+
+                foreach (var chapter in document.Chapters)
+                {
+                    _ChapterToTerms (context, chapter);
+                }
+            }
+            catch (Exception exception)
+            {
+                log.WriteLine ("Exception: {0}", exception);
+                throw;
+            }
+        }
+
+
+        log.WriteLine ("End gather terms {0}", this);
+    }
+
+    /// <inheritdoc cref="BiblioChapter.Render" />
+    public override void Render
+        (
+            BiblioContext context
+        )
+    {
+        var log = context.Log;
+        log.WriteLine ("Begin render {0}", this);
+
+        var processor = context.Processor.ThrowIfNull();
+        var report = processor.Report.ThrowIfNull();
+
+        report.Body.Add (new NewPageBand());
+        RenderTitle (context);
+
+        var keys = Dictionary.Keys.ToArray();
+        var items = keys.Select (k => CleanOrder (k)).ToArray();
+        Array.Sort (items, keys); //-V3066
+        var builder = new StringBuilder();
+        foreach (var key in keys)
+        {
+            log.Write (".");
+            builder.Clear();
+            var entry = Dictionary[key];
+            var band = new ParagraphBand();
+            report.Body.Add (band);
+
+            var title = entry.Title;
+            if (string.IsNullOrEmpty (title))
+            {
+                continue;
+            }
+
+            if (!string.IsNullOrEmpty (ExtendedFormat))
+            {
+                var maxLength = 0;
+                string? longest = null;
+                foreach (var term in Terms)
+                {
+                    if (term.Title == title)
+                    {
+                        var candidate = term.Extended;
+                        if (!string.IsNullOrEmpty (candidate))
+                        {
+                            var length = candidate.Length;
+                            if (length > maxLength)
+                            {
+                                maxLength = length;
+                                longest = candidate;
+                            }
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty (longest)
+                    && longest.StartsWith (title))
+                {
+                    title = longest;
+                }
+            }
+
+            builder.Append (title);
+            builder.Append (" {\\i ");
+            var refs = entry.References
+                .Where (item => item > 0)
+                .ToArray();
+            Array.Sort (refs);
+            var first = true;
+            foreach (var reference in refs)
+            {
+                if (!first)
+                {
+                    builder.Append (", ");
+                }
+
+                builder.Append (reference);
+                first = false;
+            }
+
+            builder.Append ('}');
+
+            var description = builder.ToString();
+            if (!string.IsNullOrEmpty (description))
+            {
+                // TODO implement properly!!!
+                var encoded = RichText.Encode3 (builder.ToString(), UnicodeRange.Russian, "\\f2");
+                if (!string.IsNullOrEmpty (encoded))
+                {
+                    band.Cells.Add (new SimpleTextCell (encoded));
+                }
+            }
+        }
+
+        log.WriteLine (" done");
+
+        RenderChildren (context);
+
+        log.WriteLine ("End render {0}", this);
+    }
+
+    #endregion
+
+    #region IVerifiable mebers
+
+    /// <inheritdoc cref="BiblioChapter.Verify" />
+    public override bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<ChapterWithDictionary> (this, throwOnError);
+
+        verifier
+            .Assert (base.Verify (throwOnError))
+            .VerifySubObject (Terms);
+
+        return verifier.Result;
+    }
+
+    #endregion
+}

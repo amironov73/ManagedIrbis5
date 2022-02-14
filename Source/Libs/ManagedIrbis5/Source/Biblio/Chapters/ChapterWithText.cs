@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ChapterWithText.cs --
+/* ChapterWithText.cs -- глава с фиксированным текстом
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,76 +25,71 @@ using ManagedIrbis.Reports;
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Глава с фиксированным текстом.
+/// </summary>
+public class ChapterWithText
+    : BiblioChapter
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Text.
     /// </summary>
-    public class ChapterWithText
-        : BiblioChapter
+    [JsonPropertyName ("text")]
+    public string? Text { get; set; }
+
+    /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
+    public override bool IsServiceChapter => true;
+
+    #endregion
+
+    #region Private members
+
+    private static readonly char[] _lineDelimiters = { '\r', '\n' };
+
+    #endregion
+
+    #region BiblioChapter members
+
+    /// <inheritdoc cref="BiblioChapter.Render" />
+    public override void Render
+        (
+            BiblioContext context
+        )
     {
-        #region Properties
+        var log = context.Log;
+        log.WriteLine ("Begin render {0}", this);
 
-        /// <summary>
-        /// Text.
-        /// </summary>
-        [JsonPropertyName("text")]
-        public string? Text { get; set; }
+        var processor = context.Processor.ThrowIfNull();
+        var report = processor.Report.ThrowIfNull();
 
-        /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
-        public override bool IsServiceChapter => true;
+        RenderTitle (context);
 
-        #endregion
-
-        #region Private members
-
-        private static readonly char[] _lineDelimiters = { '\r', '\n' };
-
-        #endregion
-
-        #region BiblioChapter members
-
-        /// <inheritdoc cref="BiblioChapter.Render" />
-        public override void Render
-            (
-                BiblioContext context
-            )
+        var text = Text;
+        if (!string.IsNullOrEmpty (text))
         {
-            var log = context.Log;
-            log.WriteLine("Begin render {0}", this);
-
-            var processor = context.Processor.ThrowIfNull();
-            var report = processor.Report.ThrowIfNull();
-
-            RenderTitle(context);
-
-            var text = Text;
-            if (!string.IsNullOrEmpty(text))
+            text = processor.GetText (context, text);
+            if (!string.IsNullOrEmpty (text))
             {
-                text = processor.GetText(context, text);
-                if (!string.IsNullOrEmpty(text))
+                var lines = text.Split (_lineDelimiters)
+                    .NonEmptyLines()
+                    .ToArray();
+                foreach (var line in lines)
                 {
-                    var lines = text.Split(_lineDelimiters)
-                        .NonEmptyLines()
-                        .ToArray();
-                    foreach (var line in lines)
-                    {
-                        ReportBand band = new ParagraphBand();
-                        report.Body.Add(band);
-                        band.Cells.Add(new SimpleTextCell(line));
-                    }
+                    ReportBand band = new ParagraphBand();
+                    report.Body.Add (band);
+                    band.Cells.Add (new SimpleTextCell (line));
                 }
             }
-
-            RenderChildren(context);
-
-            log.WriteLine("End render {0}", this);
         }
 
-        #endregion
+        RenderChildren (context);
 
-        #region Object members
-
-        #endregion
+        log.WriteLine ("End render {0}", this);
     }
+
+    #endregion
 }

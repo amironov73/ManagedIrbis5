@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* GroupingSubChapter.cs --
+/* GroupingSubChapter.cs -- глава с группировкой
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,309 +29,294 @@ using ManagedIrbis.Reports;
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Группировка документов, например, в авторские комплексы.
+/// </summary>
+public class GroupingSubChapter
+    : MenuSubChapter
 {
+    #region Nested classes
+
     /// <summary>
-    /// Группировка документов, например, в авторские комплексы.
+    /// Group of books.
     /// </summary>
-    public class GroupingSubChapter
-        : MenuSubChapter
+    public class BookGroup
+        : List<BiblioItem>
     {
-        #region Nested classes
-
-        /// <summary>
-        /// Group of books.
-        /// </summary>
-        public class BookGroup
-            : List<BiblioItem>
-        {
-            #region Properties
-
-            /// <summary>
-            /// Name.
-            /// </summary>
-            public string? Name { get; set; }
-
-            /// <summary>
-            /// Group for "other" records.
-            /// </summary>
-            public bool OtherGroup { get; set; }
-
-            #endregion
-        }
-
-        #endregion
-
         #region Properties
 
         /// <summary>
-        /// Groups.
+        /// Name.
         /// </summary>
-        public List<BookGroup> Groups { get; private set; }
-
-        #endregion
-
-        #region Construction
+        public string? Name { get; set; }
 
         /// <summary>
-        /// Constructor.
+        /// Group for "other" records.
         /// </summary>
-        public GroupingSubChapter()
-        {
-            Groups = new List<BookGroup>();
-        }
+        public bool OtherGroup { get; set; }
 
         #endregion
+    }
 
-        #region Private members
+    #endregion
 
-        private static readonly char[] _lineDelimiters = { '\r', '\n' };
+    #region Properties
 
-        private void _OrderGroup
-            (
-                BiblioContext context,
-                BookGroup bookGroup
-            )
+    /// <summary>
+    /// Groups.
+    /// </summary>
+    public List<BookGroup> Groups { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public GroupingSubChapter()
+    {
+        Groups = new List<BookGroup>();
+    }
+
+    #endregion
+
+    #region Private members
+
+    private static readonly char[] _lineDelimiters = { '\r', '\n' };
+
+    private void _OrderGroup
+        (
+            BiblioContext context,
+            BookGroup bookGroup
+        )
+    {
+        if (!bookGroup.OtherGroup)
         {
-            if (!bookGroup.OtherGroup)
-            {
-                var settings = Settings;
-                if (ReferenceEquals (settings, null))
-                {
-                    return;
-                }
-
-                var orderFormat = settings.GetSetting ("groupedOrder");
-                if (string.IsNullOrEmpty (orderFormat))
-                {
-                    return;
-                }
-
-                var processor = context.Processor.ThrowIfNull();
-                using var formatter = processor.AcquireFormatter (context);
-                orderFormat = processor.GetText (context, orderFormat).ThrowIfNull();
-                formatter.ParseProgram (orderFormat);
-
-                foreach (var item in bookGroup)
-                {
-                    var record = item.Record.ThrowIfNull();
-                    var order = formatter.FormatRecord (record.Mfn);
-
-                    //item.Order = RichText.Decode(order);
-                    item.Order = order;
-                }
-            }
-
-            var items = bookGroup
-                .OrderBy (item => item.Order)
-                .ToArray();
-            bookGroup.Clear();
-            bookGroup.AddRange (items);
-        }
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region BiblioChapter members
-
-        /// <inheritdoc cref="MenuSubChapter.BuildItems" />
-        public override void BuildItems
-            (
-                BiblioContext context
-            )
-        {
-            base.BuildItems (context);
-
-            var items = Items;
-            if (items is null)
-            {
-                return;
-            }
-
             var settings = Settings;
             if (ReferenceEquals (settings, null))
             {
                 return;
             }
 
-            var allValues = settings.GetSetting ("values");
-            if (string.IsNullOrEmpty (allValues))
+            var orderFormat = settings.GetSetting ("groupedOrder");
+            if (string.IsNullOrEmpty (orderFormat))
             {
                 return;
             }
-
-            var values = allValues.Split (';', StringSplitOptions.RemoveEmptyEntries);
-            if (values.Length == 0)
-            {
-                return;
-            }
-
-            var groupBy = settings.GetSetting ("groupBy");
-            if (string.IsNullOrEmpty (groupBy))
-            {
-                return;
-            }
-
-            var log = context.Log;
-            log.WriteLine ($"Begin grouping {this}");
-
-            var otherName = settings.GetSetting ("others");
-            var others = new BookGroup
-            {
-                Name = otherName,
-                OtherGroup = true
-            };
 
             var processor = context.Processor.ThrowIfNull();
-            using (var formatter = processor.AcquireFormatter (context))
+            using var formatter = processor.AcquireFormatter (context);
+            orderFormat = processor.GetText (context, orderFormat).ThrowIfNull();
+            formatter.ParseProgram (orderFormat);
+
+            foreach (var item in bookGroup)
             {
-                groupBy = processor.GetText (context, groupBy).ThrowIfNull();
-                formatter.ParseProgram (groupBy);
+                var record = item.Record.ThrowIfNull();
+                var order = formatter.FormatRecord (record.Mfn);
 
-                foreach (var item in items)
+                //item.Order = RichText.Decode(order);
+                item.Order = order;
+            }
+        }
+
+        var items = bookGroup
+            .OrderBy (item => item.Order)
+            .ToArray();
+        bookGroup.Clear();
+        bookGroup.AddRange (items);
+    }
+
+    #endregion
+
+    #region BiblioChapter members
+
+    /// <inheritdoc cref="MenuSubChapter.BuildItems" />
+    public override void BuildItems
+        (
+            BiblioContext context
+        )
+    {
+        base.BuildItems (context);
+
+        var items = Items;
+        if (items is null)
+        {
+            return;
+        }
+
+        var settings = Settings;
+        if (ReferenceEquals (settings, null))
+        {
+            return;
+        }
+
+        var allValues = settings.GetSetting ("values");
+        if (string.IsNullOrEmpty (allValues))
+        {
+            return;
+        }
+
+        var values = allValues.Split (';', StringSplitOptions.RemoveEmptyEntries);
+        if (values.Length == 0)
+        {
+            return;
+        }
+
+        var groupBy = settings.GetSetting ("groupBy");
+        if (string.IsNullOrEmpty (groupBy))
+        {
+            return;
+        }
+
+        var log = context.Log;
+        log.WriteLine ($"Begin grouping {this}");
+
+        var otherName = settings.GetSetting ("others");
+        var others = new BookGroup
+        {
+            Name = otherName,
+            OtherGroup = true
+        };
+
+        var processor = context.Processor.ThrowIfNull();
+        using (var formatter = processor.AcquireFormatter (context))
+        {
+            groupBy = processor.GetText (context, groupBy).ThrowIfNull();
+            formatter.ParseProgram (groupBy);
+
+            foreach (var item in items)
+            {
+                var record = item.Record.ThrowIfNull();
+                var text = formatter.FormatRecord (record.Mfn);
+                if (string.IsNullOrEmpty (text))
                 {
-                    var record = item.Record.ThrowIfNull();
-                    var text = formatter.FormatRecord (record.Mfn);
-                    if (string.IsNullOrEmpty (text))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    var keys = text.Trim()
-                        .Split (_lineDelimiters)
-                        .TrimLines()
-                        .NonEmptyLines()
-                        .Distinct()
-                        .ToArray();
-                    var found = false;
-                    foreach (var key in keys)
+                var keys = text.Trim()
+                    .Split (_lineDelimiters)
+                    .TrimLines()
+                    .NonEmptyLines()
+                    .Distinct()
+                    .ToArray();
+                var found = false;
+                foreach (var key in keys)
+                {
+                    var theKey = key;
+                    if (theKey.IsOneOf (values))
                     {
-                        var theKey = key;
-                        if (theKey.IsOneOf (values))
+                        var bookGroup = Groups.FirstOrDefault
+                            (
+                                g => g.Name == theKey
+                            );
+                        if (ReferenceEquals (bookGroup, null))
                         {
-                            var bookGroup = Groups.FirstOrDefault
-                                (
-                                    g => g.Name == theKey
-                                );
-                            if (ReferenceEquals (bookGroup, null))
+                            bookGroup = new BookGroup
                             {
-                                bookGroup = new BookGroup
-                                {
-                                    Name = theKey
-                                };
-                                Groups.Add (bookGroup);
-                            }
-
-                            bookGroup.Add (item);
-                            found = true;
-                            break;
+                                Name = theKey
+                            };
+                            Groups.Add (bookGroup);
                         }
+
+                        bookGroup.Add (item);
+                        found = true;
+                        break;
                     }
-
-                    if (!found)
-                    {
-                        others.Add (item);
-                    }
                 }
 
-                processor.ReleaseFormatter (context, formatter);
+                if (!found)
+                {
+                    others.Add (item);
+                }
             }
 
-            Groups = Groups.OrderBy (x => x.Name).ToList();
-            foreach (var bookGroup in Groups)
-            {
-                _OrderGroup (context, bookGroup);
-            }
+            processor.ReleaseFormatter (context, formatter);
+        }
 
-            _OrderGroup (context, others);
-            Groups.Add (others);
-
-            log.WriteLine ($"End grouping {this}");
-
-        } // method BuildItems
-
-        /// <inheritdoc cref="BiblioChapter.NumberItems" />
-        public override void NumberItems
-            (
-                BiblioContext context
-            )
+        Groups = Groups.OrderBy (x => x.Name).ToList();
+        foreach (var bookGroup in Groups)
         {
-            foreach (var bookGroup in Groups)
+            _OrderGroup (context, bookGroup);
+        }
+
+        _OrderGroup (context, others);
+        Groups.Add (others);
+
+        log.WriteLine ($"End grouping {this}");
+    }
+
+    /// <inheritdoc cref="BiblioChapter.NumberItems" />
+    public override void NumberItems
+        (
+            BiblioContext context
+        )
+    {
+        foreach (var bookGroup in Groups)
+        {
+            foreach (var item in bookGroup)
             {
-                foreach (var item in bookGroup)
-                {
-                    item.Number = ++context.ItemCount;
-                }
+                item.Number = ++context.ItemCount;
+            }
+        }
+    }
+
+    /// <inheritdoc cref="MenuSubChapter.Render" />
+    public override void Render
+        (
+            BiblioContext context
+        )
+    {
+        var log = context.Log;
+        log.WriteLine ($"Begin render {this}");
+
+        var processor = context.Processor.ThrowIfNull();
+        var report = processor.Report.ThrowIfNull();
+
+        RenderTitle (context);
+        foreach (var bookGroup in Groups)
+        {
+            var name = bookGroup.Name;
+            if (!string.IsNullOrEmpty (name))
+            {
+                log.WriteLine (name);
             }
 
-        } // method NumberItems
-
-        /// <inheritdoc cref="MenuSubChapter.Render" />
-        public override void Render
-            (
-                BiblioContext context
-            )
-        {
-            var log = context.Log;
-            log.WriteLine ($"Begin render {this}");
-
-            var processor = context.Processor.ThrowIfNull();
-            var report = processor.Report.ThrowIfNull();
-
-            RenderTitle (context);
-
-            foreach (var bookGroup in Groups)
+            report.Body.Add (new ParagraphBand());
+            var groupTitle = "{\\b " + name + "\\b0}";
+            if (!bookGroup.OtherGroup)
             {
-                var name = bookGroup.Name;
-                if (!string.IsNullOrEmpty (name))
-                {
-                    log.WriteLine (name);
-                }
+                groupTitle += " (автор, редактор, составитель)";
+            }
 
-                report.Body.Add (new ParagraphBand());
-                var groupTitle =
-                    "{\\b "
-                    + name
-                    + "\\b0}";
-                if (!bookGroup.OtherGroup)
-                {
-                    groupTitle += " (автор, редактор, составитель)";
-                }
+            var band = new ParagraphBand (groupTitle);
+            report.Body.Add (band);
+            report.Body.Add (new ParagraphBand());
 
-                ReportBand band = new ParagraphBand (groupTitle);
+            for (var i = 0; i < bookGroup.Count; i++)
+            {
+                log.Write (".");
+                var item = bookGroup[i];
+                var number = item.Number;
+                var description = item.Description.ThrowIfNull();
+
+                band = new ParagraphBand
+                    (
+                        number.ToInvariantString() + ") "
+                    );
                 report.Body.Add (band);
-                report.Body.Add (new ParagraphBand());
+                band.Cells.Add (new SimpleTextCell (description));
+            }
 
-                for (var i = 0; i < bookGroup.Count; i++)
-                {
-                    log.Write (".");
-                    var item = bookGroup[i];
-                    var number = item.Number;
-                    var description = item.Description.ThrowIfNull ();
+            log.WriteLine (" done");
+        }
 
-                    band = new ParagraphBand
-                        (
-                            number.ToInvariantString() + ") "
-                        );
-                    report.Body.Add (band);
-                    band.Cells.Add (new SimpleTextCell (description));
-                }
+        RenderDuplicates (context);
 
-                log.WriteLine (" done");
+        log.WriteLine ($"End render {this}");
+    }
 
-            } // foreach
-
-            RenderDuplicates (context);
-
-            log.WriteLine ($"End render {this}");
-
-        } // method Render
-
-        #endregion
-
-    } // class GroupingSubChapter
-
-} // namespace ManagedIrbis.Biblio
+    #endregion
+}

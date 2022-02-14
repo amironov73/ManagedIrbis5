@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* MixedChapter.cs --
+/* MixedChapter.cs -- смешанная глава
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,212 +24,201 @@ using ManagedIrbis.Fields;
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Смешанная глава.
+/// </summary>
+public class MixedChapter
+    : CumulatingSubChapter
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public class MixedChapter
-        : CumulatingSubChapter
+    #region BiblioChapter members
+
+    /// <inheritdoc cref="MenuSubChapter.BuildItems" />
+    public override void BuildItems
+        (
+            BiblioContext context
+        )
     {
-        #region BiblioChapter members
-
-        /// <inheritdoc cref="MenuSubChapter.BuildItems" />
-        public override void BuildItems
-            (
-                BiblioContext context
-            )
+        if (Records.Count == 0)
         {
-            if (Records.Count == 0)
+            return;
+        }
+
+        var log = context.Log;
+
+        log.WriteLine ("Begin build items {0}", this);
+        Items = new ItemCollection();
+
+        var settings = Settings;
+        if (ReferenceEquals (settings, null))
+        {
+            return;
+        }
+
+        var processor = context.Processor
+            .ThrowIfNull ("context.Processor");
+        var provider = context.Provider;
+        var nonSpec = new List<Record>();
+
+        var generalFormat = settings.GetSetting ("general");
+        var orderFormat = settings.GetSetting ("order");
+        var partFormat = settings.GetSetting ("format");
+        var normalFormat = settings.GetSetting ("normal");
+        if (string.IsNullOrEmpty (generalFormat)
+            || string.IsNullOrEmpty (orderFormat)
+            || string.IsNullOrEmpty (partFormat)
+            || string.IsNullOrEmpty (normalFormat))
+        {
+            return;
+        }
+
+        using (var formatter = processor.AcquireFormatter (context))
+        {
+            generalFormat = processor.GetText (context, generalFormat).ThrowIfNull();
+            formatter.ParseProgram (generalFormat);
+
+            Record? record;
+            for (var i = 0; i < Records.Count; i++)
             {
-                return;
-            }
-
-            var log = context.Log;
-
-            log.WriteLine("Begin build items {0}", this);
-            Items = new ItemCollection();
-
-            var settings = Settings;
-            if (ReferenceEquals(settings, null))
-            {
-                return;
-            }
-
-            var processor = context.Processor
-                .ThrowIfNull("context.Processor");
-            var provider = context.Provider;
-            var nonSpec = new List<Record>();
-
-            var generalFormat = settings.GetSetting("general");
-            var orderFormat = settings.GetSetting("order");
-            var partFormat = settings.GetSetting("format");
-            var normalFormat = settings.GetSetting("normal");
-            if (string.IsNullOrEmpty(generalFormat)
-                || string.IsNullOrEmpty(orderFormat)
-                || string.IsNullOrEmpty(partFormat)
-                || string.IsNullOrEmpty(normalFormat))
-            {
-                return;
-            }
-
-            using (var formatter = processor.AcquireFormatter(context))
-            {
-                generalFormat = processor.GetText(context, generalFormat)
-                    .ThrowIfNull("generalFormat");
-                formatter.ParseProgram(generalFormat);
-
-                Record? record;
-                for (var i = 0; i < Records.Count; i++)
+                record = Records[i];
+                var bookInfo = new BookInfo (provider, record);
+                if (!bookInfo.Worksheet.SameString ("SPEC"))
                 {
-                    record = Records[i];
-                    var bookInfo = new BookInfo(provider, record);
-                    if (!bookInfo.Worksheet.SameString( "SPEC"))
-                    {
-                        nonSpec.Add(record);
-                        continue;
-                    }
+                    nonSpec.Add (record);
+                    continue;
+                }
 
-                    log.Write("o");
-                    var header = formatter.FormatRecord(record.Mfn);
-                    if (!string.IsNullOrEmpty(header))
-                    {
-                        header = header.Trim();
-                    }
+                log.Write ("o");
+                var header = formatter.FormatRecord (record.Mfn);
+                if (!string.IsNullOrEmpty (header))
+                {
+                    header = header.Trim();
+                }
 
-                    var item = new BiblioItem
+                var item = new BiblioItem
+                {
+                    Record = record,
+                    Chapter = this
+                };
+
+                var bookGroup = Groups.FirstOrDefault
+                    (
+                        g => g.Header == header
+                    );
+                if (ReferenceEquals (bookGroup, null))
+                {
+                    bookGroup = new Multivolume
                     {
-                        Record = record,
-                        Chapter = this
+                        Header = header
                     };
-
-                    var bookGroup = Groups.FirstOrDefault
-                        (
-                            g => g.Header == header
-                        );
-                    if (ReferenceEquals(bookGroup, null))
-                    {
-                        bookGroup = new Multivolume
-                        {
-                            Header = header
-                        };
-                        Groups.Add(bookGroup);
-                    }
-                    bookGroup.Add(item);
+                    Groups.Add (bookGroup);
                 }
 
-                partFormat = processor.GetText(context, partFormat)
-                    .ThrowIfNull("partFormat");
-                formatter.ParseProgram(partFormat);
+                bookGroup.Add (item);
+            }
 
-                foreach (var grp in Groups)
+            partFormat = processor.GetText (context, partFormat).ThrowIfNull();
+            formatter.ParseProgram (partFormat);
+
+            foreach (var grp in Groups)
+            {
+                foreach (var item in grp)
                 {
-                    foreach (var item in grp)
-                    {
-                        log.Write(":");
+                    log.Write (":");
 
-                        var description = formatter.FormatRecord(item.Record)
-                            .TrimEnd('\u001F');
-
-                        // TODO handle string.IsNullOrEmpty(description)
-
-                        description = BiblioUtility.AddTrailingDot(description);
-                        item.Description = description;
-                    }
-                }
-
-                normalFormat = processor.GetText(context, normalFormat)
-                    .ThrowIfNull("normalFormat");
-                formatter.ParseProgram(normalFormat);
-
-                foreach (var rec in nonSpec)
-                {
-                    log.Write(".");
-                    var description = formatter.FormatRecord(rec)
-                        .TrimEnd('\u001F');
+                    var description = formatter.FormatRecord (item.Record)
+                        .TrimEnd ('\u001F');
 
                     // TODO handle string.IsNullOrEmpty(description)
 
-                    description = BiblioUtility.AddTrailingDot(description);
+                    description = BiblioUtility.AddTrailingDot (description);
+                    item.Description = description;
+                }
+            }
 
-                    var item = new BiblioItem
-                    {
-                        Chapter = this,
-                        Record = rec,
-                        Description = description
-                    };
-                    var bookGroup = new Multivolume
-                    {
-                        Header = description,
-                        Single = true
-                    };
-                    Groups.Add(bookGroup);
-                    bookGroup.Add(item);
+            normalFormat = processor.GetText (context, normalFormat).ThrowIfNull();
+            formatter.ParseProgram (normalFormat);
+
+            foreach (var rec in nonSpec)
+            {
+                log.Write (".");
+                var description = formatter.FormatRecord (rec)
+                    .TrimEnd ('\u001F');
+
+                // TODO handle string.IsNullOrEmpty(description)
+
+                description = BiblioUtility.AddTrailingDot (description);
+
+                var item = new BiblioItem
+                {
+                    Chapter = this,
+                    Record = rec,
+                    Description = description
+                };
+                var bookGroup = new Multivolume
+                {
+                    Header = description,
+                    Single = true
+                };
+                Groups.Add (bookGroup);
+                bookGroup.Add (item);
+            }
+
+            orderFormat = processor.GetText (context, orderFormat)
+                .ThrowIfNull ("orderFormat");
+            formatter.ParseProgram (orderFormat);
+
+            foreach (var bookGroup in Groups)
+            {
+                record = bookGroup.First().Record.ThrowIfNull ();
+                var order = formatter.FormatRecord (record.Mfn);
+                if (!string.IsNullOrEmpty (order))
+                {
+                    order = order.Trim();
                 }
 
-                orderFormat = processor.GetText(context, orderFormat)
-                    .ThrowIfNull("orderFormat");
-                formatter.ParseProgram(orderFormat);
+                order = CleanOrder (order);
+                bookGroup.Order = order;
 
-                foreach (var bookGroup in Groups)
+                if (!bookGroup.Single)
                 {
-                    record = bookGroup.First().Record
-                        .ThrowIfNull("bookGroup.Record");
-                    var order = formatter.FormatRecord(record.Mfn);
-                    if (!string.IsNullOrEmpty(order))
+                    foreach (var item in bookGroup)
                     {
-                        order = order.Trim();
-                    }
-
-                    order = CleanOrder(order);
-
-                    bookGroup.Order = order;
-
-                    if (!bookGroup.Single)
-                    {
-                        foreach (var item in bookGroup)
+                        if (item.Record is not null)
                         {
-                            if (item.Record is not null)
+                            order = formatter.FormatRecord (item.Record.Mfn);
+                            if (!string.IsNullOrEmpty (order))
                             {
-                                order = formatter.FormatRecord(item.Record.Mfn);
-                                if (!string.IsNullOrEmpty(order))
-                                {
-                                    order = order.Trim();
-                                }
-
-                                item.Order = order;
+                                order = order.Trim();
                             }
+
+                            item.Order = order;
                         }
                     }
                 }
-
-                processor.ReleaseFormatter(context, formatter);
             }
 
-            Groups = Groups.OrderBy(x => x.Order).ToList();
-            Items.Clear();
-            foreach (var bookGroup in Groups)
-            {
-                OrderGroup(bookGroup);
-                var item = new BiblioItem
-                {
-                    Description = bookGroup.Header,
-                    Record = new Record(), // TODO ???
-                    UserData = bookGroup
-                };
-                bookGroup.Item = item;
-                Items.Add(item);
-            }
-
-            log.WriteLine("End build items {0}", this);
+            processor.ReleaseFormatter (context, formatter);
         }
 
+        Groups = Groups.OrderBy (x => x.Order).ToList();
+        Items.Clear();
+        foreach (var bookGroup in Groups)
+        {
+            OrderGroup (bookGroup);
+            var item = new BiblioItem
+            {
+                Description = bookGroup.Header,
+                Record = new Record(), // TODO ???
+                UserData = bookGroup
+            };
+            bookGroup.Item = item;
+            Items.Add (item);
+        }
 
-        #endregion
-
-        #region Object members
-
-        #endregion
+        log.WriteLine ("End build items {0}", this);
     }
-}
 
+    #endregion
+}

@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* CumulatingSubChapter.cs --
+/* CumulatingSubChapter.cs -- сводное описание многотомного издания
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,264 +27,261 @@ using ManagedIrbis.Reports;
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Сводное описание многотомного издания.
+/// </summary>
+public class CumulatingSubChapter
+    : MenuSubChapter
 {
+    #region Nested classes
+
     /// <summary>
-    /// Сводное описание многотомного издания.
+    /// Multivolume document.
     /// </summary>
-    public class CumulatingSubChapter
-        : MenuSubChapter
+    public class Multivolume
+        : List<BiblioItem>
     {
-        #region Nested classes
-
-        /// <summary>
-        /// Multivolume document.
-        /// </summary>
-        public class Multivolume
-            : List<BiblioItem>
-        {
-            #region Properties
-
-            /// <summary>
-            /// Header part.
-            /// </summary>
-            public string? Header { get; set; }
-
-            /// <summary>
-            /// Order
-            /// </summary>
-            public string? Order { get; set; }
-
-            /// <summary>
-            /// Item.
-            /// </summary>
-            public BiblioItem? Item { get; set; }
-
-            /// <summary>
-            /// Single.
-            /// </summary>
-            public bool Single { get; set; }
-
-            #endregion
-        }
-
-        #endregion
-
         #region Properties
 
         /// <summary>
-        /// Groups.
+        /// Header part.
         /// </summary>
-        public List<Multivolume> Groups { get; protected set; }
-
-        #endregion
-
-        #region Construction
+        public string? Header { get; set; }
 
         /// <summary>
-        /// Constructor.
+        /// Order
         /// </summary>
-        public CumulatingSubChapter()
-        {
-            Groups = new List<Multivolume>();
-        }
-
-        #endregion
-
-        #region Private members
-
-        //private static char[] _lineDelimiters = { '\r', '\n' };
+        public string? Order { get; set; }
 
         /// <summary>
-        ///  Order the group.
+        /// Item.
         /// </summary>
-        protected static void OrderGroup
-            (
-                Multivolume bookGroup
-            )
-        {
-            var items = bookGroup
-                .OrderBy(item => item.Order)
-                .ToArray();
-            bookGroup.Clear();
-            bookGroup.AddRange(items);
-        }
+        public BiblioItem? Item { get; set; }
+
+        /// <summary>
+        /// Single.
+        /// </summary>
+        public bool Single { get; set; }
 
         #endregion
+    }
 
-        #region BiblioChapter members
+    #endregion
 
-        /// <inheritdoc cref="MenuSubChapter.BuildItems" />
-        public override void BuildItems
-            (
-                BiblioContext context
-            )
+    #region Properties
+
+    /// <summary>
+    /// Groups.
+    /// </summary>
+    public List<Multivolume> Groups { get; protected set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public CumulatingSubChapter()
+    {
+        Groups = new List<Multivolume>();
+    }
+
+    #endregion
+
+    #region Private members
+
+    //private static char[] _lineDelimiters = { '\r', '\n' };
+
+    /// <summary>
+    ///  Order the group.
+    /// </summary>
+    protected static void OrderGroup
+        (
+            Multivolume bookGroup
+        )
+    {
+        var items = bookGroup
+            .OrderBy (item => item.Order)
+            .ToArray();
+        bookGroup.Clear();
+        bookGroup.AddRange (items);
+    }
+
+    #endregion
+
+    #region BiblioChapter members
+
+    /// <inheritdoc cref="MenuSubChapter.BuildItems" />
+    public override void BuildItems
+        (
+            BiblioContext context
+        )
+    {
+        base.BuildItems (context);
+
+        var items = Items;
+        if (items is null)
         {
-            base.BuildItems(context);
-
-            var items = Items;
-            if (items is null)
-            {
-                return;
-            }
-
-            var settings = Settings;
-            if (ReferenceEquals(settings, null))
-            {
-                return;
-            }
-
-            var generalFormat = settings.GetSetting("general");
-            var orderFormat = settings.GetSetting("order");
-            if (string.IsNullOrEmpty(generalFormat)
-                || string.IsNullOrEmpty(orderFormat))
-            {
-                return;
-            }
-
-            var log = context.Log;
-            log.WriteLine("Begin grouping {0}", this);
-
-            var processor = context.Processor.ThrowIfNull();
-            using (var formatter = processor.AcquireFormatter(context))
-            {
-                generalFormat = processor.GetText(context, generalFormat).ThrowIfNull();
-                formatter.ParseProgram(generalFormat);
-
-                foreach (var item in items)
-                {
-                    var record = item.Record.ThrowIfNull();
-                    var header = formatter.FormatRecord(record.Mfn);
-                    if (!string.IsNullOrEmpty(header))
-                    {
-                        header = header.Trim();
-                    }
-                    var bookGroup = Groups.FirstOrDefault
-                        (
-                            g => g.Header == header
-                        );
-                    if (ReferenceEquals(bookGroup, null))
-                    {
-                        bookGroup = new Multivolume
-                        {
-                            Header = header
-                        };
-                        Groups.Add(bookGroup);
-                    }
-                    bookGroup.Add(item);
-                }
-
-                orderFormat = processor.GetText(context, orderFormat).ThrowIfNull();
-                formatter.ParseProgram(orderFormat);
-
-                foreach (var bookGroup in Groups)
-                {
-                    var record = bookGroup.First().Record.ThrowIfNull();
-                    var order = formatter.FormatRecord(record.Mfn);
-                    if (!string.IsNullOrEmpty(order))
-                    {
-                        order = order.Trim();
-                        order = CleanOrder(order);
-                    }
-                    bookGroup.Order = order;
-                }
-
-                processor.ReleaseFormatter(context, formatter);
-            }
-
-            Groups = Groups.OrderBy(x => x.Order).ToList();
-            items.Clear();
-            foreach (var bookGroup in Groups)
-            {
-                OrderGroup(bookGroup);
-                var item = new BiblioItem
-                {
-                    Description = bookGroup.Header,
-                    Record = new Record(), // TODO ???
-                    UserData = bookGroup
-                };
-                bookGroup.Item = item;
-                items.Add(item);
-            }
-
-
-            log.WriteLine("End grouping {0}", this);
+            return;
         }
 
-        /// <inheritdoc cref="MenuSubChapter.Render" />
-        public override void Render
-            (
-                BiblioContext context
-            )
+        var settings = Settings;
+        if (ReferenceEquals (settings, null))
         {
-            var log = context.Log;
-            log.WriteLine($"Begin render {this}");
+            return;
+        }
 
-            var processor = context.Processor.ThrowIfNull();
-            var report = processor.Report.ThrowIfNull();
+        var generalFormat = settings.GetSetting ("general");
+        var orderFormat = settings.GetSetting ("order");
+        if (string.IsNullOrEmpty (generalFormat)
+            || string.IsNullOrEmpty (orderFormat))
+        {
+            return;
+        }
 
-            var showOrder = false;
-                // TODO: implement
-                /* context.Document.CommonSettings.Value<bool?>("showOrder") ?? false; */
+        var log = context.Log;
+        log.WriteLine ("Begin grouping {0}", this);
 
-            RenderTitle(context);
+        var processor = context.Processor.ThrowIfNull();
+        using (var formatter = processor.AcquireFormatter (context))
+        {
+            generalFormat = processor.GetText (context, generalFormat).ThrowIfNull();
+            formatter.ParseProgram (generalFormat);
 
-            foreach (var bookGroup in Groups)
+            foreach (var item in items)
             {
-                var header = bookGroup.Header;
-                if (!string.IsNullOrEmpty(header))
+                var record = item.Record.ThrowIfNull();
+                var header = formatter.FormatRecord (record.Mfn);
+                if (!string.IsNullOrEmpty (header))
                 {
-                    log.WriteLine(header);
+                    header = header.Trim();
                 }
 
-                header = RichText.Encode3(header, UnicodeRange.Russian, "\\f2");
-
-                report.Body.Add(new ParagraphBand());
-                var item = bookGroup.Item.ThrowIfNull();
-                var number = item.Number;
-                ReportBand band = new ParagraphBand
+                var bookGroup = Groups.FirstOrDefault
                     (
-                        number.ToInvariantString() + ".\\~\\~"
-                        + header
+                        g => g.Header == header
                     );
-                report.Body.Add(band);
-
-                // Для отладки: проверить упорядочение
-                if (showOrder)
+                if (ReferenceEquals (bookGroup, null))
                 {
-                    if (!string.IsNullOrEmpty(bookGroup.Order))
+                    bookGroup = new Multivolume
                     {
-                        band = new ParagraphBand(bookGroup.Order);
-                        report.Body.Add(band);
-                        report.Body.Add(new ParagraphBand());
-                    }
+                        Header = header
+                    };
+                    Groups.Add (bookGroup);
                 }
 
-                if (!bookGroup.Single)
-                {
-                    for (var i = 0; i < bookGroup.Count; i++)
-                    {
-                        log.Write(".");
-                        item = bookGroup[i];
-                        var description = item.Description.ThrowIfNull();
-                        description = RichText.Encode3 ( description, UnicodeRange.Russian, "\\f2" )
-                            .ThrowIfNull();
-                        band = new ParagraphBand(description);
-                        report.Body.Add(band);
-                    }
-                }
-
-                log.WriteLine(" done");
+                bookGroup.Add (item);
             }
 
-            RenderDuplicates(context);
+            orderFormat = processor.GetText (context, orderFormat).ThrowIfNull();
+            formatter.ParseProgram (orderFormat);
 
-            log.WriteLine($"End render {this}");
+            foreach (var bookGroup in Groups)
+            {
+                var record = bookGroup.First().Record.ThrowIfNull();
+                var order = formatter.FormatRecord (record.Mfn);
+                if (!string.IsNullOrEmpty (order))
+                {
+                    order = order.Trim();
+                    order = CleanOrder (order);
+                }
 
-        } // method Render
+                bookGroup.Order = order;
+            }
 
-        #endregion
+            processor.ReleaseFormatter (context, formatter);
+        }
 
-    } // class CumulatingSubChapter
+        Groups = Groups.OrderBy (x => x.Order).ToList();
+        items.Clear();
+        foreach (var bookGroup in Groups)
+        {
+            OrderGroup (bookGroup);
+            var item = new BiblioItem
+            {
+                Description = bookGroup.Header,
+                Record = new Record(), // TODO ???
+                UserData = bookGroup
+            };
+            bookGroup.Item = item;
+            items.Add (item);
+        }
 
-} // namespace ManagedIrbis.Biblio
+        log.WriteLine ("End grouping {0}", this);
+    }
+
+    /// <inheritdoc cref="MenuSubChapter.Render" />
+    public override void Render
+        (
+            BiblioContext context
+        )
+    {
+        var log = context.Log;
+        log.WriteLine ($"Begin render {this}");
+
+        var processor = context.Processor.ThrowIfNull();
+        var report = processor.Report.ThrowIfNull();
+
+        var showOrder = false;
+
+        // TODO: implement
+        /* context.Document.CommonSettings.Value<bool?>("showOrder") ?? false; */
+
+        RenderTitle (context);
+        foreach (var bookGroup in Groups)
+        {
+            var header = bookGroup.Header;
+            if (!string.IsNullOrEmpty (header))
+            {
+                log.WriteLine (header);
+            }
+
+            header = RichText.Encode3 (header, UnicodeRange.Russian, "\\f2");
+
+            report.Body.Add (new ParagraphBand());
+            var item = bookGroup.Item.ThrowIfNull();
+            var number = item.Number;
+            ReportBand band = new ParagraphBand
+                (
+                    number.ToInvariantString() + ".\\~\\~" + header
+                );
+            report.Body.Add (band);
+
+            // Для отладки: проверить упорядочение
+            if (showOrder)
+            {
+                if (!string.IsNullOrEmpty (bookGroup.Order))
+                {
+                    band = new ParagraphBand (bookGroup.Order);
+                    report.Body.Add (band);
+                    report.Body.Add (new ParagraphBand());
+                }
+            }
+
+            if (!bookGroup.Single)
+            {
+                for (var i = 0; i < bookGroup.Count; i++)
+                {
+                    log.Write (".");
+                    item = bookGroup[i];
+                    var description = item.Description.ThrowIfNull();
+                    description = RichText.Encode3 (description, UnicodeRange.Russian, "\\f2")
+                        .ThrowIfNull();
+                    band = new ParagraphBand (description);
+                    report.Body.Add (band);
+                }
+            }
+
+            log.WriteLine (" done");
+        }
+
+        RenderDuplicates (context);
+
+        log.WriteLine ($"End render {this}");
+    }
+
+    #endregion
+}

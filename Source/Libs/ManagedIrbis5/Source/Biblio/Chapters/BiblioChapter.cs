@@ -20,426 +20,424 @@ using System.Text;
 using System.Text.Json.Serialization;
 
 using AM;
+
 using ManagedIrbis.Reports;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Базовый класс для глав библиографического указателя.
+/// </summary>
+public class BiblioChapter
+    : IAttributable,
+    IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    /// Базовый класс для глав библиографического указателя.
+    /// Whether the chapter is active?
     /// </summary>
-    public class BiblioChapter
-        : IAttributable,
-        IVerifiable
+    [JsonPropertyName ("active")]
+    public bool Active { get; set; }
+
+    /// <inheritdoc cref="IAttributable.Attributes" />
+    [JsonPropertyName ("attr")]
+    public ReportAttributes Attributes { get; private set; }
+
+    /// <summary>
+    /// Children chapters.
+    /// </summary>
+    [JsonPropertyName ("children")]
+    public ChapterCollection Children { get; private set; }
+
+    /// <summary>
+    /// Title of the chapter.
+    /// </summary>
+    [JsonPropertyName ("title")]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// Parent chapter (if any).
+    /// </summary>
+    [JsonIgnore]
+    public BiblioChapter? Parent { get; internal set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    [JsonIgnore]
+    public ItemCollection? Items { get; protected internal set; }
+
+    /// <summary>
+    /// Whether the chapter is for service purpose?
+    /// </summary>
+    [JsonIgnore]
+    public virtual bool IsServiceChapter => false;
+
+    /// <summary>
+    /// Special settings associated with the chapter
+    /// and its children.
+    /// </summary>
+    [JsonPropertyName ("settings")]
+    public SpecialSettings? Settings { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public BiblioChapter()
     {
-        #region Properties
+        Active = true;
+        Attributes = new ReportAttributes();
+        Children = new ChapterCollection (this);
+        Settings = new SpecialSettings();
+    }
 
-        /// <summary>
-        /// Whether the chapter is active?
-        /// </summary>
-        [JsonPropertyName("active")]
-        public bool Active { get; set; }
+    #endregion
 
-        /// <inheritdoc cref="IAttributable.Attributes" />
-        [JsonPropertyName("attr")]
-        public ReportAttributes Attributes { get; private set; }
+    #region Private members
 
-        /// <summary>
-        /// Children chapters.
-        /// </summary>
-        [JsonPropertyName("children")]
-        public ChapterCollection Children { get; private set; }
+    /// <summary>
+    /// Очищаем ключ упорядочивания записи.
+    /// </summary>
+    protected internal string CleanOrder
+        (
+            string text
+        )
+    {
+        var result = new StringBuilder (text);
+        result.Replace ("[", string.Empty);
+        result.Replace ("]", string.Empty);
+        result.Replace ("\"", string.Empty);
+        result.Replace ("«", string.Empty);
+        result.Replace ("»", string.Empty);
+        result.Replace ("...", string.Empty);
 
-        /// <summary>
-        /// Title of the chapter.
-        /// </summary>
-        [JsonPropertyName("title")]
-        public string? Title { get; set; }
+        return result.ToString();
+    }
 
-        /// <summary>
-        /// Parent chapter (if any).
-        /// </summary>
-        [JsonIgnore]
-        public BiblioChapter? Parent { get; internal set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        [JsonIgnore]
-        public ItemCollection? Items { get; protected internal set; }
-
-        /// <summary>
-        /// Whether the chapter is for service purpose?
-        /// </summary>
-        [JsonIgnore]
-        public virtual bool IsServiceChapter => false;
-
-        /// <summary>
-        /// Special settings associated with the chapter
-        /// and its children.
-        /// </summary>
-        [JsonPropertyName("settings")]
-        public SpecialSettings? Settings { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BiblioChapter()
+    /// <summary>
+    /// Get property value.
+    /// </summary>
+    protected TResult? GetProperty<TChapter, TResult>
+        (
+            Func<TChapter, TResult> func
+        )
+        where TChapter : BiblioChapter
+    {
+        var chapter = this;
+        while (!ReferenceEquals (chapter, null))
         {
-            Active = true;
-            Attributes = new ReportAttributes();
-            Children = new ChapterCollection(this);
-            Settings = new SpecialSettings();
-        }
-
-        #endregion
-
-        #region Private members
-
-        /// <summary>
-        /// Очищаем ключ упорядочивания записи.
-        /// </summary>
-        protected internal string CleanOrder
-            (
-                string text
-            )
-        {
-            var result = new StringBuilder(text);
-            result.Replace("[", string.Empty);
-            result.Replace("]", string.Empty);
-            result.Replace("\"", string.Empty);
-            result.Replace("«", string.Empty);
-            result.Replace("»", string.Empty);
-            result.Replace("...", string.Empty);
-
-            return result.ToString();
-        }
-
-        /// <summary>
-        /// Get property value.
-        /// </summary>
-        protected TResult? GetProperty<TChapter, TResult>
-            (
-                Func<TChapter, TResult> func
-            )
-            where TChapter : BiblioChapter
-        {
-            var chapter = this;
-            while (!ReferenceEquals(chapter, null))
+            var subChapter = chapter as TChapter;
+            if (!ReferenceEquals (subChapter, null))
             {
-                var subChapter = chapter as TChapter;
-                if (!ReferenceEquals(subChapter, null))
+                var result = func (subChapter);
+                if (!ReferenceEquals (result, null))
                 {
-                    var result = func(subChapter);
-                    if (!ReferenceEquals(result, null))
-                    {
-                        return result;
-                    }
-                }
-
-                chapter = chapter.Parent;
-            }
-
-            return default(TResult);
-        }
-
-        /// <summary>
-        /// Render children chapters.
-        /// </summary>
-        protected virtual void RenderChildren
-            (
-                BiblioContext context
-            )
-        {
-            foreach (var child in Children)
-            {
-                if (child.Active)
-                {
-                    child.Render(context);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Render the chapter title.
-        /// </summary>
-        protected virtual void RenderTitle
-            (
-                BiblioContext context
-            )
-        {
-            var processor = context.Processor
-                .ThrowIfNull();
-            var report = processor.Report
-                .ThrowIfNull();
-
-            if (!string.IsNullOrEmpty(Title))
-            {
-                ReportBand title = new ParagraphBand
-                {
-                    StyleSpecification = @"\s1\plain\f1\fs40\sb400\sa400\b "
-                };
-                report.Body.Add(title);
-                title.Cells.Add(new SimpleTextCell(Title));
-            }
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Build dictionaries.
-        /// </summary>
-        public virtual void BuildDictionary
-            (
-                BiblioContext context
-            )
-        {
-            /*
-
-            AbstractOutput log = context.Log;
-            log.WriteLine("Begin build dictionaries {0}", this);
-
-            foreach (BiblioChapter child in Children)
-            {
-                if (child.Active)
-                {
-                    child.BuildDictionary(context);
+                    return result;
                 }
             }
 
-            log.WriteLine("End build dictionaries {0}", this);
-
-            */
-
-            throw new NotImplementedException();
+            chapter = chapter.Parent;
         }
 
-        /// <summary>
-        /// Build <see cref="BiblioItem"/>s.
-        /// </summary>
-        public virtual void BuildItems
-            (
-                BiblioContext context
-            )
+        return default (TResult);
+    }
+
+    /// <summary>
+    /// Render children chapters.
+    /// </summary>
+    protected virtual void RenderChildren
+        (
+            BiblioContext context
+        )
+    {
+        foreach (var child in Children)
         {
-            /*
-
-            AbstractOutput log = context.Log;
-            log.WriteLine("Begin build items {0}", this);
-
-            foreach (BiblioChapter child in Children)
+            if (child.Active)
             {
-                if (child.Active)
-                {
-                    child.BuildItems(context);
-                }
+                child.Render (context);
             }
-
-            log.WriteLine("End build items {0}", this);
-
-            */
-
-            throw new NotImplementedException();
         }
+    }
 
-        /// <summary>
-        /// Clean gathered records.
-        /// </summary>
-        public virtual void CleanRecords
-            (
-                BiblioContext context,
-                RecordCollection records
-            )
+    /// <summary>
+    /// Render the chapter title.
+    /// </summary>
+    protected virtual void RenderTitle
+        (
+            BiblioContext context
+        )
+    {
+        var processor = context.Processor
+            .ThrowIfNull();
+        var report = processor.Report
+            .ThrowIfNull();
+
+        if (!string.IsNullOrEmpty (Title))
         {
-            /*
-
-            BiblioDocument document = context.Document
-                .ThrowIfNull("context.Document");
-            JArray array = (JArray)document.CommonSettings
-                .SelectToken("$.removeTags");
-            int[] tags = new int[0];
-            if (!ReferenceEquals(array, null))
+            ReportBand title = new ParagraphBand
             {
-                tags = array.ToObject<int[]>();
-            }
-            if (tags.Length == 0)
-            {
-                return;
-            }
-
-            foreach (Record record in records)
-            {
-                foreach (int tag in tags)
-                {
-                    record.RemoveField(tag);
-                }
-            }
-
-            */
-
-            throw new NotImplementedException();
+                StyleSpecification = @"\s1\plain\f1\fs40\sb400\sa400\b "
+            };
+            report.Body.Add (title);
+            title.Cells.Add (new SimpleTextCell (Title));
         }
+    }
 
-        /// <summary>
-        /// Gather terms.
-        /// </summary>
-        public virtual void GatherTerms
-            (
-                BiblioContext context
-            )
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Build dictionaries.
+    /// </summary>
+    public virtual void BuildDictionary
+        (
+            BiblioContext context
+        )
+    {
+        /*
+
+        AbstractOutput log = context.Log;
+        log.WriteLine("Begin build dictionaries {0}", this);
+
+        foreach (BiblioChapter child in Children)
         {
-            var log = context.Log;
-            log.WriteLine("Begin gather terms {0}", this);
-
-            foreach (var child in Children)
+            if (child.Active)
             {
-                if (child.Active)
-                {
-                    child.GatherTerms(context);
-                }
-            }
-
-            log.WriteLine("End gather terms {0}", this);
-        }
-
-        /// <summary>
-        /// Gather records.
-        /// </summary>
-        public virtual void GatherRecords
-            (
-                BiblioContext context
-            )
-        {
-            var log = context.Log;
-            log.WriteLine("Begin gather records {0}", this);
-
-            foreach (var child in Children)
-            {
-                if (child.Active)
-                {
-                    child.GatherRecords(context);
-                }
-            }
-
-            log.WriteLine("End gather records {0}", this);
-        }
-
-        /// <summary>
-        /// Initialize the chapter.
-        /// </summary>
-        public virtual void Initialize
-            (
-                BiblioContext context
-            )
-        {
-            var log = context.Log;
-            log.WriteLine("Begin initialize {0}", this);
-
-            foreach (var child in Children)
-            {
-                // Give the chapter a chance
-                child.Initialize(context);
-            }
-
-            log.WriteLine("End initialize {0}", this);
-        }
-
-        /// <summary>
-        /// Number items.
-        /// </summary>
-        public virtual void NumberItems
-            (
-                BiblioContext context
-            )
-        {
-            var items = Items;
-
-            if (!ReferenceEquals(items, null))
-            {
-                foreach (var item in items)
-                {
-                    item.Number = ++context.ItemCount;
-                }
-            }
-
-            foreach (var child in Children)
-            {
-                child.NumberItems(context);
-            }
-
-        }
-
-        /// <summary>
-        /// Render the chapter.
-        /// </summary>
-        public virtual void Render
-            (
-                BiblioContext context
-            )
-        {
-            var log = context.Log;
-            log.WriteLine("Begin render items {0}", this);
-
-            RenderTitle(context);
-            RenderChildren(context);
-
-            log.WriteLine("End render items {0}", this);
-        }
-
-        /// <summary>
-        /// Walk over the chapter and its children.
-        /// </summary>
-        public void Walk
-            (
-                Action<BiblioChapter> action
-            )
-        {
-            action(this);
-            foreach (var child in Children)
-            {
-                child.Walk(action);
+                child.BuildDictionary(context);
             }
         }
 
-        #endregion
+        log.WriteLine("End build dictionaries {0}", this);
 
-        #region IVerifiable members
+        */
 
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public virtual bool Verify
-            (
-                bool throwOnError
-            )
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Build <see cref="BiblioItem"/>s.
+    /// </summary>
+    public virtual void BuildItems
+        (
+            BiblioContext context
+        )
+    {
+        /*
+
+        AbstractOutput log = context.Log;
+        log.WriteLine("Begin build items {0}", this);
+
+        foreach (BiblioChapter child in Children)
         {
-            var verifier
-                = new Verifier<BiblioChapter>(this, throwOnError);
+            if (child.Active)
+            {
+                child.BuildItems(context);
+            }
+        }
 
-            verifier
-                .NotNull(Children, "Children")
-                .VerifySubObject(Children, "Children");
+        log.WriteLine("End build items {0}", this);
 
-            return verifier.Result;
-        } // method Verify
+        */
 
-        #endregion
+        throw new NotImplementedException();
+    }
 
-        #region Object members
+    /// <summary>
+    /// Clean gathered records.
+    /// </summary>
+    public virtual void CleanRecords
+        (
+            BiblioContext context,
+            RecordCollection records
+        )
+    {
+        /*
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() =>
-            $"{GetType().Name}: {Title.ToVisibleString()}";
+        BiblioDocument document = context.Document
+            .ThrowIfNull("context.Document");
+        JArray array = (JArray)document.CommonSettings
+            .SelectToken("$.removeTags");
+        int[] tags = new int[0];
+        if (!ReferenceEquals(array, null))
+        {
+            tags = array.ToObject<int[]>();
+        }
+        if (tags.Length == 0)
+        {
+            return;
+        }
 
-        #endregion
+        foreach (Record record in records)
+        {
+            foreach (int tag in tags)
+            {
+                record.RemoveField(tag);
+            }
+        }
 
-    } // class BiblioChapter
+        */
 
-} // namespace ManagedIrbis.Biblio
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Gather terms.
+    /// </summary>
+    public virtual void GatherTerms
+        (
+            BiblioContext context
+        )
+    {
+        var log = context.Log;
+        log.WriteLine ("Begin gather terms {0}", this);
+
+        foreach (var child in Children)
+        {
+            if (child.Active)
+            {
+                child.GatherTerms (context);
+            }
+        }
+
+        log.WriteLine ("End gather terms {0}", this);
+    }
+
+    /// <summary>
+    /// Gather records.
+    /// </summary>
+    public virtual void GatherRecords
+        (
+            BiblioContext context
+        )
+    {
+        var log = context.Log;
+        log.WriteLine ("Begin gather records {0}", this);
+
+        foreach (var child in Children)
+        {
+            if (child.Active)
+            {
+                child.GatherRecords (context);
+            }
+        }
+
+        log.WriteLine ("End gather records {0}", this);
+    }
+
+    /// <summary>
+    /// Initialize the chapter.
+    /// </summary>
+    public virtual void Initialize
+        (
+            BiblioContext context
+        )
+    {
+        var log = context.Log;
+        log.WriteLine ("Begin initialize {0}", this);
+
+        foreach (var child in Children)
+        {
+            // Give the chapter a chance
+            child.Initialize (context);
+        }
+
+        log.WriteLine ("End initialize {0}", this);
+    }
+
+    /// <summary>
+    /// Number items.
+    /// </summary>
+    public virtual void NumberItems
+        (
+            BiblioContext context
+        )
+    {
+        var items = Items;
+
+        if (!ReferenceEquals (items, null))
+        {
+            foreach (var item in items)
+            {
+                item.Number = ++context.ItemCount;
+            }
+        }
+
+        foreach (var child in Children)
+        {
+            child.NumberItems (context);
+        }
+    }
+
+    /// <summary>
+    /// Render the chapter.
+    /// </summary>
+    public virtual void Render
+        (
+            BiblioContext context
+        )
+    {
+        var log = context.Log;
+        log.WriteLine ("Begin render items {0}", this);
+
+        RenderTitle (context);
+        RenderChildren (context);
+
+        log.WriteLine ("End render items {0}", this);
+    }
+
+    /// <summary>
+    /// Walk over the chapter and its children.
+    /// </summary>
+    public void Walk
+        (
+            Action<BiblioChapter> action
+        )
+    {
+        action (this);
+        foreach (var child in Children)
+        {
+            child.Walk (action);
+        }
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public virtual bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<BiblioChapter> (this, throwOnError);
+
+        verifier
+            .NotNull (Children)
+            .VerifySubObject (Children);
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return $"{GetType().Name}: {Title.ToVisibleString()}";
+    }
+
+    #endregion
+}

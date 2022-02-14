@@ -21,95 +21,90 @@ using ManagedIrbis.Reports;
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Глава со статистикой.
+/// </summary>
+public sealed class ChapterWithStatistics
+    : BiblioChapter
 {
-    /// <summary>
-    /// Глава со статистикой.
-    /// </summary>
-    public sealed class ChapterWithStatistics
-        : BiblioChapter
+    #region Properties
+
+    /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
+    public override bool IsServiceChapter => true;
+
+    #endregion
+
+    #region Private members
+
+    private int _total;
+
+    private void _ProcessChapter
+        (
+            IrbisReport report,
+            BiblioChapter chapter
+        )
     {
-        #region Properties
-
-        /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
-        public override bool IsServiceChapter => true;
-
-        #endregion
-
-        #region Private members
-
-        private int _total;
-
-        private void _ProcessChapter
-            (
-                IrbisReport report,
-                BiblioChapter chapter
-            )
+        var items = chapter.Items;
+        if (!ReferenceEquals (items, null))
         {
-            var items = chapter.Items;
-            if (!ReferenceEquals (items, null))
+            var count = items.Count;
+            if (!chapter.IsServiceChapter)
             {
-                var count = items.Count;
-                if (!chapter.IsServiceChapter)
-                {
-                    var text = $"{chapter.Title}\\tab\\~ {{\\b {count}}}";
-                    var band = new ParagraphBand (text);
-                    report.Body.Add (band);
-                    _total += count;
-                }
+                var text = $"{chapter.Title}\\tab\\~ {{\\b {count}}}";
+                var band = new ParagraphBand (text);
+                report.Body.Add (band);
+                _total += count;
             }
+        }
 
-            foreach (var child in chapter.Children)
-            {
-                _ProcessChapter (report, child);
-            }
-
-        } // method ProcessChapter
-
-        #endregion
-
-        #region BiblioChapter members
-
-        /// <inheritdoc cref="BiblioChapter.Render" />
-        public override void Render
-            (
-                BiblioContext context
-            )
+        foreach (var child in chapter.Children)
         {
-            var log = context.Log;
-            log.WriteLine ($"Begin render {this}");
-            var document = context.Document;
-            var processor = context.Processor.ThrowIfNull();
-            var report = processor.Report.ThrowIfNull();
-            var badRecords = context.BadRecords;
+            _ProcessChapter (report, child);
+        }
+    }
 
-            RenderTitle (context);
+    #endregion
 
-            _total = 0;
-            string text;
-            if (badRecords.Count != 0)
-            {
-                text = $"ВНЕ РАЗДЕЛОВ:\\tab\\~ {{\\b {badRecords.Count.ToInvariantString()}}}";
-                report.Body.Add (new ParagraphBand (text));
-            }
+    #region BiblioChapter members
 
-            foreach (var chapter in document.Chapters)
-            {
-                _ProcessChapter (report, chapter);
-            }
+    /// <inheritdoc cref="BiblioChapter.Render" />
+    public override void Render
+        (
+            BiblioContext context
+        )
+    {
+        var log = context.Log;
+        log.WriteLine ($"Begin render {this}");
+        var document = context.Document;
+        var processor = context.Processor.ThrowIfNull();
+        var report = processor.Report.ThrowIfNull();
+        var badRecords = context.BadRecords;
 
-            report.Body.Add (new ParagraphBand());
-            text = $"ВСЕГО:\\tab\\~ {{\\b {_total.ToInvariantString()}}}";
+        RenderTitle (context);
+
+        _total = 0;
+        string text;
+        if (badRecords.Count != 0)
+        {
+            text = $"ВНЕ РАЗДЕЛОВ:\\tab\\~ {{\\b {badRecords.Count.ToInvariantString()}}}";
             report.Body.Add (new ParagraphBand (text));
+        }
 
-            RenderChildren (context);
+        foreach (var chapter in document.Chapters)
+        {
+            _ProcessChapter (report, chapter);
+        }
 
-            log.WriteLine ("End render {0}", this);
+        report.Body.Add (new ParagraphBand());
+        text = $"ВСЕГО:\\tab\\~ {{\\b {_total.ToInvariantString()}}}";
+        report.Body.Add (new ParagraphBand (text));
 
-        } // method Render
+        RenderChildren (context);
 
-        #endregion
+        log.WriteLine ("End render {0}", this);
+    }
 
-    } // class ChapterWithStatistics
-
-} // namespace ManagedIrbis.Biblio
+    #endregion
+}
