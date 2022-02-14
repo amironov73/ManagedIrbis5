@@ -40,933 +40,913 @@ using static ManagedIrbis.RecordStatus;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Библиографическая запись. Состоит из произвольного количества полей.
+/// </summary>
+[DebuggerDisplay ("[{" + nameof (Database) +
+    "}] MFN={" + nameof (Mfn) + "} ({" + nameof (Version) + "})")]
+public sealed class Record
+    : IRecord,
+    IEnumerable<Field>,
+    IVerifiable
 {
+    #region Constants
+
     /// <summary>
-    /// Библиографическая запись. Состоит из произвольного количества полей.
+    /// Запись удалена любым способом (логически или физически).
     /// </summary>
-    [DebuggerDisplay ("[{" + nameof (Database) +
-        "}] MFN={" + nameof (Mfn) + "} ({" + nameof (Version) + "})")]
-    public sealed class Record
-        : IRecord,
-            IEnumerable<Field>,
-            IVerifiable
+    internal const RecordStatus IsDeleted = LogicallyDeleted | PhysicallyDeleted;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// База данных, в которой хранится запись.
+    /// Для вновь созданных записей -- <c>null</c>.
+    /// </summary>
+    public string? Database { get; set; }
+
+    /// <summary>
+    /// MFN (порядковый номер в базе данных) записи.
+    /// Для вновь созданных записей равен <c>0</c>.
+    /// Для хранящихся в базе записей нумерация начинается
+    /// с <c>1</c>.
+    /// </summary>
+    public int Mfn { get; set; }
+
+    /// <summary>
+    /// Версия записи. Для вновь созданных записей равна <c>0</c>.
+    /// Для хранящихся в базе записей нумерация версий начинается
+    /// с <c>1</c>.
+    /// </summary>
+    public int Version { get; set; }
+
+    /// <summary>
+    /// Статус записи. Для вновь созданных записей <c>None</c>.
+    /// </summary>
+    public RecordStatus Status { get; set; }
+
+    /// <summary>
+    /// Признак -- запись помечена как логически удаленная.
+    /// </summary>
+    public bool Deleted => (Status & IsDeleted) != 0;
+
+    /// <summary>
+    /// Список полей.
+    /// </summary>
+    public FieldCollection Fields { get; }
+
+    /// <summary>
+    /// Описание в произвольной форме (опциональное).
+    /// </summary>
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// Признак того, что запись модифицирована.
+    /// </summary>
+    public bool Modified { get; internal set; }
+
+    /// <summary>
+    /// Индекс документа (поле 920).
+    /// </summary>
+    public string? Index { get; set; }
+
+    /// <summary>
+    /// Ключ для сортировки записей.
+    /// </summary>
+    public string? SortKey { get; set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// Данное свойство используется, например,
+    /// при построении отчета.
+    /// </summary>
+    [JsonIgnore]
+    [XmlIgnore]
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public Record()
     {
-        #region Constants
+        Fields = new FieldCollection() { Record = this };
+    }
 
-        /// <summary>
-        /// Запись удалена любым способом (логически или физически).
-        /// </summary>
-        private const RecordStatus IsDeleted = LogicallyDeleted | PhysicallyDeleted;
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Properties
+    /// <summary>
+    /// Добавление поля в конец списка полей.
+    /// </summary>
+    /// <param name="field">Добавляемое поле.</param>
+    /// <returns>this</returns>
+    public Record Add
+        (
+            Field field
+        )
+    {
+        Fields.Add (field);
 
-        /// <summary>
-        /// База данных, в которой хранится запись.
-        /// Для вновь созданных записей -- <c>null</c>.
-        /// </summary>
-        public string? Database { get; set; }
+        return this;
+    }
 
-        /// <summary>
-        /// MFN (порядковый номер в базе данных) записи.
-        /// Для вновь созданных записей равен <c>0</c>.
-        /// Для хранящихся в базе записей нумерация начинается
-        /// с <c>1</c>.
-        /// </summary>
-        public int Mfn { get; set; }
+    /// <summary>
+    /// Установка статуса записи.
+    /// </summary>
+    /// <param name="status">Новый статус записи.</param>
+    /// <returns>this</returns>
+    public Record Add
+        (
+            RecordStatus status
+        )
+    {
+        Status = status;
 
-        /// <summary>
-        /// Версия записи. Для вновь созданных записей равна <c>0</c>.
-        /// Для хранящихся в базе записей нумерация версий начинается
-        /// с <c>1</c>.
-        /// </summary>
-        public int Version { get; set; }
+        return this;
+    }
 
-        /// <summary>
-        /// Статус записи. Для вновь созданных записей <c>None</c>.
-        /// </summary>
-        public RecordStatus Status { get; set; }
+    /// <summary>
+    /// Добавление поля в конец записи.
+    /// </summary>
+    /// <returns>
+    /// Свежедобавленное поле (для цепочечных вызовов).
+    /// </returns>
+    public Record Add
+        (
+            int tag,
+            string? value = default
+        )
+    {
+        Sure.Positive (tag);
 
-        /// <summary>
-        /// Признак -- запись помечена как логически удаленная.
-        /// </summary>
-        public bool Deleted => (Status & IsDeleted) != 0;
+        var field = new Field (tag);
+        field.DecodeBody (value);
+        Fields.Add (field);
 
-        /// <summary>
-        /// Список полей.
-        /// </summary>
-        public FieldCollection Fields { get; }
+        return this;
+    }
 
-        /// <summary>
-        /// Описание в произвольной форме (опциональное).
-        /// </summary>
-        public string? Description { get; set; }
+    /// <summary>
+    /// Добавление поля в конец записи.
+    /// </summary>
+    /// <returns>
+    /// this (для цепочечных вызовов).
+    /// </returns>
+    public Record Add
+        (
+            int tag,
+            SubField subfield1
+        )
+    {
+        Sure.Positive (tag);
 
-        /// <summary>
-        /// Признак того, что запись модифицирована.
-        /// </summary>
-        public bool Modified { get; internal set; }
+        var field = new Field (tag) { subfield1 };
+        Fields.Add (field);
 
-        /// <summary>
-        /// Индекс документа (поле 920).
-        /// </summary>
-        public string? Index { get; set; }
+        return this;
+    }
 
-        /// <summary>
-        /// Ключ для сортировки записей.
-        /// </summary>
-        public string? SortKey { get; set; }
+    /// <summary>
+    /// Добавление полей в конец записи.
+    /// </summary>
+    /// <returns>
+    /// this (для цепочечных вызовов).
+    /// </returns>
+    public Record Add
+        (
+            int tag,
+            SubField subfield1,
+            SubField subfield2
+        )
+    {
+        Sure.Positive (tag);
 
-        /// <summary>
-        /// Произвольные пользовательские данные.
-        /// Данное свойство используется, например,
-        /// при построении отчета.
-        /// </summary>
-        [JsonIgnore]
-        [XmlIgnore]
-        public object? UserData { get; set; }
+        var field = new Field (tag) { subfield1, subfield2 };
+        Fields.Add (field);
 
-        #endregion
+        return this;
+    }
 
-        #region Construction
+    /// <summary>
+    /// Добавление полей в конец записи.
+    /// </summary>
+    /// <returns>
+    /// this (для цепочечных вызовов).
+    /// </returns>
+    public Record Add
+        (
+            int tag,
+            SubField subfield1,
+            SubField subfield2,
+            SubField subfield3
+        )
+    {
+        Sure.Positive (tag);
 
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public Record()
+        var field = new Field (tag) { subfield1, subfield2, subfield3 };
+        Fields.Add (field);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Добавление полей в конец записи.
+    /// </summary>
+    /// <param name="tag">Метка поля.</param>
+    /// <param name="subfields">Подполя.</param>
+    /// <returns>this (для цепочечных вызовов).</returns>
+    public Record Add
+        (
+            int tag,
+            params SubField[] subfields
+        )
+    {
+        Sure.Positive (tag);
+
+        var field = new Field (tag);
+        field.Subfields.AddRange (subfields);
+        Fields.Add (field);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Добавление поля в конец записи.
+    /// </summary>
+    /// <param name="tag">Метка поля.</param>
+    /// <param name="code">Код подполя.</param>
+    /// <param name="value">Значение подполя (опционально).</param>
+    /// <returns>this</returns>
+    public Record Add
+        (
+            int tag,
+            char code,
+            string? value = default
+        )
+    {
+        Sure.Positive (tag);
+
+        var field = new Field (tag);
+        field.Subfields.Add (new SubField (code, value));
+        Fields.Add (field);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Добавление поля в конец записи.
+    /// </summary>
+    /// <param name="tag">Метка поля.</param>
+    /// <param name="code1">Код подполя.</param>
+    /// <param name="value1">Значение подполя.</param>
+    /// <param name="code2">Код подполя.</param>
+    /// <param name="value2">Значение подполя (опционально).</param>
+    /// <returns>this</returns>
+    public Record Add
+        (
+            int tag,
+            char code1,
+            string? value1,
+            char code2,
+            string? value2 = default
+        )
+    {
+        Sure.Positive (tag);
+
+        var field = new Field (tag);
+        field.Subfields.Add (new SubField (code1, value1));
+        field.Subfields.Add (new SubField (code2, value2));
+        Fields.Add (field);
+
+        return this;
+    }
+
+
+    /// <summary>
+    /// Добавление поля в конец записи.
+    /// </summary>
+    /// <param name="tag">Метка поля.</param>
+    /// <param name="code1">Код подполя.</param>
+    /// <param name="value1">Значение подполя.</param>
+    /// <param name="code2">Код подполя.</param>
+    /// <param name="value2">Значение подполя.</param>
+    /// <param name="code3">Код подполя.</param>
+    /// <param name="value3">Значение подполя (опционально).</param>
+    /// <returns>this</returns>
+    public Record Add
+        (
+            int tag,
+            char code1,
+            string? value1,
+            char code2,
+            string? value2,
+            char code3,
+            string? value3 = default
+        )
+    {
+        Sure.Positive (tag);
+
+        var field = new Field (tag);
+        field.Subfields.Add (new SubField (code1, value1));
+        field.Subfields.Add (new SubField (code2, value2));
+        field.Subfields.Add (new SubField (code3, value3));
+        Fields.Add (field);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Добавление поля в конец записи.
+    /// </summary>
+    /// <param name="tag">Метка поля.</param>
+    /// <param name="subfields">Коды и значения подполей.</param>
+    /// <returns>this (для цепочечных вызовов)</returns>
+    public Record Add
+        (
+            int tag,
+            string[] subfields
+        )
+    {
+        Sure.Positive (tag);
+
+        var field = Field.WithSubFields (tag, subfields);
+        Fields.Add (field);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Добавление в запись непустого поля.
+    /// </summary>
+    public Record AddNonEmptyField
+        (
+            int tag,
+            string? value
+        )
+    {
+        Sure.Positive (tag);
+
+        if (!string.IsNullOrEmpty (value))
         {
-            Fields = new FieldCollection() { Record = this };
-
-        } // constructor
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавление поля в конец списка полей.
-        /// </summary>
-        /// <param name="field">Добавляемое поле.</param>
-        /// <returns>this</returns>
-        public Record Add
-            (
-                Field field
-            )
-        {
-            Fields.Add (field);
-
-            return this;
-
-        } // method Add
-
-        /// <summary>
-        /// Установка статуса записи.
-        /// </summary>
-        /// <param name="status">Новый статус записи.</param>
-        /// <returns>this</returns>
-        public Record Add
-            (
-                RecordStatus status
-            )
-        {
-            Status = status;
-
-            return this;
-
-        } // method Add
-
-        /// <summary>
-        /// Добавление поля в конец записи.
-        /// </summary>
-        /// <returns>
-        /// Свежедобавленное поле (для цепочечных вызовов).
-        /// </returns>
-        public Record Add
-            (
-                int tag,
-                string? value = default
-            )
-        {
-            Sure.Positive (tag);
-
-            var field = new Field (tag);
+            var field = new Field { Tag = tag };
             field.DecodeBody (value);
             Fields.Add (field);
+        }
 
-            return this;
+        return this;
+    }
 
-        } // method Add
+    /// <summary>
+    /// Очистка записи (удаление всех полей).
+    /// </summary>
+    /// <returns>
+    /// Ту же самую, но очищенную запись.
+    /// </returns>
+    public Record Clear()
+    {
+        Fields.Clear();
 
-        /// <summary>
-        /// Добавление поля в конец записи.
-        /// </summary>
-        /// <returns>
-        /// this (для цепочечных вызовов).
-        /// </returns>
-        public Record Add
-            (
-                int tag,
-                SubField subfield1
-            )
+        return this;
+    }
+
+    /// <summary>
+    /// Снятие признака "запись модифицирована".
+    /// </summary>
+    public void NotModified()
+    {
+        Modified = false;
+    }
+
+    /// <summary>
+    /// Создание глубокой копии записи.
+    /// </summary>
+    public Record Clone()
+    {
+        var result = (Record)MemberwiseClone();
+
+        for (var i = 0; i < result.Fields.Count; i++)
         {
-            Sure.Positive (tag);
+            result.Fields[i] = result.Fields[i].Clone();
+        }
 
-            var field = new Field (tag) { subfield1 };
-            Fields.Add (field);
+        return result;
+    }
 
-            return this;
-
-        } // method Add
-
-        /// <summary>
-        /// Добавление полей в конец записи.
-        /// </summary>
-        /// <returns>
-        /// this (для цепочечных вызовов).
-        /// </returns>
-        public Record Add
-            (
-                int tag,
-                SubField subfield1,
-                SubField subfield2
-            )
+    /// <summary>
+    /// Вычисление числа повторений поля с указанной меткой.
+    /// </summary>
+    public int Count
+        (
+            int tag
+        )
+    {
+        var result = 0;
+        foreach (var field in Fields)
         {
-            Sure.Positive (tag);
-
-            var field = new Field (tag) { subfield1, subfield2 };
-            Fields.Add (field);
-
-            return this;
-
-        } // method Add
-
-        /// <summary>
-        /// Добавление полей в конец записи.
-        /// </summary>
-        /// <returns>
-        /// this (для цепочечных вызовов).
-        /// </returns>
-        public Record Add
-            (
-                int tag,
-                SubField subfield1,
-                SubField subfield2,
-                SubField subfield3
-            )
-        {
-            Sure.Positive (tag);
-
-            var field = new Field (tag) { subfield1, subfield2, subfield3 };
-            Fields.Add (field);
-
-            return this;
-
-        } // method Add
-
-        /// <summary>
-        /// Добавление полей в конец записи.
-        /// </summary>
-        /// <param name="tag">Метка поля.</param>
-        /// <param name="subfields">Подполя.</param>
-        /// <returns>this (для цепочечных вызовов).</returns>
-        public Record Add
-            (
-                int tag,
-                params SubField[] subfields
-            )
-        {
-            Sure.Positive (tag);
-
-            var field = new Field (tag);
-            field.Subfields.AddRange (subfields);
-            Fields.Add (field);
-
-            return this;
-
-        } // method Add
-
-        /// <summary>
-        /// Добавление поля в конец записи.
-        /// </summary>
-        /// <param name="tag">Метка поля.</param>
-        /// <param name="code">Код подполя.</param>
-        /// <param name="value">Значение подполя (опционально).</param>
-        /// <returns>this</returns>
-        public Record Add
-            (
-                int tag,
-                char code,
-                string? value = default
-            )
-        {
-            Sure.Positive (tag);
-
-            var field = new Field (tag);
-            field.Subfields.Add (new SubField (code, value));
-            Fields.Add (field);
-
-            return this;
-
-        } // method Add
-
-        /// <summary>
-        /// Добавление поля в конец записи.
-        /// </summary>
-        /// <param name="tag">Метка поля.</param>
-        /// <param name="code1">Код подполя.</param>
-        /// <param name="value1">Значение подполя.</param>
-        /// <param name="code2">Код подполя.</param>
-        /// <param name="value2">Значение подполя (опционально).</param>
-        /// <returns>this</returns>
-        public Record Add
-            (
-                int tag,
-                char code1,
-                string? value1,
-                char code2,
-                string? value2 = default
-            )
-        {
-            Sure.Positive (tag);
-
-            var field = new Field (tag);
-            field.Subfields.Add (new SubField (code1, value1));
-            field.Subfields.Add (new SubField (code2, value2));
-            Fields.Add (field);
-
-            return this;
-        } // method Add
-
-
-        /// <summary>
-        /// Добавление поля в конец записи.
-        /// </summary>
-        /// <param name="tag">Метка поля.</param>
-        /// <param name="code1">Код подполя.</param>
-        /// <param name="value1">Значение подполя.</param>
-        /// <param name="code2">Код подполя.</param>
-        /// <param name="value2">Значение подполя.</param>
-        /// <param name="code3">Код подполя.</param>
-        /// <param name="value3">Значение подполя (опционально).</param>
-        /// <returns>this</returns>
-        public Record Add
-            (
-                int tag,
-                char code1,
-                string? value1,
-                char code2,
-                string? value2,
-                char code3,
-                string? value3 = default
-            )
-        {
-            Sure.Positive (tag);
-
-            var field = new Field (tag);
-            field.Subfields.Add (new SubField (code1, value1));
-            field.Subfields.Add (new SubField (code2, value2));
-            field.Subfields.Add (new SubField (code3, value3));
-            Fields.Add (field);
-
-            return this;
-
-        } // method Add
-
-        /// <summary>
-        /// Добавление поля в конец записи.
-        /// </summary>
-        /// <param name="tag">Метка поля.</param>
-        /// <param name="subfields">Коды и значения подполей.</param>
-        /// <returns>this (для цепочечных вызовов)</returns>
-        public Record Add
-            (
-                int tag,
-                string[] subfields
-            )
-        {
-            Sure.Positive (tag);
-
-            var field = Field.WithSubFields (tag, subfields);
-            Fields.Add (field);
-
-            return this;
-
-        } // method Add
-
-        /// <summary>
-        /// Добавление в запись непустого поля.
-        /// </summary>
-        public Record AddNonEmptyField
-            (
-                int tag,
-                string? value
-            )
-        {
-            Sure.Positive (tag);
-
-            if (!string.IsNullOrEmpty (value))
+            if (field.Tag == tag)
             {
-                var field = new Field { Tag = tag };
-                field.DecodeBody (value);
-                Fields.Add (field);
+                ++result;
             }
+        }
 
-            return this;
+        return result;
+    }
 
-        } // method AddNonEmptyField
-
-        /// <summary>
-        /// Очистка записи (удаление всех полей).
-        /// </summary>
-        /// <returns>
-        /// Ту же самую, но очищенную запись.
-        /// </returns>
-        public Record Clear()
+    /// <summary>
+    /// Вычисление числа повторений поля с указанными меткой и кодом подполя.
+    /// </summary>
+    public int Count
+        (
+            int tag,
+            char code
+        )
+    {
+        var result = 0;
+        foreach (var field in Fields)
         {
-            Fields.Clear();
-
-            return this;
-
-        } // method Clear
-
-        /// <summary>
-        /// Снятие признака "запись модифицирована".
-        /// </summary>
-        public void NotModified() => Modified = false;
-
-        /// <summary>
-        /// Создание глубокой копии записи.
-        /// </summary>
-        public Record Clone()
-        {
-            var result = (Record) MemberwiseClone();
-
-            for (var i = 0; i < result.Fields.Count; i++)
+            if (field.Tag == tag)
             {
-                result.Fields[i] = result.Fields[i].Clone();
-            }
-
-            return result;
-
-        } // method Clone
-
-        /// <summary>
-        /// Вычисление числа повторений поля с указанной меткой.
-        /// </summary>
-        public int Count
-            (
-                int tag
-            )
-        {
-            var result = 0;
-            foreach (var field in Fields)
-            {
-                if (field.Tag == tag)
+                if (field.HaveSubField (code))
                 {
                     ++result;
                 }
             }
+        }
 
-            return result;
+        return result;
+    }
 
-        } // return Count
+    /// <inheritdoc cref="IRecord.Decode(Response)"/>
+    public void Decode
+        (
+            Response response
+        )
+    {
+        Sure.NotNull (response);
 
-        /// <summary>
-        /// Вычисление числа повторений поля с указанными меткой и кодом подполя.
-        /// </summary>
-        public int Count
-            (
-                int tag,
-                char code
-            )
+        try
         {
-            var result = 0;
-            foreach (var field in Fields)
+            var line = response.ReadUtf();
+
+            var first = line.Split ('#');
+            Mfn = int.Parse (first[0]);
+            Status = first.Length == 1
+                ? None
+                : (RecordStatus)first[1].SafeToInt32();
+
+            line = response.ReadUtf();
+            var second = line.Split ('#');
+            Version = second.Length == 1
+                ? 0
+                : int.Parse (second[1]);
+
+            while (!response.EOT)
             {
-                if (field.Tag == tag)
-                {
-                    if (field.HaveSubField (code))
-                    {
-                        ++result;
-                    }
-                }
-
-            } // foreach
-
-            return result;
-
-        } // return Count
-
-        /// <inheritdoc cref="IRecord.Decode(Response)"/>
-        public void Decode
-            (
-                Response response
-            )
-        {
-            Sure.NotNull (response);
-
-            try
-            {
-                var line = response.ReadUtf();
-
-                var first = line.Split ('#');
-                Mfn = int.Parse (first[0]);
-                Status = first.Length == 1
-                    ? None
-                    : (RecordStatus)first[1].SafeToInt32();
-
                 line = response.ReadUtf();
-                var second = line.Split ('#');
-                Version = second.Length == 1
-                    ? 0
-                    : int.Parse (second[1]);
-
-                while (!response.EOT)
-                {
-                    line = response.ReadUtf();
-                    if (string.IsNullOrEmpty (line))
-                    {
-                        break;
-                    }
-
-                    var field = new Field();
-                    field.Decode (line);
-                    Fields.Add (field);
-                }
-            }
-            catch (Exception exception)
-            {
-                // response.DebugUtf(Console.Error);
-                Magna.Error (nameof (Record) + "::" + nameof (Decode));
-
-                throw new IrbisException
-                    (
-                        nameof (Record) + "::" + nameof (Decode),
-                        exception
-                    );
-            }
-
-        } // method Decode
-
-        /// <inheritdoc cref="IRecord.Decode(MstRecord64)"/>
-        public void Decode
-            (
-                MstRecord64 record
-            )
-        {
-            Sure.NotNull (record);
-
-            Mfn = record.Leader.Mfn;
-            Status = (RecordStatus)record.Leader.Status;
-            Version = record.Leader.Version;
-
-            // result.Fields.BeginUpdate();
-            // result.Fields.EnsureCapacity(Dictionary.Count);
-
-            foreach (var entry in record.Dictionary)
-            {
-                var field = record.DecodeField (entry);
-                Fields.Add (field);
-            }
-
-            // result.Fields.EndUpdate();
-
-        } // method Decode
-
-        /// <summary>
-        /// Декодирование ответа сервера.
-        /// </summary>
-        public void Decode
-            (
-                IList<string> lines
-            )
-        {
-            Sure.NotNull (lines);
-
-            try
-            {
-                var line = lines[0];
-
-                var first = line.Split ('#');
-                Mfn = int.Parse (first[0]);
-                Status = first.Length == 1
-                    ? None
-                    : (RecordStatus)first[1].SafeToInt32();
-
-                line = lines[1];
-                var second = line.Split ('#');
-                Version = second.Length == 1
-                    ? 0
-                    : int.Parse (second[1]);
-
-                for (var i = 2; i < lines.Count; i++)
-                {
-                    line = lines[i];
-                    if (string.IsNullOrEmpty (line))
-                    {
-                        break;
-                    }
-
-                    var field = new Field();
-                    field.Decode (line);
-                    Fields.Add (field);
-                }
-            }
-            catch (Exception exception)
-            {
-                Magna.Error
-                    (
-                        nameof (Record) + "::" + nameof (Decode)
-                        + ": " + exception.GetType() + ": " + exception.Message
-                    );
-
-                Console.Error.WriteLine
-                    (
-                        string.Join (Environment.NewLine, lines)
-                    );
-
-                throw new IrbisException
-                    (
-                        nameof (Record) + "::" + nameof (Decode),
-                        exception
-                    );
-            }
-
-        } // method Decode
-
-        /// <inheritdoc cref="IRecord.Encode(string)"/>
-        public string Encode
-            (
-                string? delimiter = IrbisText.IrbisDelimiter
-            )
-        {
-            var builder = StringBuilderPool.Shared.Get();
-            builder.EnsureCapacity (512);
-
-            builder.Append (Mfn.ToInvariantString())
-                .Append ('#')
-                .Append (((int)Status).ToInvariantString())
-                .Append (delimiter)
-                .Append ("0#")
-                .Append (Version.ToInvariantString())
-                .Append (delimiter);
-
-            foreach (var field in Fields)
-            {
-                builder.Append (field).Append (delimiter);
-            }
-
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
-
-        } // method Encode
-
-        /// <inheritdoc cref="IRecord.Encode(MstRecord64)"/>
-        public void Encode
-            (
-                MstRecord64 record
-            )
-        {
-            Sure.NotNull (record);
-
-            throw new NotImplementedException();
-
-        } // method Encode
-
-        /// <summary>
-        /// Получение текста поля до разделителей подполей
-        /// первого повторения поля с указанной меткой.
-        /// </summary>
-        /// <param name="tag">Метка поля.</param>
-        /// <returns>Значение поля или <c>null</c>.</returns>
-        public string? FM (int tag) => GetField (tag)?.Value;
-
-        /// <summary>
-        /// Получение текста поля до разделителей.
-        /// </summary>
-        public string? FM (int tag, int occurrence) =>
-            GetField (tag, occurrence)?.Value;
-
-        /// <summary>
-        /// Текст первого подполя с указанным тегом и кодом.
-        /// </summary>
-        public string? FM
-            (
-                int tag,
-                char code
-            )
-        {
-            Sure.Positive (tag);
-
-            var field = GetField (tag);
-
-            if (!ReferenceEquals (field, null))
-            {
-                return code == '*'
-                    ? field.GetValueOrFirstSubField()
-                    : field.GetSubFieldValue (code);
-            }
-
-            return default;
-
-        } // method FM
-
-        /// <summary>
-        /// Текст заданного подполя с указанным тегом и кодом.
-        /// </summary>
-        public string? FM
-            (
-                int tag,
-                int occurrence,
-                char code
-            )
-        {
-            var index = 0;
-            while (true)
-            {
-                var field = GetField (tag, index);
-                if (field is null)
+                if (string.IsNullOrEmpty (line))
                 {
                     break;
                 }
 
+                var field = new Field();
+                field.Decode (line);
+                Fields.Add (field);
+            }
+        }
+        catch (Exception exception)
+        {
+            // response.DebugUtf(Console.Error);
+            Magna.Error (nameof (Record) + "::" + nameof (Decode));
+
+            throw new IrbisException
+                (
+                    nameof (Record) + "::" + nameof (Decode),
+                    exception
+                );
+        }
+    }
+
+    /// <inheritdoc cref="IRecord.Decode(MstRecord64)"/>
+    public void Decode
+        (
+            MstRecord64 record
+        )
+    {
+        Sure.NotNull (record);
+
+        Mfn = record.Leader.Mfn;
+        Status = (RecordStatus)record.Leader.Status;
+        Version = record.Leader.Version;
+
+        // result.Fields.BeginUpdate();
+        // result.Fields.EnsureCapacity(Dictionary.Count);
+
+        foreach (var entry in record.Dictionary)
+        {
+            var field = record.DecodeField (entry);
+            Fields.Add (field);
+        }
+
+        // result.Fields.EndUpdate();
+    }
+
+    /// <summary>
+    /// Декодирование ответа сервера.
+    /// </summary>
+    public void Decode
+        (
+            IList<string> lines
+        )
+    {
+        Sure.NotNull (lines);
+
+        try
+        {
+            var line = lines[0];
+
+            var first = line.Split ('#');
+            Mfn = int.Parse (first[0]);
+            Status = first.Length == 1
+                ? None
+                : (RecordStatus)first[1].SafeToInt32();
+
+            line = lines[1];
+            var second = line.Split ('#');
+            Version = second.Length == 1
+                ? 0
+                : int.Parse (second[1]);
+
+            for (var i = 2; i < lines.Count; i++)
+            {
+                line = lines[i];
+                if (string.IsNullOrEmpty (line))
+                {
+                    break;
+                }
+
+                var field = new Field();
+                field.Decode (line);
+                Fields.Add (field);
+            }
+        }
+        catch (Exception exception)
+        {
+            Magna.Error
+                (
+                    nameof (Record) + "::" + nameof (Decode)
+                    + ": " + exception.GetType() + ": " + exception.Message
+                );
+
+            Console.Error.WriteLine
+                (
+                    string.Join (Environment.NewLine, lines)
+                );
+
+            throw new IrbisException
+                (
+                    nameof (Record) + "::" + nameof (Decode),
+                    exception
+                );
+        }
+    }
+
+    /// <inheritdoc cref="IRecord.Encode(string)"/>
+    public string Encode
+        (
+            string? delimiter = IrbisText.IrbisDelimiter
+        )
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (512);
+
+        builder.Append (Mfn.ToInvariantString())
+            .Append ('#')
+            .Append (((int)Status).ToInvariantString())
+            .Append (delimiter)
+            .Append ("0#")
+            .Append (Version.ToInvariantString())
+            .Append (delimiter);
+
+        foreach (var field in Fields)
+        {
+            builder.Append (field).Append (delimiter);
+        }
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
+
+    /// <inheritdoc cref="IRecord.Encode(MstRecord64)"/>
+    public void Encode
+        (
+            MstRecord64 record
+        )
+    {
+        Sure.NotNull (record);
+
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Получение текста поля до разделителей подполей
+    /// первого повторения поля с указанной меткой.
+    /// </summary>
+    /// <param name="tag">Метка поля.</param>
+    /// <returns>Значение поля или <c>null</c>.</returns>
+    public string? FM (int tag)
+    {
+        return GetField (tag)?.Value;
+    }
+
+    /// <summary>
+    /// Получение текста поля до разделителей.
+    /// </summary>
+    public string? FM (int tag, int occurrence)
+    {
+        return GetField (tag, occurrence)?.Value;
+    }
+
+    /// <summary>
+    /// Текст первого подполя с указанным тегом и кодом.
+    /// </summary>
+    public string? FM
+        (
+            int tag,
+            char code
+        )
+    {
+        Sure.Positive (tag);
+
+        var field = GetField (tag);
+
+        if (!ReferenceEquals (field, null))
+        {
+            return code == '*'
+                ? field.GetValueOrFirstSubField()
+                : field.GetSubFieldValue (code);
+        }
+
+        return default;
+    }
+
+    /// <summary>
+    /// Текст заданного подполя с указанным тегом и кодом.
+    /// </summary>
+    public string? FM
+        (
+            int tag,
+            int occurrence,
+            char code
+        )
+    {
+        var index = 0;
+        while (true)
+        {
+            var field = GetField (tag, index);
+            if (field is null)
+            {
+                break;
+            }
+
+            var value = code == '*'
+                ? field.GetValueOrFirstSubField()
+                : field.GetSubFieldValue (code);
+
+            if (!string.IsNullOrEmpty (value))
+            {
+                if (occurrence == 0)
+                {
+                    return value;
+                }
+
+                --occurrence;
+            }
+
+            ++index;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Текст всех полей с указанным тегом.
+    /// </summary>
+    public string[] FMA
+        (
+            int tag
+        )
+    {
+        var result = new LocalList<string>();
+        foreach (var field in Fields)
+        {
+            if (field.Tag == tag
+                && !field.Value.IsEmpty())
+            {
+                result.Add (field.Value);
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    /// <summary>
+    /// Текст всех подполей с указанным тегом и кодом.
+    /// </summary>
+    public string[] FMA
+        (
+            int tag,
+            char code
+        )
+    {
+        var result = new LocalList<string>();
+        foreach (var field in Fields)
+        {
+            if (field.Tag == tag)
+            {
+                // TODO: Value, если есть, всегда первое в списке подполей
                 var value = code == '*'
                     ? field.GetValueOrFirstSubField()
                     : field.GetSubFieldValue (code);
-
-                if (!string.IsNullOrEmpty (value))
+                if (!value.IsEmpty())
                 {
-                    if (occurrence == 0)
-                    {
-                        return value;
-                    }
-
-                    --occurrence;
-                }
-
-                ++index;
-
-            } // while
-
-            return null;
-
-        } // method FM
-
-        /// <summary>
-        /// Текст всех полей с указанным тегом.
-        /// </summary>
-        public string[] FMA
-            (
-                int tag
-            )
-        {
-            var result = new LocalList<string>();
-            foreach (var field in Fields)
-            {
-                if (field.Tag == tag
-                    && !field.Value.IsEmpty())
-                {
-                    result.Add (field.Value);
+                    result.Add (value);
                 }
             }
+        }
 
-            return result.ToArray();
+        return result.ToArray();
+    }
 
-        } // method FMA
+    /// <summary>
+    /// Получение заданного повторения поля с указанной меткой.
+    /// </summary>
+    public Field? GetField
+        (
+            int tag,
+            int occurrence = 0
+        )
+    {
+        Sure.NonNegative (occurrence);
 
-        /// <summary>
-        /// Текст всех подполей с указанным тегом и кодом.
-        /// </summary>
-        public string[] FMA
-            (
-                int tag,
-                char code
-            )
+        foreach (var field in Fields)
         {
-            var result = new LocalList<string>();
-            foreach (var field in Fields)
+            if (field.Tag == tag)
             {
-                if (field.Tag == tag)
-                {
-                    // TODO: Value, если есть, всегда первое в списке подполей
-                    var value = code == '*'
-                        ? field.GetValueOrFirstSubField()
-                        : field.GetSubFieldValue (code);
-                    if (!value.IsEmpty())
-                    {
-                        result.Add (value);
-                    }
-                }
-            }
-
-            return result.ToArray();
-
-        } // method FMA
-
-        /// <summary>
-        /// Получение заданного повторения поля с указанной меткой.
-        /// </summary>
-        public Field? GetField
-            (
-                int tag,
-                int occurrence = 0
-            )
-        {
-            Sure.NonNegative (occurrence);
-
-            foreach (var field in Fields)
-            {
-                if (field.Tag == tag)
-                {
-                    if (occurrence == 0)
-                    {
-                        return field;
-                    }
-
-                    --occurrence;
-                }
-
-            } // foreach
-
-            return null;
-
-        } // method GetField
-
-        /// <summary>
-        /// Перечисление полей с указанной меткой.
-        /// </summary>
-        /// <param name="tag">Искомая метка поля.</param>
-        public IEnumerable<Field> EnumerateField
-            (
-                int tag
-            )
-        {
-            foreach (var field in Fields)
-            {
-                if (field.Tag == tag)
-                {
-                    yield return field;
-                }
-
-            } // foreach
-
-        } // method EnumerateField
-
-        /// <summary>
-        /// Получение поля с указанной меткой
-        /// либо создание нового поля, если таковое отсутствует.
-        /// </summary>
-        /// <param name="tag">Искомая метка поля.</param>
-        /// <returns>Найденное либо созданное поле.</returns>
-        public Field GetOrAddField
-            (
-                int tag
-            )
-        {
-            Sure.Positive (tag);
-
-            foreach (var field in Fields)
-            {
-                if (field.Tag == tag)
+                if (occurrence == 0)
                 {
                     return field;
                 }
 
-            } // foreach
-
-            var result = new Field { Tag = tag };
-            Fields.Add (result);
-
-            return result;
-
-        } // method GetOrAddField
-
-        /// <summary>
-        /// Проверка, есть ли в записи поле с указанной меткой.
-        /// </summary>
-        public bool HaveField
-            (
-                int tag
-            )
-        {
-            foreach (var field in Fields)
-            {
-                if (field.Tag == tag)
-                {
-                    return true;
-                }
-
-            } // foreach
-
-            return false;
-
-        } // method HaveField
-
-        /// <summary>
-        /// Удаление из записи поля с указанной меткой.
-        /// </summary>
-        /// <param name="tag">Искомая метка.</param>
-        /// <returns>this.</returns>
-        public Record RemoveField
-            (
-                int tag
-            )
-        {
-            Field? field;
-            while ((field = GetField (tag)) is not null)
-            {
-                Fields.Remove (field);
+                --occurrence;
             }
+        }
 
-            return this;
+        return null;
+    }
 
-        } // method RemoveField
-
-        /// <summary>
-        /// Формирует плоское текстовое представление записи.
-        /// </summary>
-        public string ToPlainText() => PlainText.ToPlainText (this);
-
-        #endregion
-
-        #region IEnumerable<Field> members
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
-        public IEnumerator<Field> GetEnumerator() => Fields.GetEnumerator();
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify
-            (
-                bool throwOnError
-            )
+    /// <summary>
+    /// Перечисление полей с указанной меткой.
+    /// </summary>
+    /// <param name="tag">Искомая метка поля.</param>
+    public IEnumerable<Field> EnumerateField
+        (
+            int tag
+        )
+    {
+        foreach (var field in Fields)
         {
-            var verifier = new Verifier<Record> (this, throwOnError);
+            if (field.Tag == tag)
+            {
+                yield return field;
+            }
+        }
+    }
 
-            // TODO: implement
+    /// <summary>
+    /// Получение поля с указанной меткой
+    /// либо создание нового поля, если таковое отсутствует.
+    /// </summary>
+    /// <param name="tag">Искомая метка поля.</param>
+    /// <returns>Найденное либо созданное поле.</returns>
+    public Field GetOrAddField
+        (
+            int tag
+        )
+    {
+        Sure.Positive (tag);
 
-            return verifier.Result;
+        foreach (var field in Fields)
+        {
+            if (field.Tag == tag)
+            {
+                return field;
+            }
+        }
 
-        } // method Verify
+        var result = new Field { Tag = tag };
+        Fields.Add (result);
 
-        #endregion
+        return result;
+    }
 
-        #region Object members
+    /// <summary>
+    /// Проверка, есть ли в записи поле с указанной меткой.
+    /// </summary>
+    public bool HaveField
+        (
+            int tag
+        )
+    {
+        foreach (var field in Fields)
+        {
+            if (field.Tag == tag)
+            {
+                return true;
+            }
+        }
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Encode ("\n");
+        return false;
+    }
 
-        #endregion
+    /// <summary>
+    /// Удаление из записи поля с указанной меткой.
+    /// </summary>
+    /// <param name="tag">Искомая метка.</param>
+    /// <returns>this.</returns>
+    public Record RemoveField
+        (
+            int tag
+        )
+    {
+        Field? field;
+        while ((field = GetField (tag)) is not null)
+        {
+            Fields.Remove (field);
+        }
 
-    } // class Record
+        return this;
+    }
 
-} // namespace ManagedIrbis
+    /// <summary>
+    /// Формирует плоское текстовое представление записи.
+    /// </summary>
+    public string ToPlainText()
+    {
+        return PlainText.ToPlainText (this);
+    }
+
+    #endregion
+
+    #region IEnumerable<Field> members
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+    public IEnumerator<Field> GetEnumerator()
+    {
+        return Fields.GetEnumerator();
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<Record> (this, throwOnError);
+
+        // TODO: implement
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Encode ("\n");
+    }
+
+    #endregion
+}

@@ -90,9 +90,9 @@ namespace ManagedIrbis;
 [XmlRoot ("field")]
 public class Field
     : IHandmadeSerializable,
-        IReadOnly<Field>,
-        IEnumerable<SubField>,
-        IVerifiable
+    IReadOnly<Field>,
+    IEnumerable<SubField>,
+    IVerifiable
 {
     #region Constants
 
