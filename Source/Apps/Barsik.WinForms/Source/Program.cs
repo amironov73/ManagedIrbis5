@@ -16,7 +16,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -30,7 +29,7 @@ using AM.Scripting.WinForms;
 
 namespace Barsik.WinForms;
 
-static class Program
+internal static class Program
 {
     /// <summary>
     ///  The main entry point for the application.
@@ -49,67 +48,41 @@ static class Program
 
         if (args.Length == 0)
         {
-            // показываем подсказку и завершаемся нафик
+            // показываем подсказку и завершаемся нафиг
             MessageBox.Show ("Usage: Barsik <file...>");
             return 0;
         }
 
-        try
-        {
-            var dump = false;
-            var index = 0;
-            var debugWriter = new DebugTextWriter();
-            var interpreter = new Interpreter
-                    (
-                        TextReader.Null,
-                        debugWriter,
-                        debugWriter
-                    )
-                .WithStdLib()
-                .WithWinForms();
-
-            foreach (var fileName in args)
-            {
-                if (fileName == "-d")
+        var result = BarsikUtility.CreateAndRunInterpreter
+            (
+                args,
+                interpreter =>
                 {
-                    dump = true;
-                    continue;
-                }
-
-                string sourceCode;
-                if (fileName == "-e")
+                    var debugWriter = new DebugTextWriter();
+                    interpreter.WithStdLib().WithWinForms();
+                    interpreter.Context.Input = TextReader.Null;
+                    interpreter.Context.Output = debugWriter;
+                    interpreter.Context.Error = debugWriter;
+                },
+                (_, exception) =>
                 {
-                    sourceCode = string.Join (' ', args.Skip (index + 1));
-                    interpreter.Execute (sourceCode);
-                    break;
+                    MessageBox.Show (exception.ToString());
+                },
+                interpreter =>
+                {
+                    var output = new StringWriter();
+                    var context = new Context
+                        (
+                            TextReader.Null,
+                            output,
+                            output,
+                            interpreter.Context
+                        );
+                    context.DumpVariables();
+                    MessageBox.Show (output.ToString());
                 }
+            );
 
-                sourceCode = File.ReadAllText (fileName);
-                interpreter.Execute (sourceCode);
-
-                index++;
-            }
-
-            if (dump)
-            {
-                var output = new StringWriter();
-                var context = new Context
-                    (
-                        TextReader.Null,
-                        output,
-                        output,
-                        interpreter.Context
-                    );
-                context.DumpVariables();
-                MessageBox.Show (output.ToString());
-            }
-        }
-        catch (Exception exception)
-        {
-            MessageBox.Show (exception.ToString());
-            return 1;
-        }
-
-        return 0;
+        return result;
     }
 }

@@ -249,6 +249,10 @@ public sealed class Interpreter
     /// с последующим исполнением.
     /// </summary>
     /// <param name="fileName">Имя файла скрипта.</param>
+    /// <remarks>
+    /// Скрипт-файл может начинаться с "#!", эта строка будет проигнорирована.
+    /// Такой трюк позволяет сделать запускаемыми Barsuk-скрипты.
+    /// </remarks>
     public ExecutionResult ExecuteFile
         (
             string fileName
@@ -265,6 +269,8 @@ public sealed class Interpreter
             Context.Defines["__DIR__"] = Path.GetDirectoryName (fullPath);
 
             var sourceCode = File.ReadAllText (fileName);
+            // удаляем shebanh
+            sourceCode = BarsikUtility.RemoveShebang (sourceCode);
             result = Execute (sourceCode);
         }
         catch (ReturnException exception)

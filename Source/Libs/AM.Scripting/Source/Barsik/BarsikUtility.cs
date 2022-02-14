@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
 
 /* BarsikUtility.cs -- полезные методы для Барсика
  * Ars Magna project, http://arsmagna.ru
@@ -19,6 +20,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 using AM.Text;
@@ -119,6 +121,107 @@ public static class BarsikUtility
 
         return method.Invoke (target, args);
     }
+
+    /// <summary>
+    /// Создание и запуск интерпретатора.
+    /// </summary>
+    /// <param name="args">Аргументы командной строки.</param>
+    /// <param name="configure">Опциональная конфигурация интерпретатора.</param>
+    /// <param name="exceptionHandler">Опциональный обработчик исключений.</param>
+    /// <param name="dumper">Опциональный обработчик дампа переменных.</param>
+    /// <returns>Код возврата.</returns>
+    public static int CreateAndRunInterpreter
+        (
+            string[] args,
+            Action<Interpreter>? configure = null,
+            Action<Interpreter, Exception>? exceptionHandler = null,
+            Action<Interpreter>? dumper = null
+        )
+    {
+        var interpreter = new Interpreter();
+        configure?.Invoke (interpreter);
+
+        try
+        {
+            var dump = false;
+            var index = 0;
+
+            if (args.Length == 0)
+            {
+                var result = DoRepl (interpreter);
+                if (result.ExitCode != 0)
+                {
+                    interpreter.Context.Error.WriteLine (result);
+                }
+            }
+
+            foreach (var fileName in args)
+            {
+                if (fileName == "-d")
+                {
+                    dump = true;
+                    continue;
+                }
+
+                if (fileName == "-r")
+                {
+                    DoRepl (interpreter);
+                    continue;
+                }
+
+                if (fileName == "-e")
+                {
+                    var sourceCode = string.Join (' ', args.Skip (index + 1));
+                    interpreter.Execute (sourceCode);
+                    break;
+                }
+
+                var result = interpreter.ExecuteFile (fileName);
+                if (result.ExitCode != 0)
+                {
+                    interpreter.Context.Error.WriteLine (result);
+                }
+
+                if (result.ExitRequested)
+                {
+                    break;
+                }
+
+                index++;
+            }
+
+            if (dump)
+            {
+                dumper?.Invoke (interpreter);
+            }
+        }
+        catch (Exception exception)
+        {
+            exceptionHandler?.Invoke (interpreter, exception);
+            return 1;
+        }
+
+        return 0;
+
+    }
+
+    /// <summary>
+    /// Запуск REPL на указанном интерпретаторе.
+    /// </summary>
+    public static ExecutionResult DoRepl
+        (
+            Interpreter interpreter
+        )
+    {
+        Sure.NotNull (interpreter);
+
+        var version = Interpreter.FileVersion;
+        interpreter.Context.Output.WriteLine ($"Barsik interpreter {version}");
+        interpreter.Context.Output.WriteLine ("Press ENTER twice to exit");
+
+        return new Repl (interpreter).Loop();
+    }
+
 
     /// <summary>
     /// Вывод на печать Expando-объекта.
@@ -336,6 +439,65 @@ public static class BarsikUtility
         }
 
         output.Write ("]");
+    }
+
+    /// <summary>
+    /// Удаление shebang из исходного кода.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Шебанг  (англ. shebang, sha-bang, hashbang, pound-bang, or hash-pling)
+    /// - в программировании последовательность из символов решётки
+    /// и восклицательного знака ("#!") в начале файла скрипта.
+    /// </para>
+    /// <para>
+    /// https://ru.wikipedia.org/wiki/%D0%A8%D0%B5%D0%B1%D0%B0%D0%BD%D0%B3_(Unix)
+    /// </para>
+    /// <para>
+    /// Когда скрипт с шебангом выполняется как программа в Unix-подобных
+    /// операционных системах, загрузчик программ рассматривает остаток
+    /// строки после шебанга как имя файла программы-интерпретатора.
+    /// Загрузчик запускает эту программу и передаёт ей в качестве параметра
+    /// имя файла скрипта с шебангом.[8] Например, если полное имя файла
+    /// скрипта "path/to/script" и первая строка этого файла:
+    /// </para>
+    /// <code>
+    /// #!/bin/sh
+    /// </code>
+    /// <para>
+    /// то загрузчик запускает на выполнение "/bin/sh" (обычно это Bourne shell
+    /// или совместимый интерпретатор командной строки) и передаёт
+    /// "path/to/script" как первый параметр.
+    /// </para>
+    /// <para>
+    /// Строка с шебангом обычно пропускается интерпретатором, так как символ
+    /// "#" является символом начала комментариев во многих скриптовых языках.
+    /// Некоторые интерпретаторы, которые не используют символ решётки
+    /// для обозначения начала комментариев (такие, как Scheme), могут пропустить
+    /// строку шебанга, определив её назначение. Другие решения полагаются
+    /// на препроцессор, который обрабатывает и удаляет строку шебанга перед
+    /// тем, как остальная часть скрипта передаётся компилятору или интерпретатору.
+    /// Так, например, работает InstantFPC, который позволяет запускать программы,
+    /// написанные на Free Pascal, как скрипты на некоторых операционных системах.
+    /// </para>
+    /// </remarks>
+    public static string RemoveShebang
+        (
+            string sourceCode
+        )
+    {
+        Sure.NotNull (sourceCode);
+
+        if (!sourceCode.StartsWith ("#!"))
+        {
+            return sourceCode;
+        }
+
+        var stream = new StringReader (sourceCode);
+        stream.ReadLine();
+        var result = stream.ReadToEnd();
+
+        return result;
     }
 
     /// <summary>

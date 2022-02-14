@@ -14,7 +14,6 @@
 #region Using directives
 
 using System;
-using System.Linq;
 using System.Text;
 
 using AM;
@@ -33,19 +32,8 @@ namespace Chimera;
 /// <summary>
 /// Вся логика программы в одном классе.
 /// </summary>
-class Program
+internal static class Program
 {
-    static ExecutionResult DoRepl
-        (
-            Interpreter interpreter
-        )
-    {
-        var version = Interpreter.FileVersion;
-        interpreter.Context.Output.WriteLine ($"Barsik interpreter {version}");
-        interpreter.Context.Output.WriteLine ("Press ENTER twice to exit");
-        return new Repl (interpreter).Loop();
-    }
-
     /// <summary>
     /// Точка входа в программу.
     /// </summary>
@@ -58,70 +46,25 @@ class Program
 
         Magna.Initialize (args);
 
-        var interpreter = new Interpreter().WithStdLib();
-        interpreter.Context.AttachModule (new IrbisLib());
-        interpreter.Context.AttachModule (new IstuLib());
-
-        try
-        {
-            var dump = false;
-            var index = 0;
-
-            if (args.Length == 0)
-            {
-                var result = DoRepl (interpreter);
-                if (result.ExitCode != 0)
+        var result = BarsikUtility.CreateAndRunInterpreter
+            (
+                args,
+                interpreter =>
                 {
-                    interpreter.Context.Error.WriteLine (result);
-                }
-            }
-
-            foreach (var fileName in args)
-            {
-                if (fileName == "-d")
+                    interpreter.WithStdLib();
+                    interpreter.Context.AttachModule (new IrbisLib());
+                    interpreter.Context.AttachModule (new IstuLib());
+                },
+                (_, exception) =>
                 {
-                    dump = true;
-                    continue;
-                }
-
-                if (fileName == "-r")
+                    Console.WriteLine (exception);
+                },
+                interpreter =>
                 {
-                    DoRepl (interpreter);
-                    continue;
+                    interpreter.Context.DumpVariables();
                 }
+            );
 
-                if (fileName == "-e")
-                {
-                    var sourceCode = string.Join (' ', args.Skip (index + 1));
-                    interpreter.Execute (sourceCode);
-                    break;
-                }
-
-                var result = interpreter.ExecuteFile (fileName);
-                if (result.ExitCode != 0)
-                {
-                    interpreter.Context.Error.WriteLine (result);
-                }
-
-                if (result.ExitRequested)
-                {
-                    break;
-                }
-
-                index++;
-            }
-
-            if (dump)
-            {
-                interpreter.Context.DumpVariables();
-            }
-        }
-        catch (Exception exception)
-        {
-            Console.Error.WriteLine (exception);
-            return 1;
-        }
-
-        return 0;
+        return result;
     }
 }

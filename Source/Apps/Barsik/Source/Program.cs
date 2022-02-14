@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
@@ -14,7 +15,6 @@
 #region Using directives
 
 using System;
-using System.Linq;
 using System.Text;
 
 using AM.Scripting.Barsik;
@@ -23,97 +23,40 @@ using AM.Scripting.Barsik;
 
 #nullable enable
 
-namespace Barsik
+namespace Barsik;
+
+/// <summary>
+/// Вся логика программы в одном классе.
+/// </summary>
+internal static class Program
 {
     /// <summary>
-    /// Вся логика программы в одном классе.
+    /// Точка входа в программу.
     /// </summary>
-    class Program
+    static int Main
+        (
+            string[] args
+        )
     {
-        static ExecutionResult DoRepl
+        Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+
+        var result = BarsikUtility.CreateAndRunInterpreter
             (
-                Interpreter interpreter
-            )
-        {
-            var version = Interpreter.FileVersion;
-            interpreter.Context.Output.WriteLine ($"Barsik interpreter {version}");
-            interpreter.Context.Output.WriteLine ("Press ENTER twice to exit");
-            return new Repl (interpreter).Loop();
-        }
-
-        /// <summary>
-        /// Точка входа в программу.
-        /// </summary>
-        static int Main
-            (
-                string[] args
-            )
-        {
-            Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
-
-            var interpreter = new Interpreter().WithStdLib();
-
-            try
-            {
-                var dump = false;
-                var index = 0;
-
-                if (args.Length == 0)
+                args,
+                interpreter =>
                 {
-                    var result = DoRepl (interpreter);
-                    if (result.ExitCode != 0)
-                    {
-                        interpreter.Context.Error.WriteLine (result);
-                    }
-                }
-
-                foreach (var fileName in args)
+                    interpreter.WithStdLib();
+                },
+                (_, exception) =>
                 {
-                    if (fileName == "-d")
-                    {
-                        dump = true;
-                        continue;
-                    }
-
-                    if (fileName == "-r")
-                    {
-                        DoRepl (interpreter);
-                        continue;
-                    }
-
-                    if (fileName == "-e")
-                    {
-                        var sourceCode = string.Join (' ', args.Skip (index + 1));
-                        interpreter.Execute (sourceCode);
-                        break;
-                    }
-
-                    var result = interpreter.ExecuteFile (fileName);
-                    if (result.ExitCode != 0)
-                    {
-                        interpreter.Context.Error.WriteLine (result);
-                    }
-
-                    if (result.ExitRequested)
-                    {
-                        break;
-                    }
-
-                    index++;
-                }
-
-                if (dump)
+                    Console.WriteLine (exception);
+                },
+                interpreter =>
                 {
                     interpreter.Context.DumpVariables();
                 }
-            }
-            catch (Exception exception)
-            {
-                Console.Error.WriteLine (exception);
-                return 1;
-            }
+            );
 
-            return 0;
-        }
+        return result;
     }
 }

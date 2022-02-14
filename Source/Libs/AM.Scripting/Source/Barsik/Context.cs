@@ -68,17 +68,17 @@ public sealed class Context
     /// <summary>
     /// Стандартный входной поток.
     /// </summary>
-    public TextReader Input { get; }
+    public TextReader Input { get; set; }
 
     /// <summary>
     /// Стандартный выходной поток.
     /// </summary>
-    public TextWriter Output { get; private set; }
+    public TextWriter Output { get; set; }
 
     /// <summary>
     /// Выходной поток ошибок.
     /// </summary>
-    public TextWriter Error { get; }
+    public TextWriter Error { get; set; }
 
     /// <summary>
     /// Функции.
