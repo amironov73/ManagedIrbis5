@@ -21,66 +21,64 @@ using LinqToDB.Mapping;
 
 #nullable enable
 
-namespace Istu.OldModel
+namespace Istu.OldModel;
+
+/// <summary>
+/// Трансляция штрих-кодов в инвентарные номера.
+/// </summary>
+[Table]
+public class Translator
 {
+    #region Properties
+
     /// <summary>
-    /// Трансляция штрих-кодов в инвентарные номера.
+    /// Инвентарный номер экземпляра.
     /// </summary>
-    [Table]
-    public class Translator
-    {
-        #region Properties
+    [Column (Name = "invnum"), PrimaryKey]
+    public int Inventory { get; set; }
 
-        /// <summary>
-        /// Инвентарный номер экземпляра.
-        /// </summary>
-        [Column (Name = "invnum"), PrimaryKey]
-        public int Inventory { get; set; }
+    /// <summary>
+    /// Штрих-код экземпляра.
+    /// </summary>
+    [Column]
+    public string? Barcode { get; set; }
 
-        /// <summary>
-        /// Штрих-код экземпляра.
-        /// </summary>
-        [Column]
-        public string? Barcode { get; set; }
+    /// <summary>
+    /// Дата привязки штрих-кода.
+    /// </summary>
+    [Column (Name = "whn")]
+    public string? Moment { get; set; }
 
-        /// <summary>
-        /// Дата привязки штрих-кода.
-        /// </summary>
-        [Column (Name = "whn")]
-        public string? Moment { get; set; }
+    /// <summary>
+    /// Взято на обработку.
+    /// </summary>
+    [Column]
+    public bool Taken { get; set; }
 
-        /// <summary>
-        /// Взято на обработку.
-        /// </summary>
-        [Column]
-        public bool Taken { get; set; }
+    /// <summary>
+    /// Дополнительная информация об экземпляре.
+    /// </summary>
+    [Column, Nullable]
+    public string? Info { get; set; }
 
-        /// <summary>
-        /// Дополнительная информация об экземпляре.
-        /// </summary>
-        [Column, Nullable]
-        public string? Info { get; set; }
+    /// <summary>
+    /// Номер оператора, выполнившего привязку.
+    /// </summary>
+    [Column]
+    public int Operator { get; set; }
 
-        /// <summary>
-        /// Номер оператора, выполнившего привязку.
-        /// </summary>
-        [Column]
-        public int Operator { get; set; }
+    /// <summary>
+    /// Контрольный экземпляр.
+    /// </summary>
+    [Column]
+    public bool Pilot { get; set; }
 
-        /// <summary>
-        /// Контрольный экземпляр.
-        /// </summary>
-        [Column]
-        public bool Pilot { get; set; }
+    /// <summary>
+    /// RFID-метка.
+    /// </summary>
+    [Column, Nullable]
+    public string? Rfid { get; set; }
 
-        /// <summary>
-        /// RFID-метка.
-        /// </summary>
-        [Column, Nullable]
-        public string? Rfid { get; set; }
+    #endregion
 
-        #endregion
-
-    } // class Translator
-
-} // namespace Istu.OldModel
+}

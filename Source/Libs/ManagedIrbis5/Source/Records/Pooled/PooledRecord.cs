@@ -20,7 +20,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -91,7 +90,7 @@ public sealed class PooledRecord
     /// </summary>
     [XmlElement ("field")]
     [JsonPropertyName ("fields")]
-    public List<PooledField> Fields { get; private set; } = default!;
+    public PooledList<PooledField> Fields { get; private set; } = default!;
 
     /// <summary>
     /// Описание в произвольной форме (опциональное).
@@ -99,13 +98,6 @@ public sealed class PooledRecord
     [XmlIgnore]
     [JsonIgnore]
     public string? Description { get; set; }
-
-    /// <summary>
-    /// Признак того, что запись модифицирована.
-    /// </summary>
-    [XmlIgnore]
-    [JsonIgnore]
-    public bool Modified { get; internal set; }
 
     #endregion
 
@@ -231,7 +223,6 @@ public sealed class PooledRecord
         Status = RecordStatus.None;
         Fields = new();
         Description = null;
-        Modified = false;
     }
 
     /// <summary>
@@ -257,7 +248,6 @@ public sealed class PooledRecord
 
         Fields = null!;
         Description = null;
-        Modified = false;
     }
 
     #endregion
