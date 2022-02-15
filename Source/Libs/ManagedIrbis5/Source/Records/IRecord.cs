@@ -20,62 +20,58 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace ManagedIrbis.Records
+namespace ManagedIrbis.Records;
+
+/// <summary>
+/// Общий интерфейс для библиографической записи.
+/// </summary>
+public interface IRecord
 {
     /// <summary>
-    /// Общий интерфейс для библиографической записи.
+    /// База данных, в которой хранится запись.
     /// </summary>
-    public interface IRecord
-    {
-        /// <summary>
-        /// База данных, в которой хранится запись.
-        /// </summary>
-        public string? Database { get; set; }
+    public string? Database { get; set; }
 
-        /// <summary>
-        /// MFN (порядковый номер в базе данных) записи.
-        /// </summary>
-        public int Mfn { get; set; }
+    /// <summary>
+    /// MFN (порядковый номер в базе данных) записи.
+    /// </summary>
+    public int Mfn { get; set; }
 
-        /// <summary>
-        /// Версия записи.
-        /// </summary>
-        public int Version { get; set; }
+    /// <summary>
+    /// Версия записи.
+    /// </summary>
+    public int Version { get; set; }
 
-        /// <summary>
-        /// Статус записи.
-        /// </summary>
-        public RecordStatus Status { get; set; }
+    /// <summary>
+    /// Статус записи.
+    /// </summary>
+    public RecordStatus Status { get; set; }
 
-        /// <summary>
-        /// Декодирование ответа сервера.
-        /// </summary>
-        void Decode(Response response);
+    /// <summary>
+    /// Декодирование ответа сервера.
+    /// </summary>
+    void Decode (Response response);
 
-        /// <summary>
-        /// Декодирование записи, считанной из базы.
-        /// </summary>
-        void Decode(MstRecord64 record);
+    /// <summary>
+    /// Декодирование записи, считанной из базы.
+    /// </summary>
+    void Decode (MstRecord64 record);
 
-        /// <summary>
-        /// Кодирование записи в текст.
-        /// </summary>
-        string Encode (string? delimiter = IrbisText.IrbisDelimiter);
+    /// <summary>
+    /// Кодирование записи в текст.
+    /// </summary>
+    string Encode (string? delimiter = IrbisText.IrbisDelimiter);
 
-        /// <summary>
-        /// Кодирование записи для базы данных.
-        /// </summary>
-        void Encode(MstRecord64 record);
+    /// <summary>
+    /// Кодирование записи для базы данных.
+    /// </summary>
+    void Encode (MstRecord64 record);
 
-        /// <summary>
-        /// Получить текст поля до разделителей подполей
-        /// первого повторения поля с указанной меткой.
-        /// </summary>
-        /// <param name="tag">Метка поля.</param>
-        /// <returns>Значение поля или <c>null</c>.</returns>
-        string? FM (int tag);
-
-
-    } // interface IRecord
-
-} // namespace ManagedIrbis.Records
+    /// <summary>
+    /// Получить текст поля до разделителей подполей
+    /// первого повторения поля с указанной меткой.
+    /// </summary>
+    /// <param name="tag">Метка поля.</param>
+    /// <returns>Значение поля или <c>null</c>.</returns>
+    string? FM (int tag);
+}

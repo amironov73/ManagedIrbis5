@@ -14,22 +14,20 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Маркерный интерфейс для поля записи.
+/// </summary>
+public interface IField
 {
     /// <summary>
-    /// Маркерный интерфейс для поля записи.
+    /// Метка поля.
     /// </summary>
-    public interface IField
-    {
-        /// <summary>
-        /// Метка поля.
-        /// </summary>
-        public int Tag { get; set; }
+    public int Tag { get; set; }
 
-        /// <summary>
-        /// Текстовое представление поля.
-        /// </summary>
-        public ReadOnlyMemory<char> Text { get; set; }
-    } // interface IField
-
-} // namespace ManagedIrbis
+    /// <summary>
+    /// Текстовое представление поля.
+    /// </summary>
+    public ReadOnlyMemory<char> Text { get; set; }
+}

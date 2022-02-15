@@ -19,6 +19,8 @@
 
 #region Using directives
 
+using System;
+
 using AM;
 
 using Microsoft.Extensions.ObjectPool;
@@ -33,6 +35,7 @@ namespace ManagedIrbis.Records;
 /// Пул записей, полей и подполей.
 /// </summary>
 public sealed class RecordPool
+    : IDisposable
 {
     #region Properties
 
@@ -50,9 +53,10 @@ public sealed class RecordPool
     /// </summary>
     public RecordPool()
     {
-        _subFields = new DefaultObjectPool<PooledSubField> (new DefaultPooledObjectPolicy<PooledSubField>());
-        _fields = new DefaultObjectPool<PooledField> (new DefaultPooledObjectPolicy<PooledField>());
-        _records = new DefaultObjectPool<PooledRecord> (new DefaultPooledObjectPolicy<PooledRecord>());
+        var provider = new DefaultObjectPoolProvider();
+        _subFields = provider.Create<PooledSubField>();
+        _fields = provider.Create<PooledField>();
+        _records = provider.Create<PooledRecord>();
     }
 
     #endregion
@@ -92,6 +96,7 @@ public sealed class RecordPool
     {
         var result = _fields.Get();
         result.Init (tag);
+        result._pool = this;
 
         return result;
     }
@@ -103,6 +108,7 @@ public sealed class RecordPool
     {
         var result = _records.Get();
         result.Init();
+        result._pool = this;
 
         return result;
     }
@@ -147,6 +153,19 @@ public sealed class RecordPool
 
         record.Dispose();
         _records.Return (record);
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        if (this != Shared)
+        {
+            // TODO implement
+        }
     }
 
     #endregion

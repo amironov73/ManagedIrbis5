@@ -19,9 +19,12 @@
 
 #region Using directives
 
-using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
+
+using AM;
+using AM.Text;
 
 #endregion
 
@@ -49,11 +52,32 @@ public sealed class PooledField
     /// </summary>
     [XmlArrayItem ("subfield")]
     [JsonPropertyName ("subfields")]
-    public List<PooledSubField> Subfields { get; private set; } = default!;
+    public PooledList<PooledSubField> Subfields { get; private set; } = default!;
+
+    #endregion
+
+    #region Private members
+
+    internal RecordPool _pool = default!;
 
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Добавление подполя.
+    /// </summary>
+    /// <param name="code">Код добавляемого подполя.</param>
+    public PooledField Add
+        (
+            char code
+        )
+    {
+        var subfield = _pool.GetSubField (code);
+        Subfields.Add (subfield);
+
+        return this;
+    }
 
     /// <summary>
     /// Инициализация.
@@ -73,10 +97,48 @@ public sealed class PooledField
     public void Dispose()
     {
         Tag = default;
+
+        // ReSharper disable ConditionIsAlwaysTrueOrFalse
+        if (Subfields is not null)
+        // ReSharper restore ConditionIsAlwaysTrueOrFalse
+        {
+            foreach (var subfield in Subfields)
+            {
+                _pool.Return (subfield);
+            }
+
+            Subfields.Clear();
+        }
+
         Subfields = default!;
     }
 
     #endregion
 
+    #region Object members
 
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var length = 4 + Subfields.Sum
+            (
+                sf => sf.Value!.Length
+                      + (sf.Code == default ? 0 : 2)
+            );
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (length);
+        builder.Append (Tag.ToInvariantString())
+            .Append ('#');
+        foreach (var subfield in Subfields)
+        {
+            builder.Append (subfield);
+        }
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
+
+    #endregion
 }
