@@ -46,7 +46,7 @@ namespace ManagedIrbis.Magazines;
 [DebuggerDisplay ("{Year} {Number} {Supplement}")]
 public sealed class MagazineIssueInfo
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Properties
 

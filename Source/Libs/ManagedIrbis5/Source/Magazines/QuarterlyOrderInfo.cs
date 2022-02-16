@@ -41,7 +41,7 @@ namespace ManagedIrbis.Magazines;
 [XmlRoot ("quarterly")]
 public sealed class QuarterlyOrderInfo
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Constants
 

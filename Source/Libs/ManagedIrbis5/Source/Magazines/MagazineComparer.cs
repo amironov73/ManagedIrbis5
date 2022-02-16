@@ -18,23 +18,22 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace ManagedIrbis.Magazines
+namespace ManagedIrbis.Magazines;
+
+/// <summary>
+/// Сравнение описаний журналов.
+/// </summary>
+public static class MagazineComparer
 {
     /// <summary>
-    /// Сравнение описаний журналов.
+    /// Сравнение журналов по их заглавиям.
     /// </summary>
-    public static class MagazineComparer
+    public class ByTitle : IComparer<MagazineInfo>
     {
-        /// <summary>
-        /// Сравнение журналов по их заглавиям.
-        /// </summary>
-        public class ByTitle : IComparer<MagazineInfo>
+        /// <inheritdoc cref="IComparer{T}.Compare"/>
+        public int Compare (MagazineInfo? x, MagazineInfo? y)
         {
-            /// <inheritdoc cref="IComparer{T}.Compare"/>
-            public int Compare (MagazineInfo? x, MagazineInfo? y)
-            {
-                return string.Compare (x?.Title, y?.Title, StringComparison.CurrentCulture);
-            }
+            return string.Compare (x?.Title, y?.Title, StringComparison.CurrentCulture);
         }
     }
 }

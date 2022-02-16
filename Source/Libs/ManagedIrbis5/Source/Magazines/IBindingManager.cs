@@ -22,39 +22,38 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis.Magazines
+namespace ManagedIrbis.Magazines;
+
+/// <summary>
+/// Интерфейс менеджера подшивок.
+/// </summary>
+public interface IBindingManager
+    : IDisposable
 {
+
     /// <summary>
-    /// Интерфейс менеджера подшивок.
+    /// Создание либо обновление подшивки по ее спецификации.
     /// </summary>
-    public interface IBindingManager
-        : IDisposable
-    {
+    void BindMagazines
+        (
+            BindingSpecification specification
+        );
 
-        /// <summary>
-        /// Создание либо обновление подшивки по ее спецификации.
-        /// </summary>
-        void BindMagazines
-            (
-                BindingSpecification specification
-            );
+    /// <summary>
+    /// Проверка номера журнала/газеты на возможность добавления в подшивку.
+    /// </summary>
+    bool CheckIssue
+        (
+            BindingSpecification specification,
+            MagazineIssueInfo issue
+        );
 
-        /// <summary>
-        /// Проверка номера журнала/газеты на возможность добавления в подшивку.
-        /// </summary>
-        bool CheckIssue
-            (
-                BindingSpecification specification,
-                MagazineIssueInfo issue
-            );
+    /// <summary>
+    /// Расшитие и удаление подшивки по ее индексу.
+    /// </summary>
+    public void UnbindMagazines
+        (
+            string bindingIndex
+        );
 
-        /// <summary>
-        /// Расшитие и удаление подшивки по ее индексу.
-        /// </summary>
-        public void UnbindMagazines
-            (
-                string bindingIndex
-            );
-
-    }
 }

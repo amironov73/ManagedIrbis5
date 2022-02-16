@@ -74,6 +74,8 @@ public sealed class MagazineManager
             ISyncProvider connection
         )
     {
+        Sure.NotNull (connection);
+
         Connection = connection;
     }
 
@@ -133,6 +135,8 @@ public sealed class MagazineManager
             int mfn
         )
     {
+        Sure.Positive (mfn);
+
         var record = Connection.ReadRecord (mfn);
 
         return record is null ? null : MagazineInfo.Parse (record);
@@ -162,6 +166,8 @@ public sealed class MagazineManager
             MagazineArticleInfo article
         )
     {
+        Sure.VerifyNotNull (article);
+
         Magna.Error
             (
                 nameof (MagazineManager) + "::" + nameof (GetIssue)
@@ -229,6 +235,8 @@ public sealed class MagazineManager
             MagazineInfo magazine
         )
     {
+        Sure.VerifyNotNull (magazine);
+
         var searchExpression = $"\"I933={magazine.Index}/$\"";
         var records = BatchRecordReader.Search
             (
@@ -255,6 +263,9 @@ public sealed class MagazineManager
             string year
         )
     {
+        Sure.VerifyNotNull (magazine);
+        Sure.NotNullNorEmpty (year);
+
         var searchExpression = $"\"I={magazine.Index}/{year}/$\"";
         var records = BatchRecordReader.Search
             (
@@ -280,6 +291,8 @@ public sealed class MagazineManager
             MagazineIssueInfo issue
         )
     {
+        Sure.VerifyNotNull (issue);
+
         var searchExpression = $"\"II={issue.Index}\"";
         var records = BatchRecordReader.Search
             (
@@ -305,6 +318,8 @@ public sealed class MagazineManager
             MagazineIssueInfo issue
         )
     {
+        Sure.VerifyNotNull (issue);
+
         /*
         string searchExpression = string.Format
             (
@@ -331,6 +346,10 @@ public sealed class MagazineManager
             ExemplarInfo[]? exemplars
         )
     {
+        Sure.VerifyNotNull (magazine);
+        Sure.NotNullNorEmpty (year);
+        Sure.NotNullNorEmpty (issue);
+
         var fullIndex = magazine.Index + "/" + year + "/" + issue;
         var result = new MagazineIssueInfo
         {

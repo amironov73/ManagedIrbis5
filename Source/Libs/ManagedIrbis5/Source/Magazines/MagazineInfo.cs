@@ -37,7 +37,7 @@ namespace ManagedIrbis.Magazines;
 [XmlRoot ("magazine")]
 public sealed class MagazineInfo
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Constants
 
@@ -251,7 +251,7 @@ public sealed class MagazineInfo
             Record record
         )
     {
-        Sure.NotNull (record);
+        Sure.VerifyNotNull (record);
 
         // TODO: реализовать оптимально
 
@@ -274,7 +274,6 @@ public sealed class MagazineInfo
 
         if (string.IsNullOrEmpty (result.Title)
             || string.IsNullOrEmpty (result.Index)
-
             //|| string.IsNullOrEmpty(result.MagazineKind)
             //|| string.IsNullOrEmpty(result.MagazineType)
            )

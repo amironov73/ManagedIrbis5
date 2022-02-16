@@ -17,32 +17,31 @@
 
 #nullable enable
 
-namespace ManagedIrbis.Magazines
+namespace ManagedIrbis.Magazines;
+
+/// <summary>
+/// Данные используемые при кумуляции.
+/// Относятся к одному экземпляру журнала/газеты.
+/// </summary>
+sealed class CumulationData
 {
     /// <summary>
-    /// Данные используемые при кумуляции.
-    /// Относятся к одному экземпляру журнала/газеты.
+    /// Год.
     /// </summary>
-    sealed class CumulationData
-    {
-        /// <summary>
-        /// Год.
-        /// </summary>
-        public string? Year { get; set; }
+    public string? Year { get; set; }
 
-        /// <summary>
-        /// Том.
-        /// </summary>
-        public string? Volume { get; set; }
+    /// <summary>
+    /// Том.
+    /// </summary>
+    public string? Volume { get; set; }
 
-        /// <summary>
-        /// Номер выпуска.
-        /// </summary>
-        public string? Number { get; set; }
+    /// <summary>
+    /// Номер выпуска.
+    /// </summary>
+    public string? Number { get; set; }
 
-        /// <summary>
-        /// Место хранения экземпляра.
-        /// </summary>
-        public string? Place { get; set; }
-    }
+    /// <summary>
+    /// Место хранения экземпляра.
+    /// </summary>
+    public string? Place { get; set; }
 }

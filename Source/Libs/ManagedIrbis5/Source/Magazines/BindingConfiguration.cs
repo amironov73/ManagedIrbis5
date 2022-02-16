@@ -32,191 +32,190 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Magazines
-{
-    /// <summary>
-    /// Конфигурация менеджера подшивок.
-    /// </summary>
-    [XmlRoot ("binding")]
-    public sealed class BindingConfiguration
-        : IHandmadeSerializable,
+namespace ManagedIrbis.Magazines;
+
+/// <summary>
+/// Конфигурация менеджера подшивок.
+/// </summary>
+[XmlRoot ("binding")]
+public sealed class BindingConfiguration
+    : IHandmadeSerializable,
         IVerifiable
+{
+    #region Properties
+
+    /// <summary>
+    /// Статусы экземпляров, которые можно подшивать.
+    /// </summary>
+    [XmlElement ("good-status")]
+    [JsonPropertyName ("goodStatus")]
+    [Description ("Статусы экземпляров, которые можно подшивать")]
+    public string[]? GoodStatus { get; set; } = { "0" };
+
+    /// <summary>
+    /// Рабочие листы, которые можно подшивать.
+    /// </summary>
+    [XmlElement ("good-worksheet")]
+    [JsonPropertyName ("goodWorksheet")]
+    [Description ("Рабочие листы, которые можно подшивать")]
+    public string[]? GoodWorksheet { get; set; } = { "NJ" };
+
+    /// <summary>
+    /// Фонды, которые нельзя подшивать.
+    /// </summary>
+    [XmlArrayItem ("bad-place")]
+    [JsonPropertyName ("badPlace")]
+    [Description ("Фонды, которые нельзя подшивать")]
+    public string[]? BadPlace { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Проверка места хранения на возможность добавления в подшивку.
+    /// </summary>
+    public bool CheckPlace
+        (
+            string? place
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Статусы экземпляров, которые можно подшивать.
-        /// </summary>
-        [XmlElement ("good-status")]
-        [JsonPropertyName ("goodStatus")]
-        [Description ("Статусы экземпляров, которые можно подшивать")]
-        public string[]? GoodStatus { get; set; } = { "0" };
-
-        /// <summary>
-        /// Рабочие листы, которые можно подшивать.
-        /// </summary>
-        [XmlElement ("good-worksheet")]
-        [JsonPropertyName ("goodWorksheet")]
-        [Description ("Рабочие листы, которые можно подшивать")]
-        public string[]? GoodWorksheet { get; set; } = { "NJ" };
-
-        /// <summary>
-        /// Фонды, которые нельзя подшивать.
-        /// </summary>
-        [XmlArrayItem ("bad-place")]
-        [JsonPropertyName ("badPlace")]
-        [Description ("Фонды, которые нельзя подшивать")]
-        public string[]? BadPlace { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Проверка места хранения на возможность добавления в подшивку.
-        /// </summary>
-        public bool CheckPlace
-            (
-                string? place
-            )
-        {
-            return !string.IsNullOrEmpty (place)
-                   && (BadPlace is null || !BadPlace.ContainsNoCase (place));
-        }
-
-        /// <summary>
-        /// Проверка статуса экземпляра на возможность добавления в подшивку.
-        /// </summary>
-        public bool CheckStatus
-            (
-                string? status
-            )
-        {
-            return !string.IsNullOrEmpty (status)
-                   && (GoodStatus is null || GoodStatus.Contains (status));
-        }
-
-        /// <summary>
-        /// Проверка рабочего листа на возможность добавления в подшивку.
-        /// </summary>
-        public bool CheckWorksheet
-            (
-                string? worksheet
-            )
-        {
-            return !string.IsNullOrEmpty (worksheet)
-                   && (GoodWorksheet is null || GoodWorksheet.ContainsNoCase (worksheet));
-        }
-
-        /// <summary>
-        /// Получение конфигурации по умолчанию.
-        /// </summary>
-        public static BindingConfiguration GetDefault()
-        {
-            return new ();
-        }
-
-        /// <summary>
-        /// Чтение конфигурации из указанного файла.
-        /// </summary>
-        public static BindingConfiguration LoadConfiguration
-            (
-                string fileName
-            )
-        {
-            Sure.FileExists (fileName);
-
-            return JsonUtility.ReadObjectFromFile<BindingConfiguration> (fileName);
-        }
-
-        /// <summary>
-        /// Запись конфигурации в указанный файл.
-        /// </summary>
-        public void SaveConfiguration
-            (
-                string fileName
-            )
-        {
-            Sure.NotNullNorEmpty (fileName);
-
-            JsonUtility.SaveObjectToFile (this, fileName);
-        }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Sure.NotNull (reader);
-
-            GoodStatus = reader.ReadNullableStringArray();
-            GoodWorksheet = reader.ReadNullableStringArray();
-            BadPlace = reader.ReadNullableStringArray();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            Sure.NotNull (writer);
-
-            writer
-                .WriteNullableArray (GoodStatus)
-                .WriteNullableArray (GoodWorksheet)
-                .WriteNullableArray (BadPlace);
-        }
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<BindingConfiguration> (this, throwOnError);
-
-            verifier
-                .NotNullNorEmpty (GoodStatus)
-                .NotNullNorEmpty (GoodWorksheet);
-
-            return verifier.Result;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            var builder = StringBuilderPool.Shared.Get();
-            builder.Append ("GoodStatus: ");
-            builder.AppendEnumerable (GoodStatus);
-            builder.Append (", ");
-
-            builder.Append ("GoodWorksheet: ");
-            builder.AppendEnumerable (GoodWorksheet);
-            builder.Append (", ");
-
-            builder.Append ("BadPlace: ");
-            builder.AppendEnumerable (BadPlace);
-
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
-        }
-
-        #endregion
+        return !string.IsNullOrEmpty (place)
+               && (BadPlace is null || !BadPlace.ContainsNoCase (place));
     }
+
+    /// <summary>
+    /// Проверка статуса экземпляра на возможность добавления в подшивку.
+    /// </summary>
+    public bool CheckStatus
+        (
+            string? status
+        )
+    {
+        return !string.IsNullOrEmpty (status)
+               && (GoodStatus is null || GoodStatus.Contains (status));
+    }
+
+    /// <summary>
+    /// Проверка рабочего листа на возможность добавления в подшивку.
+    /// </summary>
+    public bool CheckWorksheet
+        (
+            string? worksheet
+        )
+    {
+        return !string.IsNullOrEmpty (worksheet)
+               && (GoodWorksheet is null || GoodWorksheet.ContainsNoCase (worksheet));
+    }
+
+    /// <summary>
+    /// Получение конфигурации по умолчанию.
+    /// </summary>
+    public static BindingConfiguration GetDefault()
+    {
+        return new ();
+    }
+
+    /// <summary>
+    /// Чтение конфигурации из указанного файла.
+    /// </summary>
+    public static BindingConfiguration LoadConfiguration
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
+
+        return JsonUtility.ReadObjectFromFile<BindingConfiguration> (fileName);
+    }
+
+    /// <summary>
+    /// Запись конфигурации в указанный файл.
+    /// </summary>
+    public void SaveConfiguration
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        JsonUtility.SaveObjectToFile (this, fileName);
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        GoodStatus = reader.ReadNullableStringArray();
+        GoodWorksheet = reader.ReadNullableStringArray();
+        BadPlace = reader.ReadNullableStringArray();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer
+            .WriteNullableArray (GoodStatus)
+            .WriteNullableArray (GoodWorksheet)
+            .WriteNullableArray (BadPlace);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<BindingConfiguration> (this, throwOnError);
+
+        verifier
+            .NotNullNorEmpty (GoodStatus)
+            .NotNullNorEmpty (GoodWorksheet);
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ("GoodStatus: ");
+        builder.AppendEnumerable (GoodStatus);
+        builder.Append (", ");
+
+        builder.Append ("GoodWorksheet: ");
+        builder.AppendEnumerable (GoodWorksheet);
+        builder.Append (", ");
+
+        builder.Append ("BadPlace: ");
+        builder.AppendEnumerable (BadPlace);
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
+
+    #endregion
 }

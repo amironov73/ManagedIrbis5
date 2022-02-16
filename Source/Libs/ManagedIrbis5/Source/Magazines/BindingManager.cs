@@ -32,274 +32,274 @@ using ManagedIrbis.Records;
 
 #nullable enable
 
-namespace ManagedIrbis.Magazines
+namespace ManagedIrbis.Magazines;
+
+/// <summary>
+/// Менеджер подшивок.
+/// </summary>
+public sealed class BindingManager
+    : IBindingManager
 {
+    #region Properties
+
     /// <summary>
-    /// Менеджер подшивок.
+    /// Синхронный провайдер.
     /// </summary>
-    public sealed class BindingManager
-        : IBindingManager
+    public ISyncProvider Provider { get; }
+
+    /// <summary>
+    /// Конфигурация библиографических записей.
+    /// </summary>
+    public RecordConfiguration RecordConfiguration { get; }
+
+    /// <summary>
+    /// Конфигурация подшивателя.
+    /// </summary>
+    public BindingConfiguration BindingConfiguration { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public BindingManager
+        (
+            ISyncProvider provider,
+            BindingConfiguration? bindingConfiguration = null,
+            RecordConfiguration? recordConfiguration = null
+        )
     {
-        #region Properties
+        Provider = provider;
+        BindingConfiguration = bindingConfiguration ?? BindingConfiguration.GetDefault();
+        RecordConfiguration = recordConfiguration ?? RecordConfiguration.GetDefault();
 
-        /// <summary>
-        /// Синхронный провайдер.
-        /// </summary>
-        public ISyncProvider Provider { get; }
+    } // constructor
 
-        /// <summary>
-        /// Конфигурация библиографических записей.
-        /// </summary>
-        public RecordConfiguration RecordConfiguration { get; }
+    #endregion
 
-        /// <summary>
-        /// Конфигурация подшивателя.
-        /// </summary>
-        public BindingConfiguration BindingConfiguration { get; }
+    #region Public methods
 
-        #endregion
+    /// <inheritdoc cref="IBindingManager.BindMagazines"/>
+    public void BindMagazines
+        (
+            BindingSpecification specification
+        )
+    {
+        // TODO: реализовать добавление номеров из другого года
 
-        #region Construction
+        Sure.NotNull (specification);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public BindingManager
-            (
-                ISyncProvider provider,
-                BindingConfiguration? bindingConfiguration = null,
-                RecordConfiguration? recordConfiguration = null
-            )
+        if (string.IsNullOrEmpty (specification.MagazineIndex)
+            || string.IsNullOrEmpty (specification.Year)
+            || string.IsNullOrEmpty (specification.IssueNumbers)
+            || string.IsNullOrEmpty (specification.Description)
+            || string.IsNullOrEmpty (specification.BindingNumber)
+            || string.IsNullOrEmpty (specification.Inventory)
+            || string.IsNullOrEmpty (specification.Place)
+            || string.IsNullOrEmpty (specification.Complect))
         {
-            Provider = provider;
-            BindingConfiguration = bindingConfiguration ?? BindingConfiguration.GetDefault();
-            RecordConfiguration = recordConfiguration ?? RecordConfiguration.GetDefault();
+            throw new IrbisException ("Empty binding specification");
+        }
 
-        } // constructor
-
-        #endregion
-
-        #region Public methods
-
-        /// <inheritdoc cref="IBindingManager.BindMagazines"/>
-        public void BindMagazines
-            (
-                BindingSpecification specification
-            )
+        var numbers = NumberRangeCollection.Parse (specification.IssueNumbers);
+        if (numbers.Count == 0)
         {
-            // TODO: реализовать добавление номеров из другого года
+            // если список номеров пустой
+            throw new IrbisException();
+        }
 
-            Sure.NotNull (specification);
+        var bindingDescription = specification.Description;
+        var bindingIndex = string.IsNullOrEmpty (specification.VolumeNumber)
+            ? $"{specification.MagazineIndex}/{specification.Year}/{bindingDescription}"
+            : $"{specification.MagazineIndex}/{specification.Year}/{specification.VolumeNumber}/{bindingDescription}";
 
-            if (string.IsNullOrEmpty (specification.MagazineIndex)
-                || string.IsNullOrEmpty (specification.Year)
-                || string.IsNullOrEmpty (specification.IssueNumbers)
-                || string.IsNullOrEmpty (specification.Description)
-                || string.IsNullOrEmpty (specification.BindingNumber)
-                || string.IsNullOrEmpty (specification.Inventory)
-                || string.IsNullOrEmpty (specification.Place)
-                || string.IsNullOrEmpty (specification.Complect))
+        var mainRecord = Provider.ByIndex (specification.MagazineIndex);
+        if (mainRecord is null)
+        {
+            // если сводная запись не найдена, все плохо
+            throw new IrbisException();
+        }
+
+        var magazine = MagazineInfo.Parse (mainRecord); // TODO: брать данные из сводной записи
+        if (magazine is null)
+        {
+            // если не удалось распарсить сводную запись, все плохо
+            throw new IrbisException();
+        }
+
+        foreach (var numberText in numbers)
+        {
+            // Создание записей, если их еще нет.
+            var issueIndex = string.IsNullOrEmpty (specification.VolumeNumber)
+                ? $"{specification.MagazineIndex}/{specification.Year}/{numberText}"
+                : $"{specification.MagazineIndex}/{specification.Year}/{specification.VolumeNumber}/{numberText}";
+            var issueRecord = Provider.ByIndex (issueIndex);
+            if (issueRecord is null)
             {
-                throw new IrbisException ("Empty binding specification");
-            }
-
-            var numbers = NumberRangeCollection.Parse (specification.IssueNumbers);
-            if (numbers.Count == 0)
-            {
-                // если список номеров пустой
-                throw new IrbisException();
-            }
-
-            var bindingDescription = specification.Description;
-            var bindingIndex = string.IsNullOrEmpty (specification.VolumeNumber)
-                    ? $"{specification.MagazineIndex}/{specification.Year}/{bindingDescription}"
-                    : $"{specification.MagazineIndex}/{specification.Year}/{specification.VolumeNumber}/{bindingDescription}";
-
-            var mainRecord = Provider.ByIndex (specification.MagazineIndex);
-            if (mainRecord is null)
-            {
-                // если сводная запись не найдена, все плохо
-                throw new IrbisException();
-            }
-
-            var magazine = MagazineInfo.Parse (mainRecord); // TODO: брать данные из сводной записи
-            if (magazine is null)
-            {
-                // если не удалось распарсить сводную запись, все плохо
-                throw new IrbisException();
-            }
-
-            foreach (var numberText in numbers)
-            {
-                // Создание записей, если их еще нет.
-                var issueIndex = string.IsNullOrEmpty (specification.VolumeNumber)
-                    ? $"{specification.MagazineIndex}/{specification.Year}/{numberText}"
-                    : $"{specification.MagazineIndex}/{specification.Year}/{specification.VolumeNumber}/{numberText}";
-                var issueRecord = Provider.ByIndex (issueIndex);
-                if (issueRecord is null)
-                {
-                    issueRecord = new Record
-                    {
-                        Database = Provider.Database
-                    };
-
-                    issueRecord.Add (933, specification.MagazineIndex); // поле 933: шифр журнала
-                    issueRecord.Add (903, issueIndex); // поле 903: шифр выпуска
-                    issueRecord.Add (934, specification.Year); // поле 934: год выпуска журнала
-                    issueRecord.Add (936, numberText.ToString()); // поле 936: номер, часть журнала
-                    issueRecord.Add (920, "NJP"); // поле 920: рабочий лист
-                    issueRecord.Fields.Add
-                        (
-                            new Field { Tag = 910 } // поле 910: сведения об экземпляре
-                                .Add ('a', ExemplarStatus.Bound) // подполе A: статус экземпляра
-                                .Add ('b', specification.Complect) // подполе B: номер комплекта
-                                .Add ('c', "?") // подполе C: дата поступления
-                                .Add ('d', specification.Place) // подполе D: место хранения
-                                .Add ('p', bindingIndex) // подполе P: шифр подшивки
-                                .Add ('i', specification.Inventory) // подполе I: инвентарный номер подшивки
-                        );
-
-                } // if
-
-                issueRecord.Fields.Add
-                    (
-                        new Field { Tag = 463 } // поле 463: издание, в котором опубликована статья
-                            .Add ('w', bindingIndex) // подполе W: шифр документа в базе
-                    );
-
-                Provider.WriteRecord (issueRecord);
-
-            } // foreach
-
-            // Создание записи подшивки, если ее еще нет
-            var bindingRecord = Provider.ByIndex (bindingIndex);
-            if (bindingRecord is null)
-            {
-                bindingRecord = new Record
+                issueRecord = new Record
                 {
                     Database = Provider.Database
                 };
 
-                bindingRecord.Add (933, specification.MagazineIndex); // поле 933: шифр журнала
-                bindingRecord.Add (903, bindingIndex); // поле 903: шифр подписки
-                bindingRecord.Add (934, specification.Year); // поле 934: год выпуска журналов в подшивке
-                bindingRecord.Add (936, bindingDescription); // поле 936: номер, часть журнала
-                bindingRecord.Add (931, specification.IssueNumbers); // поле 931: дополнение к номеру
-                // TODO: 931^c - дополнение к номеру (выводится в скобках)
-                bindingRecord.Add (920, "NJK"); // поле 920: рабочий лист
+                issueRecord.Add (933, specification.MagazineIndex); // поле 933: шифр журнала
+                issueRecord.Add (903, issueIndex); // поле 903: шифр выпуска
+                issueRecord.Add (934, specification.Year); // поле 934: год выпуска журнала
+                issueRecord.Add (936, numberText.ToString()); // поле 936: номер, часть журнала
+                issueRecord.Add (920, "NJP"); // поле 920: рабочий лист
+                issueRecord.Fields.Add
+                    (
+                        new Field { Tag = 910 } // поле 910: сведения об экземпляре
+                            .Add ('a', ExemplarStatus.Bound) // подполе A: статус экземпляра
+                            .Add ('b', specification.Complect) // подполе B: номер комплекта
+                            .Add ('c', "?") // подполе C: дата поступления
+                            .Add ('d', specification.Place) // подполе D: место хранения
+                            .Add ('p', bindingIndex) // подполе P: шифр подшивки
+                            .Add ('i', specification.Inventory) // подполе I: инвентарный номер подшивки
+                    );
 
             } // if
 
-            bindingRecord.Fields.Add
+            issueRecord.Fields.Add
                 (
-                    new Field { Tag = 910 }                 // поле 910: сведения об экземпляре
-                        .Add ('a', ExemplarStatus.Free)     // подполе A: статус экземпляра
-                        .Add ('b', specification.Inventory) // подполе B: инвентарный номер
-                        .Add ('c', IrbisDate.TodayText)     // подполе C: дата поступления
-                        .Add ('d', specification.Place)      // подполе D: место хранения
-                    // TODO: 910^h - штрих-код или радиометка подшивки
+                    new Field { Tag = 463 } // поле 463: издание, в котором опубликована статья
+                        .Add ('w', bindingIndex) // подполе W: шифр документа в базе
                 );
 
-            Provider.WriteRecord (bindingRecord);
+            Provider.WriteRecord (issueRecord);
 
-            // Обновление кумуляции
-            // TODO: произвести настоящую кумуляцию
-            mainRecord.Fields.Add
-                (
-                    new Field { Tag = 909 }                    // поле 909: зарегистрированы поступления
-                        .Add ('q', specification.Year)         // подполе Q: кумулированные сведения, год
-                        .Add ('d', specification.Place)         // подполе D: место хранения
-                        .Add ('k', specification.Complect)     // подполе K: номер комплекта
-                        .Add ('h', specification.IssueNumbers) // подполе H: кумулированные сведения, номера
-                );
+        } // foreach
 
-            Provider.WriteRecord (mainRecord);
+        // Создание записи подшивки, если ее еще нет
+        var bindingRecord = Provider.ByIndex (bindingIndex);
+        if (bindingRecord is null)
+        {
+            bindingRecord = new Record
+            {
+                Database = Provider.Database
+            };
 
-        } // method BindMagazines
+            bindingRecord.Add (933, specification.MagazineIndex); // поле 933: шифр журнала
+            bindingRecord.Add (903, bindingIndex); // поле 903: шифр подписки
+            bindingRecord.Add (934, specification.Year); // поле 934: год выпуска журналов в подшивке
+            bindingRecord.Add (936, bindingDescription); // поле 936: номер, часть журнала
+            bindingRecord.Add (931, specification.IssueNumbers); // поле 931: дополнение к номеру
+            // TODO: 931^c - дополнение к номеру (выводится в скобках)
+            bindingRecord.Add (920, "NJK"); // поле 920: рабочий лист
 
-        /// <inheritdoc cref="IBindingManager.CheckIssue"/>
-        public bool CheckIssue
+        } // if
+
+        bindingRecord.Fields.Add
             (
-                BindingSpecification specification,
-                MagazineIssueInfo issue
-            )
-        {
-            if (!BindingConfiguration.CheckWorksheet (issue.Worksheet))
-            {
-                // В номере неверный рабочий лист
-                return false;
-            }
+                new Field { Tag = 910 }                 // поле 910: сведения об экземпляре
+                    .Add ('a', ExemplarStatus.Free)     // подполе A: статус экземпляра
+                    .Add ('b', specification.Inventory) // подполе B: инвентарный номер
+                    .Add ('c', IrbisDate.TodayText)     // подполе C: дата поступления
+                    .Add ('d', specification.Place)      // подполе D: место хранения
+                // TODO: 910^h - штрих-код или радиометка подшивки
+            );
 
-            var exemplars = issue.Exemplars;
-            if (exemplars.IsNullOrEmpty())
-            {
-                // В номере не зарегистрированы экземпляры
-                return false;
-            }
+        Provider.WriteRecord (bindingRecord);
 
-            exemplars = exemplars
-                .Where (exemplar => exemplar.Number == specification.Complect)
-                .ToArray();
-            if (exemplars.IsNullOrEmpty())
-            {
-                // В номере нет требуемого комплекта
-                return false;
-            }
-
-            if (exemplars.Length != 1)
-            {
-                // В номере больше одного комплекта
-                return false;
-            }
-
-            var place = exemplars.First().Place;
-            if (!BindingConfiguration.CheckPlace (place))
-            {
-                // Запрещенное место хранения
-                return false;
-            }
-
-            if (!place.SameString (specification.Place))
-            {
-                // Различаются места хранения
-                return false;
-            }
-
-            if (!BindingConfiguration.CheckStatus (exemplars.First().Status))
-            {
-                // Недопустимый статус экземпляра
-                return false;
-            }
-
-            // TODO: проверить попадание номера в спецификацию подшивки
-
-            return true;
-
-        } // method CheckIssue
-
-        /// <inheritdoc cref="IBindingManager.UnbindMagazines"/>
-        public void UnbindMagazines
+        // Обновление кумуляции
+        // TODO: произвести настоящую кумуляцию
+        mainRecord.Fields.Add
             (
-                string bindingIndex
-            )
+                new Field { Tag = 909 }                    // поле 909: зарегистрированы поступления
+                    .Add ('q', specification.Year)         // подполе Q: кумулированные сведения, год
+                    .Add ('d', specification.Place)         // подполе D: место хранения
+                    .Add ('k', specification.Complect)     // подполе K: номер комплекта
+                    .Add ('h', specification.IssueNumbers) // подполе H: кумулированные сведения, номера
+            );
+
+        Provider.WriteRecord (mainRecord);
+
+    } // method BindMagazines
+
+    /// <inheritdoc cref="IBindingManager.CheckIssue"/>
+    public bool CheckIssue
+        (
+            BindingSpecification specification,
+            MagazineIssueInfo issue
+        )
+    {
+        if (!BindingConfiguration.CheckWorksheet (issue.Worksheet))
         {
-            Sure.NotNullNorEmpty (bindingIndex);
+            // В номере неверный рабочий лист
+            return false;
+        }
 
-            throw new NotImplementedException();
-
-        } // method UnbindMagazines
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
+        var exemplars = issue.Exemplars;
+        if (exemplars.IsNullOrEmpty())
         {
-        } // method Dispose
+            // В номере не зарегистрированы экземпляры
+            return false;
+        }
 
-        #endregion
+        exemplars = exemplars
+            .Where (exemplar => exemplar.Number == specification.Complect)
+            .ToArray();
+        if (exemplars.IsNullOrEmpty())
+        {
+            // В номере нет требуемого комплекта
+            return false;
+        }
 
-    } // class BindingManager
+        if (exemplars.Length != 1)
+        {
+            // В номере больше одного комплекта
+            return false;
+        }
 
-} // namespace ManagedIrbis.Magazines
+        var place = exemplars.First().Place;
+        if (!BindingConfiguration.CheckPlace (place))
+        {
+            // Запрещенное место хранения
+            return false;
+        }
+
+        if (!place.SameString (specification.Place))
+        {
+            // Различаются места хранения
+            return false;
+        }
+
+        if (!BindingConfiguration.CheckStatus (exemplars.First().Status))
+        {
+            // Недопустимый статус экземпляра
+            return false;
+        }
+
+        // TODO: проверить попадание номера в спецификацию подшивки
+
+        return true;
+
+    } // method CheckIssue
+
+    /// <inheritdoc cref="IBindingManager.UnbindMagazines"/>
+    public void UnbindMagazines
+        (
+            string bindingIndex
+        )
+    {
+        Sure.NotNullNorEmpty (bindingIndex);
+
+        throw new NotImplementedException();
+
+    } // method UnbindMagazines
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+    } // method Dispose
+
+    #endregion
+
+} // class BindingManager
+
+// namespace ManagedIrbis.Magazines
