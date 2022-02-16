@@ -1467,8 +1467,8 @@ public class Field
     {
         var length = 4 + Subfields.Sum
             (
-                sf => (sf.Value!.Length)
-                      + (sf.Code == ValueCode ? 1 : 2)
+                sf => sf.Value!.Length
+                      + (sf.Code == ValueCode ? 0 : 2)
             );
         var builder = StringBuilderPool.Shared.Get();
         builder.EnsureCapacity (length);
