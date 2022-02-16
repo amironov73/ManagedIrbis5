@@ -21,72 +21,72 @@ using Microsoft.CodeAnalysis.CSharp;
 
 #nullable enable
 
-namespace ManagedIrbis.Scripting.Sharping
+namespace ManagedIrbis.Scripting.Sharping;
+
+/// <summary>
+/// Опции скрипта.
+/// </summary>
+public sealed class ScriptOptions
 {
+    #region Properties
+
     /// <summary>
-    /// Опции скрипта.
+    /// Режим "приложения".
     /// </summary>
-    public sealed class ScriptOptions
-    {
-        #region Properties
+    public bool ApplicationMode { get; set; }
 
-        /// <summary>
-        /// Режим "приложения".
-        /// </summary>
-        public bool ApplicationMode { get; set; }
+    /// <summary>
+    /// Только выполнить, компилировать не надо.
+    /// </summary>
+    public bool ExecuteOnly { get; set; }
 
-        /// <summary>
-        /// Только выполнить, компилировать не надо.
-        /// </summary>
-        public bool ExecuteOnly { get; set; }
+    /// <summary>
+    /// Опции для компилятора.
+    /// </summary>
+    public CSharpCompilationOptions? CompilationOptions { get; set; }
 
-        /// <summary>
-        /// Опции для компилятора.
-        /// </summary>
-        public CSharpCompilationOptions? CompilationOptions { get; set; }
+    /// <summary>
+    /// Не запускать, только скомпилировать.
+    /// </summary>
+    public bool CompileOnly { get; set; }
 
-        /// <summary>
-        /// Не запускать, только скомпилировать.
-        /// </summary>
-        public bool CompileOnly { get; set; }
+    /// <summary>
+    /// Имя выходного файла.
+    /// </summary>
+    public string OutputName { get; set; } = "Script.dll";
 
-        /// <summary>
-        /// Имя выходного файла.
-        /// </summary>
-        public string OutputName { get; set; } = "Script.dll";
+    /// <summary>
+    /// Директивы #using.
+    /// </summary>
+    public List<string> Usings { get; } = new ();
 
-        /// <summary>
-        /// Директивы #using.
-        /// </summary>
-        public List<string> Usings { get; } = new ();
+    /// <summary>
+    /// Директивы #define.
+    /// </summary>
+    public List<string> Defines { get; } = new ();
 
-        /// <summary>
-        /// Директивы #define.
-        /// </summary>
-        public List<string> Defines { get; } = new ();
+    /// <summary>
+    /// Имена файлов, подлежащих компиляции.
+    /// </summary>
+    public List<string> InputFiles { get; } = new ();
 
-        /// <summary>
-        /// Имена файлов, подлежащих компиляции.
-        /// </summary>
-        public List<string> InputFiles { get; } = new ();
+    /// <summary>
+    /// Дополнительные ссылки на сборки.
+    /// </summary>
+    public List<string> References { get; } = new ();
 
-        /// <summary>
-        /// Дополнительные ссылки на сборки.
-        /// </summary>
-        public List<string> References { get; } = new ();
+    /// <summary>
+    /// Не надо ссылок по умолчанию.
+    /// </summary>
+    public bool NoDefaultReferences { get; set; }
 
-        /// <summary>
-        /// Не надо ссылок по умолчанию.
-        /// </summary>
-        public bool NoDefaultReferences { get; set; }
+    /// <summary>
+    /// Показать получившийся исходный код.
+    /// </summary>
+    public bool ShowApplicationCode { get; set; }
 
-        /// <summary>
-        /// Показать получившийся исходный код.
-        /// </summary>
-        public bool ShowApplicationCode { get; set; }
+    #endregion
 
-        #endregion
+} // class ScriptOptions
 
-    } // class ScriptOptions
-
-} // namespace ManagedIrbis.Scripting
+// namespace ManagedIrbis.Scripting

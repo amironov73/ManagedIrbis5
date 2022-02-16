@@ -18,6 +18,8 @@
 using System;
 using System.IO;
 
+using AM;
+
 using ManagedIrbis.Pft.Infrastructure.Unifors;
 using ManagedIrbis.Records;
 
@@ -25,199 +27,267 @@ using ManagedIrbis.Records;
 
 #nullable enable
 
-namespace ManagedIrbis.Scripting.Sharping
+namespace ManagedIrbis.Scripting.Sharping;
+
+/// <summary>
+/// Контекст, в котором выполняется скриптованное форматирование.
+/// </summary>
+public class ScriptContext
 {
+    #region Properties
+
     /// <summary>
-    /// Контекст, в котором выполняется скриптованное форматирование.
+    /// Выходной поток.
     /// </summary>
-    public class ScriptContext
+    public TextWriter Output { get; }
+
+    /// <summary>
+    /// Синхронный провайдер (на всякий случай).
+    /// </summary>
+    public ISyncProvider Provider { get; }
+
+    /// <summary>
+    /// Запись, подлежащая форматированию.
+    /// </summary>
+    public Record? Record { get; set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ScriptContext
+        (
+            ISyncProvider provider,
+            TextWriter output
+        )
     {
-        #region Properties
+        Sure.NotNull (provider);
+        Sure.NotNull (output);
 
-        /// <summary>
-        /// Выходной поток.
-        /// </summary>
-        public TextWriter Output { get; }
+        Provider = provider;
+        Output = output;
+    }
 
-        /// <summary>
-        /// Синхронный провайдер (на всякий случай).
-        /// </summary>
-        public ISyncProvider Provider { get; }
+    #endregion
 
-        /// <summary>
-        /// Запись, подлежащая форматированию.
-        /// </summary>
-        public Record? Record { get; set; }
+    #region Public methods
 
-        /// <summary>
-        /// Произвольные пользовательские данные.
-        /// </summary>
-        public object? UserData { get; set; }
+    /// <summary>
+    /// Вызывается после форматирования всех записей.
+    /// </summary>
+    public virtual void AfterAll()
+    {
+        // метод необходимо перегрузить в потомке
+    }
 
-        #endregion
+    /// <summary>
+    /// Вызывается перед форматированием всех записей.
+    /// </summary>
+    public virtual void BeforeAll()
+    {
+        // метод необходимо перегрузить в потомке
+    }
 
-        #region Construction
+    /// <summary>
+    /// Число повторений поля с указанной меткой.
+    /// </summary>
+    public int Count (int tag)
+    {
+        return Record?.Count (tag) ?? 0;
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ScriptContext
-            (
-                ISyncProvider provider,
-                TextWriter output
-            )
-        {
-            Provider = provider;
-            Output = output;
+    /// <summary>
+    /// Декодирование конструкции &lt;=&gt;.
+    /// </summary>
+    public string DecodeTitle (string? title, bool before)
+    {
+        return UniforPlusS.DecodeTitle (title, before);
+    }
 
-        } // constructor
+    /// <summary>
+    /// Заданное количество слов с начала строки.
+    /// </summary>
+    public string FirstWords (string? text, int words)
+    {
+        return UniforE.GetFirstWords (text, words);
+    }
 
-        #endregion
+    /// <summary>
+    /// Получение текста поля до разделителей подполей
+    /// первого повторения поля с указанной меткой.
+    /// </summary>
+    public string? FM (int tag)
+    {
+        return Record?.FM (tag);
+    }
 
-        #region Public methods
+    /// <summary>
+    /// Получение текста поля до разделителей подполей
+    /// указанного повторения поля.
+    /// </summary>
+    public string? FM (int tag, int occurrence)
+    {
+        return Record?.GetField (tag, occurrence)?.Value;
+    }
 
-        /// <summary>
-        /// Вызывается после форматирования всех записей.
-        /// </summary>
-        public virtual void AfterAll()
-        {
-            // метод необходимо перегрузить в потомке
+    /// <summary>
+    /// Текст первого подполя с указанным тегом и кодом.
+    /// </summary>
+    public string? FM (int tag, char code)
+    {
+        return Record?.FM (tag, code);
+    }
 
-        } // method AfterAll
+    /// <summary>
+    /// Текст первого подполя с указанным тегом и кодом у зданного повторения поля.
+    /// </summary>
+    public string? FM (int tag, int occurrence, char code)
+    {
+        return Record?.GetField (tag, occurrence)?.GetFirstSubFieldValue (code);
+    }
 
-        /// <summary>
-        /// Вызывается перед форматированием всех записей.
-        /// </summary>
-        public virtual void BeforeAll()
-        {
-            // метод необходимо перегрузить в потомке
+    /// <summary>
+    /// Текст всех полей с указанным тегом.
+    /// </summary>
+    public string[] FMA (int tag)
+    {
+        return Record?.FMA (tag) ?? Array.Empty<string>();
+    }
 
-        } // method BeforeAll
+    /// <summary>
+    /// Текст всех подполей с указанной меткой и кодом.
+    /// </summary>
+    public string[] FMA (int tag, char code)
+    {
+        return Record?.FMA (tag, code) ?? Array.Empty<string>();
+    }
 
-        /// <summary>
-        /// Число повторений поля с указанной меткой.
-        /// </summary>
-        public int Count (int tag) => Record?.Count (tag) ?? 0;
+    /// <summary>
+    /// Форматирование даты как в unifor('3')
+    /// </summary>
+    public string FormatDate (string format)
+    {
+        return Unifor3.FormatDate (DateTime.Now, format);
+    }
 
-        /// <summary>
-        /// Декодирование конструкции &lt;=&gt;.
-        /// </summary>
-        public string DecodeTitle (string? title, bool before) =>
-            UniforPlusS.DecodeTitle (title, before);
+    /// <summary>
+    /// Форматирование записи.
+    /// </summary>
+    public virtual void FormatRecord()
+    {
+        // метод нужно переопределить в потомке
+    }
 
-        /// <summary>
-        /// Заданное количество слов с начала строки.
-        /// </summary>
-        public string? FirstWords (string? text, int words) =>
-            UniforE.GetFirstWords (text, words);
+    /// <summary>
+    /// Проверка, есть ли в записи поле с указанной меткой.
+    /// </summary>
+    public bool HaveField
+        (
+            int tag
+        )
+    {
+        Sure.Positive (tag);
 
-        /// <summary>
-        /// Получение текста поля до разделителей подполей
-        /// первого повторения поля с указанной меткой.
-        /// </summary>
-        public string? FM (int tag) => Record?.FM (tag);
+        return Record?.HaveField (tag) ?? false;
+    }
 
-        /// <summary>
-        /// Получение текста поля до разделителей подполей
-        /// указанного повторения поля.
-        /// </summary>
-        public string? FM (int tag, int occurrence) => Record?.GetField (tag, occurrence)?.Value;
+    /// <summary>
+    /// Проверка, есть ли в записи подполе с указанной меткой.
+    /// </summary>
+    public bool HaveSubfield
+        (
+            int tag,
+            char code
+        )
+    {
+        Sure.Positive (tag);
 
-        /// <summary>
-        /// Текст первого подполя с указанным тегом и кодом.
-        /// </summary>
-        public string? FM (int tag, char code) => Record?.FM (tag, code);
+        return Record?.GetField (tag)?.HaveSubField (code) ?? false;
+    }
 
-        /// <summary>
-        /// Текст первого подполя с указанным тегом и кодом у зданного повторения поля.
-        /// </summary>
-        public string? FM (int tag, int occurrence, char code) =>
-            Record?.GetField (tag, occurrence)?.GetFirstSubFieldValue (code);
+    /// <summary>
+    /// Простейшее расформатирование на уровне "v910^b + |, |".
+    /// </summary>
+    public void S (string? format)
+    {
+        Record.SimpleFormat (format);
+    }
 
-        /// <summary>
-        /// Текст всех полей с указанным тегом.
-        /// </summary>
-        public string[] FMA (int tag) => Record?.FMA (tag) ?? Array.Empty<string>();
+    /// <summary>
+    /// Пропуск заданного количества слов с начала строки.
+    /// </summary>
+    public string LastWords
+        (
+            string? text,
+            int words
+        )
+    {
+        return UniforF.GetLastWords (text, words);
+    }
 
-        /// <summary>
-        /// Текст всех подполей с указанной меткой и кодом.
-        /// </summary>
-        public string[] FMA (int tag, char code) => Record?.FMA(tag, code) ?? Array.Empty<string>();
+    /// <summary>
+    /// Простейшее расформатирование на уровне "v910^b + |, |".
+    /// </summary>
+    public void V
+        (
+            string? format
+        )
+    {
+        Record.SimpleFormat (format);
+    }
 
-        /// <summary>
-        /// Форматирование даты как в unifor('3')
-        /// </summary>
-        public string FormatDate (string format) => Unifor3.FormatDate (DateTime.Now, format);
+    /// <summary>
+    /// Вывод значения поля до первого разделителя
+    /// или подполя с заданным кодом (с учетом повторяющихся групп).
+    /// </summary>
+    public bool V
+        (
+            int tag,
+            char? code = null,
+            string? prefix = null,
+            string? before = null,
+            string? after = null,
+            string? suffix = null,
+            bool skipFirst = false,
+            bool skipLast = false
+        )
+    {
+        Sure.Positive (tag);
 
-        /// <summary>
-        /// Форматирование записи.
-        /// </summary>
-        public virtual void FormatRecord()
-        {
-            // метод нужно переопределить в потомке
-        }
+        return RepeatingGroup.V (Output, Record, tag, code, prefix, before, after, suffix, skipFirst, skipLast);
+    }
 
-        /// <summary>
-        /// Проверка, есть ли в записи поле с указанной меткой.
-        /// </summary>
-        public bool HaveField (int tag) => Record?.HaveField (tag) ?? false;
+    /// <summary>
+    /// Вывод текста.
+    /// </summary>
+    public void Write (string? text)
+    {
+        Output.Write (text);
+    }
 
-        /// <summary>
-        /// Проверка, есть ли в записи подполе с указанной меткой.
-        /// </summary>
-        public bool HaveSubfield (int tag, char code) =>
-            Record?.GetField (tag)?.HaveSubField (code) ?? false;
+    /// <summary>
+    /// Переход на новую строку.
+    /// </summary>
+    public void WriteLine()
+    {
+        Output.WriteLine();
+    }
 
-        /// <summary>
-        /// Простейшее расформатирование на уровне "v910^b + |, |".
-        /// </summary>
-        public void S (string? format) => Record.SimpleFormat (format);
+    /// <summary>
+    /// Вывод текста с последующим переходом на новую строку.
+    /// </summary>
+    public void WriteLine (string? text)
+    {
+        Output.WriteLine (text);
+    }
 
-        /// <summary>
-        /// Пропуск заданного количества слов с начала строки.
-        /// </summary>
-        public string? LastWords (string? text, int words) =>
-            UniforF.GetLastWords (text, words);
-
-        /// <summary>
-        /// Простейшее расформатирование на уровне "v910^b + |, |".
-        /// </summary>
-        public void V (string? format) => Record.SimpleFormat (format);
-
-        /// <summary>
-        /// Вывод значения поля до первого разделителя
-        /// или подполя с заданным кодом (с учетом повторяющихся групп).
-        /// </summary>
-        public bool V
-            (
-                int tag,
-                char? code = null,
-                string? prefix = null,
-                string? before = null,
-                string? after = null,
-                string? suffix = null,
-                bool skipFirst = false,
-                bool skipLast = false
-            )
-            => RepeatingGroup.V (Output, Record, tag, code, prefix, before, after, suffix, skipFirst, skipLast);
-
-        /// <summary>
-        /// Вывод текста.
-        /// </summary>
-        public void Write (string? text) => Output.Write (text);
-
-        /// <summary>
-        /// Переход на новую строку.
-        /// </summary>
-        public void WriteLine() => Output.WriteLine();
-
-        /// <summary>
-        /// Вывод текста с последующим переходом на новую строку.
-        /// </summary>
-        public void WriteLine (string? text) => Output.WriteLine (text);
-
-        #endregion
-
-    } // class ScriptContext
-
-} // namespace ManagedIrbis.Scripting
+    #endregion
+}

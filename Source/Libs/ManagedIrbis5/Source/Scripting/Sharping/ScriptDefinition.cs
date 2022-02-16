@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
 /* ScriptDefinition.cs -- описание скрипта
  * Ars Magna project, http://arsmagna.ru
@@ -19,47 +20,44 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace ManagedIrbis.Scripting.Sharping
+namespace ManagedIrbis.Scripting.Sharping;
+
+/// <summary>
+/// Описание скрипта.
+/// </summary>
+public sealed class ScriptDefinition
 {
+    #region Properties
+
     /// <summary>
-    /// Описание скрипта.
+    /// Директивы #using.
     /// </summary>
-    public sealed class ScriptDefinition
-    {
-        #region Properties
+    [JsonPropertyName ("usings")]
+    public string[]? Usings { get; set; }
 
-        /// <summary>
-        /// Директивы #using.
-        /// </summary>
-        [JsonPropertyName("usings")]
-        public string[]? Usings { get; set; }
+    /// <summary>
+    /// Директивы #define.
+    /// </summary>
+    [JsonPropertyName ("defines")]
+    public string[]? Defines { get; set; }
 
-        /// <summary>
-        /// Директивы #define.
-        /// </summary>
-        [JsonPropertyName("defines")]
-        public string[]? Defines { get; set; }
+    /// <summary>
+    /// Исходные тексты.
+    /// </summary>
+    [JsonPropertyName ("sources")]
+    public string[]? Sources { get; set; }
 
-        /// <summary>
-        /// Исходные тексты.
-        /// </summary>
-        [JsonPropertyName("sources")]
-        public string[]? Sources { get; set; }
+    /// <summary>
+    /// Ссылки на сборки.
+    /// </summary>
+    [JsonPropertyName ("references")]
+    public string[]? References { get; set; }
 
-        /// <summary>
-        /// Ссылки на сборки.
-        /// </summary>
-        [JsonPropertyName("references")]
-        public string[]? References { get; set; }
+    /// <summary>
+    /// Не надо ссылок по умолчанию.
+    /// </summary>
+    [JsonPropertyName ("no-default-references")]
+    public bool NoDefaultReferences { get; set; }
 
-        /// <summary>
-        /// Не надо ссылок по умолчанию.
-        /// </summary>
-        [JsonPropertyName("no-default-references")]
-        public bool NoDefaultReferences { get; set; }
-
-        #endregion
-
-    } // class ScriptDefinition
-
-} // namespace ManagedIrbis.Scripting
+    #endregion
+}
