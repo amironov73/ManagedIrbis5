@@ -3,9 +3,9 @@
 if exist NuGet   rmdir /s /q NuGet
 if exist Publish rmdir /s /q Publish
 
-dotnet clean   Source\Utils\Utils-windows.sln
-dotnet clean   Source\ManagedIrbis5-windows.sln
-dotnet clean   Source\TinyClient.sln
+dotnet clean   --configuration Release Source\Utils\Utils-windows.sln
+dotnet clean   --configuration Release Source\ManagedIrbis5-windows.sln
+dotnet clean   --configuration Release Source\TinyClient.sln
 
 dotnet build   --configuration Release Source\Utils\Utils-windows.sln
 dotnet build   --configuration Release Source\ManagedIrbis5-windows.sln
