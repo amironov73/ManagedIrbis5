@@ -3,8 +3,8 @@
 rm -rf NuGet
 rm -rf Publish
 
-dotnet clean   Source/Utils/Utils.sln
-dotnet clean   Source/ManagedIrbis5.sln
+dotnet clean                           --configuration Release                  Source/Utils/Utils.sln
+dotnet clean                           --configuration Release                  Source/ManagedIrbis5.sln
 
 dotnet build                           --configuration Release                  Source/Utils/Utils.sln                                || exit
 dotnet build                           --configuration Release                  Source/ManagedIrbis5.sln                              || exit
