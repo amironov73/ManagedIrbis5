@@ -195,7 +195,7 @@ public sealed class BookRecord
 
     #region Object members
 
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
     private bool Equals
         (
             BookRecord other
