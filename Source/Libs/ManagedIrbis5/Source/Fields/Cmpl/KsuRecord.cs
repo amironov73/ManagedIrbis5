@@ -48,7 +48,7 @@ public sealed class KsuRecord
     /// Сведения о поступлении книг в библиотеку. Поле 88.
     /// </summary>
     [Field (88)]
-    public object? ReceiptInfo { get; set; }
+    public ReceiptInfo? Receipt { get; set; }
 
 
     /// <summary>
