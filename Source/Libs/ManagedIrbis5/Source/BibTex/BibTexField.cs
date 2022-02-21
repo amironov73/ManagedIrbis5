@@ -29,106 +29,104 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.BibTex
+namespace ManagedIrbis.BibTex;
+//
+// Каждая запись содержит некоторый список стандартных полей
+// (можно вводить любые другие поля, которые просто игнорируются
+// стандартными программами).
+//
+
+/// <summary>
+/// Поле BibText-записи.
+/// </summary>
+[XmlRoot ("field")]
+public sealed class BibTexField
+    : IHandmadeSerializable,
+    IVerifiable
 {
-    //
-    // Каждая запись содержит некоторый список стандартных полей
-    // (можно вводить любые другие поля, которые просто игнорируются
-    // стандартными программами).
-    //
+    #region Properties
 
     /// <summary>
-    /// Поле BibText-записи.
+    /// Метка поля, см. <see cref="KnownTags"/>.
     /// </summary>
-    [XmlRoot ("field")]
-    public sealed class BibTexField
-        : IHandmadeSerializable,
-        IVerifiable
+    [XmlAttribute ("tag")]
+    [JsonPropertyName ("tag")]
+    [Description ("Метка поля")]
+    public string? Tag { get; set; }
+
+    /// <summary>
+    /// Значение поля.
+    /// </summary>
+    [XmlAttribute ("value")]
+    [JsonPropertyName ("value")]
+    [Description ("Значение поля")]
+    public string? Value { get; set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
     {
-        #region Properties
+        Sure.NotNull (reader);
 
-        /// <summary>
-        /// Метка поля, см. <see cref="KnownTags"/>.
-        /// </summary>
-        [XmlAttribute ("tag")]
-        [JsonPropertyName ("tag")]
-        [Description ("Метка поля")]
-        public string? Tag { get; set; }
-
-        /// <summary>
-        /// Значение поля.
-        /// </summary>
-        [XmlAttribute ("value")]
-        [JsonPropertyName ("value")]
-        [Description ("Значение поля")]
-        public string? Value { get; set; }
-
-        /// <summary>
-        /// Произвольные пользовательские данные
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable (false)]
-        public object? UserData { get; set; }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Sure.NotNull (reader);
-
-            Tag = reader.ReadNullableString();
-            Value = reader.ReadNullableString();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            Sure.NotNull (writer);
-
-            writer
-                .WriteNullable (Tag)
-                .WriteNullable (Value);
-        }
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<BibTexField> (this, throwOnError);
-
-            verifier
-                .NotNullNorEmpty (Tag)
-                .IsOneOf (Tag, KnownTags.ListValues());
-
-            return verifier.Result;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            return $"{Tag.ToVisibleString()}={Value.ToVisibleString()}";
-        }
-
-        #endregion
+        Tag = reader.ReadNullableString();
+        Value = reader.ReadNullableString();
     }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer
+            .WriteNullable (Tag)
+            .WriteNullable (Value);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<BibTexField> (this, throwOnError);
+
+        verifier
+            .NotNullNorEmpty (Tag)
+            .IsOneOf (Tag, KnownTags.ListValues());
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"{Tag.ToVisibleString()}={Value.ToVisibleString()}";
+    }
+
+    #endregion
 }

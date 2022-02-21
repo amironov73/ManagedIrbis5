@@ -14,46 +14,45 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace ManagedIrbis.BibTex
+namespace ManagedIrbis.BibTex;
+
+/// <summary>
+/// Типы BibTex-токенов.
+/// </summary>
+public enum TokenKind
 {
     /// <summary>
-    /// Типы BibTex-токенов.
+    /// Нет токена (достигнут конец потока).
     /// </summary>
-    public enum TokenKind
-    {
-        /// <summary>
-        /// Нет токена (достигнут конец потока).
-        /// </summary>
-        None = -1,
+    None = -1,
 
-        /// <summary>
-        /// Комментарий.
-        /// </summary>
-        Comment = 0,
+    /// <summary>
+    /// Комментарий.
+    /// </summary>
+    Comment = 0,
 
-        /// <summary>
-        /// Открывающая фигурная скобка.
-        /// </summary>
-        OpenParenthesis = 1,
+    /// <summary>
+    /// Открывающая фигурная скобка.
+    /// </summary>
+    OpenParenthesis = 1,
 
-        /// <summary>
-        /// Закрывающая фигурная скобка.
-        /// </summary>
-        CloseParenthesis = 2,
+    /// <summary>
+    /// Закрывающая фигурная скобка.
+    /// </summary>
+    CloseParenthesis = 2,
 
-        /// <summary>
-        /// Литерал, например, метка поля или значение поля.
-        /// </summary>
-        Literal = 3,
+    /// <summary>
+    /// Литерал, например, метка поля или значение поля.
+    /// </summary>
+    Literal = 3,
 
-        /// <summary>
-        /// Знак равенства
-        /// </summary>
-        Equals = 4,
+    /// <summary>
+    /// Знак равенства
+    /// </summary>
+    Equals = 4,
 
-        /// <summary>
-        /// Запятая.
-        /// </summary>
-        Comma = 5,
-    }
+    /// <summary>
+    /// Запятая.
+    /// </summary>
+    Comma = 5,
 }

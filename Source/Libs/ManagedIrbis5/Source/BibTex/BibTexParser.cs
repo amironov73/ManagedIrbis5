@@ -28,26 +28,25 @@ using JetBrains.Annotations;
 
 #nullable enable
 
-namespace ManagedIrbis.BibTex
+namespace ManagedIrbis.BibTex;
+
+/// <summary>
+/// Парсер BibTex.
+/// </summary>
+public sealed class BibTexParser
 {
+    #region Public methods
+
     /// <summary>
-    /// Парсер BibTex.
+    /// Разбор потока токенов.
     /// </summary>
-    public sealed class BibTexParser
+    public BibTexFile Parse
+        (
+            Token[] tokens
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Разбор потока токенов.
-        /// </summary>
-        public BibTexFile Parse
-            (
-                Token[] tokens
-            )
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+        throw new NotImplementedException();
     }
+
+    #endregion
 }

@@ -28,26 +28,25 @@ using JetBrains.Annotations;
 
 #nullable enable
 
-namespace ManagedIrbis.BibTex
+namespace ManagedIrbis.BibTex;
+
+/// <summary>
+/// Токенизатор BibTex.
+/// </summary>
+public sealed class BibTexTokenizer
 {
+    #region Public methods
+
     /// <summary>
-    /// Токенизатор BibTex.
+    /// Разбиение текста на токены.
     /// </summary>
-    public sealed class BibTexTokenizer
+    public Token[] Tokenize
+        (
+            string text
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Разбиение текста на токены.
-        /// </summary>
-        public Token[] Tokenize
-            (
-                string text
-            )
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
+        throw new NotImplementedException();
     }
+
+    #endregion
 }

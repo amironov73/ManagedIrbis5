@@ -20,85 +20,84 @@ using AM;
 
 #endregion
 
-namespace ManagedIrbis.BibTex
+namespace ManagedIrbis.BibTex;
+
+/// <summary>
+/// BibTex-токен.
+/// </summary>
+public sealed class Token
 {
+    #region Properties
+
     /// <summary>
-    /// BibTex-токен.
+    /// Тип токена.
     /// </summary>
-    public sealed class Token
+    public TokenKind Kind { get; }
+
+    /// <summary>
+    /// Значение токена.
+    /// </summary>
+    public string? Value { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Token
+        (
+            TokenKind kind,
+            string? value = null
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Тип токена.
-        /// </summary>
-        public TokenKind Kind { get; }
-
-        /// <summary>
-        /// Значение токена.
-        /// </summary>
-        public string? Value { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Token
-            (
-                TokenKind kind,
-                string? value = null
-            )
-        {
-            Kind = kind;
-            Value = value;
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Требование, чтобы токен был определенного типа.
-        /// </summary>
-        public void MustBe
-            (
-                TokenKind kind
-            )
-        {
-            if (Kind != kind)
-            {
-                throw new IrbisException();
-            }
-        }
-
-        /// <summary>
-        /// Требование, чтобы токен был определенного типа.
-        /// </summary>
-        public void MustBe
-            (
-                TokenKind firstKind,
-                TokenKind secondKind
-            )
-        {
-            if (Kind != firstKind && Kind != secondKind)
-            {
-                throw new IrbisException();
-            }
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            return $"{Kind}: {Value.ToVisibleString()}";
-        }
-
-        #endregion
+        Kind = kind;
+        Value = value;
     }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Требование, чтобы токен был определенного типа.
+    /// </summary>
+    public void MustBe
+        (
+            TokenKind kind
+        )
+    {
+        if (Kind != kind)
+        {
+            throw new IrbisException();
+        }
+    }
+
+    /// <summary>
+    /// Требование, чтобы токен был определенного типа.
+    /// </summary>
+    public void MustBe
+        (
+            TokenKind firstKind,
+            TokenKind secondKind
+        )
+    {
+        if (Kind != firstKind && Kind != secondKind)
+        {
+            throw new IrbisException();
+        }
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"{Kind}: {Value.ToVisibleString()}";
+    }
+
+    #endregion
 }
