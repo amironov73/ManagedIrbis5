@@ -1,0 +1,31 @@
+﻿//
+// Востребованность бизнес-литературы
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+found = batch_search ("K=бизнес$ * K=успе$ * V=KN")
+formatted = []
+
+foreach (book in found)
+{
+    demand = (int) fm (book, 999)
+    brief = format_record ("@brief", book.Mfn)
+    formatted.Add (brief + "\t" + demand)
+}
+
+formatted.Sort()
+
+foreach (book in formatted)
+    println (book)
+
+//=================================
+
+disconnect()
