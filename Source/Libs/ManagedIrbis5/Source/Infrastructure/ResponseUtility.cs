@@ -27,254 +27,239 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Методы расширения для работы с <see cref="Response"/>.
+/// </summary>
+public static class ResponseUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Методы расширения для работы с <see cref="Response"/>.
+    /// Проверяем, хороший ли пришел ответ от сервера.
     /// </summary>
-    public static class ResponseUtility
+    public static bool IsGood
+        (
+            [NotNullWhen (true)] this Response? response,
+            bool dispose = true
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Проверяем, хороший ли пришел ответ от сервера.
-        /// </summary>
-        public static bool IsGood
-            (
-                [NotNullWhen(true)] this Response? response,
-                bool dispose = true
-            )
+        if (response is null)
         {
-            if (response is null)
-            {
-                return false;
-            }
+            return false;
+        }
 
-            var result = response.CheckReturnCode();
-            if (dispose)
-            {
-                response.Dispose();
-            }
-
-            return result;
-
-        } // method IsGood
-
-        /// <summary>
-        /// Проверяем, хороший ли пришел ответ от сервера.
-        /// </summary>
-        public static bool IsGood
-            (
-                [NotNullWhen(true)] this Response? response,
-                bool dispose = true,
-                params int[] goodCodes
-            )
+        var result = response.CheckReturnCode();
+        if (dispose)
         {
-            if (response is null)
-            {
-                return false;
-            }
+            response.Dispose();
+        }
 
-            var result = response.CheckReturnCode(goodCodes);
-            if (dispose)
-            {
-                response.Dispose();
-            }
+        return result;
+    }
 
-            return result;
-
-        } // method IsGood
-
-        /// <summary>
-        /// Проверяем, хороший ли пришел ответ от сервера.
-        /// </summary>
-        public static async Task<bool> IsGoodAsync
-            (
-                this Task<Response?> task,
-                bool dispose = true
-            )
+    /// <summary>
+    /// Проверяем, хороший ли пришел ответ от сервера.
+    /// </summary>
+    public static bool IsGood
+        (
+            [NotNullWhen (true)] this Response? response,
+            bool dispose = true,
+            params int[] goodCodes
+        )
+    {
+        if (response is null)
         {
-            var response = await task;
-            var result = response is not null && response.CheckReturnCode();
-            if (dispose)
-            {
-                response?.Dispose();
-            }
+            return false;
+        }
 
-            return result;
-
-        } // method IsGoodAsync
-
-        /// <summary>
-        /// Проверяем, хороший ли пришел ответ от сервера.
-        /// </summary>
-        public static async ValueTask<bool> IsGoodAsync
-            (
-                this ValueTask<Response?> task,
-                bool dispose = true
-            )
+        var result = response.CheckReturnCode (goodCodes);
+        if (dispose)
         {
-            var response = await task;
-            var result = response is not null && response.CheckReturnCode();
-            if (dispose)
-            {
-                response?.Dispose();
-            }
+            response.Dispose();
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method IsGoodAsync
-
-        /// <summary>
-        /// Проверяем, хороший ли пришел ответ от сервера.
-        /// </summary>
-        public static async Task<bool> IsGoodAsync
-            (
-                this Task<Response?> task,
-                bool dispose = true,
-                params int[] goodCodes
-            )
+    /// <summary>
+    /// Проверяем, хороший ли пришел ответ от сервера.
+    /// </summary>
+    public static async Task<bool> IsGoodAsync
+        (
+            this Task<Response?> task,
+            bool dispose = true
+        )
+    {
+        var response = await task;
+        var result = response is not null && response.CheckReturnCode();
+        if (dispose)
         {
-            var response = await task;
-            var result = response is not null && response.CheckReturnCode(goodCodes);
-            if (dispose)
-            {
-                response?.Dispose();
-            }
-
-            return result;
-
-        } // method IsGoodAsync
-
-        /// <summary>
-        /// Проверяем, хороший ли пришел ответ от сервера.
-        /// </summary>
-        public static async ValueTask<bool> IsGoodAsync
-            (
-                this ValueTask<Response?> task,
-                bool dispose = true,
-                params int[] goodCodes
-            )
-        {
-            var response = await task;
-            var result = response is not null && response.CheckReturnCode(goodCodes);
-            if (dispose)
-            {
-                response?.Dispose();
-            }
-
-            return result;
-
-        } // method IsGoodAsync
-
-        /// <summary>
-        /// Трансформация запроса во что-нибудь полезное.
-        /// </summary>
-        public static T? Transform<T>
-            (
-                this Response? response,
-                Func<Response, T?> transformer
-            )
-            where T : class
-        {
-            var result = response.IsGood(false) ? transformer(response) : null;
             response?.Dispose();
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method Transform
-
-        /// <summary>
-        /// Трансформация запроса во что-нибудь полезное.
-        /// </summary>
-        public static T? TransformNoCheck<T>
-            (
-                this Response? response,
-                Func<Response, T?> transformer
-            )
-            where T : class
+    /// <summary>
+    /// Проверяем, хороший ли пришел ответ от сервера.
+    /// </summary>
+    public static async ValueTask<bool> IsGoodAsync
+        (
+            this ValueTask<Response?> task,
+            bool dispose = true
+        )
+    {
+        var response = await task;
+        var result = response is not null && response.CheckReturnCode();
+        if (dispose)
         {
-            var result = response is not null ? transformer(response) : null;
             response?.Dispose();
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method TransformNoCheck
-
-        /// <summary>
-        /// Трансформация запроса во что-нибудь полезное.
-        /// </summary>
-        public static async Task<T?> TransformAsync<T>
-            (
-                this Task<Response?> response,
-                Func<Response, T?> transformer
-            )
-            where T : class
+    /// <summary>
+    /// Проверяем, хороший ли пришел ответ от сервера.
+    /// </summary>
+    public static async Task<bool> IsGoodAsync
+        (
+            this Task<Response?> task,
+            bool dispose = true,
+            params int[] goodCodes
+        )
+    {
+        var response = await task;
+        var result = response is not null && response.CheckReturnCode (goodCodes);
+        if (dispose)
         {
-            var waited = await response;
-            var result = waited.IsGood(false) ? transformer(waited) : null;
-            waited?.Dispose();
+            response?.Dispose();
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method TransformAsync
-
-        /// <summary>
-        /// Трансформация запроса во что-нибудь полезное.
-        /// </summary>
-        public static async ValueTask<T?> TransformAsync<T>
-            (
-                this ValueTask<Response?> response,
-                Func<Response, T?> transformer
-            )
-            where T : class
+    /// <summary>
+    /// Проверяем, хороший ли пришел ответ от сервера.
+    /// </summary>
+    public static async ValueTask<bool> IsGoodAsync
+        (
+            this ValueTask<Response?> task,
+            bool dispose = true,
+            params int[] goodCodes
+        )
+    {
+        var response = await task;
+        var result = response is not null && response.CheckReturnCode (goodCodes);
+        if (dispose)
         {
-            var waited = await response;
-            var result = waited.IsGood(false) ? transformer(waited) : null;
-            waited?.Dispose();
+            response?.Dispose();
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method TransformAsync
+    /// <summary>
+    /// Трансформация запроса во что-нибудь полезное.
+    /// </summary>
+    public static T? Transform<T>
+        (
+            this Response? response,
+            Func<Response, T?> transformer
+        )
+        where T : class
+    {
+        var result = response.IsGood (false) ? transformer (response) : null;
+        response?.Dispose();
 
-        /// <summary>
-        /// Трансформация запроса во что-нибудь полезное.
-        /// </summary>
-        public static async Task<T?> TransformNoCheckAsync<T>
-            (
-                this Task<Response?> response,
-                Func<Response, T?> transformer
-            )
-            where T: class
-        {
-            var waited = await response;
-            var result = waited is not null ? transformer(waited) : null;
-            waited?.Dispose();
+        return result;
+    }
 
-            return result;
+    /// <summary>
+    /// Трансформация запроса во что-нибудь полезное.
+    /// </summary>
+    public static T? TransformNoCheck<T>
+        (
+            this Response? response,
+            Func<Response, T?> transformer
+        )
+        where T : class
+    {
+        var result = response is not null ? transformer (response) : null;
+        response?.Dispose();
 
-        } // method TransformNoCheckAsync
+        return result;
+    }
 
-        /// <summary>
-        /// Трансформация запроса во что-нибудь полезное.
-        /// </summary>
-        public static async ValueTask<T?> TransformNoCheckAsync<T>
-            (
-                this ValueTask<Response?> response,
-                Func<Response, T?> transformer
-            )
-            where T: class
-        {
-            var waited = await response;
-            var result = waited is not null ? transformer(waited) : null;
-            waited?.Dispose();
+    /// <summary>
+    /// Трансформация запроса во что-нибудь полезное.
+    /// </summary>
+    public static async Task<T?> TransformAsync<T>
+        (
+            this Task<Response?> response,
+            Func<Response, T?> transformer
+        )
+        where T : class
+    {
+        var waited = await response;
+        var result = waited.IsGood (false) ? transformer (waited) : null;
+        waited?.Dispose();
 
-            return result;
+        return result;
+    }
 
-        } // method TransformNoCheckAsync
+    /// <summary>
+    /// Трансформация запроса во что-нибудь полезное.
+    /// </summary>
+    public static async ValueTask<T?> TransformAsync<T>
+        (
+            this ValueTask<Response?> response,
+            Func<Response, T?> transformer
+        )
+        where T : class
+    {
+        var waited = await response;
+        var result = waited.IsGood (false) ? transformer (waited) : null;
+        waited?.Dispose();
 
-        #endregion
+        return result;
+    }
 
-    } // class ResponseUtility
+    /// <summary>
+    /// Трансформация запроса во что-нибудь полезное.
+    /// </summary>
+    public static async Task<T?> TransformNoCheckAsync<T>
+        (
+            this Task<Response?> response,
+            Func<Response, T?> transformer
+        )
+        where T : class
+    {
+        var waited = await response;
+        var result = waited is not null ? transformer (waited) : null;
+        waited?.Dispose();
 
-} // namespace ManagedIrbis.Infrastructure
+        return result;
+    }
+
+    /// <summary>
+    /// Трансформация запроса во что-нибудь полезное.
+    /// </summary>
+    public static async ValueTask<T?> TransformNoCheckAsync<T>
+        (
+            this ValueTask<Response?> response,
+            Func<Response, T?> transformer
+        )
+        where T : class
+    {
+        var waited = await response;
+        var result = waited is not null ? transformer (waited) : null;
+        waited?.Dispose();
+
+        return result;
+    }
+
+    #endregion
+}

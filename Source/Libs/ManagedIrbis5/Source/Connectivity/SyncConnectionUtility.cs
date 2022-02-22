@@ -234,6 +234,9 @@ public static class SyncConnectionUtility
             string expression
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNullNorEmpty (expression);
+
         if (!connection.CheckProviderState())
         {
             return Array.Empty<int>();
@@ -253,6 +256,89 @@ public static class SyncConnectionUtility
         }
 
         return FoundItem.ParseMfn (response);
+    }
+
+    /// <summary>
+    /// Поиск всех записей, удовлетворяющих данному запросу,
+    /// даже если их окажется больше 32 тысяч.
+    /// </summary>
+    /// <param name="connection">Подключение.</param>
+    /// <param name="expression">Выражение для поиска по словарю.</param>
+    /// <returns>Массив MFN найденных записей.</returns>
+    /// <remarks>Метод может создать большую нагрузку на сервер!
+    /// </remarks>
+    public static int[] SearchAll
+        (
+            this ISyncConnection connection,
+            string expression
+        )
+    {
+        Sure.NotNull (connection);
+        Sure.NotNullNorEmpty (expression);
+
+        if (!connection.CheckProviderState())
+        {
+            return Array.Empty<int>();
+        }
+
+        var result = new List<int>();
+        var first = 1;
+        var expected = 0;
+        // var iteration = 0;
+        while (true)
+        {
+            using var query = new SyncQuery (connection, CommandCode.Search);
+            var parameters = new SearchParameters
+            {
+                Database = connection.Database,
+                Expression = expression,
+                NumberOfRecords = 32_000,
+                FirstRecord = first
+            };
+            parameters.Encode (connection, query);
+            var response = connection.ExecuteSync (query);
+            if (response is null
+                || !response.CheckReturnCode())
+            {
+                return Array.Empty<int>();
+            }
+
+            // response.DebugAnsi ($"search_{iteration++:0000}.txt");
+            if (first == 1)
+            {
+                expected = response.RequireInt32();
+                if (expected == 0)
+                {
+                    break;
+                }
+
+                result.EnsureCapacity (expected);
+            }
+            else
+            {
+                response.RequireInt32();
+            }
+
+            while (!response.EOT)
+            {
+                var line = response.ReadAnsi();
+                if (string.IsNullOrEmpty (line))
+                {
+                    break;
+                }
+
+                var mfn = FastNumber.ParseInt32 (line);
+                result.Add (mfn);
+                ++first;
+            }
+
+            if (first >= expected)
+            {
+                break;
+            }
+        }
+
+        return result.ToArray();
     }
 
     /// <summary>

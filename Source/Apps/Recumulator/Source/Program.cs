@@ -19,6 +19,7 @@ using System.Linq;
 
 using AM;
 using AM.AppServices;
+using AM.Collections;
 using AM.Linq;
 using AM.Text.Ranges;
 
@@ -87,23 +88,74 @@ sealed class Program
                     .ToArray();
                 foreach (var year in years)
                 {
-                    var numbers = issues
+                    var yearNumbers = issues
                         .Where (i => i.Year == year)
-                        .Select (i => i.Number)
+                        .ToArray();
+
+                    var volumes = yearNumbers
+                        .Select (i => i.Volume)
                         .NonEmptyLines()
                         .Distinct()
                         .OrderBy (s => s)
                         .ToArray();
-                    var cumulated = NumberRangeCollection.Cumulate (numbers).ToString();
+                    if (volumes.IsNullOrEmpty())
+                    {
+                        var numbers = yearNumbers
+                            .Select (i => i.Number)
+                            .NonEmptyLines()
+                            .Distinct()
+                            .OrderBy (s => s)
+                            .ToArray();
+                        var cumulated = NumberRangeCollection.Cumulate (numbers).ToString();
 
-                    // ReSharper disable TemplateIsNotCompileTimeConstantProblem
-                    Logger.LogInformation ($"{year}: {cumulated}");
-                    // ReSharper restore TemplateIsNotCompileTimeConstantProblem
+                        // ReSharper disable TemplateIsNotCompileTimeConstantProblem
+                        Logger.LogInformation ($"{year}: {cumulated}");
+                        // ReSharper restore TemplateIsNotCompileTimeConstantProblem
 
-                    record.Add (909, 'q', year, 'h', cumulated);
+                        record.Add (909, 'q', year, 'h', cumulated);
+                    }
+                    else
+                    {
+                        foreach (var volume in volumes)
+                        {
+                            var numbers = yearNumbers
+                                .Where (i => i.Volume == volume)
+                                .Select (i => i.Number)
+                                .NonEmptyLines()
+                                .Distinct()
+                                .OrderBy (s => s)
+                                .ToArray();
+                            var cumulated = NumberRangeCollection.Cumulate (numbers).ToString();
+
+                            // ReSharper disable TemplateIsNotCompileTimeConstantProblem
+                            Logger.LogInformation ($"{year}: т. {volume}: {cumulated}");
+                            // ReSharper restore TemplateIsNotCompileTimeConstantProblem
+
+                            record.Add (909, 'q', year, 'f', volume, 'h', cumulated);
+                        }
+
+                        var noVolume = yearNumbers
+                            .Where (i => string.IsNullOrEmpty (i.Volume))
+                            .Select (i => i.Number)
+                            .NonEmptyLines()
+                            .Distinct()
+                            .OrderBy (s => s)
+                            .ToArray();
+                        if (!noVolume.IsNullOrEmpty())
+                        {
+                            var cumulatedNoVolume = NumberRangeCollection.Cumulate (noVolume).ToString();
+
+                            // ReSharper disable TemplateIsNotCompileTimeConstantProblem
+                            Logger.LogInformation ($"{year}: {cumulatedNoVolume}");
+
+                            // ReSharper restore TemplateIsNotCompileTimeConstantProblem
+
+                            record.Add (909, 'q', year, 'h', cumulatedNoVolume);
+                        }
+                    }
                 }
 
-                // connection.WriteRecord (record);
+                connection.WriteRecord (record, dontParse: true);
             }
 
             if (!_stop)
