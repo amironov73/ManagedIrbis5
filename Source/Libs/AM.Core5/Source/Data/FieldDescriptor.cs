@@ -111,6 +111,20 @@ public sealed class FieldDescriptor
     public bool ReadOnly { get; set; }
 
     /// <summary>
+    /// Должно быть проиндексировано?
+    /// </summary>
+    [XmlAttribute ("indexed")]
+    [JsonPropertyName ("indexed")]
+    public bool Indexed { get; set; }
+
+    /// <summary>
+    /// Значения уникальны?
+    /// </summary>
+    [XmlAttribute ("unique")]
+    [JsonPropertyName ("unique")]
+    public bool Unique { get; set; }
+
+    /// <summary>
     /// Представляет собой первичный ключ для таблицы?
     /// </summary>
     [XmlAttribute ("primaryKey")]

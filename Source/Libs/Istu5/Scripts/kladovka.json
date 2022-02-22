@@ -1,0 +1,299 @@
+﻿{
+  "name": "kladovka",
+  "tables": [
+    {
+      "name": "podsob",
+      "fields": [
+        {
+          "name": "id",
+          "type": "Integer",
+          "length": 0,
+          "nullable": false,
+          "identity": true,
+          "display": "Идентификатор",
+          "description": "Идентификатор и первичный ключ",
+          "order": 0,
+          "hidden": true,
+          "width": 0,
+          "readonly": true,
+          "primaryKey": true
+        },
+
+        {
+          "name": "catalog",
+          "type": "Text",
+          "length": 50,
+          "nullable": true,
+          "identity": false,
+          "display": "Каталог",
+          "description": "Каталог",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": true,
+          "unique": false
+        },
+
+        {
+          "name": "number",
+          "type": "Text",
+          "length": 50,
+          "nullable": true,
+          "identity": false,
+          "display": "Инвентарный номер",
+          "description": "Инвентарный номер",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": true,
+          "unique": false
+        },
+
+        {
+          "name": "card",
+          "type": "Text",
+          "length": 50,
+          "nullable": true,
+          "identity": false,
+          "display": "Карточка",
+          "description": "Номер карточки комплектования",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": true,
+          "unique": false
+        },
+
+        {
+          "name": "place",
+          "type": "",
+          "length": 0,
+          "nullable": true,
+          "identity": false,
+          "display": "Место хранения",
+          "description": "Место хранения экземпляра",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": true,
+          "unique": false
+        },
+
+        {
+          "name": "barcode",
+          "type": "Text",
+          "length": 50,
+          "nullable": true,
+          "identity": false,
+          "display": "Штрих-код",
+          "description": "Штрих-код",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": true,
+          "unique": false
+        },
+
+        {
+          "name": "rfid",
+          "type": "Text",
+          "length": 50,
+          "nullable": true,
+          "identity": false,
+          "display": "RFID",
+          "description": "RFID-метка",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": true,
+          "unique": false
+        },
+
+        {
+          "name": "ticket",
+          "type": "Text",
+          "length": 50,
+          "nullable": true,
+          "identity": false,
+          "display": "Билет",
+          "description": "Номер читательского билета",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": true,
+          "unique": false
+        },
+
+        {
+          "name": "moment",
+          "type": "Date",
+          "length": 0,
+          "nullable": true,
+          "identity": false,
+          "display": "Выдача",
+          "description": "Дата выдачи экземпляра",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": true,
+          "unique": false
+        },
+
+        {
+          "name": "deadline",
+          "type": "Date",
+          "length": 0,
+          "nullable": true,
+          "identity": false,
+          "display": "Дата возврата",
+          "description": "Предполагаемая дата возврата",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": true,
+          "unique": false
+        },
+
+        {
+          "name": "operator",
+          "type": "Integer",
+          "length": 0,
+          "nullable": true,
+          "identity": false,
+          "display": "Оператор выдачи",
+          "description": "Оператор выдачи",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": false,
+          "unique": false
+        },
+
+        {
+          "name": "prolong",
+          "type": "Integer",
+          "length": 0,
+          "nullable": true,
+          "identity": false,
+          "display": "Продления",
+          "description": "Счетчик продления",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": false,
+          "unique": false
+        },
+
+        {
+          "name": "alert",
+          "type": "Text",
+          "length": 50,
+          "nullable": true,
+          "identity": false,
+          "display": "Сообщение",
+          "description": "Сообщение",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": false,
+          "unique": false
+        },
+
+        {
+          "name": "pilot",
+          "type": "Boolean",
+          "length": 0,
+          "nullable": true,
+          "identity": false,
+          "display": "Контрольный экземпляр",
+          "description": "Контрольный экземпляр",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": false,
+          "unique": false
+        },
+
+        {
+          "name": "price",
+          "type": "Money",
+          "length": 0,
+          "nullable": true,
+          "identity": false,
+          "display": "Цена",
+          "description": "Цена экземпляра",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": false,
+          "unique": false
+        },
+
+        {
+          "name": "seen",
+          "type": "Date",
+          "length": 0,
+          "nullable": true,
+          "identity": false,
+          "display": "Дата инвентаризации",
+          "description": "Дата инвентаризации",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": false,
+          "unique": false
+        },
+
+        {
+          "name": "seenby",
+          "type": "Integer",
+          "nullable": true,
+          "identity": false,
+          "display": "Оператор инвентаризации",
+          "description": "Оператор инвентаризации",
+          "order": 0,
+          "hidden": false,
+          "width": 0,
+          "readonly": false,
+          "primaryKey": false,
+          "indexed": false,
+          "unique": false
+        }
+
+      ],
+      "indexes": [
+
+      ]
+    }
+  ]
+}

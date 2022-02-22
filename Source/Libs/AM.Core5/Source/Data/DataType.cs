@@ -46,4 +46,9 @@ public enum DataType
     /// Текстовый тип.
     /// </summary>
     Text,
+
+    /// <summary>
+    /// Дата.
+    /// </summary>
+    Date
 }

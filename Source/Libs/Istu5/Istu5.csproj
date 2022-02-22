@@ -31,4 +31,10 @@
     <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Scripts\kladovka.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
