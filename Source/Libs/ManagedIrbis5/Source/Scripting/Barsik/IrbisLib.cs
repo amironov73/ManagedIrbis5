@@ -137,6 +137,7 @@ public sealed class IrbisLib
         { "read_terms", new FunctionDescriptor ("read_terms", ReadTerms) },
         { "read_text_file", new FunctionDescriptor ("read_text_file", ReadTextFile) },
         { "search", new FunctionDescriptor ("search", Search) },
+        { "search_all", new FunctionDescriptor ("search_all", SearchAll) },
         { "search_count", new FunctionDescriptor ("search_count", SearchCount) },
         { "search_format", new FunctionDescriptor ("search_format", SearchFormat) },
         { "search_read", new FunctionDescriptor ("search_read", SearchRead) },
@@ -1606,6 +1607,35 @@ public sealed class IrbisLib
         if (!string.IsNullOrEmpty (expression))
         {
             return connection.Search (expression);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Поиск по словарю - выдача всех записей.
+    /// </summary>
+    public static dynamic? SearchAll
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is SearchParameters parameters)
+        {
+            return connection.Search (parameters);
+        }
+
+        var expression = firstArg as string;
+        if (!string.IsNullOrEmpty (expression))
+        {
+            return connection.SearchAll (expression);
         }
 
         return null;

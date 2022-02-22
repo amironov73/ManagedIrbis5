@@ -197,9 +197,39 @@ public static class SyncConnectionUtility
                     .ToArray();
         }
 
-        // TODO: implement
+        var parameters = new FormatRecordParameters
+        {
+            Database = database,
+            Mfns = mfns,
+            Format = IrbisFormat.All
+        };
+        if (!connection.FormatRecords (parameters))
+        {
+            return null;
+        }
 
-        return Array.Empty<Record>();
+        var lines = parameters.Result.AsArray();
+        if (lines.Length == 0)
+        {
+            return null;
+        }
+
+        var result = new List<Record> (lines.Length);
+        foreach (var line in lines)
+        {
+            if (!string.IsNullOrEmpty (line))
+            {
+                var converted = IrbisText.SplitIrbisToLines (line);
+                if (converted.Length > 3)
+                {
+                    var record = new Record();
+                    record.Decode (converted[1..]);
+                    result.Add (record);
+                }
+            }
+        }
+
+        return result.ToArray();
     }
 
     /// <summary>

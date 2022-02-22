@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
 /* Program.cs -- точка входа в программу
@@ -18,13 +19,10 @@ using System.Linq;
 
 using AM;
 using AM.AppServices;
-using AM.Linq;
-using AM.Text.Ranges;
 
 using ManagedIrbis;
 using ManagedIrbis.AppServices;
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Magazines;
 using ManagedIrbis.Providers;
 
 using Microsoft.Extensions.Logging;
@@ -60,6 +58,7 @@ internal sealed class Program
             var database = connection.EnsureDatabase();
 
             var allBooks = connection.SearchAll ("V=KN");
+            // var allBooks = connection.Search ("V=KN");
             Logger.LogInformation ("Found: {Length}", allBooks.Length);
 
             var chunks = allBooks.Chunk (1000).ToArray();
@@ -67,11 +66,33 @@ internal sealed class Program
             foreach (var chunk in chunks)
             {
                 var records = connection.ReadRecords (database, chunk);
+                if (records is null)
+                {
+                    Logger.LogError ("Error reading records");
+                    return 1;
+                }
+
                 var formatted = connection.FormatRecords (chunk, IrbisFormat.Brief);
+                if (formatted is null)
+                {
+                    Logger.LogError ("Error formatting records");
+                    return 1;
+                }
+
                 if (records.Length != formatted.Length)
                 {
                     Logger.LogError ("records.Length != formatted.Length");
                     return 1;
+                }
+
+                var length = records.Length;
+                for (var i = 0; i < length; i++)
+                {
+                    var record = records[i];
+                    var brief = formatted[i];
+                    var knowledge = record.FM (60) ?? "нет"; // раздел знаний
+                    var count = record.FM (999).SafeToInt32();
+                    Console.WriteLine ($"{brief}\t{knowledge}\t{count}");
                 }
             }
 
