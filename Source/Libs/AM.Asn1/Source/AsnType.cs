@@ -7,167 +7,168 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* AsnType.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Asn1
+namespace AM.Asn1;
+
+/// <summary>
+/// Enumeration of possible ASN.1 universal class tags
+/// in Identifier octet.
+/// </summary>
+public enum AsnType
 {
     /// <summary>
-    /// Enumeration of possible ASN.1 universal class tags
-    /// in Identifier octet.
+    /// UniversalClass
     /// </summary>
-    public enum AsnType
-    {
-        /// <summary>
-        /// UniversalClass
-        /// </summary>
-        Eoc = 0,
-        /// <summary>
-        /// Boolean
-        /// </summary>
-        Boolean = 1,
+    Eoc = 0,
 
-        /// <summary>
-        /// Integer
-        /// </summary>
-        Integer = 2,
+    /// <summary>
+    /// Boolean
+    /// </summary>
+    Boolean = 1,
 
-        /// <summary>
-        /// BitString
-        /// </summary>
-        BitString = 3,
+    /// <summary>
+    /// Integer
+    /// </summary>
+    Integer = 2,
 
-        /// <summary>
-        /// OctetString
-        /// </summary>
-        OctetString = 4,
+    /// <summary>
+    /// BitString
+    /// </summary>
+    BitString = 3,
 
-        /// <summary>
-        /// NULL
-        /// </summary>
-        Null = 5,
+    /// <summary>
+    /// OctetString
+    /// </summary>
+    OctetString = 4,
 
-        /// <summary>
-        /// ObjectIdentifier
-        /// </summary>
-        ObjectIdentifier = 6,
+    /// <summary>
+    /// NULL
+    /// </summary>
+    Null = 5,
 
-        /// <summary>
-        /// ObjectDescriptor
-        /// </summary>
-        ObjectDescriptor = 7,
+    /// <summary>
+    /// ObjectIdentifier
+    /// </summary>
+    ObjectIdentifier = 6,
 
-        /// <summary>
-        /// External
-        /// </summary>
-        External = 8,
+    /// <summary>
+    /// ObjectDescriptor
+    /// </summary>
+    ObjectDescriptor = 7,
 
-        /// <summary>
-        /// Real
-        /// </summary>
-        Real = 9,
+    /// <summary>
+    /// External
+    /// </summary>
+    External = 8,
 
-        /// <summary>
-        /// Enumerated
-        /// </summary>
-        Enumerated = 10,
+    /// <summary>
+    /// Real
+    /// </summary>
+    Real = 9,
 
-        /// <summary>
-        /// EmbeddedPdv
-        /// </summary>
-        EmbeddedPdv = 11,
+    /// <summary>
+    /// Enumerated
+    /// </summary>
+    Enumerated = 10,
 
-        /// <summary>
-        /// Utf8String
-        /// </summary>
-        Utf8String = 12,
+    /// <summary>
+    /// EmbeddedPdv
+    /// </summary>
+    EmbeddedPdv = 11,
 
-        /// <summary>
-        /// RelativeOid
-        /// </summary>
-        RelativeOid = 13,
+    /// <summary>
+    /// Utf8String
+    /// </summary>
+    Utf8String = 12,
 
-        /// <summary>
-        /// Sequence
-        /// </summary>
-        Sequence = 16,
+    /// <summary>
+    /// RelativeOid
+    /// </summary>
+    RelativeOid = 13,
 
-        /// <summary>
-        /// Set
-        /// </summary>
-        Set = 17,
+    /// <summary>
+    /// Sequence
+    /// </summary>
+    Sequence = 16,
 
-        /// <summary>
-        /// NumericString
-        /// </summary>
-        NumericString = 18,
+    /// <summary>
+    /// Set
+    /// </summary>
+    Set = 17,
 
-        /// <summary>
-        /// PrintableString
-        /// </summary>
-        PrintableString = 19,
+    /// <summary>
+    /// NumericString
+    /// </summary>
+    NumericString = 18,
 
-        /// <summary>
-        /// T61String
-        /// </summary>
-        T61String = 20,
+    /// <summary>
+    /// PrintableString
+    /// </summary>
+    PrintableString = 19,
 
-        /// <summary>
-        /// VideotexString
-        /// </summary>
-        VideotexString = 21,
+    /// <summary>
+    /// T61String
+    /// </summary>
+    T61String = 20,
 
-        /// <summary>
-        /// Ia5String
-        /// </summary>
-        Ia5String = 22,
+    /// <summary>
+    /// VideotexString
+    /// </summary>
+    VideotexString = 21,
 
-        /// <summary>
-        /// UtcTime
-        /// </summary>
-        UtcTime = 23,
+    /// <summary>
+    /// Ia5String
+    /// </summary>
+    Ia5String = 22,
 
-        /// <summary>
-        /// GeneralizedTime
-        /// </summary>
-        GeneralizedTime = 24,
+    /// <summary>
+    /// UtcTime
+    /// </summary>
+    UtcTime = 23,
 
-        /// <summary>
-        /// GraphicString
-        /// </summary>
-        GraphicString = 25,
+    /// <summary>
+    /// GeneralizedTime
+    /// </summary>
+    GeneralizedTime = 24,
 
-        /// <summary>
-        /// VisibleString
-        /// </summary>
-        VisibleString = 26,
+    /// <summary>
+    /// GraphicString
+    /// </summary>
+    GraphicString = 25,
 
-        /// <summary>
-        /// GeneralString
-        /// </summary>
-        GeneralString = 27,
+    /// <summary>
+    /// VisibleString
+    /// </summary>
+    VisibleString = 26,
 
-        /// <summary>
-        /// UniversalString
-        /// </summary>
-        UniversalString = 28,
+    /// <summary>
+    /// GeneralString
+    /// </summary>
+    GeneralString = 27,
 
-        /// <summary>
-        /// CharacterString
-        /// </summary>
-        CharacterString = 29,
+    /// <summary>
+    /// UniversalString
+    /// </summary>
+    UniversalString = 28,
 
-        /// <summary>
-        /// BmpString
-        /// </summary>
-        BmpString = 30,
+    /// <summary>
+    /// CharacterString
+    /// </summary>
+    CharacterString = 29,
 
-        /// <summary>
-        /// LongForm
-        /// </summary>
-        LongForm = 31
-    }
+    /// <summary>
+    /// BmpString
+    /// </summary>
+    BmpString = 30,
+
+    /// <summary>
+    /// LongForm
+    /// </summary>
+    LongForm = 31
 }

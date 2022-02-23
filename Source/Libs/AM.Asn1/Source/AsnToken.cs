@@ -21,97 +21,97 @@ using AM;
 
 #nullable enable
 
-namespace AM.Asn1
+namespace AM.Asn1;
+
+/// <summary>
+///
+/// </summary>
+public sealed class AsnToken
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Column.
     /// </summary>
-    public sealed class AsnToken
+    public int Column;
+
+    /// <summary>
+    /// Token kind.
+    /// </summary>
+    public AsnTokenKind Kind;
+
+    /// <summary>
+    /// Line number.
+    /// </summary>
+    public int Line;
+
+    /// <summary>
+    /// Token text.
+    /// </summary>
+    public string? Text;
+
+    /// <summary>
+    /// Arbitrary user data.
+    /// </summary>
+    public object? UserData;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public AsnToken()
     {
-        #region Properties
-
-        /// <summary>
-        /// Column.
-        /// </summary>
-        public int Column;
-
-        /// <summary>
-        /// Token kind.
-        /// </summary>
-        public AsnTokenKind Kind;
-
-        /// <summary>
-        /// Line number.
-        /// </summary>
-        public int Line;
-
-        /// <summary>
-        /// Token text.
-        /// </summary>
-        public string? Text;
-
-        /// <summary>
-        /// Arbitrary user data.
-        /// </summary>
-        public object? UserData;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public AsnToken()
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public AsnToken
-            (
-                AsnTokenKind kind,
-                int line,
-                int column,
-                string text
-            )
-        {
-            Kind = kind;
-            Column = column;
-            Line = line;
-            Text = text;
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Requires specified kind of token.
-        /// </summary>
-        public AsnToken MustBe
-            (
-                AsnTokenKind kind
-            )
-        {
-            if (Kind != kind)
-            {
-                Magna.Error
-                    (
-                        "AsnToken::MustBe: "
-                        + "expecting="
-                        + kind
-                        + ", got="
-                        + Kind
-                    );
-
-                throw new AsnSyntaxException();
-            }
-
-            return this;
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public AsnToken
+        (
+            AsnTokenKind kind,
+            int line,
+            int column,
+            string text
+        )
+    {
+        Kind = kind;
+        Column = column;
+        Line = line;
+        Text = text;
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Requires specified kind of token.
+    /// </summary>
+    public AsnToken MustBe
+        (
+            AsnTokenKind kind
+        )
+    {
+        if (Kind != kind)
+        {
+            Magna.Error
+                (
+                    "AsnToken::MustBe: "
+                    + "expecting="
+                    + kind
+                    + ", got="
+                    + Kind
+                );
+
+            throw new AsnSyntaxException();
+        }
+
+        return this;
+    }
+
+    #endregion
 }

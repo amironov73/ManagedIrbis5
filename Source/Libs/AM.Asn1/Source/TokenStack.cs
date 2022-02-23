@@ -22,54 +22,53 @@ using System.Linq;
 
 #nullable enable
 
-namespace AM.Asn1
+namespace AM.Asn1;
+
+internal sealed class TokenStack
+    : Stack<AsnTokenKind>
 {
-    sealed class TokenStack
-        : Stack<AsnTokenKind>
+    #region Properties
+
+    public AsnTokenList Tokens { get; }
+
+    public TokenPair[] Pairs { get; }
+
+    #endregion
+
+    #region Construction
+
+    public TokenStack
+        (
+            AsnTokenList tokens,
+            TokenPair[] pairs
+        )
     {
-        #region Properties
-
-        public AsnTokenList Tokens { get; }
-
-        public TokenPair[] Pairs { get; }
-
-        #endregion
-
-        #region Construction
-
-        public TokenStack
-            (
-                AsnTokenList tokens,
-                TokenPair[] pairs
-            )
-        {
-            Tokens = tokens;
-            Pairs = pairs;
-        }
-
-        #endregion
-
-        #region Public methods
-
-        public void Pop(AsnTokenKind current)
-        {
-            AsnTokenKind open = Pop();
-            AsnTokenKind expected = Pairs.First(p => p.Open == open).Close;
-
-            if (expected != current)
-            {
-                throw new AsnSyntaxException(Tokens);
-            }
-        }
-
-        public void Verify()
-        {
-            if (Count != 0)
-            {
-                throw new AsnSyntaxException(Tokens);
-            }
-        }
-
-        #endregion
+        Tokens = tokens;
+        Pairs = pairs;
     }
+
+    #endregion
+
+    #region Public methods
+
+    public void Pop (AsnTokenKind current)
+    {
+        AsnTokenKind open = Pop();
+        AsnTokenKind expected = Pairs.First (p => p.Open == open).Close;
+
+        if (expected != current)
+        {
+            throw new AsnSyntaxException (Tokens);
+        }
+    }
+
+    public void Verify()
+    {
+        if (Count != 0)
+        {
+            throw new AsnSyntaxException (Tokens);
+        }
+    }
+
+    #endregion
 }

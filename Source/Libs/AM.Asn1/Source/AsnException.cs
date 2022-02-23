@@ -21,50 +21,52 @@ using System;
 
 #nullable enable
 
-namespace AM.Asn1
+namespace AM.Asn1;
+
+/// <summary>
+///
+/// </summary>
+public class AsnException
+    : Exception
 {
+    #region Construciton
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public class AsnException
-        : Exception
+    public AsnException()
     {
-        #region Construciton
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public AsnException()
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public AsnException
+        (
+            string message
+        )
+        : base (message)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public AsnException
-            (
-                string message
-            )
-            : base(message)
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public AsnException
-            (
-                string message,
-                Exception innerException
-            )
-            : base
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public AsnException
+        (
+            string message,
+            Exception innerException
+        )
+        : base
             (
                 message,
                 innerException
             )
-        {
-        }
-
-        #endregion
+    {
+        // пустое тело конструктора
     }
+
+    #endregion
 }

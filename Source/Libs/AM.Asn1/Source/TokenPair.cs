@@ -7,48 +7,48 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* TokenPair.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Asn1
+namespace AM.Asn1;
+
+/// <summary>
+/// Pair of tokens.
+/// </summary>
+struct TokenPair
 {
+    #region Properties
+
     /// <summary>
-    /// Pair of tokens.
+    /// Open token.
     /// </summary>
-    struct TokenPair
+    public AsnTokenKind Open;
+
+    /// <summary>
+    /// Close token.
+    /// </summary>
+    public AsnTokenKind Close;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public TokenPair
+        (
+            AsnTokenKind open,
+            AsnTokenKind close
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Open token.
-        /// </summary>
-        public AsnTokenKind Open;
-
-        /// <summary>
-        /// Close token.
-        /// </summary>
-        public AsnTokenKind Close;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public TokenPair
-            (
-                AsnTokenKind open,
-                AsnTokenKind close
-            )
-        {
-            Open = open;
-            Close = close;
-        }
-
-        #endregion
+        Open = open;
+        Close = close;
     }
+
+    #endregion
 }

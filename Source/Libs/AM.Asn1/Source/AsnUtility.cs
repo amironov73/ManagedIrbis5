@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* AsnUtility.cs --
@@ -25,94 +26,93 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Asn1
+namespace AM.Asn1;
+
+/// <summary>
+///
+/// </summary>
+public static class AsnUtility
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public static class AsnUtility
+    #region Public methods
+
+    //=================================================
+
+    private static readonly string[] _reservedWords =
     {
-        #region Public methods
+        "ABSENT",
+        "ABSTRACT",
+        "ALL",
+        "APPLICATION",
+        "AUTOMATIC",
+        "BEGIN",
+        "BIT",
+        "BOOLEAN",
+        "BY",
+        "CHARACTER",
+        "CHOICE",
+        "CLASS",
+        "COMPONENT",
+        "COMPONENTS",
+        "CONSTRAINED",
+        "CONTAINING",
+        "DEFAULT",
+        "DEFINITIONS",
+        "EMBEDDED",
+        "ENCODED",
+        "END",
+        "ENUMERATED",
+        "EXCEPT",
+        "EXPLICIT",
+        "EXTENSIBILITY",
+        "EXTERNAL",
+        "FALSE",
+        "false",
+        "FROM",
+        "IDENTIFIER",
+        "IMPLIED",
+        "IMPLICIT",
+        "IMPORTS",
+        "INCLUDES",
+        "INFINITY",
+        "INSTANCE",
+        "INTERSECTION",
+        "MAX",
+        "MIN",
+        "MINUS",
+        "NULL",
+        "OBJECT",
+        "OCTET",
+        "OID",
+        "OF",
+        "OPTIONAL",
+        "PATTERN",
+        "PDV",
+        "PLUS",
+        "PRESENT",
+        "PRIVATE",
+        "REAL",
+        "RELATIVE",
+        "SET",
+        "SEQUENCE",
+        "SIZE",
+        "STRING",
+        "TAGS",
+        "TRUE",
+        "true",
+        "UNION",
+        "UNIQUE",
+        "WITH",
+    };
 
-        //=================================================
-
-        private static readonly string[] _reservedWords =
-        {
-            "ABSENT",
-            "ABSTRACT",
-            "ALL",
-            "APPLICATION",
-            "AUTOMATIC",
-            "BEGIN",
-            "BIT",
-            "BOOLEAN",
-            "BY",
-            "CHARACTER",
-            "CHOICE",
-            "CLASS",
-            "COMPONENT",
-            "COMPONENTS",
-            "CONSTRAINED",
-            "CONTAINING",
-            "DEFAULT",
-            "DEFINITIONS",
-            "EMBEDDED",
-            "ENCODED",
-            "END",
-            "ENUMERATED",
-            "EXCEPT",
-            "EXPLICIT",
-            "EXTENSIBILITY",
-            "EXTERNAL",
-            "FALSE",
-            "false",
-            "FROM",
-            "IDENTIFIER",
-            "IMPLIED",
-            "IMPLICIT",
-            "IMPORTS",
-            "INCLUDES",
-            "INFINITY",
-            "INSTANCE",
-            "INTERSECTION",
-            "MAX",
-            "MIN",
-            "MINUS",
-            "NULL",
-            "OBJECT",
-            "OCTET",
-            "OID",
-            "OF",
-            "OPTIONAL",
-            "PATTERN",
-            "PDV",
-            "PLUS",
-            "PRESENT",
-            "PRIVATE",
-            "REAL",
-            "RELATIVE",
-            "SET",
-            "SEQUENCE",
-            "SIZE",
-            "STRING",
-            "TAGS",
-            "TRUE",
-            "true",
-            "UNION",
-            "UNIQUE",
-            "WITH",
-        };
-
-        /// <summary>
-        /// Get array of reserved words.
-        /// </summary>
-        public static string[] GetReservedWords()
-        {
-            return _reservedWords;
-        }
-
-        //=================================================
-
-        #endregion
+    /// <summary>
+    /// Get array of reserved words.
+    /// </summary>
+    public static string[] GetReservedWords()
+    {
+        return _reservedWords;
     }
+
+    //=================================================
+
+    #endregion
 }
