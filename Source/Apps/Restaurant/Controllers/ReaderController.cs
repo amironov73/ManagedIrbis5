@@ -30,364 +30,350 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace Studen.Controllers
+namespace Studen.Controllers;
+
+/// <summary>
+/// Контроллер API для доступа к БД читателей.
+/// </summary>
+[ApiController]
+public sealed class ReaderController
+    : ControllerBase
 {
+    #region Construction
+
     /// <summary>
-    /// Контроллер API для доступа к БД читателей.
+    /// Конструктор.
     /// </summary>
-    [ApiController]
-    public sealed class ReaderController
-        : ControllerBase
+    /// <param name="serviceProvider">Провайдер сервисов</param>
+    /// <param name="configuration">Конфигурация.</param>
+    /// <param name="logger">Логгер.</param>
+    public ReaderController
+        (
+            IServiceProvider serviceProvider,
+            IConfiguration configuration,
+            ILogger<ReaderController> logger
+        )
     {
-        #region Construction
+        _logger = logger;
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="serviceProvider">Провайдер сервисов</param>
-        /// <param name="configuration">Конфигурация.</param>
-        /// <param name="logger">Логгер.</param>
-        public ReaderController
+        _storehouse = new Storehouse (serviceProvider, configuration);
+    } // constructor
+
+    #endregion
+
+    #region Private members
+
+    private readonly ILogger _logger;
+    private readonly Storehouse _storehouse;
+
+    private IReaderManager GetReaderManager() => _storehouse.GetRequiredService<IReaderManager>();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Поиск читателя по номеру билета.
+    /// </summary>
+    /// <param name="ticket">Искомый номер</param>
+    /// <returns>Найденный читатель.</returns>
+    [HttpGet ("ticket/{ticket}")]
+    public IActionResult FindByTicket
+        (
+            string? ticket
+        )
+    {
+        _logger.LogInformation
             (
-                IServiceProvider serviceProvider,
-                IConfiguration configuration,
-                ILogger<ReaderController> logger
-            )
+                $"{nameof (FindByTicket)}:: {nameof (ticket)}={ticket}"
+            );
+
+        if (string.IsNullOrEmpty (ticket))
         {
-            _logger = logger;
+            return Problem ("Ticket not specified");
+        }
 
-            _storehouse = new Storehouse (serviceProvider, configuration);
+        using var readerManager = GetReaderManager();
+        var found = readerManager.GetReaderByTicket (ticket);
 
-        } // constructor
+        return Ok (found);
+    }
 
-        #endregion
-
-        #region Private members
-
-        private readonly ILogger _logger;
-        private readonly Storehouse _storehouse;
-
-        private IReaderManager GetReaderManager() => _storehouse.GetRequiredService<IReaderManager>();
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Поиск читателя по номеру билета.
-        /// </summary>
-        /// <param name="ticket">Искомый номер</param>
-        /// <returns>Найденный читатель.</returns>
-        [HttpGet("ticket/{ticket}")]
-        public IActionResult FindByTicket
+    /// <summary>
+    /// Поиск читателя по штрих-коду.
+    /// </summary>
+    /// <param name="barcode">Искомый штрих-код</param>
+    /// <returns>Найденный читатель.</returns>
+    [HttpGet ("barcode/{barcode}")]
+    public IActionResult FindByBarcode
+        (
+            string? barcode
+        )
+    {
+        _logger.LogInformation
             (
-                string? ticket
-            )
+                $"{nameof (FindByBarcode)}:: {nameof (barcode)}={barcode}"
+            );
+
+        if (string.IsNullOrEmpty (barcode))
         {
-            _logger.LogInformation
-                (
-                    $"{nameof(FindByTicket)}:: {nameof(ticket)}={ticket}"
-                );
+            return Problem ("Barcode not specified");
+        }
 
-            if (string.IsNullOrEmpty(ticket))
-            {
-                return Problem("Ticket not specified");
-            }
+        using var readerManager = GetReaderManager();
+        var found = readerManager.GetReaderByBarcode (barcode);
 
-            using var readerManager = GetReaderManager();
-            var found = readerManager.GetReaderByTicket(ticket);
+        return Ok (found);
+    }
 
-            return Ok(found);
-
-        } // method FindByTicket
-
-        /// <summary>
-        /// Поиск читателя по штрих-коду.
-        /// </summary>
-        /// <param name="barcode">Искомый штрих-код</param>
-        /// <returns>Найденный читатель.</returns>
-        [HttpGet("barcode/{barcode}")]
-        public IActionResult FindByBarcode
+    /// <summary>
+    /// Поиск читателя по радио-метке.
+    /// </summary>
+    /// <param name="rfid">Искомая метка</param>
+    /// <returns>Найденный читатель.</returns>
+    [HttpGet ("rfid/{rfid}")]
+    public IActionResult FindByRfid
+        (
+            string? rfid
+        )
+    {
+        _logger.LogInformation
             (
-                string? barcode
-            )
+                $"{nameof (FindByRfid)}:: {nameof (rfid)}={rfid}"
+            );
+
+        if (string.IsNullOrEmpty (rfid))
         {
-            _logger.LogInformation
-                (
-                    $"{nameof(FindByBarcode)}:: {nameof(barcode)}={barcode}"
-                );
+            return Problem ("Rfid not specified");
+        }
 
-            if (string.IsNullOrEmpty(barcode))
-            {
-                return Problem("Barcode not specified");
-            }
+        using var readerManager = GetReaderManager();
+        var found = readerManager.GetReaderByRfid (rfid);
 
-            using var readerManager = GetReaderManager();
-            var found = readerManager.GetReaderByBarcode(barcode);
+        return Ok (found);
+    }
 
-            return Ok(found);
-
-        } // method FindByBarcode
-
-        /// <summary>
-        /// Поиск читателя по радио-метке.
-        /// </summary>
-        /// <param name="rfid">Искомая метка</param>
-        /// <returns>Найденный читатель.</returns>
-        [HttpGet("rfid/{rfid}")]
-        public IActionResult FindByRfid
+    /// <summary>
+    /// Поиск читателя по идентификатору ИРНИТУ.
+    /// </summary>
+    /// <param name="id">Искомый идентификатор</param>
+    /// <returns>Найденный читатель.</returns>
+    [HttpGet ("istu/{id}")]
+    public IActionResult FindByIstu
+        (
+            string? id
+        )
+    {
+        _logger.LogInformation
             (
-                string? rfid
-            )
+                $"{nameof (FindByIstu)}:: {nameof (id)}={id}"
+            );
+
+        if (string.IsNullOrEmpty (id))
         {
-            _logger.LogInformation
-                (
-                    $"{nameof(FindByRfid)}:: {nameof(rfid)}={rfid}"
-                );
+            return Problem ("ID not specified");
+        }
 
-            if (string.IsNullOrEmpty(rfid))
-            {
-                return Problem("Rfid not specified");
-            }
+        var istuId = id.SafeToInt32();
+        if (istuId <= 0)
+        {
+            return Problem ("Bad ID");
+        }
 
-            using var readerManager = GetReaderManager();
-            var found = readerManager.GetReaderByRfid(rfid);
+        using var readerManager = GetReaderManager();
+        var found = readerManager.GetReaderByIstuID (istuId);
 
-            return Ok(found);
+        return Ok (found);
+    }
 
-        } // method FindByRfid
-
-        /// <summary>
-        /// Поиск читателя по идентификатору ИРНИТУ.
-        /// </summary>
-        /// <param name="id">Искомый идентификатор</param>
-        /// <returns>Найденный читатель.</returns>
-        [HttpGet("istu/{id}")]
-        public IActionResult FindByIstu
+    /// <summary>
+    /// Поиск читателя по номеру билета и паролю.
+    /// </summary>
+    /// <param name="ticket">Искомый номер</param>
+    /// <param name="password">Пароль</param>
+    /// <returns>Найденный читатель.</returns>
+    [HttpGet ("password/{ticket}/{password}")]
+    public IActionResult FindByTicketAndPassword
+        (
+            string? ticket,
+            string? password
+        )
+    {
+        _logger.LogInformation
             (
-                string? id
-            )
+                $"{nameof (FindByTicketAndPassword)}:: {nameof (ticket)}={ticket} {nameof (password)}={password}"
+            );
+
+        if (string.IsNullOrEmpty (ticket))
         {
-            _logger.LogInformation
-                (
-                    $"{nameof(FindByIstu)}:: {nameof(id)}={id}"
-                );
+            return Problem ("Ticket not specified");
+        }
 
-            if (string.IsNullOrEmpty(id))
-            {
-                return Problem("ID not specified");
-            }
+        if (string.IsNullOrEmpty (password))
+        {
+            return Problem ("Password not specified");
+        }
 
-            var istuId = id.SafeToInt32();
-            if (istuId <= 0)
-            {
-                return Problem("Bad ID");
-            }
+        using var readerManager = GetReaderManager();
+        var found = readerManager.GetReaderByTicketAndPassword (ticket, password);
 
-            using var readerManager = GetReaderManager();
-            var found = readerManager.GetReaderByIstuID(istuId);
+        return Ok (found);
+    }
 
-            return Ok(found);
-
-        } // method FindByIstu
-
-        /// <summary>
-        /// Поиск читателя по номеру билета и паролю.
-        /// </summary>
-        /// <param name="ticket">Искомый номер</param>
-        /// <param name="password">Пароль</param>
-        /// <returns>Найденный читатель.</returns>
-        [HttpGet("password/{ticket}/{password}")]
-        public IActionResult FindByTicketAndPassword
+    /// <summary>
+    /// Поиск читателя по имени.
+    /// </summary>
+    /// <param name="name">Имя (возможно, маска).</param>
+    /// <returns>Найденные читатели.</returns>
+    [HttpGet ("name/{name}")]
+    public IActionResult FindByName
+        (
+            string? name
+        )
+    {
+        _logger.LogInformation
             (
-                string? ticket,
-                string? password
-            )
+                $"{nameof (FindByName)}:: + {nameof (name)}={name}"
+            );
+
+        if (string.IsNullOrEmpty (name))
         {
-            _logger.LogInformation
-                (
-                    $"{nameof(FindByTicketAndPassword)}:: {nameof(ticket)}={ticket} {nameof(password)}={password}"
-                );
+            return Problem ("Name not specified");
+        }
 
-            if (string.IsNullOrEmpty(ticket))
-            {
-                return Problem("Ticket not specified");
-            }
+        using var readerManager = GetReaderManager();
+        var found = readerManager.FindReaders (ReaderSearchCriteria.Name, name, 100000);
 
-            if (string.IsNullOrEmpty(password))
-            {
-                return Problem("Password not specified");
-            }
+        return Ok (found);
+    }
 
-            using var readerManager = GetReaderManager();
-            var found = readerManager.GetReaderByTicketAndPassword(ticket, password);
-
-            return Ok(found);
-
-        } // method FindByTicket
-
-        /// <summary>
-        /// Поиск читателя по имени.
-        /// </summary>
-        /// <param name="name">Имя (возможно, маска).</param>
-        /// <returns>Найденные читатели.</returns>
-        [HttpGet("name/{name}")]
-        public IActionResult FindByName
+    /// <summary>
+    /// Поиск читателя по группе.
+    /// </summary>
+    /// <param name="group">Шифр группы (возможно, маска).</param>
+    /// <returns>Найденные читатели.</returns>
+    [HttpGet ("group/{group}")]
+    public IActionResult FindByGroup
+        (
+            string? group
+        )
+    {
+        _logger.LogInformation
             (
-                string? name
-            )
+                $"{nameof (FindByGroup)}:: + {nameof (group)}={group}"
+            );
+
+        if (string.IsNullOrEmpty (group))
         {
-            _logger.LogInformation
-                (
-                    $"{nameof(FindByName)}:: + {nameof(name)}={name}"
-                );
+            return Problem ("Group not specified");
+        }
 
-            if (string.IsNullOrEmpty(name))
-            {
-                return Problem("Name not specified");
+        using var readerManager = GetReaderManager();
+        var found = readerManager.FindReaders (ReaderSearchCriteria.Group, group, 100000);
 
-            }
+        return Ok (found);
+    }
 
-            using var readerManager = GetReaderManager();
-            var found = readerManager.FindReaders(ReaderSearchCriteria.Name, name, 100000);
-
-            return Ok(found);
-
-        } // method FindByName
-
-        /// <summary>
-        /// Поиск читателя по группе.
-        /// </summary>
-        /// <param name="group">Шифр группы (возможно, маска).</param>
-        /// <returns>Найденные читатели.</returns>
-        [HttpGet("group/{group}")]
-        public IActionResult FindByGroup
+    /// <summary>
+    /// Произвольный поиск читателей в базе.
+    /// </summary>
+    /// <param name="expression">SQL-выражение со всеми select, where и что там ещё</param>
+    /// <returns>Найденные читатели</returns>
+    [HttpGet ("readers/{expression}")]
+    public IActionResult SearchReaders
+        (
+            string? expression
+        )
+    {
+        _logger.LogInformation
             (
-                string? group
-            )
+                $"{nameof (SearchReaders)}:: + {nameof (expression)}={expression}"
+            );
+
+        if (string.IsNullOrEmpty (expression))
         {
-            _logger.LogInformation
-                (
-                    $"{nameof(FindByGroup)}:: + {nameof(group)}={group}"
-                );
+            return Problem ("Expression not specified");
+        }
 
-            if (string.IsNullOrEmpty(group))
-            {
-                return Problem("Group not specified");
+        using var readerManager = GetReaderManager();
+        var found = readerManager.Search (expression);
 
-            }
+        return Ok (found);
+    }
 
-            using var readerManager = GetReaderManager();
-            var found = readerManager.FindReaders(ReaderSearchCriteria.Group, group, 100000);
-
-            return Ok(found);
-
-        } // method FindByGroup
-
-        /// <summary>
-        /// Произвольный поиск читателей в базе.
-        /// </summary>
-        /// <param name="expression">SQL-выражение со всеми select, where и что там ещё</param>
-        /// <returns>Найденные читатели</returns>
-        [HttpGet("readers/{expression}")]
-        public IActionResult SearchReaders
+    /// <summary>
+    /// Удаление читателя по номеру билета.
+    /// </summary>
+    /// <param name="ticket">Номер билета</param>
+    [HttpGet ("delete_reader/{ticket}")]
+    public IActionResult DeleteByTicket
+        (
+            string? ticket
+        )
+    {
+        _logger.LogInformation
             (
-                string? expression
-            )
+                $"{nameof (DeleteByTicket)}:: + {nameof (ticket)}={ticket}"
+            );
+
+        if (string.IsNullOrEmpty (ticket))
         {
-            _logger.LogInformation
-                (
-                    $"{nameof(SearchReaders)}:: + {nameof(expression)}={expression}"
-                );
+            return Problem ("Ticket not specified");
+        }
 
-            if (string.IsNullOrEmpty(expression))
-            {
-                return Problem("Expression not specified");
-            }
+        using var readerManager = GetReaderManager();
+        readerManager.DeleteReader (ticket);
 
-            using var readerManager = GetReaderManager();
-            var found = readerManager.Search(expression);
+        return Ok();
+    }
 
-            return Ok(found);
-
-        } // method Search
-
-        /// <summary>
-        /// Удаление читателя по номеру билета.
-        /// </summary>
-        /// <param name="ticket">Номер билета</param>
-        [HttpGet("delete_reader/{ticket}")]
-        public IActionResult DeleteByTicket
+    /// <summary>
+    /// Создание читателя в базе.
+    /// </summary>
+    [HttpPost ("create_reader")]
+    public IActionResult CreateReader
+        (
+            [FromBody] Reader reader
+        )
+    {
+        _logger.LogInformation
             (
-                string? ticket
-            )
-        {
-            _logger.LogInformation
-                (
-                    $"{nameof(DeleteByTicket)}:: + {nameof(ticket)}={ticket}"
-                );
+                $"{nameof (CreateReader)}:: + {nameof (reader)}={reader.Ticket}"
+            );
 
-            if (string.IsNullOrEmpty(ticket))
-            {
-                return Problem("Ticket not specified");
-            }
+        // TODO верифицировать
 
-            using var readerManager = GetReaderManager();
-            readerManager.DeleteReader(ticket);
+        reader.Registered = DateTime.Now.ToString ("dd.MM.yyyy");
+        reader.Moment = DateTime.Now;
+        reader.Operator = 1;
 
-            return Ok();
+        using var readerManager = GetReaderManager();
+        readerManager.CreateReader (reader);
 
-        } // method Delete
+        return Ok();
+    }
 
-        /// <summary>
-        /// Создание читателя в базе.
-        /// </summary>
-        [HttpPost("create_reader")]
-        public IActionResult CreateReader
+    /// <summary>
+    /// Обновление читателя в базе (по идентификатору, а не по номеру читательского!).
+    /// </summary>
+    [HttpPost ("update_reader")]
+    public IActionResult UpdateReader
+        (
+            [FromBody] Reader reader
+        )
+    {
+        _logger.LogInformation
             (
-                [FromBody] Reader reader
-            )
-        {
-            _logger.LogInformation
-                (
-                    $"{nameof(CreateReader)}:: + {nameof(reader)}={reader.Ticket}"
-                );
+                $"{nameof (UpdateReader)}:: + {nameof (reader)}={reader.Ticket}"
+            );
 
-            // TODO верифицировать
+        // TODO верифицировать
 
-            reader.Registered = DateTime.Now.ToString("dd.MM.yyyy");
-            reader.Moment = DateTime.Now;
-            reader.Operator = 1;
+        using var readerManager = GetReaderManager();
+        readerManager.UpdateReaderInfo (reader);
 
-            using var readerManager = GetReaderManager();
-            readerManager.CreateReader(reader);
-
-            return Ok();
-
-        } // method CreateReader
-
-        /// <summary>
-        /// Обновление читателя в базе (по идентификатору, а не по номеру читательского!).
-        /// </summary>
-        [HttpPost("update_reader")]
-        public IActionResult UpdateReader
-            (
-                [FromBody] Reader reader
-            )
-        {
-            _logger.LogInformation
-                (
-                    $"{nameof(UpdateReader)}:: + {nameof(reader)}={reader.Ticket}"
-                );
-
-            // TODO верифицировать
-
-            using var readerManager = GetReaderManager();
-            readerManager.UpdateReaderInfo(reader);
-
-            return Ok();
-
-        } // method UpdateReader
+        return Ok();
+    }
 
 /*
 
@@ -452,8 +438,5 @@ namespace Studen.Controllers
 
 */
 
-        #endregion
-
-    } // class ReaderController
-
-} // namespace Restaurant
+    #endregion
+}

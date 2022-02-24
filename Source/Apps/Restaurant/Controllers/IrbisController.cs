@@ -36,1011 +36,1011 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace Restaurant.Controllers
+namespace Restaurant.Controllers;
+
+/// <summary>
+/// Контроллер API для доступа к ИРБИС64.
+/// </summary>
+[ApiController]
+public sealed class IrbisController
+    : ControllerBase
 {
+    #region Construction
+
     /// <summary>
-    /// Контроллер API для доступа к ИРБИС64.
+    /// Конструктор.
     /// </summary>
-    [ApiController]
-    public sealed class IrbisController
-        : ControllerBase
+    /// <param name="configuration">Конфигурация.</param>
+    /// <param name="logger">Логгер.</param>
+    public IrbisController
+        (
+            IConfiguration configuration,
+            ILogger<IrbisController> logger
+        )
     {
-        #region Construction
+        _configuration = configuration;
+        _logger = logger;
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="configuration">Конфигурация.</param>
-        /// <param name="logger">Логгер.</param>
-        public IrbisController
+        _defaultDatabase = _configuration["default-irbis-database"];
+        _defaultFormat = configuration["default-format"];
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly ILogger _logger;
+    private readonly IConfiguration _configuration;
+    private readonly string _defaultDatabase;
+    private readonly string _defaultFormat;
+
+    /// <summary>
+    /// Построение настроек подключения.
+    /// </summary>
+    /// <remarks>
+    /// Метод обязан вернуть корректные настройки подключения
+    /// либо выбросить исключение.
+    /// </remarks>
+    private static ConnectionSettings BuildConnectionSettings
+        (
+            IConfiguration configuration,
+            string[]? args = null
+        )
+    {
+        args ??= Array.Empty<string>();
+
+        // сначала берем настройки из стандартного JSON-файла конфигурации
+        var connectionString = ConnectionUtility.GetConfiguredConnectionString (configuration)
+                               ?? ConnectionUtility.GetStandardConnectionString();
+
+        var result = new ConnectionSettings();
+        if (!string.IsNullOrEmpty (connectionString))
+        {
+            result.ParseConnectionString (connectionString);
+        }
+
+        // затем из опционального файла с настройками подключения
+        connectionString = ConnectionUtility.GetConnectionStringFromFile();
+        if (!string.IsNullOrEmpty (connectionString))
+        {
+            result.ParseConnectionString (connectionString);
+        }
+
+        // затем из переменных окружения
+        CommandLineUtility.ConfigureConnectionFromEnvironment (result);
+
+        // наконец, из командной строки
+        CommandLineUtility.ConfigureConnectionFromCommandLine (result, args);
+
+        // Применяем настройки по умолчанию, если соответствующие элементы не заданы
+        result.ApplyDefaults();
+
+        // Logger.LogInformation($"Using connection settings: {Settings}");
+
+        if (!result.Verify (false))
+        {
+            throw new IrbisException ("Can't build connection settings");
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Подключение к серверу.
+    /// </summary>
+    private ISyncProvider GetConnection()
+    {
+        var settings = BuildConnectionSettings (_configuration);
+        var result = new SyncConnection();
+        settings.Apply ((ISyncProvider)result);
+        result.SetLogger (_logger);
+        result.Connect();
+
+        return result;
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение информации о базе данных.
+    /// </summary>
+    /// <param name="database">Имя базы данных.</param>
+    [HttpGet ("db_info/{database}")]
+    public IActionResult DbInfo
+        (
+            string? database
+        )
+    {
+        _logger.LogInformation
             (
-                IConfiguration configuration,
-                ILogger<IrbisController> logger
-            )
-        {
-            _configuration = configuration;
-            _logger = logger;
+                $"{nameof (DbInfo)}:: {nameof (database)}={database}"
+            );
 
-            _defaultDatabase = _configuration["default-irbis-database"];
-            _defaultFormat = configuration["default-format"];
+        if (database.IsEmpty())
+        {
+            return BadRequest ("Database not specified");
         }
 
-        #endregion
+        database = WebUtility.UrlDecode (database);
 
-        #region Private members
+        using var connection = GetConnection();
+        if (!connection.Connected)
+        {
+            return Problem ("Can't connect to IRBIS64");
+        }
 
-        private readonly ILogger _logger;
-        private readonly IConfiguration _configuration;
-        private readonly string _defaultDatabase;
-        private readonly string _defaultFormat;
+        var result = connection.GetDatabaseInfo (database);
+        if (result is null || connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
 
-        /// <summary>
-        /// Построение настроек подключения.
-        /// </summary>
-        /// <remarks>
-        /// Метод обязан вернуть корректные настройки подключения
-        /// либо выбросить исключение.
-        /// </remarks>
-        private static ConnectionSettings BuildConnectionSettings
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Форматирование записи.
+    /// </summary>
+    /// <param name="database">Имя базы данных.</param>
+    /// <param name="mfn">MFN записи.</param>
+    /// <param name="format">Спецификация формата.</param>
+    /// <returns>Результат расформатирования.</returns>
+    [HttpGet ("format/{mfn}/{database?}/{format?}")]
+    public IActionResult Format
+        (
+            string? mfn,
+            string? database = null,
+            string? format = null
+        )
+    {
+        _logger.LogInformation
             (
-                IConfiguration configuration,
-                string[]? args = null
-            )
+                $"{nameof (Format)}:: {nameof (mfn)}={mfn} {nameof (database)}={database} {nameof (format)}={format}"
+            );
+
+        if (string.IsNullOrEmpty (mfn))
         {
-            args ??= Array.Empty<string>();
-
-            // сначала берем настройки из стандартного JSON-файла конфигурации
-            var connectionString = ConnectionUtility.GetConfiguredConnectionString (configuration)
-                                   ?? ConnectionUtility.GetStandardConnectionString();
-
-            var result = new ConnectionSettings();
-            if (!string.IsNullOrEmpty (connectionString))
-            {
-                result.ParseConnectionString (connectionString);
-            }
-
-            // затем из опционального файла с настройками подключения
-            connectionString = ConnectionUtility.GetConnectionStringFromFile();
-            if (!string.IsNullOrEmpty (connectionString))
-            {
-                result.ParseConnectionString (connectionString);
-            }
-
-            // затем из переменных окружения
-            CommandLineUtility.ConfigureConnectionFromEnvironment (result);
-
-            // наконец, из командной строки
-            CommandLineUtility.ConfigureConnectionFromCommandLine (result, args);
-
-            // Применяем настройки по умолчанию, если соответствующие элементы не заданы
-            result.ApplyDefaults();
-
-            // Logger.LogInformation($"Using connection settings: {Settings}");
-
-            if (!result.Verify (false))
-            {
-                throw new IrbisException ("Can't build connection settings");
-            }
-
-            return result;
+            return Problem ("MFN not specified");
         }
 
-        /// <summary>
-        /// Подключение к серверу.
-        /// </summary>
-        private ISyncProvider GetConnection()
-        {
-            var settings = BuildConnectionSettings (_configuration);
-            var result = new SyncConnection();
-            settings.Apply ((ISyncProvider)result);
-            result.SetLogger (_logger);
-            result.Connect();
+        database = WebUtility.UrlDecode (database);
+        format = WebUtility.UrlDecode (format);
 
-            return result;
+        var mfnValue = mfn.SafeToInt32();
+        if (mfnValue <= 0)
+        {
+            return Problem ("Bad MFN");
         }
 
-        #endregion
+        if (string.IsNullOrEmpty (database))
+        {
+            database = _defaultDatabase;
+        }
 
-        #region Public methods
+        if (string.IsNullOrEmpty (format))
+        {
+            format = _defaultFormat;
+        }
 
-        /// <summary>
-        /// Получение информации о базе данных.
-        /// </summary>
-        /// <param name="database">Имя базы данных.</param>
-        [HttpGet ("db_info/{database}")]
-        public IActionResult DbInfo
+        using var connection = GetConnection();
+        if (!connection.Connected)
+        {
+            return Problem ("Can't connect to IRBIS64");
+        }
+
+        connection.Database = database;
+
+        var result = connection.FormatRecord (format, mfnValue);
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Поиск книги по инвентарному номеру
+    /// с последующим расформатированием найденной записи.
+    /// </summary>
+    /// <param name="number">Искомый инвентарный номер.</param>
+    /// <param name="database">Имя базы данных (опционально).</param>
+    /// <param name="format">Спецификация формата (опционально).</param>
+    /// <returns>Библиографическое описание найденной книги либо
+    /// "Not found".</returns>
+    /// <remarks>
+    /// Сделано специально для Политеха.
+    /// </remarks>
+    [HttpGet ("inventory/{number}/{database?}/{format?}")]
+    public IActionResult Inventory
+        (
+            string? number,
+            string? database = null,
+            string? format = null
+        )
+    {
+        _logger.LogInformation
             (
-                string? database
-            )
+                $"{nameof (Inventory)}:: {nameof (number)}={number} {nameof (database)}={database} {nameof (format)}={format}"
+            );
+
+        if (number.IsEmpty())
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (DbInfo)}:: {nameof (database)}={database}"
-                );
-
-            if (database.IsEmpty())
-            {
-                return BadRequest ("Database not specified");
-            }
-
-            database = WebUtility.UrlDecode (database);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var result = connection.GetDatabaseInfo (database);
-            if (result is null || connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (result);
+            return BadRequest ("Number not specified");
         }
 
-        /// <summary>
-        /// Форматирование записи.
-        /// </summary>
-        /// <param name="database">Имя базы данных.</param>
-        /// <param name="mfn">MFN записи.</param>
-        /// <param name="format">Спецификация формата.</param>
-        /// <returns>Результат расформатирования.</returns>
-        [HttpGet ("format/{mfn}/{database?}/{format?}")]
-        public IActionResult Format
+        number = WebUtility.UrlDecode (number);
+        database = WebUtility.UrlDecode (database);
+        format = WebUtility.UrlDecode (format);
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
+        {
+            return Problem ("Can't connect to IRBIS64");
+        }
+
+        var parameters = new SearchParameters
+        {
+            Database = database ?? _defaultDatabase,
+            Expression = $"\"IN={number}\"",
+            NumberOfRecords = 1,
+            Format = format ?? _defaultFormat
+        };
+        var found = connection.Search (parameters);
+        if (found.IsNullOrEmpty())
+        {
+            return Ok ("Not found");
+        }
+
+        return Ok (found[0].Text);
+    }
+
+    /// <summary>
+    /// Поиск книги по номеру карточки безынвентарного учета
+    /// с последующим расформатированием найденной записи.
+    /// </summary>
+    /// <param name="number">Искомый номер карточки.</param>
+    /// <param name="database">Имя базы данных (опционально).</param>
+    /// <param name="format">Спецификация формата (опционально).</param>
+    /// <returns>Библиографическое описание найденной книги либо
+    /// "Not found".</returns>
+    /// <remarks>
+    /// Сделано специально для Политеха.
+    /// </remarks>
+    [HttpGet ("kk/{number}/{database?}/{format?}")]
+    public IActionResult Kk
+        (
+            string? number,
+            string? database = null,
+            string? format = null
+        )
+    {
+        _logger.LogInformation
             (
-                string? mfn,
-                string? database = null,
-                string? format = null
-            )
+                $"{nameof (Kk)}:: {nameof (number)}={number} {nameof (database)}={database} {nameof (format)}={format}"
+            );
+
+        if (number.IsEmpty())
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (Format)}:: {nameof (mfn)}={mfn} {nameof (database)}={database} {nameof (format)}={format}"
-                );
-
-            if (string.IsNullOrEmpty (mfn))
-            {
-                return Problem ("MFN not specified");
-            }
-
-            database = WebUtility.UrlDecode (database);
-            format = WebUtility.UrlDecode (format);
-
-            var mfnValue = mfn.SafeToInt32();
-            if (mfnValue <= 0)
-            {
-                return Problem ("Bad MFN");
-            }
-
-            if (string.IsNullOrEmpty (database))
-            {
-                database = _defaultDatabase;
-            }
-
-            if (string.IsNullOrEmpty (format))
-            {
-                format = _defaultFormat;
-            }
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            connection.Database = database;
-
-            var result = connection.FormatRecord (format, mfnValue);
-
-            return Ok (result);
+            return BadRequest ("Number not specified");
         }
 
-        /// <summary>
-        /// Поиск книги по инвентарному номеру
-        /// с последующим расформатированием найденной записи.
-        /// </summary>
-        /// <param name="number">Искомый инвентарный номер.</param>
-        /// <param name="database">Имя базы данных (опционально).</param>
-        /// <param name="format">Спецификация формата (опционально).</param>
-        /// <returns>Библиографическое описание найденной книги либо
-        /// "Not found".</returns>
-        /// <remarks>
-        /// Сделано специально для Политеха.
-        /// </remarks>
-        [HttpGet ("inventory/{number}/{database?}/{format?}")]
-        public IActionResult Inventory
+        number = WebUtility.UrlDecode (number);
+        database = WebUtility.UrlDecode (database);
+        format = WebUtility.UrlDecode (format);
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
+        {
+            return Problem ("Can't connect to IRBIS64");
+        }
+
+        var parameters = new SearchParameters
+        {
+            Database = database ?? _defaultDatabase,
+            Expression = $"\"NS={number}\"",
+            NumberOfRecords = 1,
+            Format = format ?? "@brief"
+        };
+        var found = connection.Search (parameters);
+        if (found.IsNullOrEmpty())
+        {
+            return Ok ("Not found");
+        }
+
+        return Ok (found[0].Text);
+    }
+
+    /// <summary>
+    /// Получение списка баз данных.
+    /// </summary>
+    /// <param name="spec">Спецификация MNU-файла со списком баз.</param>
+    [HttpGet ("list_db/{spec?}")]
+    public IActionResult ListDb
+        (
+            string? spec = null
+        )
+    {
+        _logger.LogInformation
             (
-                string? number,
-                string? database = null,
-                string? format = null
-            )
+                $"{nameof (ListDb)}:: {nameof (spec)}={spec}"
+            );
+
+        spec = WebUtility.UrlDecode (spec);
+        spec ??= "dbnam3.mnu";
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (Inventory)}:: {nameof (number)}={number} {nameof (database)}={database} {nameof (format)}={format}"
-                );
-
-            if (number.IsEmpty())
-            {
-                return BadRequest ("Number not specified");
-            }
-
-            number = WebUtility.UrlDecode (number);
-            database = WebUtility.UrlDecode (database);
-            format = WebUtility.UrlDecode (format);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var parameters = new SearchParameters
-            {
-                Database = database ?? _defaultDatabase,
-                Expression = $"\"IN={number}\"",
-                NumberOfRecords = 1,
-                Format = format ?? _defaultFormat
-            };
-            var found = connection.Search (parameters);
-            if (found.IsNullOrEmpty())
-            {
-                return Ok ("Not found");
-            }
-
-            return Ok (found[0].Text);
+            return Problem ("Can't connect to IRBIS64");
         }
 
-        /// <summary>
-        /// Поиск книги по номеру карточки безынвентарного учета
-        /// с последующим расформатированием найденной записи.
-        /// </summary>
-        /// <param name="number">Искомый номер карточки.</param>
-        /// <param name="database">Имя базы данных (опционально).</param>
-        /// <param name="format">Спецификация формата (опционально).</param>
-        /// <returns>Библиографическое описание найденной книги либо
-        /// "Not found".</returns>
-        /// <remarks>
-        /// Сделано специально для Политеха.
-        /// </remarks>
-        [HttpGet ("kk/{number}/{database?}/{format?}")]
-        public IActionResult Kk
+        var result = connection.ListDatabases (spec);
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Получение списка файлов.
+    /// </summary>
+    /// <param name="pattern">Спецификация.</param>
+    [HttpGet ("list_files/{pattern?}")]
+    public IActionResult ListFiles
+        (
+            string? pattern = null
+        )
+    {
+        _logger.LogInformation
             (
-                string? number,
-                string? database = null,
-                string? format = null
-            )
+                $"{nameof (ListFiles)}:: {nameof (pattern)}={pattern}"
+            );
+
+        pattern = WebUtility.UrlDecode (pattern);
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (Kk)}:: {nameof (number)}={number} {nameof (database)}={database} {nameof (format)}={format}"
-                );
-
-            if (number.IsEmpty())
-            {
-                return BadRequest ("Number not specified");
-            }
-
-            number = WebUtility.UrlDecode (number);
-            database = WebUtility.UrlDecode (database);
-            format = WebUtility.UrlDecode (format);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var parameters = new SearchParameters
-            {
-                Database = database ?? _defaultDatabase,
-                Expression = $"\"NS={number}\"",
-                NumberOfRecords = 1,
-                Format = format ?? "@brief"
-            };
-            var found = connection.Search (parameters);
-            if (found.IsNullOrEmpty())
-            {
-                return Ok ("Not found");
-            }
-
-            return Ok (found[0].Text);
+            return Problem ("Can't connect to IRBIS64");
         }
 
-        /// <summary>
-        /// Получение списка баз данных.
-        /// </summary>
-        /// <param name="spec">Спецификация MNU-файла со списком баз.</param>
-        [HttpGet ("list_db/{spec?}")]
-        public IActionResult ListDb
+        pattern ??= $"2.{connection.Database}.*.*";
+        var specification = FileSpecification.Parse (pattern);
+        var result = connection.ListFiles (specification);
+        if (result is null || connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Получение списка серверных процессов.
+    /// </summary>
+    [HttpGet ("list_proc")]
+    public IActionResult ListProcesses()
+    {
+        _logger.LogInformation
             (
-                string? spec = null
-            )
+                $"{nameof (ListProcesses)}"
+            );
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (ListDb)}:: {nameof (spec)}={spec}"
-                );
-
-            spec = WebUtility.UrlDecode (spec);
-            spec ??= "dbnam3.mnu";
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var result = connection.ListDatabases (spec);
-
-            return Ok (result);
+            return Problem ("Can't connect to IRBIS64");
         }
 
-        /// <summary>
-        /// Получение списка файлов.
-        /// </summary>
-        /// <param name="pattern">Спецификация.</param>
-        [HttpGet ("list_files/{pattern?}")]
-        public IActionResult ListFiles
+        var result = connection.ListProcesses();
+        if (result is null || connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Получение списка терминов поискового словаря.
+    /// </summary>
+    /// <param name="database">Имя базы данных</param>
+    /// <param name="prefix">Префикс</param>
+    [HttpGet ("list_terms/{prefix}/{database?}")]
+    public IActionResult ListTerms
+        (
+            string? prefix,
+            string? database = null
+        )
+    {
+        _logger.LogInformation
             (
-                string? pattern = null
-            )
+                $"{nameof (ListTerms)}:: {nameof (prefix)}={prefix} {nameof (database)}={database}"
+            );
+
+        if (prefix.IsEmpty())
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (ListFiles)}:: {nameof (pattern)}={pattern}"
-                );
-
-            pattern = WebUtility.UrlDecode (pattern);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            pattern ??= $"2.{connection.Database}.*.*";
-            var specification = FileSpecification.Parse (pattern);
-            var result = connection.ListFiles (specification);
-            if (result is null || connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (result);
+            return BadRequest ("Prefix not specified");
         }
 
-        /// <summary>
-        /// Получение списка серверных процессов.
-        /// </summary>
-        [HttpGet ("list_proc")]
-        public IActionResult ListProcesses()
+        prefix = WebUtility.UrlDecode (prefix);
+        database = WebUtility.UrlDecode (database);
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (ListProcesses)}"
-                );
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var result = connection.ListProcesses();
-            if (result is null || connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (result);
+            return Problem ("Can't connect to IRBIS64");
         }
 
-        /// <summary>
-        /// Получение списка терминов поискового словаря.
-        /// </summary>
-        /// <param name="database">Имя базы данных</param>
-        /// <param name="prefix">Префикс</param>
-        [HttpGet ("list_terms/{prefix}/{database?}")]
-        public IActionResult ListTerms
+        connection.Database = database ?? _defaultDatabase;
+        var result = connection.ReadAllTerms (prefix);
+        if (connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        return Ok (Term.TrimToString (result, prefix));
+    }
+
+    /// <summary>
+    /// Получение максимального MFN для указанной базы данных.
+    /// </summary>
+    /// <param name="database">Имя базы данных.</param>
+    [HttpGet ("max_mfn/{database?}")]
+    public IActionResult MaxMfn
+        (
+            string? database = null
+        )
+    {
+        _logger.LogInformation
             (
-                string? prefix,
-                string? database = null
-            )
+                $"{nameof (MaxMfn)}:: {nameof (database)}={database}"
+            );
+
+        database = WebUtility.UrlDecode (database);
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (ListTerms)}:: {nameof (prefix)}={prefix} {nameof (database)}={database}"
-                );
-
-            if (prefix.IsEmpty())
-            {
-                return BadRequest ("Prefix not specified");
-            }
-
-            prefix = WebUtility.UrlDecode (prefix);
-            database = WebUtility.UrlDecode (database);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            connection.Database = database ?? _defaultDatabase;
-            var result = connection.ReadAllTerms (prefix);
-            if (connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (Term.TrimToString (result, prefix));
+            return Problem ("Can't connect to IRBIS64");
         }
 
-        /// <summary>
-        /// Получение максимального MFN для указанной базы данных.
-        /// </summary>
-        /// <param name="database">Имя базы данных.</param>
-        [HttpGet ("max_mfn/{database?}")]
-        public IActionResult MaxMfn
+        var result = connection.GetMaxMfn (database ?? _defaultDatabase);
+        if (result < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (result));
+        }
+
+        if (connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Получение меню с сервера.
+    /// </summary>
+    /// <param name="fileName">Спецификация.</param>
+    [HttpGet ("read_menu/{fileName}")]
+    public IActionResult ReadMenu
+        (
+            string? fileName
+        )
+    {
+        _logger.LogInformation
             (
-                string? database = null
-            )
+                $"{nameof (ReadMenu)}:: {nameof (fileName)}={fileName}"
+            );
+
+        if (fileName.IsEmpty())
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (MaxMfn)}:: {nameof (database)}={database}"
-                );
-
-            database = WebUtility.UrlDecode (database);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var result = connection.GetMaxMfn (database ?? _defaultDatabase);
-            if (result < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (result));
-            }
-
-            if (connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (result);
+            return BadRequest ("File name not specified");
         }
 
-        /// <summary>
-        /// Получение меню с сервера.
-        /// </summary>
-        /// <param name="fileName">Спецификация.</param>
-        [HttpGet ("read_menu/{fileName}")]
-        public IActionResult ReadMenu
+        fileName = WebUtility.UrlDecode (fileName);
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
+        {
+            return Problem ("Can't connect to IRBIS64");
+        }
+
+        var specification = FileSpecification.Parse (fileName);
+        var result = connection.ReadMenu (specification);
+        if (result is null || connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Чтение записи с сервера.
+    /// </summary>
+    /// <param name="database">Имя базы данных.</param>
+    /// <param name="mfn">MFN записи.</param>
+    [HttpGet ("read/{mfn}/{database?}")]
+    public IActionResult ReadRecord
+        (
+            string? mfn,
+            string? database = null
+        )
+    {
+        if (database.IsEmpty())
+        {
+            return BadRequest ("Database not specified");
+        }
+
+        if (mfn.IsEmpty())
+        {
+            return BadRequest ("MFN not specified");
+        }
+
+        database = WebUtility.UrlDecode (database);
+
+        var number = mfn.SafeToInt32();
+        if (number <= 0)
+        {
+            return BadRequest ("Bad MFN value");
+        }
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
+        {
+            return Problem ("Can't connect to IRBIS64");
+        }
+
+        var parameters = new ReadRecordParameters()
+        {
+            Database = database,
+            Mfn = number
+        };
+
+        var result = connection.ReadRecord (parameters);
+        if (result is null || connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Чтение настроек оптимизации показа.
+    /// </summary>
+    /// <param name="fileName">Спецификация файла</param>
+    [HttpGet ("read_opt/{fileName}")]
+    public IActionResult ReadOpt
+        (
+            string? fileName
+        )
+    {
+        if (fileName.IsEmpty())
+        {
+            return BadRequest ("File name not specified");
+        }
+
+        fileName = WebUtility.UrlDecode (fileName);
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
+        {
+            return Problem ("Can't connect to IRBIS64");
+        }
+
+        var specification = FileSpecification.Parse (fileName);
+        var result = connection.ReadOptFile (specification);
+        if (result is null || connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Чтение терминов поискового словаря.
+    /// </summary>
+    /// <param name="database">Имя базы данных.</param>
+    /// <param name="startTerm">Начальный термин.</param>
+    /// <param name="count">Количество считываемых терминов.</param>
+    [HttpGet ("read_terms/{startTerm}/{count?}/{database?}")]
+    public IActionResult ReadTerms
+        (
+            string? startTerm,
+            string? count = null,
+            string? database = null
+        )
+    {
+        _logger.LogInformation
             (
-                string? fileName
-            )
+                $"{nameof (ReadTerms)}:: {nameof (startTerm)}={startTerm} {nameof (count)}={count} {nameof (database)}={database}"
+            );
+
+        if (startTerm.IsEmpty())
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (ReadMenu)}:: {nameof (fileName)}={fileName}"
-                );
-
-            if (fileName.IsEmpty())
-            {
-                return BadRequest ("File name not specified");
-            }
-
-            fileName = WebUtility.UrlDecode (fileName);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var specification = FileSpecification.Parse (fileName);
-            var result = connection.ReadMenu (specification);
-            if (result is null || connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (result);
+            return BadRequest ("Start term not specified");
         }
 
-        /// <summary>
-        /// Чтение записи с сервера.
-        /// </summary>
-        /// <param name="database">Имя базы данных.</param>
-        /// <param name="mfn">MFN записи.</param>
-        [HttpGet ("read/{mfn}/{database?}")]
-        public IActionResult ReadRecord
+        startTerm = WebUtility.UrlDecode (startTerm);
+        database = WebUtility.UrlDecode (database);
+
+        var number = count.SafeToInt32 (100);
+        using var connection = GetConnection();
+        if (!connection.Connected)
+        {
+            return Problem ("Can't connect to IRBIS64");
+        }
+
+        var paremeters = new TermParameters()
+        {
+            Database = database ?? _defaultDatabase,
+            StartTerm = startTerm,
+            NumberOfTerms = number
+        };
+        var result = connection.ReadTerms (paremeters);
+        if (result is null || connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Получение текстового файла с сервера.
+    /// </summary>
+    [HttpGet ("read_text/{fileName}")]
+    public IActionResult ReadTextFile
+        (
+            string? fileName
+        )
+    {
+        _logger.LogInformation
             (
-                string? mfn,
-                string? database = null
-            )
+                $"{nameof (ReadTextFile)}:: {nameof (fileName)}={fileName}"
+            );
+
+        if (fileName.IsEmpty())
         {
-            if (database.IsEmpty())
-            {
-                return BadRequest ("Database not specified");
-            }
-
-            if (mfn.IsEmpty())
-            {
-                return BadRequest ("MFN not specified");
-            }
-
-            database = WebUtility.UrlDecode (database);
-
-            var number = mfn.SafeToInt32();
-            if (number <= 0)
-            {
-                return BadRequest ("Bad MFN value");
-            }
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var parameters = new ReadRecordParameters()
-            {
-                Database = database,
-                Mfn = number
-            };
-
-            var result = connection.ReadRecord (parameters);
-            if (result is null || connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (result);
+            return BadRequest ("File name not specified");
         }
 
-        /// <summary>
-        /// Чтение настроек оптимизации показа.
-        /// </summary>
-        /// <param name="fileName">Спецификация файла</param>
-        [HttpGet ("read_opt/{fileName}")]
-        public IActionResult ReadOpt
+        fileName = WebUtility.UrlDecode (fileName);
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
+        {
+            return Problem ("Can't connect to IRBIS64");
+        }
+
+        var specification = FileSpecification.Parse (fileName);
+        var result = connection.ReadTextFile (specification);
+        if (connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Перезапуск сервиса.
+    /// </summary>
+    [HttpGet ("restart")]
+    public IActionResult Restart()
+    {
+        _logger.LogInformation
             (
-                string? fileName
-            )
+                $"{nameof (Restart)}"
+            );
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
         {
-            if (fileName.IsEmpty())
-            {
-                return BadRequest ("File name not specified");
-            }
-
-            fileName = WebUtility.UrlDecode (fileName);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var specification = FileSpecification.Parse (fileName);
-            var result = connection.ReadOptFile (specification);
-            if (result is null || connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (result);
+            return Problem ("Can't connect to IRBIS64");
         }
 
-        /// <summary>
-        /// Чтение терминов поискового словаря.
-        /// </summary>
-        /// <param name="database">Имя базы данных.</param>
-        /// <param name="startTerm">Начальный термин.</param>
-        /// <param name="count">Количество считываемых терминов.</param>
-        [HttpGet ("read_terms/{startTerm}/{count?}/{database?}")]
-        public IActionResult ReadTerms
+        if (!connection.RestartServer())
+        {
+            return Problem ("Can't restart server");
+        }
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Получение поисковых сценариев.
+    /// </summary>
+    [HttpGet ("scenarios/{database?}")]
+    public IActionResult Scenarios
+        (
+            string? database = null
+        )
+    {
+        _logger.LogInformation
             (
-                string? startTerm,
-                string? count = null,
-                string? database = null
-            )
+                $"{nameof (Scenarios)}:: {nameof (database)}={database}"
+            );
+
+        database = WebUtility.UrlDecode (database);
+        database.NotUsed();
+
+        // TODO поддержать стандартный сценарий поиска
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (ReadTerms)}:: {nameof (startTerm)}={startTerm} {nameof (count)}={count} {nameof (database)}={database}"
-                );
-
-            if (startTerm.IsEmpty())
-            {
-                return BadRequest ("Start term not specified");
-            }
-
-            startTerm = WebUtility.UrlDecode (startTerm);
-            database = WebUtility.UrlDecode (database);
-
-            var number = count.SafeToInt32 (100);
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var paremeters = new TermParameters()
-            {
-                Database = database ?? _defaultDatabase,
-                StartTerm = startTerm,
-                NumberOfTerms = number
-            };
-            var result = connection.ReadTerms (paremeters);
-            if (result is null || connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (result);
+            return Problem ("Can't connect to IRBIS64");
         }
 
-        /// <summary>
-        /// Получение текстового файла с сервера.
-        /// </summary>
-        [HttpGet ("read_text/{fileName}")]
-        public IActionResult ReadTextFile
+        return BadRequest ("Not supported");
+    }
+
+    /// <summary>
+    /// Поиск записей.
+    /// </summary>
+    /// <param name="database">Имя базы данных.</param>
+    /// <param name="expression">Выражение на поисковом языке ИРБИС64.</param>
+    /// <param name="start">Стартовое смещение (опционально).</param>
+    /// <param name="count">Максимальное количество записей (опционально).</param>
+    [HttpGet ("search/{expression}/{database?}/{count?}/{start?}")]
+    public IActionResult Search
+        (
+            string? expression,
+            string? database = null,
+            string? count = null,
+            string? start = null
+        )
+    {
+        _logger.LogInformation
             (
-                string? fileName
-            )
+                $"{nameof (Search)}:: {nameof (expression)}={expression} {nameof (database)}={database} {nameof (count)}={count} {nameof (start)}={start}"
+            );
+
+        if (expression.IsEmpty())
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (ReadTextFile)}:: {nameof (fileName)}={fileName}"
-                );
-
-            if (fileName.IsEmpty())
-            {
-                return BadRequest ("File name not specified");
-            }
-
-            fileName = WebUtility.UrlDecode (fileName);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var specification = FileSpecification.Parse (fileName);
-            var result = connection.ReadTextFile (specification);
-            if (connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (result);
+            return BadRequest ("Expression not specified");
         }
 
-        /// <summary>
-        /// Перезапуск сервиса.
-        /// </summary>
-        [HttpGet ("restart")]
-        public IActionResult Restart()
+        expression = WebUtility.UrlDecode (expression);
+        database = WebUtility.UrlDecode (database);
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (Restart)}"
-                );
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            if (!connection.RestartServer())
-            {
-                return Problem ("Can't restart server");
-            }
-
-            return Ok();
+            return Problem ("Can't connect to IRBIS64");
         }
 
-        /// <summary>
-        /// Получение поисковых сценариев.
-        /// </summary>
-        [HttpGet ("scenarios/{database?}")]
-        public IActionResult Scenarios
+        var parameters = new SearchParameters
+        {
+            Database = database ?? _defaultDatabase,
+            Expression = expression
+        };
+
+        if (start is not null)
+        {
+            parameters.FirstRecord = start.SafeToInt32();
+        }
+
+        if (count is not null)
+        {
+            parameters.NumberOfRecords = count.SafeToInt32();
+        }
+
+        var found = connection.Search (parameters);
+        if (connection.LastError < 0 || found is null)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        var result = FoundItem.ToMfn (found);
+
+        _logger.LogInformation ($"{nameof (Search)}: found {result.Length}");
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Получение количества записей, удовлетворяющих запросу.
+    /// </summary>
+    /// <param name="database">Имя базы данных</param>
+    /// <param name="expression">Поисковое выражение</param>
+    [HttpGet ("search_count/{expression}/{database?}")]
+    public IActionResult SearchCount
+        (
+            string? expression,
+            string? database = null
+        )
+    {
+        _logger.LogInformation
             (
-                string? database = null
-            )
+                $"{nameof (SearchCount)}:: {nameof (expression)}={expression} {nameof (database)}={database}"
+            );
+
+        if (expression.IsEmpty())
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (Scenarios)}:: {nameof (database)}={database}"
-                );
-
-            database = WebUtility.UrlDecode (database);
-            database.NotUsed ();
-
-            // TODO поддержать стандартный сценарий поиска
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            return BadRequest ("Not supported");
+            return BadRequest ("Expression not specified");
         }
 
-        /// <summary>
-        /// Поиск записей.
-        /// </summary>
-        /// <param name="database">Имя базы данных.</param>
-        /// <param name="expression">Выражение на поисковом языке ИРБИС64.</param>
-        /// <param name="start">Стартовое смещение (опционально).</param>
-        /// <param name="count">Максимальное количество записей (опционально).</param>
-        [HttpGet ("search/{expression}/{database?}/{count?}/{start?}")]
-        public IActionResult Search
+        expression = WebUtility.UrlDecode (expression);
+        database = WebUtility.UrlDecode (database);
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
+        {
+            return Problem ("Can't connect to IRBIS64");
+        }
+
+        connection.Database = database ?? _defaultDatabase;
+        var result = connection switch
+        {
+            ISyncConnection syncConnection => syncConnection.SearchCount (expression),
+
+            // TODO поддерка других типов подключений
+
+            _ => throw new IrbisException()
+        };
+
+        if (connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        _logger.LogInformation ($"{nameof (SearchCount)}: found {result}");
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Поиск с форматированием.
+    /// </summary>
+    /// <param name="database">Имя базы данных</param>
+    /// <param name="expression">Поисковое выражение.</param>
+    /// <param name="start">Стартовое смещение (опционально).</param>
+    /// <param name="count">Максимальное количество найденных записей (опционально).</param>
+    /// <param name="format">Формат.</param>
+    [HttpGet ("search_format/{expression}/{format?}/{database?}/{count?}/{start?}")]
+    public IActionResult SearchFormat
+        (
+            string? expression,
+            string? format = null,
+            string? database = null,
+            string? count = null,
+            string? start = null
+        )
+    {
+        _logger.LogInformation
             (
-                string? expression,
-                string? database = null,
-                string? count = null,
-                string? start = null
-            )
+                $"{nameof (SearchFormat)}:: {nameof (expression)}={expression} {nameof (format)}={format} {nameof (database)}={database} {nameof (count)}={count} {nameof (start)}={start}"
+            );
+
+        if (expression.IsEmpty())
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (Search)}:: {nameof (expression)}={expression} {nameof (database)}={database} {nameof (count)}={count} {nameof (start)}={start}"
-                );
-
-            if (expression.IsEmpty())
-            {
-                return BadRequest ("Expression not specified");
-            }
-
-            expression = WebUtility.UrlDecode (expression);
-            database = WebUtility.UrlDecode (database);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var parameters = new SearchParameters
-            {
-                Database = database ?? _defaultDatabase,
-                Expression = expression
-            };
-
-            if (start is not null)
-            {
-                parameters.FirstRecord = start.SafeToInt32();
-            }
-
-            if (count is not null)
-            {
-                parameters.NumberOfRecords = count.SafeToInt32();
-            }
-
-            var found = connection.Search (parameters);
-            if (connection.LastError < 0 || found is null)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            var result = FoundItem.ToMfn (found);
-
-            _logger.LogInformation ($"{nameof (Search)}: found {result.Length}");
-
-            return Ok (result);
+            return BadRequest ("Expression not specified");
         }
 
-        /// <summary>
-        /// Получение количества записей, удовлетворяющих запросу.
-        /// </summary>
-        /// <param name="database">Имя базы данных</param>
-        /// <param name="expression">Поисковое выражение</param>
-        [HttpGet ("search_count/{expression}/{database?}")]
-        public IActionResult SearchCount
+        expression = WebUtility.UrlDecode (expression);
+        format = WebUtility.UrlDecode (format);
+        database = WebUtility.UrlDecode (database);
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
+        {
+            return Problem ("Can't connect to IRBIS64");
+        }
+
+        var parameters = new SearchParameters
+        {
+            Database = database ?? _defaultDatabase,
+            Expression = expression,
+            Format = format ?? _defaultFormat
+        };
+
+        if (start is not null)
+        {
+            // TODO не надо SafeToInt32
+            parameters.FirstRecord = start.SafeToInt32();
+        }
+
+        if (count is not null)
+        {
+            // TODO не надо SafeToInt32
+            parameters.NumberOfRecords = count.SafeToInt32();
+        }
+
+        var found = connection.Search (parameters);
+        if (found is null || connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        var result = found.Select (item => item.Text).ToArray();
+
+        _logger.LogInformation ($"{nameof (SearchFormat)}: found {result.Length}");
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Получение статистики работы сервера ИРБИС64.
+    /// </summary>
+    [HttpGet ("server_stat")]
+    public IActionResult ServerStat()
+    {
+        _logger.LogInformation
             (
-                string? expression,
-                string? database = null
-            )
+                $"{nameof (ServerStat)}"
+            );
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (SearchCount)}:: {nameof (expression)}={expression} {nameof (database)}={database}"
-                );
-
-            if (expression.IsEmpty())
-            {
-                return BadRequest ("Expression not specified");
-            }
-
-            expression = WebUtility.UrlDecode (expression);
-            database = WebUtility.UrlDecode (database);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            connection.Database = database ?? _defaultDatabase;
-            var result = connection switch
-            {
-                ISyncConnection syncConnection => syncConnection.SearchCount (expression),
-
-                // TODO поддерка других типов подключений
-
-                _ => throw new IrbisException()
-            };
-
-            if (connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            _logger.LogInformation ($"{nameof (SearchCount)}: found {result}");
-
-            return Ok (result);
+            return Problem ("Can't connect to IRBIS64");
         }
 
-        /// <summary>
-        /// Поиск с форматированием.
-        /// </summary>
-        /// <param name="database">Имя базы данных</param>
-        /// <param name="expression">Поисковое выражение.</param>
-        /// <param name="start">Стартовое смещение (опционально).</param>
-        /// <param name="count">Максимальное количество найденных записей (опционально).</param>
-        /// <param name="format">Формат.</param>
-        [HttpGet ("search_format/{expression}/{format?}/{database?}/{count?}/{start?}")]
-        public IActionResult SearchFormat
+        var result = connection.GetServerStat();
+        if (result is null || connection.LastError < 0)
+        {
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
+        }
+
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Получение списка зарегистрированных в система пользователей.
+    /// </summary>
+    [HttpGet ("user_list")]
+    public IActionResult UserList()
+    {
+        _logger.LogInformation
             (
-                string? expression,
-                string? format = null,
-                string? database = null,
-                string? count = null,
-                string? start = null
-            )
+                $"{nameof (UserList)}"
+            );
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (SearchFormat)}:: {nameof (expression)}={expression} {nameof (format)}={format} {nameof (database)}={database} {nameof (count)}={count} {nameof (start)}={start}"
-                );
-
-            if (expression.IsEmpty())
-            {
-                return BadRequest ("Expression not specified");
-            }
-
-            expression = WebUtility.UrlDecode (expression);
-            format = WebUtility.UrlDecode (format);
-            database = WebUtility.UrlDecode (database);
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var parameters = new SearchParameters
-            {
-                Database = database ?? _defaultDatabase,
-                Expression = expression,
-                Format = format ?? _defaultFormat
-            };
-
-            if (start is not null)
-            {
-                // TODO не надо SafeToInt32
-                parameters.FirstRecord = start.SafeToInt32();
-            }
-
-            if (count is not null)
-            {
-                // TODO не надо SafeToInt32
-                parameters.NumberOfRecords = count.SafeToInt32();
-            }
-
-            var found = connection.Search (parameters);
-            if (found is null || connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            var result = found.Select (item => item.Text).ToArray();
-
-            _logger.LogInformation ($"{nameof (SearchFormat)}: found {result.Length}");
-
-            return Ok (result);
+            return Problem ("Can't connect to IRBIS64");
         }
 
-        /// <summary>
-        /// Получение статистики работы сервера ИРБИС64.
-        /// </summary>
-        [HttpGet ("server_stat")]
-        public IActionResult ServerStat()
+        var result = connection.ListUsers();
+        if (result is null || connection.LastError < 0)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (ServerStat)}"
-                );
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var result = connection.GetServerStat();
-            if (result is null || connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (result);
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
         }
 
-        /// <summary>
-        /// Получение списка зарегистрированных в система пользователей.
-        /// </summary>
-        [HttpGet ("user_list")]
-        public IActionResult UserList()
+        return Ok (result);
+    }
+
+    /// <summary>
+    /// Получение версии сервера ИРБИС64.
+    /// </summary>
+    [HttpGet ("version")]
+    public IActionResult Version()
+    {
+        _logger.LogInformation
+            (
+                $"{nameof (Version)}"
+            );
+
+        using var connection = GetConnection();
+        if (!connection.Connected)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (UserList)}"
-                );
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var result = connection.ListUsers();
-            if (result is null || connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            return Ok (result);
+            return Problem ("Can't connect to IRBIS64");
         }
 
-        /// <summary>
-        /// Получение версии сервера ИРБИС64.
-        /// </summary>
-        [HttpGet ("version")]
-        public IActionResult Version()
+        var result = connection.GetServerVersion();
+        if (result is null || connection.LastError < 0)
         {
-            _logger.LogInformation
-                (
-                    $"{nameof (Version)}"
-                );
-
-            using var connection = GetConnection();
-            if (!connection.Connected)
-            {
-                return Problem ("Can't connect to IRBIS64");
-            }
-
-            var result = connection.GetServerVersion();
-            if (result is null || connection.LastError < 0)
-            {
-                return Problem (IrbisException.GetErrorDescription (connection.LastError));
-            }
-
-            _logger.LogInformation ($"Version: {result}");
-
-            return Ok (result);
+            return Problem (IrbisException.GetErrorDescription (connection.LastError));
         }
+
+        _logger.LogInformation ($"Version: {result}");
+
+        return Ok (result);
+    }
 
 /*
 
@@ -1158,6 +1158,5 @@ namespace Restaurant.Controllers
 
 */
 
-        #endregion
-    }
+    #endregion
 }

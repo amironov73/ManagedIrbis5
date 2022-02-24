@@ -28,80 +28,71 @@ using Microsoft.OpenApi.Models;
 
 #nullable enable
 
-namespace Restaurant
+namespace Restaurant;
+
+/// <summary>
+/// Конфигурирование перед запуском приложения.
+/// </summary>
+public class Startup
 {
     /// <summary>
-    /// Конфигурирование перед запуском приложения.
+    /// Конструктор.
     /// </summary>
-    public class Startup
+    public Startup
+        (
+            IConfiguration configuration
+        )
     {
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Startup
-            (
-                IConfiguration configuration
-            )
+        Configuration = configuration;
+    }
+
+    public IConfiguration Configuration { get; }
+
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public void ConfigureServices
+        (
+            IServiceCollection services
+        )
+    {
+        services.AddSingleton (Configuration);
+
+        services.AddOldModel();
+
+        services.AddControllers();
+        services.AddSwaggerGen (c =>
         {
-            Configuration = configuration;
+            c.SwaggerDoc ("v1", new OpenApiInfo { Title = "Restaurant", Version = "v1" });
+        });
+    }
 
-        } // constructor
-
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices
-            (
-                IServiceCollection services
-            )
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure
+        (
+            IApplicationBuilder app,
+            IWebHostEnvironment env
+        )
+    {
+        if (env.IsDevelopment())
         {
-            services.AddSingleton(Configuration);
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI (c => c.SwaggerEndpoint ("/swagger/v1/swagger.json", "Restaurant v1"));
+        }
 
-            services.AddOldModel();
+        app.UseHttpsRedirection();
 
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Restaurant", Version = "v1" });
-            });
+        app.UseCors (options => { options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod(); });
+        app.UseRouting();
 
-        } // method ConfigureServices
+        app.UseAuthorization();
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure
-            (
-                IApplicationBuilder app,
-                IWebHostEnvironment env
-            )
+        var allowedAddresses = Configuration["AllowedIP"];
+        if (!string.IsNullOrEmpty (allowedAddresses))
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Restaurant v1"));
-            }
+            // пустая строка означает, что фильтрация по IP-адресам не нужна
+            app.UseMiddleware<SecureAccessMiddleware> (allowedAddresses);
+        }
 
-            app.UseHttpsRedirection();
-
-            app.UseCors(options =>
-            {
-                options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-            });
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            var allowedAddresses = Configuration["AllowedIP"];
-            if (!string.IsNullOrEmpty(allowedAddresses))
-            {
-                // пустая строка означает, что фильтрация по IP-адресам не нужна
-                app.UseMiddleware<SecureAccessMiddleware>(allowedAddresses);
-            }
-
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-
-        } // method Configure
-
-    } // class Startup
-
-} // namespace Restaurant
+        app.UseEndpoints (endpoints => { endpoints.MapControllers(); });
+    } // method Configure
+}
