@@ -361,3 +361,7 @@ Publish/
 
 # debug break files
 debug.break
+
+# coverlet
+coverage.json
+
