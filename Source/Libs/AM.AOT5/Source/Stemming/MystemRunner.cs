@@ -31,108 +31,106 @@ using Newtonsoft.Json;
 
 #nullable enable
 
-namespace AM.AOT.Stemming
+namespace AM.AOT.Stemming;
+
+/// <summary>
+/// Запускает mystem и разбирает результаты.
+/// </summary>
+public sealed class MystemRunner
 {
+    #region Properties
+
     /// <summary>
-    /// Запускает mystem и разбирает результаты.
+    /// Путь до mystem.exe, включая exe-файл.
+    /// По умолчанию "mystem.exe".
     /// </summary>
-    public sealed class MystemRunner
+    public string MystemPath { get; set; }
+
+    /// <summary>
+    /// Опции, передаваемые mystem.exe.
+    /// По умолчанию -i -g -d.
+    /// </summary>
+    public string MystemOptions { get; set; }
+
+    /// <summary>
+    /// Кодировка, используемая при передаче.
+    /// По умолчанию CP866, т. к. применяется
+    /// перенаправление ввода-вывода.
+    /// </summary>
+    public Encoding TransferEncoding { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public MystemRunner()
     {
-        #region Properties
+        Utility.RegisterEncodingProviders(); // для cp866
 
-        /// <summary>
-        /// Путь до mystem.exe, включая exe-файл.
-        /// По умолчанию "mystem.exe".
-        /// </summary>
-        public string MystemPath { get; set; }
+        MystemPath = GetDefaultMystemName();
+        MystemOptions = "-i -g -d";
+        TransferEncoding = OperatingSystem.IsWindows()
+            ? Encoding.GetEncoding ("cp866")
+            : Encoding.UTF8;
+    } // constructor
 
-        /// <summary>
-        /// Опции, передаваемые mystem.exe.
-        /// По умолчанию -i -g -d.
-        /// </summary>
-        public string MystemOptions { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Кодировка, используемая при передаче.
-        /// По умолчанию CP866, т. к. применяется
-        /// перенаправление ввода-вывода.
-        /// </summary>
-        public Encoding TransferEncoding { get; set; }
+    #region Public methods
 
-        #endregion
+    /// <summary>
+    /// Разбор результатов.
+    /// </summary>
+    /// <param name="reader">Поток с результатами.</param>
+    public MystemResult[] DecodeResults
+        (
+            StreamReader reader
+        )
+    {
+        var result = new List<MystemResult>();
 
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public MystemRunner()
+        string? line;
+        while ((line = reader.ReadLine()) != null)
         {
-            Utility.RegisterEncodingProviders(); // для cp866
-
-            MystemPath = GetDefaultMystemName();
-            MystemOptions = "-i -g -d";
-            TransferEncoding = OperatingSystem.IsWindows()
-                ? Encoding.GetEncoding("cp866")
-                : Encoding.UTF8;
-
-        } // constructor
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Разбор результатов.
-        /// </summary>
-        /// <param name="reader">Поток с результатами.</param>
-        public MystemResult[] DecodeResults
-            (
-                StreamReader reader
-            )
-        {
-            var result = new List<MystemResult>();
-
-            string? line;
-            while ((line = reader.ReadLine()) != null)
+            var one = JsonConvert.DeserializeObject<MystemResult[]> (line);
+            if (one is not null)
             {
-                var one = JsonConvert.DeserializeObject<MystemResult[]>(line);
-                if (one is not null)
-                {
-                    result.AddRange(one);
-                }
+                result.AddRange (one);
             }
+        }
 
-            return result.ToArray();
+        return result.ToArray();
+    } // method DecodeResult
 
-        } // method DecodeResult
+    /// <summary>
+    /// Получение имени программы с учетом операционной системы.
+    /// </summary>
+    public static string GetDefaultMystemName() =>
+        OperatingSystem.IsWindows() ? "mystem.exe" : "mystem";
 
-        /// <summary>
-        /// Получение имени программы с учетом операционной системы.
-        /// </summary>
-        public static string GetDefaultMystemName() =>
-            OperatingSystem.IsWindows() ? "mystem.exe" : "mystem";
+    /// <summary>
+    /// Запускает анализ текста и выдаёт результаты.
+    /// </summary>
+    /// <param name="text">Текст для анализа.</param>
+    public MystemResult[] Run
+        (
+            string text
+        )
+    {
+        var commandLine = new StringBuilder();
+        commandLine.Append (MystemOptions);
+        commandLine.Append (" -e " +
+                            TransferEncoding.HeaderName);
+        commandLine.Append (" --format json");
 
-        /// <summary>
-        /// Запускает анализ текста и выдаёт результаты.
-        /// </summary>
-        /// <param name="text">Текст для анализа.</param>
-        public MystemResult[] Run
+        var startInfo = new ProcessStartInfo
             (
-                string text
+                MystemPath,
+                commandLine.ToString()
             )
-        {
-            var commandLine = new StringBuilder();
-            commandLine.Append(MystemOptions);
-            commandLine.Append(" -e " +
-                               TransferEncoding.HeaderName);
-            commandLine.Append(" --format json");
-
-            var startInfo = new ProcessStartInfo
-                (
-                    MystemPath,
-                    commandLine.ToString()
-                )
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,
@@ -141,19 +139,17 @@ namespace AM.AOT.Stemming
                 StandardOutputEncoding = TransferEncoding
             };
 
-            using var process = new Process { StartInfo = startInfo };
-            process.Start();
-            process.StandardInput.Write(text);
-            process.StandardInput.Close();
-            process.WaitForExit();
-            var result = DecodeResults(process.StandardOutput);
+        using var process = new Process { StartInfo = startInfo };
+        process.Start();
+        process.StandardInput.Write (text);
+        process.StandardInput.Close();
+        process.WaitForExit();
+        var result = DecodeResults (process.StandardOutput);
 
-            return result;
+        return result;
+    } // method Run
 
-        } // method Run
+    #endregion
+} // class MystemRunner
 
-        #endregion
-
-    } // class MystemRunner
-
-} // namespace AM.AOT.Stemming
+// namespace AM.AOT.Stemming

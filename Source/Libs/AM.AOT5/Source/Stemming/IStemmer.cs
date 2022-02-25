@@ -14,18 +14,17 @@
 
 #nullable enable
 
-namespace AM.AOT.Stemming
+namespace AM.AOT.Stemming;
+
+/// <summary>
+/// Общий интерфейс стеммера.
+/// </summary>
+public interface IStemmer
 {
     /// <summary>
-    /// Общий интерфейс стеммера.
+    /// Извлечение корня из указанного слова.
     /// </summary>
-    public interface IStemmer
-    {
-        /// <summary>
-        /// Извлечение корня из указанного слова.
-        /// </summary>
-        string Stem (string word);
+    string Stem (string word);
+} // interface IStemmer
 
-    } // interface IStemmer
-
-} // namespace AM.AOT.Stemming
+// namespace AM.AOT.Stemming

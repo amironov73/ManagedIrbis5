@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <!-- Assembly version and strong name -->
-    <Import Project="..\Common\ArsMagna.targets" />
+    <Import Project="..\Common\ArsMagna.targets"/>
 
     <!-- Framework and language -->
     <PropertyGroup>
@@ -34,7 +34,7 @@
 
     <!-- Icon for the NuGet package -->
     <ItemGroup>
-        <None Include="..\..\Common\arsmagna-icon.png" Pack="true" PackagePath="\" />
+        <None Include="..\..\Common\arsmagna-icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <ItemGroup>

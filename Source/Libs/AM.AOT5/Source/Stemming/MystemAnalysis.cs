@@ -25,60 +25,59 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace AM.AOT.Stemming
+namespace AM.AOT.Stemming;
+
+/// <summary>
+/// Анализ слова.
+/// </summary>
+public sealed class MystemAnalysis
 {
+    #region Properties
+
     /// <summary>
-    /// Анализ слова.
+    /// Основная форма слова.
     /// </summary>
-    public sealed class MystemAnalysis
-    {
-        #region Properties
+    [JsonPropertyName ("lex")]
+    public string? Lexeme { get; set; }
 
-        /// <summary>
-        /// Основная форма слова.
-        /// </summary>
-        [JsonPropertyName("lex")]
-        public string? Lexeme { get; set; }
+    /// <summary>
+    /// Относительный вес
+    /// </summary>
+    [JsonPropertyName ("wt")]
+    public double Weight { get; set; }
 
-        /// <summary>
-        /// Относительный вес
-        /// </summary>
-        [JsonPropertyName("wt")]
-        public double Weight { get; set; }
+    /// <summary>
+    /// Грамматический разбор слова.
+    /// </summary>
+    [JsonPropertyName ("gr")]
+    public string? Grammeme { get; set; }
 
-        /// <summary>
-        /// Грамматический разбор слова.
-        /// </summary>
-        [JsonPropertyName("gr")]
-        public string? Grammeme { get; set; }
+    /// <summary>
+    /// Часть речи.
+    /// </summary>
+    public string PartOfSpeech => Split[0].Trim ('=');
 
-        /// <summary>
-        /// Часть речи.
-        /// </summary>
-        public string PartOfSpeech => Split[0].Trim('=');
+    /// <summary>
+    /// Обсценное?
+    /// </summary>
+    public bool IsObscene => Split.Contains ("обсц");
 
-        /// <summary>
-        /// Обсценное?
-        /// </summary>
-        public bool IsObscene => Split.Contains("обсц");
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Private members
+    private string[] Split => string.IsNullOrEmpty (Grammeme)
+        ? new[] { String.Empty }
+        : Grammeme.Split (',');
 
-        private string[] Split => string.IsNullOrEmpty(Grammeme)
-            ? new[] { String.Empty }
-            : Grammeme.Split(',');
+    #endregion
 
-        #endregion
+    #region Object members
 
-        #region Object members
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => $"{Lexeme}, {PartOfSpeech}";
 
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => $"{Lexeme}, {PartOfSpeech}";
+    #endregion
+} // class MyStemAnalysis
 
-        #endregion
-
-    } // class MyStemAnalysis
-
-} // namespace AM.AOT.Stemming
+// namespace AM.AOT.Stemming

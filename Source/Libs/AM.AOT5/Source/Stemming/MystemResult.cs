@@ -24,44 +24,42 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace AM.AOT.Stemming
+namespace AM.AOT.Stemming;
+
+/// <summary>
+/// Результат анализа для одного слова.
+/// </summary>
+public sealed class MystemResult
 {
     /// <summary>
-    /// Результат анализа для одного слова.
+    /// Анализируемый текст.
     /// </summary>
-    public sealed class MystemResult
+    [JsonPropertyName ("text")]
+    public string? Text { get; set; }
+
+    /// <summary>
+    /// Массив анализов (при неоднозначности слова
+    /// может иметь более одного элемента).
+    /// </summary>
+    public MystemAnalysis[]? Analysis { get; set; }
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
     {
-        /// <summary>
-        /// Анализируемый текст.
-        /// </summary>
-        [JsonPropertyName("text")]
-        public string? Text { get; set; }
+        var result = new StringBuilder();
+        result.Append (Text);
 
-        /// <summary>
-        /// Массив анализов (при неоднозначности слова
-        /// может иметь более одного элемента).
-        /// </summary>
-        public MystemAnalysis[]? Analysis { get; set; }
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
+        if (Analysis is not null)
         {
-            var result = new StringBuilder();
-            result.Append(Text);
-            
-            if (Analysis is not null)
+            foreach (MystemAnalysis analysis in Analysis)
             {
-                foreach (MystemAnalysis analysis in Analysis)
-                {
-                    result.Append("; ");
-                    result.Append(analysis);
-                }
+                result.Append ("; ");
+                result.Append (analysis);
             }
+        }
 
-            return result.ToString();
+        return result.ToString();
+    } // method ToString
+} // class MystemResult
 
-        } // method ToString
-
-    } // class MystemResult
-
-} // namespace AM.AOT.Stemming
+// namespace AM.AOT.Stemming
