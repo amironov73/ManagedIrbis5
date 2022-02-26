@@ -1,0 +1,26 @@
+@page "/"
+@using ManagedIrbis;
+@inject IConfiguration _configuration
+
+<PageTitle>Привет, мир!</PageTitle>
+
+<h1>Привет, мир!</h1>
+
+Это тестовое приложение, показывающее возможность применения ИРБИС64 в среде Blazor.
+
+<p role="status">Подключение работает: <span style="font-weight: bold">@_itWorks</span></p>
+
+<button class="btn btn-primary" @onclick="CheckConnection">Проверить подключение</button>
+
+@code {
+    private bool? _itWorks;
+
+    private async Task CheckConnection()
+    {
+        var connectionString = _configuration.GetValue<string> ("irbis-connection");
+        await using var connection = ConnectionFactory.Shared.CreateAsyncConnection();
+        connection.ParseConnectionString (connectionString);
+        _itWorks = await connection.ConnectAsync() && connection.Connected;
+    }
+
+}
