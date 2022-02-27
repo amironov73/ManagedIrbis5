@@ -12,7 +12,9 @@ using ManagedIrbis;
 
 #endregion
 
-class Program
+#nullable enable
+
+internal sealed class Program
 {
     static int Main(string[] args)
     {

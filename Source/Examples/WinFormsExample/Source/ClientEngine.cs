@@ -16,74 +16,71 @@ using ManagedIrbis.WinForms;
 
 #nullable enable
 
-namespace WinFormsExample
+namespace WinFormsExample;
+
+public sealed class ClientEngine
+    : IDisposable
 {
-    public sealed class ClientEngine
-        : IDisposable
+    #region Properties
+
+    public ISyncProvider Provider;
+
+    #endregion
+
+    #region Construction
+
+    public ClientEngine()
+        : this (new SyncConnection(), "user=librarian;password=secret;")
     {
-        #region Properties
+    }
 
-        public ISyncProvider Provider;
+    public ClientEngine
+        (
+            ISyncProvider provider,
+            string connectionString
+        )
+    {
+        Provider = provider;
+        Provider.ParseConnectionString (connectionString);
+        Provider.Connect();
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Public methods
 
-        public ClientEngine()
-            : this (new SyncConnection(), "user=librarian;password=secret;")
+    public void PopulateDatabases
+        (
+            DatabaseComboBox comboBox
+        )
+    {
+        var databases = Provider.ListDatabases();
+        comboBox.Items.Clear();
+        comboBox.Items.AddRange (databases);
+        if (databases.Length != 0)
         {
+            comboBox.SelectedIndex = 0;
         }
+    }
 
-        public ClientEngine
-            (
-                ISyncProvider provider,
-                string connectionString
-            )
-        {
-            Provider = provider;
-            Provider.ParseConnectionString(connectionString);
-            Provider.Connect();
-        }
+    public void PopulateScenarios
+        (
+            PrefixComboBox comboBox
+        )
+    {
+        var database = Provider.EnsureDatabase();
+        comboBox.FillWithScenarios (Provider, database);
+    }
 
-        #endregion
+    #endregion
 
-        #region Public methods
+    #region IDisposable members
 
-        public void PopulateDatabases
-            (
-                DatabaseComboBox comboBox
-            )
-        {
-            var databases = Provider.ListDatabases();
-            comboBox.Items.Clear();
-            comboBox.Items.AddRange(databases);
-            if (databases.Length != 0)
-            {
-                comboBox.SelectedIndex = 0;
-            }
-        }
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        Provider.Dispose();
+    }
 
-        public void PopulateScenarios
-            (
-                PrefixComboBox comboBox
-            )
-        {
-            var database = Provider.EnsureDatabase();
-            comboBox.FillWithScenarios(Provider, database);
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            Provider.Dispose();
-        }
-
-        #endregion
-
-    } // class ClientEngine
-
-} // namespace WinFormsExample
+    #endregion
+}

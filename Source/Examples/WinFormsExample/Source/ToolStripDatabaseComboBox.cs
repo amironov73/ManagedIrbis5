@@ -22,35 +22,33 @@ using ManagedIrbis.WinForms;
 
 #nullable enable
 
-namespace WinFormsExample
+namespace WinFormsExample;
+
+/// <summary>
+/// Выпадающий список баз данных ИРБИС64.
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+[ToolStripItemDesignerAvailability (ToolStripItemDesignerAvailability.ToolStrip |
+    ToolStripItemDesignerAvailability.StatusStrip)]
+public sealed class ToolStripDatabaseComboBox
+    : ToolStripControlHost
 {
+    #region Properties
+
     /// <summary>
-    /// Выпадающий список баз данных ИРБИС64.
+    /// Внутренний контрол <see cref="DatabaseComboBox"/>.
     /// </summary>
-    [System.ComponentModel.DesignerCategory("Code")]
-    [ToolStripItemDesignerAvailability(ToolStripItemDesignerAvailability.ToolStrip| ToolStripItemDesignerAvailability.StatusStrip)]
-    public sealed class ToolStripDatabaseComboBox
-        : ToolStripControlHost
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
+    public DatabaseComboBox ComboBox => (DatabaseComboBox)Control;
+
+    #endregion
+
+    #region Construction
+
+    public ToolStripDatabaseComboBox()
+        : base (new DatabaseComboBox())
     {
-        #region Properties
+    }
 
-        /// <summary>
-        /// Внутренний контрол <see cref="DatabaseComboBox"/>.
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public DatabaseComboBox ComboBox => (DatabaseComboBox)Control;
-
-        #endregion
-
-        #region Construction
-
-        public ToolStripDatabaseComboBox()
-            : base(new DatabaseComboBox())
-        {
-        }
-
-        #endregion
-
-    } // class ToolStripDatabaseComboBox
-
-} // namespace WinFormsExample
+    #endregion
+}

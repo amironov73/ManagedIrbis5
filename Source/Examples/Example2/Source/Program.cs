@@ -1,8 +1,12 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
+// ReSharper disable TemplateIsNotCompileTimeConstantProblem
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 //
@@ -10,6 +14,8 @@
 // с логированием, инверсией зависимостей, фоновыми сервисами,
 // асинхронщиной, настраиваемым конфигурированием и т. д.
 //
+
+#region Using directives
 
 using System;
 using System.Threading;
@@ -23,6 +29,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+#endregion
 
 #nullable enable
 
@@ -72,66 +80,66 @@ internal class SampleService
             CancellationToken stoppingToken
         )
     {
-        using var scope = _logger.BeginScope("FreshMeat");
+        using var scope = _logger.BeginScope ("FreshMeat");
 
-        _logger.LogInformation("Starting");
+        _logger.LogInformation ("Starting");
 
         var connectionString = _options.Value.ConnectionString;
-        _logger.LogInformation($"Credentials: {connectionString}");
-        _connection.ParseConnectionString(connectionString);
+        _logger.LogInformation ($"Credentials: {connectionString}");
+        _connection.ParseConnectionString (connectionString);
         var success = await _connection.ConnectAsync();
         if (success)
         {
             var maxMfn = await _connection.GetMaxMfnAsync();
-            _logger.LogInformation($"Max MFN={maxMfn}");
+            _logger.LogInformation ($"Max MFN={maxMfn}");
             await _connection.DisconnectAsync();
         }
         else
         {
-            _logger.LogError($"Can't connect!");
+            _logger.LogError ($"Can't connect!");
         }
 
-        _logger.LogInformation("Stopping");
+        _logger.LogInformation ("Stopping");
         _lifetime.StopApplication();
     }
 }
 
-class Program
+internal sealed class Program
 {
-    static async Task<int> Main(string[] args)
+    static async Task<int> Main (string[] args)
     {
         // Включаем конфигурирование в appsettings.json
         var config = new ConfigurationBuilder()
-            .SetBasePath(AppContext.BaseDirectory)
-            .AddJsonFile("appsettings.json", optional: false)
+            .SetBasePath (AppContext.BaseDirectory)
+            .AddJsonFile ("appsettings.json", optional: false)
             .Build();
 
         // Настраиваем хост
-        var builder = Host.CreateDefaultBuilder(args).ConfigureServices
-                (
-                    services =>
-                    {
-                        // включаем логирование
-                        services.AddLogging(logging => logging.AddConsole());
+        var builder = Host.CreateDefaultBuilder (args).ConfigureServices
+            (
+                services =>
+                {
+                    // включаем логирование
+                    services.AddLogging (logging => logging.AddConsole());
 
-                        // регистрируем провайдеры ИРБИС64
-                        services.RegisterIrbisProviders();
+                    // регистрируем провайдеры ИРБИС64
+                    services.RegisterIrbisProviders();
 
-                        // регистрируем наш сервис
-                        services.AddHostedService<SampleService>();
+                    // регистрируем наш сервис
+                    services.AddHostedService<SampleService>();
 
-                        // откуда брать настройки
-                        var section = config.GetSection("SampleOptions");
-                        services.Configure<SampleOptions>(section);
-                    }
-                );
+                    // откуда брать настройки
+                    var section = config.GetSection ("SampleOptions");
+                    services.Configure<SampleOptions> (section);
+                }
+            );
 
         using var host = builder.Build();
         await host.StartAsync(); // запускаем наш сервис
         await host.WaitForShutdownAsync(); // ожидаем его окончания
 
         // К этому моменту всё успешно выполнено либо произошла ошибка
-        Console.WriteLine("THAT'S ALL, FOLKS!");
+        Console.WriteLine ("THAT'S ALL, FOLKS!");
 
         return 0;
     }

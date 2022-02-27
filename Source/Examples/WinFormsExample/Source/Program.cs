@@ -12,33 +12,29 @@ using AM.Windows.Forms;
 
 #endregion
 
-namespace WinFormsExample
+namespace WinFormsExample;
+
+static class Program
 {
-    static class Program
+    /// <summary>
+    ///  The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    static void Main()
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
+        try
         {
-            try
-            {
-                Application.SetHighDpiMode(HighDpiMode.SystemAware);
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
+            Application.SetHighDpiMode (HighDpiMode.SystemAware);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault (false);
 
-                InputLanguageUtility.InstallWmInputLanguageRequestFix();
+            InputLanguageUtility.InstallWmInputLanguageRequestFix();
 
-                Application.Run(new SimpleSearchForm());
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
-
-        } // method Main
-
-    } // class Program
-
-} // namespace WinFormsExample
+            Application.Run (new SimpleSearchForm());
+        }
+        catch (Exception exception)
+        {
+            ExceptionBox.Show (exception);
+        }
+    }
+}
