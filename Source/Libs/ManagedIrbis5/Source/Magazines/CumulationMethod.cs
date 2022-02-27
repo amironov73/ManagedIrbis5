@@ -18,7 +18,7 @@ namespace ManagedIrbis.Magazines;
 public enum CumulationMethod
 {
     /// <summary>
-    /// Только по годам.
+    /// Только по годам (и, конечно же, по томам).
     /// </summary>
     Year,
 
@@ -30,5 +30,5 @@ public enum CumulationMethod
     /// <summary>
     /// По годам, месту хранения и номеру комплекта.
     /// </summary>
-    Number
+    Complect
 }

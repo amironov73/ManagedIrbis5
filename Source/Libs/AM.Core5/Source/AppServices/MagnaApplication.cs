@@ -66,6 +66,11 @@ public class MagnaApplication
     [AllowNull]
     public ILogger Logger { get; protected set; }
 
+    /// <summary>
+    /// Пользователь запросил прекращение текущего действия?
+    /// </summary>
+    public bool Stop { get; set; }
+
     #endregion
 
     #region Construction
@@ -80,7 +85,7 @@ public class MagnaApplication
         )
     {
         Args = args;
-    } // constructor
+    }
 
     #endregion
 
@@ -109,12 +114,18 @@ public class MagnaApplication
     /// <summary>
     /// Построение хоста.
     /// </summary>
-    protected virtual IHostBuilder BuildHost() => Host.CreateDefaultBuilder (Args);
+    protected virtual IHostBuilder BuildHost()
+    {
+        return Host.CreateDefaultBuilder (Args);
+    }
 
     /// <summary>
     /// Корневая команда для разбора командной строки.
     /// </summary>
-    protected virtual RootCommand? BuildRootCommand() => null;
+    protected virtual RootCommand? BuildRootCommand()
+    {
+        return null;
+    }
 
     /// <summary>
     /// Конфигурирование сервисов.
@@ -128,6 +139,19 @@ public class MagnaApplication
         )
     {
         services.AddOptions();
+    }
+
+    /// <summary>
+    /// Настройка прекращения текущей операции по требованию пользователя.
+    /// </summary>
+    public virtual void ConfigureCancelKey()
+    {
+        Console.TreatControlCAsInput = false;
+        Console.CancelKeyPress += (_, eventArgs) =>
+        {
+            Stop = true;
+            eventArgs.Cancel = true;
+        };
     }
 
     /// <summary>

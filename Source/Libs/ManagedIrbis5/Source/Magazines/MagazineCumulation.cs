@@ -39,7 +39,7 @@ namespace ManagedIrbis.Magazines;
 [XmlRoot ("cumulation")]
 public sealed class MagazineCumulation
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Constants
 
@@ -268,7 +268,7 @@ public sealed class MagazineCumulation
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        return Year.ToVisibleString() + ": " + Numbers.ToVisibleString();
+        return Utility.JoinNonEmpty (" | ", Year, Volume, Place, ComplectNumber, Numbers);
     }
 
     #endregion

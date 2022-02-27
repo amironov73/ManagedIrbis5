@@ -4,11 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedMember.Global
 
 /* CumulationData.cs -- данные, используемые при кумуляции
@@ -23,7 +19,7 @@ namespace ManagedIrbis.Magazines;
 /// Данные используемые при кумуляции.
 /// Относятся к одному экземпляру журнала/газеты.
 /// </summary>
-sealed class CumulationData
+public sealed class CumulationData
 {
     /// <summary>
     /// Год.
@@ -44,4 +40,9 @@ sealed class CumulationData
     /// Место хранения экземпляра.
     /// </summary>
     public string? Place { get; set; }
+
+    /// <summary>
+    /// Номер комплекта.
+    /// </summary>
+    public string? Complect { get; set; }
 }
