@@ -40,8 +40,8 @@ namespace ManagedIrbis;
 [DebuggerDisplay ("{Mfn} {Text}")]
 public sealed class FoundItem
     : IEquatable<FoundItem>,
-        IHandmadeSerializable,
-        IVerifiable
+    IHandmadeSerializable,
+    IVerifiable
 {
     #region Properties
 

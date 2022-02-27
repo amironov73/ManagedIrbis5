@@ -1,26 +1,113 @@
 @page "/"
 @using ManagedIrbis;
+@using AM.Collections
 @inject IConfiguration _configuration
 
-<PageTitle>Привет, мир!</PageTitle>
+<PageTitle>Привет, Blazor!</PageTitle>
 
-<h1>Привет, мир!</h1>
+<div class="container">
 
-Это тестовое приложение, показывающее возможность применения ИРБИС64 в среде Blazor.
+    <div class="row">
+        <h1 class="text-center">Привет, Blazor!</h1>
+    </div>
 
-<p role="status">Подключение работает: <span style="font-weight: bold">@_itWorks</span></p>
+    <div class="row mt-3">
+        <div class="col text-center">Это тестовое приложение, показывающее возможность применения ИРБИС64 в среде Blazor.</div>
+    </div>
 
-<button class="btn btn-primary" @onclick="CheckConnection">Проверить подключение</button>
+    <div class="row mt-3 mb-3">
+        <div class="col col-lg-6 col-md-8 offset-lg-3 offset-md-2">
+            <form onsubmit="return false;">
+                <div class="input-group">
+                    <div class="form-control">Ключевое слово: </div>
+                    <input type="text" class="form-control" @bind="_keyword"/>
+                    <button class="btn btn-primary form-control" @onclick="FindBooks">Найти книги</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row my-3">
+        &nbsp;
+    </div>
+
+    @if (!string.IsNullOrEmpty (_errorMessage))
+    {
+        <div class="row my-3">
+            <div class="col alert alert-danger">@_errorMessage</div>
+        </div>
+    }
+
+    @if (_bookList is not null)
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            @foreach (var line in _bookList)
+            {
+                <div class="col mt-2">
+                    <div class="card text-black bg-light">
+                        <div class="card-header">
+                            @line.Mfn
+                            <div class="form-check-inline">
+                                <input type="checkbox" class="form-check-input"/>
+                            </div>
+                        </div>
+                        <img src="book-cover.jpg" class="card-img-top" alt="No image">
+                        <div class="card-body">
+                            @line.Text
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</div>
 
 @code {
-    private bool? _itWorks;
+    // ReSharper disable StringLiteralTypo
 
-    private async Task CheckConnection()
+    private string? _errorMessage = string.Empty;
+    private string? _keyword = "бетон";
+    private FoundItem[]? _bookList;
+
+    private async Task FindBooks()
     {
+        _bookList = null;
+        _errorMessage = null;
+
+        if (string.IsNullOrWhiteSpace (_keyword))
+        {
+            _errorMessage = "Пустой запрос";
+            return;
+        }
+
         var connectionString = _configuration.GetValue<string> ("irbis-connection");
         await using var connection = ConnectionFactory.Shared.CreateAsyncConnection();
         connection.ParseConnectionString (connectionString);
-        _itWorks = await connection.ConnectAsync() && connection.Connected;
+        if (!(await connection.ConnectAsync() && connection.Connected))
+        {
+            _errorMessage = IrbisException.GetErrorDescription (connection.LastError);
+            return;
+        }
+
+        var expression = $"\"K={_keyword}\"";
+        var searchParameters = new SearchParameters()
+        {
+            Database = connection.Database,
+            Expression = expression,
+            NumberOfRecords = 1000,
+            Format = "@brief"
+        };
+        var found = await connection.SearchAsync (searchParameters);
+        if (found.IsNullOrEmpty())
+        {
+            _errorMessage = "Ничего не найдено по запросу";
+            return;
+        }
+
+        _bookList = found
+            .OrderBy (s => s.Text)
+            .ToArray();
     }
 
 }
