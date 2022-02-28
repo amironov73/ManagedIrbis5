@@ -1,0 +1,47 @@
+﻿@using System.Text
+
+@foreach (var _ in Lines)
+{
+    <SearchLine/>
+}
+
+@code {
+
+    [Parameter]
+    public List<SearchLine> Lines { get; set; } = new();
+
+
+    protected override void OnInitialized()
+    {
+        var initialPrefixes = new[] { "A=", "T=", "K=" };
+
+        for (var i = 0; i < 3; i++)
+        {
+            var line = new SearchLine()
+            {
+                Prefix = initialPrefixes[i]
+            };
+            Lines.Add (line);
+        }
+    }
+
+    public string Expression()
+    {
+        var builder = new StringBuilder();
+        foreach (var line in Lines)
+        {
+            if (!string.IsNullOrEmpty (line.Value))
+            {
+                if (builder.Length != 0)
+                {
+                    builder.Append (" * ");
+                }
+
+                builder.Append (line.Expression());
+            }
+        }
+
+        return builder.ToString();
+    }
+
+}

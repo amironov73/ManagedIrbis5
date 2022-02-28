@@ -1,0 +1,36 @@
+﻿<div class="input-group">
+    <select class="btn btn-outline-primary" @bind="Prefix">
+        <option value="A=">Автор</option>
+        <option value="T=">Заглавие</option>
+        <option value="MR=">Кафедра</option>
+        <option value="K=">Ключевое слово</option>
+        <option value="G=">Год издания</option>
+        <option value="TJ=">Источник</option>
+        <option value="BBK=">ББК</option>
+    </select>
+    <input  type="text" class="form-control" @bind="Value">
+    <div class="input-group-text">
+        <input type="checkbox" class="form-check-input" @bind="Truncation"
+               data-bs-toggle="tooltip" data-bs-placement="top" title="усечение">
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string? Prefix { get; set; }
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public bool Truncation { get; set; } = true;
+
+    public string Expression()
+    {
+        var dollar = Truncation ? "$" : string.Empty;
+
+        return $"\"{Prefix}{Value}{dollar}\"";
+    }
+
+}
