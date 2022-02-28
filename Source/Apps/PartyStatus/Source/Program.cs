@@ -25,46 +25,45 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace PartyStatus
+namespace PartyStatus;
+
+internal static class Program
 {
-    static class Program
+    static void _ThreadException
+        (
+            object sender,
+            ThreadExceptionEventArgs eventArgs
+        )
     {
-        static void _ThreadException
+        ExceptionBox.Show (eventArgs.Exception);
+        Environment.FailFast
             (
-                object sender,
-                ThreadExceptionEventArgs eventArgs
-            )
+                "Shutting down",
+                eventArgs.Exception
+            );
+    }
+
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    static void Main()
+    {
+        try
         {
-            ExceptionBox.Show(eventArgs.Exception);
-            Environment.FailFast
-                (
-                    "Shutting down",
-                    eventArgs.Exception
-                );
+            Magna.Initialize (Array.Empty<string>());
+
+            Application.SetUnhandledExceptionMode (UnhandledExceptionMode.Automatic);
+            Application.ThreadException += _ThreadException;
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault (false);
+
+            Application.Run (new MainForm());
         }
-
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
+        catch (Exception exception)
         {
-            try
-            {
-                Magna.Initialize (Array.Empty<string>());
-
-                Application.SetUnhandledExceptionMode (UnhandledExceptionMode.Automatic);
-                Application.ThreadException += _ThreadException;
-
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-
-                Application.Run(new MainForm());
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
+            ExceptionBox.Show (exception);
         }
     }
 }

@@ -38,6 +38,15 @@
         </div>
     }
 
+    @if (_busy)
+    {
+        <div class="row my-3">
+            <div class="col col-md-8 offset-md-2 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4 text-center">
+                <img src="arctic-fox.gif" class="w-100" alt="Полярная лисичка"/>
+            </div>
+        </div>
+    }
+
     @if (_bookList is not null)
     {
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
@@ -66,7 +75,8 @@
 @code {
     // ReSharper disable StringLiteralTypo
 
-    private string? _errorMessage = string.Empty;
+    private string? _errorMessage;
+    private bool _busy;
     private string? _keyword = "бетон";
     private FoundItem[]? _bookList;
 
@@ -75,39 +85,48 @@
         _bookList = null;
         _errorMessage = null;
 
-        if (string.IsNullOrWhiteSpace (_keyword))
+        try
         {
-            _errorMessage = "Пустой запрос";
-            return;
-        }
+            _busy = true;
 
-        var connectionString = _configuration.GetValue<string> ("irbis-connection");
-        await using var connection = ConnectionFactory.Shared.CreateAsyncConnection();
-        connection.ParseConnectionString (connectionString);
-        if (!(await connection.ConnectAsync() && connection.Connected))
-        {
-            _errorMessage = IrbisException.GetErrorDescription (connection.LastError);
-            return;
-        }
+            if (string.IsNullOrWhiteSpace (_keyword))
+            {
+                _errorMessage = "Пустой запрос";
+                return;
+            }
 
-        var expression = $"\"K={_keyword}\"";
-        var searchParameters = new SearchParameters()
-        {
-            Database = connection.Database,
-            Expression = expression,
-            NumberOfRecords = 1000,
-            Format = "@brief"
-        };
-        var found = await connection.SearchAsync (searchParameters);
-        if (found.IsNullOrEmpty())
-        {
-            _errorMessage = "Ничего не найдено по запросу";
-            return;
-        }
+            var connectionString = _configuration.GetValue<string> ("irbis-connection");
+            await using var connection = ConnectionFactory.Shared.CreateAsyncConnection();
+            connection.ParseConnectionString (connectionString);
+            if (!(await connection.ConnectAsync() && connection.Connected))
+            {
+                _errorMessage = IrbisException.GetErrorDescription (connection.LastError);
+                return;
+            }
 
-        _bookList = found
-            .OrderBy (s => s.Text)
-            .ToArray();
+            var expression = $"\"K={_keyword}\"";
+            var searchParameters = new SearchParameters()
+            {
+                Database = connection.Database,
+                Expression = expression,
+                NumberOfRecords = 1000,
+                Format = "@brief"
+            };
+            var found = await connection.SearchAsync (searchParameters);
+            if (found.IsNullOrEmpty())
+            {
+                _errorMessage = "Ничего не найдено по запросу";
+                return;
+            }
+
+            _bookList = found
+                .OrderBy (s => s.Text)
+                .ToArray();
+        }
+        finally
+        {
+            _busy = false;
+        }
     }
 
 }

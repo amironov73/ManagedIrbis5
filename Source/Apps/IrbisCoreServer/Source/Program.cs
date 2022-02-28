@@ -24,63 +24,55 @@ using ManagedIrbis.Server;
 
 #nullable enable
 
-namespace IrbisCoreServer
+namespace IrbisCoreServer;
+
+/// <summary>
+/// Стартовый класс сервиса.
+/// </summary>
+static class Program
 {
+    public static ServerEngine Engine { get; private set; } = null!;
+
     /// <summary>
-    /// Стартовый класс сервиса.
+    /// Запуск и эксплуатация сервера.
     /// </summary>
-    static class Program
+    private static async Task RunServer
+        (
+            string[] args
+        )
     {
-        public static ServerEngine Engine { get; private set; } = null!;
-
-        /// <summary>
-        /// Запуск и эксплуатация сервера.
-        /// </summary>
-        private static async Task RunServer
-            (
-                string[] args
-            )
+        try
         {
-            try
-            {
-                Magna.Info ("START");
+            Magna.Info ("START");
 
-                await using (Engine = ServerUtility.CreateEngine (args))
-                {
-                    ServerUtility.DumpEngineSettings (Engine);
-                    Magna.Info ("Entering server main loop");
-                    await Engine.MainLoop();
-                    Magna.Info ("Leave server main loop");
-                }
-
-                Magna.Info ("STOP");
-            }
-            catch (Exception exception)
+            await using (Engine = ServerUtility.CreateEngine (args))
             {
-                Magna.TraceException(nameof(Program) + "::" + nameof(RunServer), exception);
+                ServerUtility.DumpEngineSettings (Engine);
+                Magna.Info ("Entering server main loop");
+                await Engine.MainLoop();
+                Magna.Info ("Leave server main loop");
             }
 
-        } // method RunServer
-
-        /// <summary>
-        /// Точка входа в сервис.
-        /// </summary>
-        public static async Task<int> Main
-            (
-                string[] args
-            )
+            Magna.Info ("STOP");
+        }
+        catch (Exception exception)
         {
-            Magna.Initialize (args, _ =>
-            {
-                Console.Out.WriteLine ("Initialized");
-            });
+            Magna.TraceException (nameof (Program) + "::" + nameof (RunServer), exception);
+        }
+    }
 
-            await RunServer (args);
+    /// <summary>
+    /// Точка входа в сервис.
+    /// </summary>
+    public static async Task<int> Main
+        (
+            string[] args
+        )
+    {
+        Magna.Initialize (args, _ => { Console.Out.WriteLine ("Initialized"); });
 
-            return 0;
+        await RunServer (args);
 
-        } // class Main
-
-    } // class Program
-
-} // namespace IrbisCoreServer
+        return 0;
+    }
+}

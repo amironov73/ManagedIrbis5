@@ -64,8 +64,8 @@ internal static class Program
         )
     {
         var errorCode = connection.LastError;
-        var errorDescription = IrbisException.GetErrorDescription(errorCode);
-        Console.WriteLine($"Can't connect: code={errorCode}, description={errorDescription}");
+        var errorDescription = IrbisException.GetErrorDescription (errorCode);
+        Console.WriteLine ($"Can't connect: code={errorCode}, description={errorDescription}");
     }
 
     static bool TryToConnect
@@ -83,7 +83,7 @@ internal static class Program
 
             if (!connection.Connect())
             {
-                DescribeError(connection);
+                DescribeError (connection);
                 return false;
             }
 
@@ -91,15 +91,16 @@ internal static class Program
             stopwatch.Start();
             if (!connection.NoOperation())
             {
-                DescribeError(connection);
+                DescribeError (connection);
                 return false;
             }
+
             var elapsed = stopwatch.Elapsed.TotalMilliseconds;
-            Console.WriteLine($"{elapsed:0} ms");
+            Console.WriteLine ($"{elapsed:0} ms");
         }
         catch (Exception exception)
         {
-            Console.WriteLine(exception.Message);
+            Console.WriteLine (exception.Message);
             return false;
         }
 
@@ -111,21 +112,21 @@ internal static class Program
             PingOptions options
         )
     {
-        while (string.IsNullOrEmpty(options.Host))
+        while (string.IsNullOrEmpty (options.Host))
         {
-            Console.Write("Введите хост: ");
+            Console.Write ("Введите хост: ");
             options.Host = Console.ReadLine()?.Trim();
         }
 
-        while (string.IsNullOrEmpty(options.Login))
+        while (string.IsNullOrEmpty (options.Login))
         {
-            Console.Write("Введите логин: ");
+            Console.Write ("Введите логин: ");
             options.Login = Console.ReadLine()?.Trim();
         }
 
-        while (string.IsNullOrEmpty(options.Password))
+        while (string.IsNullOrEmpty (options.Password))
         {
-            Console.Write("Введите пароль: ");
+            Console.Write ("Введите пароль: ");
             options.Password = Console.ReadLine()?.Trim();
         }
 
@@ -133,8 +134,8 @@ internal static class Program
         var failure = 0;
         for (var i = 0; i < options.Count; i++)
         {
-            Console.Write($"{i + 1}: ");
-            if (TryToConnect(options))
+            Console.Write ($"{i + 1}: ");
+            if (TryToConnect (options))
             {
                 ++success;
             }
@@ -144,7 +145,7 @@ internal static class Program
             }
         }
 
-        Console.WriteLine($"Success: {success}, failure: {failure}");
+        Console.WriteLine ($"Success: {success}, failure: {failure}");
 
         Environment.ExitCode = success != 0 ? 0 : 1;
     }
@@ -182,7 +183,7 @@ internal static class Program
                 () => 1,
                 "количество попыток"
             );
-        var rootCommand = new RootCommand("IrbisPing")
+        var rootCommand = new RootCommand ("IrbisPing")
         {
             hostOption,
             portOption,
@@ -191,11 +192,11 @@ internal static class Program
             countOption
         };
         rootCommand.Description = "Проверка возможности подключения к серверу ИРБИС64";
-        rootCommand.SetHandler ((Action<PingOptions>) Run);
+        rootCommand.SetHandler ((Action<PingOptions>)Run);
 
-        new CommandLineBuilder(rootCommand)
+        new CommandLineBuilder (rootCommand)
             .UseDefaults()
             .Build()
-            .Invoke(args);
+            .Invoke (args);
     }
 }
