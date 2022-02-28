@@ -1,5 +1,6 @@
-﻿<div class="input-group">
-    <select class="btn btn-outline-primary" @bind="Prefix">
+﻿@using AM
+<div class="input-group">
+    <select class="btn btn-outline-primary" @bind="@Prefix">
         <option value="A=">Автор</option>
         <option value="T=">Заглавие</option>
         <option value="MR=">Кафедра</option>
@@ -8,9 +9,9 @@
         <option value="TJ=">Источник</option>
         <option value="BBK=">ББК</option>
     </select>
-    <input  type="text" class="form-control" @bind="Value">
+    <input  type="text" class="form-control" @bind="@Value">
     <div class="input-group-text">
-        <input type="checkbox" class="form-check-input" @bind="Truncation"
+        <input type="checkbox" class="form-check-input" @bind="@Truncation"
                data-bs-toggle="tooltip" data-bs-placement="top" title="усечение">
     </div>
 </div>
@@ -26,11 +27,17 @@
     [Parameter]
     public bool Truncation { get; set; } = true;
 
-    public string Expression()
+    public string? Expression()
     {
+        var value = Value.SafeTrim();
+        if (string.IsNullOrEmpty (value))
+        {
+            return null;
+        }
+
         var dollar = Truncation ? "$" : string.Empty;
 
-        return $"\"{Prefix}{Value}{dollar}\"";
+        return $"\"{Prefix}{value}{dollar}\"";
     }
 
 }

@@ -1,0 +1,21 @@
+﻿@if (BusyState)
+{
+    <div class="row my-3">
+        <div class="col col-md-8 offset-md-2 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4 text-center">
+            <img src="arctic-fox.gif" class="w-100" alt="Полярная лисичка"/>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public bool BusyState { get; set; }
+
+    public void SetState (bool busyState)
+    {
+        BusyState = busyState;
+        StateHasChanged();
+    }
+
+}

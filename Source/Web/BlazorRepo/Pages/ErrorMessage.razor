@@ -1,0 +1,27 @@
+﻿@if (!string.IsNullOrWhiteSpace (Message))
+{
+    <div class="row my-3">
+        <div class="col alert alert-danger">@Message</div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public string? Message { get; set; }
+
+    public void SetMessage
+        (
+            string? message
+        )
+    {
+        Message = message;
+        StateHasChanged();
+    }
+
+    public void Hide()
+    {
+        Message = null;
+    }
+
+}

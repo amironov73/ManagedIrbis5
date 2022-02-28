@@ -1,47 +1,26 @@
 ﻿@using System.Text
+@using AM
 
-@foreach (var _ in Lines)
-{
-    <SearchLine/>
-}
+<SearchLine @ref="_firstLine" Prefix="A="/>
+<SearchLine @ref="_secondLine" Prefix="T="/>
+<SearchLine @ref="_thirdLine" Prefix="K="/>
 
 @code {
 
-    [Parameter]
-    public List<SearchLine> Lines { get; set; } = new();
-
-
-    protected override void OnInitialized()
-    {
-        var initialPrefixes = new[] { "A=", "T=", "K=" };
-
-        for (var i = 0; i < 3; i++)
-        {
-            var line = new SearchLine()
-            {
-                Prefix = initialPrefixes[i]
-            };
-            Lines.Add (line);
-        }
-    }
-
+    SearchLine _firstLine = new();
+    SearchLine _secondLine = new();
+    SearchLine _thirdLine = new();
     public string Expression()
     {
-        var builder = new StringBuilder();
-        foreach (var line in Lines)
-        {
-            if (!string.IsNullOrEmpty (line.Value))
-            {
-                if (builder.Length != 0)
-                {
-                    builder.Append (" * ");
-                }
+        var result = Utility.JoinNonEmpty
+            (
+                " * ",
+                _firstLine.Expression(),
+                _secondLine.Expression(),
+                _thirdLine.Expression()
+            );
 
-                builder.Append (line.Expression());
-            }
-        }
-
-        return builder.ToString();
+        return result;
     }
 
 }

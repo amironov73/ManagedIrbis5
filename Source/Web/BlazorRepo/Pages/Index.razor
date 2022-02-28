@@ -1,4 +1,8 @@
 ﻿@page "/"
+@using ManagedIrbis;
+@using AM.Collections
+@using AM.Linq
+@inject IConfiguration _configuration
 
 <div class="container">
 
@@ -6,19 +10,103 @@
 
         <form class="col-lg-6 offset-lg-3 mt-3" autocomplete="off" onsubmit="return false;">
 
-            <h2 class="text-center mb-4">Репозиторий публикаций<br/>
-                <small>преподавателей ИРНИТУ</small></h2>
+            <TitleHeader>Репозиторий публикаций<br/>
+                <small>преподавателей ИРНИТУ</small></TitleHeader>
 
             <SearchBlock @ref="_searchBlock" />
 
+            <button class="btn btn-primary form-control" @onclick="SearchBooks">Поиск!</button>
+
         </form>
 
+    </div>
+
+    <ErrorMessage @ref="_errorMessage"/>
+
+    <BusyIndicator @ref="_busyIndicator"/>
+
+    <HiddenText @ref="_hiddenText">
+        <p>Попробуйте поиск по фамилиям: Байбородин, Бегунов, Большаков, Гридин, Зайдес, <br/>
+            Лобацкая, Меерович, Пономарев, Тен, Щадов, Ястребов</p>
+        <p>или по местам работы авторов: Кафедра машиностроительных технологий и материалов,<br/>
+            Кафедра оборудования и автоматизации машиностроения,<br/>
+            Кафедра математики, Кафедра самолетостроения,<br/>
+            Кафедра электроснабжения и электротехники, Кафедра геммологии
+        </p>
+    </HiddenText>
+
+    <div>
+        <ul>
+        @foreach (var article in _articleList)
+        {
+            <li class="mt-3">@article</li>
+        }
+        </ul>
     </div>
 
 </div>
 
 @code {
 
+    // ReSharper disable StringLiteralTypo
+
     SearchBlock _searchBlock = new();
+    string? _expression;
+    List<string> _articleList = new();
+    BusyIndicator _busyIndicator = new();
+    HiddenText _hiddenText = new();
+    ErrorMessage _errorMessage = new();
+    async Task SearchBooks()
+    {
+
+        _articleList = new();
+        _errorMessage.Hide();
+        _hiddenText.Hide();
+        _busyIndicator.SetState (true);
+
+        try
+        {
+            _expression = _searchBlock.Expression();
+
+            if (string.IsNullOrWhiteSpace (_expression))
+            {
+                _errorMessage.SetMessage ("Пустой запрос");
+                return;
+            }
+
+            var connectionString = _configuration.GetValue<string> ("irbis-connection");
+            await using var connection = ConnectionFactory.Shared.CreateAsyncConnection();
+            connection.ParseConnectionString (connectionString);
+            if (!(await connection.ConnectAsync() && connection.Connected))
+            {
+                _errorMessage.SetMessage (IrbisException.GetErrorDescription (connection.LastError));
+                return;
+            }
+
+            var searchParameters = new SearchParameters()
+            {
+                Database = connection.Database,
+                Expression = _expression,
+                NumberOfRecords = 1000,
+                Format = "@brief"
+            };
+            var found = await connection.SearchAsync (searchParameters);
+            if (found.IsNullOrEmpty())
+            {
+                _errorMessage.SetMessage ("Ничего не найдено по запросу");
+                return;
+            }
+
+            _articleList = found
+                .Select (s => s.Text)
+                .NonEmptyLines()
+                .OrderBy (s => s)
+                .ToList();
+        }
+        finally
+        {
+            _busyIndicator.SetState (false);
+        }
+    }
 
 }
