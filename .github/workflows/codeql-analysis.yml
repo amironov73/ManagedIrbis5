@@ -66,6 +66,11 @@ jobs:
     #   make bootstrap
     #   make release
 
+    - name: Setup .NET 6
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.200
+        
     - run: dotnet build Source/ManagedIrbis5.sln
     
     - name: Perform CodeQL Analysis
