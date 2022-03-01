@@ -1,12 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
 
   <PropertyGroup>
     <RootNamespace>AM.Web</RootNamespace>
@@ -14,19 +10,24 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Description>Ars Magna web services</Description>
-    <Title>ArsMagna web services</Title>
+    <Description>Ars Magna Razor components</Description>
+    <Title>Ars Magna Razor compnents</Title>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\AM.Web.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\AM.Web.Razor.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\AM.Web.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\AM.Web.Razor.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <SupportedPlatform Include="browser"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.2"/>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
@@ -34,7 +35,6 @@
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="6.0.2" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
   </ItemGroup>
-
 
   <ItemGroup>
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />

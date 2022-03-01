@@ -1,4 +1,8 @@
-﻿@if (!string.IsNullOrWhiteSpace (Message))
+﻿@* ReSharper disable CheckNamespace *@
+
+@namespace AM.Web.Components
+
+@if (!string.IsNullOrWhiteSpace (Message))
 {
     <div class="row my-3">
         <div class="col alert alert-danger text-center">@Message</div>

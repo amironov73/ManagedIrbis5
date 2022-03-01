@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Scripting", "..\..\Libs\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Web", "..\..\Libs\AM.Web\AM.Web.csproj", "{84028122-1426-4B50-A0D1-02A58C61214E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Web.Razor", "..\..\Libs\AM.Web.Razor\AM.Web.Razor.csproj", "{ADCD6269-0F9E-4563-9C96-BE039743D5DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{84028122-1426-4B50-A0D1-02A58C61214E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84028122-1426-4B50-A0D1-02A58C61214E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84028122-1426-4B50-A0D1-02A58C61214E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADCD6269-0F9E-4563-9C96-BE039743D5DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADCD6269-0F9E-4563-9C96-BE039743D5DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADCD6269-0F9E-4563-9C96-BE039743D5DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADCD6269-0F9E-4563-9C96-BE039743D5DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
