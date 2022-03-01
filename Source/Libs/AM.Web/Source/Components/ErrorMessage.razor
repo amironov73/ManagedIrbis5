@@ -1,0 +1,41 @@
+﻿@* ReSharper disable once CheckNamespace *@
+
+@namespace AM.Web.Components
+
+@if (!string.IsNullOrWhiteSpace (Message))
+{
+    <div class="row my-3">
+        <div class="col alert alert-danger text-center">@Message</div>
+    </div>
+}
+
+@code
+{
+
+    /// <summary>
+    /// Текст сообщения.
+    /// </summary>
+    [Parameter]
+    public string? Message { get; set; }
+
+    /// <summary>
+    /// Установка текста сообщения.
+    /// </summary>
+    public void SetMessage
+        (
+            string? message
+        )
+    {
+        Message = message;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Скрытие сообщения.
+    /// </summary>
+    public void Hide()
+    {
+        Message = null;
+    }
+
+}

@@ -32,7 +32,7 @@ using Microsoft.Extensions.Logging;
 /// <summary>
 /// Вся логика программы в одном классе.
 /// </summary>
-sealed class Program
+internal sealed class Program
     : IrbisApplication
 {
     /// <summary>

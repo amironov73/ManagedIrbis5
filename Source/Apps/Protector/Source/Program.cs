@@ -25,48 +25,45 @@ using AM.Configuration;
 
 #nullable enable
 
-namespace Protector
-{
-    //
-    // Простейший инструмент для защиты строки подключения
-    // и других чувствительных данных.
-    //
+namespace Protector;
 
-    class Program
+//
+// Простейший инструмент для защиты строки подключения
+// и других чувствительных данных.
+//
+
+internal static class Program
+{
+    static void Main (string[] args)
     {
-        static void Main (string[] args)
+        if (args.Length == 0)
         {
-            if (args.Length == 0)
+            Console.WriteLine ("Usage: protector <string-to-protect>");
+        }
+        else
+        {
+            var source = args[0];
+            if (source == "-")
             {
-                Console.WriteLine ("Usage: protector <string-to-protect>");
+                source = Console.ReadLine().ThrowIfNull();
             }
-            else
+
+            if (source == "-u")
             {
-                var source = args[0];
+                source = args[1];
                 if (source == "-")
                 {
                     source = Console.ReadLine().ThrowIfNull();
                 }
 
-                if (source == "-u")
-                {
-                    source = args[1];
-                    if (source == "-")
-                    {
-                        source = Console.ReadLine().ThrowIfNull();
-                    }
-
-                    var decrypted = ConfigurationUtility.Unprotect (source);
-                    Console.WriteLine (decrypted);
-                }
-                else
-                {
-                    var encrypted = ConfigurationUtility.Protect (source);
-                    Console.WriteLine (encrypted);
-                }
+                var decrypted = ConfigurationUtility.Unprotect (source);
+                Console.WriteLine (decrypted);
+            }
+            else
+            {
+                var encrypted = ConfigurationUtility.Protect (source);
+                Console.WriteLine (encrypted);
             }
         }
-
-    } // class Program
-
-} // namespace Protector
+    }
+}

@@ -2,6 +2,7 @@
 @using ManagedIrbis;
 @using AM.Collections
 @using AM.Linq
+@using BlazorRepo.Components
 @inject IConfiguration _configuration
 
 <div class="container">
@@ -23,7 +24,7 @@
 
     <ErrorMessage @ref="_errorMessage"/>
 
-    <BusyIndicator @ref="_busyIndicator"/>
+    <BusyIndicator @ref="_busyIndicator" ImageSource="arctic-fox.gif" AltText="Подождите немного"/>
 
     <HiddenText @ref="_hiddenText">
         <p>Попробуйте поиск по фамилиям: Байбородин, Бегунов, Большаков, Гридин, Зайдес, <br/>

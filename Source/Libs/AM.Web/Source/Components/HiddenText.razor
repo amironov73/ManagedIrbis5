@@ -1,0 +1,35 @@
+﻿@* ReSharper disable once CheckNamespace *@
+
+@namespace AM.Web.Components
+
+@if (!Hidden)
+{
+    <div class="text-center text-info my-3">
+        @ChildContent
+    </div>
+}
+
+@code
+{
+
+    /// <summary>
+    /// Текст скрыт?
+    /// </summary>
+    [Parameter]
+    public bool Hidden { get; set; }
+
+    /// <summary>
+    /// Собственно текст (произвольный).
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Скрытие текста.
+    /// </summary>
+    public void Hide()
+    {
+        Hidden = true;
+        StateHasChanged();
+    }
+}

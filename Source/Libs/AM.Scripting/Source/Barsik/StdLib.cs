@@ -25,6 +25,8 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 
+using AM.Configuration;
+
 using Microsoft.Extensions.Caching.Memory;
 
 using Newtonsoft.Json;
@@ -90,6 +92,7 @@ public sealed class StdLib
         { "json_encode", new FunctionDescriptor ("json_encode", JsonEncode) },
         { "load", new FunctionDescriptor ("load", LoadAssembly) },
         { "module", new FunctionDescriptor ("module", LoadModule) },
+        { "protect", new FunctionDescriptor ("protect", Protect) },
         { "put_cache", new FunctionDescriptor ("put_cache", PutCache) },
         { "readdir", new FunctionDescriptor ("readdir", ReadDirectory) },
         { "remove", new FunctionDescriptor ("remove", RemoveFile) },
@@ -98,6 +101,7 @@ public sealed class StdLib
         { "system", new FunctionDescriptor ("system", System_) },
         { "tmpfile", new FunctionDescriptor ("tmpfile", TemporaryFile) },
         { "type", new FunctionDescriptor ("type", Type_) },
+        { "unprotect", new FunctionDescriptor ("unprotect", Unrotect) },
         { "unsubscribe", new FunctionDescriptor ("unsubscribe", Unsubscribe) },
         { "use", new FunctionDescriptor ("use", Use) },
     };
@@ -982,6 +986,28 @@ public sealed class StdLib
     }
 
     /// <summary>
+    /// Простейшая защита чувствительных данных вроде строк подключения.
+    /// </summary>
+    public static dynamic? Protect
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var value = Compute (context, args, 0);
+        if (value is not null)
+        {
+            var rawText = value.ToString();
+            if (!string.IsNullOrEmpty (rawText))
+            {
+                return ConfigurationUtility.Protect (rawText);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Помещение значения в кэш.
     /// </summary>
     public static dynamic? PutCache
@@ -1221,6 +1247,28 @@ public sealed class StdLib
         }
 
         return context.FindType (typeName, typeArguments.ToArray());
+    }
+
+    /// <summary>
+    /// Расшифровка чувствительных данных.
+    /// </summary>
+    public static dynamic? Unrotect
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var value = Compute (context, args, 0);
+        if (value is not null)
+        {
+            var encrypted = value.ToString();
+            if (!string.IsNullOrEmpty (encrypted))
+            {
+                return ConfigurationUtility.Unprotect (encrypted);
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

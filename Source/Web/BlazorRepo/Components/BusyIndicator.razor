@@ -1,0 +1,42 @@
+﻿@if (BusyState)
+{
+    <div class="row my-3">
+        <div class="col col-md-8 offset-md-2 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4 text-center">
+            <img src="@ImageSource" class="w-100" alt="@AltText"/>
+        </div>
+    </div>
+}
+
+@code
+{
+    /// <summary>
+    /// Подпись к картинке.
+    /// </summary>
+    [Parameter]
+    public string? AltText { get; set; }
+
+    /// <summary>
+    /// Источник картинки.
+    /// </summary>
+    [Parameter]
+    public string? ImageSource { get; set; }
+
+    /// <summary>
+    /// Состояние "занято".
+    /// </summary>
+    [Parameter]
+    public bool BusyState { get; set; }
+
+    /// <summary>
+    /// Установка состояния.
+    /// </summary>
+    public void SetState
+        (
+            bool busyState
+        )
+    {
+        BusyState = busyState;
+        StateHasChanged();
+    }
+
+}

@@ -5,14 +5,24 @@
     </div>
 }
 
-@code {
+@code
+{
 
+    /// <summary>
+    /// Текст скрыт?
+    /// </summary>
     [Parameter]
     public bool Hidden { get; set; }
 
+    /// <summary>
+    /// Собственно текст (произвольный).
+    /// </summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
+    /// <summary>
+    /// Скрытие текста.
+    /// </summary>
     public void Hide()
     {
         Hidden = true;
