@@ -238,7 +238,10 @@ public sealed class EasyExcel
     /// Вывод целого числа в текущую колонку.
     /// Переход к следующей колонке.
     /// </summary>
-    public Cell WriteInt32 (int value)
+    public Cell WriteInt32
+        (
+            int value
+        )
     {
         var result = GetCell (_currentRow, _currentColumn);
         _currentColumn++;

@@ -14,23 +14,24 @@ if (!is_connected())
 START_YEAR = 2010
 END_YEAR = 2023
 
+EasyExcel = type ("AM.Windows.DevEx.EasyExcel, AM.Windows.DevExpress5")
+xcel = new EasyExcel()
 utility = type ("AM.Utility, AM.Core5")
-// println (utility)
 orderType = type ("ManagedIrbis.Magazines.OrderedExemplarInfo")
-// println (orderType)
 manager = new "ManagedIrbis.Magazines.MagazineManager" (connection)
 magazines = manager.GetAllMagazines (false)
-// println ("Magazines=", magazines.Length)
 
+xcel.WriteText ("Годы")
 for (i = START_YEAR; i < END_YEAR; i++)
-    print ("\t", i)
-println();
+{
+    xcel.WriteInt32 (i)
+}
+xcel.NewLine (1)
 
 foreach (magazine in magazines)
 {
     orders = orderType.ParseRecord (magazine.Record)
-    // println (len (orders))
-    saved = {}
+    years = {}
     foreach (order in orders)
     {
         year = order.Year
@@ -42,29 +43,29 @@ foreach (magazine in magazines)
                 price = utility.StringSafeToDouble (order.Price)
                 if (price > 1.0)
                 {
-                    saved[year] = price
+                    years[year] = price
                 }
             }
         }
     }
 
-    if (saved)
+    if (years)
     {
-        print (magazine.Title)
+        xcel.WriteText (magazine.Title)
         for (i = START_YEAR; i < END_YEAR; i++)
         {
-            if (i in saved)
-                print ("\t", saved[i])
+            if (i in years)
+                xcel.WriteDouble (years[i])
             else
-                print ("\t")
+                xcel.Skip (1)
         }
-        println()
+        xcel.NewLine (1)
     }
 }
 
-
 //=================================
 
-println ("ALL DONE")
+xcel.SaveAs ("Prices.xlsx")
+xcel.Dispose()
 
 disconnect()

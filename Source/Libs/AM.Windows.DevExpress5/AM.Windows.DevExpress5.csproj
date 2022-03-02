@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj" />
+    <ProjectReference Include="..\AM.Scripting\AM.Scripting.csproj" />
     <ProjectReference Include="..\AM.Win32\AM.Win32.csproj" />
     <ProjectReference Include="..\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
   </ItemGroup>

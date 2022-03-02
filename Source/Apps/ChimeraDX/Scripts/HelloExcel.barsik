@@ -1,0 +1,15 @@
+﻿EasyExcel = type ("AM.Windows.DevEx.EasyExcel, AM.Windows.DevExpress5")
+excel = new EasyExcel()
+
+excel.WriteText ("Привет, мир!")
+
+for (i = 0; i < 10; i++)
+{
+    excel.NewLine (1)
+    excel.WriteInt32 (i)
+}
+
+println ("------")
+
+excel.SaveAs ("Hello.xlsx")
+excel.Dispose()
