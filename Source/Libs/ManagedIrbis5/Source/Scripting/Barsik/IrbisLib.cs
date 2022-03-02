@@ -1070,13 +1070,25 @@ public sealed class IrbisLib
             dynamic?[] args
         )
     {
-        if (!TryGetRecord (context, out var record))
+        Record? record;
+        var firstArg = Compute (context, args, 0);
+        var index = 1;
+
+        if (firstArg is Record record2)
         {
-            return Array.Empty<Field>();
+            record = record2;
+            index = 2;
+        }
+        else
+        {
+            if (!TryGetRecord (context, out record))
+            {
+                return Array.Empty<Field>();
+            }
         }
 
         var result = new BarsikList();
-        for (var i = 0; i < args.Length; i++)
+        for (var i = index; i < args.Length; i++)
         {
             var value = Compute (context, args, i);
             if (value is int tag)

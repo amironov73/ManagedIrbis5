@@ -2792,6 +2792,17 @@ public static class Utility
     }
 
     /// <summary>
+    /// Перегрузка для Барсика.
+    /// </summary>
+    public static double StringSafeToDouble
+        (
+            this string? text
+        )
+    {
+        return SafeToDouble (text);
+    }
+
+    /// <summary>
     /// Безопасное преобразование строки
     /// в число с плавающей точкой.
     /// </summary>

@@ -1,0 +1,70 @@
+﻿//
+// Цены на газетно-журнальную подписку в раскладе по годам
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+START_YEAR = 2010
+END_YEAR = 2023
+
+utility = type ("AM.Utility, AM.Core5")
+// println (utility)
+orderType = type ("ManagedIrbis.Magazines.OrderedExemplarInfo")
+// println (orderType)
+manager = new "ManagedIrbis.Magazines.MagazineManager" (connection)
+magazines = manager.GetAllMagazines (false)
+// println ("Magazines=", magazines.Length)
+
+for (i = START_YEAR; i < END_YEAR; i++)
+    print ("\t", i)
+println();
+
+foreach (magazine in magazines)
+{
+    orders = orderType.ParseRecord (magazine.Record)
+    // println (len (orders))
+    saved = {}
+    foreach (order in orders)
+    {
+        year = order.Year
+        if (year)
+        {
+            year = (int) year.Substring (0, 4)
+            if (year >= START_YEAR)
+            {
+                price = utility.StringSafeToDouble (order.Price)
+                if (price > 1.0)
+                {
+                    saved[year] = price
+                }
+            }
+        }
+    }
+
+    if (saved)
+    {
+        print (magazine.Title)
+        for (i = START_YEAR; i < END_YEAR; i++)
+        {
+            if (i in saved)
+                print ("\t", saved[i])
+            else
+                print ("\t")
+        }
+        println()
+    }
+}
+
+
+//=================================
+
+println ("ALL DONE")
+
+disconnect()
