@@ -926,7 +926,7 @@ public class Field
                 yield return subfield;
             }
         }
-    } // method EnumerateSubField
+    }
 
     /// <summary>
     /// Получение всех подполей с указанным кодом.
@@ -996,7 +996,7 @@ public class Field
     }
 
     /// <summary>
-    /// Указанное повторение подполя с данным кодом.
+    /// Выдает указанное повторение подполя с данным кодом.
     /// </summary>
     /// <param name="code">Искомый код подполя.</param>
     /// <param name="occurrence">Номер повторения.

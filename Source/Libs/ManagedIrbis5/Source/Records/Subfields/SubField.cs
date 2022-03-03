@@ -220,7 +220,7 @@ public sealed class SubField
     {
         Code = code;
         Value = value;
-    } // constructor
+    }
 
     #endregion
 
@@ -235,7 +235,7 @@ public sealed class SubField
     /// <summary>
     /// Клонирование подполя.
     /// </summary>
-    public SubField Clone() => (SubField)MemberwiseClone();
+    public SubField Clone() => (SubField) MemberwiseClone();
 
     /// <summary>
     /// Сравнение двух подполей.
