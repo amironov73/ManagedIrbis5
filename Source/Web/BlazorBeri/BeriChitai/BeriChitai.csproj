@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Libs\AM.Core5\AM.Core5.csproj" />
+      <ProjectReference Include="..\..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
+      <ProjectReference Include="..\..\..\Libs\AM.Web.Razor\AM.Web.Razor.csproj" />
+      <ProjectReference Include="..\..\..\Libs\AM.Web\AM.Web.csproj" />
+      <ProjectReference Include="..\..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+    </ItemGroup>
+
+</Project>
