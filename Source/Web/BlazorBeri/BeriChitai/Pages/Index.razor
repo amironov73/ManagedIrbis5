@@ -21,16 +21,16 @@
 
     <div class="row my-5">
         <div class="col col-lg-6 offset-lg-3">
-            <EditForm EditContext="_editContext" OnInvalidSubmit="RequestBooks">
+            <EditForm EditContext="_editContext" OnInvalidSubmit="OrderBooks">
                 <div class="form-control-plaintext">Отобрано книг:
                     <strong>@CountSelected()</strong></div>
                 <ValidationMessage For="() => _logon!.Ticket"/>
                 <ValidationMessage For="() => _logon!.Email"/>
                 <div class="input-group">
                     <label for="ticket" class="form-label visually-hidden"></label>
-                    <InputText id="ticket" class="form-control" @bind-Value="_logon.Ticket"></InputText>
+                    <InputText id="ticket" class="form-control" @bind-Value="_logon!.Ticket"></InputText>
                     <label for="email" class="form-label visually-hidden"></label>
-                    <InputText id="email" class="form-control" @bind-Value="_logon.Email"></InputText>
+                    <InputText id="email" class="form-control" @bind-Value="_logon!.Email"></InputText>
                     <button type="submit" class="btn btn-success form-control">Заказать</button>
                 </div>
             </EditForm>
@@ -61,6 +61,8 @@
 {
     private EditContext? _editContext;
     private ValidationMessageStore? _messageStore;
+    private bool _valudationSuccess;
+
     private List<BookInfo> _list { get; set; } = new();
     private string? _keyword;
     BusyIndicator? _busyIndicator;
@@ -72,8 +74,39 @@
         return _list.Count (item => item.Selected);
     }
 
-    private void RequestBooks()
+    private void OrderBooks()
     {
+        if (_valudationSuccess)
+        {
+            try
+            {
+                _busyIndicator?.SetState (true);
+
+                if (_service.Connect())
+                {
+                    var ticket = _logon!.Ticket;
+                    var email = _logon!.Email;
+                    var mfns = _list.Select (item => item.Mfn).ToArray();
+                    var result = _service.OrderBooks (ticket, email, mfns);
+                    if (!result.Ok)
+                    {
+                        _errorMessage?.SetMessage (result.Message);
+                    }
+                }
+                else
+                {
+                    _errorMessage?.SetMessage ("Ошибка связи с сервером");
+                }
+            }
+            finally
+            {
+                _service.Disconnect();
+                _busyIndicator?.SetState (false);
+            }
+
+            // очищаем список книг
+            _list = new();
+        }
     }
 
     private void FindBooks()
@@ -142,12 +175,20 @@
             ValidationRequestedEventArgs args
         )
     {
+        _valudationSuccess = true;
+
         if (_messageStore is {} store)
         {
             store.Clear();
             var earlyReturn = false;
+            var countSelected = CountSelected();
 
-            if (string.IsNullOrWhiteSpace (_logon.Ticket))
+            if (countSelected == 0)
+            {
+                store.Add (() => _logon!.Ticket, "Не выбраны книги");
+            }
+
+            if (string.IsNullOrWhiteSpace (_logon!.Ticket))
             {
                 store.Add (() => _logon.Ticket, "Не указан читательский!");
                 earlyReturn = true;
@@ -161,6 +202,7 @@
 
             if (earlyReturn)
             {
+                _valudationSuccess = false;
                 return;
             }
 
@@ -173,11 +215,13 @@
                     var reader = _service.FindReader (_logon.Ticket, _logon.Email);
                     if (reader is null)
                     {
+                        _valudationSuccess = false;
                         store.Add (() => _logon.Ticket, "Неверные данные");
                     }
                 }
                 else
                 {
+                    _valudationSuccess = false;
                     store.Add (() => _logon.Ticket, "Ошибка связи с сервером");
                 }
             }

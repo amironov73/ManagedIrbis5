@@ -21,6 +21,7 @@ using System.Linq;
 using AM;
 
 using ManagedIrbis.Batch;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -185,14 +186,8 @@ namespace ManagedIrbis.Readers
                 string ticket
             )
         {
-            /*
-            var record = Connection.SearchReadOneRecord
-                (
-                    "{0}{1}",
-                    ReaderIdentifier,
-                    ticket
-                );
-            if (ReferenceEquals(record, null))
+            var record = Connection.SearchReadOneRecord ($"\"{ReaderIdentifier}{ticket}\"");
+            if (record is null)
             {
                 return null;
             }
@@ -200,9 +195,6 @@ namespace ManagedIrbis.Readers
             var result = ReaderInfo.Parse(record);
 
             return result;
-            */
-
-            return null;
         }
 
         /// <summary>

@@ -106,7 +106,7 @@ public sealed class BeriService
         return result;
     }
 
-    public object OrderBooks
+    public OrderResult OrderBooks
         (
             string ticket,
             string email,
