@@ -1,8 +1,56 @@
 @page "/"
+@using AM.Collections
+@inject BeriService _service
 
 <PageTitle>Проект "Бери Читай"</PageTitle>
 
-<div class="row">
+<div class="container">
 
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+
+        @foreach (var book in _list)
+        {
+            <div class="col mt-2">
+                <div class="card">
+                    <div class="card-header">
+                        @book.Mfn
+                    </div>
+                    <div class="card-body">
+                        @book.Description
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
 
 </div>
+
+@code
+{
+    List<BookInfo> _list = new();
+
+    protected override void OnInitialized()
+    {
+        if (!_list.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        try
+        {
+            if (_service.Connect())
+            {
+                _list = _service.RandomBooks().ToList();
+            }
+            else
+            {
+                _list = new();
+            }
+        }
+        finally
+        {
+            _service.Disconnect();
+        }
+    }
+}
