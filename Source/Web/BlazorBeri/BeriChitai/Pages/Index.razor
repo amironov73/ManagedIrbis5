@@ -1,44 +1,125 @@
 @page "/"
 @using AM.Collections
+@using AM.Web.Components
 @inject BeriService _service
 
 <PageTitle>Проект "Бери Читай"</PageTitle>
 
 <div class="container">
 
+    <div class="row my-5">
+        <div class="col col-lg-6 offset-lg-3">
+            <div class="input-group">
+                <label for="keyword" class="form-label visually-hidden"></label>
+                <input type="text" id="keyword" class="form-control"
+                       placeholder="Ключевое слово"
+                       @bind="_keyword"/>
+                <button class="btn btn-primary form-control" @onclick="FindBooks">Поиск</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-5">
+        <div class="col col-lg-6 offset-lg-3">
+            <EditForm EditContext="_editContext" OnInvalidSubmit="RequestBooks">
+                <div class="form-control-plaintext">Отобрано книг:
+                    <strong>@CountSelected()</strong></div>
+                <ValidationMessage For="() => _logon!.Ticket"/>
+                <ValidationMessage For="() => _logon!.Email"/>
+                <div class="input-group">
+                    <label for="ticket" class="form-label visually-hidden"></label>
+                    <InputText id="ticket" class="form-control" @bind-Value="_logon.Ticket"></InputText>
+                    <label for="email" class="form-label visually-hidden"></label>
+                    <InputText id="email" class="form-control" @bind-Value="_logon.Email"></InputText>
+                    <button type="submit" class="btn btn-success form-control">Заказать</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+
+    <ErrorMessage @ref="_errorMessage"/>
+
+    <BusyIndicator @ref="_busyIndicator" ImageSource="img/arctic-fox.gif" AltText="Подождите немного"/>
+
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
 
         @foreach (var book in _list)
         {
-            <div class="col mt-2">
-                <div class="card">
-                    <div class="card-header">
-                        @book.Mfn
-                    </div>
-                    <div class="card-body">
-                        @book.Description
-                    </div>
-                </div>
-            </div>
+            <BeriBook Book="book"/>
         }
 
+    </div>
+
+    <div class="row m-5">
+        <div class="col text-center"></div>
+        <button class="btn btn-primary" @onclick="RandomBooks">Показать другие случайные книги</button>
     </div>
 
 </div>
 
 @code
 {
-    List<BookInfo> _list = new();
+    private EditContext? _editContext;
+    private ValidationMessageStore? _messageStore;
+    private List<BookInfo> _list { get; set; } = new();
+    private string? _keyword;
+    BusyIndicator? _busyIndicator;
+    ErrorMessage? _errorMessage;
+    private LogonModel? _logon;
 
-    protected override void OnInitialized()
+    private int CountSelected()
     {
-        if (!_list.IsNullOrEmpty())
+        return _list.Count (item => item.Selected);
+    }
+
+    private void RequestBooks()
+    {
+    }
+
+    private void FindBooks()
+    {
+        _errorMessage?.Hide();
+        _list = new();
+
+        var keyword = _keyword;
+        if (string.IsNullOrWhiteSpace (keyword))
         {
             return;
         }
 
         try
         {
+            _busyIndicator?.SetState (true);
+
+            if (_service.Connect())
+            {
+                _list = _service.SearchBooks (keyword).ToList();
+            }
+            else
+            {
+                _list = new();
+            }
+        }
+        finally
+        {
+            _service.Disconnect();
+            _busyIndicator?.SetState (false);
+        }
+
+        if (_list.IsNullOrEmpty())
+        {
+            _errorMessage?.SetMessage ("Ничего не найдено");
+        }
+    }
+
+    private void RandomBooks()
+    {
+        _errorMessage?.Hide();
+
+        try
+        {
+            _busyIndicator?.SetState (true);
+
             if (_service.Connect())
             {
                 _list = _service.RandomBooks().ToList();
@@ -51,6 +132,70 @@
         finally
         {
             _service.Disconnect();
+            _busyIndicator?.SetState (false);
         }
+    }
+
+    private void HandleValidationRequested
+        (
+            object? sender,
+            ValidationRequestedEventArgs args
+        )
+    {
+        if (_messageStore is {} store)
+        {
+            store.Clear();
+            var earlyReturn = false;
+
+            if (string.IsNullOrWhiteSpace (_logon.Ticket))
+            {
+                store.Add (() => _logon.Ticket, "Не указан читательский!");
+                earlyReturn = true;
+            }
+
+            if (string.IsNullOrWhiteSpace (_logon.Email))
+            {
+                store.Add (() => _logon.Email, "Не указан e-mail!");
+                earlyReturn = true;
+            }
+
+            if (earlyReturn)
+            {
+                return;
+            }
+
+            try
+            {
+                _busyIndicator?.SetState (true);
+
+                if (_service.Connect())
+                {
+                    var reader = _service.FindReader (_logon.Ticket, _logon.Email);
+                    if (reader is null)
+                    {
+                        store.Add (() => _logon.Ticket, "Неверные данные");
+                    }
+                }
+                else
+                {
+                    store.Add (() => _logon.Ticket, "Ошибка связи с сервером");
+                }
+            }
+            finally
+            {
+                _service.Disconnect();
+                _busyIndicator?.SetState (false);
+            }
+
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        _logon = new LogonModel();
+        _editContext = new EditContext (_logon);
+        _editContext.OnValidationRequested += HandleValidationRequested;
+        _messageStore = new ValidationMessageStore (_editContext);
+        RandomBooks();
     }
 }

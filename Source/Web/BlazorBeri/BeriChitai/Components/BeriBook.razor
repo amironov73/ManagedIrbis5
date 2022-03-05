@@ -1,0 +1,20 @@
+﻿<div class="col mt-2">
+    <div class="card border-info" @onclick="() => Book.Selected = !Book.Selected">
+        <div class="card-header" style="font-weight: bold;">
+            <input type="checkbox" class="mx-3"/>
+            @Book.Mfn
+        </div>
+        <BeriCover Number="@Book.Cover" />
+        <div class="card-body">
+            <span class="card-text">
+                @Book.Description
+            </span>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public BookInfo Book { get; set; } = null!;
+}

@@ -2,7 +2,7 @@
 @inject IConfiguration _configuration
 
 
-<img src="@DataSrc()" alt="Обложка"/>
+<img src="@DataSrc()" class="card-img-top" alt="Обложка"/>
 
 @code
 {
@@ -16,8 +16,20 @@
 
     private string DataSrc()
     {
+        const string NoCover = "img/nocover.png";
+
         _path ??= _configuration["image-path"];
-        var fileName = Number.ThrowIfNull();
+        if (string.IsNullOrWhiteSpace (_path))
+        {
+            return NoCover;
+        }
+
+        var fileName = Number;
+        if (string.IsNullOrWhiteSpace (fileName))
+        {
+            return NoCover;
+        }
+
         if (!fileName.Contains ('.'))
         {
             fileName += ".jpg";
@@ -26,7 +38,7 @@
         fileName = Path.Combine (_path, fileName);
         if (!File.Exists (fileName))
         {
-            return "img/nocover.png";
+            return NoCover;
         }
 
         var bytes = File.ReadAllBytes (fileName);

@@ -9,4 +9,6 @@ public sealed class BookInfo
     public int Mfn { get; set; }
 
     public string? Description { get; set; }
+
+    public string? Cover { get; set; }
 }

@@ -18,6 +18,7 @@ using AM.Collections;
 
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 using ManagedIrbis.Readers;
 
 #endregion
@@ -68,11 +69,10 @@ public sealed class BeriService
     {
         try
         {
-            //Connection.Connect();
             Connection.PushDatabase ("RDR");
             var manager = new ReaderManager (Connection);
             var result = manager.GetReader (ticket);
-            if (ReferenceEquals (result, null))
+            if (result is null)
             {
                 return null;
             }
@@ -88,8 +88,6 @@ public sealed class BeriService
         finally
         {
             Connection.PopDatabase();
-
-            //Connection.Disconnect();
         }
     }
 
@@ -308,11 +306,13 @@ public sealed class BeriService
             var index = random.Next (found.Count);
             var one = found[index];
             found.RemoveAt (index);
+            var record = Connection.ReadRecord (one.Mfn);
             var book = new BookInfo
             {
                 Selected = false,
                 Mfn = one.Mfn,
-                Description = one.Text
+                Description = one.Text,
+                Cover = record?.FM (951, 'a')
             };
             result.Add (book);
         }
@@ -320,11 +320,12 @@ public sealed class BeriService
         return CorrectBooks (result.ToArray());
     }
 
-    public BookInfo[] SearchBooks
+    public List<BookInfo> SearchBooks
         (
             string keyword
         )
     {
+        var result = new List<BookInfo>();
         var parameters = new SearchParameters()
         {
             Database = Connection.EnsureDatabase(),
@@ -335,19 +336,26 @@ public sealed class BeriService
         var found = Connection.Search (parameters);
         if (found.IsNullOrEmpty())
         {
-            return Array.Empty<BookInfo>();
+            return result;
         }
 
-        var books = found
-            .Select (book => new BookInfo
+        foreach (var item in found)
+        {
+            var record = Connection.ReadRecord (item.Mfn);
+            if (record is not null)
             {
-                Selected = false,
-                Mfn = book.Mfn,
-                Description = book.Text
-            })
-            .ToArray();
+                var book = new BookInfo()
+                {
+                    Selected = false,
+                    Mfn = record.FM (903).SafeToInt32(),
+                    Cover = record.FM (951, 'a'),
+                    Description = item.Text
+                };
+                result.Add (book);
+            }
+        }
 
-        return CorrectBooks (books);
+        return result;
     }
 
     public int CountBooks()
