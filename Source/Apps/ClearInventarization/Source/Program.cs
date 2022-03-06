@@ -24,135 +24,134 @@ using ManagedIrbis.Fields;
 
 #nullable enable
 
-namespace ClearInventarization
+namespace ClearInventarization;
+
+class Program
 {
-    class Program
+    private static string _connectionString = string.Empty;
+    private static string _searchExpression = string.Empty;
+    private static Regex _placeRegex = new ("^$");
+    private static Regex? _realPlaceRegex = null;
+
+    private static readonly SyncConnection _connection
+        = ConnectionFactory.Shared.CreateSyncConnection();
+
+    private static void _ProcessRecord
+        (
+            BatchRecordWriter writer,
+            Record record
+        )
     {
-        private static string _connectionString = string.Empty;
-        private static string _searchExpression = string.Empty;
-        private static Regex _placeRegex = new ("^$");
-        private static Regex? _realPlaceRegex = null;
-        private static readonly SyncConnection _connection
-            = ConnectionFactory.Shared.CreateSyncConnection();
+        var exemplars = ExemplarInfo.ParseRecord (record);
 
-        private static void _ProcessRecord
-            (
-                BatchRecordWriter writer,
-                Record record
-            )
+        var found = false;
+        foreach (var exemplar in exemplars)
         {
-            var exemplars = ExemplarInfo.ParseRecord(record);
-
-            var found = false;
-            foreach (var exemplar in exemplars)
+            var place = exemplar.Place;
+            if (string.IsNullOrWhiteSpace (place))
             {
-                var place = exemplar.Place;
-                if (string.IsNullOrWhiteSpace(place))
-                {
-                    continue;
-                }
+                continue;
+            }
 
-                if (!_placeRegex.IsMatch(place))
-                {
-                    continue;
-                }
+            if (!_placeRegex.IsMatch (place))
+            {
+                continue;
+            }
 
-                if (!string.IsNullOrEmpty (exemplar.RealPlace))
+            if (!string.IsNullOrEmpty (exemplar.RealPlace))
+            {
+                if (_realPlaceRegex is not null)
                 {
-                    if (_realPlaceRegex is not null)
+                    if (!_realPlaceRegex.IsMatch (exemplar.RealPlace))
                     {
-                        if (!_realPlaceRegex.IsMatch (exemplar.RealPlace))
-                        {
-                            continue;
-                        }
+                        continue;
                     }
-
-                    exemplar.Field!.RemoveSubField ('!');
-                    found = true;
                 }
 
-                if (!string.IsNullOrEmpty (exemplar.CheckedDate))
-                {
-                    exemplar.Field!.RemoveSubField ('s');
-                    found = true;
-                }
+                exemplar.Field!.RemoveSubField ('!');
+                found = true;
             }
 
-            if (found)
+            if (!string.IsNullOrEmpty (exemplar.CheckedDate))
             {
-                writer.Append(record);
-                Console.Write('!');
+                exemplar.Field!.RemoveSubField ('s');
+                found = true;
             }
-            else
-            {
-                Console.Write('.');
-            }
+        }
 
-        } // method _ProcessRecord
-
-        static int Main(string[] args)
+        if (found)
         {
-            if (args.Length < 3)
+            writer.Append (record);
+            Console.Write ('!');
+        }
+        else
+        {
+            Console.Write ('.');
+        }
+    }
+
+    static int Main
+        (
+            string[] args
+        )
+    {
+        if (args.Length < 3)
+        {
+            Console.WriteLine ("USAGE: ClearInventarization <connectionString> <searchExpression> <placeRegex>");
+            return 1;
+        }
+
+        _connectionString = args[0];
+        _searchExpression = args[1];
+        _placeRegex = new Regex (args[2]);
+        if (args.Length > 3)
+        {
+            _realPlaceRegex = new Regex (args[3]);
+        }
+
+        try
+        {
+            _connection.ParseConnectionString (_connectionString);
+            _connection.Connect();
+
+            if (!_connection.Connected)
             {
-                Console.WriteLine("USAGE: ClearInventarization <connectionString> <searchExpression> <placeRegex>");
+                Console.Error.WriteLine ("Can't connect");
+                Console.Error.WriteLine (IrbisException.GetErrorDescription (_connection.LastError));
+
                 return 1;
             }
 
-            _connectionString = args[0];
-            _searchExpression = args[1];
-            _placeRegex = new Regex(args[2]);
-            if (args.Length > 3)
+            var found = _connection.Search (_searchExpression);
+            Console.WriteLine ($"Found: {found.Length}");
+
+            var batch = new BatchRecordReader (_connection, found);
+            var database = _connection.EnsureDatabase();
+            using var writer = new BatchRecordWriter (_connection, database, 60);
+
+            writer.BatchWrite += (sender, _) =>
+                Console.Write ($"\n{((BatchRecordWriter)sender!).RecordsWritten}\n");
+
+            foreach (var record in batch)
             {
-                _realPlaceRegex = new Regex(args[3]);
+                _ProcessRecord (writer, record);
             }
 
-            try
-            {
-                _connection.ParseConnectionString(_connectionString);
-                _connection.Connect();
+            writer.Flush();
 
-                if (!_connection.Connected)
-                {
-                    Console.Error.WriteLine("Can't connect");
-                    Console.Error.WriteLine(IrbisException.GetErrorDescription(_connection.LastError));
+            Console.WriteLine();
+            Console.WriteLine ("ALL DONE");
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine (exception);
+            return 1;
+        }
+        finally
+        {
+            _connection.Dispose();
+        }
 
-                    return 1;
-                }
-
-                var found = _connection.Search(_searchExpression);
-                Console.WriteLine($"Found: {found.Length}");
-
-                var batch = new BatchRecordReader(_connection, found);
-                var database = _connection.EnsureDatabase();
-                using var writer = new BatchRecordWriter(_connection, database, 60);
-
-                writer.BatchWrite += (sender, _) =>
-                    Console.Write($"\n{((BatchRecordWriter)sender!).RecordsWritten}\n");
-
-                foreach (var record in batch)
-                {
-                    _ProcessRecord(writer, record);
-                }
-
-                writer.Flush();
-
-                Console.WriteLine();
-                Console.WriteLine("ALL DONE");
-            }
-            catch (Exception exception)
-            {
-                Console.Error.WriteLine(exception);
-                return 1;
-            }
-            finally
-            {
-                _connection.Dispose();
-            }
-
-            return 0;
-
-        } // method Main
-
-    } // class Program
-
-} // namespace ClearInventarization
+        return 0;
+    }
+}

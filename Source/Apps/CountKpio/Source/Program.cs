@@ -72,12 +72,12 @@ class Program
                 counter.Increment (year);
             }
 
-            Console.WriteLine ();
+            Console.WriteLine();
         }
 
-        Console.WriteLine ();
+        Console.WriteLine();
         Console.WriteLine (new string ('=', 80));
-        Console.WriteLine ();
+        Console.WriteLine();
 
         var sortedYears = counter.Keys.OrderBy (y => y).ToArray();
         foreach (var year in sortedYears)

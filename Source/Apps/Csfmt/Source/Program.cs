@@ -24,90 +24,84 @@ using ManagedIrbis.Scripting.Sharping;
 
 #nullable enable
 
-namespace Csfmt
+namespace Csfmt;
+
+/// <summary>
+/// Вся логика программы в одном классе.
+/// </summary>
+class Program
 {
     /// <summary>
-    /// Вся логика программы в одном классе.
+    /// Точка входа в программу.
     /// </summary>
-    class Program
+    static int Main
+        (
+            string[] args
+        )
     {
-        /// <summary>
-        /// Точка входа в программу.
-        /// </summary>
-        static int Main
-            (
-                string[] args
-            )
+        Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+
+        if (args.Length < 3)
         {
-            Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+            return 1;
+        }
 
-            if (args.Length < 3)
+        if (!Directory.Exists ("ScriptCache"))
+        {
+            Directory.CreateDirectory ("ScriptCache");
+        }
+
+        var connectionString = args[0];
+        var searchExpression = args[1];
+        var scriptFileName = args[2];
+
+        try
+        {
+            var sourceCode = File.ReadAllText (scriptFileName);
+
+            using var provider = ConnectionFactory.Shared.CreateSyncConnection();
+            provider.ParseConnectionString (connectionString);
+            provider.Connect();
+
+            if (!provider.Connected)
             {
+                Console.Error.WriteLine ("Can't connect");
                 return 1;
             }
 
-            if (!Directory.Exists("ScriptCache"))
+            var foundRecords = provider.SearchRead (searchExpression);
+            if (foundRecords is null)
             {
-                Directory.CreateDirectory("ScriptCache");
-            }
-
-            var connectionString = args[0];
-            var searchExpression = args[1];
-            var scriptFileName = args[2];
-
-            try
-            {
-                var sourceCode = File.ReadAllText (scriptFileName);
-
-                using var provider = ConnectionFactory.Shared.CreateSyncConnection();
-                provider.ParseConnectionString (connectionString);
-                provider.Connect();
-
-                if (!provider.Connected)
-                {
-                    Console.Error.WriteLine("Can't connect");
-                    return 1;
-                }
-
-                var foundRecords = provider.SearchRead (searchExpression);
-                if (foundRecords is null)
-                {
-                    Console.Error.WriteLine("Error during search");
-                    return 1;
-                }
-
-                using var cache = new ScriptCache ("ScriptCache");
-                using var formatter = new ScriptFormatter (provider, cache);
-                var instance = formatter.GetContextInstance (sourceCode, Console.Out);
-                if (instance is null)
-                {
-                    Console.Error.WriteLine ("Can't create formatter instance");
-                    return 1;
-                }
-
-                instance.BeforeAll();
-                instance.UserData = formatter.UserData;
-                foreach (var record in foundRecords)
-                {
-                    instance.Record = record;
-                    instance.FormatRecord();
-                }
-
-                instance.Record = null;
-                instance.AfterAll();
-
-            } // try
-
-            catch (Exception exception)
-            {
-                Console.Error.WriteLine (exception);
+                Console.Error.WriteLine ("Error during search");
                 return 1;
             }
 
-            return 0;
+            using var cache = new ScriptCache ("ScriptCache");
+            using var formatter = new ScriptFormatter (provider, cache);
+            var instance = formatter.GetContextInstance (sourceCode, Console.Out);
+            if (instance is null)
+            {
+                Console.Error.WriteLine ("Can't create formatter instance");
+                return 1;
+            }
 
-        } // method Main
+            instance.BeforeAll();
+            instance.UserData = formatter.UserData;
+            foreach (var record in foundRecords)
+            {
+                instance.Record = record;
+                instance.FormatRecord();
+            }
 
-    } // class Program
+            instance.Record = null;
+            instance.AfterAll();
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine (exception);
+            return 1;
+        }
 
-} // namespace Csfmt
+        return 0;
+    }
+}

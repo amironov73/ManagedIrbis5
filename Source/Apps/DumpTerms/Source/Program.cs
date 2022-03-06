@@ -34,139 +34,133 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace DumpTerms
+namespace DumpTerms;
+
+/// <summary>
+/// Единственный класс, содержащий всю функциональность утилиты.
+/// </summary>
+class Program
 {
     /// <summary>
-    /// Единственный класс, содержащий всю функциональность утилиты.
+    /// Дамп термина.
     /// </summary>
-    class Program
+    private static void DumpTerm
+        (
+            ISyncProvider connection,
+            Term term
+        )
     {
-        /// <summary>
-        /// Дамп термина.
-        /// </summary>
-        private static void DumpTerm
-            (
-                ISyncProvider connection,
-                Term term
-            )
+        var text = term.Text ?? string.Empty;
+        Console.WriteLine (text);
+
+        var parameters = new PostingParameters
         {
-            var text = term.Text ?? string.Empty;
-            Console.WriteLine (text);
-
-            var parameters = new PostingParameters
-            {
-                Database = connection.Database,
-                Terms = new [] { text }
-            };
-            var postings = connection.ReadPostings (parameters);
-            if (postings is null)
-            {
-                Console.WriteLine ("\t(null)");
-                return;
-            }
-
-            Console.WriteLine ($"\tPosting count: {postings.Length}");
-            foreach (var posting in postings)
-            {
-                Console.WriteLine
-                    (
-                        "\tMFN={0} Tag={1} Occ={2} Count={3}",
-                        posting.Mfn,
-                        posting.Tag,
-                        posting.Occurrence,
-                        posting.Count
-                    );
-
-                try
-                {
-                    var record = connection.ReadRecord (posting.Mfn);
-                    if (record is not null)
-                    {
-                        var field = record.Fields
-                            .GetField (posting.Tag)
-                            .GetOccurrence (posting.Occurrence - 1);
-                        if (field is not null)
-                        {
-                            Console.WriteLine
-                                (
-                                    "\t{0}",
-                                    field.ToText()
-                                );
-                            Console.WriteLine();
-                        }
-
-                        Console.WriteLine();
-                    }
-                } // try
-
-                catch
-                {
-                    // Nothing to do here
-                }
-
-            } // foreach
-
-            Console.WriteLine();
-
-        } // method DumpTerm
-
-        /// <summary>
-        /// Собственно точка входа в программу.
-        /// </summary>
-        static int Main
-            (
-                string[] args
-            )
+            Database = connection.Database,
+            Terms = new[] { text }
+        };
+        var postings = connection.ReadPostings (parameters);
+        if (postings is null)
         {
-            if (args.Length != 2)
-            {
-                Console.Error.WriteLine ("Usage: DumpTerms <connectionString> <termPrefix>");
+            Console.WriteLine ("\t(null)");
+            return;
+        }
 
-                return 1;
-            }
-
-            var connectionString = args[0];
-            var termPrefix = args[1];
+        Console.WriteLine ($"\tPosting count: {postings.Length}");
+        foreach (var posting in postings)
+        {
+            Console.WriteLine
+                (
+                    "\tMFN={0} Tag={1} Occ={2} Count={3}",
+                    posting.Mfn,
+                    posting.Tag,
+                    posting.Occurrence,
+                    posting.Count
+                );
 
             try
             {
-                using var connection = ConnectionFactory.Shared.CreateSyncConnection();
-                connection.ParseConnectionString (connectionString);
-                if (!connection.Connect())
+                var record = connection.ReadRecord (posting.Mfn);
+                if (record is not null)
                 {
-                    Console.Error.WriteLine ("Can't connect");
-                    return 1;
-                }
+                    var field = record.Fields
+                        .GetField (posting.Tag)
+                        .GetOccurrence (posting.Occurrence - 1);
+                    if (field is not null)
+                    {
+                        Console.WriteLine
+                            (
+                                "\t{0}",
+                                field.ToText()
+                            );
+                        Console.WriteLine();
+                    }
 
-                var parameters = new TermParameters
-                {
-                    Database = connection.Database,
-                    StartTerm = termPrefix,
-                    NumberOfTerms = 100
-                };
-                var terms = connection.ReadTerms (parameters);
-                if (terms is null)
-                {
-                    Console.Error.WriteLine ("Can't read terms");
-                    return 1;
-                }
-
-                Console.WriteLine ("Found terms: {0}", terms.Length);
-                foreach (var term in terms)
-                {
-                    DumpTerm (connection, term);
+                    Console.WriteLine();
                 }
             }
-            catch (Exception e)
+
+            catch
             {
-                Console.Error.WriteLine(e);
+                // Nothing to do here
+            }
+        }
+
+        Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Собственно точка входа в программу.
+    /// </summary>
+    static int Main
+        (
+            string[] args
+        )
+    {
+        if (args.Length != 2)
+        {
+            Console.Error.WriteLine ("Usage: DumpTerms <connectionString> <termPrefix>");
+
+            return 1;
+        }
+
+        var connectionString = args[0];
+        var termPrefix = args[1];
+
+        try
+        {
+            using var connection = ConnectionFactory.Shared.CreateSyncConnection();
+            connection.ParseConnectionString (connectionString);
+            if (!connection.Connect())
+            {
+                Console.Error.WriteLine ("Can't connect");
                 return 1;
             }
 
-            return 0;
+            var parameters = new TermParameters
+            {
+                Database = connection.Database,
+                StartTerm = termPrefix,
+                NumberOfTerms = 100
+            };
+            var terms = connection.ReadTerms (parameters);
+            if (terms is null)
+            {
+                Console.Error.WriteLine ("Can't read terms");
+                return 1;
+            }
 
-        } // method Main
+            Console.WriteLine ("Found terms: {0}", terms.Length);
+            foreach (var term in terms)
+            {
+                DumpTerm (connection, term);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine (e);
+            return 1;
+        }
 
-    } // class Program
-
-} // namespace DumpTerms
+        return 0;
+    }
+}
