@@ -27,87 +27,86 @@ using ManagedIrbis.Statistics;
 
 #nullable enable
 
-namespace PingMonitor
+namespace PingMonitor;
+
+/// <summary>
+/// Главная форма приложения.
+/// </summary>
+public partial class MainForm
+    : Form
 {
-    /// <summary>
-    /// Главная форма приложения.
-    /// </summary>
-    public partial class MainForm
-        : Form
+    #region Construction
+
+    public MainForm()
     {
-        #region Construction
+        InitializeComponent();
+    }
 
-        public MainForm()
+    #endregion
+
+    #region Private members
+
+    private ISyncConnection? _connection;
+
+    private IrbisPing? _pinger;
+
+    public ISyncConnection GetConnection()
+    {
+        var result = (ISyncConnection)ConnectionUtility.GetConnectionFromConfig();
+        result.Connect();
+
+        return result;
+    }
+
+    #endregion
+
+    private void MainForm_Load
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        this.ShowVersionInfoInTitle();
+
+        _connection = GetConnection();
+        _connection.Connect();
+
+        this.Text += ": " + _connection.Host;
+
+        _pinger = new IrbisPing (_connection)
         {
-            InitializeComponent();
-        }
+            Active = true
+        };
+        _pinger.StatisticsUpdated += _pinger_StatisticsUpdated;
+        _plotter.Statistics = _pinger.Statistics;
+    }
 
-        #endregion
-
-        #region Private members
-
-        private ISyncConnection? _connection;
-
-        private IrbisPing? _pinger;
-
-        public ISyncConnection GetConnection()
+    private void _pinger_StatisticsUpdated
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        var statistics = _pinger!.Statistics;
+        if (statistics.Data.Count > 1500)
         {
-            var result = (ISyncConnection) ConnectionUtility.GetConnectionFromConfig();
-            result.Connect();
-
-            return result;
-        }
-
-        #endregion
-
-        private void MainForm_Load
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            this.ShowVersionInfoInTitle();
-
-            _connection = GetConnection();
-            _connection.Connect();
-
-            this.Text += ": " + _connection.Host;
-
-            _pinger = new IrbisPing(_connection)
+            while (statistics.Data.Count > 1000)
             {
-                Active = true
-            };
-            _pinger.StatisticsUpdated += _pinger_StatisticsUpdated;
-            _plotter.Statistics = _pinger.Statistics;
-        }
-
-        private void _pinger_StatisticsUpdated
-            (
-                object? sender,
-                EventArgs e
-            )
-        {
-            var statistics = _pinger!.Statistics;
-            if (statistics.Data.Count > 1500)
-            {
-                while (statistics.Data.Count > 1000)
-                {
-                    statistics.Data.Dequeue();
-                }
+                statistics.Data.Dequeue();
             }
-
-            _plotter.Invalidate();
         }
 
-        private void MainForm_FormClosed
-            (
-                object sender,
-                FormClosedEventArgs e
-            )
-        {
-            _pinger!.Active = false;
-            _pinger.Dispose();
-            _connection!.Dispose();
-        }
+        _plotter.Invalidate();
+    }
+
+    private void MainForm_FormClosed
+        (
+            object sender,
+            FormClosedEventArgs e
+        )
+    {
+        _pinger!.Active = false;
+        _pinger.Dispose();
+        _connection!.Dispose();
     }
 }

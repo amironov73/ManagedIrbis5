@@ -39,8 +39,8 @@ class Program
             return;
         }
 
-        string fileName = args[0];
-        string connectionString = args[1];
+        var fileName = args[0];
+        var connectionString = args[1];
 
         var output = AbstractOutput.Console;
         using var stamper = new SiglaStamper

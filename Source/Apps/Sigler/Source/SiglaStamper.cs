@@ -42,9 +42,9 @@ public sealed class SiglaStamper
 {
     #region Properties
 
-    public SyncConnection Connection { get; private set; }
+    public SyncConnection Connection { get; }
 
-    public AbstractOutput Output { get; private set; }
+    public AbstractOutput Output { get; }
 
     #endregion
 
@@ -81,7 +81,7 @@ public sealed class SiglaStamper
             TimeSpan timeSpan
         )
     {
-        string result = $"{timeSpan.Hours:00}:{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
+        var result = $"{timeSpan.Hours:00}:{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
 
         return result;
     }
@@ -150,7 +150,7 @@ public sealed class SiglaStamper
                 );
         }
 
-        int[] mfns = Connection.Search ("\"IN=" + number + "\"");
+        var mfns = Connection.Search ("\"IN=" + number + "\"");
         if (mfns.Length == 0)
         {
             Output.WriteLine ("{0}: not found", number);
@@ -160,7 +160,7 @@ public sealed class SiglaStamper
 
         Output.Write ("{0}: ", number);
 
-        foreach (int mfn in mfns)
+        foreach (var mfn in mfns)
         {
             var record = Connection.ReadRecord (mfn);
             if (record is not null)

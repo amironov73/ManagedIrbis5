@@ -18,86 +18,83 @@ using LinqToDB.Mapping;
 
 #nullable enable
 
-namespace Irbis2istu
+namespace Irbis2istu;
+
+/// <summary>
+/// Маппинг для таблицы в базе данных ИРНИТУ.
+/// </summary>
+[Table ("irbisdata")]
+public class IrbisData
 {
+    #region Properties
+
     /// <summary>
-    /// Маппинг для таблицы в базе данных ИРНИТУ.
+    /// Уникальный идентификатор - первичный ключ.
     /// </summary>
-    [Table("irbisdata")]
-    public class IrbisData
-    {
-        #region Properties
+    [Identity]
+    [PrimaryKey]
+    [Column ("id")]
+    public int Id { get; set; }
 
-        /// <summary>
-        /// Уникальный идентификатор - первичный ключ.
-        /// </summary>
-        [Identity]
-        [PrimaryKey]
-        [Column("id")]
-        public int Id { get; set; }
+    /// <summary>
+    /// Шифр в базе данных ИРБИС.
+    /// </summary>
+    [Column ("irbisid")]
+    public string? Index { get; set; }
 
-        /// <summary>
-        /// Шифр в базе данных ИРБИС.
-        /// </summary>
-        [Column("irbisid")]
-        public string? Index { get; set; }
+    /// <summary>
+    /// Библиографическое описание.
+    /// </summary>
+    [Column ("bib_disc")]
+    public string? Description { get; set; }
 
-        /// <summary>
-        /// Библиографическое описание.
-        /// </summary>
-        [Column("bib_disc")]
-        public string? Description { get; set; }
+    /// <summary>
+    /// Предметная рубрика.
+    /// </summary>
+    [Column ("rubrica")]
+    public string? Heading { get; set; }
 
-        /// <summary>
-        /// Предметная рубрика.
-        /// </summary>
-        [Column("rubrica")]
-        public string? Heading { get; set; }
+    /// <summary>
+    /// Заглавие.
+    /// </summary>
+    [Column ("title")]
+    public string? Title { get; set; }
 
-        /// <summary>
-        /// Заглавие.
-        /// </summary>
-        [Column("title")]
-        public string? Title { get; set; }
+    /// <summary>
+    /// Индивидуальные авторы.
+    /// </summary>
+    [Column ("avtors")]
+    public string? Author { get; set; }
 
-        /// <summary>
-        /// Индивидуальные авторы.
-        /// </summary>
-        [Column("avtors")]
-        public string? Author { get; set; }
+    /// <summary>
+    /// Количество экземпляров.
+    /// </summary>
+    [Column ("cnt")]
+    public int Count { get; set; }
 
-        /// <summary>
-        /// Количество экземпляров.
-        /// </summary>
-        [Column("cnt")]
-        public int Count { get; set; }
+    /// <summary>
+    /// Год выхода из печати.
+    /// </summary>
+    [Column ("year_izd")]
+    public int Year { get; set; }
 
-        /// <summary>
-        /// Год выхода из печати.
-        /// </summary>
-        [Column("year_izd")]
-        public int Year { get; set; }
+    /// <summary>
+    /// Ссылка на электронный экземпляр.
+    /// </summary>
+    [Column ("http_link")]
+    public string? Link { get; set; }
 
-        /// <summary>
-        /// Ссылка на электронный экземпляр.
-        /// </summary>
-        [Column("http_link")]
-        public string? Link { get; set; }
+    /// <summary>
+    /// Тип издания: электронное или обычное.
+    /// </summary>
+    [Column ("izd_type")]
+    public string? Type { get; set; }
 
-        /// <summary>
-        /// Тип издания: электронное или обычное.
-        /// </summary>
-        [Column("izd_type")]
-        public string? Type { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    [Column ("place")]
+    public string? Place { get; set; }
 
-        /// <summary>
-        ///
-        /// </summary>
-        [Column("place")]
-        public string? Place { get; set; }
-
-        #endregion
-
-    } // class IrbisData
-
-} // namespace Irbis2istu
+    #endregion
+}

@@ -26,139 +26,138 @@ using AM.PlatformAbstraction;
 
 #nullable enable
 
-namespace ManagedIrbis.Statistics
+namespace ManagedIrbis.Statistics;
+
+/// <summary>
+/// Проверяет доступность сервера ИРБИС64 и скорость связи с ним.
+/// </summary>
+public sealed class IrbisPing
+    : IDisposable
 {
+    #region Events
+
     /// <summary>
-    /// Проверяет доступность сервера ИРБИС64 и скорость связи с ним.
+    /// Raised when the <see cref="Statistics"/> is updated.
     /// </summary>
-    public sealed class IrbisPing
-        : IDisposable
+    public event EventHandler? StatisticsUpdated;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Whether the <see cref="IrbisPing"/> is active?
+    /// </summary>
+    public bool Active { get; set; }
+
+    /// <summary>
+    /// Platform abstraction level.
+    /// </summary>
+    public PlatformAbstractionLayer PlatformAbstraction { get; set; }
+
+    /// <summary>
+    /// Connection.
+    /// </summary>
+    public ISyncConnection Connection { get; }
+
+    /// <summary>
+    /// Statistics.
+    /// </summary>
+    public PingStatistics Statistics { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public IrbisPing
+        (
+            ISyncConnection connection
+        )
     {
-        #region Events
-
-        /// <summary>
-        /// Raised when the <see cref="Statistics"/> is updated.
-        /// </summary>
-        public event EventHandler? StatisticsUpdated;
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Whether the <see cref="IrbisPing"/> is active?
-        /// </summary>
-        public bool Active { get; set; }
-
-        /// <summary>
-        /// Platform abstraction level.
-        /// </summary>
-        public PlatformAbstractionLayer PlatformAbstraction { get; set; }
-
-        /// <summary>
-        /// Connection.
-        /// </summary>
-        public ISyncConnection Connection { get; private set; }
-
-        /// <summary>
-        /// Statistics.
-        /// </summary>
-        public PingStatistics Statistics { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public IrbisPing
-            (
-                ISyncConnection connection
-            )
-        {
-            PlatformAbstraction = PlatformAbstractionLayer.Current;
-            Connection = connection;
-            Statistics = new PingStatistics();
-            _timer = new Timer (_timer_Elapsed, null, 1000, 1000);
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly Timer _timer;
-
-        private bool _busy;
-
-        private void _timer_Elapsed
-            (
-                object? state
-            )
-        {
-            if (!Active || _busy || Connection.Busy)
-            {
-                return;
-            }
-
-            _busy = true;
-            try
-            {
-                var ping = PingOnce();
-                Statistics.Add (ping);
-                StatisticsUpdated.Raise (this);
-            }
-            finally
-            {
-                _busy = false;
-            }
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Ping once.
-        /// </summary>
-        public PingData PingOnce()
-        {
-            var result = new PingData
-            {
-                Moment = PlatformAbstraction.Now()
-            };
-
-            try
-            {
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                result.Success = Connection.NoOperation();
-
-                stopwatch.Stop();
-                unchecked
-                {
-                    result.RoundTripTime = (int) stopwatch.ElapsedMilliseconds;
-                }
-            }
-            catch
-            {
-                result.Success = false;
-            }
-
-            return result;
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public void Dispose()
-        {
-            _timer.Dispose();
-        }
-
-        #endregion
+        PlatformAbstraction = PlatformAbstractionLayer.Current;
+        Connection = connection;
+        Statistics = new PingStatistics();
+        _timer = new Timer (_timer_Elapsed, null, 1000, 1000);
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly Timer _timer;
+
+    private bool _busy;
+
+    private void _timer_Elapsed
+        (
+            object? state
+        )
+    {
+        if (!Active || _busy || Connection.Busy)
+        {
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            var ping = PingOnce();
+            Statistics.Add (ping);
+            StatisticsUpdated.Raise (this);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Ping once.
+    /// </summary>
+    public PingData PingOnce()
+    {
+        var result = new PingData
+        {
+            Moment = PlatformAbstraction.Now()
+        };
+
+        try
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            result.Success = Connection.NoOperation();
+
+            stopwatch.Stop();
+            unchecked
+            {
+                result.RoundTripTime = (int)stopwatch.ElapsedMilliseconds;
+            }
+        }
+        catch
+        {
+            result.Success = false;
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public void Dispose()
+    {
+        _timer.Dispose();
+    }
+
+    #endregion
 }
