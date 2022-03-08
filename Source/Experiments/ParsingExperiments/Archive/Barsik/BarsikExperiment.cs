@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* BarsikExperiment.cs -- эксперименты над следующей версией Барсика
+/* BarsikUtility.cs -- полезные методы для Барсика
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,7 +29,6 @@ static class BarsikExperiment
         )
     {
         Console.WriteLine (sourceCode);
-        /*
         try
         {
             using var interpreter = new Interpreter();
@@ -41,7 +40,6 @@ static class BarsikExperiment
         {
             Console.WriteLine (exception.Message);
         }
-        */
 
         Console.WriteLine (new string ('-', 60));
     }

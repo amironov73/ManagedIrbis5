@@ -8,7 +8,10 @@
 
     <ItemGroup>
       <PackageReference Include="Pidgin" Version="3.0.0" />
-      <PackageReference Include="Sprache.Signed" Version="2.3.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Archive\**" />
     </ItemGroup>
 
 </Project>
