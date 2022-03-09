@@ -14,4 +14,8 @@
       <Compile Remove="Archive\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+    </ItemGroup>
+
 </Project>
