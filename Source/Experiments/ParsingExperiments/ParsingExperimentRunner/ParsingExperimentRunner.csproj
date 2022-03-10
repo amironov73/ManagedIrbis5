@@ -7,15 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Pidgin" Version="3.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="Archive\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+      <ProjectReference Include="..\ParsingExperiments\ParsingExperiments.csproj" />
     </ItemGroup>
 
 </Project>
