@@ -37,6 +37,9 @@
       <None Update="Scripts\Prices.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Scripts\RqstShrink.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

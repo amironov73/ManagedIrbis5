@@ -1,0 +1,58 @@
+﻿//
+// Простая программа, удаляющая из базы данных RQST все выполненные заказы
+// (для уменьшения нагрузки на сеть и сервер со стороны АРМ "Книговыдачи")
+//
+
+stopwatch = new Stopwatch()
+stopwatch.Start()
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=RQST;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+if (connection.Workstation != 'A')
+{
+    error ("Not administrator! Exiting")
+    exit()
+}
+
+maxMfn = max_mfn()
+expression = "I=0 + I=2" // невыполненные и зарезервированные
+goodRecords = batch_search (expression)
+println ("Good records loaded:", len (goodRecords))
+if (len (found) == maxMfn)
+{
+    error ("No truncation needed, exiting")
+    exit()
+}
+
+foreach (record in goodRecords)
+{
+    record.Version = 0
+    record.Mfn = 0
+}
+
+truncate_database()
+if (max_mfn() > 1)
+{
+    error ("Error while truncating the database, exiting")
+    exit()
+}
+
+println ("Database truncated")
+
+batch_write (goodRecords)
+println ("Good records restored")
+
+stopwatch.Stop()
+elapsed = stopwatch.Elapsed
+println ("Elapsed time:", elapsed)
+
+//=================================
+
+disconnect()

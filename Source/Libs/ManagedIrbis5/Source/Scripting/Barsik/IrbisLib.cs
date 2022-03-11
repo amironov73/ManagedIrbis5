@@ -524,6 +524,14 @@ public sealed class IrbisLib
             capacity = capacity2;
         }
 
+        if (Compute (context, args, 0) is IEnumerable<Record> records)
+        {
+            using var writer = new BatchRecordWriter (connection, database, capacity);
+            writer.AddRange (records);
+
+            return null;
+        }
+
         return new BatchRecordWriter (connection, database, capacity);
     }
 
