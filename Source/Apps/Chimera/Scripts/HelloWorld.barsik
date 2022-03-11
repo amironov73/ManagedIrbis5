@@ -41,7 +41,7 @@ println ("Found: ", len (found))
 maxIndex = min (10, len (found))
 for (i = 0; i < maxIndex; i++)
 {
-    rec = read_record (found[i])
+    read_record (found[i])
     println (record.Mfn, ": ", len (record.Fields))
     println (fm (200, 'a'))
     ` v700^a, ", " v700^b " "d700,

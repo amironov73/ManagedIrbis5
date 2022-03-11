@@ -27,123 +27,119 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure.Sockets
+namespace ManagedIrbis.Infrastructure.Sockets;
+
+/// <summary>
+/// Сокет, реализующий синхронный режим для TCPv4-подключения.
+/// </summary>
+public sealed class SyncTcp4Socket
+    : ISyncClientSocket
 {
-    #region ISyncClientSocket members
+    #region Properties
+
+    /// <inheritdoc cref="ISyncClientSocket.RetryCount"/>
+    public int RetryCount { get; set; }
+
+    /// <inheritdoc cref="ISyncClientSocket.RetryDelay"/>
+    public int RetryDelay { get; set; }
 
     /// <summary>
-    /// Сокет, реализующий синхронный режим для TCPv4-подключения.
+    /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
     /// </summary>
-    public sealed class SyncTcp4Socket
-        : ISyncClientSocket
-    {
-        #region Properties
+    public ISyncConnection? Connection { get; set; }
 
-        /// <inheritdoc cref="ISyncClientSocket.RetryCount"/>
-        public int RetryCount { get; set; }
+    #endregion
 
-        /// <inheritdoc cref="ISyncClientSocket.RetryDelay"/>
-        public int RetryDelay { get; set; }
+    #region ISyncClientSocket members
 
-        /// <summary>
-        /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
-        /// </summary>
-        public ISyncConnection? Connection { get; set; }
-
-        #endregion
-
-        /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
-        public unsafe Response? TransactSync
+    /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
+    public unsafe Response? TransactSync
         (
             SyncQuery query
         )
+    {
+        var connection = Connection.ThrowIfNull (nameof (Connection));
+        connection.ThrowIfCancelled();
+
+        var logger = connection.Logger;
+        logger?.LogTrace ($"{nameof (SyncTcp4Socket)}::{nameof (TransactSync)}: enter");
+
+        using var client = new TcpClient (AddressFamily.InterNetwork);
+        try
         {
-            var connection = Connection.ThrowIfNull(nameof(Connection));
-            connection.ThrowIfCancelled();
+            var host = connection.Host.ThrowIfNull (nameof (connection.Host));
+            logger?.LogTrace ("Connecting to {Host}", host);
+            client.Connect (host, connection.Port);
+            logger?.LogTrace ("Connected to {Host}", host);
+        }
+        catch (Exception exception)
+        {
+            logger?.LogError (exception, "Error while connecting");
+            connection.SetLastError (-100_002);
 
-            var logger = connection.Logger;
-            logger?.LogTrace($"{nameof(SyncTcp4Socket)}::{nameof(TransactSync)}: enter");
+            return default;
+        }
 
-            using var client = new TcpClient(AddressFamily.InterNetwork);
-            try
+        connection.ThrowIfCancelled();
+
+        var socket = client.Client;
+        var length = query.GetLength();
+        Span<byte> prefix = stackalloc byte[12];
+        length = FastNumber.Int32ToBytes (length, prefix);
+        prefix[length] = 10; // перевод строки
+        prefix = prefix.Slice (0, length + 1);
+        var body = query.GetBody();
+
+        try
+        {
+            logger?.LogTrace ("Sending");
+            socket.Send (prefix, SocketFlags.None);
+            socket.Send (body.Span, SocketFlags.None);
+            socket.Shutdown (SocketShutdown.Send);
+            logger?.LogTrace ("Send OK");
+        }
+        catch (Exception exception)
+        {
+            logger?.LogError (exception, "Error while sending");
+            connection.SetLastError (-100_002);
+
+            return default;
+        }
+
+        logger?.LogTrace ("Receiving");
+        var result = new Response (Connection.ThrowIfNull (nameof (Connection)));
+        try
+        {
+            while (true)
             {
-                var host = connection.Host.ThrowIfNull(nameof(connection.Host));
-                logger?.LogTrace($"Connecting to {host}");
-                client.Connect(host, connection.Port);
-                logger?.LogTrace($"Connected to {host}");
-            }
-            catch (Exception exception)
-            {
-                logger?.LogError(exception, "Error while connecting");
-                connection.SetLastError(-100_002);
+                connection.ThrowIfCancelled();
 
-                return default;
-            }
-
-            connection.ThrowIfCancelled();
-
-            var socket = client.Client;
-            var length = query.GetLength();
-            Span<byte> prefix = stackalloc byte[12];
-            length = FastNumber.Int32ToBytes(length, prefix);
-            prefix[length] = 10; // перевод строки
-            prefix = prefix.Slice(0, length + 1);
-            var body = query.GetBody();
-
-            try
-            {
-                logger?.LogTrace("Sending");
-                socket.Send(prefix, SocketFlags.None);
-                socket.Send(body.Span, SocketFlags.None);
-                socket.Shutdown(SocketShutdown.Send);
-                logger?.LogTrace("Send OK");
-            }
-            catch (Exception exception)
-            {
-                logger?.LogError(exception, "Error while sending");
-                connection.SetLastError(-100_002);
-
-                return default;
-            }
-
-            logger?.LogTrace("Receiving");
-            var result = new Response(Connection.ThrowIfNull(nameof(Connection)));
-            try
-            {
-                while (true)
+                var buffer = new byte[2048];
+                var chunk = new ArraySegment<byte> (buffer, 0, buffer.Length);
+                var read = socket.Receive (chunk, SocketFlags.None);
+                if (read <= 0)
                 {
-                    connection.ThrowIfCancelled();
-
-                    var buffer = new byte[2048];
-                    var chunk = new ArraySegment<byte>(buffer, 0, buffer.Length);
-                    var read = socket.Receive(chunk, SocketFlags.None);
-                    if (read <= 0)
-                    {
-                        break;
-                    }
-
-                    chunk = new ArraySegment<byte>(buffer, 0, read);
-                    result.Add(chunk);
+                    break;
                 }
 
-                logger?.LogTrace("Receive OK");
-            }
-            catch (Exception exception)
-            {
-                logger?.LogError(exception, "Error while receiving");
-                connection.SetLastError(-100_002);
-
-                return default;
+                chunk = new ArraySegment<byte> (buffer, 0, read);
+                result.Add (chunk);
             }
 
-            logger?.LogTrace($"{nameof(SyncTcp4Socket)}::{nameof(TransactSync)} OK");
+            logger?.LogTrace ("Receive OK");
+        }
+        catch (Exception exception)
+        {
+            logger?.LogError (exception, "Error while receiving");
+            connection.SetLastError (-100_002);
 
-            return result;
+            return default;
+        }
 
-        } // method TransactSync
+        logger?.LogTrace ($"{nameof (SyncTcp4Socket)}::{nameof (TransactSync)} OK");
 
-        #endregion
+        return result;
+    }
 
-    } // class SyncTcp4Socket
-
-} // namespace ManagedIrbis.Infrastructure.Sockets
+    #endregion
+}

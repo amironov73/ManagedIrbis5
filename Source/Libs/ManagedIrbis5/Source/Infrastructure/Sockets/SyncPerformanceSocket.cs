@@ -26,51 +26,49 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure.Sockets
+namespace ManagedIrbis.Infrastructure.Sockets;
+
+/// <summary>
+/// Синхронный сокет, собирающий данные о производительности.
+/// </summary>
+public sealed class SyncPerformanceSocket
+    : SyncNestedSocket
 {
+    #region Properties
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Синхронный сокет, собирающий данные о производительности.
+    /// Конструктор.
     /// </summary>
-    public sealed class SyncPerformanceSocket
-        : SyncNestedSocket
+    public SyncPerformanceSocket
+        (
+            ISyncClientSocket innerSocket
+        )
+        : base(innerSocket)
     {
-        #region Properties
+    } // constructor
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region ISyncClientSocket members
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SyncPerformanceSocket
-            (
-                ISyncClientSocket innerSocket
-            )
-            : base(innerSocket)
-        {
-        } // constructor
+    /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
+    public override Response? TransactSync
+        (
+            SyncQuery query
+        )
+    {
+        var result = base.TransactSync(query);
 
-        #endregion
+        // TODO implement
 
-        #region ISyncClientSocket members
+        return result;
 
-        /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
-        public override Response? TransactSync
-            (
-                SyncQuery query
-            )
-        {
-            var result = base.TransactSync(query);
+    }
 
-            // TODO implement
+    #endregion
 
-            return result;
-
-        } // method TransactSync
-
-        #endregion
-
-    } // class SyncPerformanceSocket
-
-} // namespace ManagedIrbis.Infrastructure.Sockets
+}

@@ -11,13 +11,37 @@ if (!is_connected())
 
 //=================================
 
-partNumber = "2022/13"
+ksuNumber = "2022/13"       // номер помечаемой партии
+theDate = now ("yyyyMMdd")  // дата прохождения инвентаризации
+theFund = "Ф603"            // в каком фонде прошла инвентаризацию
 
 //=================================
 
-expression = "NKSU=" + partNumber
+expression = "NKSU=" + ksuNumber
 books = search_read (expression)
 println ("Books found: ", len (books))
+modified = []
+
+foreach (book in books)
+{
+    need = false
+    foreach (one in get_exemplars (book))
+    {
+        if (one.KsuNumber1 == ksuNumber)
+        {
+            println (one)
+            field = one.Field
+            if (!have_subfield (field, 's') or sub_field (field, '!') != theFund)
+            {
+                field.SetSubFieldValue ('s', theDate)
+                field.SetSubFieldValue ('!', theFund)
+                modified.Add (one)
+            }
+        }
+    }
+}
+
+batch_write (modified)
 
 //=================================
 

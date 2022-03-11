@@ -25,111 +25,107 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure.Sockets
+namespace ManagedIrbis.Infrastructure.Sockets;
+
+/// <summary>
+/// Сокет, реализующий синхронный режим для TCPv6-подключения.
+/// </summary>
+public sealed class SyncTcp6Socket
+    : ISyncClientSocket
 {
+    #region Properties
+
+    /// <inheritdoc cref="ISyncClientSocket.RetryCount"/>
+    public int RetryCount { get; set; }
+
+    /// <inheritdoc cref="ISyncClientSocket.RetryDelay"/>
+    public int RetryDelay { get; set; }
+
     /// <summary>
-    /// Сокет, реализующий синхронный режим для TCPv6-подключения.
+    /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
     /// </summary>
-    public sealed class SyncTcp6Socket
-        : ISyncClientSocket
+    public ISyncConnection? Connection { get; set; }
+
+    #endregion
+
+    #region ISyncClientSocket members
+
+    /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
+    public unsafe Response? TransactSync
+        (
+            SyncQuery query
+        )
     {
-        #region Properties
+        var connection = Connection.ThrowIfNull (nameof (Connection));
+        connection.ThrowIfCancelled();
 
-        /// <inheritdoc cref="ISyncClientSocket.RetryCount"/>
-        public int RetryCount { get; set; }
-
-        /// <inheritdoc cref="ISyncClientSocket.RetryDelay"/>
-        public int RetryDelay { get; set; }
-
-        /// <summary>
-        /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
-        /// </summary>
-        public ISyncConnection? Connection { get; set; }
-
-        #endregion
-
-        #region ISyncClientSocket members
-
-        /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
-        public unsafe Response? TransactSync
-            (
-                SyncQuery query
-            )
+        using var client = new TcpClient (AddressFamily.InterNetworkV6);
+        try
         {
-            var connection = Connection.ThrowIfNull(nameof(Connection));
-            connection.ThrowIfCancelled();
+            var host = connection.Host.ThrowIfNull (nameof (connection.Host));
+            client.Connect (host, connection.Port);
+        }
+        catch (Exception exception)
+        {
+            Magna.TraceException (nameof (SyncTcp6Socket), exception);
+            connection.SetLastError (-100_002);
 
-            using var client = new TcpClient(AddressFamily.InterNetworkV6);
-            try
+            return default;
+        }
+
+        connection.ThrowIfCancelled();
+
+        var socket = client.Client;
+        var length = query.GetLength();
+        Span<byte> prefix = stackalloc byte[12];
+        length = FastNumber.Int32ToBytes (length, prefix);
+        prefix[length] = 10; // перевод строки
+        prefix = prefix.Slice (0, length + 1);
+        var body = query.GetBody();
+
+        try
+        {
+            socket.Send (prefix, SocketFlags.None);
+            socket.Send (body.Span, SocketFlags.None);
+            socket.Shutdown (SocketShutdown.Send);
+        }
+        catch (Exception exception)
+        {
+            Magna.TraceException (nameof (SyncTcp6Socket), exception);
+            connection.SetLastError (-100_002);
+
+            return default;
+        }
+
+        var result = new Response (Connection.ThrowIfNull (nameof (Connection)));
+        try
+        {
+            while (true)
             {
-                var host = connection.Host.ThrowIfNull(nameof(connection.Host));
-                client.Connect(host, connection.Port);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException(nameof(SyncTcp6Socket), exception);
-                connection.SetLastError(-100_002);
+                connection.ThrowIfCancelled();
 
-                return default;
-            }
-
-            connection.ThrowIfCancelled();
-
-            var socket = client.Client;
-            var length = query.GetLength();
-            Span<byte> prefix = stackalloc byte[12];
-            length = FastNumber.Int32ToBytes(length, prefix);
-            prefix[length] = 10; // перевод строки
-            prefix = prefix.Slice(0, length + 1);
-            var body = query.GetBody();
-
-            try
-            {
-                socket.Send(prefix, SocketFlags.None);
-                socket.Send(body.Span, SocketFlags.None);
-                socket.Shutdown(SocketShutdown.Send);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException(nameof(SyncTcp6Socket), exception);
-                connection.SetLastError(-100_002);
-
-                return default;
-            }
-
-            var result = new Response(Connection.ThrowIfNull(nameof(Connection)));
-            try
-            {
-                while (true)
+                var buffer = new byte[2048];
+                var chunk = new ArraySegment<byte> (buffer, 0, buffer.Length);
+                var read = socket.Receive (chunk, SocketFlags.None);
+                if (read <= 0)
                 {
-                    connection.ThrowIfCancelled();
-
-                    var buffer = new byte[2048];
-                    var chunk = new ArraySegment<byte>(buffer, 0, buffer.Length);
-                    var read = socket.Receive(chunk, SocketFlags.None);
-                    if (read <= 0)
-                    {
-                        break;
-                    }
-
-                    chunk = new ArraySegment<byte>(buffer, 0, read);
-                    result.Add(chunk);
+                    break;
                 }
+
+                chunk = new ArraySegment<byte> (buffer, 0, read);
+                result.Add (chunk);
             }
-            catch (Exception exception)
-            {
-                Magna.TraceException(nameof(SyncTcp6Socket), exception);
-                connection.SetLastError(-100_002);
+        }
+        catch (Exception exception)
+        {
+            Magna.TraceException (nameof (SyncTcp6Socket), exception);
+            connection.SetLastError (-100_002);
 
-                return default;
-            }
+            return default;
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method TransactSync
-
-        #endregion
-
-    } // class SyncTcp6Socket
-
+    #endregion
 }
