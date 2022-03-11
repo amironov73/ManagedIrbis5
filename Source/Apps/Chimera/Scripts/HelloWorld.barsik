@@ -1,10 +1,15 @@
-﻿create_connection()
-connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+﻿//
+// "Привет, мир" для ИРБИС + БАРСИК
+//
+
+connect()
 if (!is_connected())
 {
     error ("Not connected")
-    return
+    exit()
 }
+
+//=================================
 
 println ("Connected")
 
@@ -37,12 +42,14 @@ maxIndex = min (10, len (found))
 for (i = 0; i < maxIndex; i++)
 {
     rec = read_record (found[i])
-    println (rec.Mfn, " ", len (rec.Fields))
+    println (record.Mfn, ": ", len (record.Fields))
     println (fm (200, 'a'))
     ` v700^a, ", " v700^b " "d700,
     v200^a, " : " v200^e, " / " v200^f`
     println()
 }
 
+//=================================
+
 disconnect()
-println ("Disconnected")
+println ("THAT'S ALL, FOLKS!")

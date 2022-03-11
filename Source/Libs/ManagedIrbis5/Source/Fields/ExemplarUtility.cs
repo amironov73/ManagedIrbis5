@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* ExemplarUtility.cs -- утилиты для работы с экземплярами (поле 910).
@@ -23,217 +24,216 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Fields
+namespace ManagedIrbis.Fields;
+
+/// <summary>
+/// Утилиты для работы с экземплярами (поле 910).
+/// </summary>
+public static class ExemplarUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Утилиты для работы с экземплярами (поле 910).
+    /// Вычисляет количество свободных экземпляров данной книги/журнала.
     /// </summary>
-    public static class ExemplarUtility
+    /// <param name="record">Библиографическая запись на книгу/журнал.
+    /// </param>
+    /// <returns>Количество свободных экземпляров.</returns>
+    public static int GetFreeExemplarCount
+        (
+            this Record? record
+        )
     {
-        #region Public methods
+        var result = record is null ? 0
+            : GetFreeExemplarCount (record.Fields.GetField (910));
 
-        /// <summary>
-        /// Вычисляет количество свободных экземпляров данной книги/журнала.
-        /// </summary>
-        /// <param name="record">Библиографическая запись на книгу/журнал.
-        /// </param>
-        /// <returns>Количество свободных экземпляров.</returns>
-        public static int GetFreeExemplarCount
-            (
-                this Record? record
-            )
+        return result;
+    }
+
+    /// <summary>
+    /// Вычисляет суммарное количество экземпляров данной книги/журнала.
+    /// </summary>
+    /// <param name="record">Библиографическая запись на книгу/журнал.
+    /// </param>
+    /// <returns>Количество экземпляров.</returns>
+    public static int GetTotalExemplarCount
+        (
+            this Record? record
+        )
+    {
+        var result = record is null ? 0
+            : GetTotalExemplarCount (record.Fields.GetField (910));
+
+        return result;
+    }
+
+    /// <summary>
+    /// Вычисляет количество свободных экземпляров,
+    /// числящихся за указанными полями.
+    /// </summary>
+    /// <param name="fields">Поля, подлежащие подсчету.</param>
+    /// <returns>Количество свободных экземпляров.</returns>
+    public static int GetFreeExemplarCount
+        (
+            this IEnumerable<Field>? fields
+        )
+    {
+        var result = 0;
+
+        if (fields is null)
         {
-            var result = ReferenceEquals(record, null)
-                ? 0
-                : GetFreeExemplarCount(record.Fields.GetField(910));
-
             return result;
-        } // method GetFreeExemplarCount
+        }
 
-        /// <summary>
-        /// Вычисляет суммарное количество экземпляров данной книги/журнала.
-        /// </summary>
-        /// <param name="record">Библиографическая запись на книгу/журнал.
-        /// </param>
-        /// <returns>Количество экземпляров.</returns>
-        public static int GetTotalExemplarCount
-            (
-                this Record? record
-            )
+        foreach (var field in fields)
         {
-            var result = ReferenceEquals(record, null)
-                ? 0
-                : GetTotalExemplarCount(record.Fields.GetField(910));
+            var status = field.GetFirstSubFieldValue ('a')
+                .FirstChar();
 
-            return result;
-        } // method GetTotalExemplarCount
+            switch (status)
+            {
+                // экземпляры индивидуального учета
+                case '0': // свободный
+                    ++result;
+                    break;
 
-        /// <summary>
-        /// Вычисляет количество свободных экземпляров,
-        /// числящихся за указанными полями.
-        /// </summary>
-        /// <param name="fields">Поля, подлежащие подсчету.</param>
-        /// <returns>Количество свободных экземпляров.</returns>
-        public static int GetFreeExemplarCount
-            (
-                this IEnumerable<Field>? fields
-            )
+                // остальные статусы индивидуального учета
+                // считаем занятыми
+                // 1 - на руках у читателя
+                // 5 - временно недоступен
+                // 9 - забронирован
+
+                // экземпляры группового учета
+                case 'U':
+                case 'u': // вуз
+                case 'C':
+                case 'c': // библиотечная сеть
+                    var total = field.GetFirstSubFieldValue ('1')
+                        .SafeToInt32(); // всего экземпляров по месту хранения
+                    var nonFree = field.GetFirstSubFieldValue ('2')
+                        .SafeToInt32(); // из них числятся выданными
+                    var free = total - nonFree;
+                    result += free;
+                    break;
+
+                // прочие статусы не считаем
+                // R - требуется размножение (ещё не отработал AUTOIN)
+                // 8 - поступил, но не дошел до места хранения
+                // 2 - экземпляр ещё не поступил
+                // 3 - в переплете
+                // 4 - утерян
+                // 6 - списан
+                // P - переплетен (входит в подшивку)
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Вычисляет общее количество экземпляров,
+    /// числящихся за указанными полями.
+    /// </summary>
+    /// <param name="fields">Поля, подлежащие подсчету.</param>
+    /// <returns>Количество экземпляров.</returns>
+    public static int GetTotalExemplarCount
+        (
+            this IEnumerable<Field>? fields
+        )
+    {
+        var result = 0;
+
+        if (ReferenceEquals (fields, null))
         {
-            var result = 0;
-
-            if (ReferenceEquals(fields, null))
-            {
-                return result;
-            }
-
-            foreach (var field in fields)
-            {
-                var status = field.GetFirstSubFieldValue('a')
-                    .FirstChar();
-
-                switch (status)
-                {
-                    // экземпляры индивидуального учета
-                    case '0': // свободный
-                        ++result;
-                        break;
-
-                    // остальные статусы индивидуального учета
-                    // считаем занятыми
-                    // 1 - на руках у читателя
-                    // 5 - временно недоступен
-                    // 9 - забронирован
-
-                    // экземпляры группового учета
-                    case 'U': case 'u': // вуз
-                    case 'C': case 'c': // библиотечная сеть
-                        var total = field.GetFirstSubFieldValue('1')
-                            .SafeToInt32(); // всего экземпляров по месту хранения
-                        var nonFree = field.GetFirstSubFieldValue('2')
-                            .SafeToInt32(); // из них числятся выданными
-                        var free = total - nonFree;
-                        result += free;
-                        break;
-
-                    // прочие статусы не считаем
-                    // R - требуется размножение (ещё не отработал AUTOIN)
-                    // 8 - поступил, но не дошел до места хранения
-                    // 2 - экземпляр ещё не поступил
-                    // 3 - в переплете
-                    // 4 - утерян
-                    // 6 - списан
-                    // P - переплетен (входит в подшивку)
-                }
-            }
-
             return result;
-        } // method GetFreeExemplarCount
+        }
 
-        /// <summary>
-        /// Вычисляет общее количество экземпляров,
-        /// числящихся за указанными полями.
-        /// </summary>
-        /// <param name="fields">Поля, подлежащие подсчету.</param>
-        /// <returns>Количество экземпляров.</returns>
-        public static int GetTotalExemplarCount
-            (
-                this IEnumerable<Field>? fields
-            )
+        foreach (var field in fields)
         {
-            var result = 0;
+            var status = field.GetFirstSubFieldValue ('a')
+                .FirstChar();
 
-            if (ReferenceEquals(fields, null))
+            switch (status)
             {
-                return result;
+                // экземпляры индивидуального учета
+                case '0': // свободный
+                case '1': // на руках у читателя
+                case '5': // временно недоступен
+                case '9': // забронирован
+                    ++result;
+                    break;
+
+                // экземпляры группового учета:
+                case 'U':
+                case 'u': // вуз
+                case 'C':
+                case 'c': // библиотечная сеть
+                    var count = field.GetFirstSubFieldValue ('1')
+                        .SafeToInt32();
+                    result += count;
+                    break;
+
+                // прочие статусы не считаем
+                // R - требуется размножение (ещё не отработал AUTOIN)
+                // 8 - поступил, но не дошел до места хранения
+                // 2 - экземпляр ещё не поступил
+                // 3 - в переплете
+                // 4 - утерян
+                // 6 - списан
+                // P - переплетен (входит в подшивку)
             }
+        }
 
-            foreach (var field in fields)
-            {
-                var status = field.GetFirstSubFieldValue('a')
-                    .FirstChar();
+        return result;
+    }
 
-                switch (status)
-                {
-                    // экземпляры индивидуального учета
-                    case '0': // свободный
-                    case '1': // на руках у читателя
-                    case '5': // временно недоступен
-                    case '9': // забронирован
-                        ++result;
-                        break;
+    /// <summary>
+    /// Вычисляет количество свободных экземпляров.
+    /// </summary>
+    /// <param name="exemplars">Сведения об экземплярах,
+    /// подлежащие уточнению.</param>
+    /// <returns>Количество свободных экхемпляров.</returns>
+    public static int GetFreeExemplarCount
+        (
+            this IEnumerable<ExemplarInfo>? exemplars
+        )
+    {
+        var result = 0;
 
-                    // экземпляры группового учета:
-                    case 'U': case 'u': // вуз
-                    case 'C': case 'c': // библиотечная сеть
-                        var count = field.GetFirstSubFieldValue('1')
-                            .SafeToInt32();
-                        result += count;
-                        break;
-
-                    // прочие статусы не считаем
-                    // R - требуется размножение (ещё не отработал AUTOIN)
-                    // 8 - поступил, но не дошел до места хранения
-                    // 2 - экземпляр ещё не поступил
-                    // 3 - в переплете
-                    // 4 - утерян
-                    // 6 - списан
-                    // P - переплетен (входит в подшивку)
-                }
-            }
-
-            return result;
-        } // method GetTotalExemplarCount
-
-        /// <summary>
-        /// Вычисляет количество свободных экземпляров.
-        /// </summary>
-        /// <param name="exemplars">Сведения об экземплярах,
-        /// подлежащие уточнению.</param>
-        /// <returns>Количество свободных экхемпляров.</returns>
-        public static int GetFreeExemplarCount
-            (
-                this IEnumerable<ExemplarInfo>? exemplars
-            )
+        if (!ReferenceEquals (exemplars, null))
         {
-            var result = 0;
-
-            if (!ReferenceEquals(exemplars, null))
+            foreach (var exemplar in exemplars)
             {
-                foreach (var exemplar in exemplars)
-                {
-                    result += exemplar.GetFreeCount();
-                }
+                result += exemplar.GetFreeCount();
             }
+        }
 
-            return result;
-        } // method GetFreeExemplarCount
+        return result;
+    }
 
-        /// <summary>
-        /// Вычисляет общее количество экземпляров.
-        /// </summary>
-        /// <param name="exemplars">Информация об экземплярах,
-        /// подлежащих уточнению.</param>
-        /// <returns>Количество экземпляров.</returns>
-        public static int GetTotalExemplarCount
-            (
-                this IEnumerable<ExemplarInfo>? exemplars
-            )
+    /// <summary>
+    /// Вычисляет общее количество экземпляров.
+    /// </summary>
+    /// <param name="exemplars">Информация об экземплярах,
+    /// подлежащих уточнению.</param>
+    /// <returns>Количество экземпляров.</returns>
+    public static int GetTotalExemplarCount
+        (
+            this IEnumerable<ExemplarInfo>? exemplars
+        )
+    {
+        var result = 0;
+
+        if (!ReferenceEquals (exemplars, null))
         {
-            var result = 0;
-
-            if (!ReferenceEquals(exemplars, null))
+            foreach (var exemplar in exemplars)
             {
-                foreach (var exemplar in exemplars)
-                {
-                    result += exemplar.GetTotalCount();
-                }
+                result += exemplar.GetTotalCount();
             }
+        }
 
-            return result;
-        } // method GetTotalExemplarCount
+        return result;
+    }
 
-        #endregion
-
-    } // class ExemplarUtility
-
-} // namespace ManagedIrbis.Fields
+    #endregion
+}

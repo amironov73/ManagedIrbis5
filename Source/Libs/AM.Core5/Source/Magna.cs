@@ -93,6 +93,11 @@ public sealed class Magna
     public static string AssemblyVersion = ThisAssembly.AssemblyVersion;
 
     /// <summary>
+    /// Аргументы командной строки.
+    /// </summary>
+    public static string[] Args { get; private set; } = Array.Empty<string>();
+
+    /// <summary>
     /// Хост приложения.
     /// </summary>
     public static IHost Host { get; internal set; } = new HostBuilder().Build();
@@ -276,6 +281,8 @@ public sealed class Magna
             Action<IHostBuilder>? configurationAction = null
         )
     {
+        Args = args;
+
         var builder = Microsoft.Extensions.Hosting.Host
             .CreateDefaultBuilder (args);
         configurationAction?.Invoke (builder);

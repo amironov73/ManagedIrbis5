@@ -177,6 +177,7 @@ public static class CommandLineUtility
             // TODO: дешифровать строку подключения, если необходимо
 
             settings.ParseConnectionString (environmentValue);
+            return;
         }
 
         var rootCommand = GetRootCommand();

@@ -6,7 +6,7 @@
 stopwatch = new Stopwatch()
 stopwatch.Start()
 
-connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=RQST;")
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;arm=A;db=RQST;")
 if (!is_connected())
 {
     error ("Not connected")

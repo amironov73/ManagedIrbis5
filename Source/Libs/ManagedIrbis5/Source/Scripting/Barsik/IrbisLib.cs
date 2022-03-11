@@ -25,6 +25,7 @@ using AM;
 using AM.Collections;
 using AM.Scripting.Barsik;
 
+using ManagedIrbis.AppServices;
 using ManagedIrbis.Batch;
 using ManagedIrbis.Fields;
 using ManagedIrbis.Infrastructure;
@@ -565,8 +566,7 @@ public sealed class IrbisLib
         if (!TryGetConnection (context, out var connection, false))
         {
             // если соединения ещё нет, создаем его
-            connection = ConnectionFactory.Shared.CreateSyncConnection();
-            context.SetVariable (ConnectionDefineName, connection);
+            connection = (SyncConnection) _CreateConnection (context);
         }
 
         if (connection.Connected)
@@ -596,6 +596,17 @@ public sealed class IrbisLib
         return true;
     }
 
+    private static dynamic _CreateConnection
+        (
+            Context context
+        )
+    {
+        var result = ConnectionFactory.Shared.CreateSyncConnection();
+        context.SetVariable (ConnectionDefineName, result);
+
+        return result;
+    }
+
     /// <summary>
     /// Создание синхронного подключения.
     /// </summary>
@@ -605,14 +616,11 @@ public sealed class IrbisLib
             dynamic?[] args
         )
     {
-        var connectionString = Compute (context, args, 0) as string;
-        var result = ConnectionFactory.Shared.CreateSyncConnection();
-        if (!string.IsNullOrEmpty (connectionString))
+        var result = (SyncConnection) _CreateConnection (context);
+        if (Compute (context, args, 0) is string connectionString)
         {
             result.ParseConnectionString (connectionString);
         }
-
-        context.SetVariable (ConnectionDefineName, result);
 
         return result;
     }
@@ -930,8 +938,10 @@ public sealed class IrbisLib
             dynamic?[] args
         )
     {
-        return ConnectionUtility.GetConfiguredConnectionString (Magna.Configuration)
-            ?? ConnectionUtility.GetStandardConnectionString();
+        var application = new IrbisApplication (Magna.Args);
+        application.BuildConnectionSettings();
+
+        return application.Settings?.ToString();
     }
 
     /// <summary>

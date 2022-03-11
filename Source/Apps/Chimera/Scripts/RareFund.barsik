@@ -1,0 +1,25 @@
+﻿//
+// Пометка книг из партии: книги прошли инвентаризацию
+//
+
+connect()
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+partNumber = "2022/13"
+
+//=================================
+
+expression = "NKSU=" + partNumber
+books = search_read (expression)
+println ("Books found: ", len (books))
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")

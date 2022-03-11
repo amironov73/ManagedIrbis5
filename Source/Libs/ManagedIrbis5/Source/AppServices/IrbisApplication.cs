@@ -99,7 +99,7 @@ public class IrbisApplication
     /// Метод обязан вернуть корректные настройки подключения
     /// либо выбросить исключение.
     /// </remarks>
-    protected virtual void BuildConnectionSettings()
+    protected internal virtual void BuildConnectionSettings()
     {
         Settings = new ConnectionSettings();
 
