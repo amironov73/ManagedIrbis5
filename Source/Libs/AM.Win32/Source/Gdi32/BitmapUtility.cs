@@ -18,51 +18,48 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Utility routines for GDI bitmap.
+/// </summary>
+public static class BitmapUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Utility routines for GDI bitmap.
+    /// Gets the pixel data.
     /// </summary>
-    public static class BitmapUtility
+    public static IntPtr GetPixelData
+        (
+            IntPtr dibptr
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Gets the pixel data.
-        /// </summary>
-        public static IntPtr GetPixelData
+        var bmi = (BITMAPINFOHEADER) Marshal.PtrToStructure
             (
-                IntPtr dibptr
-            )
+                dibptr,
+                typeof (BITMAPINFOHEADER)
+            )!;
+        unchecked
         {
-            var bmi = (BITMAPINFOHEADER) Marshal.PtrToStructure
-                (
-                    dibptr,
-                    typeof(BITMAPINFOHEADER)
-                )!;
-            unchecked
+            if (bmi.biSizeImage == 0)
             {
-                if ( bmi.biSizeImage == 0 )
-                {
-                    bmi.biSizeImage =
-                        (uint) ((((bmi.biWidth * bmi.biBitCount + 31 ) & ~31 ) >> 3)
-                                 * bmi.biHeight );
-                }
-
-                var result = (int) bmi.biClrUsed;
-                if (result == 0
-                     && bmi.biBitCount <= 8)
-                {
-                    result = 1 << bmi.biBitCount;
-                }
-
-                result = (int) (result * 4 + bmi.biSize + dibptr.ToInt32 ());
-                return new IntPtr ( result );
+                bmi.biSizeImage =
+                    (uint)((((bmi.biWidth * bmi.biBitCount + 31) & ~31) >> 3)
+                           * bmi.biHeight);
             }
-        } // method GetPixelData
 
-        #endregion
+            var result = (int)bmi.biClrUsed;
+            if (result == 0
+                && bmi.biBitCount <= 8)
+            {
+                result = 1 << bmi.biBitCount;
+            }
 
-    } // class BitmapUtility
+            result = (int)(result * 4 + bmi.biSize + dibptr.ToInt32());
+            return new IntPtr (result);
+        }
+    }
 
-} // namespace AM.Win32
+    #endregion
+}

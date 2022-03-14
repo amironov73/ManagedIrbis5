@@ -19,29 +19,26 @@ using System;
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Background mix mode for text, hatch brush drawing on device context.
+/// </summary>
+[Flags]
+public enum BackgroundMode
 {
     /// <summary>
-    /// Background mix mode for text, hatch brush drawing on device context.
+    /// Error.
     /// </summary>
-    [Flags]
-    public enum BackgroundMode
-    {
-        /// <summary>
-        /// Error.
-        /// </summary>
-        ERROR = 0,
+    Error = 0,
 
-        /// <summary>
-        /// Transparent.
-        /// </summary>
-        TRANSPARENT = 1,
+    /// <summary>
+    /// Transparent.
+    /// </summary>
+    Transparent = 1,
 
-        /// <summary>
-        /// Opaque.
-        /// </summary>
-        OPAQUE = 2
-
-    } // enum BackgroundMode
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Opaque.
+    /// </summary>
+    Opaque = 2
+}
