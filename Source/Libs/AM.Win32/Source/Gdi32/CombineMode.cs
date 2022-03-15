@@ -13,46 +13,37 @@
 /* CombineMode.cs -- specifies a mode indicating how the two regions will be combined
    Ars Magna project, http://arsmagna.ru */
 
-#region Using directives
+namespace AM.Win32;
 
-using System;
-
-#endregion
-
-namespace AM.Win32
+/// <summary>
+/// Specifies a mode indicating how the two regions will be combined.
+/// </summary>
+public enum CombineMode
+    : uint
 {
     /// <summary>
-    /// Specifies a mode indicating how the two regions will be combined.
+    /// Creates the intersection of the two combined regions.
     /// </summary>
-    public enum CombineMode
-        : uint
-    {
-        /// <summary>
-        /// Creates the intersection of the two combined regions.
-        /// </summary>
-        RGN_AND = 1,
+    RGN_AND = 1,
 
-        /// <summary>
-        /// Creates the union of two combined regions.
-        /// </summary>
-        RGN_OR = 2,
+    /// <summary>
+    /// Creates the union of two combined regions.
+    /// </summary>
+    RGN_OR = 2,
 
-        /// <summary>
-        /// Creates the union of two combined regions except for any
-        /// overlapping areas.
-        /// </summary>
-        RGN_XOR = 3,
+    /// <summary>
+    /// Creates the union of two combined regions except for any
+    /// overlapping areas.
+    /// </summary>
+    RGN_XOR = 3,
 
-        /// <summary>
-        /// Combines the parts of hrgnSrc1 that are not part of hrgnSrc2.
-        /// </summary>
-        RGN_DIFF = 4,
+    /// <summary>
+    /// Combines the parts of hrgnSrc1 that are not part of hrgnSrc2.
+    /// </summary>
+    RGN_DIFF = 4,
 
-        /// <summary>
-        /// Creates a copy of the region identified by hrgnSrc1.
-        /// </summary>
-        RGN_COPY = 5
-
-    } // enum CombineMode
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Creates a copy of the region identified by hrgnSrc1.
+    /// </summary>
+    RGN_COPY = 5
+}
