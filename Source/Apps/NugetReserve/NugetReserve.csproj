@@ -1,23 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <Nullable>enable</Nullable>
+        <OutputType>Exe</OutputType>
+        <ApplicationIcon>thumbs.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+      <ProjectReference Include="..\..\Libs\AM.BuildSystem\AM.BuildSystem.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <!--
-        <PackageReference Include="Microsoft.Build" Version="17.1.0" />
-        <PackageReference Include="Microsoft.Build.Framework" Version="17.1.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.1.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Metrics" Version="3.3.3" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.1.0" />
-        -->
         <PackageReference Include="NuGet.Common" Version="6.1.0" />
         <PackageReference Include="NuGet.Configuration" Version="6.1.0" />
         <PackageReference Include="NuGet.DependencyResolver.Core" Version="6.1.0" />
@@ -27,6 +19,5 @@
         <PackageReference Include="NuGet.ProjectModel" Version="6.1.0" />
         <PackageReference Include="NuGet.Protocol" Version="6.1.0" />
     </ItemGroup>
-
-
+    
 </Project>

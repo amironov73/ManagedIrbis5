@@ -6,6 +6,8 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
@@ -18,7 +20,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text.Json;
 using System.Threading;
 
 using NuGet.Common;
@@ -26,6 +32,8 @@ using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
+
+using FileUtility = AM.IO.FileUtility;
 
 #endregion
 
@@ -78,6 +86,37 @@ public sealed class NuGetPackageDownloader
     private readonly SourceRepository _repository;
     private readonly FindPackageByIdResource _resource;
 
+    private static void _CleanupDownload
+        (
+            string? directory,
+            string fileName
+        )
+    {
+        // что-то пошло не так, удаляем неудачно скачанный файл
+        FileUtility.DeleteIfExists (fileName);
+
+        // да и всю папку заодно
+        if (Directory.Exists (directory))
+        {
+            Directory.Delete (directory, true);
+
+            var packageDirectory = Path.GetDirectoryName (directory);
+            if (!string.IsNullOrEmpty (packageDirectory))
+            {
+                var containsFiles = Directory.GetFiles
+                    (
+                        packageDirectory,
+                        "*",
+                        SearchOption.AllDirectories
+                    );
+                if (!containsFiles.Any())
+                {
+                    Directory.Delete (packageDirectory);
+                }
+            }
+        }
+    }
+
     #endregion
 
     #region Public methods
@@ -109,9 +148,10 @@ public sealed class NuGetPackageDownloader
             Directory.CreateDirectory (directory);
         }
 
-        using var stream = File.Create (fileName);
-
-        if (!_resource.CopyNupkgToStreamAsync
+        bool success;
+        using (var stream = File.Create (fileName))
+        {
+            success =_resource.CopyNupkgToStreamAsync
                     (
                         package.Id,
                         package.Version,
@@ -121,12 +161,70 @@ public sealed class NuGetPackageDownloader
                         _cancellationToken
                     )
                 .GetAwaiter()
-                .GetResult())
+                .GetResult();
+
+        }
+
+        if (!success)
         {
+            _CleanupDownload (directory, fileName);
+            return null;
+        }
+
+        var fileInfo = new FileInfo (fileName);
+        if (!fileInfo.Exists || fileInfo.Length < 100)
+        {
+            _CleanupDownload (directory, fileName);
             return null;
         }
 
         return fileName;
+    }
+
+    /// <summary>
+    /// Извлечение файлов из пакета (для организации локального кеша).
+    /// </summary>
+    public void ExtractPackage
+        (
+            string packageFile
+        )
+    {
+        Sure.FileExists (packageFile);
+
+        var packageDirectory = Path.GetDirectoryName (packageFile) ?? ".";
+        using var archiveReader = new PackageArchiveReader (packageFile);
+        var files = archiveReader.GetFiles();
+        foreach (var file in files)
+        {
+            if (file == "[Content_Types].xml"
+                || file.StartsWith ("_rels/") || file.StartsWith ("_rels\\")
+                || file.StartsWith ("package/") || file.StartsWith ("package\\"))
+            {
+                continue;
+            }
+
+            var target = Path.Combine (packageDirectory, file);
+            archiveReader.ExtractFile (file, target, _logger);
+        }
+
+        dynamic metadataHolder = new ExpandoObject();
+        metadataHolder.version = 2;
+        metadataHolder.contentHash = archiveReader.GetContentHash (_cancellationToken);
+        metadataHolder.source = _repository.PackageSource.Source;
+        var options = new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+        var metadataJson = JsonSerializer.Serialize (metadataHolder, options);
+        var metadataFile = Path.Combine (packageDirectory, ".nupkg.metadata");
+        File.WriteAllText (metadataFile, metadataJson);
+
+        var packageBytes = File.ReadAllBytes (packageFile);
+        var shaBytes = SHA512.HashData (packageBytes);
+        var shaText = Convert.ToBase64String (shaBytes);
+        var shaFile = packageFile + ".sha512";
+        File.WriteAllText (shaFile, shaText);
     }
 
     /// <summary>
@@ -140,6 +238,13 @@ public sealed class NuGetPackageDownloader
         Sure.FileExists (packageFile);
 
         var result = new List<PackageIdentity>();
+        var fileInfo = new FileInfo (packageFile);
+        if (fileInfo.Length < 100)
+        {
+            // подозрительно маленький файл, ну его нафиг!
+            return result;
+        }
+
         using var input = new FileStream (packageFile, FileMode.Open);
         using var reader = new PackageArchiveReader (input);
         var nuspec = reader.NuspecReader;
@@ -148,7 +253,7 @@ public sealed class NuGetPackageDownloader
         {
             foreach (var package in dependencyGroup.Packages)
             {
-                var identity = new PackageIdentity (package.Id, package.VersionRange.MaxVersion);
+                var identity = new PackageIdentity (package.Id, package.VersionRange.MinVersion);
                 result.Add (identity);
             }
         }

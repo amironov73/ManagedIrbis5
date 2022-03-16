@@ -6,6 +6,8 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
@@ -20,14 +22,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-using NuGet.Common;
 using NuGet.Packaging.Core;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
 #endregion
@@ -67,18 +65,43 @@ public static class ProjectParser
         }
     }
 
+    #endregion
+
+    #region Public methods
+
     /// <summary>
     /// Чисто для тестирования.
     /// </summary>
-    private static void _Main()
+    public static void ReserveNugetPackages
+        (
+            string projectRoot,
+            string reserveRoot,
+            TextWriter? outWriter = null
+        )
     {
-        var packages = CollectPackages (@"D:\Projects\ManagedIrbis5");
+        Sure.NotNullNorEmpty (projectRoot);
+        Sure.NotNullNorEmpty (reserveRoot);
+
+        outWriter ??= Console.Out;
+
+        if (!Directory.Exists (projectRoot))
+        {
+            throw new DirectoryNotFoundException (projectRoot);
+        }
+
+        if (!Directory.Exists (reserveRoot))
+        {
+            Directory.CreateDirectory (reserveRoot);
+        }
+
+        var packages = CollectPackages (projectRoot);
         packages = packages.OrderBy (package => package.Id).ToList();
         var downloader = new NuGetPackageDownloader();
+        downloader.SetTargetFolder (reserveRoot);
         var additional = new Dictionary<PackageIdentity, object?>();
         foreach (var package in packages)
         {
-            Console.WriteLine (package);
+            outWriter.WriteLine ($"{additional.Count}] {package}");
             var fileName = downloader.DownloadPackage (package);
             if (fileName is not null)
             {
@@ -87,13 +110,17 @@ public static class ProjectParser
                 {
                     additional[dependency] = null;
                 }
+
+                downloader.ExtractPackage (fileName);
             }
         }
 
         while (additional.Count != 0)
         {
+            outWriter.Write ($"{additional.Count}> ");
             var first = additional.Keys.First();
             additional.Remove (first);
+            outWriter.WriteLine (first);
             var fileName = downloader.DownloadPackage (first);
             if (fileName is not null)
             {
@@ -102,13 +129,14 @@ public static class ProjectParser
                 {
                     additional[dependency] = null;
                 }
+
+                downloader.ExtractPackage (fileName);
             }
         }
+
+        outWriter.WriteLine();
+        outWriter.WriteLine("ALL DONE");
     }
-
-    #endregion
-
-    #region Public methods
 
     /// <summary>
     /// Сбор всех ссылок на пакеты из проектов, расположенных в поддиректориях.
@@ -154,7 +182,6 @@ public static class ProjectParser
 
         return result;
     }
-
 
     #endregion
 }
