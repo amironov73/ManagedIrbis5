@@ -75,10 +75,34 @@ public static class ProjectParser
         var packages = CollectPackages (@"D:\Projects\ManagedIrbis5");
         packages = packages.OrderBy (package => package.Id).ToList();
         var downloader = new NuGetPackageDownloader();
+        var additional = new Dictionary<PackageIdentity, object?>();
         foreach (var package in packages)
         {
             Console.WriteLine (package);
-            downloader.DownloadPackage (package);
+            var fileName = downloader.DownloadPackage (package);
+            if (fileName is not null)
+            {
+                var dependencies = downloader.ListDependencies (fileName);
+                foreach (var dependency in dependencies)
+                {
+                    additional[dependency] = null;
+                }
+            }
+        }
+
+        while (additional.Count != 0)
+        {
+            var first = additional.Keys.First();
+            additional.Remove (first);
+            var fileName = downloader.DownloadPackage (first);
+            if (fileName is not null)
+            {
+                var dependencies = downloader.ListDependencies (fileName);
+                foreach (var dependency in dependencies)
+                {
+                    additional[dependency] = null;
+                }
+            }
         }
     }
 

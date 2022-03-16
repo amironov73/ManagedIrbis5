@@ -17,10 +17,12 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 
 using NuGet.Common;
+using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
@@ -83,7 +85,7 @@ public sealed class NuGetPackageDownloader
     /// <summary>
     /// Скачивание пакета.
     /// </summary>
-    public bool DownloadPackage
+    public string? DownloadPackage
         (
             PackageIdentity package
         )
@@ -91,15 +93,14 @@ public sealed class NuGetPackageDownloader
         Sure.NotNull (package);
 
         var fileName = package.HasVersion
-            ? Path.Combine (TargetFolder, package.Id.ToLowerInvariant(),
-                package.Version.ToString(), package.ToString().ToLowerInvariant())
-            : Path.Combine (TargetFolder, package.Id.ToLowerInvariant(),
-                package.ToString().ToLowerInvariant());
+            ? Path.Combine (TargetFolder, package.Id,
+                package.Version.ToString(), package.ToString())
+            : Path.Combine (TargetFolder, package.Id, package.ToString());
         fileName += ".nupkg";
 
         if (File.Exists (fileName))
         {
-            return true;
+            return fileName;
         }
 
         var directory = Path.GetDirectoryName (fileName);
@@ -110,17 +111,49 @@ public sealed class NuGetPackageDownloader
 
         using var stream = File.Create (fileName);
 
-        return _resource.CopyNupkgToStreamAsync
-                (
-                    package.Id,
-                    package.Version,
-                    stream,
-                    _cache,
-                    _logger,
-                    _cancellationToken
-                )
-            .GetAwaiter()
-            .GetResult();
+        if (!_resource.CopyNupkgToStreamAsync
+                    (
+                        package.Id,
+                        package.Version,
+                        stream,
+                        _cache,
+                        _logger,
+                        _cancellationToken
+                    )
+                .GetAwaiter()
+                .GetResult())
+        {
+            return null;
+        }
+
+        return fileName;
+    }
+
+    /// <summary>
+    /// Получение зависимостей из пакета.
+    /// </summary>
+    public List<PackageIdentity> ListDependencies
+        (
+            string packageFile
+        )
+    {
+        Sure.FileExists (packageFile);
+
+        var result = new List<PackageIdentity>();
+        using var input = new FileStream (packageFile, FileMode.Open);
+        using var reader = new PackageArchiveReader (input);
+        var nuspec = reader.NuspecReader;
+
+        foreach (var dependencyGroup in nuspec.GetDependencyGroups())
+        {
+            foreach (var package in dependencyGroup.Packages)
+            {
+                var identity = new PackageIdentity (package.Id, package.VersionRange.MaxVersion);
+                result.Add (identity);
+            }
+        }
+
+        return result;
     }
 
     /// <summary>
