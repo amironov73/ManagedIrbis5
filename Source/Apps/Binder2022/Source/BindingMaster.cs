@@ -64,16 +64,30 @@ internal sealed class BindingMaster
     public MagazineManager Manager { get; }
 
     public string BindingPlace { get; set; }
+
     public string BindingComplect { get; set; }
+
     public string BindingNumber { get; set; }
+
     public string BindingTitle { get; set; }
+
     public string BindingDescription { get; set; }
+
     public string BindingWithPrefix { get; set; }
+
     public string BindingRfid { get; set; }
+
     public MagazineIssueInfo[] BindingIssues { get; set; }
+
     public string BindingIndex { get; set; }
+
     public string BindingDestination { get; set; }
 
+    public MagazineInfo? CurrentMagazine { get; set; }
+
+    public string? CurrentYear { get; set; }
+
+    public MagazineIssueInfo? CurrentIssue { get; set; }
 
     #endregion
 
@@ -87,6 +101,21 @@ internal sealed class BindingMaster
             Program program
         )
     {
+        const string bindingConfigurationJson = "binding-configuration.json";
+        const string magazineConfigurationJson = "magazine-configuration.json";
+
+        _bindingConfiguration = BindingConfiguration.GetDefault();
+        if (File.Exists (bindingConfigurationJson))
+        {
+            _bindingConfiguration = BindingConfiguration.LoadConfiguration (bindingConfigurationJson);
+        }
+
+        _magazineConfiguration = MagazineConfiguration.GetDefault();
+        if (File.Exists (magazineConfigurationJson))
+        {
+            _magazineConfiguration = MagazineConfiguration.LoadConfiguration (magazineConfigurationJson);
+        }
+
         _program = program;
         Manager = new MagazineManager (_program.Connection.ThrowIfNull());
     }
@@ -96,6 +125,8 @@ internal sealed class BindingMaster
     #region Private members
 
     private readonly Program _program;
+    private readonly BindingConfiguration _bindingConfiguration;
+    private readonly MagazineConfiguration _magazineConfiguration;
 
     #endregion
 
@@ -288,10 +319,12 @@ internal sealed class BindingMaster
         var regex = new Regex(@"\((.+)\)");
         var match = regex.Match(BindingDescription);
 
-        var record = new Record();
-        record.Add (933, CurrentMagazine.Index);
-        record.Add (903, BindingIndex);
-        record.Add (934, CurrentYear);
+        var record = new Record
+        {
+            { 933, CurrentMagazine.Index },
+            { 903, BindingIndex },
+            { 934, CurrentYear }
+        };
         if (!string.IsNullOrEmpty(firstIssue.Volume))
         {
             record.Add (935, firstIssue.Volume);
@@ -301,18 +334,29 @@ internal sealed class BindingMaster
         {
             record.Add (931, match.Groups[1].Value);
         }
-        var field = new Field(910);
-        field.Add('A', "0");
-        field.Add('B', BindingWithPrefix);
-        field.Add('C', DateTime.Now.ToString("yyyyMMdd"));
-        field.Add('D', BindingDestination);
-        field.Add('H', BindingRfid);
+        var field = new Field(910)
+        {
+            { 'A', "0" },
+            { 'B', BindingWithPrefix },
+            { 'C', DateTime.Now.ToString("yyyyMMdd") },
+            { 'D', BindingDestination },
+            { 'H', BindingRfid }
+        };
         record.Fields.Add(field);
         record.Add (920, "NJK");
         record.Add (999, "0000000");
 
         Connection.WriteRecord(record, false, true);
         WriteLog ($"Создана запись подшивки: {BindingIndex}");
+    }
+
+    public void NoOperation()
+    {
+        if (Connection.Connected)
+        {
+            Connection.NoOperation();
+            WriteLog ("NO-OP");
+        }
     }
 
     public void CumulateBinding()
@@ -335,13 +379,14 @@ internal sealed class BindingMaster
                 .Add ('k', BindingComplect);
             record.Fields.Add(yearField);
         }
-        var text = yearField.GetFirstSubFieldText('h') ?? string.Empty;
+        var text = yearField.GetFirstSubFieldValue('h') ?? string.Empty;
         if (!string.IsNullOrEmpty(text))
         {
             text += ",";
         }
+
         text = text + BindingTitle + " " + BindingDescription;
-        yearField.SetSubField('h', text);
+        yearField.SetSubFieldValue ('h', text);
         Connection.WriteRecord(record, false, true);
 
         WriteLog ($"Произведена кумуляция, новое поле: {newField}");

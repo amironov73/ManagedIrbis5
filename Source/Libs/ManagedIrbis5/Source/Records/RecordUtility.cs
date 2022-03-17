@@ -25,396 +25,411 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Records
+namespace ManagedIrbis.Records;
+
+/// <summary>
+/// Вспомогательные методы для работы с запиями.
+/// </summary>
+public static class RecordUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Вспомогательные методы для работы с запиями.
+    /// Выполнение действий для каждого повторения указанного поля.
     /// </summary>
-    public static class RecordUtility
+    public static Record ForEach
+        (
+            this Record record,
+            int tag,
+            Action<RepeatingGroup.Repeat> action
+        )
     {
-        #region Public methods
+        var group = new RepeatingGroup (record, tag);
+        group.ForEach (action);
 
-        /// <summary>
-        /// Выполнение действий для каждого повторения указанного поля.
-        /// </summary>
-        public static Record ForEach
-            (
-                this Record record,
-                int tag,
-                Action<RepeatingGroup.Repeat> action
-            )
+        return record;
+    }
+
+    /// <summary>
+    /// Замена полей с указанной меткой.
+    /// </summary>
+    public static Record ReplaceField
+        (
+            this Record record,
+            int tag,
+            IEnumerable<Field> newFields
+        )
+    {
+        Sure.NotNull (record);
+        Sure.NotNull ((object?)newFields);
+
+        record.RemoveField (tag);
+        record.Fields.AddRange (newFields);
+
+        return record;
+    }
+
+    /// <summary>
+    /// Замена значения подполя.
+    /// </summary>
+    public static Record ReplaceValue
+        (
+            this Record record,
+            int tag,
+            char code,
+            string? oldValue,
+            string? newValue
+        )
+    {
+        foreach (var field in record.EnumerateField (tag))
         {
-            var group = new RepeatingGroup (record, tag);
-            group.ForEach (action);
+            field.ReplaceSubField (code, oldValue, newValue);
+        }
 
-            return record;
+        return record;
+    }
 
-        } // method ForEach
-
-        /// <summary>
-        /// Замена полей с указанной меткой.
-        /// </summary>
-        public static Record ReplaceField
-            (
-                this Record record,
-                int tag,
-                IEnumerable<Field> newFields
-            )
+    /// <summary>
+    /// Установка значения поля (до первого разделителя).
+    /// </summary>
+    public static Record SetValue
+        (
+            this Record record,
+            int tag,
+            string? newValue
+        )
+    {
+        var found = false;
+        foreach (var field in record.EnumerateField (tag))
         {
-            Sure.NotNull (record);
-            Sure.NotNull ((object?) newFields);
+            field.Value = newValue;
+            found = true;
+        }
 
-            record.RemoveField (tag);
-            record.Fields.AddRange (newFields);
-
-            return record;
-
-        } // method ReplaceField
-
-        /// <summary>
-        /// Замена значения подполя.
-        /// </summary>
-        public static Record ReplaceValue
-            (
-                this Record record,
-                int tag,
-                char code,
-                string? oldValue,
-                string? newValue
-            )
+        if (!found)
         {
-            foreach (var field in record.EnumerateField (tag))
+            record.Add (tag, newValue);
+        }
+
+        return record;
+    }
+
+    /// <summary>
+    /// Установка значения подполя.
+    /// </summary>
+    public static Record SetValue
+        (
+            this Record record,
+            int tag,
+            char code,
+            string? newValue
+        )
+    {
+        foreach (var field in record.EnumerateField (tag))
+        {
+            field.SetSubFieldValue (code, newValue);
+        }
+
+        return record;
+    }
+
+    /// <summary>
+    /// Простое расформатирование записи на уровне <c>"v123^a"</c>.
+    /// </summary>
+    public static bool SimpleFormat
+        (
+            this Record? record,
+            TextWriter output,
+            string? format
+        )
+    {
+        // TODO обеспечить поддержку IRecord
+
+        if (record is null || string.IsNullOrEmpty (format))
+        {
+            return false;
+        }
+
+        var result = false; // флаг: был ли вывод?
+        var navigator = new ValueTextNavigator (format); // нафигатор по тексту формата
+        while (!navigator.IsEOF)
+        {
+            ReadOnlySpan<char> prefix = default, // префикс-литерал
+                before = default, // ведущий условный литерал
+                after = default, // замыкающий условный литерал
+                suffix = default; // суффикс-литерал
+            var skipFirst = false; // флаг: подавление вывода первого повторения
+            var skipLast = false; // флаг: подавление вывода последнего повторения
+            var tag = 0; // метка поля
+            var code = '\0'; // код подполя (опциональный)
+
+            if (!navigator.SkipWhitespace())
             {
-                field.ReplaceSubField (code, oldValue, newValue);
+                // достигнут конец текста
+                break;
             }
 
-            return record;
-
-        } // method ReplaceValue
-
-        /// <summary>
-        /// Установка значения подполя.
-        /// </summary>
-        public static Record SetValue
-            (
-                this Record record,
-                int tag,
-                char code,
-                string? newValue
-            )
-        {
-            foreach (var field in record.EnumerateField (tag))
+            var chr = navigator.ReadChar();
+            if (chr == '\'')
             {
-                field.SetSubFieldValue (code, newValue);
+                // простой литерал
+                var text = navigator.ReadUntil ('\'');
+                output.Write (text);
+                result = true;
+                navigator.ReadChar();
+
+                // продолжаем с начала
+                continue;
             }
 
-            return record;
-
-        } // method SetValue
-
-        /// <summary>
-        /// Простое расформатирование записи на уровне <c>"v123^a"</c>.
-        /// </summary>
-        public static bool SimpleFormat
-            (
-                this Record? record,
-                TextWriter output,
-                string? format
-            )
-        {
-            // TODO обеспечить поддержку IRecord
-
-            if (record is null || string.IsNullOrEmpty (format))
+            if (chr == ',')
             {
-                return false;
+                continue;
             }
 
-            var result = false; // флаг: был ли вывод?
-            var navigator = new ValueTextNavigator (format); // нафигатор по тексту формата
-            while (!navigator.IsEOF)
+            if (chr == '"')
             {
-                ReadOnlySpan<char> prefix = default, // префикс-литерал
-                    before = default,                // ведущий условный литерал
-                    after = default,                 // замыкающий условный литерал
-                    suffix = default;                // суффикс-литерал
-                var skipFirst = false;               // флаг: подавление вывода первого повторения
-                var skipLast = false;                // флаг: подавление вывода последнего повторения
-                var tag = 0;                         // метка поля
-                var code = '\0';                    // код подполя (опциональный)
+                // префикс-литерал
 
-                if (!navigator.SkipWhitespace())
-                {
-                    // достигнут конец текста
-                    break;
-                }
-
-                var chr = navigator.ReadChar();
-                if (chr == '\'')
-                {
-                    // простой литерал
-                    var text = navigator.ReadUntil ('\'');
-                    output.Write (text);
-                    result = true;
-                    navigator.ReadChar();
-
-                    // продолжаем с начала
-                    continue;
-                }
-
-                if (chr == ',')
-                {
-                    continue;
-                }
-
-                if (chr == '"')
-                {
-                    // префикс-литерал
-
-                    prefix = navigator.ReadUntil ('"');
-                    navigator.ReadChar();
-                    navigator.SkipWhitespace();
-                    chr = navigator.ReadChar();
-                }
-
-                if (chr == '|')
-                {
-                    // ведущий условный литерал
-
-                    before = navigator.ReadUntil ('|');
-                    navigator.ReadChar();
-                    navigator.SkipWhitespace();
-                    chr = navigator.ReadChar();
-                    if (chr == '+')
-                    {
-                        // подавление вывода ведущего условного литерала при первом повторении поля
-
-                        skipFirst = true;
-                        navigator.SkipWhitespace();
-                        chr = navigator.ReadChar();
-                    }
-                }
-
-                if (chr != 'v' && chr != 'V' && chr != 'n' && chr != 'N'
-                    && chr != 'd' && chr != 'D')
-                {
-                    // неизвестная команда
-                    throw new FormatException (nameof (format));
-                }
-
-                var command = char.ToUpperInvariant (chr); // команда вывода
-
+                prefix = navigator.ReadUntil ('"');
+                navigator.ReadChar();
+                navigator.SkipWhitespace();
                 chr = navigator.ReadChar();
-                if (!chr.IsArabicDigit())
-                {
-                    // метка поля - не число
-                    throw new FormatException (nameof (format));
-                }
+            }
 
-                // разбор метки кода
-                while (chr.IsArabicDigit())
-                {
-                    tag = tag * 10 + chr - '0';
-                    chr = navigator.ReadChar();
-                }
+            if (chr == '|')
+            {
+                // ведущий условный литерал
 
-                if (chr != ValueTextNavigator.EOF && char.IsWhiteSpace (chr))
-                {
-                    // между меткой и подполем могут быть пробелы
-
-                    navigator.SkipWhitespace();
-                    chr = navigator.ReadChar();
-                }
-
-                if (chr == '^')
-                {
-                    // код подполя
-
-                    code = navigator.ReadChar();
-                    navigator.SkipWhitespace();
-                    chr = navigator.ReadChar();
-                }
-
+                before = navigator.ReadUntil ('|');
+                navigator.ReadChar();
+                navigator.SkipWhitespace();
+                chr = navigator.ReadChar();
                 if (chr == '+')
                 {
-                    // подавление вывода замыкающего условного литерала при последнем повторении поля
+                    // подавление вывода ведущего условного литерала при первом повторении поля
 
-                    skipLast = true;
+                    skipFirst = true;
                     navigator.SkipWhitespace();
                     chr = navigator.ReadChar();
-                }
-
-                if (chr == ',')
-                {
-                    goto DoFormat;
-                }
-
-                if (chr == '|')
-                {
-                    // замыкающий условный литерал
-
-                    after = navigator.ReadUntil ('|');
-                    navigator.ReadChar();
-                    navigator.SkipWhitespace();
-                    chr = navigator.ReadChar();
-                }
-
-                if (chr == ',')
-                {
-                    goto DoFormat;
-                }
-
-                if (chr == '"')
-                {
-                    // суффикс-литерал
-
-                    suffix = navigator.ReadUntil ('"');
-                    navigator.ReadChar();
-                    navigator.SkipWhitespace();
-                }
-
-                DoFormat: // переходим к собственно форматированию
-
-                // простые проверки перед началом форматирования
-                if (skipFirst && before.IsEmpty || skipLast && after.IsEmpty)
-                {
-                    // имеем плюсик при отсутствии соответствующего повторяющегося литерала
-                    throw new FormatException (nameof (format));
-                }
-
-                var count = code == '\0' ? record.Count (tag) : record.Count (tag, code);
-                if (command == 'N')
-                {
-                    // префикс или суффикс выводятся только при отсутсвии
-
-                    if (count == 0)
-                    {
-                        if (!prefix.IsEmpty)
-                        {
-                            output.Write (prefix);
-                            result = true;
-                        }
-
-                        if (!suffix.IsEmpty)
-                        {
-                            output.Write (suffix);
-                            result = true;
-                        }
-                    }
-                }
-                else if (command == 'D')
-                {
-                    // префикс или суффикс выводятся только при наличии
-
-                    if (count != 0)
-                    {
-                        if (!prefix.IsEmpty)
-                        {
-                            output.Write (prefix);
-                            result = true;
-                        }
-
-                        if (!suffix.IsEmpty)
-                        {
-                            output.Write (suffix);
-                            result = true;
-                        }
-                    }
-                }
-                else
-                {
-                    // команда 'V' -- крутим цикл
-
-                    for (var index = 0; index < count; index++)
-                    {
-                        if (index == 0)
-                        {
-                            // первое повторение поля
-
-                            if (!prefix.IsEmpty)
-                            {
-                                output.Write (prefix);
-                                result = true;
-                            }
-
-                            if (!skipFirst && !before.IsEmpty)
-                            {
-                                output.Write (before);
-                                result = true;
-                            }
-                        }
-                        else
-                        {
-                            if (!before.IsEmpty)
-                            {
-                                output.Write (before);
-                                result = true;
-                            }
-                        }
-
-                        var value = code == '\0'
-                            ? record.FM (tag, index)
-                            : record.FM (tag, index, code);
-                        if (!string.IsNullOrEmpty(value))
-                        {
-                            output.Write (value);
-                            result = true;
-                        }
-
-                        if (index == count - 1)
-                        {
-                            // последнее повторение поля
-
-                            if (!skipLast && !after.IsEmpty)
-                            {
-                                output.Write (after);
-                                result = true;
-                            }
-
-                            if (!suffix.IsEmpty)
-                            {
-                                output.Write (suffix);
-                                result = true;
-                            }
-                        }
-                        else
-                        {
-                            if (!after.IsEmpty)
-                            {
-                                output.Write (after);
-                                result = true;
-                            }
-                        }
-
-                    } // for
                 }
             }
 
-            return result;
-
-        } // method SimpleFormat
-
-        /// <summary>
-        /// Простое расформатирование записи на уровне <c>"v123^a"</c>.
-        /// </summary>
-        public static string? SimpleFormat
-            (
-                this Record? record,
-                string? format
-            )
-        {
-            if (record is null || string.IsNullOrEmpty (format))
+            if (chr != 'v' && chr != 'V' && chr != 'n' && chr != 'N'
+                && chr != 'd' && chr != 'D')
             {
-                return null;
+                // неизвестная команда
+                throw new FormatException (nameof (format));
             }
 
-            var output = new StringWriter();
+            var command = char.ToUpperInvariant (chr); // команда вывода
 
-            return SimpleFormat (record, output, format) ? output.ToString() : null;
+            chr = navigator.ReadChar();
+            if (!chr.IsArabicDigit())
+            {
+                // метка поля - не число
+                throw new FormatException (nameof (format));
+            }
 
-        } // method SimpleFormat
+            // разбор метки кода
+            while (chr.IsArabicDigit())
+            {
+                tag = tag * 10 + chr - '0';
+                chr = navigator.ReadChar();
+            }
 
-        #endregion
+            if (chr != ValueTextNavigator.EOF && char.IsWhiteSpace (chr))
+            {
+                // между меткой и подполем могут быть пробелы
 
-    } // class RecordUtiltity
+                navigator.SkipWhitespace();
+                chr = navigator.ReadChar();
+            }
 
-} // namespace ManagedIrbis.Records
+            if (chr == '^')
+            {
+                // код подполя
+
+                code = navigator.ReadChar();
+                navigator.SkipWhitespace();
+                chr = navigator.ReadChar();
+            }
+
+            if (chr == '+')
+            {
+                // подавление вывода замыкающего условного литерала при последнем повторении поля
+
+                skipLast = true;
+                navigator.SkipWhitespace();
+                chr = navigator.ReadChar();
+            }
+
+            if (chr == ',')
+            {
+                goto DoFormat;
+            }
+
+            if (chr == '|')
+            {
+                // замыкающий условный литерал
+
+                after = navigator.ReadUntil ('|');
+                navigator.ReadChar();
+                navigator.SkipWhitespace();
+                chr = navigator.ReadChar();
+            }
+
+            if (chr == ',')
+            {
+                goto DoFormat;
+            }
+
+            if (chr == '"')
+            {
+                // суффикс-литерал
+
+                suffix = navigator.ReadUntil ('"');
+                navigator.ReadChar();
+                navigator.SkipWhitespace();
+            }
+
+            DoFormat: // переходим к собственно форматированию
+
+            // простые проверки перед началом форматирования
+            if (skipFirst && before.IsEmpty || skipLast && after.IsEmpty)
+            {
+                // имеем плюсик при отсутствии соответствующего повторяющегося литерала
+                throw new FormatException (nameof (format));
+            }
+
+            var count = code == '\0' ? record.Count (tag) : record.Count (tag, code);
+            if (command == 'N')
+            {
+                // префикс или суффикс выводятся только при отсутсвии
+
+                if (count == 0)
+                {
+                    if (!prefix.IsEmpty)
+                    {
+                        output.Write (prefix);
+                        result = true;
+                    }
+
+                    if (!suffix.IsEmpty)
+                    {
+                        output.Write (suffix);
+                        result = true;
+                    }
+                }
+            }
+            else if (command == 'D')
+            {
+                // префикс или суффикс выводятся только при наличии
+
+                if (count != 0)
+                {
+                    if (!prefix.IsEmpty)
+                    {
+                        output.Write (prefix);
+                        result = true;
+                    }
+
+                    if (!suffix.IsEmpty)
+                    {
+                        output.Write (suffix);
+                        result = true;
+                    }
+                }
+            }
+            else
+            {
+                // команда 'V' -- крутим цикл
+
+                for (var index = 0; index < count; index++)
+                {
+                    if (index == 0)
+                    {
+                        // первое повторение поля
+
+                        if (!prefix.IsEmpty)
+                        {
+                            output.Write (prefix);
+                            result = true;
+                        }
+
+                        if (!skipFirst && !before.IsEmpty)
+                        {
+                            output.Write (before);
+                            result = true;
+                        }
+                    }
+                    else
+                    {
+                        if (!before.IsEmpty)
+                        {
+                            output.Write (before);
+                            result = true;
+                        }
+                    }
+
+                    var value = code == '\0'
+                        ? record.FM (tag, index)
+                        : record.FM (tag, index, code);
+                    if (!string.IsNullOrEmpty (value))
+                    {
+                        output.Write (value);
+                        result = true;
+                    }
+
+                    if (index == count - 1)
+                    {
+                        // последнее повторение поля
+
+                        if (!skipLast && !after.IsEmpty)
+                        {
+                            output.Write (after);
+                            result = true;
+                        }
+
+                        if (!suffix.IsEmpty)
+                        {
+                            output.Write (suffix);
+                            result = true;
+                        }
+                    }
+                    else
+                    {
+                        if (!after.IsEmpty)
+                        {
+                            output.Write (after);
+                            result = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Простое расформатирование записи на уровне <c>"v123^a"</c>.
+    /// </summary>
+    public static string? SimpleFormat
+        (
+            this Record? record,
+            string? format
+        )
+    {
+        if (record is null || string.IsNullOrEmpty (format))
+        {
+            return null;
+        }
+
+        var output = new StringWriter();
+
+        return SimpleFormat (record, output, format) ? output.ToString() : null;
+    }
+
+    #endregion
+}

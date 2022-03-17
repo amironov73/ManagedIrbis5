@@ -6,6 +6,7 @@
 // ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
 /* MainForm.cs -- главная форма
@@ -28,6 +29,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 using AM;
+using AM.Collections;
 using AM.Linq;
 using AM.Text;
 
@@ -37,6 +39,7 @@ using DevExpress.XtraReports.UI;
 using ManagedIrbis;
 using ManagedIrbis.Fields;
 using ManagedIrbis.Magazines;
+using ManagedIrbis.Menus;
 
 using ComboBox = System.Windows.Forms.ComboBox;
 
@@ -226,41 +229,41 @@ internal sealed partial class MainForm
 
     private void _DoBind()
     {
-        BindingPlace = _GetSelectedPlace(_placeBox);
-        if (string.IsNullOrEmpty(BindingPlace))
+        _master.BindingPlace = _GetSelectedPlace(_placeBox);
+        if (string.IsNullOrEmpty(_master.BindingPlace))
         {
             MessageBox.Show("Не задан фонд");
             return;
         }
 
-        BindingComplect = _complectBox.Text.Trim();
-        if (string.IsNullOrEmpty(BindingComplect))
+        _master.BindingComplect = _complectBox.Text.Trim();
+        if (string.IsNullOrEmpty(_master.BindingComplect))
         {
             MessageBox.Show("Не задан комплект");
             return;
         }
 
-        BindingNumber = _inventoryBox.Text.Trim();
-        if (string.IsNullOrEmpty(BindingNumber))
+        _master.BindingNumber = _inventoryBox.Text.Trim();
+        if (string.IsNullOrEmpty(_master.BindingNumber))
         {
             MessageBox.Show("Не задан инвентарный номер подшивки");
             return;
         }
 
         string prefix = CM.AppSettings["prefix"];
-        BindingWithPrefix = prefix + BindingNumber;
+        _master.BindingWithPrefix = prefix + _master.BindingNumber;
         if (_client.SearchReadOneRecord
             (
                 "\"IN={0}\"",
-                BindingWithPrefix
+                _master.BindingWithPrefix
             ) != null)
         {
             MessageBox.Show("Подшивка с указанным номером уже существует");
             return;
         }
 
-        BindingDescription = _descriptionBox.Text.Trim();
-        if (string.IsNullOrEmpty(BindingDescription))
+        _master.BindingDescription = _descriptionBox.Text.Trim();
+        if (string.IsNullOrEmpty(_master.BindingDescription))
         {
             MessageBox.Show("Не задано описание подшивки");
             return;
@@ -271,15 +274,15 @@ internal sealed partial class MainForm
             var regex = new Regex(@"^(янв\.|февр\.|март|апр\.|май|июнь|июль|авг\.|сент\.|окт\.|нояб.|дек\.)"
                                   + @"(?:-(янв\.|февр\.|март|апр\.|май|июнь|июль|авг\.|сент\.|окт\.|нояб.|дек\.))?\s"
                                   + @"\(\d+(?:[-,]\d+)*\)$");
-            if (!regex.IsMatch(BindingDescription))
+            if (!regex.IsMatch(_master.BindingDescription))
             {
                 MessageBox.Show("Неверное описание подшивки");
                 return;
             }
         }
 
-        BindingRfid = _rfidBox.Text.Trim();
-        if (string.IsNullOrEmpty(BindingRfid))
+        _master.BindingRfid = _rfidBox.Text.Trim();
+        if (string.IsNullOrEmpty(_master.BindingRfid))
         {
             MessageBox.Show("Не задана RFID-метка подшивки");
             return;
@@ -288,16 +291,15 @@ internal sealed partial class MainForm
         if (_client.SearchReadOneRecord
             (
                 "\"IN={0}\"",
-                BindingRfid
+                _master.BindingRfid
             ) != null)
         {
             MessageBox.Show("Метка уже используется");
             return;
         }
 
-        BindingIssues = CheckedIssues;
-        if ((BindingIssues == null)
-            || (BindingIssues.Length == 0))
+        _master.BindingIssues = CheckedIssues;
+        if (_master.BindingIssues.IsNullOrEmpty())
         {
             MessageBox.Show("Не выбраны номера для подшивки");
             return;
@@ -309,8 +311,8 @@ internal sealed partial class MainForm
         //    return;
         //}
 
-        BindingDestination = _GetSelectedPlace(_destinationBox);
-        if (string.IsNullOrEmpty(BindingDestination))
+        _master.BindingDestination = _GetSelectedPlace(_destinationBox);
+        if (string.IsNullOrEmpty(_master.BindingDestination))
         {
             MessageBox.Show("Не задан фонд назначения");
             return;
@@ -327,36 +329,36 @@ internal sealed partial class MainForm
                 BindingIssues.Length
             );
 
-        BindingTitle = string.Format
+        _master.BindingTitle = string.Format
             (
                 CM.AppSettings["title"],
                 BindingNumber
             );
 
-        BindingIndex = CurrentMagazine.Index
+        _master.BindingIndex = CurrentMagazine.Index
             + "/"
             + CurrentYear
             + "/";
         MagazineIssueInfo firstIssue = BindingIssues[0];
         if (!string.IsNullOrEmpty(firstIssue.Volume))
         {
-            BindingIndex += (firstIssue.Volume + "/");
+            _master.BindingIndex += (firstIssue.Volume + "/");
         }
-        BindingIndex += (BindingTitle + " " + BindingDescription);
+        _master.BindingIndex += (_master.BindingTitle + " " + _master.BindingDescription);
 
         WriteLog("Подшивка номеров");
 
-        _CreateBinderRecord(firstIssue);
+        _master.CreateBinderRecord(firstIssue);
 
         foreach (MagazineIssueInfo theIssue in BindingIssues)
         {
-            _BindIssue
+            _master.BindIssue
                 (
                     theIssue
                 );
         }
 
-        _CumulateBinding();
+        _master.CumulateBinding();
 
         for (var i = 0; i < _numberBox.Items.Count; i++)
         {
@@ -376,7 +378,7 @@ internal sealed partial class MainForm
                 new string('=', 60)
             );
 
-        NumberText number = BindingNumber;
+        NumberText number = _master.BindingNumber;
         number = number.Increment();
         _inventoryBox.Text = number.ToString();
         _dontCheck.Checked = false;
@@ -421,17 +423,13 @@ internal sealed partial class MainForm
         }
     }
 
-    public string _GetSelectedPlace
+    public string? _GetSelectedPlace
         (
             ComboBox combo
         )
     {
-        IrbisMenu.Entry entry = combo.SelectedItem as IrbisMenu.Entry;
-        if (entry == null)
-        {
-            return combo.Text.Trim();
-        }
-        return entry.Code;
+        var entry = combo.SelectedItem as MenuEntry;
+        return entry is null ? combo.Text.Trim() : entry.Code;
     }
 
     private bool _FixIssue
@@ -440,15 +438,15 @@ internal sealed partial class MainForm
         )
     {
         var exemplar = issue.Exemplars
-            .FirstOrDefault(ex => ex.Number == BindingComplect);
+            .FirstOrDefault(ex => ex.Number == _master.BindingComplect);
         if (exemplar == null)
         {
             exemplar = new ExemplarInfo
             {
                 Status = "0",
-                Number = BindingComplect,
+                Number = _master.BindingComplect,
                 Date = "?",
-                Place = BindingPlace,
+                Place = _master.BindingPlace,
                 BindingIndex = null,
                 BindingNumber = null
             };
@@ -457,12 +455,7 @@ internal sealed partial class MainForm
                     exemplar
                 }
             .ToArray();
-            WriteLog
-                (
-                    "Номер {0}, создан экземпляр: {1}",
-                    issue,
-                    exemplar
-                );
+            WriteLog ($"Номер {issue}, создан экземпляр: {exemplar}");
         }
         else
         {
@@ -492,15 +485,10 @@ internal sealed partial class MainForm
             }
 
             exemplar.Status = "0";
-            exemplar.Place = BindingPlace;
+            exemplar.Place = _master.BindingPlace;
             exemplar.BindingIndex = null;
             exemplar.BindingNumber = null;
-            WriteLog
-                (
-                    "Номер {0}, исправлен экземпляр: {1}",
-                    issue,
-                    exemplar
-                );
+            WriteLog ($"Номер {issue}, исправлен экземпляр: {exemplar}");
         }
         return true;
     }
@@ -511,23 +499,22 @@ internal sealed partial class MainForm
             EventArgs e
         )
     {
-        BindingPlace = _GetSelectedPlace(_placeBox);
-        if (string.IsNullOrEmpty(BindingPlace))
+        _master.BindingPlace = _GetSelectedPlace(_placeBox);
+        if (string.IsNullOrEmpty(_master.BindingPlace))
         {
             MessageBox.Show("Не задан фонд");
             return;
         }
 
-        BindingComplect = _complectBox.Text.Trim();
-        if (string.IsNullOrEmpty(BindingComplect))
+        _master.BindingComplect = _complectBox.Text.Trim();
+        if (string.IsNullOrEmpty(_master.BindingComplect))
         {
             MessageBox.Show("Не задан комплект");
             return;
         }
 
-        BindingIssues = CheckedIssues;
-        if ((BindingIssues == null)
-            || (BindingIssues.Length == 0))
+        _master.BindingIssues = CheckedIssues;
+        if (_master.BindingIssues.IsNullOrEmpty())
         {
             MessageBox.Show("Не выбраны номера для подшивки");
             return;
@@ -537,7 +524,7 @@ internal sealed partial class MainForm
 
         try
         {
-            foreach (MagazineIssueInfo issue in BindingIssues)
+            foreach (MagazineIssueInfo issue in _master.BindingIssues)
             {
                 if (!_FixIssue(issue))
                 {
@@ -619,32 +606,27 @@ internal sealed partial class MainForm
                 index
             ) != null)
         {
-            WriteLog
-                (
-                    "Номер {0}/{1} уже есть, не создаём",
-                    year,
-                    number
-                );
+            WriteLog ($"Номер {year}/{number} уже есть, не создаём");
             return;
         }
 
-        IrbisRecord record = new IrbisRecord();
-        record.AddField("933", CurrentMagazine.Index);
-        record.AddField
-            (
-                "903",
-                index
-            );
-        record.AddField("934", year);
-        record.AddField("936", number);
-        RecordField field = new RecordField("910");
-        field.AddSubField('A', "0");
-        field.AddSubField('B', BindingComplect);
-        field.AddSubField('C', "?");
-        field.AddSubField('D', BindingPlace);
+        var record = new Record
+        {
+            { 933, CurrentMagazine.Index },
+            { 903, index },
+            { 934, year },
+            { 936, number },
+            { 920, "NJ" },
+            { 999, "0000000" }
+        };
+        var field = new Field (910)
+        {
+            { 'A', "0" },
+            { 'B', _master.BindingComplect },
+            { 'C', "?" },
+            { 'D', _master.BindingPlace }
+        };
         record.Fields.Add(field);
-        record.AddField("920", "NJ");
-        record.AddField("999", "0000000");
         _client.WriteRecord(record, false, true);
         WriteLog
             (
@@ -660,15 +642,15 @@ internal sealed partial class MainForm
             EventArgs e
         )
     {
-        BindingPlace = _GetSelectedPlace(_placeBox);
-        if (string.IsNullOrEmpty(BindingPlace))
+        _master.BindingPlace = _GetSelectedPlace(_placeBox);
+        if (string.IsNullOrEmpty(_master.BindingPlace))
         {
             MessageBox.Show("Не задан фонд");
             return;
         }
 
-        BindingComplect = _complectBox.Text.Trim();
-        if (string.IsNullOrEmpty(BindingComplect))
+        _master.BindingComplect = _complectBox.Text.Trim();
+        if (string.IsNullOrEmpty(_master.BindingComplect))
         {
             MessageBox.Show("Не задан номер комплекта");
             return;
@@ -868,8 +850,8 @@ internal sealed partial class MainForm
             EventArgs e
         )
     {
-        BindingComplect = _complectBox.Text.Trim();
-        if (string.IsNullOrEmpty(BindingComplect))
+        _master.BindingComplect = _complectBox.Text.Trim();
+        if (string.IsNullOrEmpty(_master.BindingComplect))
         {
             MessageBox.Show("Не задан номер комплекта");
             return;
@@ -892,18 +874,13 @@ internal sealed partial class MainForm
                 {
                     record.Fields.Remove(fields[i]);
                 }
-                WriteLog
-                    (
-                        "Выпуск {0}: удалено повторов: {1}",
-                        issue,
-                        fields.Length - 1
-                    );
+                WriteLog ($"Выпуск {issue}: удалено повторов: {fields.Length - 1}");
                 _client.WriteRecord(record, false, true);
                 was = true;
             }
             else
             {
-                WriteLog("Выпуск {0}: нет повторов", issue);
+                WriteLog($"Выпуск {issue}: нет повторов");
             }
         }
 
@@ -1105,18 +1082,13 @@ internal sealed partial class MainForm
             EventArgs e
         )
     {
-        if ((_client != null)
-            && (_client.Connected))
+        try
         {
-            try
-            {
-                _client.NoOp();
-                WriteLog("NO-OP");
-            }
-            catch
-            {
-                _idleTimer.Enabled = false;
-            }
+            _master.NoOperation();
+        }
+        catch
+        {
+            _idleTimer.Enabled = false;
         }
     }
 
@@ -1126,14 +1098,14 @@ internal sealed partial class MainForm
             EventArgs e
         )
     {
-        BindingComplect = _complectBox.Text.Trim();
-        if (string.IsNullOrEmpty(BindingComplect))
+        _master.BindingComplect = _complectBox.Text.Trim();
+        if (string.IsNullOrEmpty(_master.BindingComplect))
         {
             MessageBox.Show("Не задан номер комплекта");
             return;
         }
 
-        WriteLog("Удаление комплекта номер " + BindingComplect);
+        WriteLog("Удаление комплекта номер " + _master.BindingComplect);
         var was = false;
 
         MagazineIssueInfo[] selected = CheckedIssues;
