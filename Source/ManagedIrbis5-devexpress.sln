@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.6.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{236AD354-B27E-4BC7-A741-D13DACE4E5FF}"
 EndProject
@@ -13,33 +13,35 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Win32", "Libs\AM.Win32\A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Windows.Forms5", "Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj", "{7B983A11-2A79-4F9A-90AE-56AEFB61DFC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Windows.DevExpress5", "Libs\AM.Windows.DevExpress5\AM.Windows.DevExpress5.csproj", "{ECAA5F2A-7A54-44E9-84E6-21F28F31B02A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Windows.DevExpress5", "Libs\AM.Windows.DevExpress5\AM.Windows.DevExpress5.csproj", "{ECAA5F2A-7A54-44E9-84E6-21F28F31B02A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Onto", "Libs\AM.Onto\AM.Onto.csproj", "{DA290DC0-DAD7-4B4D-8B17-320E67F91BF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Onto", "Libs\AM.Onto\AM.Onto.csproj", "{DA290DC0-DAD7-4B4D-8B17-320E67F91BF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Rdf", "Libs\AM.Rdf\AM.Rdf.csproj", "{0EC2767C-3769-45EB-A5F2-6E79E882EC29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Rdf", "Libs\AM.Rdf\AM.Rdf.csproj", "{0EC2767C-3769-45EB-A5F2-6E79E882EC29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestfulIrbis5", "Libs\RestfulIrbis5\RestfulIrbis5.csproj", "{C44784E9-FFFF-4680-9E00-391B73DD901B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestfulIrbis5", "Libs\RestfulIrbis5\RestfulIrbis5.csproj", "{C44784E9-FFFF-4680-9E00-391B73DD901B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Asn1", "Libs\AM.Asn1\AM.Asn1.csproj", "{69CE260F-6223-4FA9-BC38-2DF84A48079A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Asn1", "Libs\AM.Asn1\AM.Asn1.csproj", "{69CE260F-6223-4FA9-BC38-2DF84A48079A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Scripting", "Libs\AM.Scripting\AM.Scripting.csproj", "{55F2D9B5-CBAB-4DD6-A87E-C7690986A70F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Scripting", "Libs\AM.Scripting\AM.Scripting.csproj", "{55F2D9B5-CBAB-4DD6-A87E-C7690986A70F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{01FE03DD-6762-4EBF-9654-04FC0ECF9AD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagazineCensus", "Apps\MagazineCensus\MagazineCensus.csproj", "{6C24887E-BC2E-4548-A6DD-4CB834119E4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagazineCensus", "Apps\MagazineCensus\MagazineCensus.csproj", "{6C24887E-BC2E-4548-A6DD-4CB834119E4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis5", "Libs\ManagedIrbis5\ManagedIrbis5.csproj", "{ED649CDD-9364-44EC-9B6B-4DCD4BEC29FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagedIrbis5", "Libs\ManagedIrbis5\ManagedIrbis5.csproj", "{ED649CDD-9364-44EC-9B6B-4DCD4BEC29FD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experiments", "Experiments", "{9F7FCBD2-E183-44AC-B8E4-F1AE0EFC77FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevExpressExperiments", "Experiments\DevExpressExperiments\DevExpressExperiments.csproj", "{42A2003C-A82D-4CCC-A064-37858F92A475}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevExpressExperiments", "Experiments\DevExpressExperiments\DevExpressExperiments.csproj", "{42A2003C-A82D-4CCC-A064-37858F92A475}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KpioRegistry", "Apps\KpioRegistry\KpioRegistry.csproj", "{C7BC8BA0-2BC4-44DD-9936-3BC063B3D92E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KpioRegistry", "Apps\KpioRegistry\KpioRegistry.csproj", "{C7BC8BA0-2BC4-44DD-9936-3BC063B3D92E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChimeraDX", "Apps\ChimeraDX\ChimeraDX.csproj", "{9202C188-D1B7-4266-8671-528E7A9ABE2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChimeraDX", "Apps\ChimeraDX\ChimeraDX.csproj", "{9202C188-D1B7-4266-8671-528E7A9ABE2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Istu5", "Libs\Istu5\Istu5.csproj", "{390149AB-EDBA-4C8E-97CF-C3CDDFB6529E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Istu5", "Libs\Istu5\Istu5.csproj", "{390149AB-EDBA-4C8E-97CF-C3CDDFB6529E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Binder2022", "Apps\Binder2022\Binder2022.csproj", "{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -243,6 +245,18 @@ Global
 		{390149AB-EDBA-4C8E-97CF-C3CDDFB6529E}.Release|x64.Build.0 = Release|Any CPU
 		{390149AB-EDBA-4C8E-97CF-C3CDDFB6529E}.Release|x86.ActiveCfg = Release|Any CPU
 		{390149AB-EDBA-4C8E-97CF-C3CDDFB6529E}.Release|x86.Build.0 = Release|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Debug|x64.Build.0 = Debug|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Debug|x86.Build.0 = Debug|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Release|x64.ActiveCfg = Release|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Release|x64.Build.0 = Release|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Release|x86.ActiveCfg = Release|Any CPU
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -264,6 +278,7 @@ Global
 		{C7BC8BA0-2BC4-44DD-9936-3BC063B3D92E} = {01FE03DD-6762-4EBF-9654-04FC0ECF9AD9}
 		{9202C188-D1B7-4266-8671-528E7A9ABE2C} = {01FE03DD-6762-4EBF-9654-04FC0ECF9AD9}
 		{390149AB-EDBA-4C8E-97CF-C3CDDFB6529E} = {236AD354-B27E-4BC7-A741-D13DACE4E5FF}
+		{0F4980C8-E234-40F8-BA1D-515E0A9FC3D4} = {01FE03DD-6762-4EBF-9654-04FC0ECF9AD9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {035F9F95-C1E7-4D19-BFB1-8C49E14C60A5}
