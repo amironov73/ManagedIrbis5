@@ -15,33 +15,30 @@
 /* RegionComplexity.cs -- specifies the complexity of region
    Ars Magna project, http://arsmagna.ru */
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Specifies the complexity of region.
+/// </summary>
+public enum RegionComplexity
 {
     /// <summary>
-    /// Specifies the complexity of region.
+    /// Error. No region created.
     /// </summary>
-    public enum RegionComplexity
-    {
-        /// <summary>
-        /// Error. No region created.
-        /// </summary>
-        ERROR = 0,
+    ERROR = 0,
 
-        /// <summary>
-        /// The region is empty.
-        /// </summary>
-        NULLREGION = 1,
+    /// <summary>
+    /// The region is empty.
+    /// </summary>
+    NULLREGION = 1,
 
-        /// <summary>
-        /// The region is a single rectangle.
-        /// </summary>
-        SIMPLEREGION = 2,
+    /// <summary>
+    /// The region is a single rectangle.
+    /// </summary>
+    SIMPLEREGION = 2,
 
-        /// <summary>
-        /// The region is more than a single rectangle.
-        /// </summary>
-        COMPLEXREGION = 3
-
-    } // enum RegionComplexity
-
-} // namespace AM.Win32
+    /// <summary>
+    /// The region is more than a single rectangle.
+    /// </summary>
+    COMPLEXREGION = 3
+}
