@@ -23,45 +23,41 @@ using System.Reflection;
 
 #nullable enable
 
-namespace AM.Win32
-{
-    /// <summary>
-    /// Some useful methods from GDI+
-    /// </summary>
-    public static class GdiPlusUtility
-    {
-        #region Public methods
+namespace AM.Win32;
 
-        /// <summary>
-        /// Gets the bitmap from GDI plus.
-        /// </summary>
-        public static Bitmap? GetBitmapFromGdiPlus
-            (
-                IntPtr gdiPlusBitmap
-            )
-        {
-            var method = typeof(Bitmap).GetMethod
+/// <summary>
+/// Some useful methods from GDI+
+/// </summary>
+public static class GdiPlusUtility
+{
+    #region Public methods
+
+    /// <summary>
+    /// Gets the bitmap from GDI plus.
+    /// </summary>
+    public static Bitmap? GetBitmapFromGdiPlus
+        (
+            IntPtr gdiPlusBitmap
+        )
+    {
+        var method = typeof (Bitmap).GetMethod
                 (
                     "FromGDIplus",
                     BindingFlags.Static | BindingFlags.NonPublic,
                     null,
-                    new [] { typeof(IntPtr) },
+                    new[] { typeof (IntPtr) },
                     null
                 )
-                .ThrowIfNull();
+            .ThrowIfNull();
 
-            var result = (Bitmap?)method.Invoke
-                (
-                    null,
-                    new object[] { gdiPlusBitmap }
-                );
+        var result = (Bitmap?)method.Invoke
+            (
+                null,
+                new object[] { gdiPlusBitmap }
+            );
 
-            return result;
+        return result;
+    }
 
-        } // method GetBitmapFromGdiPlus
-
-        #endregion
-
-    } // class GdiPlusUtility
-
-} // namespace AM.Win32
+    #endregion
+}
