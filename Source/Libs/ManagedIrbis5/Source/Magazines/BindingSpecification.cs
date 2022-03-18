@@ -139,7 +139,10 @@ public sealed class BindingSpecification
     #region IVerifiable members
 
     /// <inheritdoc cref="IVerifiable.Verify"/>
-    public bool Verify (bool throwOnError)
+    public bool Verify
+        (
+            bool throwOnError
+        )
     {
         throw new NotImplementedException();
     }

@@ -4,9 +4,11 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
-/* MssqlScripter.cs -- генерирует базу данных по ее описанию
+/* MssqlSourcer.cs -- генерирует базу данных по ее описанию
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -88,7 +90,7 @@ namespace AM.Data;
 /// <summary>
 /// Генерирует базу данных по ее описанию.
 /// </summary>
-public sealed class MssqlScripter
+public sealed class MssqlSourcer
 {
     #region Properties
 

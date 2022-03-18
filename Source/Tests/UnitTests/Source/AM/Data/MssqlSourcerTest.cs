@@ -16,7 +16,7 @@ using AM.Text;
 namespace UnitTests.AM.Data;
 
 [TestClass]
-public sealed class MssqlScripterTest
+public sealed class MssqlSourcerTest
 {
     private void _Field
         (
@@ -24,7 +24,7 @@ public sealed class MssqlScripterTest
             string expected
         )
     {
-        var scripter = new MssqlScripter();
+        var scripter = new MssqlSourcer();
         var output = new StringWriter();
         scripter.GenerateField (output, field);
         var actual = output.ToString();
@@ -39,7 +39,7 @@ public sealed class MssqlScripterTest
             bool dropIfExist = false
         )
     {
-        var scripter = new MssqlScripter
+        var scripter = new MssqlSourcer
         {
             IfNotExist = ifNotExist,
             DropIfExist = dropIfExist
@@ -58,7 +58,7 @@ public sealed class MssqlScripterTest
             bool dropIfExist = false
         )
     {
-        var scripter = new MssqlScripter
+        var scripter = new MssqlSourcer
         {
             IfNotExist = ifNotExist,
             DropIfExist = dropIfExist
@@ -190,7 +190,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateField_1()
+    public void MssqlSourcer_GenerateField_1()
     {
         var field = new FieldDescriptor
         {
@@ -204,7 +204,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateField_2()
+    public void MssqlSourcer_GenerateField_2()
     {
         var field = new FieldDescriptor
         {
@@ -217,7 +217,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateField_3()
+    public void MssqlSourcer_GenerateField_3()
     {
         var field = new FieldDescriptor
         {
@@ -231,7 +231,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateField_4()
+    public void MssqlSourcer_GenerateField_4()
     {
         var field = new FieldDescriptor
         {
@@ -244,7 +244,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateField_5()
+    public void MssqlSourcer_GenerateField_5()
     {
         var field = new FieldDescriptor
         {
@@ -256,7 +256,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateField_6()
+    public void MssqlSourcer_GenerateField_6()
     {
         var field = new FieldDescriptor
         {
@@ -268,7 +268,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateField_7()
+    public void MssqlSourcer_GenerateField_7()
     {
         var field = new FieldDescriptor
         {
@@ -281,7 +281,7 @@ public sealed class MssqlScripterTest
 
     [TestMethod]
     [ExpectedException (typeof (VerificationException))]
-    public void MssqlScripter_GenerateField_8()
+    public void MssqlSourcer_GenerateField_8()
     {
         var field = new FieldDescriptor
         {
@@ -292,7 +292,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateTable_1()
+    public void MssqlSourcer_GenerateTable_1()
     {
         var table = _BookTable();
         var expected = "create table [dbo].[books]\n(\n    [id]             [int]            identity primary key NOT NULL,\n    [catalog]        [nvarchar](50)   index [IX_catalog] NOT NULL,\n    [number]         [nvarchar](50)   unique NOT NULL,\n    [card]           [nvarchar](50)   NOT NULL,\n    [moment]         [datetime]       index [IX_moment] NOT NULL,\n    [deadline]       [smalldatetime]  NOT NULL,\n    [prolong]        [int]            NOT NULL,\n    [pilot]          [bit]            NOT NULL,\n    [price]          [money]          NOT NULL\n)\n\nGO\n";
@@ -300,7 +300,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateTable_2()
+    public void MssqlSourcer_GenerateTable_2()
     {
         var table = _ReaderTable();
         var expected = "create table [dbo].[readers]\n(\n    [ticket]         [nvarchar](50)   primary key NOT NULL,\n    [name]           [nvarchar](50)   index [IX_name] NOT NULL,\n    [category]       [nvarchar](10)   index [IX_category] NOT NULL\n)\n\nGO\n";
@@ -308,7 +308,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateTable_3()
+    public void MssqlSourcer_GenerateTable_3()
     {
         var table = _ReaderTable();
         var expected = "create table [dbo].[readers]\n(\n    [ticket]         [nvarchar](50)   primary key NOT NULL,\n    [name]           [nvarchar](50)   index [IX_name] NOT NULL,\n    [category]       [nvarchar](10)   index [IX_category] NOT NULL\n)\n\nGO\n";
@@ -316,7 +316,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateTable_4()
+    public void MssqlSourcer_GenerateTable_4()
     {
         var table = _ReaderTable();
         var expected = "drop table if exists [readers]\ncreate table [dbo].[readers]\n(\n    [ticket]         [nvarchar](50)   primary key NOT NULL,\n    [name]           [nvarchar](50)   index [IX_name] NOT NULL,\n    [category]       [nvarchar](10)   index [IX_category] NOT NULL\n)\n\nGO\n";
@@ -324,7 +324,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateTable_5()
+    public void MssqlSourcer_GenerateTable_5()
     {
         var table = _ReaderTable();
         var expected = "if not exists (select * from sysobjects where name='readers' and xtype='U')\ncreate table [dbo].[readers]\n(\n    [ticket]         [nvarchar](50)   primary key NOT NULL,\n    [name]           [nvarchar](50)   index [IX_name] NOT NULL,\n    [category]       [nvarchar](10)   index [IX_category] NOT NULL\n)\n\nGO\n";
@@ -333,14 +333,14 @@ public sealed class MssqlScripterTest
 
     [TestMethod]
     [ExpectedException (typeof (VerificationException))]
-    public void MssqlScripter_GenerateTable_6()
+    public void MssqlSourcer_GenerateTable_6()
     {
         var table = new TableDescriptor();
         _Table (table, "");
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateDatabase_1()
+    public void MssqlSourcer_GenerateDatabase_1()
     {
         var db = _Kladovka();
         var expected = "create database [kladovka]\n\nGO\n\nuse [kladovka]\n\nGO\n\ncreate table [dbo].[books]\n(\n    [id]             [int]            identity primary key NOT NULL,\n    [catalog]        [nvarchar](50)   index [IX_catalog] NOT NULL,\n    [number]         [nvarchar](50)   unique NOT NULL,\n    [card]           [nvarchar](50)   NOT NULL,\n    [moment]         [datetime]       index [IX_moment] NOT NULL,\n    [deadline]       [smalldatetime]  NOT NULL,\n    [prolong]        [int]            NOT NULL,\n    [pilot]          [bit]            NOT NULL,\n    [price]          [money]          NOT NULL\n)\n\nGO\n\ncreate table [dbo].[readers]\n(\n    [ticket]         [nvarchar](50)   primary key NOT NULL,\n    [name]           [nvarchar](50)   index [IX_name] NOT NULL,\n    [category]       [nvarchar](10)   index [IX_category] NOT NULL\n)\n\nGO\n";
@@ -348,7 +348,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateDatabase_2()
+    public void MssqlSourcer_GenerateDatabase_2()
     {
         var db = _Kladovka();
         var expected = "drop database if exists [kladovka]\n\nGO\ncreate database [kladovka]\n\nGO\n\nuse [kladovka]\n\nGO\n\ndrop table if exists [books]\ncreate table [dbo].[books]\n(\n    [id]             [int]            identity primary key NOT NULL,\n    [catalog]        [nvarchar](50)   index [IX_catalog] NOT NULL,\n    [number]         [nvarchar](50)   unique NOT NULL,\n    [card]           [nvarchar](50)   NOT NULL,\n    [moment]         [datetime]       index [IX_moment] NOT NULL,\n    [deadline]       [smalldatetime]  NOT NULL,\n    [prolong]        [int]            NOT NULL,\n    [pilot]          [bit]            NOT NULL,\n    [price]          [money]          NOT NULL\n)\n\nGO\n\ndrop table if exists [readers]\ncreate table [dbo].[readers]\n(\n    [ticket]         [nvarchar](50)   primary key NOT NULL,\n    [name]           [nvarchar](50)   index [IX_name] NOT NULL,\n    [category]       [nvarchar](10)   index [IX_category] NOT NULL\n)\n\nGO\n";
@@ -356,7 +356,7 @@ public sealed class MssqlScripterTest
     }
 
     [TestMethod]
-    public void MssqlScripter_GenerateDatabase_3()
+    public void MssqlSourcer_GenerateDatabase_3()
     {
         var db = _Kladovka();
         var expected = "if not exists (select * from sys.databases where name='kladovka')\ncreate database [kladovka]\n\nGO\n\nuse [kladovka]\n\nGO\n\nif not exists (select * from sysobjects where name='books' and xtype='U')\ncreate table [dbo].[books]\n(\n    [id]             [int]            identity primary key NOT NULL,\n    [catalog]        [nvarchar](50)   index [IX_catalog] NOT NULL,\n    [number]         [nvarchar](50)   unique NOT NULL,\n    [card]           [nvarchar](50)   NOT NULL,\n    [moment]         [datetime]       index [IX_moment] NOT NULL,\n    [deadline]       [smalldatetime]  NOT NULL,\n    [prolong]        [int]            NOT NULL,\n    [pilot]          [bit]            NOT NULL,\n    [price]          [money]          NOT NULL\n)\n\nGO\n\nif not exists (select * from sysobjects where name='readers' and xtype='U')\ncreate table [dbo].[readers]\n(\n    [ticket]         [nvarchar](50)   primary key NOT NULL,\n    [name]           [nvarchar](50)   index [IX_name] NOT NULL,\n    [category]       [nvarchar](10)   index [IX_category] NOT NULL\n)\n\nGO\n";

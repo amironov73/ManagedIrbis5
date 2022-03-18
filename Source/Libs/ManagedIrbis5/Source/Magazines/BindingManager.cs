@@ -71,11 +71,12 @@ public sealed class BindingManager
             RecordConfiguration? recordConfiguration = null
         )
     {
+        Sure.NotNull (provider);
+
         Provider = provider;
         BindingConfiguration = bindingConfiguration ?? BindingConfiguration.GetDefault();
         RecordConfiguration = recordConfiguration ?? RecordConfiguration.GetDefault();
-
-    } // constructor
+    }
 
     #endregion
 
@@ -150,7 +151,7 @@ public sealed class BindingManager
                 issueRecord.Add (920, "NJP"); // поле 920: рабочий лист
                 issueRecord.Fields.Add
                     (
-                        new Field { Tag = 910 } // поле 910: сведения об экземпляре
+                        new Field (910) // поле 910: сведения об экземпляре
                             .Add ('a', ExemplarStatus.Bound) // подполе A: статус экземпляра
                             .Add ('b', specification.Complect) // подполе B: номер комплекта
                             .Add ('c', "?") // подполе C: дата поступления
@@ -168,8 +169,7 @@ public sealed class BindingManager
                 );
 
             Provider.WriteRecord (issueRecord);
-
-        } // foreach
+        }
 
         // Создание записи подшивки, если ее еще нет
         var bindingRecord = Provider.ByIndex (bindingIndex);
@@ -187,15 +187,14 @@ public sealed class BindingManager
             bindingRecord.Add (931, specification.IssueNumbers); // поле 931: дополнение к номеру
             // TODO: 931^c - дополнение к номеру (выводится в скобках)
             bindingRecord.Add (920, "NJK"); // поле 920: рабочий лист
-
-        } // if
+        }
 
         bindingRecord.Fields.Add
             (
-                new Field { Tag = 910 }                 // поле 910: сведения об экземпляре
-                    .Add ('a', ExemplarStatus.Free)     // подполе A: статус экземпляра
-                    .Add ('b', specification.Inventory) // подполе B: инвентарный номер
-                    .Add ('c', IrbisDate.TodayText)     // подполе C: дата поступления
+                new Field { Tag = 910 }                  // поле 910: сведения об экземпляре
+                    .Add ('a', ExemplarStatus.Free) // подполе A: статус экземпляра
+                    .Add ('b', specification.Inventory)  // подполе B: инвентарный номер
+                    .Add ('c', IrbisDate.TodayText)      // подполе C: дата поступления
                     .Add ('d', specification.Place)      // подполе D: место хранения
                 // TODO: 910^h - штрих-код или радиометка подшивки
             );
@@ -208,14 +207,13 @@ public sealed class BindingManager
             (
                 new Field { Tag = 909 }                    // поле 909: зарегистрированы поступления
                     .Add ('q', specification.Year)         // подполе Q: кумулированные сведения, год
-                    .Add ('d', specification.Place)         // подполе D: место хранения
+                    .Add ('d', specification.Place)        // подполе D: место хранения
                     .Add ('k', specification.Complect)     // подполе K: номер комплекта
                     .Add ('h', specification.IssueNumbers) // подполе H: кумулированные сведения, номера
             );
 
         Provider.WriteRecord (mainRecord);
-
-    } // method BindMagazines
+    }
 
     /// <inheritdoc cref="IBindingManager.CheckIssue"/>
     public bool CheckIssue
@@ -274,8 +272,7 @@ public sealed class BindingManager
         // TODO: проверить попадание номера в спецификацию подшивки
 
         return true;
-
-    } // method CheckIssue
+    }
 
     /// <inheritdoc cref="IBindingManager.UnbindMagazines"/>
     public void UnbindMagazines
@@ -286,8 +283,7 @@ public sealed class BindingManager
         Sure.NotNullNorEmpty (bindingIndex);
 
         throw new NotImplementedException();
-
-    } // method UnbindMagazines
+    }
 
     #endregion
 
@@ -296,10 +292,7 @@ public sealed class BindingManager
     /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
-    } // method Dispose
+    }
 
     #endregion
-
-} // class BindingManager
-
-// namespace ManagedIrbis.Magazines
+}
