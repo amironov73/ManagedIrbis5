@@ -21,24 +21,21 @@ using System;
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+///  Specifies the code pages to enumerate.
+/// </summary>
+[Flags]
+public enum CodePageEnumFlags
 {
     /// <summary>
-    ///  Specifies the code pages to enumerate.
+    /// Enumerate only installed code pages.
     /// </summary>
-    [Flags]
-    public enum CodePageEnumFlags
-    {
-        /// <summary>
-        /// Enumerate only installed code pages.
-        /// </summary>
-        CP_INSTALLED = 0x00000001,
+    CP_INSTALLED = 0x00000001,
 
-        /// <summary>
-        /// Enumerate all supported code pages.
-        /// </summary>
-        CP_SUPPORTED = 0x00000002
-
-    } // enum CodePageEnumFlags
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Enumerate all supported code pages.
+    /// </summary>
+    CP_SUPPORTED = 0x00000002
+}

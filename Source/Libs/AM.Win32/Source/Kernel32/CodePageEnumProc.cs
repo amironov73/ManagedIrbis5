@@ -15,13 +15,12 @@
 /* CodePageEnumProc.cs -- делегат для перечисления кодовых страниц
    Ars Magna project, http://arsmagna.ru */
 
-namespace AM.Win32
-{
-    /// <summary>
-    /// Делегат для перечисления кодовых страниц, установленных в системе.
-    /// </summary>
-    public delegate bool CodePageEnumProc
-        (
-            string codePage
-        );
-}
+namespace AM.Win32;
+
+/// <summary>
+/// Делегат для перечисления кодовых страниц, установленных в системе.
+/// </summary>
+public delegate bool CodePageEnumProc
+    (
+        string codePage
+    );

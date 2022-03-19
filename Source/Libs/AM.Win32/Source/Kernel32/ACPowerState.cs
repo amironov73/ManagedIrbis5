@@ -13,29 +13,26 @@
 /* ACPowerState.cs -- AC power status.
    Ars Magna project, http://arsmagna.ru */
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// AC power status.
+/// </summary>
+public enum ACPowerStatus
+    : byte
 {
     /// <summary>
-    /// AC power status.
+    /// Offline.
     /// </summary>
-    public enum ACPowerStatus
-        : byte
-    {
-        /// <summary>
-        /// Offline.
-        /// </summary>
-        Offline = 0,
+    Offline = 0,
 
-        /// <summary>
-        /// Online.
-        /// </summary>
-        Online = 1,
+    /// <summary>
+    /// Online.
+    /// </summary>
+    Online = 1,
 
-        /// <summary>
-        /// Unknown.
-        /// </summary>
-        Unknown = 255
-
-    } // enum ACPowerStatus
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Unknown.
+    /// </summary>
+    Unknown = 255
+}
