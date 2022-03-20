@@ -13,25 +13,22 @@
 /* CopyCallbackReason.cs -- reason that CopyProgressRoutine was called
    Ars Magna project, http://arsmagna.ru */
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Reason that CopyProgressRoutine was called.
+/// </summary>
+public enum CopyCallbackReason
 {
     /// <summary>
-    /// Reason that CopyProgressRoutine was called.
+    /// Another part of the data file was copied.
     /// </summary>
-    public enum CopyCallbackReason
-    {
-        /// <summary>
-        /// Another part of the data file was copied.
-        /// </summary>
-        CALLBACK_CHUNK_FINISHED = 0x00000000,
+    CALLBACK_CHUNK_FINISHED = 0x00000000,
 
-        /// <summary>
-        /// Another stream was created and is about to be copied.
-        /// This is the callback reason given when the callback
-        /// routine is first invoked.
-        /// </summary>
-        CALLBACK_STREAM_SWITCH = 0x00000001
-
-    } // enum CopyCallbackReason
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Another stream was created and is about to be copied.
+    /// This is the callback reason given when the callback
+    /// routine is first invoked.
+    /// </summary>
+    CALLBACK_STREAM_SWITCH = 0x00000001
+}

@@ -13,35 +13,32 @@
 /* CopyProgressCode.cs -- the CopyProgressRoutine function should return one of the following values
    Ars Magna project, http://arsmagna.ru */
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// The CopyProgressRoutine function should return
+/// one of the following values.
+/// </summary>
+public enum CopyProgressCode
 {
     /// <summary>
-    /// The CopyProgressRoutine function should return
-    /// one of the following values.
+    /// Continue the copy operation.
     /// </summary>
-    public enum CopyProgressCode
-    {
-        /// <summary>
-        /// Continue the copy operation.
-        /// </summary>
-        PROGRESS_CONTINUE = 0,
+    PROGRESS_CONTINUE = 0,
 
-        /// <summary>
-        /// Cancel the copy operation and delete the destination file.
-        /// </summary>
-        PROGRESS_CANCEL = 1,
+    /// <summary>
+    /// Cancel the copy operation and delete the destination file.
+    /// </summary>
+    PROGRESS_CANCEL = 1,
 
-        /// <summary>
-        /// Stop the copy operation. It can be restarted at a later time.
-        /// </summary>
-        PROGRESS_STOP = 2,
+    /// <summary>
+    /// Stop the copy operation. It can be restarted at a later time.
+    /// </summary>
+    PROGRESS_STOP = 2,
 
-        /// <summary>
-        /// Continue the copy operation, but stop invoking
-        /// CopyProgressRoutine to report progress.
-        /// </summary>
-        PROGRESS_QUIET = 3
-
-    } // enum CopyProgressCode
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Continue the copy operation, but stop invoking
+    /// CopyProgressRoutine to report progress.
+    /// </summary>
+    PROGRESS_QUIET = 3
+}
