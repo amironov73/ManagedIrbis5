@@ -4,7 +4,7 @@
         xmlns:d="clr-namespace:Dialogs.Avalonia;assembly=Dialogs.Avalonia"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Design.DataContext="{x:Static d:Designer.Dialog}"
-        x:Class="Dialogs.Avalonia.Dialogs.DialogWindow"
+        x:Class="AM.Avalonia.Dialogs.DialogWindow"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Title="{Binding Title}">
@@ -32,8 +32,8 @@
     </DataTemplate>
   </Window.DataTemplates>
   <Grid RowDefinitions="Auto,*,Auto">
-    <TextBlock Grid.Row="0" 
-               Text="{Binding Description}" 
+    <TextBlock Grid.Row="0"
+               Text="{Binding Description}"
                Margin="10"/>
     <ItemsControl Grid.Row="1" Items="{Binding Controls}"/>
     <ItemsControl Grid.Row="2"
