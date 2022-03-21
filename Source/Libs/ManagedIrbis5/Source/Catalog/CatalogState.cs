@@ -28,135 +28,134 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.Catalog
+namespace ManagedIrbis.Catalog;
+
+/// <summary>
+/// State of the catalog.
+/// </summary>
+[XmlRoot ("database")]
+[DebuggerDisplay ("{Database} {Date} {MaxMfn}")]
+public sealed class CatalogState
+    : IHandmadeSerializable
 {
+    #region Properties
+
     /// <summary>
-    /// State of the catalog.
+    /// Identifier for LiteDB.
     /// </summary>
-    [XmlRoot ("database")]
-    [DebuggerDisplay ("{Database} {Date} {MaxMfn}")]
-    public sealed class CatalogState
-        : IHandmadeSerializable
+    [XmlIgnore]
+    [JsonIgnore]
+    public int Id { get; set; }
+
+    /// <summary>
+    /// Date.
+    /// </summary>
+    [XmlAttribute ("date")]
+    [JsonPropertyName ("date")]
+    public DateTime Date { get; set; }
+
+    /// <summary>
+    /// Database name.
+    /// </summary>
+    [XmlAttribute ("database")]
+    [JsonPropertyName ("database")]
+    public string? Database { get; set; }
+
+    /// <summary>
+    /// Maximal MFN.
+    /// </summary>
+    [XmlAttribute ("maxMfn")]
+    [JsonPropertyName ("maxMfn")]
+    public int MaxMfn { get; set; }
+
+    /// <summary>
+    /// Records.
+    /// </summary>
+    [XmlArray ("records")]
+    [XmlArrayItem ("record")]
+    [JsonPropertyName ("records")]
+    public RecordState[]? Records { get; set; }
+
+    /// <summary>
+    /// Logically deleted records.
+    /// </summary>
+    [XmlArray ("logicallyDeleted")]
+    [XmlArrayItem ("mfn")]
+    [JsonPropertyName ("logicallyDeleted")]
+    public int[]? LogicallyDeleted { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Should serialize the <see cref="Date"/> field?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public bool ShouldSerializeDate()
     {
-        #region Properties
-
-        /// <summary>
-        /// Identifier for LiteDB.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Date.
-        /// </summary>
-        [XmlAttribute ("date")]
-        [JsonPropertyName ("date")]
-        public DateTime Date { get; set; }
-
-        /// <summary>
-        /// Database name.
-        /// </summary>
-        [XmlAttribute ("database")]
-        [JsonPropertyName ("database")]
-        public string? Database { get; set; }
-
-        /// <summary>
-        /// Maximal MFN.
-        /// </summary>
-        [XmlAttribute ("maxMfn")]
-        [JsonPropertyName ("maxMfn")]
-        public int MaxMfn { get; set; }
-
-        /// <summary>
-        /// Records.
-        /// </summary>
-        [XmlArray ("records")]
-        [XmlArrayItem ("record")]
-        [JsonPropertyName ("records")]
-        public RecordState[]? Records { get; set; }
-
-        /// <summary>
-        /// Logically deleted records.
-        /// </summary>
-        [XmlArray ("logicallyDeleted")]
-        [XmlArrayItem ("mfn")]
-        [JsonPropertyName ("logicallyDeleted")]
-        public int[]? LogicallyDeleted { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Should serialize the <see cref="Date"/> field?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeDate()
-        {
-            return Date != DateTime.MinValue;
-        }
-
-        /// <summary>
-        /// Should serialize the <see cref="MaxMfn"/> field?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeMaxMfn()
-        {
-            return MaxMfn != 0;
-        }
-
-        #endregion
-
-        #region IHandmadeSerializable
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Sure.NotNull (reader);
-
-            Id = reader.ReadPackedInt32();
-            Date = reader.ReadDateTime();
-            Database = reader.ReadNullableString();
-            MaxMfn = reader.ReadPackedInt32();
-            Records = reader.ReadNullableArray<RecordState>();
-            LogicallyDeleted = reader.ReadNullableInt32Array();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            Sure.NotNull (writer);
-
-            writer
-                .WritePackedInt32 (Id)
-                .Write (Date)
-                .WriteNullable (Database)
-                .WritePackedInt32 (MaxMfn)
-                .WriteNullableArray (Records)
-                .WriteNullableArray (LogicallyDeleted);
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Database.ToVisibleString()
-                   + " "
-                   + Date.ToLongUniformString()
-                   + " "
-                   + MaxMfn.ToInvariantString();
-        }
-
-        #endregion
+        return Date != DateTime.MinValue;
     }
+
+    /// <summary>
+    /// Should serialize the <see cref="MaxMfn"/> field?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public bool ShouldSerializeMaxMfn()
+    {
+        return MaxMfn != 0;
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        Id = reader.ReadPackedInt32();
+        Date = reader.ReadDateTime();
+        Database = reader.ReadNullableString();
+        MaxMfn = reader.ReadPackedInt32();
+        Records = reader.ReadNullableArray<RecordState>();
+        LogicallyDeleted = reader.ReadNullableInt32Array();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer
+            .WritePackedInt32 (Id)
+            .Write (Date)
+            .WriteNullable (Database)
+            .WritePackedInt32 (MaxMfn)
+            .WriteNullableArray (Records)
+            .WriteNullableArray (LogicallyDeleted);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Database.ToVisibleString()
+               + " "
+               + Date.ToLongUniformString()
+               + " "
+               + MaxMfn.ToInvariantString();
+    }
+
+    #endregion
 }

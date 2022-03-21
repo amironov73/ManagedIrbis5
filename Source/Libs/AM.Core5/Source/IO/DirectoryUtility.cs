@@ -80,7 +80,7 @@ public static class DirectoryUtility
     {
         Sure.NotNullNorEmpty (path);
 
-        foreach (var subdirectory in Directory.GetDirectories (path))
+        foreach (var subdirectory in Directory.EnumerateDirectories (path))
         {
             Directory.Delete
                 (
@@ -89,7 +89,7 @@ public static class DirectoryUtility
                 );
         }
 
-        foreach (var fileName in Directory.GetFiles (path))
+        foreach (var fileName in Directory.EnumerateDirectories (path))
         {
             File.Delete (Path.Combine (path, fileName));
         }
