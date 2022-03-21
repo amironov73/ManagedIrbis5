@@ -25,26 +25,23 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// The FILETIME structure is a 64-bit value representing the
+/// number of 100-nanosecond intervals since January 1, 1601 (UTC).
+/// </summary>
+[Serializable]
+[StructLayout (LayoutKind.Sequential)]
+public struct FILETIME
 {
     /// <summary>
-    /// The FILETIME structure is a 64-bit value representing the
-    /// number of 100-nanosecond intervals since January 1, 1601 (UTC).
+    /// Low-order part of the file time.
     /// </summary>
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public struct FILETIME
-    {
-        /// <summary>
-        /// Low-order part of the file time.
-        /// </summary>
-        public uint dwLowDateTime;
+    public uint dwLowDateTime;
 
-        /// <summary>
-        /// High-order part of the file time.
-        /// </summary>
-        public uint dwHighDateTime;
-
-    } // struct FILETIME
-
-} // namespace AM.Win32
+    /// <summary>
+    /// High-order part of the file time.
+    /// </summary>
+    public uint dwHighDateTime;
+}
