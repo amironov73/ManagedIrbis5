@@ -32,6 +32,7 @@ using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 
 using FileUtility = AM.IO.FileUtility;
 
@@ -225,6 +226,49 @@ public sealed class NuGetPackageDownloader
         var shaText = Convert.ToBase64String (shaBytes);
         var shaFile = packageFile + ".sha512";
         File.WriteAllText (shaFile, shaText);
+    }
+
+    /// <summary>
+    /// Получение актуальной версии пакета.
+    /// </summary>
+    public NuGetVersion? GetLatestVersion
+        (
+            string packageId
+        )
+    {
+        Sure.NotNullNorEmpty (packageId);
+
+        var found = _resource.GetAllVersionsAsync
+            (
+                packageId,
+                _cache,
+                _logger,
+                _cancellationToken
+            )
+            .GetAwaiter().GetResult();
+
+        if (found is null)
+        {
+            return null;
+        }
+
+        NuGetVersion? result = null;
+        foreach (var version in found)
+        {
+            if (result is null)
+            {
+                result = version;
+            }
+            else
+            {
+                if (version.CompareTo (result) > 0)
+                {
+                    result = version;
+                }
+            }
+        }
+
+        return result;
     }
 
     /// <summary>

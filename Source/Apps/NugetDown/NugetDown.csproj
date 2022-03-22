@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <RootNamespace>NuDown</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Libs\AM.BuildSystem\AM.BuildSystem.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NuGet.Common" Version="6.1.0" />
+        <PackageReference Include="NuGet.Configuration" Version="6.1.0" />
+        <PackageReference Include="NuGet.DependencyResolver.Core" Version="6.1.0" />
+        <PackageReference Include="NuGet.Frameworks" Version="6.1.0" />
+        <PackageReference Include="NuGet.LibraryModel" Version="6.1.0" />
+        <PackageReference Include="NuGet.Packaging" Version="6.1.0" />
+        <PackageReference Include="NuGet.ProjectModel" Version="6.1.0" />
+        <PackageReference Include="NuGet.Protocol" Version="6.1.0" />
+    </ItemGroup>
+    
+</Project>
