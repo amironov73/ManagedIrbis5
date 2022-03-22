@@ -1,20 +1,54 @@
-namespace AM.Avalonia.Enums
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedParameter.Local
+
+/* ButtonEnum.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+namespace AM.Avalonia.Enums;
+
+/// <summary>
+/// Buttons in message box window
+/// </summary>
+public enum ButtonEnum
 {
     /// <summary>
-    /// Buttons in message box window
+    /// OK.
     /// </summary>
-    public enum ButtonEnum
-    {
-        Ok,
+    Ok,
 
-        YesNo,
+    /// <summary>
+    /// Yes or No.
+    /// </summary>
+    YesNo,
 
-        OkCancel,
+    /// <summary>
+    /// OK or Cancel.
+    /// </summary>
+    OkCancel,
 
-        OkAbort,
+    /// <summary>
+    /// OK or Abort.
+    /// </summary>
+    OkAbort,
 
-        YesNoCancel,
+    /// <summary>
+    /// Yes, No or Cancel.
+    /// </summary>
+    YesNoCancel,
 
-        YesNoAbort
-    }
+    /// <summary>
+    /// Yes, No or Abort.
+    /// </summary>
+    YesNoAbort
 }

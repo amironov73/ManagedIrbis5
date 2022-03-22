@@ -1,4 +1,7 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
+
+using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Collections;
 using Avalonia.Controls;

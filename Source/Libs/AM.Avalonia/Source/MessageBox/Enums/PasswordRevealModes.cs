@@ -1,6 +1,27 @@
-﻿namespace AM.Avalonia.Enums;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-public enum PasswordRevealModes : byte
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedParameter.Local
+
+/* PasswordRevealModes.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+namespace AM.Avalonia.Enums;
+
+/// <summary>
+///
+/// </summary>
+public enum PasswordRevealModes
+    : byte
 {
     /// <summary>
     /// Don't show the reveal button

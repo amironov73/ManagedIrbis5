@@ -1,4 +1,6 @@
-﻿namespace AM.Avalonia.Notification;
+﻿using System;
+
+namespace AM.Avalonia.Notification;
 
 /// <summary>
 /// The notification message button.

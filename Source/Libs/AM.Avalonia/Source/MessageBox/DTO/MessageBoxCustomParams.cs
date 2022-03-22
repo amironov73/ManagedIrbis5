@@ -11,7 +11,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
-/* Button.cs --
+/* MessageBoxCustomParams.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

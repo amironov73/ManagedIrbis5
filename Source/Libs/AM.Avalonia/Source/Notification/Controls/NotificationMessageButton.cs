@@ -1,3 +1,5 @@
+using System;
+
 using Avalonia.Controls;
 
 
@@ -41,7 +43,7 @@ namespace AM.Avalonia.Notification.Controls
         /// </summary>
         static NotificationMessageButton()
         {
-            // TODO 
+            // TODO
             //DefaultStyleKeyProperty.OverrideMetadata(typeof(NotificationMessageButton), new FrameworkPropertyMetadata(typeof(NotificationMessageButton)));
         }
 

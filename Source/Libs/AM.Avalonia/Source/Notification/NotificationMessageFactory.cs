@@ -1,4 +1,4 @@
-using Avalonia.Notification.Controls;
+using AM.Avalonia.Notification.Controls;
 
 namespace AM.Avalonia.Notification;
 
@@ -6,7 +6,8 @@ namespace AM.Avalonia.Notification;
 /// The notification message factory.
 /// </summary>
 /// <seealso cref="INotificationMessageFactory" />
-public class NotificationMessageFactory : INotificationMessageFactory
+public class NotificationMessageFactory
+    : INotificationMessageFactory
 {
     /// <summary>
     /// Gets the message.
