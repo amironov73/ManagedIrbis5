@@ -40,7 +40,7 @@ namespace ManagedIrbis.Magazines;
 [XmlRoot ("binding")]
 public sealed class BindingConfiguration
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Properties
 

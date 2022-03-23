@@ -197,7 +197,7 @@ public sealed class Verifier<T>
     /// </summary>
     public Verifier<T> FileExist
         (
-            string path,
+            string? path,
             [CallerArgumentExpression ("path")] string? name = null
         )
     {

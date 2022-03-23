@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -21,6 +22,11 @@ using AM.IO;
 using AM.Text.Output;
 
 using ManagedIrbis.Direct;
+using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Menus;
+
+using SharpCompress.Archives;
+using SharpCompress.Archives.Rar;
 
 #endregion
 
@@ -118,6 +124,34 @@ public sealed class LocalCatalogManager
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Добавляем каталог в MNU-файл, если он там отсутствовал.
+    /// </summary>
+    public void AddToMenu
+        (
+            string menuName,
+            string catalog,
+            string description = ""
+        )
+    {
+        Sure.NotNullNorEmpty (menuName);
+        Sure.NotNullNorEmpty (catalog);
+        Sure.NotNull (description);
+
+        var menuFile = Path.Combine (RootPath, menuName);
+        if (string.IsNullOrEmpty (Path.GetExtension (menuFile)))
+        {
+            menuFile += ".mnu";
+        }
+
+        var menu = MenuFile.ParseLocalFile (menuFile);
+        if (menu.FindEntry (catalog) is null)
+        {
+            menu.Add (catalog, description);
+            File.WriteAllText (menuFile, menu.ToText(), IrbisEncoding.Ansi);
+        }
+    }
 
     /// <summary>
     /// Backup catalog database to the given path.
@@ -278,6 +312,33 @@ public sealed class LocalCatalogManager
     }
 
     /// <summary>
+    /// Удаляем каталог из MNU-файл, если он там присутствовал.
+    /// </summary>
+    public void RemoveFromMenu
+        (
+            string menuName,
+            string catalog
+        )
+    {
+        Sure.NotNullNorEmpty (menuName);
+        Sure.NotNullNorEmpty (catalog);
+
+        var menuFile = Path.Combine (RootPath, menuName);
+        if (string.IsNullOrEmpty (Path.GetExtension (menuFile)))
+        {
+            menuFile += ".mnu";
+        }
+
+        var menu = MenuFile.ParseLocalFile (menuFile);
+        var entry = menu.FindEntry (catalog);
+        if (entry is not null)
+        {
+            menu.Entries.Remove (entry);
+            File.WriteAllText (menuFile, menu.ToText(), IrbisEncoding.Ansi);
+        }
+    }
+
+    /// <summary>
     /// Replicate catalog
     /// </summary>
     public void ReplicateCatalog
@@ -316,6 +377,105 @@ public sealed class LocalCatalogManager
                 RootPath,
                 catalogName
             );
+    }
+
+    /// <summary>
+    /// Восстановление каталога из архива.
+    /// </summary>
+    /// <param name="parameters"></param>
+    public void RestoreFromArchive
+        (
+            RestoreFromArchiveParameters parameters
+        )
+    {
+        Sure.VerifyNotNull (parameters);
+
+        var ethalonDatabase = parameters.Ethalon.ThrowIfNullOrEmpty();
+        var ethalonPath = Path.Combine (RootPath, ethalonDatabase);
+        var originalDatabase = parameters.Original.ThrowIfNullOrEmpty();
+        var targetDatabase = parameters.Target.ThrowIfNullOrEmpty();
+        var targetPath = Path.Combine (RootPath, targetDatabase);
+
+        // если папка уже существует, то очищаем ее
+        if (!ethalonDatabase.SameString (targetDatabase))
+        {
+            if (!Directory.Exists (targetPath))
+            {
+                Output.Write ("Creating directory");
+                Directory.CreateDirectory (targetPath);
+                Output.WriteLine (" done");
+            }
+            else
+            {
+                Output.Write ("Clearing directory");
+                DirectoryUtility.ClearDirectory (targetPath);
+                Output.WriteLine (" done");
+            }
+        }
+
+        // копируем обвязку
+        // TODO обрабатывать вложенные папки?
+        if (!originalDatabase.SameString (targetDatabase))
+        {
+            Output.Write ("Copying strapping stuff:");
+            foreach (var originalFile in Directory.EnumerateFiles (ethalonPath))
+            {
+                var originalName = Path.GetFileName (originalFile);
+                var nameOnly = Path.GetFileNameWithoutExtension (originalName);
+                if (nameOnly.SameString (originalDatabase))
+                {
+                    // пропускаем мастер-файл и индексы, т. к. их мы будем восстанавливать из архива
+                    continue;
+                }
+
+                var destinationName = Path.Combine (targetPath, originalName.ToLowerInvariant());
+                File.Copy (originalFile, destinationName);
+                Output.Write ($" {originalName}");
+            }
+
+            Output.WriteLine (" done");
+        }
+
+        // распаковываем мастер-файл и индексы
+        Output.WriteLine ("Copying data stuff:");
+        using var archive = RarArchive.Open (parameters.ArchiveFile.ThrowIfNullOrEmpty());
+        foreach (var entry in archive.Entries)
+        {
+            var database = Path.GetFileNameWithoutExtension (Path.GetDirectoryName (entry.Key));
+            if (string.IsNullOrEmpty (database))
+            {
+                // пропускаем файлы, не входящие в базу данных
+                continue;
+            }
+
+            var entryName = Path.GetFileName (entry.Key);
+            var extension = Path.GetExtension (entryName).ToLowerInvariant();
+            if (database.SameString (originalDatabase))
+            {
+                Output.Write ($"\t{entryName}");
+                var destination = Path.Combine (targetPath, targetDatabase + extension);
+                entry.WriteToFile (destination);
+                Output.WriteLine (" done");
+            }
+        }
+
+        // изготавливаем PAR-файл
+        var parFileName = Path.Combine (RootPath, targetDatabase + ".par");
+        if (File.Exists (parFileName))
+        {
+            File.Delete (parFileName);
+        }
+
+        var parFile = new ParFile ($".\\datai\\{targetDatabase}\\");
+        parFile.WriteFile (parFileName);
+        Output.WriteLine ($"PAR file: {Path.GetFileName (parFileName)}");
+
+        // Добавляем каталог в MNU-файлы
+        AddToMenu (Constants.AdministratorDatabaseList, targetDatabase, targetDatabase);
+        Output.WriteLine ($"MNU file: {Constants.AdministratorDatabaseList}");
+
+        AddToMenu (Constants.CatalogerDatabaseList, targetDatabase, targetDatabase);
+        Output.WriteLine ($"MNU file: {Constants.CatalogerDatabaseList}");
     }
 
     #endregion

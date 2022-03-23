@@ -89,7 +89,7 @@ public static class DirectoryUtility
                 );
         }
 
-        foreach (var fileName in Directory.EnumerateDirectories (path))
+        foreach (var fileName in Directory.EnumerateFiles (path))
         {
             File.Delete (Path.Combine (path, fileName));
         }
