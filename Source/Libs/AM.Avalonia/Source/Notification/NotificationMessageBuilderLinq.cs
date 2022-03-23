@@ -1,9 +1,29 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedParameter.Local
+
+/* NotificationMessageBuilderLinq.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 
 using Avalonia.Media;
 
-// ReSharper disable UnusedMember.Global
-// ReSharper disable RedundantEmptySwitchSection
+#endregion
+
+#nullable enable
 
 namespace AM.Avalonia.Notification;
 
@@ -18,18 +38,25 @@ public static class NotificationMessageBuilderLinq
     /// <param name="builder">The builder.</param>
     /// <param name="backgroundBrush">The background brush.</param>
     /// <returns>Returns the notification message builder.</returns>
-    public static NotificationMessageBuilder Background(
-        this NotificationMessageBuilder builder,
-        Brush backgroundBrush)
+    public static NotificationMessageBuilder Background
+        (
+            this NotificationMessageBuilder builder,
+            Brush backgroundBrush
+        )
     {
         builder.SetBackground(backgroundBrush);
 
         return builder;
     }
 
-    public static NotificationMessageBuilder Foreground(
-        this NotificationMessageBuilder builder,
-        string foregroundBrush)
+    /// <summary>
+    ///
+    /// </summary>
+    public static NotificationMessageBuilder Foreground
+        (
+            this NotificationMessageBuilder builder,
+            string foregroundBrush
+        )
     {
         var brush = new BrushConverter().ConvertFrom(foregroundBrush) as Brush;
         builder.SetForeground(brush);
@@ -43,9 +70,11 @@ public static class NotificationMessageBuilderLinq
     /// <param name="builder">The builder.</param>
     /// <param name="backgroundBrush">The background brush.</param>
     /// <returns>Returns the notification message builder.</returns>
-    public static NotificationMessageBuilder Background(
-        this NotificationMessageBuilder builder,
-        string backgroundBrush)
+    public static NotificationMessageBuilder Background
+        (
+            this NotificationMessageBuilder builder,
+            string backgroundBrush
+        )
     {
         var brush = new BrushConverter().ConvertFrom(backgroundBrush) as Brush;
         builder.SetBackground(brush);
@@ -59,9 +88,11 @@ public static class NotificationMessageBuilderLinq
     /// <param name="builder">The builder.</param>
     /// <param name="accentBrush">The accent brush.</param>
     /// <returns>Returns the notification message builder.</returns>
-    public static NotificationMessageBuilder Accent(
-        this NotificationMessageBuilder builder,
-        Brush accentBrush)
+    public static NotificationMessageBuilder Accent
+        (
+            this NotificationMessageBuilder builder,
+            Brush accentBrush
+        )
     {
         builder.SetAccent(accentBrush);
 

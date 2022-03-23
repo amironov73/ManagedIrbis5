@@ -1,7 +1,30 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedParameter.Local
+
+/* NotificationMessageBuilder.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Threading.Tasks;
 
 using Avalonia.Media;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Avalonia.Notification;
 
@@ -40,7 +63,7 @@ public class NotificationMessageBuilder
     /// Sets the header.
     /// </summary>
     /// <param name="header">The header.</param>
-    public void SetHeader(string header)
+    public void SetHeader (string header)
     {
         this.Message.Header = header;
     }
@@ -49,7 +72,7 @@ public class NotificationMessageBuilder
     /// Sets the message.
     /// </summary>
     /// <param name="message">The message.</param>
-    public void SetMessage(string message)
+    public void SetMessage (string message)
     {
         this.Message.Message = message;
     }
@@ -58,19 +81,19 @@ public class NotificationMessageBuilder
     /// Adds the button.
     /// </summary>
     /// <param name="button">The button.</param>
-    public void AddButton(INotificationMessageButton button)
+    public void AddButton (INotificationMessageButton button)
     {
         if (button == null)
-            throw new ArgumentNullException(nameof(button));
+            throw new ArgumentNullException (nameof (button));
 
-        this.Message.Buttons.Add(button);
+        this.Message.Buttons.Add (button);
     }
 
     /// <summary>
     /// Sets the badge.
     /// </summary>
     /// <param name="badgeText">The badge text.</param>
-    public void SetBadge(string badgeText)
+    public void SetBadge (string badgeText)
     {
         this.Message.BadgeText = badgeText;
     }
@@ -79,7 +102,7 @@ public class NotificationMessageBuilder
     /// Sets the accent.
     /// </summary>
     /// <param name="accentBrush">The accent brush.</param>
-    public void SetAccent(Brush accentBrush)
+    public void SetAccent (Brush accentBrush)
     {
         this.Message.AccentBrush = accentBrush;
     }
@@ -97,7 +120,7 @@ public class NotificationMessageBuilder
     /// Sets the overlay.
     /// </summary>
     /// <param name="overlay">The overlay.</param>
-    public void SetOverlay(object overlay)
+    public void SetOverlay (object overlay)
     {
         this.Message.OverlayContent = overlay;
     }
@@ -106,7 +129,7 @@ public class NotificationMessageBuilder
     /// Sets the top additional content.
     /// </summary>
     /// <param name="additionalContentTop">The additional content.</param>
-    public void SetAdditionalContentTop(object additionalContentTop)
+    public void SetAdditionalContentTop (object additionalContentTop)
     {
         this.Message.AdditionalContentTop = additionalContentTop;
     }
@@ -115,7 +138,7 @@ public class NotificationMessageBuilder
     /// Sets the bottom additional content.
     /// </summary>
     /// <param name="additionalContentBottom">The additional content.</param>
-    public void SetAdditionalContentBottom(object additionalContentBottom)
+    public void SetAdditionalContentBottom (object additionalContentBottom)
     {
         this.Message.AdditionalContentBottom = additionalContentBottom;
     }
@@ -124,7 +147,7 @@ public class NotificationMessageBuilder
     /// Sets the left additional content.
     /// </summary>
     /// <param name="additionalContentLeft">The additional content.</param>
-    public void SetAdditionalContentLeft(object additionalContentLeft)
+    public void SetAdditionalContentLeft (object additionalContentLeft)
     {
         this.Message.AdditionalContentLeft = additionalContentLeft;
     }
@@ -133,7 +156,7 @@ public class NotificationMessageBuilder
     /// Sets the right additional content.
     /// </summary>
     /// <param name="additionalContentRight">The additional content.</param>
-    public void SetAdditionalContentRight(object additionalContentRight)
+    public void SetAdditionalContentRight (object additionalContentRight)
     {
         this.Message.AdditionalContentRight = additionalContentRight;
     }
@@ -142,7 +165,7 @@ public class NotificationMessageBuilder
     /// Sets the center additional content.
     /// </summary>
     /// <param name="additionalContentMain">The additional content.</param>
-    public void SetAdditionalContentMain(object additionalContentMain)
+    public void SetAdditionalContentMain (object additionalContentMain)
     {
         this.Message.AdditionalContentMain = additionalContentMain;
     }
@@ -151,7 +174,7 @@ public class NotificationMessageBuilder
     /// Sets the additional content over the badge.
     /// </summary>
     /// <param name="additionalContentOverBadge">The additional content.</param>
-    public void SetAdditionalContentOverBadge(object additionalContentOverBadge)
+    public void SetAdditionalContentOverBadge (object additionalContentOverBadge)
     {
         this.Message.AdditionalContentOverBadge = additionalContentOverBadge;
     }
@@ -168,7 +191,7 @@ public class NotificationMessageBuilder
     /// Sets whether or not the message animates.
     /// </summary>
     /// <param name="animates"></param>
-    public void SetAnimates(bool animates)
+    public void SetAnimates (bool animates)
     {
         if (this.Message is INotificationAnimation animation)
         {
@@ -180,7 +203,7 @@ public class NotificationMessageBuilder
     /// <summary>
     /// Sets the text brush.
     /// </summary>
-    public void SetForeground(Brush brush)
+    public void SetForeground (Brush brush)
     {
         this.Message.Foreground = brush;
     }
@@ -189,7 +212,7 @@ public class NotificationMessageBuilder
     /// Sets the background.
     /// </summary>
     /// <param name="backgroundBrush">The background brush.</param>
-    public void SetBackground(Brush backgroundBrush)
+    public void SetBackground (Brush backgroundBrush)
     {
         this.Message.Background = backgroundBrush;
     }
@@ -200,7 +223,7 @@ public class NotificationMessageBuilder
     /// <returns>Returns the queued message.</returns>
     public INotificationMessage Queue()
     {
-        this.Manager.Queue(this.Message);
+        this.Manager.Queue (this.Message);
 
         return this.Message;
     }
@@ -210,9 +233,9 @@ public class NotificationMessageBuilder
     /// </summary>
     /// <param name="delayMilliseconds">The delay in milliseconds.</param>
     /// <param name="action">The action.</param>
-    public void Delay(int delayMilliseconds, Action<INotificationMessage> action)
+    public void Delay (int delayMilliseconds, Action<INotificationMessage> action)
     {
-        this.Delay(TimeSpan.FromMilliseconds(delayMilliseconds), action);
+        this.Delay (TimeSpan.FromMilliseconds (delayMilliseconds), action);
     }
 
     /// <summary>
@@ -220,10 +243,10 @@ public class NotificationMessageBuilder
     /// </summary>
     /// <param name="delay">The delay.</param>
     /// <param name="action">The action.</param>
-    public void Delay(TimeSpan delay, Action<INotificationMessage> action)
+    public void Delay (TimeSpan delay, Action<INotificationMessage> action)
     {
-        Task.Delay(delay).ContinueWith(
-            context => action(this.Message),
+        Task.Delay (delay).ContinueWith (
+            context => action (this.Message),
             TaskScheduler.FromCurrentSynchronizationContext());
     }
 
@@ -237,9 +260,9 @@ public class NotificationMessageBuilder
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <exception cref="ArgumentNullException">builder</exception>
-        public DismissNotificationMessage(NotificationMessageBuilder builder)
+        public DismissNotificationMessage (NotificationMessageBuilder builder)
         {
-            this.Builder = builder ?? throw new ArgumentNullException(nameof(builder));
+            this.Builder = builder ?? throw new ArgumentNullException (nameof (builder));
         }
 
         /// <summary>

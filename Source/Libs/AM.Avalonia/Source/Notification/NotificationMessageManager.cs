@@ -1,8 +1,30 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedParameter.Local
+
+/* NotificationMessageManager.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Avalonia;
-using Avalonia.Animation;
+
+#endregion
+
+#nullable enable
 
 namespace AM.Avalonia.Notification;
 
@@ -12,18 +34,17 @@ namespace AM.Avalonia.Notification;
 /// <seealso cref="INotificationMessageManager" />
 public class NotificationMessageManager : AvaloniaObject, INotificationMessageManager
 {
-    private readonly List<INotificationMessage> queuedMessages = new List<INotificationMessage>();
-
+    private readonly List<INotificationMessage> queuedMessages = new ();
 
     /// <summary>
     /// Occurs when new notification message is queued.
     /// </summary>
-    public event NotificationMessageManagerEventHandler OnMessageQueued;
+    public event NotificationMessageManagerEventHandler? OnMessageQueued;
 
     /// <summary>
     /// Occurs when notification message is dismissed.
     /// </summary>
-    public event NotificationMessageManagerEventHandler OnMessageDismissed;
+    public event NotificationMessageManagerEventHandler? OnMessageDismissed;
 
     /// <summary>
     /// Gets or sets the factory.
@@ -39,23 +60,28 @@ public class NotificationMessageManager : AvaloniaObject, INotificationMessageMa
     /// This will ignore the <c>null</c> message or already queued notification message.
     /// </summary>
     /// <param name="message">The message.</param>
-    public void Queue(INotificationMessage message)
+    public void Queue
+        (
+            INotificationMessage? message
+        )
     {
-        if (message == null || this.queuedMessages.Contains(message))
+        if (message == null || queuedMessages.Contains (message))
+        {
             return;
+        }
 
-        this.queuedMessages.Add(message);
+        queuedMessages.Add (message);
 
-        this.TriggerMessageQueued(message);
+        TriggerMessageQueued (message);
     }
 
     /// <summary>
     /// Triggers the message queued event.
     /// </summary>
     /// <param name="message">The message.</param>
-    private void TriggerMessageQueued(INotificationMessage message)
+    private void TriggerMessageQueued (INotificationMessage message)
     {
-        this.OnMessageQueued?.Invoke(this, new NotificationMessageManagerEventArgs(message));
+        OnMessageQueued?.Invoke (this, new NotificationMessageManagerEventArgs (message));
     }
 
     /// <summary>
@@ -63,12 +89,17 @@ public class NotificationMessageManager : AvaloniaObject, INotificationMessageMa
     /// This will ignore the <c>null</c> or not queued notification message.
     /// </summary>
     /// <param name="message">The message.</param>
-    public void Dismiss(INotificationMessage message)
+    public void Dismiss
+        (
+            INotificationMessage? message
+        )
     {
-        if (message == null || !this.queuedMessages.Contains(message))
+        if (message == null || !queuedMessages.Contains (message))
+        {
             return;
+        }
 
-        this.queuedMessages.Remove(message);
+        queuedMessages.Remove (message);
 
         if (message is INotificationAnimation animatableMessage)
         {
@@ -78,18 +109,18 @@ public class NotificationMessageManager : AvaloniaObject, INotificationMessageMa
                 animatableMessage.AnimatableElement != null)
             {
                 animatableMessage.AnimatableElement.DismissAnimation = true;
-                Task.Delay(500).ContinueWith(
-                    context => { this.TriggerMessageDismissed(message); },
+                Task.Delay (500).ContinueWith (
+                    context => { this.TriggerMessageDismissed (message); },
                     TaskScheduler.FromCurrentSynchronizationContext());
             }
             else
             {
-                this.TriggerMessageDismissed(message);
+                TriggerMessageDismissed (message);
             }
         }
         else
         {
-            this.TriggerMessageDismissed(message);
+            TriggerMessageDismissed (message);
         }
     }
 
@@ -97,8 +128,8 @@ public class NotificationMessageManager : AvaloniaObject, INotificationMessageMa
     /// Triggers the message dismissed event.
     /// </summary>
     /// <param name="message">The message.</param>
-    private void TriggerMessageDismissed(INotificationMessage message)
+    private void TriggerMessageDismissed (INotificationMessage message)
     {
-        this.OnMessageDismissed?.Invoke(this, new NotificationMessageManagerEventArgs(message));
+        OnMessageDismissed?.Invoke (this, new NotificationMessageManagerEventArgs (message));
     }
 }
