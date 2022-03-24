@@ -23,6 +23,8 @@ using Avalonia.Controls;
 
 #endregion
 
+#nullable enable
+
 namespace AM.Avalonia.BaseWindows.Base;
 
 internal class MsBoxWindowBase<U, T>

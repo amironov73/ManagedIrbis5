@@ -11,12 +11,12 @@ namespace AM.Avalonia.ViewModels
     {
         private readonly MsBoxHyperlinkWindow _window;
 
-        public MsBoxHyperlinkViewModel(MessageBoxHyperlinkParams @params, MsBoxHyperlinkWindow msBoxHyperlinkWindow) :
-            base(@params, @params.Icon)
+        public MsBoxHyperlinkViewModel(MessageBoxHyperlinkParams parameters, MsBoxHyperlinkWindow msBoxHyperlinkWindow) :
+            base(parameters, parameters.Icon)
         {
             _window = msBoxHyperlinkWindow;
-            HyperlinkContentProvider = @params.HyperlinkContentProvider;
-            SetButtons(@params.ButtonDefinitions);
+            HyperlinkContentProvider = parameters.HyperlinkContentProvider;
+            SetButtons(parameters.ButtonDefinitions);
         }
 
         public bool IsOkShowed { get; private set; }

@@ -10,11 +10,11 @@ namespace AM.Avalonia.ViewModels
         private readonly MsBoxCustomWindow _window;
 
 
-        public MsBoxCustomViewModel(MsCustomParams @params, MsBoxCustomWindow msBoxCustomWindow) : base(@params,
-            @params.Icon, @params.BitmapIcon)
+        public MsBoxCustomViewModel(MsCustomParams parameters, MsBoxCustomWindow msBoxCustomWindow) : base(parameters,
+            parameters.Icon, parameters.BitmapIcon)
         {
             _window = msBoxCustomWindow;
-            ButtonDefinitions = @params.ButtonDefinitions;
+            ButtonDefinitions = parameters.ButtonDefinitions;
         }
 
         public IEnumerable<ButtonDefinition> ButtonDefinitions { get; }

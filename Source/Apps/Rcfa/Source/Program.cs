@@ -79,7 +79,10 @@ internal static class Program
                 ArchiveFile = archive,
                 Original = original,
                 Target = target,
-                Ethalon = ethalon
+                Ethalon = ethalon,
+                CreateParFile = true,
+                AddToAdminMenu = true,
+                AddToLibrarianMenu = true
             };
 
             manager.RestoreFromArchive (parameters);

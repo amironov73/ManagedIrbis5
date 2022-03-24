@@ -18,7 +18,6 @@
 #region Using directives
 
 using System;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Input;
 
@@ -113,14 +112,17 @@ public class Button
 
     #region Equals
 
-    public override bool Equals (object obj)
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
     {
         var button = obj as Button;
-        if (button != null)
-            return button.GetType() == GetType() && Equals (button.Name, Name);
-        return false;
+        return button != null && (button.GetType() == GetType() && Equals (button.Name, Name));
     }
 
+    /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
         return GetType().GetHashCode() ^ Name.GetHashCode();

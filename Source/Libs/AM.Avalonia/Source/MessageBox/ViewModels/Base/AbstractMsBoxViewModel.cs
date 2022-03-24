@@ -44,7 +44,7 @@ public abstract class AbstractMsBoxViewModel
     : INotifyPropertyChanged
 
 {
-    protected AbstractMsBoxViewModel(AbstractMessageBoxParams @params, Icon icon = Icon.None, Bitmap bitmap = null)
+    protected AbstractMsBoxViewModel(AbstractMessageBoxParams parameters, Icon icon = Icon.None, Bitmap bitmap = null)
     {
         if (bitmap != null)
         {
@@ -57,23 +57,23 @@ public abstract class AbstractMsBoxViewModel
                     $" avares://MessageBox.Avalonia/Assets/{icon.ToString().ToLowerInvariant()}.png")));
         }
 
-        MinWidth = @params.MinWidth;
-        MaxWidth = @params.MaxWidth;
-        Width = @params.Width;
-        MinHeight = @params.MinHeight;
-        MaxHeight = @params.MaxHeight;
-        Height = @params.Height;
-        CanResize = @params.CanResize;
-        FontFamily = @params.FontFamily;
-        ContentTitle = @params.ContentTitle;
-        ContentHeader = @params.ContentHeader;
-        ContentMessage = @params.ContentMessage;
-        Markdown = @params.Markdown;
-        WindowIconPath = @params.WindowIcon;
-        SizeToContent = @params.SizeToContent;
-        LocationOfMyWindow = @params.WindowStartupLocation;
-        SystemDecorations = @params.SystemDecorations;
-        Topmost = @params.Topmost;
+        MinWidth = parameters.MinWidth;
+        MaxWidth = parameters.MaxWidth;
+        Width = parameters.Width;
+        MinHeight = parameters.MinHeight;
+        MaxHeight = parameters.MaxHeight;
+        Height = parameters.Height;
+        CanResize = parameters.CanResize;
+        FontFamily = parameters.FontFamily;
+        ContentTitle = parameters.ContentTitle;
+        ContentHeader = parameters.ContentHeader;
+        ContentMessage = parameters.ContentMessage;
+        Markdown = parameters.Markdown;
+        WindowIconPath = parameters.WindowIcon;
+        SizeToContent = parameters.SizeToContent;
+        LocationOfMyWindow = parameters.WindowStartupLocation;
+        SystemDecorations = parameters.SystemDecorations;
+        Topmost = parameters.Topmost;
     }
 
     public bool CanResize { get; }

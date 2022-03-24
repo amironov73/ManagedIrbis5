@@ -1,153 +1,189 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedParameter.Local
+
+/* MsBoxInputViewModel.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
+
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+
 using AM.Avalonia.DTO;
 using AM.Avalonia.Enums;
 using AM.Avalonia.Models;
 using AM.Avalonia.Views;
 
-namespace AM.Avalonia.ViewModels
+#endregion
+
+#nullable enable
+
+namespace AM.Avalonia.ViewModels;
+
+/// <summary>
+///
+/// </summary>
+public class MsBoxInputViewModel
+    : AbstractMsBoxViewModel
 {
-    public class MsBoxInputViewModel : AbstractMsBoxViewModel
+    private readonly ToggleButton _passwordRevealBtn;
+    private readonly MsBoxInputWindow _window;
+    private string _inputText;
+    private char? _passChar;
+
+    public MsBoxInputViewModel
+        (
+            MessageBoxInputParams parameters,
+            MsBoxInputWindow msBoxInputWindow
+        )
+        : base (parameters, parameters.Icon)
     {
-        private readonly ToggleButton _passwordRevealBtn;
-        private readonly MsBoxInputWindow _window;
-        private string _inputText;
-        private char? _passChar;
+        _window = msBoxInputWindow;
+        ButtonDefinitions = parameters.ButtonDefinitions;
+        InitialPassChar = PassChar = parameters.IsPassword ? '*' : null;
+        PasswordRevealMode = parameters.PasswordRevealMode;
+        WatermarkText = parameters.WatermarkText;
+        Multiline = parameters.Multiline;
+        InputText = parameters.InputDefaultValue;
 
-        public MsBoxInputViewModel(MessageBoxInputParams @params, MsBoxInputWindow msBoxInputWindow) : base(@params,
-            @params.Icon)
+        // Make sure there are default buttons on dialog
+        if (ButtonDefinitions is null)
         {
-            _window = msBoxInputWindow;
-            ButtonDefinitions = @params.ButtonDefinitions;
-            InitialPassChar = PassChar = @params.IsPassword ? '*' : null;
-            PasswordRevealMode = @params.PasswordRevealMode;
-            WatermarkText = @params.WatermarkText;
-            Multiline = @params.Multiline;
-            InputText = @params.InputDefaultValue;
-
-            // Make sure there are default buttons on dialog
-            if (ButtonDefinitions is null)
+            ButtonDefinitions = new[]
             {
-                ButtonDefinitions = new[]
-                {
-                    new ButtonDefinition { Name = "Confirm", IsDefault = true },
-                    new ButtonDefinition { Name = "Cancel", IsCancel = true }
-                };
-            }
+                new ButtonDefinition { Name = "Confirm", IsDefault = true },
+                new ButtonDefinition { Name = "Cancel", IsCancel = true }
+            };
+        }
 
-            if (Multiline) // Fill if multi-line
+        if (Multiline) // Fill if multi-line
+        {
+            var grid = _window.FindControl<Grid> ("ContentGrid");
+            grid.RowDefinitions[0].Height = GridLength.Parse ("*");
+        }
+
+        _passwordRevealBtn = _window.FindControl<ToggleButton> ("PasswordRevealBtn");
+
+        //PointerPressedEvent
+        _passwordRevealBtn.AddHandler (InputElement.PointerPressedEvent, (sender, e) =>
+        {
+            if (!IsPasswordRevealButtonVisible || _passChar is null) return;
+
+            var pointer = e.GetCurrentPoint (_passwordRevealBtn);
+
+            if ((pointer.Properties.IsLeftButtonPressed || pointer.Properties.IsRightButtonPressed) &&
+                PasswordRevealMode == PasswordRevealModes.Hold
+                || pointer.Properties.IsRightButtonPressed &&
+                PasswordRevealMode == PasswordRevealModes.Both)
             {
-                var grid = _window.FindControl<Grid>("ContentGrid");
-                grid.RowDefinitions[0].Height = GridLength.Parse("*");
-            }
-
-            _passwordRevealBtn = _window.FindControl<ToggleButton>("PasswordRevealBtn");
-
-            //PointerPressedEvent
-            _passwordRevealBtn.AddHandler(InputElement.PointerPressedEvent, (sender, e) =>
-            {
-                if (!IsPasswordRevealButtonVisible || _passChar is null) return;
-
-                var pointer = e.GetCurrentPoint(_passwordRevealBtn);
-
-                if ((pointer.Properties.IsLeftButtonPressed || pointer.Properties.IsRightButtonPressed) &&
-                    PasswordRevealMode == PasswordRevealModes.Hold
-                    || pointer.Properties.IsRightButtonPressed &&
-                    PasswordRevealMode == PasswordRevealModes.Both)
-                {
-                    PassChar = null;
-                    _passwordRevealBtn.IsChecked = true;
-                    e.Handled = true;
-                }
-            }, RoutingStrategies.Tunnel);
-
-            // PointerReleasedEvent
-            _passwordRevealBtn.AddHandler(InputElement.PointerReleasedEvent, (sender, e) =>
-            {
-                if (_passChar == '*' ||
-                    !IsPasswordRevealButtonVisible ||
-                    (PasswordRevealMode != PasswordRevealModes.Hold &&
-                     PasswordRevealMode != PasswordRevealModes.Both)) return;
-                if (PasswordRevealMode == PasswordRevealModes.Both &&
-                    e.InitialPressMouseButton != MouseButton.Right) return;
-
-                PassChar = InitialPassChar;
-                _passwordRevealBtn.IsChecked = false;
+                PassChar = null;
+                _passwordRevealBtn.IsChecked = true;
                 e.Handled = true;
-            }, RoutingStrategies.Tunnel);
-        }
+            }
+        }, RoutingStrategies.Tunnel);
 
-        public char? InitialPassChar { get; }
-
-        public char? PassChar
+        // PointerReleasedEvent
+        _passwordRevealBtn.AddHandler (InputElement.PointerReleasedEvent, (sender, e) =>
         {
-            get => _passChar;
-            private set
+            if (_passChar == '*' ||
+                !IsPasswordRevealButtonVisible ||
+                (PasswordRevealMode != PasswordRevealModes.Hold &&
+                 PasswordRevealMode != PasswordRevealModes.Both)) return;
+            if (PasswordRevealMode == PasswordRevealModes.Both &&
+                e.InitialPressMouseButton != MouseButton.Right) return;
+
+            PassChar = InitialPassChar;
+            _passwordRevealBtn.IsChecked = false;
+            e.Handled = true;
+        }, RoutingStrategies.Tunnel);
+    }
+
+    public char? InitialPassChar { get; }
+
+    public char? PassChar
+    {
+        get => _passChar;
+        private set
+        {
+            _passChar = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public PasswordRevealModes PasswordRevealMode { get; }
+
+    public bool IsPasswordRevealButtonVisible => InitialPassChar == '*' &&
+                                                 PasswordRevealMode !=
+                                                 PasswordRevealModes.None;
+
+    public string WatermarkText { get; }
+
+    public bool Multiline { get; }
+
+    // public ReactiveCommand<string, Unit> ButtonClickCommand { get; private set; }
+
+    public IEnumerable<ButtonDefinition> ButtonDefinitions { get; }
+
+    public string InputText
+    {
+        get => _inputText;
+        set
+        {
+            _inputText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public void ButtonClick (string parameter)
+    {
+        foreach (var bd in ButtonDefinitions)
+        {
+            if (parameter.Equals (bd.Name))
             {
-                _passChar = value;
-                OnPropertyChanged();
+                _window.ButtonResult = bd.Name;
+                _window.MessageResult = InputText;
+                break;
             }
         }
 
-        public PasswordRevealModes PasswordRevealMode { get; }
+        _window.Close();
 
-        public bool IsPasswordRevealButtonVisible => InitialPassChar == '*' &&
-                                                     PasswordRevealMode !=
-                                                     PasswordRevealModes.None;
+        // Code for executing the command here.
+    }
 
-        public string WatermarkText { get; }
-
-        public bool Multiline { get; }
-        // public ReactiveCommand<string, Unit> ButtonClickCommand { get; private set; }
-
-        public IEnumerable<ButtonDefinition> ButtonDefinitions { get; }
-
-        public string InputText
+    public void PasswordRevealClick()
+    {
+        if (!IsPasswordRevealButtonVisible) return;
+        switch (PasswordRevealMode)
         {
-            get => _inputText;
-            set
-            {
-                _inputText = value;
-                OnPropertyChanged();
-            }
-        }
+            case PasswordRevealModes.Toggle:
+            case PasswordRevealModes.Both:
+                PassChar = _passwordRevealBtn.IsChecked.Value ? null : InitialPassChar;
+                break;
 
-        public void ButtonClick(string parameter)
-        {
-            foreach (var bd in ButtonDefinitions)
-            {
-                if (parameter.Equals(bd.Name))
-                {
-                    _window.ButtonResult = bd.Name;
-                    _window.MessageResult = InputText;
-                    break;
-                }
-            }
+            case PasswordRevealModes.Hold:
+                _passwordRevealBtn.IsChecked = false;
+                PassChar = InitialPassChar;
+                break;
 
-            _window.Close();
-            // Code for executing the command here.
-        }
-
-        public void PasswordRevealClick()
-        {
-            if (!IsPasswordRevealButtonVisible) return;
-            switch (PasswordRevealMode)
-            {
-                case PasswordRevealModes.Toggle:
-                case PasswordRevealModes.Both:
-                    PassChar = _passwordRevealBtn.IsChecked.Value ? null : InitialPassChar;
-                    break;
-                case PasswordRevealModes.Hold:
-                    _passwordRevealBtn.IsChecked = false;
-                    PassChar = InitialPassChar;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 }

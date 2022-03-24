@@ -390,6 +390,48 @@ public sealed class LocalCatalogManager
     {
         Sure.VerifyNotNull (parameters);
 
+        /*
+
+            База данных в ИРБИС64, как известно, состоит из двух частей:
+            1) собственно данных (мастер-файл плюс индексы),
+            2) "обвязка" (форматы, меню и пр.). Собственно данные
+            восстанавливаются из RAR- или ZIP-архива, который устроен
+            следующим образом:
+
+            ```
+            ├─┬─ATHRA
+            │ │
+            │ ├─athra.ifp
+            │ ├─athra.l01
+            │ ├─athra.mst
+            │ ├─athra.n01
+            │ └─athra.xrf
+            │
+            ├─┬─ATHRB
+            │ │
+            │ ├─athrb.ifp
+            │ ├─athrb.l01
+            │ ├─athrb.mst
+            │ ├─athrb.n01
+            │ └─athrb.xrf
+            │
+            └─┬─IBIS
+              │
+              ├─ibis.ifp
+              ├─ibis.l01
+              ├─ibis.mst
+              ├─ibis.n01
+              └─ibis.xrf
+            ```
+
+            Короче говоря, все данные помещены в папки, имена которых совпадают
+            с именем базы.
+
+            "Обвязка" восстанавливается из актуальной "эталонной базы данных",
+            как правило, это "IBIS" (но в вашем случае может быть любая другая).
+
+         */
+
         var ethalonDatabase = parameters.Ethalon.ThrowIfNullOrEmpty();
         var ethalonPath = Path.Combine (RootPath, ethalonDatabase);
         var originalDatabase = parameters.Original.ThrowIfNullOrEmpty();
@@ -459,23 +501,38 @@ public sealed class LocalCatalogManager
             }
         }
 
-        // изготавливаем PAR-файл
-        var parFileName = Path.Combine (RootPath, targetDatabase + ".par");
-        if (File.Exists (parFileName))
+        if (parameters.CreateParFile)
         {
-            File.Delete (parFileName);
+            // изготавливаем PAR-файл
+            var parFileName = Path.Combine (RootPath, targetDatabase + ".par");
+            if (File.Exists (parFileName))
+            {
+                File.Delete (parFileName);
+            }
+
+            var parFile = new ParFile ($".\\datai\\{targetDatabase}\\");
+            parFile.WriteFile (parFileName);
+            Output.WriteLine ($"PAR file: {Path.GetFileName (parFileName)}");
         }
 
-        var parFile = new ParFile ($".\\datai\\{targetDatabase}\\");
-        parFile.WriteFile (parFileName);
-        Output.WriteLine ($"PAR file: {Path.GetFileName (parFileName)}");
-
         // Добавляем каталог в MNU-файлы
-        AddToMenu (Constants.AdministratorDatabaseList, targetDatabase, targetDatabase);
-        Output.WriteLine ($"MNU file: {Constants.AdministratorDatabaseList}");
+        if (parameters.AddToAdminMenu)
+        {
+            AddToMenu (Constants.AdministratorDatabaseList, targetDatabase, targetDatabase);
+            Output.WriteLine ($"MNU file: {Constants.AdministratorDatabaseList}");
+        }
 
-        AddToMenu (Constants.CatalogerDatabaseList, targetDatabase, targetDatabase);
-        Output.WriteLine ($"MNU file: {Constants.CatalogerDatabaseList}");
+        if (parameters.AddToLibrarianMenu)
+        {
+            AddToMenu (Constants.CatalogerDatabaseList, targetDatabase, targetDatabase);
+            Output.WriteLine ($"MNU file: {Constants.CatalogerDatabaseList}");
+        }
+
+        if (parameters.AddToReaderMenu)
+        {
+            AddToMenu (Constants.ReaderDatabaseList, targetDatabase, targetDatabase);
+            Output.WriteLine ($"MNU file: {Constants.ReaderDatabaseList}");
+        }
     }
 
     #endregion

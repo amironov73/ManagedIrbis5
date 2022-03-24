@@ -1,37 +1,102 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedParameter.Local
+
+/* MsBoxStandardViewModel.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
+
 using Avalonia.Threading;
+
 using AM.Avalonia.DTO;
 using AM.Avalonia.Enums;
 using AM.Avalonia.ViewModels.Commands;
 using AM.Avalonia.Views;
 
+#endregion
+
+#nullable enable
+
 namespace AM.Avalonia.ViewModels;
 
-public class MsBoxStandardViewModel : AbstractMsBoxViewModel
+/// <summary>
+///
+/// </summary>
+public class MsBoxStandardViewModel
+    : AbstractMsBoxViewModel
 {
     public readonly ClickEnum _enterDefaultButton;
     public readonly ClickEnum _escDefaultButton;
+
     private readonly MsBoxStandardWindow _window;
 
-    public MsBoxStandardViewModel(MessageBoxStandardParams @params, MsBoxStandardWindow msBoxStandardWindow) :
-        base(@params, @params.Icon)
+    public MsBoxStandardViewModel
+        (
+            MessageBoxStandardParams parameters,
+            MsBoxStandardWindow msBoxStandardWindow
+        ) :
+        base(parameters, parameters.Icon)
     {
-        _enterDefaultButton = @params.EnterDefaultButton;
-        _escDefaultButton = @params.EscDefaultButton;
+        _enterDefaultButton = parameters.EnterDefaultButton;
+        _escDefaultButton = parameters.EscDefaultButton;
         _window = msBoxStandardWindow;
-        SetButtons(@params.ButtonDefinitions);
+        SetButtons(parameters.ButtonDefinitions);
         ButtonClickCommand = new RelayCommand(o => ButtonClick(o.ToString()));
         EnterClickCommand = new RelayCommand(o => EnterClick());
         EscClickCommand = new RelayCommand(o => EscClick());
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public bool IsOkShowed { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool IsYesShowed { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool IsNoShowed { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool IsAbortShowed { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public bool IsCancelShowed { get; private set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public RelayCommand ButtonClickCommand { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public RelayCommand EnterClickCommand { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public RelayCommand EscClickCommand { get; }
 
     private void SetButtons(ButtonEnum paramsButtonDefinitions)
@@ -41,31 +106,41 @@ public class MsBoxStandardViewModel : AbstractMsBoxViewModel
             case ButtonEnum.Ok:
                 IsOkShowed = true;
                 break;
+
             case ButtonEnum.YesNo:
                 IsYesShowed = true;
                 IsNoShowed = true;
                 break;
+
             case ButtonEnum.OkCancel:
                 IsOkShowed = true;
                 IsCancelShowed = true;
                 break;
+
             case ButtonEnum.OkAbort:
                 IsOkShowed = true;
                 IsAbortShowed = true;
                 break;
+
             case ButtonEnum.YesNoCancel:
                 IsYesShowed = true;
                 IsNoShowed = true;
                 IsCancelShowed = true;
                 break;
+
             case ButtonEnum.YesNoAbort:
                 IsYesShowed = true;
                 IsNoShowed = true;
                 IsAbortShowed = true;
                 break;
+
             default:
-                throw new ArgumentOutOfRangeException(nameof(paramsButtonDefinitions), paramsButtonDefinitions,
-                    null);
+                throw new ArgumentOutOfRangeException
+                    (
+                        nameof(paramsButtonDefinitions),
+                        paramsButtonDefinitions,
+                        null
+                    );
         }
     }
 
@@ -74,41 +149,29 @@ public class MsBoxStandardViewModel : AbstractMsBoxViewModel
         switch (_escDefaultButton)
         {
             case ClickEnum.Ok:
-            {
-                ButtonClick(ButtonResult.Ok);
+                ButtonClick (ButtonResult.Ok);
                 return;
-            }
-                break;
+
             case ClickEnum.Yes:
-            {
-                ButtonClick(ButtonResult.Yes);
+                ButtonClick (ButtonResult.Yes);
                 return;
-            }
-                break;
+
             case ClickEnum.No:
-            {
-                ButtonClick(ButtonResult.No);
+                ButtonClick (ButtonResult.No);
                 return;
-            }
-                break;
+
             case ClickEnum.Abort:
-            {
-                ButtonClick(ButtonResult.Abort);
+                ButtonClick (ButtonResult.Abort);
                 return;
-            }
-                break;
+
             case ClickEnum.Cancel:
-            {
-                ButtonClick(ButtonResult.Cancel);
+                ButtonClick (ButtonResult.Cancel);
                 return;
-            }
-                break;
+
             case ClickEnum.None:
-            {
-                ButtonClick(ButtonResult.None);
+                ButtonClick (ButtonResult.None);
                 return;
-            }
-                break;
+
             case ClickEnum.Default:
             {
                 if (IsCancelShowed)
@@ -143,41 +206,29 @@ public class MsBoxStandardViewModel : AbstractMsBoxViewModel
         switch (_enterDefaultButton)
         {
             case ClickEnum.Ok:
-            {
-                ButtonClick(ButtonResult.Ok);
+                ButtonClick (ButtonResult.Ok);
                 return;
-            }
-                break;
+
             case ClickEnum.Yes:
-            {
-                ButtonClick(ButtonResult.Yes);
+                ButtonClick (ButtonResult.Yes);
                 return;
-            }
-                break;
+
             case ClickEnum.No:
-            {
-                ButtonClick(ButtonResult.No);
+                ButtonClick (ButtonResult.No);
                 return;
-            }
-                break;
+
             case ClickEnum.Abort:
-            {
-                ButtonClick(ButtonResult.Abort);
+                ButtonClick (ButtonResult.Abort);
                 return;
-            }
-                break;
+
             case ClickEnum.Cancel:
-            {
-                ButtonClick(ButtonResult.Cancel);
+                ButtonClick (ButtonResult.Cancel);
                 return;
-            }
-                break;
+
             case ClickEnum.None:
-            {
-                ButtonClick(ButtonResult.None);
+                ButtonClick (ButtonResult.None);
                 return;
-            }
-                break;
+
             case ClickEnum.Default:
             {
                 if (IsOkShowed)
@@ -193,12 +244,19 @@ public class MsBoxStandardViewModel : AbstractMsBoxViewModel
                 }
             }
                 break;
+
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
 
-    public async void ButtonClick(string parameter)
+    /// <summary>
+    ///
+    /// </summary>
+    public async void ButtonClick
+        (
+            string parameter
+        )
     {
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
@@ -207,7 +265,13 @@ public class MsBoxStandardViewModel : AbstractMsBoxViewModel
         });
     }
 
-    public async void ButtonClick(ButtonResult buttonResult)
+    /// <summary>
+    ///
+    /// </summary>
+    public async void ButtonClick
+        (
+            ButtonResult buttonResult
+        )
     {
         await Dispatcher.UIThread.InvokeAsync(() =>
         {

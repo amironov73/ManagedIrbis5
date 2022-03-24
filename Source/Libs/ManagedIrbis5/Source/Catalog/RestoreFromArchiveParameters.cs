@@ -50,6 +50,26 @@ public sealed class RestoreFromArchiveParameters
     /// </summary>
     public string? Target { get; set; }
 
+    /// <summary>
+    /// Создать соответствующий PAR-файл?
+    /// </summary>
+    public bool CreateParFile { get; set; }
+
+    /// <summary>
+    /// Добавить базу данных в меню администратора?
+    /// </summary>
+    public bool AddToAdminMenu { get; set; }
+
+    /// <summary>
+    /// Добавить базу данных в меню библиотекаря?
+    /// </summary>
+    public bool AddToLibrarianMenu { get; set; }
+
+    /// <summary>
+    /// Добавить базу данных в меню читателя?
+    /// </summary>
+    public bool AddToReaderMenu { get; set; }
+
     #endregion
 
     #region IVerifiable members
