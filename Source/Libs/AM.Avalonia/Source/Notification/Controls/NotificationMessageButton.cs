@@ -38,7 +38,7 @@ public class NotificationMessageButton : Button, INotificationMessageButton
     /// Initializes a new instance of the <see cref="NotificationMessageButton"/> class.
     /// </summary>
     public NotificationMessageButton()
-        : this(null)
+        : this (null)
     {
     }
 
@@ -48,7 +48,7 @@ public class NotificationMessageButton : Button, INotificationMessageButton
     /// <param name="content">The content.</param>
     public NotificationMessageButton
         (
-            object content
+            object? content
         )
     {
         Content = content;
@@ -60,7 +60,7 @@ public class NotificationMessageButton : Button, INotificationMessageButton
     protected override void OnClick()
     {
         base.OnClick();
-        Callback?.Invoke(this);
+        Callback?.Invoke (this);
     }
 
     /// <summary>

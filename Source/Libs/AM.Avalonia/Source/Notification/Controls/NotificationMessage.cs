@@ -1,4 +1,23 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedParameter.Local
+
+/* NotificationMessage.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Collections.ObjectModel;
 
 using Avalonia;
@@ -9,6 +28,10 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.Styling;
 
+#endregion
+
+#nullable enable
+
 namespace AM.Avalonia.Notification.Controls;
 
 /// <summary>
@@ -16,7 +39,8 @@ namespace AM.Avalonia.Notification.Controls;
 /// </summary>
 /// <seealso cref="INotificationMessage" />
 /// <seealso cref="Control" />
-public class NotificationMessage : TemplatedControl, INotificationMessage, INotificationAnimation
+public class NotificationMessage
+    : TemplatedControl, INotificationMessage, INotificationAnimation
 {
     /// <summary>
     /// Gets or sets the content of the overlay.

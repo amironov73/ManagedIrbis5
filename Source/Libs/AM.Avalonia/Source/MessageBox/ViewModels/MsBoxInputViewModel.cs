@@ -44,9 +44,12 @@ public class MsBoxInputViewModel
 {
     private readonly ToggleButton _passwordRevealBtn;
     private readonly MsBoxInputWindow _window;
-    private string _inputText;
+    private string? _inputText;
     private char? _passChar;
 
+    /// <summary>
+    ///
+    /// </summary>
     public MsBoxInputViewModel
         (
             MessageBoxInputParams parameters,
@@ -114,8 +117,14 @@ public class MsBoxInputViewModel
         }, RoutingStrategies.Tunnel);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public char? InitialPassChar { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public char? PassChar
     {
         get => _passChar;
@@ -126,20 +135,35 @@ public class MsBoxInputViewModel
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public PasswordRevealModes PasswordRevealMode { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public bool IsPasswordRevealButtonVisible => InitialPassChar == '*' &&
                                                  PasswordRevealMode !=
                                                  PasswordRevealModes.None;
 
+    /// <summary>
+    ///
+    /// </summary>
     public string WatermarkText { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public bool Multiline { get; }
 
     // public ReactiveCommand<string, Unit> ButtonClickCommand { get; private set; }
 
     public IEnumerable<ButtonDefinition> ButtonDefinitions { get; }
 
+    /// <summary>
+    ///
+    /// </summary>
     public string InputText
     {
         get => _inputText;
@@ -150,7 +174,13 @@ public class MsBoxInputViewModel
         }
     }
 
-    public void ButtonClick (string parameter)
+    /// <summary>
+    ///
+    /// </summary>
+    public void ButtonClick
+        (
+            string parameter
+        )
     {
         foreach (var bd in ButtonDefinitions)
         {
@@ -167,6 +197,9 @@ public class MsBoxInputViewModel
         // Code for executing the command here.
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void PasswordRevealClick()
     {
         if (!IsPasswordRevealButtonVisible) return;

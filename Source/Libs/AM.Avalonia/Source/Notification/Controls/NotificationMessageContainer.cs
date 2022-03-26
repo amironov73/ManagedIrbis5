@@ -44,15 +44,15 @@ public class NotificationMessageContainer
     /// </value>
     public INotificationMessageManager Manager
     {
-        get => (INotificationMessageManager)this.GetValue(ManagerProperty);
-        set => this.SetValue(ManagerProperty, value);
+        get => GetValue (ManagerProperty);
+        set => SetValue (ManagerProperty, value);
     }
 
     /// <summary>
     /// The manager property.
     /// </summary>
     public static readonly StyledProperty<NotificationMessageManager> ManagerProperty =
-        AvaloniaProperty.Register<NotificationMessageContainer, NotificationMessageManager>("Manager");
+        AvaloniaProperty.Register<NotificationMessageContainer, NotificationMessageManager> ("Manager");
 
 
     //TODO
@@ -68,22 +68,31 @@ public class NotificationMessageContainer
             AvaloniaPropertyChangedEventArgs dependencyPropertyChangedEventArgs
         )
     {
-        if (!(dependencyObject is NotificationMessageContainer @this))
-            throw new NullReferenceException("Dependency object is not of valid type " +
-                                             nameof(NotificationMessageContainer));
+        if (!(dependencyObject is NotificationMessageContainer self))
+        {
+            throw new NullReferenceException
+                (
+                    "Dependency object is not of valid type " +
+                    nameof (NotificationMessageContainer)
+                );
+        }
 
         if (dependencyPropertyChangedEventArgs.OldValue is INotificationMessageManager oldManager)
-            @this.DetachManagerEvents(oldManager);
+        {
+            self.DetachManagerEvents (oldManager);
+        }
 
         if (dependencyPropertyChangedEventArgs.NewValue is INotificationMessageManager newManager)
-            @this.AttachManagerEvents(newManager);
+        {
+            self.AttachManagerEvents (newManager);
+        }
     }
 
     /// <summary>
     /// Attaches the manager events.
     /// </summary>
     /// <param name="newManager">The new manager.</param>
-    private void AttachManagerEvents(INotificationMessageManager newManager)
+    private void AttachManagerEvents (INotificationMessageManager newManager)
     {
         newManager.OnMessageQueued += ManagerOnOnMessageQueued;
         newManager.OnMessageDismissed += ManagerOnOnMessageDismissed;
@@ -93,7 +102,7 @@ public class NotificationMessageContainer
     /// Detaches the manager events.
     /// </summary>
     /// <param name="oldManager">The old manager.</param>
-    private void DetachManagerEvents(INotificationMessageManager oldManager)
+    private void DetachManagerEvents (INotificationMessageManager oldManager)
     {
         oldManager.OnMessageQueued -= ManagerOnOnMessageQueued;
         oldManager.OnMessageDismissed -= ManagerOnOnMessageDismissed;
@@ -105,13 +114,13 @@ public class NotificationMessageContainer
     /// <param name="sender">The sender.</param>
     /// <param name="args">The <see cref="NotificationMessageManagerEventArgs"/> instance containing the event data.</param>
     /// <exception cref="InvalidOperationException">Can't use both ItemsSource and Items collection at the same time.</exception>
-    private void ManagerOnOnMessageDismissed(object sender, NotificationMessageManagerEventArgs args)
+    private void ManagerOnOnMessageDismissed (object sender, NotificationMessageManagerEventArgs args)
     {
         /*if (this.Items != null)
             throw new InvalidOperationException(
                 "Can't use both ItemsSource and Items collection at the same time.");*/
 
-        this.RemoveMessage(args.Message);
+        RemoveMessage (args.Message);
     }
 
     private void RemoveMessage
@@ -119,7 +128,7 @@ public class NotificationMessageContainer
             INotificationMessage message
         )
     {
-        (this.Items as AvaloniaList<object>).Remove(message);
+        (Items as AvaloniaList<object>).Remove (message);
     }
 
     /// <summary>
@@ -130,7 +139,7 @@ public class NotificationMessageContainer
     /// <exception cref="InvalidOperationException">Can't use both ItemsSource and Items collection at the same time.</exception>
     private void ManagerOnOnMessageQueued
         (
-            object sender,
+            object? sender,
             NotificationMessageManagerEventArgs args
         )
     {
@@ -138,7 +147,7 @@ public class NotificationMessageContainer
             throw new InvalidOperationException(
                 "Can't use both ItemsSource and Items collection at the same time.");*/
 
-        (this.Items as AvaloniaList<object>).Add(args.Message);
+        (Items as AvaloniaList<object>).Add (args.Message);
 
         if (args.Message is INotificationAnimation animatableMessage)
         {
@@ -154,7 +163,8 @@ public class NotificationMessageContainer
     /// </summary>
     static NotificationMessageContainer()
     {
-        ManagerProperty.Changed.Subscribe(x => ManagerPropertyChangedCallback(x.Sender, x));
+        ManagerProperty.Changed.Subscribe (x => ManagerPropertyChangedCallback (x.Sender, x));
+
         //DefaultStyleKeyProperty.OverrideMetadata(typeof(NotificationMessageContainer), new FrameworkPropertyMetadata(typeof(NotificationMessageContainer)));
     }
 }

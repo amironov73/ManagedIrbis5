@@ -38,25 +38,37 @@ namespace AM.Avalonia.ViewModels;
 public class MsBoxStandardViewModel
     : AbstractMsBoxViewModel
 {
+    /// <summary>
+    ///
+    /// </summary>
     public readonly ClickEnum _enterDefaultButton;
+
+    /// <summary>
+    ///
+    /// </summary>
     public readonly ClickEnum _escDefaultButton;
 
     private readonly MsBoxStandardWindow _window;
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="parameters"></param>
+    /// <param name="msBoxStandardWindow"></param>
     public MsBoxStandardViewModel
         (
             MessageBoxStandardParams parameters,
             MsBoxStandardWindow msBoxStandardWindow
-        ) :
-        base(parameters, parameters.Icon)
+        )
+        : base (parameters, parameters.Icon)
     {
         _enterDefaultButton = parameters.EnterDefaultButton;
         _escDefaultButton = parameters.EscDefaultButton;
         _window = msBoxStandardWindow;
-        SetButtons(parameters.ButtonDefinitions);
-        ButtonClickCommand = new RelayCommand(o => ButtonClick(o.ToString()));
-        EnterClickCommand = new RelayCommand(o => EnterClick());
-        EscClickCommand = new RelayCommand(o => EscClick());
+        SetButtons (parameters.ButtonDefinitions);
+        ButtonClickCommand = new RelayCommand (o => ButtonClick (o.ToString()));
+        EnterClickCommand = new RelayCommand (o => EnterClick());
+        EscClickCommand = new RelayCommand (o => EscClick());
     }
 
     /// <summary>
@@ -99,7 +111,7 @@ public class MsBoxStandardViewModel
     /// </summary>
     public RelayCommand EscClickCommand { get; }
 
-    private void SetButtons(ButtonEnum paramsButtonDefinitions)
+    private void SetButtons (ButtonEnum paramsButtonDefinitions)
     {
         switch (paramsButtonDefinitions)
         {
@@ -137,7 +149,7 @@ public class MsBoxStandardViewModel
             default:
                 throw new ArgumentOutOfRangeException
                     (
-                        nameof(paramsButtonDefinitions),
+                        nameof (paramsButtonDefinitions),
                         paramsButtonDefinitions,
                         null
                     );
@@ -176,19 +188,19 @@ public class MsBoxStandardViewModel
             {
                 if (IsCancelShowed)
                 {
-                    ButtonClick(ButtonResult.Cancel);
+                    ButtonClick (ButtonResult.Cancel);
                     return;
                 }
 
                 if (IsAbortShowed)
                 {
-                    ButtonClick(ButtonResult.Abort);
+                    ButtonClick (ButtonResult.Abort);
                     return;
                 }
 
                 if (IsNoShowed)
                 {
-                    ButtonClick(ButtonResult.No);
+                    ButtonClick (ButtonResult.No);
                     return;
                 }
             }
@@ -198,7 +210,7 @@ public class MsBoxStandardViewModel
         }
 
 
-        ButtonClick(ButtonResult.None);
+        ButtonClick (ButtonResult.None);
     }
 
     private void EnterClick()
@@ -233,13 +245,13 @@ public class MsBoxStandardViewModel
             {
                 if (IsOkShowed)
                 {
-                    ButtonClick(ButtonResult.Ok);
+                    ButtonClick (ButtonResult.Ok);
                     return;
                 }
 
                 if (IsYesShowed)
                 {
-                    ButtonClick(ButtonResult.Yes);
+                    ButtonClick (ButtonResult.Yes);
                     return;
                 }
             }
@@ -258,9 +270,9 @@ public class MsBoxStandardViewModel
             string parameter
         )
     {
-        await Dispatcher.UIThread.InvokeAsync(() =>
+        await Dispatcher.UIThread.InvokeAsync (() =>
         {
-            _window.ButtonResult = (ButtonResult)Enum.Parse(typeof(ButtonResult), parameter.Trim(), true);
+            _window.ButtonResult = (ButtonResult)Enum.Parse (typeof (ButtonResult), parameter.Trim(), true);
             _window.Close();
         });
     }
@@ -273,7 +285,7 @@ public class MsBoxStandardViewModel
             ButtonResult buttonResult
         )
     {
-        await Dispatcher.UIThread.InvokeAsync(() =>
+        await Dispatcher.UIThread.InvokeAsync (() =>
         {
             _window.ButtonResult = buttonResult;
             _window.Close();
