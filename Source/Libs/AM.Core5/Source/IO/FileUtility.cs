@@ -32,6 +32,30 @@ namespace AM.IO;
 /// </summary>
 public static class FileUtility
 {
+    #region Private members
+
+    private static readonly char[] _InvalidFileNameChars =
+    {
+        '\"', '<', '>', '|', '\0', ':', '*', '?', '\\', '/', ';', ',',
+        (char)1, (char)2, (char)3, (char)4, (char)5, (char)6, (char)7,
+        (char)8, (char)9, (char)10, (char)11, (char)12, (char)13,
+        (char)14, (char)15, (char)16, (char)17, (char)18, (char)19,
+        (char)20, (char)21, (char)22, (char)23, (char)24, (char)25,
+        (char)26, (char)27, (char)28, (char)29, (char)30, (char)31
+    };
+
+    private static readonly string[] _SpecialFileNames =
+    {
+        "CON", "PRN", "AUX", "CLOCK$", "NUL", "COM0", "COM1", "COM2",
+        "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT0",
+        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8",
+        "LPT9", "CONFIG$", "$Mft", "$MftMirr", "$LogFile", "$Volume",
+        "$AttrDef", "$Bitmap", "$Boot", "$BadClus", "$Secure", "$Upcase",
+        "$Extend", "$Quota", "$ObjId", "$Reparse"
+    };
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
@@ -66,8 +90,7 @@ public static class FileUtility
     {
         Sure.NotNullNorEmpty (text);
 
-        var invalidCharacters = Path.GetInvalidFileNameChars();
-
+        var invalidCharacters = GetInvalidFileNameChars();
         if (text.Length >= PathUtility.MaxPath)
         {
             text = text.Substring (0, PathUtility.MaxPath);
@@ -309,6 +332,16 @@ public static class FileUtility
     }
 
     /// <summary>
+    /// Получение массива символов, которые не должны употребляться в имени файла.
+    /// Метод намеренно сделан не портабельным, чтобы то, что запрещено под
+    /// Windows, не создавалось бы и под Unix, и наоборот.
+    /// </summary>
+    public static char[] GetInvalidFileNameChars()
+    {
+        return _InvalidFileNameChars;
+    }
+
+    /// <summary>
     /// Gets the name of the not existent file.
     /// </summary>
     /// <param name="original">The original.</param>
@@ -349,6 +382,29 @@ public static class FileUtility
             );
 
         throw new ArsMagnaException();
+    }
+
+    /// <summary>
+    /// Проверяет, не является ли указанное имя зарезервированным.
+    /// Метод намеренно сделан не портабельным, чтобы то, что запрещено под
+    /// Windows, не создавалось бы и под Unix, и наоборот.
+    /// </summary>
+    public static bool IsSpecialName
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        foreach (var name in _SpecialFileNames)
+        {
+            if (fileName.SameString (name))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
