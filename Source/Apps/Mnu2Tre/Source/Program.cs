@@ -30,6 +30,8 @@ using ManagedIrbis.Trees;
 
 #endregion
 
+#nullable enable
+
 namespace Mnu2Tre;
 
 class Program
