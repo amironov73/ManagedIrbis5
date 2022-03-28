@@ -30,6 +30,15 @@ namespace AM.IO;
 /// </summary>
 public static class PathUtility
 {
+    #region Constants
+
+    /// <summary>
+    /// Максимальная длина имени файла.
+    /// </summary>
+    public const int MaxPath = 256;
+
+    #endregion
+
     #region Private members
 
     private static readonly string _backslash

@@ -8,6 +8,8 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+using System.Text;
+
 #nullable enable
 
 namespace AM.Text;
@@ -56,6 +58,80 @@ public static class TextUtility
         }
 
         return TextKind.PlainText;
+    }
+
+    /// <summary>
+    /// Удаление пробельных символов в начале и в конце текста.
+    /// </summary>
+    public static void Trim
+        (
+            this StringBuilder builder
+        )
+    {
+        Sure.NotNull (builder);
+
+        while (builder.Length > 1)
+        {
+            if (char.IsWhiteSpace (builder[0]))
+            {
+                builder.Remove (0, 1);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        while (builder.Length > 1)
+        {
+            var last = builder.Length - 1;
+            if (char.IsWhiteSpace (builder[last]))
+            {
+                builder.Remove (last, 1);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Удаление указанных символов в начале и в конце текста.
+    /// </summary>
+    public static void Trim
+        (
+            this StringBuilder builder,
+            char[] whitespace
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (whitespace);
+
+        while (builder.Length > 1)
+        {
+            if (builder[0].IsOneOf (whitespace))
+            {
+                builder.Remove (0, 1);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        while (builder.Length > 1)
+        {
+            var last = builder.Length - 1;
+            if (builder[last].IsOneOf (whitespace))
+            {
+                builder.Remove (last, 1);
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     #endregion

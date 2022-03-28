@@ -19,6 +19,8 @@
 using System;
 using System.IO;
 
+using AM.Text;
+
 #endregion
 
 #nullable enable
@@ -35,7 +37,7 @@ public static class FileUtility
     /// <summary>
     /// Побайтовое сравнение двух файлов.
     /// </summary>
-    public static int Compare
+    public static int CompareFiles
         (
             string first,
             string second
@@ -46,6 +48,7 @@ public static class FileUtility
 
         using FileStream firstStream = File.OpenRead (first),
             secondStream = File.OpenRead (second);
+
         return StreamUtility.CompareTo
             (
                 firstStream,
@@ -54,7 +57,70 @@ public static class FileUtility
     }
 
     /// <summary>
+    /// Преобразование текста в валидное имя файла.
+    /// </summary>
+    public static string ConvertToFileName
+        (
+            string text
+        )
+    {
+        Sure.NotNullNorEmpty (text);
+
+        var invalidCharacters = Path.GetInvalidFileNameChars();
+
+        if (text.Length >= PathUtility.MaxPath)
+        {
+            text = text.Substring (0, PathUtility.MaxPath);
+        }
+
+        var found = false;
+        foreach (var c in text)
+        {
+            if (c.IsOneOf (invalidCharacters))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            return text.Trim();
+        }
+
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (text.Length);
+        var first = true;
+        foreach (var c in text)
+        {
+            if (c.IsOneOf (invalidCharacters))
+            {
+                if (first)
+                {
+                    builder.Append ('_');
+                }
+
+                // съедаем лишние замещающие символы
+                first = false;
+            }
+            else
+            {
+                builder.Append (c);
+                first = true;
+            }
+        }
+
+        builder.Trim();
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
+
+    /// <summary>
     /// Копирование указанного исходного файла поверх указанного файла назначения.
+    /// Отличается тем, что переносит времена (создания, последнего доступа и модификации).
     /// </summary>
     public static void Copy
         (
@@ -63,6 +129,9 @@ public static class FileUtility
             bool overwrite
         )
     {
+        Sure.FileExists (sourceName);
+        Sure.NotNullNorEmpty (targetName);
+
         File.Copy (sourceName, targetName, overwrite);
 
         // переносим времена с исходного файла
@@ -193,23 +262,36 @@ public static class FileUtility
     }
 
     /// <summary>
-    /// Find file in path.
+    /// Найти файл по путям, используя стандартный разделитель.
+    /// </summary>
+    /// <returns></returns>
+    public static string? FindFileInPath
+        (
+            string fileName,
+            string? path
+        )
+    {
+        return FindFileInPath (fileName, path, Path.PathSeparator);
+    }
+
+    /// <summary>
+    /// Найти файл по путям, используя указанный разделитель.
     /// </summary>
     public static string? FindFileInPath
         (
             string fileName,
             string? path,
-            char elementDelimiter
+            char pathSeparator
         )
     {
         Sure.NotNullNorEmpty (fileName);
 
-        if (ReferenceEquals (path, null) || path.Length == 0)
+        if (string.IsNullOrWhiteSpace (path))
         {
             return null;
         }
 
-        var elements = path.Split (elementDelimiter);
+        var elements = path.Split (pathSeparator);
         foreach (var element in elements)
         {
             var fullPath = Path.Combine
@@ -289,7 +371,6 @@ public static class FileUtility
         {
             File.WriteAllBytes (fileName, Array.Empty<byte>());
         }
-
     }
 
     /// <summary>
