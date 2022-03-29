@@ -31,7 +31,7 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-namespace InventoryControl;
+namespace BulletinMaker;
 
 /// <summary>
 /// Точка входа в программу.
