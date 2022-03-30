@@ -31,6 +31,8 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
+#nullable enable
+
 namespace BulletinMaker;
 
 /// <summary>
