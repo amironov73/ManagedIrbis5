@@ -8,37 +8,36 @@ using AM.Collections;
 
 #nullable enable
 
-namespace UnitTests.AM.Collections
+namespace UnitTests.AM.Collections;
+
+[TestClass]
+public sealed class DisposableCollectionTest
 {
-    [TestClass]
-    public class DisposableCollectionTest
+    private static int _count;
+
+    class Dummy
+        : IDisposable
     {
-        private static int _count;
-
-        class Dummy
-            : IDisposable
+        public void Dispose()
         {
-            public void Dispose()
-            {
-                _count++;
-            }
+            _count++;
         }
+    }
 
-        [TestMethod]
-        public void DisposableCollection_Dispose()
+    [TestMethod]
+    public void DisposableCollection_Dispose()
+    {
+        _count = 0;
+
+        var collection = new DisposableCollection<Dummy>
         {
-            _count = 0;
+            new (),
+            new (),
+            new ()
+        };
 
-            var collection = new DisposableCollection<Dummy>
-            {
-                new (),
-                new (),
-                new ()
-            };
+        collection.Dispose();
 
-            collection.Dispose();
-
-            Assert.AreEqual (3, _count);
-        }
+        Assert.AreEqual (3, _count);
     }
 }

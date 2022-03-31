@@ -1,30 +1,30 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// ReSharper disable CheckNamespace
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Collections;
 
-// ReSharper disable CheckNamespace
 
-namespace UnitTests.AM.Collections
+namespace UnitTests.AM.Collections;
+
+[TestClass]
+public sealed class CloneableCollectionTest
 {
-    [TestClass]
-    public class CloneableCollectionTest
+    [TestMethod]
+    public void CloneableCollection_Clone()
     {
-        [TestMethod]
-        public void CloneableCollection_Clone()
+        var source = new CloneableCollection<int>
         {
-            var source = new CloneableCollection<int>
-            {
-                212,
-                85,
-                06
-            };
-            var clone = (CloneableCollection<int>)source.Clone();
+            212,
+            85,
+            06
+        };
+        var clone = (CloneableCollection<int>)source.Clone();
 
-            Assert.AreEqual (source.Count, clone.Count);
-            for (var i = 0; i < source.Count; i++)
-            {
-                Assert.AreEqual (source[i], clone[i]);
-            }
+        Assert.AreEqual (source.Count, clone.Count);
+        for (var i = 0; i < source.Count; i++)
+        {
+            Assert.AreEqual (source[i], clone[i]);
         }
     }
 }

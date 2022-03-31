@@ -11,7 +11,7 @@ using AM.Collections;
 namespace UnitTests.AM.Collections;
 
 [TestClass]
-public class DictionaryListTest
+public sealed class DictionaryListTest
 {
     [TestMethod]
     public void DictionaryList_Constructor()
