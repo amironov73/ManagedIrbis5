@@ -20,26 +20,25 @@ using ManagedIrbis.Gbl;
 
 #nullable enable
 
-namespace ManagedIrbis.Processing
+namespace ManagedIrbis.Processing;
+
+/// <summary>
+/// Интерфейс синхронного процессора записей.
+/// </summary>
+public interface ISyncRecordProcessor
+    : IDisposable
 {
     /// <summary>
-    /// Интерфейс синхронного процессора записей.
+    /// Обработка одной записи.
     /// </summary>
-    public interface ISyncRecordProcessor
-        : IDisposable
-    {
-        /// <summary>
-        /// Обработка одной записи.
-        /// </summary>
-        ProtocolLine ProcessOneRecord (Record record);
+    ProtocolLine ProcessOneRecord (Record record);
 
-        /// <summary>
-        /// Обработка множества записей.
-        /// </summary>
-        GblResult ProcessRecords
-            (
-                ISyncRecordSource source,
-                ISyncRecordSink sync
-            );
-    }
+    /// <summary>
+    /// Обработка множества записей.
+    /// </summary>
+    GblResult ProcessRecords
+        (
+            ISyncRecordSource source,
+            ISyncRecordSink sync
+        );
 }

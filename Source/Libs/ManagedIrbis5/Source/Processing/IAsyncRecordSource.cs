@@ -19,29 +19,28 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace ManagedIrbis.Processing
+namespace ManagedIrbis.Processing;
+
+/// <summary>
+/// Интерфейс асинхронного источника записей для глобальной корректировки.
+/// </summary>
+public interface IAsyncRecordSource
+    : IAsyncDisposable
 {
     /// <summary>
-    /// Интерфейс асинхронного источника записей для глобальной корректировки.
+    /// Получение следующей записи из источника.
     /// </summary>
-    public interface IAsyncRecordSource
-        : IAsyncDisposable
-    {
-        /// <summary>
-        /// Получение следующей записи из источника.
-        /// </summary>
-        /// <returns>
-        /// <c>null</c> означает, что записи в источнике закончились.
-        /// </returns>
-        Task<Record?> GetNextRecordAsync();
+    /// <returns>
+    /// <c>null</c> означает, что записи в источнике закончились.
+    /// </returns>
+    Task<Record?> GetNextRecordAsync();
 
-        /// <summary>
-        /// Получение общего количества записей,
-        /// подаваемых на глобальную корректировку.
-        /// </summary>
-        /// <returns>
-        /// Отрицательное число означает, что количество записей неизвестно.
-        /// </returns>
-        Task<int> GetRecordCountAsync();
-    }
+    /// <summary>
+    /// Получение общего количества записей,
+    /// подаваемых на глобальную корректировку.
+    /// </summary>
+    /// <returns>
+    /// Отрицательное число означает, что количество записей неизвестно.
+    /// </returns>
+    Task<int> GetRecordCountAsync();
 }

@@ -21,26 +21,25 @@ using ManagedIrbis.Gbl;
 
 #nullable enable
 
-namespace ManagedIrbis.Processing
+namespace ManagedIrbis.Processing;
+
+/// <summary>
+/// Интерфейс асинхронного процессора записей.
+/// </summary>
+public interface IAsyncRecordProcessor
+    : IAsyncDisposable
 {
     /// <summary>
-    /// Интерфейс асинхронного процессора записей.
+    /// Обработка одной записи.
     /// </summary>
-    public interface IAsyncRecordProcessor
-        : IAsyncDisposable
-    {
-        /// <summary>
-        /// Обработка одной записи.
-        /// </summary>
-        Task<ProtocolLine> ProcessOneRecordAsync (Record record);
+    Task<ProtocolLine> ProcessOneRecordAsync (Record record);
 
-        /// <summary>
-        /// Обработка множества записей.
-        /// </summary>
-        Task<GblResult> ProcessRecordsAsync
-            (
-                ISyncRecordSource source,
-                ISyncRecordSink sync
-            );
-    }
+    /// <summary>
+    /// Обработка множества записей.
+    /// </summary>
+    Task<GblResult> ProcessRecordsAsync
+        (
+            ISyncRecordSource source,
+            ISyncRecordSink sync
+        );
 }

@@ -18,29 +18,28 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis.Processing
+namespace ManagedIrbis.Processing;
+
+/// <summary>
+/// Интерфейс синхронного источника записей для глобальной корректировки.
+/// </summary>
+public interface ISyncRecordSource
+    : IDisposable
 {
     /// <summary>
-    /// Интерфейс синхронного источника записей для глобальной корректировки.
+    /// Получение следующей записи из источника.
     /// </summary>
-    public interface ISyncRecordSource
-        : IDisposable
-    {
-        /// <summary>
-        /// Получение следующей записи из источника.
-        /// </summary>
-        /// <returns>
-        /// <c>null</c> означает, что записи в источнике закончились.
-        /// </returns>
-        Record? GetNextRecord();
+    /// <returns>
+    /// <c>null</c> означает, что записи в источнике закончились.
+    /// </returns>
+    Record? GetNextRecord();
 
-        /// <summary>
-        /// Получение общего количества записей,
-        /// подаваемых на глобальную корректировку.
-        /// </summary>
-        /// <returns>
-        /// Отрицательное число означает, что количество записей неизвестно.
-        /// </returns>
-        int GetRecordCount();
-    }
+    /// <summary>
+    /// Получение общего количества записей,
+    /// подаваемых на глобальную корректировку.
+    /// </summary>
+    /// <returns>
+    /// Отрицательное число означает, что количество записей неизвестно.
+    /// </returns>
+    int GetRecordCount();
 }

@@ -18,35 +18,34 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis.Processing
+namespace ManagedIrbis.Processing;
+
+/// <summary>
+/// Интерфейс синхронного приемника записей для глобальной корректировки.
+/// </summary>
+public interface ISyncRecordSink
+    : IDisposable
 {
     /// <summary>
-    /// Интерфейс синхронного приемника записей для глобальной корректировки.
+    /// Помещение в приемник модифицированной записи.
+    /// Повторные попытки помещения одной и той же записи игнорируются.
+    /// Сообщения, связанные с одной записью, склеиваются.
     /// </summary>
-    public interface ISyncRecordSink
-        : IDisposable
-    {
-        /// <summary>
-        /// Помещение в приемник модифицированной записи.
-        /// Повторные попытки помещения одной и той же записи игнорируются.
-        /// Сообщения, связанные с одной записью, склеиваются.
-        /// </summary>
-        void PostRecord
-            (
-                Record record,
-                string? message = null
-            );
+    void PostRecord
+        (
+            Record record,
+            string? message = null
+        );
 
-        /// <summary>
-        /// Сигнал окончания обработки записей.
-        /// Может использоваться для пакетной отправки
-        /// измененных записей на сервер.
-        /// </summary>
-        void Complete();
+    /// <summary>
+    /// Сигнал окончания обработки записей.
+    /// Может использоваться для пакетной отправки
+    /// измененных записей на сервер.
+    /// </summary>
+    void Complete();
 
-        /// <summary>
-        /// Получение протокола.
-        /// </summary>
-        ProtocolLine[] GetProtocol();
-    }
+    /// <summary>
+    /// Получение протокола.
+    /// </summary>
+    ProtocolLine[] GetProtocol();
 }

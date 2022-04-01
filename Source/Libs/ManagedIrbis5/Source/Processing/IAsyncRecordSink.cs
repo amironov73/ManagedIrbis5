@@ -19,35 +19,34 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace ManagedIrbis.Processing
+namespace ManagedIrbis.Processing;
+
+/// <summary>
+/// Интерфейс асинхронного приемника записей для глобальной корректировки.
+/// </summary>
+public interface IAsyncRecordSink
+    : IAsyncDisposable
 {
     /// <summary>
-    /// Интерфейс асинхронного приемника записей для глобальной корректировки.
+    /// Помещение в приемник модифицированной записи.
+    /// Повторные попытки помещения одной и той же записи игнорируются.
+    /// Сообщения, связанные с одной записью, склеиваются.
     /// </summary>
-    public interface IAsyncRecordSink
-        : IAsyncDisposable
-    {
-        /// <summary>
-        /// Помещение в приемник модифицированной записи.
-        /// Повторные попытки помещения одной и той же записи игнорируются.
-        /// Сообщения, связанные с одной записью, склеиваются.
-        /// </summary>
-        Task PostRecordAsync
-            (
-                Record record,
-                string? message = null
-            );
+    Task PostRecordAsync
+        (
+            Record record,
+            string? message = null
+        );
 
-        /// <summary>
-        /// Сигнал окончания обработки записей.
-        /// Может использоваться для пакетной отправки
-        /// измененных записей на сервер.
-        /// </summary>
-        Task CompleteAsync();
+    /// <summary>
+    /// Сигнал окончания обработки записей.
+    /// Может использоваться для пакетной отправки
+    /// измененных записей на сервер.
+    /// </summary>
+    Task CompleteAsync();
 
-        /// <summary>
-        /// Получение протокола.
-        /// </summary>
-        Task<ProtocolLine[]> GetProtocolAsync();
-    }
+    /// <summary>
+    /// Получение протокола.
+    /// </summary>
+    Task<ProtocolLine[]> GetProtocolAsync();
 }
