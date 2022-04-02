@@ -2424,6 +2424,28 @@ public static class Utility
     }
 
     /// <summary>
+    /// Сравнение двух строк.
+    /// </summary>
+    public static int SameCompare
+        (
+            this string? first,
+            string? second
+        )
+    {
+        if (first is null)
+        {
+            return second is null ? 0 : -1;
+        }
+
+        if (second is null)
+        {
+            return 1;
+        }
+
+        return string.Compare (first, second, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
     /// Преобразование произвольного значения в строку
     /// по правилам инвариантной культуры.
     /// </summary>
