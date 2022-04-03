@@ -34,7 +34,7 @@ public static class WebUtility
     /// <summary>
     /// Получение статус-кода для указанного адреса.
     /// </summary>
-    static int GetHttpStatusCode
+    public static int GetHttpStatusCode
         (
             string address
         )
@@ -53,6 +53,28 @@ public static class WebUtility
         return (int) response.StatusCode;
     }
 
+    /*
+
+    /// <summary>
+    /// Forces your browser to download any kind of file instead
+    /// of trying to open it inside the browser (e.g. pictures, pdf, mp3).
+    /// Works in Chrome, Opera, Firefox and IE 7 &amp; 8!
+    /// </summary>
+    public static void ForceDownload
+        (
+            this HttpResponse response,
+            string fullPathToFile,
+            string outputFileName
+        )
+    {
+        response.Clear();
+        response.AddHeader ("content-disposition", "attachment; filename=" + outputFileName);
+        response.WriteFile (fullPathToFile);
+        response.ContentType = "";
+        response.End();
+    }
+
+    */
 
     #endregion
 }
