@@ -20,6 +20,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -2424,11 +2425,156 @@ public static class Utility
     }
 
     /// <summary>
+    /// Сравнение двух строк.
+    /// </summary>
+    [Pure]
+    public static int SameCompare
+        (
+            this string? first,
+            string? second
+        )
+    {
+        if (first is null)
+        {
+            return second is null ? 0 : -1;
+        }
+
+        if (second is null)
+        {
+            return 1;
+        }
+
+        return string.Compare (first, second, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Format a double using the local culture currency settings.
+    /// </summary>
+    /// <param name="value">The double to be formatted.</param>
+    /// <param name="culture">(Optional) If specified, uses the specified
+    /// cultures currency format. Otherwise uses machines current culture.</param>
+    /// <returns>The double formatted based on the local culture currency settings.</returns>
+    [Pure]
+    public static string ToLocalCurrencyString
+        (
+            this double value,
+            CultureInfo? culture = null
+        )
+    {
+        culture ??= CultureInfo.CurrentCulture;
+
+        return value.ToString ("c", culture);
+    }
+
+    /// <summary>
+    /// Format a decimal using the local culture currency settings.
+    /// </summary>
+    /// <param name="value">The double to be formatted.</param>
+    /// <param name="culture">(Optional) If specified, uses the specified
+    /// cultures currency format. Otherwise uses machines current culture.</param>
+    /// <returns>The double formatted based on the local culture currency settings.</returns>
+    [Pure]
+    public static string ToLocalCurrencyString
+        (
+            this decimal value,
+            CultureInfo? culture = null
+        )
+    {
+        culture ??= CultureInfo.CurrentCulture;
+
+        return value.ToString ("c", culture);
+    }
+
+    /// <summary>
+    /// 	Ensures that a string starts with a given prefix.
+    /// </summary>
+    /// <param name = "value">The string value to check.</param>
+    /// <param name = "prefix">The prefix value to check for.</param>
+    /// <returns>The string value including the prefix</returns>
+    /// <example>
+    /// 	<code>
+    /// 		var extension = "txt";
+    /// 		var fileName = string.Concat(file.Name, extension.EnsureStartsWith("."));
+    /// 	</code>
+    /// </example>
+    [Pure]
+    public static string EnsureStartsWith
+        (
+            this string value,
+            string prefix
+        )
+    {
+        return value.StartsWith (prefix) ? value : value.Insert(0, prefix);
+    }
+
+    /// <summary>
+    /// 	Ensures that a string ends with a given suffix.
+    /// </summary>
+    /// <param name = "value">The string value to check.</param>
+    /// <param name = "suffix">The suffix value to check for.</param>
+    /// <returns>The string value including the suffix</returns>
+    /// <example>
+    /// 	<code>
+    /// 		var url = "http://www.pgk.de";
+    /// 		url = url.EnsureEndsWith("/"));
+    /// 	</code>
+    /// </example>
+    [Pure]
+    public static string EnsureEndsWith
+        (
+            this string value,
+            string suffix
+        )
+    {
+        return value.EndsWith(suffix) ? value : value.Insert(value.Length, suffix);
+    }
+
+    /// <summary>
+    /// Returns characters from left of specified length
+    /// </summary>
+    /// <param name="value">String value</param>
+    /// <param name="length">Max number of charaters to return</param>
+    /// <returns>Returns string from left</returns>
+    [Pure]
+    public static string? Left
+        (
+            this string? value,
+            int length
+        )
+    {
+        return value is not null && value.Length > length
+            ? value.Substring (0, length)
+            : value;
+    }
+
+    /// <summary>
+    /// Returns characters from right of specified length
+    /// </summary>
+    /// <param name="value">String value</param>
+    /// <param name="length">Max number of charaters to return</param>
+    /// <returns>Returns string from right</returns>
+    [Pure]
+    public static string? Right
+        (
+            this string? value,
+            int length
+        )
+    {
+        return value is not null && value.Length > length
+            ? value.Substring (value.Length - length)
+            : value;
+    }
+
+    /// <summary>
     /// Преобразование произвольного значения в строку
     /// по правилам инвариантной культуры.
     /// </summary>
-    public static string ToInvariantString (object value) =>
-        value switch
+    public static string ToInvariantString
+        (
+            this object? value
+        )
+    {
+        return value switch
         {
             bool val => val.ToInvariantString(),
             double val => val.ToInvariantString(),
@@ -2437,19 +2583,31 @@ public static class Utility
             TimeSpan val => val.ToInvariantString(),
             _ => Convert.ToString (value, CultureInfo.InvariantCulture)!,
         };
+    }
 
     /// <summary>
     /// Преобразование промежутка времени в строку по правилам
     /// инвариантной культуры.
     /// </summary>
-    public static string ToInvariantString (this TimeSpan value) =>
-        value.ToString ("c", CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this TimeSpan value
+        )
+    {
+        return value.ToString ("c", CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование логического значения в "true" в "false".
     /// </summary>
     [Pure]
-    public static string ToInvariantString (this bool value) => value ? "true" : "false";
+    public static string ToInvariantString
+        (
+            this bool value
+        )
+    {
+        return value ? "true" : "false";
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
@@ -2458,34 +2616,27 @@ public static class Utility
     /// <param name="value">Число для преобразования.</param>
     /// <returns>Строковое представление числа.</returns>
     [Pure]
-    public static string ToInvariantString (this short value) =>
-        value.ToString (CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this short value
+        )
+    {
+        return value.ToString (CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
     /// (не зависящей от региона) культуры.
     /// </summary>
     [Pure]
-    public static string ToInvariantString (this short value, string format) =>
-        value.ToString (format, CultureInfo.InvariantCulture);
-
-    /// <summary>
-    /// Преобразование числа в строку по правилам инвариантной
-    /// (не зависящей от региона) культуры.
-    /// </summary>
-    /// <param name="value">Число для преобразования.</param>
-    /// <returns>Строковое представление числа.</returns>
-    [Pure]
-    public static string ToInvariantString (this ushort value) =>
-        value.ToString (CultureInfo.InvariantCulture);
-
-    /// <summary>
-    /// Преобразование числа в строку по правилам инвариантной
-    /// (не зависящей от региона) культуры.
-    /// </summary>
-    [Pure]
-    public static string ToInvariantString (this ushort value, string format) =>
-        value.ToString (format, CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this short value,
+            string format
+        )
+    {
+        return value.ToString (format, CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
@@ -2494,34 +2645,27 @@ public static class Utility
     /// <param name="value">Число для преобразования.</param>
     /// <returns>Строковое представление числа.</returns>
     [Pure]
-    public static string ToInvariantString (this int value) =>
-        value.ToString (CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this ushort value
+        )
+    {
+        return value.ToString (CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
     /// (не зависящей от региона) культуры.
     /// </summary>
     [Pure]
-    public static string ToInvariantString (this int value, string format) =>
-        value.ToString (format, CultureInfo.InvariantCulture);
-
-    /// <summary>
-    /// Преобразование числа в строку по правилам инвариантной
-    /// (не зависящей от региона) культуры.
-    /// </summary>
-    /// <param name="value">Число для преобразования.</param>
-    /// <returns>Строковое представление числа.</returns>
-    [Pure]
-    public static string ToInvariantString (this uint value) =>
-        value.ToString (CultureInfo.InvariantCulture);
-
-    /// <summary>
-    /// Преобразование числа в строку по правилам инвариантной
-    /// (не зависящей от региона) культуры.
-    /// </summary>
-    [Pure]
-    public static string ToInvariantString (this uint value, string format) =>
-        value.ToString (format, CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this ushort value,
+            string format
+        )
+    {
+        return value.ToString (format, CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
@@ -2530,16 +2674,27 @@ public static class Utility
     /// <param name="value">Число для преобразования.</param>
     /// <returns>Строковое представление числа.</returns>
     [Pure]
-    public static string ToInvariantString (this long value) =>
-        value.ToString (CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this int value
+        )
+    {
+        return value.ToString (CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
     /// (не зависящей от региона) культуры.
     /// </summary>
     [Pure]
-    public static string ToInvariantString (this long value, string format) =>
-        value.ToString (format, CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this int value,
+            string format
+        )
+    {
+        return value.ToString (format, CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
@@ -2548,70 +2703,192 @@ public static class Utility
     /// <param name="value">Число для преобразования.</param>
     /// <returns>Строковое представление числа.</returns>
     [Pure]
-    public static string ToInvariantString (this ulong value) =>
-        value.ToString (CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this uint value
+        )
+    {
+        return value.ToString (CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
     /// (не зависящей от региона) культуры.
     /// </summary>
     [Pure]
-    public static string ToInvariantString (this ulong value, string format) =>
-        value.ToString (format, CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this uint value,
+            string format
+        )
+    {
+        return value.ToString (format, CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Преобразование числа в строку по правилам инвариантной
+    /// (не зависящей от региона) культуры.
+    /// </summary>
+    /// <param name="value">Число для преобразования.</param>
+    /// <returns>Строковое представление числа.</returns>
+    [Pure]
+    public static string ToInvariantString
+        (
+            this long value
+        )
+    {
+        return value.ToString (CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
     /// (не зависящей от региона) культуры.
     /// </summary>
     [Pure]
-    public static string ToInvariantString (this float value) =>
-        value.ToString (CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this long value,
+            string format
+        )
+    {
+        return value.ToString (format, CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Преобразование числа в строку по правилам инвариантной
+    /// (не зависящей от региона) культуры.
+    /// </summary>
+    /// <param name="value">Число для преобразования.</param>
+    /// <returns>Строковое представление числа.</returns>
+    [Pure]
+    public static string ToInvariantString
+        (
+            this ulong value
+        )
+    {
+        return value.ToString (CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
     /// (не зависящей от региона) культуры.
     /// </summary>
     [Pure]
-    public static string ToInvariantString (this float value, string format) =>
-        value.ToString (format, CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this ulong value,
+            string format
+        )
+    {
+        return value.ToString (format, CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
     /// (не зависящей от региона) культуры.
     /// </summary>
     [Pure]
-    public static string ToInvariantString (this double value) =>
-        value.ToString (CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this float value
+        )
+    {
+        return value.ToString (CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
     /// (не зависящей от региона) культуры.
     /// </summary>
     [Pure]
-    public static string ToInvariantString (this double value, string format) =>
-        value.ToString (format, CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this float value,
+            string format
+        )
+    {
+        return value.ToString (format, CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
     /// (не зависящей от региона) культуры.
     /// </summary>
     [Pure]
-    public static string ToInvariantString (this decimal value) =>
-        value.ToString (CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this double value
+        )
+    {
+        return value.ToString (CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     /// Преобразование числа в строку по правилам инвариантной
     /// (не зависящей от региона) культуры.
     /// </summary>
     [Pure]
-    public static string ToInvariantString (this decimal value, string format) =>
-        value.ToString (format, CultureInfo.InvariantCulture);
+    public static string ToInvariantString
+        (
+            this double value,
+            string format
+        )
+    {
+        return value.ToString (format, CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Преобразование числа в строку по правилам инвариантной
+    /// (не зависящей от региона) культуры.
+    /// </summary>
+    [Pure]
+    public static string ToInvariantString
+        (
+            this decimal value
+        )
+    {
+        return value.ToString (CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Преобразование числа в строку по правилам инвариантной
+    /// (не зависящей от региона) культуры.
+    /// </summary>
+    [Pure]
+    public static string ToInvariantString
+        (
+            this decimal value,
+            string format
+        )
+    {
+        return value.ToString (format, CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Convert a <see cref="IEnumerable{T}"/> to a <see cref="ObservableCollection{T}"/>
+    /// and can be used in XAML projects.
+    /// </summary>
+    public static ObservableCollection<T> ToObservableCollection<T>
+        (
+            this IEnumerable<T> enumerable
+        )
+    {
+        var result = new ObservableCollection<T>();
+        foreach (var item in enumerable)
+        {
+            result.Add(item);
+        }
+
+        return result;
+    }
 
     /// <summary>
     /// Register required encoding providers.
     /// </summary>
-    public static void RegisterEncodingProviders() =>
+    public static void RegisterEncodingProviders()
+    {
         Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+    }
 
     /// <summary>
     /// Безопасное преобразование строки в целое.

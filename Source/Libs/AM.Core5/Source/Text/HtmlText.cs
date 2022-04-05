@@ -33,7 +33,7 @@ public static class HtmlText
     #region Public methods
 
     /// <summary>
-    /// Encode html entities.
+    /// Encode HTML entities.
     /// </summary>
     public static string? Encode
         (
