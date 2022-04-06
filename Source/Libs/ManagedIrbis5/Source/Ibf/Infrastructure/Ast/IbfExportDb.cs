@@ -31,77 +31,75 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Ibf.Infrastructure.Ast
+namespace ManagedIrbis.Ibf.Infrastructure.Ast;
+//
+// http://sntnarciss.ru/irbis/spravka/wa0203050150.htm
+//
+// Операнды:
+//
+// 0|1/mfnfrom/mfnto],FstName,[0/#/@|1|2],[0|1|2],FileName
+// Где:
+// Первый операнд - исходные документы:
+// 0 - все
+// 1 - диапазон документов,
+// mfnfrom - начальный MFN,
+// mfnto - конечный MFN.
+// FstName - имя ТВП переформатирования,
+// если пустое значение - переформатирование не используется.
+// Третий операнд - выходной формат данных:
+// 0 - ISO-формат,
+// # - символ-разделитель полей,
+// @ - символ-разделитель записей;
+// 1 - текстовый формат
+// 2 - XML
+// Четвертый операнд - вид кодировки:
+// 0 - DOS
+// 1 – Windows
+// 2 – UTF8
+// FileName - полное имя файла с выходными данными
+//
+// Пример:
+// ExportDB 1/21/500, UMARCEW,0,1, c:\temp\22.iso
+//
+
+/// <summary>
+/// Экспорт записей из базы данных.
+/// </summary>
+public sealed class IbfExportDb
+    : IbfNode
 {
-    //
-    // http://sntnarciss.ru/irbis/spravka/wa0203050150.htm
-    //
-    // Операнды:
-    //
-    // 0|1/mfnfrom/mfnto],FstName,[0/#/@|1|2],[0|1|2],FileName
-    // Где:
-    // Первый операнд - исходные документы:
-    // 0 - все
-    // 1 - диапазон документов,
-    // mfnfrom - начальный MFN,
-    // mfnto - конечный MFN.
-    // FstName - имя ТВП переформатирования,
-    // если пустое значение - переформатирование не используется.
-    // Третий операнд - выходной формат данных:
-    // 0 - ISO-формат,
-    // # - символ-разделитель полей,
-    // @ - символ-разделитель записей;
-    // 1 - текстовый формат
-    // 2 - XML
-    // Четвертый операнд - вид кодировки:
-    // 0 - DOS
-    // 1 – Windows
-    // 2 – UTF8
-    // FileName - полное имя файла с выходными данными
-    //
-    // Пример:
-    // ExportDB 1/21/500, UMARCEW,0,1, c:\temp\22.iso
-    //
+    #region Properties
 
-    /// <summary>
-    /// Экспорт записей из базы данных.
-    /// </summary>
-    public sealed class IbfExportDb
-        : IbfNode
+    #endregion
+
+    #region Construction
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region IbfNode members
+
+    /// <inheritdoc cref="IbfNode.Execute" />
+    public override void Execute
+        (
+            IbfContext context
+        )
     {
-        #region Properties
+        OnBeforeExecution(context);
 
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region IbfNode members
-
-        /// <inheritdoc cref="IbfNode.Execute" />
-        public override void Execute
-            (
-                IbfContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            OnAfterExecution(context);
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        OnAfterExecution(context);
     }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

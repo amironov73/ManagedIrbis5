@@ -31,56 +31,54 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Ibf.Infrastructure.Ast
+namespace ManagedIrbis.Ibf.Infrastructure.Ast;
+//
+// Операнды
+// Mfn
+// Где:
+// Mfn - номер документа
+// Пример:
+// UnLockRecord 255
+//
+
+/// <summary>
+/// Снятие блокировки с отдельной записи.
+/// </summary>
+public sealed class IbfUnlockRecord
+    : IbfNode
 {
-    //
-    // Операнды
-    // Mfn
-    // Где:
-    // Mfn - номер документа
-    // Пример:
-    // UnLockRecord 255
-    //
+    #region Properties
 
-    /// <summary>
-    /// Снятие блокировки с отдельной записи.
-    /// </summary>
-    public sealed class IbfUnlockRecord
-        : IbfNode
+    #endregion
+
+    #region Construction
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region IbfNode members
+
+    /// <inheritdoc cref="IbfNode.Execute" />
+    public override void Execute
+        (
+            IbfContext context
+        )
     {
-        #region Properties
+        OnBeforeExecution(context);
 
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region IbfNode members
-
-        /// <inheritdoc cref="IbfNode.Execute" />
-        public override void Execute
-            (
-                IbfContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            OnAfterExecution(context);
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        OnAfterExecution(context);
     }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

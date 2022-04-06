@@ -31,60 +31,58 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Ibf.Infrastructure.Ast
+namespace ManagedIrbis.Ibf.Infrastructure.Ast;
+//
+// http://sntnarciss.ru/irbis/spravka/wa0203050110.htm
+//
+// Операнды:
+// Dbname
+// Пример:
+// OpenDB RDR
+// Примечания:
+// Команда устанавливает контекст работы: БД ЦЕЛИКОМ
+// Контекст работы определяет исходные документы для последующих
+// команд - таких как EXPORTDB, COPYDB, PRINT, STAT, STATF, GLOBAL
+//
+
+/// <summary>
+/// Открытие существующей базы данных.
+/// </summary>
+public sealed class IbfOpenDb
+    : IbfNode
 {
-    //
-    // http://sntnarciss.ru/irbis/spravka/wa0203050110.htm
-    //
-    // Операнды:
-    // Dbname
-    // Пример:
-    // OpenDB RDR
-    // Примечания:
-    // Команда устанавливает контекст работы: БД ЦЕЛИКОМ
-    // Контекст работы определяет исходные документы для последующих
-    // команд - таких как EXPORTDB, COPYDB, PRINT, STAT, STATF, GLOBAL
-    //
+    #region Properties
 
-    /// <summary>
-    /// Открытие существующей базы данных.
-    /// </summary>
-    public sealed class IbfOpenDb
-        : IbfNode
+    #endregion
+
+    #region Construction
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region IbfNode members
+
+    /// <inheritdoc cref="IbfNode.Execute" />
+    public override void Execute
+        (
+            IbfContext context
+        )
     {
-        #region Properties
+        OnBeforeExecution(context);
 
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region IbfNode members
-
-        /// <inheritdoc cref="IbfNode.Execute" />
-        public override void Execute
-            (
-                IbfContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            OnAfterExecution(context);
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        OnAfterExecution(context);
     }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

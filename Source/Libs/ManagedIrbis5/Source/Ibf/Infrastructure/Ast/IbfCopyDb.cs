@@ -29,67 +29,65 @@ using AM.Text;
 
 #endregion
 
-namespace ManagedIrbis.Ibf.Infrastructure.Ast
+namespace ManagedIrbis.Ibf.Infrastructure.Ast;
+//
+// http://sntnarciss.ru/irbis/spravka/wa0203050160.htm
+//
+// Операнды:
+//
+// [0|1/mfnfrom/mfnto],FstName,DbName
+// Где:
+// Первый операнд - исходные документы:
+// 0 - все
+// 1 - диапазон документов,
+// mfnfrom - начальный MFN,
+// mfnto - конечный MFN.
+// FstName - имя ТВП переформатирования,
+// если пустое значение - переформатирование не используется.
+// DbName - имя БД, в которую будут копироваться данные
+//
+// Пример:
+// COPYDB 1/10/100,, BOOK
+//
+
+/// <summary>
+/// Копирование данных из одной базы в другую.
+/// </summary>
+public sealed class IbfCopyDb
+    : IbfNode
 {
-    //
-    // http://sntnarciss.ru/irbis/spravka/wa0203050160.htm
-    //
-    // Операнды:
-    //
-    // [0|1/mfnfrom/mfnto],FstName,DbName
-    // Где:
-    // Первый операнд - исходные документы:
-    // 0 - все
-    // 1 - диапазон документов,
-    // mfnfrom - начальный MFN,
-    // mfnto - конечный MFN.
-    // FstName - имя ТВП переформатирования,
-    // если пустое значение - переформатирование не используется.
-    // DbName - имя БД, в которую будут копироваться данные
-    //
-    // Пример:
-    // COPYDB 1/10/100,, BOOK
-    //
+    #region Properties
 
-    /// <summary>
-    /// Копирование данных из одной базы в другую.
-    /// </summary>
-    public sealed class IbfCopyDb
-        : IbfNode
+    #endregion
+
+    #region Construction
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region IbfNode members
+
+    /// <inheritdoc cref="IbfNode.Execute" />
+    public override void Execute
+        (
+            IbfContext context
+        )
     {
-        #region Properties
+        OnBeforeExecution(context);
 
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region IbfNode members
-
-        /// <inheritdoc cref="IbfNode.Execute" />
-        public override void Execute
-            (
-                IbfContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            OnAfterExecution(context);
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        OnAfterExecution(context);
     }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

@@ -31,59 +31,57 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Ibf.Infrastructure.Ast
+namespace ManagedIrbis.Ibf.Infrastructure.Ast;
+//
+// Завершить работу АРМа «Администратор».
+//
+// Операнды:
+// FileName
+// Где: FileName – путь и имя файла, куда выводится протокол
+//
+// Пример:
+// Exit c:\irbiswrk\protocol.txt
+//
+//
+
+/// <summary>
+/// Завершение обработки IBF- файла.
+/// </summary>
+public sealed class IbfExit
+    : IbfNode
 {
-    //
-    // Завершить работу АРМа «Администратор».
-    //
-    // Операнды:
-    // FileName
-    // Где: FileName – путь и имя файла, куда выводится протокол
-    //
-    // Пример:
-    // Exit c:\irbiswrk\protocol.txt
-    //
-    //
+    #region Properties
 
-    /// <summary>
-    /// Завершение обработки IBF- файла.
-    /// </summary>
-    public sealed class IbfExit
-        : IbfNode
+    #endregion
+
+    #region Construction
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region IbfNode members
+
+    /// <inheritdoc cref="IbfNode.Execute" />
+    public override void Execute
+        (
+            IbfContext context
+        )
     {
-        #region Properties
+        OnBeforeExecution(context);
 
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region IbfNode members
-
-        /// <inheritdoc cref="IbfNode.Execute" />
-        public override void Execute
-            (
-                IbfContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            OnAfterExecution(context);
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        OnAfterExecution(context);
     }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

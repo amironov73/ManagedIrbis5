@@ -29,89 +29,87 @@ using AM.Text;
 
 #endregion
 
-namespace ManagedIrbis.Ibf.Infrastructure.Ast
+namespace ManagedIrbis.Ibf.Infrastructure.Ast;
+//
+// Поиск и отбор записей.
+// http://sntnarciss.ru/irbis/spravka/wa0203050180.htm
+//
+// SEARCH - Выполнить поиск
+//
+// Команда для пакетных заданий АРМов Администратор(серверный)
+// и Администратор-клиент ИРБИС64 (версия 2013.1 и выше).
+//
+// Назначение команды:
+// Выполнить поиск
+// Оператор:
+// SEARCH
+// Операнды:
+//
+// SEXP_DIR, MFNFrom, MFNTО,SEXP_SEQ,JUMP
+// Где:
+// SEXP_DIR – поисковое выражение для прямого поиска
+// на языке запросов ИРБИС (может быть пустым)
+// SEXP_SEQ – поисковое выражение для уточняющего
+// последовательного поиска (может быть пустым)
+// MFNFrom – начальное значение диапазона MFN
+// для последовательного поиска(по умолчанию – 1)
+// MFNTo – конечное значение диапазона MFN для
+// последовательного поиска(по умолчанию – максимальный MFN БД)
+// JUMP – количество последующих пакетных команд,
+// которые должны быть пропущены в случае нулевого
+// результата поиска (по умолчанию – 0)
+//
+// Пример:
+// SEARCH “K=противопожарн$” * “K=оборудован$”,,,p(v10),2
+// Примечания:
+//
+// В серверном Администраторе команда не поддерживается.
+// Команда устанавливает контекст работы: РЕЗУЛЬТАТ ПОИСКА,
+// т.е для последующих команд – таких как EXPORTDB, COPYDB,
+// GLOBAL, PRINT, STAT, STATF – в качестве исходных документов
+// будет использоваться результат поиска.
+// Для того чтобы переключить контекст работы на БД ЦЕЛИКОМ,
+// необходимо задать команду OPENDB
+//
+
+/// <summary>
+/// Поиск и отбор записей.
+/// </summary>
+public sealed class IbfSearch
+    : IbfNode
 {
-    //
-    // Поиск и отбор записей.
-    // http://sntnarciss.ru/irbis/spravka/wa0203050180.htm
-    //
-    // SEARCH - Выполнить поиск
-    //
-    // Команда для пакетных заданий АРМов Администратор(серверный)
-    // и Администратор-клиент ИРБИС64 (версия 2013.1 и выше).
-    //
-    // Назначение команды:
-    // Выполнить поиск
-    // Оператор:
-    // SEARCH
-    // Операнды:
-    //
-    // SEXP_DIR, MFNFrom, MFNTО,SEXP_SEQ,JUMP
-    // Где:
-    // SEXP_DIR – поисковое выражение для прямого поиска
-    // на языке запросов ИРБИС (может быть пустым)
-    // SEXP_SEQ – поисковое выражение для уточняющего
-    // последовательного поиска (может быть пустым)
-    // MFNFrom – начальное значение диапазона MFN
-    // для последовательного поиска(по умолчанию – 1)
-    // MFNTo – конечное значение диапазона MFN для
-    // последовательного поиска(по умолчанию – максимальный MFN БД)
-    // JUMP – количество последующих пакетных команд,
-    // которые должны быть пропущены в случае нулевого
-    // результата поиска (по умолчанию – 0)
-    //
-    // Пример:
-    // SEARCH “K=противопожарн$” * “K=оборудован$”,,,p(v10),2
-    // Примечания:
-    //
-    // В серверном Администраторе команда не поддерживается.
-    // Команда устанавливает контекст работы: РЕЗУЛЬТАТ ПОИСКА,
-    // т.е для последующих команд – таких как EXPORTDB, COPYDB,
-    // GLOBAL, PRINT, STAT, STATF – в качестве исходных документов
-    // будет использоваться результат поиска.
-    // Для того чтобы переключить контекст работы на БД ЦЕЛИКОМ,
-    // необходимо задать команду OPENDB
-    //
+    #region Properties
 
-    /// <summary>
-    /// Поиск и отбор записей.
-    /// </summary>
-    public sealed class IbfSearch
-        : IbfNode
+    #endregion
+
+    #region Construction
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region IbfNode members
+
+    /// <inheritdoc cref="IbfNode.Execute" />
+    public override void Execute
+        (
+            IbfContext context
+        )
     {
-        #region Properties
+        OnBeforeExecution(context);
 
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region IbfNode members
-
-        /// <inheritdoc cref="IbfNode.Execute" />
-        public override void Execute
-            (
-                IbfContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            OnAfterExecution(context);
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        OnAfterExecution(context);
     }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

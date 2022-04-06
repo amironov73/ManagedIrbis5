@@ -31,58 +31,56 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Ibf.Infrastructure.Ast
+namespace ManagedIrbis.Ibf.Infrastructure.Ast;
+//
+// Восстановление файла документов.
+//
+// Операнды:
+// FileName
+// Где:
+// FileName - полное имя исходного файла
+// Пример:
+// RestoreMf c:\irbiswrk\ibis.bkp
+//
+
+/// <summary>
+/// Восстановление файла документов.
+/// </summary>
+public sealed class IbfRestoreMf
+    : IbfNode
 {
-    //
-    // Восстановление файла документов.
-    //
-    // Операнды:
-    // FileName
-    // Где:
-    // FileName - полное имя исходного файла
-    // Пример:
-    // RestoreMf c:\irbiswrk\ibis.bkp
-    //
+    #region Properties
 
-    /// <summary>
-    /// Восстановление файла документов.
-    /// </summary>
-    public sealed class IbfRestoreMf
-        : IbfNode
+    #endregion
+
+    #region Construction
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region IbfNode members
+
+    /// <inheritdoc cref="IbfNode.Execute" />
+    public override void Execute
+        (
+            IbfContext context
+        )
     {
-        #region Properties
+        OnBeforeExecution(context);
 
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region IbfNode members
-
-        /// <inheritdoc cref="IbfNode.Execute" />
-        public override void Execute
-            (
-                IbfContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            OnAfterExecution(context);
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        OnAfterExecution(context);
     }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

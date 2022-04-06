@@ -31,59 +31,57 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Ibf.Infrastructure.Ast
+namespace ManagedIrbis.Ibf.Infrastructure.Ast;
+//
+// Установка интервала опроса состояния БД (в сек.).
+//
+// Операнды:
+// NN
+// Интервал в секундах.
+// Если задается 0 – опрос состояния БД не выполняется.
+//
+// Примечания:
+// параметр в INI-файл (irbisa.ini) AUTOASKINTERVAL
+//
+
+/// <summary>
+/// Установка интервала опроса состояния БД (в сек.).
+/// </summary>
+public sealed class IbfAutoAsk
+    : IbfNode
 {
-    //
-    // Установка интервала опроса состояния БД (в сек.).
-    //
-    // Операнды:
-    // NN
-    // Интервал в секундах.
-    // Если задается 0 – опрос состояния БД не выполняется.
-    //
-    // Примечания:
-    // параметр в INI-файл (irbisa.ini) AUTOASKINTERVAL
-    //
+    #region Properties
 
-    /// <summary>
-    /// Установка интервала опроса состояния БД (в сек.).
-    /// </summary>
-    public sealed class IbfAutoAsk
-        : IbfNode
+    #endregion
+
+    #region Construction
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region IbfNode members
+
+    /// <inheritdoc cref="IbfNode.Execute" />
+    public override void Execute
+        (
+            IbfContext context
+        )
     {
-        #region Properties
+        OnBeforeExecution(context);
 
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region IbfNode members
-
-        /// <inheritdoc cref="IbfNode.Execute" />
-        public override void Execute
-            (
-                IbfContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            OnAfterExecution(context);
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        OnAfterExecution(context);
     }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }

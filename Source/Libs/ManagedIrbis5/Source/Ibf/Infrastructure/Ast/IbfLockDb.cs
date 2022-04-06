@@ -31,54 +31,52 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Ibf.Infrastructure.Ast
+namespace ManagedIrbis.Ibf.Infrastructure.Ast;
+//
+// Установить монопольную блокировку БД.
+//
+// Примечания:
+// В Администраторе-клиент команда не поддерживается.
+//
+
+/// <summary>
+/// Монопольная блокировка базы данных.
+/// </summary>
+public sealed class IbfLockDb
+    : IbfNode
 {
-    //
-    // Установить монопольную блокировку БД.
-    //
-    // Примечания:
-    // В Администраторе-клиент команда не поддерживается.
-    //
+    #region Properties
 
-    /// <summary>
-    /// Монопольная блокировка базы данных.
-    /// </summary>
-    public sealed class IbfLockDb
-        : IbfNode
+    #endregion
+
+    #region Construction
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region IbfNode members
+
+    /// <inheritdoc cref="IbfNode.Execute" />
+    public override void Execute
+        (
+            IbfContext context
+        )
     {
-        #region Properties
+        OnBeforeExecution(context);
 
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region IbfNode members
-
-        /// <inheritdoc cref="IbfNode.Execute" />
-        public override void Execute
-            (
-                IbfContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            OnAfterExecution(context);
-        }
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        OnAfterExecution(context);
     }
+
+    #endregion
+
+    #region Object members
+
+    #endregion
 }
