@@ -21,25 +21,27 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace Istu.OldModel
+namespace Istu.OldModel;
+
+/// <summary>
+/// Сравнивает читателей по их билетам.
+/// </summary>
+public sealed class ReaderComparer
+    : IEqualityComparer<Reader>
 {
-    /// <summary>
-    /// Сравнивает читателей по их билетам.
-    /// </summary>
-    public sealed class ReaderComparer
-        : IEqualityComparer<Reader>
+    #region IEqualityComparer<T> members
+
+    /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
+    public bool Equals (Reader? x, Reader? y)
     {
-        #region IEqualityComparer<T> members
+        return string.CompareOrdinal (x?.Ticket, y?.Ticket) == 0;
+    }
 
-        /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
-        public bool Equals (Reader? x, Reader? y) =>
-            string.CompareOrdinal (x?.Ticket, y?.Ticket) == 0;
+    /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
+    public int GetHashCode (Reader obj)
+    {
+        return obj.Ticket?.GetHashCode() ?? 0;
+    }
 
-        /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
-        public int GetHashCode (Reader obj) => obj.Ticket?.GetHashCode() ?? 0;
-
-        #endregion
-
-    } // class ReaderComparer
-
-} // namespace Istu.OldModel
+    #endregion
+}

@@ -80,5 +80,4 @@ public class Translator
     public string? Rfid { get; set; }
 
     #endregion
-
 }
