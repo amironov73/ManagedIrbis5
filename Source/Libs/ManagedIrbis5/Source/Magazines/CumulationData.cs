@@ -27,7 +27,7 @@ public sealed class CumulationData
     public string? Year { get; set; }
 
     /// <summary>
-    /// Том.
+    /// Том (опционально).
     /// </summary>
     public string? Volume { get; set; }
 

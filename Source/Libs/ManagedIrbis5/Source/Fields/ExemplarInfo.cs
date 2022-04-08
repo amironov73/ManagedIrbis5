@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -666,6 +667,32 @@ public sealed class ExemplarInfo
         var result = one.CompareTo (two);
 
         return result;
+    }
+
+    /// <summary>
+    /// Объединение экземпляров.
+    /// </summary>
+    public static ExemplarInfo[]? MergeExemplars
+        (
+            params ExemplarInfo[]?[] arrays
+        )
+    {
+        Sure.NotNull ((object?) arrays);
+
+        var result = new Dictionary<string, ExemplarInfo>();
+        foreach (var array in arrays)
+        {
+            foreach (var item in array)
+            {
+                var key = item.Number;
+                if (!key.IsEmpty())
+                {
+                    result[key] = item;
+                }
+            }
+        }
+
+        return result.Count == 0 ? null : result.Values.ToArray();
     }
 
     #endregion

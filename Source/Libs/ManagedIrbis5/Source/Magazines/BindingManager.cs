@@ -292,6 +292,7 @@ public sealed class BindingManager
     /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
+        // тело метода пока оставлено пустым
     }
 
     #endregion

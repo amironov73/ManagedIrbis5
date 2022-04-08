@@ -41,7 +41,7 @@ namespace ManagedIrbis.Magazines;
 [XmlRoot ("article")]
 public sealed class MagazineArticleInfo
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Properties
 

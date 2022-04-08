@@ -14,7 +14,6 @@
 
 #region Using directives
 
-using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -144,7 +143,21 @@ public sealed class BindingSpecification
             bool throwOnError
         )
     {
-        throw new NotImplementedException();
+        var verifier = new Verifier<BindingSpecification> (this, throwOnError);
+
+        // номер тома и описание могут быть пустыми, это не ошибка
+        // остальные элементы должны быть непустыми
+
+        verifier
+            .NotNullNorEmpty (MagazineIndex)
+            .NotNullNorEmpty (Year)
+            .NotNullNorEmpty (IssueNumbers)
+            .NotNullNorEmpty (Place)
+            .NotNullNorEmpty (BindingNumber)
+            .NotNullNorEmpty (Inventory)
+            .NotNullNorEmpty (Complect);
+
+        return verifier.Result;
     }
 
     #endregion

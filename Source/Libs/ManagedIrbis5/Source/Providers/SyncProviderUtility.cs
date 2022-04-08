@@ -53,14 +53,26 @@ public static class SyncProviderUtility
     /// <param name="database">Имя базы данных.
     /// По умолчанию - текущая база данных.</param>
     /// <returns>Признак успешности завершения операции.</returns>
-    public static bool ActualizeDatabase (this ISyncProvider connection, string? database = default) =>
-        connection.ActualizeRecord (new () { Database = database, Mfn = 0 });
+    public static bool ActualizeDatabase
+        (
+            this ISyncProvider connection,
+            string? database = default
+        )
+    {
+        return connection.ActualizeRecord (new () { Database = database, Mfn = 0 });
+    }
 
     /// <summary>
     /// Удаление файла на сервере.
     /// </summary>
-    public static void DeleteServerFile (this ISyncProvider connection, string fileName) =>
+    public static void DeleteServerFile
+        (
+            this ISyncProvider connection,
+            string fileName
+        )
+    {
         connection.FormatRecord ($"&if('+9K{fileName}')", 1);
+    }
 
     /// <summary>
     /// Удаление записи с указанным MFN.
@@ -85,7 +97,7 @@ public static class SyncProviderUtility
         record.Status |= RecordStatus.LogicallyDeleted;
 
         return connection.WriteRecord (record, dontParse: true);
-    } // method DeleteRecord
+    }
 
     /// <summary>
     /// Подстановка имени текущей базы данных, если она не задана явно.
@@ -95,12 +107,13 @@ public static class SyncProviderUtility
             this IIrbisProvider connection,
             string? database = null
         )
-        =>
-            string.IsNullOrEmpty (database)
-                ? string.IsNullOrEmpty (connection.Database)
-                    ? throw new ArgumentException (nameof (connection.Database))
-                    : connection.Database
-                : database;
+    {
+        return string.IsNullOrEmpty (database)
+            ? string.IsNullOrEmpty (connection.Database)
+                ? throw new ArgumentException (nameof (connection.Database))
+                : connection.Database
+            : database;
+    }
 
     /// <summary>
     /// Форматирование записи по ее MFN.
@@ -122,7 +135,7 @@ public static class SyncProviderUtility
         return connection.FormatRecords (parameters)
             ? parameters.Result.AsSingle()
             : null;
-    } // method FormatRecord
+    }
 
     /// <summary>
     /// Форматирование записи в клиентском представлении.
@@ -144,7 +157,7 @@ public static class SyncProviderUtility
         return connection.FormatRecords (parameters)
             ? parameters.Result.AsSingle()
             : null;
-    } // method FormatRecord
+    }
 
     /// <summary>
     /// Форматирование записей по их MFN.
@@ -166,7 +179,7 @@ public static class SyncProviderUtility
         return conneciton.FormatRecords (parameters)
             ? parameters.Result.AsArray()
             : null;
-    } // method FormatRecords
+    }
 
     /// <summary>
     /// Получение списка баз данных.
@@ -185,7 +198,7 @@ public static class SyncProviderUtility
         var menu = connection.RequireMenuFile (specification);
 
         return DatabaseInfo.ParseMenu (menu);
-    } // method ListDatabases
+    }
 
     /// <summary>
     /// Блокирование указанной записи.
@@ -203,7 +216,7 @@ public static class SyncProviderUtility
         };
 
         return connection.ReadRecord<NullRecord> (parameters) is not null;
-    } // method LockRecord
+    }
 
     /// <summary>
     /// Чтение всех терминов с указанным префиксом.
@@ -282,7 +295,7 @@ public static class SyncProviderUtility
         using var reader = new StringReader (content);
 
         return FstFile.ParseStream (reader);
-    } // method ReadFstFile
+    }
 
     /// <summary>
     /// Чтение INI-файла как текстового.
@@ -304,7 +317,7 @@ public static class SyncProviderUtility
         result.Read (reader);
 
         return result;
-    } // method ReadIniFile
+    }
 
     /// <summary>
     /// Чтение меню как текстового файла.
@@ -490,49 +503,85 @@ public static class SyncProviderUtility
     /// Чтение с сервера записи, которая обязательно должна быть.
     /// </summary>
     /// <exception cref="IrbisException">Запись отсутствует или другая ошибка при чтении.</exception>
-    public static Record RequireRecord (this ISyncProvider connection, int mfn) =>
-        connection.ReadRecord (mfn)
-        ?? throw new IrbisException ($"Record not found: MFN={mfn}");
+    public static Record RequireRecord
+        (
+            this ISyncProvider connection,
+            int mfn
+        )
+    {
+        return connection.ReadRecord (mfn)
+               ?? throw new IrbisException ($"Record not found: MFN={mfn}");
+    }
 
     /// <summary>
     /// Чтение с сервера записи, которая обязательно должна быть.
     /// </summary>
     /// <exception cref="IrbisException">Запись отсутствует или другая ошибка при чтении.</exception>
-    public static Record RequireRecord (this ISyncProvider connection, string expression) =>
-        connection.SearchReadOneRecord (expression)
-        ?? throw new IrbisException ($"Record not found: expression={expression}");
+    public static Record RequireRecord
+        (
+            this ISyncProvider connection,
+            string expression
+        )
+    {
+        return connection.SearchReadOneRecord (expression)
+               ?? throw new IrbisException ($"Record not found: expression={expression}");
+    }
 
     /// <summary>
     /// Чтение с сервера текстового файла, который обязательно должен быть.
     /// </summary>
     /// <exception cref="FileNotFoundException">Файл отсутствует или другая ошибка при чтении.</exception>
-    public static string RequireTextFile (this ISyncProvider connection, FileSpecification specification) =>
-        connection.ReadTextFile (specification)
-        ?? throw new IrbisException ($"File not found: {specification}");
+    public static string RequireTextFile
+        (
+            this ISyncProvider connection,
+            FileSpecification specification
+        )
+    {
+        return connection.ReadTextFile (specification)
+               ?? throw new IrbisException ($"File not found: {specification}");
+    }
 
     /// <summary>
     /// Чтение с сервера FST-файла, который обязательно должен быть.
     /// </summary>
     /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
-    public static FstFile RequireFstFile (this ISyncProvider connection, FileSpecification specification) =>
-        connection.ReadFstFile (specification)
-        ?? throw new IrbisException ($"FST not found: {specification}");
+    public static FstFile RequireFstFile
+        (
+            this ISyncProvider connection,
+            FileSpecification specification
+        )
+    {
+        return connection.ReadFstFile (specification)
+               ?? throw new IrbisException ($"FST not found: {specification}");
+    }
 
     /// <summary>
     /// Чтение с сервера INI-файла, который обязательно должен быть.
     /// </summary>
     /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
-    public static IniFile RequireIniFile (this ISyncProvider connection, FileSpecification specification) =>
-        connection.ReadIniFile (specification)
-        ?? throw new IrbisException ($"INI not found: {specification}");
+    public static IniFile RequireIniFile
+        (
+            this ISyncProvider connection,
+            FileSpecification specification
+        )
+    {
+        return connection.ReadIniFile (specification)
+               ?? throw new IrbisException ($"INI not found: {specification}");
+    }
 
     /// <summary>
     /// Чтение с сервера файла меню, которое обязательно должно быть.
     /// </summary>
     /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
-    public static MenuFile RequireMenuFile (this ISyncProvider connection, FileSpecification specification) =>
-        connection.ReadMenuFile (specification)
-        ?? throw new IrbisException ($"Menu not found: {specification}");
+    public static MenuFile RequireMenuFile
+        (
+            this ISyncProvider connection,
+            FileSpecification specification
+        )
+    {
+        return connection.ReadMenuFile (specification)
+               ?? throw new IrbisException ($"Menu not found: {specification}");
+    }
 
     /// <summary>
     /// Чтение с сервера PAR-файла, который обязательно должен быть.
@@ -566,6 +615,33 @@ public static class SyncProviderUtility
         var result = FoundItem.ToMfn (lines);
 
         return result;
+    }
+
+    /// <summary>
+    /// Упрощенный поиск.
+    /// </summary>
+    public static int SearchCount
+        (
+            this ISyncProvider connection,
+            string expression
+        )
+    {
+        if (!connection.CheckProviderState())
+        {
+            return -1;
+        }
+
+        var parameters = new SearchParameters
+        {
+            Database = connection.Database,
+            Expression = expression,
+            FirstRecord = 0
+        };
+
+        // TODO реализовать адекватно
+        var found = connection.Search (parameters);
+
+        return found?.Length ?? 0;
     }
 
     /// <summary>

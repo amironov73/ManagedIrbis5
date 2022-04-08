@@ -244,6 +244,20 @@ public sealed class MagazineInfo
     }
 
     /// <summary>
+    /// Формирование шифра документа по свойству
+    /// <see cref="Index"/>, году, тому и номеру.
+    /// </summary>
+    public string BuildIssueIndex
+        (
+            YearVolumeNumber yearVolumeNumber
+        )
+    {
+        Sure.VerifyNotNull (yearVolumeNumber);
+
+        return Index.ThrowIfNullOrEmpty() + "/" + yearVolumeNumber;
+    }
+
+    /// <summary>
     /// Разбор указанной библиографической записи.
     /// </summary>
     public static MagazineInfo? Parse

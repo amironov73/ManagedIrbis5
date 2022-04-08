@@ -17,11 +17,10 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using AM;
+using AM.Collections;
 using AM.Linq;
 
 using ManagedIrbis.Batch;
@@ -106,8 +105,6 @@ public sealed class MagazineManager
     {
         Sure.NotNullNorEmpty (searchExpression);
 
-        var result = new List<MagazineInfo>();
-
         var batch = BatchRecordReader.Search
             (
                 Connection,
@@ -115,16 +112,12 @@ public sealed class MagazineManager
                 Connection.Database.ThrowIfNull(),
                 1000
             );
-        foreach (var record in batch)
-        {
-            var magazine = MagazineInfo.Parse (record);
-            if (magazine is not null)
-            {
-                result.Add (magazine);
-            }
-        }
+        var result = batch.AsParallel()
+            .Select (record => MagazineInfo.Parse (record))
+            .NonNullItems()
+            .ToArray();
 
-        return result.ToArray();
+        return result;
     }
 
     /// <summary>
@@ -161,20 +154,19 @@ public sealed class MagazineManager
     /// <summary>
     /// Получение выпуска журнала по статье из этого выпуска.
     /// </summary>
-    public MagazineIssueInfo GetIssue
+    public MagazineIssueInfo? GetIssue
         (
             MagazineArticleInfo article
         )
     {
         Sure.VerifyNotNull (article);
 
-        Magna.Error
-            (
-                nameof (MagazineManager) + "::" + nameof (GetIssue)
-                + ": not implemented"
-            );
+        var source = article.Sources.ThrowIfNullOrEmpty().First();
+        source.Verify (true);
+        var index = source.Index.ThrowIfNullOrEmpty (); // шифр выпуска
+        var record = Connection.ByIndex (index);
 
-        throw new NotImplementedException();
+        return record is null ? null : MagazineIssueInfo.Parse (record);
     }
 
     /// <summary>
@@ -219,12 +211,42 @@ public sealed class MagazineManager
 
         var index = magazine.BuildIssueIndex (year, volume, number);
         var record = Connection.ByIndex (index);
-        if (record is null)
-        {
-            return null;
-        }
 
-        return MagazineIssueInfo.Parse (record);
+        return record is null ? null : MagazineIssueInfo.Parse (record);
+    }
+
+    /// <summary>
+    /// Получение выпуска журнала с указанным номером.
+    /// </summary>
+    public MagazineIssueInfo? GetIssue
+        (
+            MagazineInfo magazine,
+            YearVolumeNumber yearVolumeNumber
+        )
+    {
+        Sure.VerifyNotNull (magazine);
+        Sure.VerifyNotNull (yearVolumeNumber);
+        var index = magazine.BuildIssueIndex (yearVolumeNumber);
+        var record = Connection.ByIndex (index);
+
+        return record is null ? null : MagazineIssueInfo.Parse (record);
+    }
+
+    /// <summary>
+    /// Получение выпуска журнала с указанным номером.
+    /// </summary>
+    public MagazineIssueInfo? GetIssue
+        (
+            string magazineIndex,
+            YearVolumeNumber yearVolumeNumber
+        )
+    {
+        Sure.NotNullNorEmpty (magazineIndex);
+        Sure.VerifyNotNull (yearVolumeNumber);
+        var index = magazineIndex + "/" + yearVolumeNumber;
+        var record = Connection.ByIndex (index);
+
+        return record is null ? null : MagazineIssueInfo.Parse (record);
     }
 
     /// <summary>
@@ -320,49 +342,141 @@ public sealed class MagazineManager
     {
         Sure.VerifyNotNull (issue);
 
-        /*
-        string searchExpression = string.Format
-            (
-                "\"II={0}\"",
-                issue.Index
-            );
-        int result = Connection.SearchCount(searchExpression);
+        var searchExpression = $"\"II={issue.Index}\"";
+        var result = Connection.SearchCount (searchExpression);
 
         return result;
-
-        */
-
-        throw new NotImplementedException();
     }
 
     /// <summary>
-    /// Создание журнала в базе по описанию.
+    /// Создание выпуска журнала в базе по описанию.
     /// </summary>
-    public MagazineIssueInfo CreateMagazine
+    public MagazineIssueInfo CreateIssue
         (
             MagazineInfo magazine,
-            string year,
-            string issue,
-            ExemplarInfo[]? exemplars
+            YearVolumeNumber yearVolumeNumber,
+            ExemplarInfo[]? exemplars,
+            string? supplement = null
         )
     {
         Sure.VerifyNotNull (magazine);
-        Sure.NotNullNorEmpty (year);
-        Sure.NotNullNorEmpty (issue);
+        Sure.VerifyNotNull (yearVolumeNumber);
 
-        var fullIndex = magazine.Index + "/" + year + "/" + issue;
-        var result = new MagazineIssueInfo
+        var magazineIndex = magazine.Index.ThrowIfNullOrEmpty();
+        var issueIndex = magazineIndex + "/" + yearVolumeNumber;
+        var record = Connection.ByIndex (issueIndex);
+        MagazineIssueInfo result;
+        if (record is not null)
         {
-            Index = fullIndex,
-            DocumentCode = fullIndex,
-            MagazineCode = magazine.Index,
-            Year = year,
-            Number = issue,
-            Worksheet = "NJ",
-            Exemplars = exemplars
-        };
+            result = MagazineIssueInfo.Parse (record);
+
+            if (!exemplars.IsNullOrEmpty())
+            {
+                var available = ExemplarInfo.ParseRecord (record);
+                var merged = ExemplarInfo.MergeExemplars (available, exemplars);
+                record.RemoveField (ExemplarInfo.ExemplarTag);
+                foreach (var one in merged!)
+                {
+                    var field = one.ToField();
+                    record.Add (field);
+                }
+            }
+        }
+        else
+        {
+            result = new MagazineIssueInfo
+            {
+                Index = issueIndex,
+                DocumentCode = issueIndex,
+                MagazineCode = magazineIndex,
+                Year = yearVolumeNumber.Year,
+                Volume = yearVolumeNumber.Volume,
+                Number = yearVolumeNumber.Number,
+                Supplement = supplement,
+                Worksheet = "NJ",
+                Exemplars = exemplars
+            };
+            record = result.ToRecord();
+            record.Database = Connection.EnsureDatabase();
+            Connection.WriteRecord (record);
+        }
 
         return result;
+    }
+
+    /// <summary>
+    /// Существует ли сводная запись журнала с указанным шифром?
+    /// </summary>
+    public bool MagazineByIndex
+        (
+            string index
+        )
+    {
+        Sure.NotNullNorEmpty (index);
+
+        var record = Connection.ByIndex (index);
+
+        return record is not null;
+    }
+
+    /// <summary>
+    /// Существует ли запись выпуска с указанными шифром, годом и номером?
+    /// </summary>
+    public bool IssueExist
+        (
+            string magazineIndex,
+            string year,
+            string number
+        )
+    {
+        Sure.NotNullNorEmpty (magazineIndex);
+        Sure.NotNullNorEmpty (year);
+        Sure.NotNullNorEmpty (number);
+
+        var index = magazineIndex + "/" + year + "/" + number;
+        var record = Connection.ByIndex (index);
+
+        return record is not null;
+    }
+
+    /// <summary>
+    /// Существует ли запись выпуска с указанными шифром, годом и номером?
+    /// </summary>
+    public bool IssueExist
+        (
+            string magazineIndex,
+            string year,
+            string volume,
+            string number
+        )
+    {
+        Sure.NotNullNorEmpty (magazineIndex);
+        Sure.NotNullNorEmpty (year);
+        Sure.NotNullNorEmpty (volume);
+        Sure.NotNullNorEmpty (number);
+
+        var index = magazineIndex + "/" + year + "/" + volume + "/" + number;
+        var record = Connection.ByIndex (index);
+
+        return record is not null;
+    }
+
+    /// <summary>
+    /// Существует ли запись выпуска с указанными шифром, годом и номером?
+    /// </summary>
+    public bool IssueExist
+        (
+            string magazineIndex,
+            YearVolumeNumber yearVolumeNumber
+        )
+    {
+        Sure.NotNullNorEmpty (magazineIndex);
+        Sure.VerifyNotNull (yearVolumeNumber);
+
+        var index = magazineIndex + "/" + yearVolumeNumber;
+        var record = Connection.ByIndex (index);
+
+        return record is not null;
     }
 
     #endregion
