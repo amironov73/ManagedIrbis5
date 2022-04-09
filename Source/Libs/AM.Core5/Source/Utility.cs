@@ -57,6 +57,7 @@ public static class Utility
     /// <summary>
     /// Переменная не используется.
     /// </summary>
+    [DebuggerStepThrough]
     public static void NotUsed<T>
         (
             this T variable,
@@ -3215,370 +3216,871 @@ public static class Utility
     }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static short ParseInt16 (this string text) =>
-        short.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static short ParseInt16
+        (
+            this string text
+        )
+    {
+        return short.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static short ParseInt16 (this ReadOnlyMemory<char> text) =>
-        short.Parse (text.Span, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static short ParseInt16
+        (
+            this ReadOnlyMemory<char> text
+        )
+    {
+        return short.Parse
+            (
+                text.Span,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static short ParseInt16 (this ReadOnlySpan<char> text) =>
-        short.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static short ParseInt16
+        (
+            this ReadOnlySpan<char> text
+        )
+    {
+        return short.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static int ParseInt32 (this string text) =>
-        int.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static int ParseInt32
+        (
+            this string text
+        )
+    {
+        return int.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static int ParseInt32 (this ReadOnlyMemory<char> text) =>
-        int.Parse (text.Span, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static int ParseInt32
+        (
+            this ReadOnlyMemory<char> text
+        )
+    {
+        return int.Parse
+            (
+                text.Span,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static int ParseInt32 (this ReadOnlySpan<char> text) =>
-        int.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static int ParseInt32
+        (
+            this ReadOnlySpan<char> text
+        )
+    {
+        return int.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static long ParseInt64 (this string text) =>
-        long.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static long ParseInt64
+        (
+            this string text
+        )
+    {
+        return long.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static long ParseInt64 (this ReadOnlyMemory<char> text) =>
-        long.Parse (text.Span, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static long ParseInt64
+        (
+            this ReadOnlyMemory<char> text
+        )
+    {
+        return long.Parse
+            (
+                text.Span,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static long ParseInt64 (this ReadOnlySpan<char> text) =>
-        long.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static long ParseInt64
+        (
+            this ReadOnlySpan<char> text
+        )
+    {
+        return long.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static ushort ParseUInt16 (this string text) =>
-        ushort.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static ushort ParseUInt16
+        (
+            this string text
+        )
+    {
+        return ushort.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static ushort ParseUInt16 (this ReadOnlySpan<char> text) =>
-        ushort.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static ushort ParseUInt16
+        (
+            this ReadOnlySpan<char> text
+        )
+    {
+        return ushort.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static uint ParseUInt32 (this string text) =>
-        uint.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static uint ParseUInt32
+        (
+            this string text
+        )
+    {
+        return uint.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static uint ParseUInt32 (this ReadOnlySpan<char> text) =>
-        uint.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static uint ParseUInt32
+        (
+            this ReadOnlySpan<char> text
+        )
+    {
+        return uint.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static ulong ParseUInt64 (this string text) =>
-        ulong.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static ulong ParseUInt64
+        (
+            this string text
+        )
+    {
+        return ulong.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static ulong ParseUInt64 (this ReadOnlySpan<char> text) =>
-        ulong.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static ulong ParseUInt64
+        (
+            this ReadOnlySpan<char> text
+        )
+    {
+        return ulong.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static float ParseSingle (this string text) =>
-        float.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static float ParseSingle
+        (
+            this string text
+        )
+    {
+        return float.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static float ParseSingle (this ReadOnlySpan<char> text) =>
-        float.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static float ParseSingle
+        (
+            this ReadOnlySpan<char> text
+        )
+    {
+        return float.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static double ParseDouble (this string text) =>
-        double.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static double ParseDouble
+        (
+            this string text
+        )
+    {
+        return double.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static double ParseDouble (this ReadOnlySpan<char> text) =>
-        double.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static double ParseDouble
+        (
+            this ReadOnlySpan<char> text
+        )
+    {
+        return double.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static decimal ParseDecimal (this string text) =>
-        decimal.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static decimal ParseDecimal
+        (
+            this string text
+        )
+    {
+        return decimal.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для Parse.
+    /// Сокращение для Parse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static decimal ParseDecimal (this ReadOnlySpan<char> text) =>
-        decimal.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+    public static decimal ParseDecimal
+        (
+            this ReadOnlySpan<char> text
+        )
+    {
+        return decimal.Parse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseInt16 (string? text, out short result) =>
-        short.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseInt16
+        (
+            string? text,
+            out short result
+        )
+    {
+        return short.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseInt16 (ReadOnlySpan<char> text, out short result) =>
-        short.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseInt16
+        (
+            ReadOnlySpan<char> text,
+            out short result
+        )
+    {
+        return short.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseInt32 (string? text, out int result) =>
-        int.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseInt32
+        (
+            string? text,
+            out int result
+        )
+    {
+        return int.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseInt32 (ReadOnlySpan<char> text, out int result) =>
-        int.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseInt32
+        (
+            ReadOnlySpan<char> text,
+            out int result
+        )
+    {
+        return int.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseInt64 (string? text, out long result) =>
-        long.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseInt64
+        (
+            string? text,
+            out long result
+        )
+    {
+        return long.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseInt64 (ReadOnlySpan<char> text, out long result) =>
-        long.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseInt64
+        (
+            ReadOnlySpan<char> text,
+            out long result
+        )
+    {
+        return long.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseUInt16 (string? text, out ushort result) =>
-        ushort.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseUInt16
+        (
+            string? text,
+            out ushort result
+        )
+    {
+        return ushort.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseUInt16 (ReadOnlySpan<char> text, out ushort result) =>
-        ushort.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseUInt16
+        (
+            ReadOnlySpan<char> text,
+            out ushort result
+        )
+    {
+        return ushort.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseUInt32 (string? text, out uint result) =>
-        uint.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseUInt32
+        (
+            string? text,
+            out uint result
+        )
+    {
+        return uint.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseUInt32 (ReadOnlySpan<char> text, out uint result) =>
-        uint.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseUInt32
+        (
+            ReadOnlySpan<char> text,
+            out uint result
+        )
+    {
+        return uint.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseUInt64 (string? text, out ulong result) =>
-        ulong.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseUInt64
+        (
+            string? text,
+            out ulong result
+        )
+    {
+        return ulong.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseUInt64 (ReadOnlySpan<char> text, out ulong result) =>
-        ulong.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseUInt64
+        (
+            ReadOnlySpan<char> text,
+            out ulong result
+        )
+    {
+        return ulong.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseDouble (string? text, out double result) =>
-        double.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseDouble
+        (
+            string? text,
+            out double result
+        )
+    {
+        return double.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseDouble (ReadOnlySpan<char> text, out double result) =>
-        double.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseDouble
+        (
+            ReadOnlySpan<char> text,
+            out double result
+        )
+    {
+        return double.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseSingle (string? text, out float result) =>
-        float.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseSingle
+        (
+            string? text,
+            out float result
+        )
+    {
+        return float.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
     [Pure]
     [DebuggerStepThrough]
-    public static bool TryParseSingle (ReadOnlySpan<char> text, out float result) =>
-        float.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseSingle
+        (
+            ReadOnlySpan<char> text,
+            out float result
+        )
+    {
+        return float.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
-    public static bool TryParseDecimal (string? text, out decimal result) =>
-        decimal.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseDecimal
+        (
+            string? text,
+            out decimal result
+        )
+    {
+        return decimal.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
-    public static bool TryParseDecimal (ReadOnlySpan<char> text, out decimal result) =>
-        decimal.TryParse (text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    public static bool TryParseDecimal
+        (
+            ReadOnlySpan<char> text,
+            out decimal result
+        )
+    {
+        return decimal.TryParse
+            (
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
-    public static bool TryParseDateTime (string? text, out DateTime result) =>
-        DateTime.TryParse (text, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out result);
+    public static bool TryParseDateTime
+        (
+            string? text,
+            out DateTime result
+        )
+    {
+        return DateTime.TryParse
+            (
+                text,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AllowWhiteSpaces,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
-    public static bool TryParseDateTime (ReadOnlySpan<char> text, out DateTime result) =>
-        DateTime.TryParse (text, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out result);
+    public static bool TryParseDateTime
+        (
+            ReadOnlySpan<char> text,
+            out DateTime result
+        )
+    {
+        return DateTime.TryParse
+            (
+                text,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AllowWhiteSpaces,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
-    public static bool TryParseDateTime (string? text, string? format, out DateTime result) =>
-        DateTime.TryParseExact (text, format, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces,
-            out result);
+    public static bool TryParseDateTime
+        (
+            string? text,
+            string? format,
+            out DateTime result
+        )
+    {
+        return DateTime.TryParseExact
+            (
+                text,
+                format,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AllowWhiteSpaces,
+                out result
+            );
+    }
 
     /// <summary>
-    /// Сокращение для TryParse.
+    /// Сокращение для TryParse с <see cref="CultureInfo.InvariantCulture"/>.
     /// </summary>
-    public static bool TryParseDateTime (ReadOnlySpan<char> text, ReadOnlySpan<char> format, out DateTime result) =>
-        DateTime.TryParseExact (text, format, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces,
-            out result);
+    public static bool TryParseDateTime
+        (
+            ReadOnlySpan<char> text,
+            ReadOnlySpan<char> format,
+            out DateTime result
+        )
+    {
+        return DateTime.TryParseExact
+            (
+                text,
+                format,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AllowWhiteSpaces,
+                out result
+            );
+    }
 
     /// <summary>
     /// Определяет, равен ли ли данный объект
     /// любому из перечисленных.
     /// </summary>
     [Pure]
-    public static bool IsOneOf (this string? value, string? first, string? second) =>
-        !string.IsNullOrEmpty (value)
-        && (string.CompareOrdinal (value, first) == 0
-            || string.CompareOrdinal (value, second) == 0);
+    public static bool IsOneOf
+        (
+            this string? value,
+            string? first,
+            string? second
+        )
+    {
+        return !string.IsNullOrEmpty (value) &&
+               (
+                    string.CompareOrdinal (value, first) == 0
+                   || string.CompareOrdinal (value, second) == 0
+               );
+    }
 
     /// <summary>
     /// Определяет, равен ли ли данный объект
     /// любому из перечисленных.
     /// </summary>
     [Pure]
-    public static bool IsOneOf<T> (this T value, T first, T second)
-        where T : IComparable<T> =>
-        value.CompareTo (first) == 0
-        || value.CompareTo (second) == 0;
+    public static bool IsOneOf<T>
+        (
+            this T value,
+            T first,
+            T second
+        )
+        where T : IComparable<T>
+    {
+        return value.CompareTo (first) == 0
+               || value.CompareTo (second) == 0;
+    }
 
     /// <summary>
     /// Определяет, равен ли ли данный объект
     /// любому из перечисленных.
     /// </summary>
     [Pure]
-    public static bool IsOneOf (this string? value, string? first,
-        string? second, string? third) =>
-        !string.IsNullOrEmpty (value)
-        && (string.CompareOrdinal (value, first) == 0
-            || string.CompareOrdinal (value, second) == 0
-            || string.CompareOrdinal (value, third) == 0);
+    public static bool IsOneOf
+        (
+            this string? value,
+            string? first,
+            string? second,
+            string? third
+        )
+    {
+        return !string.IsNullOrEmpty (value) &&
+               (
+                   string.CompareOrdinal (value, first) == 0
+                   || string.CompareOrdinal (value, second) == 0
+                   || string.CompareOrdinal (value, third) == 0
+               );
+    }
 
     /// <summary>
     /// Определяет, равен ли ли данный объект
@@ -3814,22 +4316,37 @@ public static class Utility
     /// Converts empty string to <c>null</c>.
     /// </summary>
     [Pure]
-    public static string? EmptyToNull (this string? value) =>
-        string.IsNullOrEmpty (value) ? null : value;
+    public static string? EmptyToNull
+        (
+            this string? value
+        )
+    {
+        return string.IsNullOrEmpty (value) ? null : value;
+    }
 
     /// <summary>
     /// Converts empty string to <c>null</c>.
     /// </summary>
     [Pure]
-    public static string? EmptyToNull (this ReadOnlySpan<char> value) =>
-        value.IsEmpty ? null : value.ToString();
+    public static string? EmptyToNull
+        (
+            this ReadOnlySpan<char> value
+        )
+    {
+        return value.IsEmpty ? null : value.ToString();
+    }
 
     /// <summary>
     /// Converts empty string to <c>null</c>.
     /// </summary>
     [Pure]
-    public static string? EmptyToNull (this ReadOnlyMemory<char> value) =>
-        value.IsEmpty ? null : value.ToString();
+    public static string? EmptyToNull
+        (
+            this ReadOnlyMemory<char> value
+        )
+    {
+        return value.IsEmpty ? null : value.ToString();
+    }
 
     /// <summary>
     /// Добавление объекта-перечисления.
@@ -3975,7 +4492,7 @@ public static class Utility
         }
 
         return false;
-    } // method CanConvertTo
+    }
 
     /// <summary>
     /// Converts given value to the specified type.
@@ -4027,7 +4544,7 @@ public static class Utility
         }
 
         throw new ArsMagnaException();
-    } // method ConvertTo
+    }
 
     /// <summary>
     /// Converts given object to boolean value.
@@ -4122,33 +4639,65 @@ public static class Utility
     /// <summary>
     /// Raises the specified handler.
     /// </summary>
-    public static void Raise<T> (this EventHandler<T>? handler, object? sender, T args)
+    public static void Raise<T>
+        (
+            this EventHandler<T>? handler,
+            object? sender,
+            T args
+        )
         where T : EventArgs
-        => handler?.Invoke (sender, args);
+    {
+        handler?.Invoke (sender, args);
+    }
 
     /// <summary>
     /// Raises the specified handler.
     /// </summary>
-    public static void Raise<T> (this EventHandler<T>? handler, object? sender)
+    public static void Raise<T>
+        (
+            this EventHandler<T>? handler,
+            object? sender
+        )
         where T : EventArgs
-        => handler?.Invoke (sender, null!);
+    {
+        handler?.Invoke (sender, null!);
+    }
 
     /// <summary>
     /// Raises the specified handler.
     /// </summary>
-    public static void Raise (this EventHandler? handler, object? sender) =>
+    public static void Raise
+        (
+            this EventHandler? handler,
+            object? sender
+        )
+    {
         handler?.Invoke (sender, EventArgs.Empty);
+    }
 
     /// <summary>
     /// Raises the specified handler.
     /// </summary>
-    public static Task RaiseAsync (this EventHandler? handler, object? sender, EventArgs args) =>
-        handler is null ? Task.CompletedTask : Task.Factory.StartNew (() => { handler.Invoke (sender, args); });
+    public static Task RaiseAsync
+        (
+            this EventHandler? handler,
+            object? sender,
+            EventArgs args
+        )
+    {
+        return handler is null
+            ? Task.CompletedTask
+            : Task.Factory.StartNew (() => { handler.Invoke (sender, args); });
+    }
 
     /// <summary>
     /// Raises the specified handler.
     /// </summary>
-    public static Task RaiseAsync (this EventHandler? handler, object? sender)
+    public static Task RaiseAsync
+        (
+            this EventHandler? handler,
+            object? sender
+        )
     {
         if (handler is null)
         {
@@ -4162,22 +4711,37 @@ public static class Utility
     /// Is zero-length time span?
     /// </summary>
     [Pure]
-    public static bool IsZero (this TimeSpan timeSpan)
-        => TimeSpan.Compare (timeSpan, TimeSpan.Zero) == 0;
+    public static bool IsZero
+        (
+            this TimeSpan timeSpan
+        )
+    {
+        return TimeSpan.Compare (timeSpan, TimeSpan.Zero) == 0;
+    }
 
     /// <summary>
     /// Is zero-length or less?
     /// </summary>
     [Pure]
-    public static bool IsZeroOrLess (this TimeSpan timeSpan)
-        => TimeSpan.Compare (timeSpan, TimeSpan.Zero) <= 0;
+    public static bool IsZeroOrLess
+        (
+            this TimeSpan timeSpan
+        )
+    {
+        return TimeSpan.Compare (timeSpan, TimeSpan.Zero) <= 0;
+    }
 
     /// <summary>
     /// Is length of the time span less than zero?
     /// </summary>
     [Pure]
-    public static bool LessThanZero (this TimeSpan timeSpan)
-        => TimeSpan.Compare (timeSpan, TimeSpan.Zero) < 0;
+    public static bool LessThanZero
+        (
+            this TimeSpan timeSpan
+        )
+    {
+        return TimeSpan.Compare (timeSpan, TimeSpan.Zero) < 0;
+    }
 
     /// <summary>
     /// Converts time span to string
@@ -4212,28 +4776,40 @@ public static class Utility
     /// Converts time span using format 'dd:hh:mm:ss'
     /// </summary>
     [Pure]
-    public static string ToDayString (this TimeSpan span) => string.Format
+    public static string ToDayString
         (
-            CultureInfo.InvariantCulture,
-            "{0:00} d {1:00} h {2:00} m {3:00} s",
-            span.Days,
-            span.Hours,
-            span.Minutes,
-            span.Seconds
-        );
+            this TimeSpan span
+        )
+    {
+        return string.Format
+            (
+                CultureInfo.InvariantCulture,
+                "{0:00} d {1:00} h {2:00} m {3:00} s",
+                span.Days,
+                span.Hours,
+                span.Minutes,
+                span.Seconds
+            );
+    }
 
     /// <summary>
     /// Converts time span using format 'hh:mm:ss'
     /// </summary>
     [Pure]
-    public static string ToHourString (this TimeSpan span) => string.Format
+    public static string ToHourString
         (
-            CultureInfo.InvariantCulture,
-            "{0:00}:{1:00}:{2:00}",
-            span.Hours + span.Days * 24,
-            span.Minutes,
-            span.Seconds
-        );
+            this TimeSpan span
+        )
+    {
+        return string.Format
+            (
+                CultureInfo.InvariantCulture,
+                "{0:00}:{1:00}:{2:00}",
+                span.Hours + span.Days * 24,
+                span.Minutes,
+                span.Seconds
+            );
+    }
 
     /// <summary>
     /// Converts time span using format 'mm:ss'
@@ -4593,6 +5169,8 @@ public static class Utility
     /// <summary>
     /// Безопасный триминг строки.
     /// </summary>
+    [Pure]
+    [DebuggerStepThrough]
     public static string? SafeTrim
         (
             this string? text
@@ -4648,12 +5226,15 @@ public static class Utility
     /// </summary>
     /// <param name="task">Проверяемая задача.</param>
     [Pure]
+    [DebuggerStepThrough]
     public static T? GetResultOrDefault<T>
         (
             this Task<T?> task
         )
     {
-        return task.Status == TaskStatus.RanToCompletion ? task.Result : default;
+        return task.Status == TaskStatus.RanToCompletion
+            ? task.Result
+            : default;
     }
 
     /// <summary>
@@ -4682,6 +5263,7 @@ public static class Utility
     /// <summary>
     /// Выбор первой не пустой среди перечисленных строк.
     /// </summary>
+    [Pure]
     public static string NonEmpty
         (
             string? first,
@@ -4696,6 +5278,7 @@ public static class Utility
     /// <summary>
     /// Выбор первой не пустой среди перечисленных строк.
     /// </summary>
+    [Pure]
     public static string NonEmpty
         (
             string? first,
@@ -4712,6 +5295,7 @@ public static class Utility
     /// <summary>
     /// Выбор первой не пустой среди перечисленных строк.
     /// </summary>
+    [Pure]
     public static string NonEmpty
         (
             string? first,
@@ -4750,6 +5334,7 @@ public static class Utility
     /// Выбирает первую не пустую среди перечисленных строк,
     /// либо возвращает значение по умолчанию.
     /// </summary>
+    [Pure]
     public static string NonEmptyOrDefault
         (
             string?[]? array,
@@ -4775,6 +5360,7 @@ public static class Utility
     /// <summary>
     /// Выбирает первый не пустой спан среди перечисленных.
     /// </summary>
+    [Pure]
     public static ReadOnlySpan<T> NonEmpty<T>
         (
             ReadOnlySpan<T> first,
@@ -4789,6 +5375,7 @@ public static class Utility
     /// <summary>
     /// Выбирает первый не пустой спан среди перечисленных.
     /// </summary>
+    [Pure]
     public static ReadOnlySpan<T> NonEmpty<T>
         (
             ReadOnlySpan<T> first,
@@ -4805,6 +5392,7 @@ public static class Utility
     /// <summary>
     /// Выбор первого не пустого спана среди перечисленных.
     /// </summary>
+    [Pure]
     public static ReadOnlySpan<T> NonEmpty<T>
         (
             ReadOnlySpan<T> first,
@@ -4823,6 +5411,7 @@ public static class Utility
     /// <summary>
     /// Выбор первого не пустго спана среди перечисленных.
     /// </summary>
+    [Pure]
     public static ReadOnlyMemory<T> NonEmpty<T>
         (
             ReadOnlyMemory<T> first,
@@ -4837,6 +5426,7 @@ public static class Utility
     /// <summary>
     /// Выбор первого не пустого спана среди перечисленных.
     /// </summary>
+    [Pure]
     public static ReadOnlyMemory<T> NonEmpty<T>
         (
             ReadOnlyMemory<T> first,
@@ -4853,6 +5443,7 @@ public static class Utility
     /// <summary>
     /// Выбор первого не пустого спана среди перечисленных.
     /// </summary>
+    [Pure]
     public static ReadOnlyMemory<T> NonEmpty<T>
         (
             ReadOnlyMemory<T> first,
@@ -4999,7 +5590,7 @@ public static class Utility
                 );
 
             return aggregate.InnerExceptions[0];
-        } // if
+        }
 
         return exception;
     }
@@ -5028,22 +5619,38 @@ public static class Utility
     /// Сокращение для <see cref="string.IsNullOrEmpty"/>
     /// </summary>
     [Pure]
-    public static bool IsEmpty ([NotNullWhen (false)] this string? text)
-        => string.IsNullOrEmpty (text);
+    [DebuggerStepThrough]
+    public static bool IsEmpty
+        (
+            [NotNullWhen (false)] this string? text
+        )
+    {
+        return string.IsNullOrEmpty (text);
+    }
 
     /// <summary>
     /// Универсальное длинное представление даты/времени.
     /// </summary>
     [Pure]
-    public static string ToLongUniformString (this DateTime dateTime) =>
-        dateTime.ToString ("yyyy-MM-dd HH:mm:ss");
+    public static string ToLongUniformString
+        (
+            this DateTime dateTime
+        )
+    {
+        return dateTime.ToString ("yyyy-MM-dd HH:mm:ss");
+    }
 
     /// <summary>
     /// Универсальное короткое представление даты.
     /// </summary>
     [Pure]
-    public static string ToShortUniformString (this DateTime dateTime) =>
-        dateTime.ToString ("yyyy-MM-dd");
+    public static string ToShortUniformString
+        (
+            this DateTime dateTime
+        )
+    {
+        return dateTime.ToString ("yyyy-MM-dd");
+    }
 
     /// <summary>
     /// Начало эпохи UNIX.
@@ -5054,12 +5661,18 @@ public static class Utility
     /// Переводит указанную дату в формат Unix.
     /// </summary>
     [Pure]
-    public static long ToUnixTime (this DateTime dateTime) =>
-        (long)(dateTime - UnixStart).TotalSeconds;
+    public static long ToUnixTime
+        (
+            this DateTime dateTime
+        )
+    {
+        return (long)(dateTime - UnixStart).TotalSeconds;
+    }
 
     /// <summary>
     /// Получение индекса последнего вхождения любой из перечисленных строк.
     /// </summary>
+    [Pure]
     public static int LastIndexOfAny
         (
             string text,
@@ -5083,43 +5696,80 @@ public static class Utility
     /// Чтение структуры по указанному смещению.
     /// </summary>
     [Pure]
-    public static T Read<T> (this ReadOnlySpan<byte> span, int offset) where T : struct
-        => MemoryMarshal.Read<T> (span[offset..]);
+    public static T Read<T>
+        (
+            this ReadOnlySpan<byte> span,
+            int offset
+        )
+        where T : struct
+    {
+        return MemoryMarshal.Read<T> (span[offset..]);
+    }
 
     /// <summary>
     /// Чтение 16-битного целого в хостовой раскладке по указанному смещению.
     /// </summary>
     [Pure]
-    public static short ReadHostInt16 (this ReadOnlySpan<byte> span, int offset)
-        => MemoryMarshal.Read<short> (span[offset..]);
+    public static short ReadHostInt16
+        (
+            this ReadOnlySpan<byte> span,
+            int offset
+        )
+    {
+        return MemoryMarshal.Read<short> (span[offset..]);
+    }
 
     /// <summary>
     /// Чтение 32-битного целого в сетевой раскладке по указанному смещению.
     /// </summary>
     [Pure]
-    public static short ReadNetworkInt16 (this ReadOnlySpan<byte> span, int offset)
-        => IPAddress.NetworkToHostOrder (MemoryMarshal.Read<short> (span[offset..]));
+    public static short ReadNetworkInt16
+        (
+            this ReadOnlySpan<byte> span,
+            int offset
+        )
+    {
+        return IPAddress.NetworkToHostOrder (MemoryMarshal.Read<short> (span[offset..]));
+    }
 
     /// <summary>
     /// Чтение 32-битного целого в хостовой раскладке по указанному смещению.
     /// </summary>
     [Pure]
-    public static int ReadHostInt32 (this ReadOnlySpan<byte> span, int offset)
-        => MemoryMarshal.Read<int> (span[offset..]);
+    public static int ReadHostInt32
+        (
+            this ReadOnlySpan<byte> span,
+            int offset
+        )
+    {
+        return MemoryMarshal.Read<int> (span[offset..]);
+    }
 
     /// <summary>
     /// Чтение 32-битного целого в сетевой раскладке по указанному смещению.
     /// </summary>
     [Pure]
-    public static int ReadNetworkInt32 (this ReadOnlySpan<byte> span, int offset)
-        => IPAddress.NetworkToHostOrder (MemoryMarshal.Read<int> (span[offset..]));
+    public static int ReadNetworkInt32
+        (
+            this ReadOnlySpan<byte> span,
+            int offset
+        )
+    {
+        return IPAddress.NetworkToHostOrder (MemoryMarshal.Read<int> (span[offset..]));
+    }
 
     /// <summary>
     /// Чтение 64-битного целого в хостовой раскладке по указанному смещению.
     /// </summary>
     [Pure]
-    public static long ReadHostInt64 (this ReadOnlySpan<byte> span, int offset)
-        => MemoryMarshal.Read<long> (span[offset..]);
+    public static long ReadHostInt64
+        (
+            this ReadOnlySpan<byte> span,
+            int offset
+        )
+    {
+        return MemoryMarshal.Read<long> (span[offset..]);
+    }
 
     /// <summary>
     /// Чтение 64-битного целого в сетевой раскладке по указанному смещению.
@@ -5132,48 +5782,91 @@ public static class Utility
         )
     {
         var buffer = stackalloc byte[sizeof (long)];
-        *(long*)buffer = MemoryMarshal.Read<long> (span[offset..]);
+        *(long*) buffer = MemoryMarshal.Read<long> (span[offset..]);
         StreamUtility.NetworkToHost64 (buffer);
 
-        return *(long*)buffer;
+        return *(long*) buffer;
     }
 
     /// <summary>
     /// Запись структуры по указанному смещению.
     /// Метод предназначен для мелких структур, например, System.Int32.
     /// </summary>
-    public static void Write<T> (this Span<byte> span, int offset, T value) where T : struct
-        => MemoryMarshal.Write (span[offset..], ref value);
+    public static void Write<T>
+        (
+            this Span<byte> span,
+            int offset,
+            T value
+        )
+        where T : struct
+    {
+        MemoryMarshal.Write (span[offset..], ref value);
+    }
 
     /// <summary>
     /// Запись 16-битного целого по указанному адресу в хостовой раскладке.
     /// </summary>
-    public static void WriteHostInt16 (this Span<byte> span, int offset, short value)
-        => Write (span, offset, value);
+    public static void WriteHostInt16
+        (
+            this Span<byte> span,
+            int offset,
+            short value
+        )
+    {
+        Write (span, offset, value);
+    }
 
     /// <summary>
     /// Запись 16-битного целого по указанному адресу в сетевой раскладке.
     /// </summary>
-    public static void WriteNetworkInt16 (this Span<byte> span, int offset, short value)
-        => Write (span, offset, IPAddress.HostToNetworkOrder (value));
+    public static void WriteNetworkInt16
+        (
+            this Span<byte> span,
+            int offset,
+            short value
+        )
+    {
+        Write (span, offset, IPAddress.HostToNetworkOrder (value));
+    }
 
     /// <summary>
     /// Запись 32-битного целого по указанному адресу в хостовой раскладке.
     /// </summary>
-    public static void WriteHostInt32 (this Span<byte> span, int offset, int value)
-        => Write (span, offset, value);
+    public static void WriteHostInt32
+        (
+            this Span<byte> span,
+            int offset,
+            int value
+        )
+    {
+        Write (span, offset, value);
+    }
 
     /// <summary>
     /// Запись 32-битного целого по указанному адресу в сетевой раскладке.
     /// </summary>
-    public static void WriteNetworkInt32 (this Span<byte> span, int offset, int value)
-        => Write (span, offset, IPAddress.HostToNetworkOrder (value));
+    public static void WriteNetworkInt32
+        (
+            this Span<byte> span,
+            int offset,
+            int value
+        )
+    {
+        Write (span, offset, IPAddress.HostToNetworkOrder (value));
+    }
 
     /// <summary>
     /// Запись 64-битного целого по указанному адресу в хостовой раскладке.
     /// </summary>
-    public static void WriteHostInt64 (this Span<byte> span, int offset, long value)
-        => Write (span, offset, value);
+    public static void WriteHostInt64
+        (
+            this Span<byte> span,
+            int offset,
+            long value
+        )
+    {
+        Write (span, offset, value);
+    }
 
     /// <summary>
     /// Запись 64-битного целого по указанному адресу в сетевой раскладке.
@@ -5185,7 +5878,7 @@ public static class Utility
             long value
         )
     {
-        var ptr = (byte*)&value;
+        var ptr = (byte*) &value;
         StreamUtility.HostToNetwork64 (ptr);
         Write (span, offset, value);
     }
@@ -5194,76 +5887,144 @@ public static class Utility
     /// Упрощенное получение информации о методе.
     /// </summary>
     [Pure]
-    public static MethodInfo GetMethodInfo (Expression<Action> expression)
-        => ((MethodCallExpression)expression.Body).Method;
+    [DebuggerStepThrough]
+    public static MethodInfo GetMethodInfo
+        (
+            Expression<Action> expression
+        )
+    {
+        return ((MethodCallExpression) expression.Body).Method;
+    }
 
     /// <summary>
     /// Упрощенное получение информации о методе.
     /// </summary>
     [Pure]
-    public static MethodInfo GetMethodInfo<T> (Expression<Action<T>> expression)
-        => ((MethodCallExpression)expression.Body).Method;
+    [DebuggerStepThrough]
+    public static MethodInfo GetMethodInfo<T>
+        (
+            Expression<Action<T>> expression
+        )
+    {
+        return ((MethodCallExpression) expression.Body).Method;
+    }
 
     /// <summary>
     /// Упрощенное получение информации о методе.
     /// </summary>
     [Pure]
-    public static MethodInfo GetMethodInfo<T1, T2> (Expression<Action<T1, T2>> expression)
-        => ((MethodCallExpression)expression.Body).Method;
+    [DebuggerStepThrough]
+    public static MethodInfo GetMethodInfo<T1, T2>
+        (
+            Expression<Action<T1, T2>> expression
+        )
+    {
+        return ((MethodCallExpression) expression.Body).Method;
+    }
 
     /// <summary>
     /// Упрощенное получение информации о методе.
     /// </summary>
     [Pure]
-    public static MethodInfo GetMethodInfo<T1, T2, T3> (Expression<Action<T1, T2, T3>> expression)
-        => ((MethodCallExpression)expression.Body).Method;
+    [DebuggerStepThrough]
+    public static MethodInfo GetMethodInfo<T1, T2, T3>
+        (
+            Expression<Action<T1, T2, T3>> expression
+        )
+    {
+        return ((MethodCallExpression) expression.Body).Method;
+    }
 
     /// <summary>
     /// Упрощенное получение информации о методе.
     /// </summary>
     [Pure]
-    public static MethodInfo GetMethodInfo<T1, T2, T3, T4> (Expression<Action<T1, T2, T3, T4>> expression)
-        => ((MethodCallExpression)expression.Body).Method;
+    [DebuggerStepThrough]
+    public static MethodInfo GetMethodInfo<T1, T2, T3, T4>
+        (
+            Expression<Action<T1, T2, T3, T4>> expression
+        )
+    {
+        return ((MethodCallExpression) expression.Body).Method;
+    }
 
     /// <summary>
     /// Упрощенное получение информации о методе.
     /// </summary>
     [Pure]
-    public static MethodInfo GetMethodInfo<T> (Expression<Func<T>> expression)
-        => ((MethodCallExpression)expression.Body).Method;
+    [DebuggerStepThrough]
+    public static MethodInfo GetMethodInfo<T>
+        (
+            Expression<Func<T>> expression
+        )
+    {
+        return ((MethodCallExpression) expression.Body).Method;
+    }
 
     /// <summary>
     /// Упрощенное получение информации о методе.
     /// </summary>
     [Pure]
-    public static MethodInfo GetMethodInfo<T1, T2> (Expression<Func<T1, T2>> expression)
-        => ((MethodCallExpression)expression.Body).Method;
+    [DebuggerStepThrough]
+    public static MethodInfo GetMethodInfo<T1, T2>
+        (
+            Expression<Func<T1, T2>> expression
+        )
+    {
+        return ((MethodCallExpression) expression.Body).Method;
+    }
 
     /// <summary>
     /// Упрощенное получение информации о методе.
     /// </summary>
     [Pure]
-    public static MethodInfo GetMethodInfo<T1, T2, T3> (Expression<Func<T1, T2, T3>> expression)
-        => ((MethodCallExpression)expression.Body).Method;
+    [DebuggerStepThrough]
+    public static MethodInfo GetMethodInfo<T1, T2, T3>
+        (
+            Expression<Func<T1, T2, T3>> expression
+        )
+    {
+        return ((MethodCallExpression) expression.Body).Method;
+    }
 
     /// <summary>
     /// Упрощенное получение информации о методе.
     /// </summary>
     [Pure]
-    public static MethodInfo GetMethodInfo<T1, T2, T3, T4> (Expression<Func<T1, T2, T3, T4>> expression)
-        => ((MethodCallExpression)expression.Body).Method;
+    [DebuggerStepThrough]
+    public static MethodInfo GetMethodInfo<T1, T2, T3, T4>
+        (
+            Expression<Func<T1, T2, T3, T4>> expression
+        )
+    {
+        return ((MethodCallExpression) expression.Body).Method;
+    }
 
     /// <summary>
     /// Получение ссылочного перечислителя.
     /// </summary>
     [Pure]
-    public static RefEnumerable<T> AsRefEnumerable<T> (this Span<T> data) => new (data);
+    [DebuggerStepThrough]
+    public static RefEnumerable<T> AsRefEnumerable<T>
+        (
+            this Span<T> data
+        )
+    {
+        return new (data);
+    }
 
     /// <summary>
     /// Получение ссылочного перечислителя.
     /// </summary>
     [Pure]
-    public static RefEnumerable<T> AsRefEnumerable<T> (this T[] data) => new (data.AsSpan());
+    [DebuggerStepThrough]
+    public static RefEnumerable<T> AsRefEnumerable<T>
+        (
+            this T[] data
+        )
+    {
+        return new (data.AsSpan());
+    }
 
     /// <summary>
     /// "Запустить и забыть".
@@ -5300,6 +6061,8 @@ public static class Utility
     /// <summary>
     /// Соединение последовательности в строку.
     /// </summary>
+    [Pure]
+    [DebuggerStepThrough]
     public static string JoinText<T>
         (
             this IEnumerable<T> sequence,
