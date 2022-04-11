@@ -19,11 +19,7 @@
 
 using System;
 using System.Buffers;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using System.Threading;
 
 #endregion
 
@@ -37,25 +33,61 @@ namespace AM.Collections;
 public ref struct ValueListPool<T>
     where T : IEquatable<T>
 {
+    #region Enums
+
+    /// <summary>
+    ///
+    /// </summary>
     public enum SourceType
     {
+        /// <summary>
+        ///
+        /// </summary>
         UseAsInitialBuffer,
+
+        /// <summary>
+        ///
+        /// </summary>
         UseAsReferenceData,
+
+        /// <summary>
+        ///
+        /// </summary>
         Copy
     }
 
-    private const int MinimumCapacity = 16;
-    private T[] _disposableBuffer;
-    private Span<T> _buffer;
+    #endregion
+
+    #region Properties
 
     /// <summary>
-    ///     Construct ValueListPool with the indicated capacity.
+    /// Емкость списка.
     /// </summary>
-    /// <param name="capacity">Required initial capacity</param>
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public ValueListPool (int capacity)
+    public int Capacity => _buffer.Length;
+
+    /// <summary>
+    /// Количество элементов в списке.
+    /// </summary>
+    public int Count { get; private set; }
+
+    /// <summary>
+    /// Список только для чтения?
+    /// </summary>
+    public bool IsReadOnly => false;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор с начальной емкостью.
+    /// </summary>
+    public ValueListPool
+        (
+            int capacity
+        )
     {
-        _disposableBuffer = ArrayPool<T>.Shared.Rent (capacity < MinimumCapacity ? MinimumCapacity : capacity);
+        _disposableBuffer = ArrayPool<T>.Shared.Rent (Math.Max (capacity, MinimumCapacity));
         _buffer = _disposableBuffer;
         Count = 0;
     }
@@ -67,7 +99,11 @@ public ref struct ValueListPool<T>
     /// </summary>
     /// <param name="source">source/buffer</param>
     /// <param name="sourceType">Action to take with the source</param>
-    public ValueListPool (Span<T> source, SourceType sourceType)
+    public ValueListPool
+        (
+            Span<T> source,
+            SourceType sourceType
+        )
     {
         if (sourceType == SourceType.UseAsInitialBuffer)
         {
@@ -83,7 +119,7 @@ public ref struct ValueListPool<T>
         }
         else
         {
-            T[] disposableBuffer =
+            var disposableBuffer =
                 ArrayPool<T>.Shared.Rent (source.Length > MinimumCapacity ? source.Length : MinimumCapacity);
 
             source.CopyTo (disposableBuffer);
@@ -93,33 +129,64 @@ public ref struct ValueListPool<T>
         }
     }
 
-    /// <summary>
-    ///     Capacity of the underlying array.
-    /// </summary>
-    public int Capacity => _buffer.Length;
+    #endregion
+
+    #region Private members
+
+    private const int MinimumCapacity = 16;
+    private T[]? _disposableBuffer;
+    private Span<T> _buffer;
 
     /// <summary>
-    ///     Returns underlying array to the pool
+    /// Добавление элемента с сопутствующим расширением буфера.
     /// </summary>
-    public void Dispose()
+    private void AddWithResize
+        (
+            T item
+        )
     {
-        Count = 0;
-        T[] buffer = _disposableBuffer;
-        if (buffer != null)
-            ArrayPool<T>.Shared.Return (buffer);
+        var arrayPool = ArrayPool<T>.Shared;
+        if (_disposableBuffer == null)
+        {
+            var oldBuffer = _buffer;
+            var newSize = oldBuffer.Length * 2;
+            var newBuffer = arrayPool.Rent (Math.Max (newSize, MinimumCapacity));
+            oldBuffer.CopyTo (newBuffer);
+            newBuffer[oldBuffer.Length] = item;
+            _disposableBuffer = newBuffer;
+            _buffer = newBuffer;
+            Count++;
+        }
+        else
+        {
+            var oldBuffer = _disposableBuffer;
+            var newBuffer = arrayPool.Rent (oldBuffer.Length * 2);
+            var count = oldBuffer.Length;
+
+            Array.Copy (oldBuffer, 0, newBuffer, 0, count);
+
+            newBuffer[count] = item;
+            _disposableBuffer = newBuffer;
+            _buffer = newBuffer;
+            Count = count + 1;
+            arrayPool.Return (oldBuffer);
+        }
     }
 
+    #endregion
+
+    #region Public methods
+
     /// <summary>
-    ///     Count of items added.
+    /// Добавление элемента.
     /// </summary>
-    public int Count { get; private set; }
-
-    public bool IsReadOnly => false;
-
-    public void Add (T item)
+    public void Add
+        (
+            T item
+        )
     {
-        Span<T> buffer = _buffer;
-        int count = Count;
+        var buffer = _buffer;
+        var count = Count;
 
         if (count < buffer.Length)
         {
@@ -132,35 +199,83 @@ public ref struct ValueListPool<T>
         }
     }
 
+    /// <summary>
+    /// Очистка списка.
+    /// </summary>
     public void Clear() => Count = 0;
 
-    public readonly bool Contains (T item) => IndexOf (item) > -1;
-
-    public readonly int IndexOf (T item) => _buffer.Slice (0, Count).IndexOf (item);
-
-    public readonly void CopyTo (Span<T> array) => _buffer.Slice (0, Count).CopyTo (array);
-
-    public bool Remove (T item)
+    /// <summary>
+    /// Проверка наличия элемента в списке.
+    /// </summary>
+    public readonly bool Contains
+        (
+            T item
+        )
     {
-        if (item is null) return false;
+        return IndexOf (item) >= 0;
+    }
 
-        int index = IndexOf (item);
+    /// <summary>
+    /// Поиск первого вхождения элемента в список.
+    /// </summary>
+    public readonly int IndexOf
+        (
+            T item
+        )
+    {
+        return _buffer.Slice (0, Count).IndexOf (item);
+    }
 
-        if (index == -1) return false;
+    /// <summary>
+    /// Копирование списка в указанный диапазон памяти.
+    /// </summary>
+    public readonly void CopyTo
+        (
+            Span<T> array
+        )
+    {
+        _buffer.Slice (0, Count).CopyTo (array);
+    }
+
+    /// <summary>
+    /// Удаление элемента из списка.
+    /// </summary>
+    public bool Remove
+        (
+            [MaybeNull] T item
+        )
+    {
+        if (((object?) item) is null)
+        {
+            return false;
+        }
+
+        var index = IndexOf (item);
+        if (index == -1)
+        {
+            return false;
+        }
 
         RemoveAt (index);
 
         return true;
     }
 
-    public void Insert (int index, T item)
+    /// <summary>
+    /// Вставка элемента в список в указанную позицию.
+    /// </summary>
+    public void Insert
+        (
+            int index,
+            T item
+        )
     {
-        int count = Count;
-        Span<T> buffer = _buffer;
+        var count = Count;
+        var buffer = _buffer;
 
         if (buffer.Length == count)
         {
-            int newCapacity = count * 2;
+            var newCapacity = count * 2;
             EnsureCapacity (newCapacity);
             buffer = _buffer;
         }
@@ -179,37 +294,56 @@ public ref struct ValueListPool<T>
         else throw new ArgumentOutOfRangeException (nameof (index));
     }
 
-    public void RemoveAt (int index)
+    /// <summary>
+    /// Удаление из списка элемента в указанной позиции.
+    /// </summary>
+    public void RemoveAt
+        (
+            int index
+        )
     {
-        int count = Count;
-        Span<T> buffer = _buffer;
+        var count = Count;
+        var buffer = _buffer;
 
-        if (index >= count) throw new IndexOutOfRangeException (nameof (index));
+        if (index >= count)
+        {
+            throw new IndexOutOfRangeException (nameof (index));
+        }
 
         count--;
         buffer.Slice (index + 1).CopyTo (buffer.Slice (index));
         Count = count;
     }
 
+    /// <summary>
+    /// Индексатор.
+    /// </summary>
     [MaybeNull]
     public readonly ref T this [int index]
     {
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
         get
         {
             if (index >= Count)
+            {
                 throw new IndexOutOfRangeException (nameof (index));
+            }
 
-            return ref _buffer[index];
+            return ref _buffer[index]!;
         }
     }
 
-    public void AddRange (ReadOnlySpan<T> items)
+    /// <summary>
+    /// Одновременное добавление нескольких элементов.
+    /// </summary>
+    public void AddRange
+        (
+            ReadOnlySpan<T> items
+        )
     {
-        int count = Count;
-        Span<T> buffer = _buffer;
+        var count = Count;
+        var buffer = _buffer;
 
-        bool isCapacityEnough = buffer.Length - items.Length - count >= 0;
+        var isCapacityEnough = buffer.Length - items.Length - count >= 0;
         if (!isCapacityEnough)
         {
             EnsureCapacity (buffer.Length + items.Length);
@@ -220,18 +354,24 @@ public ref struct ValueListPool<T>
         Count += items.Length;
     }
 
-    public void AddRange (T[] array)
+    /// <summary>
+    /// Одновременное добавление нескольких элементов.
+    /// </summary>
+    public void AddRange
+        (
+            T[] array
+        )
     {
-        int count = Count;
-        T[] disposableBuffer = _disposableBuffer;
-        Span<T> buffer = _buffer;
+        var count = Count;
+        var disposableBuffer = _disposableBuffer;
+        var buffer = _buffer;
 
-        bool isCapacityEnough = buffer.Length - array.Length - count >= 0;
+        var isCapacityEnough = buffer.Length - array.Length - count >= 0;
         if (!isCapacityEnough)
         {
             EnsureCapacity (buffer.Length + array.Length);
             disposableBuffer = _disposableBuffer;
-            array.CopyTo (disposableBuffer, count);
+            array.CopyTo (disposableBuffer!, count);
             Count += array.Length;
             return;
         }
@@ -248,37 +388,12 @@ public ref struct ValueListPool<T>
         Count += array.Length;
     }
 
-    public readonly Span<T> AsSpan() => _buffer.Slice (0, Count);
-
-    [MethodImpl (MethodImplOptions.NoInlining)]
-    private void AddWithResize (T item)
+    /// <summary>
+    /// Доступ к внутреннему массиву как диапазону памяти.
+    /// </summary>
+    public readonly Span<T> AsSpan()
     {
-        ArrayPool<T> arrayPool = ArrayPool<T>.Shared;
-        if (_disposableBuffer == null)
-        {
-            Span<T> oldBuffer = _buffer;
-            int newSize = oldBuffer.Length * 2;
-            T[] newBuffer = arrayPool.Rent (newSize > MinimumCapacity ? newSize : MinimumCapacity);
-            oldBuffer.CopyTo (newBuffer);
-            newBuffer[oldBuffer.Length] = item;
-            _disposableBuffer = newBuffer;
-            _buffer = newBuffer;
-            Count++;
-        }
-        else
-        {
-            T[] oldBuffer = _disposableBuffer;
-            T[] newBuffer = arrayPool.Rent (oldBuffer.Length * 2);
-            int count = oldBuffer.Length;
-
-            Array.Copy (oldBuffer, 0, newBuffer, 0, count);
-
-            newBuffer[count] = item;
-            _disposableBuffer = newBuffer;
-            _buffer = newBuffer;
-            Count = count + 1;
-            arrayPool.Return (oldBuffer);
-        }
+        return _buffer.Slice (0, Count);
     }
 
     /// <summary>
@@ -289,9 +404,9 @@ public ref struct ValueListPool<T>
     public void EnsureCapacity (int capacity)
     {
         if (capacity <= _buffer.Length) return;
-        ArrayPool<T> arrayPool = ArrayPool<T>.Shared;
-        T[] newBuffer = arrayPool.Rent (capacity);
-        Span<T> oldBuffer = _buffer;
+        var arrayPool = ArrayPool<T>.Shared;
+        var newBuffer = arrayPool.Rent (capacity);
+        var oldBuffer = _buffer;
 
         oldBuffer.CopyTo (newBuffer);
 
@@ -304,31 +419,68 @@ public ref struct ValueListPool<T>
         _disposableBuffer = newBuffer;
     }
 
-    public readonly Enumerator GetEnumerator() => new Enumerator (_buffer.Slice (0, Count));
+    /// <summary>
+    /// Получение перечислителя.
+    /// </summary>
+    public readonly Enumerator GetEnumerator()
+    {
+        return new Enumerator (_buffer.Slice (0, Count));
+    }
 
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        Count = 0;
+        var buffer = _disposableBuffer;
+        if (buffer != null)
+        {
+            ArrayPool<T>.Shared.Return (buffer);
+        }
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Перечислитель.
+    /// </summary>
     public ref struct Enumerator
     {
         private readonly Span<T> _source;
         private int _index;
 
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-        public Enumerator (Span<T> source)
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public Enumerator
+            (
+                Span<T> source
+            )
         {
             _source = source;
             _index = -1;
         }
 
+        /// <summary>
+        /// Текущий элемент.
+        /// </summary>
         [MaybeNull]
-        public readonly ref T Current
+        public readonly ref T Current => ref _source[_index]!;
+
+        /// <summary>
+        /// Переход к следующему элементу.
+        /// </summary>
+        public bool MoveNext()
         {
-            [MethodImpl (MethodImplOptions.AggressiveInlining)]
-            get => ref _source[_index];
+            return unchecked (++_index < _source.Length);
         }
 
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-        public bool MoveNext() => unchecked (++_index < _source.Length);
-
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Сброс в начальное состояние.
+        /// </summary>
         public void Reset()
         {
             _index = -1;
