@@ -116,6 +116,17 @@ function buildUrl (expression) {
     return result
 }
 
+function buildUrl2 (expression) {
+    const resource = 'http://elib.istu.edu/Jsoner.php?op=search_format'
+    const database = 'ISTU'
+    const format = '@brief_with_url'
+    const limit = howMany.value
+    const filter = fullText.checked ? 'TEK=HTTP:%2F%2F$+*+' : ''
+    const result = resource + '&db=' +  database + '&expr=' + filter + encodeURIComponent (expression) + '&format=' + format + "&limit=" + limit
+
+    return result
+}
+
 function handleSuccess (data) {
     const articles = data.sort()
     // console.log ('Найдено: ' + articles.length)
@@ -179,6 +190,21 @@ function searchForArticles (expression) {
         })
 }
 
+function searchForArticles2 (expression) {
+    const url = buildUrl2 (expression)
+    showBusy()
+    axios.get (url)
+        .then (function (response) {
+            handleSuccess (response.data)
+            hideBusy ()
+        })
+        .catch (function (error) {
+            console.log(error)
+            hideBusy ()
+            showError ('Сервер не ответил либо прислал невалидный ответ')
+        })
+}
+
 function handleSubmit() {
     showBusy()
     clearArticleList()
@@ -194,6 +220,7 @@ function handleSubmit() {
     // showDebug (expression)
 
     searchForArticles (expression)
+    searchForArticles2 (expression)
 
     return false
 }
