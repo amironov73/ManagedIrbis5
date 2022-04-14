@@ -9,17 +9,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Biblio.Dictionaries
+namespace UnitTests.ManagedIrbis.Biblio.Dictionaries;
+
+[TestClass]
+public sealed class BiblioDictionaryTest
 {
-    [TestClass]
-    public sealed class BiblioDictionaryTest
+    [TestMethod]
+    [Description ("Конструктор по умолчанию")]
+    public void BiblioDictionary_Construction_1()
     {
-        [TestMethod]
-        [Description ("Конструктор по умолчанию")]
-        public void BiblioDictionary_Construction_1()
-        {
-            var dictionary = new BiblioDictionary();
-            Assert.AreEqual (0, dictionary.Count);
-        }
+        var dictionary = new BiblioDictionary();
+        Assert.AreEqual (0, dictionary.Count);
     }
 }

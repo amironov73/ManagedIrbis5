@@ -9,17 +9,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Biblio.Dictionaries
+namespace UnitTests.ManagedIrbis.Biblio.Dictionaries;
+
+[TestClass]
+public sealed class TermCollectionTest
 {
-    [TestClass]
-    public sealed class TermCollectionTest
+    [TestMethod]
+    [Description ("Конструктор по умолчанию")]
+    public void TermCollection_Construction_1()
     {
-        [TestMethod]
-        [Description ("Конструктор по умолчанию")]
-        public void TermCollection_Construction_1()
-        {
-            var collection = new TermCollection();
-            Assert.AreEqual (0, collection.Count);
-        }
+        var collection = new TermCollection();
+        Assert.AreEqual (0, collection.Count);
     }
 }
