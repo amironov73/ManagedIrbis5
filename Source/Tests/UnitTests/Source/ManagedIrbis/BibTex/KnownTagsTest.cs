@@ -12,17 +12,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.BibTex
+namespace UnitTests.ManagedIrbis.BibTex;
+
+[TestClass]
+public sealed class KnownTagsTest
 {
-    [TestClass]
-    public sealed class KnownTagsTest
+    [TestMethod]
+    [Description ("Получение массива значений констант")]
+    public void KnownTags_ListValues_1()
     {
-        [TestMethod]
-        [Description ("Получение массива значений констант")]
-        public void KnownTags_ListValues_1()
-        {
-            var values = KnownTags.ListValues();
-            Assert.AreEqual (27, values.Length);
-        }
+        var values = KnownTags.ListValues();
+        Assert.AreEqual (27, values.Length);
     }
 }

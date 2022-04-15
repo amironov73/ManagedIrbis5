@@ -19,26 +19,25 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.BibTex
-{
-    [TestClass]
-    public class BibTexUtilityTest
-        : Common.CommonUnitTest
-    {
-        private string BibTexPath
-            (
-                string fileName
-            )
-        {
-            return Path.Combine (this.TestDataPath, "BibTex", fileName);
-        }
+namespace UnitTests.ManagedIrbis.BibTex;
 
-        [TestMethod]
-        [ExpectedException (typeof (NotImplementedException))]
-        public void BibTexUtility_ReadFile_1()
-        {
-            var fileName = BibTexPath ("database.bib");
-            BibTexUtility.ReadFile (fileName);
-        }
+[TestClass]
+public class BibTexUtilityTest
+    : Common.CommonUnitTest
+{
+    private string BibTexPath
+        (
+            string fileName
+        )
+    {
+        return Path.Combine (this.TestDataPath, "BibTex", fileName);
+    }
+
+    [TestMethod]
+    [ExpectedException (typeof (NotImplementedException))]
+    public void BibTexUtility_ReadFile_1()
+    {
+        var fileName = BibTexPath ("database.bib");
+        BibTexUtility.ReadFile (fileName);
     }
 }

@@ -12,17 +12,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.BibTex
+namespace UnitTests.ManagedIrbis.BibTex;
+
+[TestClass]
+public sealed class RecordTypeTest
 {
-    [TestClass]
-    public sealed class RecordTypeTest
+    [TestMethod]
+    [Description ("Получение массива значений констант")]
+    public void RecordType_ListValues_1()
     {
-        [TestMethod]
-        [Description ("Получение массива значений констант")]
-        public void RecordType_ListValues_1()
-        {
-            var values = RecordType.ListValues();
-            Assert.AreEqual (14, values.Length);
-        }
+        var values = RecordType.ListValues();
+        Assert.AreEqual (14, values.Length);
     }
 }

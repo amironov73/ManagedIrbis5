@@ -14,17 +14,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.BibTex
+namespace UnitTests.ManagedIrbis.BibTex;
+
+[TestClass]
+public sealed class BibTexParserTest
 {
-    [TestClass]
-    public sealed class BibTexParserTest
+    [TestMethod]
+    [ExpectedException (typeof (NotImplementedException))]
+    public void BibTexParser_Parse_1()
     {
-        [TestMethod]
-        [ExpectedException (typeof (NotImplementedException))]
-        public void BibTexParser_Parse_1()
-        {
-            var parser = new BibTexParser();
-            parser.Parse (Array.Empty<Token>());
-        }
+        var parser = new BibTexParser();
+        parser.Parse (Array.Empty<Token>());
     }
 }

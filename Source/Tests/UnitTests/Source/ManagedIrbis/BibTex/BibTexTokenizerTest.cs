@@ -14,18 +14,17 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.BibTex
+namespace UnitTests.ManagedIrbis.BibTex;
+
+[TestClass]
+public sealed class BibTexTokenizerTest
+    : Common.CommonUnitTest
 {
-    [TestClass]
-    public sealed class BibTexTokenizerTest
-        : Common.CommonUnitTest
+    [TestMethod]
+    [ExpectedException (typeof (NotImplementedException))]
+    public void BibTexTokenizer_Tokenize_1()
     {
-        [TestMethod]
-        [ExpectedException (typeof (NotImplementedException))]
-        public void BibTexTokenizer_Tokenize_1()
-        {
-            var tokenizer = new BibTexTokenizer();
-            tokenizer.Tokenize ("this is a test");
-        }
+        var tokenizer = new BibTexTokenizer();
+        tokenizer.Tokenize ("this is a test");
     }
 }
