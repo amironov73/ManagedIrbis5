@@ -13,88 +13,87 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Caching
+namespace UnitTests.ManagedIrbis.Caching;
+
+[TestClass]
+public sealed class TreeCacheTest
 {
-    [TestClass]
-    public sealed class TreeCacheTest
+    [TestMethod]
+    [Description ("Конструктор")]
+    public void TreeCache_Construction_1()
     {
-        [TestMethod]
-        [Description ("Конструктор")]
-        public void TreeCache_Construction_1()
+        using var provider = new NullProvider();
+        using var cache = new TreeCache (provider);
+        Assert.AreSame (provider, cache.Provider);
+    }
+
+    [TestMethod]
+    [Description ("Конструктор")]
+    public void TreeCache_Construction_2()
+    {
+        using var memory = new MemoryCache (new MemoryCacheOptions());
+        using var provider = new NullProvider();
+        using var cache = new TreeCache (provider, memory);
+        Assert.AreSame (provider, cache.Provider);
+    }
+
+    [TestMethod]
+    [Description ("Конструктор")]
+    public void TreeCache_Construction_3()
+    {
+        var options = new MemoryCacheOptions();
+        using var provider = new NullProvider();
+        using var cache = new TreeCache (provider, options);
+        Assert.AreSame (provider, cache.Provider);
+    }
+
+    [TestMethod]
+    [Description ("Очистка")]
+    public void TreeCache_Clear_1()
+    {
+        using var provider = new NullProvider();
+        using var cache = new TreeCache (provider);
+        Assert.IsNotNull (cache);
+        cache.Clear();
+    }
+
+    [TestMethod]
+    [Description ("Получение дерева")]
+    public void TreeCache_GetTree_1()
+    {
+        using var provider = new NullProvider();
+        using var cache = new TreeCache (provider);
+        var specification = new FileSpecification()
         {
-            using var provider = new NullProvider();
-            using var cache = new TreeCache (provider);
-            Assert.AreSame (provider, cache.Provider);
-        }
+            Path = IrbisPath.MasterFile,
+            Database = "IBIS",
+            FileName = "ii.tre"
+        };
+        Assert.IsNull (cache.GetTree (specification));
+    }
 
-        [TestMethod]
-        [Description ("Конструктор")]
-        public void TreeCache_Construction_2()
+    [TestMethod]
+    [Description ("Обновление дерева")]
+    public void TreeCache_UpdateTree_1()
+    {
+        using var provider = new NullProvider();
+        using var cache = new TreeCache (provider);
+        var specification = new FileSpecification()
         {
-            using var memory = new MemoryCache (new MemoryCacheOptions());
-            using var provider = new NullProvider();
-            using var cache = new TreeCache (provider, memory);
-            Assert.AreSame (provider, cache.Provider);
-        }
+            Path = IrbisPath.MasterFile,
+            Database = "IBIS",
+            FileName = "ii.tre"
+        };
+        Assert.IsNull (cache.GetTree (specification));
 
-        [TestMethod]
-        [Description ("Конструктор")]
-        public void TreeCache_Construction_3()
-        {
-            var options = new MemoryCacheOptions();
-            using var provider = new NullProvider();
-            using var cache = new TreeCache (provider, options);
-            Assert.AreSame (provider, cache.Provider);
-        }
+        var newTree = new TreeFile();
+        newTree.AddRoot ("Code").AddChild ("Comment");
+        cache.UpdateTree (specification, newTree);
 
-        [TestMethod]
-        [Description ("Очистка")]
-        public void TreeCache_Clear_1()
-        {
-            using var provider = new NullProvider();
-            using var cache = new TreeCache (provider);
-            Assert.IsNotNull (cache);
-            cache.Clear();
-        }
-
-        [TestMethod]
-        [Description ("Получение дерева")]
-        public void TreeCache_GetTree_1()
-        {
-            using var provider = new NullProvider();
-            using var cache = new TreeCache (provider);
-            var specification = new FileSpecification()
-            {
-                Path = IrbisPath.MasterFile,
-                Database = "IBIS",
-                FileName = "ii.tre"
-            };
-            Assert.IsNull (cache.GetTree (specification));
-        }
-
-        [TestMethod]
-        [Description ("Обновление дерева")]
-        public void TreeCache_UpdateTree_1()
-        {
-            using var provider = new NullProvider();
-            using var cache = new TreeCache (provider);
-            var specification = new FileSpecification()
-            {
-                Path = IrbisPath.MasterFile,
-                Database = "IBIS",
-                FileName = "ii.tre"
-            };
-            Assert.IsNull (cache.GetTree (specification));
-
-            var newTree = new TreeFile();
-            newTree.AddRoot ("Code").AddChild ("Comment");
-            cache.UpdateTree (specification, newTree);
-
-            var cached = cache.GetTree (specification);
-            Assert.IsNotNull (cached);
-            // TODO исправить
-            //Assert.AreEqual ("Code", cached.Roots[0].Value);
-            //Assert.AreEqual ("Comment", cached.Roots[0].Children[0].Value);
-        }
+        var cached = cache.GetTree (specification);
+        Assert.IsNotNull (cached);
+        // TODO исправить
+        //Assert.AreEqual ("Code", cached.Roots[0].Value);
+        //Assert.AreEqual ("Comment", cached.Roots[0].Children[0].Value);
     }
 }
