@@ -16,42 +16,43 @@ using AM;
 
 #nullable enable
 
-namespace UnitTests.AM
+namespace UnitTests.AM;
+
+[TestClass]
+public sealed class UtilityTest
 {
-    [TestClass]
-    public class UtilityTest
+    [TestMethod]
+    public void Utility_ThrowIfNull_1()
     {
-        [TestMethod]
-        public void Utility_ThrowIfNull_1()
-        {
-            string text = "Hello";
-            Assert.AreSame(text, text.ThrowIfNull());
-        }
+        string text = "Hello";
+        Assert.AreSame (text, text.ThrowIfNull());
+    }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void Utility_ThrowIfNull_2()
-        {
-            string? text = null;
+    [TestMethod]
+    [ExpectedException (typeof (ArgumentException))]
+    public void Utility_ThrowIfNull_2()
+    {
+        string? text = null;
 
-            // ReSharper disable ExpressionIsAlwaysNull
-            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
-            text.ThrowIfNull();
-            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
-            // ReSharper restore ExpressionIsAlwaysNull
-        }
+        // ReSharper disable ExpressionIsAlwaysNull
+        // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+        text.ThrowIfNull();
 
-        [TestMethod]
-        public void Utility_ToVisibleString_1()
-        {
-            string? text = "Hello";
-            Assert.AreEqual("Hello", text.ToVisibleString());
+        // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+        // ReSharper restore ExpressionIsAlwaysNull
+    }
 
-            text = null;
+    [TestMethod]
+    public void Utility_ToVisibleString_1()
+    {
+        string? text = "Hello";
+        Assert.AreEqual ("Hello", text.ToVisibleString());
 
-            // ReSharper disable ExpressionIsAlwaysNull
-            Assert.AreEqual("(null)", text.ToVisibleString());
-            // ReSharper restore ExpressionIsAlwaysNull
-        }
+        text = null;
+
+        // ReSharper disable ExpressionIsAlwaysNull
+        Assert.AreEqual ("(null)", text.ToVisibleString());
+
+        // ReSharper restore ExpressionIsAlwaysNull
     }
 }
