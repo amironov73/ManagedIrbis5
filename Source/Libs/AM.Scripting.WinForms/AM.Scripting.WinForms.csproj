@@ -25,7 +25,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Pidgin" Version="3.0.0" />
+        <PackageReference Include="Pidgin" Version="3.1.0" />
     </ItemGroup>
 
     <ItemGroup>
