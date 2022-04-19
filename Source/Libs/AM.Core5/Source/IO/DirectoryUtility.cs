@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* DirectoryUtility.cs -- работа с директориями
@@ -16,6 +17,7 @@
 #region Using directives
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 
@@ -67,6 +69,41 @@ public static class DirectoryUtility
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Проверка возможности записи в папку по указанному пути.
+    /// </summary>
+    public static bool CanWriteTo
+        (
+            string path
+        )
+    {
+        Sure.DirectoryExists (path);
+
+        var pool = ArrayPool<byte>.Shared;
+        var bytes = pool.Rent (1024);
+        var fileName = Path.Combine
+            (
+                path,
+                Guid.NewGuid().ToString ("N")
+            );
+        try
+        {
+            File.WriteAllBytes (fileName, bytes);
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            pool.Return (bytes);
+        }
+
+        File.Delete (fileName);
+
+        return true;
+    }
 
     /// <summary>
     /// Clears the specified directory. Deletes all files

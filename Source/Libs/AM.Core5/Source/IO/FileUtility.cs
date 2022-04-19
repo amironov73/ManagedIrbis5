@@ -267,7 +267,8 @@ public static class FileUtility
     }
 
     /// <summary>
-    /// Deletes specified file if it exists.
+    /// Удаление файла, если он существует.
+    /// Если файл с указанным именем не существует, ничего не происходит.
     /// </summary>
     /// <param name="fileName">Name of the file.</param>
     public static void DeleteIfExists
@@ -276,6 +277,11 @@ public static class FileUtility
         )
     {
         Sure.NotNullNorEmpty (fileName);
+
+        if (Directory.Exists (fileName))
+        {
+            throw new FileNotFoundException ("Directory, not file", fileName);
+        }
 
         if (File.Exists (fileName))
         {
