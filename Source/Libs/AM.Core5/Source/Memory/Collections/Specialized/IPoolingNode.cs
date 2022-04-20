@@ -24,7 +24,8 @@ using System;
 namespace AM.Memory.Collections.Specialized;
 
 /// <summary>
-/// Интерфейс контейнера для хранения элемента коллекции.
+/// Интерфейс контейнера для хранения элемента коллекции,
+/// использующей пулинг.
 /// </summary>
 /// <typeparam name="T">Тип хранимого элемента.</typeparam>
 public interface IPoolingNode<T>

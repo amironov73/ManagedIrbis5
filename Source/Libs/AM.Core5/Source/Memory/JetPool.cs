@@ -26,7 +26,7 @@ namespace AM.Memory;
 /// <summary>
 /// Пул поверх стека.
 /// </summary>
-public class JetPool<T>
+public sealed class JetPool<T>
     where T : class, new()
 {
     #region Private members
@@ -38,9 +38,8 @@ public class JetPool<T>
     #region Public methods
 
     /// <summary>
-    /// Выделение объекта из пула.
+    /// Получение объекта из пула.
     /// </summary>
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public T Get()
     {
         return _freeObjectsQueue.Count > 0 ? _freeObjectsQueue.Pop() : new T();
@@ -49,7 +48,6 @@ public class JetPool<T>
     /// <summary>
     /// Возврат объекта в стек.
     /// </summary>
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void Return (T instance)
     {
         _freeObjectsQueue.Push (instance);

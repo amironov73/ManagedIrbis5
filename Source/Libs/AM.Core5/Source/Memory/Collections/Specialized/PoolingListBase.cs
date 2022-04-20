@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/*
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,6 +17,7 @@
 
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 
 #endregion
 
@@ -24,23 +25,27 @@ using System.Buffers;
 
 namespace AM.Memory.Collections.Specialized;
 
-public abstract class PoolingListBase<T> : IDisposable, IPoolingEnumerable<T>
+/// <summary>
+/// Базовый класс для списка, хранящего свои элементы в массиве,
+/// взятом из пула.
+/// </summary>
+/// <typeparam name="T">Тип элементов списка.</typeparam>
+public abstract class PoolingListBase<T>
+    : IDisposable,
+    IPoolingEnumerable<T>
 {
+    #region Private members
+
     protected IMemoryOwner<IPoolingNode<T>> _root;
     protected int _count;
     protected int _ver;
 
-    public IPoolingEnumerator<T> GetEnumerator()
-    {
-        return Pool<Enumerator>.Get().Init (this);
-    }
-
-    IPoolingEnumerator IPoolingEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
     protected abstract IPoolingNode<T> CreateNodeHolder();
+
+    #endregion
+
+    #region Public methods
+
 
     public void Add (T item)
     {
@@ -59,6 +64,7 @@ public abstract class PoolingListBase<T> : IDisposable, IPoolingEnumerable<T>
         }
     }
 
+    /// <inheritdoc cref="ICollection{T}.Clear"/>
     public void Clear()
     {
         for (int i = 0, len = _root.Memory.Span.Length; i < len; i++)
@@ -77,10 +83,25 @@ public abstract class PoolingListBase<T> : IDisposable, IPoolingEnumerable<T>
         }
     }
 
-    public bool Contains (T item) => IndexOf (item) != -1;
-
-    public void CopyTo (T[] array, int arrayIndex)
+    /// <inheritdoc cref="ICollection{T}.Count"/>
+    public bool Contains
+        (
+            T item
+        )
     {
+        return IndexOf (item) != -1;
+    }
+
+    /// <inheritdoc cref="ICollection{T}.CopyTo"/>
+    public void CopyTo
+        (
+            T[] array,
+            int arrayIndex
+        )
+    {
+        Sure.NotNull (array);
+        Sure.Positive (arrayIndex);
+
         var len = 0;
         for (var i = 0; i <= PoolsDefaults.DefaultPoolBucketSize; i++)
         for (var j = 0; j < PoolsDefaults.DefaultPoolBucketSize && len < _count; j++, len++)
@@ -89,6 +110,10 @@ public abstract class PoolingListBase<T> : IDisposable, IPoolingEnumerable<T>
         }
     }
 
+    /// <inheritdoc cref="IList{T}.Count"/>
+    public int Count => _count;
+
+    /// <inheritdoc cref="ICollection{T}.Remove"/>
     public bool Remove (T item)
     {
         int i, j;
@@ -118,8 +143,7 @@ public abstract class PoolingListBase<T> : IDisposable, IPoolingEnumerable<T>
         return i != j && i != 0;
     }
 
-    public int Count => _count;
-
+    /// <inheritdoc cref="ICollection{T}.IsReadOnly"/>
     public bool IsReadOnly => false;
 
     public int IndexOf (T item)
@@ -256,6 +280,22 @@ public abstract class PoolingListBase<T> : IDisposable, IPoolingEnumerable<T>
             }
         }
     }
+
+    #endregion
+
+    #region IPoolingEnumerable members
+
+    public IPoolingEnumerator<T> GetEnumerator()
+    {
+        return Pool<Enumerator>.Get().Init (this);
+    }
+
+    IPoolingEnumerator IPoolingEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    #endregion
 
     public void Dispose()
     {

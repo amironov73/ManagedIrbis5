@@ -2,21 +2,17 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* MemoryEx.cs --
+/* Pool.cs -- утилиты для пулинга объектов
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Runtime.CompilerServices;
 
 using Microsoft.Extensions.ObjectPool;
 
@@ -27,49 +23,94 @@ using Microsoft.Extensions.ObjectPool;
 namespace AM.Memory;
 
 /// <summary>
-///
+/// Утилиты для пулинга объектов.
 /// </summary>
 public static class Pool<T>
     where T : class, new()
 {
-    private static readonly DefaultObjectPool<T> _freeObjectsQueue = new (new DefaultPooledObjectPolicy<T>());
+    #region Private members
 
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
+    private static readonly DefaultObjectPool<T> _freeObjectsQueue
+        = new (new DefaultPooledObjectPolicy<T>());
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение объекта из пула.
+    /// </summary>
     public static T Get()
     {
         return _freeObjectsQueue.Get();
     }
 
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static void Return<T1> (T1 instance) where T1 : T
+    /// <summary>
+    /// Возврат объекта в пул.
+    /// </summary>
+    public static void Return<T1>
+        (
+            T1 instance
+        )
+        where T1 : T
     {
         _freeObjectsQueue.Return (instance);
     }
+
+    #endregion
 }
 
+/// <summary>
+/// Утилиты для пулинга объектов
+/// </summary>
 public static class Pool
 {
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static T Get<T>() where T : class, new()
+    #region Public methods
+
+    /// <summary>
+    /// Получение объекта из пула.
+    /// </summary>
+    public static T Get<T>()
+        where T : class, new()
     {
         return Pool<T>.Get();
     }
 
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static void Return<T> (T instance) where T : class, new()
+    /// <summary>
+    /// Возврат объекта в пул.
+    /// </summary>
+    public static void Return<T>
+        (
+            T instance
+        )
+        where T : class, new()
     {
         Pool<T>.Return (instance);
     }
 
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static CountdownMemoryOwner<T> GetBuffer<T> (int size)
+    /// <summary>
+    /// Получение буфера указанного размера.
+    /// </summary>
+    public static CountdownMemoryOwner<T> GetBuffer<T>
+        (
+            int size
+        )
     {
-        return InternalArraysPool.Rent<T> (size, false);
+        Sure.Positive (size);
+
+        return InternalArraysPool.Rent<T> (size);
     }
 
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static CountdownMemoryOwner<T> GetBufferFrom<T> (ReadOnlySpan<T> source)
+    /// <summary>
+    /// Получение буфера из указанного диапазона.
+    /// </summary>
+    public static CountdownMemoryOwner<T> GetBufferFrom<T>
+        (
+            ReadOnlySpan<T> source
+        )
     {
-        return InternalArraysPool.RentFrom (source, false);
+        return InternalArraysPool.RentFrom (source);
     }
+
+    #endregion
 }

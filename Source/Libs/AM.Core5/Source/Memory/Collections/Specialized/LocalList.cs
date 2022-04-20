@@ -29,7 +29,8 @@ namespace AM.Memory.Collections.Specialized;
 ///     Use this class when you need to store 1 or 2 items in class fields and in very rare scenarios
 ///     more then 2 items. In super-rare scenarios - to pass it as IList, ICollection or as IEnumerable.
 /// </summary>
-public struct LocalList<T> : IList<T>
+public struct LocalList<T>
+    : IList<T>
 {
     private static readonly EqualityComparer<T> ItemComparer = EqualityComparer<T>.Default;
 

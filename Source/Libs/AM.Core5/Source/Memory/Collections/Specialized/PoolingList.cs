@@ -18,7 +18,7 @@
 namespace AM.Memory.Collections.Specialized;
 
 /// <summary>
-/// Список, хранящий свои элементы в пуле.
+/// Список, хранящий свои элементы в массиве, занимаемом из системного пула.
 /// </summary>
 /// <typeparam name="T">Тип элементов списка.</typeparam>
 public sealed class PoolingList<T>
