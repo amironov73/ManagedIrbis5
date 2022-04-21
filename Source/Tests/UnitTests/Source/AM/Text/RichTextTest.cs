@@ -1,5 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 
+using System;
+
 using AM.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,15 +9,56 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.AM.Text;
 
 [TestClass]
-public class RichTextTest
+public sealed class RichTextTest
 {
     [TestMethod]
+    [Description ("Статический конструктор")]
     public void RichText_Construction_1()
     {
         Assert.IsNotNull (RichText.CentralEuropeanPrologue);
         Assert.IsNotNull (RichText.CommonPrologue);
         Assert.IsNotNull (RichText.RussianPrologue);
         Assert.IsNotNull (RichText.WesternEuropeanPrologue);
+    }
+
+    [TestMethod]
+    [Description ("Баланс фигурных скобок")]
+    public void RichText_CheckBraces_1()
+    {
+        Assert.IsTrue (RichText.CheckBraces (ReadOnlySpan<char>.Empty));
+        Assert.IsTrue (RichText.CheckBraces (" "));
+        Assert.IsTrue (RichText.CheckBraces ("\r\n"));
+
+        Assert.IsTrue (RichText.CheckBraces ("{}"));
+        Assert.IsTrue (RichText.CheckBraces ("{hello}"));
+        Assert.IsTrue (RichText.CheckBraces ("hello{}world"));
+        Assert.IsTrue (RichText.CheckBraces ("{{}}"));
+        Assert.IsTrue (RichText.CheckBraces ("{hello{}world}"));
+        Assert.IsTrue (RichText.CheckBraces ("{}{}"));
+        Assert.IsTrue (RichText.CheckBraces ("{hello}{world}"));
+        Assert.IsTrue (RichText.CheckBraces ("{}{}{}"));
+        Assert.IsTrue (RichText.CheckBraces ("{}hello{}world{}"));
+
+        Assert.IsTrue (RichText.CheckBraces (@"\{"));
+        Assert.IsTrue (RichText.CheckBraces (@"\{hello"));
+        Assert.IsTrue (RichText.CheckBraces (@"hello\{"));
+        Assert.IsTrue (RichText.CheckBraces (@"\}"));
+        Assert.IsTrue (RichText.CheckBraces (@"\}hello"));
+        Assert.IsTrue (RichText.CheckBraces (@"hello\}"));
+        Assert.IsTrue (RichText.CheckBraces (@"\{\}"));
+        Assert.IsTrue (RichText.CheckBraces (@"hello\{\}"));
+        Assert.IsTrue (RichText.CheckBraces (@"\{hello\}"));
+        Assert.IsTrue (RichText.CheckBraces (@"\{\}hello"));
+        Assert.IsTrue (RichText.CheckBraces (@"{\}}"));
+
+        Assert.IsFalse (RichText.CheckBraces ("{"));
+        Assert.IsFalse (RichText.CheckBraces ("}"));
+        Assert.IsFalse (RichText.CheckBraces ("}{"));
+        Assert.IsFalse (RichText.CheckBraces ("{}{"));
+        Assert.IsFalse (RichText.CheckBraces ("{}}"));
+
+        Assert.IsFalse (RichText.CheckBraces (@"{}\"));
+        Assert.IsFalse (RichText.CheckBraces (@"\"));
     }
 
     [TestMethod]

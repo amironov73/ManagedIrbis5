@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using System.Text;
 
 #endregion
@@ -24,7 +25,7 @@ using System.Text;
 namespace AM.Text;
 
 /// <summary>
-/// Работа с RTF
+/// Работа с RTF.
 /// </summary>
 public static class RichText
 {
@@ -68,11 +69,52 @@ public static class RichText
 
     #endregion
 
-    #region Private members
-
-    #endregion
-
     #region Public methods
+
+    /// <summary>
+    /// Проверка парных фигурных скобок.
+    /// Пустой текст считается валидным.
+    /// </summary>
+    public static bool CheckBraces
+        (
+            ReadOnlySpan<char> text
+        )
+    {
+        var counter = 0;
+        var escape = false;
+        foreach (var chr in text)
+        {
+            if (chr == '\\')
+            {
+                // включаем экранирование следующего символа
+                escape = true;
+            }
+            else
+            {
+                if (chr == '{')
+                {
+                    if (!escape)
+                    {
+                        ++counter;
+                    }
+                }
+                else if (chr == '}')
+                {
+                    if (!escape)
+                    {
+                        if (--counter < 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                escape = false;
+            }
+        }
+
+        return !escape && counter == 0;
+    }
 
     /// <summary>
     /// Decode text.
@@ -82,13 +124,12 @@ public static class RichText
             string? text
         )
     {
-        if (string.IsNullOrEmpty (text))
+        if (string.IsNullOrWhiteSpace (text))
         {
             return text;
         }
 
         var length = text.Length;
-
         var result = new StringBuilder (length);
         var navigator = new TextNavigator (text);
         while (!navigator.IsEOF)
@@ -146,13 +187,12 @@ public static class RichText
             UnicodeRange? goodRange
         )
     {
-        if (ReferenceEquals (text, null) || text.Length == 0)
+        if (string.IsNullOrWhiteSpace (text))
         {
             return text;
         }
 
         var length = text.Length;
-
         var result = new StringBuilder (length);
         foreach (var c in text)
         {
@@ -221,7 +261,7 @@ public static class RichText
             UnicodeRange? goodRange
         )
     {
-        if (string.IsNullOrEmpty (text))
+        if (string.IsNullOrWhiteSpace (text))
         {
             return text;
         }
@@ -280,7 +320,7 @@ public static class RichText
             string? modeSwitch
         )
     {
-        if (string.IsNullOrEmpty (text))
+        if (string.IsNullOrWhiteSpace (text))
         {
             return text;
         }
