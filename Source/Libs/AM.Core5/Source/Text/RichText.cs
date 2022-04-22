@@ -187,7 +187,7 @@ public static class RichText
             UnicodeRange? goodRange
         )
     {
-        if (string.IsNullOrWhiteSpace (text))
+        if (string.IsNullOrEmpty (text))
         {
             return text;
         }
@@ -198,7 +198,7 @@ public static class RichText
         {
             if (c < 0x20)
             {
-                result.AppendFormat ("\\'{0:x2}", (byte)c);
+                result.AppendFormat ("\\'{0:x2}", (byte) c);
             }
             else if (c < 0x80)
             {
@@ -223,7 +223,7 @@ public static class RichText
             }
             else if (c < 0x100)
             {
-                result.AppendFormat ("\\'{0:x2}", (byte)c);
+                result.AppendFormat ("\\'{0:x2}", (byte) c);
             }
             else
             {
@@ -244,7 +244,7 @@ public static class RichText
                 {
                     // После \u следующий символ съедается
                     // поэтому подсовываем знак вопроса
-                    result.AppendFormat ("\\u{0}?", (short)c);
+                    result.AppendFormat ("\\u{0}?", (short) c);
                 }
             }
         }
@@ -261,7 +261,7 @@ public static class RichText
             UnicodeRange? goodRange
         )
     {
-        if (string.IsNullOrWhiteSpace (text))
+        if (string.IsNullOrEmpty (text))
         {
             return text;
         }
@@ -273,7 +273,7 @@ public static class RichText
         {
             if (c < 0x20)
             {
-                result.AppendFormat ("\\'{0:x2}", (byte)c);
+                result.AppendFormat ("\\'{0:x2}", (byte) c);
             }
             else if (c < 0x80)
             {
@@ -281,7 +281,7 @@ public static class RichText
             }
             else if (c < 0x100)
             {
-                result.AppendFormat ("\\'{0:x2}", (byte)c);
+                result.AppendFormat ("\\'{0:x2}", (byte) c);
             }
             else
             {
@@ -302,7 +302,7 @@ public static class RichText
                 {
                     // После \u следующий символ съедается
                     // поэтому подсовываем знак вопроса
-                    result.AppendFormat ("\\u{0}?", (int)c);
+                    result.AppendFormat ("\\u{0}?", (int) c);
                 }
             }
         }
@@ -320,7 +320,7 @@ public static class RichText
             string? modeSwitch
         )
     {
-        if (string.IsNullOrWhiteSpace (text))
+        if (string.IsNullOrEmpty (text))
         {
             return text;
         }
@@ -332,7 +332,7 @@ public static class RichText
         {
             if (c < 0x20)
             {
-                result.AppendFormat ("\\'{0:x2}", (byte)c);
+                result.AppendFormat ("\\'{0:x2}", (byte) c);
             }
             else if (c < 0x80)
             {
@@ -341,7 +341,7 @@ public static class RichText
             else if (c < 0x100)
             {
                 result.Append ('{');
-                result.AppendFormat ("{0}\\'{1:x2}", modeSwitch, (byte)c);
+                result.AppendFormat ("{0}\\'{1:x2}", modeSwitch, (byte) c);
                 result.Append ('}');
             }
             else
@@ -363,7 +363,7 @@ public static class RichText
                 {
                     // После \u следующий символ съедается
                     // поэтому подсовываем знак вопроса
-                    result.AppendFormat ("\\u{0}?", (int)c);
+                    result.AppendFormat ("\\u{0}?", (int) c);
                 }
             }
         }
