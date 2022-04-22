@@ -72,8 +72,10 @@ public abstract class PoolingQueue<T>
     #region Public methods
 
     /// <inheritdoc cref="Queue{T}.Enqueue"/>
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public void Enqueue (T obj)
+    public void Enqueue
+        (
+            T obj
+        )
     {
         if (Count == 0 && _enqueueTo is null)
         {
@@ -104,7 +106,6 @@ public abstract class PoolingQueue<T>
     /// <returns>
     ///     true if element found or false otherwise
     /// </returns>
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public bool TryDequeue
         (
             out T val
@@ -126,7 +127,6 @@ public abstract class PoolingQueue<T>
     /// <returns>
     ///     Returns element or throws IndexOutOfRangeException if no element found
     /// </returns>
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public T Dequeue()
     {
         if (IsEmpty)
@@ -171,7 +171,6 @@ public abstract class PoolingQueue<T>
     }
 
     /// <inheritdoc cref="Queue{T}.Clear"/>
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void Clear()
     {
         while (_enqueueTo is not null)

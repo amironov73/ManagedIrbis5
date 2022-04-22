@@ -21,80 +21,82 @@ using AM.IO;
 
 #nullable enable
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis.Client;
+
+/// <summary>
+/// DISPLAY-секция INI-файла для клиента.
+/// </summary>
+/// <remarks>
+/// Находится в серверном INI-файле irbisc.ini.
+/// </remarks>
+public sealed class DisplayIniSection
+    : AbstractIniSection
 {
+    #region Constants
+
     /// <summary>
-    /// DISPLAY-секция INI-файла для клиента.
+    /// Имя секции.
     /// </summary>
-    /// <remarks>
-    /// Находится в серверном INI-файле irbisc.ini.
-    /// </remarks>
-    public sealed class DisplayIniSection
-        : AbstractIniSection
+    public const string SectionName = "Display";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Размер порции для показа кратких описаний.
+    /// </summary>
+    public int MaxBriefPortion
     {
-        #region Constants
-
-        /// <summary>
-        /// Имя секции.
-        /// </summary>
-        public const string SectionName = "Display";
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Размер порции для показа кратких описаний.
-        /// </summary>
-        public int MaxBriefPortion
-        {
-            get => Section.GetValue ("MaxBriefPortion", 6);
-            set => Section.SetValue ("MaxBriefPortion", value);
-        }
-
-        /// <summary>
-        /// Максимальное количество отмеченных документов.
-        /// </summary>
-        public int MaxMarked
-        {
-            get => Section.GetValue ("MaxMarked", 100);
-            set => Section.SetValue ("MaxMarked", value);
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public DisplayIniSection()
-            : base (SectionName)
-        {
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public DisplayIniSection
-            (
-                IniFile iniFile
-            )
-            : base (iniFile, SectionName)
-        {
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public DisplayIniSection
-            (
-                IniFile.Section section
-            )
-            : base (section)
-        {
-        }
-
-        #endregion
+        get => Section.GetValue ("MaxBriefPortion", 6);
+        set => Section.SetValue ("MaxBriefPortion", value);
     }
+
+    /// <summary>
+    /// Максимальное количество отмеченных документов.
+    /// </summary>
+    public int MaxMarked
+    {
+        get => Section.GetValue ("MaxMarked", 100);
+        set => Section.SetValue ("MaxMarked", value);
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public DisplayIniSection()
+        : base (SectionName)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DisplayIniSection
+        (
+            IniFile iniFile
+        )
+        : base (iniFile, SectionName)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DisplayIniSection
+        (
+            IniFile.Section section
+        )
+        : base (section)
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
 }

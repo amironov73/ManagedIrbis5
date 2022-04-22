@@ -27,166 +27,166 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis.Client;
+
+//
+// Example
+//
+// (empty line)
+// Ассоциация ЭБНИТ
+// Система автоматизации библиотек
+// ИРБИС64
+// Copyright© 2006-2007
+// База данных:
+// Список разделов Электронного каталога или тематических БД
+// Вид поиска:
+// Список библиографических элементов, доступных для поиска
+// Словарь
+// Предыдущий
+// Прокрутка словаря к началу алфавита
+// Словарь - упорядоченный список терминов, соответствующих виду поиска
+// Следующий
+// Прокрутка словаря к концу алфавита
+// Ключ:
+// Установка начальной точки просмотра словаря
+// Отбор
+// Отбор термина из словаря для текущего запроса
+// Ссылка от:
+// Заголовок Рубрикатора
+// Тематический рубрикатор(ГРНТИ)
+// Раскрытие/Закрытие тематических рубрик
+// Переход к рубрикам, по ссылкам/отсылкам "Смотри..." и "Смотри также..."
+// Выделение фрагмента Тематического рубрикатора
+// Навигация
+// Таблица
+// Переключение формы представления Рубрикатора: Дерево/Таблица
+// Свободный поиск
+// Поиск с использованием базового языка запросов CDS/ISIS
+// Текущий запрос
+//
+
+/// <summary>
+/// Файл с сообщениями, выдаваемыми клиентами.
+/// </summary>
+public sealed class MessageFile
+    : IHandmadeSerializable
 {
-    //
-    // Example
-    //
-    // (empty line)
-    // Ассоциация ЭБНИТ
-    // Система автоматизации библиотек
-    // ИРБИС64
-    // Copyright© 2006-2007
-    // База данных:
-    // Список разделов Электронного каталога или тематических БД
-    // Вид поиска:
-    // Список библиографических элементов, доступных для поиска
-    // Словарь
-    // Предыдущий
-    // Прокрутка словаря к началу алфавита
-    // Словарь - упорядоченный список терминов, соответствующих виду поиска
-    // Следующий
-    // Прокрутка словаря к концу алфавита
-    // Ключ:
-    // Установка начальной точки просмотра словаря
-    // Отбор
-    // Отбор термина из словаря для текущего запроса
-    // Ссылка от:
-    // Заголовок Рубрикатора
-    // Тематический рубрикатор(ГРНТИ)
-    // Раскрытие/Закрытие тематических рубрик
-    // Переход к рубрикам, по ссылкам/отсылкам "Смотри..." и "Смотри также..."
-    // Выделение фрагмента Тематического рубрикатора
-    // Навигация
-    // Таблица
-    // Переключение формы представления Рубрикатора: Дерево/Таблица
-    // Свободный поиск
-    // Поиск с использованием базового языка запросов CDS/ISIS
-    // Текущий запрос
-    //
+    #region Constants
 
     /// <summary>
-    /// Файл с сообщениями, выдаваемыми клиентами.
+    /// Default name of the file.
     /// </summary>
-    public sealed class MessageFile
-        : IHandmadeSerializable
+    public const string DefaultName = "irbismsg.txt";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Count of lines.
+    /// </summary>
+    public int LineCount => _list.Count;
+
+    /// <summary>
+    /// Name of the file.
+    /// </summary>
+    public string? Name { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public MessageFile()
     {
-        #region Constants
+        _list = new List<string>();
+    }
 
-        /// <summary>
-        /// Default name of the file.
-        /// </summary>
-        public const string DefaultName = "irbismsg.txt";
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Properties
+    private readonly List<string> _list;
 
-        /// <summary>
-        /// Count of lines.
-        /// </summary>
-        public int LineCount => _list.Count;
+    #endregion
 
-        /// <summary>
-        /// Name of the file.
-        /// </summary>
-        public string? Name { get; set; }
+    #region Public methods
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public MessageFile()
+    /// <summary>
+    /// Get message by index.
+    /// </summary>
+    public string GetMessage
+        (
+            int index
+        )
+    {
+        if (index < 0 || index >= _list.Count)
         {
-            _list = new List<string>();
+            Magna.Error
+                (
+                    "MessageFile::GetMessage: "
+                    + "missing index="
+                    + index
+                );
+
+            return string.Format
+                (
+                    "MISSING @" + index
+                );
         }
 
-        #endregion
+        return _list[index];
+    }
 
-        #region Private members
-
-        private readonly List<string> _list;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Get message by index.
-        /// </summary>
-        public string GetMessage
-            (
-                int index
-            )
+    /// <summary>
+    /// Read local file.
+    /// </summary>
+    public static MessageFile ReadLocalFile
+        (
+            string fileName,
+            Encoding encoding
+        )
+    {
+        var result = new MessageFile
         {
-            if (index < 0 || index >= _list.Count)
-            {
-                Magna.Error
-                    (
-                        "MessageFile::GetMessage: "
-                        + "missing index="
-                        + index
-                    );
+            Name = fileName
+        };
 
-                return string.Format
-                    (
-                        "MISSING @" + index
-                    );
-            }
+        var lines = File.ReadAllLines(fileName, encoding);
+        result._list.AddRange(lines);
 
-            return _list[index];
-        }
+        return result;
+    }
 
-        /// <summary>
-        /// Read local file.
-        /// </summary>
-        public static MessageFile ReadLocalFile
-            (
-                string fileName,
-                Encoding encoding
-            )
-        {
-            var result = new MessageFile
-            {
-                Name = fileName
-            };
+    #endregion
 
-            var lines = File.ReadAllLines(fileName, encoding);
-            result._list.AddRange(lines);
+    #region IHandmadeSerializable members
 
-            return result;
-        }
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        _list.Clear();
+        Name = reader.ReadNullableString();
+        _list.AddRange (reader.ReadStringArray());
+    }
 
-        #endregion
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        writer.WriteNullable(Name);
+        writer.WriteArray(_list.ToArray());
+    }
 
-        #region IHandmadeSerializable members
+    #endregion
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            _list.Clear();
-            Name = reader.ReadNullableString();
-            _list.AddRange (reader.ReadStringArray());
-        }
+} // class MessageFile
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WriteNullable(Name);
-            writer.WriteArray(_list.ToArray());
-        }
-
-        #endregion
-
-    } // class MessageFile
-
-} // namespace ManagedIrbis.Client
+// namespace ManagedIrbis.Client

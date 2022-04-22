@@ -31,140 +31,139 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis.Client;
+
+/// <summary>
+/// Абстрактная секция INI-файла для клиента.
+/// </summary>
+public abstract class AbstractIniSection
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Абстрактная секция INI-файла для клиента.
+    /// INI file section.
     /// </summary>
-    public abstract class AbstractIniSection
-        : IDisposable
+    public IniFile.Section Section { get; protected set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    protected AbstractIniSection
+        (
+            string sectionName
+        )
     {
-        #region Properties
+        Sure.NotNull (sectionName);
 
-        /// <summary>
-        /// INI file section.
-        /// </summary>
-        public IniFile.Section Section { get; protected set; }
+        _ourIniFile = new IniFile();
+        Section = _ourIniFile.GetOrCreateSection (sectionName);
+    }
 
-        #endregion
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    protected AbstractIniSection
+        (
+            IniFile iniFile,
+            string sectionName
+        )
+    {
+        Sure.NotNull (iniFile);
+        Sure.NotNull (sectionName);
 
-        #region Construction
+        _ourIniFile = null;
+        Section = iniFile.GetOrCreateSection (sectionName);
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        protected AbstractIniSection
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    protected AbstractIniSection
+        (
+            IniFile.Section section
+        )
+    {
+        Sure.NotNull (section);
+
+        _ourIniFile = null;
+        Section = section;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly IniFile? _ourIniFile;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Очистка секции.
+    /// </summary>
+    public void Clear()
+    {
+        Section.Clear();
+    }
+
+    /// <summary>
+    /// Получение булевого значения.
+    /// </summary>
+    public bool GetBoolean
+        (
+            string name,
+            string defaultValue
+        )
+    {
+        Sure.NotNullNorEmpty (name, nameof (name));
+        Sure.NotNullNorEmpty (defaultValue, nameof (defaultValue));
+
+        return Utility.ToBoolean
             (
-                string sectionName
-            )
-        {
-            Sure.NotNull (sectionName);
+                Section.GetValue (name, defaultValue)
+                    .ThrowIfNull()
+            );
+    }
 
-            _ourIniFile = new IniFile();
-            Section = _ourIniFile.GetOrCreateSection (sectionName);
-        }
+    /// <summary>
+    /// Установка булевого значения.
+    /// </summary>
+    public void SetBoolean
+        (
+            string name,
+            bool value
+        )
+    {
+        Sure.NotNullNorEmpty (name, nameof (name));
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        protected AbstractIniSection
+        Section.SetValue
             (
-                IniFile iniFile,
-                string sectionName
-            )
-        {
-            Sure.NotNull (iniFile);
-            Sure.NotNull (sectionName);
+                name,
+                value ? "1" : "0"
+            );
+    }
 
-            _ourIniFile = null;
-            Section = iniFile.GetOrCreateSection (sectionName);
-        }
+    #endregion
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        protected AbstractIniSection
-            (
-                IniFile.Section section
-            )
-        {
-            Sure.NotNull (section);
+    #region IDisposable members
 
-            _ourIniFile = null;
-            Section = section;
-        }
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public void Dispose()
+    {
+        _ourIniFile?.Dispose();
+    }
 
-        #endregion
+    #endregion
 
-        #region Private members
-
-        private readonly IniFile? _ourIniFile;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Очистка секции.
-        /// </summary>
-        public void Clear()
-        {
-            Section.Clear();
-        }
-
-        /// <summary>
-        /// Получение булевого значения.
-        /// </summary>
-        public bool GetBoolean
-            (
-                string name,
-                string defaultValue
-            )
-        {
-            Sure.NotNullNorEmpty (name, nameof (name));
-            Sure.NotNullNorEmpty (defaultValue, nameof (defaultValue));
-
-            return Utility.ToBoolean
-                (
-                    Section.GetValue (name, defaultValue)
-                        .ThrowIfNull()
-                );
-        }
-
-        /// <summary>
-        /// Установка булевого значения.
-        /// </summary>
-        public void SetBoolean
-            (
-                string name,
-                bool value
-            )
-        {
-            Sure.NotNullNorEmpty (name, nameof (name));
-
-            Section.SetValue
-                (
-                    name,
-                    value ? "1" : "0"
-                );
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public void Dispose()
-        {
-            _ourIniFile?.Dispose();
-        }
-
-        #endregion
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Section.ToString();
-        }
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Section.ToString();
     }
 }

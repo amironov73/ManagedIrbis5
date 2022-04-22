@@ -33,193 +33,187 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis.Client;
+
+/// <summary>
+/// Запускает указанный клиент с заданными логином и паролем.
+/// </summary>
+[XmlRoot ("clientRunner")]
+[ExcludeFromCodeCoverage]
+public sealed class ClientRunner
 {
+    #region Properties
+
     /// <summary>
-    /// Запускает указанный клиент с заданными логином и паролем.
+    /// Database name (required if <see cref="UserName"/>
+    /// and <see cref="Password"/> are specified).
     /// </summary>
-    [XmlRoot("clientRunner")]
-    [ExcludeFromCodeCoverage]
-    public sealed class ClientRunner
+    [XmlElement ("database")]
+    [JsonPropertyName ("database")]
+    public string? Database { get; set; }
+
+    /// <summary>
+    /// Executable file name.
+    /// </summary>
+    [JsonIgnore]
+    public string Executable { get; set; }
+
+    /// <summary>
+    /// INI-file name.
+    /// </summary>
+    public string IniFileName { get; set; }
+
+    /// <summary>
+    /// Current MFN.
+    /// </summary>
+    [XmlElement ("mfn")]
+    [JsonPropertyName ("mfn")]
+    public int Mfn { get; set; }
+
+    /// <summary>
+    /// Password.
+    /// </summary>
+    [XmlElement("password")]
+    [JsonPropertyName("password")]
+    public string? Password { get; set; }
+
+    /// <summary>
+    /// User name.
+    /// </summary>
+    [XmlElement("username")]
+    [JsonPropertyName("username")]
+    public string? UserName { get; set; }
+
+    /// <summary>
+    /// Working directory.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    public string WorkingDirectory { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ClientRunner()
     {
-        #region Properties
+        // Starting with 2018.1: cirbis_plus.exe
+        Executable = "cirbisc_new_unicode.exe";
+        IniFileName = "cirbisc.ini";
+        WorkingDirectory = @"C:\IRBIS64";
+    }
 
-        /// <summary>
-        /// Database name (required if <see cref="UserName"/>
-        /// and <see cref="Password"/> are specified).
-        /// </summary>
-        [XmlElement("database")]
-        [JsonPropertyName("database")]
-        public string? Database { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Executable file name.
-        /// </summary>
-        [JsonIgnore]
-        public string Executable { get; set; }
+    #region Private members
 
-        /// <summary>
-        /// INI-file name.
-        /// </summary>
-        public string IniFileName { get; set; }
+    private string? _copyIniPath;
 
-        /// <summary>
-        /// Current MFN.
-        /// </summary>
-        [XmlElement("mfn")]
-        [JsonPropertyName("mfn")]
-        public int Mfn { get; set; }
+    private void _ProcessExited
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        var process = (Process?) sender;
 
-        /// <summary>
-        /// Password.
-        /// </summary>
-        [XmlElement("password")]
-        [JsonPropertyName("password")]
-        public string? Password { get; set; }
+        File.Delete(_copyIniPath!);
+        process?.Dispose();
+    }
 
-        /// <summary>
-        /// User name.
-        /// </summary>
-        [XmlElement("username")]
-        [JsonPropertyName("username")]
-        public string? UserName { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Working directory.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public string WorkingDirectory { get; set; }
+    #region Public methods
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ClientRunner()
+    /// <summary>
+    /// Run the client and optionally wait for it.
+    /// </summary>
+    public void RunClient
+        (
+            bool wait
+        )
+    {
+        if (!Directory.Exists(WorkingDirectory))
         {
-            // Starting with 2018.1: cirbis_plus.exe
-            Executable = "cirbisc_new_unicode.exe";
-            IniFileName = "cirbisc.ini";
-            WorkingDirectory = @"C:\IRBIS64";
+            throw new IrbisException("Working directory not exists");
+        }
 
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private string? _copyIniPath;
-
-        private void _ProcessExited
+        var executablePath = Path.Combine
             (
-                object? sender,
-                EventArgs e
-            )
+                WorkingDirectory,
+                Executable
+            );
+        if (!File.Exists(executablePath))
         {
-            var process = (Process?) sender;
+            throw new IrbisException("Executable file not exists");
+        }
 
-            File.Delete(_copyIniPath!);
-            process?.Dispose();
-
-        } // method _ProcessExited
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Run the client and optionally wait for it.
-        /// </summary>
-        public void RunClient
+        var mainIniPath = Path.Combine
             (
-                bool wait
-            )
+                WorkingDirectory,
+                IniFileName
+            );
+        if (!File.Exists(mainIniPath))
         {
-            if (!Directory.Exists(WorkingDirectory))
-            {
-                throw new IrbisException("Working directory not exists");
-            }
-
-            var executablePath = Path.Combine
+            throw new IrbisException
                 (
-                    WorkingDirectory,
-                    Executable
+                    "INI file not exists: "
+                    + mainIniPath
                 );
-            if (!File.Exists(executablePath))
-            {
-                throw new IrbisException("Executable file not exists");
-            }
+        }
 
-            var mainIniPath = Path.Combine
-                (
-                    WorkingDirectory,
-                    IniFileName
-                );
-            if (!File.Exists(mainIniPath))
-            {
-                throw new IrbisException
-                    (
-                        "INI file not exists: "
-                        + mainIniPath
-                    );
-            }
+        var copyIniName =
+            "_"
+            + Guid.NewGuid().ToString("N")
+            + ".ini";
+        _copyIniPath = Path.Combine
+            (
+                WorkingDirectory,
+                copyIniName
+            );
+        File.Copy(mainIniPath, _copyIniPath);
 
-            var copyIniName =
-                "_"
-                + Guid.NewGuid().ToString("N")
-                + ".ini";
-            _copyIniPath = Path.Combine
-                (
-                    WorkingDirectory,
-                    copyIniName
-                );
-            File.Copy(mainIniPath, _copyIniPath);
+        using (var iniFile = new IniFile
+                   (
+                       _copyIniPath,
+                       IrbisEncoding.Ansi
+                   ))
+        using (var _ = new ContextIniSection(iniFile)
+               {
+                   Database = Database,
+                   Mfn = Mfn,
+                   Password = Password,
+                   UserName = UserName
+               })
+        {
+            iniFile.Save(_copyIniPath);
+        }
 
-            using (var iniFile = new IniFile
-                (
-                    _copyIniPath,
-                    IrbisEncoding.Ansi
-                ))
-            using (var _ = new ContextIniSection(iniFile)
-                {
-                    Database = Database,
-                    Mfn = Mfn,
-                    Password = Password,
-                    UserName = UserName
-                })
-            {
-                iniFile.Save(_copyIniPath);
-            }
-
-            var startInfo = new ProcessStartInfo
-                (
-                    executablePath,
-                    copyIniName
-                )
+        var startInfo = new ProcessStartInfo
+            (
+                executablePath,
+                copyIniName
+            )
             {
                 UseShellExecute = false,
                 WorkingDirectory = WorkingDirectory
             };
-            var process = new Process
-            {
-                StartInfo = startInfo
-            };
-            process.Exited += _ProcessExited;
+        var process = new Process
+        {
+            StartInfo = startInfo
+        };
+        process.Exited += _ProcessExited;
 
-            process.Start();
+        process.Start();
 
-            if (wait)
-            {
-                process.WaitForExit();
-            }
+        if (wait)
+        {
+            process.WaitForExit();
+        }
+    }
 
-        } // method RunClient
-
-        #endregion
-
-    } // class ClientRunner
-
-} // namespace ManagedIrbis.Client
+    #endregion
+}

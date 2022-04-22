@@ -9,14 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* AliasManager.cs --
+/* AliasManager.cs -- менеджер псевдонимов для баз данных/серверов
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 using AM;
@@ -29,167 +28,181 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis.Client;
+
+/// <summary>
+/// Менеджер псевдонимов для баз данных/серверов.
+/// </summary>
+public sealed class AliasManager
 {
+    #region Construction
+
     /// <summary>
-    /// Aliases for databases/servers.
+    /// Конструктор по умолчанию.
     /// </summary>
-    [DebuggerDisplay ("Count={_aliases.Count}")]
-    public sealed class AliasManager
+    public AliasManager()
     {
-        #region Construction
+        _aliases = new List<ConnectionAlias>();
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public AliasManager()
+    #endregion
+
+    #region Private members
+
+    private readonly List<ConnectionAlias> _aliases;
+
+    private ConnectionAlias? _GetAlias
+        (
+            string name
+        )
+    {
+        foreach (var theAlias in _aliases)
         {
-            _aliases = new List<ConnectionAlias>();
+            if (theAlias.Name.SameString (name))
+            {
+                return theAlias;
+            }
         }
 
-        #endregion
+        return null;
+    }
 
-        #region Private members
+    #endregion
 
-        private readonly List<ConnectionAlias> _aliases;
+    #region Public methods
 
-        private ConnectionAlias? _GetAlias
-            (
-                string name
-            )
+    /// <summary>
+    /// Clear the table.
+    /// </summary>
+    public AliasManager Clear()
+    {
+        _aliases.Clear();
+
+        return this;
+    }
+
+    /// <summary>
+    /// Создание менеджера с одновременным чтением
+    /// всех псевдонимов из текстового файла.
+    /// </summary>
+    public static AliasManager FromPlainTextFile
+        (
+            string fileName
+        )
+    {
+        using var reader = TextReaderUtility.OpenRead (fileName, IrbisEncoding.Ansi);
+        var result = new AliasManager();
+
+        while (true)
         {
-            foreach (var theAlias in _aliases)
+            var line1 = reader.ReadLine();
+            var line2 = reader.ReadLine();
+
+            if (string.IsNullOrEmpty (line1)
+                || string.IsNullOrEmpty (line2))
             {
-                if (theAlias.Name.SameString (name))
-                {
-                    return theAlias;
-                }
+                break;
             }
 
-            return null;
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Clear the table.
-        /// </summary>
-        public AliasManager Clear()
-        {
-            _aliases.Clear();
-
-            return this;
-        }
-
-        /// <summary>
-        /// Read file and create <see cref="AliasManager"/>.
-        /// </summary>
-        public static AliasManager FromPlainTextFile
-            (
-                string fileName
-            )
-        {
-            using var reader = TextReaderUtility.OpenRead (fileName, IrbisEncoding.Ansi);
-            var result = new AliasManager();
-
-            while (true)
+            var theAlias = new ConnectionAlias
             {
-                var line1 = reader.ReadLine();
-                var line2 = reader.ReadLine();
+                Name = line1,
+                Value = line2
+            };
+            result._aliases.Add (theAlias);
+        }
 
-                if (string.IsNullOrEmpty (line1)
-                    || string.IsNullOrEmpty (line2))
-                {
-                    break;
-                }
+        return result;
+    }
 
-                var theAlias = new ConnectionAlias
+    /// <summary>
+    /// Get alias value if exists.
+    /// </summary>
+    public string? GetAliasValue
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        return _GetAlias (name)?.Value;
+    }
+
+    /// <summary>
+    /// Перечень всех алиасов.
+    /// </summary>
+    public string[] ListAliases()
+    {
+        var result = _aliases
+            .Select (alias => alias.Name)
+            .NonNullItems()
+            .ToArray();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Сохранение псевдонимов в файл.
+    /// </summary>
+    public void SaveToPlainTextFile
+        (
+            string fileName
+        )
+    {
+        using var writer = TextWriterUtility.Create (fileName, IrbisEncoding.Ansi);
+        foreach (var alias in _aliases)
+        {
+            writer.WriteLine (alias.Name);
+            writer.WriteLine (alias.Value);
+        }
+    }
+
+    /// <summary>
+    /// Добавление нового или модификация существующего псевдонима.
+    /// </summary>
+    public AliasManager SetAlias
+        (
+            string name,
+            string? value
+        )
+    {
+        var alias = _GetAlias (name);
+        if (alias is null)
+        {
+            if (!string.IsNullOrEmpty (value))
+            {
+                alias = new ConnectionAlias
                 {
-                    Name = line1,
-                    Value = line2
+                    Name = name,
+                    Value = value
                 };
-                result._aliases.Add (theAlias);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Get alias value if exists.
-        /// </summary>
-        public string? GetAliasValue (string name)
-        {
-            return _GetAlias (name)?.Value;
-        }
-
-        /// <summary>
-        /// List aliases.
-        /// </summary>
-        public string[] ListAliases()
-        {
-            var result = _aliases
-                .Select (alias => alias.Name)
-                .NonNullItems()
-                .ToArray();
-
-            return result;
-        }
-
-        /// <summary>
-        /// Save aliases to file.
-        /// </summary>
-        public void SaveToPlainTextFile
-            (
-                string fileName
-            )
-        {
-            using var writer = TextWriterUtility.Create (fileName, IrbisEncoding.Ansi);
-            foreach (var theAlias in _aliases)
-            {
-                writer.WriteLine (theAlias.Name);
-                writer.WriteLine (theAlias.Value);
+                _aliases.Add (alias);
             }
         }
-
-        /// <summary>
-        /// Add new or modify existing alias.
-        /// </summary>
-        public AliasManager SetAlias
-            (
-                string name,
-                string? value
-            )
+        else
         {
-            var theAlias = _GetAlias (name);
-            if (theAlias is null)
+            if (string.IsNullOrEmpty (value))
             {
-                if (!string.IsNullOrEmpty (value))
-                {
-                    theAlias = new ConnectionAlias
-                    {
-                        Name = name,
-                        Value = value
-                    };
-                    _aliases.Add (theAlias);
-                }
+                _aliases.Remove (alias);
             }
             else
             {
-                if (string.IsNullOrEmpty (value))
-                {
-                    _aliases.Remove (theAlias);
-                }
-                else
-                {
-                    theAlias.Value = value;
-                }
+                alias.Value = value;
             }
-
-            return this;
         }
 
-        #endregion
+        return this;
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return _aliases.Count.ToInvariantString();
+    }
+
+    #endregion
 }

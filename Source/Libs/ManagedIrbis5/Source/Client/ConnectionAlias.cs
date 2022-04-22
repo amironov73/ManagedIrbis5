@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Alias.cs --
+/* Alias.cs -- псевдоним для сервера или базы данных ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,86 +27,86 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis.Client;
+
+/// <summary>
+/// Псевдоним для сервера или базы данных ИРБИС64.
+/// </summary>
+[XmlRoot("alias")]
+public sealed class ConnectionAlias
+    : IHandmadeSerializable,
+    IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Собственно псевдоним.
     /// </summary>
-    [XmlRoot("alias")]
-    public sealed class ConnectionAlias
-        : IHandmadeSerializable,
-        IVerifiable
+    [XmlAttribute ("name")]
+    [JsonPropertyName ("name")]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Значение псевдонима, например, строка подключения,
+    /// в которую он раскрывается.
+    /// </summary>
+    [XmlAttribute ("value")]
+    [JsonPropertyName ("value")]
+    public string? Value { get; set; }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Name of the alias.
-        /// </summary>
-        [XmlAttribute("name")]
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Value of the alias.
-        /// </summary>
-        [XmlAttribute("value")]
-        [JsonPropertyName("value")]
-        public string? Value { get; set; }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Name = reader.ReadNullableString();
-            Value = reader.ReadNullableString();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WriteNullable(Name)
-                .WriteNullable(Value);
-        }
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<ConnectionAlias>(this, throwOnError);
-
-            verifier
-                .NotNullNorEmpty(Name, "Name")
-                .NotNullNorEmpty(Value, "Value");
-
-            return verifier.Result;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Name.ToVisibleString() + "=" + Value.ToVisibleString();
-        }
-
-        #endregion
+        Name = reader.ReadNullableString();
+        Value = reader.ReadNullableString();
     }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        writer
+            .WriteNullable(Name)
+            .WriteNullable(Value);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<ConnectionAlias> (this, throwOnError);
+
+        verifier
+            .NotNullNorEmpty (Name, "Name")
+            .NotNullNorEmpty (Value, "Value");
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Name.ToVisibleString() + "=" + Value.ToVisibleString();
+    }
+
+    #endregion
 }

@@ -40,7 +40,7 @@ public static class TextReaderUtility
             Encoding encoding
         )
     {
-        Sure.NotNullNorEmpty (fileName);
+        Sure.FileExists (fileName);
         Sure.NotNull (encoding);
 
         var result = new StreamReader

@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 
 /* ConnectionElement.cs -- элемент строки подключения к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
@@ -14,47 +15,46 @@ using System;
 
 #endregion
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis.Client;
+
+/// <summary>
+/// Элемент строки подключения к серверу ИРБИС64.
+/// </summary>
+[Flags]
+public enum ConnectionElement
 {
     /// <summary>
-    /// Элемент строки подключения к серверу ИРБИС64.
+    /// Ничего.
     /// </summary>
-    [Flags]
-    public enum ConnectionElement
-    {
-        /// <summary>
-        /// Ничего.
-        /// </summary>
-        None = 0,
+    None = 0,
 
-        /// <summary>
-        /// Имя или адрес хоста.
-        /// </summary>
-        Host = 1,
+    /// <summary>
+    /// Имя или адрес хоста.
+    /// </summary>
+    Host = 1,
 
-        /// <summary>
-        /// Номер порта.
-        /// </summary>
-        Port = 2,
+    /// <summary>
+    /// Номер порта.
+    /// </summary>
+    Port = 2,
 
-        /// <summary>
-        /// Логин пользователя.
-        /// </summary>
-        Username = 4,
+    /// <summary>
+    /// Логин пользователя.
+    /// </summary>
+    Username = 4,
 
-        /// <summary>
-        /// Пароль.
-        /// </summary>
-        Password = 8,
+    /// <summary>
+    /// Пароль.
+    /// </summary>
+    Password = 8,
 
-        /// <summary>
-        /// Код АРМ.
-        /// </summary>
-        Workstation = 16,
+    /// <summary>
+    /// Код АРМ.
+    /// </summary>
+    Workstation = 16,
 
-        /// <summary>
-        /// Всё вышеперечисленное.
-        /// </summary>
-        All = 31
-    }
+    /// <summary>
+    /// Всё вышеперечисленное.
+    /// </summary>
+    All = 31
 }

@@ -28,129 +28,129 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis.Client;
+
+/// <summary>
+/// Client LM.
+/// </summary>
+public sealed class ClientLM
 {
+    #region Constants
+
     /// <summary>
-    /// Client LM.
+    /// Default salt.
     /// </summary>
-    public sealed class ClientLM
+    public const string DefaultSalt = "Ассоциация ЭБНИТ";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Encoding.
+    /// </summary>
+    public Encoding Encoding { get; private set; }
+
+    /// <summary>
+    /// Salt.
+    /// </summary>
+    public string? Salt { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ClientLM()
+        : this
+            (
+                IrbisEncoding.Ansi,
+                DefaultSalt
+            )
     {
-        #region Constants
-
-        /// <summary>
-        /// Default salt.
-        /// </summary>
-        public const string DefaultSalt = "Ассоциация ЭБНИТ";
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Encoding.
-        /// </summary>
-        public Encoding Encoding { get; private set; }
-
-        /// <summary>
-        /// Salt.
-        /// </summary>
-        public string? Salt { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ClientLM()
-            : this
-                (
-                    IrbisEncoding.Ansi,
-                    DefaultSalt
-                )
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="encoding"></param>
-        /// <param name="salt"></param>
-        public ClientLM
-            (
-                Encoding encoding,
-                string? salt
-            )
-        {
-            Encoding = encoding;
-            Salt = salt;
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Check hash for the INI-file
-        /// (both IRBIS32 and IRBIS64).
-        /// </summary>
-        public bool CheckHash
-            (
-                IniFile iniFile
-            )
-        {
-            var user = iniFile.GetValue("Main", "User", null);
-            var common = iniFile.GetValue("Main", "Common", null);
-
-            if (string.IsNullOrEmpty(user)
-                || string.IsNullOrEmpty(common))
-            {
-                return false;
-            }
-
-            var hash = ComputeHash(user);
-
-            return hash == common;
-        }
-
-        /// <summary>
-        /// Compute hash for the text
-        /// (both IRBIS32 and IRBIS64).
-        /// </summary>
-        public string ComputeHash
-            (
-                string text
-            )
-        {
-            var salted = Salt + text;
-            var raw = Encoding.GetBytes(salted);
-            unchecked
-            {
-                var sum = 0;
-                foreach (var one in raw)
-                {
-                    sum += one;
-                }
-
-                raw = Encoding.GetBytes
-                    (
-                        sum.ToString(CultureInfo.InvariantCulture)
-                    )
-                    .Reverse()
-                    .ToArray();
-
-                for (var i = 0; i < raw.Length; i++)
-                {
-                    raw[i] += 0x6D;
-                }
-            }
-
-            var result = Encoding.GetString(raw, 0, raw.Length);
-
-            return result;
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="encoding"></param>
+    /// <param name="salt"></param>
+    public ClientLM
+        (
+            Encoding encoding,
+            string? salt
+        )
+    {
+        Encoding = encoding;
+        Salt = salt;
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Check hash for the INI-file
+    /// (both IRBIS32 and IRBIS64).
+    /// </summary>
+    public bool CheckHash
+        (
+            IniFile iniFile
+        )
+    {
+        var user = iniFile.GetValue ("Main", "User", null);
+        var common = iniFile.GetValue ("Main", "Common", null);
+
+        if (string.IsNullOrEmpty(user)
+            || string.IsNullOrEmpty(common))
+        {
+            return false;
+        }
+
+        var hash = ComputeHash(user);
+
+        return hash == common;
+    }
+
+    /// <summary>
+    /// Compute hash for the text
+    /// (both IRBIS32 and IRBIS64).
+    /// </summary>
+    public string ComputeHash
+        (
+            string text
+        )
+    {
+        var salted = Salt + text;
+        var raw = Encoding.GetBytes (salted);
+        unchecked
+        {
+            var sum = 0;
+            foreach (var one in raw)
+            {
+                sum += one;
+            }
+
+            raw = Encoding.GetBytes
+                    (
+                        sum.ToString (CultureInfo.InvariantCulture)
+                    )
+                .Reverse()
+                .ToArray();
+
+            for (var i = 0; i < raw.Length; i++)
+            {
+                raw[i] += 0x6D;
+            }
+        }
+
+        var result = Encoding.GetString(raw, 0, raw.Length);
+
+        return result;
+    }
+
+    #endregion
 }

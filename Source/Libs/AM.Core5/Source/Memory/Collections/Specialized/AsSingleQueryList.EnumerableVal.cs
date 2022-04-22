@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* AsSingleQueryList.EnumerableVal.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,11 +19,13 @@ namespace AM.Memory.Collections.Specialized;
 
 public static partial class AsSingleQueryList
 {
-    private class EnumerableTyped<T> : IPoolingEnumerable<T>
+    private class EnumerableTyped<T>
+        : IPoolingEnumerable<T>
     {
-        private PoolingList<T> _src;
-
-        public IPoolingEnumerable<T> Init (PoolingList<T> src)
+        public IPoolingEnumerable<T> Init
+            (
+                PoolingList<T> src
+            )
         {
             _src = src;
             return this;
@@ -37,14 +39,24 @@ public static partial class AsSingleQueryList
             return Pool<EnumeratorVal>.Get().Init (src);
         }
 
+        #region Private members
+
+        private PoolingList<T> _src;
+
         IPoolingEnumerator IPoolingEnumerable.GetEnumerator() => GetEnumerator();
 
-        private class EnumeratorVal : IPoolingEnumerator<T>
+        #endregion
+
+        private class EnumeratorVal
+            : IPoolingEnumerator<T>
         {
             private PoolingList<T> _src;
             private IPoolingEnumerator<T> _enumerator;
 
-            public IPoolingEnumerator<T> Init (PoolingList<T> src)
+            public IPoolingEnumerator<T> Init
+                (
+                    PoolingList<T> src
+                )
             {
                 _src = src;
                 _enumerator = _src.GetEnumerator();

@@ -26,105 +26,107 @@ using AM.IO;
 
 #nullable enable
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis.Client;
+
+/// <summary>
+///
+/// </summary>
+/// <remarks>
+/// Находится в серверном INI-файле irbisc.ini.
+/// </remarks>
+public sealed class EntryIniSection
+    : AbstractIniSection
 {
+    #region Constants
+
     /// <summary>
-    ///
+    /// Имя секции.
     /// </summary>
-    /// <remarks>
-    /// Находится в серверном INI-файле irbisc.ini.
-    /// </remarks>
-    public sealed class EntryIniSection
-        : AbstractIniSection
+    public const string SectionName = "Entry";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Имя формата для ФЛК документа в целом.
+    /// </summary>
+    [XmlElement ("dbnflc")]
+    [JsonPropertyName ("dbnflc")]
+    public string? DbnFlc
     {
-        #region Constants
-
-        /// <summary>
-        /// Имя секции.
-        /// </summary>
-        public const string SectionName = "Entry";
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Имя формата для ФЛК документа в целом.
-        /// </summary>
-        [XmlElement ("dbnflc")]
-        [JsonPropertyName ("dbnflc")]
-        public string? DbnFlc
-        {
-            get => Section.GetValue ("DBNFLC", "DBNFLC");
-            set => Section["DBNFLC"] = value;
-        }
-
-        /// <summary>
-        /// DefFieldNumb.
-        /// </summary>
-        [XmlElement ("DefFieldNumb")]
-        [JsonPropertyName ("DefFieldNumb")]
-        public int DefFieldNumb
-        {
-            get => Section.GetValue ("DefFieldNumb", 10);
-            set => Section.SetValue ("DefFieldNumb", value);
-        }
-
-        /// <summary>
-        /// MaxAddFields.
-        /// </summary>
-        [XmlElement ("MaxAddFields")]
-        [JsonPropertyName ("MaxAddFields")]
-        public int MaxAddFields
-        {
-            get => Section.GetValue ("MaxAddFields", 10);
-            set => Section.SetValue ("MaxAddFields", value);
-        }
-
-        /// <summary>
-        /// Признак автоматической актуализации записей
-        /// при корректировке.
-        /// </summary>
-        public bool RecordUpdate
-        {
-            get => Utility.ToBoolean (Section.GetValue ("RECUPDIF", "1").ThrowIfNull());
-            set => Section.SetValue ("RECUPDIF", value ? "1" : "0");
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public EntryIniSection()
-            : base (SectionName)
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public EntryIniSection
-            (
-                IniFile iniFile
-            )
-            : base (iniFile, SectionName)
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public EntryIniSection
-            (
-                IniFile.Section section
-            )
-            : base (section)
-        {
-        }
-
-        #endregion
+        get => Section.GetValue ("DBNFLC", "DBNFLC");
+        set => Section["DBNFLC"] = value;
     }
+
+    /// <summary>
+    /// DefFieldNumb.
+    /// </summary>
+    [XmlElement ("DefFieldNumb")]
+    [JsonPropertyName ("DefFieldNumb")]
+    public int DefFieldNumb
+    {
+        get => Section.GetValue ("DefFieldNumb", 10);
+        set => Section.SetValue ("DefFieldNumb", value);
+    }
+
+    /// <summary>
+    /// MaxAddFields.
+    /// </summary>
+    [XmlElement ("MaxAddFields")]
+    [JsonPropertyName ("MaxAddFields")]
+    public int MaxAddFields
+    {
+        get => Section.GetValue ("MaxAddFields", 10);
+        set => Section.SetValue ("MaxAddFields", value);
+    }
+
+    /// <summary>
+    /// Признак автоматической актуализации записей
+    /// при корректировке.
+    /// </summary>
+    public bool RecordUpdate
+    {
+        get => Utility.ToBoolean (Section.GetValue ("RECUPDIF", "1").ThrowIfNull());
+        set => Section.SetValue ("RECUPDIF", value ? "1" : "0");
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public EntryIniSection()
+        : base (SectionName)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public EntryIniSection
+        (
+            IniFile iniFile
+        )
+        : base (iniFile, SectionName)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public EntryIniSection
+        (
+            IniFile.Section section
+        )
+        : base (section)
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
 }
