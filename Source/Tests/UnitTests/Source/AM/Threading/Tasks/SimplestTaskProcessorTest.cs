@@ -10,78 +10,78 @@ using AM.Threading.Tasks;
 
 #nullable enable
 
-namespace UnitTests.AM.Threading.Tasks
+namespace UnitTests.AM.Threading.Tasks;
+
+[TestClass]
+public sealed class SimplestTaskProcessorTest
 {
-    [TestClass]
-    public class SimplestTaskProcessorTest
+    [TestMethod]
+    public void SimplestTaskProcessor_1()
     {
-        [TestMethod]
-        public void SimplestTaskProcessor_1()
-        {
-            var lines = new List<string>();
+        var lines = new List<string>();
 
-            var processor = new SimplestTaskProcessor(1);
-            for (var i = 0; i < 10; i++)
+        var processor = new SimplestTaskProcessor (1);
+        for (var i = 0; i < 10; i++)
+        {
+            var number = i;
+
+            Action action = () =>
             {
-                var number = i;
-
-                Action action = () =>
+                var item = "Hello " + number;
+                lock (lines)
                 {
-                    var item = "Hello " + number;
-                    lock (lines)
-                    {
-                        lines.Add(item);
-                    }
-                };
+                    lines.Add (item);
+                }
+            };
 
-                processor.Enqueue(action);
-            }
-
-            processor.Complete();
-            processor.WaitForCompletion();
-
-            Assert.AreEqual(10, lines.Count);
-            Assert.IsFalse(processor.HaveErrors);
-            Assert.AreEqual(0, processor.Exceptions.Count);
+            processor.Enqueue (action);
         }
 
-        [TestMethod]
-        [Ignore]
-        public void SimplestTaskProcessor_2()
-        {
-            var lines = new List<string>();
+        processor.Complete();
+        processor.WaitForCompletion();
 
-            var processor = new SimplestTaskProcessor(1);
-            for (var i = 0; i < 10; i++)
+        Assert.AreEqual (10, lines.Count);
+        Assert.IsFalse (processor.HaveErrors);
+        Assert.AreEqual (0, processor.Exceptions.Count);
+    }
+
+    [TestMethod]
+    [Ignore]
+    public void SimplestTaskProcessor_2()
+    {
+        var lines = new List<string>();
+
+        var processor = new SimplestTaskProcessor (1);
+        for (var i = 0; i < 10; i++)
+        {
+            var number = i;
+
+            Action action = () =>
             {
-                var number = i;
-
-                Action action = () =>
+                var item = "Hello " + number;
+                lock (lines)
                 {
-                    var item = "Hello " + number;
-                    lock (lines)
-                    {
-                        lines.Add(item);
-                    }
-                    throw new Exception(item);
-                };
+                    lines.Add (item);
+                }
 
-                processor.Enqueue(action);
-            }
+                throw new Exception (item);
+            };
 
-            processor.Complete();
-            processor.WaitForCompletion();
-
-            Assert.AreEqual(10, lines.Count);
-            Assert.IsTrue(processor.HaveErrors);
-            Assert.AreEqual(10, processor.Exceptions.Count);
+            processor.Enqueue (action);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void SimplestTaskProcessor_Construction_1()
-        {
-            _ = new SimplestTaskProcessor(-1);
-        }
+        processor.Complete();
+        processor.WaitForCompletion();
+
+        Assert.AreEqual (10, lines.Count);
+        Assert.IsTrue (processor.HaveErrors);
+        Assert.AreEqual (10, processor.Exceptions.Count);
+    }
+
+    [TestMethod]
+    [ExpectedException (typeof (ArgumentOutOfRangeException))]
+    public void SimplestTaskProcessor_Construction_1()
+    {
+        _ = new SimplestTaskProcessor (-1);
     }
 }

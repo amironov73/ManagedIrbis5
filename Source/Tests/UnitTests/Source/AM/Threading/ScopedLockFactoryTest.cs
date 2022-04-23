@@ -7,24 +7,23 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.AM.Text
-{
-    [TestClass]
-    public class ScopedLockFactoryTest
-    {
-        [TestMethod]
-        public void ScopedLockFactory_Construction_1()
-        {
-            using var factory = new ScopedLockFactory();
-            using (var lock1 = factory.CreateLock())
-            {
-                Assert.IsNotNull(lock1);
-            }
+namespace UnitTests.AM.Text;
 
-            using (var lock2 = factory.CreateLock())
-            {
-                Assert.IsNotNull(lock2);
-            }
+[TestClass]
+public sealed class ScopedLockFactoryTest
+{
+    [TestMethod]
+    public void ScopedLockFactory_Construction_1()
+    {
+        using var factory = new ScopedLockFactory();
+        using (var lock1 = factory.CreateLock())
+        {
+            Assert.IsNotNull (lock1);
+        }
+
+        using (var lock2 = factory.CreateLock())
+        {
+            Assert.IsNotNull (lock2);
         }
     }
 }
