@@ -24,6 +24,7 @@ namespace UnitTests.ManagedIrbis.CommandLine;
 public class CommandLineUtilityTest
 {
     [TestMethod]
+    [Description ("Корневая команда")]
     public void CommandLineUtility_GetRootCommand_1()
     {
         var rootCommand = CommandLineUtility.GetRootCommand();
@@ -54,6 +55,7 @@ public class CommandLineUtilityTest
     }
 
     [TestMethod]
+    [Description ("Корневая команда")]
     public void CommandLineUtility_GetRootCommand_2()
     {
         var rootCommand = CommandLineUtility.GetRootCommand();
@@ -76,6 +78,7 @@ public class CommandLineUtilityTest
     }
 
     [TestMethod]
+    [Description ("Корневая команда")]
     public void CommandLineUtility_GetRootCommand_3()
     {
         var rootCommand = CommandLineUtility.GetRootCommand();
@@ -146,6 +149,7 @@ public class CommandLineUtilityTest
     // }
 
     [TestMethod]
+    [Description ("Парсинг аргументов командной строки")]
     public void CommandLineUtility_ConfigureConnectionFromCommandLine_1()
     {
         var arguments = new[]
@@ -179,6 +183,7 @@ public class CommandLineUtilityTest
     }
 
     [TestMethod]
+    [Description ("Парсинг аргументов командной строки")]
     public void CommandLineUtility_ConfigureConnectionFromCommandLine_2()
     {
         var arguments = Array.Empty<string>();
@@ -203,6 +208,7 @@ public class CommandLineUtilityTest
     }
 
     [TestMethod]
+    [Description ("Парсинг аргументов командной строки")]
     public void CommandLineUtility_ConfigureConnectionFromCommandLine_3()
     {
         var arguments = new[]
@@ -255,6 +261,7 @@ public class CommandLineUtilityTest
     // }
 
     [TestMethod]
+    [Description ("Разбор переменной окружения")]
     public void CommandLineUtility_ParseEnvironment_2()
     {
         var environment = "--host:testHost --port:5555 --username:librarian "
@@ -297,6 +304,7 @@ public class CommandLineUtilityTest
     }
 
     [TestMethod]
+    [Description ("Разбор переменной окружения")]
     public void CommandLineUtility_ConfigureConnectionFromEnvironment_2()
     {
         var mock = new Mock<IConnection>();
