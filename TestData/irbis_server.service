@@ -1,0 +1,15 @@
+[Unit]
+Description=Irbis server
+After=syslog.target
+After=network.target
+
+[Service]
+User=irbis
+Group=irbis
+Environment=LD_LIBRARY_PATH=/home/irbis/irbis_server
+WorkingDirectory=/home/irbis/irbis_server
+ExecStart=/home/irbis/irbis_server/irbis_server
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
