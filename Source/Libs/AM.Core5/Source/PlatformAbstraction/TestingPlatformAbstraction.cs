@@ -51,7 +51,7 @@ public sealed class TestingPlatformAbstraction
     /// <summary>
     /// Environment variables.
     /// </summary>
-    public CaseInsensitiveDictionary<string> Variables { get; private set; }
+    public CaseInsensitiveDictionary<string> Variables { get; }
 
     #endregion
 
@@ -75,7 +75,7 @@ public sealed class TestingPlatformAbstraction
             string variableName
         )
     {
-        Variables.TryGetValue (variableName, out string? result);
+        Variables.TryGetValue (variableName, out var result);
 
         return result;
     }
@@ -99,13 +99,19 @@ public sealed class TestingPlatformAbstraction
     }
 
     /// <inheritdoc cref="PlatformAbstractionLayer.Exit" />
-    public override void Exit (int exitCode)
+    public override void Exit
+        (
+            int exitCode
+        )
     {
         ExitFlag = true;
     }
 
     /// <inheritdoc cref="PlatformAbstractionLayer.FailFast" />
-    public override void FailFast (string message)
+    public override void FailFast
+        (
+            string message
+        )
     {
         FailFastFlag = true;
     }
@@ -113,8 +119,8 @@ public sealed class TestingPlatformAbstraction
     /// <inheritdoc cref="PlatformAbstractionLayer.OsVersion" />
     public override OperatingSystem OsVersion()
     {
-        Version windows7sp1 = new Version (6, 1, 7601, 65536);
-        OperatingSystem result = new OperatingSystem
+        var windows7sp1 = new Version (6, 1, 7601, 65536);
+        var result = new OperatingSystem
             (
                 PlatformID.Win32NT,
                 windows7sp1

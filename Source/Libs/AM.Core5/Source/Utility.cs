@@ -39,6 +39,7 @@ using System.Threading.Tasks;
 using AM.Collections;
 using AM.IO;
 using AM.PlatformAbstraction;
+using AM.Reflection;
 using AM.Text;
 
 #endregion
@@ -6070,6 +6071,66 @@ public static class Utility
         )
     {
         return string.Join (separator, sequence.ToArray());
+    }
+
+    /// <summary>
+    /// Проверка, установлен ли флаг в перечислении.
+    /// </summary>
+    /// <remarks>
+    /// Ну и не забываем, что <see cref="Enum.HasFlag"/>
+    /// с .NET6 теперь считается интринсиком и разворачивается джитом
+    /// в эффективный код, если на момент компиляции известен тип.
+    /// </remarks>
+    public static unsafe bool IsAnyFlagMatch<T>
+        (
+            this T value,
+            T flag
+        )
+        where T : unmanaged, Enum
+    {
+        if (TypeHelper<T>.TypeCode == TypeCode.Byte)
+        {
+            var v = (int) Unsafe.As<T, byte> (ref value);
+            var f = (int) Unsafe.As<T, byte> (ref flag);
+            return (v & f) != 0;
+        }
+
+        if (TypeHelper<T>.TypeCode == TypeCode.SByte)
+        {
+            var v = (int) Unsafe.As<T, sbyte> (ref value);
+            var f = (int) Unsafe.As<T, sbyte> (ref flag);
+            return (v & f) != 0;
+        }
+
+        if (TypeHelper<T>.TypeCode == TypeCode.Int16)
+        {
+            var v = (int) Unsafe.As<T, short> (ref value);
+            var f = (int) Unsafe.As<T, short> (ref flag);
+            return (v & f) != 0;
+        }
+
+        if (TypeHelper<T>.TypeCode == TypeCode.UInt16)
+        {
+            var v = (int) Unsafe.As<T, ushort> (ref value);
+            var f = (int) Unsafe.As<T, ushort> (ref flag);
+            return (v & f) != 0;
+        }
+
+        if (sizeof(T) == 4)
+        {
+            var v = Unsafe.As<T, int> (ref value);
+            var f = Unsafe.As<T, int> (ref flag);
+            return (v & f) != 0;
+        }
+
+        if (sizeof(T) == 8)
+        {
+            var v = Unsafe.As<T, long> (ref value);
+            var f = Unsafe.As<T, long> (ref flag);
+            return (v & f) != 0;
+        }
+
+        return false;
     }
 
     #endregion

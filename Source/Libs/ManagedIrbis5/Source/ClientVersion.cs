@@ -20,26 +20,23 @@ using System.Reflection;
 
 #nullable enable
 
-namespace ManagedIrbis
-{
-    /// <summary>
-    /// Версия клиента.
-    /// </summary>
-    public static class ClientVersion
-    {
-        #region Properties
+namespace ManagedIrbis;
 
-        /// <summary>
-        /// Собственно версия клиента.
-        /// </summary>
-        public static readonly Version Version = Assembly
-            .GetExecutingAssembly()
+/// <summary>
+/// Версия клиента (сборки, содержащей данный класс).
+/// </summary>
+public static class ClientVersion
+{
+    #region Properties
+
+    /// <summary>
+    /// Собственно версия клиента.
+    /// </summary>
+    public static readonly Version Version
+        = Assembly.GetExecutingAssembly()
             .GetName()
             .Version
-            ?? throw new ApplicationException("ClientVersion not defined");
+            ?? throw new ApplicationException ("ClientVersion not defined");
 
-        #endregion
-
-    } // class ClientVersion
-
-} // namespace ManagedIrbis
+    #endregion
+}
