@@ -28,6 +28,47 @@ using System.IO;
 namespace AM.Linux;
 
 /*
+    Подсистема systemd оперирует специально оформленными файлами
+    конфигурации — модулями (англ. unit). Каждый модуль отвечает
+    за отдельно взятую службу, точку монтирования, подключаемое
+    устройство, файл подкачки, виртуальную машину и тому подобные
+    ресурсы. Существуют специальные типы модулей, которые не несут
+    функциональной нагрузки, но позволяют задействовать дополнительные
+    возможности systemd, к ним относятся модули типа target, slice,
+    automount и ряд других. На октябрь 2016 года systemd поддерживает
+    следующие типы модулей:
+
+    * .target — позволяет группировать модули, воплощая концепцию уровней
+      запуска;
+    * .service — отвечает за запуск сервисов (служб), также поддерживает
+      вызов интерпретаторов для исполнения пользовательских скриптов;
+    * .mount — отвечает за монтирование файловых систем;
+    * .automount — позволяет отложить монтирование файловых систем
+      до фактического обращения к точке монтирования;
+    * .swap — отвечает за подключение файла или устройства подкачки;
+    * .timer — позволяет запускать модули по расписанию;
+    * .socket — предоставляет службам поддержку механизма сокет-активации;
+    * .slice — отвечает за создание контейнера cgroups;
+    * .device — позволяет реагировать на подключение устройств;
+    * .path — управляет иерархией файловой системы.
+
+    Дистрибутивы, в которых systemd установлен по умолчанию:
+
+    * Debian GNU/Linux версии 8 и выше
+    * RHEL версии 7 и выше
+    * CentOS версии 7 и выше
+    * Ubuntu версии 15.10 и выше
+    * Fedora версии 15 и выше
+    * Mageia 2
+    * Mandriva 2011
+    * Rosa
+    * openSUSE 12.1 и позже
+    * Arch Linux 12.11
+    * Sabayon 13.08
+
+ */
+
+/*
     https://www.freedesktop.org/software/systemd/man/systemd.unit.html
     https://linux-notes.org/pishem-systemd-unit-fajl/
     https://habr.com/ru/company/southbridge/blog/255845/
@@ -78,9 +119,25 @@ public sealed class ServiceUnit
     #region Секция Unit
 
     /// <summary>
-    /// Описание юнита в произвольной форме.
+    /// Человеко-читаемое описание юнита в произвольной форме.
     /// </summary>
-    public string? UnitDescription { get; set; }
+    /// <example>
+    /// <code>
+    /// Description=Apache2 Web Server
+    /// </code>
+    /// </example>
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// Список URI к документации юнита Принимаемые типы URI: "http://",
+    /// "https://", "file:", "info:", "man:".
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// Documentation=file:/usr/doc/some/document.txt
+    /// </code>
+    /// </example>
+    public string[]? Documentation { get; set; }
 
     /// <summary>
     /// Юниты, перечисленные в этой директиве, не будут запущены до тех пор,
@@ -145,6 +202,30 @@ public sealed class ServiceUnit
     /// </code>
     /// </example>
     public string[]? Requires { get; set; }
+
+    /// <summary>
+    /// Подобно <see cref="Requires"/>, но с одним отличием:
+    /// если нужный юнит ещё не запущен, он не будет запускаться,
+    /// будет выдана ошибка.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// Requisite=mysql.service
+    /// </code>
+    /// </example>
+    public string[]? Requisite { get; set; }
+
+    /// <summary>
+    /// Список юнитов, запускаемых при сбое (когда сервис переходит
+    /// в состояние <c>failed</c>). Разделитель - пробел.
+    /// </summary>
+    public string? OnFailure { get; set; }
+
+    /// <summary>
+    /// Список юнитов, запускаемых при неактивности (когда сервис переходит
+    /// в состояние <c>inactive</c>). Разделитель - пробел.
+    /// </summary>
+    public string? OnSuccess { get; set; }
 
     /// <summary>
     /// Эта директива аналогична <see cref="Requires"/>, но также приводит
@@ -289,6 +370,14 @@ public sealed class ServiceUnit
     /// </example>
     public string? Restart { get; set; }
 
+    /// <summary>
+    /// Куда перенаправляется стандартный выходной поток.
+    /// </summary>
+    /// <example>
+    /// StandardOutput=null
+    /// </example>
+    public string? StandardOutput { get; set; }
+
     #endregion
 
     #region Секция Install
@@ -306,6 +395,14 @@ public sealed class ServiceUnit
     /// или через сеть».
     /// </remarks>
     public string? WantedBy { get; set; }
+
+    /// <summary>
+    /// Псевдонимы.
+    /// </summary>
+    /// <example>
+    /// Alias=sshd.service
+    /// </example>
+    public string[]? Aliases { get; set; }
 
     #endregion
 
@@ -399,7 +496,7 @@ public sealed class ServiceUnit
             switch (key)
             {
                 case "Description":
-                    UnitDescription = value;
+                    Description = value;
                     break;
 
                 case "After":
@@ -491,7 +588,7 @@ public sealed class ServiceUnit
         Sure.NotNull (writer);
 
         writer.WriteLine ("[Unit]");
-        Write (writer, "Description", UnitDescription);
+        Write (writer, "Description", Description);
         Write (writer, "After", After);
         Write (writer, "Requires", Requires);
         Write (writer, "Wants", Wants);
@@ -535,7 +632,7 @@ public sealed class ServiceUnit
         var verifier = new Verifier<ServiceUnit> (this, throwOnError);
 
         verifier
-            .NotNullNorEmpty (UnitDescription)
+            .NotNullNorEmpty (Description)
             .NotNullNorEmpty (ExecStart);
 
         return verifier.Result;
