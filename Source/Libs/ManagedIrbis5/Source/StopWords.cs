@@ -28,76 +28,76 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+//
+// STW file example:
+//
+// A
+// ABOUT
+// AFTER
+// AGAINST
+// ALL
+// ALS
+// AN
+// AND
+// AS
+// AT
+// AUF
+// AUS
+// AUX
+// B
+// BIJ
+// BY
+//
+
+/// <summary>
+/// Обертка над списком стоп-слов. STW-файлы.
+/// </summary>
+public sealed class StopWords
 {
-    //
-    // STW file example:
-    //
-    // A
-    // ABOUT
-    // AFTER
-    // AGAINST
-    // ALL
-    // ALS
-    // AN
-    // AND
-    // AS
-    // AT
-    // AUF
-    // AUS
-    // AUX
-    // B
-    // BIJ
-    // BY
-    //
+    #region Properties
 
     /// <summary>
-    /// Обертка над списком стоп-слов. STW-файлы.
+    /// File name (for identification only).
     /// </summary>
-    public sealed class StopWords
+    public string? FileName { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public StopWords()
     {
-        #region Properties
+        _dictionary = new CaseInsensitiveDictionary<object?>();
+    }
 
-        /// <summary>
-        /// File name (for identification only).
-        /// </summary>
-        public string? FileName { get; set; }
+    /// <summary>
+    /// Initializes a new instance of the
+    /// <see cref="StopWords"/> class.
+    /// </summary>
+    /// <param name="fileName">The name.</param>
+    public StopWords
+        (
+            string? fileName
+        )
+        : this()
+    {
+        FileName = fileName;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Private members
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public StopWords()
-        {
-            _dictionary = new CaseInsensitiveDictionary<object?>();
-        }
+    private readonly CaseInsensitiveDictionary<object?> _dictionary;
 
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="StopWords"/> class.
-        /// </summary>
-        /// <param name="fileName">The name.</param>
-        public StopWords
-            (
-                string? fileName
-            )
-            : this()
-        {
-            FileName = fileName;
-        }
+    #endregion
 
-        #endregion
-
-        #region Private members
-
-        private readonly CaseInsensitiveDictionary<object?> _dictionary;
-
-        #endregion
-
-        #region Public methods
+    #region Public methods
 
 //        /// <summary>
 //        /// Load stopword list from server.
@@ -146,50 +146,50 @@ namespace ManagedIrbis
 //            return result;
 //        }
 
-        /// <summary>
-        /// Is given word is stopword?
-        /// </summary>
-        public bool IsStopWord
-            (
-                string? word
-            )
+    /// <summary>
+    /// Is given word is stopword?
+    /// </summary>
+    public bool IsStopWord
+        (
+            string? word
+        )
+    {
+        if (string.IsNullOrEmpty(word))
         {
-            if (string.IsNullOrEmpty(word))
-            {
-                return true;
-            }
-
-            word = word.Trim();
-            if (string.IsNullOrEmpty(word))
-            {
-                return true;
-            }
-
-            return _dictionary.ContainsKey(word);
+            return true;
         }
 
-        /// <summary>
-        /// Parse array of plain text lines.
-        /// </summary>
-        public static StopWords ParseLines
-            (
-                string? name,
-                string[] lines
-            )
+        word = word.Trim();
+        if (string.IsNullOrEmpty(word))
         {
-            var result = new StopWords(name);
-
-            foreach (var line in lines)
-            {
-                var trimmed = line.Trim();
-                if (!string.IsNullOrEmpty(trimmed))
-                {
-                    result._dictionary[trimmed] = null;
-                }
-            }
-
-            return result;
+            return true;
         }
+
+        return _dictionary.ContainsKey(word);
+    }
+
+    /// <summary>
+    /// Parse array of plain text lines.
+    /// </summary>
+    public static StopWords ParseLines
+        (
+            string? name,
+            string[] lines
+        )
+    {
+        var result = new StopWords(name);
+
+        foreach (var line in lines)
+        {
+            var trimmed = line.Trim();
+            if (!string.IsNullOrEmpty(trimmed))
+            {
+                result._dictionary[trimmed] = null;
+            }
+        }
+
+        return result;
+    }
 
 //        /// <summary>
 //        /// Parse plain text.
@@ -205,50 +205,49 @@ namespace ManagedIrbis
 //            return ParseLines(name, lines);
 //        }
 
-        /// <summary>
-        /// Parse the text file.
-        /// </summary>
-        public static StopWords ParseFile
+    /// <summary>
+    /// Parse the text file.
+    /// </summary>
+    public static StopWords ParseFile
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty(fileName, nameof(fileName));
+
+        var name = Path.GetFileNameWithoutExtension(fileName);
+        var lines = File.ReadAllLines
             (
-                string fileName
-            )
-        {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+                path: fileName,
+                encoding: IrbisEncoding.Ansi
+            );
 
-            var name = Path.GetFileNameWithoutExtension(fileName);
-            var lines = File.ReadAllLines
-                (
-                    path: fileName,
-                    encoding: IrbisEncoding.Ansi
-                );
-
-            return ParseLines(name, lines);
-        }
-
-        /// <summary>
-        /// Convert <see cref="StopWords"/> to array
-        /// of text lines.
-        /// </summary>
-        public string[] ToLines()
-        {
-            var result = _dictionary.Keys.ToArray();
-            Array.Sort(result);
-
-            return result;
-        }
-
-        /// <summary>
-        /// Convert <see cref="StopWords"/> to plain text.
-        /// </summary>
-        public string ToText()
-        {
-            return string.Join
-                (
-                    separator: Environment.NewLine,
-                    value: ToLines()
-                );
-        }
-
-        #endregion
+        return ParseLines(name, lines);
     }
+
+    /// <summary>
+    /// Convert <see cref="StopWords"/> to array
+    /// of text lines.
+    /// </summary>
+    public string[] ToLines()
+    {
+        var result = _dictionary.Keys.ToArray();
+        Array.Sort (result);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Convert <see cref="StopWords"/> to plain text.
+    /// </summary>
+    public string ToText()
+    {
+        return string.Join
+            (
+                separator: Environment.NewLine,
+                value: ToLines()
+            );
+    }
+
+    #endregion
 }

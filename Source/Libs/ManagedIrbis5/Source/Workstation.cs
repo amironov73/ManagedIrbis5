@@ -11,61 +11,58 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Коды АРМ ИРБИС64.
+/// Не известные серверу ИРБИС64 коды АРМ
+/// приводят к ошибке при регистрации на сервере.
+/// </summary>
+public enum Workstation
+    : byte
 {
     /// <summary>
-    /// Коды АРМ ИРБИС64.
-    /// Незнакомые серверу ИРБИС64 коды АРМ
-    /// приводят к ошибке при регистрации на сервере.
+    /// Администратор.
     /// </summary>
-    public enum Workstation
-        : byte
-    {
-        /// <summary>
-        /// Администратор.
-        /// </summary>
-        Administrator = (byte)'A',
+    Administrator = (byte)'A',
 
-        /// <summary>
-        /// Каталогизатор.
-        /// </summary>
-        Cataloger = (byte)'C',
+    /// <summary>
+    /// Каталогизатор.
+    /// </summary>
+    Cataloger = (byte)'C',
 
-        /// <summary>
-        /// Комплектатор.
-        /// </summary>
-        Acquisitions = (byte)'M',
+    /// <summary>
+    /// Комплектатор.
+    /// </summary>
+    Acquisitions = (byte)'M',
 
-        /// <summary>
-        /// Читатель.
-        /// </summary>
-        Reader = (byte)'R',
+    /// <summary>
+    /// Читатель.
+    /// </summary>
+    Reader = (byte)'R',
 
-        /// <summary>
-        /// Книговыдача.
-        /// </summary>
-        Circulation = (byte)'B',
+    /// <summary>
+    /// Книговыдача.
+    /// </summary>
+    Circulation = (byte)'B',
 
-        /// <summary>
-        /// Тоже книговыдача.
-        /// </summary>
-        Bookland = (byte)'B',
+    /// <summary>
+    /// Тоже книговыдача.
+    /// </summary>
+    Bookland = (byte)'B',
 
-        /// <summary>
-        /// Книгообеспеченность.
-        /// </summary>
-        Provision = (byte)'K',
+    /// <summary>
+    /// Книгообеспеченность.
+    /// </summary>
+    Provision = (byte)'K',
 
-        /// <summary>
-        /// Java апплет.
-        /// </summary>
-        JavaApplet = (byte)'J',
+    /// <summary>
+    /// Java апплет.
+    /// </summary>
+    JavaApplet = (byte)'J',
 
-        /// <summary>
-        /// Не задан.
-        /// </summary>
-        None = 0
-
-    } // enum Workstation
-
-} // namespace ManagedIrbis
+    /// <summary>
+    /// Не задан.
+    /// </summary>
+    None = 0
+}
