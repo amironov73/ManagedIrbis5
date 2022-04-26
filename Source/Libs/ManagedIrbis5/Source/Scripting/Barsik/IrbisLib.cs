@@ -910,13 +910,24 @@ public sealed class IrbisLib
             dynamic?[] args
         )
     {
-        if (!TryGetRecord (context, out var record))
+        Record? record;
+        var firstArg = Compute (context, args, 0);
+        var index = 1;
+        if (firstArg is Record record2)
         {
-            return null;
+            record = record2;
+            firstArg = Compute (context, args, 1);
+            index = 2;
+        }
+        else
+        {
+            if (!TryGetRecord (context, out record))
+            {
+                return null;
+            }
         }
 
-        var firstArg = Compute (context, args, 0);
-        var secondArg = Compute (context, args, 1);
+        var secondArg = Compute (context, args, index);
         if (firstArg is int tag)
         {
             if (secondArg is char code)

@@ -15,8 +15,10 @@
 
 #region Using directives
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 #endregion
 
@@ -53,33 +55,48 @@ public sealed class DictionaryCounterInt32<TKey>
         }
     }
 
+    /// <summary>
+    /// Сортированные ключи.
+    /// </summary>
+    public TKey[] SortedKeys
+    {
+        get
+        {
+            var result = Keys.ToArray();
+            Array.Sort (result);
+
+            return result;
+        }
+    }
+
     #endregion
 
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public DictionaryCounterInt32()
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
-    /// <param name="comparer">The comparer.</param>
+    /// <param name="comparer">Сравнение для элементов.</param>
     public DictionaryCounterInt32
         (
             IEqualityComparer<TKey> comparer
         )
-        : base (comparer)
+        : base (comparer.ThrowIfNull ())
     {
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
-    /// <param name="capacity">The capacity.</param>
+    /// <param name="capacity">Начальная емкость.</param>
     public DictionaryCounterInt32
         (
             int capacity
@@ -89,10 +106,9 @@ public sealed class DictionaryCounterInt32<TKey>
     }
 
     /// <summary>
-    /// Initializes a new instance of the
-    /// <see cref="DictionaryCounterInt32{TKey}"/> class.
+    /// Конструктор.
     /// </summary>
-    /// <param name="dictionary">The dictionary.</param>
+    /// <param name="dictionary">Начальное наполнение словаря.</param>
     public DictionaryCounterInt32
         (
             DictionaryCounterInt32<TKey> dictionary
@@ -105,7 +121,7 @@ public sealed class DictionaryCounterInt32<TKey>
 
     #region Private members
 
-    private object SyncRoot => ((ICollection)this).SyncRoot;
+    private object SyncRoot => ((ICollection) this).SyncRoot;
 
     #endregion
 

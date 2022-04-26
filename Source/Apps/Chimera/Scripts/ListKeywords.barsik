@@ -1,0 +1,58 @@
+﻿//
+// Список ключевых слов и предметных рубрик для базы данных ZIMA
+//
+
+load ("AM.Core5") // для DictionaryCounterInt32
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=ZIMA;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+// сравнение строк без учета регистра символов
+comparer = type ("System.StringComparer").OrdinalIgnoreCase
+
+// словарь "ключевое слово - количество упоминаний"
+counter = new "AM.Collections.DictionaryCounterInt32`1" <string> (comparer)
+
+// считываем все записи в базе данных
+everything = batch_read (true)
+foreach (one in everything)
+{
+    // ключевые слова
+    keywords = fma (one, 610)
+    if (keywords)
+    {
+        foreach (keyword in keywords)
+        {
+            counter.Increment (keyword.Trim())
+        }
+    }
+
+    // предметные рубрики
+    subjects = fma (one, 606, 'a')
+    if (subjects)
+    {
+        foreach (subject in subjects)
+        {
+            counter.Increment (subject.Trim())
+        }
+    }
+}
+
+//=================================
+
+// выводим в алфавитном порядке
+keys = counter.SortedKeys
+foreach (key in keys)
+{
+    println (key, "\t", counter[key])
+}
+
+//=================================
+
+disconnect()
