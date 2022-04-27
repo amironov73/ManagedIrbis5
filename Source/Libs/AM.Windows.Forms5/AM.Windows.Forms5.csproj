@@ -52,6 +52,9 @@
     <Compile Update="Source\BusyForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Source\AppServices\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

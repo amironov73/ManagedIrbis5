@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <UseWindowsForms>true</UseWindowsForms>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Libs\AM.Drawing5\AM.Drawing5.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Source\MyMainForm.cs">
+        <SubType>Form</SubType>
+      </Compile>
+    </ItemGroup>
+
+</Project>
