@@ -117,16 +117,12 @@ public static class ServiceNegotiator
     {
         Sure.NotNullNorEmpty (arguments);
 
-        var startInfo = new ProcessStartInfo
+        using var process = Process.Start
             (
                 "systemctl",
                 arguments
             );
-        using var process = Process.Start (startInfo);
-        if (process is not null)
-        {
-            process.WaitForExit();
-        }
+        process.WaitForExit();
     }
 
     /// <summary>

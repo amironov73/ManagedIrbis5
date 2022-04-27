@@ -5,7 +5,6 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* Workstation.cs -- коды АРМов ИРБИС64.
  * Ars Magna project, http://arsmagna.ru
@@ -24,42 +23,42 @@ public enum Workstation
     /// <summary>
     /// Администратор.
     /// </summary>
-    Administrator = (byte)'A',
+    Administrator = (byte) 'A',
 
     /// <summary>
     /// Каталогизатор.
     /// </summary>
-    Cataloger = (byte)'C',
+    Cataloger = (byte) 'C',
 
     /// <summary>
     /// Комплектатор.
     /// </summary>
-    Acquisitions = (byte)'M',
+    Acquisitions = (byte) 'M',
 
     /// <summary>
     /// Читатель.
     /// </summary>
-    Reader = (byte)'R',
+    Reader = (byte) 'R',
 
     /// <summary>
     /// Книговыдача.
     /// </summary>
-    Circulation = (byte)'B',
+    Circulation = (byte) 'B',
 
     /// <summary>
     /// Тоже книговыдача.
     /// </summary>
-    Bookland = (byte)'B',
+    Bookland = (byte) 'B',
 
     /// <summary>
     /// Книгообеспеченность.
     /// </summary>
-    Provision = (byte)'K',
+    Provision = (byte) 'K',
 
     /// <summary>
     /// Java апплет.
     /// </summary>
-    JavaApplet = (byte)'J',
+    JavaApplet = (byte) 'J',
 
     /// <summary>
     /// Не задан.

@@ -36,9 +36,9 @@ public class IrbisException
     #region Properties
 
     /// <summary>
-    /// Return (error) code.
-    /// Less than zero means error.
-    /// Zero or more means normal execution.
+    /// Код возврата (ошибки).
+    /// Отрицательное число означает ошибку.
+    /// Ноль или положительное число означает нормальное выполнение операции.
     /// </summary>
     public int ErrorCode { get; }
 
@@ -55,7 +55,7 @@ public class IrbisException
     }
 
     /// <summary>
-    /// Constructor with return (error) code.
+    /// Конструктор, принимающий код возврата (ошибки).
     /// </summary>
     public IrbisException
         (
@@ -67,7 +67,7 @@ public class IrbisException
     }
 
     /// <summary>
-    /// Constructor with error message.
+    /// Конструктор, принимающий сообщение об ошибке.
     /// </summary>
     public IrbisException
         (
@@ -75,10 +75,12 @@ public class IrbisException
         )
         : base (message)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
-    /// Constructor with error message and inner exception.
+    /// Конструктор, принимающий сообщение об ошибке
+    /// и вложенное исключение.
     /// </summary>
     public IrbisException
         (
@@ -87,6 +89,7 @@ public class IrbisException
         )
         : base (message, innerException)
     {
+        // пустое тело конструктора
     }
 
     #endregion
@@ -94,20 +97,22 @@ public class IrbisException
     #region Public methods
 
     /// <summary>
-    /// Get text description of the error.
+    /// Получение текстового описания ошибки по исключению.
     /// </summary>
     public static string GetErrorDescription
         (
             IrbisException exception
         )
     {
+        Sure.NotNull (exception);
+
         return string.IsNullOrEmpty (exception.Message)
             ? GetErrorDescription (exception.ErrorCode)
             : exception.Message;
     }
 
     /// <summary>
-    /// Get text description ot the error.
+    /// Получение текстового описчания ошибки по ее коду.
     /// </summary>
     public static string GetErrorDescription
         (
@@ -318,14 +323,17 @@ public class IrbisException
     #region Object members
 
     /// <inheritdoc cref="object.ToString" />
-    public override string ToString() => string.Format
-        (
-            "ErrorCode: {2}{1}Description: {3}{1}{0}",
-            base.ToString(),
-            Environment.NewLine,
-            ErrorCode,
-            Message
-        );
+    public override string ToString()
+    {
+        return string.Format
+            (
+                "ErrorCode: {2}{1}Description: {3}{1}{0}",
+                base.ToString(),
+                Environment.NewLine,
+                ErrorCode,
+                Message
+            );
+    }
 
     #endregion
 }

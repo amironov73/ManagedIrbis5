@@ -60,7 +60,7 @@ public sealed class DatabaseInfo
     public string? Name { get; set; }
 
     /// <summary>
-    /// Описание базы данных
+    /// Описание базы данных в произвольной форме.
     /// </summary>
     [XmlAttribute ("description")]
     [JsonPropertyName ("description")]
