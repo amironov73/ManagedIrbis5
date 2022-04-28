@@ -21,133 +21,131 @@ using AM.Text.Output;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Вывод в текстовое поле.
+/// </summary>
+public sealed class TextBoxOutput
+    : AbstractOutput
 {
+    #region Properties
+
     /// <summary>
-    /// Вывод в текстовое поле.
+    /// Текстбокс, в который направляется выводимый текст.
     /// </summary>
-    public sealed class TextBoxOutput
-        : AbstractOutput
+    public TextBox TextBox { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public TextBoxOutput
+        (
+            TextBox textBox
+        )
     {
-        #region Properties
+        Sure.NotNull (textBox);
 
-        /// <summary>
-        /// Текстбокс
-        /// </summary>
-        public TextBox TextBox { get; set; }
+        TextBox = textBox;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Public methods
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public TextBoxOutput
-            (
-                TextBox textBox
-            )
+    /// <summary>
+    /// Добавление текста в конец текстбокса.
+    /// </summary>
+    /// <param name="text"></param>
+    public void AppendText
+        (
+            string? text
+        )
+    {
+        if (!string.IsNullOrEmpty (text))
         {
-            TextBox = textBox;
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавление текста в конец текстбокса.
-        /// </summary>
-        /// <param name="text"></param>
-        public void AppendText
-            (
-                string? text
-            )
-        {
-            if (!string.IsNullOrEmpty(text))
-            {
-                TextBox.InvokeIfRequired
-                    (
-                        () => TextBox.AppendText(text)
-                    )
-                    .WaitFor();
-            }
-
             TextBox.InvokeIfRequired
-                (
-                    () => TextBox.SelectionStart = TextBox.TextLength
-                )
+                    (
+                        () =>
+                        {
+                            TextBox.AppendText (text);
+                            TextBox.SelectionStart = TextBox.TextLength;
+                        })
                 .WaitFor();
         }
+    }
 
-        #endregion
+    #endregion
 
-        #region AbstractOutput members
+    #region AbstractOutput members
 
-        /// <summary>
-        /// Флаг: был ли вывод с помощью WriteError.
-        /// </summary>
-        public override bool HaveError { get; set; }
+    /// <summary>
+    /// Флаг: был ли вывод с помощью WriteError.
+    /// </summary>
+    public override bool HaveError { get; set; }
 
-        /// <summary>
-        /// Очищает вывод, например, окно.
-        /// Надо переопределить в потомке.
-        /// </summary>
-        public override AbstractOutput Clear()
-        {
-            HaveError = false;
-            TextBox.InvokeIfRequired
+    /// <summary>
+    /// Очищает вывод, например, окно.
+    /// Надо переопределить в потомке.
+    /// </summary>
+    public override AbstractOutput Clear()
+    {
+        HaveError = false;
+        TextBox.InvokeIfRequired
                 (
                     () => TextBox.Clear()
                 )
-                .WaitFor();
+            .WaitFor();
 
-            return this;
-        }
-
-        /// <summary>
-        /// Конфигурирование объекта.
-        /// Надо переопределить в потомке.
-        /// </summary>
-        public override AbstractOutput Configure
-            (
-                string configuration
-            )
-        {
-            // TODO: implement
-
-            return this;
-        }
-
-        /// <summary>
-        /// Метод, который нужно переопределить
-        /// в потомке.
-        /// </summary>
-        public override AbstractOutput Write
-            (
-                string text
-            )
-        {
-            AppendText(text);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Выводит ошибку. Например, красным цветом.
-        /// Надо переопределить в потомке.
-        /// </summary>
-        public override AbstractOutput WriteError
-            (
-                string text
-            )
-        {
-            HaveError = true;
-            AppendText(text);
-
-            return this;
-        }
-
-        #endregion
+        return this;
     }
+
+    /// <summary>
+    /// Конфигурирование объекта.
+    /// Надо переопределить в потомке.
+    /// </summary>
+    public override AbstractOutput Configure
+        (
+            string configuration
+        )
+    {
+        // TODO: implement
+
+        return this;
+    }
+
+    /// <summary>
+    /// Простой вывод строки.
+    /// Нужно переопределить в потомке.
+    /// </summary>
+    public override AbstractOutput Write
+        (
+            string text
+        )
+    {
+        AppendText (text);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Выводит ошибку. Например, красным цветом.
+    /// Надо переопределить в потомке.
+    /// </summary>
+    public override AbstractOutput WriteError
+        (
+            string text
+        )
+    {
+        HaveError = true;
+        AppendText (text);
+
+        return this;
+    }
+
+    #endregion
 }

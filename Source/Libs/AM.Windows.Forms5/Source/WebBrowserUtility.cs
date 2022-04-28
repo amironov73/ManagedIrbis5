@@ -21,87 +21,90 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Вспомогательные методы для контрола <see cref="WebBrowser"/>.
+/// </summary>
+public static class WebBrowserUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Вспомогательные методы для контрола <see cref="WebBrowser"/>.
+    /// Очистка окна браузера.
     /// </summary>
-    public static class WebBrowserUtility
+    public static void ClearBrowser
+        (
+            this WebBrowser browser
+        )
     {
-        #region Public methods
+        Sure.NotNull (browser);
 
-        /// <summary>
-        /// Очистка окна браузера.
-        /// </summary>
-        public static void ClearBrowser
-            (
-                this WebBrowser browser
-            )
+        if (!browser.Disposing && !browser.IsDisposed)
         {
-            if (!browser.Disposing && !browser.IsDisposed)
+            browser.Navigate ("about:blank");
+        }
+    }
+
+    /// <summary>
+    /// Передача текста в браузер.
+    /// </summary>
+    public static void SetBrowserText
+        (
+            this WebBrowser browser,
+            string? html
+        )
+    {
+        Sure.NotNull (browser);
+
+        if (!browser.Disposing && !browser.IsDisposed)
+        {
+            browser.DocumentText = html ?? string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// Первоначальная инициализация браузера.
+    /// </summary>
+    public static async Task<bool> PrepareBrowser
+        (
+            this WebBrowser browser
+        )
+    {
+        Sure.NotNull (browser);
+
+        if (browser.Disposing || browser.IsDisposed)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < 2; i++)
+        {
+            try
             {
-                browser.Navigate("about:blank");
+                browser.Navigate ("about:blank");
+                while (browser.IsBusy)
+                {
+                    Application.DoEvents();
+                }
+
+                browser.DocumentText = "&nbsp;";
+
+                await ApplicationUtility.IdleDelay();
             }
-        } // method ClearBrowser
-
-        /// <summary>
-        /// Передача текста в браузер.
-        /// </summary>
-        public static void SetBrowserText
-            (
-                this WebBrowser browser,
-                string? html
-            )
-        {
-            if (!browser.Disposing && !browser.IsDisposed)
+            catch (Exception exception)
             {
-                browser.DocumentText = html ?? string.Empty;
-            }
-        } // method SetBrowserText
-
-        /// <summary>
-        /// Первоначальная инициализация браузера.
-        /// </summary>
-        public static async Task<bool> PrepareBrowser
-            (
-                this WebBrowser browser
-            )
-        {
-            if (browser.Disposing || browser.IsDisposed)
-            {
+                Magna.TraceException
+                    (
+                        nameof (WebBrowserUtility) + "::" + nameof (PrepareBrowser),
+                        exception
+                    );
                 return false;
             }
+        }
 
-            for (var i = 0; i < 2; i++)
-            {
-                try
-                {
-                    browser.Navigate("about:blank");
-                    while (browser.IsBusy)
-                    {
-                        Application.DoEvents();
-                    }
+        return true;
+    }
 
-                    browser.DocumentText = "&nbsp;";
-
-                    await ApplicationUtility.IdleDelay();
-                }
-                catch (Exception exception)
-                {
-                    Magna.TraceException
-                        (
-                            nameof(WebBrowserUtility) + "::" + nameof(PrepareBrowser),
-                            exception
-                        );
-                    return false;
-                }
-            }
-
-            return true;
-        } // method PrepareBrowser
-
-        #endregion
-
-    } // class WebBrowserUtility
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

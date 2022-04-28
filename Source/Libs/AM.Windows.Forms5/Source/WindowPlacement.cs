@@ -3,8 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
-/* WindowPlacement.cs -- места, где может быть расположена форма
+/* WindowPlacement.cs -- места на экране, где может быть расположено окно
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,67 +15,70 @@ using System.ComponentModel;
 
 #endregion
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Места на экране, где может быть расположено окно.
+/// </summary>
+public enum WindowPlacement
 {
     /// <summary>
-    /// Места, где может быть расположена форма.
+    /// Где угодно (местоположение безразлично).
     /// </summary>
-    public enum WindowPlacement
-    {
-        /// <summary>
-        /// Center of the screen.
-        /// </summary>
-        [Description("Screen center")]
-        ScreenCenter,
+    [Description ("Где угодно")]
+    Anywhere,
 
-        /// <summary>
-        /// Top left corner.
-        /// </summary>
-        [Description("Top left corner")]
-        TopLeftCorner,
+    /// <summary>
+    /// Центр экрана.
+    /// </summary>
+    [Description ("Центр экрана")]
+    ScreenCenter,
 
-        /// <summary>
-        /// Top right corner.
-        /// </summary>
-        [Description("Top right corner")]
-        TopRightCorner,
+    /// <summary>
+    /// Верхний левый угол.
+    /// </summary>
+    [Description ("Верхний левый угол")]
+    TopLeftCorner,
 
-        /// <summary>
-        /// Center of the top side.
-        /// </summary>
-        [Description("Center of the top side")]
-        TopSide,
+    /// <summary>
+    /// Верхний правый угол.
+    /// </summary>
+    [Description ("Верхний правый угол")]
+    TopRightCorner,
 
-        /// <summary>
-        /// Center of the left side.
-        /// </summary>
-        [Description("Center of the left side")]
-        LeftSide,
+    /// <summary>
+    /// Вверху по центру.
+    /// </summary>
+    [Description ("Вверху по центру")]
+    TopSide,
 
-        /// <summary>
-        /// Center of the right side.
-        /// </summary>
-        [Description("Center of the right side")]
-        RightSide,
+    /// <summary>
+    /// Слева по центру.
+    /// </summary>
+    [Description ("Слева по центру")]
+    LeftSide,
 
-        /// <summary>
-        /// Center of the bottom side.
-        /// </summary>
-        [Description("Center of the bottom side")]
-        BottomSide,
+    /// <summary>
+    /// Справа по центру.
+    /// </summary>
+    [Description ("Справа по центру")]
+    RightSide,
 
-        /// <summary>
-        /// Bottom left corner.
-        /// </summary>
-        [Description("Bottom left corner")]
-        BottomLeftCorner,
+    /// <summary>
+    /// Внизу по центру.
+    /// </summary>
+    [Description ("Внизу по центру")]
+    BottomSide,
 
-        /// <summary>
-        /// Bottom right corner.
-        /// </summary>
-        [Description("Bottom right corner")]
-        BottomRightCorner
+    /// <summary>
+    /// Нижний левый угол.
+    /// </summary>
+    [Description ("Нижний левый угол")]
+    BottomLeftCorner,
 
-    } // enum WindowPlacement
-
-} // namespace AM.Windows.Forms
+    /// <summary>
+    /// Нижний правый угол.
+    /// </summary>
+    [Description ("Нижний правый угол")]
+    BottomRightCorner
+}
