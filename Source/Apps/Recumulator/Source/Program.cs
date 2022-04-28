@@ -45,7 +45,10 @@ internal sealed class Program
     }
 
     /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun()
+    protected override int ActualRun
+        (
+            Func<int>? action
+        )
     {
         try
         {

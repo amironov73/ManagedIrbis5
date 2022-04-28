@@ -50,7 +50,10 @@ internal sealed class Program
     private static volatile bool _stop;
 
     /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun()
+    protected override int ActualRun
+        (
+            Func<int>? action
+        )
     {
         try
         {

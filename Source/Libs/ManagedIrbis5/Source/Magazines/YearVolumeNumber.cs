@@ -147,7 +147,7 @@ public sealed class YearVolumeNumber
 
     #region IEquatable members
 
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
     public bool Equals
         (
             YearVolumeNumber? other

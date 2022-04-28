@@ -72,8 +72,7 @@ namespace AM.Windows.Forms
                 ListBox.InvokeIfRequired
                     (
                         () => ListBox.Items.Add(text)
-                    )
-                    .WaitFor();
+                    );
             }
 
             ListBox.InvokeIfRequired
@@ -86,8 +85,7 @@ namespace AM.Windows.Forms
                                     = ListBox.Items.Count - 1;
                             }
                         }
-                )
-                .WaitFor();
+                );
         }
 
         #endregion
@@ -109,8 +107,7 @@ namespace AM.Windows.Forms
             ListBox.InvokeIfRequired
                 (
                     () => ListBox.Items.Clear()
-                )
-                .WaitFor();
+                );
 
             return this;
         }

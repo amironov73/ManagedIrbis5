@@ -682,12 +682,15 @@ public sealed class ExemplarInfo
         var result = new Dictionary<string, ExemplarInfo>();
         foreach (var array in arrays)
         {
-            foreach (var item in array)
+            if (array is not null)
             {
-                var key = item.Number;
-                if (!key.IsEmpty())
+                foreach (var item in array)
                 {
-                    result[key] = item;
+                    var key = item.Number;
+                    if (!key.IsEmpty())
+                    {
+                        result[key] = item;
+                    }
                 }
             }
         }

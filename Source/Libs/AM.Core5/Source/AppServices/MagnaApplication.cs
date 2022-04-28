@@ -241,9 +241,12 @@ public class MagnaApplication
     /// Метод должен быть переопределен в классе-потомке.
     /// </summary>
     /// <returns>Код, возвращаемый операционной системе.</returns>
-    protected virtual int ActualRun()
+    protected virtual int ActualRun
+        (
+            Func<int>? action = null
+        )
     {
-        return 0;
+        return action?.Invoke() ?? 0;
     }
 
     /// <summary>
@@ -251,7 +254,10 @@ public class MagnaApplication
     /// </summary>
     /// <returns>Код, возвращаемый операционной системе.
     /// </returns>
-    public virtual int Run()
+    public virtual int Run
+        (
+            Func<int>? action = null
+        )
     {
         try
         {
@@ -263,7 +269,7 @@ public class MagnaApplication
 
             Magna.Host.Start();
 
-            return ActualRun();
+            return ActualRun (action);
         }
         catch (Exception exception)
         {

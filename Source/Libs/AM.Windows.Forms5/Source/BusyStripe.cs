@@ -110,7 +110,7 @@ namespace AM.Windows.Forms
             }
         }
 
-        private async void Busy_StateChanged
+        private void Busy_StateChanged
             (
                 object? sender,
                 EventArgs e
@@ -120,7 +120,7 @@ namespace AM.Windows.Forms
 
             if (state is not null)
             {
-                await this.InvokeIfRequired
+                this.InvokeIfRequired
                     (
                         () =>
                         {

@@ -51,7 +51,10 @@ sealed class Program
     private static bool _stop;
 
     /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun()
+    protected override int ActualRun
+        (
+            Func<int>? action
+        )
     {
         var connection = Connection!;
         var manager = new MagazineManager (connection);

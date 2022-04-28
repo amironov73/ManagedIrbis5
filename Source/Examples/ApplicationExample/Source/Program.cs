@@ -9,6 +9,8 @@
 
 #region Using directives
 
+using System;
+
 using AM.AppServices;
 
 using Microsoft.Extensions.Logging;
@@ -32,7 +34,10 @@ internal class Program
     }
 
     /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun()
+    protected override int ActualRun
+        (
+            Func<int>? action
+        )
     {
         Logger.LogInformation ("Привет из приложения!");
 

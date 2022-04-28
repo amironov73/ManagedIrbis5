@@ -69,13 +69,13 @@ public sealed class TextBoxOutput
         if (!string.IsNullOrEmpty (text))
         {
             TextBox.InvokeIfRequired
-                    (
-                        () =>
-                        {
-                            TextBox.AppendText (text);
-                            TextBox.SelectionStart = TextBox.TextLength;
-                        })
-                .WaitFor();
+                (
+                    () =>
+                    {
+                        TextBox.AppendText (text);
+                        TextBox.SelectionStart = TextBox.TextLength;
+                    }
+                );
         }
     }
 
@@ -98,8 +98,7 @@ public sealed class TextBoxOutput
         TextBox.InvokeIfRequired
                 (
                     () => TextBox.Clear()
-                )
-            .WaitFor();
+                );
 
         return this;
     }

@@ -210,7 +210,10 @@ public class IrbisApplication
     }
 
     /// <inheritdoc cref="MagnaApplication.Run"/>
-    public override int Run()
+    public override int Run
+        (
+            Func<int>? action = null
+        )
     {
         try
         {

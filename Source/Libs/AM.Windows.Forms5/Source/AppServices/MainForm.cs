@@ -15,7 +15,10 @@
 #region Using directives
 
 using System;
+using System.Drawing;
 using System.Windows.Forms;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -45,7 +48,12 @@ public class MainForm
     /// </summary>
     public MainForm()
     {
-        // пустое тело конструктора
+        _toolStripContainer = new ToolStripContainer();
+        _menuStrip = new MenuStrip();
+        _toolStrip = new ToolStrip();
+        _statusStrip = new StatusStrip();
+
+        InitializeComponent();
     }
 
     /// <summary>
@@ -72,6 +80,44 @@ public class MainForm
             timer.Dispose();
         };
         timer.Enabled = true;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly ToolStripContainer _toolStripContainer;
+    private readonly StatusStrip _statusStrip;
+    private readonly MenuStrip _menuStrip;
+    private readonly ToolStrip _toolStrip;
+    private LogBox? _logBox;
+
+    private void InitializeComponent()
+    {
+        _toolStripContainer.BottomToolStripPanel.SuspendLayout();
+        _toolStripContainer.TopToolStripPanel.SuspendLayout();
+        _toolStripContainer.SuspendLayout();
+        SuspendLayout();
+
+        // _toolStripContainer
+        _toolStripContainer.BottomToolStripPanel.Controls.Add (_statusStrip);
+        _toolStripContainer.Dock = DockStyle.Fill;
+
+        // _toolStripContainer.TopToolStripPanel
+        _toolStripContainer.TopToolStripPanel.Controls.Add (_menuStrip);
+        _toolStripContainer.TopToolStripPanel.Controls.Add (_toolStrip);
+
+        // MainForm
+        Controls.Add (_toolStripContainer);
+        MainMenuStrip = _menuStrip;
+
+        _toolStripContainer.BottomToolStripPanel.ResumeLayout (false);
+        _toolStripContainer.BottomToolStripPanel.PerformLayout();
+        _toolStripContainer.TopToolStripPanel.ResumeLayout (false);
+        _toolStripContainer.TopToolStripPanel.PerformLayout();
+        _toolStripContainer.ResumeLayout (false);
+        _toolStripContainer.PerformLayout();
+        ResumeLayout (false);
     }
 
     #endregion
@@ -167,7 +213,92 @@ public class MainForm
     /// </summary>
     public void AddLogBox()
     {
-        throw new NotImplementedException();
+        if (_logBox is null)
+        {
+            _logBox = new LogBox
+            {
+                Dock = DockStyle.Fill,
+            };
+
+            var wrapper = new ToolStripHost (_logBox);
+            _toolStripContainer.BottomToolStripPanel.Controls.Add (wrapper);
+        }
+    }
+
+    /// <summary>
+    /// Добавление элемента в тулбар.
+    /// </summary>
+    public ToolStripButton AddToolButton
+        (
+            string text
+        )
+    {
+        Sure.NotNullNorEmpty (text);
+
+        var result = new ToolStripButton (text);
+        _toolStrip.Items.Add (result);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Добавление текста в
+    /// </summary>
+    public ToolStripLabel AddStatusLabel
+        (
+            string? text = null,
+            int width = 100
+        )
+    {
+        Sure.Positive (width);
+
+        var result = new ToolStripLabel
+        {
+            Text = text,
+            Width = width,
+            Padding = new Padding (2)
+        };
+        result.Paint += (_, args) =>
+        {
+            var graphics = args.Graphics;
+            var bounds = args.ClipRectangle;
+            bounds.Inflate (-1, -1);
+            graphics.DrawRectangle (Pens.Black, bounds);
+        };
+        _statusStrip.Items.Add (result);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Добавление элемента меню.
+    /// </summary>
+    public ToolStripMenuItem AddMenuItem
+        (
+            string text
+        )
+    {
+        Sure.NotNullNorEmpty (text);
+
+        var result = new ToolStripMenuItem (text);
+        _menuStrip.Items.Add (result);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Вывод строки в лог.
+    /// </summary>
+    public void WriteLog
+        (
+            string? text
+        )
+    {
+        if (!string.IsNullOrEmpty (text) && _logBox is not null)
+        {
+            _logBox.Output.WriteLine (text);
+            Magna.Application.Logger.LogInformation (text);
+        }
     }
 
     /// <summary>
@@ -184,5 +315,6 @@ public class MainForm
     }
 
     #endregion
+
 }
 

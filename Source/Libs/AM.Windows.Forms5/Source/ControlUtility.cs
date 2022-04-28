@@ -13,91 +13,87 @@
 
 #region Using directives
 
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Полезные методы для работы с контролами.
+/// </summary>
+public static class ControlUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Полезные методы для работы с контролами.
+    /// Find focused control.
     /// </summary>
-    public static class ControlUtility
+    /// <remarks>Borrowed from StackOverflow:
+    /// http://stackoverflow.com/questions/435433/what-is-the-preferred-way-to-find-focused-control-in-winforms-app
+    /// </remarks>
+    public static Control? FindFocusedControl
+        (
+            this Control? control
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Find focused control.
-        /// </summary>
-        /// <remarks>Borrowed from StackOverflow:
-        /// http://stackoverflow.com/questions/435433/what-is-the-preferred-way-to-find-focused-control-in-winforms-app
-        /// </remarks>
-        public static Control? FindFocusedControl
-            (
-                this Control? control
-            )
+        var container = control as IContainerControl;
+        while (container is not null)
         {
-            var container = control as IContainerControl;
-            while (container is not null)
-            {
-                control = container.ActiveControl;
-                container = control as IContainerControl;
-            }
+            control = container.ActiveControl;
+            container = control as IContainerControl;
+        }
 
-            return control;
+        return control;
 
-        } // method FindFocusedControl
+    } // method FindFocusedControl
 
-        /// <summary>
-        /// Invoke specified <paramref name="action"/>
-        /// strictly in UI thread for specified
-        /// <paramref name="control"/>.
-        /// </summary>
-        public static async Task InvokeIfRequired
-            (
-                this Control? control,
-                MethodInvoker? action
-            )
+    /// <summary>
+    /// Invoke specified <paramref name="action"/>
+    /// strictly in UI thread for specified
+    /// <paramref name="control"/>.
+    /// </summary>
+    public static void InvokeIfRequired
+        (
+            this Control? control,
+            MethodInvoker? action
+        )
+    {
+        if (control is null || action is null)
         {
-            if (control is null || action is null)
-            {
-                return;
-            }
+            return;
+        }
 
-            var counter = 0;
+        var counter = 0;
 
-            // When the form, thus the control, isn't visible yet,
-            // InvokeRequired returns false, resulting still
-            // in a cross-thread exception.
-            while (!control.Visible
-                && counter < 20)
-            {
-                await Task.Delay(50);
-                counter++;
-            }
+        // When the form, thus the control, isn't visible yet,
+        // InvokeRequired returns false, resulting still
+        // in a cross-thread exception.
+        while (!control.Visible
+               && counter < 20)
+        {
+            Application.DoEvents();
+            Thread.Sleep (10);
+            counter++;
+        }
 
-            if (!control.Visible
-                && counter >= 20)
-            {
-                return;
-            }
+        if (!control.Visible && counter >= 20)
+        {
+            return;
+        }
 
-            if (control.InvokeRequired)
-            {
-                control.Invoke(action);
-            }
-            else
-            {
-                action();
-            }
+        if (control.InvokeRequired)
+        {
+            control.Invoke (action);
+        }
+        else
+        {
+            action();
+        }
+    }
 
-        } // method InvokeIfRequired
-
-        #endregion
-
-    } // class ControlUtility
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
@@ -18,7 +19,9 @@
 #region Using directives
 
 using System;
+using System.Windows.Forms;
 
+using AM;
 using AM.Windows.Forms.AppServices;
 
 #endregion
@@ -50,10 +53,16 @@ internal sealed class Program
 
     #region WinFormsApplication members
 
-    /// <inheritdoc cref="WinFormsApplication.CreateMainForm"/>
-    public override MainForm CreateMainForm()
+    // /// <inheritdoc cref="WinFormsApplication.CreateMainForm"/>
+    // public override MainForm CreateMainForm()
+    // {
+    //     return new MyMainForm();
+    // }
+
+    /// <inheritdoc cref="WinFormsApplication.VisualInitialization"/>
+    public override void VisualInitialization()
     {
-        return new MyMainForm();
+        MainForm.AddLogBox();
     }
 
     #endregion
@@ -66,7 +75,34 @@ internal sealed class Program
     [STAThread]
     static int Main (string[] args)
     {
-        return new Program (args).Run();
+        return new Program (args).Run(() =>
+        {
+            var app = (Program) Magna.Application;
+            var main = app.MainForm;
+
+            main.WriteLog ("Hello from WinFormsApp");
+            main.WriteLog ("Hello again");
+            main.AddToolButton ("Hello").Click += (sender, eventArgs) =>
+            {
+                MessageBox.Show ("Hello");
+            };
+            main.AddToolButton ("World").Click += (sender, eventArgs) =>
+            {
+                MessageBox.Show ("World");
+            };
+            main.AddStatusLabel ("Status1");
+            main.AddStatusLabel ("Status2");
+            main.AddStatusLabel ("Status3");
+            main.AddMenuItem ("File")
+                .DropDownItems.Add ("Exit", null, (sender, eventArgs) =>
+                {
+                    MessageBox.Show ("Exit");
+                });
+            main.AddMenuItem ("Edit");
+            main.AddMenuItem ("View");
+
+            return 0;
+        });
     }
 
     #endregion

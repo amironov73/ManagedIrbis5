@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System;
 using System.Linq;
 
 using AM;
@@ -146,7 +147,10 @@ namespace GetOutLaters
         } // method ProcessRecord
 
         /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-        protected override int ActualRun()
+        protected override int ActualRun
+            (
+                Func<int>? action
+            )
         {
             Logger.LogInformation("Прогоняем ночующих");
 

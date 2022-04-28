@@ -64,7 +64,10 @@ public class WinFormsApplication
     #region MagnaApplication members
 
     /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun()
+    protected override int ActualRun
+        (
+            Func<int>? action
+        )
     {
         Application.ThreadException += HandleThreadException;
 
@@ -78,6 +81,20 @@ public class WinFormsApplication
 
             MainForm ??= CreateMainForm();
             MainForm.ShowVersionInfoInTitle();
+
+            if (action is not null)
+            {
+                var timer = new System.Windows.Forms.Timer
+                {
+                    Interval = 10
+                };
+                timer.Tick += (sender, args) =>
+                {
+                    action();
+                    timer.Enabled = false;
+                };
+                timer.Enabled = true;
+            }
 
             // ReSharper restore NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
 
@@ -145,6 +162,17 @@ public class WinFormsApplication
     public virtual void VisualShutdown()
     {
         // перекрыть в потомке
+    }
+
+    /// <summary>
+    /// Вывод строки в лог.
+    /// </summary>
+    public void WriteLog
+        (
+            string text
+        )
+    {
+        MainForm.WriteLog (text);
     }
 
     #endregion

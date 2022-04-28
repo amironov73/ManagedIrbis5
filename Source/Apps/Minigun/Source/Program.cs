@@ -131,7 +131,10 @@ internal sealed class Program
     #region IrbisApplication members
 
     /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun()
+    protected override int ActualRun
+        (
+            Func<int>? action
+        )
     {
         Debugger.Break();
         var mainConnection = (Connection as SyncConnection).ThrowIfNull();
