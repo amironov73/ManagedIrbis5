@@ -41,6 +41,12 @@
     </EmbeddedResource>
     <None Remove="Properties\XPThemes.manifest" />
     <EmbeddedResource Include="Properties\XPThemes.manifest" />
+    <EmbeddedResource Update="Source\PictureViewForm.ru.resx">
+      <DependentUpon>PictureViewForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Source\PlainTextEditor.ru.resx">
+      <DependentUpon>PlainTextEditor.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

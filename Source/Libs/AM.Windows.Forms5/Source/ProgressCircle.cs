@@ -8,7 +8,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 
-/* ProgressCircle.cs --
+/* ProgressCircle.cs -- индикатор прогресса в виде круга
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,230 +27,218 @@ using AM.Drawing;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Индикатор прогресса в виде круга.
+/// </summary>
+
+// ReSharper disable RedundantNameQualifier
+[System.ComponentModel.DesignerCategory ("Code")]
+
+// ReSharper restore RedundantNameQualifier
+[ToolboxBitmap (typeof (ProgressCircle), "Images.ProgressCircle.bmp")]
+public class ProgressCircle
+    : Control
 {
+    #region Properties
+
+    private Color _fillColor = Color.White;
+
     /// <summary>
-    ///
+    /// Gets or sets the color of the fill.
     /// </summary>
-    // ReSharper disable RedundantNameQualifier
-    [System.ComponentModel.DesignerCategory("Code")]
-    // ReSharper restore RedundantNameQualifier
-    [ToolboxBitmap(typeof(ProgressCircle),
-        "Images.ProgressCircle.bmp")]
-    public class ProgressCircle
-        : Control
+    /// <value>The color of the fill.</value>
+    [DefaultValue (typeof (Color), "White")]
+    public Color FillColor
     {
-        #region Properties
-
-        private Color _fillColor = Color.White;
-
-        /// <summary>
-        /// Gets or sets the color of the fill.
-        /// </summary>
-        /// <value>The color of the fill.</value>
-        [DefaultValue(typeof(Color), "White")]
-        public Color FillColor
+        get => _fillColor;
+        [DebuggerStepThrough]
+        set
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _fillColor;
-            }
-            [DebuggerStepThrough]
-            set
-            {
-                _fillColor = value;
-                Invalidate();
-            }
+            _fillColor = value;
+            Invalidate();
         }
+    }
 
-        private Color _doneColor = Color.Blue;
+    private Color _doneColor = Color.Blue;
 
-        /// <summary>
-        /// Gets or sets the color of the done.
-        /// </summary>
-        /// <value>The color of the done.</value>
-        [DefaultValue(typeof(Color), "Blue")]
-        public Color DoneColor
+    /// <summary>
+    /// Gets or sets the color of the done.
+    /// </summary>
+    /// <value>The color of the done.</value>
+    [DefaultValue (typeof (Color), "Blue")]
+    public Color DoneColor
+    {
+        get => _doneColor;
+        [DebuggerStepThrough]
+        set
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _doneColor;
-            }
-            [DebuggerStepThrough]
-            set
-            {
-                _doneColor = value;
-                Invalidate();
-            }
+            _doneColor = value;
+            Invalidate();
         }
+    }
 
-        private float _percent;
+    private float _percent;
 
-        /// <summary>
-        /// Gets or sets the percent.
-        /// </summary>
-        /// <value>The percent.</value>
-        [DefaultValue(0f)]
-        public float Percent
+    /// <summary>
+    /// Gets or sets the percent.
+    /// </summary>
+    /// <value>The percent.</value>
+    [DefaultValue (0f)]
+    public float Percent
+    {
+        get => _percent;
+        [DebuggerStepThrough]
+        set
         {
-            [DebuggerStepThrough]
-            get
+            if ((value < 0)
+                || (value > 100))
             {
-                return _percent;
+                throw new ArgumentException();
             }
-            [DebuggerStepThrough]
-            set
-            {
-                if ((value < 0)
-                     || (value > 100))
-                {
-                    throw new ArgumentException();
-                }
-                _percent = value;
-                Invalidate();
-            }
+
+            _percent = value;
+            Invalidate();
         }
+    }
 
-        private bool _square = true;
+    private bool _square = true;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="ProgressCircle"/> is square.
-        /// </summary>
-        /// <value><c>true</c> if square; otherwise, <c>false</c>.</value>
-        [DefaultValue(true)]
-        public bool Square
+    /// <summary>
+    /// Gets or sets a value indicating whether this <see cref="ProgressCircle"/> is square.
+    /// </summary>
+    /// <value><c>true</c> if square; otherwise, <c>false</c>.</value>
+    [DefaultValue (true)]
+    public bool Square
+    {
+        [DebuggerStepThrough] get { return _square; }
+        [DebuggerStepThrough] set { _square = value; }
+    }
+
+    private bool _drawValue = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether [draw value].
+    /// </summary>
+    /// <value><c>true</c> if [draw value]; otherwise, <c>false</c>.</value>
+    [DefaultValue (true)]
+    public bool DrawValue
+    {
+        [DebuggerStepThrough] get { return _drawValue; }
+        [DebuggerStepThrough]
+        set
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _square;
-            }
-            [DebuggerStepThrough]
-            set
-            {
-                _square = value;
-            }
+            _drawValue = value;
+            Invalidate();
         }
+    }
 
-        private bool _drawValue = true;
+    #endregion
 
-        /// <summary>
-        /// Gets or sets a value indicating whether [draw value].
-        /// </summary>
-        /// <value><c>true</c> if [draw value]; otherwise, <c>false</c>.</value>
-        [DefaultValue(true)]
-        public bool DrawValue
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _drawValue;
-            }
-            [DebuggerStepThrough]
-            set
-            {
-                _drawValue = value;
-                Invalidate();
-            }
-        }
+    #region Construction
 
-        #endregion
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public ProgressCircle()
+    {
+        ResizeRedraw = true;
+        DoubleBuffered = true;
+        SetStyle (ControlStyles.AllPaintingInWmPaint, true);
+        SetStyle (ControlStyles.UserPaint, true);
+        SetStyle (ControlStyles.OptimizedDoubleBuffer, true);
+    }
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProgressCircle"/> class.
-        /// </summary>
-        public ProgressCircle()
-        {
-            ResizeRedraw = true;
-            DoubleBuffered = true;
-            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            SetStyle(ControlStyles.UserPaint, true);
-        }
+    #region Control members
 
-        #endregion
-
-        #region Control members
-
-        /// <summary>
-        /// Raises the <see cref="E:System.Windows.Forms.Control.Paint"></see> event.
-        /// </summary>
-        /// <param name="e">A <see cref="T:System.Windows.Forms.PaintEventArgs"></see> that contains the event data.</param>
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            Graphics g = e.Graphics;
-            g.SmoothingMode = SmoothingMode.HighQuality;
-            Rectangle r = ClientRectangle;
-            r.Width--;
-            r.Height--;
-            Rectangle r2 = r;
-            r2.Inflate(-2, -2);
-            string s = string.Format("{0:0}", _percent);
-            SizeF size = g.MeasureString(s, Font);
-            size.Width = size.Width * 5 / 3;
-            size.Height = size.Height * 5 / 3;
-            RectangleF inner = new RectangleF
-                (
+    /// <inheritdoc cref="Control.OnPaint"/>
+    protected override void OnPaint
+        (
+            PaintEventArgs e
+        )
+    {
+        var g = e.Graphics;
+        g.SmoothingMode = SmoothingMode.HighQuality;
+        var r = ClientRectangle;
+        r.Width--;
+        r.Height--;
+        var r2 = r;
+        r2.Inflate (-2, -2);
+        var s = string.Format ("{0:0}", _percent);
+        var size = g.MeasureString (s, Font);
+        size.Width = size.Width * 5 / 3;
+        size.Height = size.Height * 5 / 3;
+        var inner = new RectangleF
+            (
                 r.Left + r.Width / 2 - size.Width / 2,
                 r.Top + r.Height / 2 - size.Height / 2,
                 size.Width,
                 size.Height
-                );
-            using (Pen pen = new Pen(ForeColor, 0))
+            );
+        using (var pen = new Pen (ForeColor, 0))
+        {
+            using (Brush fillBrush = new SolidBrush (FillColor))
             {
-                using (Brush fillBrush = new SolidBrush(FillColor))
+                using (Brush doneBrush = new SolidBrush (DoneColor))
                 {
-                    using (Brush doneBrush = new SolidBrush(DoneColor))
+                    using (Brush textBrush = new SolidBrush (ForeColor))
                     {
-                        using (Brush textBrush = new SolidBrush(ForeColor))
+                        g.FillEllipse (fillBrush, r);
+                        g.FillPie (doneBrush, r2, 270, 360 * _percent / 100);
+                        if (_drawValue)
                         {
-                            g.FillEllipse(fillBrush, r);
-                            g.FillPie(doneBrush, r2, 270, 360 * _percent / 100);
-                            if (_drawValue)
-                            {
-                                g.FillEllipse(fillBrush, inner);
-                            }
-                            for (float i = 0; i < 360; i += 20)
-                            {
-                                g.FillPie(fillBrush, r2, i, 4);
-                            }
-                            if (_drawValue)
-                            {
-                                g.DrawString(s, Font, textBrush, inner, TextFormat.CenterCenter);
-                            }
-                            g.DrawEllipse(pen, r);
+                            g.FillEllipse (fillBrush, inner);
                         }
+
+                        for (float i = 0; i < 360; i += 20)
+                        {
+                            g.FillPie (fillBrush, r2, i, 4);
+                        }
+
+                        if (_drawValue)
+                        {
+                            g.DrawString (s, Font, textBrush, inner, TextFormat.CenterCenter);
+                        }
+
+                        g.DrawEllipse (pen, r);
                     }
                 }
             }
-            base.OnPaint(e);
         }
 
-        /// <summary>
-        /// Performs the work of setting the specified bounds of this control.
-        /// </summary>
-        /// <param name="x">The new <see cref="P:System.Windows.Forms.Control.Left"></see> property value of the control.</param>
-        /// <param name="y">The new <see cref="P:System.Windows.Forms.Control.Top"></see> property value of the control.</param>
-        /// <param name="width">The new <see cref="P:System.Windows.Forms.Control.Width"></see> property value of the control.</param>
-        /// <param name="height">The new <see cref="P:System.Windows.Forms.Control.Height"></see> property value of the control.</param>
-        /// <param name="specified">A bitwise combination of the <see cref="T:System.Windows.Forms.BoundsSpecified"></see> values.</param>
-        protected override void SetBoundsCore
-            (int x, int y, int width, int height, BoundsSpecified specified)
-        {
-            if (_square)
-            {
-                int size = Math.Min(width, height);
-                base.SetBoundsCore(x, y, size, size, specified);
-            }
-            else
-            {
-                base.SetBoundsCore(x, y, width, height, specified);
-            }
-        }
-
-        #endregion
+        base.OnPaint (e);
     }
+
+    /// <summary>
+    /// Performs the work of setting the specified bounds of this control.
+    /// </summary>
+    /// <param name="x">The new <see cref="P:System.Windows.Forms.Control.Left"></see> property value of the control.</param>
+    /// <param name="y">The new <see cref="P:System.Windows.Forms.Control.Top"></see> property value of the control.</param>
+    /// <param name="width">The new <see cref="P:System.Windows.Forms.Control.Width"></see> property value of the control.</param>
+    /// <param name="height">The new <see cref="P:System.Windows.Forms.Control.Height"></see> property value of the control.</param>
+    /// <param name="specified">A bitwise combination of the <see cref="T:System.Windows.Forms.BoundsSpecified"></see> values.</param>
+    protected override void SetBoundsCore
+        (
+            int x,
+            int y,
+            int width,
+            int height,
+            BoundsSpecified specified
+        )
+    {
+        if (_square)
+        {
+            var size = Math.Min (width, height);
+            base.SetBoundsCore (x, y, size, size, specified);
+        }
+        else
+        {
+            base.SetBoundsCore (x, y, width, height, specified);
+        }
+    }
+
+    #endregion
 }

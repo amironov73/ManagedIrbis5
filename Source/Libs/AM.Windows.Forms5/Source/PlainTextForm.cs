@@ -22,100 +22,95 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Форма для демонстрации пользователю
+/// некоторого простого текста, например,
+/// лицензионного соглашения или простейшего отчета.
+/// </summary>
+public sealed partial class PlainTextForm
+    : Form
 {
+    #region Properties
+
     /// <summary>
-    /// Форма для демонстрации пользователю
-    /// некоторого простого текста, например,
-    /// лицензионного соглашения или простейшего отчета.
+    /// Текстовый редактор, используемый для отображения текста.
     /// </summary>
-    public partial class PlainTextForm
-        : Form
+    public PlainTextEditor Editor => _textControl;
+
+    /// <inheritdoc cref="Control.Text" />
+    public override string? Text
     {
-        #region Properties
-
-        /// <summary>
-        /// Текстовый редактор.
-        /// </summary>
-        public PlainTextEditor Editor => _textControl;
-
-        /// <inheritdoc cref="Control.Text" />
-        public override string? Text
+        get => _textControl?.Text;
+        set
         {
-            get => _textControl?.Text;
-            set
+            if (!ReferenceEquals (_textControl, null))
             {
-                if (!ReferenceEquals(_textControl, null))
-                {
-                    _textControl.Text = value ?? string.Empty;
-                }
-
-            } // method set
-
-        } // property Text
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PlainTextForm()
-        {
-            InitializeComponent();
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PlainTextForm
-            (
-                string? text
-            )
-            : this()
-        {
-            Text = text;
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавление кнопки на тулбар.
-        /// </summary>
-        public void AddButton
-            (
-                ToolStripButton button
-            )
-        {
-            Editor.AddButton (button);
-
-        } // method AddButton
-
-        /// <summary>
-        /// Демонстрация диалога с указанным текстом.
-        /// </summary>
-        public static DialogResult ShowDialog
-            (
-                IWin32Window? owner,
-                string? text,
-                bool maximized = false
-            )
-        {
-            using var form = new PlainTextForm (text);
-            if (maximized)
-            {
-                form.WindowState = FormWindowState.Maximized;
+                _textControl.Text = value ?? string.Empty;
             }
+        }
+    }
 
-            return form.ShowDialog (owner);
+    #endregion
 
-        } // method ShowDialog
+    #region Construction
 
-        #endregion
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PlainTextForm()
+    {
+        InitializeComponent();
+    }
 
-    } // method PlainTextForm
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PlainTextForm
+        (
+            string? text
+        )
+        : this()
+    {
+        Text = text;
+    }
 
-} // namespace AM.Windows.Forms
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Добавление кнопки на тулбар.
+    /// </summary>
+    public void AddButton
+        (
+            ToolStripButton button
+        )
+    {
+        Sure.NotNull (button);
+
+        Editor.AddButton (button);
+    }
+
+    /// <summary>
+    /// Демонстрация диалога с указанным текстом в блокирующем режиме.
+    /// </summary>
+    public static DialogResult ShowDialog
+        (
+            IWin32Window? owner,
+            string? text,
+            bool maximized = false
+        )
+    {
+        using var form = new PlainTextForm (text);
+        if (maximized)
+        {
+            form.WindowState = FormWindowState.Maximized;
+        }
+
+        return form.ShowDialog (owner);
+    }
+
+    #endregion
+}

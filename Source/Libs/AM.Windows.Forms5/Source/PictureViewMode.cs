@@ -2,36 +2,32 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
-/* PictureViewMode.cs -- picture view mode.
+/* PictureViewMode.cs -- режим просмотра картинки
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Режим просмотра картинки для формы <see cref="PictureViewForm"/>.
+/// </summary>
+public enum PictureViewMode
 {
     /// <summary>
-    /// Image view mode for <see cref="PictureViewForm"/>.
+    /// Режим выбирается автоматически.
     /// </summary>
-    public enum PictureViewMode
-    {
-        /// <summary>
-        /// Automatic mode.
-        /// </summary>
-        Auto,
+    Auto,
 
-        /// <summary>
-        /// Fit form to picture size.
-        /// </summary>
-        Fit,
+    /// <summary>
+    /// Подгонка масштаба, чтобы картинка поместилась на экране полностью.
+    /// </summary>
+    Fit,
 
-        /// <summary>
-        /// Scroll picture.
-        /// </summary>
-        Scroll
-    }
+    /// <summary>
+    /// Режим прокрутки.
+    /// </summary>
+    Scroll
 }
