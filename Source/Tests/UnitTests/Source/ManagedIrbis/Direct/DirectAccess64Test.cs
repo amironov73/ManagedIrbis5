@@ -16,12 +16,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Direct
-{
-    [TestClass]
-    public class DirectAccess64Test
-        : Common.CommonUnitTest
-    {
+namespace UnitTests.ManagedIrbis.Direct;
 
-    }
+[TestClass]
+public class DirectAccess64Test
+    : Common.CommonUnitTest
+{
+
 }
