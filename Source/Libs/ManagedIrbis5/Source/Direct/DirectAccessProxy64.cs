@@ -14,71 +14,85 @@
 
 using System;
 
+using AM;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+/// <summary>
+/// Прокси для отслеживания "убивания" ацессора в соответствии
+/// со  стратегией.
+/// </summary>
+public sealed class DirectAccessProxy64
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Прокси для отслеживания "убивания" ацессора в соответствии
-    /// со  стратегией.
+    /// Собственно акцессор.
     /// </summary>
-    public sealed class DirectAccessProxy64
-        : IDisposable
+    public DirectAccess64 Accessor => _accessor;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DirectAccessProxy64
+        (
+            IDirectAccess64Strategy strategy,
+            DirectProvider provider,
+            DirectAccess64 accessor
+        )
     {
-        #region Properties
+        Sure.NotNull (strategy);
+        Sure.NotNull (provider);
+        Sure.NotNull (accessor);
 
-        /// <summary>
-        /// Собственно акцессор.
-        /// </summary>
-        public DirectAccess64 Accessor => _accessor;
+        _strategy = strategy;
+        _provider = provider;
+        _accessor = accessor;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Private members
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public DirectAccessProxy64
-            (
-                IDirectAccess64Strategy strategy,
-                DirectProvider provider,
-                DirectAccess64 accessor
-            )
-        {
-            _strategy = strategy;
-            _provider = provider;
-            _accessor = accessor;
-        }
+    private readonly IDirectAccess64Strategy _strategy;
+    private readonly DirectProvider _provider;
+    private readonly DirectAccess64 _accessor;
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Public methods
 
-        private readonly IDirectAccess64Strategy _strategy;
-        private readonly DirectProvider _provider;
-        private readonly DirectAccess64 _accessor;
+    /// <summary>
+    /// Неявное преобразование к акцессору.
+    /// </summary>
+    public static implicit operator DirectAccess64
+        (
+            DirectAccessProxy64 proxy
+        )
+    {
+        Sure.NotNull (proxy);
 
-        #endregion
+        return proxy._accessor;
+    }
 
-        #region Public methods
+    #endregion
 
-        /// <summary>
-        /// Неявное преобразование к акцессору.
-        /// </summary>
-        public static implicit operator DirectAccess64(DirectAccessProxy64 proxy) => proxy._accessor;
+    #region IDisposable members
 
-        #endregion
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        _strategy.ReleaseAccessor (_provider, _accessor);
+    }
 
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => _strategy.ReleaseAccessor(_provider, _accessor);
-
-        #endregion
-
-    } // class DirectAccessProxy64
-
-} // namespace ManagedIrbis.Direct
+    #endregion
+}
