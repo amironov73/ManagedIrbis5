@@ -2,65 +2,91 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* FoundRecord.cs -- found record info
+/* FoundRecord.cs -- информация о найденной/отобранной записи
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
+
+#endregion
+
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+/// <summary>
+/// Информация о найденной/отобранной записи.
+/// </summary>
+[Serializable]
+public struct FoundRecord
 {
+    #region Properties
+
     /// <summary>
-    /// Found record info.
+    /// MFN записи.
     /// </summary>
-    public struct FoundRecord
+    [XmlAttribute ("mfn")]
+    [JsonPropertyName ("mfn")]
+    [Description ("MFN")]
+    public int Mfn { get; set; }
+
+    /// <summary>
+    /// Смещение относительно начала файла, байты.
+    /// </summary>
+    [XmlAttribute ("position")]
+    [JsonPropertyName ("position")]
+    [Description ("Смещение")]
+    public long Position { get; set; }
+
+    /// <summary>
+    /// Длина записи в байтах.
+    /// </summary>
+    [XmlAttribute ("length")]
+    [JsonPropertyName ("length")]
+    [Description ("Длина")]
+    public int Length { get; set; }
+
+    /// <summary>
+    /// Количество полей в записи.
+    /// </summary>
+    [XmlAttribute ("fields")]
+    [JsonPropertyName ("fields")]
+    [Description ("Полей")]
+    public int FieldCount { get; set; }
+
+    /// <summary>
+    /// Версия записи (нумерация от 1).
+    /// </summary>
+    [XmlAttribute ("version")]
+    [JsonPropertyName ("version")]
+    [Description ("Версия")]
+    public int Version { get; set; }
+
+    /// <summary>
+    /// Флаги.
+    /// </summary>
+    [XmlAttribute ("flags")]
+    [JsonPropertyName ("flags")]
+    [Description ("Флаги")]
+    public int Flags { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
     {
-        #region Properties
-
-        /// <summary>
-        /// MFN.
-        /// </summary>
-        public int Mfn { get; set; }
-
-        /// <summary>
-        /// Offset.
-        /// </summary>
-        public long Position { get; set; }
-
-        /// <summary>
-        /// Length of the record.
-        /// </summary>
-        public int Length { get; set; }
-
-        /// <summary>
-        /// Field count.
-        /// </summary>
-        public int FieldCount { get; set; }
-
-        /// <summary>
-        /// Version of the record.
-        /// </summary>
-        public int Version { get; set; }
-
-        /// <summary>
-        /// Flags.
-        /// </summary>
-        public int Flags { get; set; }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => $"[{Mfn}] v{Version}";
-
-        #endregion
+        return $"[{Mfn}] v{Version}";
     }
+
+    #endregion
 }
