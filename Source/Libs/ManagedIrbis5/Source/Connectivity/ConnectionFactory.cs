@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ConnectionFactory.cs -- фабрика подключений к ИРБИС64
+/* ConnectionFactory.cs -- фабрика подключений к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,8 +22,12 @@ using ManagedIrbis.Infrastructure.Sockets;
 namespace ManagedIrbis;
 
 /// <summary>
-/// Фабрика подключений.
+/// Фабрика подключений к серверу ИРБИС64.
 /// </summary>
+/// <remarks>
+/// Предполагается создание классов-потомков,
+/// определенным образом настраивающих создаваемое подключение.
+/// </remarks>
 public class ConnectionFactory
 {
     #region Properties
@@ -43,7 +47,7 @@ public class ConnectionFactory
     public virtual SyncConnection CreateSyncConnection()
     {
         var socket = new SyncTcp4Socket();
-        var result = new SyncConnection(socket, Magna.Host.Services);
+        var result = new SyncConnection (socket, Magna.Host.Services);
 
         return result;
     }
@@ -54,10 +58,9 @@ public class ConnectionFactory
     public virtual AsyncConnection CreateAsyncConnection()
     {
         var socket = new AsyncTcp4Socket();
-        var result = new AsyncConnection(socket, Magna.Host.Services);
+        var result = new AsyncConnection (socket, Magna.Host.Services);
 
         return result;
-
     }
 
     /// <summary>
@@ -71,6 +74,8 @@ public class ConnectionFactory
             ConnectionFactory newFactory
         )
     {
+        Sure.NotNull (newFactory);
+
         var result = Shared;
         Shared = newFactory;
 
