@@ -10,7 +10,7 @@ using ManagedIrbis;
 namespace UnitTests.ManagedIrbis;
 
 [TestClass]
-public class ConnectionFactoryTest
+public sealed class ConnectionFactoryTest
 {
     [TestMethod]
     [Description ("Создание синхронного подключения")]

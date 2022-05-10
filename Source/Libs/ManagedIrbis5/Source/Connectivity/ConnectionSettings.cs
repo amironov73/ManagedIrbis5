@@ -158,7 +158,6 @@ public sealed class ConnectionSettings
     [Description ("Тип сокета")]
     public string? SocketTypeName { get; set; }
 
-
     /// <summary>
     /// Флаг: включена отладка.
     /// </summary>
@@ -445,8 +444,12 @@ public sealed class ConnectionSettings
     }
 
     /// <summary>
-    /// Encrypt the connection settings.
+    /// Примитивное шифрование настроек.
     /// </summary>
+    /// <remarks>
+    /// <para>Никак не защищает от сколько-нибудь квалифицированного
+    /// любопытного пользователя!</para>
+    /// </remarks>
     public string Encrypt()
     {
         var bytes = this.SaveToMemory();
@@ -648,7 +651,7 @@ public sealed class ConnectionSettings
         }
 
         return this;
-    } // method ParseConnectionString
+    }
 
     #endregion
 
