@@ -20,6 +20,8 @@ using System;
 
 using AM;
 
+using ManagedIrbis.Infrastructure;
+
 #endregion
 
 #nullable enable
@@ -112,7 +114,18 @@ public class IrbisException
     }
 
     /// <summary>
-    /// Получение текстового описчания ошибки по ее коду.
+    /// Получение текстового описания ошибки по ее коду.
+    /// </summary>
+    public static string GetErrorDescription
+        (
+            ReturnCode code
+        )
+    {
+        return GetErrorDescription ((int)code);
+    }
+
+    /// <summary>
+    /// Получение текстового описания ошибки по ее коду.
     /// </summary>
     public static string GetErrorDescription
         (
