@@ -4,9 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
-/* IrbisNetworkException.cs -- exception during IRBIS network communication
+/* IrbisNetworkException.cs -- исключение, возникшее при сетевом обмене с сервером ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,52 +13,64 @@
 
 using System;
 
-using AM;
-
 #endregion
 
-namespace ManagedIrbis
+#nullable enable
+
+namespace ManagedIrbis;
+
+/// <summary>
+/// Исключение, возникшее при сетевом обмене с сервером ИРБИС64.
+/// </summary>
+public sealed class IrbisNetworkException
+    : IrbisException
 {
+    #region Construction
+
     /// <summary>
-    /// Exception during IRBIS network communication.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class IrbisNetworkException
-        : ArsMagnaException
+    public IrbisNetworkException()
     {
-        #region Construction
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public IrbisNetworkException()
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public IrbisNetworkException
+        (
+            int errorCode
+        )
+        : base (errorCode)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public IrbisNetworkException
-            (
-                string message
-            )
-            : base(message)
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public IrbisNetworkException
+        (
+            string message
+        )
+        : base (message)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public IrbisNetworkException
-            (
-                string message,
-                Exception innerException
-            )
-            : base(message, innerException)
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public IrbisNetworkException
+        (
+            string message,
+            Exception innerException
+        )
+        : base (message, innerException)
+    {
+        // пустое тело конструктора
+    }
 
-        #endregion
-
-    } // class IrbisNetworkException
-
-} // namespace ManagedIrbis
+    #endregion
+}

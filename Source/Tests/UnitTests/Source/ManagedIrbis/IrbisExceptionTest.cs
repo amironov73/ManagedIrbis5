@@ -14,6 +14,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests.ManagedIrbis;
 
+#nullable enable
+
 [TestClass]
 public class IrbisExceptionTest
 {
