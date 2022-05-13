@@ -15,6 +15,8 @@
 
 using AM;
 
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable
@@ -72,12 +74,11 @@ namespace ManagedIrbis
                 string index
             )
         {
-            // Sure.NotNull(connection, nameof(connection));
-            // Sure.NotNullNorEmpty(inventory, nameof(inventory));
+            Sure.NotNull (connection);
+            Sure.NotNullNorEmpty (index);
 
             return SingleOrDefault (connection, IndexPrefix, index);
-
-        } // method ByIndex
+        }
 
         /// <summary>
         /// Поиск единственной записи, содержащей экземпляр с указанным номером
@@ -90,12 +91,11 @@ namespace ManagedIrbis
                 string inventory
             )
         {
-            // Sure.NotNull(connection, nameof(connection));
-            // Sure.NotNullNorEmpty(inventory, nameof(inventory));
+            Sure.NotNull (connection);
+            Sure.NotNullNorEmpty (inventory);
 
             return SingleOrDefault (connection, InventoryPrefix, inventory);
-
-        } // method ByInventory
+        }
 
         /// <summary>
         /// Поиск первой попавшейся записи, удовлетворяющей указанному условию.
@@ -118,7 +118,7 @@ namespace ManagedIrbis
             */
 
             return null;
-        } // method FirstOrDefault
+        }
 
         /// <summary>
         /// Поиск единственной записи, удовлетворяющей указанному условию.
@@ -133,6 +133,16 @@ namespace ManagedIrbis
                 string value
             )
         {
+            Sure.NotNull (connection);
+
+            if (connection is ISyncConnection syncConnection)
+            {
+                var expression = $"\"{prefix}{value}\"";
+                var result = syncConnection.SearchReadOneRecord (expression);
+
+                return result;
+            }
+
             /*
 
             string expression = $"\"{prefix}{value}\"";
@@ -159,7 +169,7 @@ namespace ManagedIrbis
             */
 
             return null;
-        } // method SingleOrDefault
+        }
 
         /// <summary>
         /// Поиск единственной записи, удовлетворяющей данному условию.

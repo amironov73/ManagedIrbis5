@@ -121,6 +121,21 @@ public sealed class MagazineManager
     }
 
     /// <summary>
+    /// Получение журнала по шифру его записи.
+    /// </summary>
+    public MagazineInfo? GetMagazine
+        (
+            string index
+        )
+    {
+        Sure.NotNullNorEmpty (index);
+
+        var record = Connection.ByIndex (index);
+
+        return record is null ? null : MagazineInfo.Parse (record);
+    }
+
+    /// <summary>
     /// Получение журнала по MFN его записи.
     /// </summary>
     public MagazineInfo? GetMagazine
@@ -277,7 +292,7 @@ public sealed class MagazineManager
     }
 
     /// <summary>
-    /// Получение списка выпусков данного журнала.
+    /// Получение списка выпусков данного журнала за определенный год.
     /// </summary>
     public MagazineIssueInfo[] GetIssues
         (
@@ -292,8 +307,8 @@ public sealed class MagazineManager
         var records = BatchRecordReader.Search
             (
                 Connection,
-                Connection.Database.ThrowIfNull(),
                 searchExpression,
+                Connection.EnsureDatabase(),
                 1000
             );
 

@@ -1,0 +1,31 @@
+﻿//
+// Книговыдача журнала "СИБИРЬ" для министра
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+START_YEAR = 2018
+END_YEAR = 2022
+
+manager = new "ManagedIrbis.Magazines.MagazineManager" (connection)
+siberia = manager.GetMagazine ("С683")
+
+for (year = START_YEAR; year < END_YEAR; year++)
+{
+    issues = manager.GetIssues (siberia, (string) year)
+    foreach (issue in issues)
+    {
+        println (issue.FullNumber(), " => ", issue.LoanCount)
+    }
+}
+
+//=================================
+
+disconnect()

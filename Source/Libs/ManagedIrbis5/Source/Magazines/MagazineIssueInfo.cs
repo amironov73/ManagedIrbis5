@@ -55,6 +55,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("mfn")]
     [JsonPropertyName ("mfn")]
+    [Description ("MFN")]
     public int Mfn { get; set; }
 
     /// <summary>
@@ -62,6 +63,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("index")]
     [JsonPropertyName ("index")]
+    [Description ("Шифр в базе")]
     public string? Index { get; set; }
 
     /// <summary>
@@ -69,6 +71,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("description")]
     [JsonPropertyName ("description")]
+    [Description ("Библиографическое описание")]
     public string? Description { get; set; }
 
     /// <summary>
@@ -83,6 +86,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("magazine-code")]
     [JsonPropertyName ("magazine-code")]
+    [Description ("Шифр журнала")]
     public string? MagazineCode { get; set; }
 
     /// <summary>
@@ -90,6 +94,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("year")]
     [JsonPropertyName ("year")]
+    [Description ("Год")]
     public string? Year { get; set; }
 
     /// <summary>
@@ -97,6 +102,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("volume")]
     [JsonPropertyName ("volume")]
+    [Description ("Том (если есть)")]
     public string? Volume { get; set; }
 
     /// <summary>
@@ -104,6 +110,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("number")]
     [JsonPropertyName ("number")]
+    [Description ("Номер, часть")]
     public string? Number { get; set; }
 
     /// <summary>
@@ -111,6 +118,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]
+    [Browsable (false)]
     public string? NumberForSorting
     {
         get
@@ -130,6 +138,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("supplement")]
     [JsonPropertyName ("supplement")]
+    [Description ("Дополнение к номеру")]
     public string? Supplement { get; set; }
 
     /// <summary>
@@ -138,6 +147,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("worksheet")]
     [JsonPropertyName ("worksheet")]
+    [Description ("Рабочий лист")]
     public string? Worksheet { get; set; }
 
     /// <summary>
@@ -145,6 +155,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlElement ("article")]
     [JsonPropertyName ("articles")]
+    [Description ("Расписанное оглавление")]
     public MagazineArticleInfo[]? Articles { get; set; }
 
     /// <summary>
@@ -152,13 +163,15 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlElement ("exemplar")]
     [JsonPropertyName ("exemplars")]
+    [Description ("Экземпляры")]
     public ExemplarInfo[]? Exemplars { get; set; }
 
     /// <summary>
-    /// Loan count.
+    /// Количество выдач.
     /// </summary>
     [XmlElement ("loanCount")]
     [JsonPropertyName ("loanCount")]
+    [Description ("Количество выдач")]
     public int LoanCount { get; set; }
 
     /// <summary>
@@ -200,6 +213,18 @@ public sealed class MagazineIssueInfo
         return string.IsNullOrEmpty (Volume)
             ? MagazineCode + "/" + Year + "/" + Number
             : MagazineCode + "/" + Year + "/" + Volume + "/" + Number;
+    }
+
+    /// <summary>
+    /// Формирование полного номера выпуска по свойствам
+    /// <see cref="Year"/>, <see cref="Volume"/> и <see cref="Number"/>.
+    /// </summary>
+    [Pure]
+    public string FullNumber()
+    {
+        return string.IsNullOrEmpty (Volume)
+            ? Year + "/" + Number
+            : Year + "/" + Volume + "/" + Number;
     }
 
     /// <summary>
