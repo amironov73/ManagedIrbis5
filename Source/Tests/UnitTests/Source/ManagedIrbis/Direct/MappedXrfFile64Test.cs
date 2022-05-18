@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis.Direct;
 
 [TestClass]
-public class MappedXrfFile64Test
+public sealed class MappedXrfFile64Test
     : Common.CommonUnitTest
 {
     private string _GetFileName()

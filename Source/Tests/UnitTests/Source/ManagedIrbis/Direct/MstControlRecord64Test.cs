@@ -15,7 +15,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis.Direct;
 
 [TestClass]
-public class MstControlRecord64Test
+public sealed class MstControlRecord64Test
     : Common.CommonUnitTest
 {
     [TestMethod]
