@@ -961,6 +961,55 @@ public class Field
     }
 
     /// <summary>
+    /// Получение всех подполей с указанными подполями.
+    /// </summary>
+    public SubField[] GetSubFields
+        (
+            char code1,
+            char code2
+        )
+    {
+        var result = new List<SubField>();
+
+        foreach (var subfield in Subfields)
+        {
+            var code = subfield.Code;
+            if (code.SameChar (code1) || code.SameChar (code2))
+            {
+                result.Add (subfield);
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    /// <summary>
+    /// Получение всех подполей с указанными подполями.
+    /// </summary>
+    public SubField[] GetSubFields
+        (
+            char code1,
+            char code2,
+            char code3
+        )
+    {
+        var result = new List<SubField>();
+
+        foreach (var subfield in Subfields)
+        {
+            var code = subfield.Code;
+            if (code.SameChar (code1)
+                || code.SameChar (code2)
+                || code.SameChar (code3))
+            {
+                result.Add (subfield);
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    /// <summary>
     /// Получение первого подполя с указанным кодом
     /// либо создание нового подполя, если таковое отсуствует.
     /// </summary>
@@ -1070,6 +1119,31 @@ public class Field
         )
     {
         return GetSubField (code, occurrence)?.Value;
+    }
+
+    /// <summary>
+    /// Получение текста первого из указанных подполей.
+    /// </summary>
+    public string? GetSubFieldValue
+        (
+            char code1,
+            char code2
+        )
+    {
+        return (GetSubField (code1) ?? GetSubField (code2))?.Value;
+    }
+
+    /// <summary>
+    /// Получение текста первого из указанных подполей.
+    /// </summary>
+    public string? GetSubFieldValue
+        (
+            char code1,
+            char code2,
+            char code3
+        )
+    {
+        return (GetSubField (code1) ?? GetSubField (code2) ?? GetSubField (code3))?.Value;
     }
 
     /// <summary>

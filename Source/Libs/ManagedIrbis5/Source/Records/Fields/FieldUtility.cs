@@ -1114,6 +1114,61 @@ public static class FieldUtility
     }
 
     /// <summary>
+    /// Есть хотя бы одно подполе с любым из указанным кодов?
+    /// </summary>
+    public static bool HaveSubField
+        (
+            this Field field,
+            char code1,
+            char code2
+        )
+    {
+        Sure.NotNull (field);
+
+        var subFields = field.Subfields;
+        var count = subFields.Count;
+        for (var i = 0; i < count; i++)
+        {
+            var code = subFields[i].Code;
+            if (code.SameChar (code1) || code.SameChar (code2))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Есть хотя бы одно подполе с любым из указанным кодов?
+    /// </summary>
+    public static bool HaveSubField
+        (
+            this Field field,
+            char code1,
+            char code2,
+            char code3
+        )
+    {
+        Sure.NotNull (field);
+
+        var subFields = field.Subfields;
+        var count = subFields.Count;
+        for (var i = 0; i < count; i++)
+        {
+            var code = subFields[i].Code;
+            if (code.SameChar (code1)
+                || code.SameChar (code2)
+                || code.SameChar (code3))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Есть хотя бы одно подполе с указанным кодом?
     /// </summary>
     public static bool HaveSubField

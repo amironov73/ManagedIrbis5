@@ -61,6 +61,30 @@ public static class TextUtility
     }
 
     /// <summary>
+    /// Удаление пробельных символов в конце текста.
+    /// </summary>
+    public static void TrimEnd
+        (
+            this StringBuilder builder
+        )
+    {
+        Sure.NotNull (builder);
+
+        while (builder.Length > 1)
+        {
+            var last = builder.Length - 1;
+            if (char.IsWhiteSpace (builder[last]))
+            {
+                builder.Remove (last, 1);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    /// <summary>
     /// Удаление пробельных символов в начале и в конце текста.
     /// </summary>
     public static void Trim

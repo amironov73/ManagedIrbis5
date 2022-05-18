@@ -718,27 +718,30 @@ public static class Utility
         }
 
         var bytes = encoding.GetBytes (text);
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         foreach (var b in bytes)
         {
-            var c = (char)b;
+            var c = (char) b;
             if (IsUrlSafeChar (c))
             {
-                result.Append (c);
+                builder.Append (c);
             }
             else if (c == ' ')
             {
-                result.Append ('+');
+                builder.Append ('+');
             }
             else
             {
-                result.Append ('%');
-                result.Append (_IntToHex ((b >> 4) & 0x0F));
-                result.Append (_IntToHex (b & 0x0F));
+                builder.Append ('%');
+                builder.Append (_IntToHex ((b >> 4) & 0x0F));
+                builder.Append (_IntToHex (b & 0x0F));
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -4415,6 +4418,111 @@ public static class Utility
     }
 
     /// <summary>
+    /// Добавление разделенных между собой элементов.
+    /// </summary>
+    public static StringBuilder AppendWithSeparator
+        (
+            this StringBuilder builder,
+            string? separator,
+            string? item1,
+            string? item2
+        )
+    {
+        var separate = false;
+
+        if (!string.IsNullOrEmpty (item1))
+        {
+            builder.Append (item1);
+            separate = true;
+        }
+
+        if (!string.IsNullOrEmpty (item2))
+        {
+            if (separate)
+            {
+                builder.Append (separator);
+            }
+
+            builder.Append (item2);
+        }
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Добавление разделенных между собой элементов.
+    /// </summary>
+    public static StringBuilder AppendWithSeparator
+        (
+            this StringBuilder builder,
+            string? separator,
+            string? item1,
+            string? item2,
+            string? item3
+        )
+    {
+        var separate = false;
+
+        if (!string.IsNullOrEmpty (item1))
+        {
+            builder.Append (item1);
+            separate = true;
+        }
+
+        if (!string.IsNullOrEmpty (item2))
+        {
+            if (separate)
+            {
+                builder.Append (separator);
+            }
+
+            builder.Append (item2);
+            separate = true;
+        }
+
+        if (!string.IsNullOrEmpty (item3))
+        {
+            if (separate)
+            {
+                builder.Append (separator);
+            }
+
+            builder.Append (item3);
+        }
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Добавление разделенных между собой элементов.
+    /// </summary>
+    public static StringBuilder AppendWithSeparator
+        (
+            this StringBuilder builder,
+            string? separator,
+            IEnumerable<string?> items
+        )
+    {
+        var separate = false;
+
+        foreach (var item in items)
+        {
+            if (separate)
+            {
+                builder.Append (separator);
+            }
+
+            if (!string.IsNullOrEmpty (item))
+            {
+                builder.Append (item);
+                separate = true;
+            }
+        }
+
+        return builder;
+    }
+
+    /// <summary>
     /// Добавление объекта, заключенного в скобки.
     /// </summary>
     public static StringBuilder AppendWithBrackets
@@ -4439,6 +4547,44 @@ public static class Utility
             }
 
             builder.Append (close);
+        }
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Добавление текста с префиксом.
+    /// </summary>
+    public static StringBuilder AppendWithPrefix
+        (
+            this StringBuilder builder,
+            string? text,
+            string? prefix
+        )
+    {
+        if (!string.IsNullOrEmpty (text))
+        {
+            builder.Append (prefix);
+            builder.Append (text);
+        }
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Добавление текста с суффиксом.
+    /// </summary>
+    public static StringBuilder AppendWithSuffix
+        (
+            this StringBuilder builder,
+            string? text,
+            string? suffix
+        )
+    {
+        if (!string.IsNullOrEmpty (text))
+        {
+            builder.Append (text);
+            builder.Append (suffix);
         }
 
         return builder;
