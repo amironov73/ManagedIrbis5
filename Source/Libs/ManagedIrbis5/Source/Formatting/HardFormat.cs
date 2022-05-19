@@ -160,9 +160,9 @@ public sealed class HardFormat
     }
 
     /// <summary>
-    /// Авторы книги.
+    /// Автор книги из общей части.
     /// </summary>
-    public void Authors
+    public void CommonAuthor
         (
             StringBuilder builder,
             Record record
@@ -554,7 +554,7 @@ public sealed class HardFormat
         Sure.NotNull (builder);
         Sure.NotNull (record);
 
-        Authors (builder, record);
+        CommonAuthor (builder, record);
         CommonInfo (builder, record);
         FirstAuthor (builder, record);
         TitleArea (builder, record);
