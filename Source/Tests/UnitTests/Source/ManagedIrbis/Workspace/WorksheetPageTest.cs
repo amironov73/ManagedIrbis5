@@ -15,177 +15,186 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Worksheet
+namespace UnitTests.ManagedIrbis.Worksheet;
+
+[TestClass]
+public sealed class WorksheetPageTest
 {
-    [TestClass]
-    public class WorksheetPageTest
+    private WorksheetPage _GetPage()
     {
-        private WorksheetPage _GetPage()
+        return new WorksheetPage
         {
-            return new WorksheetPage
+            Name = "Основное БО",
+            Items =
             {
-                Name = "Основное БО",
-                Items =
+                new WorksheetItem
                 {
-                    new WorksheetItem
-                    {
-                        Tag = "A",
-                        Title = "НАЗВАНИЕ",
-                        Repeatable = false,
-                        Help = "0",
-                        EditMode = "2",
-                        InputInfo = ",T=,@!tmovzh"
-                    },
-                    new WorksheetItem
-                    {
-                        Tag = "U",
-                        Title = "Роль",
-                        Repeatable = false,
-                        Help = "0",
-                        EditMode = "1",
-                        InputInfo = "rolzm.mnu"
-                    },
-                    new WorksheetItem
-                    {
-                        Tag = "B",
-                        Title = "Общее обозначение материала",
-                        Repeatable = false,
-                        Help = "0",
-                        EditMode = "1",
-                        InputInfo = "200bm.mnu"
-                    },
-                    new WorksheetItem
-                    {
-                        Tag = "E",
-                        Title = "Сведения, относящиеся к названию",
-                        Repeatable = false,
-                        Help = "0",
-                        EditMode = "1",
-                        InputInfo = "200em.mnu"
-                    }
+                    Tag = "A",
+                    Title = "НАЗВАНИЕ",
+                    Repeatable = false,
+                    Help = "0",
+                    EditMode = "2",
+                    InputInfo = ",T=,@!tmovzh"
+                },
+                new WorksheetItem
+                {
+                    Tag = "U",
+                    Title = "Роль",
+                    Repeatable = false,
+                    Help = "0",
+                    EditMode = "1",
+                    InputInfo = "rolzm.mnu"
+                },
+                new WorksheetItem
+                {
+                    Tag = "B",
+                    Title = "Общее обозначение материала",
+                    Repeatable = false,
+                    Help = "0",
+                    EditMode = "1",
+                    InputInfo = "200bm.mnu"
+                },
+                new WorksheetItem
+                {
+                    Tag = "E",
+                    Title = "Сведения, относящиеся к названию",
+                    Repeatable = false,
+                    Help = "0",
+                    EditMode = "1",
+                    InputInfo = "200em.mnu"
                 }
-            };
-        }
-
-        [TestMethod]
-        public void WorksheetPage_Construction_1()
-        {
-            var page = new WorksheetPage();
-            Assert.IsNull(page.Name);
-            Assert.IsNotNull(page.Items);
-            Assert.AreEqual(0, page.Items.Count);
-            Assert.IsNull(page.UserData);
-        }
-
-        private void _TestSerialization
-            (
-                WorksheetPage first
-            )
-        {
-            var bytes = first.SaveToMemory();
-            var second = bytes.RestoreObjectFromMemory<WorksheetPage>();
-
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first.Name, second!.Name);
-            Assert.AreEqual(first.Items.Count, second.Items.Count);
-            Assert.IsNull(second.UserData);
-            for (var i = 0; i < first.Items.Count; i++)
-            {
-                Assert.AreEqual(first.Items[i].DefaultValue, second.Items[i].DefaultValue);
-                Assert.AreEqual(first.Items[i].FormalVerification, second.Items[i].FormalVerification);
-                Assert.AreEqual(first.Items[i].Help, second.Items[i].Help);
-                Assert.AreEqual(first.Items[i].Hint, second.Items[i].Hint);
-                Assert.AreEqual(first.Items[i].InputInfo, second.Items[i].InputInfo);
-                Assert.AreEqual(first.Items[i].EditMode, second.Items[i].EditMode);
-                Assert.AreEqual(first.Items[i].Repeatable, second.Items[i].Repeatable);
-                Assert.AreEqual(first.Items[i].Reserved, second.Items[i].Reserved);
-                Assert.AreEqual(first.Items[i].Tag, second.Items[i].Tag);
-                Assert.AreEqual(first.Items[i].Title, second.Items[i].Title);
-                Assert.IsNull(second.Items[i].UserData);
             }
-        }
+        };
+    }
 
-        [TestMethod]
-        public void WorksheetPage_Serialization_1()
+    [TestMethod]
+    [Description ("Конструктор по умолчанию")]
+    public void WorksheetPage_Construction_1()
+    {
+        var page = new WorksheetPage();
+        Assert.IsNull (page.Name);
+        Assert.IsNotNull (page.Items);
+        Assert.AreEqual (0, page.Items.Count);
+        Assert.IsNull (page.UserData);
+    }
+
+    private void _TestSerialization
+        (
+            WorksheetPage first
+        )
+    {
+        var bytes = first.SaveToMemory();
+        var second = bytes.RestoreObjectFromMemory<WorksheetPage>();
+
+        Assert.IsNotNull (second);
+        Assert.AreEqual (first.Name, second.Name);
+        Assert.AreEqual (first.Items.Count, second.Items.Count);
+        Assert.IsNull (second.UserData);
+        for (var i = 0; i < first.Items.Count; i++)
         {
-            var page = new WorksheetPage();
-            _TestSerialization(page);
-
-            page.UserData = "User data";
-            _TestSerialization(page);
-
-            page = _GetPage();
-            _TestSerialization(page);
+            Assert.AreEqual (first.Items[i].DefaultValue, second.Items[i].DefaultValue);
+            Assert.AreEqual (first.Items[i].FormalVerification, second.Items[i].FormalVerification);
+            Assert.AreEqual (first.Items[i].Help, second.Items[i].Help);
+            Assert.AreEqual (first.Items[i].Hint, second.Items[i].Hint);
+            Assert.AreEqual (first.Items[i].InputInfo, second.Items[i].InputInfo);
+            Assert.AreEqual (first.Items[i].EditMode, second.Items[i].EditMode);
+            Assert.AreEqual (first.Items[i].Repeatable, second.Items[i].Repeatable);
+            Assert.AreEqual (first.Items[i].Reserved, second.Items[i].Reserved);
+            Assert.AreEqual (first.Items[i].Tag, second.Items[i].Tag);
+            Assert.AreEqual (first.Items[i].Title, second.Items[i].Title);
+            Assert.IsNull (second.Items[i].UserData);
         }
+    }
 
-        [TestMethod]
-        public void WorksheetPage_Encode_1()
-        {
-            var page = _GetPage();
-            using var writer = new StringWriter();
-            page.Encode(writer);
-            Assert.AreEqual
+    [TestMethod]
+    [Description ("Сериализация")]
+    public void WorksheetPage_Serialization_1()
+    {
+        var page = new WorksheetPage();
+        _TestSerialization (page);
+
+        page.UserData = "User data";
+        _TestSerialization (page);
+
+        page = _GetPage();
+        _TestSerialization (page);
+    }
+
+    [TestMethod]
+    [Description ("Кодирование в текстовый поток")]
+    public void WorksheetPage_Encode_1()
+    {
+        var page = _GetPage();
+        using var writer = new StringWriter();
+        page.Encode (writer);
+        Assert.AreEqual
             (
                 "A\nНАЗВАНИЕ\n0\n0\n2\n,T=,@!tmovzh\n\n\n\n\nU\nРоль\n0\n0\n1\nrolzm.mnu\n\n\n\n\nB\nОбщее обозначение материала\n0\n0\n1\n200bm.mnu\n\n\n\n\nE\nСведения, относящиеся к названию\n0\n0\n1\n200em.mnu\n\n\n\n\n",
                 writer.ToString().DosToUnix()
             );
-        }
+    }
 
-        [TestMethod]
-        public void WorksheetPage_ParseStream_1()
-        {
-            const string text = "A\nНАЗВАНИЕ\n0\n0\n2\n,T =,@!tmovzh\n\n\n\n\nU\nРоль\n0\n0\n1\nrolzm.mnu\n\n\n\n\nB\nОбщее обозначение материала\n0\n0\n1\n200bm.mnu\n\n\n\n\nE\nСведения, относящиеся к названию\n0\n0\n1\n200em.mnu\n\n\n\n\n";
-            using var reader = new StringReader(text);
-            var page = WorksheetPage.ParseStream(reader, "Name", 4);
-            Assert.AreEqual("Name", page.Name);
-            Assert.AreEqual(4, page.Items.Count);
-            Assert.AreEqual("A", page.Items[0].Tag);
-            Assert.AreEqual("U", page.Items[1].Tag);
-            Assert.AreEqual("B", page.Items[2].Tag);
-            Assert.AreEqual("E", page.Items[3].Tag);
-        }
+    [TestMethod]
+    [Description ("Разбор текстового потока")]
+    public void WorksheetPage_ParseStream_1()
+    {
+        const string text = "A\nНАЗВАНИЕ\n0\n0\n2\n,T =,@!tmovzh\n\n\n\n\nU\nРоль\n0\n0\n1\nrolzm.mnu\n\n\n\n\nB\nОбщее обозначение материала\n0\n0\n1\n200bm.mnu\n\n\n\n\nE\nСведения, относящиеся к названию\n0\n0\n1\n200em.mnu\n\n\n\n\n";
+        using var reader = new StringReader (text);
+        var page = WorksheetPage.ParseStream (reader, "Name", 4);
+        Assert.AreEqual ("Name", page.Name);
+        Assert.AreEqual (4, page.Items.Count);
+        Assert.AreEqual ("A", page.Items[0].Tag);
+        Assert.AreEqual ("U", page.Items[1].Tag);
+        Assert.AreEqual ("B", page.Items[2].Tag);
+        Assert.AreEqual ("E", page.Items[3].Tag);
+    }
 
-        [TestMethod]
-        public void WorksheetPage_Verify_1()
-        {
-            var page = new WorksheetPage();
-            Assert.IsFalse(page.Verify(false));
+    [TestMethod]
+    [Description ("Верификация")]
+    public void WorksheetPage_Verify_1()
+    {
+        var page = new WorksheetPage();
+        Assert.IsFalse (page.Verify (false));
 
-            page = _GetPage();
-            Assert.IsTrue(page.Verify(false));
-        }
+        page = _GetPage();
+        Assert.IsTrue (page.Verify (false));
+    }
 
-        [TestMethod]
-        public void WorksheetPage_ToXml_1()
-        {
-            var page = new WorksheetPage();
-            Assert.AreEqual("<page />", XmlUtility.SerializeShort(page));
+    [TestMethod]
+    [Description ("XML-представление")]
+    public void WorksheetPage_ToXml_1()
+    {
+        var page = new WorksheetPage();
+        Assert.AreEqual ("<page />", XmlUtility.SerializeShort (page));
 
-            page = _GetPage();
-            const string expected = "<page><name>Основное БО</name><item><tag>A</tag><title>НАЗВАНИЕ</title><help>0</help><input-mode>2</input-mode><input-info>,T=,@!tmovzh</input-info></item><item><tag>U</tag><title>Роль</title><help>0</help><input-mode>1</input-mode><input-info>rolzm.mnu</input-info></item><item><tag>B</tag><title>Общее обозначение материала</title><help>0</help><input-mode>1</input-mode><input-info>200bm.mnu</input-info></item><item><tag>E</tag><title>Сведения, относящиеся к названию</title><help>0</help><input-mode>1</input-mode><input-info>200em.mnu</input-info></item></page>";
-            var actual = XmlUtility.SerializeShort(page);
-            Assert.AreEqual (expected, actual);
-        }
+        page = _GetPage();
+        const string expected = "<page><name>Основное БО</name><item><tag>A</tag><title>НАЗВАНИЕ</title><help>0</help><input-mode>2</input-mode><input-info>,T=,@!tmovzh</input-info></item><item><tag>U</tag><title>Роль</title><help>0</help><input-mode>1</input-mode><input-info>rolzm.mnu</input-info></item><item><tag>B</tag><title>Общее обозначение материала</title><help>0</help><input-mode>1</input-mode><input-info>200bm.mnu</input-info></item><item><tag>E</tag><title>Сведения, относящиеся к названию</title><help>0</help><input-mode>1</input-mode><input-info>200em.mnu</input-info></item></page>";
+        var actual = XmlUtility.SerializeShort (page);
+        Assert.AreEqual (expected, actual);
+    }
 
-        [Ignore]
-        [TestMethod]
-        public void WorksheetPage_ToJson_1()
-        {
-            var page = new WorksheetPage();
-            Assert.AreEqual("{\"items\":[]}", JsonUtility.SerializeShort(page));
+    [Ignore]
+    [TestMethod]
+    [Description ("JSON-представление")]
+    public void WorksheetPage_ToJson_1()
+    {
+        var page = new WorksheetPage();
+        Assert.AreEqual ("{\"items\":[]}", JsonUtility.SerializeShort (page));
 
-            page = _GetPage();
-            Assert.AreEqual("{'name':'Основное БО','items':[{'tag':'A','title':'НАЗВАНИЕ','help':'0','input-mode':'2','input-info':',T=,@!tmovzh'},{'tag':'U','title':'Роль','help':'0','input-mode':'1','input-info':'rolzm.mnu'},{'tag':'B','title':'Общее обозначение материала','help':'0','input-mode':'1','input-info':'200bm.mnu'},{'tag':'E','title':'Сведения, относящиеся к названию','help':'0','input-mode':'1','input-info':'200em.mnu'}]}", JsonUtility.SerializeShort(page));
-        }
+        page = _GetPage();
+        Assert.AreEqual (
+            "{'name':'Основное БО','items':[{'tag':'A','title':'НАЗВАНИЕ','help':'0','input-mode':'2','input-info':',T=,@!tmovzh'},{'tag':'U','title':'Роль','help':'0','input-mode':'1','input-info':'rolzm.mnu'},{'tag':'B','title':'Общее обозначение материала','help':'0','input-mode':'1','input-info':'200bm.mnu'},{'tag':'E','title':'Сведения, относящиеся к названию','help':'0','input-mode':'1','input-info':'200em.mnu'}]}",
+            JsonUtility.SerializeShort (page));
+    }
 
-        [TestMethod]
-        public void WorksheetPage_ToString_1()
-        {
-            var page = new WorksheetPage();
-            Assert.AreEqual("(null)", page.ToString());
+    [TestMethod]
+    [Description ("Представление в виде плоского текста")]
+    public void WorksheetPage_ToString_1()
+    {
+        var page = new WorksheetPage();
+        Assert.AreEqual ("(null)", page.ToString());
 
-            page = _GetPage();
-            Assert.AreEqual("Основное БО", page.ToString());
-        }
+        page = _GetPage();
+        Assert.AreEqual ("Основное БО", page.ToString());
     }
 }
