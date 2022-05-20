@@ -4591,6 +4591,27 @@ public static class Utility
     }
 
     /// <summary>
+    /// Добавление текста с префиксом и суффиксом.
+    /// </summary>
+    public static StringBuilder AppendWithPrefixAndSuffix
+        (
+            this StringBuilder builder,
+            string? text,
+            string? prefix,
+            string? suffix
+        )
+    {
+        if (!string.IsNullOrEmpty (text))
+        {
+            builder.Append (prefix);
+            builder.Append (text);
+            builder.Append (suffix);
+        }
+
+        return builder;
+    }
+
+    /// <summary>
     /// Determines whether given value can be converted to
     /// the specified type.
     /// </summary>

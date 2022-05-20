@@ -66,9 +66,9 @@ public sealed class HardFormat
             StringBuilder builder
         )
     {
+        var position = builder.Length - 1;
         while (true)
         {
-            var position = builder.Length - 1;
             if (position < 0)
             {
                 break;
@@ -79,6 +79,8 @@ public sealed class HardFormat
             {
                 return result;
             }
+
+            --position;
         }
 
         return '\0';
@@ -140,6 +142,50 @@ public sealed class HardFormat
         }
 
         return false;
+    }
+
+    private static bool _AppendWithPrefixAndSuffix
+        (
+            StringBuilder builder,
+            string? text,
+            string? prefix,
+            string? suffix
+        )
+    {
+        if (!string.IsNullOrEmpty (text))
+        {
+            builder.AppendWithPrefixAndSuffix (text, prefix, suffix);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static readonly char[] _codeDelimiters = { '=', '-' };
+
+    /// <summary>
+    /// Добавление кодированной информации вроде "a-ил.".
+    /// </summary>
+    private static void _AppendWithCode
+        (
+            StringBuilder builder,
+            string? text,
+            string? prefix = null
+        )
+    {
+        if (!string.IsNullOrEmpty (text))
+        {
+            builder.Append (prefix);
+
+            var position = text.IndexOfAny (_codeDelimiters);
+            builder.Append
+                (
+                    position >= 0
+                        ? text[(position + 1)..]
+                        : text
+                );
+        }
     }
 
     #endregion
@@ -304,11 +350,12 @@ public sealed class HardFormat
             builder.Append (author.GetSubFieldValue ('a'));
             builder.AppendWithPrefix (author.GetSubFieldValue ('g', 'b'), ", ");
             _AddDot (builder);
+            builder.Append (' ');
         }
     }
 
     /// <summary>
-    /// Область заглавия.
+    /// Область заглавия, поле 200.
     /// </summary>
     public void TitleArea
         (
@@ -339,6 +386,23 @@ public sealed class HardFormat
             {
                 builder.AppendWithPrefix (one.GetSubFieldValue ('d'), " = ");
             }
+        }
+
+        // несколько томов в одной книге
+        foreach (var volume in record.EnumerateField (925))
+        {
+            builder.Append (", ");
+            builder.AppendWithSuffix (volume.GetSubFieldValue ('v'), " : "); // обозначение и номер тома
+            builder.Append (volume.GetSubFieldValue ('a')); // заглавие тома
+            builder.AppendWithPrefix (volume.GetSubFieldValue ('b'), " ; "); // заглавие второго произведения
+            builder.AppendWithPrefix (volume.GetSubFieldValue ('c'), " ; "); // заглавие третьего произведения
+        }
+
+        // статьи сборника без общего заглавия
+        foreach (var article in record.EnumerateField (922))
+        {
+            builder.Append (". ");
+            builder.Append (article.GetSubFieldValue ('c'));
         }
 
         // сведения, относящиеся к заглавию
@@ -389,7 +453,7 @@ public sealed class HardFormat
     }
 
     /// <summary>
-    /// Выходные данные.
+    /// Выходные данные, поле 210.
     /// </summary>
     public void Imprint
         (
@@ -406,19 +470,95 @@ public sealed class HardFormat
             _AddSeparator (builder);
 
             var prefix = string.Empty;
-            if (_Append (builder, imprint.GetSubFieldValue ('a')) // место издания
-                || _AppendWithPrefix (builder, imprint.GetSubFieldValue ('c'), " : ")) // издательство
+
+            // флаг: был вывод
+            var flag = false;
+
+            // выводить города?
+            var city = string.IsNullOrEmpty (imprint.GetSubFieldValue ('?'));
+
+            // издательство
+            var publisher = imprint.GetSubFieldValue ('i', 'c');
+
+            if (city)
+            {
+                flag = _Append (builder, imprint.GetSubFieldValue ('a')); // место издания - город 1
+
+                var city2 = imprint.GetSubFieldValue('x'); // город 2
+                var city3 = imprint.GetSubFieldValue('y'); // город 3
+
+                if (!string.IsNullOrEmpty (city2) || !string.IsNullOrEmpty (city3))
+                {
+                    // "и др." для городов
+                    var etal = imprint.GetSubFieldValue ('2');
+
+                    if (!string.IsNullOrEmpty (etal))
+                    {
+                        builder.AppendWithPrefix (etal, " ");
+                    }
+                    else
+                    {
+                        builder.AppendWithPrefix (city2, " ; ");
+                        builder.AppendWithPrefix (city3, " ; ");
+                    }
+                }
+
+            }
+
+            flag =  flag
+                || _AppendWithPrefix (builder, publisher, " : ") // издательство
+                || _AppendWithPrefixAndSuffix (builder, imprint.GetSubFieldValue ('6'), " [", "]"); // функция издающей организации
+
+
+            if (flag)
             {
                 prefix = ", ";
             }
 
+            // пояснения к году, стоящие перед ним
+            var explanation = imprint.GetSubFieldValue ('5');
+            if (explanation is not null)
+            {
+                builder.AppendWithPrefix (explanation, prefix);
+                prefix = " ";
+            }
+
             // год издания
             builder.AppendWithPrefix (imprint.GetSubFieldValue ('d'), prefix);
+
+            // место печати
+            var place = imprint.GetSubFieldValue ('1');
+
+            // типография
+            var house = imprint.GetSubFieldValue ('g', 't');
+
+            // дата печати
+            var date = imprint.GetSubFieldValue ('h');
+
+            prefix = string.Empty;
+            if (!string.IsNullOrEmpty (place)
+                || !string.IsNullOrEmpty (house)
+                || !string.IsNullOrEmpty (date))
+            {
+                builder.Append (" (");
+                if (_Append (builder, place))
+                {
+                    prefix = " : ";
+                }
+
+                if (_AppendWithPrefix (builder, house, prefix))
+                {
+                    prefix = ", ";
+                }
+
+                builder.AppendWithPrefix (date, prefix);
+            }
+
         }
     }
 
     /// <summary>
-    /// Физические характеристики.
+    /// Физические характеристики, поле 215.
     /// </summary>
     public void PhysicalCharacteristics
         (
@@ -429,8 +569,7 @@ public sealed class HardFormat
         Sure.NotNull (builder);
         Sure.NotNull (record);
 
-        var physical = record.GetField (215);
-        if (physical is not null)
+        foreach (var physical in record.EnumerateField (215))
         {
             _AddSeparator (builder);
 
@@ -442,7 +581,28 @@ public sealed class HardFormat
             builder.AppendWithPrefix (unit, " ");
 
             // иллюстрации
-            builder.AppendWithPrefix (physical.GetSubFieldValue ('c'), " : ");
+            var illustrations = physical.GetSubFields ('c', '0', '7', '8');
+            if (!illustrations.IsNullOrEmpty())
+            {
+                _AppendWithCode (builder, illustrations[0].Value, " : ");
+
+                for (var index = 1; index < illustrations.Length; index++)
+                {
+                    _AppendWithCode (builder, illustrations[index].Value, ", ");
+                }
+            }
+
+            // сопроводительный материал
+            builder.AppendWithPrefix (physical.GetSubFieldValue ('e'), " + ");
+
+            // единица измерения сопроводительного материала
+            builder.AppendWithPrefix (physical.GetSubFieldValue ('2'), " ");
+
+            // размер
+            builder.AppendWithPrefixAndSuffix (physical.GetSubFieldValue ('d'), " ; ", " см.");
+
+            // тираж
+            builder.AppendWithPrefix (physical.GetSubFieldValue ('x'), ". - Тираж ");
         }
     }
 
@@ -499,23 +659,88 @@ public sealed class HardFormat
 
         foreach (var one in record.EnumerateField (10))
         {
+            var isbn = one.GetSubFields ('a', 'e', 'n');
+            var erroneous = one.GetSubFieldValue ('z'); // ошибочный ISBN
             var price = one.GetSubFieldValue ('d'); // цена (цифры)
-            if (!string.IsNullOrEmpty (price))
+            if (!string.IsNullOrEmpty (price)
+                || !string.IsNullOrEmpty (erroneous)
+                || !isbn.IsNullOrEmpty())
+            {
+                var prefix = string.Empty;
+
+                var first = true; // признак первого вывода ISBN
+                _AddSeparator (builder);
+
+                if (!isbn.IsNullOrEmpty())
+                {
+                    foreach (var two in isbn)
+                    {
+                        var three = two.Value;
+                        if (!string.IsNullOrEmpty (three))
+                        {
+                            if (!first)
+                            {
+                                _AddSeparator (builder);
+                            }
+
+                            builder.AppendWithPrefix (three, "ISBN ");
+                            first = true;
+                        }
+                    }
+
+                    prefix = " : ";
+                }
+
+                if (!string.IsNullOrEmpty (erroneous))
+                {
+                    if (!first)
+                    {
+                        _AddSeparator (builder);
+                    }
+
+                    builder.AppendWithPrefixAndSuffix (erroneous, "ISBN ", " (ошибочный)");
+                    prefix = " : ";
+                }
+
+                if (!string.IsNullOrEmpty (price))
+                {
+                    builder.Append (prefix);
+
+                    // валюта
+                    var currency = Utility.NonEmpty
+                        (
+                            one.GetSubFieldValue ('c'),
+                            "руб."
+                        );
+                    builder.AppendWithSuffix (price, " " + currency);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Идентификационный номер нетекстового материала, подполе 19.
+    /// </summary>
+    public void Identifier
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        foreach (var one in record.EnumerateField (19))
+        {
+            // основной документ или приложение
+            var mainDocument = one.GetSubFieldValue ('x');
+
+            if (mainDocument == "0")
             {
                 _AddSeparator (builder);
-                var currency = Utility.NonEmpty (one.GetSubFieldValue ('c'), "руб."); // валюта
-                builder.AppendWithSuffix (price, " " + currency);
-            }
 
-            var isbn = one.GetSubFields ('a', 'e', 'n');
-            foreach (var two in isbn)
-            {
-                var three = two.Value;
-                if (!string.IsNullOrEmpty (three))
-                {
-                    _AddSeparator (builder);
-                    builder.AppendWithPrefix (three, "ISBN ");
-                }
+                builder.Append (one.GetSubFieldValue ('a')); // тип номера
+                builder.AppendWithPrefix (one.GetSubFieldValue ('b'), " "); // собственно номер
             }
         }
     }
@@ -563,6 +788,7 @@ public sealed class HardFormat
         PhysicalCharacteristics (builder, record);
         Series (builder, record);
         IsbnAndPrice (builder, record);
+        Identifier (builder, record);
         Print203 (builder, record);
     }
 

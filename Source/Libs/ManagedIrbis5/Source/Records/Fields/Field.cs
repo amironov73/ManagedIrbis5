@@ -1010,6 +1010,34 @@ public class Field
     }
 
     /// <summary>
+    /// Получение всех подполей с указанными подполями.
+    /// </summary>
+    public SubField[] GetSubFields
+        (
+            char code1,
+            char code2,
+            char code3,
+            char code4
+        )
+    {
+        var result = new List<SubField>();
+
+        foreach (var subfield in Subfields)
+        {
+            var code = subfield.Code;
+            if (code.SameChar (code1)
+                || code.SameChar (code2)
+                || code.SameChar (code3)
+                || code.SameChar (code4))
+            {
+                result.Add (subfield);
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    /// <summary>
     /// Получение первого подполя с указанным кодом
     /// либо создание нового подполя, если таковое отсуствует.
     /// </summary>
