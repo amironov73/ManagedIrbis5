@@ -64,7 +64,7 @@ internal static class Program
                 Arity = ArgumentArity.ZeroOrOne,
                 Description = "Connection string"
             };
-            var exprOption = new Option ("-e", "Search expression", typeof (string));
+            var exprOption = new Option<string> ("-e", "Search expression");
             rootCommand.AddArgument (csArgument);
             rootCommand.AddOption (exprOption);
             var builder = new CommandLineBuilder (rootCommand).Build();
@@ -89,7 +89,7 @@ internal static class Program
                 var maxMfn = connection.GetMaxMfn();
 
                 var expression = config.GetValue<string> ("Expression");
-                var expressionValue = parseResult.GetValueForOption<string> (exprOption);
+                var expressionValue = parseResult.GetValueForOption (exprOption);
                 if (!string.IsNullOrEmpty (expressionValue))
                 {
                     expression = expressionValue;
