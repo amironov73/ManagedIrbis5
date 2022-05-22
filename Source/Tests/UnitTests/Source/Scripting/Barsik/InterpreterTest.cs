@@ -5,6 +5,8 @@
 // ReSharper disable InvokeAsExtensionMethod
 // ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedMember.Local
 
 using System;
