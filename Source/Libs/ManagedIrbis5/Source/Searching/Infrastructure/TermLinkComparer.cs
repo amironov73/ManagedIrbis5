@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* TermLinkComparer.cs --
+/* TermLinkComparer.cs -- сравнивает термины-ссылки
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,169 +20,165 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Сравнивает термины-ссылки по MFN, меткам и повторениям поля
+/// и индексу слова.
+/// </summary>
+public static class TermLinkComparer
 {
+    #region Nested classes
+
     /// <summary>
-    ///
+    /// Сравнивает термины-ссылки <see cref="TermLink"/> по MFN.
     /// </summary>
-    public static class TermLinkComparer
+    public sealed class ByMfn
+        : IEqualityComparer<TermLink>
     {
-        #region Nested classes
+        #region IEqualityComparer members
 
-        /// <summary>
-        /// Compares two <see cref="TermLink"/>s by MFN.
-        /// </summary>
-        public sealed class ByMfn
-            : IEqualityComparer<TermLink>
+        /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
+        public bool Equals
+            (
+                TermLink? x,
+                TermLink? y
+            )
         {
-            #region IEqualityComparer members
+            Sure.NotNull (x);
+            Sure.NotNull (y);
 
-            /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
-            public bool Equals
-                (
-                    TermLink? x,
-                    TermLink? y
-                )
-            {
-                Sure.NotNull(x, nameof(x));
-                Sure.NotNull(y, nameof(y));
-
-                return x!.Mfn == y!.Mfn;
-            }
-
-            /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
-            public int GetHashCode
-                (
-                    TermLink obj
-                )
-            {
-                Sure.NotNull(obj, nameof(obj));
-
-                return obj.Mfn;
-            }
-
-            #endregion
+            return x!.Mfn == y!.Mfn;
         }
 
-        /// <summary>
-        /// Compares two <see cref="TermLink"/>s by MFN
-        /// and field tag.
-        /// </summary>
-        public sealed class ByTag
-            : IEqualityComparer<TermLink>
+        /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
+        public int GetHashCode
+            (
+                TermLink obj
+            )
         {
-            #region IEqualityComparer members
+            Sure.NotNull (obj);
 
-            /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
-            public bool Equals
-                (
-                    TermLink? x,
-                    TermLink? y
-                )
-            {
-                Sure.NotNull(x, nameof(x));
-                Sure.NotNull(y, nameof(y));
-
-                return x!.Mfn == y!.Mfn && x!.Tag == y!.Tag;
-            }
-
-            /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
-            public int GetHashCode
-                (
-                    TermLink obj
-                )
-            {
-                Sure.NotNull(obj, nameof(obj));
-
-                return unchecked (obj.Mfn * 37 + obj.Tag);
-            }
-
-            #endregion
-        }
-
-        /// <summary>
-        /// Compares two <see cref="TermLink"/>s by MFN,
-        /// field tag and occurrence.
-        /// </summary>
-        public sealed class ByOccurrence
-            : IEqualityComparer<TermLink>
-        {
-            #region IEqualityComparer members
-
-            /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
-            public bool Equals
-                (
-                    TermLink? x,
-                    TermLink? y
-                )
-            {
-                Sure.NotNull(x, nameof(x));
-                Sure.NotNull(y, nameof(y));
-
-                return x!.Mfn == y!.Mfn
-                    && x!.Tag == y!.Tag
-                    && x!.Occurrence == y!.Occurrence;
-            }
-
-            /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
-            public int GetHashCode
-                (
-                    TermLink obj
-                )
-            {
-                Sure.NotNull(obj, nameof(obj));
-
-                return unchecked ((obj.Mfn * 37 + obj.Tag) * 37
-                    + obj.Occurrence);
-            }
-
-            #endregion
-        }
-
-        /// <summary>
-        /// Compares two <see cref="TermLink"/>s by MFN,
-        /// field tag, occurrence and index.
-        /// </summary>
-        public sealed class ByIndex
-            : IEqualityComparer<TermLink>
-        {
-            #region IEqualityComparer members
-
-            /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
-            public bool Equals
-                (
-                    TermLink? x,
-                    TermLink? y
-                )
-            {
-                Sure.NotNull(x, nameof(x));
-                Sure.NotNull(y, nameof(y));
-
-                return x!.Mfn == y!.Mfn
-                    && x!.Tag == y!.Tag
-                    && x!.Occurrence == y!.Occurrence
-                    && Math.Abs(x!.Index - y!.Index) == 1;
-            }
-
-            /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
-            public int GetHashCode
-                (
-                    TermLink obj
-                )
-            {
-                Sure.NotNull(obj, nameof(obj));
-
-                // obj.Index not forgotten!
-
-                return unchecked ((obj.Mfn * 37 + obj.Tag) * 37
-                    + obj.Occurrence);
-            }
-
-            #endregion
+            return obj.Mfn;
         }
 
         #endregion
+    }
 
-    } // class TermLinkComparer
+    /// <summary>
+    /// Сравнивает термины-ссылки <see cref="TermLink"/> по MFN
+    /// и метке поля.
+    /// </summary>
+    public sealed class ByTag
+        : IEqualityComparer<TermLink>
+    {
+        #region IEqualityComparer members
 
-} // namespace ManagedIrbis.Infrastructure
+        /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
+        public bool Equals
+            (
+                TermLink? x,
+                TermLink? y
+            )
+        {
+            Sure.NotNull (x);
+            Sure.NotNull (y);
+
+            return x!.Mfn == y!.Mfn && x.Tag == y.Tag;
+        }
+
+        /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
+        public int GetHashCode
+            (
+                TermLink obj
+            )
+        {
+            Sure.NotNull (obj);
+
+            return unchecked (obj.Mfn * 37 + obj.Tag);
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Сравнивает термины-ссылки <see cref="TermLink"/> по MFN,
+    /// метке поля и его повторению.
+    /// </summary>
+    public sealed class ByOccurrence
+        : IEqualityComparer<TermLink>
+    {
+        #region IEqualityComparer members
+
+        /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
+        public bool Equals
+            (
+                TermLink? x,
+                TermLink? y
+            )
+        {
+            Sure.NotNull (x);
+            Sure.NotNull (y);
+
+            return x!.Mfn == y!.Mfn
+                   && x.Tag == y.Tag
+                   && x.Occurrence == y.Occurrence;
+        }
+
+        /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
+        public int GetHashCode
+            (
+                TermLink obj
+            )
+        {
+            Sure.NotNull (obj);
+
+            return unchecked ((obj.Mfn * 37 + obj.Tag) * 37 + obj.Occurrence);
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Сравнивает термины-ссылки <see cref="TermLink"/>s по MFN,
+    /// метке поля, повторению поля и индексу слова.
+    /// </summary>
+    public sealed class ByIndex
+        : IEqualityComparer<TermLink>
+    {
+        #region IEqualityComparer members
+
+        /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
+        public bool Equals
+            (
+                TermLink? x,
+                TermLink? y
+            )
+        {
+            Sure.NotNull (x);
+            Sure.NotNull (y);
+
+            return x!.Mfn == y!.Mfn
+                   && x.Tag == y.Tag
+                   && x.Occurrence == y.Occurrence
+                   && Math.Abs (x.Index - y.Index) == 1;
+        }
+
+        /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
+        public int GetHashCode
+            (
+                TermLink obj
+            )
+        {
+            Sure.NotNull (obj);
+
+            // obj.Index not forgotten!
+
+            return unchecked ((obj.Mfn * 37 + obj.Tag) * 37 + obj.Occurrence);
+        }
+
+        #endregion
+    }
+
+    #endregion
+}

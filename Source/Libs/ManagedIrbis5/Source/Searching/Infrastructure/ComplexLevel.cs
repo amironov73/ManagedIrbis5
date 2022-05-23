@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
 
 /* ComplexLevel.cs -- комплексный уровень
@@ -21,142 +22,140 @@ using AM.Collections;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Комплексный уровень (состоит из нескольких элементов).
+/// </summary>
+internal class ComplexLevel<T>
+    : ISearchTree
+    where T : class, ISearchTree
 {
+    #region Properties
+
     /// <summary>
-    /// Комплексный уровень.
+    /// Выражение реально комплексное (т. е. содержит более одного элемента)?
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    class ComplexLevel<T>
-        : ISearchTree
-        where T: class, ISearchTree
+    public bool IsComplex => Items.Count > 1;
+
+    /// <summary>
+    /// Разделитель элементов.
+    /// </summary>
+    public string? Separator { get; }
+
+    /// <summary>
+    /// Собственно элементы.
+    /// </summary>
+    public NonNullCollection<T> Items { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ComplexLevel
+        (
+            string? separator
+        )
     {
-        #region Properties
+        Separator = separator;
+        Items = new NonNullCollection<T>();
+    }
 
-        /// <summary>
-        /// Is complex expression?
-        /// </summary>
-        public bool IsComplex => Items.Count > 1;
+    #endregion
 
-        /// <summary>
-        /// Item separator.
-        /// </summary>
-        public string? Separator { get; }
+    #region Public methods
 
-        /// <summary>
-        /// Items.
-        /// </summary>
-        public NonNullCollection<T> Items { get; }
+    /// <summary>
+    /// Добавление элемента.
+    /// </summary>
+    public ComplexLevel<T> AddItem
+        (
+            T item
+        )
+    {
+        Sure.NotNull (item);
 
-        #endregion
+        Items.Add (item);
 
-        #region Construction
+        return this;
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ComplexLevel
-            (
-                string? separator
-            )
+    #endregion
+
+    #region ISearchTree members
+
+    /// <inheritdoc cref="ISearchTree.Parent"/>
+    public ISearchTree? Parent { get; set; }
+
+    /// <inheritdoc cref="ISearchTree.Children" />
+    public ISearchTree[] Children => Items.ToArray();
+
+    /// <inheritdoc cref="ISearchTree.Value" />
+    public string? Value => null;
+
+    /// <inheritdoc cref="ISearchTree.Find"/>
+    public virtual TermLink[] Find
+        (
+            SearchContext context
+        )
+    {
+        return Array.Empty<TermLink>();
+    }
+
+    /// <inheritdoc cref="ISearchTree.ReplaceChild"/>
+    public void ReplaceChild
+        (
+            ISearchTree fromChild,
+            ISearchTree? toChild
+        )
+    {
+        var item = (T) fromChild;
+
+        var index = Items.IndexOf (item);
+        if (index < 0)
         {
-            Separator = separator;
-            Items = new NonNullCollection<T>();
+            Magna.Error
+                (
+                    nameof (ComplexLevel<T>) + "::" + nameof (ReplaceChild)
+                    + "child not found: "
+                    + fromChild.ToVisibleString()
+                );
+
+            throw new KeyNotFoundException();
         }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Add item.
-        /// </summary>
-        public ComplexLevel<T> AddItem
-            (
-                T item
-            )
+        if (toChild is null)
         {
-            Items.Add(item);
-
-            return this;
+            Items.RemoveAt (index);
+        }
+        else
+        {
+            Items[index] = item;
+            toChild.Parent = this;
         }
 
-        #endregion
+        fromChild.Parent = this;
+    }
 
-        #region ISearchTree members
+    #endregion
 
-        /// <inheritdoc cref="ISearchTree.Parent"/>
-        public ISearchTree? Parent { get; set; }
+    #region Object members
 
-        /// <inheritdoc cref="ISearchTree.Children" />
-        public ISearchTree[] Children
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var result = string.Join (Separator, Items);
+
+        if (IsComplex)
         {
-            // ReSharper disable CoVariantArrayConversion
-            get { return Items.ToArray(); }
-            // ReSharper restore CoVariantArrayConversion
+            result = " ( " + result + " ) ";
         }
 
-        /// <inheritdoc cref="ISearchTree.Value" />
-        public string? Value => null;
+        return result;
+    }
 
-        /// <inheritdoc cref="ISearchTree.Find"/>
-        public virtual TermLink[] Find ( SearchContext context ) =>
-            Array.Empty<TermLink>();
-
-        /// <inheritdoc cref="ISearchTree.ReplaceChild"/>
-        public void ReplaceChild
-            (
-                ISearchTree fromChild,
-                ISearchTree? toChild
-            )
-        {
-            T item = (T) fromChild;
-
-            int index = Items.IndexOf(item);
-            if (index < 0)
-            {
-                Magna.Error
-                    (
-                        "ComplexLevel::ReplaceChild: "
-                        + "child not found: "
-                        + fromChild.ToVisibleString()
-                    );
-
-                throw new KeyNotFoundException();
-            }
-
-            if (ReferenceEquals(toChild, null))
-            {
-                Items.RemoveAt(index);
-            }
-            else
-            {
-                Items[index] = item;
-                toChild.Parent = this;
-            }
-
-            fromChild.Parent = this;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            string result = string.Join(Separator, Items);
-
-            if (IsComplex)
-            {
-                result = " ( " + result + " ) ";
-            }
-
-            return result;
-        }
-
-        #endregion
-
-    } // class ComplexLevel
-
-} // namespace ManagedIrbis.Infrastructure
+    #endregion
+}
