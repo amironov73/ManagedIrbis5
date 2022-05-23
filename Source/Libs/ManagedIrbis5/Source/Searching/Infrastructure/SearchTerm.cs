@@ -17,185 +17,219 @@ using System.Text;
 using AM;
 
 using ManagedIrbis.Client;
+using ManagedIrbis.Direct;
+using ManagedIrbis.Providers;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+//
+// В общем виде операнд поискового выражения можно
+// представить следующим образом:
+//
+// “<префикс><термин>$”/(tag1,tag2,…tagN)
+//
+// где:
+//
+// <префикс> - префикс, определяющий вид
+// термина(вид словаря);
+// <термин> - собственно термин словаря;
+// $ - признак правого усечения термина;
+// определяет совокупность терминов, имеющих
+// начальную последовательность символов,
+// совпадающую с указанным термином;
+//может отсутствовать – в этом случае поиск
+// идет по точному значению указанного термина.
+// “ – символ-ограничитель термина (двойные кавычки);
+// должен использоваться обязательно, если термин
+// включает в себя символы пробел, круглые скобки,
+// решетка (#), а также символы, совпадающие
+// с обозначениями логических операторов;
+// / (tag1, tag2,…tagN) – конструкция квалификации
+// термина; определяет метки поля, в которых должен
+// находиться указанный термин, или точнее – вторую
+// часть ссылки термина
+// (Приложение  5. ТАБЛИЦЫ ВЫБОРА ПОЛЕЙ (ТВП));
+// может отсутствовать – что означает отсутствие
+// дополнительных требований в части меток полей.
+//
+
+/// <summary>
+/// Leaf node of AST.
+/// </summary>
+public sealed class SearchTerm
+    : ISearchTree
 {
-    //
-    // В общем виде операнд поискового выражения можно
-    // представить следующим образом:
-    //
-    // “<префикс><термин>$”/(tag1,tag2,…tagN)
-    //
-    // где:
-    //
-    // <префикс> - префикс, определяющий вид
-    // термина(вид словаря);
-    // <термин> - собственно термин словаря;
-    // $ - признак правого усечения термина;
-    // определяет совокупность терминов, имеющих
-    // начальную последовательность символов,
-    // совпадающую с указанным термином;
-    //может отсутствовать – в этом случае поиск
-    // идет по точному значению указанного термина.
-    // “ – символ-ограничитель термина (двойные кавычки);
-    // должен использоваться обязательно, если термин
-    // включает в себя символы пробел, круглые скобки,
-    // решетка (#), а также символы, совпадающие
-    // с обозначениями логических операторов;
-    // / (tag1, tag2,…tagN) – конструкция квалификации
-    // термина; определяет метки поля, в которых должен
-    // находиться указанный термин, или точнее – вторую
-    // часть ссылки термина
-    // (Приложение  5. ТАБЛИЦЫ ВЫБОРА ПОЛЕЙ (ТВП));
-    // может отсутствовать – что означает отсутствие
-    // дополнительных требований в части меток полей.
-    //
+    #region Properties
+
+    /// <inheritdoc cref="ISearchTree.Parent"/>
+    public ISearchTree? Parent { get; set; }
 
     /// <summary>
-    /// Leaf node of AST.
+    /// K=keyword
     /// </summary>
-    public sealed class SearchTerm
-        : ISearchTree
+    public string? Term { get; set; }
+
+    /// <summary>
+    /// $ or @
+    /// </summary>
+    public string? Tail { get; set; }
+
+    /// <summary>
+    /// /(tag,tag,tag)
+    /// </summary>
+    public string[]? Context { get; set; }
+
+    #endregion
+
+    #region Private members
+
+    private TermLink[] _ExactSearch
+        (
+            ISyncProvider provider,
+            string database,
+            string term,
+            int limit
+        )
     {
-        #region Properties
-
-        /// <inheritdoc cref="ISearchTree.Parent"/>
-        public ISearchTree? Parent { get; set; }
-
-        /// <summary>
-        /// K=keyword
-        /// </summary>
-        public string? Term { get; set; }
-
-        /// <summary>
-        /// $ or @
-        /// </summary>
-        public string? Tail { get; set; }
-
-        /// <summary>
-        /// /(tag,tag,tag)
-        /// </summary>
-        public string[]? Context { get; set; }
-
-        #endregion
-
-        #region ISearchTree members
-
-        /// <inheritdoc cref="ISearchTree.Children" />
-        public ISearchTree[] Children => Array.Empty<ISearchTree>();
-
-        /// <inheritdoc cref="ISearchTree.Value" />
-        public string? Value => Term;
-
-        /// <inheritdoc cref="ISearchTree.Find" />
-        public TermLink[] Find
-            (
-                SearchContext context
-            )
+        if (provider is DirectProvider direct)
         {
-            /*
-
-            Sure.NotNull(context, nameof(context));
-
-            var provider = context.Provider;
-            TermLink[] result;
-            string term = Term.ThrowIfNull(nameof(Term));
-
-            switch (Tail)
-            {
-                case null:
-                case "":
-                    result = provider.ExactSearchLinks(term);
-                    break;
-
-                case "$":
-                    result = provider.ExactSearchTrimLinks(term, 1000);
-                    break;
-
-                case "@":
-                    Magna.Error
-                        (
-                            "SearchTerm::Find: "
-                            + "@ not implemented"
-                        );
-
-                    throw new NotImplementedException();
-
-                default:
-                    Magna.Error
-                        (
-                            "SearchTerm::Find: "
-                            + "unexpected tail: "
-                            + Tail.ToVisibleString()
-                        );
-
-                    throw new IrbisException("Unexpected tail");
-            }
-
-            // TODO implement context filtering
+            var accessor = direct.GetAccessor (database);
+            var result = accessor.Accessor.ReadLinks (term);
 
             return result;
-
-            */
-
-            throw new NotImplementedException();
         }
 
-        /// <inheritdoc cref="ISearchTree.ReplaceChild"/>
-        public void ReplaceChild
-            (
-                ISearchTree fromChild,
-                ISearchTree? toChild
-            )
+        throw new NotImplementedException (nameof (_ExactSearch));
+    }
+
+    private TermLink[] _TrimSearch
+        (
+            ISyncProvider provider,
+            string database,
+            string term,
+            int limit
+        )
+    {
+        throw new NotImplementedException (nameof (_TrimSearch));
+    }
+
+    private TermLink[] _MorphoSearch
+        (
+            ISyncProvider provider,
+            string database,
+            string term,
+            int limit
+        )
+    {
+        throw new NotImplementedException (nameof (_MorphoSearch));
+    }
+
+    #endregion
+
+    #region ISearchTree members
+
+    /// <inheritdoc cref="ISearchTree.Children" />
+    public ISearchTree[] Children => Array.Empty<ISearchTree>();
+
+    /// <inheritdoc cref="ISearchTree.Value" />
+    public string? Value => Term;
+
+    /// <inheritdoc cref="ISearchTree.Find" />
+    public TermLink[] Find
+        (
+            SearchContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        var provider = context.Provider;
+        var database = provider.EnsureDatabase();
+        var term = Term.ThrowIfNull(nameof(Term));
+        TermLink[] result;
+
+        switch (Tail)
         {
-            Magna.Error
-                (
-                    "SearchTerm::ReplaceChild: "
-                    + "not implemented"
-                );
+            case null:
+            case "":
+                result = _ExactSearch (provider, database, term, 1000);
+                break;
 
-            throw new NotImplementedException();
-        }
+            case "$":
+                result = _TrimSearch (provider, database, term, 1000);
+                break;
 
-        #endregion
+            case "@":
+                result = _MorphoSearch (provider, database, term, 1000);
+                break;
 
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            StringBuilder result = new StringBuilder();
-
-            result.Append('"');
-            result.Append(Term);
-            if (!string.IsNullOrEmpty(Tail))
-            {
-                result.Append(Tail);
-            }
-            result.Append('"');
-            if (!ReferenceEquals(Context, null))
-            {
-                result.Append("/(");
-                result.Append
+            default:
+                Magna.Error
                     (
-                        string.Join
+                        nameof (SearchTerm) + "::" + nameof (Find)
+                        + "unexpected tail: "
+                        + Tail.ToVisibleString()
+                    );
+
+                throw new IrbisException ("Unexpected search term tail");
+        }
+
+        // TODO implement context filtering
+
+        return result;
+    }
+
+    /// <inheritdoc cref="ISearchTree.ReplaceChild"/>
+    public void ReplaceChild
+        (
+            ISearchTree fromChild,
+            ISearchTree? toChild
+        )
+    {
+        Magna.Error
+            (
+                "SearchTerm::ReplaceChild: "
+                + "not implemented"
+            );
+
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var result = new StringBuilder();
+
+        result.Append('"');
+        result.Append(Term);
+        if (!string.IsNullOrEmpty(Tail))
+        {
+            result.Append(Tail);
+        }
+        result.Append('"');
+        if (!ReferenceEquals(Context, null))
+        {
+            result.Append("/(");
+            result.Append
+                (
+                    string.Join
                         (
                             ",",
                             Context
                         )
-                    );
-                result.Append(')');
-            }
-
-            return result.ToString();
+                );
+            result.Append(')');
         }
 
-        #endregion
+        return result.ToString();
+    }
 
-    } // class SearchTerm
-
-} // namespace ManagedIrbis.Infrastructure
+    #endregion
+}

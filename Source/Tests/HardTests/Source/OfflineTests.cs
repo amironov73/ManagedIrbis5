@@ -12,9 +12,12 @@
 using System;
 using System.Text;
 
+using AM;
+
 using ManagedIrbis;
 using ManagedIrbis.Formatting;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Records;
 
 #endregion
 
@@ -26,9 +29,12 @@ internal static class OfflineTests
 {
     public static void Run
         (
-            string[] args
+            string[] args,
+            Action<HardFormat, StringBuilder, Record> action
         )
     {
+        Sure.NotNull (action);
+
         try
         {
             Console.WriteLine (Infrastructure.TestDataPath);
@@ -38,7 +44,11 @@ internal static class OfflineTests
             var maxMfn = provider.GetMaxMfn();
             Console.WriteLine ($"Max MFN={maxMfn}");
 
-            var formatter = new HardFormat();
+            var formatter = new HardFormat
+                (
+                    RecordConfiguration.GetDefault(),
+                    provider
+                );
             var builder = new StringBuilder();
             builder.EnsureCapacity (4096);
 
@@ -50,9 +60,11 @@ internal static class OfflineTests
                 {
                     builder.Clear();
 
-                    formatter.Brief (builder, record);
+                    action (formatter, builder, record);
+
                     var formatted = builder.ToString();
                     Console.WriteLine ($"{mfn}");
+                    Console.WriteLine ($"{formatter.Worksheet (record)}");
                     Console.WriteLine (formatted);
                     Console.WriteLine();
                 }

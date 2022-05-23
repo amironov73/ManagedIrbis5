@@ -1,6 +1,10 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
 /* SearchLevel2.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -51,12 +55,11 @@ namespace ManagedIrbis.Infrastructure
                 SearchContext context
             )
         {
-            Sure.NotNull(context, nameof(context));
+            Sure.NotNull (context);
 
-            TermLink[] result = Items[0].Find(context);
-            IEqualityComparer<TermLink> comparer
-                = new TermLinkComparer.ByOccurrence();
-            for (int i = 1; i < Items.Count; i++)
+            var result = Items[0].Find(context);
+            IEqualityComparer<TermLink> comparer = new TermLinkComparer.ByOccurrence();
+            for (var i = 1; i < Items.Count; i++)
             {
                 if (result.Length == 0)
                 {

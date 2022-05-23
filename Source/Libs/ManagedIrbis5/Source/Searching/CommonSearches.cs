@@ -15,6 +15,7 @@
 
 using AM;
 
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 
 #endregion
@@ -135,40 +136,37 @@ namespace ManagedIrbis
         {
             Sure.NotNull (connection);
 
+            var expression = $"\"{prefix}{value}\"";
+            Record? result;
             if (connection is ISyncConnection syncConnection)
             {
-                var expression = $"\"{prefix}{value}\"";
-                var result = syncConnection.SearchReadOneRecord (expression);
+                // протокол позволяет не только найти запись,
+                // но и заодно прочитать её при помощи форматирования
+                result = syncConnection.SearchReadOneRecord (expression);
 
                 return result;
             }
 
-            /*
-
-            string expression = $"\"{prefix}{value}\"";
-            SearchReadCommand command = new SearchReadCommand
+            var searchParameters = new SearchParameters
             {
-                Database = connection.Database,
-                SearchExpression = expression,
+                Database = connection.EnsureDatabase(),
+                Expression = expression,
                 NumberOfRecords = 2
             };
-
-            connection.ExecuteCommand(command);
-
-            Record[] found = command.Records
-                .ThrowIfNull(nameof(command.Records));
-            if (found.Length > 1)
+            var found = connection.Search (searchParameters);
+            if (found is null || found.Length != 1)
             {
-                throw new IrbisException($"Too many records found: {expression}");
+                return null;
             }
 
-            Record result = found.GetItem(0);
+            var readParameters = new ReadRecordParameters()
+            {
+                Database = connection.EnsureDatabase(),
+                Mfn = found[0].Mfn
+            };
+            result = connection.ReadRecord<Record> (readParameters);
 
             return result;
-
-            */
-
-            return null;
         }
 
         /// <summary>

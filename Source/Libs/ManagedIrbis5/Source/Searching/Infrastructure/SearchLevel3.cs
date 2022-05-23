@@ -1,6 +1,10 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
 /* SearchLevel3.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -14,66 +18,65 @@ using AM;
 
 #endregion
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+//
+// первый оператор контекстного И; соединение двух
+// терминов таким оператором контекстного И обозначает
+// требование поиска записей, в которых оба термина
+// присутствуют в одном и том же поле
+// (или точнее – когда у терминов совпадают вторые
+// части ссылок).
+//
+
+/// <summary>
+/// level2 (G) level2
+/// </summary>
+sealed class SearchLevel3
+    : ComplexLevel<SearchLevel2>
 {
-    //
-    // первый оператор контекстного И; соединение двух
-    // терминов таким оператором контекстного И обозначает
-    // требование поиска записей, в которых оба термина
-    // присутствуют в одном и том же поле
-    // (или точнее – когда у терминов совпадают вторые
-    // части ссылок).
-    //
+    #region Construction
 
     /// <summary>
-    /// level2 (G) level2
+    /// Constructor.
     /// </summary>
-    sealed class SearchLevel3
-        : ComplexLevel<SearchLevel2>
+    public SearchLevel3()
+        : base(" (G) ")
     {
-        #region Construction
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public SearchLevel3()
-            : base(" (G) ")
+    #endregion
+
+    #region ISearchTree members
+
+    /// <inheritdoc cref="ComplexLevel{T}.Find"/>
+    public override TermLink[] Find
+        (
+            SearchContext context
+        )
+    {
+        Sure.NotNull(context, nameof(context));
+
+        var result = Items[0].Find(context);
+        IEqualityComparer<TermLink> comparer
+            = new TermLinkComparer.ByTag();
+        for (var i = 1; i < Items.Count; i++)
         {
-        }
-
-        #endregion
-
-        #region ISearchTree members
-
-        /// <inheritdoc cref="ComplexLevel{T}.Find"/>
-        public override TermLink[] Find
-            (
-                SearchContext context
-            )
-        {
-            Sure.NotNull(context, nameof(context));
-
-            TermLink[] result = Items[0].Find(context);
-            IEqualityComparer<TermLink> comparer
-                = new TermLinkComparer.ByTag();
-            for (int i = 1; i < Items.Count; i++)
+            if (result.Length == 0)
             {
-                if (result.Length == 0)
-                {
-                    return result;
-                }
-                result = result.Intersect
+                return result;
+            }
+            result = result.Intersect
                     (
                         Items[i].Find(context),
                         comparer
                     )
-                    .ToArray();
-            }
-            result = result.Distinct(comparer).ToArray();
-
-            return result;
+                .ToArray();
         }
+        result = result.Distinct(comparer).ToArray();
 
-        #endregion
+        return result;
     }
+
+    #endregion
 }

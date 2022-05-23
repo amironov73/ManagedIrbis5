@@ -1034,13 +1034,13 @@ public class DirectProvider
             return Array.Empty<FoundItem>();
         }
 
-        var manager = new SearchManager(this);
-        var context = new SearchContext(manager, this);
-        var tokenList = SearchQueryLexer.Tokenize(expression);
-        var parser = new SearchQueryParser(tokenList);
+        var manager = new SearchManager (this);
+        var context = new SearchContext (manager, this);
+        var tokenList = SearchQueryLexer.Tokenize (expression);
+        var parser = new SearchQueryParser (tokenList);
         var program = parser.Parse();
-        var found = program.Find(context);
-        var result = new List<FoundItem>(found.Length);
+        var found = program.Find (context);
+        var result = new List<FoundItem> (found.Length);
         foreach (var termLink in found)
         {
             var item = new FoundItem()
@@ -1048,6 +1048,8 @@ public class DirectProvider
                 Mfn = termLink.Mfn,
                 Text = null // TODO: возвращать текст
             };
+
+            result.Add (item);
         }
 
         return result.ToArray();

@@ -16,11 +16,9 @@
 
 #region Using directives
 
-using System;
-using System.IO;
-using System.Linq;
+using System.Text;
 
-using ManagedIrbis.Direct;
+using ManagedIrbis;
 using ManagedIrbis.Formatting;
 
 #endregion
@@ -36,7 +34,14 @@ static class Program
             string[] args
         )
     {
-        OfflineTests.Run (args);
+        void action (HardFormat formatter, StringBuilder builder, Record record)
+             => formatter.Brief (builder, record);
+
+        OfflineTests.Run
+            (
+                args,
+                action
+            );
 
         return 0;
     }

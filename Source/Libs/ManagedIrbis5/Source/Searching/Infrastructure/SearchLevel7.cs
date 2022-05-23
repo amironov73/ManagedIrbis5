@@ -15,55 +15,54 @@ using AM;
 
 #endregion
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// ( level6 )
+/// </summary>
+sealed class SearchLevel7
+    : ComplexLevel<SearchLevel6>
 {
+    #region Construction
+
     /// <summary>
-    /// ( level6 )
+    /// Constructor.
     /// </summary>
-    sealed class SearchLevel7
-        : ComplexLevel<SearchLevel6>
+    public SearchLevel7()
+        : base(null)
     {
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public SearchLevel7()
-            : base(null)
-        {
-        }
-
-        #endregion
-
-        #region ISearchTree members
-
-        /// <inheritdoc cref="ComplexLevel{T}.Find"/>
-        public override TermLink[] Find
-            (
-                SearchContext context
-            )
-        {
-            Sure.NotNull(context, nameof(context));
-
-            TermLink[] result = Items[0].Find(context);
-
-            return result;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="ComplexLevel{T}.ToString" />
-        public override string ToString()
-        {
-            SearchLevel6 item = Items[0];
-
-            string result = item.ToString();
-
-            return result;
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region ISearchTree members
+
+    /// <inheritdoc cref="ComplexLevel{T}.Find"/>
+    public override TermLink[] Find
+        (
+            SearchContext context
+        )
+    {
+        Sure.NotNull(context, nameof(context));
+
+        var result = Items[0].Find(context);
+
+        return result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="ComplexLevel{T}.ToString" />
+    public override string ToString()
+    {
+        var item = Items[0];
+
+        var result = item.ToString();
+
+        return result;
+    }
+
+    #endregion
 }

@@ -18,6 +18,8 @@ using AM;
 using AM.Collections;
 using AM.Text;
 
+using ManagedIrbis.Pft.Infrastructure.Unifors;
+using ManagedIrbis.Providers;
 using ManagedIrbis.Records;
 
 namespace ManagedIrbis.Formatting;
@@ -33,7 +35,7 @@ public sealed class HardFormat
     /// Конструктор по умолчанию.
     /// </summary>
     public HardFormat()
-        : this (RecordConfiguration.GetDefault())
+        : this (RecordConfiguration.GetDefault(), new NullProvider())
     {
     }
 
@@ -42,12 +44,15 @@ public sealed class HardFormat
     /// </summary>
     public HardFormat
         (
-            RecordConfiguration configuration
+            RecordConfiguration configuration,
+            ISyncProvider provider
         )
     {
         Sure.NotNull (configuration);
+        Sure.NotNull (provider);
 
         _configuration = configuration;
+        _provider = provider;
     }
 
     #endregion
@@ -55,6 +60,8 @@ public sealed class HardFormat
     #region Private members
 
     private readonly RecordConfiguration _configuration;
+
+    private readonly ISyncProvider _provider;
 
     /// <summary>
     /// Ограничители, после которых нельзя ставить точку
@@ -366,17 +373,20 @@ public sealed class HardFormat
         Sure.NotNull (builder);
         Sure.NotNull (record);
 
-        var title = record.GetField (200);
-        if (title is null)
+        var field = record.GetField (200);
+        if (field is null)
         {
             return;
         }
 
         // обозначение и номер тома
-        builder.AppendWithSuffix (title.GetSubFieldValue ('v'), " : ");
+        var volumeNumber = field.GetSubFieldValue ('v');
 
-        // заглавие тома
-        builder.Append (title.GetSubFieldValue ('a'));
+        // заглавие тома (основное заглавие)
+        var title = field.GetSubFieldValue ('a');
+        title = UniforPlusS.DecodeTitle (title, true); // для "<1000=тысяча> мелочей
+
+        builder.AppendWithSeparator (" : ", volumeNumber, title);
 
         // параллельные заглавия
         var parallel = record.Fields.GetField (510);
@@ -392,8 +402,12 @@ public sealed class HardFormat
         foreach (var volume in record.EnumerateField (925))
         {
             builder.Append (", ");
-            builder.AppendWithSuffix (volume.GetSubFieldValue ('v'), " : "); // обозначение и номер тома
-            builder.Append (volume.GetSubFieldValue ('a')); // заглавие тома
+
+            volumeNumber = volume.GetSubFieldValue ('v'); // обозначение и номер тома
+            title = volume.GetSubFieldValue ('a'); // заглавие тома
+
+            builder.AppendWithSeparator (" : ", volumeNumber, title);
+
             builder.AppendWithPrefix (volume.GetSubFieldValue ('b'), " ; "); // заглавие второго произведения
             builder.AppendWithPrefix (volume.GetSubFieldValue ('c'), " ; "); // заглавие третьего произведения
         }
@@ -406,30 +420,36 @@ public sealed class HardFormat
         }
 
         // сведения, относящиеся к заглавию
-        builder.AppendWithPrefix (title.GetSubFieldValue ('e'), ":");
+        builder.AppendWithPrefix (field.GetSubFieldValue ('e'), " : ");
 
         // вторая и третья единицы деления
         var issue = record.GetField (923);
         if (issue is not null)
         {
-            if (_AppendWithPrefix (builder, issue.GetSubFieldValue ('h'), " ") // обозначение второй единицы деления
-                || _AppendWithPrefix (builder, issue.GetSubFieldValue ('i'), " ")) // заглавие второй единицы деления
+            volumeNumber = issue.GetSubFieldValue ('h'); // обозначение второй единицы деления
+            title = issue.GetSubFieldValue ('i'); // заглавие второй единицы деления
+            if (!string.IsNullOrEmpty (volumeNumber) || !string.IsNullOrEmpty (title))
             {
+                _AddDot (builder);
+                builder.AppendWithSeparator (" : ", volumeNumber, title);
                 _AddDot (builder);
             }
 
-            if (_AppendWithPrefix (builder, issue.GetSubFieldValue ('k'), " ") // обозначение третьей единицы деления
-                || _AppendWithPrefix (builder, issue.GetSubFieldValue ('l'), " ")) // заглавие третьей единицы деления
+            volumeNumber = issue.GetSubFieldValue ('k'); // обозначение третьей единицы деления
+            title = issue.GetSubFieldValue ('l'); // заглавие третьей единицы деления
+            if (!string.IsNullOrEmpty (volumeNumber) || !string.IsNullOrEmpty (title))
             {
+                _AddDot (builder);
+                builder.AppendWithSeparator (" : ", volumeNumber, title);
                 _AddDot (builder);
             }
         }
 
         // первые сведения об ответственности
-        builder.AppendWithPrefix (title.GetSubFieldValue ('f'), " / ");
+        builder.AppendWithPrefix (field.GetSubFieldValue ('f'), " / ");
 
         // последующие сведения об ответственности
-        builder.AppendWithPrefix (title.GetSubFieldValue ('g'), " ; ");
+        builder.AppendWithPrefix (field.GetSubFieldValue ('g'), " ; ");
     }
 
     /// <summary>
@@ -768,6 +788,141 @@ public sealed class HardFormat
     }
 
     /// <summary>
+    /// Выпуск журнала/газеты.
+    /// </summary>
+    public void MagazineIssue
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        var worksheet = Worksheet (record);
+        if (string.IsNullOrEmpty (worksheet))
+        {
+            return;
+        }
+
+        var isIssue = worksheet.Contains ("NJ", StringComparison.InvariantCultureIgnoreCase);
+        if (!isIssue)
+        {
+            return;
+        }
+
+        var summaryIndex = record.FM (933); // шифр сводной записи
+        if (string.IsNullOrEmpty (summaryIndex))
+        {
+            return;
+        }
+
+        var magazine = _provider.ByIndex (summaryIndex);
+        if (magazine is null)
+        {
+            return;
+        }
+
+        // область заглавия
+        var title = magazine.GetField (200);
+        if (title is null)
+        {
+            return;
+        }
+
+        // заглавие (название) журнала/газеты
+        builder.Append (title.GetSubFieldValue ('a'));
+
+        // подзаголовочные сведения
+        builder.AppendWithPrefix (title.GetSubFieldValue ('e'), " : ");
+
+        // первые сведения об ответственности
+        builder.AppendWithPrefix (title.GetSubFieldValue ('f'), " / ");
+
+        // последующие сведения об ответственности
+        builder.AppendWithPrefix (title.GetSubFieldValue ('g'), " ; ");
+
+        builder.AppendWithPrefix (record.FM (934), ". - "); // год
+        builder.AppendWithPrefix (record.FM (935), ". - Т. "); // том
+        builder.AppendWithPrefix (record.FM (936), ". - № "); // номер
+        builder.AppendWithBrackets (record.FM (931, 'c')); // дата выхода
+        builder.AppendWithPrefix (magazine.FM (110, 'x'), ". - Периодичность: "); // периодичность
+        builder.AppendWithPrefix (magazine.FM (11, 'a'), ". - ISSN "); // ISSN
+
+        _AddDot (builder);
+    }
+
+    /// <summary>
+    /// Составная часть документа, например, статья в журнале или сборнике.
+    /// Поле 463.
+    /// </summary>
+    public void Article
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        var field = record.GetField (463);
+        if (field is null)
+        {
+            return;
+        }
+
+        // заглавие журнала/газеты
+        var title = field.GetSubFieldValue ('c');
+        if (string.IsNullOrEmpty (title))
+        {
+            return;
+        }
+
+        // признак начала области источника плюс заглавие
+        builder.Append (" // ");
+        builder.Append (title);
+
+        // сведения, относящиеся к заглавию
+        builder.AppendWithPrefix (field.GetSubFieldValue ('e'), " : ");
+
+        // первичные сведения об ответственности
+        builder.AppendWithPrefix (field.GetSubFieldValue ('f'), " / ");
+
+        _AddSeparator (builder);
+
+        // год издания
+        builder.Append (field.GetSubFieldValue ('j'));
+
+        // обозначение и номер первой единицы деления
+        if (field.HaveSubField ('a', 'v'))
+        {
+            _AddSeparator (builder);
+
+            builder.Append (field.GetSubFieldValue ('v'));
+            builder.Append (field.GetSubFieldValue ('a'));
+        }
+
+        // обозначение и номер второй единицы деления
+        if (field.HaveSubField ('h', 'i'))
+        {
+            _AddSeparator (builder);
+
+            builder.Append (field.GetSubFieldValue ('h'));
+            builder.Append (field.GetSubFieldValue ('i'));
+        }
+
+        if (field.HaveSubField ('s'))
+        {
+            _AddSeparator (builder);
+            var unit = Utility.NonEmpty (field.GetSubFieldValue ('1'), "С.");
+            builder.AppendWithPrefix (field.GetSubFieldValue ('s'), unit + " ");
+        }
+
+
+        _AddDot (builder);
+    }
+
+    /// <summary>
     /// Краткое описание.
     /// </summary>
     public void Brief
@@ -783,6 +938,8 @@ public sealed class HardFormat
         CommonInfo (builder, record);
         FirstAuthor (builder, record);
         TitleArea (builder, record);
+        MagazineIssue (builder, record);
+        Article (builder, record);
         Edition (builder, record);
         Imprint (builder, record);
         PhysicalCharacteristics (builder, record);
