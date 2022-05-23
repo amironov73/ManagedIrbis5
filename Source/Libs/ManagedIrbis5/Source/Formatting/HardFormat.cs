@@ -12,12 +12,14 @@
  */
 
 using System;
+using System.Linq;
 using System.Text;
 
 using AM;
 using AM.Collections;
 using AM.Text;
 
+using ManagedIrbis.Fields;
 using ManagedIrbis.Pft.Infrastructure.Unifors;
 using ManagedIrbis.Providers;
 using ManagedIrbis.Records;
@@ -29,6 +31,15 @@ namespace ManagedIrbis.Formatting;
 /// </summary>
 public sealed class HardFormat
 {
+    #region Properties
+
+    /// <summary>
+    /// Разделитель областей.
+    /// </summary>
+    public string? AreaSeparator { get; set; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -51,6 +62,7 @@ public sealed class HardFormat
         Sure.NotNull (configuration);
         Sure.NotNull (provider);
 
+        AreaSeparator = String.Empty;
         _configuration = configuration;
         _provider = provider;
     }
@@ -213,6 +225,55 @@ public sealed class HardFormat
     }
 
     /// <summary>
+    /// Переход к новой области описания.
+    /// </summary>
+    public void NewArea
+        (
+            StringBuilder builder
+        )
+    {
+        Sure.NotNull (builder);
+
+        if (string.IsNullOrEmpty (AreaSeparator))
+        {
+            return;
+        }
+
+
+        if (string.IsNullOrWhiteSpace (AreaSeparator))
+        {
+            // не даём накапливаться лишним переводам строки
+            builder.TrimEnd();
+
+            if (builder.Length != 0)
+            {
+                // текст библиографического описания не должен
+                // начинаться с перехода на новую область
+                builder.Append (AreaSeparator);
+            }
+        }
+        else
+        {
+            var builderLength = builder.Length;
+            if (builderLength != 0)
+            {
+                var areaLength = AreaSeparator.Length;
+                var enable = areaLength < builderLength;
+                if (enable)
+                {
+                    var text = builder.ToString (builderLength - areaLength, areaLength);
+                    enable = text != AreaSeparator;
+                }
+
+                if (enable)
+                {
+                    builder.Append (AreaSeparator);
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Автор книги из общей части.
     /// </summary>
     public void CommonAuthor
@@ -272,6 +333,7 @@ public sealed class HardFormat
 
         var first = true;
         var commons = record.Fields.GetField (461);
+        var additionals = record.Fields.GetField (46); // дополнение
 
         foreach (var common in commons)
         {
@@ -525,10 +587,17 @@ public sealed class HardFormat
 
             }
 
-            flag =  flag
-                || _AppendWithPrefix (builder, publisher, " : ") // издательство
-                || _AppendWithPrefixAndSuffix (builder, imprint.GetSubFieldValue ('6'), " [", "]"); // функция издающей организации
+            // издательство
+            if (_AppendWithPrefix (builder, publisher, " : "))
+            {
+                flag = true;
+            }
 
+            // функция издающей организации
+            if (_AppendWithPrefixAndSuffix (builder, imprint.GetSubFieldValue ('6'), " [", "]"))
+            {
+                flag = true;
+            }
 
             if (flag)
             {
@@ -638,28 +707,34 @@ public sealed class HardFormat
         Sure.NotNull (builder);
         Sure.NotNull (record);
 
-        foreach (var serie in record.EnumerateField (225))
+        foreach (var field in record.EnumerateField (225))
         {
+            if (!field.HaveSubField ('a'))
+            {
+                // серии без заглавия пропускаем
+                continue;
+            }
+
             _AddSeparator (builder);
             builder.Append ('(');
 
             // наименование (заглавие) серии
-            builder.Append (serie.GetSubFieldValue ('a'));
+            builder.Append (field.GetSubFieldValue ('a'));
 
             // параллельное наименование серии
-            builder.AppendWithPrefix (serie.GetSubFieldValue ('d'), " = ");
+            builder.AppendWithPrefix (field.GetSubFieldValue ('d'), " = ");
 
             // сведения, относящиеся к наименованию серии
-            builder.AppendWithPrefix (serie.GetSubFieldValue ('e'), " : ");
+            builder.AppendWithPrefix (field.GetSubFieldValue ('e'), " : ");
 
             // сведения об ответственности
-            builder.AppendWithPrefix (serie.GetSubFieldValue ('f'), " / ");
+            builder.AppendWithPrefix (field.GetSubFieldValue ('f'), " / ");
 
             // ISSN
-            builder.AppendWithPrefix (serie.GetSubFieldValue ('x'), ". - ISSN ");
+            builder.AppendWithPrefix (field.GetSubFieldValue ('x'), ". - ISSN ");
 
             // номер выпуска
-            builder.AppendWithPrefix (serie.GetSubFieldValue ('v'), " ; ");
+            builder.AppendWithPrefix (field.GetSubFieldValue ('v'), " ; ");
 
             builder.Append (").");
         }
@@ -734,7 +809,32 @@ public sealed class HardFormat
                         );
                     builder.AppendWithSuffix (price, " " + currency);
                 }
+
+                _AddDot (builder);
             }
+        }
+    }
+
+    /// <summary>
+    /// ISSN, поле 11.
+    /// </summary>
+    public void Issn
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        var issn = record.FM (11, 'a');
+        if (!string.IsNullOrEmpty (issn)
+            && !issn.SameString ("XXXX-XXXX")
+            && !issn.SameString ("ХХХХ-ХХХХ"))
+        {
+            _AddSeparator (builder);
+            builder.AppendWithPrefix (issn, "ISSN ");
+            _AddDot (builder);
         }
     }
 
@@ -761,6 +861,8 @@ public sealed class HardFormat
 
                 builder.Append (one.GetSubFieldValue ('a')); // тип номера
                 builder.AppendWithPrefix (one.GetSubFieldValue ('b'), " "); // собственно номер
+
+                _AddDot (builder);
             }
         }
     }
@@ -918,8 +1020,224 @@ public sealed class HardFormat
             builder.AppendWithPrefix (field.GetSubFieldValue ('s'), unit + " ");
         }
 
-
         _AddDot (builder);
+    }
+
+    /// <summary>
+    /// Страны издания, поле 102.
+    /// </summary>
+    public void Countries
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        var items = record.FMA (102);
+        if (!items.IsNullOrEmpty())
+        {
+            var need = items.Any
+                (
+                    item => !(string.Compare (item, "RU", StringComparison.OrdinalIgnoreCase) == 0
+                        || string.Compare (item, "SU", StringComparison.OrdinalIgnoreCase) == 0)
+                );
+
+            if (need)
+            {
+                NewArea (builder);
+                builder.Append (items.Length == 1 ? "Страна" : "Страны");
+                builder.Append (": ");
+                builder.AppendWithSeparator (", ", items);
+                _AddDot (builder);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Языки документа, поле 101.
+    /// </summary>
+    public void Languages
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        var items = record.FMA (101);
+        if (!items.IsNullOrEmpty())
+        {
+            var need = items.Any
+                (
+                    item => string.Compare (item, "rus", StringComparison.OrdinalIgnoreCase) != 0
+                );
+
+            if (need)
+            {
+                NewArea (builder);
+                builder.Append (items.Length == 1 ? "Язык" : "Языки");
+                builder.Append (": ");
+                builder.AppendWithSeparator (", ", items);
+                _AddDot (builder);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Аннотация, поле 331.
+    /// </summary>
+    public void Annotation
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        var prefix = "Аннотация: ";
+        foreach (var annotation in record.FMA (331))
+        {
+            NewArea (builder);
+            builder.Append (prefix);
+            prefix = null;
+
+            // для "Рассмотрены возможности языка <Object Pascal>."
+            var decoded = UniforPlusS.DecodeTitle (annotation, true);
+            builder.Append (decoded);
+            _AddDot (builder);
+        }
+    }
+
+    /// <summary>
+    /// Вывод рубрик с указанной меткой.
+    /// </summary>
+    public void Subjects
+        (
+            StringBuilder builder,
+            Record record,
+            int tag,
+            string title
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+        Sure.Positive (tag);
+        Sure.NotNull (title);
+
+        var fields = record.Fields.GetField (tag);
+        if (!fields.IsNullOrEmpty())
+        {
+            NewArea (builder);
+            builder.Append (title);
+            builder.Append (": ");
+            var index = 1;
+            foreach (var field in fields)
+            {
+                if (index != 1)
+                {
+                    NewArea (builder);
+                }
+
+                builder.Append ($"{index.ToInvariantString()}. ");
+                builder.Append (field.GetSubFieldValue ('a'));
+                builder.AppendWithPrefix (field.GetSubFieldValue ('b'), " - ");
+                builder.AppendWithPrefix (field.GetSubFieldValue ('c'), " - ");
+                builder.AppendWithPrefix (field.GetSubFieldValue ('d'), " - ");
+                _AddDot (builder);
+
+                index++;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Рубрики, поля 606, 607.
+    /// </summary>
+    public void Subjects
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        Subjects (builder, record, 606, "Рубрики");
+        Subjects (builder, record, 607, "Географические рубрики");
+    }
+
+    /// <summary>
+    /// Ключевые слова, поле 610.
+    /// </summary>
+    public void Keywords
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        var keywords = record.FMA (610);
+        if (!keywords.IsNullOrEmpty())
+        {
+            NewArea (builder);
+            builder.Append ("Ключевые слова: ");
+
+            var first = true;
+            foreach (var keyword in keywords)
+            {
+                if (!first)
+                {
+                    builder.Append (", ");
+                }
+
+                var decoded = UniforPlusS.DecodeTitle (keyword, true);
+                builder.Append (decoded);
+                first = false;
+            }
+            _AddDot (builder);
+        }
+    }
+
+    /// <summary>
+    /// Экземпляры, поле 910.
+    /// </summary>
+    public void Exemplars
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        var exemplars = ExemplarInfo.ParseRecord (record);
+        if (!exemplars.IsNullOrEmpty())
+        {
+            NewArea (builder);
+            builder.Append ("Экземпляры: ");
+            var first = true;
+            foreach (var exemplar in exemplars)
+            {
+                var number = exemplar.Amount ?? exemplar.Number;
+                var place = exemplar.Place;
+                if (!string.IsNullOrEmpty (number) && !string.IsNullOrEmpty (place))
+                {
+                    if (!first)
+                    {
+                        builder.Append (", ");
+                    }
+
+                    builder.AppendWithSeparator (" - ", number, place);
+                    first = false;
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -936,7 +1254,9 @@ public sealed class HardFormat
 
         CommonAuthor (builder, record);
         CommonInfo (builder, record);
+        NewArea (builder);
         FirstAuthor (builder, record);
+        NewArea (builder);
         TitleArea (builder, record);
         MagazineIssue (builder, record);
         Article (builder, record);
@@ -945,8 +1265,30 @@ public sealed class HardFormat
         PhysicalCharacteristics (builder, record);
         Series (builder, record);
         IsbnAndPrice (builder, record);
+        Issn (builder, record);
         Identifier (builder, record);
+        Countries (builder, record);
+        Languages (builder, record);
         Print203 (builder, record);
+    }
+
+    /// <summary>
+    /// Полное описание.
+    /// </summary>
+    public void FullDescription
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        Brief (builder, record);
+        Subjects (builder, record);
+        Keywords (builder, record);
+        Annotation (builder, record);
+        Exemplars (builder, record);
     }
 
     #endregion

@@ -30,6 +30,7 @@ internal static class OfflineTests
     public static void Run
         (
             string[] args,
+            string areaSeparator,
             Action<HardFormat, StringBuilder, Record> action
         )
     {
@@ -51,6 +52,7 @@ internal static class OfflineTests
                 );
             var builder = new StringBuilder();
             builder.EnsureCapacity (4096);
+            formatter.AreaSeparator = areaSeparator;
 
             for (var mfn = 1; mfn < maxMfn; mfn++)
             {

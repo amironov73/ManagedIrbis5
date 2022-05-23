@@ -16,6 +16,7 @@
 
 #region Using directives
 
+using System;
 using System.Text;
 
 using ManagedIrbis;
@@ -35,11 +36,12 @@ static class Program
         )
     {
         void action (HardFormat formatter, StringBuilder builder, Record record)
-             => formatter.Brief (builder, record);
+             => formatter.FullDescription (builder, record);
 
         OfflineTests.Run
             (
                 args,
+                Environment.NewLine,
                 action
             );
 

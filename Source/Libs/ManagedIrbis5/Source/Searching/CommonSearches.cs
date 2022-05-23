@@ -22,178 +22,199 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Наиболее распространенные поиски.
+/// </summary>
+public static class CommonSearches
 {
+    #region Constants
+
     /// <summary>
-    /// Наиболее распространенные поиски.
+    /// Ключевые слова.
     /// </summary>
-    public static class CommonSearches
+    public const string KeywordPrefix = "K=";
+
+    /// <summary>
+    /// Индивидуальный автор, редактор, составитель.
+    /// </summary>
+    public const string AuthorPrefix = "A=";
+
+    /// <summary>
+    /// Коллектив или мероприятие.
+    /// </summary>
+    public const string CollectivePrefix = "M=";
+
+    /// <summary>
+    /// Заглавие.
+    /// </summary>
+    public const string TitlePrefix = "T=";
+
+    /// <summary>
+    /// Шифр документа в базе.
+    /// </summary>
+    public const string IndexPrefix = "I=";
+
+    /// <summary>
+    /// Инвентарный номер, штрих-код или радиометка.
+    /// </summary>
+    public const string InventoryPrefix = "IN=";
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Поиск единственной записи с указанным шифром.
+    /// Запись может отсуствовать, это не будет считаться ошибкой.
+    /// </summary>
+    public static Record? ByIndex
+        (
+            this ISyncProvider connection,
+            string index
+        )
     {
-        #region Constants
+        Sure.NotNull (connection);
+        Sure.NotNullNorEmpty (index);
 
-        /// <summary>
-        /// Ключевые слова.
-        /// </summary>
-        public const string KeywordPrefix = "K=";
+        return SingleOrDefault (connection, IndexPrefix, index);
+    }
 
-        /// <summary>
-        /// Индивидуальный автор, редактор, составитель.
-        /// </summary>
-        public const string AuthorPrefix = "A=";
+    /// <summary>
+    /// Поиск единственной записи, содержащей экземпляр с указанным номером
+    /// (или штрих-кодом или радио-меткой).
+    /// Запись может отсуствовать, это не будет считаться ошибкой.
+    /// </summary>
+    public static Record? ByInventory
+        (
+            this ISyncProvider connection,
+            string inventory
+        )
+    {
+        Sure.NotNull (connection);
+        Sure.NotNullNorEmpty (inventory);
 
-        /// <summary>
-        /// Коллектив или мероприятие.
-        /// </summary>
-        public const string CollectivePrefix = "M=";
+        return SingleOrDefault (connection, InventoryPrefix, inventory);
+    }
 
-        /// <summary>
-        /// Заглавие.
-        /// </summary>
-        public const string TitlePrefix = "T=";
+    /// <summary>
+    /// Поиск первой попавшейся записи, удовлетворяющей указанному условию.
+    /// Запись может отсуствовать, это не будет считаться ошибкой.
+    /// </summary>
+    /// <returns>Найденную запись либо <c>null</c>.</returns>
+    public static Record? FirstOrDefault
+        (
+            this ISyncProvider connection,
+            string prefix,
+            string value
+        )
+    {
+        Sure.NotNull (connection);
 
-        /// <summary>
-        /// Шифр документа в базе.
-        /// </summary>
-        public const string IndexPrefix = "I=";
-
-        /// <summary>
-        /// Инвентарный номер, штрих-код или радиометка.
-        /// </summary>
-        public const string InventoryPrefix = "IN=";
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Поиск единственной записи с указанным шифром.
-        /// Запись может отсуствовать, это не будет считаться ошибкой.
-        /// </summary>
-        public static Record? ByIndex
-            (
-                this ISyncProvider connection,
-                string index
-            )
+        var expression = $"\"{prefix}{value}\"";
+        Record? result;
+        if (connection is ISyncConnection syncConnection)
         {
-            Sure.NotNull (connection);
-            Sure.NotNullNorEmpty (index);
-
-            return SingleOrDefault (connection, IndexPrefix, index);
-        }
-
-        /// <summary>
-        /// Поиск единственной записи, содержащей экземпляр с указанным номером
-        /// (или штрих-кодом или радио-меткой).
-        /// Запись может отсуствовать, это не будет считаться ошибкой.
-        /// </summary>
-        public static Record? ByInventory
-            (
-                this ISyncProvider connection,
-                string inventory
-            )
-        {
-            Sure.NotNull (connection);
-            Sure.NotNullNorEmpty (inventory);
-
-            return SingleOrDefault (connection, InventoryPrefix, inventory);
-        }
-
-        /// <summary>
-        /// Поиск первой попавшейся записи, удовлетворяющей указанному условию.
-        /// Запись может отсуствовать, это не будет считаться ошибкой.
-        /// </summary>
-        /// <returns>Найденную запись либо <c>null</c>.</returns>
-        public static Record? FirstOrDefault
-            (
-                this ISyncProvider connection,
-                string prefix,
-                string value
-            )
-        {
-            /*
-
-            Record result = connection.SearchReadOneRecord("\"{0}{1}\"", prefix, value);
+            // протокол позволяет не только найти запись,
+            // но и заодно прочитать её при помощи форматирования
+            result = syncConnection.SearchReadOneRecord (expression);
 
             return result;
+        }
 
-            */
-
+        var searchParameters = new SearchParameters
+        {
+            Database = connection.EnsureDatabase(),
+            Expression = expression,
+            NumberOfRecords = 1
+        };
+        var found = connection.Search (searchParameters);
+        if (found is null)
+        {
             return null;
         }
 
-        /// <summary>
-        /// Поиск единственной записи, удовлетворяющей указанному условию.
-        /// Запись может отсуствовать, это не будет считаться ошибкой.
-        /// </summary>
-        /// <returns>Найденную запись либо <c>null</c>.</returns>
-        /// <exception cref="IrbisException">Если найдено более одной записи.</exception>
-        public static Record? SingleOrDefault
-            (
-                this ISyncProvider connection,
-                string prefix,
-                string value
-            )
+        var readParameters = new ReadRecordParameters()
         {
-            Sure.NotNull (connection);
+            Database = connection.EnsureDatabase(),
+            Mfn = found[0].Mfn
+        };
+        result = connection.ReadRecord<Record> (readParameters);
 
-            var expression = $"\"{prefix}{value}\"";
-            Record? result;
-            if (connection is ISyncConnection syncConnection)
-            {
-                // протокол позволяет не только найти запись,
-                // но и заодно прочитать её при помощи форматирования
-                result = syncConnection.SearchReadOneRecord (expression);
+        return result;
+    }
 
-                return result;
-            }
+    /// <summary>
+    /// Поиск единственной записи, удовлетворяющей указанному условию.
+    /// Запись может отсуствовать, это не будет считаться ошибкой.
+    /// </summary>
+    /// <returns>Найденную запись либо <c>null</c>.</returns>
+    /// <exception cref="IrbisException">Если найдено более одной записи.</exception>
+    public static Record? SingleOrDefault
+        (
+            this ISyncProvider connection,
+            string prefix,
+            string value
+        )
+    {
+        Sure.NotNull (connection);
 
-            var searchParameters = new SearchParameters
-            {
-                Database = connection.EnsureDatabase(),
-                Expression = expression,
-                NumberOfRecords = 2
-            };
-            var found = connection.Search (searchParameters);
-            if (found is null || found.Length != 1)
-            {
-                return null;
-            }
-
-            var readParameters = new ReadRecordParameters()
-            {
-                Database = connection.EnsureDatabase(),
-                Mfn = found[0].Mfn
-            };
-            result = connection.ReadRecord<Record> (readParameters);
+        var expression = $"\"{prefix}{value}\"";
+        Record? result;
+        if (connection is ISyncConnection syncConnection)
+        {
+            // протокол позволяет не только найти запись,
+            // но и заодно прочитать её при помощи форматирования
+            result = syncConnection.SearchReadOneRecord (expression);
 
             return result;
         }
 
-        /// <summary>
-        /// Поиск единственной записи, удовлетворяющей данному условию.
-        /// Запись должна существовать.
-        /// </summary>
-        /// <returns>Найденную запись.</returns>
-        /// <exception cref="IrbisException">Найдено более одной записи,
-        /// либо вообще ничего не найдено.</exception>
-        public static Record Required
-            (
-                this ISyncProvider connection,
-                string prefix,
-                string value
-            )
+        var searchParameters = new SearchParameters
         {
-            var result = SingleOrDefault(connection, prefix, value);
-            if (ReferenceEquals(result, null))
-            {
-                throw new IrbisException($"Not found: {prefix}{value}");
-            }
+            Database = connection.EnsureDatabase(),
+            Expression = expression,
+            NumberOfRecords = 2
+        };
+        var found = connection.Search (searchParameters);
+        if (found is null || found.Length != 1)
+        {
+            return null;
+        }
 
-            return result;
-        } // method Required
+        var readParameters = new ReadRecordParameters()
+        {
+            Database = connection.EnsureDatabase(),
+            Mfn = found[0].Mfn
+        };
+        result = connection.ReadRecord<Record> (readParameters);
 
-        #endregion
+        return result;
+    }
 
-    } // class CommonSearches
+    /// <summary>
+    /// Поиск единственной записи, удовлетворяющей данному условию.
+    /// Запись должна существовать.
+    /// </summary>
+    /// <returns>Найденную запись.</returns>
+    /// <exception cref="IrbisException">Найдено более одной записи,
+    /// либо вообще ничего не найдено.</exception>
+    public static Record Required
+        (
+            this ISyncProvider connection,
+            string prefix,
+            string value
+        )
+    {
+        var result = SingleOrDefault(connection, prefix, value);
+        if (ReferenceEquals(result, null))
+        {
+            throw new IrbisException($"Not found: {prefix}{value}");
+        }
 
-} // namespace ManagedIrbis
+        return result;
+    }
+
+    #endregion
+}
