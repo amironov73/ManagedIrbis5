@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32510.428
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rubricator64", "Rubricator64.csproj", "{23341C62-B630-489F-B158-20006EC62EA3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23341C62-B630-489F-B158-20006EC62EA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23341C62-B630-489F-B158-20006EC62EA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23341C62-B630-489F-B158-20006EC62EA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23341C62-B630-489F-B158-20006EC62EA3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5B818C54-D385-46DF-94DE-E187D4D1B85A}
+	EndGlobalSection
+EndGlobal
