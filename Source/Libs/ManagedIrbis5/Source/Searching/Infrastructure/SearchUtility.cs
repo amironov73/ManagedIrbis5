@@ -24,209 +24,202 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Разнообразные утилиты, используемые
+/// при работе с поисковыми выражениями.
+/// </summary>
+public static class SearchUtility
 {
+    #region Constants
+
     /// <summary>
-    /// Разнообразные утилиты, используемые
-    /// при работе с поисковыми выражениями.
+    /// Maximal term length (bytes, not characters!).
     /// </summary>
-    public static class SearchUtility
+    public const int MaxTermLength = 255;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Special symbols.
+    /// </summary>
+    public static readonly char[] SpecialSymbols =
     {
-        #region Constants
+        ' ', '(', ')', '+', '*', '.', '"'
+    };
 
-        /// <summary>
-        /// Maximal term length (bytes, not characters!).
-        /// </summary>
-        public const int MaxTermLength = 255;
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Properties
+    /// <summary>
+    /// Concatenate some terms together.
+    /// </summary>
+    public static string ConcatTerms
+        (
+            string? prefix,
+            string? operation,
+            IEnumerable<string> terms
+        )
+    {
+        var first = true;
+        var result = new StringBuilder();
 
-        /// <summary>
-        /// Special symbols.
-        /// </summary>
-        public static char[] SpecialSymbols =
+        foreach (var term in terms)
         {
-            ' ', '(', ')', '+', '*', '.', '"'
-        };
-
-        /// <summary>
-        /// Empty array.
-        /// </summary>
-        internal static readonly ISearchTree[] EmptyArray = new ISearchTree[0];
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Concatenate some terms together.
-        /// </summary>
-        public static string ConcatTerms
-            (
-                string? prefix,
-                string? operation,
-                IEnumerable<string> terms
-            )
-        {
-            bool first = true;
-            StringBuilder result = new StringBuilder();
-
-            foreach (string term in terms)
+            if (!string.IsNullOrEmpty (term))
             {
-                if (!string.IsNullOrEmpty(term))
+                if (!first)
                 {
-                    if (!first)
-                    {
-                        result.Append(operation);
-                    }
-
-                    string wrapped = WrapTerm
-                    (
-                        TrimTerm(prefix + term)
-                    );
-                    result.Append(wrapped);
-
-                    first = false;
+                    result.Append (operation);
                 }
-            }
 
-            if (first)
-            {
-                Magna.Error
+                var wrapped = WrapTerm
                     (
-                        nameof(SearchUtility) + "::" + nameof(ConcatTerms)
-                        + ": empty list of terms"
+                        TrimTerm (prefix + term)
                     );
+                result.Append (wrapped);
 
-                throw new IrbisException("Empty list of terms");
+                first = false;
             }
-
-            return result.ToString();
         }
 
-        /// <summary>
-        /// Escape quotation mark for Web-IRBIS.
-        /// </summary>
-        public static string? EscapeQuotation
-            (
-                string? text
-            )
+        if (first)
         {
-            if (string.IsNullOrEmpty(text))
-            {
-                return text;
-            }
-
-            if (!text.Contains("\""))
-            {
-                return text;
-            }
-
-            string result = text.Replace
+            Magna.Error
                 (
-                    "\"",
-                    "<.>"
+                    nameof (SearchUtility) + "::" + nameof (ConcatTerms)
+                    + ": empty list of terms"
                 );
 
-            return result;
+            throw new IrbisException ("Empty list of terms");
         }
 
-        /// <summary>
-        /// Trim the term (if exceeds <see cref="MaxTermLength"/>
-        /// bytes).
-        /// </summary>
-        public static string TrimTerm
-            (
-                string term
-            )
+        return result.ToString();
+    }
+
+    /// <summary>
+    /// Escape quotation mark for Web-IRBIS.
+    /// </summary>
+    public static string? EscapeQuotation
+        (
+            string? text
+        )
+    {
+        if (string.IsNullOrEmpty (text))
         {
-            Sure.NotNull(term, nameof(term));
-
-            int originalLength = term.Length;
-
-            // Simple optimization
-            if (originalLength < MaxTermLength / 2)
-            {
-                // Garanteed to fit into
-                return term;
-            }
-
-            Encoding encoding = IrbisEncoding.Utf8;
-            char[] charArray = term.ToCharArray();
-            int currentLength = Math.Max(originalLength, MaxTermLength);
-
-            while (currentLength > 0)
-            {
-                int count = encoding.GetByteCount
-                    (
-                        charArray,
-                        0,
-                        currentLength
-                    );
-                if (count <= MaxTermLength)
-                {
-                    break;
-                }
-                currentLength--;
-            }
-
-            string result = currentLength == originalLength
-                ? term
-                : term.Substring(0, currentLength);
-
-            return result;
+            return text;
         }
 
-        /// <summary>
-        /// Unescape quotation mark for Web-IRBIS.
-        /// </summary>
-        public static string? UnescapeQuotation
-            (
-                string? text
-            )
+        if (!text.Contains ("\""))
         {
-            if (string.IsNullOrEmpty(text))
-            {
-                return text;
-            }
-
-            if (!text.Contains("<.>"))
-            {
-                return text;
-            }
-
-            string result = text.Replace
-                (
-                    "<.>",
-                    "\""
-                );
-
-            return result;
+            return text;
         }
 
-        /// <summary>
-        /// Wrap the term if needed.
-        /// </summary>
-        public static string WrapTerm
+        var result = text.Replace
             (
-                string term
-            )
+                "\"",
+                "<.>"
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Trim the term (if exceeds <see cref="MaxTermLength"/> bytes).
+    /// </summary>
+    public static string TrimTerm
+        (
+            string term
+        )
+    {
+        Sure.NotNull (term, nameof (term));
+
+        var originalLength = term.Length;
+
+        // Simple optimization
+        if (originalLength < MaxTermLength / 2)
         {
-            /*
-            string result = term.ContainsAny(SpecialSymbols)
-                ? "\"" + term + "\""
-                : term;
-
-            return result;
-            */
-
+            // Garanteed to fit into
             return term;
         }
 
-        #endregion
+        var encoding = IrbisEncoding.Utf8;
+        var charArray = term.ToCharArray();
+        var currentLength = Math.Max (originalLength, MaxTermLength);
 
-    } // class SearchUtility
+        while (currentLength > 0)
+        {
+            var count = encoding.GetByteCount
+                (
+                    charArray,
+                    0,
+                    currentLength
+                );
+            if (count <= MaxTermLength)
+            {
+                break;
+            }
 
-} // namespace ManagedIrbis.Infrastructure
+            currentLength--;
+        }
+
+        var result = currentLength == originalLength
+            ? term
+            : term[..currentLength];
+
+        return result;
+    }
+
+    /// <summary>
+    /// Unescape quotation mark for Web-IRBIS.
+    /// </summary>
+    public static string? UnescapeQuotation
+        (
+            string? text
+        )
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return text;
+        }
+
+        if (!text.Contains ("<.>"))
+        {
+            return text;
+        }
+
+        var result = text.Replace
+            (
+                "<.>",
+                "\""
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Оборачивает термин в кавычки, если необходимо.
+    /// </summary>
+    public static string WrapTerm
+        (
+            string? term
+        )
+    {
+        if (string.IsNullOrEmpty (term))
+        {
+            return "\"\"";
+        }
+
+        var result = term.ContainsAnySymbol (SpecialSymbols)
+            ? "\"" + term + "\""
+            : term;
+
+        return result;
+    }
+
+    #endregion
+}

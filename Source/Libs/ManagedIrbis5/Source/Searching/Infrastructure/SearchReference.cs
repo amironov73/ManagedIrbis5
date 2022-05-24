@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* SearchReference.cs --
+/* SearchReference.cs -- ссылка на результат прошлого поиска по его номеру
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,90 +21,91 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// "#N" -- ссылка на результат прошлого поиска по его номеру.
+/// </summary>
+internal sealed class SearchReference
+    : ISearchTree
 {
+    #region Properties
+
+    /// <inheritdoc cref="ISearchTree.Parent"/>
+    public ISearchTree? Parent { get; set; }
+
     /// <summary>
-    /// #N
+    /// Номер поиска (нумерация с 1).
     /// </summary>
-    sealed class SearchReference
-        : ISearchTree
+    public string? Number { get; set; }
+
+    #endregion
+
+    #region ISearchTree members
+
+    /// <inheritdoc cref="ISearchTree.Children"/>
+    public ISearchTree[] Children => Array.Empty<ISearchTree>();
+
+    /// <inheritdoc cref="ISearchTree.Value"/>
+    public string? Value => Number;
+
+    /// <inheritdoc cref="ISearchTree.Find"/>
+    public TermLink[] Find
+        (
+            SearchContext context
+        )
     {
-        #region Properties
+        Sure.NotNull (context);
 
-        /// <inheritdoc cref="ISearchTree.Parent"/>
-        public ISearchTree? Parent { get; set; }
+        var result = Array.Empty<TermLink>();
 
-        /// <summary>
-        /// Number.
-        /// </summary>
-        public string? Number { get; set; }
-
-        #endregion
-
-        #region ISearchTree members
-
-        public ISearchTree[] Children
+        var number = Number.SafeToInt32 (-1);
+        if (number > 0)
         {
-            get { return SearchUtility.EmptyArray; }
-        }
-
-        public string? Value => Number;
-
-        public TermLink[] Find
-            (
-                SearchContext context
-            )
-        {
-            TermLink[] result = Array.Empty<TermLink>();
-
-            int number = Number.SafeToInt32(-1);
-            if (number > 0)
+            var history = context.Manager.SearchHistory;
+            if (number <= history.Count)
             {
-                var history = context.Manager.SearchHistory;
-                if (number <= history.Count)
-                {
-                    var previous = history[number - 1];
-                    var query = previous.Query;
+                var previous = history[number - 1];
+                var query = previous.Query;
 
-                    if (!string.IsNullOrEmpty(query))
-                    {
-                        int[] found = context.Provider.Search(query);
-                        result = TermLink.FromMfn(found);
-                    }
+                if (!string.IsNullOrEmpty (query))
+                {
+                    var found = context.Provider.Search (query);
+                    result = TermLink.FromMfn (found);
                 }
             }
-
-            return result;
         }
 
-        /// <inheritdoc cref="ISearchTree.ReplaceChild"/>
-        public void ReplaceChild
+        return result;
+    }
+
+    /// <inheritdoc cref="ISearchTree.ReplaceChild"/>
+    public void ReplaceChild
+        (
+            ISearchTree fromChild,
+            ISearchTree? toChild
+        )
+    {
+        Sure.NotNull (fromChild);
+
+        Magna.Error
             (
-                ISearchTree fromChild,
-                ISearchTree? toChild
-            )
-        {
-            Magna.Error
-                (
-                    "SearchReference::ReplaceChild: "
-                    + "not implemented"
-                );
+                nameof (SearchReference) + "::" + nameof (ReplaceChild)
+                + "not implemented"
+            );
 
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
+    }
 
-        #endregion
+    #endregion
 
-        #region Object members
+    #region Object members
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return "#" + Number;
-        }
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return "#" + Number;
+    }
 
-        #endregion
-
-    } // class SearchReference
-
-} // namespace ManagedIrbis.Infrastructure
+    #endregion
+}

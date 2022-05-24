@@ -69,7 +69,7 @@ public sealed class BatchSearcherTest
         var expression = searcher.BuildExpression (authors);
         Assert.AreEqual
             (
-                "A=Пушкин А. С.+A=Лермонтов М. Ю.+A=Миронов А. В.",
+                "\"A=Пушкин А. С.\"+\"A=Лермонтов М. Ю.\"+\"A=Миронов А. В.\"",
                 expression
             );
     }
