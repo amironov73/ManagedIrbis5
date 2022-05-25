@@ -24,6 +24,8 @@ using ManagedIrbis.Pft.Infrastructure.Unifors;
 using ManagedIrbis.Providers;
 using ManagedIrbis.Records;
 
+using Microsoft.Extensions.Caching.Memory;
+
 namespace ManagedIrbis.Formatting;
 
 /// <summary>
@@ -46,7 +48,7 @@ public sealed class HardFormat
     /// Конструктор по умолчанию.
     /// </summary>
     public HardFormat()
-        : this (RecordConfiguration.GetDefault(), new NullProvider())
+        : this (new NullProvider())
     {
     }
 
@@ -55,16 +57,31 @@ public sealed class HardFormat
     /// </summary>
     public HardFormat
         (
-            RecordConfiguration configuration,
-            ISyncProvider provider
+            ISyncProvider provider,
+            RecordConfiguration? configuration = null,
+            IMemoryCache? cache = null
         )
     {
         Sure.NotNull (configuration);
         Sure.NotNull (provider);
 
-        AreaSeparator = String.Empty;
-        _configuration = configuration;
+        AreaSeparator = string.Empty;
+        _configuration = configuration ?? RecordConfiguration.GetDefault();
         _provider = provider;
+
+        if (cache is not null)
+        {
+            _cache = cache;
+        }
+        else
+        {
+            var cacheOptions = new MemoryCacheOptions
+            {
+                ExpirationScanFrequency = TimeSpan.FromMinutes (5),
+                SizeLimit = 1000
+            };
+            _cache = new MemoryCache (cacheOptions);
+        }
     }
 
     #endregion
@@ -74,6 +91,8 @@ public sealed class HardFormat
     private readonly RecordConfiguration _configuration;
 
     private readonly ISyncProvider _provider;
+
+    private readonly IMemoryCache _cache;
 
     /// <summary>
     /// Ограничители, после которых нельзя ставить точку
@@ -212,6 +231,27 @@ public sealed class HardFormat
     #region Public methods
 
     /// <summary>
+    /// Получение записи по ее шифру в базе.
+    /// </summary>
+    public Record? RecordByIndex
+        (
+            string index
+        )
+    {
+        Sure.NotNullNorEmpty (index);
+
+        if (_cache.TryGetValue (index, out Record? result))
+        {
+            return result;
+        }
+
+        result = _provider.ByIndex (index);
+        _cache.Set (index, result);
+
+        return result;
+    }
+
+    /// <summary>
     /// Получение рабочего листа записи.
     /// </summary>
     public string? Worksheet
@@ -291,13 +331,13 @@ public sealed class HardFormat
             if (author.HaveSubField ('z'))
             {
                 // фамилия
-                builder.Append (author.GetSubFieldValue ('a'));
+                builder.Append (author ['a']);
 
                 // римские цифры
-                builder.AppendWithPrefix (author.GetSubFieldValue ('d'), " ");
+                builder.AppendWithPrefix (author ['d'], " ");
 
                 // инициалы и их расширение
-                builder.AppendWithPrefix (author.GetSubFieldValue ('g', 'b'), ", ");
+                builder.AppendWithPrefix (author ['g', 'b'], ", ");
 
                 if (author.HaveSubField ('1', 'c', 'f'))
                 {
@@ -309,9 +349,9 @@ public sealed class HardFormat
                     builder.AppendWithSeparator
                         (
                             "; ",
-                            author.GetSubFieldValue ('1'),
-                            author.GetSubFieldValue ('c'),
-                            author.GetSubFieldValue ('f')
+                            author ['1'],
+                            author ['c'],
+                            author ['f']
                         );
                     builder.Append (')');
                 }
@@ -343,17 +383,17 @@ public sealed class HardFormat
             }
 
             // заглавие
-            builder.Append (common.GetSubFieldValue ('c'));
+            builder.Append (common ['c']);
             first = false;
         }
 
         foreach (var common in commons)
         {
             // сведения, относящиеся к заглавию
-            builder.AppendWithPrefix (common.GetSubFieldValue ('e'), " : ");
+            builder.AppendWithPrefix (common ['e'], " : ");
 
             // сведения об ответственности
-            builder.AppendWithPrefix (common.GetSubFieldValue ('f'), " / ");
+            builder.AppendWithPrefix (common ['f'], " / ");
         }
 
         // города и издательства из общей части
@@ -373,11 +413,11 @@ public sealed class HardFormat
             if (common.HaveNotSubField ('?')) // города не выводить?
             {
                 // город
-                builder.AppendWithPrefix (common.GetSubFieldValue ('d'), prefix);
+                builder.AppendWithPrefix (common ['d'], prefix);
             }
 
             // издательство
-            builder.AppendWithPrefix (common.GetSubFieldValue ('g'), " : ");
+            builder.AppendWithPrefix (common ['g'], " : ");
 
             first = false;
         }
@@ -385,8 +425,8 @@ public sealed class HardFormat
         // годы общей части
         foreach (var common in commons)
         {
-            var start = common.GetSubFieldValue ('h'); // начало издания
-            var stop = common.GetSubFieldValue ('z'); // окончание издания
+            var start = common ['h']; // начало издания
+            var stop = common ['z']; // окончание издания
 
             builder.AppendWithPrefix (start, ", ");
             if (!string.IsNullOrEmpty (stop) && stop != start)
@@ -416,8 +456,8 @@ public sealed class HardFormat
         var author = record.GetField (700);
         if (author is not null)
         {
-            builder.Append (author.GetSubFieldValue ('a'));
-            builder.AppendWithPrefix (author.GetSubFieldValue ('g', 'b'), ", ");
+            builder.Append (author.FM ('a'));
+            builder.AppendWithPrefix (author.FM ('g', 'b'), ", ");
             _AddDot (builder);
             builder.Append (' ');
         }
@@ -919,7 +959,7 @@ public sealed class HardFormat
             return;
         }
 
-        var magazine = _provider.ByIndex (summaryIndex);
+        var magazine = RecordByIndex (summaryIndex);
         if (magazine is null)
         {
             return;
@@ -974,7 +1014,7 @@ public sealed class HardFormat
         }
 
         // заглавие журнала/газеты
-        var title = field.GetSubFieldValue ('c');
+        var title = field.FM ('c');
         if (string.IsNullOrEmpty (title))
         {
             return;
@@ -985,23 +1025,23 @@ public sealed class HardFormat
         builder.Append (title);
 
         // сведения, относящиеся к заглавию
-        builder.AppendWithPrefix (field.GetSubFieldValue ('e'), " : ");
+        builder.AppendWithPrefix (field.FM ('e'), " : ");
 
         // первичные сведения об ответственности
-        builder.AppendWithPrefix (field.GetSubFieldValue ('f'), " / ");
+        builder.AppendWithPrefix (field.FM ('f'), " / ");
 
         _AddSeparator (builder);
 
         // год издания
-        builder.Append (field.GetSubFieldValue ('j'));
+        builder.Append (field.FM ('j'));
 
         // обозначение и номер первой единицы деления
         if (field.HaveSubField ('a', 'v'))
         {
             _AddSeparator (builder);
 
-            builder.Append (field.GetSubFieldValue ('v'));
-            builder.Append (field.GetSubFieldValue ('a'));
+            builder.Append (field.FM ('v'));
+            builder.Append (field.FM ('a'));
         }
 
         // обозначение и номер второй единицы деления
@@ -1009,15 +1049,15 @@ public sealed class HardFormat
         {
             _AddSeparator (builder);
 
-            builder.Append (field.GetSubFieldValue ('h'));
-            builder.Append (field.GetSubFieldValue ('i'));
+            builder.Append (field.FM ('h'));
+            builder.Append (field.FM ('i'));
         }
 
         if (field.HaveSubField ('s'))
         {
             _AddSeparator (builder);
-            var unit = Utility.NonEmpty (field.GetSubFieldValue ('1'), "С.");
-            builder.AppendWithPrefix (field.GetSubFieldValue ('s'), unit + " ");
+            var unit = Utility.NonEmpty (field.FM ('1'), "С.");
+            builder.AppendWithPrefix (field.FM ('s'), unit + " ");
         }
 
         _AddDot (builder);

@@ -26,6 +26,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
@@ -185,6 +186,35 @@ public class Field
     [XmlIgnore]
     [JsonIgnore]
     public bool IsEmpty => Subfields.Count == 0;
+
+    /// <summary>
+    /// Получение значения первого повторения подполя с указанным кодом.
+    /// </summary>
+    public string? this [char code]
+    {
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
+        get => this.GetFirstSubFieldValue (code);
+    }
+
+    /// <summary>
+    /// Получение значения первого повторения подполя с любым
+    /// из указанныъ кодов.
+    /// </summary>
+    public string? this [char code1, char code2]
+    {
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
+        get => GetSubFieldValue (code1, code2);
+    }
+
+    /// <summary>
+    /// Получение значения первого повторения подполя с любым
+    /// из указанныъ кодов.
+    /// </summary>
+    public string? this [char code1, char code2, char code3]
+    {
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
+        get => GetSubFieldValue (code1, code2, code3);
+    }
 
     #endregion
 

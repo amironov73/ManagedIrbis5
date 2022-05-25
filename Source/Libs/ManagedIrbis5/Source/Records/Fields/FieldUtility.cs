@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -1709,6 +1710,52 @@ public static class FieldUtility
         }
 
         throw new KeyNotFoundException ($"Tag={tag}");
+    }
+
+    // ==========================================================
+
+    /// <summary>
+    /// Получение значения первого повторения подполя с указанным кодом.
+    /// </summary>
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
+    public static string? FM
+        (
+            this Field field,
+            char code
+        )
+    {
+        return field.GetFirstSubFieldValue (code);
+    }
+
+    /// <summary>
+    /// Получение значения первого повторения подполя с любым
+    /// из указанных кодов.
+    /// </summary>
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
+    public static string? FM
+        (
+            this Field field,
+            char code1,
+            char code2
+        )
+    {
+        return field.GetSubFieldValue (code1, code2);
+    }
+
+    /// <summary>
+    /// Получение значения первого повторения подполя с любым
+    /// из указанных кодов.
+    /// </summary>
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
+    public static string? FM
+        (
+            this Field field,
+            char code1,
+            char code2,
+            char code3
+        )
+    {
+        return field.GetSubFieldValue (code1, code2, code3);
     }
 
     #endregion

@@ -47,7 +47,6 @@ internal static class OfflineTests
 
             var formatter = new HardFormat
                 (
-                    RecordConfiguration.GetDefault(),
                     provider
                 );
             var builder = new StringBuilder();
