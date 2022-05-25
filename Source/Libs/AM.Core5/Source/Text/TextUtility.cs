@@ -44,8 +44,8 @@ public static class TextUtility
             return TextKind.Html;
         }
 
-        var curly = text.Contains ("{") && text.Contains ("}");
-        var angle = text.Contains ("<") && text.Contains (">");
+        var curly = text.Contains ('{') && text.Contains ('}');
+        var angle = text.Contains ('<') && text.Contains ('>');
 
         if (curly && !angle)
         {
@@ -61,9 +61,30 @@ public static class TextUtility
     }
 
     /// <summary>
+    /// Добавление пробела в конец текста, если последний символ не пробельный.
+    /// К пустому тексту ничего не добавляется.
+    /// </summary>
+    public static StringBuilder AppendSpace
+        (
+            this StringBuilder builder
+        )
+    {
+        if (builder.Length != 0)
+        {
+            var lastChar = builder[^1];
+            if (!char.IsWhiteSpace (lastChar))
+            {
+                builder.Append (' ');
+            }
+        }
+
+        return builder;
+    }
+
+    /// <summary>
     /// Удаление пробельных символов в конце текста.
     /// </summary>
-    public static void TrimEnd
+    public static StringBuilder TrimEnd
         (
             this StringBuilder builder
         )
@@ -82,12 +103,14 @@ public static class TextUtility
                 break;
             }
         }
+
+        return builder;
     }
 
     /// <summary>
     /// Удаление пробельных символов в начале и в конце текста.
     /// </summary>
-    public static void Trim
+    public static StringBuilder Trim
         (
             this StringBuilder builder
         )
@@ -118,12 +141,14 @@ public static class TextUtility
                 break;
             }
         }
+
+        return builder;
     }
 
     /// <summary>
     /// Удаление указанных символов в начале и в конце текста.
     /// </summary>
-    public static void Trim
+    public static StringBuilder Trim
         (
             this StringBuilder builder,
             char[] whitespace
@@ -156,6 +181,8 @@ public static class TextUtility
                 break;
             }
         }
+
+        return builder;
     }
 
     #endregion

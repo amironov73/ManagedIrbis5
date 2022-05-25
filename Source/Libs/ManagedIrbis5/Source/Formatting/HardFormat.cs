@@ -62,7 +62,6 @@ public sealed class HardFormat
             IMemoryCache? cache = null
         )
     {
-        Sure.NotNull (configuration);
         Sure.NotNull (provider);
 
         AreaSeparator = string.Empty;
@@ -77,8 +76,7 @@ public sealed class HardFormat
         {
             var cacheOptions = new MemoryCacheOptions
             {
-                ExpirationScanFrequency = TimeSpan.FromMinutes (5),
-                SizeLimit = 1000
+                ExpirationScanFrequency = TimeSpan.FromMinutes (5)
             };
             _cache = new MemoryCache (cacheOptions);
         }
@@ -355,6 +353,8 @@ public sealed class HardFormat
                         );
                     builder.Append (')');
                 }
+
+                builder.AppendSpace();
             }
         }
     }
@@ -459,7 +459,7 @@ public sealed class HardFormat
             builder.Append (author.FM ('a'));
             builder.AppendWithPrefix (author.FM ('g', 'b'), ", ");
             _AddDot (builder);
-            builder.Append (' ');
+            builder.AppendSpace();
         }
     }
 
@@ -1089,7 +1089,7 @@ public sealed class HardFormat
                 NewArea (builder);
                 builder.Append (items.Length == 1 ? "Страна" : "Страны");
                 builder.Append (": ");
-                builder.AppendWithSeparator (", ", items);
+                builder.AppendList (items, KnownCountries.TranslateCode, union: " и ");
                 _AddDot (builder);
             }
         }
@@ -1120,7 +1120,7 @@ public sealed class HardFormat
                 NewArea (builder);
                 builder.Append (items.Length == 1 ? "Язык" : "Языки");
                 builder.Append (": ");
-                builder.AppendWithSeparator (", ", items);
+                builder.AppendList (items, KnownLanguages.TranslateCode, union: " и ");
                 _AddDot (builder);
             }
         }

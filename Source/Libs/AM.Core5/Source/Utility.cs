@@ -4353,6 +4353,81 @@ public static class Utility
     }
 
     /// <summary>
+    /// Добавление списка по принципу "первый, второй и последний".
+    /// </summary>
+    public static StringBuilder AppendList
+        (
+            this StringBuilder builder,
+            IList? list,
+            string? separator = ", ",
+            string? union = " and "
+        )
+    {
+        Sure.NotNull (builder);
+
+        if (list is null)
+        {
+            return builder;
+        }
+
+        var count = list.Count;
+        for (var index = 0; index < count; index++)
+        {
+            if (index == count - 1 && count > 1)
+            {
+                builder.Append (union);
+            }
+            else if (index != 0)
+            {
+                builder.Append (separator);
+            }
+
+            builder.Append (list[index]);
+        }
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Добавление списка по принципу "первый, второй и последний".
+    /// </summary>
+    public static StringBuilder AppendList<T>
+        (
+            this StringBuilder builder,
+            IList<T> list,
+            Func<T, string> transformator,
+            string? separator = ", ",
+            string? union = " and "
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (transformator);
+
+        if (list is null)
+        {
+            return builder;
+        }
+
+        var count = list.Count;
+        for (var index = 0; index < count; index++)
+        {
+            if (index == count - 1 && count > 1)
+            {
+                builder.Append (union);
+            }
+            else if (index != 0)
+            {
+                builder.Append (separator);
+            }
+
+            var transformed = transformator (list[index]);
+            builder.Append (transformed);
+        }
+
+        return builder;
+    }
+
+    /// <summary>
     /// Добавление объекта-перечисления.
     /// </summary>
     public static StringBuilder AppendEnumerable

@@ -59,7 +59,6 @@ public static class MemoryCacheUtility
             return true;
         }
 
-
         return false;
     }
 
