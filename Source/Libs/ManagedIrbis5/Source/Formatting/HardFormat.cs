@@ -16,6 +16,7 @@ using System.Linq;
 using System.Text;
 
 using AM;
+using AM.AppServices;
 using AM.Collections;
 using AM.Text;
 
@@ -25,6 +26,7 @@ using ManagedIrbis.Providers;
 using ManagedIrbis.Records;
 
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Localization;
 
 namespace ManagedIrbis.Formatting;
 
@@ -59,6 +61,7 @@ public sealed class HardFormat
         (
             ISyncProvider provider,
             RecordConfiguration? configuration = null,
+            IStringLocalizer? localizer = null,
             IMemoryCache? cache = null
         )
     {
@@ -66,6 +69,7 @@ public sealed class HardFormat
 
         AreaSeparator = string.Empty;
         _configuration = configuration ?? RecordConfiguration.GetDefault();
+        _localizer = localizer ?? new NullLocalizer();
         _provider = provider;
 
         if (cache is not null)
@@ -92,55 +96,19 @@ public sealed class HardFormat
 
     private readonly IMemoryCache _cache;
 
+    private readonly IStringLocalizer _localizer;
+
     /// <summary>
-    /// Ограничители, после которых нельзя ставить точку
+    /// Ограничители, после которых нельзя ставить точку.
     /// </summary>
     private static readonly char[] _delimiters = { '!', '?', '.', ',' };
-
-    private static char _GetLastChar
-        (
-            StringBuilder builder
-        )
-    {
-        var position = builder.Length - 1;
-        while (true)
-        {
-            if (position < 0)
-            {
-                break;
-            }
-
-            var result = builder[position];
-            if (!char.IsWhiteSpace (result))
-            {
-                return result;
-            }
-
-            --position;
-        }
-
-        return '\0';
-    }
-
-    private static void _AddDot
-        (
-            StringBuilder builder
-        )
-    {
-        var lastChar = _GetLastChar (builder);
-        if (Array.IndexOf (_delimiters, lastChar) < 0)
-        {
-            builder.TrimEnd();
-            builder.Append (". ");
-        }
-    }
 
     private static void _AddSeparator
         (
             StringBuilder builder
         )
     {
-        var lastChar = _GetLastChar (builder);
+        var lastChar = builder.LastNonSpaceChar();
         if (lastChar != '-')
         {
             var needDot = Array.IndexOf (_delimiters, lastChar) < 0;
@@ -332,7 +300,7 @@ public sealed class HardFormat
                 builder.Append (author ['a']);
 
                 // римские цифры
-                builder.AppendWithPrefix (author ['d'], " ");
+                builder.AppendWithSpacePrefix (author ['d'], " ");
 
                 // инициалы и их расширение
                 builder.AppendWithPrefix (author ['g', 'b'], ", ");
@@ -379,7 +347,7 @@ public sealed class HardFormat
         {
             if (!first && common.HaveSubField ('c'))
             {
-                _AddDot (builder);
+                builder.AppendDot();
             }
 
             // заглавие
@@ -390,10 +358,10 @@ public sealed class HardFormat
         foreach (var common in commons)
         {
             // сведения, относящиеся к заглавию
-            builder.AppendWithPrefix (common ['e'], " : ");
+            builder.AppendWithSpacePrefix (common ['e'], " : ");
 
             // сведения об ответственности
-            builder.AppendWithPrefix (common ['f'], " / ");
+            builder.AppendWithSpacePrefix (common ['f'], " / ");
         }
 
         // города и издательства из общей части
@@ -413,11 +381,11 @@ public sealed class HardFormat
             if (common.HaveNotSubField ('?')) // города не выводить?
             {
                 // город
-                builder.AppendWithPrefix (common ['d'], prefix);
+                builder.AppendWithSpacePrefix (common ['d'], prefix);
             }
 
             // издательство
-            builder.AppendWithPrefix (common ['g'], " : ");
+            builder.AppendWithSpacePrefix (common ['g'], " : ");
 
             first = false;
         }
@@ -431,13 +399,13 @@ public sealed class HardFormat
             builder.AppendWithPrefix (start, ", ");
             if (!string.IsNullOrEmpty (stop) && stop != start)
             {
-                builder.AppendWithPrefix (stop, " - ");
+                builder.AppendWithSpacePrefix (stop, " - ");
             }
         }
 
         if (commons.Length != 0)
         {
-            _AddDot (builder);
+            builder.AppendDot();
         }
     }
 
@@ -458,7 +426,7 @@ public sealed class HardFormat
         {
             builder.Append (author.FM ('a'));
             builder.AppendWithPrefix (author.FM ('g', 'b'), ", ");
-            _AddDot (builder);
+            builder.AppendDot();
             builder.AppendSpace();
         }
     }
@@ -510,48 +478,51 @@ public sealed class HardFormat
 
             builder.AppendWithSeparator (" : ", volumeNumber, title);
 
-            builder.AppendWithPrefix (volume.GetSubFieldValue ('b'), " ; "); // заглавие второго произведения
-            builder.AppendWithPrefix (volume.GetSubFieldValue ('c'), " ; "); // заглавие третьего произведения
+            // заглавие второго произведения
+            builder.AppendWithSpacePrefix (volume.GetSubFieldValue ('b'), " ; ");
+
+            // заглавие третьего произведения
+            builder.AppendWithSpacePrefix (volume.GetSubFieldValue ('c'), " ; ");
         }
 
         // статьи сборника без общего заглавия
         foreach (var article in record.EnumerateField (922))
         {
-            builder.Append (". ");
+            builder.AppendDot();
             builder.Append (article.GetSubFieldValue ('c'));
         }
 
         // сведения, относящиеся к заглавию
-        builder.AppendWithPrefix (field.GetSubFieldValue ('e'), " : ");
+        builder.AppendWithSpacePrefix (field.GetSubFieldValue ('e'), " : ");
 
         // вторая и третья единицы деления
         var issue = record.GetField (923);
         if (issue is not null)
         {
-            volumeNumber = issue.GetSubFieldValue ('h'); // обозначение второй единицы деления
-            title = issue.GetSubFieldValue ('i'); // заглавие второй единицы деления
+            volumeNumber = issue ['h']; // обозначение второй единицы деления
+            title = issue ['i']; // заглавие второй единицы деления
             if (!string.IsNullOrEmpty (volumeNumber) || !string.IsNullOrEmpty (title))
             {
-                _AddDot (builder);
+                builder.AppendDot();
                 builder.AppendWithSeparator (" : ", volumeNumber, title);
-                _AddDot (builder);
+                builder.AppendDot();
             }
 
-            volumeNumber = issue.GetSubFieldValue ('k'); // обозначение третьей единицы деления
-            title = issue.GetSubFieldValue ('l'); // заглавие третьей единицы деления
+            volumeNumber = issue ['k']; // обозначение третьей единицы деления
+            title = issue ['l']; // заглавие третьей единицы деления
             if (!string.IsNullOrEmpty (volumeNumber) || !string.IsNullOrEmpty (title))
             {
-                _AddDot (builder);
+                builder.AppendDot();
                 builder.AppendWithSeparator (" : ", volumeNumber, title);
-                _AddDot (builder);
+                builder.AppendDot();
             }
         }
 
         // первые сведения об ответственности
-        builder.AppendWithPrefix (field.GetSubFieldValue ('f'), " / ");
+        builder.AppendWithSpacePrefix (field ['f'], " / ");
 
         // последующие сведения об ответственности
-        builder.AppendWithPrefix (field.GetSubFieldValue ('g'), " ; ");
+        builder.AppendWithSpacePrefix (field ['g'], " ; ");
     }
 
     /// <summary>
@@ -570,7 +541,7 @@ public sealed class HardFormat
         if (edition is not null)
         {
             _AddSeparator (builder);
-            builder.Append (edition.GetSubFieldValue ('a'));
+            builder.Append (edition ['a']);
         }
     }
 
@@ -597,31 +568,31 @@ public sealed class HardFormat
             var flag = false;
 
             // выводить города?
-            var city = string.IsNullOrEmpty (imprint.GetSubFieldValue ('?'));
+            var city = string.IsNullOrEmpty (imprint ['?']);
 
             // издательство
             var publisher = imprint.GetSubFieldValue ('i', 'c');
 
             if (city)
             {
-                flag = _Append (builder, imprint.GetSubFieldValue ('a')); // место издания - город 1
+                flag = _Append (builder, imprint ['a']); // место издания - город 1
 
-                var city2 = imprint.GetSubFieldValue('x'); // город 2
-                var city3 = imprint.GetSubFieldValue('y'); // город 3
+                var city2 = imprint ['x']; // город 2
+                var city3 = imprint ['y']; // город 3
 
                 if (!string.IsNullOrEmpty (city2) || !string.IsNullOrEmpty (city3))
                 {
                     // "и др." для городов
-                    var etal = imprint.GetSubFieldValue ('2');
+                    var etal = imprint ['2'];
 
                     if (!string.IsNullOrEmpty (etal))
                     {
-                        builder.AppendWithPrefix (etal, " ");
+                        builder.AppendWithSpacePrefix (etal, " ");
                     }
                     else
                     {
-                        builder.AppendWithPrefix (city2, " ; ");
-                        builder.AppendWithPrefix (city3, " ; ");
+                        builder.AppendWithSpacePrefix (city2, " ; ");
+                        builder.AppendWithSpacePrefix (city3, " ; ");
                     }
                 }
 
@@ -634,7 +605,7 @@ public sealed class HardFormat
             }
 
             // функция издающей организации
-            if (_AppendWithPrefixAndSuffix (builder, imprint.GetSubFieldValue ('6'), " [", "]"))
+            if (_AppendWithPrefixAndSuffix (builder, imprint ['6'], " [", "]"))
             {
                 flag = true;
             }
@@ -645,7 +616,7 @@ public sealed class HardFormat
             }
 
             // пояснения к году, стоящие перед ним
-            var explanation = imprint.GetSubFieldValue ('5');
+            var explanation = imprint ['5'];
             if (explanation is not null)
             {
                 builder.AppendWithPrefix (explanation, prefix);
@@ -653,16 +624,16 @@ public sealed class HardFormat
             }
 
             // год издания
-            builder.AppendWithPrefix (imprint.GetSubFieldValue ('d'), prefix);
+            builder.AppendWithSpacePrefix (imprint.GetSubFieldValue ('d'), prefix);
 
             // место печати
-            var place = imprint.GetSubFieldValue ('1');
+            var place = imprint ['1'];
 
             // типография
             var house = imprint.GetSubFieldValue ('g', 't');
 
             // дата печати
-            var date = imprint.GetSubFieldValue ('h');
+            var date = imprint ['h'];
 
             prefix = string.Empty;
             if (!string.IsNullOrEmpty (place)
@@ -680,7 +651,7 @@ public sealed class HardFormat
                     prefix = ", ";
                 }
 
-                builder.AppendWithPrefix (date, prefix);
+                builder.AppendWithSpacePrefix (date, prefix);
             }
 
         }
@@ -703,11 +674,11 @@ public sealed class HardFormat
             _AddSeparator (builder);
 
             // объем (цифры)
-            builder.Append (physical.GetSubFieldValue ('a'));
+            builder.Append (physical ['a']);
 
             // единица измерения
-            var unit = Utility.NonEmpty (physical.GetSubFieldValue ('1'), "с.");
-            builder.AppendWithPrefix (unit, " ");
+            var unit = Utility.NonEmpty (physical ['1'], "с.");
+            builder.AppendWithSpacePrefix (unit, " ");
 
             // иллюстрации
             var illustrations = physical.GetSubFields ('c', '0', '7', '8');
@@ -722,16 +693,16 @@ public sealed class HardFormat
             }
 
             // сопроводительный материал
-            builder.AppendWithPrefix (physical.GetSubFieldValue ('e'), " + ");
+            builder.AppendWithSpacePrefix (physical ['e'], " + ");
 
             // единица измерения сопроводительного материала
-            builder.AppendWithPrefix (physical.GetSubFieldValue ('2'), " ");
+            builder.AppendWithSpacePrefix (physical ['2'], " ");
 
             // размер
-            builder.AppendWithPrefixAndSuffix (physical.GetSubFieldValue ('d'), " ; ", " см.");
+            builder.AppendWithPrefixAndSuffix (physical ['d'], " ; ", " см.");
 
             // тираж
-            builder.AppendWithPrefix (physical.GetSubFieldValue ('x'), ". - Тираж ");
+            builder.AppendWithDotPrefix (physical ['x'], ". - Тираж ");
         }
     }
 
@@ -759,22 +730,22 @@ public sealed class HardFormat
             builder.Append ('(');
 
             // наименование (заглавие) серии
-            builder.Append (field.GetSubFieldValue ('a'));
+            builder.Append (field ['a']);
 
             // параллельное наименование серии
-            builder.AppendWithPrefix (field.GetSubFieldValue ('d'), " = ");
+            builder.AppendWithSpacePrefix (field ['d'], " = ");
 
             // сведения, относящиеся к наименованию серии
-            builder.AppendWithPrefix (field.GetSubFieldValue ('e'), " : ");
+            builder.AppendWithSpacePrefix (field ['e'], " : ");
 
             // сведения об ответственности
-            builder.AppendWithPrefix (field.GetSubFieldValue ('f'), " / ");
+            builder.AppendWithSpacePrefix (field ['f'], " / ");
 
             // ISSN
-            builder.AppendWithPrefix (field.GetSubFieldValue ('x'), ". - ISSN ");
+            builder.AppendWithDotPrefix (field ['x'], ". - ISSN ");
 
             // номер выпуска
-            builder.AppendWithPrefix (field.GetSubFieldValue ('v'), " ; ");
+            builder.AppendWithSpacePrefix (field ['v'], " ; ");
 
             builder.Append (").");
         }
@@ -850,7 +821,7 @@ public sealed class HardFormat
                     builder.AppendWithSuffix (price, " " + currency);
                 }
 
-                _AddDot (builder);
+                builder.AppendDot();
             }
         }
     }
@@ -874,7 +845,7 @@ public sealed class HardFormat
         {
             _AddSeparator (builder);
             builder.AppendWithPrefix (issn, "ISSN ");
-            _AddDot (builder);
+            builder.AppendDot();
         }
     }
 
@@ -893,16 +864,15 @@ public sealed class HardFormat
         foreach (var one in record.EnumerateField (19))
         {
             // основной документ или приложение
-            var mainDocument = one.GetSubFieldValue ('x');
+            var mainDocument = one ['x'];
 
             if (mainDocument == "0")
             {
                 _AddSeparator (builder);
 
-                builder.Append (one.GetSubFieldValue ('a')); // тип номера
-                builder.AppendWithPrefix (one.GetSubFieldValue ('b'), " "); // собственно номер
-
-                _AddDot (builder);
+                builder.Append (one ['a']); // тип номера
+                builder.AppendWithSpacePrefix (one ['b'], " "); // собственно номер
+                builder.AppendDot();
             }
         }
     }
@@ -922,10 +892,10 @@ public sealed class HardFormat
         foreach (var one in record.EnumerateField (_configuration.ContentTypeTag))
         {
             _AddSeparator (builder);
-            builder.Append (one.GetSubFieldValue ('a'));
-            builder.AppendWithBrackets (one.GetSubFieldValue ('p'));
-            builder.AppendWithPrefix (one.GetSubFieldValue ('c'), " : ");
-            _AddDot (builder);
+            builder.Append (one ['a']);
+            builder.AppendWithBrackets (one ['p']);
+            builder.AppendWithSpacePrefix (one ['c'], " : ");
+            builder.AppendDot();
         }
     }
 
@@ -973,25 +943,25 @@ public sealed class HardFormat
         }
 
         // заглавие (название) журнала/газеты
-        builder.Append (title.GetSubFieldValue ('a'));
+        builder.Append (title ['a']);
 
         // подзаголовочные сведения
-        builder.AppendWithPrefix (title.GetSubFieldValue ('e'), " : ");
+        builder.AppendWithSpacePrefix (title ['e'], " : ");
 
         // первые сведения об ответственности
-        builder.AppendWithPrefix (title.GetSubFieldValue ('f'), " / ");
+        builder.AppendWithSpacePrefix (title['f'], " / ");
 
         // последующие сведения об ответственности
-        builder.AppendWithPrefix (title.GetSubFieldValue ('g'), " ; ");
+        builder.AppendWithSpacePrefix (title ['g'], " ; ");
 
-        builder.AppendWithPrefix (record.FM (934), ". - "); // год
-        builder.AppendWithPrefix (record.FM (935), ". - Т. "); // том
-        builder.AppendWithPrefix (record.FM (936), ". - № "); // номер
+        builder.AppendWithDotPrefix (record.FM (934), ". - "); // год
+        builder.AppendWithDotPrefix (record.FM (935), ". - Т. "); // том
+        builder.AppendWithDotPrefix (record.FM (936), ". - № "); // номер
         builder.AppendWithBrackets (record.FM (931, 'c')); // дата выхода
-        builder.AppendWithPrefix (magazine.FM (110, 'x'), ". - Периодичность: "); // периодичность
-        builder.AppendWithPrefix (magazine.FM (11, 'a'), ". - ISSN "); // ISSN
+        builder.AppendWithDotPrefix (magazine.FM (110, 'x'), ". - Периодичность: "); // периодичность
+        builder.AppendWithDotPrefix (magazine.FM (11, 'a'), ". - ISSN "); // ISSN
 
-        _AddDot (builder);
+        builder.AppendDot();
     }
 
     /// <summary>
@@ -1021,14 +991,14 @@ public sealed class HardFormat
         }
 
         // признак начала области источника плюс заглавие
-        builder.Append (" // ");
+        builder.AppendDot (" // ");
         builder.Append (title);
 
         // сведения, относящиеся к заглавию
-        builder.AppendWithPrefix (field.FM ('e'), " : ");
+        builder.AppendWithSpacePrefix (field.FM ('e'), " : ");
 
         // первичные сведения об ответственности
-        builder.AppendWithPrefix (field.FM ('f'), " / ");
+        builder.AppendWithSpacePrefix (field.FM ('f'), " / ");
 
         _AddSeparator (builder);
 
@@ -1060,7 +1030,7 @@ public sealed class HardFormat
             builder.AppendWithPrefix (field.FM ('s'), unit + " ");
         }
 
-        _AddDot (builder);
+        builder.AppendDot();
     }
 
     /// <summary>
@@ -1087,10 +1057,11 @@ public sealed class HardFormat
             if (need)
             {
                 NewArea (builder);
-                builder.Append (items.Length == 1 ? "Страна" : "Страны");
+                builder.Append (_localizer [items.Length == 1 ? "Страна" : "Страны"]);
                 builder.Append (": ");
-                builder.AppendList (items, KnownCountries.TranslateCode, union: " и ");
-                _AddDot (builder);
+                var and = _localizer[" and "];
+                builder.AppendList (items, KnownCountries.TranslateCode, union: and);
+                builder.AppendDot();
             }
         }
     }
@@ -1118,10 +1089,11 @@ public sealed class HardFormat
             if (need)
             {
                 NewArea (builder);
-                builder.Append (items.Length == 1 ? "Язык" : "Языки");
+                builder.Append (_localizer [items.Length == 1 ? "Язык" : "Языки"]);
                 builder.Append (": ");
-                builder.AppendList (items, KnownLanguages.TranslateCode, union: " и ");
-                _AddDot (builder);
+                var and = _localizer[" and "];
+                builder.AppendList (items, KnownLanguages.TranslateCode, union: and);
+                builder.AppendDot();
             }
         }
     }
@@ -1138,7 +1110,7 @@ public sealed class HardFormat
         Sure.NotNull (builder);
         Sure.NotNull (record);
 
-        var prefix = "Аннотация: ";
+        var prefix = _localizer["Аннотация: "].ToString();
         foreach (var annotation in record.FMA (331))
         {
             NewArea (builder);
@@ -1148,7 +1120,7 @@ public sealed class HardFormat
             // для "Рассмотрены возможности языка <Object Pascal>."
             var decoded = UniforPlusS.DecodeTitle (annotation, true);
             builder.Append (decoded);
-            _AddDot (builder);
+            builder.AppendDot();
         }
     }
 
@@ -1183,12 +1155,12 @@ public sealed class HardFormat
                 }
 
                 builder.Append ($"{index.ToInvariantString()}. ");
-                builder.Append (field.GetSubFieldValue ('a'));
-                builder.AppendWithPrefix (field.GetSubFieldValue ('b'), " - ");
-                builder.AppendWithPrefix (field.GetSubFieldValue ('c'), " - ");
-                builder.AppendWithPrefix (field.GetSubFieldValue ('d'), " - ");
-                _AddDot (builder);
+                builder.Append (field ['a']);
+                builder.AppendWithSpacePrefix (field ['b'], " - ");
+                builder.AppendWithSpacePrefix (field ['c'], " - ");
+                builder.AppendWithSpacePrefix (field ['d'], " - ");
 
+                builder.AppendDot();
                 index++;
             }
         }
@@ -1206,8 +1178,8 @@ public sealed class HardFormat
         Sure.NotNull (builder);
         Sure.NotNull (record);
 
-        Subjects (builder, record, 606, "Рубрики");
-        Subjects (builder, record, 607, "Географические рубрики");
+        Subjects (builder, record, 606, _localizer ["Рубрики"]);
+        Subjects (builder, record, 607, _localizer ["Географические рубрики"]);
     }
 
     /// <summary>
@@ -1226,7 +1198,8 @@ public sealed class HardFormat
         if (!keywords.IsNullOrEmpty())
         {
             NewArea (builder);
-            builder.Append ("Ключевые слова: ");
+            var keywordsTitle = _localizer["Ключевые слова: "];
+            builder.Append (keywordsTitle);
 
             var first = true;
             foreach (var keyword in keywords)
@@ -1240,7 +1213,8 @@ public sealed class HardFormat
                 builder.Append (decoded);
                 first = false;
             }
-            _AddDot (builder);
+
+            builder.AppendDot();
         }
     }
 
@@ -1260,7 +1234,8 @@ public sealed class HardFormat
         if (!exemplars.IsNullOrEmpty())
         {
             NewArea (builder);
-            builder.Append ("Экземпляры: ");
+            var exemplarsTitle = _localizer["Экземпляры: "];
+            builder.Append (exemplarsTitle);
             var first = true;
             foreach (var exemplar in exemplars)
             {

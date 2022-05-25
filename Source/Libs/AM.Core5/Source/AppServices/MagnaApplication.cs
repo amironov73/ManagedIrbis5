@@ -139,6 +139,7 @@ public class MagnaApplication
         )
     {
         services.AddOptions();
+        services.AddLocalization();
     }
 
     /// <summary>

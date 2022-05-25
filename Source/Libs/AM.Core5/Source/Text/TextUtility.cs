@@ -8,10 +8,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-using System.Text;
+
 
 #nullable enable
 
+using System;
+using System.Text;
 namespace AM.Text;
 
 /// <summary>
@@ -19,6 +21,15 @@ namespace AM.Text;
 /// </summary>
 public static class TextUtility
 {
+    #region Private members
+
+    /// <summary>
+    /// Ограничители, после которых нельзя ставить точку.
+    /// </summary>
+    private static readonly char[] _delimiters = { '!', '?', '.', ',' };
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
@@ -61,6 +72,138 @@ public static class TextUtility
     }
 
     /// <summary>
+    /// Получение последнего символа.
+    /// </summary>
+    public static char GetLastChar
+        (
+            this StringBuilder builder
+        )
+    {
+        Sure.NotNull (builder);
+
+        return builder.Length == 0 ? '\0' : builder[^1];
+    }
+
+    /// <summary>
+    /// Получение последнего непробельного символа.
+    /// </summary>
+    public static char LastNonSpaceChar
+        (
+            this StringBuilder builder
+        )
+    {
+        Sure.NotNull (builder);
+
+        var position = builder.Length - 1;
+        while (true)
+        {
+            if (position < 0)
+            {
+                break;
+            }
+
+            var result = builder[position];
+            if (!char.IsWhiteSpace (result))
+            {
+                return result;
+            }
+
+            --position;
+        }
+
+        return '\0';
+    }
+
+    /// <summary>
+    /// Добавление точки в конец текста.
+    /// </summary>
+    public static StringBuilder AppendDot
+        (
+            this StringBuilder builder,
+            string dot = ". ",
+            char[]? delimiters = null
+        )
+    {
+        Sure.NotNull (builder);
+
+        delimiters ??= _delimiters;
+        var lastChar = builder.LastNonSpaceChar();
+        if (Array.IndexOf (delimiters, lastChar) < 0)
+        {
+            builder.TrimEnd();
+            builder.Append (dot);
+        }
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Добавление текста с префиксом, начинающимся с точки.
+    /// </summary>
+    public static StringBuilder AppendWithDotPrefix
+        (
+            this StringBuilder builder,
+            string? text,
+            string? prefix
+        )
+    {
+        Sure.NotNull (builder);
+
+        if (!string.IsNullOrEmpty (text))
+        {
+            if (!string.IsNullOrEmpty (prefix))
+            {
+                if (prefix.StartsWith ('.'))
+                {
+                    builder.AppendDot (prefix);
+                }
+                else
+                {
+                    builder.Append (prefix);
+                }
+            }
+
+            builder.Append (text);
+        }
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Добавление текста с префиксом, начинающимся с пробельного символа.
+    /// </summary>
+    public static StringBuilder AppendWithSpacePrefix
+        (
+            this StringBuilder builder,
+            string? text,
+            string? prefix
+        )
+    {
+        Sure.NotNull (builder);
+
+        if (!string.IsNullOrEmpty (text))
+        {
+            if (!string.IsNullOrEmpty (prefix))
+            {
+                if (char.IsWhiteSpace (builder.GetLastChar())
+                    && char.IsWhiteSpace (prefix[0]))
+                {
+                    // лишний пробел не выводим
+                    builder.Append (prefix.AsSpan()[1..]);
+                }
+                else
+                {
+                    builder.Append (prefix);
+                }
+            }
+
+            builder.Append (text);
+        }
+
+        return builder;
+    }
+
+    /// <summary>
     /// Добавление пробела в конец текста, если последний символ не пробельный.
     /// К пустому тексту ничего не добавляется.
     /// </summary>
@@ -69,6 +212,8 @@ public static class TextUtility
             this StringBuilder builder
         )
     {
+        Sure.NotNull (builder);
+
         if (builder.Length != 0)
         {
             var lastChar = builder[^1];
