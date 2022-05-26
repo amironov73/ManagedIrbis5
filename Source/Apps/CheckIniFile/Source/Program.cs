@@ -53,17 +53,17 @@ class Program
                 .ThrowIfNullOrEmpty();
             var encoding = IrbisEncoding.Ansi;
 
-            using var iniFile = new IniFile(fileName, encoding);
+            using var iniFile = new IniFile (fileName, encoding);
             var lm = new ClientLM();
-            var result = lm.CheckHash(iniFile);
+            var result = lm.CheckHash (iniFile);
 
-            Console.WriteLine($"{fileName}: {result}");
+            Console.WriteLine ($"{fileName}: {result}");
 
             Environment.ExitCode = result ? 0 : 1;
         }
         catch (Exception exception)
         {
-            Console.WriteLine(exception);
+            Console.WriteLine (exception);
             Environment.ExitCode = 2;
         }
     }
@@ -73,16 +73,16 @@ class Program
             string[] args
         )
     {
-        var rootCommand = new RootCommand("CheckIniFile")
+        var rootCommand = new RootCommand ("CheckIniFile")
         {
             _fileArgument
         };
         rootCommand.Description = "Проверка в клиентском INI-файле АБИС ИРБИС64";
         rootCommand.SetHandler ((Action<ParseResult>) Run);
 
-        new CommandLineBuilder(rootCommand)
+        new CommandLineBuilder (rootCommand)
             .UseDefaults()
             .Build()
-            .Invoke(args);
+            .Invoke (args);
     }
 }

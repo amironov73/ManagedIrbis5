@@ -88,7 +88,7 @@ class Program
             _outputArgument
         };
         rootCommand.Description = "Создание таблицы актуализации по таблице инверсии";
-        rootCommand.SetHandler ((Action<ParseResult>)Run);
+        rootCommand.SetHandler ((Action<ParseResult>) Run);
 
         new CommandLineBuilder (rootCommand)
             .UseDefaults()

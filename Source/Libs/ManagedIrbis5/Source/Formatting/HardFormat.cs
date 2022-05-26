@@ -11,6 +11,8 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
 using System;
 using System.Linq;
 using System.Text;
@@ -27,6 +29,12 @@ using ManagedIrbis.Records;
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
+
+#endregion
+
+#pragma warning disable CA1822 // member can be marked as static
+
+#nullable enable
 
 namespace ManagedIrbis.Formatting;
 
@@ -62,6 +70,7 @@ public sealed class HardFormat
             ISyncProvider provider,
             RecordConfiguration? configuration = null,
             IStringLocalizer? localizer = null,
+            IFormatDriver? driver = null,
             IMemoryCache? cache = null
         )
     {
@@ -70,6 +79,7 @@ public sealed class HardFormat
         AreaSeparator = string.Empty;
         _configuration = configuration ?? RecordConfiguration.GetDefault();
         _localizer = localizer ?? new NullLocalizer();
+        _driver = driver ?? new PlainFormatDriver();
         _provider = provider;
 
         if (cache is not null)
@@ -97,6 +107,8 @@ public sealed class HardFormat
     private readonly IMemoryCache _cache;
 
     private readonly IStringLocalizer _localizer;
+
+    private readonly IFormatDriver _driver;
 
     /// <summary>
     /// Ограничители, после которых нельзя ставить точку.
@@ -231,6 +243,26 @@ public sealed class HardFormat
     }
 
     /// <summary>
+    /// Переход на новую строку.
+    /// </summary>
+    public void NewLine
+        (
+            StringBuilder builder
+        )
+    {
+        Sure.NotNull (builder);
+
+        builder.Trim();
+        if (builder.Length == 0)
+        {
+            // не переходим на новую строку при пустом тексте
+            return;
+        }
+
+        builder.Append ('\n');
+    }
+
+    /// <summary>
     /// Переход к новой области описания.
     /// </summary>
     public void NewArea
@@ -245,37 +277,57 @@ public sealed class HardFormat
             return;
         }
 
-
-        if (string.IsNullOrWhiteSpace (AreaSeparator))
+        var builderLength = builder.Length;
+        if (builderLength == 0)
         {
-            // не даём накапливаться лишним переводам строки
-            builder.TrimEnd();
-
-            if (builder.Length != 0)
-            {
-                // текст библиографического описания не должен
-                // начинаться с перехода на новую область
-                builder.Append (AreaSeparator);
-            }
+            // текст библиографического описания не должен
+            // начинаться с перехода на новую область
+            return;
         }
-        else
-        {
-            var builderLength = builder.Length;
-            if (builderLength != 0)
-            {
-                var areaLength = AreaSeparator.Length;
-                var enable = areaLength < builderLength;
-                if (enable)
-                {
-                    var text = builder.ToString (builderLength - areaLength, areaLength);
-                    enable = text != AreaSeparator;
-                }
 
-                if (enable)
-                {
-                    builder.Append (AreaSeparator);
-                }
-            }
+        // не должно быть подряд двух переходов на новую область
+        var areaLength = AreaSeparator.Length;
+        var enable = areaLength < builderLength;
+        if (enable)
+        {
+            var text = builder.ToString (builderLength - areaLength, areaLength);
+            enable = text != AreaSeparator;
+        }
+
+        if (enable)
+        {
+            builder.Append (AreaSeparator);
+        }
+    }
+
+    /// <summary>
+    /// Расстановочные шифры.
+    /// </summary>
+    public void ShelfIndex
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        // систематический шифр
+        var systematic = record.FM (906)
+            ?? record.FM (675, '*') // УДК
+            ?? record.FM (621, '*') // ББК
+            ?? record.FM (964) // ГРНТИ
+            ?? record.FM (686); // индексы другой классификации
+
+        // авторский знак
+        var authorSign = record.FM (908);
+
+        if (!string.IsNullOrEmpty (systematic)
+            && !string.IsNullOrEmpty (authorSign))
+        {
+            builder.Append (systematic);
+            NewLine (builder);
+            builder.Append (authorSign);
         }
     }
 
@@ -1151,7 +1203,7 @@ public sealed class HardFormat
             {
                 if (index != 1)
                 {
-                    NewArea (builder);
+                    NewLine (builder);
                 }
 
                 builder.Append ($"{index.ToInvariantString()}. ");
@@ -1256,6 +1308,44 @@ public sealed class HardFormat
     }
 
     /// <summary>
+    /// Ссылка - внешний объект, поле 951.
+    /// </summary>
+    public void ExternalObject
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        var fields = record.Fields.GetField (951);
+        if (!fields.IsNullOrEmpty())
+        {
+            NewArea (builder);
+
+            var first = true;
+            foreach (var field in fields)
+            {
+                var link = field ['i'];
+                if (string.IsNullOrEmpty (link))
+                {
+                    continue;
+                }
+
+                if (!first)
+                {
+                    NewLine (builder);
+                }
+
+                var title = field ['t'] ?? _localizer ["URL"];
+                _driver.Link (builder, link, title);
+                first = false;
+            }
+        }
+    }
+
+    /// <summary>
     /// Краткое описание.
     /// </summary>
     public void Brief
@@ -1303,6 +1393,7 @@ public sealed class HardFormat
         Subjects (builder, record);
         Keywords (builder, record);
         Annotation (builder, record);
+        ExternalObject (builder, record);
         Exemplars (builder, record);
     }
 

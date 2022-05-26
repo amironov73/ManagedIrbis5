@@ -690,7 +690,7 @@ public sealed class Record
 
         var field = GetField (tag);
 
-        if (!ReferenceEquals (field, null))
+        if (field is not null)
         {
             return code == '*'
                 ? field.GetValueOrFirstSubField()

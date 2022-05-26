@@ -16,6 +16,9 @@
 
 #region Using directives
 
+using System;
+using System.Linq;
+
 using AM;
 using AM.Collections;
 
@@ -191,6 +194,28 @@ public static class KnownCountries
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Получение списка всех известных кодов.
+    /// </summary>
+    public static string[] ListAllCodes()
+    {
+        var result = _dictionary.Keys.ToArray();
+        Array.Sort (result);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Получение списка всех известных названий.
+    /// </summary>
+    public static string[] ListAllTitles()
+    {
+        var result = _dictionary.Values.ToArray();
+        Array.Sort (result);
+
+        return result;
+    }
 
     /// <summary>
     /// Раскрытие кода страны в ее название.

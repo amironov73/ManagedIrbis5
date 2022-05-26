@@ -33,7 +33,7 @@ internal class Program
     /// <summary>
     /// Точка входа в программу.
     /// </summary>
-    private static async Task<int> Main(string[] args)
+    private static async Task<int> Main (string[] args)
     {
         try
         {
@@ -49,74 +49,72 @@ internal class Program
             var success = await connection.ConnectAsync();
             if (!success)
             {
-                await Error.WriteLineAsync("Can't connect");
+                await Error.WriteLineAsync ("Can't connect");
                 return 1;
             }
 
-            WriteLine("Successfully connected");
+            WriteLine ("Successfully connected");
 
             var version = await connection.GetServerVersionAsync();
-            WriteLine(version);
+            WriteLine (version);
 
             var processes = await connection.ListProcessesAsync();
             if (processes is not null)
             {
-                WriteLine("Processes: "
-                       + string.Join<ProcessInfo>(" | ", processes!));
+                WriteLine ("Processes: "
+                           + string.Join<ProcessInfo> (" | ", processes!));
             }
 
             var maxMfn = await connection.GetMaxMfnAsync();
-            WriteLine($"Max MFN={maxMfn}");
+            WriteLine ($"Max MFN={maxMfn}");
 
             await connection.NoOperationAsync();
-            WriteLine("NOP");
+            WriteLine ("NOP");
 
-            var found = await connection.SearchAsync(Search.Keyword("бетон$"));
-            WriteLine("Found: " + string.Join(", ", found));
+            var found = await connection.SearchAsync (Search.Keyword ("бетон$"));
+            WriteLine ("Found: " + string.Join (", ", found));
 
-            var terms = await connection.ReadTermsAsync("K=БЕТОН", 10);
-            WriteLine("Terms: " + string.Join<Term>(", ", terms!));
+            var terms = await connection.ReadTermsAsync ("K=БЕТОН", 10);
+            WriteLine ("Terms: " + string.Join<Term> (", ", terms!));
 
             if (terms!.Length != 0)
             {
-                var postings = await connection.ReadPostingsAsync(terms[0].Text!, 10);
-                WriteLine("Postings: " + string.Join<TermPosting>(", ", postings!));
+                var postings = await connection.ReadPostingsAsync (terms[0].Text!, 10);
+                WriteLine ("Postings: " + string.Join<TermPosting> (", ", postings!));
             }
 
-            var record = await connection.ReadRecordAsync(1);
-            WriteLine($"ReadRecord={record?.FM(200, 'a')}");
+            var record = await connection.ReadRecordAsync (1);
+            WriteLine ($"ReadRecord={record?.FM (200, 'a')}");
 
-            var formatted = await connection.FormatRecordAsync("@brief", 1);
-            WriteLine($"Formatted={formatted}");
+            var formatted = await connection.FormatRecordAsync ("@brief", 1);
+            WriteLine ($"Formatted={formatted}");
 
-            var files = await connection.ListFilesAsync(new FileSpecification
+            var files = await connection.ListFilesAsync (new FileSpecification
             {
                 Path = IrbisPath.MasterFile,
                 Database = connection.Database,
                 FileName = "*.mnu"
             });
-            WriteLine("Files: " + string.Join(",", files!));
+            WriteLine ("Files: " + string.Join (",", files!));
 
-            var fileText = await connection.ReadTextFileAsync(new FileSpecification
+            var fileText = await connection.ReadTextFileAsync (new FileSpecification
             {
                 Path = IrbisPath.MasterFile,
                 Database = connection.Database,
                 FileName = "brief.pft"
-
             });
-            WriteLine($"BRIEF: {fileText}");
+            WriteLine ($"BRIEF: {fileText}");
             WriteLine();
 
             await connection.DisposeAsync();
-            WriteLine("Successfully disconnected");
+            WriteLine ("Successfully disconnected");
         }
         catch (Exception exception)
         {
-            WriteLine(exception);
+            WriteLine (exception);
             return 1;
         }
 
         return 0;
-    } // method Main
-
-} // class Program
+    }
+}

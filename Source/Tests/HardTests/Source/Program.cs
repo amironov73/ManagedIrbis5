@@ -30,19 +30,28 @@ namespace HardTests;
 
 static class Program
 {
+    static void DoFormat
+        (
+            HardFormat formatter,
+            StringBuilder builder,
+            Record record
+        )
+    {
+        formatter.ShelfIndex (builder, record);
+        formatter.NewArea (builder);
+        formatter.FullDescription (builder, record);
+    }
+
     static int Main
         (
             string[] args
         )
     {
-        void action (HardFormat formatter, StringBuilder builder, Record record)
-             => formatter.FullDescription (builder, record);
-
         OfflineTests.Run
             (
                 args,
                 Environment.NewLine,
-                action
+                DoFormat
             );
 
         return 0;

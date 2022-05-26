@@ -22,6 +22,7 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +43,15 @@ namespace AM.AppServices;
 /// </summary>
 public class MagnaApplication
 {
+    #region Events
+
+    /// <summary>
+    /// Вызывается при работе приложения.
+    /// </summary>
+    public event EventHandler<MagnaApplicationEventArgs>? Running;
+
+    #endregion
+
     #region Properties
 
     /// <summary>
@@ -52,7 +62,7 @@ public class MagnaApplication
     /// <summary>
     /// Результат разбора командной строки.
     /// </summary>
-    public ParseResult? ParseResult { get; protected set; }
+    public ParseResult? CommandLineParseResult { get; protected set; }
 
     /// <summary>
     /// Конфигурация.
@@ -197,6 +207,8 @@ public class MagnaApplication
             return this;
         }
 
+        Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+
         // Это временный хост, чтобы сделать возможным логирование
         // до того, как всё проинициализируется окончательно
         var preliminaryServices = new ServiceCollection()
@@ -212,7 +224,7 @@ public class MagnaApplication
 
         Magna.Application = this;
         Configuration = BuildConfiguration().Build();
-        ParseResult = ParseCommandLine();
+        CommandLineParseResult = ParseCommandLine();
 
         var hostBuilder = BuildHost();
         hostBuilder.ConfigureServices (ConfigureServices);
@@ -247,7 +259,48 @@ public class MagnaApplication
             Func<int>? action = null
         )
     {
-        return action?.Invoke() ?? 0;
+        int result;
+
+        try
+        {
+            result = action?.Invoke() ?? 0;
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError
+                (
+                    exception,
+                    nameof (MagnaApplication) + "::" + nameof (ActualRun)
+                );
+
+            return -1;
+        }
+
+        if (result == 0)
+        {
+            var handler = Running;
+            if (handler is not null)
+            {
+                var args = new MagnaApplicationEventArgs ();
+                try
+                {
+                    handler (this, args);
+                    result = args.ExitCode;
+                }
+                catch (Exception exception)
+                {
+                    Logger.LogError
+                        (
+                            exception,
+                            nameof (MagnaApplication) + "::" + nameof (ActualRun)
+                        );
+
+                    return -1;
+                }
+            }
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -268,7 +321,7 @@ public class MagnaApplication
 
             using var host = Magna.Host;
 
-            Magna.Host.Start();
+            host.Start();
 
             return ActualRun (action);
         }
