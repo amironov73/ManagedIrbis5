@@ -395,6 +395,7 @@ internal sealed class AssignmentNode
                 new [] { BinaryLeft ("<<"), BinaryLeft (">>") },
                 new [] { BinaryLeft ("<="), BinaryLeft (">="), BinaryLeft ("<"), BinaryLeft (">") },
                 new [] { BinaryLeft ("==="), BinaryLeft ("!="), BinaryLeft ("==") },
+                new [] { BinaryLeft ("@") },
                 new [] { BinaryLeft ("&") },
                 new [] { BinaryLeft ("^") },
                 new [] { BinaryLeft ("|") },

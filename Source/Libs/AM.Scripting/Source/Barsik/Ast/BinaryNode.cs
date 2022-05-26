@@ -54,6 +54,41 @@ internal sealed class BinaryNode
     private readonly string _op;
 
     /// <summary>
+    /// Оператор сравнения.
+    /// </summary>
+    private static dynamic? Shuttle
+        (
+            Context context,
+            dynamic? left,
+            dynamic? right
+        )
+    {
+        context.NotUsed();
+
+        if (left is null)
+        {
+            return right is null ? 0 : -1;
+        }
+
+        if (right is null)
+        {
+            return 1;
+        }
+
+        if (left is IComparable leftComparable)
+        {
+            return leftComparable.CompareTo (right);
+        }
+
+        if (right is IComparable rightComparable)
+        {
+            return -rightComparable.CompareTo (left);
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Расширенная операция сложения.
     /// </summary>
     private static dynamic? Addition
@@ -404,6 +439,7 @@ internal sealed class BinaryNode
             "~" => RegexMatch (context, left, right),
             "is" => Is (context, left, right),
             "in" => In (context, left, right),
+            "@" or "<=>" or "<:>" => Shuttle (context, left, right),
             _ => throw new Exception ($"Unknown operation '{_op}'")
         };
     }
