@@ -65,27 +65,7 @@ internal sealed class BinaryNode
     {
         context.NotUsed();
 
-        if (left is null)
-        {
-            return right is null ? 0 : -1;
-        }
-
-        if (right is null)
-        {
-            return 1;
-        }
-
-        if (left is IComparable leftComparable)
-        {
-            return leftComparable.CompareTo (right);
-        }
-
-        if (right is IComparable rightComparable)
-        {
-            return -rightComparable.CompareTo (left);
-        }
-
-        return null;
+        return OmnipotentComparer.Default.Compare (left, right);
     }
 
     /// <summary>
