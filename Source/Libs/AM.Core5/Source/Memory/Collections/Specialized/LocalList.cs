@@ -44,14 +44,23 @@ public struct LocalList<T>
     private const int DefaultListCapacity = 8;
     public const int LocalStoreCapacity = 2;
 
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
     public IEnumerator<T> GetEnumerator()
     {
         // empty
-        if (_other == null) yield break;
+        if (_other == null)
+        {
+            yield break;
+        }
+
         if (_other.Count <= LocalStoreCapacity)
         {
             yield return _items.Item1;
-            if (ReferenceEquals (_other, LengthIs2)) yield return _items.Item2;
+            if (ReferenceEquals (_other, LengthIs2))
+            {
+                yield return _items.Item2;
+            }
+
             yield break;
         }
 
@@ -61,6 +70,7 @@ public struct LocalList<T>
         }
     }
 
+    /// <inheritdoc cref="ICollection{T}.Add"/>
     public void Add (T item)
     {
         // empty
@@ -94,6 +104,7 @@ public struct LocalList<T>
         }
     }
 
+    /// <inheritdoc cref="ICollection{T}.Clear"/>
     public void Clear()
     {
         _other = null;
@@ -101,14 +112,19 @@ public struct LocalList<T>
         _items.Item2 = default;
     }
 
+    /// <inheritdoc cref="ICollection{T}.Contains"/>
     public bool Contains (T item)
     {
         return IndexOf (item) >= 0;
     }
 
+    /// <inheritdoc cref="ICollection{T}.CopyTo"/>
     public void CopyTo (T[] array, int arrayIndex)
     {
-        if (_other == null) return;
+        if (_other == null)
+        {
+            return;
+        }
 
         if (_other.Count > LocalStoreCapacity)
         {
@@ -116,8 +132,15 @@ public struct LocalList<T>
         }
         else
         {
-            if (_other.Count > 0) array[arrayIndex++] = _items.Item1;
-            if (_other.Count > 1) array[arrayIndex] = _items.Item2;
+            if (_other.Count > 0)
+            {
+                array[arrayIndex++] = _items.Item1;
+            }
+
+            if (_other.Count > 1)
+            {
+                array[arrayIndex] = _items.Item2;
+            }
         }
     }
 
@@ -126,7 +149,10 @@ public struct LocalList<T>
     /// </summary>
     public bool Remove (T item)
     {
-        if (_other == null) return false;
+        if (_other == null)
+        {
+            return false;
+        }
 
         if (_other.Count > LocalStoreCapacity)
         {
@@ -169,23 +195,39 @@ public struct LocalList<T>
         return false;
     }
 
+    /// <inheritdoc cref="ICollection{T}.Count"/>
     public int Count => _other?.Count ?? 0;
 
+    /// <inheritdoc cref="ICollection{T}.IsReadOnly"/>
     public bool IsReadOnly => false;
 
+    /// <inheritdoc cref="IList{T}.IndexOf"/>
     public int IndexOf (T item)
     {
         if (_other == null)
+        {
             return -1;
+        }
 
-        if (_other.Count > LocalStoreCapacity) return _other.IndexOf (item);
+        if (_other.Count > LocalStoreCapacity)
+        {
+            return _other.IndexOf (item);
+        }
 
-        if (_other.Count > 0 && ItemComparer.Equals (_items.Item1, item)) return 0;
-        if (_other.Count > 1 && ItemComparer.Equals (_items.Item2, item)) return 1;
+        if (_other.Count > 0 && ItemComparer.Equals (_items.Item1, item))
+        {
+            return 0;
+        }
+
+        if (_other.Count > 1 && ItemComparer.Equals (_items.Item2, item))
+        {
+            return 1;
+        }
 
         return -1;
     }
 
+    /// <inheritdoc cref="IList{T}.Insert"/>
     public void Insert (int index, T item)
     {
         // 2nd of 1, 3rd of 2, 4th of 3..
@@ -196,10 +238,16 @@ public struct LocalList<T>
         }
 
         // Asked non-first when empty
-        if (_other == null) throw new IndexOutOfRangeException();
+        if (_other == null)
+        {
+            throw new IndexOutOfRangeException();
+        }
 
         // If list already created
-        if (_other.Count > LocalStoreCapacity) _other.Insert (index, item);
+        if (_other.Count > LocalStoreCapacity)
+        {
+            _other.Insert (index, item);
+        }
 
         if (index == 0)
         {
@@ -225,10 +273,13 @@ public struct LocalList<T>
         }
     }
 
+    /// <inheritdoc cref="IList{T}.RemoveAt"/>
     public void RemoveAt (int index)
     {
         if (_other == null || _other.Count <= index || index < 0)
+        {
             throw new IndexOutOfRangeException();
+        }
 
         if (_other.Count < LocalStoreCapacity)
         {
@@ -255,27 +306,56 @@ public struct LocalList<T>
         }
     }
 
+    /// <summary>
+    /// Получение элемента по его индексу.
+    /// </summary>
     public T this [int index]
     {
         get
         {
             if (_other == null || index >= Count || index < 0)
+            {
                 throw new IndexOutOfRangeException();
+            }
 
-            if (_other?.Count > LocalStoreCapacity) return _other[index];
-            if (_other.Count > 0 && index == 0) return _items.Item1;
-            if (_other.Count > 1 && index == 1) return _items.Item2;
+            if (_other?.Count > LocalStoreCapacity)
+            {
+                return _other[index];
+            }
+
+            if (_other.Count > 0 && index == 0)
+            {
+                return _items.Item1;
+            }
+
+            if (_other.Count > 1 && index == 1)
+            {
+                return _items.Item2;
+            }
 
             throw new InvalidOperationException ("Uncovered branch");
         }
         set
         {
             if (_other == null || index >= Count || index < 0)
+            {
                 throw new IndexOutOfRangeException();
+            }
 
-            if (_other.Count > LocalStoreCapacity) _other[index] = value;
-            if (_other.Count > 0 && index == 0) _items.Item1 = value;
-            if (_other.Count > 1 && index == 1) _items.Item2 = value;
+            if (_other.Count > LocalStoreCapacity)
+            {
+                _other[index] = value;
+            }
+
+            if (_other.Count > 0 && index == 0)
+            {
+                _items.Item1 = value;
+            }
+
+            if (_other.Count > 1 && index == 1)
+            {
+                _items.Item2 = value;
+            }
 
             throw new InvalidOperationException ("Uncovered branch");
         }
@@ -293,6 +373,9 @@ public struct LocalList<T>
         return obj is LocalList<T> other && Equals (other);
     }
 
+    /// <summary>
+    /// Сравнение с другим списком.
+    /// </summary>
     public bool Equals (LocalList<T> other)
     {
         return _items.Equals (other._items) && Equals (_other, other._other);

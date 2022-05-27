@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* AsyncTcp4Socket.cs -- клиентский сокет на основе TCP/IP v4
  * Ars Magna project, http://arsmagna.ru
@@ -28,119 +24,115 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure.Sockets
+namespace ManagedIrbis.Infrastructure.Sockets;
+
+/// <summary>
+/// Сокет, реализующий асинхронный режим для TCPv4-подключения.
+/// </summary>
+public sealed class AsyncTcp4Socket
+    : IAsyncClientSocket
 {
+    #region IAsyncClientSocket members
+
+    /// <inheritdoc cref="ISyncClientSocket.RetryCount"/>
+    public int RetryCount { get; set; }
+
+    /// <inheritdoc cref="ISyncClientSocket.RetryDelay"/>
+    public int RetryDelay { get; set; }
+
     /// <summary>
-    /// Сокет, реализующий асинхронный режим для TCPv4-подключения.
+    /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
     /// </summary>
-    public sealed class AsyncTcp4Socket
-        : IAsyncClientSocket
+    public IAsyncConnection? Connection { get; set; }
+
+    /// <inheritdoc cref="IAsyncClientSocket.TransactAsync"/>
+    public async Task<Response?> TransactAsync
+        (
+            AsyncQuery asyncQuery
+        )
     {
-        #region IAsyncClientSocket members
+        var connection = Connection.ThrowIfNull (nameof (Connection));
+        connection.ThrowIfCancelled();
 
-        /// <inheritdoc cref="ISyncClientSocket.RetryCount"/>
-        public int RetryCount { get; set; }
+        var logger = connection.Logger;
+        logger?.LogTrace ($"{nameof (AsyncTcp4Socket)}::{nameof (TransactAsync)}: enter");
 
-        /// <inheritdoc cref="ISyncClientSocket.RetryDelay"/>
-        public int RetryDelay { get; set; }
-
-        /// <summary>
-        /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
-        /// </summary>
-        public IAsyncConnection? Connection { get; set; }
-
-        /// <inheritdoc cref="IAsyncClientSocket.TransactAsync"/>
-        public async Task<Response?> TransactAsync
-            (
-                AsyncQuery asyncQuery
-            )
+        using var client = new TcpClient (AddressFamily.InterNetwork);
+        try
         {
-            var connection = Connection.ThrowIfNull(nameof(Connection));
-            connection.ThrowIfCancelled();
+            var host = connection.Host.ThrowIfNull (nameof (connection.Host));
+            logger?.LogTrace ($"Connecting to {host}");
+            await client.ConnectAsync (host, connection.Port);
+            logger?.LogTrace ($"Connected to {host}");
+        }
+        catch (Exception exception)
+        {
+            logger?.LogError (exception, "Error while connecting");
+            connection.SetLastError (-100_002);
 
-            var logger = connection.Logger;
-            logger?.LogTrace($"{nameof(AsyncTcp4Socket)}::{nameof(TransactAsync)}: enter");
+            return default;
+        }
 
-            using var client = new TcpClient(AddressFamily.InterNetwork);
-            try
+        connection.ThrowIfCancelled();
+
+        var socket = client.Client;
+        var length = asyncQuery.GetLength();
+        var prefix = Encoding.ASCII.GetBytes
+            (
+                length.ToInvariantString() + "\n"
+            );
+        var body = asyncQuery.GetBody();
+
+        try
+        {
+            logger?.LogTrace ("Sending");
+            await socket.SendAsync (prefix, SocketFlags.None);
+            await socket.SendAsync (body, SocketFlags.None);
+            socket.Shutdown (SocketShutdown.Send);
+            logger?.LogTrace ("Send OK");
+        }
+        catch (Exception exception)
+        {
+            logger?.LogError (exception, "Error while sending");
+            connection.SetLastError (-100_002);
+
+            return default;
+        }
+
+        logger?.LogTrace ("Receiving");
+        var result = new Response (Connection.ThrowIfNull (nameof (Connection)));
+        try
+        {
+            while (true)
             {
-                var host = connection.Host.ThrowIfNull(nameof(connection.Host));
-                logger?.LogTrace($"Connecting to {host}");
-                await client.ConnectAsync(host, connection.Port);
-                logger?.LogTrace($"Connected to {host}");
-            }
-            catch (Exception exception)
-            {
-                logger?.LogError(exception, "Error while connecting");
-                connection.SetLastError(-100_002);
+                connection.ThrowIfCancelled();
 
-                return default;
-            }
-
-            connection.ThrowIfCancelled();
-
-            var socket = client.Client;
-            var length = asyncQuery.GetLength();
-            var prefix = Encoding.ASCII.GetBytes
-                (
-                    length.ToInvariantString() + "\n"
-                );
-            var body = asyncQuery.GetBody();
-
-            try
-            {
-                logger?.LogTrace("Sending");
-                await socket.SendAsync(prefix, SocketFlags.None);
-                await socket.SendAsync(body, SocketFlags.None);
-                socket.Shutdown(SocketShutdown.Send);
-                logger?.LogTrace("Send OK");
-            }
-            catch (Exception exception)
-            {
-                logger?.LogError(exception, "Error while sending");
-                connection.SetLastError(-100_002);
-
-                return default;
-            }
-
-            logger?.LogTrace("Receiving");
-            var result = new Response(Connection.ThrowIfNull(nameof(Connection)));
-            try
-            {
-                while (true)
+                var buffer = new byte[2048];
+                var chunk = new ArraySegment<byte> (buffer, 0, buffer.Length);
+                var read = await socket.ReceiveAsync (chunk, SocketFlags.None);
+                if (read <= 0)
                 {
-                    connection.ThrowIfCancelled();
-
-                    var buffer = new byte[2048];
-                    var chunk = new ArraySegment<byte>(buffer, 0, buffer.Length);
-                    var read = await socket.ReceiveAsync(chunk, SocketFlags.None);
-                    if (read <= 0)
-                    {
-                        break;
-                    }
-
-                    chunk = new ArraySegment<byte>(buffer, 0, read);
-                    result.Add(chunk);
+                    break;
                 }
 
-                logger?.LogTrace("Receive OK");
-            }
-            catch (Exception exception)
-            {
-                logger?.LogError(exception, "Error while receiving");
-                connection.SetLastError(-100_002);
-
-                return default;
+                chunk = new ArraySegment<byte> (buffer, 0, read);
+                result.Add (chunk);
             }
 
-            logger?.LogTrace($"{nameof(AsyncTcp4Socket)}::{nameof(TransactAsync)} OK");
+            logger?.LogTrace ("Receive OK");
+        }
+        catch (Exception exception)
+        {
+            logger?.LogError (exception, "Error while receiving");
+            connection.SetLastError (-100_002);
 
-            return result;
+            return default;
+        }
 
-        } // method TransactAsync
+        logger?.LogTrace ($"{nameof (AsyncTcp4Socket)}::{nameof (TransactAsync)} OK");
 
-        #endregion
+        return result;
+    }
 
-    } // class AsyncTcp4Socket
-
-} // namespace ManagedIrbis.Infrastructure.Sockets
+    #endregion
+}

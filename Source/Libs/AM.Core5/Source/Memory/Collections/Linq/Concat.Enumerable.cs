@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* 
+/* Concat.Enumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,12 +17,17 @@
 
 namespace AM.Memory.Collections.Linq;
 
-internal class ConcatExprEnumerable<T> : IPoolingEnumerable<T>
+internal sealed class ConcatExprEnumerable<T>
+    : IPoolingEnumerable<T>
 {
-    private IPoolingEnumerable<T> _src, _second;
+    private IPoolingEnumerable<T>? _src, _second;
     private int _count;
 
-    public ConcatExprEnumerable<T> Init (IPoolingEnumerable<T> src, IPoolingEnumerable<T> second)
+    public ConcatExprEnumerable<T> Init
+        (
+            IPoolingEnumerable<T> src,
+            IPoolingEnumerable<T> second
+        )
     {
         _src = src;
         _count = 0;
@@ -33,12 +38,21 @@ internal class ConcatExprEnumerable<T> : IPoolingEnumerable<T>
     public IPoolingEnumerator<T> GetEnumerator()
     {
         _count++;
-        return Pool<ConcatExprEnumerator>.Get().Init (this, _src.GetEnumerator(), _second.GetEnumerator());
+        return Pool<ConcatExprEnumerator>.Get().Init
+            (
+                this,
+                _src!.GetEnumerator(),
+                _second!.GetEnumerator()
+            );
     }
 
     private void Dispose()
     {
-        if (_count == 0) return;
+        if (_count == 0)
+        {
+            return;
+        }
+
         _count--;
         if (_count == 0)
         {
@@ -50,12 +64,16 @@ internal class ConcatExprEnumerable<T> : IPoolingEnumerable<T>
 
     internal class ConcatExprEnumerator : IPoolingEnumerator<T>
     {
-        private ConcatExprEnumerable<T> _parent;
-        private IPoolingEnumerator<T> _src, _second;
+        private ConcatExprEnumerable<T>? _parent;
+        private IPoolingEnumerator<T>? _src, _second;
         private bool _first;
 
-        public ConcatExprEnumerator Init (
-            ConcatExprEnumerable<T> parent, IPoolingEnumerator<T> src, IPoolingEnumerator<T> second)
+        public ConcatExprEnumerator Init
+            (
+                ConcatExprEnumerable<T> parent,
+                IPoolingEnumerator<T> src,
+                IPoolingEnumerator<T> second
+            )
         {
             _parent = parent;
             _src = src;
@@ -68,7 +86,7 @@ internal class ConcatExprEnumerable<T> : IPoolingEnumerable<T>
         {
             if (_first)
             {
-                if (_src.MoveNext())
+                if (_src!.MoveNext())
                 {
                     return true;
                 }
@@ -76,19 +94,19 @@ internal class ConcatExprEnumerable<T> : IPoolingEnumerable<T>
                 _first = false;
             }
 
-            return _second.MoveNext();
+            return _second!.MoveNext();
         }
 
         public void Reset()
         {
             _first = true;
-            _src.Reset();
-            _second.Reset();
+            _src!.Reset();
+            _second!.Reset();
         }
 
-        object IPoolingEnumerator.Current => Current;
+        object IPoolingEnumerator.Current => Current!;
 
-        public T Current => _first ? _src.Current : _second.Current;
+        public T Current => _first ? _src!.Current : _second!.Current;
 
         public void Dispose()
         {

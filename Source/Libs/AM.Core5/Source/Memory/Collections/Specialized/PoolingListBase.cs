@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* PoolingListBase.cs -- базовый класс для списка, хранящего элементы в пуле
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -36,10 +36,25 @@ public abstract class PoolingListBase<T>
 {
     #region Private members
 
+    /// <summary>
+    /// Указатель на корневую ноду.
+    /// </summary>
     protected IMemoryOwner<IPoolingNode<T>> _root;
+
+    /// <summary>
+    /// Количество элементов.
+    /// </summary>
     protected int _count;
+
+    /// <summary>
+    /// Версия.
+    /// </summary>
     protected int _ver;
 
+    /// <summary>
+    /// Создание холдера для ноды.
+    /// </summary>
+    /// <returns></returns>
     protected abstract IPoolingNode<T> CreateNodeHolder();
 
     #endregion
@@ -47,6 +62,9 @@ public abstract class PoolingListBase<T>
     #region Public methods
 
 
+    /// <summary>
+    /// Добавление элемента в конец списка.
+    /// </summary>
     public void Add (T item)
     {
         var bn = _count >> PoolsDefaults.DefaultPoolBucketDegree;
@@ -69,7 +87,11 @@ public abstract class PoolingListBase<T>
     {
         for (int i = 0, len = _root.Memory.Span.Length; i < len; i++)
         {
-            if (_root.Memory.Span[i] == null) break;
+            if (_root.Memory.Span[i] == null)
+            {
+                break;
+            }
+
             _root.Memory.Span[i].Clear();
             _root.Memory.Span[i].Dispose();
             _root.Memory.Span[i] = default;
@@ -146,6 +168,9 @@ public abstract class PoolingListBase<T>
     /// <inheritdoc cref="ICollection{T}.IsReadOnly"/>
     public bool IsReadOnly => false;
 
+    /// <summary>
+    /// Поиск элемента в списке.
+    /// </summary>
     public int IndexOf (T item)
     {
         var len = 0;
@@ -153,12 +178,18 @@ public abstract class PoolingListBase<T>
         for (var i = 0; i <= PoolsDefaults.DefaultPoolBucketSize; i++)
         for (var j = 0; j < PoolsDefaults.DefaultPoolBucketSize && len < _count; j++, len++)
         {
-            if (item.Equals (_root.Memory.Span[i][j])) return len;
+            if (item.Equals (_root.Memory.Span[i][j]))
+            {
+                return len;
+            }
         }
 
         return -1;
     }
 
+    /// <summary>
+    /// Вставка элемента по указанному индексу.
+    /// </summary>
     public void Insert (int index, T item)
     {
         if (index < _count)
@@ -188,6 +219,9 @@ public abstract class PoolingListBase<T>
         }
     }
 
+    /// <summary>
+    /// Удаление элемента по указанному индексу.
+    /// </summary>
     public void RemoveAt (int index)
     {
         if (index >= _count)
@@ -213,6 +247,9 @@ public abstract class PoolingListBase<T>
         }
     }
 
+    /// <summary>
+    /// Изменение размера списка.
+    /// </summary>
     public void Resize (int size)
     {
         if (size == _count) return;
@@ -250,6 +287,9 @@ public abstract class PoolingListBase<T>
         }
     }
 
+    /// <summary>
+    /// Доступ по индексу.
+    /// </summary>
     public T this [int index]
     {
         get
@@ -285,6 +325,7 @@ public abstract class PoolingListBase<T>
 
     #region IPoolingEnumerable members
 
+    /// <inheritdoc cref="IPoolingEnumerable{T}.GetEnumerator"/>
     public IPoolingEnumerator<T> GetEnumerator()
     {
         return Pool<Enumerator>.Get().Init (this);
@@ -297,6 +338,7 @@ public abstract class PoolingListBase<T>
 
     #endregion
 
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
         Clear();
@@ -304,7 +346,8 @@ public abstract class PoolingListBase<T>
         _root = default;
     }
 
-    private class Enumerator : IPoolingEnumerator<T>
+    private class Enumerator
+        : IPoolingEnumerator<T>
     {
         private PoolingListBase<T> _src;
         private int _bucket, _index, _ver;
@@ -367,6 +410,7 @@ public abstract class PoolingListBase<T>
 
         object IPoolingEnumerator.Current => Current;
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
             Pool<Enumerator>.Return (this);

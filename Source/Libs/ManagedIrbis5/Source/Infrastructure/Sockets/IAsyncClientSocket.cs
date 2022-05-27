@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
 
 /* IAsyncClientSocket.cs -- интерфейс асинхронного клиентского сокета
  * Ars Magna project, http://arsmagna.ru
@@ -21,36 +18,34 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure.Sockets
+namespace ManagedIrbis.Infrastructure.Sockets;
+
+/// <summary>
+/// Интерфейс асинхронного клиентского сокета.
+/// </summary>
+public interface IAsyncClientSocket
 {
     /// <summary>
-    /// Интерфейс асинхронного клиентского сокета.
+    /// Количество повторов при сетевом сбое.
     /// </summary>
-    public interface IAsyncClientSocket
-    {
-        /// <summary>
-        /// Количество повторов при сетевом сбое.
-        /// </summary>
-        int RetryCount { get; set; }
+    int RetryCount { get; set; }
 
-        /// <summary>
-        /// Задержка при повторе, миллисекунды.
-        /// </summary>
-        int RetryDelay { get; set; }
+    /// <summary>
+    /// Задержка при повторе, миллисекунды.
+    /// </summary>
+    int RetryDelay { get; set; }
 
-        /// <summary>
-        /// Подключение.
-        /// </summary>
-        IAsyncConnection? Connection { get; set; }
+    /// <summary>
+    /// Подключение.
+    /// </summary>
+    IAsyncConnection? Connection { get; set; }
 
-        /// <summary>
-        /// Собственно общение с сервером -- в асинхронном режиме.
-        /// </summary>
-        Task<Response?> TransactAsync
-            (
-                AsyncQuery asyncQuery
-            );
+    /// <summary>
+    /// Собственно общение с сервером -- в асинхронном режиме.
+    /// </summary>
+    Task<Response?> TransactAsync
+        (
+            AsyncQuery asyncQuery
+        );
 
-    } // interface IAsyncClientSocket
-
-} // namespace ManagedIrbis.Infrastructure.Sockets
+}

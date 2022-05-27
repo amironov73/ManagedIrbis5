@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* PoolingDictionary.cs -- словарь, хранящий свои элементы в пуле
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -60,8 +60,14 @@ public partial class PoolingDictionary<TKey, TValue> :
     private bool _refType;
     private const int EndOfChain = -1;
 
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
     public PoolingDictionary() => Init();
 
+    /// <summary>
+    /// Инициализация словаря.
+    /// </summary>
     public PoolingDictionary<TKey, TValue> Init
         (
             int capacity = 0,
@@ -87,6 +93,7 @@ public partial class PoolingDictionary<TKey, TValue> :
         return this;
     }
 
+    /// <inheritdoc cref="IDictionary{TKey,TValue}.TryGetValue"/>
     public bool TryGetValue (TKey key, out TValue value)
     {
         var i = FindEntry (key);
@@ -129,21 +136,37 @@ public partial class PoolingDictionary<TKey, TValue> :
         }
 
         if (_buckets == null) return -1;
-        var hashCode = key.GetHashCode() & 0x7FFFFFFF;
+        var hashCode = key!.GetHashCode() & 0x7FFFFFFF;
         for (var i = _buckets[hashCode % _buckets.Count]; i >= 0; i = _entries[i].next)
         {
-            if (_entries[i].hashCode == hashCode && _comparer.Equals (_entries[i].key, key)) return i;
+            if (_entries[i].hashCode == hashCode
+                && _comparer.Equals (_entries[i].key, key))
+            {
+                return i;
+            }
         }
 
         return -1;
     }
 
+    /// <summary>
+    /// Сложность.
+    /// </summary>
     public int Complexity => _complexity;
 
+    /// <summary>
+    /// Добавление пары "ключ-значение".
+    /// </summary>
     public void Add (TKey key, TValue value) => Insert (key, value, true);
 
+    /// <summary>
+    /// Проверка наличия указанного ключа.
+    /// </summary>
     public bool ContainsKey (TKey key) => FindEntry (key) >= 0;
 
+    /// <summary>
+    /// Удаление элемента по его ключу.
+    /// </summary>
     public bool Remove (TKey key)
     {
         throw new NotImplementedException();
@@ -157,7 +180,7 @@ public partial class PoolingDictionary<TKey, TValue> :
         }
 
         if (_buckets == null) Init (PoolsDefaults.DefaultPoolBucketSize);
-        var hashCode = key.GetHashCode() & 0x7FFFFFFF;
+        var hashCode = key!.GetHashCode() & 0x7FFFFFFF;
         var targetBucket = hashCode % _buckets.Count;
         var complexity = 0;
 
@@ -263,6 +286,7 @@ public partial class PoolingDictionary<TKey, TValue> :
         _buckets = newBuckets;
     }
 
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
         unchecked
@@ -277,17 +301,19 @@ public partial class PoolingDictionary<TKey, TValue> :
         Pool<PoolingList<Entry>>.Return (_entries);
 
         _buckets = default;
-        _entries = default;
-        _comparer = default;
+        _entries = default!;
+        _comparer = default!;
         _complexity = _count = _version = _freeCount = _freeList = default;
     }
 
+    /// <inheritdoc cref="ICollection{T}.Add"/>
     public void Add (KeyValuePair<TKey, TValue> item) =>
         Insert (item.Key, item.Value, true);
 
+    /// <inheritdoc cref="ICollection{T}.Clear"/>
     public void Clear()
     {
-        _buckets.Clear();
+        _buckets!.Clear();
         _entries.Clear();
         _complexity = 0;
         _count = _freeList = _freeCount = 0;
@@ -298,13 +324,15 @@ public partial class PoolingDictionary<TKey, TValue> :
         }
     }
 
+    /// <inheritdoc cref="ICollection{T}.Contains"/>
     public bool Contains (KeyValuePair<TKey, TValue> item)
     {
-        var keyHash = item.Key.GetHashCode() & 0x7FFFFFFF;
+        var keyHash = item.Key!.GetHashCode() & 0x7FFFFFFF;
         for (var i = 0; i < _entries.Count; i++)
         {
-            if (_entries[i].hashCode == keyHash && _comparer.Equals (_entries[i].key, item.Key) &&
-                _entries[i].value.Equals (item.Value))
+            if (_entries[i].hashCode == keyHash
+                && _comparer.Equals (_entries[i].key, item.Key)
+                && _entries[i].value!.Equals (item.Value))
             {
                 return true;
             }
@@ -313,6 +341,7 @@ public partial class PoolingDictionary<TKey, TValue> :
         return false;
     }
 
+    /// <inheritdoc cref="ICollection{T}.CopyTo"/>
     public void CopyTo (KeyValuePair<TKey, TValue>[] array, int arrayIndex)
     {
         if (array.Length - arrayIndex < _entries.Count)
@@ -326,6 +355,7 @@ public partial class PoolingDictionary<TKey, TValue> :
         }
     }
 
+    /// <inheritdoc cref="ICollection{T}.Remove"/>
     public bool Remove (KeyValuePair<TKey, TValue> item)
     {
         throw new NotImplementedException();
@@ -390,6 +420,7 @@ public partial class PoolingDictionary<TKey, TValue> :
         }
     }
 
+    /// <inheritdoc cref="IPoolingEnumerable{T}.GetEnumerator"/>
     public IPoolingEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() =>
         Pool<Enumerator>.Get().Init (this);
 

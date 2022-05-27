@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* Distict.Enumerable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,12 +26,13 @@ using AM.Memory.Collections.Specialized;
 
 namespace AM.Memory.Collections.Linq;
 
-internal class DistinctExprEnumerable<T, TItem> : IPoolingEnumerable<T>
+internal sealed class DistinctExprEnumerable<T, TItem>
+    : IPoolingEnumerable<T>
 {
     private int _count;
-    private IPoolingEnumerator<T> _parent;
+    private IPoolingEnumerator<T>? _parent;
     private IEqualityComparer<TItem>? _comparer;
-    private Func<T, TItem> _selector;
+    private Func<T, TItem>? _selector;
 
     public DistinctExprEnumerable<T, TItem> Init
         (
@@ -67,18 +68,21 @@ internal class DistinctExprEnumerable<T, TItem> : IPoolingEnumerable<T>
         }
     }
 
-    internal class DistinctExprEnumerator : IPoolingEnumerator<T>
+    internal class DistinctExprEnumerator
+        : IPoolingEnumerator<T>
     {
-        private IPoolingEnumerator<T> _src;
+        private IPoolingEnumerator<T>? _src;
         private Func<T, TItem> _selector;
-        private PoolingDictionary<TItem, int> _hashset;
-        private DistinctExprEnumerable<T, TItem> _parent;
+        private PoolingDictionary<TItem, int>? _hashset;
+        private DistinctExprEnumerable<T, TItem>? _parent;
 
-        public DistinctExprEnumerator Init (
-            DistinctExprEnumerable<T, TItem> parent,
-            IPoolingEnumerator<T> src,
-            Func<T, TItem> selector,
-            IEqualityComparer<TItem> comparer)
+        public DistinctExprEnumerator Init
+            (
+                DistinctExprEnumerable<T, TItem> parent,
+                IPoolingEnumerator<T> src,
+                Func<T, TItem> selector,
+                IEqualityComparer<TItem>? comparer
+            )
         {
             _src = src;
             _parent = parent;

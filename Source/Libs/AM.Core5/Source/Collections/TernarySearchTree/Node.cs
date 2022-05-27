@@ -19,27 +19,28 @@ internal sealed class Node<TValue>
 {
     private TValue value;
 
-    public Node(char splitCharacter)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Node (char splitCharacter)
     {
+        value = default!;
         SplitCharacter = splitCharacter;
     }
 
-    public char SplitCharacter { get; private set; }
+    public char SplitCharacter { get; }
 
-    public Node<TValue> HigherNode { get; set; }
+    public Node<TValue>? HigherNode { get; set; }
 
-    public Node<TValue> EqualNode { get; set; }
+    public Node<TValue>? EqualNode { get; set; }
 
-    public Node<TValue> LowerNode { get; set; }
+    public Node<TValue>? LowerNode { get; set; }
 
     public bool HasValue { get; private set; }
 
     public TValue Value
     {
-        get
-        {
-            return value;
-        }
+        get => value;
 
         set
         {
@@ -50,11 +51,12 @@ internal sealed class Node<TValue>
 
     internal void ClearValue()
     {
-        value = default(TValue);
+        value = default!;
         HasValue = false;
     }
 
     public bool CanBeRemoved => HigherNode == null && LowerNode == null && EqualNode == null && HasValue == false;
 
-    public bool CanBeSimplified => EqualNode == null && HasValue == false && (LowerNode == null) != (HigherNode == null);
+    public bool CanBeSimplified =>
+        EqualNode == null && HasValue == false && LowerNode == null != (HigherNode == null);
 }

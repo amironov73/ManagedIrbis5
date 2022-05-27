@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 #endregion
 
@@ -154,14 +153,13 @@ public abstract class PoolingQueue<T>
             if (_enqueueTo != _dequeueFrom)
             {
                 var empty = _dequeueFrom;
-                _dequeueFrom = _dequeueFrom.Next;
+                _dequeueFrom = _dequeueFrom!.Next;
                 _dequeueIndex = 0;
-                empty.Dispose();
+                empty!.Dispose();
             }
             else
-
-                // reset to pool start
             {
+                // reset to pool start
                 _enqueueIndex = 0;
                 _dequeueIndex = 0;
             }

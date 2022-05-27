@@ -25,7 +25,7 @@ internal static class Tree
 {
     internal static void GetSiblings<TValue>
         (
-            Node<TValue> node,
+            Node<TValue>? node,
             IList<Node<TValue>> siblings
         )
     {
@@ -40,7 +40,10 @@ internal static class Tree
         GetSiblings (node.HigherNode, siblings);
     }
 
-    internal static IEnumerable<Node<TValue>> GetEqualNodes<TValue> (Node<TValue> node)
+    internal static IEnumerable<Node<TValue>> GetEqualNodes<TValue>
+        (
+            Node<TValue> node
+        )
     {
         foreach (var n in GetAllNodes (node))
         {
@@ -51,7 +54,10 @@ internal static class Tree
         }
     }
 
-    internal static Node<TValue> OptimizeEqualNode<TValue> (Node<TValue> equalNode)
+    internal static Node<TValue>? OptimizeEqualNode<TValue>
+        (
+            Node<TValue> equalNode
+        )
     {
         var siblings = new List<Node<TValue>>();
         GetSiblings (equalNode, siblings);
@@ -60,7 +66,12 @@ internal static class Tree
         return OptimizeSiblings (siblings, 0, siblings.Count);
     }
 
-    internal static Node<TValue> OptimizeSiblings<TValue> (IList<Node<TValue>> nodes, int index, int count)
+    internal static Node<TValue>? OptimizeSiblings<TValue>
+        (
+            IList<Node<TValue>> nodes,
+            int index,
+            int count
+        )
     {
         if (count == 0)
         {
@@ -76,12 +87,16 @@ internal static class Tree
         }
 
         var middleNode = nodes[index + count / 2];
-        middleNode.LowerNode = OptimizeSiblings<TValue> (nodes, index, count / 2);
-        middleNode.HigherNode = OptimizeSiblings<TValue> (nodes, index + count / 2 + 1, (count - 1) / 2);
+        middleNode.LowerNode = OptimizeSiblings (nodes, index, count / 2);
+        middleNode.HigherNode = OptimizeSiblings (nodes, index + count / 2 + 1, (count - 1) / 2);
         return middleNode;
     }
 
-    internal static Node<TValue> GetNodeWithValue<TValue> (Node<TValue> node, string key)
+    internal static Node<TValue>? GetNodeWithValue<TValue>
+        (
+            Node<TValue>? node,
+            string key
+        )
     {
         // Setup current key index and character.
         var currentKeyCharacterIndex = 0;
@@ -120,7 +135,11 @@ internal static class Tree
         return null;
     }
 
-    internal static Node<TValue> GetNode<TValue> (Node<TValue> node, string key)
+    internal static Node<TValue>? GetNode<TValue>
+        (
+            Node<TValue>? node,
+            string key
+        )
     {
         // Setup current key index and character.
         var currentKeyCharacterIndex = 0;
@@ -159,17 +178,18 @@ internal static class Tree
         return null;
     }
 
-    internal static Node<TValue> CreateNodes<TValue> (ref Node<TValue> root, string key)
+    internal static Node<TValue> CreateNodes<TValue>
+        (
+            ref Node<TValue>? root,
+            string key
+        )
     {
         // Setup current key index and character.
         var currentKeyCharacterIndex = 0;
         var currentKeyCharacter = key[currentKeyCharacterIndex];
 
         // Create a root node if it does not exist.
-        if (root == null)
-        {
-            root = new Node<TValue> (currentKeyCharacter);
-        }
+        root ??= new Node<TValue> (currentKeyCharacter);
 
         // Get current node.
         var node = root;
@@ -180,10 +200,7 @@ internal static class Tree
             if (currentKeyCharacter < node.SplitCharacter)
             {
                 // If no lower node exists, create a new lower node.
-                if (node.LowerNode == null)
-                {
-                    node.LowerNode = new Node<TValue> (currentKeyCharacter);
-                }
+                node.LowerNode ??= new Node<TValue> (currentKeyCharacter);
 
                 // Set current node to lower node.
                 node = node.LowerNode;
@@ -191,10 +208,7 @@ internal static class Tree
             else if (currentKeyCharacter > node.SplitCharacter)
             {
                 // If no higher node exists, create a new higher node.
-                if (node.HigherNode == null)
-                {
-                    node.HigherNode = new Node<TValue> (currentKeyCharacter);
-                }
+                node.HigherNode ??= new Node<TValue> (currentKeyCharacter);
 
                 // Set current node to higher node.
                 node = node.HigherNode;
@@ -205,10 +219,7 @@ internal static class Tree
                 currentKeyCharacter = key[currentKeyCharacterIndex];
 
                 // Create new equal node if it does not exist.
-                if (node.EqualNode == null)
-                {
-                    node.EqualNode = new Node<TValue> (currentKeyCharacter);
-                }
+                node.EqualNode ??= new Node<TValue> (currentKeyCharacter);
 
                 // Set current node to equal node.
                 node = node.EqualNode;
@@ -220,7 +231,11 @@ internal static class Tree
         }
     }
 
-    internal static IEnumerable<string> GetAllKeys<TValue> (Node<TValue> node, string key)
+    internal static IEnumerable<string> GetAllKeys<TValue>
+        (
+            Node<TValue>? node,
+            string key
+        )
     {
         if (node == null)
         {
@@ -232,23 +247,26 @@ internal static class Tree
             yield return key + node.SplitCharacter;
         }
 
-        foreach (var lowerValueKey in GetAllKeys (node.LowerNode, key))
+        foreach (var lowerValueKey in GetAllKeys (node.LowerNode!, key))
         {
             yield return lowerValueKey;
         }
 
-        foreach (var equalValueKey in GetAllKeys (node.EqualNode, key + node.SplitCharacter))
+        foreach (var equalValueKey in GetAllKeys (node.EqualNode!, key + node.SplitCharacter))
         {
             yield return equalValueKey;
         }
 
-        foreach (var higherValueKey in GetAllKeys (node.HigherNode, key))
+        foreach (var higherValueKey in GetAllKeys (node.HigherNode!, key))
         {
             yield return higherValueKey;
         }
     }
 
-    internal static IEnumerable<TValue> GetAllValues<TValue> (Node<TValue> node)
+    internal static IEnumerable<TValue> GetAllValues<TValue>
+        (
+            Node<TValue>? node
+        )
     {
         if (node == null)
         {
@@ -276,7 +294,10 @@ internal static class Tree
         }
     }
 
-    internal static IEnumerable<Node<TValue>> GetAllNodes<TValue> (Node<TValue> node)
+    internal static IEnumerable<Node<TValue>> GetAllNodes<TValue>
+        (
+            Node<TValue>? node
+        )
     {
         if (node == null)
         {
@@ -301,8 +322,11 @@ internal static class Tree
         }
     }
 
-    internal static IEnumerable<KeyValuePair<string, TValue>> GetAllKeyValuePairs<TValue> (Node<TValue> node,
-        string key)
+    internal static IEnumerable<KeyValuePair<string, TValue>> GetAllKeyValuePairs<TValue>
+        (
+            Node<TValue>? node,
+            string key
+        )
     {
         if (node == null)
         {
@@ -330,19 +354,24 @@ internal static class Tree
         }
     }
 
-    internal static bool RemoveNode<TValue> (Node<TValue> node, string key, int keyIndex)
+    internal static bool RemoveNode<TValue>
+        (
+            Node<TValue> node,
+            string key,
+            int keyIndex
+        )
     {
         var currentKeyCharacter = key[keyIndex];
 
         if (currentKeyCharacter < node.SplitCharacter)
         {
-            if (RemoveNode (node.LowerNode, key, keyIndex))
+            if (RemoveNode (node.LowerNode!, key, keyIndex))
             {
                 node.LowerNode = null;
                 return node.CanBeRemoved;
             }
 
-            if (node.LowerNode.CanBeSimplified)
+            if (node.LowerNode!.CanBeSimplified)
             {
                 node.LowerNode = node.LowerNode.LowerNode ?? node.LowerNode.HigherNode;
             }
@@ -350,20 +379,21 @@ internal static class Tree
 
         if (currentKeyCharacter > node.SplitCharacter)
         {
-            if (RemoveNode (node.HigherNode, key, keyIndex))
+            if (RemoveNode (node.HigherNode!, key, keyIndex))
             {
                 node.HigherNode = null;
                 return node.CanBeRemoved;
             }
 
-            if (node.HigherNode.CanBeSimplified)
+            if (node.HigherNode!.CanBeSimplified)
             {
                 node.HigherNode = node.HigherNode.HigherNode ?? node.HigherNode.LowerNode;
             }
         }
 
-        if (keyIndex < key.Length - 1 && currentKeyCharacter == node.SplitCharacter &&
-            RemoveNode (node.EqualNode, key, keyIndex + 1))
+        if (keyIndex < key.Length - 1
+            && currentKeyCharacter == node.SplitCharacter
+            && RemoveNode (node.EqualNode!, key, keyIndex + 1))
         {
             node.EqualNode = null;
             return node.CanBeRemoved;

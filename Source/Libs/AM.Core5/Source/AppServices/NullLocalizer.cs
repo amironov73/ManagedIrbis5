@@ -45,10 +45,14 @@ public sealed class NullLocalizer
         return Array.Empty<LocalizedString>();
     }
 
-    /// <inheritdoc cref="IStringLocalizer.this(string)"/>
+    /// <summary>
+    /// Получение локализованной строки.
+    /// </summary>
     public LocalizedString this [string name] => new (name, name, true);
 
-    /// <inheritdoc cref="IStringLocalizer.this(string,object[])"/>
+    /// <summary>
+    /// Получение локализованной строки.
+    /// </summary>
     public LocalizedString this [string name, params object[] arguments]
         => new (name, name, true);
 
