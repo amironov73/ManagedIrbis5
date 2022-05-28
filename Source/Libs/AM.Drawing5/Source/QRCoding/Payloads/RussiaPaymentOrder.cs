@@ -35,9 +35,9 @@ public class RussiaPaymentOrder
     : Payload
 {
     // Specification of RussianPaymentOrder
-    //https://docs.cntd.ru/document/1200110981
-    //https://roskazna.gov.ru/upload/iblock/5fa/gost_r_56042_2014.pdf
-    //https://sbqr.ru/standard/files/standart.pdf
+    // https://docs.cntd.ru/document/1200110981
+    // https://roskazna.gov.ru/upload/iblock/5fa/gost_r_56042_2014.pdf
+    // https://sbqr.ru/standard/files/standart.pdf
 
     // Specification of data types described in the above standard
     // https://gitea.sergeybochkov.com/bochkov/emuik/src/commit/d18f3b550f6415ea4a4a5e6097eaab4661355c72/template/ed
@@ -243,11 +243,11 @@ public class RussiaPaymentOrder
 
     private class MandatoryFields
     {
-        public string Name;
-        public string PersonalAcc;
-        public string BankName;
-        public string BIC;
-        public string CorrespAcc;
+        public string? Name;
+        public string? PersonalAcc;
+        public string? BankName;
+        public string? BIC;
+        public string? CorrespAcc;
     }
 
     /// <summary>

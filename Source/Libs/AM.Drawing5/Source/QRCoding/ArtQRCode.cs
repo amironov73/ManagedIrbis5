@@ -121,75 +121,83 @@ public class ArtQRCode
         }
 
         var pixelSize = (int)Math.Min (pixelsPerModule, Math.Floor (pixelsPerModule / pixelSizeFactor));
-        var numModules = QrCodeData.ModuleMatrix.Count - (drawQuietZones ? 0 : 8);
-        var offset = (drawQuietZones ? 0 : 4);
+        var numModules = QrCodeData!.ModuleMatrix!.Count - (drawQuietZones ? 0 : 8);
+        var offset = drawQuietZones ? 0 : 4;
         var size = numModules * pixelsPerModule;
         var bitmap = new Bitmap (size, size);
 
-        using (var graphics = Graphics.FromImage (bitmap))
+        using var graphics = Graphics.FromImage (bitmap);
+        using var lightBrush = new SolidBrush (lightColor);
+        using var darkBrush = new SolidBrush (darkColor);
+
+        // make background transparent
+        using (var brush = new SolidBrush (backgroundColor))
+            graphics.FillRectangle (brush, new Rectangle (0, 0, size, size));
+
+        //Render background if set
+        if (backgroundImage != null)
         {
-            using (var lightBrush = new SolidBrush (lightColor))
+            if (backgroundImageStyle == BackgroundImageStyle.Fill)
             {
-                using (var darkBrush = new SolidBrush (darkColor))
+                graphics.DrawImage (Resize (backgroundImage, size)!, 0, 0);
+            }
+            else if (backgroundImageStyle == BackgroundImageStyle.DataAreaOnly)
+            {
+                var bgOffset = 4 - offset;
+                graphics.DrawImage
+                    (
+                        Resize (backgroundImage, size - 2 * bgOffset * pixelsPerModule)!,
+                        0 + bgOffset * pixelsPerModule,
+                        bgOffset * pixelsPerModule
+                    );
+            }
+        }
+
+        var darkModulePixel = MakeDotPixel (pixelsPerModule, pixelSize, darkBrush);
+        var lightModulePixel = MakeDotPixel (pixelsPerModule, pixelSize, lightBrush);
+
+        for (var x = 0; x < numModules; x += 1)
+        {
+            for (var y = 0; y < numModules; y += 1)
+            {
+                var rectangleF = new Rectangle (x * pixelsPerModule, y * pixelsPerModule, pixelsPerModule,
+                    pixelsPerModule);
+
+                var pixelIsDark = QrCodeData.ModuleMatrix[offset + y][offset + x];
+                var solidBrush = pixelIsDark ? darkBrush : lightBrush;
+                var pixelImage = pixelIsDark ? darkModulePixel : lightModulePixel;
+
+                if (!IsPartOfFinderPattern (x, y, numModules, offset))
                 {
-                    // make background transparent
-                    using (var brush = new SolidBrush (backgroundColor))
-                        graphics.FillRectangle (brush, new Rectangle (0, 0, size, size));
-
-                    //Render background if set
-                    if (backgroundImage != null)
+                    if (drawQuietZones && quietZoneRenderingStyle == QuietZoneStyle.Flat &&
+                        IsPartOfQuietZone (x, y, numModules))
                     {
-                        if (backgroundImageStyle == BackgroundImageStyle.Fill)
-                            graphics.DrawImage (Resize (backgroundImage, size), 0, 0);
-                        else if (backgroundImageStyle == BackgroundImageStyle.DataAreaOnly)
-                        {
-                            var bgOffset = 4 - offset;
-                            graphics.DrawImage (Resize (backgroundImage, size - (2 * bgOffset * pixelsPerModule)),
-                                0 + (bgOffset * pixelsPerModule), (bgOffset * pixelsPerModule));
-                        }
+                        graphics.FillRectangle (solidBrush, rectangleF);
                     }
-
-
-                    var darkModulePixel = MakeDotPixel (pixelsPerModule, pixelSize, darkBrush);
-                    var lightModulePixel = MakeDotPixel (pixelsPerModule, pixelSize, lightBrush);
-
-                    for (var x = 0; x < numModules; x += 1)
+                    else
                     {
-                        for (var y = 0; y < numModules; y += 1)
-                        {
-                            var rectangleF = new Rectangle (x * pixelsPerModule, y * pixelsPerModule, pixelsPerModule,
-                                pixelsPerModule);
-
-                            var pixelIsDark = QrCodeData.ModuleMatrix[offset + y][offset + x];
-                            var solidBrush = pixelIsDark ? darkBrush : lightBrush;
-                            var pixelImage = pixelIsDark ? darkModulePixel : lightModulePixel;
-
-                            if (!IsPartOfFinderPattern (x, y, numModules, offset))
-                                if (drawQuietZones && quietZoneRenderingStyle == QuietZoneStyle.Flat &&
-                                    IsPartOfQuietZone (x, y, numModules))
-                                    graphics.FillRectangle (solidBrush, rectangleF);
-                                else
-                                    graphics.DrawImage (pixelImage, rectangleF);
-                            else if (finderPatternImage == null)
-                                graphics.FillRectangle (solidBrush, rectangleF);
-                        }
+                        graphics.DrawImage (pixelImage, rectangleF);
                     }
-
-                    if (finderPatternImage != null)
-                    {
-                        var finderPatternSize = 7 * pixelsPerModule;
-                        graphics.DrawImage (finderPatternImage,
-                            new Rectangle (0, 0, finderPatternSize, finderPatternSize));
-                        graphics.DrawImage (finderPatternImage,
-                            new Rectangle (size - finderPatternSize, 0, finderPatternSize, finderPatternSize));
-                        graphics.DrawImage (finderPatternImage,
-                            new Rectangle (0, size - finderPatternSize, finderPatternSize, finderPatternSize));
-                    }
-
-                    graphics.Save();
+                }
+                else if (finderPatternImage == null)
+                {
+                    graphics.FillRectangle (solidBrush, rectangleF);
                 }
             }
         }
+
+        if (finderPatternImage != null)
+        {
+            var finderPatternSize = 7 * pixelsPerModule;
+            graphics.DrawImage (finderPatternImage,
+                new Rectangle (0, 0, finderPatternSize, finderPatternSize));
+            graphics.DrawImage (finderPatternImage,
+                new Rectangle (size - finderPatternSize, 0, finderPatternSize, finderPatternSize));
+            graphics.DrawImage (finderPatternImage,
+                new Rectangle (0, size - finderPatternSize, finderPatternSize, finderPatternSize));
+        }
+
+        graphics.Save();
 
         return bitmap;
     }
@@ -271,17 +279,17 @@ public class ArtQRCode
         )
     {
         var cornerSize = 11 - offset;
-        var outerLimitLow = (numModules - cornerSize - 1);
+        var outerLimitLow = numModules - cornerSize - 1;
         var outerLimitHigh = outerLimitLow + 8;
         var invertedOffset = 4 - offset;
 
         return
-            (x >= invertedOffset && x < cornerSize && y >= invertedOffset &&
-             y < cornerSize) || //Top-left finder pattern
-            (x > outerLimitLow && x < outerLimitHigh && y >= invertedOffset &&
-             y < cornerSize) || //Top-right finder pattern
-            (x >= invertedOffset && x < cornerSize && y > outerLimitLow &&
-             y < outerLimitHigh); //Bottom-left finder pattern
+            x >= invertedOffset && x < cornerSize && y >= invertedOffset &&
+            y < cornerSize || //Top-left finder pattern
+            x > outerLimitLow && x < outerLimitHigh && y >= invertedOffset &&
+            y < cornerSize || //Top-right finder pattern
+            x >= invertedOffset && x < cornerSize && y > outerLimitLow &&
+            y < outerLimitHigh; //Bottom-left finder pattern
     }
 
     /// <summary>
@@ -311,19 +319,15 @@ public class ArtQRCode
 
         var bm = new Bitmap (newSize, newSize);
 
-        using (var graphics = Graphics.FromImage (bm))
-        {
-            using (var brush = new SolidBrush (Color.Transparent))
-            {
-                graphics.FillRectangle (brush, new Rectangle (0, 0, newSize, newSize));
+        using var graphics = Graphics.FromImage (bm);
+        using var brush = new SolidBrush (Color.Transparent);
+        graphics.FillRectangle (brush, new Rectangle (0, 0, newSize, newSize));
 
-                graphics.InterpolationMode = InterpolationMode.High;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        graphics.InterpolationMode = InterpolationMode.High;
+        graphics.CompositingQuality = CompositingQuality.HighQuality;
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-                graphics.DrawImage (scaledImage, new Rectangle (offsetX, offsetY, scaledWidth, scaledHeight));
-            }
-        }
+        graphics.DrawImage (scaledImage, new Rectangle (offsetX, offsetY, scaledWidth, scaledHeight));
 
         return bm;
     }
@@ -333,7 +337,14 @@ public class ArtQRCode
     /// </summary>
     public enum QuietZoneStyle
     {
+        /// <summary>
+        ///
+        /// </summary>
         Dotted,
+
+        /// <summary>
+        ///
+        /// </summary>
         Flat
     }
 
@@ -342,13 +353,23 @@ public class ArtQRCode
     /// </summary>
     public enum BackgroundImageStyle
     {
+        /// <summary>
+        ///
+        /// </summary>
         Fill,
+
+        /// <summary>
+        ///
+        /// </summary>
         DataAreaOnly
     }
 }
 
+/// <summary>
+/// Вспомогательные методы для Art QR-кода.
+/// </summary>
 [System.Runtime.Versioning.SupportedOSPlatform ("windows")]
-public static class ArtQRCodeHelper
+internal static class ArtQRCodeHelper
 {
     /// <summary>
     /// Helper function to create an ArtQRCode graphic with a single function call
@@ -390,10 +411,22 @@ public static class ArtQRCodeHelper
             Bitmap? finderPatternImage = null
         )
     {
-        using (var qrGenerator = new QRCodeGenerator())
-        using (var qrCodeData = qrGenerator.CreateQrCode (plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion))
-        using (var qrCode = new ArtQRCode (qrCodeData))
-            return qrCode.GetGraphic (pixelsPerModule, darkColor, lightColor, backgroundColor, backgroundImage,
-                pixelSizeFactor, drawQuietZones, quietZoneRenderingStyle, backgroundImageStyle, finderPatternImage);
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrCodeData = qrGenerator.CreateQrCode (plainText, eccLevel, forceUtf8, utf8BOM, eciMode, requestedVersion);
+        using var qrCode = new ArtQRCode (qrCodeData);
+
+        return qrCode.GetGraphic
+            (
+                pixelsPerModule,
+                darkColor,
+                lightColor,
+                backgroundColor,
+                backgroundImage,
+                pixelSizeFactor,
+                drawQuietZones,
+                quietZoneRenderingStyle,
+                backgroundImageStyle,
+                finderPatternImage
+            );
     }
 }

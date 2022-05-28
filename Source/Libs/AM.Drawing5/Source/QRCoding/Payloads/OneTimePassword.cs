@@ -31,63 +31,134 @@ namespace AM.Drawing.QRCoding;
 public class OneTimePassword
     : Payload
 {
+    /// <summary>
+    ///
+    /// </summary>
     //https://github.com/google/google-authenticator/wiki/Key-Uri-Format
     public OneTimePasswordAuthType Type { get; set; } = OneTimePasswordAuthType.TOTP;
-    public string Secret { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Secret { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public OneTimePasswordAuthAlgorithm AuthAlgorithm { get; set; } = OneTimePasswordAuthAlgorithm.SHA1;
 
+    /// <summary>
+    ///
+    /// </summary>
     [Obsolete ("This property is obsolete, use " + nameof (AuthAlgorithm) + " instead", false)]
     public OoneTimePasswordAuthAlgorithm Algorithm
     {
-        get =>
-            (OoneTimePasswordAuthAlgorithm)Enum.Parse (typeof (OoneTimePasswordAuthAlgorithm),
-                AuthAlgorithm.ToString());
-        set =>
-            AuthAlgorithm =
-                (OneTimePasswordAuthAlgorithm)Enum.Parse (typeof (OneTimePasswordAuthAlgorithm), value.ToString());
+        get => (OoneTimePasswordAuthAlgorithm) Enum.Parse
+            (
+                typeof (OoneTimePasswordAuthAlgorithm),
+                AuthAlgorithm.ToString()
+            );
+
+        set => AuthAlgorithm = (OneTimePasswordAuthAlgorithm) Enum.Parse
+            (
+                typeof (OneTimePasswordAuthAlgorithm),
+                value.ToString()
+            );
     }
 
-    public string Issuer { get; set; }
-    public string Label { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Issuer { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Label { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
     public int Digits { get; set; } = 6;
+
+    /// <summary>
+    ///
+    /// </summary>
     public int? Counter { get; set; } = null;
+
+    /// <summary>
+    ///
+    /// </summary>
     public int? Period { get; set; } = 30;
 
+    /// <summary>
+    ///
+    /// </summary>
     public enum OneTimePasswordAuthType
     {
+        /// <summary>
+        ///
+        /// </summary>
         TOTP,
+
+        /// <summary>
+        ///
+        /// </summary>
         HOTP,
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public enum OneTimePasswordAuthAlgorithm
     {
+        /// <summary>
+        ///
+        /// </summary>
         SHA1,
+
+        /// <summary>
+        ///
+        /// </summary>
         SHA256,
+
+        /// <summary>
+        ///
+        /// </summary>
         SHA512,
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [Obsolete ("This enum is obsolete, use " + nameof (OneTimePasswordAuthAlgorithm) + " instead", false)]
     public enum OoneTimePasswordAuthAlgorithm
     {
+        /// <summary>
+        ///
+        /// </summary>
         SHA1,
+
+        /// <summary>
+        ///
+        /// </summary>
         SHA256,
+
+        /// <summary>
+        ///
+        /// </summary>
         SHA512,
     }
 
+    /// <inheritdoc cref="Payload.ToString"/>
     public override string ToString()
     {
-        switch (Type)
+        return Type switch
         {
-            case OneTimePasswordAuthType.TOTP:
-                return TimeToString();
-
-            case OneTimePasswordAuthType.HOTP:
-                return HMACToString();
-
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            OneTimePasswordAuthType.TOTP => TimeToString(),
+            OneTimePasswordAuthType.HOTP => HMACToString(),
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 
     // Note: Issuer:Label must only contain 1 : if either of the Issuer or the Label has a : then it is invalid.
@@ -127,9 +198,9 @@ public class OneTimePassword
             throw new Exception ("Secret must be a filled out base32 encoded string");
         }
 
-        string strippedSecret = Secret.Replace (" ", "");
-        string escapedIssuer = null;
-        string label = null;
+        var strippedSecret = Secret.Replace (" ", "");
+        string? escapedIssuer = null;
+        string? label = null;
 
         if (!string.IsNullOrWhiteSpace (Issuer))
         {

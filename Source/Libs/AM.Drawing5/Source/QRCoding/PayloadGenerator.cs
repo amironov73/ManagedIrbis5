@@ -47,7 +47,6 @@ public static class PayloadGenerator
         var structurallyValid = Regex.IsMatch (ibanCleared, @"^[a-zA-Z]{2}[0-9]{2}([a-zA-Z0-9]?){16,30}$");
 
         //Check IBAN checksum
-        var checksumValid = false;
         var sum = $"{ibanCleared.Substring (4)}{ibanCleared.Substring (0, 4)}".ToCharArray().Aggregate ("",
             (current, c) => current + (char.IsLetter (c) ? (c - 55).ToString() : c.ToString()));
         var m = 0;
@@ -61,7 +60,7 @@ public static class PayloadGenerator
             m = m % 97;
         }
 
-        checksumValid = m == 1;
+        var checksumValid = m == 1;
         return structurallyValid && checksumValid;
     }
 
@@ -75,10 +74,11 @@ public static class PayloadGenerator
         {
             var ibanCleared = iban.ToUpper().Replace (" ", "").Replace ("-", "");
             var possibleQrIid = Convert.ToInt32 (ibanCleared.Substring (4, 5));
-            foundQrIid = possibleQrIid >= 30000 && possibleQrIid <= 31999;
+            foundQrIid = possibleQrIid is >= 30000 and <= 31999;
         }
         catch
         {
+            Magna.Debug (nameof (IsValidQRIban));
         }
 
         return IsValidIban (iban) && foundQrIid;
@@ -108,14 +108,19 @@ public static class PayloadGenerator
 
     internal static string EscapeInput
         (
-            string input,
+            string? input,
             bool simple = false
         )
     {
+        if (string.IsNullOrEmpty (input))
+        {
+            return string.Empty;
+        }
+
         char[] forbiddenChars = { '\\', ';', ',', ':' };
         if (simple)
         {
-            forbiddenChars = new char[1] { ':' };
+            forbiddenChars = new[] { ':' };
         }
 
         foreach (var c in forbiddenChars)
@@ -144,7 +149,7 @@ public static class PayloadGenerator
             return false;
         }
 
-        var mods = new int[] { 0, 9, 4, 6, 8, 2, 7, 1, 3, 5 };
+        var mods = new[] { 0, 9, 4, 6, 8, 2, 7, 1, 3, 5 };
 
         var remainder = 0;
         for (var i = 0; i < digits.Length - 1; i++)
@@ -154,7 +159,7 @@ public static class PayloadGenerator
         }
 
         var checksum = (10 - remainder) % 10;
-        return checksum == Convert.ToInt32 (digits[digits.Length - 1]) - 48;
+        return checksum == Convert.ToInt32 (digits[^1]) - 48;
     }
 
     #endregion

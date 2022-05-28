@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* ShadowSocksConfig.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,13 +27,18 @@ using System.Text;
 
 namespace AM.Drawing.QRCoding;
 
-public class ShadowSocksConfig : Payload
+/// <summary>
+///
+/// </summary>
+public class ShadowSocksConfig
+    : Payload
 {
-    private readonly string hostname, password, tag, methodStr, parameter;
+    private readonly string hostname, password, methodStr;
+    private readonly string? tag, parameter;
     private readonly Method method;
     private readonly int port;
 
-    private Dictionary<string, string> encryptionTexts = new Dictionary<string, string>()
+    private readonly Dictionary<string, string> encryptionTexts = new ()
     {
         { "Chacha20IetfPoly1305", "chacha20-ietf-poly1305" },
         { "Aes128Gcm", "aes-128-gcm" },
@@ -88,13 +93,38 @@ public class ShadowSocksConfig : Payload
     /// <param name="password">Password of the SS proxy</param>
     /// <param name="method">Encryption type</param>
     /// <param name="tag">Optional tag line</param>
-    public ShadowSocksConfig (string hostname, int port, string password, Method method, string tag = null) :
+    public ShadowSocksConfig
+        (
+            string hostname,
+            int port,
+            string password,
+            Method method,
+            string? tag = null
+        ) :
         this (hostname, port, password, method, null, tag)
     {
     }
 
-    public ShadowSocksConfig (string hostname, int port, string password, Method method, string plugin,
-        string pluginOption, string tag = null) :
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="hostname"></param>
+    /// <param name="port"></param>
+    /// <param name="password"></param>
+    /// <param name="method"></param>
+    /// <param name="plugin"></param>
+    /// <param name="pluginOption"></param>
+    /// <param name="tag"></param>
+    public ShadowSocksConfig
+        (
+            string hostname,
+            int port,
+            string password,
+            Method method,
+            string plugin,
+            string pluginOption,
+            string? tag = null
+        ) :
         this (hostname, port, password, method, new Dictionary<string, string>
         {
             ["plugin"] = plugin + (
@@ -106,7 +136,10 @@ public class ShadowSocksConfig : Payload
     {
     }
 
-    private Dictionary<string, string> UrlEncodeTable = new Dictionary<string, string>
+    /// <summary>
+    ///
+    /// </summary>
+    private readonly Dictionary<string, string> UrlEncodeTable = new ()
     {
         [" "] = "+",
         ["\0"] = "%00",
@@ -151,14 +184,34 @@ public class ShadowSocksConfig : Payload
         return j;
     }
 
-    public ShadowSocksConfig (string hostname, int port, string password, Method method,
-        Dictionary<string, string> parameters, string tag = null)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="hostname"></param>
+    /// <param name="port"></param>
+    /// <param name="password"></param>
+    /// <param name="method"></param>
+    /// <param name="parameters"></param>
+    /// <param name="tag"></param>
+    /// <exception cref="ShadowSocksConfigException"></exception>
+    public ShadowSocksConfig
+        (
+            string hostname,
+            int port,
+            string password,
+            Method method,
+            Dictionary<string, string>? parameters,
+            string? tag = null
+        )
     {
         this.hostname = Uri.CheckHostName (hostname) == UriHostNameType.IPv6
             ? $"[{hostname}]"
             : hostname;
         if (port < 1 || port > 65535)
+        {
             throw new ShadowSocksConfigException ("Value of 'port' must be within 0 and 65535.");
+        }
+
         this.port = port;
         this.password = password;
         this.method = method;
@@ -166,13 +219,16 @@ public class ShadowSocksConfig : Payload
         this.tag = tag;
 
         if (parameters != null)
+        {
             parameter =
                 string.Join ("&",
                     parameters.Select (
                             kv => $"{UrlEncode (kv.Key)}={UrlEncode (kv.Value)}"
                         ).ToArray());
+        }
     }
 
+    /// <inheritdoc cref="Payload.ToString"/>
     public override string ToString()
     {
         if (string.IsNullOrEmpty (parameter))
@@ -191,64 +247,208 @@ public class ShadowSocksConfig : Payload
             $"ss://{authStringEncoded}@{hostname}:{port}/?{parameter}{(!string.IsNullOrEmpty (tag) ? $"#{tag}" : string.Empty)}";
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public enum Method
     {
+        /// <summary>
+        ///
+        /// </summary>
         // AEAD
         Chacha20IetfPoly1305,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes128Gcm,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes192Gcm,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes256Gcm,
 
+        /// <summary>
+        ///
+        /// </summary>
         // AEAD, not standard
         XChacha20IetfPoly1305,
 
+        /// <summary>
+        ///
+        /// </summary>
         // Stream cipher
         Aes128Cfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes192Cfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes256Cfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes128Ctr,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes192Ctr,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes256Ctr,
+
+        /// <summary>
+        ///
+        /// </summary>
         Camellia128Cfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Camellia192Cfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Camellia256Cfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Chacha20Ietf,
 
+        /// <summary>
+        ///
+        /// </summary>
         // alias of Aes256Cfb
         Aes256Cb,
 
+        /// <summary>
+        ///
+        /// </summary>
         // Stream cipher, not standard
         Aes128Ofb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes192Ofb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes256Ofb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes128Cfb1,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes192Cfb1,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes256Cfb1,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes128Cfb8,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes192Cfb8,
+
+        /// <summary>
+        ///
+        /// </summary>
         Aes256Cfb8,
 
+        /// <summary>
+        ///
+        /// </summary>
         // Stream cipher, deprecated
         Chacha20,
+
+        /// <summary>
+        ///
+        /// </summary>
         BfCfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Rc4Md5,
+
+        /// <summary>
+        ///
+        /// </summary>
         Salsa20,
 
+        /// <summary>
+        ///
+        /// </summary>
         // Not standard and not in acitve use
         DesCfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         IdeaCfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Rc2Cfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Cast5Cfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Salsa20Ctr,
+
+        /// <summary>
+        ///
+        /// </summary>
         Rc4,
+
+        /// <summary>
+        ///
+        /// </summary>
         SeedCfb,
+
+        /// <summary>
+        ///
+        /// </summary>
         Table
     }
 
     /// <summary>
     /// Специфичное исключение.
     /// </summary>
-    public class ShadowSocksConfigException
+    public sealed class ShadowSocksConfigException
         : Exception
     {
         #region Construction

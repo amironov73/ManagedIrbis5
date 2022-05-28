@@ -27,6 +27,9 @@ using System.Collections;
 
 namespace AM.Drawing.QRCoding;
 
+/// <summary>
+///
+/// </summary>
 public class QRCodeGenerator
     : IDisposable
 {
@@ -42,11 +45,29 @@ public class QRCodeGenerator
     private static readonly List<Antilog> galoisField = CreateAntilogTable();
     private static readonly Dictionary<char, int> alphanumEncDict = CreateAlphanumEncDict();
 
+    /// <summary>
+    ///
+    /// </summary>
     public enum EciMode
     {
+        /// <summary>
+        ///
+        /// </summary>
         Default = 0,
+
+        /// <summary>
+        ///
+        /// </summary>
         Iso8859_1 = 3,
+
+        /// <summary>
+        ///
+        /// </summary>
         Iso8859_2 = 4,
+
+        /// <summary>
+        ///
+        /// </summary>
         Utf8 = 26
     }
 
@@ -214,13 +235,21 @@ public class QRCodeGenerator
         var dataLength = eccInfo.TotalDataCodewords * 8;
         var lengthDiff = dataLength - bitString.Length;
         if (lengthDiff > 0)
+        {
             bitString += new string('0', Math.Min(lengthDiff, 4));
+        }
+
         if ((bitString.Length % 8) != 0)
+        {
             bitString += new string('0', 8 - (bitString.Length % 8));
+        }
+
         while (bitString.Length < dataLength)
             bitString += "1110110000010001";
         if (bitString.Length > dataLength)
+        {
             bitString = bitString.Substring(0, dataLength);
+        }
 
         //Calculate error correction words
         var codeWordWithECC = new List<CodewordBlock>(eccInfo.BlocksInGroup1 + eccInfo.BlocksInGroup2);
@@ -266,7 +295,9 @@ public class QRCodeGenerator
         {
             foreach (var codeBlock in codeWordWithECC)
                 if (codeBlock.CodeWords.Count > i)
+                {
                     interleavedWordsSb.Append(codeBlock.CodeWords[i]);
+                }
         }
 
 
@@ -274,7 +305,9 @@ public class QRCodeGenerator
         {
             foreach (var codeBlock in codeWordWithECC)
                 if (codeBlock.ECCWords.Count > i)
+                {
                     interleavedWordsSb.Append(codeBlock.ECCWords[i]);
+                }
         }
         interleavedWordsSb.Append(new string('0', remainderBits[version - 1]));
         var interleavedData = interleavedWordsSb.ToString();
@@ -318,7 +351,10 @@ public class QRCodeGenerator
             var sb = new StringBuilder();
             generator = generator.PadRight(fStrEcc.Length, '0');
             for (var i = 0; i < fStrEcc.Length; i++)
+            {
                 sb.Append((Convert.ToInt32(fStrEcc[i]) ^ Convert.ToInt32(generator[i])).ToString());
+            }
+
             fStrEcc = sb.ToString().TrimStart('0');
         }
         fStrEcc = fStrEcc.PadLeft(10, '0');
@@ -326,7 +362,10 @@ public class QRCodeGenerator
 
         var sbMask = new StringBuilder();
         for (var i = 0; i < fStr.Length; i++)
+        {
             sbMask.Append((Convert.ToInt32(fStr[i]) ^ Convert.ToInt32(fStrMask[i])).ToString());
+        }
+
         return sbMask.ToString();
     }
 
@@ -341,7 +380,10 @@ public class QRCodeGenerator
             var sb = new StringBuilder();
             generator = generator.PadRight(vStrEcc.Length, '0');
             for (var i = 0; i < vStrEcc.Length; i++)
+            {
                 sb.Append((Convert.ToInt32(vStrEcc[i]) ^ Convert.ToInt32(generator[i])).ToString());
+            }
+
             vStrEcc = sb.ToString().TrimStart('0');
         }
         vStrEcc = vStrEcc.PadLeft(12, '0');
@@ -356,11 +398,20 @@ public class QRCodeGenerator
         {
             var quietLine = new bool[qrCode.ModuleMatrix.Count + 8];
             for (var i = 0; i < quietLine.Length; i++)
+            {
                 quietLine[i] = false;
+            }
+
             for (var i = 0; i < 4; i++)
+            {
                 qrCode.ModuleMatrix.Insert(0, new BitArray(quietLine));
+            }
+
             for (var i = 0; i < 4; i++)
+            {
                 qrCode.ModuleMatrix.Add(new BitArray(quietLine));
+            }
+
             for (var i = 4; i < qrCode.ModuleMatrix.Count - 4; i++)
             {
                 bool[] quietPart = { false, false, false, false };
@@ -377,12 +428,18 @@ public class QRCodeGenerator
             if (inp.Length > 0)
             {
                 for (int i = inp.Length - 1; i >= 0; i--)
+                {
                     newStr += inp[i];
+                }
             }
             return newStr;
         }
 
-        public static void PlaceVersion(ref QRCodeData qrCode, string versionStr)
+        public static void PlaceVersion
+            (
+                ref QRCodeData qrCode,
+                string versionStr
+            )
         {
             var size = qrCode.ModuleMatrix.Count;
 
@@ -427,8 +484,16 @@ public class QRCodeGenerator
             }
         }
 
-
-        public static int MaskCode(ref QRCodeData qrCode, int version, ref List<Rectangle> blockedModules, ECCLevel eccLevel)
+        /// <summary>
+        ///
+        /// </summary>
+        public static int MaskCode
+            (
+                ref QRCodeData qrCode,
+                int version,
+                ref List<Rectangle> blockedModules,
+                ECCLevel eccLevel
+            )
         {
             int? selectedPattern = null;
             var patternScore = 0;
@@ -504,8 +569,15 @@ public class QRCodeGenerator
             return selectedPattern.Value - 1;
         }
 
-
-        public static void PlaceDataWords(ref QRCodeData qrCode, string data, ref List<Rectangle> blockedModules)
+        /// <summary>
+        ///
+        /// </summary>
+        public static void PlaceDataWords
+            (
+                ref QRCodeData qrCode,
+                string data,
+                ref List<Rectangle> blockedModules
+            )
         {
             var size = qrCode.ModuleMatrix.Count;
             var up = true;
@@ -517,7 +589,10 @@ public class QRCodeGenerator
             for (var x = size - 1; x >= 0; x = x - 2)
             {
                 if (x == 6)
+                {
                     x = 5;
+                }
+
                 for (var yMod = 1; yMod <= size; yMod++)
                 {
                     int y;
@@ -525,17 +600,27 @@ public class QRCodeGenerator
                     {
                         y = size - yMod;
                         if (datawords.Count > 0 && !IsBlocked(new Rectangle(x, y, 1, 1), blockedModules))
+                        {
                             qrCode.ModuleMatrix[y][x] = datawords.Dequeue();
+                        }
+
                         if (datawords.Count > 0 && x > 0 && !IsBlocked(new Rectangle(x - 1, y, 1, 1), blockedModules))
+                        {
                             qrCode.ModuleMatrix[y][x - 1] = datawords.Dequeue();
+                        }
                     }
                     else
                     {
                         y = yMod - 1;
                         if (datawords.Count > 0 && !IsBlocked(new Rectangle(x, y, 1, 1), blockedModules))
+                        {
                             qrCode.ModuleMatrix[y][x] = datawords.Dequeue();
+                        }
+
                         if (datawords.Count > 0 && x > 0 && !IsBlocked(new Rectangle(x - 1, y, 1, 1), blockedModules))
+                        {
                             qrCode.ModuleMatrix[y][x - 1] = datawords.Dequeue();
+                        }
                     }
                 }
                 up = !up;
@@ -615,7 +700,9 @@ public class QRCodeGenerator
                     }
                 }
                 if (blocked)
+                {
                     continue;
+                }
 
                 for (var x = 0; x < 5; x++)
                 {
@@ -658,7 +745,9 @@ public class QRCodeGenerator
             foreach (var blockedMod in blockedModules)
             {
                 if (Intersects(blockedMod, r1))
+                {
                     return true;
+                }
             }
             return false;
         }
@@ -723,24 +812,44 @@ public class QRCodeGenerator
                     for (var x = 0; x < size; x++)
                     {
                         if (qrCode.ModuleMatrix[y][x] == lastValRow)
+                        {
                             modInRow++;
+                        }
                         else
+                        {
                             modInRow = 1;
+                        }
+
                         if (modInRow == 5)
+                        {
                             score1 += 3;
+                        }
                         else if (modInRow > 5)
+                        {
                             score1++;
+                        }
+
                         lastValRow = qrCode.ModuleMatrix[y][x];
 
 
                         if (qrCode.ModuleMatrix[x][y] == lastValColumn)
+                        {
                             modInColumn++;
+                        }
                         else
+                        {
                             modInColumn = 1;
+                        }
+
                         if (modInColumn == 5)
+                        {
                             score1 += 3;
+                        }
                         else if (modInColumn > 5)
+                        {
                             score1++;
+                        }
+
                         lastValColumn = qrCode.ModuleMatrix[x][y];
                     }
                 }
@@ -754,7 +863,9 @@ public class QRCodeGenerator
                         if (qrCode.ModuleMatrix[y][x] == qrCode.ModuleMatrix[y][x + 1] &&
                             qrCode.ModuleMatrix[y][x] == qrCode.ModuleMatrix[y + 1][x] &&
                             qrCode.ModuleMatrix[y][x] == qrCode.ModuleMatrix[y + 1][x + 1])
+                        {
                             score2 += 3;
+                        }
                     }
                 }
 
@@ -822,7 +933,9 @@ public class QRCodeGenerator
                 foreach (var row in qrCode.ModuleMatrix)
                 foreach (bool bit in row)
                     if (bit)
+                    {
                         blackModules++;
+                    }
 
                 var percent = (blackModules / (qrCode.ModuleMatrix.Count * qrCode.ModuleMatrix.Count)) * 100;
                 var prevMultipleOf5 = Math.Abs((int) Math.Floor(percent/5)*5 - 50)/5;
@@ -842,12 +955,16 @@ public class QRCodeGenerator
         var generatorPolynom = CalculateGeneratorPolynom(eccWords);
 
         for (var i = 0; i < messagePolynom.PolyItems.Count; i++)
+        {
             messagePolynom.PolyItems[i] = new PolynomItem(messagePolynom.PolyItems[i].Coefficient,
                 messagePolynom.PolyItems[i].Exponent + eccWords);
+        }
 
         for (var i = 0; i < generatorPolynom.PolyItems.Count; i++)
+        {
             generatorPolynom.PolyItems[i] = new PolynomItem(generatorPolynom.PolyItems[i].Coefficient,
                 generatorPolynom.PolyItems[i].Exponent + (messagePolynom.PolyItems.Count-1));
+        }
 
         var leadTermSource = messagePolynom;
         for (var i = 0; (leadTermSource.PolyItems.Count > 0 && leadTermSource.PolyItems[leadTermSource.PolyItems.Count - 1].Exponent > 0); i++)
@@ -872,11 +989,14 @@ public class QRCodeGenerator
     {
         var newPoly = new Polynom();
         for (var i = 0; i < poly.PolyItems.Count; i++)
+        {
             newPoly.PolyItems.Add(
                 new PolynomItem(
                     (poly.PolyItems[i].Coefficient != 0
                         ? GetAlphaExpFromIntVal(poly.PolyItems[i].Coefficient)
                         : 0), poly.PolyItems[i].Exponent));
+        }
+
         return newPoly;
     }
 
@@ -884,11 +1004,19 @@ public class QRCodeGenerator
     {
         var newPoly = new Polynom();
         for (var i = 0; i < poly.PolyItems.Count; i++)
+        {
             newPoly.PolyItems.Add(new PolynomItem(GetIntValFromAlphaExp(poly.PolyItems[i].Coefficient), poly.PolyItems[i].Exponent));
+        }
+
         return newPoly;
     }
 
-    private static int GetVersion(int length, EncodingMode encMode, ECCLevel eccLevel)
+    private static int GetVersion
+        (
+            int length,
+            EncodingMode encMode,
+            ECCLevel eccLevel
+        )
     {
 
         var fittingVersions = capacityTable.Where(
@@ -905,7 +1033,9 @@ public class QRCodeGenerator
         });
 
         if (fittingVersions.Any())
+        {
             return fittingVersions.Min(x => x.version);
+        }
 
         var maxSizeByte = capacityTable.Where(
                 x => x.Details.Any(
@@ -914,15 +1044,31 @@ public class QRCodeGenerator
         throw new DataTooLongException(eccLevel.ToString(), encMode.ToString(), maxSizeByte);
     }
 
-    private static EncodingMode GetEncodingFromPlaintext(string plainText, bool forceUtf8)
+    private static EncodingMode GetEncodingFromPlaintext
+        (
+            string plainText,
+            bool forceUtf8
+        )
     {
-        if (forceUtf8) return EncodingMode.Byte;
+        if (forceUtf8)
+        {
+            return EncodingMode.Byte;
+        }
+
         EncodingMode result = EncodingMode.Numeric; // assume numeric
         foreach (char c in plainText)
         {
-            if (IsInRange(c, '0', '9')) continue;   // numeric - char.IsDigit() for Latin1
+            if (IsInRange(c, '0', '9'))
+            {
+                continue;   // numeric - char.IsDigit() for Latin1
+            }
+
             result = EncodingMode.Alphanumeric;     // not numeric, assume alphanumeric
-            if (IsInRange(c, 'A', 'Z') || alphanumEncTable.Contains(c)) continue; // alphanumeric
+            if (IsInRange(c, 'A', 'Z') || alphanumEncTable.Contains(c))
+            {
+                continue; // alphanumeric
+            }
+
             return EncodingMode.Byte;               // not numeric or alphanumeric, assume byte
         }
         return result;                              // either numeric or alphanumeric
@@ -1006,33 +1152,55 @@ public class QRCodeGenerator
         if (version < 10)
         {
             if (encMode == EncodingMode.Numeric)
+            {
                 return 10;
+            }
             else if (encMode == EncodingMode.Alphanumeric)
+            {
                 return 9;
+            }
             else
+            {
                 return 8;
+            }
         }
         else if (version < 27)
         {
             if (encMode == EncodingMode.Numeric)
+            {
                 return 12;
+            }
             else if (encMode == EncodingMode.Alphanumeric)
+            {
                 return 11;
+            }
             else if (encMode == EncodingMode.Byte)
+            {
                 return 16;
+            }
             else
+            {
                 return 10;
+            }
         }
         else
         {
             if (encMode == EncodingMode.Numeric)
+            {
                 return 14;
+            }
             else if (encMode == EncodingMode.Alphanumeric)
+            {
                 return 13;
+            }
             else if (encMode == EncodingMode.Byte)
+            {
                 return 16;
+            }
             else
+            {
                 return 12;
+            }
         }
     }
 
@@ -1143,7 +1311,9 @@ public class QRCodeGenerator
         var codeText = string.Empty;
 
         if (IsValidISO(plainText) && !forceUtf8)
+        {
             codeBytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(plainText);
+        }
         else
         {
             switch(eciMode)
@@ -1268,13 +1438,22 @@ public class QRCodeGenerator
         var localAlphanumEncDict = new Dictionary<char, int>(45);
         //Add numbers
         for (int i = 0; i < 10; i++)
+        {
             localAlphanumEncDict.Add($"{i}"[0], i);
+        }
+
         //Add chars
         for (char c = 'A'; c <= 'Z'; c++)
+        {
             localAlphanumEncDict.Add(c, localAlphanumEncDict.Count());
+        }
+
         //Add special chars
         for (int i = 0; i < alphanumEncTable.Length; i++)
+        {
             localAlphanumEncDict.Add(alphanumEncTable[i], localAlphanumEncDict.Count());
+        }
+
         return localAlphanumEncDict;
     }
 
@@ -1295,7 +1474,9 @@ public class QRCodeGenerator
                         {
                             var p = new Point(alignmentPatternBaseValues[i + x] - 2, alignmentPatternBaseValues[i + y] - 2);
                             if (!points.Contains(p))
+                            {
                                 points.Add(p);
+                            }
                         }
                     }
                 }
@@ -1429,7 +1610,9 @@ public class QRCodeGenerator
             localGaloisField.Add(new Antilog(i, gfItem));
             gfItem *= 2;
             if (gfItem > 255)
+            {
                 gfItem ^= 285;
+            }
         }
         return localGaloisField;
     }
@@ -1486,19 +1669,55 @@ public class QRCodeGenerator
             ECCWordsInt = eccWordsInt;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         public int GroupNumber { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public int BlockNumber { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public string BitString { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public List<string> CodeWords { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public List<int> CodeWordsInt { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public List<string> ECCWords { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
         public List<int> ECCWordsInt { get; }
     }
 
     private struct ECCInfo
     {
-        public ECCInfo(int version, ECCLevel errorCorrectionLevel, int totalDataCodewords, int eccPerBlock, int blocksInGroup1,
-            int codewordsInGroup1, int blocksInGroup2, int codewordsInGroup2)
+        public ECCInfo
+            (
+                int version,
+                ECCLevel errorCorrectionLevel,
+                int totalDataCodewords,
+                int eccPerBlock,
+                int blocksInGroup1,
+                int codewordsInGroup1,
+                int blocksInGroup2,
+                int codewordsInGroup2
+            )
         {
             Version = version;
             ErrorCorrectionLevel = errorCorrectionLevel;
@@ -1509,6 +1728,7 @@ public class QRCodeGenerator
             BlocksInGroup2 = blocksInGroup2;
             CodewordsInGroup2 = codewordsInGroup2;
         }
+
         public int Version { get; }
         public ECCLevel ErrorCorrectionLevel { get; }
         public int TotalDataCodewords { get; }
