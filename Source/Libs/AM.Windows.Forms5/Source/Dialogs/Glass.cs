@@ -139,8 +139,8 @@ public static class Glass
         try
         {
             using (SafeDeviceHandle memoryHdc = NativeMethods.CreateCompatibleDC (primaryHdc))
-            using (SafeGDIHandle fontHandle = new SafeGDIHandle (font.ToHfont(), true))
-            using (SafeGDIHandle dib = NativeMethods.CreateDib (bounds, primaryHdc, memoryHdc))
+            using (SafeGdiHandle fontHandle = new SafeGdiHandle (font.ToHfont(), true))
+            using (SafeGdiHandle dib = NativeMethods.CreateDib (bounds, primaryHdc, memoryHdc))
             {
                 NativeMethods.SelectObject (memoryHdc, fontHandle);
 
@@ -198,8 +198,8 @@ public static class Glass
             Rectangle bounds = new Rectangle (0, 0, int.MaxValue, int.MaxValue);
 
             using (SafeDeviceHandle memoryHdc = NativeMethods.CreateCompatibleDC (primaryHdc))
-            using (SafeGDIHandle fontHandle = new SafeGDIHandle (font.ToHfont(), true))
-            using (SafeGDIHandle dib = NativeMethods.CreateDib (bounds, primaryHdc, memoryHdc))
+            using (SafeGdiHandle fontHandle = new SafeGdiHandle (font.ToHfont(), true))
+            using (SafeGdiHandle dib = NativeMethods.CreateDib (bounds, primaryHdc, memoryHdc))
             {
                 NativeMethods.SelectObject (memoryHdc, fontHandle);
 

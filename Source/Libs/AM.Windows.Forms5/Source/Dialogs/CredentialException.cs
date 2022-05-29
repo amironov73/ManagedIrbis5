@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* CredentialException.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,6 +19,8 @@ using AM.Windows.Forms.Dialogs.Properties;
 
 #endregion
 
+#pragma warning disable SYSLIB0003
+
 #nullable enable
 
 namespace AM.Windows.Forms.Dialogs;
@@ -28,7 +30,8 @@ namespace AM.Windows.Forms.Dialogs;
 /// </summary>
 /// <threadsafety instance="false" static="true" />
 [Serializable]
-public class CredentialException : Win32Exception
+public class CredentialException
+    : Win32Exception
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="CredentialException" /> class.
@@ -37,16 +40,18 @@ public class CredentialException : Win32Exception
     public CredentialException()
         : base (Resources.CredentialError)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CredentialException" /> class with the specified error. 
+    /// Initializes a new instance of the <see cref="CredentialException" /> class with the specified error.
     /// </summary>
     /// <param name="error">The Win32 error code associated with this exception.</param>
     [SecurityPermission (SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
     public CredentialException (int error)
         : base (error)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -57,6 +62,7 @@ public class CredentialException : Win32Exception
     public CredentialException (string message)
         : base (message)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -68,6 +74,7 @@ public class CredentialException : Win32Exception
     public CredentialException (int error, string message)
         : base (error, message)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -79,6 +86,7 @@ public class CredentialException : Win32Exception
     public CredentialException (string message, Exception innerException)
         : base (message, innerException)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -90,5 +98,6 @@ public class CredentialException : Win32Exception
     protected CredentialException (SerializationInfo info, StreamingContext context)
         : base (info, context)
     {
+        // пустое тело конструктора
     }
 }

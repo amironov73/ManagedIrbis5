@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* NativeMethods.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,11 +23,13 @@ using AM.Windows.Forms.Dialogs.Interop;
 
 #endregion
 
+#pragma warning disable SYSLIB0004
+
 #nullable enable
 
 namespace AM.Windows.Forms.Dialogs;
 
-static class NativeMethods
+internal static class NativeMethods
 {
     public static bool IsWindowsVistaOrLater
     {
@@ -520,7 +522,7 @@ static class NativeMethods
     public static extern SafeDeviceHandle CreateCompatibleDC (IntPtr hDC);
 
     [DllImport ("gdi32.dll", ExactSpelling = true)]
-    public static extern IntPtr SelectObject (SafeDeviceHandle hDC, SafeGDIHandle hObject);
+    public static extern IntPtr SelectObject (SafeDeviceHandle hDC, SafeGdiHandle hObject);
 
     [DllImport ("gdi32.dll", ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs (UnmanagedType.Bool)]
@@ -542,7 +544,7 @@ static class NativeMethods
         string text, int iCharCount, int dwFlags, ref RECT pRect, ref DTTOPTS pOptions);
 
     [DllImport ("gdi32.dll")]
-    public static extern SafeGDIHandle CreateDIBSection (IntPtr hdc, BITMAPINFO pbmi, uint iUsage, IntPtr ppvBits,
+    public static extern SafeGdiHandle CreateDIBSection (IntPtr hdc, BITMAPINFO pbmi, uint iUsage, IntPtr ppvBits,
         IntPtr hSection, uint dwOffset);
 
     [DllImport ("UxTheme.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
@@ -638,7 +640,7 @@ static class NativeMethods
         }
     }
 
-    public static SafeGDIHandle CreateDib (Rectangle bounds, IntPtr primaryHdc, SafeDeviceHandle memoryHdc)
+    public static SafeGdiHandle CreateDib (Rectangle bounds, IntPtr primaryHdc, SafeDeviceHandle memoryHdc)
     {
         BITMAPINFO info = new BITMAPINFO();
         info.biSize = Marshal.SizeOf (info);
@@ -647,7 +649,7 @@ static class NativeMethods
         info.biPlanes = 1;
         info.biBitCount = 32;
         info.biCompression = 0; // BI_RGB
-        SafeGDIHandle dib = CreateDIBSection (primaryHdc, info, 0, IntPtr.Zero, IntPtr.Zero, 0);
+        SafeGdiHandle dib = CreateDIBSection (primaryHdc, info, 0, IntPtr.Zero, IntPtr.Zero, 0);
         SelectObject (memoryHdc, dib);
         return dib;
     }

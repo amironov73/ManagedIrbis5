@@ -26,6 +26,8 @@ using AM.Windows.Forms.Dialogs.Properties;
 
 #endregion
 
+#pragma warning disable SYSLIB0003
+
 #nullable enable
 
 namespace AM.Windows.Forms.Dialogs;
@@ -55,13 +57,12 @@ namespace AM.Windows.Forms.Dialogs;
 public partial class CredentialDialog : Component
 {
     private string _confirmTarget;
-    private NetworkCredential _credentials = new NetworkCredential();
+    private readonly NetworkCredential _credentials = new ();
     private bool _isSaveChecked;
     private byte[] _additionalEntropy;
     private string _target;
 
-    private static readonly Dictionary<string, NetworkCredential> _applicationInstanceCredentialCache =
-        new Dictionary<string, NetworkCredential>();
+    private static readonly Dictionary<string, NetworkCredential> _applicationInstanceCredentialCache = new ();
 
     private string _caption;
     private string _text;
@@ -226,8 +227,8 @@ public partial class CredentialDialog : Component
     /// The target for the credentials. The default value is an empty string ("").
     /// </value>
     /// <remarks>
-    /// Credentials are stored on a per user, not on a per application basis. To ensure that credentials stored by different 
-    /// applications do not conflict, you should prefix the target with an application-specific identifer, e.g. 
+    /// Credentials are stored on a per user, not on a per application basis. To ensure that credentials stored by different
+    /// applications do not conflict, you should prefix the target with an application-specific identifer, e.g.
     /// "Company_Application_target".
     /// </remarks>
     [Category ("Behavior"),
@@ -356,7 +357,7 @@ public partial class CredentialDialog : Component
     public bool ShowSaveCheckBox { get; set; }
 
     /// <summary>
-    /// Gets or sets a value that indicates whether the dialog should be displayed even when saved credentials exist for the 
+    /// Gets or sets a value that indicates whether the dialog should be displayed even when saved credentials exist for the
     /// specified target.
     /// </summary>
     /// <value>
@@ -368,7 +369,7 @@ public partial class CredentialDialog : Component
     ///   This property applies only when the <see cref="ShowSaveCheckBox"/> property is <see langword="true" />.
     /// </para>
     /// <para>
-    ///   Note that even if this property is <see langword="true" />, if the proper credentials exist in the 
+    ///   Note that even if this property is <see langword="true" />, if the proper credentials exist in the
     ///   application instance credentials cache the dialog will not be displayed.
     /// </para>
     /// </remarks>
@@ -621,7 +622,7 @@ public partial class CredentialDialog : Component
     /// </note>
     /// <para>
     ///   If the credential manager already contains credentials for the specified <paramref name="target"/>, they
-    ///   will be overwritten; this can even overwrite credentials that were stored by another application. Therefore 
+    ///   will be overwritten; this can even overwrite credentials that were stored by another application. Therefore
     ///   it is strongly recommended that you prefix the target name to ensure uniqueness, e.g. using the
     ///   form "Company_ApplicationName_www.example.com".
     /// </para>
@@ -664,7 +665,7 @@ public partial class CredentialDialog : Component
     /// <returns>The credentials if they were found; otherwise, <see langword="null" />.</returns>
     /// <remarks>
     /// <para>
-    ///   If the requested credential was not originally stored using the <see cref="CredentialDialog"/> class (but e.g. by 
+    ///   If the requested credential was not originally stored using the <see cref="CredentialDialog"/> class (but e.g. by
     ///   another application), the password may not be decoded correctly.
     /// </para>
     /// <para>

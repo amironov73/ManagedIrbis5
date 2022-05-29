@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* 
+/* DockPane.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,16 +19,32 @@ using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
+#pragma warning disable SYSLIB0003
+
 #nullable enable
 
 namespace AM.Windows.Forms.Docking;
 
+/// <summary>
+///
+/// </summary>
 [ToolboxItem (false)]
-public partial class DockPane : UserControl, IDockDragSource
+public partial class DockPane
+    : UserControl, IDockDragSource
 {
+    /// <summary>
+    ///
+    /// </summary>
     public enum AppearanceStyle
     {
+        /// <summary>
+        ///
+        /// </summary>
         ToolWindow,
+
+        /// <summary>
+        ///
+        /// </summary>
         Document
     }
 
@@ -42,29 +58,23 @@ public partial class DockPane : UserControl, IDockDragSource
 
     private struct HitTestResult
     {
-        public HitTestArea HitArea;
-        public int Index;
+        public readonly HitTestArea HitArea;
+        public readonly int Index;
 
-        public HitTestResult (HitTestArea hitTestArea, int index)
+        public HitTestResult
+            (
+                HitTestArea hitTestArea,
+                int index
+            )
         {
             HitArea = hitTestArea;
             Index = index;
         }
     }
 
-    private DockPaneCaptionBase m_captionControl;
+    private DockPaneCaptionBase CaptionControl { get; set; }
 
-    private DockPaneCaptionBase CaptionControl
-    {
-        get { return m_captionControl; }
-    }
-
-    private DockPaneStripBase m_tabStripControl;
-
-    public DockPaneStripBase TabStripControl
-    {
-        get { return m_tabStripControl; }
-    }
+    public DockPaneStripBase TabStripControl { get; private set; }
 
     internal protected DockPane (IDockContent content, DockState visibleState, bool show)
     {
@@ -75,7 +85,9 @@ public partial class DockPane : UserControl, IDockDragSource
     internal protected DockPane (IDockContent content, FloatWindow floatWindow, bool show)
     {
         if (floatWindow == null)
+        {
             throw new ArgumentNullException (nameof (floatWindow));
+        }
 
         InternalConstruct (content, DockState.Float, false, Rectangle.Empty,
             floatWindow.NestedPanes.GetDefaultPreviousPane (this), DockAlignment.Right, 0.5, show);
@@ -85,7 +97,10 @@ public partial class DockPane : UserControl, IDockDragSource
         double proportion, bool show)
     {
         if (previousPane == null)
+        {
             throw (new ArgumentNullException (nameof (previousPane)));
+        }
+
         InternalConstruct (content, previousPane.DockState, false, Rectangle.Empty, previousPane, alignment,
             proportion, show);
     }
@@ -100,13 +115,19 @@ public partial class DockPane : UserControl, IDockDragSource
         Rectangle floatWindowBounds, DockPane prevPane, DockAlignment alignment, double proportion, bool show)
     {
         if (dockState == DockState.Hidden || dockState == DockState.Unknown)
+        {
             throw new ArgumentException (Strings.DockPane_SetDockState_InvalidState);
+        }
 
         if (content == null)
+        {
             throw new ArgumentNullException (Strings.DockPane_Constructor_NullContent);
+        }
 
         if (content.DockHandler.DockPanel == null)
+        {
             throw new ArgumentException (Strings.DockPane_Constructor_NullDockPanel);
+        }
 
         SuspendLayout();
         SetStyle (ControlStyles.Selectable, false);
@@ -123,24 +144,34 @@ public partial class DockPane : UserControl, IDockDragSource
 
         m_nestedDockingStatus = new NestedDockingStatus (this);
 
-        m_captionControl = DockPanel.Theme.Extender.DockPaneCaptionFactory.CreateDockPaneCaption (this);
-        m_tabStripControl = DockPanel.Theme.Extender.DockPaneStripFactory.CreateDockPaneStrip (this);
-        Controls.AddRange (new Control[] { m_captionControl, m_tabStripControl });
+        CaptionControl = DockPanel.Theme.Extender.DockPaneCaptionFactory.CreateDockPaneCaption (this);
+        TabStripControl = DockPanel.Theme.Extender.DockPaneStripFactory.CreateDockPaneStrip (this);
+        Controls.AddRange (new Control[] { CaptionControl, TabStripControl });
 
         DockPanel.SuspendLayout (true);
         if (flagBounds)
+        {
             FloatWindow =
                 DockPanel.Theme.Extender.FloatWindowFactory.CreateFloatWindow (DockPanel, this, floatWindowBounds);
+        }
         else if (prevPane != null)
+        {
             DockTo (prevPane.NestedPanesContainer, prevPane, alignment, proportion);
+        }
 
         SetDockState (dockState);
         if (show)
+        {
             content.DockHandler.Pane = this;
+        }
         else if (this.IsFloat)
+        {
             content.DockHandler.FloatPane = this;
+        }
         else
+        {
             content.DockHandler.PanelPane = this;
+        }
 
         ResumeLayout();
         DockPanel.ResumeLayout (true, true);
@@ -152,12 +183,14 @@ public partial class DockPane : UserControl, IDockDragSource
     {
         if (disposing)
         {
-            // IMPORTANT: avoid nested call into this method on Mono. 
+            // IMPORTANT: avoid nested call into this method on Mono.
             // https://github.com/dockpanelsuite/dockpanelsuite/issues/16
             if (Win32Helper.IsRunningOnMono)
             {
                 if (m_isDisposing)
+                {
                     return;
+                }
 
                 m_isDisposing = true;
             }
@@ -165,7 +198,9 @@ public partial class DockPane : UserControl, IDockDragSource
             m_dockState = DockState.Unknown;
 
             if (NestedPanesContainer != null)
+            {
                 NestedPanesContainer.NestedPanes.Remove (this);
+            }
 
             if (DockPanel != null)
             {
@@ -175,7 +210,9 @@ public partial class DockPane : UserControl, IDockDragSource
 
             Splitter.Dispose();
             if (m_autoHidePane != null)
+            {
                 m_autoHidePane.Dispose();
+            }
         }
 
         base.Dispose (disposing);
@@ -189,52 +226,78 @@ public partial class DockPane : UserControl, IDockDragSource
         set
         {
             if (ActiveContent == value)
+            {
                 return;
+            }
 
             if (value != null)
             {
                 if (!DisplayingContents.Contains (value))
+                {
                     throw (new InvalidOperationException (Strings.DockPane_ActiveContent_InvalidValue));
+                }
             }
             else
             {
                 if (DisplayingContents.Count != 0)
+                {
                     throw (new InvalidOperationException (Strings.DockPane_ActiveContent_InvalidValue));
+                }
             }
 
             IDockContent oldValue = m_activeContent;
 
             if (DockPanel.ActiveAutoHideContent == oldValue)
+            {
                 DockPanel.ActiveAutoHideContent = null;
+            }
 
             m_activeContent = value;
 
             if (DockPanel.DocumentStyle == DocumentStyle.DockingMdi && DockState == DockState.Document)
             {
                 if (m_activeContent != null)
+                {
                     m_activeContent.DockHandler.Form.BringToFront();
+                }
             }
             else
             {
                 if (m_activeContent != null)
+                {
                     m_activeContent.DockHandler.SetVisible();
+                }
+
                 if (oldValue != null && DisplayingContents.Contains (oldValue))
+                {
                     oldValue.DockHandler.SetVisible();
+                }
+
                 if (IsActivated && m_activeContent != null)
+                {
                     m_activeContent.DockHandler.Activate();
+                }
             }
 
             if (FloatWindow != null)
+            {
                 FloatWindow.SetText();
+            }
 
             if (DockPanel.DocumentStyle == DocumentStyle.DockingMdi &&
                 DockState == DockState.Document)
+            {
                 RefreshChanges (false); // delayed layout to reduce screen flicker
+            }
             else
+            {
                 RefreshChanges();
+            }
 
             if (m_activeContent != null)
+            {
                 TabStripControl.EnsureTabVisible (m_activeContent);
+            }
         }
     }
 
@@ -274,16 +337,22 @@ public partial class DockPane : UserControl, IDockDragSource
             IDockContent content = ActiveContent;
 
             if (content == null)
+            {
                 return null;
+            }
 
             if (content.DockHandler.TabPageContextMenuStrip != null)
+            {
                 return content.DockHandler.TabPageContextMenuStrip;
+            }
 #if NET35 || NET40
                 else if (content.DockHandler.TabPageContextMenu != null)
                     return content.DockHandler.TabPageContextMenu;
 #endif
             else
+            {
                 return null;
+            }
         }
     }
 
@@ -297,7 +366,9 @@ public partial class DockPane : UserControl, IDockDragSource
         object menu = TabPageContextMenu;
 
         if (menu == null)
+        {
             return;
+        }
 
         ContextMenuStrip contextMenuStrip = menu as ContextMenuStrip;
         if (contextMenuStrip != null)
@@ -317,7 +388,9 @@ public partial class DockPane : UserControl, IDockDragSource
         get
         {
             if (!HasCaption)
+            {
                 return Rectangle.Empty;
+            }
 
             Rectangle rectWindow = DisplayingRectangle;
             int x, y, width;
@@ -343,7 +416,9 @@ public partial class DockPane : UserControl, IDockDragSource
             int y = rectWindow.Y + (rectCaption.IsEmpty ? 0 : rectCaption.Height);
             if (DockState == DockState.Document &&
                 DockPanel.DocumentTabStripLocation == DocumentTabStripLocation.Top)
+            {
                 y += rectTabStrip.Height;
+            }
 
             int width = rectWindow.Width;
             int height = rectWindow.Height - rectCaption.Height - rectTabStrip.Height;
@@ -357,9 +432,13 @@ public partial class DockPane : UserControl, IDockDragSource
         get
         {
             if (Appearance == AppearanceStyle.ToolWindow)
+            {
                 return TabStripRectangle_ToolWindow;
+            }
             else
+            {
                 return TabStripRectangle_Document;
+            }
         }
     }
 
@@ -368,7 +447,9 @@ public partial class DockPane : UserControl, IDockDragSource
         get
         {
             if (DisplayingContents.Count <= 1 || IsAutoHide)
+            {
                 return Rectangle.Empty;
+            }
 
             Rectangle rectWindow = DisplayingRectangle;
 
@@ -378,7 +459,9 @@ public partial class DockPane : UserControl, IDockDragSource
             int y = rectWindow.Bottom - height;
             Rectangle rectCaption = CaptionRectangle;
             if (rectCaption.Contains (x, y))
+            {
                 y = rectCaption.Y + rectCaption.Height;
+            }
 
             return new Rectangle (x, y, width, height);
         }
@@ -389,10 +472,14 @@ public partial class DockPane : UserControl, IDockDragSource
         get
         {
             if (DisplayingContents.Count == 0)
+            {
                 return Rectangle.Empty;
+            }
 
             if (DisplayingContents.Count == 1 && DockPanel.DocumentStyle == DocumentStyle.DockingSdi)
+            {
                 return Rectangle.Empty;
+            }
 
             Rectangle rectWindow = DisplayingRectangle;
             int x = rectWindow.X;
@@ -401,9 +488,13 @@ public partial class DockPane : UserControl, IDockDragSource
 
             int y = 0;
             if (DockPanel.DocumentTabStripLocation == DocumentTabStripLocation.Bottom)
+            {
                 y = rectWindow.Height - height;
+            }
             else
+            {
                 y = rectWindow.Y;
+            }
 
             return new Rectangle (x, y, width, height);
         }
@@ -443,9 +534,13 @@ public partial class DockPane : UserControl, IDockDragSource
                 DockState == DockState.Hidden ||
                 DockState == DockState.Unknown ||
                 (DockState == DockState.Float && FloatWindow.VisibleNestedPanes.Count <= 1))
+            {
                 return false;
+            }
             else
+            {
                 return true;
+            }
         }
     }
 
@@ -459,11 +554,16 @@ public partial class DockPane : UserControl, IDockDragSource
     internal void SetIsActivated (bool value)
     {
         if (m_isActivated == value)
+        {
             return;
+        }
 
         m_isActivated = value;
         if (DockState != DockState.Document)
+        {
             RefreshChanges (false);
+        }
+
         OnIsActivatedChanged (EventArgs.Empty);
     }
 
@@ -477,11 +577,16 @@ public partial class DockPane : UserControl, IDockDragSource
     internal void SetIsActiveDocumentPane (bool value)
     {
         if (m_isActiveDocumentPane == value)
+        {
             return;
+        }
 
         m_isActiveDocumentPane = value;
         if (DockState == DockState.Document)
+        {
             RefreshChanges();
+        }
+
         OnIsActiveDocumentPaneChanged (EventArgs.Empty);
     }
 
@@ -494,7 +599,9 @@ public partial class DockPane : UserControl, IDockDragSource
     {
         foreach (IDockContent content in Contents)
             if (!content.DockHandler.IsDockStateValid (dockState))
+            {
                 return false;
+            }
 
         return true;
     }
@@ -517,15 +624,21 @@ public partial class DockPane : UserControl, IDockDragSource
     public void Activate()
     {
         if (DockHelper.IsDockStateAutoHide (DockState) && DockPanel.ActiveAutoHideContent != ActiveContent)
+        {
             DockPanel.ActiveAutoHideContent = ActiveContent;
+        }
         else if (!IsActivated && ActiveContent != null)
+        {
             ActiveContent.DockHandler.Activate();
+        }
     }
 
     internal void AddContent (IDockContent content)
     {
         if (Contents.Contains (content))
+        {
             return;
+        }
 
         Contents.Add (content);
     }
@@ -543,10 +656,14 @@ public partial class DockPane : UserControl, IDockDragSource
     internal void CloseContent (IDockContent content)
     {
         if (content == null)
+        {
             return;
+        }
 
         if (!content.DockHandler.CloseButton)
+        {
             return;
+        }
 
         DockPanel dockPanel = DockPanel;
 
@@ -578,16 +695,22 @@ public partial class DockPane : UserControl, IDockDragSource
 
         Rectangle rectCaption = CaptionRectangle;
         if (rectCaption.Contains (ptMouseClient))
+        {
             return new HitTestResult (HitTestArea.Caption, -1);
+        }
 
         Rectangle rectContent = ContentRectangle;
         if (rectContent.Contains (ptMouseClient))
+        {
             return new HitTestResult (HitTestArea.Content, -1);
+        }
 
         Rectangle rectTabStrip = TabStripRectangle;
         if (rectTabStrip.Contains (ptMouseClient))
+        {
             return new HitTestResult (HitTestArea.TabStrip,
                 TabStripControl.HitTest (TabStripControl.PointToClient (ptMouse)));
+        }
 
         return new HitTestResult (HitTestArea.None, -1);
     }
@@ -602,7 +725,9 @@ public partial class DockPane : UserControl, IDockDragSource
     private void SetIsHidden (bool value)
     {
         if (m_isHidden == value)
+        {
             return;
+        }
 
         m_isHidden = value;
         if (DockHelper.IsDockStateAutoHide (DockState))
@@ -611,7 +736,9 @@ public partial class DockPane : UserControl, IDockDragSource
             DockPanel.PerformLayout();
         }
         else if (NestedPanesContainer != null)
+        {
             ((Control)NestedPanesContainer).PerformLayout();
+        }
     }
 
     protected override void OnLayout (LayoutEventArgs e)
@@ -627,8 +754,12 @@ public partial class DockPane : UserControl, IDockDragSource
             foreach (IDockContent content in Contents)
             {
                 if (DisplayingContents.Contains (content))
+                {
                     if (content.DockHandler.FlagClipWindow && content.DockHandler.Form.Visible)
+                    {
                         content.DockHandler.FlagClipWindow = false;
+                    }
+                }
             }
         }
 
@@ -639,7 +770,9 @@ public partial class DockPane : UserControl, IDockDragSource
     {
         Rectangle rectContent = ContentRectangle;
         if (DockState == DockState.Document && DockPanel.DocumentStyle == DocumentStyle.DockingMdi)
+        {
             rectContent = DockPanel.RectangleToMdiClient (RectangleToScreen (rectContent));
+        }
 
         Rectangle rectInactive =
             new Rectangle (-rectContent.Width, rectContent.Y, rectContent.Width, rectContent.Height);
@@ -647,9 +780,13 @@ public partial class DockPane : UserControl, IDockDragSource
             if (content.DockHandler.Pane == this)
             {
                 if (content == ActiveContent)
+                {
                     content.DockHandler.Form.Bounds = rectContent;
+                }
                 else
+                {
                     content.DockHandler.Form.Bounds = rectInactive;
+                }
             }
     }
 
@@ -661,12 +798,17 @@ public partial class DockPane : UserControl, IDockDragSource
     private void RefreshChanges (bool performLayout)
     {
         if (IsDisposed)
+        {
             return;
+        }
 
         CaptionControl.RefreshChanges();
         TabStripControl.RefreshChanges();
         if (DockState == DockState.Float && FloatWindow != null)
+        {
             FloatWindow.RefreshChanges();
+        }
+
         if (DockHelper.IsDockStateAutoHide (DockState) && DockPanel != null)
         {
             DockPanel.RefreshAutoHideStrip();
@@ -674,13 +816,17 @@ public partial class DockPane : UserControl, IDockDragSource
         }
 
         if (performLayout)
+        {
             PerformLayout();
+        }
     }
 
     internal void RemoveContent (IDockContent content)
     {
         if (!Contents.Contains (content))
+        {
             return;
+        }
 
         Contents.Remove (content);
     }
@@ -689,24 +835,41 @@ public partial class DockPane : UserControl, IDockDragSource
     {
         int oldIndex = Contents.IndexOf (content);
         if (oldIndex == -1)
+        {
             throw (new ArgumentException (Strings.DockPane_SetContentIndex_InvalidContent));
+        }
 
         if (index < 0 || index > Contents.Count - 1)
+        {
             if (index != -1)
+            {
                 throw (new ArgumentOutOfRangeException (Strings.DockPane_SetContentIndex_InvalidIndex));
+            }
+        }
 
         if (oldIndex == index)
+        {
             return;
+        }
+
         if (oldIndex == Contents.Count - 1 && index == -1)
+        {
             return;
+        }
 
         Contents.Remove (content);
         if (index == -1)
+        {
             Contents.Add (content);
+        }
         else if (oldIndex < index)
+        {
             Contents.AddAt (content, index - 1);
+        }
         else
+        {
             Contents.AddAt (content, index);
+        }
 
         RefreshChanges();
     }
@@ -738,16 +901,20 @@ public partial class DockPane : UserControl, IDockDragSource
     private void SetParent (Control value)
     {
         if (Parent == value)
+        {
             return;
+        }
 
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // Workaround of .Net Framework bug:
         // Change the parent of a control with focus may result in the first
-        // MDI child form get activated. 
+        // MDI child form get activated.
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         IDockContent contentFocused = GetFocusedContent();
         if (contentFocused != null)
+        {
             DockPanel.SaveFocus();
+        }
 
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -756,10 +923,12 @@ public partial class DockPane : UserControl, IDockDragSource
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // Workaround of .Net Framework bug:
         // Change the parent of a control with focus may result in the first
-        // MDI child form get activated. 
+        // MDI child form get activated.
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if (contentFocused != null)
+        {
             contentFocused.DockHandler.Activate();
+        }
 
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
@@ -772,15 +941,21 @@ public partial class DockPane : UserControl, IDockDragSource
     internal void TestDrop (IDockDragSource dragSource, DockOutlineBase dockOutline)
     {
         if (!dragSource.CanDockTo (this))
+        {
             return;
+        }
 
         Point ptMouse = Control.MousePosition;
 
         HitTestResult hitTestResult = GetHitTest (ptMouse);
         if (hitTestResult.HitArea == HitTestArea.Caption)
+        {
             dockOutline.Show (this, -1);
+        }
         else if (hitTestResult.HitArea == HitTestArea.TabStrip && hitTestResult.Index != -1)
+        {
             dockOutline.Show (this, hitTestResult.Index);
+        }
     }
 
     internal void ValidateActiveContent()
@@ -788,12 +963,17 @@ public partial class DockPane : UserControl, IDockDragSource
         if (ActiveContent == null)
         {
             if (DisplayingContents.Count != 0)
+            {
                 ActiveContent = DisplayingContents[0];
+            }
+
             return;
         }
 
         if (DisplayingContents.IndexOf (ActiveContent) >= 0)
+        {
             return;
+        }
 
         IDockContent prevVisible = null;
         for (int i = Contents.IndexOf (ActiveContent) - 1; i >= 0; i--)
@@ -812,11 +992,17 @@ public partial class DockPane : UserControl, IDockDragSource
             }
 
         if (prevVisible != null)
+        {
             ActiveContent = prevVisible;
+        }
         else if (nextVisible != null)
+        {
             ActiveContent = nextVisible;
+        }
         else
+        {
             ActiveContent = null;
+        }
     }
 
     private static readonly object DockStateChangedEvent = new object();
@@ -831,7 +1017,9 @@ public partial class DockPane : UserControl, IDockDragSource
     {
         EventHandler handler = (EventHandler)Events[DockStateChangedEvent];
         if (handler != null)
+        {
             handler (this, e);
+        }
     }
 
     private static readonly object IsActivatedChangedEvent = new object();
@@ -846,7 +1034,9 @@ public partial class DockPane : UserControl, IDockDragSource
     {
         EventHandler handler = (EventHandler)Events[IsActivatedChangedEvent];
         if (handler != null)
+        {
             handler (this, e);
+        }
     }
 
     private static readonly object IsActiveDocumentPaneChangedEvent = new object();
@@ -861,7 +1051,9 @@ public partial class DockPane : UserControl, IDockDragSource
     {
         EventHandler handler = (EventHandler)Events[IsActiveDocumentPaneChangedEvent];
         if (handler != null)
+        {
             handler (this, e);
+        }
     }
 
     public DockWindow DockWindow
@@ -876,13 +1068,15 @@ public partial class DockPane : UserControl, IDockDragSource
         {
             DockWindow oldValue = DockWindow;
             if (oldValue == value)
+            {
                 return;
+            }
 
             DockTo (value);
         }
     }
 
-    public FloatWindow FloatWindow
+    public FloatWindow? FloatWindow
     {
         get
         {
@@ -894,7 +1088,9 @@ public partial class DockPane : UserControl, IDockDragSource
         {
             FloatWindow oldValue = FloatWindow;
             if (oldValue == value)
+            {
                 return;
+            }
 
             DockTo (value);
         }
@@ -919,9 +1115,13 @@ public partial class DockPane : UserControl, IDockDragSource
         get
         {
             if (NestedDockingStatus.NestedPanes == null)
+            {
                 return null;
+            }
             else
+            {
                 return NestedDockingStatus.NestedPanes.Container;
+            }
         }
     }
 
@@ -936,7 +1136,9 @@ public partial class DockPane : UserControl, IDockDragSource
     public DockPane SetDockState (DockState value)
     {
         if (value == DockState.Unknown || value == DockState.Hidden)
+        {
             throw new InvalidOperationException (Strings.DockPane_SetDockState_InvalidState);
+        }
 
         if ((value == DockState.Float) == this.IsFloat)
         {
@@ -945,7 +1147,9 @@ public partial class DockPane : UserControl, IDockDragSource
         }
 
         if (DisplayingContents.Count == 0)
+        {
             return null;
+        }
 
         IDockContent firstContent = null;
         for (int i = 0; i < DisplayingContents.Count; i++)
@@ -959,7 +1163,9 @@ public partial class DockPane : UserControl, IDockDragSource
         }
 
         if (firstContent == null)
+        {
             return null;
+        }
 
         firstContent.DockHandler.DockState = value;
         DockPane pane = firstContent.DockHandler.Pane;
@@ -968,7 +1174,9 @@ public partial class DockPane : UserControl, IDockDragSource
         {
             IDockContent content = DisplayingContents[i];
             if (content.DockHandler.IsDockStateValid (value))
+            {
                 content.DockHandler.Pane = pane;
+            }
         }
 
         DockPanel.ResumeLayout (true, true);
@@ -978,7 +1186,9 @@ public partial class DockPane : UserControl, IDockDragSource
     private void InternalSetDockState (DockState value)
     {
         if (m_dockState == value)
+        {
             return;
+        }
 
         DockState oldDockState = m_dockState;
         INestedPanesContainer oldContainer = NestedPanesContainer;
@@ -989,12 +1199,18 @@ public partial class DockPane : UserControl, IDockDragSource
 
         IDockContent contentFocused = GetFocusedContent();
         if (contentFocused != null)
+        {
             DockPanel.SaveFocus();
+        }
 
         if (!IsFloat)
+        {
             DockWindow = DockPanel.DockWindows[DockState];
+        }
         else if (FloatWindow == null)
+        {
             FloatWindow = DockPanel.Theme.Extender.FloatWindowFactory.CreateFloatWindow (DockPanel, this);
+        }
 
         if (contentFocused != null)
         {
@@ -1036,7 +1252,9 @@ public partial class DockPane : UserControl, IDockDragSource
     private void RefreshStateChange (INestedPanesContainer oldContainer, DockState oldDockState)
     {
         if (IsRefreshStateChangeSuspended)
+        {
             return;
+        }
 
         SuspendRefreshStateChange();
 
@@ -1044,33 +1262,50 @@ public partial class DockPane : UserControl, IDockDragSource
 
         IDockContent contentFocused = GetFocusedContent();
         if (contentFocused != null)
+        {
             DockPanel.SaveFocus();
+        }
+
         SetParent();
 
         if (ActiveContent != null)
+        {
             ActiveContent.DockHandler.SetDockState (ActiveContent.DockHandler.IsHidden, DockState,
                 ActiveContent.DockHandler.Pane);
+        }
+
         foreach (IDockContent content in Contents)
         {
             if (content.DockHandler.Pane == this)
+            {
                 content.DockHandler.SetDockState (content.DockHandler.IsHidden, DockState,
                     content.DockHandler.Pane);
+            }
         }
 
         if (oldContainer != null)
         {
             Control oldContainerControl = (Control)oldContainer;
             if (oldContainer.DockState == oldDockState && !oldContainerControl.IsDisposed)
+            {
                 oldContainerControl.PerformLayout();
+            }
         }
 
         if (DockHelper.IsDockStateAutoHide (oldDockState))
+        {
             DockPanel.RefreshActiveAutoHideContent();
+        }
 
         if (NestedPanesContainer.DockState == DockState)
+        {
             ((Control)NestedPanesContainer).PerformLayout();
+        }
+
         if (DockHelper.IsDockStateAutoHide (DockState))
+        {
             DockPanel.RefreshActiveAutoHideContent();
+        }
 
         if (DockHelper.IsDockStateAutoHide (oldDockState) ||
             DockHelper.IsDockStateAutoHide (DockState))
@@ -1082,12 +1317,16 @@ public partial class DockPane : UserControl, IDockDragSource
         ResumeRefreshStateChange();
 
         if (contentFocused != null)
+        {
             contentFocused.DockHandler.Activate();
+        }
 
         DockPanel.ResumeLayout (true, true);
 
         if (oldDockState != DockState)
+        {
             OnDockStateChanged (EventArgs.Empty);
+        }
     }
 
     private IDockContent GetFocusedContent()
@@ -1108,13 +1347,19 @@ public partial class DockPane : UserControl, IDockDragSource
     public DockPane DockTo (INestedPanesContainer container)
     {
         if (container == null)
+        {
             throw new InvalidOperationException (Strings.DockPane_DockTo_NullContainer);
+        }
 
         DockAlignment alignment;
         if (container.DockState == DockState.DockLeft || container.DockState == DockState.DockRight)
+        {
             alignment = DockAlignment.Bottom;
+        }
         else
+        {
             alignment = DockAlignment.Right;
+        }
 
         return DockTo (container, container.NestedPanes.GetDefaultPreviousPane (this), alignment, 0.5);
     }
@@ -1123,7 +1368,9 @@ public partial class DockPane : UserControl, IDockDragSource
         double proportion)
     {
         if (container == null)
+        {
             throw new InvalidOperationException (Strings.DockPane_DockTo_NullContainer);
+        }
 
         if (container.IsFloat == this.IsFloat)
         {
@@ -1133,16 +1380,22 @@ public partial class DockPane : UserControl, IDockDragSource
 
         IDockContent firstContent = GetFirstContent (container.DockState);
         if (firstContent == null)
+        {
             return null;
+        }
 
         DockPane pane;
         DockPanel.DummyContent.DockPanel = DockPanel;
         if (container.IsFloat)
+        {
             pane = DockPanel.Theme.Extender.DockPaneFactory.CreateDockPane (DockPanel.DummyContent,
                 (FloatWindow)container, true);
+        }
         else
+        {
             pane = DockPanel.Theme.Extender.DockPaneFactory.CreateDockPane (DockPanel.DummyContent,
                 container.DockState, true);
+        }
 
         pane.DockTo (container, previousPane, alignment, proportion);
         SetVisibleContentsToPane (pane);
@@ -1169,26 +1422,39 @@ public partial class DockPane : UserControl, IDockDragSource
         }
 
         if (activeContent.DockHandler.Pane == pane)
+        {
             pane.ActiveContent = activeContent;
+        }
     }
 
     private void InternalAddToDockList (INestedPanesContainer container, DockPane prevPane, DockAlignment alignment,
         double proportion)
     {
         if ((container.DockState == DockState.Float) != IsFloat)
+        {
             throw new InvalidOperationException (Strings.DockPane_DockTo_InvalidContainer);
+        }
 
         int count = container.NestedPanes.Count;
         if (container.NestedPanes.Contains (this))
+        {
             count--;
+        }
+
         if (prevPane == null && count > 0)
+        {
             throw new InvalidOperationException (Strings.DockPane_DockTo_NullPrevPane);
+        }
 
         if (prevPane != null && !container.NestedPanes.Contains (prevPane))
+        {
             throw new InvalidOperationException (Strings.DockPane_DockTo_NoPrevPane);
+        }
 
         if (prevPane == this)
+        {
             throw new InvalidOperationException (Strings.DockPane_DockTo_SelfPrevPane);
+        }
 
         INestedPanesContainer oldContainer = NestedPanesContainer;
         DockState oldDockState = DockState;
@@ -1196,7 +1462,9 @@ public partial class DockPane : UserControl, IDockDragSource
         NestedDockingStatus.SetStatus (container.NestedPanes, prevPane, alignment, proportion);
 
         if (DockHelper.IsDockWindowState (DockState))
+        {
             m_dockState = container.DockState;
+        }
 
         RefreshStateChange (oldContainer, oldDockState);
     }
@@ -1206,7 +1474,9 @@ public partial class DockPane : UserControl, IDockDragSource
         NestedDockingStatus.SetStatus (NestedDockingStatus.NestedPanes, NestedDockingStatus.PreviousPane,
             NestedDockingStatus.Alignment, proportion);
         if (NestedPanesContainer != null)
+        {
             ((Control)NestedPanesContainer).PerformLayout();
+        }
     }
 
     public DockPane Float()
@@ -1249,12 +1519,18 @@ public partial class DockPane : UserControl, IDockDragSource
         {
             IDockContent content = DisplayingContents[i];
             if (!content.DockHandler.IsDockStateValid (DockState.Float))
+            {
                 continue;
+            }
 
             if (floatPane != null && content.DockHandler.FloatPane != floatPane)
+            {
                 return null;
+            }
             else
+            {
                 floatPane = content.DockHandler.FloatPane;
+            }
         }
 
         return floatPane;
@@ -1266,7 +1542,9 @@ public partial class DockPane : UserControl, IDockDragSource
         {
             IDockContent content = DisplayingContents[i];
             if (content.DockHandler.IsDockStateValid (dockState))
+            {
                 return content;
+            }
         }
 
         return null;
@@ -1282,7 +1560,9 @@ public partial class DockPane : UserControl, IDockDragSource
         {
             IDockContent content = DisplayingContents[i];
             if (content.DockHandler.CheckDockState (false) != DockState.Unknown)
+            {
                 content.DockHandler.IsFloat = false;
+            }
         }
 
         DockPanel.ResumeLayout (true, true);
@@ -1292,7 +1572,9 @@ public partial class DockPane : UserControl, IDockDragSource
     protected override void WndProc (ref Message m)
     {
         if (m.Msg == (int)Win32.Msgs.WM_MOUSEACTIVATE)
+        {
             Activate();
+        }
 
         base.WndProc (ref m);
     }
@@ -1318,10 +1600,14 @@ public partial class DockPane : UserControl, IDockDragSource
     bool IDockDragSource.CanDockTo (DockPane pane)
     {
         if (!IsDockStateValid (pane.DockState))
+        {
             return false;
+        }
 
         if (pane == this)
+        {
             return false;
+        }
 
         return true;
     }
@@ -1333,12 +1619,18 @@ public partial class DockPane : UserControl, IDockDragSource
 
         DockPane floatPane = ActiveContent.DockHandler.FloatPane;
         if (DockState == DockState.Float || floatPane == null || floatPane.FloatWindow.NestedPanes.Count != 1)
+        {
             size = DockPanel.DefaultFloatWindowSize;
+        }
         else
+        {
             size = floatPane.FloatWindow.Size;
+        }
 
         if (ptMouse.X > location.X + size.Width)
+        {
             location.X += ptMouse.X - (location.X + size.Width) + DockPanel.Theme.Measures.SplitterSize;
+        }
 
         return new Rectangle (location, size);
     }
@@ -1347,20 +1639,32 @@ public partial class DockPane : UserControl, IDockDragSource
     {
     }
 
-    public void FloatAt (Rectangle floatWindowBounds)
+    public void FloatAt
+        (
+            Rectangle floatWindowBounds
+        )
     {
         if (FloatWindow == null || FloatWindow.NestedPanes.Count != 1)
+        {
             FloatWindow =
                 DockPanel.Theme.Extender.FloatWindowFactory.CreateFloatWindow (DockPanel, this, floatWindowBounds);
+        }
         else
+        {
             FloatWindow.Bounds = floatWindowBounds;
+        }
 
         DockState = DockState.Float;
 
         NestedDockingStatus.NestedPanes.SwitchPaneWithFirstChild (this);
     }
 
-    public void DockTo (DockPane pane, DockStyle dockStyle, int contentIndex)
+    public void DockTo
+        (
+            DockPane pane,
+            DockStyle dockStyle,
+            int contentIndex
+        )
     {
         if (dockStyle == DockStyle.Fill)
         {
@@ -1372,7 +1676,9 @@ public partial class DockPane : UserControl, IDockDragSource
                 {
                     c.DockHandler.Pane = pane;
                     if (contentIndex != -1)
+                    {
                         pane.SetContentIndex (c, contentIndex);
+                    }
                 }
             }
 
@@ -1381,13 +1687,21 @@ public partial class DockPane : UserControl, IDockDragSource
         else
         {
             if (dockStyle == DockStyle.Left)
+            {
                 DockTo (pane.NestedPanesContainer, pane, DockAlignment.Left, 0.5);
+            }
             else if (dockStyle == DockStyle.Right)
+            {
                 DockTo (pane.NestedPanesContainer, pane, DockAlignment.Right, 0.5);
+            }
             else if (dockStyle == DockStyle.Top)
+            {
                 DockTo (pane.NestedPanesContainer, pane, DockAlignment.Top, 0.5);
+            }
             else if (dockStyle == DockStyle.Bottom)
+            {
                 DockTo (pane.NestedPanesContainer, pane, DockAlignment.Bottom, 0.5);
+            }
 
             DockState = pane.DockState;
         }
@@ -1396,18 +1710,30 @@ public partial class DockPane : UserControl, IDockDragSource
     public void DockTo (DockPanel panel, DockStyle dockStyle)
     {
         if (panel != DockPanel)
+        {
             throw new ArgumentException (Strings.IDockDragSource_DockTo_InvalidPanel, nameof (panel));
+        }
 
         if (dockStyle == DockStyle.Top)
+        {
             DockState = DockState.DockTop;
+        }
         else if (dockStyle == DockStyle.Bottom)
+        {
             DockState = DockState.DockBottom;
+        }
         else if (dockStyle == DockStyle.Left)
+        {
             DockState = DockState.DockLeft;
+        }
         else if (dockStyle == DockStyle.Right)
+        {
             DockState = DockState.DockRight;
+        }
         else if (dockStyle == DockStyle.Fill)
+        {
             DockState = DockState.Document;
+        }
     }
 
     #endregion
@@ -1428,6 +1754,7 @@ public partial class DockPane : UserControl, IDockDragSource
     /// </summary>
     private DockWindow _lastParentWindow;
 
+    /// <inheritdoc cref="ContainerControl.OnParentChanged"/>
     protected override void OnParentChanged (EventArgs e)
     {
         base.OnParentChanged (e);
@@ -1435,7 +1762,10 @@ public partial class DockPane : UserControl, IDockDragSource
         if (newParent != _lastParentWindow)
         {
             if (_lastParentWindow != null)
+            {
                 _lastParentWindow.PerformLayout();
+            }
+
             _lastParentWindow = newParent;
         }
     }

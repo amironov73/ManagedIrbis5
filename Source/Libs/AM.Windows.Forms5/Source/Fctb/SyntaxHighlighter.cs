@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 
 /* SyntaxHighlighter.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -31,130 +32,430 @@ namespace Fctb;
 public class SyntaxHighlighter
     : IDisposable
 {
+    /// <summary>
+    ///
+    /// </summary>
     //styles
     protected static readonly Platform platformType = PlatformType.GetOperationSystemPlatform();
 
+    /// <summary>
+    ///
+    /// </summary>
     public readonly Style BlueBoldStyle = new TextStyle (Brushes.Blue, null, FontStyle.Bold);
+
+    /// <summary>
+    ///
+    /// </summary>
     public readonly Style BlueStyle = new TextStyle (Brushes.Blue, null, FontStyle.Regular);
+
+    /// <summary>
+    ///
+    /// </summary>
     public readonly Style BoldStyle = new TextStyle (null, null, FontStyle.Bold | FontStyle.Underline);
+
+    /// <summary>
+    ///
+    /// </summary>
     public readonly Style BrownStyle = new TextStyle (Brushes.Brown, null, FontStyle.Italic);
+
+    /// <summary>
+    ///
+    /// </summary>
     public readonly Style GrayStyle = new TextStyle (Brushes.Gray, null, FontStyle.Regular);
+
+    /// <summary>
+    ///
+    /// </summary>
     public readonly Style GreenStyle = new TextStyle (Brushes.Green, null, FontStyle.Italic);
+
+    /// <summary>
+    ///
+    /// </summary>
     public readonly Style MagentaStyle = new TextStyle (Brushes.Magenta, null, FontStyle.Regular);
+
+    /// <summary>
+    ///
+    /// </summary>
     public readonly Style MaroonStyle = new TextStyle (Brushes.Maroon, null, FontStyle.Regular);
+
+    /// <summary>
+    ///
+    /// </summary>
     public readonly Style RedStyle = new TextStyle (Brushes.Red, null, FontStyle.Regular);
 
+    /// <summary>
+    ///
+    /// </summary>
     public readonly Style BlackStyle = new TextStyle (Brushes.Black, null, FontStyle.Regular);
 
     //
     protected readonly Dictionary<string, SyntaxDescriptor> descByXMLfileNames = new ();
 
-    protected readonly List<Style> resilientStyles = new List<Style> (5);
+    protected readonly List<Style> resilientStyles = new (5);
 
-    protected Regex CSharpAttributeRegex,
-        CSharpClassNameRegex;
+    #nullable enable
 
-    protected Regex CSharpCommentRegex1,
-        CSharpCommentRegex2,
-        CSharpCommentRegex3;
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex CSharpAttributeRegex;
 
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex CSharpClassNameRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex CSharpCommentRegex1;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex CSharpCommentRegex2;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex CSharpCommentRegex3;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex CSharpKeywordRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex CSharpNumberRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex CSharpStringRegex;
 
-    protected Regex HTMLAttrRegex,
-        HTMLAttrValRegex,
-        HTMLCommentRegex1,
-        HTMLCommentRegex2;
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex HTMLAttrRegex;
 
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex HTMLAttrValRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex HTMLCommentRegex1;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex HTMLCommentRegex2;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex HTMLEndTagRegex;
 
-    protected Regex HTMLEntityRegex,
-        HTMLTagContentRegex;
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex HTMLEntityRegex;
 
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex HTMLTagContentRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex HTMLTagNameRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex HTMLTagRegex;
 
-    protected Regex XMLAttrRegex,
-        XMLAttrValRegex,
-        XMLCommentRegex1,
-        XMLCommentRegex2;
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex XMLAttrRegex;
 
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex XMLAttrValRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex XMLCommentRegex1;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex XMLCommentRegex2;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex XMLEndTagRegex;
 
-    protected Regex XMLEntityRegex,
-        XMLTagContentRegex;
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex XMLEntityRegex;
 
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex XMLTagContentRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex XMLTagNameRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex XMLTagRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex XMLCDataRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex XMLFoldingRegex;
 
-    protected Regex JScriptCommentRegex1,
-        JScriptCommentRegex2,
-        JScriptCommentRegex3;
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex JScriptCommentRegex1;
 
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex JScriptCommentRegex2;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex JScriptCommentRegex3;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex JScriptKeywordRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex JScriptNumberRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex JScriptStringRegex;
 
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex JSONKeywordRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex JSONNumberRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex JSONStringRegex;
 
-    protected Regex LuaCommentRegex1,
-        LuaCommentRegex2,
-        LuaCommentRegex3;
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex LuaCommentRegex1;
 
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex LuaCommentRegex2;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex LuaCommentRegex3;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex LuaKeywordRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex LuaNumberRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex LuaStringRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex LuaFunctionsRegex;
 
-    protected Regex PHPCommentRegex1,
-        PHPCommentRegex2,
-        PHPCommentRegex3;
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex PHPCommentRegex1;
 
-    protected Regex PHPKeywordRegex1,
-        PHPKeywordRegex2,
-        PHPKeywordRegex3;
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex PHPCommentRegex2;
 
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex PHPCommentRegex3;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex PHPKeywordRegex1;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex PHPKeywordRegex2;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex PHPKeywordRegex3;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex PHPNumberRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex PHPStringRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex PHPVarRegex;
 
-    protected Regex SQLCommentRegex1,
-        SQLCommentRegex2,
-        SQLCommentRegex3,
-        SQLCommentRegex4;
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex SQLCommentRegex1;
 
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex SQLCommentRegex2;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex SQLCommentRegex3;
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected Regex SQLCommentRegex4;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex SQLFunctionsRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex SQLKeywordsRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex SQLNumberRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex SQLStatementsRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex SQLStringRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex SQLTypesRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex SQLVarRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex VBClassNameRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex VBCommentRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex VBKeywordRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex VBNumberRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     protected Regex VBStringRegex;
+
+    #nullable restore
 
     protected SyntaxTextBox currentTb;
 
-    public static RegexOptions RegexCompiledOption
-    {
-        get
-        {
-            if (platformType == Platform.X86)
-                return RegexOptions.Compiled;
-            else
-                return RegexOptions.None;
-        }
-    }
+    public static RegexOptions RegexCompiledOption =>
+        platformType == Platform.X86
+            ? RegexOptions.Compiled
+            : RegexOptions.None;
 
-    public SyntaxHighlighter (SyntaxTextBox currentTb)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SyntaxHighlighter
+        (
+            SyntaxTextBox currentTb
+        )
     {
         this.currentTb = currentTb;
     }

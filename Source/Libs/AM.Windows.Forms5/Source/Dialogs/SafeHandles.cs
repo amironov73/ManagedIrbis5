@@ -3,8 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
-/*
+/* ActivationContextSafeHandle.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,18 +21,27 @@ using Microsoft.Win32.SafeHandles;
 
 #endregion
 
+#pragma warning disable SYSLIB0003
+#pragma warning disable SYSLIB0004
+
 #nullable enable
 
 namespace AM.Windows.Forms.Dialogs;
 
 [SecurityPermission (SecurityAction.Demand, UnmanagedCode = true)]
-class ActivationContextSafeHandle : SafeHandleZeroOrMinusOneIsInvalid
+internal sealed class ActivationContextSafeHandle
+    : SafeHandleZeroOrMinusOneIsInvalid
 {
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
     public ActivationContextSafeHandle()
         : base (true)
     {
+        // пустое тело конструктора
     }
 
+    /// <inheritdoc cref="SafeHandle.ReleaseHandle"/>
     [ReliabilityContract (Consistency.WillNotCorruptState, Cer.MayFail)]
     protected override bool ReleaseHandle()
     {
@@ -41,19 +51,28 @@ class ActivationContextSafeHandle : SafeHandleZeroOrMinusOneIsInvalid
 }
 
 [SecurityPermission (SecurityAction.Demand, UnmanagedCode = true)]
-class SafeGDIHandle : SafeHandleZeroOrMinusOneIsInvalid
+internal sealed class SafeGdiHandle
+    : SafeHandleZeroOrMinusOneIsInvalid
 {
-    internal SafeGDIHandle()
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public SafeGdiHandle()
         : base (true)
     {
+        // пустое тело конструктора
     }
 
-    internal SafeGDIHandle (IntPtr existingHandle, bool ownsHandle)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SafeGdiHandle (IntPtr existingHandle, bool ownsHandle)
         : base (ownsHandle)
     {
         SetHandle (existingHandle);
     }
 
+    /// <inheritdoc cref="SafeHandle.ReleaseHandle"/>
     protected override bool ReleaseHandle()
     {
         return NativeMethods.DeleteObject (handle);
@@ -61,38 +80,51 @@ class SafeGDIHandle : SafeHandleZeroOrMinusOneIsInvalid
 }
 
 [SecurityPermission (SecurityAction.Demand, UnmanagedCode = true)]
-class SafeDeviceHandle : SafeHandleZeroOrMinusOneIsInvalid
+internal class SafeDeviceHandle
+    : SafeHandleZeroOrMinusOneIsInvalid
 {
-    internal SafeDeviceHandle()
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public SafeDeviceHandle()
         : base (true)
     {
+        // пустое тело конструктора
     }
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     [SuppressMessage ("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-    internal SafeDeviceHandle (IntPtr existingHandle, bool ownsHandle)
+    public SafeDeviceHandle (IntPtr existingHandle, bool ownsHandle)
         : base (ownsHandle)
     {
         SetHandle (existingHandle);
     }
 
+    /// <inheritdoc cref="SafeHandle.ReleaseHandle"/>
     protected override bool ReleaseHandle()
     {
         return NativeMethods.DeleteDC (handle);
     }
 }
 
-class SafeModuleHandle : SafeHandle
+internal class SafeModuleHandle
+    : SafeHandle
 {
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
     public SafeModuleHandle()
         : base (IntPtr.Zero, true)
     {
+        // пустое тело конструктора
     }
 
-    public override bool IsInvalid
-    {
-        get { return handle == IntPtr.Zero; }
-    }
+    /// <inheritdoc cref="SafeHandle.IsInvalid"/>
+    public override bool IsInvalid => handle == IntPtr.Zero;
 
+    /// <inheritdoc cref="SafeHandle.ReleaseHandle"/>
     [ReliabilityContract (Consistency.WillNotCorruptState, Cer.MayFail)]
     protected override bool ReleaseHandle()
     {

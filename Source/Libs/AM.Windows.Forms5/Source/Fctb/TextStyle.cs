@@ -24,30 +24,57 @@ namespace Fctb;
 /// Style for chars rendering
 /// This renderer can draws chars, with defined fore and back colors
 /// </summary>
-public class TextStyle : Style
+public class TextStyle
+    : Style
 {
-    public Brush ForeBrush { get; set; }
-    public Brush BackgroundBrush { get; set; }
+    /// <summary>
+    /// Кисть для текста.
+    /// </summary>
+    public Brush? ForeBrush { get; set; }
 
+    /// <summary>
+    /// Кисть для фона.
+    /// </summary>
+    public Brush? BackgroundBrush { get; set; }
+
+    /// <summary>
+    /// Стиль шрифта.
+    /// </summary>
     public FontStyle FontStyle { get; set; }
 
     //public readonly Font Font;
     public StringFormat stringFormat;
 
-    public TextStyle (Brush foreBrush, Brush backgroundBrush, FontStyle fontStyle)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public TextStyle
+        (
+            Brush? foreBrush,
+            Brush? backgroundBrush,
+            FontStyle fontStyle
+        )
     {
-        this.ForeBrush = foreBrush;
-        this.BackgroundBrush = backgroundBrush;
-        this.FontStyle = fontStyle;
+        ForeBrush = foreBrush;
+        BackgroundBrush = backgroundBrush;
+        FontStyle = fontStyle;
         stringFormat = new StringFormat (StringFormatFlags.MeasureTrailingSpaces);
     }
 
-    public override void Draw (Graphics graphics, Point position, TextRange range)
+    /// <inheritdoc cref="Style.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics,
+            Point position,
+            TextRange range
+        )
     {
         //draw background
         if (BackgroundBrush != null)
+        {
             graphics.FillRectangle (BackgroundBrush, position.X, position.Y,
                 (range.End.Column - range.Start.Column) * range._textBox.CharWidth, range._textBox.CharHeight);
+        }
 
         //draw chars
         using (var f = new Font (range._textBox.Font, FontStyle))
@@ -58,7 +85,9 @@ public class TextStyle : Style
             float x = position.X - range._textBox.CharWidth / 3;
 
             if (ForeBrush == null)
+            {
                 ForeBrush = new SolidBrush (range._textBox.ForeColor);
+            }
 
             if (range._textBox.ImeAllowed)
             {
@@ -89,6 +118,7 @@ public class TextStyle : Style
         }
     }
 
+    /// <inheritdoc cref="Style.GetCSS"/>
     public override string GetCSS()
     {
         var result = "";
@@ -97,46 +127,77 @@ public class TextStyle : Style
         {
             var s = ExportToHtml.GetColorAsString ((BackgroundBrush as SolidBrush).Color);
             if (s != "")
+            {
                 result += "background-color:" + s + ";";
+            }
         }
 
         if (ForeBrush is SolidBrush)
         {
             var s = ExportToHtml.GetColorAsString ((ForeBrush as SolidBrush).Color);
             if (s != "")
+            {
                 result += "color:" + s + ";";
+            }
         }
 
         if ((FontStyle & FontStyle.Bold) != 0)
+        {
             result += "font-weight:bold;";
+        }
+
         if ((FontStyle & FontStyle.Italic) != 0)
+        {
             result += "font-style:oblique;";
+        }
+
         if ((FontStyle & FontStyle.Strikeout) != 0)
+        {
             result += "text-decoration:line-through;";
+        }
+
         if ((FontStyle & FontStyle.Underline) != 0)
+        {
             result += "text-decoration:underline;";
+        }
 
         return result;
     }
 
+    /// <inheritdoc cref="GetRTF"/>
     public override RtfStyleDescriptor GetRTF()
     {
         var result = new RtfStyleDescriptor();
 
         if (BackgroundBrush is SolidBrush)
-            result.BackColor = (BackgroundBrush as SolidBrush).Color;
+        {
+            result.BackColor = (BackgroundBrush as SolidBrush)!.Color;
+        }
 
         if (ForeBrush is SolidBrush)
-            result.ForeColor = (ForeBrush as SolidBrush).Color;
+        {
+            result.ForeColor = (ForeBrush as SolidBrush)!.Color;
+        }
 
         if ((FontStyle & FontStyle.Bold) != 0)
+        {
             result.AdditionalTags += @"\b";
+        }
+
         if ((FontStyle & FontStyle.Italic) != 0)
+        {
             result.AdditionalTags += @"\i";
+        }
+
         if ((FontStyle & FontStyle.Strikeout) != 0)
+        {
             result.AdditionalTags += @"\strike";
+        }
+
         if ((FontStyle & FontStyle.Underline) != 0)
+        {
             result.AdditionalTags += @"\ul";
+        }
 
         return result;
     }

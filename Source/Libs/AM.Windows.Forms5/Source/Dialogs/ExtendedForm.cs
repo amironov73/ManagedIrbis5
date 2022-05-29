@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* ExtendedForm.cs -- base class for windows forms with extended functionality
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,6 +20,8 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 
 #endregion
+
+#pragma warning disable SYSLIB0003
 
 #nullable enable
 
@@ -46,7 +48,7 @@ namespace AM.Windows.Forms.Dialogs;
 /// </para>
 /// <para>
 ///     Because the font metrics of these different fonts can be vary greatly
-///     (especially on Vista which uses a larger font), please make sure the 
+///     (especially on Vista which uses a larger font), please make sure the
 ///     <see cref="ContainerControl.AutoScaleMode" /> property is set to
 ///     <see cref="AutoScaleMode.Font"/>, and make special provisions for resizing
 ///     graphics and other elements.
@@ -64,7 +66,7 @@ namespace AM.Windows.Forms.Dialogs;
 ///     properties have no effect on other operating systems.
 /// </para>
 /// <note>
-///     Many Windows Forms controls will not display correctly when placed over a glass area. Use the 
+///     Many Windows Forms controls will not display correctly when placed over a glass area. Use the
 ///     <see cref="Glass.DrawCompositedText"/> method to display text on a glass area.
 /// </note>
 /// <para>
@@ -97,7 +99,7 @@ public class ExtendedForm : Form
     /// Gets or sets a value that indicates whether or not the form automatically uses the system default font.
     /// </summary>
     /// <value>
-    /// <see langword="true" /> when the form's font is automatically adjusted to the system font; 
+    /// <see langword="true" /> when the form's font is automatically adjusted to the system font;
     /// otherwise, <see langword="false" />. The default value is <see langword="false" />.
     /// </value>
     /// <remarks>
@@ -106,11 +108,11 @@ public class ExtendedForm : Form
     ///   run time.
     /// </para>
     /// <para>
-    ///   When this property is set to <see langword="true" />, the form will use the configured 
-    ///   system font and font size automatically, e.g. it will use Segoe UI on Windows Vista and 
-    ///   Tahoma on Windows XP. Please make sure the <see cref="ContainerControl.AutoScaleMode" /> 
-    ///   property is set to <see cref="AutoScaleMode.Font"/> 
-    ///   to account for the different metrics of the various fonts, and make special provisions 
+    ///   When this property is set to <see langword="true" />, the form will use the configured
+    ///   system font and font size automatically, e.g. it will use Segoe UI on Windows Vista and
+    ///   Tahoma on Windows XP. Please make sure the <see cref="ContainerControl.AutoScaleMode" />
+    ///   property is set to <see cref="AutoScaleMode.Font"/>
+    ///   to account for the different metrics of the various fonts, and make special provisions
     ///   to scale graphics and other element. Note that the system font can also be smaller than
     ///   the font you used at design time, causing the form to be scaled down. For example the font
     ///   MS Gothic UI, used on Japanese versions of Windows (pre-Vista), has smaller metrics than
@@ -146,7 +148,7 @@ public class ExtendedForm : Form
     ///   area of your window.
     /// </para>
     /// <para>
-    ///   Use negative margins to create the "sheet of glass" effect where the client area is rendered 
+    ///   Use negative margins to create the "sheet of glass" effect where the client area is rendered
     ///   as a completely glass surface.
     /// </para>
     /// <para>
@@ -317,7 +319,7 @@ public class ExtendedForm : Form
     }
 
     /// <summary>
-    /// Overrides <see cref="Form.ScaleControl" />.
+    /// Overrides <see cref="Form.ScaleControl(System.Drawing.SizeF,System.Windows.Forms.BoundsSpecified)" />.
     /// </summary>
     /// <param name="factor">The height and width of the control's bounds.</param>
     /// <param name="specified">A <see cref="BoundsSpecified" /> value that specifies the bounds of the control to use when defining its size and position.</param>
