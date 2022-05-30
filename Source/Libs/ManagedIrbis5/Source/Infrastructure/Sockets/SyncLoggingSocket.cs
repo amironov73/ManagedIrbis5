@@ -2,13 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable ReplaceSliceWithRangeIndexer
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* SyncLoggingSocket.cs -- синхронный логирующий сокет
  * Ars Magna project, http://arsmagna.ru
@@ -23,88 +18,89 @@ using System.IO;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure.Sockets
+namespace ManagedIrbis.Infrastructure.Sockets;
+
+/// <summary>
+/// Синхронный логирующий сокет.
+/// Записывает все исходящие и входящие пакеты.
+/// </summary>
+public sealed class SyncLoggingSocket
+    : SyncNestedSocket
 {
+    #region Properties
+
     /// <summary>
-    /// Синхронный логирующий сокет.
-    /// Записывает все исходящие и входящие пакеты.
+    /// Директория, в которой сохраняются пакеты.
     /// </summary>
-    public sealed class SyncLoggingSocket
-        : SyncNestedSocket
+    public string LoggingPath { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SyncLoggingSocket
+        (
+            ISyncClientSocket innerSocket,
+            string loggingPath
+        )
+        : base (innerSocket)
     {
-        #region Properties
-
-        /// <summary>
-        /// Директория, в которой сохраняются пакеты.
-        /// </summary>
-        public string LoggingPath { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SyncLoggingSocket
-            (
-                ISyncClientSocket innerSocket,
-                string loggingPath
-            )
-            : base(innerSocket)
+        if (!Directory.Exists (loggingPath))
         {
-            if (!Directory.Exists(loggingPath))
-            {
-                Directory.CreateDirectory(loggingPath);
-            }
-
-            LoggingPath = loggingPath;
-            _counter = 0;
-
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private int _counter;
-
-        private void LogPacket(SyncQuery query)
-        {
-            var fileName = Path.Combine(LoggingPath, $"{_counter:000000000}up.packet");
-            var body = query.GetBody();
-            File.WriteAllBytes(fileName, body.ToArray());
+            Directory.CreateDirectory (loggingPath);
         }
 
-        private void LogPacket(Response? response)
-        {
-            var fileName = Path.Combine(LoggingPath, $"{_counter:00000000}dn.packet");
-            var body = response?.RemainingBytes() ?? Array.Empty<byte>();
-            File.WriteAllBytes(fileName, body);
-        }
+        LoggingPath = loggingPath;
+        _counter = 0;
+    }
 
-        #endregion
+    #endregion
 
-        #region ISyncClientSocket members
+    #region Private members
 
-        /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
-        public override Response? TransactSync
-            (
-                SyncQuery query
-            )
-        {
-            LogPacket(query);
+    private int _counter;
 
-            var result = base.TransactSync(query);
-            LogPacket(result);
-            ++_counter;
+    private void LogPacket
+        (
+            SyncQuery query
+        )
+    {
+        var fileName = Path.Combine (LoggingPath, $"{_counter:000000000}up.packet");
+        var body = query.GetBody();
+        File.WriteAllBytes (fileName, body.ToArray());
+    }
 
-            return result;
+    private void LogPacket
+        (
+            Response? response
+        )
+    {
+        var fileName = Path.Combine (LoggingPath, $"{_counter:00000000}dn.packet");
+        var body = response?.RemainingBytes() ?? Array.Empty<byte>();
+        File.WriteAllBytes (fileName, body);
+    }
 
-        } // method TransactSync
+    #endregion
 
-        #endregion
+    #region ISyncClientSocket members
 
-    } // class SyncLoggingSocket
+    /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
+    public override Response? TransactSync
+        (
+            SyncQuery query
+        )
+    {
+        LogPacket (query);
 
-} // namespace ManagedIrbis.Infrastructure.Sockets
+        var result = base.TransactSync (query);
+        LogPacket (result);
+        ++_counter;
+
+        return result;
+    }
+
+    #endregion
+}
