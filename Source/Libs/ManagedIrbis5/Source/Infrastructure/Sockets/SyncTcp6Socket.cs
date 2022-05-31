@@ -56,13 +56,13 @@ public sealed class SyncTcp6Socket
             SyncQuery query
         )
     {
-        var connection = Connection.ThrowIfNull (nameof (Connection));
+        var connection = Connection.ThrowIfNull();
         connection.ThrowIfCancelled();
 
         using var client = new TcpClient (AddressFamily.InterNetworkV6);
         try
         {
-            var host = connection.Host.ThrowIfNull (nameof (connection.Host));
+            var host = connection.Host.ThrowIfNull();
             client.Connect (host, connection.Port);
         }
         catch (Exception exception)
@@ -97,7 +97,7 @@ public sealed class SyncTcp6Socket
             return default;
         }
 
-        var result = new Response (Connection.ThrowIfNull (nameof (Connection)));
+        var result = new Response (Connection.ThrowIfNull());
         try
         {
             while (true)

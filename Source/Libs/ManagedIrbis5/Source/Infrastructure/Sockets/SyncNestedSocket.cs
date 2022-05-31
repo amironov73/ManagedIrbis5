@@ -16,67 +16,67 @@
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure.Sockets
+using AM;
+
+namespace ManagedIrbis.Infrastructure.Sockets;
+
+/// <summary>
+/// Синхронный сокет с вложенным сокетом.
+/// </summary>
+public abstract class SyncNestedSocket
+    : ISyncClientSocket
 {
-    /// <summary>
-    /// Синхронный сокет с вложенным сокетом.
-    /// </summary>
-    public abstract class SyncNestedSocket
-        : ISyncClientSocket
+    #region Properties
+
+    /// <inheritdoc cref="ISyncClientSocket.RetryCount"/>
+    public int RetryCount
     {
-        #region Properties
+        get => InnerSocket.RetryCount;
+        set => InnerSocket.RetryCount = value;
+    }
 
-        /// <inheritdoc cref="ISyncClientSocket.RetryCount"/>
-        public int RetryCount
-        {
-            get => InnerSocket.RetryCount;
-            set => InnerSocket.RetryCount = value;
-        }
+    /// <inheritdoc cref="ISyncClientSocket.RetryDelay"/>
+    public int RetryDelay
+    {
+        get => InnerSocket.RetryDelay;
+        set => InnerSocket.RetryDelay = value;
+    }
 
-        /// <inheritdoc cref="ISyncClientSocket.RetryDelay"/>
-        public int RetryDelay
-        {
-            get => InnerSocket.RetryDelay;
-            set => InnerSocket.RetryDelay = value;
-        }
+    /// <summary>
+    /// Внутренний сокет, который выполняет все операции.
+    /// </summary>
+    public ISyncClientSocket InnerSocket { get; }
 
-        /// <summary>
-        /// Внутренний сокет, который выполняет все операции.
-        /// </summary>
-        public ISyncClientSocket InnerSocket { get; }
+    /// <inheritdoc cref="ISyncClientSocket.Connection"/>
+    public ISyncConnection? Connection
+    {
+        get => InnerSocket.Connection;
+        set => InnerSocket.Connection = value;
+    }
 
-        /// <inheritdoc cref="ISyncClientSocket.Connection"/>
-        public ISyncConnection? Connection
-        {
-            get => InnerSocket.Connection;
-            set => InnerSocket.Connection = value;
-        }
+    #endregion
 
-        #endregion
+    #region Construction
 
-        #region Construction
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    protected SyncNestedSocket
+        (
+            ISyncClientSocket innerSocket
+        )
+    {
+        Sure.NotNull (innerSocket);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        protected SyncNestedSocket
-            (
-                ISyncClientSocket innerSocket
-            )
-        {
-            InnerSocket = innerSocket;
+        InnerSocket = innerSocket;
+    }
 
-        } // constructor
+    #endregion
 
-        #endregion
+    #region ISyncClientSocket members
 
-        #region ISyncClientSocket members
+    /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
+    public virtual Response? TransactSync (SyncQuery query) => InnerSocket.TransactSync (query);
 
-        /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
-        public virtual Response? TransactSync(SyncQuery query) => InnerSocket.TransactSync(query);
-
-        #endregion
-
-    } // class SyncNestedSocket
-
-} // namespace ManagedIrbis.Infrastructure.Sockets
+    #endregion
+}
