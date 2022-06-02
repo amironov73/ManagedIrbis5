@@ -7,13 +7,14 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* CatalogState.cs --
+/* CatalogState.cs -- зафиксированное состояние каталога
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -31,7 +32,7 @@ using AM.Runtime;
 namespace ManagedIrbis.Catalog;
 
 /// <summary>
-/// State of the catalog.
+/// Зафиксированное каталога.
 /// </summary>
 [XmlRoot ("database")]
 [DebuggerDisplay ("{Database} {Date} {MaxMfn}")]
@@ -41,39 +42,44 @@ public sealed class CatalogState
     #region Properties
 
     /// <summary>
-    /// Identifier for LiteDB.
+    /// Идентификатор для LiteDB.
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]
+    [Browsable (false)]
     public int Id { get; set; }
 
     /// <summary>
-    /// Date.
+    /// Дата фиксации состояния.
     /// </summary>
     [XmlAttribute ("date")]
     [JsonPropertyName ("date")]
+    [Description ("Дата")]
     public DateTime Date { get; set; }
 
     /// <summary>
-    /// Database name.
+    /// Имя базы данных.
     /// </summary>
     [XmlAttribute ("database")]
     [JsonPropertyName ("database")]
+    [Description ("Имя базы")]
     public string? Database { get; set; }
 
     /// <summary>
-    /// Maximal MFN.
+    /// Максимальный MFN.
     /// </summary>
     [XmlAttribute ("maxMfn")]
     [JsonPropertyName ("maxMfn")]
+    [Description ("Максимальный MFN")]
     public int MaxMfn { get; set; }
 
     /// <summary>
-    /// Records.
+    /// Состояние записей.
     /// </summary>
     [XmlArray ("records")]
     [XmlArrayItem ("record")]
     [JsonPropertyName ("records")]
+    [Description ("Состояние записей")]
     public RecordState[]? Records { get; set; }
 
     /// <summary>

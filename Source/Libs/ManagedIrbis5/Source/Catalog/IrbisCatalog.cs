@@ -23,47 +23,47 @@ public static class IrbisCatalog
     #region Constants
 
     /// <summary>
-    /// Master file.
+    /// Мастер-файл.
     /// </summary>
     public const string MasterFileExtension = "mst";
 
     /// <summary>
-    /// Cross-reference.
+    /// Файл ссылок на записи.
     /// </summary>
     public const string CrossReferenceExtension = "xrf";
 
     /// <summary>
-    /// Index (inverted) file.
+    /// Индексный (инвертированный) файл.
     /// </summary>
     public const string IndexFileExtension = "ifp";
 
     /// <summary>
-    /// Node file.
+    /// Файл узлов.
     /// </summary>
     public const string NodeFileExtension1 = "n01";
 
     /// <summary>
-    /// Node file.
+    /// Файл узлов.
     /// </summary>
     public const string NodeFileExtension2 = "n02";
 
     /// <summary>
-    /// Leaf node file.
+    /// Файл листьев.
     /// </summary>
     public const string LeafFileExtension1 = "l01";
 
     /// <summary>
-    /// Leaf node file.
+    /// Файл листьев.
     /// </summary>
     public const string LeafFileExtension2 = "l02";
 
     /// <summary>
-    /// File selection table.
+    /// Файл выбора полей.
     /// </summary>
     public const string FileSelectionTableExtension = "fst";
 
     /// <summary>
-    /// File selection table.
+    /// Таблица выбора полей.
     /// </summary>
     public const string FileSelectionInvertedTableExtension = "ifs";
 
@@ -78,7 +78,7 @@ public static class IrbisCatalog
     #region Public methods
 
     /// <summary>
-    /// Get extensions for database files.
+    /// Перечень расширений для файлов базы данных.
     /// </summary>
     public static string[] GetExtensions()
     {
