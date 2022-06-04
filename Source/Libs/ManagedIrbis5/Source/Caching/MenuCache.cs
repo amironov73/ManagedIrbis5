@@ -18,6 +18,8 @@
 
 using System.IO;
 
+using AM;
+
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 
@@ -27,76 +29,95 @@ using Microsoft.Extensions.Caching.Memory;
 
 #nullable enable
 
-namespace ManagedIrbis.Caching
+namespace ManagedIrbis.Caching;
+
+/// <summary>
+/// Простейший кэш меню для ИРБИС
+/// </summary>
+public sealed class MenuCache
+    : DocumentCache
 {
+    #region Construction
+
     /// <summary>
-    /// Простейший кэш меню для ИРБИС
+    /// Конструктор.
     /// </summary>
-    public sealed class MenuCache
-        : DocumentCache
+    public MenuCache
+        (
+            ISyncProvider provider
+        )
+        : base (provider)
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public MenuCache (ISyncProvider provider) : base (provider)
-        {
-        }
-
-        /// <summary>
-        /// Конструктор с опциями кэширования.
-        /// </summary>
-        public MenuCache (ISyncProvider provider, MemoryCacheOptions options)
-            : base (provider, options)
-        {
-        }
-
-        /// <summary>
-        /// Конструктор с внешним кэш-провайдером.
-        /// </summary>
-        public MenuCache (ISyncProvider provider, IMemoryCache cache)
-            : base (provider, cache)
-        {
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Получение меню из кэша.
-        /// Если локальная копия отсутствует,
-        /// она запрашивается с сервера.
-        /// </summary>
-        public MenuFile? GetMenu
-            (
-                FileSpecification specification
-            )
-        {
-            var document = GetDocument (specification);
-            if (document is not null)
-            {
-                var reader = new StringReader (document);
-
-                return MenuFile.ParseStream (reader);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Обновление меню на сервере и заодно в кэше.
-        /// </summary>
-        public void UpdateMenu
-            (
-                FileSpecification specification,
-                MenuFile menu
-            )
-        {
-            UpdateDocument (specification, menu.ToText());
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    /// <summary>
+    /// Конструктор с опциями кэширования.
+    /// </summary>
+    public MenuCache
+        (
+            ISyncProvider provider,
+            MemoryCacheOptions options
+        )
+        : base (provider, options)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор с внешним кэш-провайдером.
+    /// </summary>
+    public MenuCache
+        (
+            ISyncProvider provider,
+            IMemoryCache cache
+        )
+        : base (provider, cache)
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение меню из кэша.
+    /// Если локальная копия отсутствует,
+    /// она запрашивается с сервера.
+    /// </summary>
+    public MenuFile? GetMenu
+        (
+            FileSpecification specification
+        )
+    {
+        Sure.NotNull (specification);
+
+        var document = GetDocument (specification);
+        if (document is not null)
+        {
+            var reader = new StringReader (document);
+
+            return MenuFile.ParseStream (reader);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Обновление меню на сервере и заодно в кэше.
+    /// </summary>
+    public void UpdateMenu
+        (
+            FileSpecification specification,
+            MenuFile menu
+        )
+    {
+        Sure.NotNull (specification);
+        Sure.NotNull (menu);
+
+        UpdateDocument (specification, menu.ToText());
+    }
+
+    #endregion
 }

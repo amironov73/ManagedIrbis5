@@ -16,8 +16,9 @@
 
 #region Using directives
 
-using System;
 using System.IO;
+
+using AM;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Trees;
@@ -28,76 +29,99 @@ using Microsoft.Extensions.Caching.Memory;
 
 #nullable enable
 
-namespace ManagedIrbis.Caching
+namespace ManagedIrbis.Caching;
+
+/// <summary>
+/// Простейший кэш "деревянных" меню для ИРБИС
+/// </summary>
+public sealed class TreeCache
+    : DocumentCache
 {
+    #region Construction
+
     /// <summary>
-    /// Простейший кэш "деревянных" меню для ИРБИС
+    /// Конструктор.
     /// </summary>
-    public sealed class TreeCache
-        : DocumentCache
+    public TreeCache
+        (
+            ISyncProvider provider
+        )
+        : base (provider)
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public TreeCache (ISyncProvider provider) : base (provider)
-        {
-        }
-
-        /// <summary>
-        /// Конструктор с опциями кэширования.
-        /// </summary>
-        public TreeCache (ISyncProvider provider, MemoryCacheOptions options)
-            : base (provider, options)
-        {
-        }
-
-        /// <summary>
-        /// Конструктор с внешним кэш-провайдером.
-        /// </summary>
-        public TreeCache (ISyncProvider provider, IMemoryCache cache)
-            : base (provider, cache)
-        {
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Получение "деревянного" меню из кэша.
-        /// Если локальная копия отсутствует,
-        /// она запрашивается с сервера.
-        /// </summary>
-        public TreeFile? GetTree
-            (
-                FileSpecification specification
-            )
-        {
-            var document = GetDocument (specification);
-            if (document is not null)
-            {
-                var reader = new StringReader (document);
-
-                return TreeFile.ParseStream (reader);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Обновление "деревянного" меню на сервере и заодно в кэше.
-        /// </summary>
-        public void UpdateTree
-            (
-                FileSpecification specification,
-                TreeFile tree
-            )
-        {
-            UpdateDocument (specification, tree.ToString() ?? String.Empty);
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    /// <summary>
+    /// Конструктор с опциями кэширования.
+    /// </summary>
+    public TreeCache
+        (
+            ISyncProvider provider,
+            MemoryCacheOptions options
+        )
+        : base (provider, options)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор с внешним кэш-провайдером.
+    /// </summary>
+    public TreeCache
+        (
+            ISyncProvider provider,
+            IMemoryCache cache
+        )
+        : base (provider, cache)
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение "деревянного" меню из кэша.
+    /// Если локальная копия отсутствует,
+    /// она запрашивается с сервера.
+    /// </summary>
+    public TreeFile? GetTree
+        (
+            FileSpecification specification
+        )
+    {
+        Sure.NotNull (specification);
+
+        var document = GetDocument (specification);
+        if (document is not null)
+        {
+            var reader = new StringReader (document);
+
+            return TreeFile.ParseStream (reader);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Обновление "деревянного" меню на сервере и заодно в кэше.
+    /// </summary>
+    public void UpdateTree
+        (
+            FileSpecification specification,
+            TreeFile tree
+        )
+    {
+        Sure.NotNull (specification);
+        Sure.NotNull (tree);
+
+        UpdateDocument
+            (
+                specification,
+                tree.ToString() ?? string.Empty
+            );
+    }
+
+    #endregion
 }

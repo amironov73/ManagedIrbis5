@@ -18,6 +18,9 @@
 
 using System;
 
+using AM;
+using AM.Memory;
+
 using ManagedIrbis.Infrastructure;
 
 using Microsoft.Extensions.Caching.Memory;
@@ -26,136 +29,150 @@ using Microsoft.Extensions.Caching.Memory;
 
 #nullable enable
 
-namespace ManagedIrbis.Caching
+namespace ManagedIrbis.Caching;
+
+/// <summary>
+/// Простейший текстовый кэк для ИРБИС
+/// </summary>
+public class DocumentCache
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Простейший текстовый кэк для ИРБИС
+    /// Провайдер (на всякий случай).
     /// </summary>
-    public class DocumentCache
-        : IDisposable
+    public ISyncProvider Provider { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DocumentCache
+        (
+            ISyncProvider provider
+        )
+        : this (provider, new MemoryCacheOptions())
     {
-        #region Properties
+        _options = new MemoryCacheOptions();
+    }
 
-        /// <summary>
-        /// Провайдер (на всякий случай).
-        /// </summary>
-        public ISyncProvider Provider { get; }
+    /// <summary>
+    /// Конструктор с опциями кэширования.
+    /// </summary>
+    public DocumentCache
+        (
+            ISyncProvider provider,
+            MemoryCacheOptions options
+        )
+        : this (provider, new MemoryCache (options))
+    {
+        _options = options;
+    }
 
-        #endregion
+    /// <summary>
+    /// Конструктор с внешним кэш-провайдером.
+    /// </summary>
+    public DocumentCache
+        (
+            ISyncProvider provider,
+            IMemoryCache cache
+        )
+    {
+        Provider = provider;
+        _cache = cache;
+        _options = new MemoryCacheOptions();
+    }
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public DocumentCache (ISyncProvider provider)
-            : this (provider, new MemoryCacheOptions())
-        {
-            _options = new MemoryCacheOptions();
-        }
+    #region Private members
 
-        /// <summary>
-        /// Конструктор с опциями кэширования.
-        /// </summary>
-        public DocumentCache (ISyncProvider provider, MemoryCacheOptions options)
-            : this (provider, new MemoryCache (options))
-        {
-            _options = options;
-        }
+    private readonly MemoryCacheOptions _options;
+    private IMemoryCache _cache;
 
-        /// <summary>
-        /// Конструктор с внешним кэш-провайдером.
-        /// </summary>
-        public DocumentCache
-            (
-                ISyncProvider provider,
-                IMemoryCache cache
-            )
-        {
-            Provider = provider;
-            _cache = cache;
-            _options = new MemoryCacheOptions();
-        }
+    /// <summary>
+    /// Получение ключа для указанной спецификации.
+    /// </summary>
+    protected static string GetKey (FileSpecification specification)
+    {
+        return specification.ToString().ToUpperInvariant();
+    }
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Public methods
 
-        private readonly MemoryCacheOptions _options;
-        private IMemoryCache _cache;
-
-        /// <summary>
-        /// Получение ключа для указанной спецификации.
-        /// </summary>
-        protected static string GetKey (FileSpecification specification)
-        {
-            return specification.ToString().ToUpperInvariant();
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Очистка кэша.
-        /// </summary>
-        public void Clear()
+    /// <summary>
+    /// Очистка кэша.
+    /// </summary>
+    public void Clear()
+    {
+        if (!_cache.Clear())
         {
             _cache.Dispose();
             _cache = new MemoryCache (_options);
         }
-
-        /// <summary>
-        /// Получение документа из кэша.
-        /// Если локальная копия отсутствует,
-        /// она запрашивается с сервера.
-        /// </summary>
-        public string? GetDocument
-            (
-                FileSpecification specification
-            )
-        {
-            var key = GetKey (specification);
-            if (!_cache.TryGetValue (key, out string? result))
-            {
-                result = Provider.ReadTextFile (specification);
-                if (!string.IsNullOrEmpty (result))
-                {
-                    _cache.Set (key, result);
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Обновление документа на сервере
-        /// и заодно в кэше.
-        /// </summary>
-        public void UpdateDocument
-            (
-                FileSpecification specification,
-                string documentText
-            )
-        {
-            var withContent = specification.Clone();
-            withContent.Content = documentText;
-            Provider.WriteTextFile (withContent);
-            var key = GetKey (specification);
-
-            _cache.Set (key, documentText);
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            _cache.Dispose();
-        }
-
-        #endregion
     }
+
+    /// <summary>
+    /// Получение документа из кэша.
+    /// Если локальная копия отсутствует,
+    /// она запрашивается с сервера.
+    /// </summary>
+    public string? GetDocument
+        (
+            FileSpecification specification
+        )
+    {
+        Sure.NotNull (specification);
+
+        var key = GetKey (specification);
+        if (!_cache.TryGetValue (key, out string? result))
+        {
+            result = Provider.ReadTextFile (specification);
+            if (!string.IsNullOrEmpty (result))
+            {
+                _cache.Set (key, result);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Обновление документа на сервере
+    /// и заодно в кэше.
+    /// </summary>
+    public void UpdateDocument
+        (
+            FileSpecification specification,
+            string documentText
+        )
+    {
+        Sure.NotNull (specification);
+        Sure.NotNull (documentText);
+
+        var withContent = specification.Clone();
+        withContent.Content = documentText;
+        Provider.WriteTextFile (withContent);
+        var key = GetKey (specification);
+
+        _cache.Set (key, documentText);
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        _cache.Dispose();
+    }
+
+    #endregion
 }

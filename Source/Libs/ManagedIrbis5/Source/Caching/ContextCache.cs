@@ -21,6 +21,7 @@ using System.Globalization;
 using System.IO;
 
 using AM;
+using AM.Memory;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
@@ -34,358 +35,367 @@ using Microsoft.Extensions.Caching.Memory;
 
 #nullable enable
 
-namespace ManagedIrbis.Caching
+namespace ManagedIrbis.Caching;
+
+/// <summary>
+/// Контекстный кэш для ИРБИС.
+/// </summary>
+public sealed class ContextCache
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Контекстный кэш для ИРБИС.
+    /// Провайдер (на всякий случай).
     /// </summary>
-    public sealed class ContextCache
-        : IDisposable
+    public ISyncProvider Provider { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор..
+    /// </summary>
+    public ContextCache (ISyncProvider provider)
+        : this
+            (
+                provider,
+                new MemoryCacheOptions()
+            )
     {
-        #region Properties
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Провайдер (на всякий случай).
-        /// </summary>
-        public ISyncProvider Provider { get; }
+    /// <summary>
+    /// Конструктор с опциями кэширования.
+    /// </summary>
+    public ContextCache
+        (
+            ISyncProvider provider,
+            MemoryCacheOptions options
+        )
+        : this (provider, new MemoryCache (options))
+    {
+        _options = options;
+    }
 
-        #endregion
+    /// <summary>
+    /// Конструктор с внешним кэш-провайдером.
+    /// </summary>
+    public ContextCache
+        (
+            ISyncProvider provider,
+            IMemoryCache cache
+        )
+    {
+        Sure.NotNull (provider);
+        Sure.NotNull (cache);
 
-        #region Construction
+        Provider = provider;
+        _options = new MemoryCacheOptions();
+        _cache = cache;
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ContextCache (ISyncProvider provider)
-            : this (provider, new MemoryCacheOptions())
-        {
-        }
+    #endregion
 
-        /// <summary>
-        /// Конструктор с опциями кэширования.
-        /// </summary>
-        public ContextCache (ISyncProvider provider, MemoryCacheOptions options)
-            : this (provider, new MemoryCache (options))
-        {
-            Sure.NotNull (options);
+    #region Private members
 
-            _options = options;
-        }
+    private readonly MemoryCacheOptions _options;
+    private IMemoryCache _cache;
 
-        /// <summary>
-        /// Конструктор с внешним кэш-провайдером.
-        /// </summary>
-        public ContextCache
+    private static string GetKey
+        (
+            FileSpecification specification
+        )
+    {
+        return specification.ToString().ToUpperInvariant();
+    }
+
+    private static string GetKey (int mfn)
+    {
+        return string.Format
             (
-                ISyncProvider provider,
-                IMemoryCache cache
-            )
-        {
-            Sure.NotNull (provider);
-            Sure.NotNull (cache);
+                CultureInfo.InvariantCulture,
+                "_record_{0}",
+                mfn
+            );
+    }
 
-            Provider = provider;
-            _options = new MemoryCacheOptions();
-            _cache = cache;
-        }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Private members
-
-        private readonly MemoryCacheOptions _options;
-        private IMemoryCache _cache;
-
-        private static string GetKey
-            (
-                FileSpecification specification
-            )
-        {
-            return specification.ToString().ToUpperInvariant();
-        }
-
-        private static string GetKey (int mfn)
-        {
-            return string.Format
-                (
-                    CultureInfo.InvariantCulture,
-                    "_record_{0}",
-                    mfn
-                );
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Очистка кэша.
-        /// </summary>
-        public void Clear()
+    /// <summary>
+    /// Очистка кэша.
+    /// </summary>
+    public void Clear()
+    {
+        if (!_cache.Clear())
         {
             _cache.Dispose();
             _cache = new MemoryCache (_options);
         }
-
-        /// <summary>
-        /// Получение документа из кэша.
-        /// Если локальная копия отсутствует,
-        /// она запрашивается с сервера.
-        /// </summary>
-        public string? GetDocument
-            (
-                FileSpecification specification
-            )
-        {
-            Sure.VerifyNotNull (specification);
-
-            var key = GetKey (specification);
-            if (!_cache.TryGetValue (key, out string? result))
-            {
-                result = Provider.ReadTextFile (specification);
-                if (!string.IsNullOrEmpty (result))
-                {
-                    _cache.Set (key, result);
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Получение меню из кэша.
-        /// Если локальная копия отсутствует,
-        /// она запрашивается с сервера.
-        /// </summary>
-        public MenuFile? GetMenu
-            (
-                FileSpecification specification
-            )
-        {
-            Sure.VerifyNotNull (specification);
-
-            var document = GetDocument (specification);
-            if (document is not null)
-            {
-                var reader = new StringReader (document);
-
-                return MenuFile.ParseStream (reader);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Получение записи из кэша.
-        /// Если локальная копия отсутствует,
-        /// она запрашивается с сервера.
-        /// </summary>
-        public T? GetRecord<T>
-            (
-                int mfn
-            )
-            where T : class, IRecord, new()
-        {
-            Sure.Positive (mfn);
-
-            var key = GetKey (mfn);
-            if (!_cache.TryGetValue (key, out T? result))
-            {
-                var parameters = new ReadRecordParameters()
-                {
-                    Database = Provider.Database,
-                    Mfn = mfn
-                };
-                result = Provider.ReadRecord<T> (parameters);
-                if (result is not null)
-                {
-                    _cache.Set (key, result);
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Получение "деревянного" меню из кэша.
-        /// Если локальная копия отсутствует,
-        /// она запрашивается с сервера.
-        /// </summary>
-        public TreeFile? GetTree
-            (
-                FileSpecification specification
-            )
-        {
-            Sure.VerifyNotNull (specification);
-
-            var document = GetDocument (specification);
-            if (document is not null)
-            {
-                var reader = new StringReader (document);
-
-                return TreeFile.ParseStream (reader);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Получение рабочего листа из кэша.
-        /// Если локальная копия отсутствует,
-        /// она запрашивается с сервера.
-        /// </summary>
-        public WsFile? GetWs
-            (
-                FileSpecification specification
-            )
-        {
-            Sure.VerifyNotNull (specification);
-
-            var document = GetDocument (specification);
-            if (document is not null)
-            {
-                var reader = new StringReader (document);
-
-                return WsFile.ParseStream (reader);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Получение рабочего листа из кэша.
-        /// Если локальная копия отсутствует,
-        /// она запрашивается с сервера.
-        /// </summary>
-        public WssFile? GetWss
-            (
-                FileSpecification specification
-            )
-        {
-            Sure.VerifyNotNull (specification);
-
-            var document = GetDocument (specification);
-            if (document is not null)
-            {
-                var reader = new StringReader (document);
-
-                return WssFile.ParseStream (reader);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Обновление документа на сервере
-        /// и заодно в кэше.
-        /// </summary>
-        public void UpdateDocument
-            (
-                FileSpecification specification,
-                string documentText
-            )
-        {
-            Sure.VerifyNotNull (specification);
-            Sure.NotNull (documentText);
-
-            var withContent = specification.Clone();
-            withContent.Content = documentText;
-            Provider.WriteTextFile (withContent);
-            var key = GetKey (specification);
-
-            _cache.Set (key, documentText);
-        }
-
-        /// <summary>
-        /// Обновление меню на сервере и заодно в кэше.
-        /// </summary>
-        public void UpdateMenu
-            (
-                FileSpecification specification,
-                MenuFile menu
-            )
-        {
-            Sure.VerifyNotNull (specification);
-            Sure.VerifyNotNull (menu);
-
-            UpdateDocument (specification, menu.ToText());
-        }
-
-        /// <summary>
-        /// Обновление "деревянного" меню на сервере и заодно в кэше.
-        /// </summary>
-        public void UpdateTree
-            (
-                FileSpecification specification,
-                TreeFile tree
-            )
-        {
-            Sure.VerifyNotNull (specification);
-            Sure.VerifyNotNull (tree);
-
-            UpdateDocument (specification, tree.ToString() ?? string.Empty);
-        }
-
-        /// <summary>
-        /// Обновление записи на сервере.
-        /// </summary>
-        public void UpdateRecord<T>
-            (
-                T record
-            )
-            where T : class, IRecord
-        {
-            Sure.NotNull (record);
-
-            var parameters = new WriteRecordParameters()
-            {
-                Record = record
-            };
-            Provider.WriteRecord (parameters);
-            var key = GetKey (record.Mfn);
-            _cache.Set (key, record);
-        }
-
-        /// <summary>
-        /// Обновление рабочего листа на сервере и заодно в кэше.
-        /// </summary>
-        public void UpdateWs
-            (
-                FileSpecification specification,
-                WsFile worksheet
-            )
-        {
-            Sure.VerifyNotNull (specification);
-            Sure.VerifyNotNull (worksheet);
-
-            UpdateDocument (specification, worksheet.ToString());
-        }
-
-        /// <summary>
-        /// Обновление рабочего листа на сервере и заодно в кэше.
-        /// </summary>
-        public void UpdateWss
-            (
-                FileSpecification specification,
-                WssFile worksheet
-            )
-        {
-            Sure.VerifyNotNull (specification);
-            Sure.VerifyNotNull (worksheet);
-
-            UpdateDocument (specification, worksheet.ToString());
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            _cache.Dispose();
-        }
-
-        #endregion
     }
+
+    /// <summary>
+    /// Получение документа из кэша.
+    /// Если локальная копия отсутствует,
+    /// она запрашивается с сервера.
+    /// </summary>
+    public string? GetDocument
+        (
+            FileSpecification specification
+        )
+    {
+        Sure.VerifyNotNull (specification);
+
+        var key = GetKey (specification);
+        if (!_cache.TryGetValue (key, out string? result))
+        {
+            result = Provider.ReadTextFile (specification);
+            if (!string.IsNullOrEmpty (result))
+            {
+                _cache.Set (key, result);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Получение меню из кэша.
+    /// Если локальная копия отсутствует,
+    /// она запрашивается с сервера.
+    /// </summary>
+    public MenuFile? GetMenu
+        (
+            FileSpecification specification
+        )
+    {
+        Sure.VerifyNotNull (specification);
+
+        var document = GetDocument (specification);
+        if (document is not null)
+        {
+            var reader = new StringReader (document);
+
+            return MenuFile.ParseStream (reader);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение записи из кэша.
+    /// Если локальная копия отсутствует,
+    /// она запрашивается с сервера.
+    /// </summary>
+    public T? GetRecord<T>
+        (
+            int mfn
+        )
+        where T : class, IRecord, new()
+    {
+        Sure.Positive (mfn);
+
+        var key = GetKey (mfn);
+        if (!_cache.TryGetValue (key, out T? result))
+        {
+            var parameters = new ReadRecordParameters()
+            {
+                Database = Provider.Database,
+                Mfn = mfn
+            };
+            result = Provider.ReadRecord<T> (parameters);
+            if (result is not null)
+            {
+                _cache.Set (key, result);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Получение "деревянного" меню из кэша.
+    /// Если локальная копия отсутствует,
+    /// она запрашивается с сервера.
+    /// </summary>
+    public TreeFile? GetTree
+        (
+            FileSpecification specification
+        )
+    {
+        Sure.VerifyNotNull (specification);
+
+        var document = GetDocument (specification);
+        if (document is not null)
+        {
+            var reader = new StringReader (document);
+
+            return TreeFile.ParseStream (reader);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение рабочего листа из кэша.
+    /// Если локальная копия отсутствует,
+    /// она запрашивается с сервера.
+    /// </summary>
+    public WsFile? GetWs
+        (
+            FileSpecification specification
+        )
+    {
+        Sure.VerifyNotNull (specification);
+
+        var document = GetDocument (specification);
+        if (document is not null)
+        {
+            var reader = new StringReader (document);
+
+            return WsFile.ParseStream (reader);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение рабочего листа из кэша.
+    /// Если локальная копия отсутствует,
+    /// она запрашивается с сервера.
+    /// </summary>
+    public WssFile? GetWss
+        (
+            FileSpecification specification
+        )
+    {
+        Sure.VerifyNotNull (specification);
+
+        var document = GetDocument (specification);
+        if (document is not null)
+        {
+            var reader = new StringReader (document);
+
+            return WssFile.ParseStream (reader);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Обновление документа на сервере
+    /// и заодно в кэше.
+    /// </summary>
+    public void UpdateDocument
+        (
+            FileSpecification specification,
+            string documentText
+        )
+    {
+        Sure.VerifyNotNull (specification);
+        Sure.NotNull (documentText);
+
+        var withContent = specification.Clone();
+        withContent.Content = documentText;
+        Provider.WriteTextFile (withContent);
+        var key = GetKey (specification);
+
+        _cache.Set (key, documentText);
+    }
+
+    /// <summary>
+    /// Обновление меню на сервере и заодно в кэше.
+    /// </summary>
+    public void UpdateMenu
+        (
+            FileSpecification specification,
+            MenuFile menu
+        )
+    {
+        Sure.VerifyNotNull (specification);
+        Sure.VerifyNotNull (menu);
+
+        UpdateDocument (specification, menu.ToText());
+    }
+
+    /// <summary>
+    /// Обновление "деревянного" меню на сервере и заодно в кэше.
+    /// </summary>
+    public void UpdateTree
+        (
+            FileSpecification specification,
+            TreeFile tree
+        )
+    {
+        Sure.VerifyNotNull (specification);
+        Sure.VerifyNotNull (tree);
+
+        UpdateDocument (specification, tree.ToString() ?? string.Empty);
+    }
+
+    /// <summary>
+    /// Обновление записи на сервере.
+    /// </summary>
+    public void UpdateRecord<T>
+        (
+            T record
+        )
+        where T : class, IRecord
+    {
+        Sure.NotNull (record);
+
+        var parameters = new WriteRecordParameters()
+        {
+            Record = record
+        };
+        Provider.WriteRecord (parameters);
+        var key = GetKey (record.Mfn);
+        _cache.Set (key, record);
+    }
+
+    /// <summary>
+    /// Обновление рабочего листа на сервере и заодно в кэше.
+    /// </summary>
+    public void UpdateWs
+        (
+            FileSpecification specification,
+            WsFile worksheet
+        )
+    {
+        Sure.VerifyNotNull (specification);
+        Sure.VerifyNotNull (worksheet);
+
+        UpdateDocument (specification, worksheet.ToString());
+    }
+
+    /// <summary>
+    /// Обновление рабочего листа на сервере и заодно в кэше.
+    /// </summary>
+    public void UpdateWss
+        (
+            FileSpecification specification,
+            WssFile worksheet
+        )
+    {
+        Sure.VerifyNotNull (specification);
+        Sure.VerifyNotNull (worksheet);
+
+        UpdateDocument (specification, worksheet.ToString());
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        _cache.Dispose();
+    }
+
+    #endregion
 }

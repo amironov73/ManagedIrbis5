@@ -19,6 +19,9 @@
 using System;
 using System.Globalization;
 
+using AM;
+using AM.Memory;
+
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Records;
 
@@ -28,141 +31,153 @@ using Microsoft.Extensions.Caching.Memory;
 
 #nullable enable
 
-namespace ManagedIrbis.Caching
+namespace ManagedIrbis.Caching;
+
+/// <summary>
+/// Простейший кэш записей для ИРБИС.
+/// </summary>
+public sealed class RecordCache
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Простейший кэш записей для ИРБИС.
+    /// Провайдер (на всякий случай).
     /// </summary>
-    public sealed class RecordCache
-        : IDisposable
+    public ISyncProvider Provider { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public RecordCache
+        (
+            ISyncProvider provider
+        )
+        : this (provider, new MemoryCacheOptions())
     {
-        #region Properties
+        _options = new MemoryCacheOptions();
+    }
 
-        /// <summary>
-        /// Провайдер (на всякий случай).
-        /// </summary>
-        public ISyncProvider Provider { get; }
+    /// <summary>
+    /// Конструктор с опциями кэширования.
+    /// </summary>
+    public RecordCache
+        (
+            ISyncProvider provider,
+            MemoryCacheOptions options
+        )
+        : this (provider, new MemoryCache (options))
+    {
+        _options = options;
+    }
 
-        #endregion
+    /// <summary>
+    /// Конструктор с внешним кэш-провайдером.
+    /// </summary>
+    public RecordCache
+        (
+            ISyncProvider provider,
+            IMemoryCache cache
+        )
+    {
+        Sure.NotNull (provider);
+        Sure.NotNull (cache);
 
-        #region Construction
+        Provider = provider;
+        _options = new MemoryCacheOptions();
+        _cache = cache;
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public RecordCache (ISyncProvider provider)
-            : this (provider, new MemoryCacheOptions())
-        {
-            _options = new MemoryCacheOptions();
-        }
+    #endregion
 
-        /// <summary>
-        /// Конструктор с опциями кэширования.
-        /// </summary>
-        public RecordCache (ISyncProvider provider, MemoryCacheOptions options)
-            : this (provider, new MemoryCache (options))
-        {
-            _options = options;
-        }
+    #region Private members
 
-        /// <summary>
-        /// Конструктор с внешним кэш-провайдером.
-        /// </summary>
-        public RecordCache
-            (
-                ISyncProvider provider,
-                IMemoryCache cache
-            )
-        {
-            Provider = provider;
-            _options = new MemoryCacheOptions();
-            _cache = cache;
-        }
+    private readonly MemoryCacheOptions _options;
+    private IMemoryCache _cache;
 
-        #endregion
+    private static string GetKey (int mfn) => string.Format
+        (
+            CultureInfo.InvariantCulture,
+            "_record_{0}",
+            mfn
+        );
 
-        #region Private members
+    #endregion
 
-        private readonly MemoryCacheOptions _options;
-        private IMemoryCache _cache;
+    #region Public methods
 
-        private static string GetKey (int mfn) => string.Format
-            (
-                CultureInfo.InvariantCulture,
-                "_record_{0}",
-                mfn
-            );
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Очистка кэша.
-        /// </summary>
-        public void Clear()
+    /// <summary>
+    /// Очистка кэша.
+    /// </summary>
+    public void Clear()
+    {
+        if (!_cache.Clear())
         {
             _cache.Dispose();
             _cache = new MemoryCache (_options);
         }
-
-        /// <summary>
-        /// Получение записи из кэша.
-        /// Если локальная копия отсутствует,
-        /// она запрашивается с сервера.
-        /// </summary>
-        public T? GetRecord<T>
-            (
-                int mfn
-            )
-            where T : class, IRecord, new()
-        {
-            var key = GetKey (mfn);
-            if (!_cache.TryGetValue (key, out T? result))
-            {
-                var parameters = new ReadRecordParameters()
-                {
-                    Database = Provider.Database,
-                    Mfn = mfn
-                };
-                result = Provider.ReadRecord<T> (parameters);
-                if (result is not null)
-                {
-                    _cache.Set (key, result);
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Обновление записи на сервере.
-        /// </summary>
-        public void UpdateRecord<T>
-            (
-                T record
-            )
-            where T : class, IRecord
-        {
-            var parameters = new WriteRecordParameters()
-            {
-                Record = record
-            };
-            Provider.WriteRecord (parameters);
-            var key = GetKey (record.Mfn);
-            _cache.Set (key, record);
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            // TODO выполнить очистку
-        }
-
-        #endregion
     }
+
+    /// <summary>
+    /// Получение записи из кэша.
+    /// Если локальная копия отсутствует,
+    /// она запрашивается с сервера.
+    /// </summary>
+    public T? GetRecord<T>
+        (
+            int mfn
+        )
+        where T : class, IRecord, new()
+    {
+        var key = GetKey (mfn);
+        if (!_cache.TryGetValue (key, out T? result))
+        {
+            var parameters = new ReadRecordParameters()
+            {
+                Database = Provider.Database,
+                Mfn = mfn
+            };
+            result = Provider.ReadRecord<T> (parameters);
+            if (result is not null)
+            {
+                _cache.Set (key, result);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Обновление записи на сервере.
+    /// </summary>
+    public void UpdateRecord<T>
+        (
+            T record
+        )
+        where T : class, IRecord
+    {
+        var parameters = new WriteRecordParameters()
+        {
+            Record = record
+        };
+        Provider.WriteRecord (parameters);
+        var key = GetKey (record.Mfn);
+        _cache.Set (key, record);
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        // TODO выполнить очистку
+    }
+
+    #endregion
 }

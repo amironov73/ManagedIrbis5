@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* MemoryUtility.cs --
+/* MemoryUtility.cs -- полезные методы для работы с памятью
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,6 +23,9 @@ using System.Runtime.CompilerServices;
 
 namespace AM.Memory;
 
+/// <summary>
+/// Полезные методы для работы с памятью.
+/// </summary>
 internal static class MemoryUtility
 {
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
