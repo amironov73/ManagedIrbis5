@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* CatalogDelta.cs --
+/* CatalogDelta.cs -- дельта (приращение) каталога
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,6 +26,7 @@ using System.Xml.Serialization;
 using AM;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 #endregion
 
@@ -34,7 +35,7 @@ using AM.Runtime;
 namespace ManagedIrbis.Catalog;
 
 /// <summary>
-///
+/// Дельта (приращение) каталога.
 /// </summary>
 [XmlRoot ("catalogDelta")]
 public sealed class CatalogDelta
@@ -43,28 +44,28 @@ public sealed class CatalogDelta
     #region Properties
 
     /// <summary>
-    /// Identifier for LiteDB.
+    /// Идентификатор для LiteDB.
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]
     public int Id { get; set; }
 
     /// <summary>
-    /// First date.
+    /// Первая дата.
     /// </summary>
     [XmlAttribute ("firstDate")]
     [JsonPropertyName ("firstDate")]
     public DateTime FirstDate { get; set; }
 
     /// <summary>
-    /// Second date.
+    /// Вторая дата.
     /// </summary>
     [XmlAttribute ("secondDate")]
     [JsonPropertyName ("secondDate")]
     public DateTime SecondDate { get; set; }
 
     /// <summary>
-    /// Database name.
+    /// Имя базы данных.
     /// </summary>
     [XmlAttribute ("database")]
     [JsonPropertyName ("database")]
@@ -72,7 +73,7 @@ public sealed class CatalogDelta
     public string? Database { get; set; }
 
     /// <summary>
-    /// New records.
+    /// Перечень новых MFN.
     /// </summary>
     [XmlArray ("new")]
     [XmlArrayItem ("mfn")]
@@ -81,7 +82,7 @@ public sealed class CatalogDelta
     public int[]? NewRecords { get; set; }
 
     /// <summary>
-    /// Deleted records.
+    /// Перечень удаленных записей.
     /// </summary>
     [XmlArray ("deleted")]
     [XmlArrayItem ("mfn")]
@@ -90,7 +91,7 @@ public sealed class CatalogDelta
     public int[]? DeletedRecords { get; set; }
 
     /// <summary>
-    /// Altered records.
+    /// Перечень измененных записей.
     /// </summary>
     [XmlArray ("altered")]
     [XmlArrayItem ("mfn")]
@@ -112,19 +113,10 @@ public sealed class CatalogDelta
         if (!ReferenceEquals (records, null)
             && records.Length != 0)
         {
-            builder.AppendLine
-                (
-                    string.Format
-                        (
-                            "{0}: {1}",
-                            name,
-                            string.Join
-                                (
-                                    ", ",
-                                    records
-                                )
-                        )
-                );
+            builder.Append (name);
+            builder.Append (": ");
+            builder.AppendJoin (", ", records);
+            builder.AppendLine();
         }
     }
 
@@ -133,7 +125,7 @@ public sealed class CatalogDelta
     #region Public methods
 
     /// <summary>
-    /// Create delta for two catalog states.
+    /// Построение дельты для двух заданных состояний каталога.
     /// </summary>
     public static CatalogDelta Create
         (
@@ -141,19 +133,17 @@ public sealed class CatalogDelta
             CatalogState second
         )
     {
-        RecordState[] firstRecords = first.Records
-            .ThrowIfNull ("first.Records");
-        RecordState[] secondRecords = second.Records
-            .ThrowIfNull ("second.Records");
+        Sure.NotNull (first);
+        Sure.NotNull (second);
 
-        int[] firstDeleted = first.LogicallyDeleted
-            .ThrowIfNull ("first.LogicallyDeleted");
-        int[] secondDeleted = second.LogicallyDeleted
-            .ThrowIfNull ("second.LogicallyDeleted");
+        var firstRecords = first.Records.ThrowIfNull();
+        var secondRecords = second.Records.ThrowIfNull();
+        var firstDeleted = first.LogicallyDeleted.ThrowIfNull ();
+        var secondDeleted = second.LogicallyDeleted.ThrowIfNull ();
 
         // TODO compare first.Database with second.Database?
 
-        CatalogDelta result = new CatalogDelta
+        var result = new CatalogDelta
         {
             FirstDate = first.Date,
             SecondDate = second.Date,
@@ -168,7 +158,6 @@ public sealed class CatalogDelta
                 .ToArray()
         };
 
-
         result.AlteredRecords = secondRecords.Except
                 (
                     firstRecords,
@@ -176,12 +165,11 @@ public sealed class CatalogDelta
                 )
             .Select (state => state.Mfn)
             .Where (mfn => mfn != 0)
-            .Except (result.NewRecords.ThrowIfNull ("result.NewRecords"))
+            .Except (result.NewRecords.ThrowIfNull())
             .Except (secondDeleted)
             .ToArray();
 
-        result.DeletedRecords
-            = secondDeleted.Except (firstDeleted)
+        result.DeletedRecords = secondDeleted.Except (firstDeleted)
                 .Where (mfn => mfn != 0)
                 .ToArray();
 
@@ -189,7 +177,7 @@ public sealed class CatalogDelta
     }
 
     /// <summary>
-    /// Should serialize the <see cref="FirstDate"/> field?
+    /// Нужно ли сериализовать поле <see cref="FirstDate"/>?
     /// </summary>
     [ExcludeFromCodeCoverage]
     public bool ShouldSerializeFirstDate()
@@ -198,7 +186,7 @@ public sealed class CatalogDelta
     }
 
     /// <summary>
-    /// Should serialize the <see cref="SecondDate"/> field?
+    /// Нужно ли сериализовать поле <see cref="SecondDate"/>?
     /// </summary>
     [ExcludeFromCodeCoverage]
     public bool ShouldSerializeSecondDate()
@@ -248,13 +236,16 @@ public sealed class CatalogDelta
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        StringBuilder result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
 
-        _AppendRecords (result, NewRecords, "New");
-        _AppendRecords (result, DeletedRecords, "Deleted");
-        _AppendRecords (result, AlteredRecords, "Altered");
+        _AppendRecords (builder, NewRecords, "New");
+        _AppendRecords (builder, DeletedRecords, "Deleted");
+        _AppendRecords (builder, AlteredRecords, "Altered");
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

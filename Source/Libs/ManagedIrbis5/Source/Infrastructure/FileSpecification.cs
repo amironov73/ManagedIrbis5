@@ -31,306 +31,296 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+//
+// Путь на файл Αpath.Adbn.Afilename
+// Αpath – код путей:
+// 0 – общесистемный путь.
+// 1 – путь размещения сведений о базах данных сервера ИРБИС64
+// 2 – путь на мастер-файл базы данных.
+// 3 – путь на словарь базы данных.
+// 10 – путь на параметрию базы данных.
+// Adbn – имя базы данных
+// Afilename – имя требуемого файла с расширением
+// В случае чтения ресурса по пути 0 и 1 имя базы данных не задается.
+//
+
+/// <summary>
+/// Спецификация пути к файлу на сервере ИРБИС64.
+/// </summary>
+[DebuggerDisplay ("{" + nameof (Path) + "} {" + nameof (Database) + "} {" + nameof (FileName) + "}")]
+public sealed class FileSpecification
+    : IHandmadeSerializable,
+        IVerifiable,
+        IEquatable<FileSpecification>
 {
-    //
-    // Путь на файл Αpath.Adbn.Afilename
-    // Αpath – код путей:
-    // 0 – общесистемный путь.
-    // 1 – путь размещения сведений о базах данных сервера ИРБИС64
-    // 2 – путь на мастер-файл базы данных.
-    // 3 – путь на словарь базы данных.
-    // 10 – путь на параметрию базы данных.
-    // Adbn – имя базы данных
-    // Afilename – имя требуемого файла с расширением
-    // В случае чтения ресурса по пути 0 и 1 имя базы данных не задается.
-    //
+    #region Properties
 
     /// <summary>
-    /// Спецификация пути к файлу на сервере ИРБИС64.
+    /// Признак бинарного (двоичного) файла.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(Path) + "} {" + nameof(Database)
-                     + "} {" + nameof (FileName) + "}")]
-    public sealed class FileSpecification
-        :  IHandmadeSerializable,
-            IVerifiable,
-            IEquatable<FileSpecification>
+    public bool BinaryFile { get; set; }
+
+    /// <summary>
+    /// Путь на сервере ИРБИС64.
+    /// </summary>
+    public IrbisPath Path { get; set; }
+
+    /// <summary>
+    /// Имя базы данных (имеет смысл не для всех путей).
+    /// </summary>
+    public string? Database { get; set; }
+
+    /// <summary>
+    /// Имя файла (с расширением).
+    /// </summary>
+    public string? FileName { get; set; }
+
+    /// <summary>
+    /// Содержимое файла (для отправки на сервер).
+    /// </summary>
+    public string? Content { get; set; }
+
+    #endregion
+
+    #region Private members
+
+    private static bool _CompareDatabases
+        (
+            string? first,
+            string? second
+        )
     {
-        #region Properties
+        return string.IsNullOrEmpty (first) && string.IsNullOrEmpty (second) || first.SameString (second);
+    }
 
-        /// <summary>
-        /// Признак бинарного (двоичного) файла.
-        /// </summary>
-        public bool BinaryFile { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Путь на сервере ИРБИС64.
-        /// </summary>
-        public IrbisPath Path { get; set; }
+    #region Public methods
 
-        /// <summary>
-        /// Имя базы данных (имеет смысл не для всех путей).
-        /// </summary>
-        public string? Database { get; set; }
+    /// <summary>
+    /// Построение спецификации файла по ее компонентам.
+    /// </summary>
+    public static string Build
+        (
+            IrbisPath path,
+            string database,
+            string fileName
+        )
+    {
+        return ((int) path).ToInvariantString()
+               + "."
+               + database
+               + "."
+               + fileName;
+    }
 
-        /// <summary>
-        /// Имя файла (с расширением).
-        /// </summary>
-        public string? FileName { get; set; }
+    /// <summary>
+    /// Клонирование спецификации.
+    /// </summary>
+    public FileSpecification Clone()
+    {
+        return (FileSpecification)MemberwiseClone();
+    }
 
-        /// <summary>
-        /// Содержимое файла (для отправки на сервер).
-        /// </summary>
-        public string? Content { get; set; }
+    /// <summary>
+    /// Разбор текста.
+    /// </summary>
+    public static FileSpecification Parse
+        (
+            string text
+        )
+    {
+        Sure.NotNullNorEmpty (text);
 
-        #endregion
-
-        #region Private members
-
-        private static bool _CompareDatabases
+        var navigator = new TextNavigator (text);
+        var path = int.Parse
             (
-                string? first,
-                string? second
-            )
+                navigator.ReadTo (".").ToString(),
+                CultureInfo.InvariantCulture
+            );
+        var database = navigator.ReadTo (".").ToString().EmptyToNull();
+        var fileName = navigator.GetRemainingText().ToString();
+        var binaryFile = fileName.StartsWith ("@");
+        if (binaryFile)
         {
-            return string.IsNullOrEmpty (first) && string.IsNullOrEmpty (second) || first.SameString (second);
-
+            fileName = fileName.Substring (1);
         }
 
-        #endregion
-
-         #region Public methods
-
-         /// <summary>
-         /// Построение спецификации файла по ее компонентам.
-         /// </summary>
-         public static string Build
-             (
-                IrbisPath path,
-                string database,
-                string fileName
-             )
-         {
-             return ((int) path).ToInvariantString()
-                    + "."
-                    + database
-                    + "."
-                    + fileName;
-
-         }
-
-         /// <summary>
-         /// Клонирование спецификации.
-         /// </summary>
-         public FileSpecification Clone()
-         {
-             return (FileSpecification)MemberwiseClone();
-         }
-
-         /// <summary>
-        /// Разбор текста.
-        /// </summary>
-        public static FileSpecification Parse
-            (
-                string text
-            )
+        string? content = null;
+        var position = fileName.IndexOf ("&", StringComparison.InvariantCulture);
+        if (position >= 0)
         {
-            var navigator = new TextNavigator (text);
-            var path = int.Parse
-                (
-                    navigator.ReadTo (".").ToString(),
-                    CultureInfo.InvariantCulture
-                );
-            var database = navigator.ReadTo (".").ToString().EmptyToNull();
-            var fileName = navigator.GetRemainingText().ToString();
-            var binaryFile = fileName.StartsWith ("@");
-            if (binaryFile)
-            {
-                fileName = fileName.Substring (1);
-            }
-
-            string? content = null;
-            var position = fileName.IndexOf ("&", StringComparison.InvariantCulture);
-            if (position >= 0)
-            {
-                content = fileName.Substring (position + 1);
-                fileName = fileName.Substring (0, position);
-            }
-
-            var result = new FileSpecification
-            {
-                BinaryFile = binaryFile,
-                Path = (IrbisPath)path,
-                Database = database,
-                FileName = fileName,
-                Content = content
-            };
-
-            return result;
+            content = fileName.Substring (position + 1);
+            fileName = fileName.Substring (0, position);
         }
 
-        #endregion
+        var result = new FileSpecification
+        {
+            BinaryFile = binaryFile,
+            Path = (IrbisPath)path,
+            Database = database,
+            FileName = fileName,
+            Content = content
+        };
 
-        #region IHandmadeSerializable members
+        return result;
+    }
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        BinaryFile = reader.ReadBoolean();
+        Path = (IrbisPath)reader.ReadPackedInt32();
+        Database = reader.ReadNullableString();
+        FileName = reader.ReadNullableString();
+        Content = reader.ReadNullableString();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.Write (BinaryFile);
+        writer
+            .WritePackedInt32 ((int)Path)
+            .WriteNullable (Database)
+            .WriteNullable (FileName)
+            .WriteNullable (Content);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        Verifier<FileSpecification> verifier = new Verifier<FileSpecification>
             (
-                BinaryReader reader
-            )
+                this,
+                throwOnError
+            );
+
+        verifier
+            .NotNullNorEmpty (FileName, nameof (FileName));
+
+        if (Path != IrbisPath.System
+            && Path != IrbisPath.Data)
         {
-            Sure.NotNull(reader, nameof(reader));
+            verifier.NotNullNorEmpty (Database, nameof (Database));
+        }
 
-            BinaryFile = reader.ReadBoolean();
-            Path = (IrbisPath)reader.ReadPackedInt32();
-            Database = reader.ReadNullableString();
-            FileName = reader.ReadNullableString();
-            Content = reader.ReadNullableString();
+        return verifier.Result;
+    } // method Verify
 
-        } // method RestoreFromStream
+    #endregion
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
+    #region Object members
+
+    /// <summary>
+    /// Compare with other <see cref="FileSpecification"/>
+    /// instance.
+    /// </summary>
+    public bool Equals
+        (
+            FileSpecification? other
+        )
+    {
+        other = other.ThrowIfNull();
+
+        return Path == other.Path
+               && _CompareDatabases (Database, other.Database)
+               && FileName.SameString (other.FileName);
+    } // method Equals
+
+    /// <inheritdoc cref="object.Equals(object)" />
+    public override bool Equals
+        (
+            object? obj
+        )
+    {
+        if (ReferenceEquals (null, obj))
         {
-            Sure.NotNull(writer, nameof(writer));
+            return false;
+        }
 
-            writer.Write(BinaryFile);
-            writer
-                .WritePackedInt32((int)Path)
-                .WriteNullable(Database)
-                .WriteNullable(FileName)
-                .WriteNullable(Content);
-
-        } // method SaveToStream
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
+        if (ReferenceEquals (this, obj))
         {
-            Verifier<FileSpecification> verifier = new Verifier<FileSpecification>
-                    (
-                        this,
-                        throwOnError
-                    );
+            return true;
+        }
 
-            verifier
-                .NotNullNorEmpty(FileName, nameof(FileName));
+        return obj is FileSpecification other && Equals (other);
+    } // method Equals
 
-            if (Path != IrbisPath.System
-                && Path != IrbisPath.Data)
-            {
-                verifier.NotNullNorEmpty(Database, nameof(Database));
-            }
-
-            return verifier.Result;
-
-        } // method Verify
-
-        #endregion
-
-        #region Object members
-
-        /// <summary>
-        /// Compare with other <see cref="FileSpecification"/>
-        /// instance.
-        /// </summary>
-        public bool Equals
-            (
-                FileSpecification? other
-            )
+    /// <inheritdoc cref="object.GetHashCode" />
+    [ExcludeFromCodeCoverage]
+    public override int GetHashCode()
+    {
+        unchecked
         {
-            other = other.ThrowIfNull();
+            var hashCode = (int)Path;
+            hashCode = (hashCode * 397) ^ (Database != null ? Database.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (FileName != null ? FileName.GetHashCode() : 0);
 
-            return Path == other.Path
-                   && _CompareDatabases(Database, other.Database)
-                   && FileName.SameString(other.FileName);
+            return hashCode;
+        }
+    } // method GetHashCode
 
-        } // method Equals
-
-        /// <inheritdoc cref="object.Equals(object)" />
-        public override bool Equals
-            (
-                object? obj
-            )
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var fileName = FileName;
+        if (BinaryFile)
         {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            return obj is FileSpecification other && Equals(other);
-
-        } // method Equals
-
-        /// <inheritdoc cref="object.GetHashCode" />
-        [ExcludeFromCodeCoverage]
-        public override int GetHashCode()
+            fileName = "@" + fileName;
+        }
+        else
         {
-            unchecked
+            if (!ReferenceEquals (Content, null))
             {
-                var hashCode = (int)Path;
-                hashCode = (hashCode * 397) ^ (Database != null ? Database.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (FileName != null ? FileName.GetHashCode() : 0);
-
-                return hashCode;
+                fileName = "&" + fileName;
             }
+        }
 
-        } // method GetHashCode
+        string result;
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
+        switch (Path)
         {
-            var fileName = FileName;
-            if (BinaryFile)
-            {
-                fileName = "@" + fileName;
-            }
-            else
-            {
-                if (!ReferenceEquals(Content, null))
-                {
-                    fileName = "&" + fileName;
-                }
-            }
+            case IrbisPath.System:
+            case IrbisPath.Data:
+                result = $"{(int)Path}..{fileName}";
+                break;
 
-            string result;
+            default:
+                result = $"{(int)Path}.{Database}.{fileName}";
+                break;
+        }
 
-            switch (Path)
-            {
-                case IrbisPath.System:
-                case IrbisPath.Data:
-                    result = $"{(int) Path}..{fileName}";
-                    break;
+        if (Content is not null)
+        {
+            result = result + "&" + IrbisText.WindowsToIrbis (Content);
+        }
 
-                default:
-                    result = $"{(int) Path}.{Database}.{fileName}";
-                    break;
-            }
+        return result;
+    }
 
-            if (!ReferenceEquals(Content, null))
-            {
-                result = result + "&" + IrbisText.WindowsToIrbis(Content);
-            }
-
-            return result;
-
-        } // method ToString
-
-        #endregion
-
-   } // class FileSpecification
-
-} // namespace ManagedIrbis.Infrastructure
+    #endregion
+}

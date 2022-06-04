@@ -24,7 +24,6 @@ modified = []
 
 foreach (book in books)
 {
-    need = false
     foreach (one in get_exemplars (book))
     {
         if (one.KsuNumber1 == ksuNumber)

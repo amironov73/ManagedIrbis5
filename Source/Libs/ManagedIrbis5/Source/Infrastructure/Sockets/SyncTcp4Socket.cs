@@ -58,7 +58,7 @@ public sealed class SyncTcp4Socket
             SyncQuery query
         )
     {
-        var connection = Connection.ThrowIfNull (nameof (Connection));
+        var connection = Connection.ThrowIfNull();
         connection.ThrowIfCancelled();
 
         var logger = connection.Logger;
@@ -67,7 +67,7 @@ public sealed class SyncTcp4Socket
         using var client = new TcpClient (AddressFamily.InterNetwork);
         try
         {
-            var host = connection.Host.ThrowIfNull (nameof (connection.Host));
+            var host = connection.Host.ThrowIfNull();
             logger?.LogTrace ("Connecting to {Host}", host);
             client.Connect (host, connection.Port);
             logger?.LogTrace ("Connected to {Host}", host);
@@ -107,7 +107,7 @@ public sealed class SyncTcp4Socket
         }
 
         logger?.LogTrace ("Receiving");
-        var result = new Response (Connection.ThrowIfNull (nameof (Connection)));
+        var result = new Response (Connection.ThrowIfNull());
         try
         {
             while (true)

@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* MessageFile.cs -- файл с сообщениями, выдаваемыми клиентами.
  * Ars Magna project, http://arsmagna.ru
@@ -74,7 +70,7 @@ public sealed class MessageFile
     #region Constants
 
     /// <summary>
-    /// Default name of the file.
+    /// Имя файла с сообщению по умолчанию.
     /// </summary>
     public const string DefaultName = "irbismsg.txt";
 
@@ -83,39 +79,28 @@ public sealed class MessageFile
     #region Properties
 
     /// <summary>
-    /// Count of lines.
+    /// Общее количество сообщений.
     /// </summary>
     public int LineCount => _list.Count;
 
     /// <summary>
-    /// Name of the file.
+    /// Имя файла, из которого считаны сообщения.
     /// </summary>
     public string? Name { get; set; }
 
     #endregion
 
-    #region Construction
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    public MessageFile()
-    {
-        _list = new List<string>();
-    }
-
-    #endregion
-
     #region Private members
 
-    private readonly List<string> _list;
+    // список сообщений
+    private readonly List<string> _list = new();
 
     #endregion
 
     #region Public methods
 
     /// <summary>
-    /// Get message by index.
+    /// Получение текста сообщения по его индексу.
     /// </summary>
     public string GetMessage
         (
@@ -126,7 +111,7 @@ public sealed class MessageFile
         {
             Magna.Error
                 (
-                    "MessageFile::GetMessage: "
+                    nameof (MessageFile) + "::" + nameof (GetMessage)
                     + "missing index="
                     + index
                 );
@@ -141,7 +126,7 @@ public sealed class MessageFile
     }
 
     /// <summary>
-    /// Read local file.
+    /// Чтение списка сообщений из локальной файловой системы.
     /// </summary>
     public static MessageFile ReadLocalFile
         (
@@ -149,13 +134,16 @@ public sealed class MessageFile
             Encoding encoding
         )
     {
+        Sure.FileExists (fileName);
+        Sure.NotNull (encoding);
+
         var result = new MessageFile
         {
             Name = fileName
         };
 
-        var lines = File.ReadAllLines(fileName, encoding);
-        result._list.AddRange(lines);
+        var lines = Unix.ReadAllLines (fileName, encoding);
+        result._list.AddRange (lines);
 
         return result;
     }
@@ -170,6 +158,8 @@ public sealed class MessageFile
             BinaryReader reader
         )
     {
+        Sure.NotNull (reader);
+
         _list.Clear();
         Name = reader.ReadNullableString();
         _list.AddRange (reader.ReadStringArray());
@@ -181,12 +171,11 @@ public sealed class MessageFile
             BinaryWriter writer
         )
     {
-        writer.WriteNullable(Name);
-        writer.WriteArray(_list.ToArray());
+        Sure.NotNull (writer);
+
+        writer.WriteNullable (Name);
+        writer.WriteArray (_list.ToArray());
     }
 
     #endregion
-
-} // class MessageFile
-
-// namespace ManagedIrbis.Client
+}

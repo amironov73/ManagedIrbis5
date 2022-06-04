@@ -68,6 +68,28 @@ internal sealed class BinaryNode
         return OmnipotentComparer.Default.Compare (left, right);
     }
 
+    private static dynamic? Same
+        (
+            Context context,
+            dynamic? left,
+            dynamic? right
+        )
+    {
+        context.NotUsed();
+
+        if (left is char leftChar && right is char rightChar)
+        {
+            return leftChar.SameChar (rightChar);
+        }
+
+        if (left is string leftString && right is string rightString)
+        {
+            return leftString.SameString (rightString);
+        }
+
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// Расширенная операция сложения.
     /// </summary>
@@ -258,7 +280,7 @@ internal sealed class BinaryNode
     {
         context.NotUsed();
 
-        return left == right;
+        return OmnipotentComparer.Default.Compare (left, right) == 0;
     }
 
     /// <summary>
@@ -419,6 +441,7 @@ internal sealed class BinaryNode
             "~" => RegexMatch (context, left, right),
             "is" => Is (context, left, right),
             "in" => In (context, left, right),
+            "same" => Same (context, left, right),
             "@" or "<=>" or "<:>" => Shuttle (context, left, right),
             _ => throw new Exception ($"Unknown operation '{_op}'")
         };

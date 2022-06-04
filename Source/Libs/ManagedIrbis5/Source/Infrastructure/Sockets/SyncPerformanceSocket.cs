@@ -34,10 +34,6 @@ namespace ManagedIrbis.Infrastructure.Sockets;
 public sealed class SyncPerformanceSocket
     : SyncNestedSocket
 {
-    #region Properties
-
-    #endregion
-
     #region Construction
 
     /// <summary>
@@ -49,7 +45,8 @@ public sealed class SyncPerformanceSocket
         )
         : base(innerSocket)
     {
-    } // constructor
+        // пустое тело конструктора
+    }
 
     #endregion
 
@@ -70,5 +67,4 @@ public sealed class SyncPerformanceSocket
     }
 
     #endregion
-
 }

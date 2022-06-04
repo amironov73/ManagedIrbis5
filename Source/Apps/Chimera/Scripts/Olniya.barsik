@@ -1,0 +1,48 @@
+﻿//
+// Перемещение всех книг/журналов из фонда ОЛНИЯ в Ф404
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+FROM_FOND = "ОЛНИЯ"
+TO_FOND = "Ф404"
+
+//=================================
+
+expression = "MHR=" + FROM_FOND
+found = batch_search (expression)
+modified = []
+
+foreach (book in found)
+{
+    need = false
+    foreach (one in get_exemplars (book))
+    {
+        if (one.Place same FROM_FOND)
+        {
+            println (one)
+            field = one.Field
+            field.SetSubFieldValue ('d', TO_FOND)
+            need = true
+        }
+    }
+
+    if (need)
+    {
+        modified.Add (book)
+    }
+}
+
+batch_write (modified)
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")

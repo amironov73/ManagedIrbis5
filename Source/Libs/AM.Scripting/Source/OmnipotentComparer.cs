@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* OmnipotentComparer.cs -- универсальный сравнитель
+/* OmnipotentComparer.cs -- сравнитель всего со всем
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +21,7 @@ using System.Collections;
 namespace AM.Scripting;
 
 /// <summary>
-/// Универсальный сравнитель.
+/// Сравнитель всего со всем.
 /// </summary>
 public sealed class OmnipotentComparer
     : IComparer

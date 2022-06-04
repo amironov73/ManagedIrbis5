@@ -126,7 +126,7 @@ public sealed class LocalCatalogManager
     #region Public methods
 
     /// <summary>
-    /// Добавляем каталог в MNU-файл, если он там отсутствовал.
+    /// Добавление каталога в MNU-файл, если он там отсутствовал.
     /// </summary>
     public void AddToMenu
         (
@@ -154,7 +154,7 @@ public sealed class LocalCatalogManager
     }
 
     /// <summary>
-    /// Backup catalog database to the given path.
+    /// Создание страховой копии базы данных в указанной директории.
     /// </summary>
     public void BackupDatabase
         (
@@ -181,7 +181,7 @@ public sealed class LocalCatalogManager
     }
 
     /// <summary>
-    /// Create database from the blank.
+    /// Создание базы данных с нуля в указанной папке.
     /// </summary>
     public void CreateCatalog
         (
@@ -312,7 +312,7 @@ public sealed class LocalCatalogManager
     }
 
     /// <summary>
-    /// Удаляем каталог из MNU-файл, если он там присутствовал.
+    /// Удаление каталога из MNU-файл, если он там присутствовал.
     /// </summary>
     public void RemoveFromMenu
         (
@@ -339,7 +339,7 @@ public sealed class LocalCatalogManager
     }
 
     /// <summary>
-    /// Replicate catalog
+    /// Репликация каталога.
     /// </summary>
     public void ReplicateCatalog
         (
@@ -360,7 +360,7 @@ public sealed class LocalCatalogManager
     }
 
     /// <summary>
-    /// Restore catalog database from the given path.
+    /// Восстановление базы данных из указанной директории.
     /// </summary>
     public void RestoreDatabase
         (

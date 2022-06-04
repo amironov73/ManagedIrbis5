@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable ReplaceSliceWithRangeIndexer
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
 /* SyncBrokenSocket.cs -- синхронный "сбойный" сокет для целей тестирования
@@ -17,87 +13,83 @@
 #region Using directives
 
 using System;
+
 using AM;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure.Sockets
+namespace ManagedIrbis.Infrastructure.Sockets;
+
+/// <summary>
+/// Синхронный "сбойный" сокет для целей тестирования.
+/// </summary>
+public sealed class SyncBrokenSocket
+    : SyncNestedSocket
 {
+    #region Constants
+
     /// <summary>
-    /// Синхронный "сбойный" сокет для целей тестирования.
+    /// Вероятность сбоя по умолчанию.
     /// </summary>
-    public sealed class SyncBrokenSocket
-        : SyncNestedSocket
+    public const double DefaultProbability = 0.07;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Вероятность сбоя.
+    /// </summary>
+    public double Probability { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SyncBrokenSocket
+        (
+            ISyncClientSocket innerSocket,
+            double probability = DefaultProbability
+        )
+        : base (innerSocket)
     {
-        #region Constants
+        _random = new Random();
+    }
 
-        /// <summary>
-        /// Вероятность сбоя по умолчанию.
-        /// </summary>
-        public const double DefaultProbability = 0.07;
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Properties
+    private readonly Random _random;
 
-        /// <summary>
-        /// Вероятность сбоя.
-        /// </summary>
-        public double Probability { get; set; }
+    #endregion
 
-        #endregion
+    #region ISyncClientSocket members
 
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SyncBrokenSocket
-            (
-                ISyncClientSocket innerSocket,
-                double probability = DefaultProbability
-            )
-            : base(innerSocket)
+    /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
+    public override Response? TransactSync
+        (
+            SyncQuery query
+        )
+    {
+        if (Probability is > 0.0 and < 1.0)
         {
-            _random = new Random();
-
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private readonly Random _random;
-
-        #endregion
-
-        #region ISyncClientSocket members
-
-        /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
-        public override Response? TransactSync
-            (
-                SyncQuery query
-            )
-        {
-            if (Probability is > 0.0 and < 1.0)
+            var value = _random.NextDouble();
+            if (value < Probability)
             {
-                var value = _random.NextDouble();
-                if (value < Probability)
-                {
-                    Magna.Trace(nameof(SyncBrokenSocket) + "::" + nameof(TransactSync)
-                                + ": simulate broken network");
-                    return null;
-                }
+                Magna.Trace (nameof (SyncBrokenSocket) + "::" + nameof (TransactSync)
+                             + ": simulate broken network");
+                return null;
             }
+        }
 
-            return base.TransactSync(query);
+        return base.TransactSync (query);
+    }
 
-        } // method TransactSync
-
-        #endregion
-
-    } // class SyncBrokenSocket
-
-} // namespace ManagedIrbis.Infrastructure.Sockets
+    #endregion
+}

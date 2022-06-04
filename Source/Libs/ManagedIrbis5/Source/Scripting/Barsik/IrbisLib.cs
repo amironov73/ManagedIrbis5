@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 using AM;
 using AM.Collections;
@@ -512,23 +513,33 @@ public sealed class IrbisLib
         }
 
         var database = connection.EnsureDatabase();
-        if (Compute (context, args, 0) is string database2
-            && !string.IsNullOrEmpty (database2)
-            )
+        var arg0 = Compute (context, args, 0);
+        var arg1 = Compute (context, args, 1);
+        if (arg0 is string database2
+            && !string.IsNullOrEmpty (database2))
         {
             database = database2;
         }
 
         var capacity = 500;
-        if (Compute (context, args, 1) is int capacity2 and > 0)
+        if (arg1 is int capacity2 and > 0)
         {
             capacity = capacity2;
         }
 
-        if (Compute (context, args, 0) is IEnumerable<Record> records)
+        if (arg0 is IEnumerable<Record> records)
         {
             using var writer = new BatchRecordWriter (connection, database, capacity);
             writer.AddRange (records);
+
+            return null;
+        }
+
+        if (arg0 is BarsikList list)
+        {
+            var records2 = list.OfType<Record>().ToArray();
+            using var writer2 = new BatchRecordWriter (connection, database, capacity);
+            writer2.AddRange (records2);
 
             return null;
         }
