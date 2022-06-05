@@ -19,13 +19,16 @@
 #region Using directives
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
+using AM;
 using AM.IO;
+using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
 
@@ -41,6 +44,7 @@ namespace ManagedIrbis.Client;
 [XmlRoot ("clientRunner")]
 [ExcludeFromCodeCoverage]
 public sealed class ClientRunner
+    : IHandmadeSerializable
 {
     #region Properties
 
@@ -50,45 +54,55 @@ public sealed class ClientRunner
     /// </summary>
     [XmlElement ("database")]
     [JsonPropertyName ("database")]
+    [Description ("Имя базы данных")]
     public string? Database { get; set; }
 
     /// <summary>
     /// Executable file name.
     /// </summary>
-    [JsonIgnore]
+    [XmlElement ("exe-name")]
+    [JsonPropertyName ("exe-name")]
+    [Description ("EXE-файл")]
     public string Executable { get; set; }
 
     /// <summary>
     /// INI-file name.
     /// </summary>
+    [XmlElement ("ini-file")]
+    [JsonPropertyName ("ini-file")]
+    [Description ("INI-файл")]
     public string IniFileName { get; set; }
 
     /// <summary>
-    /// Current MFN.
+    /// Выбранный MFN.
     /// </summary>
     [XmlElement ("mfn")]
     [JsonPropertyName ("mfn")]
+    [Description ("MFN")]
     public int Mfn { get; set; }
 
     /// <summary>
-    /// Password.
+    /// Пароль.
     /// </summary>
-    [XmlElement("password")]
-    [JsonPropertyName("password")]
+    [XmlElement ("password")]
+    [JsonPropertyName ("password")]
+    [Description ("Пароль")]
     public string? Password { get; set; }
 
     /// <summary>
-    /// User name.
+    /// Имя пользователя (логин).
     /// </summary>
-    [XmlElement("username")]
-    [JsonPropertyName("username")]
+    [XmlElement ("username")]
+    [JsonPropertyName ("username")]
+    [Description ("Логин")]
     public string? UserName { get; set; }
 
     /// <summary>
-    /// Working directory.
+    /// Рабочая директория.
     /// </summary>
-    [XmlIgnore]
-    [JsonIgnore]
+    [XmlElement ("directory")]
+    [JsonPropertyName ("directory")]
+    [Description ("Рабочая директория")]
     public string WorkingDirectory { get; set; }
 
     #endregion
@@ -118,27 +132,67 @@ public sealed class ClientRunner
             EventArgs e
         )
     {
-        var process = (Process?) sender;
+        var process = (Process?)sender;
 
-        File.Delete(_copyIniPath!);
+        File.Delete (_copyIniPath!);
         process?.Dispose();
     }
 
     #endregion
 
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        Database = reader.ReadNullableString();
+        Executable = reader.ReadString();
+        IniFileName = reader.ReadString();
+        Mfn = reader.ReadPackedInt32();
+        Password = reader.ReadNullableString();
+        UserName = reader.ReadNullableString();
+        WorkingDirectory = reader.ReadString();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WriteNullable (Database);
+        writer.Write (Executable);
+        writer.Write (IniFileName);
+        writer
+            .WritePackedInt32 (Mfn)
+            .WriteNullable (Password)
+            .WriteNullable (UserName);
+        writer.Write (WorkingDirectory);
+    }
+
+    #endregion
+
+
     #region Public methods
 
     /// <summary>
-    /// Run the client and optionally wait for it.
+    /// Запускает клиента и опционально дожидается окончания работы.
     /// </summary>
     public void RunClient
         (
             bool wait
         )
     {
-        if (!Directory.Exists(WorkingDirectory))
+        if (!Directory.Exists (WorkingDirectory))
         {
-            throw new IrbisException("Working directory not exists");
+            throw new IrbisException ("Working directory not exists");
         }
 
         var executablePath = Path.Combine
@@ -146,9 +200,9 @@ public sealed class ClientRunner
                 WorkingDirectory,
                 Executable
             );
-        if (!File.Exists(executablePath))
+        if (!File.Exists (executablePath))
         {
-            throw new IrbisException("Executable file not exists");
+            throw new IrbisException ("Executable file not exists");
         }
 
         var mainIniPath = Path.Combine
@@ -156,7 +210,7 @@ public sealed class ClientRunner
                 WorkingDirectory,
                 IniFileName
             );
-        if (!File.Exists(mainIniPath))
+        if (!File.Exists (mainIniPath))
         {
             throw new IrbisException
                 (
@@ -167,21 +221,21 @@ public sealed class ClientRunner
 
         var copyIniName =
             "_"
-            + Guid.NewGuid().ToString("N")
+            + Guid.NewGuid().ToString ("N")
             + ".ini";
         _copyIniPath = Path.Combine
             (
                 WorkingDirectory,
                 copyIniName
             );
-        File.Copy(mainIniPath, _copyIniPath);
+        File.Copy (mainIniPath, _copyIniPath);
 
         using (var iniFile = new IniFile
                    (
                        _copyIniPath,
                        IrbisEncoding.Ansi
                    ))
-        using (var _ = new ContextIniSection(iniFile)
+        using (var _ = new ContextIniSection (iniFile)
                {
                    Database = Database,
                    Mfn = Mfn,
@@ -189,7 +243,7 @@ public sealed class ClientRunner
                    UserName = UserName
                })
         {
-            iniFile.Save(_copyIniPath);
+            iniFile.Save (_copyIniPath);
         }
 
         var startInfo = new ProcessStartInfo

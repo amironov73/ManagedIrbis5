@@ -2,15 +2,12 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* ClientLM.cs --
+/* ClientLM.cs -- менеджер клиентских лицензий
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,6 +17,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
+using AM;
 using AM.IO;
 
 using ManagedIrbis.Infrastructure;
@@ -31,14 +29,14 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis.Client;
 
 /// <summary>
-/// Client LM.
+/// Менеджер клиентских лицензий.
 /// </summary>
 public sealed class ClientLM
 {
     #region Constants
 
     /// <summary>
-    /// Default salt.
+    /// Соль по умолчанию.
     /// </summary>
     public const string DefaultSalt = "Ассоциация ЭБНИТ";
 
@@ -47,21 +45,21 @@ public sealed class ClientLM
     #region Properties
 
     /// <summary>
-    /// Encoding.
+    /// Кодировка символов.
     /// </summary>
-    public Encoding Encoding { get; private set; }
+    public Encoding Encoding { get; }
 
     /// <summary>
-    /// Salt.
+    /// Текущая соль.
     /// </summary>
-    public string? Salt { get; private set; }
+    public string? Salt { get; }
 
     #endregion
 
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public ClientLM()
         : this
@@ -74,16 +72,18 @@ public sealed class ClientLM
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
-    /// <param name="encoding"></param>
-    /// <param name="salt"></param>
+    /// <param name="encoding">Кодировка символов.</param>
+    /// <param name="salt">Соль</param>
     public ClientLM
         (
             Encoding encoding,
             string? salt
         )
     {
+        Sure.NotNull (encoding);
+
         Encoding = encoding;
         Salt = salt;
     }
@@ -93,37 +93,40 @@ public sealed class ClientLM
     #region Public methods
 
     /// <summary>
-    /// Check hash for the INI-file
-    /// (both IRBIS32 and IRBIS64).
+    /// Проверка хеша из INI-файла <see cref="IniFile"/>
+    /// (работает как в ИРБИС32, так и в ИРБИС64).
     /// </summary>
     public bool CheckHash
         (
             IniFile iniFile
         )
     {
+        Sure.NotNull (iniFile);
+
         var user = iniFile.GetValue ("Main", "User", null);
         var common = iniFile.GetValue ("Main", "Common", null);
 
-        if (string.IsNullOrEmpty(user)
-            || string.IsNullOrEmpty(common))
+        if (string.IsNullOrEmpty (user)
+            || string.IsNullOrEmpty (common))
         {
             return false;
         }
 
-        var hash = ComputeHash(user);
+        var hash = ComputeHash (user);
 
         return hash == common;
     }
 
     /// <summary>
-    /// Compute hash for the text
-    /// (both IRBIS32 and IRBIS64).
+    /// Вычисление хеша (работает как в ИРБИС32, так и в ИРБИС64).
     /// </summary>
     public string ComputeHash
         (
             string text
         )
     {
+        Sure.NotNull (text);
+
         var salted = Salt + text;
         var raw = Encoding.GetBytes (salted);
         unchecked
@@ -147,7 +150,7 @@ public sealed class ClientLM
             }
         }
 
-        var result = Encoding.GetString(raw, 0, raw.Length);
+        var result = Encoding.GetString (raw, 0, raw.Length);
 
         return result;
     }

@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* Alias.cs -- псевдоним для сервера или базы данных ИРБИС64
  * Ars Magna project, http://arsmagna.ru
@@ -15,6 +11,7 @@
 
 #region Using directives
 
+using System.ComponentModel;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -44,6 +41,7 @@ public sealed class ConnectionAlias
     /// </summary>
     [XmlAttribute ("name")]
     [JsonPropertyName ("name")]
+    [Description ("Псевдоним")]
     public string? Name { get; set; }
 
     /// <summary>
@@ -52,6 +50,7 @@ public sealed class ConnectionAlias
     /// </summary>
     [XmlAttribute ("value")]
     [JsonPropertyName ("value")]
+    [Description ("Значение")]
     public string? Value { get; set; }
 
     #endregion
@@ -64,6 +63,8 @@ public sealed class ConnectionAlias
             BinaryReader reader
         )
     {
+        Sure.NotNull (reader);
+
         Name = reader.ReadNullableString();
         Value = reader.ReadNullableString();
     }
@@ -74,6 +75,8 @@ public sealed class ConnectionAlias
             BinaryWriter writer
         )
     {
+        Sure.NotNull (writer);
+
         writer
             .WriteNullable(Name)
             .WriteNullable(Value);
@@ -92,8 +95,8 @@ public sealed class ConnectionAlias
         var verifier = new Verifier<ConnectionAlias> (this, throwOnError);
 
         verifier
-            .NotNullNorEmpty (Name, "Name")
-            .NotNullNorEmpty (Value, "Value");
+            .NotNullNorEmpty (Name)
+            .NotNullNorEmpty (Value);
 
         return verifier.Result;
     }

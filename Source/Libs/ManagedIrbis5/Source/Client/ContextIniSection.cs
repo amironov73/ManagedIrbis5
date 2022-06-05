@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* ContextIniSection.cs -- CONTEXT-секция INI-файла для клиента
  * Ars Magna project, http://arsmagna.ru
@@ -15,16 +12,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-
-using AM;
 using AM.IO;
-using AM.Runtime;
-using AM.Text;
-
-using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -41,7 +29,7 @@ public sealed class ContextIniSection
     #region Constants
 
     /// <summary>
-    /// Section name.
+    /// Имя секции INI-файла.
     /// </summary>
     public const string SectionName = "CONTEXT";
 
@@ -50,7 +38,7 @@ public sealed class ContextIniSection
     #region Properties
 
     /// <summary>
-    /// Database name.
+    /// Имя базы данных.
     /// </summary>
     public string? Database
     {
@@ -59,7 +47,7 @@ public sealed class ContextIniSection
     }
 
     /// <summary>
-    /// Display format description.
+    /// Имя формата отображения.
     /// </summary>
     public string? DisplayFormat
     {
@@ -68,16 +56,16 @@ public sealed class ContextIniSection
     }
 
     /// <summary>
-    /// Current MFN.
+    /// Текущий MFN.
     /// </summary>
     public int Mfn
     {
-        get => Section.GetValue("CURMFN", 0);
-        set => Section.SetValue("CURMFN", value);
+        get => Section.GetValue ("CURMFN", 0);
+        set => Section.SetValue ("CURMFN", value);
     }
 
     /// <summary>
-    /// Password.
+    /// Пароль.
     /// </summary>
     public string? Password
     {
@@ -86,7 +74,7 @@ public sealed class ContextIniSection
     }
 
     /// <summary>
-    /// AsyncQuery.
+    /// Текст запроса..
     /// </summary>
     public string? Query
     {
@@ -97,7 +85,7 @@ public sealed class ContextIniSection
     }
 
     /// <summary>
-    /// Search prefix.
+    /// Поисковый префикс.
     /// </summary>
     public string? SearchPrefix
     {
@@ -106,7 +94,7 @@ public sealed class ContextIniSection
     }
 
     /// <summary>
-    /// User name.
+    /// Имя пользователя (логин).
     /// </summary>
     public string? UserName
     {
@@ -115,7 +103,7 @@ public sealed class ContextIniSection
     }
 
     /// <summary>
-    /// Worksheet code.
+    /// Код рабочего листа.
     /// </summary>
     public string? Worksheet
     {
@@ -143,7 +131,7 @@ public sealed class ContextIniSection
         (
             IniFile iniFile
         )
-        : base(iniFile, SectionName)
+        : base (iniFile, SectionName)
     {
         // пустое тело конструктора
     }
@@ -155,7 +143,7 @@ public sealed class ContextIniSection
         (
             IniFile.Section section
         )
-        : base(section)
+        : base (section)
     {
         // пустое тело конструктора
     }
