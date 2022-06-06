@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
 
 /* BarsikToken.cs -- токен языка Барсик
@@ -27,12 +28,71 @@ namespace AM.Scripting;
 /// </summary>
 public sealed class BarsikToken
 {
+    #region Constants
+
+    /// <summary>
+    /// Признак конца текста.
+    /// </summary>
+    public const string? EOT = null;
+
+    /// <summary>
+    /// Ключевое слово, например, "if".
+    /// </summary>
+    public const string Keyword = "keyword";
+
+    /// <summary>
+    /// Идентификатор.
+    /// </summary>
+    public const string Identifier = "idenfier";
+
+    /// <summary>
+    /// Один символ в одиночных кавычках.
+    /// </summary>
+    public const string Char = "char";
+
+    /// <summary>
+    /// Произвольное количество символов в двойных кавычках.
+    /// </summary>
+    public const string String = "string";
+
+    /// <summary>
+    /// Целое 32-битное число со знаком без префикса и суффикса.
+    /// </summary>
+    public const string Int32 = "int32";
+
+    /// <summary>
+    /// Целое 64-битное число зе знака без префикса и суффикса.
+    /// </summary>
+    public const string Int64 = "int64";
+
+    /// <summary>
+    /// Целое 32-битное число без знака без префикса и суффикса.
+    /// </summary>
+    public const string UInt32 = "uint32";
+
+    /// <summary>
+    /// Целое 64-битное число без знака без префикса и суффикса.
+    /// </summary>
+    public const string UInt64 = "uint64";
+
+    /// <summary>
+    /// Число с плавающей точкой с одинарной точностью.
+    /// </summary>
+    public const string Single = "single";
+
+    /// <summary>
+    /// Число с плавающей точкой с двойной точностью.
+    /// </summary>
+    public const string Double = "double";
+
+    #endregion
+
     #region Properties
 
     /// <summary>
     /// Вид токена.
     /// </summary>
-    public TokenKind Kind { get; internal set; }
+    public string? Kind { get; internal set; }
 
     /// <summary>
     /// Значение.
@@ -48,7 +108,7 @@ public sealed class BarsikToken
     /// </summary>
     public BarsikToken
         (
-            TokenKind kind,
+            string? kind,
             ReadOnlyMemory<char> value = default
         )
     {
@@ -81,13 +141,13 @@ public sealed class BarsikToken
     /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
-        return HashCode.Combine ((int) Kind, Value);
+        return HashCode.Combine (Kind, Value);
     }
 
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return $"{Kind}: {Value}";
+        return $"{Kind.ToVisibleString()}: {Value.ToVisibleString()}";
     }
 
     #endregion
