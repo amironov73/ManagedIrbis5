@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <ImplicitUsings>disable</ImplicitUsings>
+        <ImplicitUsings>false</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
@@ -18,7 +18,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\AM.Kitten\AM.Kitten.csproj" />
+      <ProjectReference Include="..\..\..\Libs\AM.Core5\AM.Core5.csproj" />
+      <ProjectReference Include="..\AM.Scripting\AM.Scripting.csproj" />
     </ItemGroup>
 
 </Project>
