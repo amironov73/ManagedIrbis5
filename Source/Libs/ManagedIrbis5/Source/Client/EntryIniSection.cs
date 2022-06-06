@@ -2,13 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* EntryIniSection.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -16,6 +12,7 @@
 
 #region Using directives
 
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
@@ -53,6 +50,7 @@ public sealed class EntryIniSection
     /// </summary>
     [XmlElement ("dbnflc")]
     [JsonPropertyName ("dbnflc")]
+    [Description ("ФЛК документа")]
     public string? DbnFlc
     {
         get => Section.GetValue ("DBNFLC", "DBNFLC");
@@ -85,6 +83,7 @@ public sealed class EntryIniSection
     /// Признак автоматической актуализации записей
     /// при корректировке.
     /// </summary>
+    [Description ("Автоматическая актуализация")]
     public bool RecordUpdate
     {
         get => Utility.ToBoolean (Section.GetValue ("RECUPDIF", "1").ThrowIfNull());

@@ -15,6 +15,8 @@
 
 #region Using directives
 
+using System.ComponentModel;
+
 using AM.IO;
 
 #endregion
@@ -46,6 +48,7 @@ public sealed class DisplayIniSection
     /// <summary>
     /// Размер порции для показа кратких описаний.
     /// </summary>
+    [Description ("Размер порции")]
     public int MaxBriefPortion
     {
         get => Section.GetValue ("MaxBriefPortion", 6);
@@ -55,6 +58,7 @@ public sealed class DisplayIniSection
     /// <summary>
     /// Максимальное количество отмеченных документов.
     /// </summary>
+    [Description ("Максимальное количество отмеченных")]
     public int MaxMarked
     {
         get => Section.GetValue ("MaxMarked", 100);

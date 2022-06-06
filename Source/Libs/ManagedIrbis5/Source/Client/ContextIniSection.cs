@@ -12,6 +12,8 @@
 
 #region Using directives
 
+using System.ComponentModel;
+
 using AM.IO;
 
 #endregion
@@ -40,6 +42,7 @@ public sealed class ContextIniSection
     /// <summary>
     /// Имя базы данных.
     /// </summary>
+    [Description ("База данных")]
     public string? Database
     {
         get => Section["DBN"];
@@ -49,6 +52,7 @@ public sealed class ContextIniSection
     /// <summary>
     /// Имя формата отображения.
     /// </summary>
+    [Description ("Формат отображения")]
     public string? DisplayFormat
     {
         get => Section["PFT"];
@@ -58,6 +62,7 @@ public sealed class ContextIniSection
     /// <summary>
     /// Текущий MFN.
     /// </summary>
+    [Description ("MFN")]
     public int Mfn
     {
         get => Section.GetValue ("CURMFN", 0);
@@ -67,6 +72,7 @@ public sealed class ContextIniSection
     /// <summary>
     /// Пароль.
     /// </summary>
+    [Description ("Пароль")]
     public string? Password
     {
         get => Section["UserPassword"] ?? Section["Password"];
@@ -74,8 +80,9 @@ public sealed class ContextIniSection
     }
 
     /// <summary>
-    /// Текст запроса..
+    /// Текст запроса.
     /// </summary>
+    [Description ("Запрос")]
     public string? Query
     {
         // TODO использовать UTF8
@@ -87,6 +94,7 @@ public sealed class ContextIniSection
     /// <summary>
     /// Поисковый префикс.
     /// </summary>
+    [Description ("Префикс")]
     public string? SearchPrefix
     {
         get => Section["PREFIX"];
@@ -96,6 +104,7 @@ public sealed class ContextIniSection
     /// <summary>
     /// Имя пользователя (логин).
     /// </summary>
+    [Description ("Логин")]
     public string? UserName
     {
         get => Section["UserName"];

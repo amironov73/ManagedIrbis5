@@ -48,8 +48,14 @@ class Program
         }
     }
 
-    public static int Main (string[] args)
+    public static int Main
+        (
+            string[] args
+        )
     {
+        Console.WriteLine ($"Barsik test runner version {Interpreter.FileVersion}");
+        Console.WriteLine ();
+
         var startAt = AppContext.BaseDirectory;
         if (args.Length != 0)
         {

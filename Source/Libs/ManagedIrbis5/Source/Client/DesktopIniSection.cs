@@ -2,18 +2,18 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* DesktopIniSection.cs -- DESKTOP-секция INI-файла для клиента
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using System.ComponentModel;
 
 using AM.IO;
 
@@ -44,129 +44,143 @@ public sealed class DesktopIniSection
     #region Properties
 
     /// <summary>
-    /// Use auto service?
+    /// Использовать авто-сервис?
     /// </summary>
+    [Description ("Автосервис")]
     public bool AutoService
     {
-        get => GetBoolean("AutoService", "1");
-        set => SetBoolean("AutoService", value);
+        get => GetBoolean ("AutoService", "1");
+        set => SetBoolean ("AutoService", value);
     }
 
     /// <summary>
-    /// Show database context panel?
+    /// Показываль панель контекста базы данных?
     /// </summary>
+    [Description ("Показывать панель контекста?")]
     public bool DBContext
     {
-        get => GetBoolean("DBContext", "1");
-        set => SetBoolean("DBContext", value);
+        get => GetBoolean ("DBContext", "1");
+        set => SetBoolean ("DBContext", value);
     }
 
     /// <summary>
-    /// Database context panel is floating?
+    /// Панель контекста плавающая?
     /// </summary>
+    [Description ("Панель контекста плавающая?")]
     public bool DBContextFloating
     {
-        get => GetBoolean("DBContextFloating", "0");
-        set => SetBoolean("DBContextFloating", value);
+        get => GetBoolean ("DBContextFloating", "0");
+        set => SetBoolean ("DBContextFloating", value);
     }
 
     /// <summary>
-    /// DBOpen panel visible?
+    /// Показывать панель открытия базы данных?
     /// </summary>
+    [Description ("Панель базы данных")]
     public bool DBOpen
     {
-        get => GetBoolean("DBOpen", "1");
-        set => SetBoolean("DBOpen", value);
+        get => GetBoolean ("DBOpen", "1");
+        set => SetBoolean ("DBOpen", value);
     }
 
     /// <summary>
-    /// Whether DBOpen panel is floating?
+    /// Панель открытия базы данных плавающая?
     /// </summary>
+    [Description ("Панель базы плавающая?")]
     public bool DBOpenFloating
     {
-        get => GetBoolean("DBOpenFloating", "0");
-        set => SetBoolean("DBOpenFloating", value);
+        get => GetBoolean ("DBOpenFloating", "0");
+        set => SetBoolean ("DBOpenFloating", value);
     }
 
     /// <summary>
-    /// Show the entry panel?
+    /// Показывать панель ввода?
     /// </summary>
+    [Description ("Показывать панель ввода?")]
     public bool Entry
     {
-        get => GetBoolean("Entry", "1");
-        set => SetBoolean("Entry", value);
+        get => GetBoolean ("Entry", "1");
+        set => SetBoolean ("Entry", value);
     }
 
     /// <summary>
-    /// Entry panel is floating?
+    /// Панель ввода плавающая?
     /// </summary>
+    [Description ("Панель ввода плавающая?")]
     public bool EntryFloating
     {
-        get => GetBoolean("EntryFloating", "0");
-        set => SetBoolean("EntryFloating", value);
+        get => GetBoolean ("EntryFloating", "0");
+        set => SetBoolean ("EntryFloating", value);
     }
 
     /// <summary>
-    /// Show then main menu?
+    /// Показывать главное меню?
     /// </summary>
+    [Description ("Показывать главное меню?")]
     public bool MainMenu
     {
-        get => GetBoolean("MainMenu", "1");
-        set => SetBoolean("MainMenu", value);
+        get => GetBoolean ("MainMenu", "1");
+        set => SetBoolean ("MainMenu", value);
     }
 
     /// <summary>
-    /// Main menu is floating panel?
+    /// Главное меню плавающее?
     /// </summary>
+    [Description ("Главное меню плавающее?")]
     public bool MainMenuFloating
     {
-        get => GetBoolean("MainMenuFloating", "0");
-        set => SetBoolean("MainMenuFloating", value);
+        get => GetBoolean ("MainMenuFloating", "0");
+        set => SetBoolean ("MainMenuFloating", value);
     }
 
     /// <summary>
-    /// Show the search panel?
+    /// Показывать панель поиска?
     /// </summary>
+    [Description ("Показывать панель поиска?")]
     public bool Search
     {
-        get => GetBoolean("Search", "1");
-        set => SetBoolean("Search", value);
+        get => GetBoolean ("Search", "1");
+        set => SetBoolean ("Search", value);
     }
 
     /// <summary>
-    /// Whether the search panel is floating?
+    /// Панель поиска плавающая?
     /// </summary>
+    [Description ("Панель поиска плавающая?")]
     public bool SearchFloating
     {
-        get => GetBoolean("SearchFloating", "0");
-        set => SetBoolean("SearchFloating", value);
+        get => GetBoolean ("SearchFloating", "0");
+        set => SetBoolean ("SearchFloating", value);
     }
 
     /// <summary>
-    /// Use spelling engine?
+    /// Проверка орфографии.
     /// </summary>
+    [Description ("Проверка орфографии")]
     public bool Spelling
     {
-        get => GetBoolean("Spelling", "1");
-        set => SetBoolean("Spelling", value);
+        get => GetBoolean ("Spelling", "1");
+        set => SetBoolean ("Spelling", value);
     }
 
     /// <summary>
-    /// Show the user mode panel?
+    /// Показывать панель пользовательских режимов?
     /// </summary>
+    [Description ("Панель пользовательских режимов?")]
     public bool UserMode
     {
-        get => GetBoolean("UserMode", "1");
-        set => SetBoolean("UserMode", value);
+        get => GetBoolean ("UserMode", "1");
+        set => SetBoolean ("UserMode", value);
     }
 
     /// <summary>
-    /// Whether the user mode panel is floating?
+    /// Панель пользовательских режимов плавающая?
     /// </summary>
+    [Description ("Плавающая панель?")]
     public bool UserModeFloating
     {
-        get => GetBoolean("UserModeFloating", "0");
-        set => SetBoolean("UserModeFloating", value);
+        get => GetBoolean ("UserModeFloating", "0");
+        set => SetBoolean ("UserModeFloating", value);
     }
 
     #endregion
@@ -189,7 +203,7 @@ public sealed class DesktopIniSection
         (
             IniFile iniFile
         )
-        : base(iniFile, SectionName)
+        : base (iniFile, SectionName)
     {
         // пустое тело конструктора
     }
@@ -201,7 +215,7 @@ public sealed class DesktopIniSection
         (
             IniFile.Section section
         )
-        : base(section)
+        : base (section)
     {
         // пустое тело конструктора
     }

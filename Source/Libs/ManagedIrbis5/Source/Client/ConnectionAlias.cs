@@ -29,7 +29,7 @@ namespace ManagedIrbis.Client;
 /// <summary>
 /// Псевдоним для сервера или базы данных ИРБИС64.
 /// </summary>
-[XmlRoot("alias")]
+[XmlRoot ("alias")]
 public sealed class ConnectionAlias
     : IHandmadeSerializable,
     IVerifiable
@@ -78,8 +78,8 @@ public sealed class ConnectionAlias
         Sure.NotNull (writer);
 
         writer
-            .WriteNullable(Name)
-            .WriteNullable(Value);
+            .WriteNullable (Name)
+            .WriteNullable (Value);
     }
 
     #endregion

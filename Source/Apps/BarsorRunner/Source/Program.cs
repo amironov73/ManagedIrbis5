@@ -32,6 +32,9 @@ class Program
             string[] args
         )
     {
+        Console.WriteLine ($"Barsor runner version {Interpreter.FileVersion}");
+        Console.WriteLine ();
+
         foreach (var fileName in args)
         {
             var barsor = new BarsorParser();

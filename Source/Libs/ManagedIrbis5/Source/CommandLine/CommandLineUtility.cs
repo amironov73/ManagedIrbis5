@@ -6,9 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* CommandLineUtility.cs -- утилиты для работы с командной строкой
  * Ars Magna project, http://arsmagna.ru
@@ -78,8 +76,15 @@ public static class CommandLineUtility
     /// </summary>
     /// <param name="environmentName">Имя переменной окружения.</param>
     /// <returns>Строка подключения либо <c>null</c>.</returns>
-    public static string? GetConnectionStringFromEnvironment (string? environmentName = DefaultIrbisEnvironment) =>
-        environmentName is null ? null : Environment.GetEnvironmentVariable (environmentName);
+    public static string? GetConnectionStringFromEnvironment
+        (
+            string? environmentName = DefaultIrbisEnvironment
+        )
+    {
+        return environmentName is null
+            ? null
+            : Environment.GetEnvironmentVariable (environmentName);
+    }
 
     /// <summary>
     /// Настройки для подключения к серверу.

@@ -2,22 +2,20 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable ConvertToAutoProperty
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Local
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* RemoteCatalogerIniFile.cs -- серверный INI-файл для АРМ Каталогизатор.
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using System;
+using System.ComponentModel;
 
 using AM;
 using AM.IO;
@@ -36,22 +34,22 @@ public class RemoteCatalogerIniFile
     #region Constants
 
     /// <summary>
-    /// Display section name.
+    /// Имя секции <c>[Display]</c>.
     /// </summary>
     public const string Display = "Display";
 
     /// <summary>
-    /// Entry section name.
+    /// Имя секции <c>[Entry]</c>.
     /// </summary>
     public const string Entry = "Entry";
 
     /// <summary>
-    /// Main section name.
+    /// Имя секции <c>[Main]</c>.
     /// </summary>
     public const string Main = "Main";
 
     /// <summary>
-    /// Private section name.
+    /// Имя секции <c>[Private]</c>.
     /// </summary>
     public const string Private = "Private";
 
@@ -62,6 +60,7 @@ public class RemoteCatalogerIniFile
     /// <summary>
     /// Имя файла пакетного задания для АВТОВВОДА.
     /// </summary>
+    [Description ("Автоввод")]
     public string AutoinFile => RequireValue
         (
             Main,
@@ -78,6 +77,7 @@ public class RemoteCatalogerIniFile
     /// по формальному алгоритму: неповторяющиеся поля заменяются,
     /// а оригинальные значения повторяющихся полей суммируются
     /// </summary>
+    [Description ("Автоматическое слияние")]
     public bool AutoMerge => GetBoolean
         (
             Main,
@@ -88,106 +88,126 @@ public class RemoteCatalogerIniFile
     /// <summary>
     /// Имя краткого (строкa) формата показа.
     /// </summary>
+    [Description ("Краткий формат")]
     public string BriefPft => RequireValue (Main, "BRIEFPFT", "brief.pft");
 
     /// <summary>
-    /// Интервал в мин., по истечении которого клиент посылает
+    /// Интервал в минутах, по истечении которого клиент посылает
     /// на сервер уведомление о том, что он «жив».
     /// </summary>
+    [Description ("Интервал подтверждения")]
     public int ClientTimeLive => GetValue (Main, "CLIENT_TIME_LIVE", 15);
 
     /// <summary>
     /// Имя файла-справочника со списком ТВП переформатирования
     /// для копирования.
     /// </summary>
+    [Description ("Справочник для копирования")]
     public string CopyMnu => RequireValue (Main, "COPYMNU", "fst.mnu");
 
     /// <summary>
     /// Метка поля «количество выдач» в БД ЭК.
     /// </summary>
+    [Description ("Поле с количеством выдач")]
     public string CountTag => RequireValue (Main, "DBNTAGSPROS", "999");
 
     /// <summary>
     /// Имя файла списка БД для АРМа Каталогизатора/Комплектатора.
     /// </summary>
+    [Description ("Список баз данных для Каталогизатора")]
     public string DatabaseList => RequireValue (Main, "DBNNAMECAT", "dbnam2.mnu");
 
     /// <summary>
     /// Имя формата для ФЛК документа в целом.
     /// </summary>
+    [Description ("ФЛК документа в целом")]
     public string DbnFlc => RequireValue (Entry, "DBNFLC", "dbnflc.pft");
 
     /// <summary>
     /// Имя базы данных по умолчанию.
     /// </summary>
+    [Description ("База по умолчанию")]
     public string DefaultDb => RequireValue (Main, "DEFAULTDB", "IBIS");
 
     /// <summary>
     /// Имя шаблона для создания новой БД.
     /// </summary>
+    [Description ("Шаблон базы данных")]
     public string EmptyDbn => RequireValue (Main, "EMPTYDBN", "BLANK");
 
     /// <summary>
     /// Метка поля «экземпляры» в БД ЭК.
     /// </summary>
+    [Description ("Поле \"экземпляры\"")]
     public string ExemplarTag => RequireValue (Main, "DBNTAGEKZ", "910");
 
     /// <summary>
     /// Имя файла-справочника со списком ТВП переформатирования
     /// для экспорта.
     /// </summary>
+    [Description ("Справочник для экспорта")]
     public string ExportMenu => RequireValue (Main, "EXPORTMNU", "export.mnu");
 
     /// <summary>
     /// Имя файла-справочника со списком доступных РЛ.
     /// </summary>
+    [Description ("Справочник рабочих листов")]
     public string FormatMenu => RequireValue (Main, "FMTMNU", "fmt.mnu");
 
     /// <summary>
     /// Имя БД, содержащей тематический рубрикатор ГРНТИ.
     /// </summary>
+    [Description ("База ГРНТИ")]
     public string HelpDbn => RequireValue (Main, "HELPDBN", "HELP");
 
     /// <summary>
     /// Имя файла-справочника со списком ТВП переформатирования
     /// для импорта.
     /// </summary>
+    [Description ("Справочник для импорта")]
     public string ImportMenu => RequireValue (Main, "IMPORTMNU", "import.mnu");
 
     /// <summary>
     /// Префикс инверсии для шифра документа в БД ЭК.
     /// </summary>
+    [Description ("Префикс шифра документа")]
     public string IndexPrefix => RequireValue (Main, "DBNPREFSHIFR", "I=");
 
     /// <summary>
     /// Метка поля «шифр документа» в БД ЭК.
     /// </summary>
+    [Description ("Метка поля \"шифр докумнета\"")]
     public string IndexTag => RequireValue (Main, "DBNTAGSHIFR", "903");
 
     /// <summary>
-    /// INI-file.
+    /// INI-файл.
     /// </summary>
-    public IniFile Ini { get; private set; }
+    [Browsable (false)]
+    public IniFile Ini { get; }
 
     /// <summary>
     /// Имя файла-справочника со списком постоянных запросов.
     /// </summary>
+    [Description ("Справочник постоянных запросов")]
     public string IriMenu => RequireValue (Main, "IRIMNU", "iri.mnu");
 
     /// <summary>
     /// Размер порции для показа кратких описаний.
     /// </summary>
+    [Description ("Размер порции для показа")]
     public int MaxBriefPortion => GetValue (Main, "MAXBRIEFPORTION", 10);
 
     /// <summary>
     /// Максимальное количество отмеченных документов.
     /// </summary>
+    [Description ("Максимальное количество отмеченных документов")]
     public int MaxMarked => GetValue (Main, "MAXMARKED", 10);
 
     /// <summary>
     /// Имя файла-справочника со списком доступных форматов
     /// показа документов.
     /// </summary>
+    [Description ("Справочник форматов показа")]
     public string PftMenu => RequireValue (Main, "PFTMNU", "pft.mnu");
 
     /// <summary>
@@ -197,6 +217,7 @@ public class RemoteCatalogerIniFile
     /// определяет в качестве оптимизированных  RTF-форматы,
     /// а значение PFTW_H.OPT – HTML-форматы
     /// </summary>
+    [Description ("Файл оптимизации формата")]
     public string PftOpt => RequireValue (Main, "PFTOPT", "pft.opt");
 
     /// <summary>
@@ -213,26 +234,31 @@ public class RemoteCatalogerIniFile
     /// При значении параметра 3 – вариант 2 с добавлением режима
     /// удаления данных.
     /// </summary>
+    [Description ("Редим работы \"для читателя\"")]
     public int ReaderMode => GetValue (Main, "ReaderMode", 0);
 
     /// <summary>
     /// Имя дополнительного INI-файла со сценариями поиска для БД.
     /// </summary>
+    [Description ("Сценарии поиска")]
     public string SearchIni => RequireValue (Main, "SEARCHINI", string.Empty);
 
     /// <summary>
     /// Имя эталонной БД Электронного каталога.
     /// </summary>
+    [Description ("Эталонная база")]
     public string StandardDbn => RequireValue (Main, "ETALONDBN", "IBIS");
 
     /// <summary>
     /// Директория для сохранения временных (выходных) данных.
     /// </summary>
+    [Description ("Директория для временных данных")]
     public string WorkDirectory => RequireValue (Main, "WORKDIR", "/irbiswrk");
 
     /// <summary>
     /// Имя файла оптимизации РЛ ввода.
     /// </summary>
+    [Description ("Файл оптимизации рабочего листа")]
     public string WsOpt => RequireValue (Main, "WSOPT", "ws.opt");
 
     #endregion
@@ -240,7 +266,7 @@ public class RemoteCatalogerIniFile
     #region Construction
 
     /// <summary>
-    /// Конструктор..
+    /// Конструктор.
     /// </summary>
     public RemoteCatalogerIniFile
         (
@@ -270,7 +296,7 @@ public class RemoteCatalogerIniFile
         Sure.NotNullNorEmpty (keyName);
         Sure.NotNullNorEmpty (defaultValue);
 
-        string text = Ini.GetValue
+        var text = Ini.GetValue
                 (
                     sectionName,
                     keyName,
@@ -317,7 +343,7 @@ public class RemoteCatalogerIniFile
         Sure.NotNullNorEmpty (sectionName);
         Sure.NotNullNorEmpty (keyName);
 
-        string result = Ini.GetValue
+        var result = Ini.GetValue
                 (
                     sectionName,
                     keyName,
@@ -386,6 +412,36 @@ public class RemoteCatalogerIniFile
     {
         Sure.NotNullNorEmpty (sectionName);
         Sure.NotNullNorEmpty (keyName);
+
+        Ini.SetValue
+            (
+                sectionName,
+                keyName,
+                value
+            );
+
+        return this;
+    }
+
+    /// <summary>
+    /// Задание типизированного значения для указанного ключа.
+    /// </summary>
+    public RemoteCatalogerIniFile SetValue<T>
+        (
+            string sectionName,
+            string keyName,
+            T? value,
+            T? defaultValue
+        )
+        where T: IComparable<T>
+    {
+        Sure.NotNullNorEmpty (sectionName);
+        Sure.NotNullNorEmpty (keyName);
+
+        if (value?.CompareTo (defaultValue) == 0)
+        {
+            value = default;
+        }
 
         Ini.SetValue
             (
