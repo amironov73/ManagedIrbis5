@@ -23,105 +23,104 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.InMemory
+namespace ManagedIrbis.InMemory;
+
+/// <summary>
+/// База данных, расположенная в оперативной памяти.
+/// </summary>
+public sealed class InMemoryDatabase
 {
+    #region Properties
+
     /// <summary>
-    /// База данных, расположенная в оперативной памяти.
+    /// Имя базы данных. Нечувствительно к регистру.
     /// </summary>
-    public class InMemoryDatabase
+    public string Name { get; }
+
+    /// <summary>
+    /// База заблокирована?
+    /// </summary>
+    public bool Locked { get; set; }
+
+    /// <summary>
+    /// Мастер-файл.
+    /// </summary>
+    public InMemoryMaster Master { get; }
+
+    /// <summary>
+    /// Инвертированный файл.
+    /// </summary>
+    public InMemoryInverted Inverted { get; }
+
+    /// <summary>
+    /// Запрещено вносить изменения в базу?
+    /// </summary>
+    public bool ReadOnly { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public InMemoryDatabase
+        (
+            string name,
+            bool readOnly = false
+        )
     {
-        #region Properties
+        Sure.NotNullNorEmpty (name);
 
-        /// <summary>
-        /// Имя базы данных. Нечувствительно к регистру.
-        /// </summary>
-        public string Name { get; }
-
-        /// <summary>
-        /// База заблокирована?
-        /// </summary>
-        public bool Locked { get; set; }
-
-        /// <summary>
-        /// Мастер-файл.
-        /// </summary>
-        public InMemoryMaster Master { get; }
-
-        /// <summary>
-        /// Инвертированный файл.
-        /// </summary>
-        public InMemoryInverted Inverted { get; }
-
-        /// <summary>
-        /// Запрещено вносить изменения в базу?
-        /// </summary>
-        public bool ReadOnly { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public InMemoryDatabase
-            (
-                string name,
-                bool readOnly = false
-            )
-        {
-            Sure.NotNullNorEmpty (name);
-
-            Name = name;
-            ReadOnly = readOnly;
-            Master = new InMemoryMaster();
-            Inverted = new InMemoryInverted();
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Дамп базы данных.
-        /// </summary>
-        public void Dump
-            (
-                TextWriter output
-            )
-        {
-            Sure.NotNull (output);
-
-            Master.Dump (output);
-            Inverted.Dump (output);
-        }
-
-        /// <summary>
-        /// Чтение записи.
-        /// </summary>
-        public Record? ReadRecord
-            (
-                int mfn
-            )
-        {
-            Sure.Positive (mfn);
-
-            return Master.ReadRecord (mfn);
-        }
-
-        /// <summary>
-        /// Сохранение/обновление записи.
-        /// </summary>
-        public bool WriteRecord
-            (
-                Record record
-            )
-        {
-            Sure.NotNull (record);
-
-            return Master.WriteRecord (record);
-        }
-
-        #endregion
+        Name = name;
+        ReadOnly = readOnly;
+        Master = new InMemoryMaster();
+        Inverted = new InMemoryInverted();
     }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Дамп базы данных.
+    /// </summary>
+    public void Dump
+        (
+            TextWriter output
+        )
+    {
+        Sure.NotNull (output);
+
+        Master.Dump (output);
+        Inverted.Dump (output);
+    }
+
+    /// <summary>
+    /// Чтение записи.
+    /// </summary>
+    public Record? ReadRecord
+        (
+            int mfn
+        )
+    {
+        Sure.Positive (mfn);
+
+        return Master.ReadRecord (mfn);
+    }
+
+    /// <summary>
+    /// Сохранение/обновление записи.
+    /// </summary>
+    public bool WriteRecord
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        return Master.WriteRecord (record);
+    }
+
+    #endregion
 }

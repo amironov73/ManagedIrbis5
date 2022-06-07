@@ -27,55 +27,54 @@ using AM.Collections;
 
 #nullable enable
 
-namespace ManagedIrbis.InMemory
+namespace ManagedIrbis.InMemory;
+
+/// <summary>
+/// Инвертированный файл, расположенный в оперативной памяти.
+/// </summary>
+public sealed class InMemoryInverted
+    : CaseInsensitiveSortedList<InMemoryTerm>
 {
+    #region Public methods
+
     /// <summary>
-    /// Инвертированный файл, расположенный в оперативной памяти.
+    /// Дамп инвертированного файла.
     /// </summary>
-    public class InMemoryInverted
-        : CaseInsensitiveSortedList<InMemoryTerm>
+    public void Dump
+        (
+            TextWriter output
+        )
     {
-        #region Public methods
+        Sure.NotNull (output);
 
-        /// <summary>
-        /// Дамп инвертированного файла.
-        /// </summary>
-        public void Dump
-            (
-                TextWriter output
-            )
-        {
-            Sure.NotNull (output);
-
-            // TODO: implement
-        }
-
-        /// <summary>
-        /// Загрузка из потока.
-        /// </summary>
-        public void Read
-            (
-                BinaryReader reader
-            )
-        {
-            Sure.NotNull (reader);
-
-            // TODO: implement
-        }
-
-        /// <summary>
-        /// Сохранение в поток.
-        /// </summary>
-        public void Save
-            (
-                BinaryWriter writer
-            )
-        {
-            Sure.NotNull (writer);
-
-            // TODO: implement
-        }
-
-        #endregion
+        // TODO: implement
     }
+
+    /// <summary>
+    /// Загрузка из потока.
+    /// </summary>
+    public void Read
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        // TODO: implement
+    }
+
+    /// <summary>
+    /// Сохранение в поток.
+    /// </summary>
+    public void Save
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        // TODO: implement
+    }
+
+    #endregion
 }

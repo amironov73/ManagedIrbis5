@@ -17,25 +17,24 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace ManagedIrbis.InMemory
+namespace ManagedIrbis.InMemory;
+
+/// <summary>
+/// Термин поискового словаря в оперативной памяти.
+/// </summary>
+public class InMemoryTerm
 {
+    #region Properties
+
     /// <summary>
-    /// Термин поискового словаря в оперативной памяти.
+    /// Текст.
     /// </summary>
-    public class InMemoryTerm
-    {
-        #region Properties
+    public string? Text { get; set; }
 
-        /// <summary>
-        /// Текст.
-        /// </summary>
-        public string? Text { get; set; }
+    /// <summary>
+    /// Постинги.
+    /// </summary>
+    public List<InMemoryPosting>? Postings { get; set; }
 
-        /// <summary>
-        /// Постинги.
-        /// </summary>
-        public List<InMemoryPosting>? Postings { get; set; }
-
-        #endregion
-    }
+    #endregion
 }

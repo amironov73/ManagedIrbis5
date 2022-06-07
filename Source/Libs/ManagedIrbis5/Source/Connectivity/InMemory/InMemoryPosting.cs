@@ -11,35 +11,34 @@
 
 #nullable enable
 
-namespace ManagedIrbis.InMemory
+namespace ManagedIrbis.InMemory;
+
+/// <summary>
+/// Постинг термина в оперативной памяти.
+/// </summary>
+public sealed class InMemoryPosting
 {
+    #region Properties
+
     /// <summary>
-    /// Постинг термина в оперативной памяти.
+    /// MFN.
     /// </summary>
-    public sealed class InMemoryPosting
-    {
-        #region Properties
+    public int Mfn { get; set; }
 
-        /// <summary>
-        /// MFN.
-        /// </summary>
-        public int Mfn { get; set; }
+    /// <summary>
+    /// Метка поля.
+    /// </summary>
+    public int Tag { get; set; }
 
-        /// <summary>
-        /// Метка поля.
-        /// </summary>
-        public int Tag { get; set; }
+    /// <summary>
+    /// Повторение поля.
+    /// </summary>
+    public int Occurrence { get; set; }
 
-        /// <summary>
-        /// Повторение поля.
-        /// </summary>
-        public int Occurrence { get; set; }
+    /// <summary>
+    /// Позиция в поле.
+    /// </summary>
+    public int Position { get; set; }
 
-        /// <summary>
-        /// Позиция в поле.
-        /// </summary>
-        public int Position { get; set; }
-
-        #endregion
-    }
+    #endregion
 }
