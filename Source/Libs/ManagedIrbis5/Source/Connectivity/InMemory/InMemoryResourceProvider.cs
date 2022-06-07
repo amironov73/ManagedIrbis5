@@ -34,7 +34,7 @@ namespace ManagedIrbis.InMemory
     /// Провайдер ресурсов, расположенных в оперативной памяти.
     /// </summary>
     public sealed class InMemoryResourceProvider
-        : IResourceProvider
+        : ISyncResourceProvider
     {
         #region Properties
 
@@ -132,7 +132,7 @@ namespace ManagedIrbis.InMemory
 
         #region IResourceProvider members
 
-        /// <inheritdoc cref="IResourceProvider.Dump"/>
+        /// <inheritdoc cref="ISyncResourceProvider.Dump"/>
         public void Dump
             (
                 TextWriter output
@@ -143,7 +143,7 @@ namespace ManagedIrbis.InMemory
             throw new NotImplementedException();
         }
 
-        /// <inheritdoc cref="IResourceProvider.ListResources"/>
+        /// <inheritdoc cref="ISyncResourceProvider.ListResources"/>
         public string[] ListResources
             (
                 string path
@@ -154,7 +154,7 @@ namespace ManagedIrbis.InMemory
             return _files.Values.ToArray();
         }
 
-        /// <inheritdoc cref="IResourceProvider.ReadResource"/>
+        /// <inheritdoc cref="ISyncResourceProvider.ReadResource"/>
         public string? ReadResource
             (
                 string fileName
@@ -178,7 +178,7 @@ namespace ManagedIrbis.InMemory
             return default;
         }
 
-        /// <inheritdoc cref="IResourceProvider.ResourceExists"/>
+        /// <inheritdoc cref="ISyncResourceProvider.ResourceExists"/>
         public bool ResourceExists
             (
                 string fileName
@@ -196,7 +196,7 @@ namespace ManagedIrbis.InMemory
             return provider._files.ContainsKey (fileName);
         }
 
-        /// <inheritdoc cref="IResourceProvider.WriteResource"/>
+        /// <inheritdoc cref="ISyncResourceProvider.WriteResource"/>
         public bool WriteResource
             (
                 string fileName,

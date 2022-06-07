@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
 
 /* IConnectionDebugger.cs -- интерфейс отладчика подключений
  * Ars Magna project, http://arsmagna.ru
@@ -15,37 +12,59 @@
 
 #region Using directives
 
+using System;
+using System.Threading.Tasks;
+
 using ManagedIrbis.Infrastructure.Sockets;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure.Debugging
+namespace ManagedIrbis.Infrastructure.Debugging;
+
+/// <summary>
+/// Интерфейс отладчика подключений.
+/// </summary>
+public interface IConnectionDebugger
 {
     /// <summary>
-    /// Интерфейс отладчика подключений.
+    /// Отладка при отправке пакета.
+    /// Вариант для синхронного сокета.
     /// </summary>
-    public interface IConnectionDebugger
-    {
-        /// <summary>
-        /// Отладка при отправке пакета.
-        /// </summary>
-        void DebugOugoingPacket
-            (
-                ISyncClientSocket socket,
-                byte[] packet
-            );
+    void DebugOugoingPacket
+        (
+            ISyncClientSocket socket,
+            ReadOnlyMemory<byte> packet
+        );
 
-        /// <summary>
-        /// Отладка при получении пакета.
-        /// </summary>
-        void DebugIncomingPacket
-            (
-                ISyncClientSocket socket,
-                byte[] packet
-            );
+    /// <summary>
+    /// Отладка при получении пакета.
+    /// Вариант для синхронного сокета.
+    /// </summary>
+    void DebugIncomingPacket
+        (
+            ISyncClientSocket socket,
+            ReadOnlyMemory<byte> packet
+        );
 
-    } // interface IConnectionDebugger
+    /// <summary>
+    /// Отладка при отправке пакета.
+    /// Вариант для асинхронного сокета.
+    /// </summary>
+    Task DebugOugoingPacketAsync
+        (
+            IAsyncClientSocket socket,
+            ReadOnlyMemory<byte> packet
+        );
 
-} // namespace ManagedIrbis.Infrastructure.Debugging
+    /// <summary>
+    /// Отладка при получении пакета.
+    /// Вариант для асинхронного сокета.
+    /// </summary>
+    Task DebugIncomingPacketAsync
+        (
+            IAsyncClientSocket socket,
+            ReadOnlyMemory<byte> packet
+        );
+}

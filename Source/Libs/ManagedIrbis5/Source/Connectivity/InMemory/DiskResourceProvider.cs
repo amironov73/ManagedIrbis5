@@ -23,112 +23,111 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.InMemory
+namespace ManagedIrbis.InMemory;
+
+/// <summary>
+/// Провайдер ресурсов, расположенных на диске.
+/// </summary>
+public class DiskResourceProvider
+    : ISyncResourceProvider
 {
+    #region Properties
+
     /// <summary>
-    /// Провайдер ресурсов, расположенных на диске.
+    /// Путь к корню дерева ресурсов.
     /// </summary>
-    public class DiskResourceProvider
-        : IResourceProvider
+    public string RootPath { get; }
+
+    /// <summary>
+    /// Провайдеру запрещено писать на диск?
+    /// </summary>
+    public bool ReadOnly { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="rootPath">Путь к конрню дерева ресурсов.</param>
+    /// <param name="readOnly">Провайдеру запрещено писать на диск?</param>
+    public DiskResourceProvider
+        (
+            string rootPath,
+            bool readOnly = true
+        )
     {
-        #region Properties
+        Sure.NotNullNorEmpty (rootPath);
 
-        /// <summary>
-        /// Путь к корню дерева ресурсов.
-        /// </summary>
-        public string RootPath { get; }
-
-        /// <summary>
-        /// Провайдеру запрещено писать на диск?
-        /// </summary>
-        public bool ReadOnly { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="rootPath">Путь к конрню дерева ресурсов.</param>
-        /// <param name="readOnly">Провайдеру запрещено писать на диск?</param>
-        public DiskResourceProvider
-            (
-                string rootPath,
-                bool readOnly = true
-            )
+        if (!Directory.Exists (rootPath))
         {
-            Sure.NotNullNorEmpty (rootPath);
-
-            if (!Directory.Exists (rootPath))
-            {
-                throw new ArgumentException (nameof (rootPath));
-            }
-
-            RootPath = rootPath;
-            ReadOnly = readOnly;
+            throw new ArgumentException (nameof (rootPath));
         }
 
-        #endregion
-
-        #region IResourceProvider members
-
-        /// <inheritdoc cref="IResourceProvider.Dump"/>
-        public void Dump
-            (
-                TextWriter output
-            )
-        {
-            Sure.NotNull (output);
-
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc cref="IResourceProvider.ListResources"/>
-        public string[] ListResources
-            (
-                string path
-            )
-        {
-            Sure.NotNullNorEmpty (path);
-
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc cref="IResourceProvider.ReadResource"/>
-        public string? ReadResource
-            (
-                string fileName
-            )
-        {
-            Sure.NotNullNorEmpty (fileName);
-
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc cref="IResourceProvider.ResourceExists"/>
-        public bool ResourceExists
-            (
-                string fileName
-            )
-        {
-            Sure.NotNullNorEmpty (fileName);
-
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc cref="IResourceProvider.WriteResource"/>
-        public bool WriteResource
-            (
-                string fileName,
-                string? content
-            )
-        {
-            Sure.NotNull (fileName);
-
-            throw new NotImplementedException();
-        }
-
-        #endregion
+        RootPath = rootPath;
+        ReadOnly = readOnly;
     }
+
+    #endregion
+
+    #region IResourceProvider members
+
+    /// <inheritdoc cref="ISyncResourceProvider.Dump"/>
+    public void Dump
+        (
+            TextWriter output
+        )
+    {
+        Sure.NotNull (output);
+
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="ISyncResourceProvider.ListResources"/>
+    public string[] ListResources
+        (
+            string path
+        )
+    {
+        Sure.NotNullNorEmpty (path);
+
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="ISyncResourceProvider.ReadResource"/>
+    public string? ReadResource
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="ISyncResourceProvider.ResourceExists"/>
+    public bool ResourceExists
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc cref="ISyncResourceProvider.WriteResource"/>
+    public bool WriteResource
+        (
+            string fileName,
+            string? content
+        )
+    {
+        Sure.NotNull (fileName);
+
+        throw new NotImplementedException();
+    }
+
+    #endregion
 }
