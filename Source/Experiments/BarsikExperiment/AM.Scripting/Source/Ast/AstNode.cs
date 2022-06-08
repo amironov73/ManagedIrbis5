@@ -8,11 +8,13 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* BarsikParser.cs -- парсер барсиковых токенов
+/* AstNode.cs -- абстрактный узел AST
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using System;
 
 using Pidgin;
 
@@ -23,11 +25,9 @@ using Pidgin;
 namespace AM.Scripting;
 
 /// <summary>
-/// Парсер барсиковых токенов
+/// Абстрактный узел AST.
 /// </summary>
-/// <typeparam name="TOutput"></typeparam>
-internal abstract class BarsikParser<TOutput>
-    : Parser<BarsikToken,TOutput>
+public abstract class AstNode
 {
     // пустое тело класса
 }

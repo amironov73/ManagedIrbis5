@@ -10,7 +10,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* ExemplarManager.cs -- manages exemplars of the books/magazines etc
+/* ExemplarManager.cs -- работа с экземплярами книги/журнала/газеты/подшивки и т. д.
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -39,6 +39,7 @@ using ManagedIrbis.Providers;
 namespace ManagedIrbis.Fields;
 
 /// <summary>
+/// Работа с экземплярами книги/журнала/газеты/подшивки и т. д.
 /// Manages exemplars of the books/magazines etc.
 /// </summary>
 public sealed class ExemplarManager
@@ -46,27 +47,27 @@ public sealed class ExemplarManager
     #region Properties
 
     /// <summary>
-    /// Client connection.
+    /// Провайдер данных.
     /// </summary>
     public ISyncProvider Connection { get; }
 
     /// <summary>
-    /// Brief format name.
+    /// Формат краткого библиографического описания.
     /// </summary>
     public string Format { get; set; }
 
     /// <summary>
-    /// List of exemplars.
+    /// Список экземпляров.
     /// </summary>
     public ReadOnlyCollection<ExemplarInfo> List => _list.AsReadOnly();
 
     /// <summary>
-    /// Output.
+    /// Выходной поток.
     /// </summary>
     public AbstractOutput? Output => _output;
 
     /// <summary>
-    /// Prefix.
+    /// Префикс.
     /// </summary>
     public string Prefix { get; set; }
 
@@ -75,7 +76,7 @@ public sealed class ExemplarManager
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public ExemplarManager
         (
@@ -83,6 +84,8 @@ public sealed class ExemplarManager
             AbstractOutput? output = null
         )
     {
+        Sure.NotNull (connection);
+
         Connection = connection;
         _output = output;
         Prefix = "IN=";
@@ -119,8 +122,10 @@ public sealed class ExemplarManager
 
         if (result.IsEmpty())
         {
-            var workList = record.FM (920);
-            if (workList.SameString ("NJ"))
+            var worksheet = record.FM (920);
+            if (worksheet.SameString ("NJ") // отдельный номер журнала
+                || worksheet.SameString ("NJK") // подшивка
+                || worksheet.SameString ("NJP")) // номер, входящий в подшивку
             {
                 result = record.FM (934);
             }
