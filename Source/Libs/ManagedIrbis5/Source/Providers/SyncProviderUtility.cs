@@ -248,14 +248,14 @@ public static class SyncProviderUtility
             if (result.Count != 0)
             {
                 var lastTerm = result[^1];
-                var firstTerm = terms![0];
+                var firstTerm = terms[0];
                 if (firstTerm.Text == lastTerm.Text)
                 {
                     startIndex = 1;
                 }
             }
 
-            for (var i = startIndex; i < terms!.Length; i++)
+            for (var i = startIndex; i < terms.Length; i++)
             {
                 var term = terms[i];
                 var text = term.Text;

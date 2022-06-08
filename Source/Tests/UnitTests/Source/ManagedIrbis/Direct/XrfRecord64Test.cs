@@ -22,8 +22,8 @@ public class XrfRecord64Test
         var record = new XrfRecord64();
         Assert.AreEqual (0L, record.Offset);
         Assert.AreEqual (0, (int)record.Status);
-        Assert.IsFalse (record.Deleted);
-        Assert.IsFalse (record.Locked);
+        Assert.IsFalse (record.IsDeleted);
+        Assert.IsFalse (record.IsLocked);
     }
 
     [TestMethod]
@@ -35,11 +35,11 @@ public class XrfRecord64Test
         Assert.AreEqual (23456L, record.Offset);
         record.Status = RecordStatus.LogicallyDeleted;
         Assert.AreEqual (RecordStatus.LogicallyDeleted, record.Status);
-        Assert.IsTrue (record.Deleted);
-        Assert.IsFalse (record.Locked);
+        Assert.IsTrue (record.IsDeleted);
+        Assert.IsFalse (record.IsLocked);
         record.Status = RecordStatus.Locked;
-        Assert.IsTrue (record.Locked);
-        Assert.IsFalse (record.Deleted);
+        Assert.IsTrue (record.IsLocked);
+        Assert.IsFalse (record.IsDeleted);
     }
 
     [TestMethod]
@@ -48,12 +48,12 @@ public class XrfRecord64Test
     {
         var record = new XrfRecord64();
         record.Status = RecordStatus.Last;
-        Assert.IsFalse (record.Locked);
-        record.Locked = true;
-        Assert.IsTrue (record.Locked);
+        Assert.IsFalse (record.IsLocked);
+        record.IsLocked = true;
+        Assert.IsTrue (record.IsLocked);
         Assert.AreEqual (RecordStatus.Last | RecordStatus.Locked, record.Status);
-        record.Locked = false;
-        Assert.IsFalse (record.Locked);
+        record.IsLocked = false;
+        Assert.IsFalse (record.IsLocked);
         Assert.AreEqual (RecordStatus.Last, record.Status);
     }
 

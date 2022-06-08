@@ -412,7 +412,7 @@ public sealed class DirectAccess64
         var result = new List<int>();
         foreach (var mfn in found)
         {
-            if (!Xrf.ReadRecord (mfn).Deleted)
+            if (!Xrf.ReadRecord (mfn).IsDeleted)
             {
                 result.Add (mfn);
             }
@@ -438,7 +438,7 @@ public sealed class DirectAccess64
             try
             {
                 var xrfRecord = Xrf.ReadRecord (mfn);
-                if (!xrfRecord.Deleted)
+                if (!xrfRecord.IsDeleted)
                 {
                     var mstRecord = Mst.ReadRecord (xrfRecord.Offset);
                     if (!mstRecord.Deleted)

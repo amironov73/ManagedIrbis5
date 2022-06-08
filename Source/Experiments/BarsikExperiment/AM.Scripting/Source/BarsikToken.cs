@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 
 #endregion
 
@@ -28,6 +29,15 @@ namespace AM.Scripting;
 /// </summary>
 public sealed class BarsikToken
 {
+    #region Properties
+
+    /// <summary>
+    /// Токен-признак конца текста.
+    /// </summary>
+    public static readonly BarsikToken Eot = new (EOT);
+
+    #endregion
+
     #region Constants
 
     /// <summary>
@@ -114,6 +124,138 @@ public sealed class BarsikToken
     {
         Kind = kind;
         Value = value;
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Конец текста?
+    /// </summary>
+    public bool IsEot()
+    {
+        return string.IsNullOrEmpty (Kind);
+    }
+
+    /// <summary>
+    /// Сравнение с заданной строкой.
+    /// </summary>
+    public bool IsOneOf
+        (
+            string kind1
+        )
+    {
+        Sure.NotNull (kind1);
+
+        return string.CompareOrdinal (Kind, kind1) == 0;
+    }
+
+    /// <summary>
+    /// Сравнение с заданными строками.
+    /// </summary>
+    public bool IsOneOf
+        (
+            string kind1,
+            string kind2
+        )
+    {
+        Sure.NotNull (kind1);
+        Sure.NotNull (kind2);
+
+        return string.CompareOrdinal (Kind, kind1) == 0
+            || string.CompareOrdinal (Kind, kind2) == 0;
+    }
+
+    /// <summary>
+    /// Сравнение с заданными строками.
+    /// </summary>
+    public bool IsOneOf
+        (
+            string kind1,
+            string kind2,
+            string kind3
+        )
+    {
+        Sure.NotNull (kind1);
+        Sure.NotNull (kind2);
+        Sure.NotNull (kind3);
+
+        return string.CompareOrdinal (Kind, kind1) == 0
+            || string.CompareOrdinal (Kind, kind2) == 0
+            || string.CompareOrdinal (Kind, kind3) == 0;
+    }
+
+    /// <summary>
+    /// Сравнение с заданными строками.
+    /// </summary>
+    public bool IsOneOf
+        (
+            IEnumerable<string> kinds
+        )
+    {
+        Sure.NotNull ((object?) kinds);
+
+        foreach (var kind in kinds)
+        {
+            Sure.NotNull (kind);
+            if (string.CompareOrdinal (Kind, kind) == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Сравнение с заданными строками.
+    /// </summary>
+    public bool IsOneOf
+        (
+            params string[] kinds
+        )
+    {
+        Sure.NotNull ((object?) kinds);
+
+        foreach (var kind in kinds)
+        {
+            Sure.NotNull (kind);
+            if (string.CompareOrdinal (Kind, kind) == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    #endregion
+
+    #region Operators
+
+    /// <summary>
+    /// Оператор сравнения со строкой.
+    /// </summary>
+    public static bool operator ==
+        (
+            BarsikToken token,
+            string? kind
+        )
+    {
+        return string.CompareOrdinal (token.Kind, kind) == 0;
+    }
+
+    /// <summary>
+    /// Оператор сравнения со строкой.
+    /// </summary>
+    public static bool operator !=
+        (
+            BarsikToken token,
+            string? kind
+        )
+    {
+        return string.CompareOrdinal (token.Kind, kind) != 0;
     }
 
     #endregion
