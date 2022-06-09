@@ -4,14 +4,19 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
-/* InMemoryTerm.cs -- термин поискового словаря в оперативной памяти
+/* InMemoryTerm.cs -- термин поискового словаря, хранящийся в оперативной памяти
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 #endregion
 
@@ -20,8 +25,10 @@ using System.Collections.Generic;
 namespace ManagedIrbis.InMemory;
 
 /// <summary>
-/// Термин поискового словаря в оперативной памяти.
+/// Термин поискового словаря, хранящийся в оперативной памяти.
 /// </summary>
+[Serializable]
+[XmlRoot ("term")]
 public class InMemoryTerm
 {
     #region Properties
@@ -29,11 +36,19 @@ public class InMemoryTerm
     /// <summary>
     /// Текст.
     /// </summary>
+    [XmlAttribute ("text")]
+    [JsonPropertyName ("text")]
+    [DisplayName ("Текст")]
+    [Description ("Текст")]
     public string? Text { get; set; }
 
     /// <summary>
-    /// Постинги.
+    /// Постинги термина.
     /// </summary>
+    [XmlElement ("postings")]
+    [JsonPropertyName ("postings")]
+    [DisplayName ("Постинги")]
+    [Description ("Постинги термина")]
     public List<InMemoryPosting>? Postings { get; set; }
 
     #endregion

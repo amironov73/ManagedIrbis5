@@ -4,34 +4,53 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
 /* ActualizeRecordParameters.cs -- параметры актуализации записи на ИРБИС-сервере
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
+
+#endregion
+
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Параметры актуализации записи на ИРБИС-сервере.
+/// </summary>
+[Serializable]
+[XmlRoot ("parameters")]
+public sealed class ActualizeRecordParameters
 {
+    #region Properties
+
     /// <summary>
-    /// Параметры актуализации записи на ИРБИС-сервере.
+    /// Имя базы данных (опционально).
+    /// Если не указано, используется текущая база данных.
     /// </summary>
-    public sealed class ActualizeRecordParameters
-    {
-        #region Properties
+    [XmlAttribute ("database")]
+    [JsonPropertyName ("database")]
+    [DisplayName ("База данных")]
+    [Description ("Имя базы данных")]
+    public string? Database { get; set; }
 
-        /// <summary>
-        /// Имя базы данных (опционально).
-        /// Если не указано, используется текущая база данных.
-        /// </summary>
-        public string? Database { get; set; }
+    /// <summary>
+    /// MFN актуализируемой записи (обязательно).
+    /// 0 означает "актуализировать всю базу данных".
+    /// </summary>
+    [XmlAttribute ("mfn")]
+    [JsonPropertyName ("mfn")]
+    [DisplayName ("MFN")]
+    [Description ("MFN актуализируемой записи")]
+    public int Mfn { get; set; }
 
-        /// <summary>
-        /// MFN актуализируемой записи (обязательно).
-        /// 0 означает "актуализировать всю базу данных".
-        /// </summary>
-        public int Mfn { get; set; }
-
-        #endregion
-    }
+    #endregion
 }

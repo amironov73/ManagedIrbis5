@@ -1,0 +1,32 @@
+import AM.Windows.Forms
+
+text: "Hello Form"
+width: 600
+height: 300
+
+Label {
+  name: "_label1"
+  left: 10
+  top: 10
+  text: "Hello, world!"
+}
+
+TextBox {
+  name: "_textBox1"
+  left: 10
+  top: 60
+  multiline: false
+  scrollbars: vertical
+}
+
+ListBox {
+  name: "_listBox1"
+  left: 10
+  top: 110
+  height: 100
+  items: [
+    "item 1"
+    "item 2"
+    "item 3"
+  ]
+}
