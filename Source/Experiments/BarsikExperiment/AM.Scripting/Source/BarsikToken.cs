@@ -46,9 +46,9 @@ public sealed class BarsikToken
     public const string? EOT = null;
 
     /// <summary>
-    /// Ключевое слово, например, "if".
+    /// Зарезервированное слово, например, "if".
     /// </summary>
-    public const string Keyword = "keyword";
+    public const string ReservedWord = "reserved";
 
     /// <summary>
     /// Идентификатор.
@@ -94,6 +94,11 @@ public sealed class BarsikToken
     /// Число с плавающей точкой с двойной точностью.
     /// </summary>
     public const string Double = "double";
+
+    /// <summary>
+    /// Число с фиксированной точкой (денежное).
+    /// </summary>
+    public const string Decimal = "decimal";
 
     #endregion
 
@@ -239,10 +244,15 @@ public sealed class BarsikToken
     /// </summary>
     public static bool operator ==
         (
-            BarsikToken token,
+            BarsikToken? token,
             string? kind
         )
     {
+        if (token is null || kind is null)
+        {
+            return false;
+        }
+
         return string.CompareOrdinal (token.Kind, kind) == 0;
     }
 
@@ -251,10 +261,15 @@ public sealed class BarsikToken
     /// </summary>
     public static bool operator !=
         (
-            BarsikToken token,
+            BarsikToken? token,
             string? kind
         )
     {
+        if (token is null || kind is null)
+        {
+            return true;
+        }
+
         return string.CompareOrdinal (token.Kind, kind) != 0;
     }
 

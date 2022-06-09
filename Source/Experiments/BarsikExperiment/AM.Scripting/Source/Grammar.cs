@@ -14,10 +14,7 @@
 
 #region Using directives
 
-using System;
-
 using Pidgin;
-using Pidgin.Expression;
 
 using static Pidgin.Parser;
 
@@ -30,36 +27,53 @@ namespace AM.Scripting;
 /// <summary>
 /// Грамматика языка Барсик.
 /// </summary>
-public static class Grammar
+internal static class Grammar
 {
     #region Private members
 
     /// <summary>
     /// Токен, например, "+" или "==".
     /// </summary>
-    private static BarsikTerm Term (string kind) => new (kind);
+    internal static BarsikTerm Term (params string[] kinds) => new (kinds);
 
     /// <summary>
     /// Идентификатор, например, "hello" или "help123".
     /// </summary>
-    private static readonly BarsikIdentifier Identifier = new ();
+    internal static readonly IdentifierParser Identifier = new ();
 
-    #endregion
+    /// <summary>
+    /// Зарезервированные слова, например, "if".
+    /// </summary>
+    internal static ReservedParser Keyword (params string[] kinds) => new (kinds);
 
-    #region Public methods
+    private static readonly Parser<BarsikToken, ConstantNode> NullLiteral =
+        Keyword ("null").ThenReturn (new ConstantNode (null));
 
-    private static readonly Parser<BarsikToken, AtomNode> CharLiteral =
-        new BarsikTerm (BarsikToken.Char)
-            .Select<AtomNode> (v => new ConstantNode (v![0]));
+    private static readonly Parser<BarsikToken, ConstantNode> TrueLiteral =
+        Keyword ("true").ThenReturn (new ConstantNode (true));
 
-    private static readonly Parser<BarsikToken, AtomNode> StringLiteral =
-        new BarsikTerm (BarsikToken.String)
-            .Select<AtomNode> (v => new ConstantNode (v));
+    private static readonly Parser<BarsikToken, ConstantNode> FalseLiteral =
+        Keyword ("false").ThenReturn (new ConstantNode (false));
 
-    private static readonly Parser<BarsikToken, AtomNode> Literal = OneOf
+    private static readonly Parser<BarsikToken, ConstantNode> CharLiteral =
+        new ConstantParser (BarsikToken.Char)
+            .Select (v => v.ChangeValue (((string) v.Value!)[0]));
+
+    private static readonly Parser<BarsikToken, ConstantNode> StringLiteral =
+        new ConstantParser (BarsikToken.String)
+            .Select (v => v.ChangeValue ((string) v.Value!));
+
+    private static readonly Parser<BarsikToken, ConstantNode> NumberLiteral =
+        new NumberParser();
+
+    internal static readonly Parser<BarsikToken, ConstantNode> Literal = OneOf
         (
+            NullLiteral,
+            TrueLiteral,
+            FalseLiteral,
             CharLiteral,
-            StringLiteral
+            StringLiteral,
+            NumberLiteral
         );
 
     #endregion

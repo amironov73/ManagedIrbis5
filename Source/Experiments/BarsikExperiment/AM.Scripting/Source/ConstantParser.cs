@@ -8,7 +8,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* BarsikTerm.cs -- парсер барсиковых токенов
+/* ConstantParser.cs -- парсер барсиковых констант
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,10 +23,10 @@ using Pidgin;
 namespace AM.Scripting;
 
 /// <summary>
-/// Парсер барсиковых токенов.
+/// Парсер барсиковых констант.
 /// </summary>
-internal sealed class BarsikTerm
-    : Parser<BarsikToken,string?>
+internal sealed class ConstantParser
+    : Parser<BarsikToken, ConstantNode>
 {
     #region Properties
 
@@ -43,7 +43,7 @@ internal sealed class BarsikTerm
     /// Конструктор.
     /// </summary>
     /// <param name="expectedKinds">Ожидаемые типы токена</param>
-    public BarsikTerm
+    public ConstantParser
         (
             params string[] expectedKinds
         )
@@ -62,10 +62,10 @@ internal sealed class BarsikTerm
         (
             ref ParseState<BarsikToken> state,
             ref PooledList<Expected<BarsikToken>> expecteds,
-            out string? result
+            out ConstantNode result
         )
     {
-        result = default;
+        result = default!;
         if (!state.HasCurrent)
         {
             return false;
@@ -76,7 +76,7 @@ internal sealed class BarsikTerm
         {
             if (current.Kind == kind)
             {
-                result = current.Kind;
+                result = new ConstantNode (current.Value.ToString());
                 state.Advance();
                 return true;
             }

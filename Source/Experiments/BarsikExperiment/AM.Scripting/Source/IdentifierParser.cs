@@ -25,7 +25,7 @@ namespace AM.Scripting;
 /// <summary>
 /// Парсер барсиковых идентификаторов.
 /// </summary>
-internal sealed class BarsikIdentifier
+internal sealed class IdentifierParser
     : Parser<BarsikToken, string?>
 {
     #region Parser<T1,T2> members
@@ -48,6 +48,7 @@ internal sealed class BarsikIdentifier
         if (current.Kind == BarsikToken.Identifier)
         {
             result = current.Value.ToString();
+            state.Advance();
             return true;
         }
 

@@ -8,11 +8,13 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* BarsikTerm.cs -- парсер барсиковых токенов
+/* ReservedParser.cs -- парсер барсиковых зарезервированных слов
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using System;
 
 using Pidgin;
 
@@ -23,9 +25,9 @@ using Pidgin;
 namespace AM.Scripting;
 
 /// <summary>
-/// Парсер барсиковых токенов.
+/// Парсер барсиковых зарезервированных слов.
 /// </summary>
-internal sealed class BarsikTerm
+public sealed class ReservedParser
     : Parser<BarsikToken,string?>
 {
     #region Properties
@@ -43,7 +45,7 @@ internal sealed class BarsikTerm
     /// Конструктор.
     /// </summary>
     /// <param name="expectedKinds">Ожидаемые типы токена</param>
-    public BarsikTerm
+    public ReservedParser
         (
             params string[] expectedKinds
         )
@@ -72,13 +74,17 @@ internal sealed class BarsikTerm
         }
 
         var current = state.Current;
-        foreach (var kind in ExpectedKinds)
+        if (current.Kind == BarsikToken.ReservedWord)
         {
-            if (current.Kind == kind)
+            var valueSpan = current.Value.Span;
+            foreach (var kind in ExpectedKinds)
             {
-                result = current.Kind;
-                state.Advance();
-                return true;
+                if (Utility.CompareOrdinal (kind.AsSpan(), valueSpan) == 0)
+                {
+                    result = current.Value.ToString();
+                    state.Advance();
+                    return true;
+                }
             }
         }
 

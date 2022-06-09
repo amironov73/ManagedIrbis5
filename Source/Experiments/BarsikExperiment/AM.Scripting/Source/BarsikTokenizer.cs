@@ -130,14 +130,21 @@ public static class BarsikTokenizer
         var isU = false;
         var isL = false;
         var isF = false;
+        var isM = false;
 
         // суффиксы
         if (isFloat)
         {
             chr = navigator.PeekChar();
-            if (chr == 'F' || chr == 'f')
+            if (chr is 'F' or 'f')
             {
                 isF = true;
+                navigator.ReadChar();
+            }
+
+            if (chr is 'M' or 'm')
+            {
+                isM = true;
                 navigator.ReadChar();
             }
         }
@@ -150,7 +157,7 @@ public static class BarsikTokenizer
                 {
                     case 'u':
                     case 'U':
-                        if (isU)
+                        if (isU || isF || isFloat || isM)
                         {
                             // нельзя указывать больше одного раза
                             throw new FormatException();
@@ -161,13 +168,34 @@ public static class BarsikTokenizer
 
                     case 'l':
                     case 'L':
-                        if (isL)
+                        if (isL || isF || isFloat || isM)
                         {
                             // нельзя указывать больше одного раза
                             throw new FormatException();
                         }
 
                         isL = true;
+                        break;
+
+                    case 'f':
+                    case 'F':
+                        if (isU || isL || isM)
+                        {
+                            throw new FormatException();
+                        }
+
+                        isFloat = true;
+                        isF = true;
+                        break;
+
+                    case 'm':
+                    case 'M':
+                        if (isU || isL || isF)
+                        {
+                            throw new FormatException();
+                        }
+
+                        isM = true;
                         break;
 
                     default:
@@ -188,13 +216,17 @@ public static class BarsikTokenizer
         kind = isFloat
             ?
                 (
-                    isF
+                    isM
+                    ? BarsikToken.Decimal
+                    : isF
                     ? BarsikToken.Single
                     : BarsikToken.Double
                 )
             :
                 (
-                    isL
+                    isM
+                    ? BarsikToken.Decimal
+                    : isL
                     ? isU ? BarsikToken.UInt64 : BarsikToken.Int64
                     : isU ? BarsikToken.UInt32 : BarsikToken.Int32
                 );
@@ -310,7 +342,13 @@ public static class BarsikTokenizer
 
         var end = navigator.Position;
         var value = navigator.Text.AsMemory (start, end - start);
-        var result = new BarsikToken (BarsikToken.Identifier, value);
+        var result = new BarsikToken
+            (
+                BarsikUtility.IsReservedWord (value)
+                    ? BarsikToken.ReservedWord
+                    : BarsikToken.Identifier,
+                value
+            );
 
         return result;
     }

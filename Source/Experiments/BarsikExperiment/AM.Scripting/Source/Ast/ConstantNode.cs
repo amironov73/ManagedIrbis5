@@ -4,9 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedMember.Global
 
 /* ConstantNode.cs -- константное значение
  * Ars Magna project, http://arsmagna.ru
@@ -17,11 +14,20 @@
 namespace AM.Scripting;
 
 /// <summary>
-/// Константное значение.
+/// Хранимое константное значение.
 /// </summary>
 internal sealed class ConstantNode
     : AtomNode
 {
+    #region Properties
+
+    /// <summary>
+    /// Собственно хранимое значение.
+    /// </summary>
+    public object? Value { get; private set; }
+
+    #endregion
+
     #region Construction
 
     /// <summary>
@@ -32,15 +38,25 @@ internal sealed class ConstantNode
             object? value
         )
     {
-        _value = value;
+        Value = value;
     }
 
     #endregion
 
-    #region Private members
+    #region Public methods
 
-    // собственно хранимое значение
-    private readonly object? _value;
+    /// <summary>
+    /// Изменение значения константы.
+    /// </summary>
+    public ConstantNode ChangeValue
+        (
+            object? newValue
+        )
+    {
+        Value = newValue;
+
+        return this;
+    }
 
     #endregion
 
@@ -52,7 +68,7 @@ internal sealed class ConstantNode
             Context context
         )
     {
-        return _value;
+        return Value;
     }
 
     #endregion
@@ -62,7 +78,7 @@ internal sealed class ConstantNode
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return $"constant '{_value}'";
+        return $"constant '{Value}'";
     }
 
     #endregion
