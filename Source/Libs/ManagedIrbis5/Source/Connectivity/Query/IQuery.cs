@@ -19,54 +19,51 @@ using System.IO;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Интерфейс клиентского запроса к серверу ИРБИС64.
+/// </summary>
+public interface IQuery
 {
     /// <summary>
-    /// Интерфейс клиентского запроса к серверу ИРБИС64.
+    /// Добавление строки с целым числом (плюс перевод строки).
     /// </summary>
-    public interface IQuery
-    {
-        /// <summary>
-        /// Добавление строки с целым числом (плюс перевод строки).
-        /// </summary>
-        void Add (int value);
+    void Add (int value);
 
-        /// <summary>
-        /// Добавление строки в кодировке ANSI (плюс перевод строки).
-        /// </summary>
-        void AddAnsi (string? value);
+    /// <summary>
+    /// Добавление строки в кодировке ANSI (плюс перевод строки).
+    /// </summary>
+    void AddAnsi (string? value);
 
-        /// <summary>
-        /// Добавление строки в кодировке UTF-8 (плюс перевод строки).
-        /// </summary>
-        void AddUtf (string? value);
+    /// <summary>
+    /// Добавление строки в кодировке UTF-8 (плюс перевод строки).
+    /// </summary>
+    void AddUtf (string? value);
 
-        /// <summary>
-        /// Добавление формата.
-        /// </summary>
-        void AddFormat (string? format);
+    /// <summary>
+    /// Добавление спецификации формата формата (плюс перевод строки).
+    /// </summary>
+    void AddFormat (string? format);
 
-        /// <summary>
-        /// Отладочная печать.
-        /// </summary>
-        void Debug (TextWriter writer);
+    /// <summary>
+    /// Отладочная печать.
+    /// </summary>
+    void Debug (TextWriter writer);
 
-        /// <summary>
-        /// Получение массива байтов, из которых состоит
-        /// клиентский запрос.
-        /// </summary>
-        ReadOnlyMemory<byte> GetBody();
+    /// <summary>
+    /// Получение массива байтов, из которых состоит
+    /// клиентский запрос.
+    /// </summary>
+    ReadOnlyMemory<byte> GetBody();
 
-        /// <summary>
-        /// Подсчет общей длины запроса (в байтах).
-        /// </summary>
-        int GetLength();
+    /// <summary>
+    /// Подсчет общей длины запроса в байтах.
+    /// </summary>
+    int GetLength();
 
-        /// <summary>
-        /// Добавление одного перевода строки.
-        /// </summary>
-        void NewLine();
-
-    } // interface IQuery
-
-} // namespace ManagedIrbis.Infrastructrue
+    /// <summary>
+    /// Добавление одного перевода строки.
+    /// </summary>
+    void NewLine();
+}

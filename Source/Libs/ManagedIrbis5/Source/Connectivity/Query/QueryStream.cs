@@ -21,167 +21,174 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Общий код для <see cref="SyncQuery"/> и <see cref="AsyncQuery"/>.
+/// </summary>
+sealed class QueryStream
+    : MemoryStream
 {
+    #region Construction
+
     /// <summary>
-    /// Общий код для <see cref="SyncQuery"/> и <see cref="AsyncQuery"/>.
+    /// Конструктор с начальной емкостью.
     /// </summary>
-    sealed class QueryStream
-        : MemoryStream
+    /// <param name="capacity">Начальная емкость буфера.</param>
+    public QueryStream
+        (
+            int capacity
+        )
+        : base (capacity)
     {
-        #region Construction
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public QueryStream()
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Добавление строки с целым числом (плюс перевод строки).
+    /// </summary>
+    public void Add
+        (
+            int value
+        )
+    {
+        AddAnsi (value.ToInvariantString());
+    }
+
+    /// <summary>
+    /// Добавление строки в кодировке ANSI (плюс перевод строки).
+    /// </summary>
+    public void AddAnsi
+        (
+            string? value
+        )
+    {
+        value ??= string.Empty;
+        var converted = IrbisEncoding.Ansi.GetBytes (value);
+        Write (converted);
+        NewLine();
+    }
+
+    /// <summary>
+    /// Добавление стандартного заголовка.
+    /// </summary>
+    /// <param name="connection">Данные о подключении.</param>
+    /// <param name="commandCode">Код команды.</param>
+    public void AddHeader
+        (
+            IConnectionSettings connection,
+            string commandCode
+        )
+    {
+        Sure.NotNull (connection);
+        Sure.NotNullNorEmpty (commandCode);
+
+        var header = commandCode + "\n"
+            + connection.Workstation + "\n"
+            + commandCode + "\n"
+            + connection.ClientId.ToInvariantString() + "\n"
+            + connection.QueryId.ToInvariantString() + "\n"
+            + connection.Password + "\n"
+            + connection.Username + "\n"
+            + "\n\n";
+
+        AddAnsi (header);
+    }
+
+    /// <summary>
+    /// Добавление строки в кодировке UTF-8 (плюс перевод строки).
+    /// </summary>
+    public void AddUtf
+        (
+            string? value
+        )
+    {
+        value ??= String.Empty;
+        var converted = IrbisEncoding.Utf8.GetBytes (value);
+        Write (converted);
+        NewLine();
+    }
+
+    /// <summary>
+    /// Добавление спецификации формата (плюс перевод строки).
+    /// </summary>
+    public void AddFormat
+        (
+            string? format
+        )
+    {
+        if (string.IsNullOrEmpty (format))
         {
-        } // constructor
-
-        /// <summary>
-        /// Конструктор с начальной емкостью.
-        /// </summary>
-        /// <param name="capacity">Начальная емкость буфера.</param>
-        public QueryStream
-            (
-                int capacity
-            )
-            : base(capacity)
-        {
-        } // constructor
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавление строки с целым числом (плюс перевод строки).
-        /// </summary>
-        public void Add (int value) => AddAnsi (value.ToInvariantString());
-
-        /// <summary>
-        /// Добавление строки в кодировке ANSI (плюс перевод строки).
-        /// </summary>
-        public void AddAnsi
-            (
-                string? value
-            )
-        {
-            value ??= string.Empty;
-            var converted = IrbisEncoding.Ansi.GetBytes(value);
-            Write(converted);
             NewLine();
-        } // method AddAnsi
-
-        /// <summary>
-        /// Добавление стандартного заголовка.
-        /// </summary>
-        /// <param name="connection">Данные о подключении.</param>
-        /// <param name="commandCode">Код команды.</param>
-        public void AddHeader
-            (
-                IConnectionSettings connection,
-                string commandCode
-            )
+        }
+        else
         {
-            var header = commandCode + "\n"
-                + connection.Workstation + "\n"
-                + commandCode + "\n"
-                + connection.ClientId.ToInvariantString() + "\n"
-                + connection.QueryId.ToInvariantString() + "\n"
-                + connection.Password + "\n"
-                + connection.Username + "\n"
-                + "\n\n";
-
-            AddAnsi(header);
-        } // method AddHeader
-
-        /// <summary>
-        /// Добавление строки в кодировке UTF-8 (плюс перевод строки).
-        /// </summary>
-        public void AddUtf
-            (
-                string? value
-            )
-        {
-            value ??= String.Empty;
-            var converted = IrbisEncoding.Utf8.GetBytes(value);
-            Write(converted);
-            NewLine();
-        } // method AddUtf
-
-        /// <summary>
-        /// Добавление формата.
-        /// </summary>
-        public void AddFormat
-            (
-                string? format
-            )
-        {
+            format = format.Trim();
             if (string.IsNullOrEmpty (format))
             {
                 NewLine();
             }
             else
             {
-                format = format.Trim();
-                if (string.IsNullOrEmpty (format))
+                if (format.StartsWith ('@'))
                 {
-                    NewLine();
+                    AddAnsi (format);
                 }
                 else
                 {
-                    if (format.StartsWith ('@'))
-                    {
-                        AddAnsi (format);
-                    }
-                    else
-                    {
-                        var prepared = IrbisFormat.PrepareFormat (format);
-                        AddUtf ("!" + prepared);
-                    }
+                    var prepared = IrbisFormat.PrepareFormat (format);
+                    AddUtf ("!" + prepared);
                 }
             }
         }
+    }
 
-        /// <summary>
-        /// Отладочная печать.
-        /// </summary>
-        public void Debug
-            (
-                TextWriter writer
-            )
+    /// <summary>
+    /// Отладочная печать в кодировке ANSI.
+    /// </summary>
+    public void Debug
+        (
+            TextWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        foreach (var b in ToArray())
         {
-            foreach (var b in ToArray())
-            {
-                writer.Write($" {b:X2}");
-            }
-        } // method Debug
+            writer.Write ($" {b:X2}");
+        }
+    }
 
-        /// <summary>
-        /// Отладочная печать.
-        /// </summary>
-        public void DebugUtf (TextWriter writer) =>
-            writer.WriteLine(IrbisEncoding.Utf8.GetString(ToArray()));
+    /// <summary>
+    /// Отладочная печать в кодировке UTF-8.
+    /// </summary>
+    public void DebugUtf
+        (
+            TextWriter writer
+        )
+    {
+        writer.WriteLine (IrbisEncoding.Utf8.GetString (ToArray()));
+    }
 
-        /// <summary>
-        /// Получение массива фрагментов, из которых состоит
-        /// клиентский запрос.
-        /// </summary>
-        public byte[] GetBody () => ToArray();
+    /// <summary>
+    /// Получение массива фрагментов, из которых состоит
+    /// клиентский запрос.
+    /// </summary>
+    public byte[] GetBody() => ToArray();
 
-        /// <summary>
-        /// Подсчет общей длины запроса (в байтах).
-        /// </summary>
-        public int GetLength() => unchecked((int)Length);
+    /// <summary>
+    /// Подсчет общей длины запроса (в байтах).
+    /// </summary>
+    public int GetLength() => unchecked ((int) Length);
 
-        /// <summary>
-        /// Добавление одного перевода строки.
-        /// </summary>
-        public void NewLine() => WriteByte(10);
+    /// <summary>
+    /// Добавление одного перевода строки.
+    /// </summary>
+    public void NewLine() => WriteByte (10);
 
-        #endregion
-
-    } // class QueryUtility
-
-} // namespace ManagedIrbis.Infrastructure
+    #endregion
+}
