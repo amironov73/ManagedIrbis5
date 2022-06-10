@@ -30,7 +30,7 @@ namespace AM.Scripting;
 /// Парсер барсиковых чисел-констант.
 /// </summary>
 internal sealed class NumberParser
-    : Parser<BarsikToken, ConstantNode>
+    : Parser<Token, ConstantNode>
 {
     #region Private members
 
@@ -41,13 +41,13 @@ internal sealed class NumberParser
 
     private static readonly string[] _kinds =
     {
-        BarsikToken.Int32, BarsikToken.Int64, BarsikToken.UInt32,
-        BarsikToken.UInt64, BarsikToken.Single, BarsikToken.Double,
-        BarsikToken.Decimal
+        TokenKind.Int32, TokenKind.Int64, TokenKind.UInt32,
+        TokenKind.UInt64, TokenKind.Single, TokenKind.Double,
+        TokenKind.Decimal
     };
 
-    private static ReadOnlySpan<char> _Trim (ReadOnlyMemory<char> text)
-        => text.TrimEnd (_suffixes).Span;
+    private static ReadOnlySpan<char> _Trim (string? text)
+        => text.ThrowIfNullOrEmpty ().AsSpan().TrimEnd (_suffixes);
 
     #endregion
 
@@ -56,8 +56,8 @@ internal sealed class NumberParser
     /// <inheritdoc cref="Parser{TToken,T}.TryParse"/>
     public override bool TryParse
         (
-            ref ParseState<BarsikToken> state,
-            ref PooledList<Expected<BarsikToken>> expecteds,
+            ref ParseState<Token> state,
+            ref PooledList<Expected<Token>> expecteds,
             out ConstantNode result
         )
     {
@@ -76,43 +76,43 @@ internal sealed class NumberParser
             var invariant = CultureInfo.InvariantCulture;
             var value = current.Kind switch
             {
-                BarsikToken.Int32 => int.Parse
+                TokenKind.Int32 => int.Parse
                     (
                         _Trim (current.Value),
                         none,
                         invariant
                     ) as object,
-                BarsikToken.Int64 => long.Parse
+                TokenKind.Int64 => long.Parse
                     (
                         _Trim (current.Value),
                         none,
                         invariant
                     ),
-                BarsikToken.UInt32 => uint.Parse
+                TokenKind.UInt32 => uint.Parse
                     (
                         _Trim (current.Value),
                         none,
                         invariant
                     ),
-                BarsikToken.UInt64 => ulong.Parse
+                TokenKind.UInt64 => ulong.Parse
                     (
                         _Trim (current.Value),
                         none,
                         invariant
                     ),
-                BarsikToken.Single => float.Parse
+                TokenKind.Single => float.Parse
                     (
                         _Trim (current.Value),
                         floating,
                         invariant
                     ),
-                BarsikToken.Double => double.Parse
+                TokenKind.Double => double.Parse
                     (
                         _Trim (current.Value),
                         floating,
                         invariant
                     ),
-                BarsikToken.Decimal => decimal.Parse
+                TokenKind.Decimal => decimal.Parse
                     (
                         _Trim (current.Value),
                         floating,

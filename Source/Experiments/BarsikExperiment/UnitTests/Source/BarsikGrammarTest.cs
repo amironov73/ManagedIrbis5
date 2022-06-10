@@ -19,11 +19,11 @@ public sealed class BarsikGrammarTest
     private static T[] ParseMany<T>
         (
             string text,
-            Parser<BarsikToken, T> parser
+            Parser<Token, T> parser
         )
     {
-        var tokens = BarsikTokenizer.Tokenize (text);
-        var result = parser.Many().Before (Parser<BarsikToken>.End)
+        var tokens = new Tokenizer().Tokenize (text);
+        var result = parser.Many().Before (Parser<Token>.End)
             .ParseReadOnlyList (tokens);
 
         return result.Value.ToArray();
@@ -203,11 +203,12 @@ public sealed class BarsikGrammarTest
     {
         var parsed = ParseMany (" + ++ = +=", Grammar.Term ("+", "++", "=", "+=", "=="));
         Assert.IsNotNull (parsed);
-        Assert.AreEqual (3, parsed.Length);
+        Assert.AreEqual (4, parsed.Length);
 
-        Assert.AreEqual ("++", parsed[0]);
-        Assert.AreEqual ("+=", parsed[1]);
-        Assert.AreEqual ("+=", parsed[2]);
+        Assert.AreEqual ("+", parsed[0]);
+        Assert.AreEqual ("++", parsed[1]);
+        Assert.AreEqual ("=", parsed[2]);
+        Assert.AreEqual ("+=", parsed[3]);
 
         Assert.ThrowsException<InvalidOperationException>
             (

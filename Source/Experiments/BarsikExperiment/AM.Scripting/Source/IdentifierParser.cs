@@ -26,15 +26,15 @@ namespace AM.Scripting;
 /// Парсер барсиковых идентификаторов.
 /// </summary>
 internal sealed class IdentifierParser
-    : Parser<BarsikToken, string?>
+    : Parser<Token, string?>
 {
     #region Parser<T1,T2> members
 
     /// <inheritdoc cref="Parser{TToken,T}.TryParse"/>
     public override bool TryParse
         (
-            ref ParseState<BarsikToken> state,
-            ref PooledList<Expected<BarsikToken>> expecteds,
+            ref ParseState<Token> state,
+            ref PooledList<Expected<Token>> expecteds,
             out string? result
         )
     {
@@ -45,9 +45,9 @@ internal sealed class IdentifierParser
         }
 
         var current = state.Current;
-        if (current.Kind == BarsikToken.Identifier)
+        if (current.Kind == TokenKind.Identifier)
         {
-            result = current.Value.ToString();
+            result = current.Value;
             state.Advance();
             return true;
         }

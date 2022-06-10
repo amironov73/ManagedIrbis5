@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
@@ -59,6 +60,13 @@ public class Tokenizer
         )
         .ToCharArray();
 
+    private static readonly string[] _knownTerms =
+    {
+        "!", ";", ":", ",", "(", ")", "+", "-", "*", "/", "[", "]",
+        "{", "}", "|", "%", "~", "=", "++", "--", "+=", "-=", "*=",
+        "/="
+    };
+
     private bool IsEOF => _navigator.IsEOF;
 
     private char PeekChar() => _navigator.PeekChar();
@@ -72,6 +80,38 @@ public class Tokenizer
     #region Protected members
 
     /// <summary>
+    /// Пропускаем комментарии.
+    /// </summary>
+    /// <returns><c>true</c>, если были встречены комментарии.
+    /// </returns>
+    protected virtual bool SkipComments()
+    {
+        if (PeekChar() == '/')
+        {
+            var nextChar = _navigator.LookAhead();
+
+
+            // комментарий до конца строки
+            if (nextChar == '/')
+            {
+                // съедаем всю текущую строку до конца
+                _navigator.ReadLine();
+                return true;
+            }
+
+            // многострочный комментарий
+            if (nextChar == '*')
+            {
+                // проматываем всё до конца
+                _navigator.ReadTo ("*/");
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Разбор единичного символа в кавычках.
     /// </summary>
     /// <returns><c>null</c>, если в текущей позиции не символ.</returns>
@@ -82,9 +122,14 @@ public class Tokenizer
             return null;
         }
 
+        ReadChar(); // съедаем открывающий апостроф
+        var result = ReadChar();
+        if (ReadChar() != '\'')
+        {
+            throw new SyntaxException(_navigator);
+        }
 
-
-        return null;
+        return new Token (TokenKind.Char, result.ToString());
     }
 
     /// <summary>
@@ -92,7 +137,265 @@ public class Tokenizer
     /// </summary>
     protected virtual Token? ParseString()
     {
-        return null;
+        if (PeekChar() != '"')
+        {
+            return null;
+        }
+
+        ReadChar(); // съедаем открывающую кавычку
+        char chr = default;
+        var builder = new StringBuilder();
+        while (!IsEOF)
+        {
+            chr = ReadChar();
+            if (chr == '"')
+            {
+                break;
+            }
+
+            builder.Append (chr);
+        }
+
+        if (chr != '"')
+        {
+            throw new SyntaxException (_navigator);
+        }
+
+        return new Token (TokenKind.String, builder.ToString());
+    }
+
+    /// <summary>
+    /// Разбор числа.
+    /// </summary>
+    protected virtual Token? ParseNumber()
+    {
+        char chr = PeekChar();
+        if (!chr.IsArabicDigit())
+        {
+            return null;
+        }
+
+        var builder = new StringBuilder();
+        while (!IsEOF)
+        {
+            chr = PeekChar();
+            if (!chr.IsArabicDigit())
+            {
+                break;
+            }
+
+            builder.Append (ReadChar());
+        }
+
+        var isFloat = false;
+
+        // дробное число
+        if (chr == '.')
+        {
+            isFloat = true;
+            builder.Append (ReadChar());
+
+            while (!IsEOF)
+            {
+                chr = PeekChar();
+                if (!chr.IsArabicDigit())
+                {
+                    break;
+                }
+
+                builder.Append (ReadChar());
+            }
+        }
+
+        var isU = false;
+        var isL = false;
+        var isF = false;
+        var isM = false;
+
+        // суффиксы
+        if (isFloat)
+        {
+            chr = PeekChar();
+            if (chr is 'F' or 'f')
+            {
+                isF = true;
+                builder.Append (ReadChar());
+            }
+
+            if (chr is 'M' or 'm')
+            {
+                isM = true;
+                builder.Append (ReadChar());
+            }
+        }
+        else
+        {
+            while (!IsEOF)
+            {
+                var canContinue = true;
+                switch (chr)
+                {
+                    case 'u':
+                    case 'U':
+                        if (isU || isF || isFloat || isM)
+                        {
+                            // нельзя указывать больше одного раза
+                            throw new FormatException();
+                        }
+
+                        isU = true;
+                        break;
+
+                    case 'l':
+                    case 'L':
+                        if (isL || isF || isFloat || isM)
+                        {
+                            // нельзя указывать больше одного раза
+                            throw new FormatException();
+                        }
+
+                        isL = true;
+                        break;
+
+                    case 'f':
+                    case 'F':
+                        if (isU || isL || isM)
+                        {
+                            throw new FormatException();
+                        }
+
+                        isFloat = true;
+                        isF = true;
+                        break;
+
+                    case 'm':
+                    case 'M':
+                        if (isU || isL || isF)
+                        {
+                            throw new FormatException();
+                        }
+
+                        isM = true;
+                        break;
+
+                    default:
+                        canContinue = false;
+                        break;
+                }
+
+                if (!canContinue)
+                {
+                    break;
+                }
+
+                builder.Append (ReadChar());
+                chr = PeekChar();
+            }
+        }
+
+        var kind = isFloat
+            ?
+            (
+                isM
+                    ? TokenKind.Decimal
+                    : isF
+                        ? TokenKind.Single
+                        : TokenKind.Double
+            )
+            :
+            (
+                isM
+                    ? TokenKind.Decimal
+                    : isL
+                        ? isU ? TokenKind.UInt64 : TokenKind.Int64
+                        : isU ? TokenKind.UInt32 : TokenKind.Int32
+            );
+
+        var result = new Token
+            (
+                kind,
+                builder.ToString()
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Разбор терма.
+    /// </summary>
+    protected virtual Token? ParseTerm()
+    {
+        string? previousGood = null;
+        var line = _navigator.Line;
+        var column = _navigator.Column;
+        var builder = new StringBuilder();
+        while (true)
+        {
+            var chr = _navigator.LookAhead (builder.Length);
+            if (chr == Text.TextNavigator.EOF)
+            {
+                return MakeToken (previousGood);
+            }
+
+            builder.Append (chr);
+            var text = builder.ToString();
+            var count = 0;
+            foreach (var known in _knownTerms)
+            {
+                if (known.StartsWith (text))
+                {
+                    count++;
+                }
+            }
+
+            if (count == 0)
+            {
+                return MakeToken (previousGood);
+            }
+
+            if (count == 1)
+            {
+                foreach (var known in _knownTerms)
+                {
+                    if (known == text)
+                    {
+                        return MakeToken (known);
+                    }
+                }
+            }
+
+            previousGood = null;
+            foreach (var known in _knownTerms)
+            {
+                if (known == text)
+                {
+                    previousGood = known;
+                    break;
+                }
+            }
+        }
+
+        Token? MakeToken (string? tokenValue)
+        {
+            if (tokenValue is null)
+            {
+                return null;
+            }
+
+            for (var i = 0; i < builder.Length; i++)
+            {
+                ReadChar();
+            }
+
+            return new Token
+                (
+                    TokenKind.Term,
+                    tokenValue,
+                    line,
+                    column
+                );
+        }
+
     }
 
     /// <summary>
@@ -107,25 +410,29 @@ public class Tokenizer
             return null;
         }
 
-        var value = new StringBuilder();
+        var builder = new StringBuilder();
         var line = _navigator.Line;
         var column = _navigator.Column;
-        value.Append (ReadChar());
+        builder.Append (ReadChar());
 
-        while (IsEOF)
+        while (!IsEOF)
         {
             if (Array.IndexOf (_nextIdentifierLetter, PeekChar()) < 0)
             {
                 break;
             }
 
-            value.Append(ReadChar());
+            builder.Append(ReadChar());
         }
+
+        var value = builder.ToString();
 
         return new Token
             (
-                TokenKind.Identifier,
-                value.ToString(),
+                BarsikUtility.IsReservedWord (value)
+                    ? TokenKind.ReservedWord
+                    : TokenKind.Identifier,
+                value,
                 line,
                 column
             );
@@ -138,7 +445,7 @@ public class Tokenizer
     /// <summary>
     /// Разбор текста на токены.
     /// </summary>
-    public List<Token> Parse
+    public List<Token> Tokenize
         (
             string text
         )
@@ -155,10 +462,17 @@ public class Tokenizer
                 break;
             }
 
+            if (SkipComments())
+            {
+                continue;
+            }
+
             var token = ParseCharacter()
                 ?? ParseString()
+                ?? ParseNumber()
+                ?? ParseTerm()
                 ?? ParseIdentifier()
-                ?? throw new Exception();
+                ?? throw new SyntaxException (_navigator);
 
             result.Add (token);
         }

@@ -26,7 +26,7 @@ namespace AM.Scripting;
 /// Парсер барсиковых констант.
 /// </summary>
 internal sealed class ConstantParser
-    : Parser<BarsikToken, ConstantNode>
+    : Parser<Token, ConstantNode>
 {
     #region Properties
 
@@ -60,8 +60,8 @@ internal sealed class ConstantParser
     /// <inheritdoc cref="Parser{TToken,T}.TryParse"/>
     public override bool TryParse
         (
-            ref ParseState<BarsikToken> state,
-            ref PooledList<Expected<BarsikToken>> expecteds,
+            ref ParseState<Token> state,
+            ref PooledList<Expected<Token>> expecteds,
             out ConstantNode result
         )
     {
@@ -76,7 +76,7 @@ internal sealed class ConstantParser
         {
             if (current.Kind == kind)
             {
-                result = new ConstantNode (current.Value.ToString());
+                result = new ConstantNode (current.Value);
                 state.Advance();
                 return true;
             }

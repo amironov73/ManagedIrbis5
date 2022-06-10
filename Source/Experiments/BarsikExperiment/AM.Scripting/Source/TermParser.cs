@@ -8,7 +8,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* BarsikTerm.cs -- парсер барсиковых токенов
+/* TermParser.cs -- парсер барсиковых токенов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,15 +25,15 @@ namespace AM.Scripting;
 /// <summary>
 /// Парсер барсиковых токенов.
 /// </summary>
-internal sealed class BarsikTerm
-    : Parser<BarsikToken,string?>
+internal sealed class TermParser
+    : Parser<Token,string?>
 {
     #region Properties
 
     /// <summary>
-    /// Ожидаемый тип токена.
+    /// Ожидаемые значения термов.
     /// </summary>
-    public string[] ExpectedKinds { get; }
+    public string[] ExpectedValues { get; }
 
     #endregion
 
@@ -42,15 +42,15 @@ internal sealed class BarsikTerm
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="expectedKinds">Ожидаемые типы токена</param>
-    public BarsikTerm
+    /// <param name="expectedValues">Ожидаемые значения термов</param>
+    public TermParser
         (
-            params string[] expectedKinds
+            params string[] expectedValues
         )
     {
-        Sure.NotNull (expectedKinds);
+        Sure.NotNull (expectedValues);
 
-        ExpectedKinds = expectedKinds;
+        ExpectedValues = expectedValues;
     }
 
     #endregion
@@ -60,8 +60,8 @@ internal sealed class BarsikTerm
     /// <inheritdoc cref="Parser{TToken,T}.TryParse"/>
     public override bool TryParse
         (
-            ref ParseState<BarsikToken> state,
-            ref PooledList<Expected<BarsikToken>> expecteds,
+            ref ParseState<Token> state,
+            ref PooledList<Expected<Token>> expecteds,
             out string? result
         )
     {
@@ -72,13 +72,16 @@ internal sealed class BarsikTerm
         }
 
         var current = state.Current;
-        foreach (var kind in ExpectedKinds)
+        if (current.Kind == TokenKind.Term)
         {
-            if (current.Kind == kind)
+            foreach (var value in ExpectedValues)
             {
-                result = current.Kind;
-                state.Advance();
-                return true;
+                if (current.Value == value)
+                {
+                    result = current.Value;
+                    state.Advance();
+                    return true;
+                }
             }
         }
 

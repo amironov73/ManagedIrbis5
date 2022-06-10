@@ -34,7 +34,7 @@ internal static class Grammar
     /// <summary>
     /// Токен, например, "+" или "==".
     /// </summary>
-    internal static BarsikTerm Term (params string[] kinds) => new (kinds);
+    internal static TermParser Term (params string[] kinds) => new (kinds);
 
     /// <summary>
     /// Идентификатор, например, "hello" или "help123".
@@ -46,27 +46,27 @@ internal static class Grammar
     /// </summary>
     internal static ReservedParser Keyword (params string[] kinds) => new (kinds);
 
-    private static readonly Parser<BarsikToken, ConstantNode> NullLiteral =
+    private static readonly Parser<Token, ConstantNode> NullLiteral =
         Keyword ("null").ThenReturn (new ConstantNode (null));
 
-    private static readonly Parser<BarsikToken, ConstantNode> TrueLiteral =
+    private static readonly Parser<Token, ConstantNode> TrueLiteral =
         Keyword ("true").ThenReturn (new ConstantNode (true));
 
-    private static readonly Parser<BarsikToken, ConstantNode> FalseLiteral =
+    private static readonly Parser<Token, ConstantNode> FalseLiteral =
         Keyword ("false").ThenReturn (new ConstantNode (false));
 
-    private static readonly Parser<BarsikToken, ConstantNode> CharLiteral =
-        new ConstantParser (BarsikToken.Char)
+    private static readonly Parser<Token, ConstantNode> CharLiteral =
+        new ConstantParser (TokenKind.Char)
             .Select (v => v.ChangeValue (((string) v.Value!)[0]));
 
-    private static readonly Parser<BarsikToken, ConstantNode> StringLiteral =
-        new ConstantParser (BarsikToken.String)
+    private static readonly Parser<Token, ConstantNode> StringLiteral =
+        new ConstantParser (TokenKind.String)
             .Select (v => v.ChangeValue ((string) v.Value!));
 
-    private static readonly Parser<BarsikToken, ConstantNode> NumberLiteral =
+    private static readonly Parser<Token, ConstantNode> NumberLiteral =
         new NumberParser();
 
-    internal static readonly Parser<BarsikToken, ConstantNode> Literal = OneOf
+    internal static readonly Parser<Token, ConstantNode> Literal = OneOf
         (
             NullLiteral,
             TrueLiteral,

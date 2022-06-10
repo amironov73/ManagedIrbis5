@@ -27,7 +27,7 @@ internal static class TokenKind
     /// <summary>
     /// Терм, например, "{" или "++".
     /// </summary>
-    public const string? Term = "term";
+    public const string Term = "term";
 
     /// <summary>
     /// Зарезервированное слово, например, "if".

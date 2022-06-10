@@ -28,7 +28,7 @@ namespace AM.Scripting;
 /// Парсер барсиковых зарезервированных слов.
 /// </summary>
 public sealed class ReservedParser
-    : Parser<BarsikToken,string?>
+    : Parser<Token,string?>
 {
     #region Properties
 
@@ -62,8 +62,8 @@ public sealed class ReservedParser
     /// <inheritdoc cref="Parser{TToken,T}.TryParse"/>
     public override bool TryParse
         (
-            ref ParseState<BarsikToken> state,
-            ref PooledList<Expected<BarsikToken>> expecteds,
+            ref ParseState<Token> state,
+            ref PooledList<Expected<Token>> expecteds,
             out string? result
         )
     {
@@ -74,14 +74,14 @@ public sealed class ReservedParser
         }
 
         var current = state.Current;
-        if (current.Kind == BarsikToken.ReservedWord)
+        if (current.Kind == TokenKind.ReservedWord)
         {
-            var valueSpan = current.Value.Span;
+            var valueSpan = current.Value;
             foreach (var kind in ExpectedKinds)
             {
                 if (Utility.CompareOrdinal (kind.AsSpan(), valueSpan) == 0)
                 {
-                    result = current.Value.ToString();
+                    result = current.Value;
                     state.Advance();
                     return true;
                 }
