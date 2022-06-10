@@ -1,0 +1,72 @@
+﻿//
+// Подсчет количества экземпляров старых книг
+//
+
+connect ("host=127.0.0.1;port=6666;user=1;password=1;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+YEAR = 1830
+FOND = "Ф603"
+
+//=================================
+
+managerType = type ("ManagedIrbis.Fields.ExemplarManager")
+manager = new managerType (connection, null)
+counter = 0
+total = 0
+totalFond = 0
+
+//=================================
+
+allBooks = batch_read (true)
+
+foreach (book in allBooks)
+{
+    if (counter % 1000 == 0)
+    {
+        println (counter, " => ", total, ", ", totalFond)
+    }
+
+    counter++
+    ws = fm (book, 920)
+    if (ws same "PAZK" or ws same "SPEC" or ws same "PVK" or ws same "IBIS")
+    {
+         year = (int) managerType.GetYear (book)
+         if (year and year <= YEAR)
+         {
+            exemplars = get_exemplars (book)
+            foreach (exemplar in exemplars)
+            {
+                status = exemplar.Status
+                if (status == "0" or status == "1" or status == "5"
+                    or status == "9")
+                {
+                    description = manager.GetDescription (book)
+                    total++
+                    println (exemplar.Number, "\t", exemplar.Place, "\t",
+                        exemplar.Status, "\t", description)
+
+                    if (exemplar.Place same FOND)
+                    {
+                        totalFond++
+                    }
+                }
+            }
+        }
+    }
+}
+
+//=================================
+
+println()
+println ("=> ", total, ", ", totalFond)
+
+//=================================
+
+disconnect()

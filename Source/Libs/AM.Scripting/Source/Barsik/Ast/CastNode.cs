@@ -128,7 +128,9 @@ internal sealed class CastNode
         {
             if (operandValue is string text)
             {
-                return int.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+                return text.SafeToInt32();
+
+                // return int.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
             }
         }
 
@@ -144,7 +146,9 @@ internal sealed class CastNode
         {
             if (operandValue is string text)
             {
-                return long.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
+                return text.SafeToInt64();
+
+                // return long.Parse (text, NumberStyles.Any, CultureInfo.InvariantCulture);
             }
         }
 

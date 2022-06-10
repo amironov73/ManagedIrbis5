@@ -104,7 +104,10 @@ public sealed class ExemplarManager
 
     private readonly AbstractOutput? _output;
 
-    private static string GetYear
+    /// <summary>
+    /// Получение года издания.
+    /// </summary>
+    public static string GetYear
         (
             Record record
         )
@@ -145,7 +148,10 @@ public sealed class ExemplarManager
         return result;
     }
 
-    private static string GetPrice
+    /// <summary>
+    /// Получение цены экземпляра.
+    /// </summary>
+    public static string GetPrice
         (
             Record record,
             ExemplarInfo exemplar
@@ -173,6 +179,8 @@ public sealed class ExemplarManager
             ExemplarInfo exemplar
         )
     {
+        Sure.NotNull (exemplar);
+
         if (string.IsNullOrEmpty (exemplar.Number))
         {
             return this;
@@ -194,6 +202,8 @@ public sealed class ExemplarManager
             IEnumerable<ExemplarInfo> exemplars
         )
     {
+        Sure.NotNull ((object?) exemplars);
+
         foreach (var exemplar in exemplars)
         {
             Add (exemplar);
@@ -235,8 +245,8 @@ public sealed class ExemplarManager
         {
             Magna.Error
                 (
-                    "ExemplarManager::GetDescription: "
-                    + "empty description"
+                    nameof (ExemplarManager) + "::" + nameof (GetDescription)
+                    + ": empty description"
                 );
 
             throw new IrbisException ("Empty description");
@@ -339,7 +349,7 @@ public sealed class ExemplarManager
         }
 
         return exemplar;
-    } // method Extend
+    }
 
     /// <summary>
     ///

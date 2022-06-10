@@ -1483,6 +1483,8 @@ public sealed class TextNavigator
     /// <summary>
     /// Пропускаем пробельные символы.
     /// </summary>
+    /// <returns><c>false</c>, если достигнут конец текста,
+    /// иначе <c>true</c>.</returns>
     public bool SkipWhitespace()
     {
         while (true)

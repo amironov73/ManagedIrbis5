@@ -9,7 +9,7 @@
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UnusedMember.Global
 
-/* BarsikToken.cs -- токен языка Барсик
+/* Token.cs -- собственно токен
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,94 +25,34 @@ using System.Collections.Generic;
 namespace AM.Scripting;
 
 /// <summary>
-/// Токен языка Барсик.
+/// Собственно токен.
+/// Состоит из вида и значения.
+/// Помнит свое местоположение
 /// </summary>
-public sealed class BarsikToken
+public sealed class Token
+    : IEquatable<Token>
 {
     #region Properties
 
     /// <summary>
-    /// Токен-признак конца текста.
+    /// Номер строки, начинается с 1.
     /// </summary>
-    public static readonly BarsikToken Eot = new (EOT);
-
-    #endregion
-
-    #region Constants
+    public int Line { get; }
 
     /// <summary>
-    /// Признак конца текста.
+    /// Номер столбца, начинается с 1.
     /// </summary>
-    public const string? EOT = null;
-
-    /// <summary>
-    /// Зарезервированное слово, например, "if".
-    /// </summary>
-    public const string ReservedWord = "reserved";
-
-    /// <summary>
-    /// Идентификатор.
-    /// </summary>
-    public const string Identifier = "idenfier";
-
-    /// <summary>
-    /// Один символ в одиночных кавычках.
-    /// </summary>
-    public const string Char = "char";
-
-    /// <summary>
-    /// Произвольное количество символов в двойных кавычках.
-    /// </summary>
-    public const string String = "string";
-
-    /// <summary>
-    /// Целое 32-битное число со знаком без префикса и суффикса.
-    /// </summary>
-    public const string Int32 = "int32";
-
-    /// <summary>
-    /// Целое 64-битное число зе знака без префикса и суффикса.
-    /// </summary>
-    public const string Int64 = "int64";
-
-    /// <summary>
-    /// Целое 32-битное число без знака без префикса и суффикса.
-    /// </summary>
-    public const string UInt32 = "uint32";
-
-    /// <summary>
-    /// Целое 64-битное число без знака без префикса и суффикса.
-    /// </summary>
-    public const string UInt64 = "uint64";
-
-    /// <summary>
-    /// Число с плавающей точкой с одинарной точностью.
-    /// </summary>
-    public const string Single = "single";
-
-    /// <summary>
-    /// Число с плавающей точкой с двойной точностью.
-    /// </summary>
-    public const string Double = "double";
-
-    /// <summary>
-    /// Число с фиксированной точкой (денежное).
-    /// </summary>
-    public const string Decimal = "decimal";
-
-    #endregion
-
-    #region Properties
+    public int Column { get; }
 
     /// <summary>
     /// Вид токена.
     /// </summary>
-    public string? Kind { get; internal set; }
+    public string Kind { get; }
 
     /// <summary>
-    /// Значение.
+    /// Собственно значение токена.
     /// </summary>
-    public ReadOnlyMemory<char> Value { get; }
+    public string? Value { get; }
 
     #endregion
 
@@ -121,14 +61,20 @@ public sealed class BarsikToken
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public BarsikToken
+    public Token
         (
-            string? kind,
-            ReadOnlyMemory<char> value = default
+            string kind,
+            string? value,
+            int line = 0,
+            int column = 0
         )
     {
+        Sure.NotNullNorEmpty (kind);
+
         Kind = kind;
         Value = value;
+        Line = line;
+        Column = column;
     }
 
     #endregion
@@ -244,7 +190,7 @@ public sealed class BarsikToken
     /// </summary>
     public static bool operator ==
         (
-            BarsikToken? token,
+            Token? token,
             string? kind
         )
     {
@@ -261,7 +207,7 @@ public sealed class BarsikToken
     /// </summary>
     public static bool operator !=
         (
-            BarsikToken? token,
+            Token? token,
             string? kind
         )
     {
@@ -275,15 +221,22 @@ public sealed class BarsikToken
 
     #endregion
 
-    #region Object members
+    #region IEquatable<T> members
 
-    private bool Equals
+    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    public bool Equals
         (
-            BarsikToken other
+            Token? other
         )
     {
-        return Kind == other.Kind && Value.Equals (other.Value);
+        return other is not null
+            && string.CompareOrdinal (Kind, other.Kind) == 0
+            && string.CompareOrdinal (Value, other.Value) == 0;
     }
+
+    #endregion
+
+    #region Object members
 
     /// <inheritdoc cref="object.Equals(object?)"/>
     public override bool Equals
@@ -292,7 +245,7 @@ public sealed class BarsikToken
         )
     {
         return ReferenceEquals (this, obj)
-               || obj is BarsikToken other && Equals (other);
+               || obj is Token other && Equals (other);
     }
 
     /// <inheritdoc cref="object.GetHashCode"/>
@@ -304,8 +257,9 @@ public sealed class BarsikToken
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return $"{Kind.ToVisibleString()}: {Value.ToVisibleString()}";
+        return $"[{Line}, {Column}] {Kind.ToVisibleString()}: {Value.ToVisibleString()}";
     }
 
     #endregion
+
 }

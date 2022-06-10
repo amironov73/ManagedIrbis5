@@ -52,6 +52,9 @@
       <None Update="Scripts\Olniya.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Scripts\OldBooks.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

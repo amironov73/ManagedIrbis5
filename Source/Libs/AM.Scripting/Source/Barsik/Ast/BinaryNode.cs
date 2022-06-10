@@ -77,6 +77,11 @@ internal sealed class BinaryNode
     {
         context.NotUsed();
 
+        if (left is null)
+        {
+            return right is null;
+        }
+
         if (left is char leftChar && right is char rightChar)
         {
             return leftChar.SameChar (rightChar);
@@ -403,6 +408,74 @@ internal sealed class BinaryNode
         return Regex.IsMatch (input, pattern);
     }
 
+    private static dynamic Less
+        (
+            Context context,
+            dynamic? left,
+            dynamic? right
+        )
+    {
+        context.NotUsed();
+
+        if (left is string leftString && right is string rightString)
+        {
+            return string.Compare (leftString, rightString) < 0;
+        }
+
+        return left < right;
+    }
+
+    private static dynamic LessOrEqual
+        (
+            Context context,
+            dynamic? left,
+            dynamic? right
+        )
+    {
+        context.NotUsed();
+
+        if (left is string leftString && right is string rightString)
+        {
+            return string.Compare (leftString, rightString) <= 0;
+        }
+
+        return left <= right;
+    }
+
+    private static dynamic More
+        (
+            Context context,
+            dynamic? left,
+            dynamic? right
+        )
+    {
+        context.NotUsed();
+
+        if (left is string leftString && right is string rightString)
+        {
+            return string.Compare (leftString, rightString) > 0;
+        }
+
+        return left > right;
+    }
+
+    private static dynamic MoreOrEqual
+        (
+            Context context,
+            dynamic? left,
+            dynamic? right
+        )
+    {
+        context.NotUsed();
+
+        if (left is string leftString && right is string rightString)
+        {
+            return string.Compare (leftString, rightString) >= 0;
+        }
+
+        return left >= right;
+    }
+
     #endregion
 
     #region AtomNode members
@@ -424,11 +497,11 @@ internal sealed class BinaryNode
             "/" => left / right,
             "%" => left % right,
             "<<" => LeftShift (context, left, right),
-            "<" => left < right,
-            "<=" => left <= right,
+            "<" => Less (context, left, right),
+            "<=" => LessOrEqual (context, left, right),
             ">>" => RightShift (context, left, right),
-            ">" => left > right,
-            ">=" => left >= right,
+            ">" => More (context, left, right),
+            ">=" => MoreOrEqual (context, left, right),
             "==" => Equality (context, left, right),
             "!=" => left != right,
             "===" => StrictEquality (context, left, right),
