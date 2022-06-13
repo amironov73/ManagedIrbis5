@@ -11,15 +11,14 @@
 
 #nullable enable
 
-namespace ManagedIrbis
-{
-    /// <summary>
-    /// Генерализованный интерфейс подключения к ИРБИС-серверу.
-    /// </summary>
-    public interface IConnection
-        : IConnectionSettings,
-        IIrbisProvider
-    {
-    } // interface IConnection
+namespace ManagedIrbis;
 
-} // namespace ManagedIrbis
+/// <summary>
+/// Генерализованный интерфейс подключения к ИРБИС-серверу.
+/// </summary>
+public interface IConnection
+    : IConnectionSettings,
+    IIrbisProvider
+{
+    // пустое тело интерфейса
+}

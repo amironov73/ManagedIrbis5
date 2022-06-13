@@ -19,48 +19,46 @@ using System;
 
 #endregion
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Элемент строки подключения.
+/// </summary>
+[Flags]
+public enum ConnectionElement
 {
     /// <summary>
-    /// Элемент строки подключения.
+    /// Нет элементов.
     /// </summary>
-    [Flags]
-    public enum ConnectionElement
-    {
-        /// <summary>
-        /// None
-        /// </summary>
-        None = 0,
+    None = 0,
 
-        /// <summary>
-        /// Host name or address.
-        /// </summary>
-        Host = 1,
+    /// <summary>
+    /// Имя или адрес хоста.
+    /// </summary>
+    Host = 1,
 
-        /// <summary>
-        /// Port number.
-        /// </summary>
-        Port = 2,
+    /// <summary>
+    /// Номер порта.
+    /// </summary>
+    Port = 2,
 
-        /// <summary>
-        /// User name.
-        /// </summary>
-        Username = 4,
+    /// <summary>
+    /// Имя пользователя (логин).
+    /// </summary>
+    Username = 4,
 
-        /// <summary>
-        /// Password.
-        /// </summary>
-        Password = 8,
+    /// <summary>
+    /// Пароль.
+    /// </summary>
+    Password = 8,
 
-        /// <summary>
-        /// Workstation.
-        /// </summary>
-        Workstation = 16,
+    /// <summary>
+    /// Код рабочей станции.
+    /// </summary>
+    Workstation = 16,
 
-        /// <summary>
-        /// All of above.
-        /// </summary>
-        All = 31
-    } // enum ConnectionElement
-
-} // namespace ManagedIrbis
+    /// <summary>
+    /// Все вышеперечисленное.
+    /// </summary>
+    All = 31
+}

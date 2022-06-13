@@ -47,7 +47,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace ManagedIrbis;
 
 /// <summary>
-/// Асинхронное подключение к серверу ИРБИС64.
+/// Асинхронное клиентское подключение к серверу ИРБИС64.
 /// </summary>
 public sealed class AsyncConnection
     : ConnectionBase,
@@ -67,6 +67,13 @@ public sealed class AsyncConnection
     /// <summary>
     /// Конструктор (выглядит как конструктор по умолчанию)..
     /// </summary>
+    /// <param name="socket">Клиентский сокет. <c>null</c> означает,
+    /// что автоматически будет выбран сокет по умолчанию.
+    /// В текущей реализации это <see cref="AsyncTcp4Socket"/>.
+    /// </param>
+    /// <param name="serviceProvider">Провайдер сервисов.
+    /// <c>null</c> означает использование глобального провайдера
+    /// из <see cref="Magna.Host"/>.</param>
     public AsyncConnection
         (
             IAsyncClientSocket? socket = null,
@@ -122,7 +129,8 @@ public sealed class AsyncConnection
     /// Отправка запроса на сервер по упрощённой схеме.
     /// </summary>
     /// <param name="command">Код команды.</param>
-    /// <returns>Ответ сервера.</returns>
+    /// <returns>Ответ сервера либо <c>null</c> пре неудачном
+    /// выполнении операции.</returns>
     public async Task<Response?> ExecuteAsync
         (
             string command
@@ -148,7 +156,8 @@ public sealed class AsyncConnection
     /// </summary>
     /// <param name="command">Код команды.</param>
     /// <param name="arg1">Параметр команды.</param>
-    /// <returns>Ответ сервера.</returns>
+    /// <returns>Ответ сервера либо <c>null</c> при неудачном
+    /// выполнении операции.</returns>
     public async Task<Response?> ExecuteAsync
         (
             string command,
@@ -181,7 +190,8 @@ public sealed class AsyncConnection
     /// и получение ответа от него.
     /// </summary>
     /// <param name="asyncQuery">Клиентский запрос.</param>
-    /// <returns>Ответ от сервера.</returns>
+    /// <returns>Ответ от сервера либо <c>null</c> при неудачном
+    /// выполнении операции.</returns>
     public async Task<Response?> ExecuteAsync
         (
             AsyncQuery asyncQuery
@@ -272,6 +282,7 @@ public sealed class AsyncConnection
     /// <summary>
     /// Получение статистики по базе данных.
     /// </summary>
+    /// <param name="definition">Параметры статистики.</param>
     public async Task<string?> GetDatabaseStatAsync
         (
             StatDefinition definition
@@ -303,6 +314,7 @@ public sealed class AsyncConnection
     /// <summary>
     /// Переподключение к серверу.
     /// </summary>
+    /// <returns>Признак успешного завершения операции.</returns>
     public async Task<bool> ReconnectAsync()
     {
         if (Connected)
@@ -317,8 +329,9 @@ public sealed class AsyncConnection
     }
 
     /// <summary>
-    /// Остановка сервера (расширенная команда).
+    /// Остановка сервера ИРБИС64 (расширенная команда).
     /// </summary>
+    /// <returns>Признак успешного завершения операции.</returns>
     public async Task<bool> StopServerAsync()
     {
         using var response = await ExecuteAsync ("STOP");
@@ -331,6 +344,7 @@ public sealed class AsyncConnection
     /// <summary>
     /// Разблокирование указанной записи (альтернативный вариант).
     /// </summary>
+    /// <returns>Признак успешного завершения операции.</returns>
     public async Task<bool> UnlockRecordAltAsync
         (
             int mfn

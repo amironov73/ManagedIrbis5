@@ -11,14 +11,16 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
 
-/* ConnectionBuilder.cs -- паттерн Builder для Connection
+/* ConnectionBuilder.cs -- паттерн Builder для SyncConnection
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+
 using AM;
+
 using ManagedIrbis.Infrastructure.Sockets;
 
 using Microsoft.Extensions.Logging;
@@ -27,102 +29,108 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Паттерн Builder для <see cref="SyncConnection"/>.
+/// </summary>
+public sealed class ConnectionBuilder
 {
+    #region Private members
+
+    private string? _connectionString;
+    private ILogger? _logger;
+    private ISyncClientSocket? _socket;
+    private IServiceProvider? _serviceProvider;
+
+    #endregion
+
+    #region Public methods
+
     /// <summary>
-    /// Паттерн Builder для <see cref="SyncConnection"/>.
+    /// Создание подключения.
     /// </summary>
-    public sealed class ConnectionBuilder
+    public SyncConnection Build()
     {
-        #region Private members
+        // TODO: делать ISyncProvider
 
-        private string? _connectionString;
-        private ILogger? _logger;
-        private ISyncClientSocket? _socket;
-        private IServiceProvider? _serviceProvider;
+        var socket = _socket ?? new SyncTcp4Socket();
+        var serviceProvider = _serviceProvider ?? Magna.Host.Services;
+        var result = new SyncConnection (socket, serviceProvider);
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Создание подключения.
-        /// </summary>
-        public SyncConnection Build()
+        if (_logger is not null)
         {
-            // TODO: делать ISyncProvider
+            result._logger = _logger;
+        }
 
-            var socket = _socket ?? new SyncTcp4Socket();
-            var serviceProvider = _serviceProvider ?? Magna.Host.Services;
-            var result = new SyncConnection(socket, serviceProvider);
-
-            if (_logger is not null)
-            {
-                result._logger = _logger;
-            }
-
-            if (_connectionString is not null)
-            {
-                result.ParseConnectionString(_connectionString);
-            }
-
-            return result;
-        } // method Build
-
-        /// <summary>
-        /// Установка провайдера сервисов.
-        /// </summary>
-        public ConnectionBuilder WithServiceProvider
-            (
-                IServiceProvider serviceProvider
-            )
+        if (_connectionString is not null)
         {
-            _serviceProvider = serviceProvider;
+            result.ParseConnectionString (_connectionString);
+        }
 
-            return this;
-        } // method WithServiceProvider
+        return result;
+    }
 
-        /// <summary>
-        /// Установка строки подключения.
-        /// </summary>
-        public ConnectionBuilder WithConnectionString
-            (
-                string connectionString
-            )
-        {
-            _connectionString = connectionString;
+    /// <summary>
+    /// Установка провайдера сервисов.
+    /// </summary>
+    public ConnectionBuilder WithServiceProvider
+        (
+            IServiceProvider serviceProvider
+        )
+    {
+        Sure.NotNull (serviceProvider);
 
-            return this;
-        } // method WithConnectionString
+        _serviceProvider = serviceProvider;
 
-        /// <summary>
-        /// Установка логгера.
-        /// </summary>
-        public ConnectionBuilder WithLogger
-            (
-                ILogger logger
-            )
-        {
-            _logger = logger;
+        return this;
+    }
 
-            return this;
-        } // method WithLogger
+    /// <summary>
+    /// Установка строки подключения.
+    /// </summary>
+    public ConnectionBuilder WithConnectionString
+        (
+            string connectionString
+        )
+    {
+        Sure.NotNull (connectionString);
 
-        /// <summary>
-        /// Установка сокета.
-        /// </summary>
-        public ConnectionBuilder WithSocket
-            (
-                ISyncClientSocket socket
-            )
-        {
-            _socket = socket;
+        _connectionString = connectionString;
 
-            return this;
-        } // method WithSocket
+        return this;
+    }
 
-        #endregion
+    /// <summary>
+    /// Установка логгера.
+    /// </summary>
+    public ConnectionBuilder WithLogger
+        (
+            ILogger logger
+        )
+    {
+        Sure.NotNull (logger);
 
-    } // class ConnectionBuilder
+        _logger = logger;
 
-} // namespace ManagedIrbis
+        return this;
+    }
+
+    /// <summary>
+    /// Установка сокета.
+    /// </summary>
+    public ConnectionBuilder WithSocket
+        (
+            ISyncClientSocket socket
+        )
+    {
+        Sure.NotNull (socket);
+        Sure.AssertState (socket.Connection is null);
+
+        _socket = socket;
+
+        return this;
+    }
+
+    #endregion
+}

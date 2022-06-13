@@ -18,10 +18,12 @@
 
 #region Using directives
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
 
+using AM;
 using AM.Configuration;
 
 using ManagedIrbis.Providers;
@@ -96,6 +98,8 @@ public static class ConnectionUtility
             string fileName
         )
     {
+        Sure.NotNull (connection);
+
         // connection.RequireServerVersion("2010.1", true);
 
         connection.FormatRecord
@@ -134,8 +138,7 @@ public static class ConnectionUtility
         {
             result = IrbisUtility.DecryptConnectionString
                 (
-                    result,
-                    null
+                    result
                 );
         }
 
@@ -163,8 +166,7 @@ public static class ConnectionUtility
 
         var result = IrbisUtility.DecryptConnectionString
             (
-                candidate,
-                null
+                candidate
             );
 
         return result;
@@ -214,8 +216,7 @@ public static class ConnectionUtility
         {
             result = IrbisUtility.DecryptConnectionString
                 (
-                    result,
-                    null
+                    result
                 );
         }
 
@@ -247,12 +248,18 @@ public static class ConnectionUtility
     /// <summary>
     /// Разбор строки подключения.
     /// </summary>
+    /// <param name="connection">Подключение, к которому будут применены
+    /// параметры, заданные в строке подключения.</param>
+    /// <param name="connectionString">Разбираемая строка подключения.
+    /// </param>
     public static void ParseConnectionString
         (
             this IConnectionSettings connection,
             string? connectionString
         )
     {
+        Sure.NotNull (connection);
+
         if (string.IsNullOrWhiteSpace (connectionString))
         {
             return;
@@ -266,12 +273,23 @@ public static class ConnectionUtility
     /// <summary>
     /// Разбор строки подключения.
     /// </summary>
+    /// <param name="provider">Провайдер, к которому будут применены
+    /// параметры, заданные в строке подключения.</param>
+    /// <param name="connectionString">Разбираемая строка подключения.
+    /// </param>
     public static void ParseConnectionString
         (
             this IIrbisProvider provider,
             string? connectionString
         )
     {
+        Sure.NotNull (provider);
+
+        if (provider.Connected)
+        {
+            throw new InvalidOperationException ("Already connected");
+        }
+
         if (string.IsNullOrWhiteSpace (connectionString))
         {
             return;
@@ -285,25 +303,55 @@ public static class ConnectionUtility
     /// <summary>
     /// Разбор строки подключения.
     /// </summary>
+    /// <param name="connection">Подключение, к которому будут применены
+    /// параметры, заданные в строке подключения.</param>
+    /// <param name="connectionString">Разбираемая строка подключения.
+    /// </param>
     public static void ParseConnectionString
         (
             this IAsyncConnection connection,
             string? connectionString
         )
     {
-        ParseConnectionString ((IAsyncProvider) connection, connectionString);
+        Sure.NotNull (connection);
+
+        if (connection.Connected)
+        {
+            throw new InvalidOperationException ("Already connected");
+        }
+
+        ParseConnectionString
+            (
+                (IAsyncProvider) connection,
+                connectionString
+            );
     }
 
     /// <summary>
     /// Разбор строки подключения.
     /// </summary>
+    /// <param name="connection">Подключение, к которому будут применены
+    /// параметры, заданные в строке подключения.</param>
+    /// <param name="connectionString">Разбираемая строка подключения.
+    /// </param>
     public static void ParseConnectionString
         (
             this ISyncConnection connection,
             string? connectionString
         )
     {
-        ParseConnectionString ((ISyncProvider) connection, connectionString);
+        Sure.NotNull (connection);
+
+        if (connection.Connected)
+        {
+            throw new InvalidOperationException ("Already connected");
+        }
+
+        ParseConnectionString
+            (
+                (ISyncProvider) connection,
+                connectionString
+            );
     }
 
     #endregion
