@@ -2,13 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
 
 /* LimitKind.cs -- единица ограничения доступа к ресурсу
  * Ars Magna project, http://arsmagna.ru
@@ -22,37 +17,36 @@ using AM.Reflection;
 
 #nullable enable
 
-namespace ManagedIrbis.Drm
+namespace ManagedIrbis.Drm;
+
+/// <summary>
+/// Единица ограничения доступа к ресурсу.
+/// </summary>
+public static class LimitKind
 {
+    #region Constants
+
     /// <summary>
-    /// Единица ограничения доступа к ресурсу.
+    /// Страница.
     /// </summary>
-    public static class LimitKind
+    public const string Page = "";
+
+    /// <summary>
+    /// Процент.
+    /// </summary>
+    public const string Percent = "%";
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение массива значение констант.
+    /// </summary>
+    public static string[] ListValues()
     {
-        #region Constants
-
-        /// <summary>
-        /// Страница.
-        /// </summary>
-        public const string Page = "";
-
-        /// <summary>
-        /// Процент.
-        /// </summary>
-        public const string Percent = "%";
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Получение массива значение констант.
-        /// </summary>
-        public static string[] ListValues()
-        {
-            return ReflectionUtility.ListConstantValues<string> (typeof (LimitKind));
-        }
-
-        #endregion
+        return ReflectionUtility.ListConstantValues<string> (typeof (LimitKind));
     }
+
+    #endregion
 }
