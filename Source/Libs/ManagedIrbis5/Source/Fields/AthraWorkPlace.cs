@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Text.Json.Serialization;
@@ -29,179 +30,210 @@ using ManagedIrbis.Mapping;
 
 #nullable enable
 
-namespace ManagedIrbis.Fields
+namespace ManagedIrbis.Fields;
+
+/// <summary>
+/// Место работы в базе данных ATHRA.
+/// Поле 910.
+/// </summary>
+[XmlRoot ("workplace")]
+public sealed class AthraWorkPlace
+    : IHandmadeSerializable,
+    IVerifiable
 {
+    #region Constants
+
     /// <summary>
-    /// Место работы в базе данных ATHRA.
-    /// Поле 910.
+    /// Метка поля.
     /// </summary>
-    [XmlRoot ("workplace")]
-    public sealed class AthraWorkPlace
-        : IHandmadeSerializable,
-        IVerifiable
+    public const int Tag = 910;
+
+    /// <summary>
+    /// Известные коды подполей.
+    /// </summary>
+    public const string KnownCodes = "py";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Работает в данной организации.
+    /// Подполе Y.
+    /// </summary>
+    [SubField ('y')]
+    [XmlElement ("here")]
+    [JsonPropertyName ("here")]
+    [Description ("Работает в данной организации")]
+    [DisplayName ("Работает в данной организации")]
+    public string? WorksHere { get; set; }
+
+    /// <summary>
+    /// Место работы автора.
+    /// Подполе P.
+    /// </summary>
+    [SubField ('p')]
+    [XmlElement ("place")]
+    [JsonPropertyName ("place")]
+    [Description ("Место работы автора")]
+    [DisplayName ("Место работы автора")]
+    public string? WorkPlace { get; set; }
+
+    /// <summary>
+    /// Неизвестные подполя.
+    /// </summary>
+    [XmlElement ("unknown")]
+    [JsonPropertyName ("unknown")]
+    [Browsable (false)]
+    public SubField[]? UnknownSubFields { get; set; }
+
+    /// <summary>
+    /// Ассоциированное поле библиографической записи
+    /// <see cref="Field"/>.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public Field? Field { get; set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Применение данных к полю библиографической записи
+    /// <see cref="Field"/>.
+    /// </summary>
+    public Field ApplyTo
+        (
+            Field field
+        )
     {
-        #region Constants
+        Sure.NotNull (field);
 
-        /// <summary>
-        /// Метка поля.
-        /// </summary>
-        public const int Tag = 910;
-
-        /// <summary>
-        /// Известные коды подполей.
-        /// </summary>
-        public const string KnownCodes = "py";
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Работает в данной организации.
-        /// Подполе Y.
-        /// </summary>
-        [SubField ('y')]
-        [XmlElement ("here")]
-        [JsonPropertyName ("here")]
-        [Description ("Работает в данной организации")]
-        [DisplayName ("Работает в данной организации")]
-        public string? WorksHere { get; set; }
-
-        /// <summary>
-        /// Место работы автора.
-        /// Подполе P.
-        /// </summary>
-        [SubField ('p')]
-        [XmlElement ("place")]
-        [JsonPropertyName ("place")]
-        [Description ("Место работы автора")]
-        [DisplayName ("Место работы автора")]
-        public string? WorkPlace { get; set; }
-
-        /// <summary>
-        /// Неизвестные подполя.
-        /// </summary>
-        [XmlElement ("unknown")]
-        [JsonPropertyName ("unknown")]
-        [Browsable (false)]
-        public SubField[]? UnknownSubFields { get; set; }
-
-        /// <summary>
-        /// Ассоциированное поле библиографической записи <see cref="Field"/>.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable (false)]
-        public Field? Field { get; set; }
-
-        /// <summary>
-        /// Произвольные пользовательские данные.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable (false)]
-        public object? UserData { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Применение данных к полю библиографической записи.
-        /// </summary>
-        public Field ApplyTo (Field field) => field
-            .ThrowIfNull ()
+        return field
+            .ThrowIfNull()
             .SetSubFieldValue ('y', WorksHere)
             .SetSubFieldValue ('p', WorkPlace);
+    }
 
-        /// <summary>
-        /// Разбор поля библиографической записи.
-        /// </summary>
-        public static AthraWorkPlace ParseField
-            (
-                Field field
-            )
+    /// <summary>
+    /// Разбор поля библиографической записи.
+    /// </summary>
+    public static AthraWorkPlace ParseField
+        (
+            Field field
+        )
+    {
+        Sure.NotNull (field);
+
+        return new AthraWorkPlace
         {
-            Sure.NotNull (field);
+            WorksHere = field.GetFirstSubFieldValue ('y'),
+            WorkPlace = field.GetFirstSubFieldValue ('p'),
+            UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
+            Field = field
+        };
+    }
 
-            return new AthraWorkPlace
-            {
-                WorksHere = field.GetFirstSubFieldValue ('y'),
-                WorkPlace = field.GetFirstSubFieldValue ('p'),
-                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
-                Field = field
-            };
+    /// <summary>
+    /// Разбор библиографической записи <see cref="Record"/>.
+    /// </summary>
+    public static AthraWorkPlace[]? ParseRecord
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
 
-        } // method ParseField
+        var result = new List<AthraWorkPlace>();
+        foreach (var field in record.EnumerateField (Tag))
+        {
+            var workplace = ParseField (field);
+            result.Add (workplace);
+        }
 
-        /// <summary>
-        /// Преобразование в поле библиографической записи <see cref="Field"/>.
-        /// </summary>
-        public Field ToField() => new Field (Tag)
+        return result.Count == 0
+            ? null
+            : result.ToArray();
+    }
+
+    /// <summary>
+    /// Преобразование в поле библиографической записи <see cref="Field"/>.
+    /// </summary>
+    public Field ToField()
+    {
+        return new Field (Tag)
             .AddNonEmpty ('p', WorkPlace)
             .AddNonEmpty ('y', WorksHere);
+    }
 
-        #endregion
+    #endregion
 
-        #region IHandmadeSerializable members
+    #region IHandmadeSerializable members
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Sure.NotNull (reader);
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
 
-            WorksHere = reader.ReadNullableString();
-            WorkPlace = reader.ReadNullableString();
-            UnknownSubFields = reader.ReadNullableArray<SubField>();
+        WorksHere = reader.ReadNullableString();
+        WorkPlace = reader.ReadNullableString();
+        UnknownSubFields = reader.ReadNullableArray<SubField>();
+    }
 
-        } // method RestoreFromStream
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            Sure.NotNull (writer);
+        writer
+            .WriteNullable (WorksHere)
+            .WriteNullable (WorkPlace)
+            .WriteNullableArray (UnknownSubFields);
+    }
 
-            writer
-                .WriteNullable (WorksHere)
-                .WriteNullable (WorkPlace)
-                .WriteNullableArray (UnknownSubFields);
+    #endregion
 
-        } // method SaveToStream
+    #region IVerifiable members
 
-        #endregion
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<AthraWorkPlace> (this, throwOnError);
 
-        #region IVerifiable members
+        verifier
+            .Assert (!string.IsNullOrEmpty (WorksHere) || !string.IsNullOrEmpty (WorkPlace));
 
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<AthraWorkPlace> (this, throwOnError);
+        return verifier.Result;
+    }
 
-            verifier
-                .Assert (!string.IsNullOrEmpty (WorksHere) || !string.IsNullOrEmpty (WorkPlace));
+    #endregion
 
-            return verifier.Result;
+    #region Object members
 
-        } // method Verify
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return WorkPlace.ToVisibleString();
+    }
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => WorkPlace.ToVisibleString();
-
-        #endregion
-
-    } // class AthraWorkPlace
-
-} // namespace ManagedIrbis.Fieldss
+    #endregion
+}

@@ -36,9 +36,11 @@ namespace UnitTests.ManagedIrbis.Fields
         private void _Compare
             (
                 AthraTitle first,
-                AthraTitle second
+                AthraTitle? second
             )
         {
+            Assert.IsNotNull (second);
+
             Assert.AreEqual (first.Surname, second.Surname);
             Assert.AreEqual (first.Initials, second.Initials);
             Assert.AreEqual (first.Extension, second.Extension);
@@ -95,6 +97,7 @@ namespace UnitTests.ManagedIrbis.Fields
             var field = _GetField();
             var actual = AthraTitle.ParseField (field);
             var expected = _GetAthraTitle();
+            Assert.IsNotNull (actual);
             _Compare (expected, actual);
             Assert.AreSame (field, actual.Field);
             Assert.IsNull (actual.UserData);

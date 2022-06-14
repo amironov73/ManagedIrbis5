@@ -248,7 +248,19 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Разбор поля библиографической записи.
         /// </summary>
-        public static AthraTitle ParseField (Field field) => new ()
+        public static AthraTitle? ParseField
+            (
+                Field? field
+            )
+        {
+            Sure.NotNull (field);
+
+            if (field is null)
+            {
+                return null;
+            }
+
+            return new ()
             {
                 Surname = field.GetFirstSubFieldValue ('a'),
                 Initials = field.GetFirstSubFieldValue ('b'),
@@ -266,6 +278,7 @@ namespace ManagedIrbis.Fields
                 UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
+        }
 
         /// <summary>
         /// Преобразование в поле библиографической записи <see cref="Field"/>.
