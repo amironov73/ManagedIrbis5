@@ -27,6 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
@@ -39,6 +40,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Update="GeoLite2-Country.mmdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
