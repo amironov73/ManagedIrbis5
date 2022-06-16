@@ -86,6 +86,19 @@ public sealed class IPRange
     }
 
     /// <summary>
+    /// Содержит ли наш диапазон указанный поддиапазон?
+    /// </summary>
+    public bool Contains
+        (
+            IPRange range
+        )
+    {
+        Sure.NotNull (range);
+
+        return Contains (range.Begin) && Contains (range.End);
+    }
+
+    /// <summary>
     /// Разбор текстовой спецификации диапазона.
     /// </summary>
     public static IPRange Parse
@@ -184,6 +197,16 @@ public sealed class IPRange
                 nameof (specification),
                 "Bad IP range specification"
             );
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="ToString"/>
+    public override string ToString()
+    {
+        return $"{Begin}-{End}";
     }
 
     #endregion

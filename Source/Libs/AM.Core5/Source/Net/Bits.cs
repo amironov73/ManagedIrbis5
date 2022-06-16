@@ -33,7 +33,7 @@ internal static class Bits
             byte[] bytes
         )
     {
-        return bytes.Select (b => (byte)~b).ToArray();
+        return bytes.Select (b => unchecked ((byte) ~b)).ToArray();
     }
 
     public static byte[] And
@@ -42,14 +42,17 @@ internal static class Bits
             byte[] right
         )
     {
-        var length = left.Length;
-        var result = new byte[length];
-        for (var i = 0; i < length; i++)
+        unchecked
         {
-            result[i] = (byte)(left[i] & right[i]);
-        }
+            var length = left.Length;
+            var result = new byte[length];
+            for (var i = 0; i < length; i++)
+            {
+                result[i] = (byte)(left[i] & right[i]);
+            }
 
-        return result;
+            return result;
+        }
     }
 
     public static byte[] Or
@@ -58,14 +61,17 @@ internal static class Bits
             byte[] right
         )
     {
-        var length = left.Length;
-        var result = new byte[length];
-        for (var i = 0; i < length; i++)
+        unchecked
         {
-            result[i] = (byte)(left[i] | right[i]);
-        }
+            var length = left.Length;
+            var result = new byte[length];
+            for (var i = 0; i < length; i++)
+            {
+                result[i] = (byte)(left[i] | right[i]);
+            }
 
-        return result;
+            return result;
+        }
     }
 
     public static bool MoreOrEqual
@@ -74,17 +80,20 @@ internal static class Bits
             byte[] right
         )
     {
-        var length = left.Length;
-        var result = new int[length];
-        for (var i = 0; i < length; i++)
+        unchecked
         {
-            int a = left[i], b = right[i];
-            result[i] = a == b ? 0 : a < b ? 1 : -1;
-        }
+            var length = left.Length;
+            var result = new int[length];
+            for (var i = 0; i < length; i++)
+            {
+                int a = left[i], b = right[i];
+                result[i] = a == b ? 0 : a < b ? 1 : -1;
+            }
 
-        return result
-            .SkipWhile (c => c == 0)
-            .FirstOrDefault() >= 0;
+            return result
+                .SkipWhile (c => c == 0)
+                .FirstOrDefault() >= 0;
+        }
     }
 
     public static bool LessOrEqual
@@ -93,17 +102,20 @@ internal static class Bits
             byte[] right
         )
     {
-        var length = left.Length;
-        var result = new int[length];
-        for (var i = 0; i < length; i++)
+        unchecked
         {
-            int a = left[i], b = right[i];
-            result[i] = a == b ? 0 : a < b ? 1 : -1;
-        }
+            var length = left.Length;
+            var result = new int[length];
+            for (var i = 0; i < length; i++)
+            {
+                int a = left[i], b = right[i];
+                result[i] = a == b ? 0 : a < b ? 1 : -1;
+            }
 
-        return result
-            .SkipWhile (c => c == 0)
-            .FirstOrDefault() <= 0;
+            return result
+                .SkipWhile (c => c == 0)
+                .FirstOrDefault() <= 0;
+        }
     }
 
     public static byte[] GetBitMask
@@ -112,22 +124,25 @@ internal static class Bits
             int bitLen
         )
     {
-        var maskBytes = new byte[bufferSize];
-        var bytesLen = bitLen / 8;
-        var bitsLen = bitLen % 8;
-        for (var i = 0; i < bytesLen; i++)
+        unchecked
         {
-            maskBytes[i] = 0xff;
-        }
+            var maskBytes = new byte[bufferSize];
+            var bytesLen = bitLen / 8;
+            var bitsLen = bitLen % 8;
+            for (var i = 0; i < bytesLen; i++)
+            {
+                maskBytes[i] = 0xff;
+            }
 
-        if (bitsLen > 0)
-        {
-            maskBytes[bytesLen] = (byte)~Enumerable
-                .Range (1, 8 - bitsLen).Select (n => 1 << n - 1)
-                .Aggregate ((a, b) => a | b);
-        }
+            if (bitsLen > 0)
+            {
+                maskBytes[bytesLen] = unchecked ((byte) ~Enumerable
+                    .Range (1, 8 - bitsLen).Select (n => unchecked (1 << n - 1))
+                    .Aggregate ((a, b) => a | b));
+            }
 
-        return maskBytes;
+            return maskBytes;
+        }
     }
 
     #endregion

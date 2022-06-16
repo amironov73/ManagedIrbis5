@@ -17,9 +17,10 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+
+using AM.Net;
 
 using MaxMind.GeoIP2;
 
@@ -28,6 +29,27 @@ using MaxMind.GeoIP2;
 #nullable enable
 
 namespace AM.Web;
+
+/*
+    Марсианский пакет — это IP-пакет, видимый в общедоступном Интернете,
+    который содержит адрес источника или пункта назначения,
+    зарезервированный для специального использования Администрацией
+    адресного пространства Интернета (IANA). В общедоступном Интернете
+    такой пакет либо имеет поддельный адрес источника, и он фактически
+    не может быть создан как заявлено, либо пакет не может быть доставлен.
+    Требование сделать это содержится в RFC 1812, раздел 5.2.3.
+
+    Марсианские пакеты обычно возникают из-за подмены IP-адресов
+    при атаках типа «отказ в обслуживании», но также могут возникать
+    из-за сбоя сетевого оборудования или неправильной конфигурации хоста.
+
+    В терминологии Linux марсианский пакет — это IP-пакет, полученный
+    ядром через определённый интерфейс, а таблицы маршрутизации указывают,
+    что исходный IP-адрес ожидается на другом интерфейсе.
+
+    Как в IPv4, так и в IPv6 марсианские пакеты имеют адреса отправителя
+    или получателя в специальных диапазонах, определённых в RFC 6890.
+ */
 
 /// <summary>
 /// Полезные методы для работы с геолокацией IP-адресов
@@ -38,7 +60,7 @@ public static class GeoUtility
 
     private static DatabaseReader? _databaseReader;
 
-    private static IPAddress[]? _localAddresses;
+    private static IPRange[]? _localAddresses;
 
     private static DatabaseReader _GetDatabaseReader()
     {
@@ -47,13 +69,9 @@ public static class GeoUtility
         return _databaseReader;
     }
 
-    private static IPAddress[] _GetLocalAddresses()
+    private static IPRange[] _GetLocalAddresses()
     {
-        _localAddresses ??= Dns.GetHostAddresses
-            (
-                Dns.GetHostName(),
-                AddressFamily.InterNetwork
-            );
+        _localAddresses ??= NetUtility.GetLocalNetwork();
 
         return _localAddresses;
     }
@@ -82,18 +100,15 @@ public static class GeoUtility
             return true;
         }
 
-        // это один из наших сетевых интерфейсов?
+        // это наша подсеть?
         var addresses = _GetLocalAddresses();
         foreach (var one in addresses)
         {
-            if (one.Equals (address))
+            if (one.Contains (address))
             {
                 return true;
             }
         }
-
-        // это наша подсеть?
-        // TODO implement
 
         return false;
     }
@@ -116,6 +131,114 @@ public static class GeoUtility
         var result = country.IsoCode == "RU";
 
         return result;
+    }
+
+    /// <summary>
+    /// Немаршрутизируемый адрес?
+    /// </summary>
+    public static bool IsBogonNetwork
+        (
+            IPAddress address
+        )
+    {
+        Sure.NotNull (address);
+
+        if (address.AddressFamily != AddressFamily.InterNetwork)
+        {
+            throw new ArgumentOutOfRangeException
+                (
+                    nameof(address),
+                    "Only IPv4 supported"
+                );
+        }
+
+        var bytes = address.GetAddressBytes();
+
+        if (bytes[0] == 0)
+        {
+            // 0.0.0.0/8
+            // Диапазон описан в RFC1122 , RFC3330 и RFC1700 как
+            // "Этот хост в этой сети" (this host on this network),
+            // хотя, учитывая варианты применения, правильнее было бы
+            // назвать его как "любой адрес".
+            //
+            // В частности, IP-адрес 0.0.0.0 используется для:
+            //
+            // - обозначения в конфигурационных файлах серверов
+            //   и выводе netstat информации о том, что определенный
+            //   сервис "слушает" запросы на всех IP-адресах данного сервера;
+            //
+            // - конфигурации маршрута по умолчанию на активном
+            //   сетевом оборудовании;
+            //
+            // - использования в качестве src address в запросах
+            //   на получение IP-адреса (DHCPDISCOVER);
+            //
+            // - обозначения IP-адреса в суммаризованных событиях
+            //   безопасности IDS/IPS/WAF/etc (например,
+            //   TCP Host Sweep - обозначение dst host в случае
+            //   инициации коннектов к большому количеству IP-адресов).
+            //
+            // Подробнее: https://www.securitylab.ru/blog/personal/aodugin/305208.php
+
+            return true;
+        }
+
+        if (bytes[0] >= 240)
+        {
+            // 240.0.0.0/4
+            // В соответствии с RFC1122 , данный диапазон IP-адресов,
+            // исторически также известный как Class E, зарезервирован
+            // под использование в будущем. Юмор ситуации в том,
+            // что RFC1122 издавался еще в августе 1989 года,
+            // сейчас IPv4-адреса закончились, но для IETF будущее еще
+            // не наступило, потому что из всей большой подсети /4
+            // до сих пор используется только один адрес. Но, наверное,
+            // если посчитать статистику по всем подсетям всех организаций
+            // мира, этот адрес окажется в лидерах, потому что сервисы,
+            // использующие broadcast, обращаются к адресу 255.255.255.255,
+            // который и принадлежит описанному диапазону.
+
+            return true;
+        }
+
+        if (bytes[0] >= 224)
+        {
+            // 224.0.0.0/4
+            // Этот диапазон в исторической классификации еще называется
+            // "Class D". Выделен под Multicast, уточнение специфики
+            // работы которого тоже вроде как отдельная заметка.
+            // В RFC5771 подробно расписано использование подсетей
+            // внутри блока, но суть остается той же: эти адреса
+            // не закреплены ни за каким провайдером, и, соответственно,
+            // через Интернет не должны светиться.
+
+            return true;
+        }
+
+        if (bytes[0] == 169 && bytes[1] == 254)
+        {
+            // 169.254.0.0/16
+            // В соответствии с RFC3927 , определен как Link-Local
+            // для автоматической конфигурации. Думаю, каждый человек
+            // хоть раз в жизни, но успел столкнуться с ситуацией,
+            // когда ПК, не получив IP-адрес от DHCP-сервера, присваивает
+            // сам себе непонятный и нигде не прописанный ранее IP,
+            // начинающийся на 169.254... Это и есть реализация рекомендаций
+            // из RFC3927.
+
+            return true;
+        }
+
+        if (bytes[0] == 192 && bytes[1] == 0 && bytes[2] == 2)
+        {
+            // 192.0.2.0/8
+            // адреса TEST-NET
+
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
