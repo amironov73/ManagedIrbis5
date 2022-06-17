@@ -36,7 +36,40 @@ public static class NetUtility
     #region Public methods
 
     /// <summary>
-    /// Возвращает диапазоны адресов локальной сети.
+    /// Получение массива локальных адресов хоста.
+    /// </summary>
+    /// <param name="onlyUp">Только реально работающие сетевые интерфейсы.</param>
+    public static IPAddress[] GetLocalAdresses
+        (
+            bool onlyUp = true
+        )
+    {
+        var result = new List<IPAddress>();
+
+        foreach (var adapter in NetworkInterface.GetAllNetworkInterfaces())
+        {
+            if (onlyUp &&
+                adapter.OperationalStatus != OperationalStatus.Up)
+            {
+                continue;
+            }
+
+            foreach (var unicast in adapter.GetIPProperties().UnicastAddresses)
+            {
+                var address = unicast.Address;
+                if (address.AddressFamily == AddressFamily.InterNetwork
+                    && !IPAddress.IsLoopback (address))
+                {
+                    result.Add (address);
+                }
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    /// <summary>
+    /// Получение массива диапазонов адресов локальной сети.
     /// </summary>
     public static IPRange[] GetLocalNetwork()
     {

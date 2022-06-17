@@ -19,6 +19,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -32,6 +33,7 @@ namespace AM.Net;
 /// Диапазон IP-адресов.
 /// </summary>
 public sealed class IPRange
+    : IEquatable<IPRange>
 {
     #region Properties
 
@@ -113,8 +115,8 @@ public sealed class IPRange
         {
             return new IPRange
                 (
-                    new IPAddress (0),
-                    new IPAddress (0xFFFF_FFFF)
+                    IPAddress.Any,
+                    IPAddress.Broadcast
                 );
         }
 
@@ -127,7 +129,7 @@ public sealed class IPRange
         var match = Regex.Match
             (
                 specification,
-                @"^(?<addr>[\da-f\.:]+)/(?<maskLen>\d+)$",
+                @"^(?<addr>[\da-f\.]+)/(?<maskLen>\d+)$",
                 RegexOptions.IgnoreCase
             );
         if (match.Success)
@@ -149,7 +151,7 @@ public sealed class IPRange
         match = Regex.Match
             (
                 specification,
-                @"^(?<addr>[\da-f\.:]+)$",
+                @"^(?<addr>[\da-f\.]+)$",
                 RegexOptions.IgnoreCase
             );
         if (match.Success)
@@ -162,32 +164,13 @@ public sealed class IPRange
         match = Regex.Match
             (
                 specification,
-                @"^(?<begin>[\da-f\.:]+)-(?<end>[\da-f\.:]+)$",
+                @"^(?<begin>[\da-f\.]+)-(?<end>[\da-f\.]+)$",
                 RegexOptions.IgnoreCase
             );
         if (match.Success)
         {
             var begin = IPAddress.Parse (match.Groups["begin"].Value);
             var end = IPAddress.Parse (match.Groups["end"].Value);
-
-            return new IPRange (begin, end);
-        }
-
-        match = Regex.Match
-            (
-                specification,
-                @"^(?<addr>[\da-f\.:]+)/(?<mask>[\da-f]\.:]+)$",
-                RegexOptions.IgnoreCase
-            );
-        if (match.Success)
-        {
-            var addressBytes = IPAddress.Parse (match.Groups["addr"].Value)
-                .GetAddressBytes();
-            var bitMask = IPAddress.Parse (match.Groups["mask"].Value)
-                .GetAddressBytes();
-            addressBytes = Bits.And (addressBytes, bitMask);
-            var begin = new IPAddress (addressBytes);
-            var end = new IPAddress (Bits.Or (addressBytes, Bits.Not (bitMask)));
 
             return new IPRange (begin, end);
         }
@@ -201,12 +184,47 @@ public sealed class IPRange
 
     #endregion
 
+    #region IEquatable<T> members
+
+    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+    public bool Equals
+        (
+            IPRange? other
+        )
+    {
+        return other is not null
+               && Begin.Equals (other.Begin)
+               && End.Equals (other.End);
+    }
+
+    #endregion
+
     #region Object members
+
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    [ExcludeFromCodeCoverage]
+    public override bool Equals
+        (
+            object? obj
+        )
+    {
+        return ReferenceEquals (this, obj)
+            || obj is IPRange other && Equals (other);
+    }
+
+    /// <inheritdoc cref="object.GetHashCode"/>
+    [ExcludeFromCodeCoverage]
+    public override int GetHashCode()
+    {
+        return Begin.GetHashCode() * 17 + End.GetHashCode();
+    }
 
     /// <inheritdoc cref="ToString"/>
     public override string ToString()
     {
-        return $"{Begin}-{End}";
+        return Begin.Equals (End)
+            ? Begin.ToString()
+            : $"{Begin}-{End}";
     }
 
     #endregion
