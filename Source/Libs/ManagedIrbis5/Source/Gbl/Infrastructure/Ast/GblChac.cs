@@ -6,90 +6,61 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* ChacNode.cs --
+/* ChacNode.cs -- замена данных в поле/подполе с учетом регистра символов
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure.Ast
+namespace ManagedIrbis.Gbl.Infrastructure.Ast;
+
+/// <summary>
+/// Замена данные в поле/подполе с учетом регистра символов.
+/// </summary>
+public sealed class GblChac
+    : GblNode
 {
+    #region Constants
+
     /// <summary>
-    ///
+    /// Мнемоническое обозначение команды.
     /// </summary>
-    public sealed class GblChac
-        : GblNode
+    public const string Mnemonic = "CHAC";
+
+    #endregion
+
+    #region GblNode members
+
+    /// <inheritdoc cref="GblNode.Execute"/>
+    public override void Execute
+        (
+            GblContext context
+        )
     {
-        #region Constants
+        Sure.NotNull(context);
 
-        /// <summary>
-        /// Command mnemonic.
-        /// </summary>
-        public const string Mnemonic = "CHAC";
+        OnBeforeExecution(context);
 
-        #endregion
+        // TODO implement
 
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region GblNode members
-
-        /// <summary>
-        /// Execute the node.
-        /// </summary>
-        public override void Execute
-            (
-                GblContext context
-            )
-        {
-            Sure.NotNull(context, nameof(context));
-
-            OnBeforeExecution(context);
-
-            // Nothing to do here
-
-            OnAfterExecution(context);
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Mnemonic;
-        }
-
-        #endregion
+        OnAfterExecution(context);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Mnemonic;
+    }
+
+    #endregion
 }

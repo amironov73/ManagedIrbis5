@@ -6,101 +6,71 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* GblAll.cs --
+/* GblAll.cs -- дополнение новой записи всеми полями текущей записи
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure.Ast
+namespace ManagedIrbis.Gbl.Infrastructure.Ast;
+//
+// Official documentation:
+//
+// Оператор можно использовать в группе операторов после
+// операторов NEWMFN или CORREC. Он дополняет записи всеми
+// полями текущей записи. Т.е. это способ, например,
+// создать новую запись и наполнить ее содержимым текущей записи.
+// Или можно вызвать на корректировку другую запись (CORREC),
+// очистить ее (EMPTY) и наполнить содержимым текущей записи.
+//
+
+/// <summary>
+/// Добавление в новую запись всех полей текущей записи.
+/// </summary>
+public sealed class GblAll
+    : GblNode
 {
-    //
-    // Official documentation:
-    //
-    // Оператор можно использовать в группе операторов после
-    // операторов NEWMFN или CORREC. Он дополняет записи всеми
-    // полями текущей записи. Т.е. это способ, например,
-    // создать новую запись и наполнить ее содержимым текущей записи.
-    // Или можно вызвать на корректировку другую запись (CORREC),
-    // очистить ее (EMPTY) и наполнить содержимым текущей записи.
-    //
+    #region Constants
 
     /// <summary>
-    ///
+    /// Мнемоническое обозначение команды.
     /// </summary>
-    public sealed class GblAll
-        : GblNode
+    public const string Mnemonic = "ALL";
+
+    #endregion
+
+    #region GblNode members
+
+    /// <inheritdoc cref="GblNode.Execute"/>
+    public override void Execute
+        (
+            GblContext context
+        )
     {
-        #region Constants
+        Sure.NotNull (context);
 
-        /// <summary>
-        /// Command mnemonic.
-        /// </summary>
-        public const string Mnemonic = "ALL";
+        OnBeforeExecution (context);
 
-        #endregion
+        // TODO implement
 
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region GblNode members
-
-        /// <summary>
-        /// Execute the node.
-        /// </summary>
-        public override void Execute
-            (
-                GblContext context
-            )
-        {
-            Sure.NotNull(context, nameof(context));
-
-            OnBeforeExecution(context);
-
-            // Nothing to do here
-
-            OnAfterExecution(context);
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Mnemonic;
-        }
-
-        #endregion
+        OnAfterExecution (context);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Mnemonic;
+    }
+
+    #endregion
 }
