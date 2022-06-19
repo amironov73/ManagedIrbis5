@@ -12,40 +12,41 @@
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure.Ast
+namespace ManagedIrbis.Gbl.Infrastructure.Ast;
+
+//
+// Official documentation:
+//
+// Комментарий. Может находиться между другими операторами
+// и содержать любые тексты в строках (до 4-х) после себя.
+//
+
+/// <summary>
+/// Комментарий (пустой оператор).
+/// Данная команда не несет никакой полезной нагрузки,
+/// и предназначена для человека
+/// либо для временного отключения некоторых операторов
+/// </summary>
+public sealed class GblNop
+    : GblNode
 {
-    //
-    // Official documentation:
-    //
-    // Комментарий. Может находиться между другими операторами
-    // и содержать любые тексты в строках (до 4-х) после себя.
-    //
+    #region Constants
 
     /// <summary>
-    /// Комментарий (пустой оператор).
-    /// Данная команда не несет никакой полезной нагрузки,
-    /// и предназначена для человека
-    /// либо для временного отключения некоторых операторов
+    /// Мнемоническое обозначение команды.
     /// </summary>
-    public sealed class GblNop
-        : GblNode
+    public const string Mnemonic = "//";
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
     {
-        #region Constants
+        return Mnemonic;
+    }
 
-        /// <summary>
-        /// Мнемоническое обозначение команды.
-        /// </summary>
-        public const string Mnemonic = "//";
+    #endregion
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Mnemonic;
-
-        #endregion
-
-    } // class GblNop
-
-} // namespace ManagedIrbis.Gbl.Infrastructure.Ast
+}

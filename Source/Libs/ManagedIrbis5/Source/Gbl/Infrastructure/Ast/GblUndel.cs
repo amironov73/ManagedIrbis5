@@ -6,98 +6,107 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* GblUndel.cs --
+/* GblUndel.cs -- восстановление записи
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
+
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure.Ast
+namespace ManagedIrbis.Gbl.Infrastructure.Ast;
+
+//
+// Восстанавливает записи в диапазоне MFN,
+// который задан в форме ГЛОБАЛЬНОЙ.
+// Не требует никаких дополнительных данных.
+// Операторы, следующие за данным, выполняются
+// на восстановленных записях.
+//
+
+/// <summary>
+/// Восстановление записи.
+/// </summary>
+public sealed class GblUndel
+    : GblNode
 {
-    //
-    // Восстанавливает записи в диапазоне MFN,
-    // который задан в форме ГЛОБАЛЬНОЙ.
-    // Не требует никаких дополнительных данных.
-    // Операторы, следующие за данным, выполняются
-    // на восстановленных записях.
-    //
+    #region Constants
 
     /// <summary>
-    /// Восстановление данных.
+    /// Мнемоническое обозначение команды.
     /// </summary>
-    public sealed class GblUndel
-        : GblNode
+    public const string Mnemonic = "UNDEL";
+
+    #endregion
+
+    #region GblNode members
+
+    /// <inheritdoc cref="GblNode.Execute"/>
+    public override void Execute
+        (
+            GblContext context
+        )
     {
-        #region Constants
+        Sure.NotNull (context);
 
-        /// <summary>
-        /// Command mnemonic.
-        /// </summary>
-        public const string Mnemonic = "UNDEL";
+        OnBeforeExecution (context);
 
-        #endregion
-
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region GblNode members
-
-        /// <summary>
-        /// Execute the node.
-        /// </summary>
-        public override void Execute
-            (
-                GblContext context
-            )
+        var record = context.CurrentRecord;
+        if (record is null)
         {
-            Sure.NotNull(context, nameof(context));
-
-            OnBeforeExecution(context);
-
-            // Nothing to do here
-
-            OnAfterExecution(context);
+            return;
         }
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
+        var provider = context.SyncProvider;
+        if (provider is null)
         {
-            return Mnemonic;
+            return;
         }
 
-        #endregion
+        var mfn = record.Mfn;
+        if (mfn <= 0)
+        {
+            return;
+        }
+
+        if ((record.Status & RecordStatus.LogicallyDeleted) == 0)
+        {
+            return;
+        }
+
+        record.Status &= ~RecordStatus.LogicallyDeleted;
+
+        var parameters = new WriteRecordParameters()
+        {
+            Record = record,
+            Actualize = true,
+            DontParse = false,
+            Lock = false
+        };
+
+        if (!provider.WriteRecord (parameters))
+        {
+            return;
+        }
+
+        OnAfterExecution (context);
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Mnemonic;
+    }
+
+    #endregion
 }
