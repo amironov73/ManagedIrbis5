@@ -18,22 +18,22 @@ namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
         [TestMethod]
         public void GblEmpty_Construction_1()
         {
-            GblEmpty empty = new GblEmpty();
+            var empty = new GblEmpty();
             Assert.IsNotNull(empty);
         }
 
         [TestMethod]
         public void GblEmpty_Execute_1()
         {
-            GblContext context = new GblContext();
-            GblEmpty empty = new GblEmpty();
+            var context = new GblContext();
+            var empty = new GblEmpty();
             empty.Execute(context);
         }
 
         [TestMethod]
         public void GblEmpty_Verify_1()
         {
-            GblEmpty empty = new GblEmpty();
+            var empty = new GblEmpty();
             Assert.IsTrue(empty.Verify(false));
         }
     }

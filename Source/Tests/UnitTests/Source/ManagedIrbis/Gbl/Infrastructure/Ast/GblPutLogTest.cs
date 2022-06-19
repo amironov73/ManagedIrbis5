@@ -18,22 +18,22 @@ namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
         [TestMethod]
         public void GblPutLog_Construction_1()
         {
-            GblPutLog putLog = new GblPutLog();
+            var putLog = new GblPutLog();
             Assert.IsNotNull(putLog);
         }
 
         [TestMethod]
         public void GblPutLog_Execute_1()
         {
-            GblContext context = new GblContext();
-            GblPutLog putLog = new GblPutLog();
+            var context = new GblContext();
+            var putLog = new GblPutLog();
             putLog.Execute(context);
         }
 
         [TestMethod]
         public void GblPutLog_Verify_1()
         {
-            GblPutLog putLog = new GblPutLog();
+            var putLog = new GblPutLog();
             Assert.IsTrue(putLog.Verify(false));
         }
     }

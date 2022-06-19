@@ -18,22 +18,22 @@ namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
         [TestMethod]
         public void GblNewMfn_Construction_1()
         {
-            GblNewMfn newMfn = new GblNewMfn();
+            var newMfn = new GblNewMfn();
             Assert.IsNotNull(newMfn);
         }
 
         [TestMethod]
         public void GblNewMfn_Execute_1()
         {
-            GblContext context = new GblContext();
-            GblNewMfn newMfn = new GblNewMfn();
+            var context = new GblContext();
+            var newMfn = new GblNewMfn();
             newMfn.Execute(context);
         }
 
         [TestMethod]
         public void GblNewMfn_Verify_1()
         {
-            GblNewMfn newMfn = new GblNewMfn();
+            var newMfn = new GblNewMfn();
             Assert.IsTrue(newMfn.Verify(false));
         }
     }

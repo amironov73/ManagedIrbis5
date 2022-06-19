@@ -18,21 +18,21 @@ namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
         [TestMethod]
         public void GblRep_Construction_1()
         {
-            GblRep rep = new GblRep();
+            var rep = new GblRep();
         }
 
         [TestMethod]
         public void GblRep_Execute_1()
         {
-            GblContext context = new GblContext();
-            GblRep rep = new GblRep();
+            var context = new GblContext();
+            var rep = new GblRep();
             rep.Execute(context);
         }
 
         [TestMethod]
         public void GblRep_Verify_1()
         {
-            GblRep rep = new GblRep();
+            var rep = new GblRep();
             Assert.IsTrue(rep.Verify(false));
         }
     }

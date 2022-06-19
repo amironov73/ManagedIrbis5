@@ -18,22 +18,22 @@ namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
         [TestMethod]
         public void GblCorrec_Construction_1()
         {
-            GblCorrec correc = new GblCorrec();
+            var correc = new GblCorrec();
             Assert.IsNotNull(correc);
         }
 
         [TestMethod]
         public void GblCorrec_Execute_1()
         {
-            GblContext context = new GblContext();
-            GblCorrec correc = new GblCorrec();
+            var context = new GblContext();
+            var correc = new GblCorrec();
             correc.Execute(context);
         }
 
         [TestMethod]
         public void GblCorrec_Verify_1()
         {
-            GblCorrec correc = new GblCorrec();
+            var correc = new GblCorrec();
             Assert.IsTrue(correc.Verify(false));
         }
     }

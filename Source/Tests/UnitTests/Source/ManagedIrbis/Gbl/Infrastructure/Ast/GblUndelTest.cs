@@ -18,21 +18,21 @@ namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
         [TestMethod]
         public void GblUndel_Construction_1()
         {
-            GblUndel undel = new GblUndel();
+            var undel = new GblUndel();
         }
 
         [TestMethod]
         public void GblUndel_Execute_1()
         {
-            GblContext context = new GblContext();
-            GblUndel undel = new GblUndel();
+            var context = new GblContext();
+            var undel = new GblUndel();
             undel.Execute(context);
         }
 
         [TestMethod]
         public void GblUndel_Verify_1()
         {
-            GblUndel undel = new GblUndel();
+            var undel = new GblUndel();
             Assert.IsTrue(undel.Verify(false));
         }
     }

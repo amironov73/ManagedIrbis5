@@ -4,10 +4,10 @@
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
+namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast;
+
+public class CommonGblAstTest
+    : Common.CommonUnitTest
 {
-    public class CommonGblAstTest
-        : Common.CommonUnitTest
-    {
-    }
+    // пустое тело класса
 }

@@ -10,34 +10,34 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
+namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast;
+
+[TestClass]
+public class GblAddTest
+    : CommonGblAstTest
 {
-    [TestClass]
-    public class GblAddTest
-        : CommonGblAstTest
+    [TestMethod]
+    public void GblAdd_Construction_1()
     {
-        [TestMethod]
-        public void GblAdd_Construction_1()
-        {
-            GblAdd add = new GblAdd();
-        }
+        var add = new GblAdd();
+        Assert.IsNotNull (add);
+    }
 
-        [TestMethod]
-        public void GblAdd_Execute_1()
+    [TestMethod]
+    public void GblAdd_Execute_1()
+    {
+        var context = new GblContext
         {
-            GblContext context = new GblContext()
-            {
-                CurrentRecord = new Record()
-            };
-            GblAdd add = new GblAdd();
-            add.Execute(context);
-        }
+            CurrentRecord = new Record()
+        };
+        var add = new GblAdd();
+        add.Execute (context);
+    }
 
-        [TestMethod]
-        public void GblAdd_Verify_1()
-        {
-            GblAdd add = new GblAdd();
-            Assert.IsTrue(add.Verify(false));
-        }
+    [TestMethod]
+    public void GblAdd_Verify_1()
+    {
+        var add = new GblAdd();
+        Assert.IsTrue (add.Verify (false));
     }
 }

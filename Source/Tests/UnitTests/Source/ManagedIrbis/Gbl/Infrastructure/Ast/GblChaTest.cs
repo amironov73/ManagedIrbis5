@@ -18,22 +18,22 @@ namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
         [TestMethod]
         public void GblCha_Construction_1()
         {
-            GblCha cha = new GblCha();
+            var cha = new GblCha();
             Assert.IsNotNull(cha);
         }
 
         [TestMethod]
         public void GblCha_Execute_1()
         {
-            GblContext context = new GblContext();
-            GblCha cha = new GblCha();
+            var context = new GblContext();
+            var cha = new GblCha();
             cha.Execute(context);
         }
 
         [TestMethod]
         public void GblCha_Verify_1()
         {
-            GblCha cha = new GblCha();
+            var cha = new GblCha();
             Assert.IsTrue(cha.Verify(false));
         }
     }

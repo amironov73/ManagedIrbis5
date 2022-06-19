@@ -18,22 +18,22 @@ namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
         [TestMethod]
         public void GblDel_Construction_1()
         {
-            GblDel del = new GblDel();
+            var del = new GblDel();
             Assert.IsNotNull(del);
         }
 
         [TestMethod]
         public void GblDel_Execute_1()
         {
-            GblContext context = new GblContext();
-            GblDel del = new GblDel();
+            var context = new GblContext();
+            var del = new GblDel();
             del.Execute(context);
         }
 
         [TestMethod]
         public void GblDel_Verify_1()
         {
-            GblDel del = new GblDel();
+            var del = new GblDel();
             Assert.IsTrue(del.Verify(false));
         }
     }

@@ -18,22 +18,22 @@ namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
         [TestMethod]
         public void GblNop_Construction_1()
         {
-            GblNop nop = new GblNop();
+            var nop = new GblNop();
             Assert.IsNotNull(nop);
         }
 
         [TestMethod]
         public void GblNop_Execute_1()
         {
-            GblContext context = new GblContext();
-            GblNop nop = new GblNop();
+            var context = new GblContext();
+            var nop = new GblNop();
             nop.Execute(context);
         }
 
         [TestMethod]
         public void GblNop_Verify_1()
         {
-            GblNop nop = new GblNop();
+            var nop = new GblNop();
             Assert.IsTrue(nop.Verify(false));
         }
     }

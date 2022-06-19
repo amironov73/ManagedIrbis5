@@ -18,21 +18,21 @@ namespace UnitTests.ManagedIrbis.Gbl.Infrastructure.Ast
         [TestMethod]
         public void GblUndor_Construction_1()
         {
-            GblUndor undor = new GblUndor();
+            var undor = new GblUndor();
         }
 
         [TestMethod]
         public void GblUndor_Execute_1()
         {
-            GblContext context = new GblContext();
-            GblUndor undor = new GblUndor();
+            var context = new GblContext();
+            var undor = new GblUndor();
             undor.Execute(context);
         }
 
         [TestMethod]
         public void GblUndor_Verify_1()
         {
-            GblUndor undor = new GblUndor();
+            var undor = new GblUndor();
             Assert.IsTrue(undor.Verify(false));
         }
     }
