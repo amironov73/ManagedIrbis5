@@ -205,7 +205,7 @@ public struct Place
     /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
-        return Column.GetHashCode() ^ Line.GetHashCode();
+        return HashCode.Combine (Column, Line);
     }
 
     /// <inheritdoc cref="ValueType.ToString"/>

@@ -98,7 +98,7 @@ namespace AM.Linguistics.Hunspell
 
         public override int GetHashCode()
         {
-            return unchecked (Flags.GetHashCode() ^ Morphs.GetHashCode() ^ Options.GetHashCode());
+            return HashCode.Combine (Flags, Morphs, Options);
         }
 
 #if !NO_INLINE

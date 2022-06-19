@@ -2,8 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable NonReadonlyMemberInGetHashCode
 
 /* TermLink.cs -- связь термина
  * Ars Magna project, http://arsmagna.ru
@@ -25,268 +26,270 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Связь термина с библиографической записью.
+/// </summary>
+[XmlRoot("link")]
+public sealed class TermLink
+    : IEquatable<TermLink>,
+    IHandmadeSerializable,
+    IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    /// Связь термина
+    /// MFN записи с искомым термом.
     /// </summary>
-    [XmlRoot("link")]
-    public sealed class TermLink
-        : IEquatable<TermLink>,
-        IHandmadeSerializable,
-        IVerifiable
+    [XmlAttribute("mfn")]
+    [JsonPropertyName("mfn")]
+    public int Mfn { get; set; }
+
+    /// <summary>
+    /// Метка поля с искомым термом.
+    /// </summary>
+    [XmlAttribute("tag")]
+    [JsonPropertyName("tag")]
+    public int Tag { get; set; }
+
+    /// <summary>
+    /// Повторение поля.
+    /// </summary>
+    [XmlAttribute("occurrence")]
+    [JsonPropertyName("occurrence")]
+    public int Occurrence { get; set; }
+
+    /// <summary>
+    /// Смещение от начала поля.
+    /// </summary>
+    [XmlAttribute("index")]
+    [JsonPropertyName("index")]
+    public int Index { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Клонирование связи.
+    /// </summary>
+    public TermLink Clone()
     {
-        #region Properties
+        return (TermLink) MemberwiseClone();
+    }
 
-        /// <summary>
-        /// MFN записи с искомым термом.
-        /// </summary>
-        [XmlAttribute("mfn")]
-        [JsonPropertyName("mfn")]
-        public int Mfn { get; set; }
+    /// <summary>
+    /// Преобразование <see cref="TermPosting"/>
+    /// в <see cref="TermLink"/>.
+    /// </summary>
+    public static TermLink FromPosting
+        (
+            TermPosting posting
+        )
+    {
+        Sure.NotNull (posting);
 
-        /// <summary>
-        /// Тег поля с искомым термом.
-        /// </summary>
-        [XmlAttribute("tag")]
-        [JsonPropertyName("tag")]
-        public int Tag { get; set; }
-
-        /// <summary>
-        /// Повторение поля.
-        /// </summary>
-        [XmlAttribute("occurrence")]
-        [JsonPropertyName("occurrence")]
-        public int Occurrence { get; set; }
-
-        /// <summary>
-        /// Смещение от начала поля.
-        /// </summary>
-        [XmlAttribute("index")]
-        [JsonPropertyName("index")]
-        public int Index { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Клонирование связи.
-        /// </summary>
-        public TermLink Clone()
+        var result = new TermLink
         {
-            return (TermLink) MemberwiseClone();
+            Mfn = posting.Mfn,
+            Tag = posting.Tag,
+            Occurrence = posting.Occurrence,
+            Index = posting.Count
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Преобразование списка <see cref="TermPosting"/>
+    /// в массив <see cref="TermLink"/>.
+    /// </summary>
+    public static TermLink[] FromPostings
+        (
+            IList<TermPosting> postings
+        )
+    {
+        Sure.NotNull (postings);
+
+        var result = new TermLink[postings.Count];
+        for (var i = 0; i < postings.Count; i++)
+        {
+            result[i] = FromPosting(postings[i]);
         }
 
-        /// <summary>
-        /// Конвертируем <see cref="TermPosting"/>
-        /// в <see cref="TermLink"/>.
-        /// </summary>
-        public static TermLink FromPosting
-            (
-                TermPosting posting
-            )
+        return result;
+    }
+
+    /// <summary>
+    /// Чтение ссылки из файла.
+    /// </summary>
+    public static TermLink Read
+        (
+            Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        var result = new TermLink
         {
-            var result = new TermLink
+            Mfn = stream.ReadInt32Network(),
+            Tag = stream.ReadInt32Network(),
+            Occurrence = stream.ReadInt32Network(),
+            Index = stream.ReadInt32Network()
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Преобразование <see cref="TermLink"/> в массив MFN.
+    /// </summary>
+    public static int[] ToMfn
+        (
+            IReadOnlyList<TermLink> links
+        )
+    {
+        Sure.NotNull (links);
+
+        var result = new int[links.Count];
+        for (var i = 0; i < links.Count; i++)
+        {
+            result[i] = links[i].Mfn;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Преобразование списка MFN в массив <see cref="TermLink"/>s.
+    /// </summary>
+    public static TermLink[] FromMfn
+        (
+            IReadOnlyList<int> array
+        )
+    {
+        Sure.NotNull (array);
+
+        var result = new TermLink[array.Count];
+        for (var i = 0; i < array.Count; i++)
+        {
+            result[i] = new TermLink
             {
-                Mfn = posting.Mfn,
-                Tag = posting.Tag,
-                Occurrence = posting.Occurrence,
-                Index = posting.Count
+                Mfn = array[i]
             };
-
-            return result;
         }
 
-        /// <summary>
-        /// Конвертируем список <see cref="TermPosting"/>
-        /// в массив <see cref="TermLink"/>.
-        /// </summary>
-        public static TermLink[] FromPostings
-            (
-                IList<TermPosting> postings
-            )
-        {
-            var result = new TermLink[postings.Count];
-            for (int i = 0; i < postings.Count; i++)
-            {
-                result[i] = FromPosting(postings[i]);
-            }
+        return result;
+    }
 
-            return result;
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        Mfn = reader.ReadPackedInt32();
+        Tag = reader.ReadPackedInt32();
+        Occurrence = reader.ReadPackedInt32();
+        Index = reader.ReadPackedInt32();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer
+            .WritePackedInt32(Mfn)
+            .WritePackedInt32(Tag)
+            .WritePackedInt32(Occurrence)
+            .WritePackedInt32(Index);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<TermLink>(this, throwOnError);
+
+        verifier
+            .Assert (Mfn > 0, "Mfn")
+            .Assert (Tag > 0, "Tag")
+            .Assert (Occurrence > 0, "Occurrence")
+            .Assert (Index > 0, "Index");
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"[{Mfn}] {Tag}/{Occurrence} {Index}";
+    }
+
+    /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
+    public bool Equals
+        (
+            TermLink? other
+        )
+    {
+        if (other is not null)
+        {
+            return Mfn == other.Mfn
+                   && Tag == other.Tag
+                   && Occurrence == other.Occurrence
+                   && Index == other.Index;
         }
 
-        /// <summary>
-        /// Чтение ссылки из файла.
-        /// </summary>
-        public static TermLink Read
-            (
-                Stream stream
-            )
+        return false;
+    }
+
+    /// <inheritdoc cref="object.Equals(object)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
+    {
+        if (ReferenceEquals(null, obj))
         {
-            var result = new TermLink
-            {
-                Mfn = stream.ReadInt32Network(),
-                Tag = stream.ReadInt32Network(),
-                Occurrence = stream.ReadInt32Network(),
-                Index = stream.ReadInt32Network()
-            };
-
-            return result;
-        }
-
-        /// <summary>
-        /// Convert array of <see cref="TermLink"/> into array of MFN.
-        /// </summary>
-        public static int[] ToMfn
-            (
-                IList<TermLink> links
-            )
-        {
-            var result = new int[links.Count];
-            for (var i = 0; i < links.Count; i++)
-            {
-                result[i] = links[i].Mfn;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Convert array of MFN into array of <see cref="TermLink"/>s.
-        /// </summary>
-        public static TermLink[] FromMfn
-            (
-                IList<int> array
-            )
-        {
-            var result = new TermLink[array.Count];
-            for (var i = 0; i < array.Count; i++)
-            {
-                result[i] = new TermLink
-                {
-                    Mfn = array[i]
-                };
-            }
-
-            return result;
-        }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Mfn = reader.ReadPackedInt32();
-            Tag = reader.ReadPackedInt32();
-            Occurrence = reader.ReadPackedInt32();
-            Index = reader.ReadPackedInt32();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WritePackedInt32(Mfn)
-                .WritePackedInt32(Tag)
-                .WritePackedInt32(Occurrence)
-                .WritePackedInt32(Index);
-        }
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<TermLink>(this, throwOnError);
-
-            verifier
-                .Assert(Mfn > 0, "Mfn")
-                .Assert(Tag > 0, "Tag")
-                .Assert(Occurrence > 0, "Occurrence")
-                .Assert(Index > 0, "Index");
-
-            return verifier.Result;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            return $"[{Mfn}] {Tag}/{Occurrence} {Index}";
-        }
-
-        /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
-        public bool Equals
-            (
-                TermLink? other
-            )
-        {
-            if (other is not null)
-            {
-                return Mfn == other.Mfn
-                       && Tag == other.Tag
-                       && Occurrence == other.Occurrence
-                       && Index == other.Index;
-            }
-
             return false;
         }
-
-        /// <inheritdoc cref="object.Equals(object)"/>
-        public override bool Equals
-            (
-                object? obj
-            )
+        if (ReferenceEquals(this, obj))
         {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            var termLink = obj as TermLink;
-
-            return !ReferenceEquals(termLink, null)
-                   && Equals(termLink);
+            return true;
         }
 
-        /// <inheritdoc cref="object.GetHashCode"/>
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                // ReSharper disable NonReadonlyMemberInGetHashCode
+        var termLink = obj as TermLink;
 
-                var hashCode = Mfn;
-                hashCode = (hashCode * 397) ^ Tag;
-                hashCode = (hashCode * 397) ^ Occurrence;
-                hashCode = (hashCode * 397) ^ Index;
-
-                return hashCode;
-                // ReSharper restore NonReadonlyMemberInGetHashCode
-            }
-        }
-
-        #endregion
+        return !ReferenceEquals(termLink, null)
+               && Equals(termLink);
     }
+
+    /// <inheritdoc cref="object.GetHashCode"/>
+    public override int GetHashCode()
+    {
+        return HashCode.Combine (Mfn, Tag, Occurrence, Index);
+    }
+
+    #endregion
 }

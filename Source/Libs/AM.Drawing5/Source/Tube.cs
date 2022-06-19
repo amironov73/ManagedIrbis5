@@ -263,7 +263,10 @@ namespace AM.Drawing
         }
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => $"{Color} [{Name}]";
+        public override string ToString()
+        {
+            return $"{Color} [{Name}]";
+        }
 
         #endregion
     }

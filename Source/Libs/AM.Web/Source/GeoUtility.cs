@@ -58,23 +58,15 @@ public static class GeoUtility
 {
     #region Private members
 
-    private static DatabaseReader? _databaseReader;
+    private static readonly Lazy<DatabaseReader> _databaseReader = new
+        (
+            () => new DatabaseReader ("GeoLite2-Country.mmdb")
+        );
 
-    private static IPRange[]? _localAddresses;
-
-    private static DatabaseReader _GetDatabaseReader()
-    {
-        _databaseReader ??= new DatabaseReader ("GeoLite2-Country.mmdb");
-
-        return _databaseReader;
-    }
-
-    private static IPRange[] _GetLocalAddresses()
-    {
-        _localAddresses ??= NetUtility.GetLocalNetwork();
-
-        return _localAddresses;
-    }
+    private static readonly Lazy<IPRange[]> _localAddresses = new
+        (
+            NetUtility.GetLocalNetwork
+        );
 
     #endregion
 
@@ -101,7 +93,7 @@ public static class GeoUtility
         }
 
         // это наша подсеть?
-        var addresses = _GetLocalAddresses();
+        var addresses = _localAddresses.Value;
         foreach (var one in addresses)
         {
             if (one.Contains (address))
@@ -125,7 +117,7 @@ public static class GeoUtility
     {
         Sure.NotNull (address);
 
-        var reader = _GetDatabaseReader();
+        var reader = _databaseReader.Value;
         var response = reader.Country (address);
         var country = response.Country;
         var result = country.IsoCode == "RU";

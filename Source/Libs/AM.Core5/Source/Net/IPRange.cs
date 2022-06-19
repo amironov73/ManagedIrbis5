@@ -2,15 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
-// ReSharper disable UnusedType.Global
 
 /* IPRange.cs -- диапазон IP-адресов
  * Ars Magna project, http://arsmagna.ru
@@ -216,7 +212,7 @@ public sealed class IPRange
     [ExcludeFromCodeCoverage]
     public override int GetHashCode()
     {
-        return Begin.GetHashCode() * 17 + End.GetHashCode();
+        return HashCode.Combine (Begin, End);
     }
 
     /// <inheritdoc cref="ToString"/>

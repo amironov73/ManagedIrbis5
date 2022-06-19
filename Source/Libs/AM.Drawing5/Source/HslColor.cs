@@ -18,148 +18,143 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Drawing
+namespace AM.Drawing;
+
+//
+// https://ru.wikipedia.org/wiki/HSL
+//
+// HSL, HLS или HSI (от англ. hue, saturation,
+// lightness (intensity)) — цветовая модель, в которой цветовыми
+// координатами являются тон, насыщенность и светлота.
+// Следует отметить, что HSV и HSL — две разные цветовые модели
+// (lightness — светлота, что отличается от яркости).
+//
+
+/// <summary>
+/// Цветовая модель "тон, насыщенность, яркость".
+/// </summary>
+public struct HslColor
 {
-    //
-    // https://ru.wikipedia.org/wiki/HSL
-    //
-    // HSL, HLS или HSI (от англ. hue, saturation,
-    // lightness (intensity)) — цветовая модель, в которой цветовыми
-    // координатами являются тон, насыщенность и светлота.
-    // Следует отметить, что HSV и HSL — две разные цветовые модели
-    // (lightness — светлота, что отличается от яркости).
-    //
+    #region Constants
 
     /// <summary>
-    /// Цветовая модель "тон, насыщенность, яркость".
+    /// Минимальное значение компонента.
     /// </summary>
-    public struct HslColor
+    public const float MinComponentValue = 0f;
+
+    /// <summary>
+    /// Максимальное значение компонента.
+    /// </summary>
+    public const float MaxComponentValue = 1f;
+
+    #endregion
+
+    #region Properties
+
+    private float _h;
+
+    /// <summary>
+    /// Цветовой тон.
+    /// </summary>
+    public float H
     {
-        #region Constants
+        get => _h;
+        set => _h = _CheckComponent (value, "H");
+    }
 
-        /// <summary>
-        /// Минимальное значение компонента.
-        /// </summary>
-        public const float MinComponentValue = 0f;
+    private float _l;
 
-        /// <summary>
-        /// Максимальное значение компонента.
-        /// </summary>
-        public const float MaxComponentValue = 1f;
+    /// <summary>
+    /// Насыщенность.
+    /// </summary>
+    public float L
+    {
+        get => _l;
+        set => _l = _CheckComponent (value, "L");
+    }
 
-        #endregion
+    private float _s;
 
-        #region Properties
+    /// <summary>
+    /// Яркость (светлота).
+    /// </summary>
+    public float S
+    {
+        get => _s;
+        set => _s = _CheckComponent (value, "S");
+    }
 
-        private float _h;
+    #endregion
 
-        /// <summary>
-        /// Цветовой тон.
-        /// </summary>
-        public float H
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public HslColor
+        (
+            float h,
+            float s,
+            float l
+        )
+    {
+        _h = _CheckComponent (h, "H");
+        _s = _CheckComponent (s, "S");
+        _l = _CheckComponent (l, "L");
+    }
+
+    #endregion
+
+    #region Private members
+
+    private static float _CheckComponent
+        (
+            float value,
+            string name
+        )
+    {
+        if (value < MinComponentValue || value > MaxComponentValue)
         {
-            get => _h;
-            set => _h = _CheckComponent(value, "H");
+            throw new ArgumentOutOfRangeException (name);
         }
 
-        private float _l;
+        return value;
+    }
 
-        /// <summary>
-        /// Насыщенность.
-        /// </summary>
-        public float L
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
+    {
+        if (obj is HslColor other)
         {
-            get => _l;
-            set => _l = _CheckComponent(value, "L");
+            return H == other.H && L == other.L && S == other.S;
         }
 
-        private float _s;
+        return false;
+    }
 
-        /// <summary>
-        /// Яркость (светлота).
-        /// </summary>
-        public float S
-        {
-            get => _s;
-            set => _s = _CheckComponent(value, "S");
-        }
+    /// <inheritdoc cref="object.GetHashCode"/>
+    public override int GetHashCode()
+    {
+        return HashCode.Combine (H, L, S);
+    }
 
-        #endregion
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"H: {H}; S: {S}; L: {L}";
+    }
 
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public HslColor
-            (
-                float h,
-                float s,
-                float l
-            )
-        {
-            _h = _CheckComponent(h, "H");
-            _s = _CheckComponent(s, "S");
-            _l = _CheckComponent(l, "L");
-        }
-
-        #endregion
-
-        #region Private members
-
-        private static float _CheckComponent
-            (
-                float value,
-                string name
-            )
-        {
-            if (value < MinComponentValue || value > MaxComponentValue)
-            {
-                throw new ArgumentOutOfRangeException(name);
-            }
-
-            return value;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.Equals(object?)"/>
-        public override bool Equals
-            (
-                object? obj
-            )
-        {
-            if (obj is HslColor other)
-            {
-                return H == other.H && L == other.L && S == other.S;
-            }
-
-            return false;
-        }
-
-        /// <inheritdoc cref="object.GetHashCode"/>
-        public override int GetHashCode()
-        {
-            var result = H.GetHashCode();
-            result = 29 * result + L.GetHashCode();
-            result = 29 * result + S.GetHashCode();
-
-            return result;
-        }
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => $"H: {H}; S: {S}; L: {L}";
-
-        #endregion
-
-    } // struct HslColor
-
-} // namespace AM.Drawing
+    #endregion
+}

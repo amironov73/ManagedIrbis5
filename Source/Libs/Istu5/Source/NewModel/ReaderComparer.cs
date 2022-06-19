@@ -36,7 +36,10 @@ namespace Istu.NewModel
             string.CompareOrdinal (x?.Ticket, y?.Ticket) == 0;
 
         /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
-        public int GetHashCode (Reader obj) => obj.Ticket?.GetHashCode() ?? 0;
+        public int GetHashCode (Reader obj)
+        {
+            return obj.Ticket?.GetHashCode() ?? 0;
+        }
 
         #endregion
 

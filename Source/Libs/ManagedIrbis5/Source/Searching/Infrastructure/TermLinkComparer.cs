@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 using AM;
 
@@ -52,6 +53,7 @@ public static class TermLinkComparer
         }
 
         /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
+        [ExcludeFromCodeCoverage]
         public int GetHashCode
             (
                 TermLink obj
@@ -88,6 +90,7 @@ public static class TermLinkComparer
         }
 
         /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
+        [ExcludeFromCodeCoverage]
         public int GetHashCode
             (
                 TermLink obj
@@ -95,7 +98,7 @@ public static class TermLinkComparer
         {
             Sure.NotNull (obj);
 
-            return unchecked (obj.Mfn * 37 + obj.Tag);
+            return HashCode.Combine (obj.Mfn, obj.Tag);
         }
 
         #endregion
@@ -126,6 +129,7 @@ public static class TermLinkComparer
         }
 
         /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
+        [ExcludeFromCodeCoverage]
         public int GetHashCode
             (
                 TermLink obj
@@ -133,7 +137,7 @@ public static class TermLinkComparer
         {
             Sure.NotNull (obj);
 
-            return unchecked ((obj.Mfn * 37 + obj.Tag) * 37 + obj.Occurrence);
+            return HashCode.Combine (obj.Mfn, obj.Tag, obj.Occurrence);
         }
 
         #endregion
@@ -165,6 +169,7 @@ public static class TermLinkComparer
         }
 
         /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
+        [ExcludeFromCodeCoverage]
         public int GetHashCode
             (
                 TermLink obj
@@ -174,7 +179,7 @@ public static class TermLinkComparer
 
             // obj.Index not forgotten!
 
-            return unchecked ((obj.Mfn * 37 + obj.Tag) * 37 + obj.Occurrence);
+            return HashCode.Combine (obj.Mfn, obj.Tag, obj.Occurrence);
         }
 
         #endregion

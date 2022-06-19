@@ -364,11 +364,14 @@ public struct LocalList<T>
     /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
-        return (_items.GetHashCode() * 37) & _other.GetHashCode();
+        return HashCode.Combine (_items, _other);
     }
 
     /// <inheritdoc cref="ValueType.Equals(object?)"/>
-    public override bool Equals (object? obj)
+    public override bool Equals
+        (
+            object? obj
+        )
     {
         return obj is LocalList<T> other && Equals (other);
     }
