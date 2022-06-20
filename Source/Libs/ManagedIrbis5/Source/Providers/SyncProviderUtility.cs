@@ -125,9 +125,11 @@ public static class SyncProviderUtility
             int mfn
         )
     {
+        Sure.NotNull (connection);
+
         var parameters = new FormatRecordParameters
         {
-            Database = connection.Database,
+            Database = connection.EnsureDatabase(),
             Format = format,
             Mfn = mfn
         };

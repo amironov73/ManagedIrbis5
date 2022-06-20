@@ -209,6 +209,13 @@ namespace ManagedIrbis.Gbl
             }
 
             var limit = Connection.GetMaxMfn() - 1;
+            if (limit <= 0)
+            {
+                Result = GblResult.GetEmptyResult();
+
+                return Result;
+            }
+
             if (minMfn > limit)
             {
                 Magna.Error
