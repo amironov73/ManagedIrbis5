@@ -31,7 +31,7 @@ public sealed class ServiceAggregator
     /// <summary>
     /// Простейший дескриптор сервиса.
     /// </summary>
-    record ServiceDescriptor(Type ServiceType, object Instance);
+    record ServiceDescriptor (Type ServiceType, object Instance);
 
     #endregion
 
@@ -54,6 +54,8 @@ public sealed class ServiceAggregator
             bool atBeginning = true
         )
     {
+        Sure.NotNull (provider);
+
         if (atBeginning)
         {
             _providers.Insert (0, provider);
@@ -99,6 +101,8 @@ public sealed class ServiceAggregator
             Type serviceType
         )
     {
+        Sure.NotNull (serviceType);
+
         foreach (var descriptor in _descriptors)
         {
             if (descriptor.ServiceType == serviceType)

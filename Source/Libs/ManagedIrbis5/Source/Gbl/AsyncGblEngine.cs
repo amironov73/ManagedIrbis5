@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedMember.Global
 
 /* AsyncGblEngine.cs -- асинхронная реализация по умолчанию движка пакетной корректировки
  * Ars Magna project, http://arsmagna.ru
@@ -18,6 +14,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using AM;
 
 using ManagedIrbis.Gbl.Infrastructure;
 using ManagedIrbis.Processing;
@@ -30,132 +28,140 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl
+namespace ManagedIrbis.Gbl;
+
+/// <summary>
+/// Асинхронная реализация по умолчанию движка пакетной
+/// корректировки записей.
+/// </summary>
+public sealed class AsyncGblEngine
+    : IAsyncGblEngine
 {
+    #region Properties
+
     /// <summary>
-    /// Асинхронная реализация по умолчанию движка пакетной
-    /// корректировки записей.
+    /// Асинхронный ИРБИС-провайдер.
     /// </summary>
-    public sealed class AsyncGblEngine
-        : IAsyncGblEngine
+    public IAsyncProvider IrbisProvider { get; }
+
+    /// <summary>
+    /// Провайдер различных сервисов,
+    /// которые могут понадобиться в процессе корректировки.
+    /// </summary>
+    public IServiceProvider ServiceProvider { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public AsyncGblEngine
+        (
+            IAsyncProvider irbisProvider,
+            IServiceProvider serviceProvider
+        )
     {
-        #region Properties
+        Sure.NotNull (irbisProvider);
+        Sure.NotNull (serviceProvider);
 
-        /// <summary>
-        /// Синхронный ИРБИС-провайдер.
-        /// </summary>
-        public IAsyncProvider IrbisProvider { get; }
+        IrbisProvider = irbisProvider;
+        ServiceProvider = serviceProvider;
+    }
 
-        /// <summary>
-        /// Провайдер различных сервисов,
-        /// которые могут понадобиться в процессе корректировки.
-        /// </summary>
-        public IServiceProvider ServiceProvider { get; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Construction
+    /// <summary>
+    /// Создание контекста.
+    /// </summary>
+    public GblContext CreateContext
+        (
+            IAsyncRecordSource recordSource,
+            IAsyncRecordSink recordSink
+        )
+    {
+        Sure.NotNull (recordSource);
+        Sure.NotNull (recordSink);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public AsyncGblEngine
-            (
-                IAsyncProvider irbisProvider,
-                IServiceProvider serviceProvider
-            )
+        var result = new GblContext
         {
-            IrbisProvider = irbisProvider;
-            ServiceProvider = serviceProvider;
+            AsyncRecordSource = recordSource,
+            AsyncRecordSink = recordSink,
+            AsyncProvider = IrbisProvider,
+            Logger = ServiceProvider.GetService<ILogger<SyncGblEngine>>()
+        };
 
-        } // constructor
+        return result;
+    }
 
-        #endregion
+    #endregion
 
-        #region Public methods
+    #region IAsyncGblEngine members
 
-        /// <summary>
-        /// Создание контекста.
-        /// </summary>
-        public GblContext CreateContext
-            (
-                ISyncRecordSource recordSource,
-                ISyncRecordSink recordSink
-            )
+    /// <inheritdoc cref="IAsyncGblEngine.CorrectRecordsAsync"/>
+    public async Task<GblResult> CorrectRecordsAsync
+        (
+            GblContext context,
+            IReadOnlyList<GblNode> program
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (program);
+
+        var result = new GblResult();
+
+        var recordSource = context.AsyncRecordSource;
+        var recordSink = context.AsyncRecordSink;
+        if (recordSource is not null && recordSink is not null)
         {
-            var result = new GblContext
+            var index = 0;
+            var progress = ServiceProvider.GetService<IProgress<int>>();
+
+            while (true)
             {
-                SyncRecordSource = recordSource,
-                SyncRecordSink = recordSink,
-                AsyncProvider = IrbisProvider,
-                Logger = ServiceProvider.GetService <ILogger<SyncGblEngine>> ()
-            };
+                ++index;
 
-            return result;
-
-        } // method CreateContext
-
-        #endregion
-
-        #region IAsyncGblEngine members
-
-        /// <inheritdoc cref="IAsyncGblEngine.CorrectRecordsAsync"/>
-        public async Task<GblResult> CorrectRecordsAsync
-            (
-                GblContext context,
-                IReadOnlyList<GblNode> program
-            )
-        {
-            var result = new GblResult();
-
-            var recordSource = context.AsyncRecordSource;
-            var recordSink = context.AsyncRecordSink;
-            if (recordSource is not null && recordSink is not null)
-            {
-                var index = 0;
-                var progress = ServiceProvider.GetService <IProgress<int>>();
-
-                while (true)
+                var record = await recordSource.GetNextRecordAsync();
+                if (record is null)
                 {
-                    ++index;
+                    break;
+                }
 
-                    var record = await recordSource.GetNextRecordAsync();
-                    if (record is null)
-                    {
-                        break;
-                    }
+                result.RecordsSupposed++;
+                context.CurrentRecord = record;
 
-                    context.CurrentRecord = record;
+                foreach (var node in program)
+                {
+                    await node.ExecuteAsync (context);
+                }
 
-                    foreach (var node in program)
-                    {
-                        await node.ExecuteAsync (context);
-                    }
-
-                    progress?.Report (index);
-
-                } // while
-
-                await recordSink.CompleteAsync();
-                result.Protocol = await recordSink.GetProtocolAsync();
-
-                await recordSource.DisposeAsync();
-                await recordSink.DisposeAsync();
+                result.RecordsProcessed++;
+                result.RecordsSucceeded++;
+                progress?.Report (index);
             }
 
-            return result;
+            await recordSink.CompleteAsync();
+            result.Protocol = await recordSink.GetProtocolAsync();
 
-        } // method CorrectRecords
+            await recordSource.DisposeAsync();
+            await recordSink.DisposeAsync();
+        }
 
-        #endregion
+        return result;
+    }
 
-        #region IAsyncDisposable members
+    #endregion
 
-        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    #region IAsyncDisposable members
 
-        #endregion
+    /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
 
-    } // class AsyncGblEngine
-
-} // namespace ManagedIrbis.Gbl
+    #endregion
+}

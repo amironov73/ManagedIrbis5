@@ -4,10 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedMember.Global
 
 /* SyncGblEngine.cs -- синхронная реализация по умолчанию движка пакетной корректировки
  * Ars Magna project, http://arsmagna.ru
@@ -17,6 +13,8 @@
 
 using System;
 using System.Collections.Generic;
+
+using AM;
 
 using ManagedIrbis.Gbl.Infrastructure;
 using ManagedIrbis.Processing;
@@ -28,133 +26,141 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl
+namespace ManagedIrbis.Gbl;
+
+/// <summary>
+/// Синхронная реализация по умолчанию движка пакетной
+/// корректировки записей.
+/// </summary>
+public sealed class SyncGblEngine
+    : ISyncGblEngine
 {
+    #region Properties
+
     /// <summary>
-    /// Синхронная реализация по умолчанию движка пакетной
-    /// корректировки записей.
+    /// Синхронный ИРБИС-провайдер.
     /// </summary>
-    public sealed class SyncGblEngine
-        : ISyncGblEngine
+    public ISyncProvider IrbisProvider { get; }
+
+    /// <summary>
+    /// Провайдер различных сервисов,
+    /// которые могут понадобиться в процессе корректировки.
+    /// </summary>
+    public IServiceProvider ServiceProvider { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SyncGblEngine
+        (
+            ISyncProvider irbisProvider,
+            IServiceProvider serviceProvider
+        )
     {
-        #region Properties
+        Sure.NotNull (irbisProvider);
+        Sure.NotNull (serviceProvider);
 
-        /// <summary>
-        /// Синхронный ИРБИС-провайдер.
-        /// </summary>
-        public ISyncProvider IrbisProvider { get; }
+        IrbisProvider = irbisProvider;
+        ServiceProvider = serviceProvider;
+    }
 
-        /// <summary>
-        /// Провайдер различных сервисов,
-        /// которые могут понадобиться в процессе корректировки.
-        /// </summary>
-        public IServiceProvider ServiceProvider { get; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Construction
+    /// <summary>
+    /// Создание контекста.
+    /// </summary>
+    public GblContext CreateContext
+        (
+            ISyncRecordSource recordSource,
+            ISyncRecordSink recordSink
+        )
+    {
+        Sure.NotNull (recordSource);
+        Sure.NotNull (recordSink);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SyncGblEngine
-            (
-                ISyncProvider irbisProvider,
-                IServiceProvider serviceProvider
-            )
+        var result = new GblContext
         {
-            IrbisProvider = irbisProvider;
-            ServiceProvider = serviceProvider;
+            SyncRecordSource = recordSource,
+            SyncRecordSink = recordSink,
+            SyncProvider = IrbisProvider,
+            Logger = ServiceProvider.GetService<ILogger<SyncGblEngine>>()
+        };
 
-        } // constructor
+        return result;
+    }
 
-        #endregion
+    #endregion
 
-        #region Public methods
+    #region ISyncGblEngine members
 
-        /// <summary>
-        /// Создание контекста.
-        /// </summary>
-        public GblContext CreateContext
-            (
-                ISyncRecordSource recordSource,
-                ISyncRecordSink recordSink
-            )
+    /// <inheritdoc cref="ISyncGblEngine.CorrectRecords"/>
+    public GblResult CorrectRecords
+        (
+            GblContext context,
+            IReadOnlyList<GblNode> program
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (program);
+
+        var result = new GblResult();
+
+        var recordSource = context.SyncRecordSource;
+        var recordSink = context.SyncRecordSink;
+        if (recordSource is not null && recordSink is not null)
         {
-            var result = new GblContext
+            var index = 0;
+            var progress = ServiceProvider.GetService<IProgress<int>>();
+
+            while (true)
             {
-                SyncRecordSource = recordSource,
-                SyncRecordSink = recordSink,
-                SyncProvider = IrbisProvider,
-                Logger = ServiceProvider.GetService <ILogger<SyncGblEngine>> ()
-            };
+                ++index;
 
-            return result;
-
-        } // method CreateContext
-
-        #endregion
-
-        #region ISyncGblEngine members
-
-        /// <inheritdoc cref="ISyncGblEngine.CorrectRecords"/>
-        public GblResult CorrectRecords
-            (
-                GblContext context,
-                IReadOnlyList<GblNode> program
-            )
-        {
-            var result = new GblResult();
-
-            var recordSource = context.SyncRecordSource;
-            var recordSink = context.SyncRecordSink;
-            if (recordSource is not null && recordSink is not null)
-            {
-                var index = 0;
-                var progress = ServiceProvider.GetService <IProgress<int>>();
-
-                while (true)
+                var record = recordSource.GetNextRecord();
+                if (record is null)
                 {
-                    ++index;
+                    break;
+                }
 
-                    var record = recordSource.GetNextRecord();
-                    if (record is null)
-                    {
-                        break;
-                    }
+                result.RecordsSupposed++;
+                context.CurrentRecord = record;
 
-                    context.CurrentRecord = record;
+                foreach (var node in program)
+                {
+                    node.Execute (context);
+                }
 
-                    foreach (var node in program)
-                    {
-                        node.Execute (context);
-                    }
+                result.RecordsProcessed++;
+                result.RecordsSucceeded++;
+                progress?.Report (index);
+            }
 
-                    progress?.Report (index);
+            recordSink.Complete();
+            result.Protocol = recordSink.GetProtocol();
 
-                } // while
+            recordSource.Dispose();
+            recordSink.Dispose();
+        }
 
-                recordSink.Complete();
-                result.Protocol = recordSink.GetProtocol();
+        return result;
+    }
 
-                recordSource.Dispose();
-                recordSink.Dispose();
+    #endregion
 
-            } // if
+    #region IDisposable members
 
-            return result;
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        // пустое тело метода
+    }
 
-        } // method CorrectRecords
+    #endregion
+}
 
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() { }
-
-        #endregion
-
-    } // class SyncGblEngine
-
-} // namespace ManagedIrbis.Gbl
