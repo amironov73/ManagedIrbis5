@@ -12,6 +12,7 @@
 
 #region Using directives
 
+using System;
 using System.Windows.Forms;
 
 #endregion
@@ -71,6 +72,54 @@ public static class FlowLayoutPanelExtensions
         Sure.NotNull (panel);
 
         panel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+
+        return panel;
+    }
+
+    /// <summary>
+    /// Размещение контрола.
+    /// </summary>
+    public static TPanel Place<TPanel>
+        (
+            this TPanel panel,
+            Control control
+        )
+        where TPanel: FlowLayoutPanel
+    {
+        Sure.NotNull (panel);
+        Sure.NotNull (control);
+
+        control.Dock = panel.FlowDirection switch
+        {
+            System.Windows.Forms.FlowDirection.TopDown => DockStyle.Top,
+            System.Windows.Forms.FlowDirection.BottomUp => DockStyle.Bottom,
+            System.Windows.Forms.FlowDirection.LeftToRight => DockStyle.Left,
+            System.Windows.Forms.FlowDirection.RightToLeft => DockStyle.Right,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        panel.Controls.Add (control);
+
+        return panel;
+    }
+
+    /// <summary>
+    /// Размещение контролов.
+    /// </summary>
+    public static TPanel Place<TPanel>
+        (
+            this TPanel panel,
+            params Control[] controls
+        )
+        where TPanel: FlowLayoutPanel
+    {
+        Sure.NotNull (panel);
+        Sure.NotNull (controls);
+
+        foreach (var control in controls)
+        {
+            panel.Place (control);
+        }
 
         return panel;
     }
