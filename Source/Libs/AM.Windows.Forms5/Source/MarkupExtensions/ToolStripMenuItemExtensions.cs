@@ -1,0 +1,48 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* ToolStripMenuItemExtensions.cs -- методы расширения для ToolStripMenuItem
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System.Windows.Forms;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Windows.Forms.MarkupExtensions;
+
+/// <summary>
+/// Методы расширения для <see cref="ToolStripMenuItem"/>.
+/// </summary>
+public static class ToolStripMenuItemExtensions
+{
+    #region Public methods
+
+    /// <summary>
+    /// Задание клавиатурного сочетания для элемента меню.
+    /// </summary>
+    public static TToolStripMenuItem Keys<TToolStripMenuItem>
+        (
+            this TToolStripMenuItem menuItem,
+            Keys shortcutKeys
+        )
+        where TToolStripMenuItem: ToolStripMenuItem
+    {
+        Sure.NotNull (menuItem);
+
+        menuItem.ShortcutKeys = shortcutKeys;
+
+        return menuItem;
+    }
+
+    #endregion
+}
