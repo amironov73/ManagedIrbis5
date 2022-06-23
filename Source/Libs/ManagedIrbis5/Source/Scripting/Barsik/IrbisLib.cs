@@ -166,7 +166,7 @@ public sealed class IrbisLib
     /// Отыскиваем текущее подключение к серверу.
     /// Ругаемся, если не находим или находим что-то не то.
     /// </summary>
-    private static bool TryGetConnection
+    internal static bool TryGetConnection
         (
             Context context,
             out SyncConnection connection,

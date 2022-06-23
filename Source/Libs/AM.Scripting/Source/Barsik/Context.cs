@@ -512,6 +512,25 @@ public sealed class Context
     }
 
     /// <summary>
+    /// Проверка, загружен ли уже модуль.
+    /// </summary>
+    public bool IsModuleLoaded<TModule>()
+        where TModule: IBarsikModule
+    {
+        var moduleType = typeof (TModule);
+        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+        foreach (var module in interpreter.Modules)
+        {
+            if (module.GetType() == moduleType)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Загрузка сборки.
     /// </summary>
     public Assembly? LoadAssembly
