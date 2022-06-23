@@ -16,7 +16,10 @@
 using System;
 using System.Diagnostics;
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 #endregion
 
@@ -66,6 +69,28 @@ public static class LoggingUtility
         {
             logger.LogError (lazy());
         }
+    }
+
+    /// <summary>
+    /// Получение от хоста логгера для указанного типа.
+    /// </summary>
+    public static ILogger GetLogger
+        (
+            IHost host,
+            Type type
+        )
+    {
+        Sure.NotNull (host);
+        Sure.NotNull (type);
+
+        ILogger result = NullLogger.Instance;
+        var factory = host.Services.GetService<ILoggerFactory>();
+        if (factory is not null)
+        {
+            result = factory.CreateLogger (type);
+        }
+
+        return result;
     }
 
     /// <summary>
