@@ -47,9 +47,26 @@ public static class ControlExtensions
     }
 
     /// <summary>
+    /// Выполнение произвольных побочных действий.
+    /// </summary>
+    public static TControl Also<TControl>
+        (
+            this TControl control,
+            Action<TControl> action
+        )
+        where TControl: Control
+    {
+        Sure.NotNull (control);
+        Sure.NotNull (action);
+
+        action (control);
+
+        return control;
+    }
+
+    /// <summary>
     /// Задание "якорей" для контрола.
     /// </summary>
-    /// <returns></returns>
     public static TControl Anchor<TControl>
         (
             this TControl control,
@@ -60,6 +77,23 @@ public static class ControlExtensions
         Sure.NotNull (control);
 
         control.Anchor = anchors;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Присваивание указанной переменной.
+    /// </summary>
+    public static TControl Assign<TControl>
+        (
+            this TControl control,
+            out TControl variable
+        )
+        where TControl: Control
+    {
+        Sure.NotNull (control);
+
+        variable = control;
 
         return control;
     }
