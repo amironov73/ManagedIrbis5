@@ -31,68 +31,64 @@ using System.Windows.Threading;
 
 #nullable enable
 
-namespace AM.Windows
+namespace AM.Windows;
+
+/// <summary>
+/// Полезные методы для WPF.
+/// </summary>
+public static class WpfUtility
 {
-    /// <summary>
-    /// Полезные методы для WPF.
-    /// </summary>
-    public static class WpfUtility
+    #region Private members
+
+    private static void _DoNothing()
     {
-        #region Private members
+        // Nothing to do here
+    }
 
-        private static void _DoNothing()
-        {
-            // Nothing to do here
-        }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Public methods
-
-        /// <summary>
-        /// Analog for WinForms Apllication.DoEvents.
-        /// </summary>
-        /// <remarks>
-        /// Borrowed from https://stackoverflow.com/questions/4502037/where-is-the-application-doevents-in-wpf
-        /// </remarks>
-        public static void DoEvents()
-        {
-            Application.Current.Dispatcher.Invoke
-                (
-                    DispatcherPriority.Background,
-                    new Action(_DoNothing)
-                );
-        } // method DoEvents
-
-        /// <summary>
-        /// List of (recursive) children of the given type.
-        /// </summary>
-        public static List<TChild> ListChildren<TChild>
+    /// <summary>
+    /// Analog for WinForms Apllication.DoEvents.
+    /// </summary>
+    /// <remarks>
+    /// Borrowed from https://stackoverflow.com/questions/4502037/where-is-the-application-doevents-in-wpf
+    /// </remarks>
+    public static void DoEvents()
+    {
+        Application.Current.Dispatcher.Invoke
             (
-                DependencyObject element
-            )
-            where TChild : DependencyObject
-        {
-            var result = new List<TChild>();
-            var count = VisualTreeHelper.GetChildrenCount(element);
-            for (var i = 0; i < count; i++)
-            {
-                var child = VisualTreeHelper.GetChild(element, i);
-                if (child is TChild item)
-                {
-                    result.Add(item);
-                }
+                DispatcherPriority.Background,
+                new Action (_DoNothing)
+            );
+    }
 
-                var list = ListChildren<TChild>(child);
-                result.AddRange(list);
+    /// <summary>
+    /// List of (recursive) children of the given type.
+    /// </summary>
+    public static List<TChild> ListChildren<TChild>
+        (
+            DependencyObject element
+        )
+        where TChild : DependencyObject
+    {
+        var result = new List<TChild>();
+        var count = VisualTreeHelper.GetChildrenCount(element);
+        for (var i = 0; i < count; i++)
+        {
+            var child = VisualTreeHelper.GetChild(element, i);
+            if (child is TChild item)
+            {
+                result.Add(item);
             }
 
-            return result;
+            var list = ListChildren<TChild>(child);
+            result.AddRange(list);
+        }
 
-        } // method ListChildren
+        return result;
+    }
 
-        #endregion
-
-    } // class WpfUtility
-
-} // namespace AM.Windows
+    #endregion
+}
