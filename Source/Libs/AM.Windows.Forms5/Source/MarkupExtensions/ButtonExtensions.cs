@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.Windows.Forms;
 
 #endregion
@@ -33,7 +34,7 @@ public static class ButtonExtensions
     /// </summary>
     public static TButton DialogResult<TButton>
         (
-            TButton button,
+            this TButton button,
             DialogResult dialogResult
         )
         where TButton: Button
@@ -51,7 +52,7 @@ public static class ButtonExtensions
     /// </summary>
     public static TButton DialogResultCancel<TButton>
         (
-            TButton button
+            this TButton button
         )
         where TButton: Button
     {
@@ -67,7 +68,7 @@ public static class ButtonExtensions
     /// </summary>
     public static TButton DialogResultNo<TButton>
         (
-            TButton button
+            this TButton button
         )
         where TButton: Button
     {
@@ -83,7 +84,7 @@ public static class ButtonExtensions
     /// </summary>
     public static TButton DialogResultOK<TButton>
         (
-            TButton button
+            this TButton button
         )
         where TButton: Button
     {
@@ -99,13 +100,49 @@ public static class ButtonExtensions
     /// </summary>
     public static TButton DialogResultYes<TButton>
         (
-            TButton button
+            this TButton button
         )
         where TButton: Button
     {
         Sure.NotNull (button);
 
         button.DialogResult = System.Windows.Forms.DialogResult.Yes;
+
+        return button;
+    }
+
+    /// <summary>
+    /// Подписка на событие <see cref="Button.DoubleClick"/>.
+    /// </summary>
+    public static TButton OnDoubleClick<TButton>
+        (
+            this TButton button,
+            EventHandler handler
+        )
+        where TButton: Button
+    {
+        Sure.NotNull (button);
+        Sure.NotNull (handler);
+
+        button.DoubleClick += handler;
+
+        return button;
+    }
+
+    /// <summary>
+    /// Подписка на событие <see cref="Button.OnMouseDoubleClick"/>.
+    /// </summary>
+    public static TButton OnMouseDoubleClick<TButton>
+        (
+            this TButton button,
+            MouseEventHandler handler
+        )
+        where TButton: Button
+    {
+        Sure.NotNull (button);
+        Sure.NotNull (handler);
+
+        button.MouseDoubleClick += handler;
 
         return button;
     }

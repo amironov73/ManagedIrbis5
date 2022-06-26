@@ -83,7 +83,7 @@ public static class CheckBoxExtensions
     }
 
     /// <summary>
-    /// Отмечено?
+    /// Чекбокс отмечен?
     /// </summary>
     public static TCheckBox Checked<TCheckBox>
         (
@@ -122,7 +122,7 @@ public static class CheckBoxExtensions
     /// </summary>
     public static TCheckBox OnCheckedChanged<TCheckBox>
         (
-            TCheckBox checkBox,
+            this TCheckBox checkBox,
             EventHandler handler
         )
         where TCheckBox: CheckBox
@@ -140,7 +140,7 @@ public static class CheckBoxExtensions
     /// </summary>
     public static TCheckBox OnCheckStateChanged<TCheckBox>
         (
-            TCheckBox checkBox,
+            this TCheckBox checkBox,
             EventHandler handler
         )
         where TCheckBox: CheckBox
@@ -158,7 +158,7 @@ public static class CheckBoxExtensions
     /// </summary>
     public static TCheckBox OnDoubleClick<TCheckBox>
         (
-            TCheckBox checkBox,
+            this TCheckBox checkBox,
             EventHandler handler
         )
         where TCheckBox: CheckBox
@@ -176,7 +176,7 @@ public static class CheckBoxExtensions
     /// </summary>
     public static TCheckBox OnMouseDoubleClick<TCheckBox>
         (
-            TCheckBox checkBox,
+            this TCheckBox checkBox,
             MouseEventHandler handler
         )
         where TCheckBox: CheckBox

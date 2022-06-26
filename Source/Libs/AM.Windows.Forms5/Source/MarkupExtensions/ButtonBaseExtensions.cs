@@ -34,7 +34,7 @@ public static class ButtonBaseExtensions
     /// </summary>
     public static TButton FlatStyle<TButton>
         (
-            TButton button,
+            this TButton button,
             FlatStyle flatStyle = System.Windows.Forms.FlatStyle.Flat
         )
         where TButton: ButtonBase
@@ -51,7 +51,7 @@ public static class ButtonBaseExtensions
     /// </summary>
     public static TButton Image<TButton>
         (
-            TButton button,
+            this TButton button,
             Image image
         )
         where TButton: ButtonBase
@@ -69,7 +69,7 @@ public static class ButtonBaseExtensions
     /// </summary>
     public static TButton ImageAlign<TButton>
         (
-            TButton button,
+            this TButton button,
             ContentAlignment alignment
         )
         where TButton: ButtonBase
@@ -78,6 +78,113 @@ public static class ButtonBaseExtensions
         Sure.Defined (alignment);
 
         button.ImageAlign = alignment;
+
+        return button;
+    }
+
+    /// <summary>
+    /// Порядковый номер картинки.
+    /// </summary>
+    public static TButton ImageIndex<TButton>
+        (
+            this TButton button,
+            int index
+        )
+        where TButton: ButtonBase
+    {
+        Sure.NotNull (button);
+        Sure.NonNegative (index);
+
+        button.ImageIndex = index;
+
+        return button;
+    }
+
+    /// <summary>
+    /// Ключ картинки.
+    /// </summary>
+    public static TButton ImageKey<TButton>
+        (
+            this TButton button,
+            string key
+        )
+        where TButton: ButtonBase
+    {
+        Sure.NotNull (button);
+        Sure.NotNullNorEmpty (key);
+
+        button.ImageKey = key;
+
+        return button;
+    }
+
+    /// <summary>
+    /// Список картинок.
+    /// </summary>
+    public static TButton ImageList<TButton>
+        (
+            this TButton button,
+            ImageList imageList
+        )
+        where TButton: ButtonBase
+    {
+        Sure.NotNull (button);
+        Sure.NotNull (imageList);
+
+        button.ImageList = imageList;
+
+        return button;
+    }
+
+    /// <summary>
+    /// Выравнивание текста.
+    /// </summary>
+    public static TButton TextAlign<TButton>
+        (
+            this TButton button,
+            ContentAlignment alignment
+        )
+        where TButton: ButtonBase
+    {
+        Sure.NotNull (button);
+        Sure.Defined (alignment);
+
+        button.TextAlign = alignment;
+
+        return button;
+    }
+
+    /// <summary>
+    /// Соотношение текста и картинки.
+    /// </summary>
+    public static TButton TextImageRelation<TButton>
+        (
+            this TButton button,
+            TextImageRelation relation
+        )
+        where TButton: ButtonBase
+    {
+        Sure.NotNull (button);
+        Sure.Defined (relation);
+
+        button.TextImageRelation = relation;
+
+        return button;
+    }
+
+    /// <summary>
+    /// Использование мнемоники.
+    /// </summary>
+    public static TButton UseMnemonic<TButton>
+        (
+            this TButton button,
+            bool useMnemonic = true
+        )
+        where TButton: ButtonBase
+    {
+        Sure.NotNull (button);
+
+        button.UseMnemonic = useMnemonic;
 
         return button;
     }
