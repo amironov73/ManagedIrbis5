@@ -3,30 +3,25 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
-/* ImagePosition.cs -- position of the image to print
+/* ImagePosition.cs -- позицич для распечатывания картинки
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Windows.Forms.Printing
+namespace AM.Windows.Forms.Printing;
+
+/// <summary>
+/// Позиция для распечатывания картинки..
+/// </summary>
+public enum ImagePosition
 {
     /// <summary>
-    /// Position of the image to print.
+    /// В центре страницы..
     /// </summary>
-    public enum ImagePosition
-    {
-        /// <summary>
-        /// Page center.
-        /// </summary>
-        PageCenter,
+    PageCenter,
 
-        /// <summary>
-        /// Top left corner.
-        /// </summary>
-        TopLeftCorner
-
-    } // enum ImagePosition
-
-} // namespace AM.Windows.Forms.Printing
+    /// <summary>
+    /// Левый верхний угол.
+    /// </summary>
+    TopLeftCorner
+}

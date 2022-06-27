@@ -7,7 +7,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
-/* PrinterDefinition.cs --
+/* PrinterDefinition.cs -- настройки принтера (например, для сохранения в файл)
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,185 +26,202 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace AM.Windows.Forms.Printing
+namespace AM.Windows.Forms.Printing;
+
+/// <summary>
+/// Настройки принтера (например, для сохранения в файл).
+/// </summary>
+[XmlRoot ("printer")]
+public sealed class PrinterDefinition
+    : IHandmadeSerializable,
+    IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    /// Printer definition for saving/restoring.
+    /// Как Windows называет принтер.
     /// </summary>
-    [XmlRoot("printer")]
-    public sealed class PrinterDefinition
-        : IHandmadeSerializable,
-        IVerifiable
+    [XmlElement ("name")]
+    [JsonPropertyName ("name")]
+    [DisplayName ("Принтер")]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Ширина страницы в сотых долях дюйма.
+    /// </summary>
+    [XmlElement ("width")]
+    [JsonPropertyName ("width")]
+    [DisplayName ("Ширина страницы")]
+    public int PageWidth { get; set; }
+
+    /// <summary>
+    /// Высота страницы в сотых долях дюйма.
+    /// </summary>
+    [XmlElement ("height")]
+    [JsonPropertyName ("height")]
+    [DisplayName ("Высота страницы")]
+    public int PageHeight { get; set; }
+
+    /// <summary>
+    /// Ландшафтная ориентация страницы?
+    /// </summary>
+    [XmlElement ("landscape")]
+    [JsonPropertyName ("landscape")]
+    [DisplayName ("Ландшафтная ориентация")]
+    public bool Landscape { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Принтер Fargo HDP5000 для печати на пластиковых картах.
+    /// </summary>
+    public static PrinterDefinition GetFargoPrinter()
     {
-        #region Properties
-
-        /// <summary>
-        /// Как Windows называет принтер.
-        /// </summary>
-        [XmlElement("name")]
-        [JsonPropertyName("name")]
-        [DisplayName("Принтер")]
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Ширина страницы в сотых долях дюйма.
-        /// </summary>
-        [XmlElement("width")]
-        [JsonPropertyName("width")]
-        [DisplayName("Ширина страницы")]
-        public int PageWidth { get; set; }
-
-        /// <summary>
-        /// Высота страницы в сотых долях дюйма.
-        /// </summary>
-        [XmlElement("height")]
-        [JsonPropertyName("height")]
-        [DisplayName("Высота страницы")]
-        public int PageHeight { get; set; }
-
-        /// <summary>
-        /// Ландшафтная ориентация страницы?
-        /// </summary>
-        [XmlElement("landscape")]
-        [JsonPropertyName("landscape")]
-        [DisplayName("Ландшафтная ориентация")]
-        public bool Landscape { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Get Fargo Card printer.
-        /// </summary>
-        public static PrinterDefinition GetFargoPrinter()
+        var result = new PrinterDefinition
         {
-            var result = new PrinterDefinition
-            {
-                Name = "HDP5000 Card Printer",
-                PageWidth = 220,
-                PageHeight = 345,
-                Landscape = true
-            };
+            Name = "HDP5000 Card Printer",
+            PageWidth = 220,
+            PageHeight = 345,
+            Landscape = true
+        };
 
-            return result;
-        }
+        return result;
+    }
 
-        /// <summary>
-        /// Загрузка определения принтера из JSON-файла.
-        /// </summary>
-        public static PrinterDefinition LoadJson ( string fileName ) =>
-            JsonUtility.ReadObjectFromFile<PrinterDefinition> (fileName);
+    /// <summary>
+    /// Загрузка определения принтера из JSON-файла.
+    /// </summary>
+    public static PrinterDefinition LoadJson
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
 
-        /// <summary>
-        /// Загрузка определения принтера из XML-файла.
-        /// </summary>
-        public static PrinterDefinition LoadXml
+        return JsonUtility.ReadObjectFromFile<PrinterDefinition> (fileName);
+    }
+
+    /// <summary>
+    /// Загрузка определения принтера из XML-файла.
+    /// </summary>
+    public static PrinterDefinition LoadXml
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
+
+        using var stream = File.OpenRead (fileName);
+        var serializer = new XmlSerializer (typeof (PrinterDefinition));
+
+        return (PrinterDefinition)serializer.Deserialize (stream).ThrowIfNull();
+    }
+
+    /// <summary>
+    /// Сохранение настроек принтера <see cref="PrinterDefinition"/>
+    /// в JSON-файле.
+    /// </summary>
+    public void SaveJson
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        JsonUtility.SaveObjectToFile
             (
-                string fileName
-            )
-        {
-            using var stream = File.OpenRead(fileName);
-            var serializer = new XmlSerializer(typeof(PrinterDefinition));
+                this,
+                fileName
+            );
+    }
 
-            return (PrinterDefinition)serializer.Deserialize(stream).ThrowIfNull();
-        }
+    /// <summary>
+    /// Сохранение настроек принтера <see cref="PrinterDefinition"/>
+    /// в XML-файле.
+    /// </summary>
+    public void SaveXml
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
 
-        /// <summary>
-        /// Save the <see cref="PrinterDefinition"/>
-        /// to the JSON file.
-        /// </summary>
-        public void SaveJson
-            (
-                string fileName
-            )
-        {
-            JsonUtility.SaveObjectToFile
-                (
-                    this,
-                    fileName
-                );
-        }
+        using var stream = File.Create (fileName);
+        var serializer = new XmlSerializer (typeof (PrinterDefinition));
+        serializer.Serialize (stream, this);
+    }
 
-        /// <summary>
-        /// Save the <see cref="PrinterDefinition"/>
-        /// to the XML file.
-        /// </summary>
-        public void SaveXml
-            (
-                string fileName
-            )
-        {
-            using var stream = File.Create(fileName);
-            var serializer = new XmlSerializer(typeof(PrinterDefinition));
-            serializer.Serialize(stream, this);
-        }
+    #endregion
 
-        #endregion
+    #region IHandmadeSerializable members
 
-        #region IHandmadeSerializable members
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Name = reader.ReadNullableString();
-            PageWidth = reader.ReadPackedInt32();
-            PageHeight = reader.ReadPackedInt32();
-            Landscape = reader.ReadBoolean();
-        }
+        Name = reader.ReadNullableString();
+        PageWidth = reader.ReadPackedInt32();
+        PageHeight = reader.ReadPackedInt32();
+        Landscape = reader.ReadBoolean();
+    }
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WriteNullable(Name)
-                .WritePackedInt32(PageWidth)
-                .WritePackedInt32(PageHeight)
-                .Write(Landscape);
-        }
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        #endregion
+        writer
+            .WriteNullable (Name)
+            .WritePackedInt32 (PageWidth)
+            .WritePackedInt32 (PageHeight)
+            .Write (Landscape);
+    }
 
-        #region IVerifiable members
+    #endregion
 
-        /// <summary>
-        /// Verify the object state.
-        /// </summary>
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier
-                = new Verifier<PrinterDefinition>
+    #region IVerifiable members
+
+    /// <summary>
+    /// Verify the object state.
+    /// </summary>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier
+            = new Verifier<PrinterDefinition>
                 (
                     this,
                     throwOnError
                 );
 
-            verifier
-                .NotNullNorEmpty(Name, "Name")
-                .Assert(PageWidth > 0, "PageWidth")
-                .Assert(PageHeight > 0, "PageHeight");
+        verifier
+            .NotNullNorEmpty (Name)
+            .Assert (PageWidth > 0)
+            .Assert (PageHeight > 0);
 
-            return verifier.Result;
-        }
+        return verifier.Result;
+    }
 
-        #endregion
+    #endregion
 
-        #region Object members
+    #region Object members
 
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => $"{Name}: {PageWidth} x {PageHeight}";
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"{Name}: {PageWidth} x {PageHeight}";
+    }
 
-        #endregion
-
-    } // class PrinterDefinition
-
-} // namespace AM.Windows.Forms.Printing
+    #endregion
+}
