@@ -5,6 +5,7 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable RedundantNameQualifier
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -34,9 +35,7 @@ namespace AM.Windows.Forms
     /// <see cref="ComboBox"/> that contains list of installed
     /// drives.
     /// </summary>
-    // ReSharper disable RedundantNameQualifier
     [System.ComponentModel.DesignerCategory("Code")]
-    // ReSharper restore RedundantNameQualifier
     [ToolboxBitmap(typeof(DriveComboBox), "Images.drive.bmp")]
     public class DriveComboBox
         : ComboBox
