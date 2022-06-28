@@ -33,7 +33,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox AutoCompleteMode<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             AutoCompleteMode mode
         )
         where TComboBox: ComboBox
@@ -51,7 +51,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox AutoCompleteSource<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             AutoCompleteSource source
         )
         where TComboBox: ComboBox
@@ -69,7 +69,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox DrawMode<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             DrawMode drawMode
         )
         where TComboBox: ComboBox
@@ -87,7 +87,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox DropDownHeight<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             int height
         )
         where TComboBox: ComboBox
@@ -105,7 +105,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox DropDownList<TComboBox>
         (
-            TComboBox comboBox
+            this TComboBox comboBox
         )
         where TComboBox: ComboBox
     {
@@ -121,7 +121,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox DropDownStyle<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             ComboBoxStyle style
         )
         where TComboBox: ComboBox
@@ -139,7 +139,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox DropDownWidth<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             int width
         )
         where TComboBox: ComboBox
@@ -157,7 +157,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox FlatStyle<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             FlatStyle flatStyle
         )
         where TComboBox: ComboBox
@@ -175,7 +175,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox IntegralHeight<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             bool enabled = true
         )
         where TComboBox: ComboBox
@@ -192,7 +192,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox ItemHeight<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             int height
         )
         where TComboBox: ComboBox
@@ -210,7 +210,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox Items<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             params object[] items
         )
         where TComboBox: ComboBox
@@ -228,7 +228,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox OnDoubleClick<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             EventHandler handler
         )
         where TComboBox: ComboBox
@@ -246,7 +246,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox OnSelectedIndexChanged<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             EventHandler handler
         )
         where TComboBox: ComboBox
@@ -264,7 +264,7 @@ public static class ComboBoxExtensions
     /// </summary>
     public static TComboBox Sorted<TComboBox>
         (
-            TComboBox comboBox,
+            this TComboBox comboBox,
             bool sorted = true
         )
         where TComboBox: ComboBox

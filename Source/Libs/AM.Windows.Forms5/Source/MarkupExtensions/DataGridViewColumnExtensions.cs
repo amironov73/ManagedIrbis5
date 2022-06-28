@@ -33,7 +33,7 @@ public static class DataGridViewColumnExtensions
     /// </summary>
     public static TColumn AutoSizeMode<TColumn>
         (
-            TColumn column,
+            this TColumn column,
             DataGridViewAutoSizeColumnMode mode
         )
         where TColumn: DataGridViewColumn
@@ -51,7 +51,7 @@ public static class DataGridViewColumnExtensions
     /// </summary>
     public static TColumn AutoSizeModeFill<TColumn>
         (
-            TColumn column,
+            this TColumn column,
             int fillWeight = 0
         )
         where TColumn: DataGridViewColumn
@@ -72,7 +72,7 @@ public static class DataGridViewColumnExtensions
     /// </summary>
     public static TColumn DataPropertyName<TColumn>
         (
-            TColumn column,
+            this TColumn column,
             string name
         )
         where TColumn: DataGridViewColumn
@@ -90,7 +90,7 @@ public static class DataGridViewColumnExtensions
     /// </summary>
     public static TColumn Frozen<TColumn>
         (
-            TColumn column,
+            this TColumn column,
             bool frozen = true
         )
         where TColumn: DataGridViewColumn
@@ -107,7 +107,7 @@ public static class DataGridViewColumnExtensions
     /// </summary>
     public static TColumn HeaderText<TColumn>
         (
-            TColumn column,
+            this TColumn column,
             string text
         )
         where TColumn: DataGridViewColumn
@@ -125,7 +125,7 @@ public static class DataGridViewColumnExtensions
     /// </summary>
     public static TColumn ReadOnly<TColumn>
         (
-            TColumn column,
+            this TColumn column,
             bool readOnly = true
         )
         where TColumn: DataGridViewColumn
@@ -142,7 +142,7 @@ public static class DataGridViewColumnExtensions
     /// </summary>
     public static TColumn ValueType<TColumn>
         (
-            TColumn column,
+            this TColumn column,
             Type valueType
         )
         where TColumn: DataGridViewColumn

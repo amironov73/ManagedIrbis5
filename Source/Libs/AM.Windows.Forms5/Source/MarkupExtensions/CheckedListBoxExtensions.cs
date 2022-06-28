@@ -33,7 +33,7 @@ public static class CheckedListBoxExtensions
     /// </summary>
     public static TCheckedListBox CheckedIndices<TCheckedListBox>
         (
-            TCheckedListBox listBox,
+            this TCheckedListBox listBox,
             params int[] indices
         )
         where TCheckedListBox: CheckedListBox
@@ -55,7 +55,7 @@ public static class CheckedListBoxExtensions
     /// </summary>
     public static TCheckedListBox CheckOnClick<TCheckedListBox>
         (
-            TCheckedListBox listBox,
+            this TCheckedListBox listBox,
             bool enabled = true
         )
         where TCheckedListBox: CheckedListBox
@@ -72,7 +72,7 @@ public static class CheckedListBoxExtensions
     /// </summary>
     public static TCheckedListBox Items<TCheckedListBox>
         (
-            TCheckedListBox listBox,
+            this TCheckedListBox listBox,
             params object[] items
         )
         where TCheckedListBox: CheckedListBox
@@ -90,7 +90,7 @@ public static class CheckedListBoxExtensions
     /// </summary>
     public static TCheckedListBox OnClick<TCheckedListBox>
         (
-            TCheckedListBox listBox,
+            this TCheckedListBox listBox,
             EventHandler handler
         )
         where TCheckedListBox: CheckedListBox
@@ -108,7 +108,7 @@ public static class CheckedListBoxExtensions
     /// </summary>
     public static TCheckedListBox OnItemCheck<TCheckedListBox>
         (
-            TCheckedListBox listBox,
+            this TCheckedListBox listBox,
             ItemCheckEventHandler handler
         )
         where TCheckedListBox: CheckedListBox
@@ -126,7 +126,7 @@ public static class CheckedListBoxExtensions
     /// </summary>
     public static TCheckedListBox OnMouseClick<TCheckedListBox>
         (
-            TCheckedListBox listBox,
+            this TCheckedListBox listBox,
             MouseEventHandler handler
         )
         where TCheckedListBox: CheckedListBox

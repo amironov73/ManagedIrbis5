@@ -601,7 +601,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl Height<TControl>
         (
-            TControl control,
+            this TControl control,
             int height
         )
         where TControl: Control
@@ -617,7 +617,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl IsAccessible<TControl>
         (
-            TControl control,
+            this TControl control,
             bool accessible = true
         )
         where TControl : Control
@@ -634,7 +634,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl Left<TControl>
         (
-            TControl control,
+            this TControl control,
             int left
         )
         where TControl : Control
@@ -652,7 +652,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl Location<TControl>
         (
-            TControl control,
+            this TControl control,
             Point location
         )
         where TControl : Control
@@ -669,7 +669,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl Location<TControl>
         (
-            TControl control,
+            this TControl control,
             int left,
             int top
         )
@@ -805,7 +805,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnClick<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -823,7 +823,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnDoubleClick<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -841,7 +841,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnDragDrop<TControl>
         (
-            TControl control,
+            this TControl control,
             DragEventHandler handler
         )
         where TControl : Control
@@ -859,7 +859,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnDragEnter<TControl>
         (
-            TControl control,
+            this TControl control,
             DragEventHandler handler
         )
         where TControl : Control
@@ -877,7 +877,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnDragLeave<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -895,7 +895,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnDragOver<TControl>
         (
-            TControl control,
+            this TControl control,
             DragEventHandler handler
         )
         where TControl : Control
@@ -913,7 +913,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnEnabledChanged<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -931,7 +931,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnEnter<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -949,7 +949,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnGotFocus<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -967,7 +967,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnHelpRequested<TControl>
         (
-            TControl control,
+            this TControl control,
             HelpEventHandler handler
         )
         where TControl : Control
@@ -985,7 +985,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnKeyDown<TControl>
         (
-            TControl control,
+            this TControl control,
             KeyEventHandler handler
         )
         where TControl : Control
@@ -1003,7 +1003,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnKeyPress<TControl>
         (
-            TControl control,
+            this TControl control,
             KeyPressEventHandler handler
         )
         where TControl : Control
@@ -1021,7 +1021,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnKeyUp<TControl>
         (
-            TControl control,
+            this TControl control,
             KeyEventHandler handler
         )
         where TControl : Control
@@ -1039,7 +1039,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnLayout<TControl>
         (
-            TControl control,
+            this TControl control,
             LayoutEventHandler handler
         )
         where TControl : Control
@@ -1057,7 +1057,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnLeave<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -1075,7 +1075,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnLostFocus<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -1093,7 +1093,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnMouseClick<TControl>
         (
-            TControl control,
+            this TControl control,
             MouseEventHandler handler
         )
         where TControl : Control
@@ -1111,7 +1111,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnMouseDoubleClick<TControl>
         (
-            TControl control,
+            this TControl control,
             MouseEventHandler handler
         )
         where TControl : Control
@@ -1129,7 +1129,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnMouseDown<TControl>
         (
-            TControl control,
+            this TControl control,
             MouseEventHandler handler
         )
         where TControl : Control
@@ -1147,7 +1147,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnMouseEnter<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -1165,7 +1165,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnMouseHover<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -1183,7 +1183,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnMouseLeave<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -1201,7 +1201,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnMouseMove<TControl>
         (
-            TControl control,
+            this TControl control,
             MouseEventHandler handler
         )
         where TControl : Control
@@ -1219,7 +1219,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnMouseUp<TControl>
         (
-            TControl control,
+            this TControl control,
             MouseEventHandler handler
         )
         where TControl : Control
@@ -1237,7 +1237,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnMouseWheel<TControl>
         (
-            TControl control,
+            this TControl control,
             MouseEventHandler handler
         )
         where TControl : Control
@@ -1255,7 +1255,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnMove<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -1273,7 +1273,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnPaint<TControl>
         (
-            TControl control,
+            this TControl control,
             PaintEventHandler handler
         )
         where TControl : Control
@@ -1291,7 +1291,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnPreviewKeyDown<TControl>
         (
-            TControl control,
+            this TControl control,
             PreviewKeyDownEventHandler handler
         )
         where TControl : Control
@@ -1309,7 +1309,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnQueryContinueDrag<TControl>
         (
-            TControl control,
+            this TControl control,
             QueryContinueDragEventHandler handler
         )
         where TControl : Control
@@ -1327,7 +1327,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnQueryContinueDrag<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -1345,7 +1345,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnSizeChanged<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -1363,7 +1363,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnTextChanged<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -1381,7 +1381,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl OnVisibleChanged<TControl>
         (
-            TControl control,
+            this TControl control,
             EventHandler handler
         )
         where TControl : Control
@@ -1547,7 +1547,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl ToBack<TControl>
         (
-            TControl control
+            this TControl control
         )
         where TControl: Control
     {
@@ -1576,7 +1576,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl ToFront<TControl>
         (
-            TControl control
+            this TControl control
         )
         where TControl: Control
     {
@@ -1605,7 +1605,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl Top<TControl>
         (
-            TControl control,
+            this TControl control,
             int top
         )
         where TControl: Control
@@ -1623,7 +1623,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl Visible<TControl>
         (
-            TControl control,
+            this TControl control,
             bool visible
         )
         where TControl: Control
@@ -1640,7 +1640,7 @@ public static class ControlExtensions
     /// </summary>
     public static TControl Width<TControl>
         (
-            TControl control,
+            this TControl control,
             int width
         )
         where TControl: Control
