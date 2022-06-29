@@ -15,7 +15,7 @@ using System;
 
 using AM.Drawing.HtmlRenderer.Adapters;
 
-using PdfSharp.Drawing;
+using PdfSharpCore.Drawing;
 
 #endregion
 
@@ -26,7 +26,7 @@ namespace AM.Drawing.HtmlRenderer.PdfSharp.Adapters;
 /// <summary>
 /// Adapter for WinForms brushes objects for core.
 /// </summary>
-internal sealed class BrushAdapter 
+internal sealed class BrushAdapter
     : RBrush
 {
     /// <summary>

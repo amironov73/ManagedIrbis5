@@ -15,7 +15,7 @@ using System.Drawing;
 
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
 
-using PdfSharp.Drawing;
+using PdfSharpCore.Drawing;
 
 #endregion
 

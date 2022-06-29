@@ -18,9 +18,9 @@ using AM.Drawing.HtmlRenderer.Core;
 using AM.Drawing.HtmlRenderer.Core.Entities;
 using AM.Drawing.HtmlRenderer.PdfSharp.Adapters;
 
-using PdfSharp;
-using PdfSharp.Drawing;
-using PdfSharp.Pdf;
+using PdfSharpCore;
+using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf;
 
 #endregion
 

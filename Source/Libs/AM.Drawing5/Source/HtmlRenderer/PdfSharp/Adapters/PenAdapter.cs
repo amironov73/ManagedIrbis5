@@ -14,7 +14,7 @@
 using AM.Drawing.HtmlRenderer.Adapters;
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
 
-using PdfSharp.Drawing;
+using PdfSharpCore.Drawing;
 
 #endregion
 
@@ -25,7 +25,7 @@ namespace AM.Drawing.HtmlRenderer.PdfSharp.Adapters;
 /// <summary>
 /// Adapter for WinForms pens objects for core.
 /// </summary>
-internal sealed class PenAdapter 
+internal sealed class PenAdapter
     : RPen
 {
     /// <summary>

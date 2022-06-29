@@ -11,7 +11,7 @@
 
 #region Using directives
 
-using PdfSharp.Drawing;
+using PdfSharpCore.Drawing;
 
 #endregion
 

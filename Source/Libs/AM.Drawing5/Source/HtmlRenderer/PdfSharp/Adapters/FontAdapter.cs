@@ -13,7 +13,7 @@
 
 using AM.Drawing.HtmlRenderer.Adapters;
 
-using PdfSharp.Drawing;
+using PdfSharpCore.Drawing;
 
 #endregion
 
@@ -24,7 +24,7 @@ namespace AM.Drawing.HtmlRenderer.PdfSharp.Adapters;
 /// <summary>
 /// Adapter for WinForms Font object for core.
 /// </summary>
-internal sealed class FontAdapter 
+internal sealed class FontAdapter
     : RFont
 {
     #region Fields and Consts

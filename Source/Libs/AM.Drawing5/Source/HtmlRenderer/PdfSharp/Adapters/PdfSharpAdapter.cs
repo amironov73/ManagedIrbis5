@@ -20,8 +20,8 @@ using AM.Drawing.HtmlRenderer.Adapters;
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
 using AM.Drawing.HtmlRenderer.PdfSharp.Utilities;
 
-using PdfSharp.Drawing;
-using PdfSharp.Pdf;
+using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf;
 
 #endregion
 
@@ -32,7 +32,7 @@ namespace AM.Drawing.HtmlRenderer.PdfSharp.Adapters;
 /// <summary>
 /// Adapter for PdfSharp library platform.
 /// </summary>
-internal sealed class PdfSharpAdapter 
+internal sealed class PdfSharpAdapter
     : RAdapter
 {
     #region Fields and Consts
@@ -123,7 +123,7 @@ internal sealed class PdfSharpAdapter
 
     protected override RImage ImageFromStreamInt(Stream memoryStream)
     {
-        return new ImageAdapter(XImage.FromStream(memoryStream));
+        return new ImageAdapter(XImage.FromStream(() => memoryStream));
     }
 
     protected override RFont CreateFontInt(string family, double size, RFontStyle style)

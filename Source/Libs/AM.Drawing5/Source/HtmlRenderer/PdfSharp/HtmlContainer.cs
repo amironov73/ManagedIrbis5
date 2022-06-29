@@ -22,7 +22,7 @@ using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Drawing.HtmlRenderer.PdfSharp.Adapters;
 using AM.Drawing.HtmlRenderer.PdfSharp.Utilities;
 
-using PdfSharp.Drawing;
+using PdfSharpCore.Drawing;
 
 #endregion
 

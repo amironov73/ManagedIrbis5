@@ -18,7 +18,7 @@ using AM.Drawing.HtmlRenderer.Adapters.Entities;
 using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Drawing.HtmlRenderer.PdfSharp.Utilities;
 
-using PdfSharp.Drawing;
+using PdfSharpCore.Drawing;
 
 #endregion
 
@@ -29,7 +29,7 @@ namespace AM.Drawing.HtmlRenderer.PdfSharp.Adapters;
 /// <summary>
 /// Adapter for WinForms Graphics for core.
 /// </summary>
-internal sealed class GraphicsAdapter 
+internal sealed class GraphicsAdapter
     : RGraphics
 {
     #region Fields and Consts
