@@ -12,7 +12,10 @@
 
 #region Using directives
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 #endregion
@@ -25,7 +28,8 @@ namespace AM.Windows.Forms.MarkupExtensions;
 /// Строка контролов для метода <see cref="ControlExtensions.Pack{TControl}"/>.
 /// </summary>
 public sealed class Row
-    : Control
+    : Control,
+    IEnumerable<Control>
 {
     #region Nested classes
 
@@ -229,6 +233,21 @@ public sealed class Row
         }
 
         return result;
+    }
+
+    #endregion
+
+    #region IEnumerable<T> members
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+    public IEnumerator<Control> GetEnumerator()
+    {
+        return Controls.Cast<Control>().GetEnumerator();
     }
 
     #endregion

@@ -250,5 +250,9 @@
   {
     "class": "FormsTests.PackTest3",
     "title": "PackTest - 3"
+  },
+  {
+    "class": "FormsTests.PackTest4",
+    "title": "PackTest - 4"
   }
 ]

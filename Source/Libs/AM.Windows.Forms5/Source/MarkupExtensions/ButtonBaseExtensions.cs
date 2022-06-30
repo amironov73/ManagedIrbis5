@@ -137,6 +137,23 @@ public static class ButtonBaseExtensions
     }
 
     /// <summary>
+    /// Для растягивания по горизонтали при
+    /// <see cref="ControlExtensions.Pack{TControl}"/>.
+    /// </summary>
+    public static TButton Packed<TButton>
+        (
+            this TButton button
+        )
+        where TButton: Button
+    {
+        Sure.NotNull (button);
+
+        return button
+            .AutoSize()
+            .DockTop();
+    }
+
+    /// <summary>
     /// Выравнивание текста.
     /// </summary>
     public static TButton TextAlign<TButton>

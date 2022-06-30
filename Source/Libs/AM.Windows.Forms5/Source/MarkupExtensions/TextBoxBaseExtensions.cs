@@ -64,7 +64,26 @@ public static class TextBoxBaseExtensions
     }
 
     /// <summary>
-    /// Текстбокс прячет подсветку выделенного текста при потере фокуса.
+    /// Задание комфортабельных (для меня!) настроек
+    /// многострочного текстбокса.
+    /// </summary>
+    public static TTextBoxBase ComfortableMultiline<TTextBoxBase>
+        (
+            this TTextBoxBase textBox
+        )
+        where TTextBoxBase: TextBoxBase
+    {
+        Sure.NotNull (textBox);
+
+        textBox.Multiline = true;
+        textBox.WordWrap = true;
+
+        return textBox;
+    }
+
+    /// <summary>
+    /// Текстбокс прячет подсветку выделенного текста
+    /// при потере фокуса?
     /// </summary>
     public static TTextBoxBase HideSelection<TTextBoxBase>
         (

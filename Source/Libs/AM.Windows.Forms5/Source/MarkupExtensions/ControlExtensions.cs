@@ -1741,6 +1741,48 @@ public static class ControlExtensions
     }
 
     /// <summary>
+    /// Создание вертикальной области.
+    /// </summary>
+    public static TChild VerticalArea<TChild>
+        (
+            this Control control,
+            int width
+        )
+        where TChild: Control, new()
+    {
+        Sure.NotNull (control);
+
+        var anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+        var lastChild = control.Controls.Cast<Control>().LastOrDefault();
+        var left = lastChild?.Right ?? 0;
+
+        switch (width)
+        {
+            case 0:
+                width = control.ClientSize.Width - (lastChild?.Right ?? 0);
+                anchor = AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom;
+                break;
+
+            case < 0:
+                width = control.ClientSize.Width * width / -100;
+                break;
+        }
+
+        var result = new TChild
+        {
+            Top = 0,
+            Left = left,
+            Width = width,
+            Height = control.ClientSize.Height,
+            Anchor = anchor
+        };
+
+        control.Controls.Add (result);
+
+        return result;
+    }
+
+    /// <summary>
     /// Видимость контрола.
     /// </summary>
     public static TControl Visible<TControl>
@@ -1787,7 +1829,7 @@ public static class ControlExtensions
     {
         Sure.NotNull (control);
 
-        return control.Width
+        return control.ClientSize.Width
                - control.Padding.Horizontal
                - additional * 2;
     }

@@ -11,12 +11,13 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PackTest3.cs --
+/* PackTest4.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System.Drawing;
 using System.Windows.Forms;
 
 using AM.Windows.Forms;
@@ -28,7 +29,7 @@ using AM.Windows.Forms.MarkupExtensions;
 
 namespace FormsTests;
 
-public sealed class PackTest3
+public sealed class PackTest4
     : IFormsTest
 {
     #region IFormsTest members
@@ -38,45 +39,44 @@ public sealed class PackTest3
             IWin32Window? ownerWindow
         )
     {
-        var allButOne = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-
-        const int buttonWidth = 90;
         using var form = new Form()
             .Size (550, 300)
             .MinimumSize()
             .Padding (5)
-            .Text ("Это третья тестовая форма");
+            .MinimizeBox (false)
+            .ControlBox (false)
+            .Text ("Это четвертая тестовая форма");
 
-        var groupBox = new GroupBox()
+        form.VerticalArea<GroupBox> (420)
             .Text ("Группа контролов по предварительному сговору")
-            .Location (10, 10)
-            .Size
+            .Padding (5)
+            .Pack
                 (
-                    form.WidthMinusPadding (10) - buttonWidth - form.Padding.Horizontal,
-                    220
-                )
-            .Padding (10);
+                    new Row
+                    {
+                        new Label().Text ("Первая метка")
+                            .AutoSize()
+                            .ForeColor (Color.Blue)
+                            .DockFill(),
 
-        var buttonBox = new Panel()
-            .Location (groupBox.Right + 10, groupBox.Top)
-            .Size (buttonWidth + form.Padding.Horizontal, form.ClientSize.Height - form.Padding.Vertical - 10)
-            .AnchorAll()
-            .Padding (10)
-            .BorderStyleNone();
+                        new Label().Text ("Вторая метка")
+                            .AutoSize()
+                            .ForeColor (Color.Green)
+                            .DockFill(),
 
-        groupBox.Pack
-                (
+                        new Label().Text ("Третья метка")
+                            .AutoSize()
+                            .ForeColor (Color.Red)
+                            .DockFill(),
+                    },
+
                     new LabeledTextBox
                     {
                         Name = "_textBox",
                         Label = { Text = "Текстбокс с надписью" },
                         Left = 5,
-                        Width = groupBox.WidthMinusPadding (5),
-                        Anchor = allButOne,
-                        TextBox =
-                        {
-                            Text = "Тут какой-то текст"
-                        }
+                        Dock = DockStyle.Top,
+                        TextBox = { Text = "Тут какой-то текст" }
                     },
 
                     new CheckBox
@@ -84,8 +84,7 @@ public sealed class PackTest3
                         Name = "_checkBox",
                         Text = "Отметь меня",
                         Left = 5,
-                        Width = groupBox.WidthMinusPadding (5),
-                        Anchor = allButOne
+                        Dock = DockStyle.Top
                     },
 
                     new LabeledComboBox
@@ -93,8 +92,7 @@ public sealed class PackTest3
                         Name = "_comboBox",
                         Label = { Text = "Комбобокс с надписью" },
                         Left = 5,
-                        Width = groupBox.WidthMinusPadding (5),
-                        Anchor = allButOne,
+                        Dock = DockStyle.Top,
                         ComboBox =
                         {
                             DropDownStyle = ComboBoxStyle.DropDownList,
@@ -108,30 +106,28 @@ public sealed class PackTest3
                             SelectedIndex = 1
                         }
                     }
-
                 );
 
         var okButton = new Button()
             .Text ("&OK")
-            .AutoSize (false)
-            .DialogResultOK();
+            .Packed()
+            .DialogResultOK()
+            .OnClick ((_, _) => MessageBox.Show ("OK pressed"));
 
         var cancelButton = new Button()
             .Text ("&Cancel")
-            .AutoSize (false)
-            .DialogResultCancel();
+            .Packed()
+            .DialogResultCancel()
+            .OnClick ((_, _) => MessageBox.Show ("Cancel pressed"));
 
-        buttonBox.Pack (okButton, cancelButton);
+        form.VerticalArea<Panel> (0)
+            .Padding (5)
+            .BorderStyleNone()
+            .Pack (okButton, cancelButton);
 
-        form.Controls
-                (
-                    groupBox,
-                    buttonBox
-                )
-            .AcceptButton (okButton)
-            .CancelButton (cancelButton);
-
-        form.ShowDialog (ownerWindow);
+        form.AcceptButton (okButton)
+            .CancelButton (cancelButton)
+            .ShowDialog (ownerWindow);
     }
 
     #endregion
