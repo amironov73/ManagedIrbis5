@@ -24,29 +24,28 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class ExceptionBoxTest
+    : IFormsTest
 {
-    public sealed class ExceptionBoxTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        try
         {
-            try
-            {
-                var exception = new ApplicationException("Некая ошибка в приложении");
-                throw exception;
-            }
-            catch (Exception ex)
-            {
-                ExceptionBox.Show(ownerWindow, ex);
-            }
+            var exception = new ApplicationException ("Некая ошибка в приложении");
+            throw exception;
         }
-
-        #endregion
+        catch (Exception ex)
+        {
+            ExceptionBox.Show (ownerWindow, ex);
+        }
     }
+
+    #endregion
 }

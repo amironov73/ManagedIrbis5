@@ -312,6 +312,22 @@ public static class FormExtensions
     }
 
     /// <summary>
+    /// Максимальный размер формы равен текущему размеру.
+    /// </summary>
+    public static TForm MaximumSize<TForm>
+        (
+            this TForm form
+        )
+        where TForm: Form
+    {
+        Sure.NotNull (form);
+
+        form.MaximumSize = form.MaximumSize;
+
+        return form;
+    }
+
+    /// <summary>
     /// Кнопка "Свернуть" в заголовке формы.
     /// </summary>
     public static TForm MinimizeBox<TForm>
@@ -342,6 +358,22 @@ public static class FormExtensions
         Sure.NotNull (form);
 
         form.MinimumSize = new Size (width, height);
+
+        return form;
+    }
+
+    /// <summary>
+    /// Минимальный размер формы равен текущему размеру.
+    /// </summary>
+    public static TForm MinimumSize<TForm>
+        (
+            this TForm form
+        )
+        where TForm: Form
+    {
+        Sure.NotNull (form);
+
+        form.MinimumSize = form.Size;
 
         return form;
     }

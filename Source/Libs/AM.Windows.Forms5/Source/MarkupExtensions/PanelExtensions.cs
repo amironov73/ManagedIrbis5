@@ -27,7 +27,39 @@ public static class PanelExtensions
 {
     #region Public methods
 
+    /// <summary>
+    /// Задание стиля рамки.
+    /// </summary>
+    public static TPanel BorderStyle<TPanel>
+        (
+            this TPanel panel,
+            BorderStyle borderStyle
+        )
+        where TPanel : Panel
+    {
+        Sure.NotNull (panel);
+        Sure.Defined (borderStyle);
 
+        panel.BorderStyle = borderStyle;
+
+        return panel;
+    }
+
+    /// <summary>
+    /// Задание стиля рамки.
+    /// </summary>
+    public static TPanel BorderStyleNone<TPanel>
+        (
+            this TPanel panel
+        )
+        where TPanel : Panel
+    {
+        Sure.NotNull (panel);
+
+        panel.BorderStyle = System.Windows.Forms.BorderStyle.None;
+
+        return panel;
+    }
 
     #endregion
 }

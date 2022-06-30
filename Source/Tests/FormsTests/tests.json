@@ -238,5 +238,17 @@
   {
     "class": "FormsTests.VirtualGridTest1",
     "title": "VirtualGridTest - 1"
+  },
+  {
+    "class": "FormsTests.PackTest1",
+    "title": "PackTest - 1"
+  },
+  {
+    "class": "FormsTests.PackTest2",
+    "title": "PackTest - 2"
+  },
+  {
+    "class": "FormsTests.PackTest3",
+    "title": "PackTest - 3"
   }
 ]

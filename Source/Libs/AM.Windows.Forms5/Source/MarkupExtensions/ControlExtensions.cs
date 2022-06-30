@@ -14,6 +14,7 @@
 
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 #endregion
@@ -149,6 +150,71 @@ public static class ControlExtensions
         Sure.NotNull (control);
 
         control.Anchor = anchors;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Задание "якорей" для контрола.
+    /// </summary>
+    public static TControl AnchorNone<TControl>
+        (
+            this TControl control
+        )
+        where TControl: Control
+    {
+        Sure.NotNull (control);
+
+        control.Anchor = AnchorStyles.None;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Задание "якорей" для контрола.
+    /// </summary>
+    public static TControl AnchorRightTop<TControl>
+        (
+            this TControl control
+        )
+        where TControl: Control
+    {
+        Sure.NotNull (control);
+
+        control.Anchor = AnchorStyles.Right | AnchorStyles.Top;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Задание "якорей" для контрола.
+    /// </summary>
+    public static TControl AnchorRightBottom<TControl>
+        (
+            this TControl control
+        )
+        where TControl: Control
+    {
+        Sure.NotNull (control);
+
+        control.Anchor = AnchorStyles.Right | AnchorStyles.Bottom;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Задание "якорей" для контрола.
+    /// </summary>
+    public static TControl AnchorAll<TControl>
+        (
+            this TControl control
+        )
+        where TControl: Control
+    {
+        Sure.NotNull (control);
+
+        control.Anchor = AnchorStyles.Left | AnchorStyles.Top
+            | AnchorStyles.Right | AnchorStyles.Bottom;
 
         return control;
     }
@@ -1395,6 +1461,62 @@ public static class ControlExtensions
     }
 
     /// <summary>
+    /// Упаковка контролов сверху вниз.
+    /// </summary>
+    public static TControl Pack<TControl>
+        (
+            this TControl control,
+            params Control[] children
+        )
+        where TControl : Control
+    {
+        Sure.NotNull (control);
+        Sure.NotNull (children);
+
+        var count = children.Length;
+        var tablePanel = control.Controls.Cast<Control>().FirstOrDefault()
+            as TableLayoutPanel;
+        if (tablePanel is null)
+        {
+            tablePanel = new TableLayoutPanel()
+            {
+                Dock = DockStyle.Fill,
+                RowCount = count,
+                ColumnCount = 1
+            };
+            control.Controls.Add (tablePanel);
+        }
+
+        tablePanel.ColumnStyles.Add
+            (
+                new ColumnStyle (SizeType.Percent, 100)
+            );
+
+        for (var index = 0; index < count; index++)
+        {
+            tablePanel.RowStyles.Add (new RowStyle (SizeType.AutoSize));
+
+            var child = children[index];
+            if (child is Row row)
+            {
+                var rowPanel = row.ToTableLayoutPanel()
+                    .DockFill();
+                tablePanel.Controls.Add (rowPanel);
+                tablePanel.SetColumn (rowPanel, 0);
+                tablePanel.SetRow (rowPanel, index);
+            }
+            else
+            {
+                tablePanel.Controls.Add (child);
+                tablePanel.SetColumn (child, 0);
+                tablePanel.SetRow (child, index);
+            }
+        }
+
+        return control;
+    }
+
+    /// <summary>
     /// Задание паддинга.
     /// </summary>
     public static TControl Padding<TControl>
@@ -1651,6 +1773,23 @@ public static class ControlExtensions
         control.Width = width;
 
         return control;
+    }
+
+    /// <summary>
+    /// Ширина контрола минус отступы слева и справа.
+    /// </summary>
+    public static int WidthMinusPadding<TControl>
+        (
+            this TControl control,
+            int additional = 0
+        )
+        where TControl: Control
+    {
+        Sure.NotNull (control);
+
+        return control.Width
+               - control.Padding.Horizontal
+               - additional * 2;
     }
 
     #endregion

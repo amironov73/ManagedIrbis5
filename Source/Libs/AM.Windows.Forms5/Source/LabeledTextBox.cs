@@ -28,8 +28,10 @@ namespace AM.Windows.Forms
     /// <summary>
     ///
     /// </summary>
+
     // ReSharper disable RedundantNameQualifier
-    [System.ComponentModel.DesignerCategory("Code")]
+    [System.ComponentModel.DesignerCategory ("Code")]
+
     // ReSharper restore RedundantNameQualifier
     public partial class LabeledTextBox
         : UserControl
@@ -40,28 +42,20 @@ namespace AM.Windows.Forms
         /// Gets the label.
         /// </summary>
         /// <value>The label.</value>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
         public Label Label
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _label;
-            }
+            [DebuggerStepThrough] get { return _label; }
         }
 
         /// <summary>
         /// Gets the text box.
         /// </summary>
         /// <value>The text box.</value>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
         public TextBox TextBox
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _textBox;
-            }
+            [DebuggerStepThrough] get { return _textBox; }
         }
 
         #endregion
@@ -75,18 +69,6 @@ namespace AM.Windows.Forms
         {
             InitializeComponent();
         }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region Control members
 
         #endregion
     }

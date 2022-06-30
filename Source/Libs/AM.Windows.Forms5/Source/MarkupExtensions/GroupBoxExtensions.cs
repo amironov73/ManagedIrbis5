@@ -33,7 +33,7 @@ public static class GroupBoxExtensions
     /// </summary>
     public static TGroupBox FlatStyle<TGroupBox>
         (
-            TGroupBox groupBox,
+            this TGroupBox groupBox,
             FlatStyle flatStyle = System.Windows.Forms.FlatStyle.Flat
         )
         where TGroupBox: GroupBox
@@ -195,7 +195,7 @@ public static class GroupBoxExtensions
     /// </summary>
     public static TGroupBox TabStop<TGroupBox>
         (
-            TGroupBox groupBox,
+            this TGroupBox groupBox,
             bool tabStop
         )
         where TGroupBox: GroupBox
