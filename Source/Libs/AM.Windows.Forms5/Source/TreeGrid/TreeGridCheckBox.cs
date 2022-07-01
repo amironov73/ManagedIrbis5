@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridCheckBox.cs
+/* TreeGridCheckBox.cs -- редактор данных в виде чекбокса
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,78 +17,53 @@ using System.Windows.Forms;
 
 #endregion
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Редактор данных в виде чекбокса.
+/// </summary>
+public class TreeGridCheckBox
+    : TreeGridEditor
 {
+    #region Properties
+
+    /// <inheritdoc cref="TreeGridEditor.Control"/>
+    public override Control Control => CheckBox;
+
     /// <summary>
-    ///
+    /// Собственно чекбокс, реализующий фукнциональность.
     /// </summary>
-    public class TreeGridCheckBox
-        : TreeGridEditor
+    public CheckBox CheckBox { get; } = new ();
+
+    #endregion
+
+    #region TreeGridEditor members
+
+    /// <inheritdoc cref="TreeGridEditor.SetValue"/>
+    public override void SetValue
+        (
+            string? value
+        )
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public TreeGridCheckBox()
-        {
-            _control = new CheckBox();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly CheckBox _control;
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets the control.
-        /// </summary>
-        /// <value>The control.</value>
-        public override Control Control => _control;
-
-        /// <summary>
-        /// Gets the check box.
-        /// </summary>
-        /// <value>The check box.</value>
-        public CheckBox CheckBox => _control;
-
-        #endregion
-
-        #region TreeGridEditor members
-
-        /// <summary>
-        /// Sets the value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        public override void SetValue(string? value)
-        {
-            _control.Checked = Convert.ToBoolean(value);
-        }
-
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        /// <returns></returns>
-        public override string GetValue()
-        {
-            return _control.Checked.ToString();
-        }
-
-        /// <summary>
-        /// Selects the text.
-        /// </summary>
-        /// <param name="start">The start.</param>
-        /// <param name="length">The length.</param>
-        public override void SelectText(int start, int length)
-        {
-            // Nothing to do
-        }
-
-        #endregion
+        CheckBox.Checked = Convert.ToBoolean (value);
     }
+
+    /// <inheritdoc cref="TreeGridEditor.GetValue"/>
+    public override string GetValue()
+    {
+        return CheckBox.Checked.ToString();
+    }
+
+    /// <inheritdoc cref="TreeGridEditor.SelectText"/>
+    public override void SelectText
+        (
+            int start,
+            int length
+        )
+    {
+        start.NotUsed();
+        length.NotUsed();
+    }
+
+    #endregion
 }

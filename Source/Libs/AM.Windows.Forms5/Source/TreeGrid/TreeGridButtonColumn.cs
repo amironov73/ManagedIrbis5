@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridButtonColumn.cs
+/* TreeGridButtonColumn.cs -- колонка, содержащая кнопки
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,117 +20,111 @@ using System.Windows.Forms.VisualStyles;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Колонка, содержащая кнопки.
+/// </summary>
+public class TreeGridButtonColumn
+    : TreeGridColumn
 {
+    #region Events
+
     /// <summary>
-    ///
+    /// Событие, возникающее при клике по кнопке.
     /// </summary>
-    public class TreeGridButtonColumn
-        : TreeGridColumn
+    public event EventHandler<EventArgs>? Click;
+
+    /// <summary>
+    /// Событие, возникающее при клике мышкой по кнопке.
+    /// </summary>
+    public event EventHandler<TreeGridMouseEventArgs>? MouseClick;
+
+    /// <summary>
+    /// Событие, возникающее при двойном клике мышкой по кнопке.
+    /// </summary>
+    public event EventHandler<TreeGridMouseEventArgs>? MouseDoubleClick;
+
+    #endregion
+
+    #region TreeGridColumn members
+
+    /// <inheritdoc cref="TreeGridColumn.OnDrawCell"/>
+    protected internal override void OnDrawCell
+        (
+            TreeGridDrawCellEventArgs args
+        )
     {
-        #region Events
+        Sure.NotNull (args);
 
-        /// <summary>
-        ///
-        /// </summary>
-        public event EventHandler<EventArgs>? Click;
-
-        /// <summary>
-        ///
-        /// </summary>
-        public event EventHandler<TreeGridMouseEventArgs>? MouseClick;
-
-        /// <summary>
-        ///
-        /// </summary>
-        public event EventHandler<TreeGridMouseEventArgs>? MouseDoubleClick;
-
-        #endregion
-
-        #region Construction
-
-        //public TreeGridButtonColumn()
-        //{
-        //}
-
-        #endregion
-
-        #region TreeGridColumn members
-
-        /// <inheritdoc cref="TreeGridColumn.OnDrawCell"/>
-        protected internal override void OnDrawCell
-            (
-                TreeGridDrawCellEventArgs args
-            )
+        var graphics = args.Graphics;
+        if (graphics is null)
         {
-            var graphics = args.Graphics;
-            if (graphics is null)
-            {
-                Magna.Debug("Graphics is null");
-                return;
-            }
+            Magna.Debug ("Graphics is null");
+            return;
+        }
 
-            var node = args.Node;
-            if (node is null)
-            {
-                Magna.Debug("Node is null");
-                return;
-            }
+        var node = args.Node;
+        if (node is null)
+        {
+            Magna.Debug ("Node is null");
+            return;
+        }
 
-            var column = args.Column;
-            if (column is null)
-            {
-                Magna.Debug("Column is null");
-                return;
-            }
+        var column = args.Column;
+        if (column is null)
+        {
+            Magna.Debug ("Column is null");
+            return;
+        }
 
-            var text = node.Data.SafeGet(column.Index-1) as string;
+        var text = node.Data.SafeGet (column.Index - 1) as string;
 
-            graphics.FillRectangle
+        graphics.FillRectangle
+            (
+                args.GetBackgroundBrush(),
+                args.Bounds
+            );
+
+        if (!string.IsNullOrEmpty (text))
+        {
+            ButtonRenderer.DrawButton
                 (
-                    args.GetBackgroundBrush(),
-                    args.Bounds
+                    graphics,
+                    args.Bounds,
+                    text,
+                    node.Font,
+                    false,
+                    PushButtonState.Normal
                 );
-
-            if (!string.IsNullOrEmpty(text))
-            {
-                ButtonRenderer.DrawButton
-                    (
-                        graphics,
-                        args.Bounds,
-                        text,
-                        node.Font,
-                        false,
-                        PushButtonState.Normal
-                    );
-            }
         }
+    }
 
-        /// <inheritdoc cref="TreeGridColumn.OnMouseClick"/>
-        protected internal override void OnMouseClick
-            (
-                TreeGridMouseEventArgs args
-            )
-        {
+    /// <inheritdoc cref="TreeGridColumn.OnMouseClick"/>
+    protected internal override void OnMouseClick
+        (
+            TreeGridMouseEventArgs args
+        )
+    {
+        Sure.NotNull (args);
 
-            Click?.Invoke(this, args);
-            MouseClick?.Invoke(this, args);
-        }
+        Click?.Invoke (this, args);
+        MouseClick?.Invoke (this, args);
+    }
 
-        /// <inheritdoc cref="TreeGridColumn.OnMouseDoubleClick"/>
-        protected internal override void OnMouseDoubleClick
-            (
-                TreeGridMouseEventArgs args
-            )
-        {
-            MouseDoubleClick?.Invoke(this, args);
-        }
+    /// <inheritdoc cref="TreeGridColumn.OnMouseDoubleClick"/>
+    protected internal override void OnMouseDoubleClick
+        (
+            TreeGridMouseEventArgs args
+        )
+    {
+        Sure.NotNull (args);
 
-        /// <inheritdoc cref="TreeGridColumn.Editable"/>
-        public override bool Editable => false;
+        MouseDoubleClick?.Invoke (this, args);
+    }
 
-        #endregion
+    /// <inheritdoc cref="TreeGridColumn.Editable"/>
+    public override bool Editable => false;
 
-    } // class TreeGridButtomColumn
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

@@ -21,147 +21,167 @@ using System.ComponentModel;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Набор данных, хранящихся в строке грида.
+/// При любом изменении данных грид перерисовывается.
+/// </summary>
+[Serializable]
+public sealed class DataCollection
+    : Collection<object?>
 {
+    #region Properties
+
     /// <summary>
-    /// Набор данных, хранящихся в строке грида.
-    /// При любом изменении данных грид перерисовывается.
+    /// Нода, которой принадлежат данные.
     /// </summary>
-    [Serializable]
-    public sealed class DataCollection
-        : Collection<object?>
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public TreeGridNode Node { get; }
+
+    /// <summary>
+    /// Gets the tree grid.
+    /// </summary>
+    /// <value>The tree grid.</value>
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public TreeGrid Grid => Node.Grid.ThrowIfNull();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="node">Нода, которой принадлежат данные.</param>
+    public DataCollection
+        (
+            TreeGridNode node
+        )
     {
-        #region Properties
+        Sure.NotNull (node);
 
-        /// <summary>
-        /// Нода, которой принадлежат данные.
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TreeGridNode Node { get; }
+        Node = node;
+    }
 
-        /// <summary>
-        /// Gets the tree grid.
-        /// </summary>
-        /// <value>The tree grid.</value>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TreeGrid Grid => Node.Grid.ThrowIfNull();
+    #endregion
 
-        #endregion
+    #region Collection<T> members
 
-        #region Construction
+    /// <inheritdoc cref="Collection{T}.ClearItems"/>
+    protected override void ClearItems()
+    {
+        base.ClearItems();
+        _UpdateNode();
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="node">Нода, которой принадлежат данные.</param>
-        public DataCollection
-            (
-                TreeGridNode node
-            )
+    /// <inheritdoc cref="Collection{T}.InsertItem"/>
+    protected override void InsertItem
+        (
+            int index,
+            object? item
+        )
+    {
+        Sure.NonNegative (index);
+
+        base.InsertItem (index, item);
+        _UpdateNode();
+    }
+
+    /// <inheritdoc cref="Collection{T}.RemoveItem"/>
+    protected override void RemoveItem
+        (
+            int index
+        )
+    {
+        Sure.NonNegative (index);
+
+        base.RemoveItem (index);
+        _UpdateNode();
+    }
+
+    /// <inheritdoc cref="Collection{T}.SetItem"/>
+    protected override void SetItem
+        (
+            int index,
+            object? item
+        )
+    {
+        Sure.NonNegative (index);
+
+        base.SetItem (index, item);
+        _UpdateNode();
+    }
+
+    #endregion
+
+    #region Private members
+
+    internal void _UpdateNode() => Node._UpdateGrid();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Добавление множества элементов.
+    /// </summary>
+    public void AddRange
+        (
+            params object[] range
+        )
+    {
+        Sure.NotNull (range);
+
+        foreach (var item in range)
         {
-            Node = node;
+            Add (item);
+        }
+    }
+
+    /// <summary>
+    /// Добавление множества элементов.
+    /// </summary>
+    public void AddRange
+        (
+            IEnumerable range
+        )
+    {
+        Sure.NotNull ((object?) range);
+
+        foreach (var item in range)
+        {
+            Add (item);
+        }
+    }
+
+    /// <summary>
+    /// Безопасный доступ к элементу по индексу.
+    /// </summary>
+    public object? SafeGet
+        (
+            int index
+        )
+    {
+        return index >= 0 && index < Count ? this[index] : null;
+    }
+
+    /// <summary>
+    /// Безопасное задание значения элемента по индексу.
+    /// </summary>
+    public void SafeSet
+        (
+            int index,
+            object? data
+        )
+    {
+        while (Count <= index)
+        {
+            Add (null);
         }
 
-        #endregion
+        this[index] = data;
+    }
 
-        #region Collection<T> members
-
-        /// <inheritdoc cref="Collection{T}.ClearItems"/>
-        protected override void ClearItems()
-        {
-            base.ClearItems();
-            _UpdateNode();
-        }
-
-        /// <inheritdoc cref="Collection{T}.InsertItem"/>
-        protected override void InsertItem
-            (
-                int index,
-                object? item
-            )
-        {
-            base.InsertItem(index,item);
-            _UpdateNode();
-        }
-
-        /// <inheritdoc cref="Collection{T}.RemoveItem"/>
-        protected override void RemoveItem
-            (
-                int index
-            )
-        {
-            base.RemoveItem(index);
-            _UpdateNode();
-        }
-
-        /// <inheritdoc cref="Collection{T}.SetItem"/>
-        protected override void SetItem
-            (
-                int index,
-                object? item
-            )
-        {
-            base.SetItem(index,item);
-            _UpdateNode();
-        }
-
-        #endregion
-
-        #region Private members
-
-        internal void _UpdateNode () => Node._UpdateGrid();
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавление множества элементов.
-        /// </summary>
-        public void AddRange ( params object [] range )
-        {
-            foreach (object item in range)
-            {
-                Add(item);
-            }
-        }
-
-        /// <summary>
-        /// Добавление множества элементов.
-        /// </summary>
-        public void AddRange ( IEnumerable range )
-        {
-            foreach (object item in range)
-            {
-                Add(item);
-            }
-        }
-
-        /// <summary>
-        /// Безопасный доступ к элементу по индексу.
-        /// </summary>
-        public object? SafeGet ( int index ) =>
-            index >= 0 && index < Count ? this[index] : null;
-
-        /// <summary>
-        /// Безопасное задание значения элемента по индексу.
-        /// </summary>
-        public void SafeSet
-            (
-                int index,
-                object? data
-            )
-        {
-            while (Count <= index)
-            {
-                Add(null);
-            }
-
-            this[index] = data;
-        }
-
-        #endregion
-
-    } // class DataCollection
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

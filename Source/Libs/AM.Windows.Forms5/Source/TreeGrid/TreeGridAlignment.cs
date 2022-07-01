@@ -6,32 +6,29 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridAlignment.cs
+/* TreeGridAlignment.cs -- выравнивание элементов в гриде
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Выравнивание элементов в гриде <see cref="TreeGrid"/>.
+/// </summary>
+public enum TreeGridAlignment
 {
     /// <summary>
-    ///
+    /// Влево.
     /// </summary>
-    public enum TreeGridAlignment
-    {
-        /// <summary>
-        ///
-        /// </summary>
-        Near,
+    Near,
 
-        /// <summary>
-        ///
-        /// </summary>
-        Center,
+    /// <summary>
+    /// По центру.
+    /// </summary>
+    Center,
 
-        /// <summary>
-        ///
-        /// </summary>
-        Far
-
-    } // enum TreeGridAlignment
-
-} // namespace AM.Windows.Forms
+    /// <summary>
+    /// Вправо.
+    /// </summary>
+    Far
+}
