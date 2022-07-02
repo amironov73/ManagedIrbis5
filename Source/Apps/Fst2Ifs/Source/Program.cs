@@ -6,10 +6,8 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* Program.cs -- утилита для создания таблицы актуализации
  * Ars Magna project, http://arsmagna.ru
@@ -25,6 +23,7 @@ using System.IO;
 
 using AM;
 
+using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -33,7 +32,7 @@ using ManagedIrbis.Infrastructure;
 
 namespace Fst2Ifs;
 
-class Program
+internal static class Program
 {
     private static readonly Argument<string> _inputArgument = new ("fst-file")
     {
@@ -47,17 +46,21 @@ class Program
         Description = "имя IFS-файла (будет перезаписан!), например, ibis.ifs"
     };
 
-    static void Run
+    private static void Run
         (
             ParseResult parseResult
         )
     {
+        Sure.NotNull (parseResult);
+
         try
         {
             var inputName = parseResult.GetValueForArgument (_inputArgument)
                 .ThrowIfNullOrEmpty();
+
             var outputName = parseResult.GetValueForArgument (_outputArgument)
                 .ThrowIfNullOrEmpty();
+
             var encoding = IrbisEncoding.Ansi;
 
             var reader = new StreamReader (inputName, encoding);
@@ -66,6 +69,7 @@ class Program
             try
             {
                 using var transformer = new FstTransformer (reader, writer);
+
                 transformer.TransformFile();
             }
             catch (Exception exception)
@@ -80,7 +84,10 @@ class Program
         }
     }
 
-    static void Main (string[] args)
+    internal static void Main
+        (
+            string[] args
+        )
     {
         var rootCommand = new RootCommand ("Fst2Ifs")
         {
