@@ -98,6 +98,8 @@ public sealed class Ean13
             string text
         )
     {
+        Sure.NotNullNorEmpty (text);
+
         unchecked
         {
             var sum = 0;
@@ -124,6 +126,8 @@ public sealed class Ean13
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var text = data.Message.ThrowIfNull();
         var builder = StringBuilderPool.Shared.Get();
         builder.EnsureCapacity (3 * 3 + 13 * 7);
@@ -168,6 +172,8 @@ public sealed class Ean13
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var message = data.Message;
 
         if (string.IsNullOrWhiteSpace (message))

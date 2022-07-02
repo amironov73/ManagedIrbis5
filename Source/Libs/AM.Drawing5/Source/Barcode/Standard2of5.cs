@@ -53,6 +53,8 @@ public sealed class Standard2of5
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var text = data.Message.ThrowIfNull();
         var builder = StringBuilderPool.Shared.Get();
         builder.EnsureCapacity (8 + 7 + text.Length * 14);
@@ -79,6 +81,8 @@ public sealed class Standard2of5
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var message = data.Message;
 
         if (string.IsNullOrWhiteSpace (message))

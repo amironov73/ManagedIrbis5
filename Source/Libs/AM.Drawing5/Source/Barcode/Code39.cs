@@ -74,7 +74,7 @@ namespace AM.Drawing.Barcodes;
 /// Штрих-код, поддерживающий A-Z, 0-9 и некоторые спецсимволы
 /// (например, знак доллара <c>$</c>).
 /// </summary>
-public class Code39
+public sealed class Code39
     : LinearBarcodeBase
 {
     #region Private members
@@ -260,6 +260,8 @@ public class Code39
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var builder = StringBuilderPool.Shared.Get();
         var text = data.Message.ThrowIfNull().Replace ("*", string.Empty);
 
@@ -301,6 +303,8 @@ public class Code39
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var message = data.Message;
 
         if (string.IsNullOrWhiteSpace (message))

@@ -113,7 +113,7 @@ namespace AM.Drawing.Barcodes;
 /// Штрих-код, поддерживающий не только цифры,
 /// но и буквы латинского алфавита, а также специальные символы.
 /// </summary>
-public class Code128
+public sealed class Code128
     : IBarcode
 {
     #region Constants
@@ -458,15 +458,15 @@ public class Code128
     };
 
     /// <summary>
-    ///
+    /// Кодирование данных.
     /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
     public static string Encode
         (
             string text
         )
     {
+        Sure.NotNull (text);
+
         var result = new List<char>();
 
         return new string (result.ToArray());
@@ -516,6 +516,8 @@ public class Code128
             BarcodeContext context
         )
     {
+        Sure.NotNull (context);
+
         var data = context.Data;
         if (data is null || !Verify (data))
         {

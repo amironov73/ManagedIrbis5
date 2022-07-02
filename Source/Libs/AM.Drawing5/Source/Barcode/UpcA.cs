@@ -95,6 +95,8 @@ public sealed class UpcA
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var text = data.Message.ThrowIfNull();
         var builder = StringBuilderPool.Shared.Get();
         builder.EnsureCapacity (3 + 5 + 3 + 12 * 7);
@@ -132,6 +134,8 @@ public sealed class UpcA
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var message = data.Message;
 
         if (string.IsNullOrWhiteSpace (message))

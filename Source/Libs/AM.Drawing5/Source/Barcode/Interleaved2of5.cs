@@ -26,7 +26,7 @@ namespace AM.Drawing.Barcodes;
 /// <summary>
 /// Чередующийся штрих-код "2 из 5".
 /// </summary>
-public class Interleaved2of5
+public sealed class Interleaved2of5
     : IBarcode
 {
     //
@@ -40,7 +40,7 @@ public class Interleaved2of5
 
     #region Nested classes
 
-    sealed class Painter
+    private sealed class Painter
         : IDisposable
     {
         public Graphics? Graphics;
@@ -150,6 +150,8 @@ public class Interleaved2of5
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var message = data.Message;
 
         if (string.IsNullOrWhiteSpace (message))
@@ -175,6 +177,8 @@ public class Interleaved2of5
             BarcodeContext context
         )
     {
+        Sure.NotNull (context);
+
         var data = context.Data;
         if (data is null || !Verify (data))
         {

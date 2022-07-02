@@ -56,7 +56,8 @@ namespace AM.Drawing.Barcodes;
 // фотопечать.
 //
 // Применяется на складах, транспорте, в логистике и др.
-///
+//
+
 /// <summary>
 /// Штриховой код, позволяющий кодировать числа от 0 до 9,
 /// символы -, $, :, /, ., + и четыре буквы (A, B, C, D).
@@ -105,6 +106,8 @@ public sealed class Codabar
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var text = data.Message.ThrowIfNull();
         var builder = StringBuilderPool.Shared.Get();
 
@@ -129,6 +132,8 @@ public sealed class Codabar
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var message = data.Message;
 
         if (string.IsNullOrWhiteSpace (message))

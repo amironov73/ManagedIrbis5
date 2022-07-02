@@ -76,6 +76,8 @@ public sealed class Code11
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var text = data.Message.ThrowIfNull();
         var builder = StringBuilderPool.Shared.Get();
         var checksumC = 0;
@@ -150,6 +152,8 @@ public sealed class Code11
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var message = data.Message;
 
         if (string.IsNullOrWhiteSpace (message))

@@ -67,6 +67,8 @@ public abstract class LinearBarcodeBase
             BarcodeContext context
         )
     {
+        Sure.NotNull (context);
+
         var data = context.Data;
         if (data is null || !Verify (data))
         {

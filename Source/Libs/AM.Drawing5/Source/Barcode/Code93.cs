@@ -97,6 +97,8 @@ public sealed class Code93
             BarcodeData text
         )
     {
+        Sure.NotNull (text);
+
         var builder = StringBuilderPool.Shared.Get();
 
         var result = builder.ToString();
@@ -111,6 +113,8 @@ public sealed class Code93
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var message = data.Message;
 
         if (string.IsNullOrWhiteSpace (message))

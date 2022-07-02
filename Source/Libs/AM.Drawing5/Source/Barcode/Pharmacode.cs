@@ -44,6 +44,8 @@ public class Pharmacode
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var text = data.Message.ThrowIfNull();
         var result = new StringBuilder();
         var number = text.ParseInt32();
@@ -76,6 +78,8 @@ public class Pharmacode
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var message = data.Message;
 
         if (string.IsNullOrWhiteSpace (message))

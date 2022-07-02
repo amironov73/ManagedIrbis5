@@ -67,6 +67,8 @@ public sealed class Ean8
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var text = data.Message.ThrowIfNull();
         var builder = StringBuilderPool.Shared.Get();
         builder.EnsureCapacity (3 * 3 + 7 * 8);
@@ -103,6 +105,8 @@ public sealed class Ean8
             BarcodeData data
         )
     {
+        Sure.NotNull (data);
+
         var message = data.Message;
 
         if (string.IsNullOrWhiteSpace (message))
