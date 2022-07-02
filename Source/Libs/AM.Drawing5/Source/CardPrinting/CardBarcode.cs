@@ -2,14 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* CardBarcode.cs --
+/* CardBarcode.cs -- штрих-код на читательском билете
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,91 +24,87 @@ using AM.Drawing.Barcodes;
 
 #nullable enable
 
-namespace AM.Drawing.CardPrinting
+namespace AM.Drawing.CardPrinting;
+
+/// <summary>
+/// Штрих-код на читательском билете.
+/// </summary>
+public sealed class CardBarcode
+    : CardItem
 {
+    #region Properties
+
     /// <summary>
-    /// Штрих-код EAN-13.
+    /// Ширина штрих-кода.
     /// </summary>
-    public sealed class CardBarcode
-        : CardItem
+    [XmlElement ("width")]
+    [DisplayName ("Ширина")]
+    [JsonPropertyName ("width")]
+    [Description ("Ширина штрих-кода")]
+    public int Width { get; set; }
+
+    /// <summary>
+    /// Высота штрих-кода.
+    /// </summary>
+    [XmlElement ("height")]
+    [DisplayName ("Высота")]
+    [JsonPropertyName ("height")]
+    [Description ("Высота штрих-кода")]
+    public int Height { get; set; }
+
+    /// <summary>
+    /// Текст штрих-кода.
+    /// </summary>
+    [XmlElement ("text")]
+    [DisplayName ("Текст")]
+    [JsonPropertyName ("text")]
+    [Description ("Текстовое представление штрих-кода")]
+    public string? Text { get; set; }
+
+    #endregion
+
+    #region CardItem members
+
+    /// <inheritdoc cref="CardItem.Draw"/>
+    public override void Draw
+        (
+            DrawingContext context
+        )
     {
-        #region Properties
+        Sure.NotNull (context);
 
-        /// <summary>
-        /// Ширина.
-        /// </summary>
-        [XmlElement ("width")]
-        [DisplayName ("Ширина")]
-        [JsonPropertyName ("width")]
-        public int Width { get; set; }
+        var graphics = context.Graphics.ThrowIfNull();
 
-        /// <summary>
-        /// Высота.
-        /// </summary>
-        [XmlElement ("height")]
-        [DisplayName ("Высота")]
-        [JsonPropertyName ("height")]
-        public int Height { get; set; }
-
-        /// <summary>
-        /// Текст штрих-кода.
-        /// </summary>
-        [XmlElement ("text")]
-        [DisplayName ("Текст")]
-        [JsonPropertyName ("text")]
-        public string? Text { get; set; }
-
-        #endregion
-
-        #region CardItem members
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="context"></param>
-        public override void Draw
-            (
-                DrawingContext context
-            )
+        if (!string.IsNullOrEmpty (Text))
         {
-            var graphics = context.Graphics.ThrowIfNull();
-
-            if (!string.IsNullOrEmpty (Text))
+            var text = context.ExpandText (Text);
+            if (!string.IsNullOrEmpty (text))
             {
-                var text = context.ExpandText(Text);
-                if (!string.IsNullOrEmpty (text))
+                var barcode = new Code39();
+                var data = new BarcodeData
                 {
-                    var barcode = new Code39();
-                    var data = new BarcodeData
-                    {
-                        Message = text
-                    };
-                    var barcodeContext = new BarcodeContext
-                    {
-                        Data = data,
-                        Bounds = new RectangleF(Left, Top, Width, Height),
-                        Graphics = graphics
-                    };
-                    graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-                    graphics.SmoothingMode = SmoothingMode.None;
-                    graphics.PixelOffsetMode = PixelOffsetMode.None;
-                    barcode.DrawBarcode(barcodeContext);
+                    Message = text
+                };
+                var barcodeContext = new BarcodeContext
+                {
+                    Data = data,
+                    Bounds = new RectangleF (Left, Top, Width, Height),
+                    Graphics = graphics
+                };
+                graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+                graphics.SmoothingMode = SmoothingMode.None;
+                graphics.PixelOffsetMode = PixelOffsetMode.None;
+                barcode.DrawBarcode (barcodeContext);
+            }
+        }
+    }
 
-                } // if
+    #endregion
 
-            } // if
+    #region Object members
 
-        } // method Draw
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => $"Штрих-код: {Text}";
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => $"Штрих-код: {Text}";
-
-        #endregion
-
-    } // class CardBarcode
-
-} // namespace AM.Drawing.CardPrinting
+    #endregion
+}

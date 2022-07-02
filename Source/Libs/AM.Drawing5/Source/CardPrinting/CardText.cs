@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* CardText.cs -- многострочный текст
  * Ars Magna project, http://arsmagna.ru
@@ -24,103 +21,101 @@ using System.Xml.Serialization;
 
 #nullable enable
 
-namespace AM.Drawing.CardPrinting
+namespace AM.Drawing.CardPrinting;
+
+/// <summary>
+/// Многострочный текст.
+/// </summary>
+public sealed class CardText
+    : CardItem
 {
+    #region Properties
+
     /// <summary>
-    /// Многострочный текст.
+    /// Ширина текста.
     /// </summary>
-    public sealed class CardText
-        : CardItem
+    [XmlElement ("width")]
+    [DisplayName ("Ширина")]
+    [JsonPropertyName ("width")]
+    public int Width { get; set; }
+
+    /// <summary>
+    /// Высота текста.
+    /// </summary>
+    [XmlElement ("height")]
+    [DisplayName ("Высота")]
+    [JsonPropertyName ("height")]
+    public int Height { get; set; }
+
+    /// <summary>
+    /// Шрифт.
+    /// </summary>
+    [XmlElement ("font")]
+    [DisplayName ("Шрифт")]
+    [JsonPropertyName ("font")]
+    public string? Font { get; set; }
+
+    /// <summary>
+    /// Цвет текста.
+    /// </summary>
+    [XmlElement ("color")]
+    [DisplayName ("Цвет")]
+    [JsonPropertyName ("color")]
+    public string? Color { get; set; }
+
+    /// <summary>
+    /// Собственно текст.
+    /// </summary>
+    [XmlElement ("text")]
+    [DisplayName ("Текст")]
+    [JsonPropertyName ("text")]
+    public string? Text { get; set; }
+
+    #endregion
+
+    #region CardItem members
+
+    /// <inheritdoc cref="CardItem.Draw"/>
+    public override void Draw
+        (
+            DrawingContext context
+        )
     {
-        #region Properties
+        var graphics = context.Graphics.ThrowIfNull();
 
-        /// <summary>
-        /// Ширина текста.
-        /// </summary>
-        [XmlElement("width")]
-        [DisplayName("Ширина")]
-        [JsonPropertyName("width")]
-        public int Width { get; set; }
-
-        /// <summary>
-        /// Высота текста.
-        /// </summary>
-        [XmlElement("height")]
-        [DisplayName("Высота")]
-        [JsonPropertyName("height")]
-        public int Height { get; set; }
-
-        /// <summary>
-        /// Шрифт.
-        /// </summary>
-        [XmlElement("font")]
-        [DisplayName("Шрифт")]
-        [JsonPropertyName("font")]
-        public string? Font { get; set; }
-
-        /// <summary>
-        /// Цвет текста.
-        /// </summary>
-        [XmlElement("color")]
-        [DisplayName("Цвет")]
-        [JsonPropertyName("color")]
-        public string? Color { get; set; }
-
-        /// <summary>
-        /// Собственно текст.
-        /// </summary>
-        [XmlElement("text")]
-        [DisplayName("Текст")]
-        [JsonPropertyName("text")]
-        public string? Text { get; set; }
-
-        #endregion
-
-        #region CardItem members
-
-        /// <inheritdoc cref="CardItem.Draw"/>
-        public override void Draw
-            (
-                DrawingContext context
-            )
+        if (string.IsNullOrEmpty (Font))
         {
-            var graphics = context.Graphics.ThrowIfNull("context.Graphics");
-
-            if (string.IsNullOrEmpty(Font))
-            {
-                Magna.Warning("Font isn't specified");
-            }
-
-            if (string.IsNullOrEmpty(Color))
-            {
-                Magna.Warning("Color isn't specified");
-            }
-
-            if (!string.IsNullOrEmpty(Font)
-                && !string.IsNullOrEmpty(Color)
-                && !string.IsNullOrEmpty(Text))
-            {
-                var fontConverter = new FontConverter();
-                using var font = (Font) fontConverter.ConvertFromString(Font)
-                    .ThrowIfNull("fontConverter.ConvertFromString");
-                var colorConverter = new ColorConverter();
-                var color = (Color) colorConverter.ConvertFromString (Color)!;
-                var text = context.ExpandText(Text);
-                using var brush = new SolidBrush(color);
-                var rectangle = new Rectangle(Left, Top, Width, Height);
-                graphics.DrawString(text, font, brush, rectangle);
-            }
+            Magna.Warning ("Font isn't specified");
         }
 
-        #endregion
+        if (string.IsNullOrEmpty (Color))
+        {
+            Magna.Warning ("Color isn't specified");
+        }
 
-        #region Object members
+        if (!string.IsNullOrEmpty (Font)
+            && !string.IsNullOrEmpty (Color)
+            && !string.IsNullOrEmpty (Text))
+        {
+            var fontConverter = new FontConverter();
+            using var font = (Font)fontConverter.ConvertFromString (Font)
+                .ThrowIfNull();
+            var colorConverter = new ColorConverter();
+            var color = (Color)colorConverter.ConvertFromString (Color)!;
+            var text = context.ExpandText (Text);
 
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => $"Многострочный текст: {Text}";
+            using var brush = new SolidBrush (color);
+            var rectangle = new Rectangle (Left, Top, Width, Height);
+            graphics.DrawString (text, font, brush, rectangle);
+        }
+    }
 
-        #endregion
+    #endregion
 
-    } // class CardText
+    #region Object members
 
-} // namespace AM.Drawing.CardPrinting
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => $"Многострочный текст: {Text}";
+
+    #endregion
+}

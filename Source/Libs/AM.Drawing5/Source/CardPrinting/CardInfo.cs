@@ -2,14 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* CardInfo.cs -- описание карточки, на которую будет выведена информация
+/* CardInfo.cs -- описание карточки, на которую будет выведен читательский билет
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,70 +23,72 @@ using System.Xml.Serialization;
 
 #nullable enable
 
-namespace AM.Drawing.CardPrinting
+namespace AM.Drawing.CardPrinting;
+
+/// <summary>
+/// Описание карточки, на которую будет выведена информация
+/// из читательского билета.
+/// </summary>
+[XmlRoot ("card")]
+public class CardInfo
 {
+    #region Properties
+
     /// <summary>
-    /// Описание карточки, на которую будет выведена информация.
+    /// Ширина.
     /// </summary>
-    [XmlRoot("card")]
-    public class CardInfo
+    [XmlElement ("width")]
+    [DisplayName ("Ширина")]
+    [JsonPropertyName ("width")]
+    public int Width { get; set; }
+
+    /// <summary>
+    /// Высота.
+    /// </summary>
+    [XmlElement ("height")]
+    [DisplayName ("Высота")]
+    [JsonPropertyName ("height")]
+    public int Height { get; set; }
+
+    /// <summary>
+    /// Фоновый рисунок.
+    /// </summary>
+    [XmlElement ("background")]
+    [DisplayName ("Фоновый рисунок")]
+    [JsonPropertyName ("background")]
+    public string? Background { get; set; }
+
+    /// <summary>
+    /// Элементы карточки.
+    /// </summary>
+    [XmlArray ("items")]
+    [DisplayName ("Элементы")]
+
+    //[Editor(typeof(CardItemCollectionEditor), typeof(CollectionEditor))]
+    [XmlArrayItem (typeof (CardLabel), ElementName = "label")]
+    [XmlArrayItem (typeof (CardText), ElementName = "text")]
+    [XmlArrayItem (typeof (CardPicture), ElementName = "picture")]
+    [XmlArrayItem (typeof (CardBarcode), ElementName = "barcode")]
+    [XmlArrayItem (typeof (CardRectangle), ElementName = "rectangle")]
+    public List<CardItem> Items { get; } = new List<CardItem>();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Карточка по умолчанию (для ИРНИТУ).
+    /// </summary>
+    public static CardInfo CreateDefaultCard()
     {
-        #region Properties
-
-        /// <summary>
-        /// Ширина.
-        /// </summary>
-        [XmlElement("width")]
-        [DisplayName("Ширина")]
-        [JsonPropertyName("width")]
-        public int Width { get; set; }
-
-        /// <summary>
-        /// Высота.
-        /// </summary>
-        [XmlElement("height")]
-        [DisplayName("Высота")]
-        [JsonPropertyName("height")]
-        public int Height { get; set; }
-
-        /// <summary>
-        /// Фоновый рисунок.
-        /// </summary>
-        [XmlElement("background")]
-        [DisplayName("Фоновый рисунок")]
-        [JsonPropertyName("background")]
-        public string? Background { get; set; }
-
-        /// <summary>
-        /// Элементы карточки.
-        /// </summary>
-        [XmlArray("items")]
-        [DisplayName("Элементы")]
-        //[Editor(typeof(CardItemCollectionEditor), typeof(CollectionEditor))]
-        [XmlArrayItem(typeof(CardLabel), ElementName = "label")]
-        [XmlArrayItem(typeof(CardText), ElementName = "text")]
-        [XmlArrayItem(typeof(CardPicture), ElementName = "picture")]
-        [XmlArrayItem(typeof(CardBarcode), ElementName = "barcode")]
-        [XmlArrayItem(typeof(CardRectangle), ElementName = "rectangle")]
-        public List<CardItem> Items { get; } = new List<CardItem>();
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Карточка по умолчанию (для ИРНИТУ).
-        /// </summary>
-        public static CardInfo CreateDefaultCard()
+        var card = new CardInfo
         {
-            var card = new CardInfo
-            {
-                Background = "Bottom_texture_hf.bmp",
-                Width = 3508,
-                Height = 2240
-            };
+            Background = "Bottom_texture_hf.bmp",
+            Width = 3508,
+            Height = 2240
+        };
 
-            card.Items.AddRange
+        card.Items.AddRange
             (
                 new CardItem[]
                 {
@@ -113,82 +112,83 @@ namespace AM.Drawing.CardPrinting
                 }
             );
 
-            return card;
+        return card;
+    }
+
+    /// <summary>
+    /// Проверка карточки.
+    /// </summary>
+    public void Verify()
+    {
+        // Пустое тело метода
+    }
+
+    /// <summary>
+    /// Сохранение карточки со всеми элементами в указанный XML-файл.
+    /// </summary>
+    public void SaveXml
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        using var stream = File.Create (fileName);
+        var serializer = new XmlSerializer (typeof (CardInfo));
+        serializer.Serialize (stream, this);
+    }
+
+    /// <summary>
+    /// Загрузка карточки из указанного файла.
+    /// </summary>
+    public static CardInfo LoadXml
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
+
+        using var stream = File.OpenRead (fileName);
+        var serializer = new XmlSerializer (typeof (CardInfo));
+
+        return (CardInfo) serializer.Deserialize (stream).ThrowIfNull();
+    }
+
+    /// <summary>
+    /// Отрисовка карточки в указанном контексте.
+    /// </summary>
+    public Image Draw
+        (
+            DrawingContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        var bitmap = new Bitmap (Width, Height);
+        using var graphics = Graphics.FromImage (bitmap);
+        context.Graphics = graphics;
+        if (!string.IsNullOrEmpty (Background))
+        {
+            using var backImage = Image.FromFile (Background);
+            graphics.DrawImage
+                (
+                    backImage,
+                    0,
+                    0,
+                    Width,
+                    Height
+                );
         }
 
-        /// <summary>
-        /// Проверка карточки.
-        /// </summary>
-        public void Verify()
+        foreach (var item in Items)
         {
-            // Nothing to do yet
+            item.Draw (context);
         }
 
-        /// <summary>
-        /// Сохранение карточки со всеми элементами в указанный XML-файл.
-        /// </summary>
-        public void SaveXml
-            (
-                string fileName
-            )
-        {
-            using var stream = File.Create(fileName);
-            var serializer = new XmlSerializer(typeof(CardInfo));
-            serializer.Serialize(stream, this);
-        }
+        context.Graphics = null;
 
-        /// <summary>
-        /// Загрузка карточки из указанного файла.
-        /// </summary>
-        public static CardInfo LoadXml
-            (
-                string fileName
-            )
-        {
-            using var stream = File.OpenRead (fileName);
-            var serializer = new XmlSerializer (typeof (CardInfo));
+        return bitmap;
+    }
 
-            return (CardInfo) serializer.Deserialize (stream).ThrowIfNull();
-
-        } // method LoadXml
-
-        /// <summary>
-        /// Отрисовка карточки.
-        /// </summary>
-        public Image Draw
-            (
-                DrawingContext context
-            )
-        {
-            var bitmap = new Bitmap(Width, Height);
-            using var graphics = Graphics.FromImage(bitmap);
-            context.Graphics = graphics;
-            if (!string.IsNullOrEmpty(Background))
-            {
-                var backImage = Image.FromFile(Background);
-                graphics.DrawImage
-                    (
-                        backImage,
-                        0,
-                        0,
-                        Width,
-                        Height
-                    );
-            }
-
-            foreach (var item in Items)
-            {
-                item.Draw(context);
-            }
-
-            context.Graphics = null;
-
-            return bitmap;
-
-        } // method Draw
-
-        #endregion
-
-    } // class CardInfo
-
-} // namespace AM.Drawing.CardPrinting
+    #endregion
+}

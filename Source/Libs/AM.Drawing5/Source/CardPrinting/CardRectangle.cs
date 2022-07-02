@@ -2,14 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* CardRectangle.cs --
+/* CardRectangle.cs -- пустой прямоугольник (с границей или без)
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,99 +21,95 @@ using System.Xml.Serialization;
 
 #nullable enable
 
-namespace AM.Drawing.CardPrinting
+namespace AM.Drawing.CardPrinting;
+
+/// <summary>
+/// Простой прямоугольник (с границей или без).
+/// Заливка может быть прозрачной.
+/// </summary>
+public sealed class CardRectangle
+    : CardItem
 {
+    #region Properties
+
     /// <summary>
-    /// Простой прямоугольник (с границей или без).
-    /// Заливка может быть прозрачной.
+    /// Ширина.
     /// </summary>
-    public sealed class CardRectangle
-        : CardItem
+    [XmlElement ("width")]
+    [DisplayName ("Ширина")]
+    [JsonPropertyName ("width")]
+    public int Width { get; set; }
+
+    /// <summary>
+    /// Высота.
+    /// </summary>
+    [XmlElement ("height")]
+    [DisplayName ("Высота")]
+    [JsonPropertyName ("height")]
+    public int Height { get; set; }
+
+    /// <summary>
+    /// Цвет для заполнения.
+    /// </summary>
+    [XmlElement ("fill")]
+    [DisplayName ("Цвет заливки")]
+    [JsonPropertyName ("fill")]
+    public string? FillColor { get; set; }
+
+    /// <summary>
+    /// Цвет границы.
+    /// </summary>
+    [XmlElement ("border")]
+    [DisplayName ("Цвет границы")]
+    [JsonPropertyName ("border")]
+    public string? BorderColor { get; set; }
+
+    /// <summary>
+    /// Толщина границы.
+    /// </summary>
+    [XmlElement ("thickness")]
+    [DisplayName ("Толщина границы")]
+    [JsonPropertyName ("thickness")]
+    public int Thickness { get; set; }
+
+    #endregion
+
+    #region CardItem members
+
+    /// <inheritdoc cref="CardItem.Draw"/>
+    public override void Draw
+        (
+            DrawingContext context
+        )
     {
-        #region Properties
+        var converter = new ColorConverter();
+        var graphics = context.Graphics.ThrowIfNull();
 
-        /// <summary>
-        /// Ширина.
-        /// </summary>
-        [XmlElement("width")]
-        [DisplayName("Ширина")]
-        [JsonPropertyName("width")]
-        public int Width { get; set; }
-
-        /// <summary>
-        /// Высота.
-        /// </summary>
-        [XmlElement("height")]
-        [DisplayName("Высота")]
-        [JsonPropertyName("height")]
-        public int Height { get; set; }
-
-        /// <summary>
-        /// Цвет для заполнения.
-        /// </summary>
-        [XmlElement("fill")]
-        [DisplayName("Цвет заливки")]
-        [JsonPropertyName("fill")]
-        public string? FillColor { get; set; }
-
-        /// <summary>
-        /// Цвет границы.
-        /// </summary>
-        [XmlElement("border")]
-        [DisplayName("Цвет границы")]
-        [JsonPropertyName("border")]
-        public string? BorderColor { get; set; }
-
-        /// <summary>
-        /// Толщина границы.
-        /// </summary>
-        [XmlElement("thickness")]
-        [DisplayName("Толщина границы")]
-        [JsonPropertyName("thickness")]
-        public int Thickness { get; set; }
-
-        #endregion
-
-        #region CardItem members
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="context"></param>
-        public override void Draw
-            (
-                DrawingContext context
-            )
+        if (!string.IsNullOrEmpty (FillColor))
         {
-            var converter = new ColorConverter();
-            var graphics = context.Graphics.ThrowIfNull("context.Graphics");
+            var fillColor = (Color)converter.ConvertFromString (FillColor)
+                .ThrowIfNull();
 
-            if (!string.IsNullOrEmpty(FillColor))
-            {
-                var fillColor = (Color) converter.ConvertFromString(FillColor)
-                    .ThrowIfNull("FillColor");
-                using Brush brush = new SolidBrush(fillColor);
-                graphics.FillRectangle(brush, Left, Top, Width, Height);
-            }
-
-            if (!string.IsNullOrEmpty(BorderColor) && Thickness > 0)
-            {
-                var borderColor = (Color) converter.ConvertFromString(BorderColor)
-                    .ThrowIfNull("BorderColor");
-                using var pen = new Pen(borderColor, Thickness);
-                graphics.DrawRectangle(pen, Left, Top, Width, Height);
-            }
+            using Brush brush = new SolidBrush (fillColor);
+            graphics.FillRectangle (brush, Left, Top, Width, Height);
         }
 
-        #endregion
+        if (!string.IsNullOrEmpty (BorderColor) && Thickness > 0)
+        {
+            var borderColor = (Color) converter.ConvertFromString (BorderColor)
+                .ThrowIfNull();
 
-        #region Object members
+            using var pen = new Pen (borderColor, Thickness);
+            graphics.DrawRectangle (pen, Left, Top, Width, Height);
+        }
+    }
 
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => "Прямоугольник";
+    #endregion
 
-        #endregion
+    #region Object members
 
-    } // class CardRectangle
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => "Прямоугольник";
 
-} // namespace AM.Drawing.CardPrinting
+    #endregion
+}

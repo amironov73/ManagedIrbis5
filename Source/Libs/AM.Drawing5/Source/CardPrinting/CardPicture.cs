@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* CardPicture.cs -- картинка, например, фото читателя
  * Ars Magna project, http://arsmagna.ru
@@ -24,127 +21,120 @@ using System.Xml.Serialization;
 
 #nullable enable
 
-namespace AM.Drawing.CardPrinting
+namespace AM.Drawing.CardPrinting;
+
+/// <summary>
+/// Картинка, например, фото читателя.
+/// </summary>
+public sealed class CardPicture
+    : CardItem
 {
+    #region Properties
+
     /// <summary>
-    /// Картинка, например, фото читателя.
+    /// Ширина.
     /// </summary>
-    public sealed class CardPicture
-        : CardItem
+    [XmlElement ("width")]
+    [DisplayName ("Ширина")]
+    [JsonPropertyName ("width")]
+    public int Width { get; set; }
+
+    /// <summary>
+    /// Высота.
+    /// </summary>
+    [XmlElement ("height")]
+    [DisplayName ("Высота")]
+    [JsonPropertyName ("height")]
+    public int Height { get; set; }
+
+    /// <summary>
+    /// Источник картинки, например, путь к файлу.
+    /// </summary>
+    [XmlElement ("source")]
+    [DisplayName ("Файл")]
+    [JsonPropertyName ("source")]
+    public string? Source { get; set; }
+
+    #endregion
+
+    #region Private members
+
+    /// <summary>
+    /// Пропорционально масштабирует изображение так, чтобы оно
+    /// вписывалось в указанные размеры.
+    /// </summary>
+    private static void _ProportionalPrint
+        (
+            Graphics graphics,
+            Image image,
+            int x,
+            int y,
+            int width,
+            int height
+        )
     {
-        #region Properties
+        double imageHeight = image.Height;
+        double imageWidth = image.Width;
+        double windowHeight = width;
+        double windowWidth = height;
+        var imageAspect = imageWidth / imageHeight;
+        var panelAspect = windowWidth / windowHeight;
+        var superAspect = imageAspect / panelAspect;
+        var ratio = superAspect > 1.0
+            ? windowWidth / imageWidth
+            : windowHeight / imageHeight;
+        imageWidth *= ratio;
+        imageHeight *= ratio;
 
-        /// <summary>
-        /// Ширина.
-        /// </summary>
-        [XmlElement("width")]
-        [DisplayName("Ширина")]
-        [JsonPropertyName("width")]
-        public int Width { get; set; }
-
-        /// <summary>
-        /// Высота.
-        /// </summary>
-        [XmlElement("height")]
-        [DisplayName("Высота")]
-        [JsonPropertyName("height")]
-        public int Height { get; set; }
-
-        /// <summary>
-        /// Источник картинки, например, путь к файлу.
-        /// </summary>
-        [XmlElement("source")]
-        [DisplayName("Файл")]
-        [JsonPropertyName("source")]
-        public string? Source { get; set; }
-
-        #endregion
-
-        #region Private members
-
-        /// <summary>
-        /// Пропорционально масштабирует изображение так, чтобы оно
-        /// вписывалось в указанные размеры.
-        /// </summary>
-        private static void _ProportionalPrint
+        graphics.DrawImage
             (
-                Graphics graphics,
-                Image image,
-                int x,
-                int y,
-                int width,
-                int height
-            )
+                image,
+                x,
+                y,
+                (float)imageWidth,
+                (float)imageHeight
+            );
+    }
+
+    #endregion
+
+    #region CardItem members
+
+    /// <inheritdoc cref="CardItem.Draw"/>
+    public override void Draw
+        (
+            DrawingContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        var graphics = context.Graphics.ThrowIfNull();
+
+        if (Width > 0 && Height > 0 && !string.IsNullOrEmpty (Source))
         {
-            double imageHeight = image.Height;
-            double imageWidth = image.Width;
-            double windowHeight = width;
-            double windowWidth = height;
-            double imageAspect = imageWidth / imageHeight;
-            double panelAspect = windowWidth / windowHeight;
-            double superAspect = imageAspect / panelAspect;
-            double ratio = superAspect > 1.0
-                ? windowWidth / imageWidth
-                : windowHeight / imageHeight;
-            imageWidth *= ratio;
-            imageHeight *= ratio;
-
-            graphics.DrawImage
-                (
-                    image,
-                    x,
-                    y,
-                    (float) imageWidth,
-                    (float) imageHeight
-                );
-        }
-
-        #endregion
-
-        #region CardItem members
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="context"></param>
-        public override void Draw
-            (
-                DrawingContext context
-            )
-        {
-            Graphics graphics = context.Graphics.ThrowIfNull();
-
-            if (Width > 0 && Height > 0 && !string.IsNullOrEmpty (Source))
+            var source = context.ExpandText (Source);
+            if (!string.IsNullOrEmpty (source))
             {
-                var source = context.ExpandText (Source);
-                if (!string.IsNullOrEmpty (source))
-                {
-                    using Image bitmap = Image.FromFile (source);
-                    _ProportionalPrint
-                        (
-                            graphics,
-                            bitmap,
-                            Left,
-                            Top,
-                            Width,
-                            Height
-                        );
+                using var bitmap = Image.FromFile (source);
+                _ProportionalPrint
+                    (
+                        graphics,
+                        bitmap,
+                        Left,
+                        Top,
+                        Width,
+                        Height
+                    );
+            }
+        }
+    }
 
-                } // if
+    #endregion
 
-            } // if
+    #region Object members
 
-        } // method Draw
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => $"Картинка: {Source}";
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => $"Картинка: {Source}";
-
-        #endregion
-
-    } // class CardPicture
-
-} // namespace AM.Drawing.CardPrinting
+    #endregion
+}

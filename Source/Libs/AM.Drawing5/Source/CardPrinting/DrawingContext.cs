@@ -2,14 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* DrawingContext.cs -- контекст рисования на карточке
+/* DrawingContext.cs -- контекст отрисовки на читательском билете
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,91 +20,91 @@ using System.Text.RegularExpressions;
 
 #nullable enable
 
-namespace AM.Drawing.CardPrinting
+namespace AM.Drawing.CardPrinting;
+
+/// <summary>
+/// Контекст отрисовки на читательском билете.
+/// </summary>
+public sealed class DrawingContext
 {
+    #region Properties
+
+    // public PrinterInfo Printer { get; set; }
+
     /// <summary>
-    /// Контекст рисования на карточке.
+    /// Информация о карточке билета.
     /// </summary>
-    public class DrawingContext
+    public CardInfo? Card { get; set; }
+
+    // public HumanInfo Human { get; set; }
+
+    /// <summary>
+    /// Канва для отрисовки.
+    /// </summary>
+    public Graphics? Graphics { get; set; }
+
+    #endregion
+
+    #region Private members
+
+    private string _Evaluator
+        (
+            Match match
+        )
     {
-        #region Properties
+        var name = match.Groups["name"].Value;
 
-        //public PrinterInfo Printer { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public CardInfo? Card { get; set; }
-
-        // public HumanInfo Human { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public Graphics? Graphics { get; set; }
-
-        #endregion
-
-        #region Private members
-
-        private string _Evaluator(Match match)
+        switch (name)
         {
-            var name = match.Groups["name"].Value;
+            case "Date":
+                return DateTime.Today.ToShortDateString();
 
-            switch (name)
-            {
-                case "Date":
-                    return DateTime.Today.ToShortDateString();
+            case "Time":
+                return DateTime.Now.ToShortTimeString();
 
-                case "Time":
-                    return DateTime.Now.ToShortTimeString();
+            case "DateTime":
+                return DateTime.Now.ToString (CultureInfo.CurrentCulture);
 
-                case "DateTime":
-                    return DateTime.Now.ToString(CultureInfo.CurrentCulture);
-
-                case "Year":
-                    return DateTime.Today.Year
-                        .ToString(CultureInfo.InvariantCulture);
-            }
-
-            /*
-            PropertyInfo property = typeof(HumanInfo).GetProperty(name);
-            object value = property.GetValue
-            (
-                Human,
-                null
-            );
-
-            return ReferenceEquals(value, null)
-                ? string.Empty
-                : value.ToString();
-
-                */
-
-            return string.Empty;
+            case "Year":
+                return DateTime.Today.Year
+                    .ToString (CultureInfo.InvariantCulture);
         }
 
-        #endregion
+        /*
+        PropertyInfo property = typeof(HumanInfo).GetProperty(name);
+        object value = property.GetValue
+        (
+            Human,
+            null
+        );
 
-        #region Public methods
+        return ReferenceEquals(value, null)
+            ? string.Empty
+            : value.ToString();
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        public string ExpandText
-            (
-                string input
-            )
-        {
-            var regex = new Regex(@"{(?<name>\w+)}");
-            var result = regex.Replace ( input, _Evaluator );
-            return result;
-        }
+            */
 
-        #endregion
+        return string.Empty;
+    }
 
-    } // class DrawingContext
+    #endregion
 
-} // namespace AM.Drawing.CardPrinting
+    #region Public methods
+
+    /// <summary>
+    /// Подставновка элементов в строку.
+    /// </summary>
+    public string ExpandText
+        (
+            string input
+        )
+    {
+        Sure.NotNull (input);
+
+        var regex = new Regex (@"{(?<name>\w+)}");
+        var result = regex.Replace (input, _Evaluator);
+        return result;
+    }
+
+    #endregion
+}
