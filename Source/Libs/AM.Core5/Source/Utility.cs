@@ -34,6 +34,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AM.Collections;
@@ -4394,7 +4396,7 @@ public static class Utility
     public static StringBuilder AppendList<T>
         (
             this StringBuilder builder,
-            IList<T> list,
+            IList<T>? list,
             Func<T, string> transformator,
             string? separator = ", ",
             string? union = " and "
@@ -6373,6 +6375,140 @@ public static class Utility
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Ожидание завершения задачи с таймаутом или отменой по токену.
+    /// </summary>
+    public static async Task<TResult> WithTimeout<TResult>
+        (
+            this Task<TResult> task,
+            TimeSpan timeout,
+            CancellationToken cToken
+        )
+    {
+        Sure.NotNull (task);
+
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource (cToken);
+        var completedTask = await Task.WhenAny (task, Task.Delay (timeout, cts.Token));
+        if (completedTask == task)
+        {
+            cts.Cancel(); // Cancel to stop timer
+            return await task;
+        }
+
+        throw new TimeoutException();
+    }
+
+    /// <summary>
+    /// Распечатка свойств объекта в соответствии с шаблоном.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// person.ToPropertyString ("{FirstName} {LastName} has {Children.Count} children.");
+    /// </code>
+    /// </example>
+    public static string ToPropertyString
+        (
+            this object obj,
+            string format,
+            IFormatProvider? formatProvider = null
+        )
+    {
+        Sure.NotNull (format);
+
+        formatProvider ??= CultureInfo.InvariantCulture;
+
+        var builder = StringBuilderPool.Shared.Get();
+        var reg = new Regex (@"{([^}]+)}", RegexOptions.IgnoreCase);
+        var matches = reg.Matches (format);
+
+        var startIndex = 0;
+        foreach (Match match in matches)
+        {
+            var group = match.Groups[1];
+
+            // Append everything before the "{"
+            var length = group.Index - startIndex - 1;
+            builder.Append (format.Substring (startIndex, length));
+
+            string? propertyChain;
+            string? formatString = null;
+            var formatIndex = group.Value.IndexOf
+                (
+                    ":",
+                    StringComparison.InvariantCulture
+                );
+            if (formatIndex == -1)
+            {
+                propertyChain = group.Value;
+            }
+            else
+            {
+                propertyChain = group.Value[..formatIndex];
+                formatString = group.Value[(formatIndex + 1)..];
+            }
+
+            var value = ObjectStringFlector.GetValue (obj, propertyChain);
+            if (value is not null)
+            {
+                object[]? invokeArgs = null;
+
+                if (formatString != null)
+                {
+                    invokeArgs = new object[] { formatString, formatProvider };
+                }
+
+                var result = (string?)value.GetType().InvokeMember
+                    (
+                        "ToString",
+                        BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod,
+                        null,
+                        value,
+                        invokeArgs
+                    );
+
+                builder.Append (result);
+            }
+
+            startIndex = group.Index + group.Length + 1;
+        }
+
+        // Include the rest of the string.
+        if (startIndex < format.Length)
+        {
+            builder.Append (format.Substring (startIndex));
+        }
+
+        var finalResult = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return finalResult;
+    }
+
+    /// <summary>
+    /// Материализация коллекции.
+    /// </summary>
+    public static IReadOnlyCollection<T> ReifyCollection<T>
+        (
+            IEnumerable<T> source
+        )
+    {
+        Sure.NotNull ((object?) source);
+
+        return source switch
+        {
+            IReadOnlyCollection<T> readOnlyCollection =>
+                readOnlyCollection,
+
+            ICollection<T> genericCollection =>
+                new CollectionWrapper<T> (genericCollection),
+
+            ICollection nongenericCollection =>
+                new NongenericCollectionWrapper<T> (nongenericCollection),
+
+            _ => new List<T> (source)
+        };
     }
 
     #endregion
