@@ -3,10 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
-/* ConsoleInputEventArgs.cs --
+/* ConsoleInputEventArgs.cs -- аргументы события для консольного контрола
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,21 +16,20 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Аргументы события для консольного контрола <see cref="ConsoleControl"/>
+/// </summary>
+public sealed class ConsoleInputEventArgs
+    : EventArgs
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Текст, ассоциированный с событием.
     /// </summary>
-    public sealed class ConsoleInputEventArgs
-        : EventArgs
-    {
-        #region Properties
+    public string? Text { get; set; }
 
-        /// <summary>
-        /// Text.
-        /// </summary>
-        public string? Text { get; set; }
-
-        #endregion
-    }
+    #endregion
 }
