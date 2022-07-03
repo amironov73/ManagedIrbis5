@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* PaletteColorAttribute.cs
+/* PaletteColorAttribute.cs -- задание палитры для элемента пользовательского интерфейса
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,30 +21,37 @@ using System;
 
 #nullable enable
 
-namespace AM.Drawing
-{
-    /// <summary>
-    ///
-    /// </summary>
-    public class PaletteColorAttribute
-        : Attribute
-    {
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="PaletteColorAttribute"/> class.
-        /// </summary>
-        public PaletteColorAttribute
-            (
-                string color
-            )
-        {
-            Color = color;
-        }
+namespace AM.Drawing;
 
-        /// <summary>
-        /// Gets the color.
-        /// </summary>
-        /// <value>The color.</value>
-        public string Color { get; }
+/// <summary>
+/// Задание палитры для элемента пользовательского интерфейса.
+/// </summary>
+public sealed class PaletteColorAttribute
+    : Attribute
+{
+    #region Properties
+
+    /// <summary>
+    /// Имя или значение цвета.
+    /// </summary>
+    public string Color { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PaletteColorAttribute
+        (
+            string color
+        )
+    {
+        Sure.NotNullNorEmpty (color);
+
+        Color = color;
     }
+
+    #endregion
 }

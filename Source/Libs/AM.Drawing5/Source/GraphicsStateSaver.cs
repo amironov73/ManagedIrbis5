@@ -23,89 +23,86 @@ using System.Drawing.Drawing2D;
 
 #nullable enable
 
-namespace AM.Drawing
+namespace AM.Drawing;
+
+/// <summary>
+/// Holds state of <see cref="T:System.Drawing.Graphics"/>
+/// class.
+/// </summary>
+public sealed class GraphicsStateSaver
+    : IDisposable
 {
+    #region Construction
+
     /// <summary>
-    /// Holds state of <see cref="T:System.Drawing.Graphics"/>
-    /// class.
+    /// Initializes a new instance of the
+    /// <see cref="T:GraphicsStateSaver"/> class.
     /// </summary>
-    public sealed class GraphicsStateSaver
-        : IDisposable
+    public GraphicsStateSaver
+        (
+            Graphics graphics
+        )
     {
-        #region Construction
+        _graphics = graphics;
+        _state = _graphics.Save();
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="T:GraphicsStateSaver"/> class.
-        /// </summary>
-        public GraphicsStateSaver
-            (
-                Graphics graphics
-            )
+    /// <summary>
+    /// Releases unmanaged resources and performs
+    /// other cleanup operations before the
+    /// <see cref="T:AM.Drawing.GraphicsStateSaver"/>
+    /// is reclaimed by garbage collection.
+    /// </summary>
+    ~GraphicsStateSaver()
+    {
+        Dispose (false);
+    }
+
+    #endregion
+
+    #region Private members
+
+    /// <summary>
+    /// Object of <see cref="T:System.Drawing.Graphics"/> type
+    /// which state have been saved.
+    /// </summary>
+    private readonly Graphics _graphics;
+
+    /// <summary>
+    /// Saved state itself.
+    /// </summary>
+    private GraphicsState? _state;
+
+    /// <summary>
+    /// Disposes the object.
+    /// </summary>
+    /// <param name="disposing">if set to <c>true</c>
+    /// [disposing].</param>
+    private void Dispose
+        (
+            bool disposing
+        )
+    {
+        if (_state != null)
         {
-            _graphics = graphics;
-            _state = _graphics.Save();
+            _graphics.Restore (_state);
+            _state = null;
         }
+    }
 
-        /// <summary>
-        /// Releases unmanaged resources and performs
-        /// other cleanup operations before the
-        /// <see cref="T:AM.Drawing.GraphicsStateSaver"/>
-        /// is reclaimed by garbage collection.
-        /// </summary>
-        ~GraphicsStateSaver()
-        {
-            Dispose(false);
-        }
+    #endregion
 
-        #endregion
+    #region IDisposable members
 
-        #region Private members
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing,
+    /// releasing, or resetting unmanaged resources.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose (true);
+        GC.SuppressFinalize (this);
+    }
 
-        /// <summary>
-        /// Object of <see cref="T:System.Drawing.Graphics"/> type
-        /// which state have been saved.
-        /// </summary>
-        private readonly Graphics _graphics;
-
-        /// <summary>
-        /// Saved state itself.
-        /// </summary>
-        private GraphicsState? _state;
-
-        /// <summary>
-        /// Disposes the object.
-        /// </summary>
-        /// <param name="disposing">if set to <c>true</c>
-        /// [disposing].</param>
-        private void Dispose
-            (
-                bool disposing
-            )
-        {
-            if (_state != null)
-            {
-                _graphics.Restore(_state);
-                _state = null;
-            }
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing,
-        /// releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
-
-    } // class GraphicsStateSaver
-
-} // namespace AM.Drawing
+    #endregion
+}

@@ -25,377 +25,384 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Drawing
+namespace AM.Drawing;
+
+/// <summary>
+/// General information about image.
+/// </summary>
+public sealed class ImageInfo
 {
+    #region Constants
+
     /// <summary>
-    /// General information about image.
+    ///
     /// </summary>
-    public sealed class ImageInfo
+    public const int Unspecified = -1;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Gets the colors.
+    /// </summary>
+    public long Colors { get; internal set; }
+
+    /// <summary>
+    /// Gets the name of the file.
+    /// </summary>
+    public string? FileName { get; internal set; }
+
+    /// <summary>
+    /// Gets the height.
+    /// </summary>
+    public int Height { get; internal set; }
+
+    /// <summary>
+    /// Gets the horizontal resolution.
+    /// </summary>
+    public double HorizontalResolution { get; internal set; }
+
+    /// <summary>
+    /// Gets the length.
+    /// </summary>
+    public long Length { get; internal set; }
+
+    /// <summary>
+    /// Gets the version.
+    /// </summary>
+    public string? Version { get; internal set; }
+
+    /// <summary>
+    /// Gets the vertical resolution.
+    /// </summary>
+    public double VerticalResolution { get; internal set; }
+
+    /// <summary>
+    /// Gets the width.
+    /// </summary>
+    public int Width { get; internal set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="T:ImageInfo"/> class.
+    /// </summary>
+    internal ImageInfo()
     {
-        #region Constants
+        _Clear();
+    }
 
-        /// <summary>
-        ///
-        /// </summary>
-        public const int Unspecified = -1;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="T:ImageInfo"/> class.
+    /// </summary>
+    internal ImageInfo (string fileName)
+    {
+        _Clear();
 
-        #endregion
+        FileName = fileName;
+        Length = new FileInfo (fileName).Length;
+    }
 
-        #region Properties
+    /// <summary>
+    /// Initializes a new instance of the <see cref="T:ImageInfo"/> class.
+    /// </summary>
+    internal ImageInfo
+        (
+            int width,
+            int height
+        )
+    {
+        _Clear();
 
-        /// <summary>
-        /// Gets the colors.
-        /// </summary>
-        public long Colors { get; internal set; }
+        Width = width;
+        Height = height;
+    }
 
-        /// <summary>
-        /// Gets the name of the file.
-        /// </summary>
-        public string? FileName { get; internal set; }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="T:ImageInfo"/> class.
+    /// </summary>
+    internal ImageInfo
+        (
+            int width,
+            int height,
+            long colors
+        )
+    {
+        _Clear();
 
-        /// <summary>
-        /// Gets the height.
-        /// </summary>
-        public int Height { get; internal set; }
+        Width = width;
+        Height = height;
+        Colors = colors;
+    }
 
-        /// <summary>
-        /// Gets the horizontal resolution.
-        /// </summary>
-        public double HorizontalResolution { get; internal set; }
+    #endregion
 
-        /// <summary>
-        /// Gets the length.
-        /// </summary>
-        public long Length { get; internal set; }
+    #region Private members
 
-        /// <summary>
-        /// Gets the version.
-        /// </summary>
-        public string? Version { get; internal set; }
+    /// <summary>
+    /// Initializes the instance.
+    /// </summary>
+    private void _Clear()
+    {
+        Colors = Unspecified;
+        Height = Unspecified;
+        Length = Unspecified;
+        Width = Unspecified;
+    }
 
-        /// <summary>
-        /// Gets the vertical resolution.
-        /// </summary>
-        public double VerticalResolution { get; internal set; }
-
-        /// <summary>
-        /// Gets the width.
-        /// </summary>
-        public int Width { get; internal set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:ImageInfo"/> class.
-        /// </summary>
-        internal ImageInfo()
+    private static bool _Compare
+        (
+            byte[] stream,
+            int offset,
+            params byte[] pattern
+        )
+    {
+        if (offset + pattern.Length > stream.Length)
         {
-            _Clear();
+            return false;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:ImageInfo"/> class.
-        /// </summary>
-        internal ImageInfo(string fileName)
+        for (var i = 0; i < pattern.Length; i++)
         {
-            _Clear();
-
-            FileName = fileName;
-            Length = new FileInfo(fileName).Length;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:ImageInfo"/> class.
-        /// </summary>
-        internal ImageInfo
-            (
-                int width,
-                int height
-            )
-        {
-            _Clear();
-
-            Width = width;
-            Height = height;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:ImageInfo"/> class.
-        /// </summary>
-        internal ImageInfo
-            (
-                int width,
-                int height,
-                long colors
-            )
-        {
-            _Clear();
-
-            Width = width;
-            Height = height;
-            Colors = colors;
-        }
-
-        #endregion
-
-        #region Private members
-
-        /// <summary>
-        /// Initializes the instance.
-        /// </summary>
-        private void _Clear()
-        {
-            Colors = Unspecified;
-            Height = Unspecified;
-            Length = Unspecified;
-            Width = Unspecified;
-        }
-
-        private static bool _Compare
-            (
-                byte[] stream,
-                int offset,
-                params byte[] pattern
-            )
-        {
-            if (offset + pattern.Length > stream.Length)
+            if (stream[offset + i] != pattern[i])
             {
                 return false;
             }
-            for (var i = 0; i < pattern.Length; i++)
-            {
-                if (stream[offset + i] != pattern[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
-        private static ImageInfo _GetBmpImageInfo
-            (
-                string fileName
-            )
+        return true;
+    }
+
+    private static ImageInfo _GetBmpImageInfo
+        (
+            string fileName
+        )
+    {
+        using var file = File.OpenRead (fileName);
+        var buffer = new byte[256];
+        var result = new ImageInfo (fileName);
+
+        while (true)
         {
-            using var file = File.OpenRead(fileName);
-            var buffer = new byte[256];
-            var result = new ImageInfo(fileName);
-
-            while (true)
-            {
-                if (
-                        file.Read(buffer, 0, 32) != 32
-                        || !_Compare(buffer, 0, 0x42, 0x4D)
-                    )
-                {
-                    break;
-                }
-
-                result.Width = BitConverter.ToInt32(buffer, 18);
-                result.Height = BitConverter.ToInt32(buffer, 22);
-                result.Colors = 1 << buffer[28];
-
-                return result;
-            }
-
-            throw new ApplicationException();
-        }
-
-        private static ImageInfo _GetGifImageInfo
-            (
-                string fileName
-            )
-        {
-            using var file = File.OpenRead(fileName);
-            var buffer = new byte[256];
-            var result = new ImageInfo(fileName);
-
-            while (true)
-            {
-                if (
-                        file.Read(buffer, 0, 13) != 13
-                        || !_Compare(buffer, 0, 0x47, 0x49, 0x46)
-                    )
-                {
-                    break;
-                }
-
-                var version = Encoding.ASCII.GetString(buffer, 3, 3);
-                if (version != "87a" && version != "89a")
-                {
-                    break;
-                }
-
-                result.Version = version;
-                result.Width = buffer[6] + buffer[7] * 256;
-                result.Height = buffer[8] + buffer[9] * 256;
-                var packed = buffer[10];
-                result.Colors = 1 << ((packed & 7) + 1);
-
-                return result;
-            }
-
-            throw new ApplicationException();
-        }
-
-        private static ImageInfo _GetJpegImageInfo
-            (
-                string fileName
-            )
-        {
-            using var file = File.OpenRead(fileName);
-            var buffer = new byte[256];
             if (
-                    file.Read(buffer, 0, 2) != 2
-                    || !_Compare(buffer, 0, 0xFF, 0xD8)
+                    file.Read (buffer, 0, 32) != 32
+                    || !_Compare (buffer, 0, 0x42, 0x4D)
                 )
             {
-                throw new ApplicationException();
+                break;
             }
 
-            var result = new ImageInfo(fileName)
+            result.Width = BitConverter.ToInt32 (buffer, 18);
+            result.Height = BitConverter.ToInt32 (buffer, 22);
+            result.Colors = 1 << buffer[28];
+
+            return result;
+        }
+
+        throw new ApplicationException();
+    }
+
+    private static ImageInfo _GetGifImageInfo
+        (
+            string fileName
+        )
+    {
+        using var file = File.OpenRead (fileName);
+        var buffer = new byte[256];
+        var result = new ImageInfo (fileName);
+
+        while (true)
+        {
+            if (
+                    file.Read (buffer, 0, 13) != 13
+                    || !_Compare (buffer, 0, 0x47, 0x49, 0x46)
+                )
             {
-                Colors = 1 << 24
-            };
-            while (true)
+                break;
+            }
+
+            var version = Encoding.ASCII.GetString (buffer, 3, 3);
+            if (version != "87a" && version != "89a")
             {
-                if (
-                        file.Read(buffer, 0, 2) != 2
-                        || buffer[0] != 0xFF
-                    )
+                break;
+            }
+
+            result.Version = version;
+            result.Width = buffer[6] + buffer[7] * 256;
+            result.Height = buffer[8] + buffer[9] * 256;
+            var packed = buffer[10];
+            result.Colors = 1 << ((packed & 7) + 1);
+
+            return result;
+        }
+
+        throw new ApplicationException();
+    }
+
+    private static ImageInfo _GetJpegImageInfo
+        (
+            string fileName
+        )
+    {
+        using var file = File.OpenRead (fileName);
+        var buffer = new byte[256];
+        if (
+                file.Read (buffer, 0, 2) != 2
+                || !_Compare (buffer, 0, 0xFF, 0xD8)
+            )
+        {
+            throw new ApplicationException();
+        }
+
+        var result = new ImageInfo (fileName)
+        {
+            Colors = 1 << 24
+        };
+        while (true)
+        {
+            if (
+                    file.Read (buffer, 0, 2) != 2
+                    || buffer[0] != 0xFF
+                )
+            {
+                break;
+            }
+
+            var position = file.Position;
+            var blockCode = buffer[1];
+            int blockLength = _ReadUInt16 (file);
+            if (blockCode.IsOneOf<byte> (0xE0))
+            {
+                var toRead = Math.Min (blockLength, buffer.Length);
+                if (file.Read (buffer, 0, toRead) != toRead
+                    || !_Compare (buffer, 0, 0x4A, 0x46, 0x49, 0x46, 0x00)
+                   )
                 {
                     break;
                 }
 
-                var position = file.Position;
-                var blockCode = buffer[1];
-                int blockLength = _ReadUInt16(file);
-                if (blockCode.IsOneOf<byte>(0xE0))
-                {
-                    var toRead = Math.Min(blockLength, buffer.Length);
-                    if (file.Read(buffer, 0, toRead) != toRead
-                        || !_Compare(buffer, 0, 0x4A, 0x46, 0x49, 0x46, 0x00)
-                    )
-                    {
-                        break;
-                    }
-                    result.Version
-                        = new Version(buffer[5], buffer[6]).ToString();
-                    result.HorizontalResolution
-                        = (short)(buffer[8] * 256 + buffer[9]);
-                    result.VerticalResolution
-                        = (short)(buffer[10] * 256 + buffer[11]);
-                }
+                result.Version
+                    = new Version (buffer[5], buffer[6]).ToString();
+                result.HorizontalResolution
+                    = (short)(buffer[8] * 256 + buffer[9]);
+                result.VerticalResolution
+                    = (short)(buffer[10] * 256 + buffer[11]);
+            }
 
-                if (blockCode.IsOneOf<byte>(0xC0, 0xC1,
+            if (blockCode.IsOneOf<byte> (0xC0, 0xC1,
                     0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB,
                     0xCD, 0xCE, 0xCF))
+            {
+                if (file.ReadByte() < 0)
                 {
-                    if (file.ReadByte() < 0)
-                    {
-                        throw new IOException();
-                    }
-                    result.Height = _ReadUInt16(file);
-                    result.Width = _ReadUInt16(file);
-
-                    return result;
+                    throw new IOException();
                 }
-                file.Position = position + blockLength;
+
+                result.Height = _ReadUInt16 (file);
+                result.Width = _ReadUInt16 (file);
+
+                return result;
             }
 
-            throw new ApplicationException();
+            file.Position = position + blockLength;
         }
 
-        private static ImageInfo _GetPcxImageInfo
-            (
-                string fileName
-            )
-        {
-            throw new NotImplementedException(nameof(_GetPcxImageInfo));
-        }
-
-        private static ImageInfo _GetTgaImageInfo
-            (
-                string fileName
-            )
-        {
-            throw new NotImplementedException(nameof(_GetTgaImageInfo));
-        }
-
-        private static ImageInfo _GetTiffImageInfo
-            (
-                string fileName
-            )
-        {
-            throw new NotImplementedException(nameof(_GetTiffImageInfo));
-        }
-
-        private static ushort _ReadUInt16(Stream stream)
-        {
-            var buffer = new byte[2];
-            var readed = stream.Read(buffer, 0, 2);
-            if (readed != 2)
-            {
-                throw new IOException();
-            }
-            return (ushort)(buffer[0] * 256 + buffer[1]);
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Gets the image info.
-        /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <returns></returns>
-        public static ImageInfo FromFile
-            (
-                string fileName
-            )
-        {
-            var extension = Path.GetExtension(fileName)
-                .ThrowIfNull("extension")
-                .ToLowerInvariant();
-            switch (extension)
-            {
-                case ".bmp":
-                    return _GetBmpImageInfo(fileName);
-
-                case ".gif":
-                    return _GetGifImageInfo(fileName);
-
-                case ".jpeg":
-                case ".jpg":
-                case ".jfif":
-                    return _GetJpegImageInfo(fileName);
-
-                case ".pcx":
-                    return _GetPcxImageInfo(fileName);
-
-                case ".tga":
-                    return _GetTgaImageInfo(fileName);
-
-                case ".tif":
-                case ".tiff":
-                    return _GetTiffImageInfo(fileName);
-
-                default:
-                    throw new ArgumentException();
-            }
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => $"Width={Width} Height={Height} Colors={Colors}";
-
-        #endregion
+        throw new ApplicationException();
     }
+
+    private static ImageInfo _GetPcxImageInfo
+        (
+            string fileName
+        )
+    {
+        throw new NotImplementedException (nameof (_GetPcxImageInfo));
+    }
+
+    private static ImageInfo _GetTgaImageInfo
+        (
+            string fileName
+        )
+    {
+        throw new NotImplementedException (nameof (_GetTgaImageInfo));
+    }
+
+    private static ImageInfo _GetTiffImageInfo
+        (
+            string fileName
+        )
+    {
+        throw new NotImplementedException (nameof (_GetTiffImageInfo));
+    }
+
+    private static ushort _ReadUInt16 (Stream stream)
+    {
+        var buffer = new byte[2];
+        var readed = stream.Read (buffer, 0, 2);
+        if (readed != 2)
+        {
+            throw new IOException();
+        }
+
+        return (ushort)(buffer[0] * 256 + buffer[1]);
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Gets the image info.
+    /// </summary>
+    /// <param name="fileName">Name of the file.</param>
+    /// <returns></returns>
+    public static ImageInfo FromFile
+        (
+            string fileName
+        )
+    {
+        var extension = Path.GetExtension (fileName)
+            .ThrowIfNull ("extension")
+            .ToLowerInvariant();
+        switch (extension)
+        {
+            case ".bmp":
+                return _GetBmpImageInfo (fileName);
+
+            case ".gif":
+                return _GetGifImageInfo (fileName);
+
+            case ".jpeg":
+            case ".jpg":
+            case ".jfif":
+                return _GetJpegImageInfo (fileName);
+
+            case ".pcx":
+                return _GetPcxImageInfo (fileName);
+
+            case ".tga":
+                return _GetTgaImageInfo (fileName);
+
+            case ".tif":
+            case ".tiff":
+                return _GetTiffImageInfo (fileName);
+
+            default:
+                throw new ArgumentException();
+        }
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return $"Width={Width} Height={Height} Colors={Colors}";
+    }
+
+    #endregion
 }

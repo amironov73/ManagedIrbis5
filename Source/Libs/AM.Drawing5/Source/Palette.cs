@@ -6,10 +6,11 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable RedundantNameQualifier
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Palette.cs -- палитра цветов
+/* Palette.cs -- палитра цветов для пользовательского интерфейсов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,289 +23,285 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+
+using AM.Text;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Drawing
+namespace AM.Drawing;
+
+/// <summary>
+/// Палитра цветов для пользовательского интерфейса.
+/// </summary>
+[XmlRoot ("palette")]
+[System.ComponentModel.DesignerCategory ("Code")]
+public class Palette
+    : Collection<Tube>,
+    IXmlSerializable,
+    IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Палитра цветов.
+    /// Доступ к цвету палитры по его имени.
     /// </summary>
-    [XmlRoot("palette")]
-    // ReSharper disable RedundantNameQualifier
-    [System.ComponentModel.DesignerCategory("Code")]
-    // ReSharper restore RedundantNameQualifier
-    public class Palette
-        : Collection<Tube>,
-        IXmlSerializable,
-        IDisposable
+    public Tube this [string name] => _dictionary[name];
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор,
+    /// </summary>
+    public Palette()
     {
-        #region Properties
+        _dictionary = new Dictionary<string, Tube>();
+    }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="name"></param>
-        public Tube this[string name] => _dictionary[name];
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Construction
+    private readonly Dictionary<string, Tube> _dictionary;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Palette"/> class.
-        /// </summary>
-        public Palette()
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Добавляет указанный цвет с уникальным именем.
+    /// </summary>
+    public Tube Add
+        (
+            string name,
+            Color color
+        )
+    {
+        var result = new Tube (name, color);
+        Add (result);
+
+        return result;
+    }
+
+    /// <inheritdoc cref="Collection{T}.ClearItems"/>
+    protected override void ClearItems()
+    {
+        Dispose();
+        _dictionary.Clear();
+        base.ClearItems();
+    }
+
+    /// <summary>
+    /// Считывание палитры из атрибутов элементов пользовательского
+    /// интерфейсов.
+    /// </summary>
+    public void InitializeFromAttributes()
+    {
+        var properties = GetType()
+            .GetProperties (BindingFlags.Instance
+                            | BindingFlags.Public);
+        foreach (var property in properties)
         {
-            _dictionary = new Dictionary<string, Tube>();
-        }
-
-        /// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before the
-        /// <see cref="Palette"/> is reclaimed by garbage collection.
-        /// </summary>
-        ~Palette()
-        {
-            Dispose();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly Dictionary<string, Tube> _dictionary;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавляет указанный цвет с уникальным именем.
-        /// </summary>
-        public Tube Add
-            (
-                string name,
-                Color color
-            )
-        {
-            var result = new Tube(name, color);
-            Add(result);
-
-            return result;
-        }
-
-        /// <inheritdoc cref="Collection{T}.ClearItems"/>
-        protected override void ClearItems()
-        {
-            Dispose();
-            _dictionary.Clear();
-            base.ClearItems();
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public void InitializeFromAttributes()
-        {
-            var properties = GetType()
-                .GetProperties(BindingFlags.Instance
-                               | BindingFlags.Public);
-            foreach (var property in properties)
+            var attributes = property.GetCustomAttributes
+                (
+                    typeof (PaletteColorAttribute),
+                    true
+                );
+            foreach (PaletteColorAttribute attribute in attributes)
             {
-                var attributes = property.GetCustomAttributes
-                    (
-                        typeof(PaletteColorAttribute),
-                        true
-                    );
-                foreach (PaletteColorAttribute attribute in attributes)
-                {
-                    var name = property.Name;
-                    var color = Color.FromName(attribute.Color);
-                    Add(name, color);
-                }
+                var name = property.Name;
+                var color = Color.FromName (attribute.Color);
+                Add (name, color);
+            }
+        }
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    public Tube GetTubeFromReflection()
+    {
+        var frame = new StackFrame (1, false);
+        var funcName = frame.GetMethod()!.Name.Substring (4);
+        return this[funcName];
+    }
+
+    /// <inheritdoc cref="Collection{T}.InsertItem"/>
+    protected override void InsertItem
+        (
+            int index,
+            Tube item
+        )
+    {
+        if (_dictionary.ContainsKey (item.Name))
+        {
+            _dictionary.Remove (item.Name);
+        }
+
+        _dictionary.Add (item.Name, item);
+        base.InsertItem (index, item);
+    }
+
+    /// <inheritdoc cref="Collection{T}.RemoveItem"/>
+    protected override void RemoveItem (int index)
+    {
+        var item = this[index];
+        _dictionary.Remove (item.Name);
+        item.Dispose();
+        base.RemoveItem (index);
+    }
+
+    /// <inheritdoc cref="Collection{T}.SetItem"/>
+    protected override void SetItem
+        (
+            int index,
+            Tube item
+        )
+    {
+        if (_dictionary.ContainsKey (item.Name))
+        {
+            _dictionary.Remove (item.Name);
+
+            //Remove(item.Name);
+        }
+
+        _dictionary.Add (item.Name, item);
+        base.SetItem (index, item);
+    }
+
+    /// <summary>
+    /// Saves the specified file name.
+    /// </summary>
+    /// <param name="fileName">Name of the file.</param>
+    public void Save (string fileName)
+    {
+        var serializer = new XmlSerializer (typeof (Palette));
+        using var writer = new StreamWriter (fileName);
+        serializer.Serialize (writer, this);
+    }
+
+    /// <summary>
+    /// Reads the specified file name.
+    /// </summary>
+    /// <param name="fileName">Name of the file.</param>
+    /// <returns></returns>
+    public static Palette Read (string fileName)
+    {
+        var serializer = new XmlSerializer (typeof (Palette));
+        using var reader = new StreamReader (fileName);
+        var result = (Palette)serializer.Deserialize (reader)
+            .ThrowIfNull ("serializer.Deserialize");
+        return result;
+    }
+
+    /// <summary>
+    /// Removes the specified name.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    public void Remove (string name)
+    {
+        int index;
+        for (index = 0; index < Count; index++)
+        {
+            if (this[index].Name == name)
+            {
+                break;
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
-        public Tube GetTubeFromReflection ()
+        if (index >= Count)
         {
-            var frame = new StackFrame(1,false);
-            var funcName = frame.GetMethod()!.Name.Substring(4);
-            return this[funcName];
+            throw new KeyNotFoundException();
         }
 
-        /// <inheritdoc cref="Collection{T}.InsertItem"/>
-        protected override void InsertItem
-            (
-                int index,
-                Tube item
-            )
+        RemoveItem (index);
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        foreach (var tube in Items)
         {
-            if (_dictionary.ContainsKey(item.Name))
+            tube.Dispose();
+        }
+    }
+
+    #endregion
+
+    #region IXmlSerializable members
+
+    /// <inheritdoc cref="IXmlSerializable.GetSchema"/>
+    XmlSchema? IXmlSerializable.GetSchema()
+    {
+        return null;
+    }
+
+    /// <inheritdoc cref="IXmlSerializable.ReadXml"/>
+    void IXmlSerializable.ReadXml (XmlReader reader)
+    {
+        reader.Read();
+        while (true)
+        {
+            if (reader.Name != "tube")
             {
-                _dictionary.Remove(item.Name);
-            }
-            _dictionary.Add(item.Name,item);
-            base.InsertItem(index, item);
-        }
-
-        /// <inheritdoc cref="Collection{T}.RemoveItem"/>
-        protected override void RemoveItem(int index)
-        {
-            var item = this[index];
-            _dictionary.Remove(item.Name);
-            item.Dispose();
-            base.RemoveItem(index);
-        }
-
-        /// <inheritdoc cref="Collection{T}.SetItem"/>
-        protected override void SetItem
-            (
-                int index,
-                Tube item
-            )
-        {
-            if (_dictionary.ContainsKey(item.Name))
-            {
-                _dictionary.Remove(item.Name);
-                //Remove(item.Name);
-            }
-            _dictionary.Add(item.Name,item);
-            base.SetItem(index, item);
-        }
-
-        /// <summary>
-        /// Saves the specified file name.
-        /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        public void Save(string fileName)
-        {
-            var serializer = new XmlSerializer(typeof(Palette));
-            using var writer = new StreamWriter(fileName);
-            serializer.Serialize(writer, this);
-        }
-
-        /// <summary>
-        /// Reads the specified file name.
-        /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <returns></returns>
-        public static Palette Read(string fileName)
-        {
-            var serializer = new XmlSerializer(typeof(Palette));
-            using var reader = new StreamReader(fileName);
-            var result = (Palette)serializer.Deserialize(reader)
-                .ThrowIfNull("serializer.Deserialize");
-            return result;
-        }
-
-        /// <summary>
-        /// Removes the specified name.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        public void Remove(string name)
-        {
-            int index;
-            for (index = 0; index < Count; index++)
-            {
-                if (this[index].Name == name)
-                {
-                    break;
-                }
-            }
-            if (index >= Count)
-            {
-                throw new KeyNotFoundException();
-            }
-            RemoveItem(index);
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            foreach (var tube in Items)
-            {
-                tube.Dispose();
-            }
-        }
-
-        #endregion
-
-        #region IXmlSerializable members
-
-        /// <inheritdoc cref="IXmlSerializable.GetSchema"/>
-        XmlSchema? IXmlSerializable.GetSchema()
-        {
-            return null;
-        }
-
-        /// <inheritdoc cref="IXmlSerializable.ReadXml"/>
-        void IXmlSerializable.ReadXml(XmlReader reader)
-        {
-            reader.Read();
-            while (true)
-            {
-                if (reader.Name != "tube")
-                {
-                    break;
-                }
-                var tube = new Tube();
-                ((IXmlSerializable)tube).ReadXml(reader);
-                Add(tube);
-            }
-        }
-
-        /// <inheritdoc cref="IXmlSerializable.WriteXml"/>
-        void IXmlSerializable.WriteXml
-            (
-                XmlWriter writer
-            )
-        {
-            foreach (var tube in Items)
-            {
-                writer.WriteStartElement("tube");
-                ((IXmlSerializable)tube).WriteXml(writer);
-                writer.WriteEndElement();
-            }
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-
-            foreach (var item in Items)
-            {
-                result.AppendFormat
-                    (
-                        "{0}{1}",
-                        item,
-                        Environment.NewLine
-                    );
+                break;
             }
 
-            return result.ToString();
+            var tube = new Tube();
+            ((IXmlSerializable)tube).ReadXml (reader);
+            Add (tube);
+        }
+    }
+
+    /// <inheritdoc cref="IXmlSerializable.WriteXml"/>
+    void IXmlSerializable.WriteXml
+        (
+            XmlWriter writer
+        )
+    {
+        foreach (var tube in Items)
+        {
+            writer.WriteStartElement ("tube");
+            ((IXmlSerializable)tube).WriteXml (writer);
+            writer.WriteEndElement();
+        }
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+
+        foreach (var item in Items)
+        {
+            builder.AppendFormat
+                (
+                    "{0}{1}",
+                    item,
+                    Environment.NewLine
+                );
         }
 
-        #endregion
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-    } // class Palette
+        return result;
+    }
 
-} // namespace AM.Drawing
+    #endregion
+}
