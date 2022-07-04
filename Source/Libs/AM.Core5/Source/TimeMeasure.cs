@@ -36,10 +36,8 @@ public sealed class TimeMeasure
     /// <inheritdoc cref="Stopwatch.ElapsedMilliseconds"/>
     public long ElapsedMilliseconds => _stopwatch.ElapsedMilliseconds;
 
-
     /// <inheritdoc cref="Stopwatch.Elapsed"/>
     public TimeSpan Elapsed => _stopwatch.Elapsed;
-
 
     #endregion
 

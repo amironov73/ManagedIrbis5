@@ -1,0 +1,66 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/* AnonymousDisposable.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
+
+#endregion
+
+#nullable enable
+
+namespace AM;
+
+/// <summary>
+///
+/// </summary>
+public sealed class AnonymousDisposable
+    : SingleDisposable<Action>
+{
+    /// <summary>
+    /// Creates a new disposable that executes <paramref name="dispose"/> when disposed.
+    /// </summary>
+    /// <param name="dispose">The delegate to execute when disposed. If this is <c>null</c>, then this instance does nothing when it is disposed.</param>
+    public AnonymousDisposable(Action? dispose)
+        : base(dispose!)
+    {
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose(Action? context) => context?.Invoke();
+
+    /// <summary>
+    /// Adds a delegate to be executed when this instance is disposed. If this instance is already disposed or disposing, then <paramref name="dispose"/> is executed immediately.
+    /// If this method is called multiple times concurrently at the same time this instance is disposed, then the different <paramref name="dispose"/> arguments may be disposed concurrently.
+    /// </summary>
+    /// <param name="dispose">The delegate to add. May be <c>null</c> to indicate no additional action.</param>
+    public void Add(Action? dispose)
+    {
+        if (dispose == null)
+            return;
+        if (TryUpdateContext(x => x + dispose))
+            return;
+
+        // Wait for our disposal to complete; then call the additional delegate.
+        Dispose();
+        dispose();
+    }
+
+    /// <summary>
+    /// Creates a new disposable that executes <paramref name="dispose"/> when disposed.
+    /// </summary>
+    /// <param name="dispose">The delegate to execute when disposed. If this is <c>null</c>, then this instance does nothing when it is disposed.</param>
+    public static AnonymousDisposable Create(Action? dispose) => new AnonymousDisposable(dispose);
+}
