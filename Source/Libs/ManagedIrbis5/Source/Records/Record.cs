@@ -789,6 +789,24 @@ public sealed class Record
     }
 
     /// <summary>
+    /// Перечисление полей с указанной меткой.
+    /// </summary>
+    /// <param name="tag">Искомая метка поля.</param>
+    public IEnumerable<Field> EnumerateField
+        (
+            int tag
+        )
+    {
+        foreach (var field in Fields)
+        {
+            if (field.Tag == tag)
+            {
+                yield return field;
+            }
+        }
+    }
+
+    /// <summary>
     /// Получение заданного повторения поля с указанной меткой.
     /// </summary>
     public Field? GetField
@@ -813,24 +831,6 @@ public sealed class Record
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Перечисление полей с указанной меткой.
-    /// </summary>
-    /// <param name="tag">Искомая метка поля.</param>
-    public IEnumerable<Field> EnumerateField
-        (
-            int tag
-        )
-    {
-        foreach (var field in Fields)
-        {
-            if (field.Tag == tag)
-            {
-                yield return field;
-            }
-        }
     }
 
     /// <summary>

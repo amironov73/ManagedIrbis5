@@ -27,6 +27,7 @@ using AM.Collections;
 using AM.IO;
 using AM.Linq;
 
+using ManagedIrbis.Direct;
 using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
@@ -644,6 +645,32 @@ public static class SyncProviderUtility
         var found = connection.Search (parameters);
 
         return found?.Length ?? 0;
+    }
+
+    /// <summary>
+    /// Поиск с последующим чтением одной записи.
+    /// </summary>
+    public static Record[]? SearchReadRecords
+        (
+            this ISyncProvider connection,
+            string expression
+        )
+    {
+        var parameters = new SearchParameters
+        {
+            Expression = expression,
+            Database = connection.Database.ThrowIfNull(),
+            NumberOfRecords = 1
+        };
+        var found = connection.Search (parameters);
+
+        return found is null
+            ? default
+            : connection.ReadRecords
+                (
+                    connection.EnsureDatabase(),
+                    FoundItem.ToMfn (found)
+                );
     }
 
     /// <summary>

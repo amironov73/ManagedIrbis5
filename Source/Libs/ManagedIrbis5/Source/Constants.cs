@@ -79,6 +79,16 @@ public static class Constants
     public const string Nj = "NJ";
 
     /// <summary>
+    /// Подшивка журнала/газеты.
+    /// </summary>
+    public const string Njk = "NJK";
+
+    /// <summary>
+    /// Подшитые выпуски журнала/газеты.
+    /// </summary>
+    public const string Njp = "NJP";
+
+    /// <summary>
     /// Рабочий лист "OJ" для сводного описания журнала/газеты.
     /// </summary>
     public const string Oj = "OJ";

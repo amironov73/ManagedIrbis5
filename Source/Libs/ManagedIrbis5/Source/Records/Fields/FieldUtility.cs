@@ -52,17 +52,15 @@ public static class FieldUtility
     /// </summary>
     [Pure]
 
-    // ReSharper disable PossibleMultipleEnumeration
     public static Field[] GetField
         (
             this IEnumerable<Field> fields,
             int tag
         )
     {
-        Sure.NotNull (fields);
+        Sure.NotNull ((object?) fields);
 
         var list = new ValueList<Field>();
-
         foreach (var field in fields)
         {
             if (field.Tag == tag)
@@ -74,7 +72,69 @@ public static class FieldUtility
         return list.ToArray();
     }
 
-    // ReSharper restore PossibleMultipleEnumeration
+    /// <summary>
+    /// Фильтрация полей.
+    /// </summary>
+    /// <param name="fields"></param>
+    /// <param name="tag"></param>
+    /// <param name="code"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    [Pure]
+    public static Field[] GetField
+        (
+            this IEnumerable<Field> fields,
+            int tag,
+            char code,
+            string? value
+        )
+    {
+        Sure.NotNull ((object?) fields);
+
+        var list = new ValueList<Field>();
+
+        foreach (var field in fields)
+        {
+            if (field.Tag == tag
+                && field.HaveSubField (code, value))
+            {
+                list.Append (field);
+            }
+        }
+
+        return list.ToArray();
+    }
+
+    /// <summary>
+    /// Получение заданного повторения поля.
+    /// </summary>
+    public static Field? GetField
+        (
+            this IEnumerable<Field> fields,
+            int tag,
+            char code,
+            string? value,
+            int occurrence
+        )
+    {
+        Sure.NotNull ((object?) fields);
+
+        foreach (var field in fields)
+        {
+            if (field.Tag == tag
+                && field.HaveSubField (code, value))
+            {
+                if (occurrence == 0)
+                {
+                    return field;
+                }
+
+                --occurrence;
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// Фильтрация полей.
@@ -107,15 +167,13 @@ public static class FieldUtility
     /// Фильтрация полей.
     /// </summary>
     [Pure]
-
-    // ReSharper disable PossibleMultipleEnumeration
     public static Field[] GetField
         (
             this IEnumerable<Field> fields,
             IReadOnlyList<int> tags
         )
     {
-        Sure.NotNull (fields);
+        Sure.NotNull ((object?) fields);
         Sure.NotNull (tags);
 
         var list = new ValueList<Field>();
@@ -130,8 +188,6 @@ public static class FieldUtility
 
         return list.ToArray();
     }
-
-    // ReSharper restore PossibleMultipleEnumeration
 
     ///// <summary>
     ///// Фильтрация полей.
@@ -1176,7 +1232,7 @@ public static class FieldUtility
         (
             this Field field,
             char code,
-            string value
+            string? value
         )
     {
         Sure.NotNull (field);

@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* BindingConfiguration.cs -- конфигурация менеджера подшивок
+/* BindingConfiguration.cs -- конфигурация для менеджера подшивок
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -35,7 +35,7 @@ using AM.Text;
 namespace ManagedIrbis.Magazines;
 
 /// <summary>
-/// Конфигурация менеджера подшивок.
+/// Конфигурация для менеджера подшивок.
 /// </summary>
 [XmlRoot ("binding")]
 public sealed class BindingConfiguration
@@ -49,6 +49,7 @@ public sealed class BindingConfiguration
     /// </summary>
     [XmlElement ("good-status")]
     [JsonPropertyName ("goodStatus")]
+    [DisplayName ("Хорошие статусы")]
     [Description ("Статусы экземпляров, которые можно подшивать")]
     public string[]? GoodStatus { get; set; } = { "0" };
 
@@ -57,6 +58,7 @@ public sealed class BindingConfiguration
     /// </summary>
     [XmlElement ("good-worksheet")]
     [JsonPropertyName ("goodWorksheet")]
+    [DisplayName ("Хорошие рабочие листы")]
     [Description ("Рабочие листы, которые можно подшивать")]
     public string[]? GoodWorksheet { get; set; } = { "NJ" };
 
@@ -65,6 +67,7 @@ public sealed class BindingConfiguration
     /// </summary>
     [XmlArrayItem ("bad-place")]
     [JsonPropertyName ("badPlace")]
+    [DisplayName ("Плохие фонды")]
     [Description ("Фонды, которые нельзя подшивать")]
     public string[]? BadPlace { get; set; }
 

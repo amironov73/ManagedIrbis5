@@ -51,9 +51,10 @@ public interface IBindingManager
     /// <summary>
     /// Расшитие и удаление подшивки по ее индексу.
     /// </summary>
-    public void UnbindMagazines
+    public bool UnbindMagazines
         (
-            string bindingIndex
+            string bindingIndex,
+            bool deleteBinding = true
         );
 
 }

@@ -25,6 +25,7 @@ using AM.Text;
 #endregion
 
 #nullable enable
+
 namespace ManagedIrbis.Magazines;
 
 /// <summary>
@@ -221,6 +222,14 @@ public sealed class YearVolumeNumber
     #endregion
 
     #region Object members
+
+    /// <inheritdoc cref="object.GetHashCode"/>
+    public override int GetHashCode()
+    {
+        // ReSharper disable NonReadonlyMemberInGetHashCode
+        return HashCode.Combine (Year, Volume, Number);
+        // ReSharper restore NonReadonlyMemberInGetHashCode
+    }
 
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()

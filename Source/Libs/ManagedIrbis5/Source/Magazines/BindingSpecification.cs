@@ -5,8 +5,6 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* BindingSpecification.cs -- спецификация подшивки
  * Ars Magna project, http://arsmagna.ru
@@ -42,7 +40,8 @@ public sealed class BindingSpecification
     /// </remarks>
     [JsonPropertyName ("magazine")]
     [XmlAttribute ("magazine")]
-    [Description ("Шифр журнала")]
+    [DisplayName ("Шифр журнала")]
+    [Description ("Шифр журнала (обязательно)")]
     public string? MagazineIndex { get; set; }
 
     /// <summary>
@@ -53,7 +52,8 @@ public sealed class BindingSpecification
     /// </remarks>
     [JsonPropertyName ("year")]
     [XmlAttribute ("year")]
-    [Description ("Год")]
+    [DisplayName ("Год")]
+    [Description ("Год (обязательно)")]
     public string? Year { get; set; }
 
     /// <summary>
@@ -64,7 +64,8 @@ public sealed class BindingSpecification
     /// </remarks>
     [JsonPropertyName ("volume")]
     [XmlAttribute ("volume")]
-    [Description ("Номер тома")]
+    [DisplayName ("Том")]
+    [Description ("Номер тома (необязательно)")]
     public string? VolumeNumber { get; set; }
 
     /// <summary>
@@ -75,7 +76,8 @@ public sealed class BindingSpecification
     /// </remarks>
     [JsonPropertyName ("numbers")]
     [XmlAttribute ("numbers")]
-    [Description ("Номера выпусков")]
+    [DisplayName ("Номера")]
+    [Description ("Номера выпусков (обязательно)")]
     public string? IssueNumbers { get; set; }
 
     /// <summary>
@@ -86,7 +88,8 @@ public sealed class BindingSpecification
     /// </remarks>
     [JsonPropertyName ("description")]
     [XmlAttribute ("description")]
-    [Description ("Описание подшивки")]
+    [DisplayName ("Описание")]
+    [Description ("Описание подшивки (необязательно)")]
     public string? Description { get; set; }
 
     /// <summary>
@@ -97,7 +100,8 @@ public sealed class BindingSpecification
     /// </remarks>
     [JsonPropertyName ("number")]
     [XmlAttribute ("number")]
-    [Description ("Номер подшивки в году")]
+    [DisplayName ("Номер подшивки")]
+    [Description ("Номер подшивки в году (обязательно)")]
     public string? BindingNumber { get; set; }
 
     /// <summary>
@@ -108,7 +112,8 @@ public sealed class BindingSpecification
     /// </remarks>
     [JsonPropertyName ("inventory")]
     [XmlAttribute ("inventory")]
-    [Description ("Инвентарный номер подшивки")]
+    [DisplayName ("Инвентарный номер")]
+    [Description ("Инвентарный номер подшивки (обязательно)")]
     public string? Inventory { get; set; }
 
     /// <summary>
@@ -119,7 +124,8 @@ public sealed class BindingSpecification
     /// </remarks>
     [JsonPropertyName ("place")]
     [XmlAttribute ("place")]
-    [Description ("Место хранения подшивки")]
+    [DisplayName ("Место хранения")]
+    [Description ("Место хранения подшивки (обязательно)")]
     public string? Place { get; set; }
 
     /// <summary>
@@ -130,8 +136,47 @@ public sealed class BindingSpecification
     /// </remarks>
     [JsonPropertyName ("complect")]
     [XmlAttribute ("complect")]
-    [Description ("Номер комплекта")]
+    [DisplayName ("Номер комплекта")]
+    [Description ("Номер комплекта (обязательно)")]
     public string? Complect { get; set; }
+
+    /// <summary>
+    /// Номера за другие годы.
+    /// </summary>
+    [Browsable (false)]
+    [JsonPropertyName ("additional")]
+    [XmlElement ("additional")]
+    public YearVolumeNumbers[]? AdditionalYears { get; set; }
+
+    /// <summary>
+    /// Штрих-код или радиометка подшивки.
+    /// </summary>
+    [JsonPropertyName ("barcode")]
+    [XmlAttribute ("barcode")]
+    [DisplayName ("Метка")]
+    [Description ("Штрих-код или радиометка (необязательно)")]
+    public string? Barcode { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Формирование шифра документа для указанного выпуска.
+    /// </summary>
+    public string BuildIndex
+        (
+            string issueNumber
+        )
+    {
+        Sure.NotNullNorEmpty (issueNumber);
+
+        var result = string.IsNullOrEmpty (VolumeNumber)
+            ? $"{MagazineIndex}/{Year}/{issueNumber}"
+            : $"{MagazineIndex}/{Year}/{VolumeNumber}/{issueNumber}";
+
+        return result;
+    }
 
     #endregion
 
