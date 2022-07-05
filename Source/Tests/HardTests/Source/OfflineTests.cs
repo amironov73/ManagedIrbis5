@@ -47,6 +47,7 @@ internal static class OfflineTests
 
             var formatter = new HardFormat
                 (
+                    Magna.Host,
                     provider
                 );
             var builder = new StringBuilder();

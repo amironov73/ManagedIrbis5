@@ -78,6 +78,7 @@ namespace AM;
 /// <summary>
 /// Организация среды для приложения в целом.
 /// </summary>
+// нельзя делать static -- слетят дженерики
 public sealed class Magna
 {
     #region Properites
