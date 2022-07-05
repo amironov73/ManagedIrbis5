@@ -23,12 +23,17 @@ using AM.Collections;
 using AM.Text;
 
 using ManagedIrbis.Fields;
+using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Menus;
 using ManagedIrbis.Pft.Infrastructure.Unifors;
 using ManagedIrbis.Providers;
 using ManagedIrbis.Records;
 
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -58,7 +63,11 @@ public sealed class HardFormat
     /// Конструктор по умолчанию.
     /// </summary>
     public HardFormat()
-        : this (new NullProvider())
+        : this
+        (
+            Magna.Host,
+            new NullProvider()
+        )
     {
     }
 
@@ -67,6 +76,7 @@ public sealed class HardFormat
     /// </summary>
     public HardFormat
         (
+            IHost host,
             ISyncProvider provider,
             RecordConfiguration? configuration = null,
             IStringLocalizer? localizer = null,
@@ -77,9 +87,23 @@ public sealed class HardFormat
         Sure.NotNull (provider);
 
         AreaSeparator = string.Empty;
-        _configuration = configuration ?? RecordConfiguration.GetDefault();
-        _localizer = localizer ?? new NullLocalizer();
-        _driver = driver ?? new PlainFormatDriver();
+        _logger = LoggingUtility.GetLogger (host, typeof (HardFormat));
+
+        var services = host.Services;
+        _configuration = configuration
+            ?? services.GetService<RecordConfiguration> ()
+            ?? RecordConfiguration.GetDefault();
+
+        _localizer = localizer
+            ?? (IStringLocalizer?) services.GetService<IStringLocalizer<HardFormat>>()
+            ?? new NullLocalizer();
+
+        _driver = driver
+            ?? services.GetService<IFormatDriver>()
+            ?? new PlainFormatDriver();
+
+        cache ??= services.GetService<IMemoryCache>();
+
         _provider = provider;
 
         if (cache is not null)
@@ -99,6 +123,8 @@ public sealed class HardFormat
     #endregion
 
     #region Private members
+
+    private readonly ILogger _logger;
 
     private readonly RecordConfiguration _configuration;
 
@@ -121,10 +147,23 @@ public sealed class HardFormat
         )
     {
         var lastChar = builder.LastNonSpaceChar();
-        if (lastChar != '-')
+        if (lastChar != '-') // проверяем, есть ли предыдущий разделитель
         {
             var needDot = Array.IndexOf (_delimiters, lastChar) < 0;
             builder.Append (needDot ? ". - " : " - ");
+        }
+    }
+
+    private static void _AddWithSeparator
+        (
+            StringBuilder builder,
+            string? text
+        )
+    {
+        if (!string.IsNullOrEmpty (text))
+        {
+            _AddSeparator (builder);
+            builder.Append (text);
         }
     }
 
@@ -209,6 +248,45 @@ public sealed class HardFormat
     #region Public methods
 
     /// <summary>
+    /// Перекодирование значения через меню.
+    /// </summary>
+    public string? TranslateMenu
+        (
+            string menuName,
+            string? key
+        )
+    {
+        Sure.NotNullNorEmpty (menuName);
+
+        if (!_cache.TryGetValue (menuName, out MenuFile? menu))
+        {
+            var specification = new FileSpecification()
+            {
+                Database = _provider.EnsureDatabase(),
+                Path = IrbisPath.MasterFile,
+                FileName = menuName
+            };
+            menu = _provider.ReadMenu (specification);
+        }
+
+        if (menu is null)
+        {
+            _logger.LogDebug ("Can't find menu {MenuName}", menuName);
+            return key;
+        }
+
+        if (string.IsNullOrEmpty (key))
+        {
+            _logger.LogDebug ("Empty key for menu {MenuName}", menuName);
+            return key;
+        }
+
+        var result = menu.GetString (key);
+
+        return result;
+    }
+
+    /// <summary>
     /// Получение записи по ее шифру в базе.
     /// </summary>
     public Record? RecordByIndex
@@ -220,6 +298,7 @@ public sealed class HardFormat
 
         if (_cache.TryGetValue (index, out Record? result))
         {
+            _logger.LogDebug ("Can't find record by index \"{Index}\"", index);
             return result;
         }
 
@@ -239,7 +318,13 @@ public sealed class HardFormat
     {
         Sure.NotNull (record);
 
-        return _configuration.GetWorksheet (record);
+        var result = _configuration.GetWorksheet (record);
+        if (string.IsNullOrEmpty (result))
+        {
+            _logger.LogDebug ("No worksheet in MFN {Mfn}", record.Mfn);
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -297,6 +382,24 @@ public sealed class HardFormat
         if (enable)
         {
             builder.Append (AreaSeparator);
+        }
+    }
+
+    /// <summary>
+    /// Переход к новой области описания.
+    /// </summary>
+    public void NewArea
+        (
+            StringBuilder builder,
+            string? areaText
+        )
+    {
+        Sure.NotNull (builder);
+
+        if (!string.IsNullOrEmpty (areaText))
+        {
+            NewArea (builder);
+            builder.Append (areaText);
         }
     }
 
@@ -1111,7 +1214,7 @@ public sealed class HardFormat
                 NewArea (builder);
                 builder.Append (_localizer [items.Length == 1 ? "Страна" : "Страны"]);
                 builder.Append (": ");
-                var and = _localizer[" and "];
+                var and = _localizer[" и "];
                 builder.AppendList (items, KnownCountries.TranslateCode, union: and);
                 builder.AppendDot();
             }
@@ -1143,7 +1246,7 @@ public sealed class HardFormat
                 NewArea (builder);
                 builder.Append (_localizer [items.Length == 1 ? "Язык" : "Языки"]);
                 builder.Append (": ");
-                var and = _localizer[" and "];
+                var and = _localizer[" и "];
                 builder.AppendList (items, KnownLanguages.TranslateCode, union: and);
                 builder.AppendDot();
             }
@@ -1346,6 +1449,131 @@ public sealed class HardFormat
     }
 
     /// <summary>
+    /// Поле 337 - примечания об электронном документе.
+    /// </summary>
+    public void NotesForElectronicDocument
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        // |. - |v337^e,|. - |v337^f,|. - |v337^g,|. - |v337^h,|. - |v337^a
+        foreach (var field in record.EnumerateField (337))
+        {
+            _AddWithSeparator (builder, field['e']); // подполе E: источник основного заглавия
+            _AddWithSeparator (builder, field['f']); // подполе F: примечание о библиографической истории
+            _AddWithSeparator (builder, field['g']); // подполе G: примечание о датах
+            _AddWithSeparator (builder, field['h']); // подполе H: другие примечания
+            _AddWithSeparator (builder, field['a']); // подполе A: примечания в "собранном" виде
+        }
+    }
+
+    /// <summary>
+    /// Поле 982: патент, отчет о НИР, НТД и ЮД - спец. сведения.
+    /// </summary>
+    public void Patent
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        // TODO: отображать правильно
+
+        var fields = record.Fields.GetField (982);
+        foreach (var field in fields)
+        {
+            NewArea (builder);
+            var key = field['0']; // подполе 0: вид патентного или НТД документа
+            var kind = TranslateMenu ("vpatu.mnu", key);
+            builder.AppendWithSeparator
+                (
+                    " ",
+                    kind,
+                    field['9'] // подполе 9: номер документа
+                );
+        }
+    }
+
+    /// <summary>
+    /// Поле 902 - держатель документа.
+    /// </summary>
+    public void DocumentHolder
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        var holders = record.Fields.GetField (902);
+        if (!holders.IsNullOrEmpty())
+        {
+            NewArea (builder);
+            var title = holders.Length switch
+            {
+                1 => "Держатель документа",
+                _ => "Держатели документа"
+            };
+
+            builder.Append (_localizer[title]);
+            builder.Append (": ");
+            foreach (var holder in holders)
+            {
+                // |v902^a,| : |v902^b
+                NewLine (builder);
+                builder.AppendWithSeparator
+                    (
+                        " : ",
+                        holder['a'], // подполе A: наименование организации
+                        holder['b']  // подполе B: почтовый адрес
+                    );
+            }
+        }
+    }
+
+    /// <summary>
+    /// Различные примечания.
+    /// </summary>
+    public void Comments
+        (
+            StringBuilder builder,
+            Record record
+        )
+    {
+        void AddField (int tag)
+        {
+            foreach (var field in record.EnumerateField (tag))
+            {
+                NewArea (builder, field.Value);
+            }
+        }
+
+        Sure.NotNull (builder);
+        Sure.NotNull (record);
+
+        AddField (314); // поле 314: примечания об интеллектуальной ответственности
+        AddField (320); // поле 320: примечания о наличии библиографии
+        AddField (912); // поле 912: примечания о языке
+        AddField (300); // поле 300: общие примечания
+
+        // поле 541: перевод заглавия
+        foreach (var field in record.EnumerateField (541))
+        {
+            NewArea (builder);
+            builder.Append (_localizer["Перевод заглавия"]);
+            builder.Append (": ");
+            builder.Append (field.Value);
+        }
+    }
+
+    /// <summary>
     /// Краткое описание.
     /// </summary>
     public void Brief
@@ -1356,6 +1584,8 @@ public sealed class HardFormat
     {
         Sure.NotNull (builder);
         Sure.NotNull (record);
+
+        _logger.LogTrace ("Begin BriefDescription for MFN {Mfn}", record.Mfn);
 
         CommonAuthor (builder, record);
         CommonInfo (builder, record);
@@ -1372,9 +1602,13 @@ public sealed class HardFormat
         IsbnAndPrice (builder, record);
         Issn (builder, record);
         Identifier (builder, record);
+        Patent (builder, record);
         Countries (builder, record);
         Languages (builder, record);
         Print203 (builder, record);
+        Comments (builder, record);
+
+        _logger.LogTrace ("End BriefDescription for MFN {Mfn}", record.Mfn);
     }
 
     /// <summary>
@@ -1389,12 +1623,18 @@ public sealed class HardFormat
         Sure.NotNull (builder);
         Sure.NotNull (record);
 
+        _logger.LogTrace ("Begin FullDescription for MFN {Mfn}", record.Mfn);
+
         Brief (builder, record);
         Subjects (builder, record);
         Keywords (builder, record);
         Annotation (builder, record);
         ExternalObject (builder, record);
+        NotesForElectronicDocument (builder, record);
+        DocumentHolder (builder, record);
         Exemplars (builder, record);
+
+        _logger.LogTrace ("End FullDescription for MFN {Mfn}", record.Mfn);
     }
 
     #endregion
