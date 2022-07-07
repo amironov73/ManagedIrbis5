@@ -22,7 +22,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 
 using AM;
-using AM.AppServices;
 
 using ManagedIrbis;
 using ManagedIrbis.AppServices;
@@ -112,29 +111,16 @@ internal sealed class Program
             string[] args
         )
     {
-        try
-        {
-            new Program (args).Run();
-        }
-        catch (Exception exception)
-        {
-            Console.Error.WriteLine (exception);
-
-            return 1;
-        }
-
-        return 0;
+        return new Program (args)
+            .ConfigureCancelKey()
+            .Run<Program>();
     }
 
     #endregion
 
     #region IrbisApplication members
 
-    /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun
-        (
-            Func<int>? action
-        )
+    protected override int DoTheWork()
     {
         Debugger.Break();
         var mainConnection = (Connection as SyncConnection).ThrowIfNull();

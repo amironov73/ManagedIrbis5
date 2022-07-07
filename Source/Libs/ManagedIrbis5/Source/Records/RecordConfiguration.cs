@@ -665,6 +665,27 @@ public sealed class RecordConfiguration
     }
 
     /// <summary>
+    /// Проверка, всё ли нормально с рабочим листом?
+    /// </summary>
+    public bool WorksheetOK
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        if (record.GetFieldCount (WorksheetTag) != 1)
+        {
+            // должно быть только одно повторение
+            return false;
+        }
+
+        var worksheet = GetWorksheet (record);
+
+        return !string.IsNullOrWhiteSpace (worksheet);
+    }
+
+    /// <summary>
     /// Получение года издания (выхода из печати).
     /// </summary>
     public string? GetYear

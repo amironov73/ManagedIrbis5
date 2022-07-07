@@ -173,7 +173,7 @@ public sealed class LocalCatalogerIniFile
         };
 
         return settings.ToString();
-    } // method BuildConnectionString
+    }
 
     /// <summary>
     /// Получение значения из указанных секции и ключа.

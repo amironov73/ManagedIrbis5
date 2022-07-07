@@ -54,7 +54,7 @@ class Program
             return 1;
         }
 
-        var manager = new MagazineManager (connection);
+        var manager = new MagazineManager (Magna.Host, connection);
         var newspapers = manager.GetAllMagazines ("V=01");
         Console.WriteLine ($"Всего названий газет: {newspapers.Length}");
         newspapers = newspapers.OrderBy (n => n.Title!.Trim ('"')).ToArray();

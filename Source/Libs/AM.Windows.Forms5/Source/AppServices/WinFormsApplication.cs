@@ -21,8 +21,6 @@ using System.Windows.Forms;
 
 using AM.AppServices;
 
-using Microsoft.Extensions.Logging;
-
 #endregion
 
 #nullable enable
@@ -54,7 +52,7 @@ public class WinFormsApplication
             string[] args,
             MainForm? mainForm = null
         )
-        : base(args)
+        : base (args)
     {
         MainForm = mainForm!;
     }
@@ -63,53 +61,66 @@ public class WinFormsApplication
 
     #region MagnaApplication members
 
-    /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun
-        (
-            Func<int>? action
-        )
+    /// <inheritdoc cref="EarlyInitialization"/>
+    protected override void EarlyInitialization()
     {
+        base.EarlyInitialization();
+
+        Application.SetCompatibleTextRenderingDefault (false);
+        Application.SetHighDpiMode (HighDpiMode.SystemAware);
+        Application.EnableVisualStyles();
         Application.ThreadException += HandleThreadException;
 
-        try
+    }
+
+    /// <inheritdoc cref="FinalInitialization"/>
+    protected override bool FinalInitialization()
+    {
+        var mainForm = ((MainForm?) MainForm) ?? CreateMainForm();
+        MainForm = mainForm;
+        MainForm.ShowVersionInfoInTitle();
+
+        return true;
+    }
+
+    /// <inheritdoc cref="MagnaApplication.HandleException"/>
+    public override void HandleException
+        (
+            Exception exception
+        )
+    {
+        base.HandleException (exception);
+        ShowException (exception);
+    }
+
+    /// <summary>
+    /// Запуск приложения.
+    /// </summary>
+    public override int Run<TApplication>
+        (
+            Func<TApplication, int> runDelegate,
+            bool waitForHostShutdown = true,
+            bool shutdownHost = true
+        )
+    {
+        var timer = new System.Windows.Forms.Timer
         {
-            Application.SetCompatibleTextRenderingDefault (false);
-            Application.SetHighDpiMode (HighDpiMode.SystemAware);
-            Application.EnableVisualStyles();
-
-            // ReSharper disable NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
-
-            MainForm ??= CreateMainForm();
-            MainForm.ShowVersionInfoInTitle();
-
-            if (action is not null)
-            {
-                var timer = new System.Windows.Forms.Timer
-                {
-                    Interval = 10
-                };
-                timer.Tick += (sender, args) =>
-                {
-                    action();
-                    timer.Enabled = false;
-                };
-                timer.Enabled = true;
-            }
-
-            // ReSharper restore NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
-
-            VisualInitialization();
-            Application.Run (MainForm);
-            VisualShutdown();
-        }
-        catch (Exception exception)
+            Interval = 10
+        };
+        var result = int.MaxValue;
+        timer.Tick += (_, _) =>
         {
-            Logger.LogError (exception, "Exception occurred");
-            ShowException (exception);
-            return 1;
-        }
+            var self = (TApplication) Convert.ChangeType (this, typeof (TApplication));
+            result = runDelegate (self);
+            timer.Enabled = false;
+        };
+        timer.Enabled = true;
 
-        return MainForm.ReturnCode;
+        VisualInitialization();
+        Application.Run (MainForm);
+        VisualShutdown();
+
+        return result;
     }
 
     #endregion

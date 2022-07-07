@@ -9,8 +9,6 @@
 
 #region Using directives
 
-using System;
-
 using AM.AppServices;
 
 using Microsoft.Extensions.Logging;
@@ -22,30 +20,24 @@ namespace ApplicationExample;
 /// <summary>
 /// Наше приложение.
 /// </summary>
-internal class Program
-    : MagnaApplication
+internal static class Program
 {
-    /// <summary>
-    /// Конструктор.
-    /// </summary>
-    public Program (string[] args)
-        : base (args)
-    {
-    }
-
-    /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun
+    private static int ActualRun
         (
-            Func<int>? action
+            MagnaApplication application
         )
     {
-        Logger.LogInformation ("Привет из приложения!");
+        var logger = application.Logger;
+
+        logger.LogInformation ("Привет из приложения!");
 
         return 0;
     }
 
-    static int Main (string[] args)
+    public static int Main (string[] args)
     {
-        return new Program (args).Run();
+        return new MagnaApplication (args)
+            .ConfigureCancelKey()
+            .Run<MagnaApplication> (ActualRun);
     }
 }

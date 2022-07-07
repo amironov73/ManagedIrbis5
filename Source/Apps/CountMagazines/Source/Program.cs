@@ -19,7 +19,6 @@ using System.IO;
 using System.Linq;
 
 using AM;
-using AM.AppServices;
 
 using ManagedIrbis;
 using ManagedIrbis.AppServices;
@@ -37,39 +36,33 @@ namespace CountMagazines;
 /// <summary>
 /// Вся логика программы в одном классе.
 /// </summary>
-sealed class Program
+internal sealed class Program
     : IrbisApplication
 {
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public Program (string[] args)
-        : base (args)
+    public Program(string[] args)
+        : base(args)
     {
+        // пустое тело конструктора
     }
 
-    private static bool _stop;
-
-    /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun
-        (
-            Func<int>? action
-        )
+    protected override int DoTheWork()
     {
-        var connection = Connection!;
-        var manager = new MagazineManager (connection);
+        var manager = new MagazineManager (Magna.Host, Connection);
         var magazineList = File.ReadLines ("magazine-list.txt");
 
         foreach (var title in magazineList)
         {
-            if (_stop)
+            if (Stop)
             {
                 Logger.LogError ("Cancel key pressed");
                 break;
             }
 
             var expression = Search.Magazine (title).ToString();
-            var record = connection.SearchReadOneRecord (expression);
+            var record = Connection.SearchReadOneRecord (expression);
             if (record is null)
             {
                 Logger.LogError ("Can't find magazine {Title}", title);
@@ -87,23 +80,21 @@ sealed class Program
                 .Where (issue => issue.Year.SafeToInt32() >= 2017)
                 .ToArray();
             var loanCount = issues.Sum (issue => issue.LoanCount);
-            Console.WriteLine ($"{title}\t{issues.Length}\t{loanCount}");
+            var message = $"{title}\t{issues.Length}\t{loanCount}";
+            Logger.LogInformation ("Magazine: {Message}", magazine);
+            Console.WriteLine (message);
         }
 
         return 0;
     }
 
-    static void Main
+    public static int Main
         (
             string[] args
         )
     {
-        Console.TreatControlCAsInput = false;
-        Console.CancelKeyPress += (_, eventArgs) =>
-        {
-            _stop = true;
-            eventArgs.Cancel = true;
-        };
-        new Program (args).Run();
+        return new Program (args)
+            .ConfigureCancelKey()
+            .Run<Program>();
     }
 }

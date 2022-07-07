@@ -11,6 +11,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable VirtualMemberCallInConstructor
 // ReSharper disable VirtualMemberNeverOverridden.Global
 
 /* IrbisApplication.cs -- класс-приложение, работающее с ИРБИС64
@@ -31,8 +32,6 @@ using ManagedIrbis.Client;
 using ManagedIrbis.CommandLine;
 using ManagedIrbis.Providers;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 #endregion
@@ -52,23 +51,24 @@ public class IrbisApplication
     /// <summary>
     /// Настройки подключения.
     /// </summary>
-    [MaybeNull]
+    [AllowNull]
     public ConnectionSettings Settings { get; set; }
 
     /// <summary>
-    /// Подключение к серверу ИРБИС64.
+    /// Действующее подключение к серверу ИРБИС64.
     /// </summary>
-    [MaybeNull]
+    [AllowNull]
     public ISyncProvider Connection { get; set; }
 
     /// <summary>
-    /// Фабрика подключений.
+    /// Фабрика, использущаяся для создания подключений.
     /// </summary>
     public virtual ConnectionFactory Factory => ConnectionFactory.Shared;
 
     /// <summary>
     /// INI-файл.
     /// </summary>
+    [AllowNull]
     public LocalCatalogerIniFile IniFile { get; protected set; }
 
     #endregion
@@ -85,7 +85,7 @@ public class IrbisApplication
         )
         : base (args)
     {
-        IniFile = new LocalCatalogerIniFile (new IniFile());
+        // пустое тело конструктора
     }
 
     #endregion
@@ -99,24 +99,21 @@ public class IrbisApplication
     /// Метод обязан вернуть корректные настройки подключения
     /// либо выбросить исключение.
     /// </remarks>
-    protected internal virtual void BuildConnectionSettings()
+    protected internal virtual bool BuildConnectionSettings()
     {
-        Settings = new ConnectionSettings();
-
         // сначала берем настройки из INI-файла, если он есть
         var connectionString = IniFile.BuildConnectionString();
         if (!string.IsNullOrEmpty (connectionString))
         {
             Settings.ParseConnectionString (connectionString);
-            if (Settings.Verify (false))
-            {
-                return;
-            }
+
+            // достаточно INI-файла
+            return !Settings.Verify (false);
         }
 
         // сначала берем настройки из стандартного JSON-файла конфигурации
         connectionString = ConnectionUtility.GetConfiguredConnectionString (Configuration)
-                           ?? ConnectionUtility.GetStandardConnectionString();
+            ?? ConnectionUtility.GetStandardConnectionString();
 
         if (!string.IsNullOrEmpty (connectionString))
         {
@@ -146,23 +143,27 @@ public class IrbisApplication
         {
             throw new IrbisException ("Can't build connection settings");
         }
+
+        return false;
     }
 
     /// <summary>
     /// Конфигурирование подключения к серверу.
     /// </summary>
-    /// <param name="context">Контекст.</param>
-    /// <param name="services">Сервисы.</param>
-    protected virtual void ConfigureConnection
-        (
-            HostBuilderContext context,
-            IServiceCollection services
-        )
+    protected virtual bool ConfigureConnection()
     {
-        LoadIniFile();
-        BuildConnectionSettings();
-        Connection = Factory.CreateSyncConnection();
         Settings.ThrowIfNull().Apply (Connection);
+
+        return true;
+    }
+
+    /// <summary>
+    /// Создание подключения.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual ISyncProvider CreateConnection()
+    {
+        return Factory.CreateSyncConnection();
     }
 
     /// <summary>
@@ -178,10 +179,12 @@ public class IrbisApplication
         var iniName = GetIniFileName();
         if (string.IsNullOrEmpty (iniName))
         {
-            return false;
+            return true;
         }
 
-        var iniPath = Path.Combine (AppContext.BaseDirectory, iniName);
+        var iniPath = Path.IsPathFullyQualified (iniName)
+            ? iniName
+            : Path.Combine (AppContext.BaseDirectory, iniName);
         if (File.Exists (iniPath))
         {
             IniFile = LocalCatalogerIniFile.Load (iniPath);
@@ -192,72 +195,58 @@ public class IrbisApplication
         return false;
     }
 
+    /// <summary>
+    /// Подключение к серверу.
+    /// </summary>
+    protected virtual bool ConnectToServer()
+    {
+        Connection.Connect();
+        if (!Connection.Connected)
+        {
+            Logger.LogError ("Can't connect");
+            Logger.LogInformation
+                (
+                    "Last error: {LastError}",
+                    IrbisException.GetErrorDescription (Connection.LastError)
+                );
+
+            return false;
+        }
+        return true;
+    }
+
     #endregion
 
     #region MagnaApplication members
 
-    /// <inheritdoc cref="MagnaApplication.ConfigureServices"/>
-    protected override void ConfigureServices
-        (
-            HostBuilderContext context,
-            IServiceCollection services
-        )
+    /// <inheritdoc cref="MagnaApplication.EarlyInitialization"/>
+    protected override void EarlyInitialization()
     {
-        base.ConfigureServices (context, services);
+        base.EarlyInitialization();
 
-        services.RegisterIrbisProviders();
-        ConfigureConnection (context, services);
+        Connection = new NullProvider(); // временно
+        IniFile = new LocalCatalogerIniFile (new IniFile()); // временно
+        Settings = new ConnectionSettings(); // пусть пока будут по умолчанию
+        ConfigureServices (services => services.RegisterIrbisProviders());
     }
 
-    /// <inheritdoc cref="MagnaApplication.Run"/>
-    public override int Run
-        (
-            Func<int>? action = null
-        )
+    /// <inheritdoc cref="MagnaApplication.FinalInitialization"/>
+    protected override bool FinalInitialization()
     {
-        try
-        {
-            PreRun();
+        return base.FinalInitialization()
+               && LoadIniFile()
+               && BuildConnectionSettings()
+               && ConfigureConnection ()
+               && ConnectToServer();
+    }
 
-            using var host = Magna.Host;
-            using var connection = Connection.ThrowIfNull();
-            connection.Connect();
-            if (!connection.Connected)
-            {
-                Logger.LogError ("Can't connect");
-                Logger.LogInformation
-                    (
-                        "Last error: {LastError}",
-                        IrbisException.GetErrorDescription (connection.LastError)
-                    );
+    /// <inheritdoc cref="MagnaApplication.Cleanup"/>
+    protected override void Cleanup()
+    {
+        Connection.Disconnect();
+        Logger.LogInformation ("Disconnected from IRBIS server");
 
-                return 1;
-            }
-
-            Logger.LogInformation ("Successfully connected");
-
-            Magna.Host.Start();
-
-            var result = ActualRun();
-
-            Logger.LogInformation ("Disconnecting");
-
-            return result;
-        }
-        catch (Exception exception)
-        {
-            Logger.LogError
-                (
-                    exception,
-                    nameof (IrbisApplication) + "::" + nameof (Run)
-                    + ": {Type}: {Message}",
-                    exception.GetType(),
-                    exception.Message
-                );
-            Console.Error.WriteLine (exception);
-        }
-
-        return 1;
+        base.Cleanup();
     }
 
     #endregion

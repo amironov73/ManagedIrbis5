@@ -17,7 +17,6 @@ using System;
 using System.Linq;
 
 using AM;
-using AM.AppServices;
 
 using ManagedIrbis.AppServices;
 using ManagedIrbis.Magazines;
@@ -32,82 +31,66 @@ using Microsoft.Extensions.Logging;
 /// <summary>
 /// Вся логика программы в одном классе.
 /// </summary>
-internal sealed class Program
-    : IrbisApplication
+internal static class Program
 {
-    /// <summary>
-    /// Конструктор.
-    /// </summary>
-    private Program (string[] args)
-        : base (args)
-    {
-        ConfigureCancelKey();
-    }
-
-    /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun
+    private static int ActualRun
         (
-            Func<int>? action
+            IrbisApplication application
         )
     {
-        try
+        var connection = application.Connection;
+        var logger = application.Logger;
+        var manager = new MagazineManager (Magna.Host, connection);
+        var cumulator = new Cumulator();
+        var magazines = manager.GetAllMagazines()
+            .OrderBy (m => m.Title)
+            .ToArray();
+
+        // magazines = magazines.Take (50).ToArray();
+        logger.LogInformation ("Magazines found: {Length}", magazines.Length);
+
+        foreach (var magazine in magazines)
         {
-            using var connection = Connection!;
-
-            var manager = new MagazineManager (connection);
-            var cumulator = new Cumulator();
-            var magazines = manager.GetAllMagazines()
-                .OrderBy (m => m.Title)
-                .ToArray();
-            // magazines = magazines.Take (50).ToArray();
-            Logger.LogInformation ("Magazines found: {Length}", magazines.Length);
-
-            foreach (var magazine in magazines)
+            if (application.Stop)
             {
-                if (Stop)
-                {
-                    Logger.LogError ("Cancel key pressed");
-                    break;
-                }
-
-                // кумуляция у нас проживает в 909 поле
-                var record = magazine.Record.ThrowIfNull();
-                record.RemoveField (909);
-
-                var title = magazine.ExtendedTitle;
-                Logger.LogInformation ("Magazine: {Title}", title);
-
-                var issues = manager.GetIssues (magazine);
-                var cumulated = cumulator.Cumulate (issues, CumulationMethod.Complect);
-                foreach (var cumulation in cumulated)
-                {
-                    Logger.LogInformation ("{Cumulation}", cumulation.ToString());
-                    var field = cumulation.ToField();
-                    record.Add (field);
-                }
-
-                connection.WriteRecord (record, dontParse: true);
+                logger.LogError ("Cancel key pressed");
+                break;
             }
 
-            if (!Stop)
+            // кумуляция у нас проживает в 909 поле
+            var record = magazine.Record.ThrowIfNull();
+            record.RemoveField (909);
+
+            var title = magazine.ExtendedTitle;
+            logger.LogInformation ("Magazine: {Title}", title);
+
+            var issues = manager.GetIssues (magazine);
+            var cumulated = cumulator.Cumulate (issues, CumulationMethod.Complect);
+            foreach (var cumulation in cumulated)
             {
-                Console.WriteLine ("ALL DONE");
+                logger.LogInformation ("{Cumulation}", cumulation.ToString());
+                var field = cumulation.ToField();
+                record.Add (field);
             }
+
+            connection.WriteRecord (record, dontParse: true);
         }
-        catch (Exception exception)
+
+        if (!application.Stop)
         {
-            Logger.LogError (exception, "Error during recumulation");
-            return 1;
+            Console.WriteLine ("ALL DONE");
         }
 
         return 0;
     }
 
-    static void Main
+    private static int Main
         (
             string[] args
         )
     {
-        new Program (args).Run();
+        return new IrbisApplication (args)
+            .ConfigureCancelKey()
+            .Run<IrbisApplication> (ActualRun);
     }
 }

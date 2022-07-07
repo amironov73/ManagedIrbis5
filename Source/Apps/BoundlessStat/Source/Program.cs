@@ -18,7 +18,6 @@ using System;
 using System.Linq;
 
 using AM;
-using AM.AppServices;
 
 using ManagedIrbis;
 using ManagedIrbis.AppServices;
@@ -47,67 +46,54 @@ internal sealed class Program
     {
     }
 
-    private static volatile bool _stop;
-
-    /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-    protected override int ActualRun
-        (
-            Func<int>? action
-        )
+    protected override int DoTheWork()
     {
-        try
+        using var connection = (ISyncConnection)Connection;
+        var database = connection.EnsureDatabase();
+
+        var allBooks = connection.SearchAll ("V=KN");
+
+        // var allBooks = connection.Search ("V=KN");
+        Logger.LogInformation ("Found: {Length}", allBooks.Length);
+
+        var chunks = allBooks.Chunk (1000).ToArray();
+
+        foreach (var chunk in chunks)
         {
-            using var connection = (ISyncConnection) Connection!;
-            var database = connection.EnsureDatabase();
-
-            var allBooks = connection.SearchAll ("V=KN");
-            // var allBooks = connection.Search ("V=KN");
-            Logger.LogInformation ("Found: {Length}", allBooks.Length);
-
-            var chunks = allBooks.Chunk (1000).ToArray();
-
-            foreach (var chunk in chunks)
+            var records = connection.ReadRecords (database, chunk);
+            if (records is null)
             {
-                var records = connection.ReadRecords (database, chunk);
-                if (records is null)
-                {
-                    Logger.LogError ("Error reading records");
-                    return 1;
-                }
-
-                var formatted = connection.FormatRecords (chunk, IrbisFormat.Brief);
-                if (formatted is null)
-                {
-                    Logger.LogError ("Error formatting records");
-                    return 1;
-                }
-
-                if (records.Length != formatted.Length)
-                {
-                    Logger.LogError ("records.Length != formatted.Length");
-                    return 1;
-                }
-
-                var length = records.Length;
-                for (var i = 0; i < length; i++)
-                {
-                    var record = records[i];
-                    var brief = formatted[i];
-                    var knowledge = record.FM (60) ?? "нет"; // раздел знаний
-                    var count = record.FM (999).SafeToInt32();
-                    Console.WriteLine ($"{brief}\t{knowledge}\t{count}");
-                }
+                Logger.LogError ("Error reading records");
+                return 1;
             }
 
-            if (!_stop)
+            var formatted = connection.FormatRecords (chunk, IrbisFormat.Brief);
+            if (formatted is null)
             {
-                Console.WriteLine ("ALL DONE");
+                Logger.LogError ("Error formatting records");
+                return 1;
+            }
+
+            if (records.Length != formatted.Length)
+            {
+                Logger.LogError ("records.Length != formatted.Length");
+                return 1;
+            }
+
+            var length = records.Length;
+            for (var i = 0; i < length; i++)
+            {
+                var record = records[i];
+                var brief = formatted[i];
+                var knowledge = record.FM (60) ?? "нет"; // раздел знаний
+                var count = record.FM (999).SafeToInt32();
+                Console.WriteLine ($"{brief}\t{knowledge}\t{count}");
             }
         }
-        catch (Exception exception)
+
+        if (!Stop)
         {
-            Logger.LogError (exception, "Error during stat");
-            return 1;
+            Console.WriteLine ("ALL DONE");
         }
 
         return 0;
@@ -116,17 +102,13 @@ internal sealed class Program
     /// <summary>
     /// Точка входа в программу.
     /// </summary>
-    static void Main
+    public static int Main
         (
             string[] args
         )
     {
-        Console.TreatControlCAsInput = false;
-        Console.CancelKeyPress += (_, eventArgs) =>
-        {
-            _stop = true;
-            eventArgs.Cancel = true;
-        };
-        new Program (args).Run();
+        return new Program (args)
+            .ConfigureCancelKey()
+            .Run<Program>();
     }
 }

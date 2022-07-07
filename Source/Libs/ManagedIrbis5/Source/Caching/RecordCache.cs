@@ -99,10 +99,11 @@ public sealed class RecordCache
     private readonly MemoryCacheOptions _options;
     private IMemoryCache _cache;
 
-    private static string GetKey (int mfn) => string.Format
+    private string GetKey (int mfn) => string.Format
         (
             CultureInfo.InvariantCulture,
-            "_record_{0}",
+            "{0}_record_{1}",
+            Provider,
             mfn
         );
 

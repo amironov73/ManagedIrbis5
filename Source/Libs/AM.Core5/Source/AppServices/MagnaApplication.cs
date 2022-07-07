@@ -2,14 +2,18 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* MagnaApplication.cs -- класс-приложение
  * Ars Magna project, http://arsmagna.ru
@@ -21,14 +25,15 @@ using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Threading.Tasks;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 using NLog.Extensions.Logging;
 
@@ -46,9 +51,9 @@ public class MagnaApplication
     #region Events
 
     /// <summary>
-    /// Вызывается при работе приложения.
+    /// Вызывается при возникновении исключения.
     /// </summary>
-    public event EventHandler<MagnaApplicationEventArgs>? Running;
+    public event EventHandler<UnhandledExceptionEventArgs>? ExceptionOccurs;
 
     #endregion
 
@@ -81,9 +86,31 @@ public class MagnaApplication
     /// </summary>
     public bool Stop { get; set; }
 
+    /// <summary>
+    /// Хост.
+    /// </summary>
+    [AllowNull]
+    public IHost ApplicationHost { get; protected set; }
+
     #endregion
 
     #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public MagnaApplication
+        (
+            IHostBuilder builder,
+            string[]? args = null
+        )
+    {
+        Sure.NotNull (builder);
+
+        _builder = builder;
+        Args = args ?? Array.Empty<string>();
+        EarlyInitialization();
+    }
 
     /// <summary>
     /// Конструктор.
@@ -94,124 +121,77 @@ public class MagnaApplication
             string[] args
         )
     {
+        Sure.NotNull (args);
+
         Args = args;
+        _builder = Host.CreateDefaultBuilder (args);
+        EarlyInitialization();
     }
 
     #endregion
 
     #region Private members
 
-    private bool _prerun;
-
-    #endregion
-
-    #region Public methods
+    private readonly IHostBuilder _builder;
+    private bool _initialized, _shutdown;
+    private ServiceProvider? _preliminaryServices;
 
     /// <summary>
-    /// Построение конфигурации.
+    /// Проверяем, не поздно ли инициализироваться.
     /// </summary>
-    protected virtual IConfigurationBuilder BuildConfiguration()
+    protected void CheckForLateInitialization()
     {
-        var result = new ConfigurationBuilder()
-            .SetBasePath (AppContext.BaseDirectory)
-            .AddJsonFile ("appsettings.json", true, true)
-            .AddEnvironmentVariables()
-            .AddCommandLine (Args);
-
-        return result;
-    }
-
-    /// <summary>
-    /// Построение хоста.
-    /// </summary>
-    protected virtual IHostBuilder BuildHost()
-    {
-        return Host.CreateDefaultBuilder (Args);
-    }
-
-    /// <summary>
-    /// Корневая команда для разбора командной строки.
-    /// </summary>
-    protected virtual RootCommand? BuildRootCommand()
-    {
-        return null;
-    }
-
-    /// <summary>
-    /// Конфигурирование сервисов.
-    /// </summary>
-    /// <param name="context">Контекст.</param>
-    /// <param name="services">Коллекция сервисов.</param>
-    protected virtual void ConfigureServices
-        (
-            HostBuilderContext context,
-            IServiceCollection services
-        )
-    {
-        services.AddOptions();
-        services.AddLocalization();
-    }
-
-    /// <summary>
-    /// Настройка прекращения текущей операции по требованию пользователя.
-    /// </summary>
-    public virtual void ConfigureCancelKey()
-    {
-        Console.TreatControlCAsInput = false;
-        Console.CancelKeyPress += (_, eventArgs) =>
+        if (_initialized)
         {
-            Stop = true;
-            eventArgs.Cancel = true;
-        };
-    }
-
-    /// <summary>
-    /// Конфигурирование логирования.
-    /// </summary>
-    /// <param name="logging">Билдер.</param>
-    protected virtual void ConfigureLogging
-        (
-            ILoggingBuilder logging
-        )
-    {
-        logging.ClearProviders();
-        logging.AddNLog (Configuration);
-    }
-
-    /// <summary>
-    /// Разбор командной строки.
-    /// </summary>
-    protected virtual ParseResult? ParseCommandLine()
-    {
-        var rootCommand = BuildRootCommand();
-        if (rootCommand is null)
-        {
-            return null;
+            throw new ApplicationException ("Too late");
         }
-
-        var result = new CommandLineBuilder (rootCommand)
-            .UseDefaults()
-            .Build()
-            .Parse (Args);
-
-        return result;
     }
 
     /// <summary>
-    /// Конфигурирование перед запуском.
+    /// Проверяем, не забыли ли мы проинициализироваться.
     /// </summary>
-    protected virtual MagnaApplication PreRun()
+    protected void CheckForgottenInitialization()
     {
-        if (_prerun)
+        if (!_initialized)
         {
-            return this;
+            throw new ApplicationException ("Not initialized");
         }
+    }
+
+    /// <summary>
+    /// Проверяем, не заглушили ли мы приложение.
+    /// </summary>
+    protected void CheckForShutdown()
+    {
+        if (_shutdown)
+        {
+            throw new ApplicationException ("Application is already completed");
+        }
+    }
+
+    /// <summary>
+    /// Реальная работа приложения.
+    /// </summary>
+    /// <returns>Код завершения.</returns>
+    protected virtual int DoTheWork()
+    {
+        return 0;
+    }
+
+    /// <summary>
+    /// Первоначальная инициализация.
+    /// </summary>
+    protected virtual void EarlyInitialization()
+    {
+        Magna.Application = this;
+        ApplicationHost = new HostBuilder().Build(); // это временный хост
+        Magna.Host = ApplicationHost;
 
         Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
 
         // Это временный хост, чтобы сделать возможным логирование
         // до того, как всё проинициализируется окончательно
-        var preliminaryServices = new ServiceCollection()
+        _preliminaryServices = new ServiceCollection()
             .AddLogging (builder =>
             {
                 builder.ClearProviders();
@@ -219,122 +199,400 @@ public class MagnaApplication
             })
             .BuildServiceProvider();
 
-        Logger = preliminaryServices.GetRequiredService<ILogger<MagnaApplication>>();
-        Logger.LogInformation ("Preliminary logging enabled");
+        // временный логгер
+        Logger = _preliminaryServices.GetRequiredService<ILogger<MagnaApplication>>();
+        Logger.LogInformation ("Preliminary initialization started");
 
-        Magna.Application = this;
-        Configuration = BuildConfiguration().Build();
-        CommandLineParseResult = ParseCommandLine();
+        Configuration = new ConfigurationBuilder()
+            .SetBasePath (AppContext.BaseDirectory)
+            .AddJsonFile ("appsettings.json", true, true)
+            .AddEnvironmentVariables()
+            .AddCommandLine (Args)
+            .Build();
 
-        var hostBuilder = BuildHost();
-        hostBuilder.ConfigureServices (ConfigureServices);
-        hostBuilder.ConfigureServices
-            (
-                serviceCollection => serviceCollection.AddLogging (ConfigureLogging)
-            );
+        Logger.LogInformation ("Early initialization done");
+    }
 
-        var host = hostBuilder.Build();
-        Magna.Host = host;
+    /// <summary>
+    /// Окончательная инициализация.
+    /// </summary>
+    protected virtual bool FinalInitialization()
+    {
+        if (_initialized)
+        {
+            return true;
+        }
 
-        Logger.LogInformation ("Switching to main logging");
-        preliminaryServices.Dispose();
-        Logger = host.Services
-            .GetRequiredService<ILoggerFactory>()
-            .CreateLogger<MagnaApplication>();
+        Logger.LogInformation ("Final initialization started");
 
-        _prerun = true;
+        // освобождаем предварительные сервисы
+        _preliminaryServices?.Dispose();
+        _preliminaryServices = null;
 
-        Logger.LogInformation ("Pre-run configuration done");
+        _builder.ConfigureLogging (logging =>
+        {
+            logging.ClearProviders();
+            logging.AddNLog (Configuration);
+        });
+        _builder.ConfigureServices (services =>
+        {
+            services.AddOptions();
+            services.AddLocalization();
+        });
+
+        ApplicationHost = _builder.Build();
+        Magna.Host = ApplicationHost;
+        _initialized = true;
+        Logger = ApplicationHost.Services.GetRequiredService<ILogger<MagnaApplication>>();
+        Configuration = ApplicationHost.Services.GetRequiredService<IConfiguration>();
+
+        Logger.LogInformation ("Final initialization done");
+
+        return true;
+    }
+
+    /// <summary>
+    /// Вызывается в конце <see cref="Run{TApplication}(bool,bool)"/> и <see cref="RunAsync{T}"/>.
+    /// </summary>
+    protected virtual void Cleanup()
+    {
+        // пустое тело метода
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Настройка конфигурации для построения хоста приложения.
+    /// </summary>
+    public MagnaApplication ConfigureAppConfiguration
+        (
+            Action<HostBuilderContext,IConfigurationBuilder> configureDelegate
+        )
+    {
+        Sure.NotNull (configureDelegate);
+        CheckForLateInitialization();
+
+        _builder.ConfigureAppConfiguration (configureDelegate);
 
         return this;
     }
 
     /// <summary>
-    /// Собственно работа приложения.
-    /// Метод должен быть переопределен в классе-потомке.
+    /// Настройка прекращения текущей операции по требованию пользователя.
     /// </summary>
-    /// <returns>Код, возвращаемый операционной системе.</returns>
-    protected virtual int ActualRun
+    public virtual MagnaApplication ConfigureCancelKey()
+    {
+        Console.TreatControlCAsInput = false;
+        Console.CancelKeyPress += (_, eventArgs) =>
+        {
+            Stop = true;
+            eventArgs.Cancel = true;
+        };
+
+        return this;
+    }
+
+    /// <summary>
+    /// Настройка контейнера сервисов для хоста приложения.
+    /// </summary>
+    public MagnaApplication ConfigureContainer<TContainerBuilder>
         (
-            Func<int>? action = null
+            Action<HostBuilderContext, TContainerBuilder> configureDelegate
+        )
+        where TContainerBuilder: IContainer
+    {
+        Sure.NotNull (configureDelegate);
+        CheckForLateInitialization();
+
+        _builder.ConfigureContainer (configureDelegate);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Настройка конфигурации для самого построителя хоста.
+    /// </summary>
+    public virtual MagnaApplication ConfigureHostConfiguration
+        (
+            Action<IConfigurationBuilder> configureDelegate
         )
     {
-        int result;
+        Sure.NotNull (configureDelegate);
+        CheckForLateInitialization();
 
+        _builder.ConfigureHostConfiguration (configureDelegate);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Настройка логирования.
+    /// </summary>
+    public virtual MagnaApplication ConfigureLogging
+        (
+            Action<HostBuilderContext, ILoggingBuilder> configureDelegate
+        )
+    {
+        Sure.NotNull (configureDelegate);
+        CheckForLateInitialization();
+
+        _builder.ConfigureLogging (configureDelegate);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Добавление сервисов в контейнер. Метод может быть вызван несколько раз.
+    /// </summary>
+    public virtual MagnaApplication ConfigureServices
+        (
+            Action<HostBuilderContext, IServiceCollection> configureDelegate
+        )
+    {
+        Sure.NotNull (configureDelegate);
+        CheckForLateInitialization();
+
+        _builder.ConfigureServices (configureDelegate);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Добавление сервисов в контейнер. Метод может быть вызван несколько раз.
+    /// </summary>
+    public virtual MagnaApplication ConfigureServices
+        (
+            Action<IServiceCollection> configureDelegate
+        )
+    {
+        Sure.NotNull (configureDelegate);
+        CheckForLateInitialization();
+
+        _builder.ConfigureServices (configureDelegate);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Обработка исключения.
+    /// </summary>
+    public virtual void HandleException
+        (
+            Exception exception
+        )
+    {
+        Sure.NotNull (exception);
+
+        Logger.LogError
+            (
+                exception,
+                nameof (MagnaApplication) + "::" + nameof (Run)
+            );
+
+        var handler = ExceptionOccurs;
+        if (handler is not null)
+        {
+            var eventArgs = new UnhandledExceptionEventArgs (exception, true);
+            handler (this, eventArgs);
+        }
+    }
+
+    /// <summary>
+    /// Разбор командной строки.
+    /// </summary>
+    public virtual MagnaApplication ParseCommandLine
+        (
+            Func<RootCommand> rootCommandDelegate
+        )
+    {
+        Sure.NotNull (rootCommandDelegate);
+        CheckForLateInitialization();
+
+        var rootCommand = rootCommandDelegate();
+        CommandLineParseResult = new CommandLineBuilder (rootCommand)
+            .UseDefaults()
+            .Build()
+            .Parse (Args);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Запрос сервиса, который обязательно должен быть.
+    /// </summary>
+    public virtual TService RequireService<TService>()
+        where TService: class
+    {
+        CheckForgottenInitialization();
+        CheckForShutdown();
+
+        return ApplicationHost.Services.GetRequiredService<TService>();
+    }
+
+    /// <summary>
+    /// Запуск приложения с переопределенным методом <see cref="DoTheWork"/>.
+    /// </summary>
+    /// <returns>Код завершения.</returns>
+    public int Run<TApplication>
+        (
+            bool waitForHostShutdown = true,
+            bool shutdownHost = true
+        )
+        where TApplication: MagnaApplication
+    {
+        Func<TApplication, int> func = self => DoTheWork();
+
+        return Run (func, waitForHostShutdown, shutdownHost);
+    }
+
+    /// <summary>
+    /// Запуск приложения.
+    /// </summary>
+    public virtual int Run<TApplication>
+        (
+            Func<TApplication, int> runDelegate,
+            bool waitForHostShutdown = true,
+            bool shutdownHost = true
+        )
+        where TApplication: MagnaApplication
+    {
+        Sure.NotNull (runDelegate);
+
+        if (!FinalInitialization())
+        {
+            return int.MaxValue;
+        }
+
+        var result = int.MaxValue;
         try
         {
-            result = action?.Invoke() ?? 0;
+            ApplicationHost.Start();
+
+            result = runDelegate ((TApplication) this);
+
+            if (waitForHostShutdown)
+            {
+                ApplicationHost.WaitForShutdown();
+                _shutdown = true;
+            }
         }
         catch (Exception exception)
         {
-            Logger.LogError
-                (
-                    exception,
-                    nameof (MagnaApplication) + "::" + nameof (ActualRun)
-                );
-
-            return -1;
+            HandleException (exception);
         }
 
-        if (result == 0)
-        {
-            var handler = Running;
-            if (handler is not null)
-            {
-                var args = new MagnaApplicationEventArgs ();
-                try
-                {
-                    handler (this, args);
-                    result = args.ExitCode;
-                }
-                catch (Exception exception)
-                {
-                    Logger.LogError
-                        (
-                            exception,
-                            nameof (MagnaApplication) + "::" + nameof (ActualRun)
-                        );
+        Cleanup();
 
-                    return -1;
-                }
-            }
+        if (shutdownHost)
+        {
+            ApplicationHost.Dispose();
+            _shutdown = true;
         }
 
         return result;
     }
 
     /// <summary>
-    /// Собственно работа приложения.
+    /// Запуск приложения.
     /// </summary>
-    /// <returns>Код, возвращаемый операционной системе.
-    /// </returns>
-    public virtual int Run
+    public virtual async Task<int> RunAsync<TApplication>
         (
-            Func<int>? action = null
+            Func<TApplication, Task<int>> runDelegate,
+            bool waitForHostShutdown = true,
+            bool shutdownHost = true
         )
+        where TApplication: MagnaApplication
     {
+        Sure.NotNull (runDelegate);
+
+        if (!FinalInitialization())
+        {
+            return int.MaxValue;
+        }
+
+        var result = int.MaxValue;
         try
         {
-            Logger = new NullLogger<MagnaApplication>();
+            await ApplicationHost.StartAsync();
 
-            PreRun();
+            result = await runDelegate ((TApplication) this);
 
-            using var host = Magna.Host;
-
-            host.Start();
-
-            return ActualRun (action);
+            if (waitForHostShutdown)
+            {
+                await ApplicationHost.WaitForShutdownAsync();
+                _shutdown = true;
+            }
         }
         catch (Exception exception)
         {
-            Logger.LogError
-                (
-                    exception,
-                    nameof (MagnaApplication) + "::" + nameof (Run)
-                );
+            HandleException (exception);
         }
 
-        return 1;
+        if (shutdownHost)
+        {
+            ApplicationHost.Dispose();
+            _shutdown = true;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Отправка хосту команды "пора завершаться".
+    /// </summary>
+    public void Shutdown()
+    {
+        if (_shutdown)
+        {
+            return;
+        }
+
+        CheckForgottenInitialization();
+
+        var application = ApplicationHost.Services
+            .GetRequiredService<IHostApplicationLifetime>()
+            .ThrowIfNull ();
+        application.StopApplication();
+        _shutdown = true;
+    }
+
+    /// <summary>
+    /// Фабрика, используемая для создания провайдера сервисов.
+    /// </summary>
+    public virtual MagnaApplication UseServiceProviderFactory<TContainerBuilder>
+        (
+            IServiceProviderFactory<TContainerBuilder> providerFactory
+        )
+        where TContainerBuilder: IContainer
+    {
+        Sure.NotNull (providerFactory);
+        CheckForLateInitialization();
+
+        _builder.UseServiceProviderFactory (providerFactory);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Ожидание завершения приложения.
+    /// </summary>
+    public virtual void WaitForShutdown()
+    {
+        CheckForgottenInitialization();
+
+        ApplicationHost.WaitForShutdown();
+    }
+
+    /// <summary>
+    /// Ожидание завершения приложения.
+    /// </summary>
+    public virtual Task WaitForShutdownAsync()
+    {
+        CheckForgottenInitialization();
+
+        return ApplicationHost.WaitForShutdownAsync();
     }
 
     #endregion

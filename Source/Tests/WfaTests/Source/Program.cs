@@ -6,10 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
 /* Program.cs -- точка входа в приложение
@@ -21,7 +18,7 @@
 using System;
 using System.Windows.Forms;
 
-using AM;
+using AM.AppServices;
 using AM.Windows.Forms.AppServices;
 
 #endregion
@@ -44,7 +41,7 @@ internal sealed class Program
             string[] args,
             MainForm? mainForm = null
         )
-        : base(args, mainForm)
+        : base (args, mainForm)
     {
         // пустое тело конструктора
     }
@@ -53,11 +50,34 @@ internal sealed class Program
 
     #region WinFormsApplication members
 
-    // /// <inheritdoc cref="WinFormsApplication.CreateMainForm"/>
-    // public override MainForm CreateMainForm()
-    // {
-    //     return new MyMainForm();
-    // }
+    /// <inheritdoc cref="MagnaApplication.DoTheWork"/>
+    protected override int DoTheWork()
+    {
+        MainForm.WriteLog ("Hello from WinFormsApp");
+        MainForm.WriteLog ("Hello again");
+        MainForm.AddToolButton ("Hello").Click += (sender, eventArgs) =>
+        {
+            MessageBox.Show ("Hello");
+        };
+
+        MainForm.AddToolButton ("World").Click += (sender, eventArgs) =>
+        {
+            MessageBox.Show ("World");
+        };
+
+        MainForm.AddStatusLabel ("Status1");
+        MainForm.AddStatusLabel ("Status2");
+        MainForm.AddStatusLabel ("Status3");
+        MainForm.AddMenuItem ("File")
+            .DropDownItems.Add ("Exit", null, (sender, eventArgs) =>
+            {
+                MessageBox.Show ("Exit");
+            });
+        MainForm.AddMenuItem ("Edit");
+        MainForm.AddMenuItem ("View");
+
+        return 0;
+    }
 
     /// <inheritdoc cref="WinFormsApplication.VisualInitialization"/>
     public override void VisualInitialization()
@@ -73,36 +93,9 @@ internal sealed class Program
     ///  The main entry point for the application.
     /// </summary>
     [STAThread]
-    static int Main (string[] args)
+    public static int Main (string[] args)
     {
-        return new Program (args).Run(() =>
-        {
-            var app = (Program) Magna.Application;
-            var main = app.MainForm;
-
-            main.WriteLog ("Hello from WinFormsApp");
-            main.WriteLog ("Hello again");
-            main.AddToolButton ("Hello").Click += (sender, eventArgs) =>
-            {
-                MessageBox.Show ("Hello");
-            };
-            main.AddToolButton ("World").Click += (sender, eventArgs) =>
-            {
-                MessageBox.Show ("World");
-            };
-            main.AddStatusLabel ("Status1");
-            main.AddStatusLabel ("Status2");
-            main.AddStatusLabel ("Status3");
-            main.AddMenuItem ("File")
-                .DropDownItems.Add ("Exit", null, (sender, eventArgs) =>
-                {
-                    MessageBox.Show ("Exit");
-                });
-            main.AddMenuItem ("Edit");
-            main.AddMenuItem ("View");
-
-            return 0;
-        });
+        return new Program (args).Run<WinFormsApplication>();
     }
 
     #endregion

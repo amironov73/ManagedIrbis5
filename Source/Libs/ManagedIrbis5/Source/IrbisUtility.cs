@@ -263,6 +263,32 @@ public static class IrbisUtility
     }
 
     /// <summary>
+    /// Текущий рабочий лист соответствует сводной записи журнала?
+    /// </summary>
+    [Pure]
+    public static bool IsMagazineSummary
+        (
+            string? worksheet
+        )
+    {
+        return worksheet.SameString ("J");
+    }
+
+    /// <summary>
+    /// Текущий рабочий лист соответствует выпуску журнала?
+    /// </summary>
+    [Pure]
+    public static bool IsMagazineIssue
+        (
+            string? worksheet
+        )
+    {
+        return worksheet.SameString (Constants.Nj)
+            || worksheet.SameString (Constants.Njp)
+            || worksheet.SameString (Constants.Spec);
+    }
+
+    /// <summary>
     /// Текущий рабочий лист ASP?
     /// </summary>
     [Pure]
@@ -271,7 +297,7 @@ public static class IrbisUtility
             string? worksheet
         )
     {
-        return worksheet.SameString ("ASP");
+        return worksheet.SameString (Constants.Asp);
     }
 
     /// <summary>
