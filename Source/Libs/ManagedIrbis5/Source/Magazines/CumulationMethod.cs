@@ -4,9 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
-/* CumulationMethod.cs -- метод кумуляции
+/* CumulationMethod.cs -- метод кумуляции выпусков журналов/газет
  * Ars Magna project, http://arsmagna.ru
  */
 

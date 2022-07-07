@@ -49,11 +49,21 @@ public interface IBindingManager
         );
 
     /// <summary>
+    /// Проверка номера журнала/газеты на возможность добавления в подшивку.
+    /// </summary>
+    bool CheckIssue
+        (
+            BindingSpecification specification,
+            Record record
+        );
+
+    /// <summary>
     /// Расшитие и удаление подшивки по ее индексу.
     /// </summary>
     public bool UnbindMagazines
         (
             string bindingIndex,
+            bool decumulate = true,
             bool deleteBinding = true
         );
 

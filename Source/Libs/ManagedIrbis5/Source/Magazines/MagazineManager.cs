@@ -17,6 +17,7 @@
 
 #region Using directives
 
+using System;
 using System.Linq;
 
 using AM;
@@ -26,6 +27,11 @@ using AM.Linq;
 using ManagedIrbis.Batch;
 using ManagedIrbis.Fields;
 using ManagedIrbis.Providers;
+using ManagedIrbis.Records;
+
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -57,25 +63,92 @@ public sealed class MagazineManager
     /// <summary>
     /// Клиент для связи с сервером.
     /// </summary>
+    public ISyncProvider Connection { get; }
 
-    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local
-    public ISyncProvider Connection { get; private set; }
+    /// <summary>
+    /// Конфигурация библиографических записей.
+    /// </summary>
+    public RecordConfiguration RecordConfiguration { get; }
 
     #endregion
 
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public MagazineManager
         (
-            ISyncProvider connection
+            IHost host,
+            ISyncProvider connection,
+            RecordConfiguration? recordConfiguration = null
         )
     {
+        Sure.NotNull (host);
         Sure.NotNull (connection);
 
+        _logger = LoggingUtility.GetLogger (host, typeof (BindingManager));
+        var options = new MemoryCacheOptions();
+        _cache = new MemoryCache (options);
         Connection = connection;
+        RecordConfiguration = recordConfiguration ?? RecordConfiguration.GetDefault();
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly ILogger _logger;
+    private readonly IMemoryCache _cache;
+
+    /// <summary>
+    /// Получение записи по ее шифру в базе.
+    /// </summary>
+    private Record? _GetRecordByIndex
+        (
+            string index
+        )
+    {
+        if (!_cache.TryGetValue (index, out Record? result))
+        {
+            result = Connection.ByIndex (index);
+            if (result is not null)
+            {
+                _cache.Set (index, result);
+            }
+        }
+
+        if (result is null)
+        {
+            _logger.LogDebug ("No record with index\"{Index}\"", index);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Получение рабочего листа по шифру в базе. Логирование проблем.
+    /// </summary>
+    private string? _GetWorksheetByIndex
+        (
+            string index
+        )
+    {
+        var record = _GetRecordByIndex (index);
+        if (record is null)
+        {
+            return null;
+        }
+
+        if (!RecordConfiguration.WorksheetOK (record))
+        {
+            _logger.LogDebug ("Problem with worksheet: Index=\"{Index}\", MFN={Mfn}", index, record.Mfn);
+            return null;
+        }
+
+        var result = RecordConfiguration.GetWorksheet (record);
+
+        return result;
     }
 
     #endregion
@@ -130,7 +203,7 @@ public sealed class MagazineManager
     {
         Sure.NotNullNorEmpty (index);
 
-        var record = Connection.ByIndex (index);
+        var record = _GetRecordByIndex (index);
 
         return record is null ? null : MagazineInfo.Parse (record);
     }
@@ -161,7 +234,7 @@ public sealed class MagazineManager
         Sure.VerifyNotNull (issue);
 
         var index = issue.BuildIssueIndex();
-        var record = Connection.ByIndex (index);
+        var record = _GetRecordByIndex (index);
 
         return record is null ? null : MagazineInfo.Parse (record);
     }
@@ -179,7 +252,7 @@ public sealed class MagazineManager
         var source = article.Sources.ThrowIfNullOrEmpty().First();
         source.Verify (true);
         var index = source.Index.ThrowIfNullOrEmpty (); // шифр выпуска
-        var record = Connection.ByIndex (index);
+        var record = _GetRecordByIndex (index);
 
         return record is null ? null : MagazineIssueInfo.Parse (record);
     }
@@ -199,7 +272,7 @@ public sealed class MagazineManager
         Sure.NotNullNorEmpty (number);
 
         var index = magazine.BuildIssueIndex (year, number);
-        var record = Connection.ByIndex (index);
+        var record = _GetRecordByIndex (index);
         if (record is null)
         {
             return null;
@@ -225,7 +298,7 @@ public sealed class MagazineManager
         Sure.NotNullNorEmpty (number);
 
         var index = magazine.BuildIssueIndex (year, volume, number);
-        var record = Connection.ByIndex (index);
+        var record = _GetRecordByIndex (index);
 
         return record is null ? null : MagazineIssueInfo.Parse (record);
     }
@@ -241,8 +314,9 @@ public sealed class MagazineManager
     {
         Sure.VerifyNotNull (magazine);
         Sure.VerifyNotNull (yearVolumeNumber);
+
         var index = magazine.BuildIssueIndex (yearVolumeNumber);
-        var record = Connection.ByIndex (index);
+        var record = _GetRecordByIndex (index);
 
         return record is null ? null : MagazineIssueInfo.Parse (record);
     }
@@ -258,8 +332,9 @@ public sealed class MagazineManager
     {
         Sure.NotNullNorEmpty (magazineIndex);
         Sure.VerifyNotNull (yearVolumeNumber);
+
         var index = magazineIndex + "/" + yearVolumeNumber;
-        var record = Connection.ByIndex (index);
+        var record = _GetRecordByIndex (index);
 
         return record is null ? null : MagazineIssueInfo.Parse (record);
     }
@@ -377,9 +452,17 @@ public sealed class MagazineManager
         Sure.VerifyNotNull (magazine);
         Sure.VerifyNotNull (yearVolumeNumber);
 
+        _logger.LogTrace
+            (
+                "Creating issue {Issue} for magazine {Magazine}",
+                yearVolumeNumber,
+                magazine
+            );
+
         var magazineIndex = magazine.Index.ThrowIfNullOrEmpty();
         var issueIndex = magazineIndex + "/" + yearVolumeNumber;
-        var record = Connection.ByIndex (issueIndex);
+        var record = _GetRecordByIndex (issueIndex);
+
         MagazineIssueInfo result;
         if (record is not null)
         {
@@ -420,18 +503,47 @@ public sealed class MagazineManager
     }
 
     /// <summary>
+    /// Регистрация выпуска журнала в базе по описанию.
+    /// </summary>
+    public MagazineIssueInfo RegisterIssue
+        (
+            MagazineInfo magazine,
+            YearVolumeNumber yearVolumeNumber,
+            ExemplarInfo[]? exemplars,
+            string? supplement = null
+        )
+    {
+        Sure.VerifyNotNull (magazine);
+        Sure.VerifyNotNull (yearVolumeNumber);
+
+        _logger.LogTrace
+            (
+                "Registering issue {Issue} for magazine {Magazine}",
+                yearVolumeNumber,
+                magazine
+            );
+
+        // var magazineIndex = magazine.Index.ThrowIfNullOrEmpty();
+        // var issueIndex = magazineIndex + "/" + yearVolumeNumber;
+
+        // TODO: зарегистрировать выпуск
+
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
     /// Существует ли сводная запись журнала с указанным шифром?
     /// </summary>
-    public bool MagazineByIndex
+    public bool MagazineExist
         (
             string index
         )
     {
         Sure.NotNullNorEmpty (index);
 
-        var record = Connection.ByIndex (index);
+        var worksheet = _GetWorksheetByIndex (index);
 
-        return record is not null;
+        return IrbisUtility.IsMagazineSummary (worksheet);
     }
 
     /// <summary>
@@ -449,13 +561,13 @@ public sealed class MagazineManager
         Sure.NotNullNorEmpty (number);
 
         var index = magazineIndex + "/" + year + "/" + number;
-        var record = Connection.ByIndex (index);
+        var worksheet = _GetWorksheetByIndex (index);
 
-        return record is not null;
+        return IrbisUtility.IsMagazineIssue (worksheet);
     }
 
     /// <summary>
-    /// Существует ли запись выпуска с указанными шифром, годом и номером?
+    /// Существует ли запись выпуска с указанными шифром, годом, томом и номером?
     /// </summary>
     public bool IssueExist
         (
@@ -471,9 +583,9 @@ public sealed class MagazineManager
         Sure.NotNullNorEmpty (number);
 
         var index = magazineIndex + "/" + year + "/" + volume + "/" + number;
-        var record = Connection.ByIndex (index);
+        var worksheet = _GetWorksheetByIndex (index);
 
-        return record is not null;
+        return IrbisUtility.IsMagazineIssue (worksheet);
     }
 
     /// <summary>
@@ -489,9 +601,9 @@ public sealed class MagazineManager
         Sure.VerifyNotNull (yearVolumeNumber);
 
         var index = magazineIndex + "/" + yearVolumeNumber;
-        var record = Connection.ByIndex (index);
+        var worksheet = _GetWorksheetByIndex (index);
 
-        return record is not null;
+        return IrbisUtility.IsMagazineIssue (worksheet);
     }
 
     #endregion

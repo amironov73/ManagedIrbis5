@@ -126,6 +126,28 @@ public sealed class BindingManager
             throw new IrbisException ("Empty list of magazine issues");
         }
 
+        foreach (var number in numbers)
+        {
+            var numberText = number.ToString();
+            var issueIndex = specification.BuildIndex (numberText);
+            var issueRecord = Provider.ByIndex (issueIndex);
+            if (issueRecord is null)
+            {
+                if (specification.IssueMustExist)
+                {
+                    _logger.LogError ("Can't find issue {IssueNumber}", numberText);
+                    throw new IrbisException ($"Can't find issue {numberText}");
+                }
+            }
+            else
+            {
+                if (!CheckIssue (specification, issueRecord))
+                {
+                    throw new IrbisException();
+                }
+            }
+        }
+
         var bindingDescription = specification.Description.ThrowIfNullOrEmpty ();
         var bindingIndex = specification.BuildIndex (bindingDescription);
 
@@ -253,7 +275,7 @@ public sealed class BindingManager
                     .Add ('b', specification.Inventory)  // подполе B: инвентарный номер
                     .Add ('c', IrbisDate.TodayText)      // подполе C: дата поступления
                     .Add ('d', specification.Place)      // подполе D: место хранения
-                    .AddNonEmpty ('h', specification.Barcode) // подполе H: штрих-код или радиометка
+                    .AddNonEmpty ('h', specification.BindingBarcode) // подполе H: штрих-код или радиометка
             );
 
         Provider.WriteRecord (bindingRecord);
@@ -274,7 +296,21 @@ public sealed class BindingManager
         _logger.LogInformation ("Done binding");
     }
 
-    /// <inheritdoc cref="IBindingManager.CheckIssue"/>
+    /// <inheritdoc cref="IBindingManager.CheckIssue(BindingSpecification,MagazineIssueInfo)"/>
+    public bool CheckIssue
+        (
+            BindingSpecification specification,
+            Record record
+        )
+    {
+        Sure.NotNull (specification);
+        Sure.NotNull (record);
+
+        return CheckIssue (specification, MagazineIssueInfo.Parse (record));
+    }
+
+
+    /// <inheritdoc cref="IBindingManager.CheckIssue(BindingSpecification,MagazineIssueInfo)"/>
     public bool CheckIssue
         (
             BindingSpecification specification,
@@ -348,6 +384,7 @@ public sealed class BindingManager
     public bool UnbindMagazines
         (
             string bindingIndex,
+            bool decumulate = true,
             bool deleteBinding = true
         )
     {
@@ -415,6 +452,12 @@ public sealed class BindingManager
                 var issueIndex = RecordConfiguration.GetIndex (issueRecord);
                 _logger.LogInformation ("Issue {IssueIndex} fixed", issueIndex);
             }
+        }
+
+        // декумуляция
+        if (decumulate)
+        {
+            // TODO: implement
         }
 
         // удаление записи подшивки

@@ -155,7 +155,25 @@ public sealed class BindingSpecification
     [XmlAttribute ("barcode")]
     [DisplayName ("Метка")]
     [Description ("Штрих-код или радиометка (необязательно)")]
-    public string? Barcode { get; set; }
+    public string? BindingBarcode { get; set; }
+
+    /// <summary>
+    /// Входящие в подписку номера должны существовать.
+    /// </summary>
+    [JsonPropertyName ("issue-must-exust")]
+    [XmlAttribute ("issueMustExist")]
+    [DisplayName ("Номера должны существовать")]
+    [Description ("Входящие в подшивку номера журналов должны существовать?")]
+    public bool IssueMustExist { get; set; }
+
+    /// <summary>
+    /// Входящие в подписку экземпляры должны существовать.
+    /// </summary>
+    [JsonPropertyName ("exemplar-must-exist")]
+    [XmlAttribute ("exemplarMustExist")]
+    [DisplayName ("Экземпляры должны существовать")]
+    [Description ("Входящие в подшивку экземпляры должны существовать?")]
+    public bool ExemplarMustExist { get; set; }
 
     #endregion
 
