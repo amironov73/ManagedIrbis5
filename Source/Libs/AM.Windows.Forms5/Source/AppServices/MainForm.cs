@@ -35,6 +35,11 @@ public class MainForm
     #region Properties
 
     /// <summary>
+    /// Панель для размещения контента.
+    /// </summary>
+    public ToolStripContentPanel ContentPanel => _toolStripContainer.ContentPanel;
+
+    /// <summary>
     /// Код возврата для приложения.
     /// </summary>
     public int ReturnCode { get; set; }
@@ -75,8 +80,8 @@ public class MainForm
         };
         timer.Tick += (_, _) =>
         {
-            action();
             timer.Enabled = false;
+            action();
             timer.Dispose();
         };
         timer.Enabled = true;

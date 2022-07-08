@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -61,6 +62,13 @@ public class WinFormsApplication
 
     #endregion
 
+    #region Private members
+
+    private string? _formTitle;
+    private List<Action<WinFormsApplication>>? _postConfigure;
+
+    #endregion
+
     #region MagnaApplication members
 
     /// <inheritdoc cref="EarlyInitialization"/>
@@ -84,6 +92,7 @@ public class WinFormsApplication
         }
 
         var mainForm = ((MainForm?) MainForm) ?? CreateMainForm();
+        mainForm.Text = _formTitle;
         MainForm = mainForm;
         MainForm.ShowVersionInfoInTitle();
 
@@ -130,6 +139,15 @@ public class WinFormsApplication
             {
                 var self = (TApplication)(object)  this;
                 timer.Enabled = false;
+
+                if (_postConfigure is not null)
+                {
+                    foreach (var action in _postConfigure)
+                    {
+                        action (this);
+                    }
+                }
+
                 result = runDelegate (self);
             };
             timer.Enabled = true;
@@ -148,7 +166,7 @@ public class WinFormsApplication
             if (waitForHostShutdown)
             {
                 ApplicationHost.WaitForShutdown();
-                _shutdown = true;
+                MarkAsShutdown();
             }
         }
         catch (Exception exception)
@@ -161,7 +179,7 @@ public class WinFormsApplication
         if (shutdownHost)
         {
             ApplicationHost.Dispose();
-            _shutdown = true;
+            MarkAsShutdown();
         }
 
         return result;
@@ -172,11 +190,45 @@ public class WinFormsApplication
     #region Public methods
 
     /// <summary>
+    /// Конфигуризрование пользовательского интерфейса после запуска.
+    /// </summary>
+    public WinFormsApplication PostConfigure
+        (
+            Action<WinFormsApplication> configureDelegate
+        )
+    {
+        _postConfigure ??= new List<Action<WinFormsApplication>>();
+        _postConfigure.Add (configureDelegate);
+
+        return this;
+    }
+
+    /// <summary>
     /// Создание главной формы приложения.
     /// </summary>
     public virtual MainForm CreateMainForm()
     {
         return new MainForm();
+    }
+
+    /// <summary>
+    /// Установка заглавия формы.
+    /// </summary>
+    public virtual WinFormsApplication SetTitle
+        (
+            string? title
+        )
+    {
+        if (IsInitialized)
+        {
+            MainForm.Text = title;
+        }
+        else
+        {
+            _formTitle = title;
+        }
+
+        return this;
     }
 
     /// <summary>

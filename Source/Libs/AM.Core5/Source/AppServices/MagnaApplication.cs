@@ -60,6 +60,16 @@ public class MagnaApplication
     #region Properties
 
     /// <summary>
+    /// Экземпляр инициализирован?
+    /// </summary>
+    public bool IsInitialized { get; private set; }
+
+    /// <summary>
+    /// Экземпляр отработал?
+    /// </summary>
+    public bool IsShutdown { get; private set; }
+
+    /// <summary>
     /// Аргументы командной строки.
     /// </summary>
     public string[] Args { get; }
@@ -133,15 +143,30 @@ public class MagnaApplication
     #region Private members
 
     private readonly IHostBuilder _builder;
-    protected bool _initialized, _shutdown;
     private ServiceProvider? _preliminaryServices;
+
+    /// <summary>
+    /// Пометка экземпляра как проинициазированного.
+    /// </summary>
+    protected void MarkAsInitialized()
+    {
+        IsInitialized = true;
+    }
+
+    /// <summary>
+    /// Пометка экземпляра как отработавшего.
+    /// </summary>
+    protected void MarkAsShutdown()
+    {
+        IsShutdown = true;
+    }
 
     /// <summary>
     /// Проверяем, не поздно ли инициализироваться.
     /// </summary>
     protected void CheckForLateInitialization()
     {
-        if (_initialized)
+        if (IsInitialized)
         {
             throw new ApplicationException ("Too late");
         }
@@ -152,7 +177,7 @@ public class MagnaApplication
     /// </summary>
     protected void CheckForgottenInitialization()
     {
-        if (!_initialized)
+        if (!IsInitialized)
         {
             throw new ApplicationException ("Not initialized");
         }
@@ -163,7 +188,7 @@ public class MagnaApplication
     /// </summary>
     protected void CheckForShutdown()
     {
-        if (_shutdown)
+        if (IsShutdown)
         {
             throw new ApplicationException ("Application is already completed");
         }
@@ -218,7 +243,7 @@ public class MagnaApplication
     /// </summary>
     protected virtual bool FinalInitialization()
     {
-        if (_initialized)
+        if (IsInitialized)
         {
             return true;
         }
@@ -242,7 +267,7 @@ public class MagnaApplication
 
         ApplicationHost = _builder.Build();
         Magna.Host = ApplicationHost;
-        _initialized = true;
+        MarkAsInitialized();
         Logger = ApplicationHost.Services.GetRequiredService<ILogger<MagnaApplication>>();
         Configuration = ApplicationHost.Services.GetRequiredService<IConfiguration>();
 
@@ -442,7 +467,9 @@ public class MagnaApplication
         )
         where TApplication: MagnaApplication
     {
+        // ReSharper disable ConvertToLocalFunction
         Func<TApplication, int> func = self => DoTheWork();
+        // ReSharper restore ConvertToLocalFunction
 
         return Run (func, waitForHostShutdown, shutdownHost);
     }
@@ -475,7 +502,7 @@ public class MagnaApplication
             if (waitForHostShutdown)
             {
                 ApplicationHost.WaitForShutdown();
-                _shutdown = true;
+                MarkAsShutdown();
             }
         }
         catch (Exception exception)
@@ -488,7 +515,7 @@ public class MagnaApplication
         if (shutdownHost)
         {
             ApplicationHost.Dispose();
-            _shutdown = true;
+            MarkAsShutdown();
         }
 
         return result;
@@ -522,7 +549,7 @@ public class MagnaApplication
             if (waitForHostShutdown)
             {
                 await ApplicationHost.WaitForShutdownAsync();
-                _shutdown = true;
+                MarkAsShutdown();
             }
         }
         catch (Exception exception)
@@ -533,7 +560,7 @@ public class MagnaApplication
         if (shutdownHost)
         {
             ApplicationHost.Dispose();
-            _shutdown = true;
+            MarkAsShutdown();
         }
 
         return result;
@@ -544,7 +571,7 @@ public class MagnaApplication
     /// </summary>
     public void Shutdown()
     {
-        if (_shutdown)
+        if (IsShutdown)
         {
             return;
         }
@@ -555,7 +582,7 @@ public class MagnaApplication
             .GetRequiredService<IHostApplicationLifetime>()
             .ThrowIfNull ();
         application.StopApplication();
-        _shutdown = true;
+        MarkAsShutdown();
     }
 
     /// <summary>
