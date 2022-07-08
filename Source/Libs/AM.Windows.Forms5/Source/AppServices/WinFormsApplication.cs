@@ -21,6 +21,8 @@ using System.Windows.Forms;
 
 using AM.AppServices;
 
+using Microsoft.Extensions.Hosting;
+
 #endregion
 
 #nullable enable
@@ -76,6 +78,11 @@ public class WinFormsApplication
     /// <inheritdoc cref="FinalInitialization"/>
     protected override bool FinalInitialization()
     {
+        if (!base.FinalInitialization())
+        {
+            return false;
+        }
+
         var mainForm = ((MainForm?) MainForm) ?? CreateMainForm();
         MainForm = mainForm;
         MainForm.ShowVersionInfoInTitle();
@@ -103,22 +110,59 @@ public class WinFormsApplication
             bool shutdownHost = true
         )
     {
-        var timer = new System.Windows.Forms.Timer
-        {
-            Interval = 10
-        };
-        var result = int.MaxValue;
-        timer.Tick += (_, _) =>
-        {
-            var self = (TApplication) Convert.ChangeType (this, typeof (TApplication));
-            result = runDelegate (self);
-            timer.Enabled = false;
-        };
-        timer.Enabled = true;
+        Sure.NotNull (runDelegate);
 
-        VisualInitialization();
-        Application.Run (MainForm);
-        VisualShutdown();
+        if (!FinalInitialization())
+        {
+            return int.MaxValue;
+        }
+
+        var result = int.MaxValue;
+        try
+        {
+            ApplicationHost.Start();
+
+            var timer = new System.Windows.Forms.Timer
+            {
+                Interval = 10
+            };
+            timer.Tick += (_, _) =>
+            {
+                var self = (TApplication)(object)  this;
+                timer.Enabled = false;
+                result = runDelegate (self);
+            };
+            timer.Enabled = true;
+
+            VisualInitialization();
+
+            MainForm.FormClosed += (_, _) =>
+            {
+                var lifetime = RequireService<IHostApplicationLifetime>();
+                lifetime.StopApplication();
+            };
+
+            Application.Run (MainForm);
+            VisualShutdown();
+
+            if (waitForHostShutdown)
+            {
+                ApplicationHost.WaitForShutdown();
+                _shutdown = true;
+            }
+        }
+        catch (Exception exception)
+        {
+            HandleException (exception);
+        }
+
+        Cleanup();
+
+        if (shutdownHost)
+        {
+            ApplicationHost.Dispose();
+            _shutdown = true;
+        }
 
         return result;
     }

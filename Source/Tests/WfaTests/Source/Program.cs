@@ -82,6 +82,8 @@ internal sealed class Program
     /// <inheritdoc cref="WinFormsApplication.VisualInitialization"/>
     public override void VisualInitialization()
     {
+        MainForm.Width = 780;
+        MainForm.Height = 500;
         MainForm.AddLogBox();
     }
 

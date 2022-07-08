@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
+using AM;
+
 using ManagedIrbis.Magazines;
 
 #endregion
@@ -140,7 +142,7 @@ namespace ManagedIrbis.WinForms
                 ISyncProvider connection
             )
         {
-            var result = new MagazineManager(connection);
+            var result = new MagazineManager(Magna.Host, connection);
 
             LoadMagazines(result);
 

@@ -133,7 +133,7 @@ public class MagnaApplication
     #region Private members
 
     private readonly IHostBuilder _builder;
-    private bool _initialized, _shutdown;
+    protected bool _initialized, _shutdown;
     private ServiceProvider? _preliminaryServices;
 
     /// <summary>
