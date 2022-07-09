@@ -41,6 +41,7 @@
     <PackageReference Include="GridExtra.Avalonia" Version="0.9.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="ReactiveHistory" Version="0.10.7" />
+    <PackageReference Include="SkiaSharp" Version="2.88.1-preview.1" />
     <PackageReference Include="XamlColorSchemeGenerator" Version="3.0.0.31" />
   </ItemGroup>
 
