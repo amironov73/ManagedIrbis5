@@ -1,0 +1,391 @@
+﻿<Styles
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controlz="clr-namespace:Avalonia.Controlz.Controls;assembly=AM.Avalonia"
+    xmlns:System="clr-namespace:System;assembly=mscorlib">
+  <Styles.Resources>
+    <System:Double x:Key="HorizontalThumb.Height">16</System:Double>
+    <System:Double x:Key="HorizontalThumb.Width">10</System:Double>
+    <System:Double x:Key="VerticalThumb.Width">16</System:Double>
+    <System:Double x:Key="VerticalThumb.Height">10</System:Double>
+  </Styles.Resources>
+
+  <Style Selector="Thumb.Slider">
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="2"
+                  />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="RepeatButton.HorizontalTrack">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Grid Background="{TemplateBinding Background}">
+            <Rectangle Height="3" Fill="{TemplateBinding Foreground}" />
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="RepeatButton.HorizontalTrackValue">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Grid Background="{TemplateBinding Background}">
+            <Rectangle Height="5" Fill="{TemplateBinding Foreground}" />
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="RepeatButton.VerticalTrack">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Grid Background="{TemplateBinding Background}">
+            <Rectangle Width="3" Fill="{TemplateBinding Foreground}" />
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="RepeatButton.VerticalTrackValue">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ThemeBorderLowBrush}"/>
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Grid Background="{TemplateBinding Background}">
+            <Rectangle Width="5" Fill="{TemplateBinding Foreground}" />
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal">
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="Foreground" Value="{DynamicResource ThemeBorderMidBrush}" />
+    <Setter Property="Maximum" Value="100" />
+    <Setter Property="Minimum" Value="0" />
+    <Setter Property="MinWidth" Value="40"/>
+    <Setter Property="MinHeight" Value="20"/>
+    <Setter Property="Value" Value="0" />
+    <Setter Property="Template" >
+      <ControlTemplate>
+        <Grid x:Name="HorizontalTemplate"
+            Background="{TemplateBinding Background}">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" MinHeight="20" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <Controlz:TickBar x:Name="TopTick"
+                              Grid.Row="0"
+                              Height="4"
+                              Fill="{TemplateBinding Foreground}"
+                              Maximum="{TemplateBinding Maximum}"
+                              Minimum="{TemplateBinding Minimum}"
+                              Placement="Top"
+                              ReservedSpace="{DynamicResource HorizontalThumbWidth}"
+                              TickFrequency="{TemplateBinding TickFrequency}"
+                              Ticks="{TemplateBinding Ticks}"
+                              IsSelectionRangeEnabled="{TemplateBinding IsSelectionRangeEnabled}"
+                              SelectionEnd="{TemplateBinding SelectionEnd}"
+                              SelectionStart="{TemplateBinding SelectionStart}"
+                              IsVisible="False" />
+
+
+          <Controlz:TickBar x:Name="BottomTick"
+                                  Grid.Row="2"
+                                  Height="4"
+                                  Fill="{TemplateBinding Foreground}"
+                                  Maximum="{TemplateBinding Maximum}"
+                                  Minimum="{TemplateBinding Minimum}"
+                                  Placement="Bottom"
+                                  ReservedSpace="{DynamicResource HorizontalThumbWidth}"
+                                  Ticks="{TemplateBinding Ticks}"
+                                  IsSelectionRangeEnabled="{TemplateBinding IsSelectionRangeEnabled}"
+                                  SelectionEnd="{TemplateBinding SelectionEnd}"
+                                  SelectionStart="{TemplateBinding SelectionStart}"
+                                  TickFrequency="{TemplateBinding TickFrequency}"
+                                  IsVisible="False" />
+
+
+          <Border Name="TrackBackground" Grid.Row="1" Height="4" Margin="6,0" VerticalAlignment="Center"/>
+          <Track x:Name="PART_Track" Grid.Row="1" Orientation="Horizontal">
+            <Track.DecreaseButton>
+              <RepeatButton x:Name="PART_DecreaseButton"
+                            Foreground="{DynamicResource ThemeAccentBrush}"
+                            Classes="HorizontalTrackValue"
+                            Command="{x:Static Controlz:SliderEx.DecreaseLargeCommand}"
+                            />
+            </Track.DecreaseButton>
+            <Track.IncreaseButton>
+              <RepeatButton x:Name="PART_IncreaseButton"
+                            Foreground="{DynamicResource ThemeControlHighlightLowBrush}"
+                            Classes="HorizontalTrack"
+                            Command="{x:Static Controlz:SliderEx.IncreaseLargeCommand}"
+                            />
+
+            </Track.IncreaseButton>
+            <Track.Thumb>
+              <Thumb x:Name="HorizontalThumb"
+                        Width="{DynamicResource  HorizontalThumb.Width}"
+                        Height="{DynamicResource HorizontalThumb.Height}"
+                        Background="{DynamicResource ThemeBorderMidBrush}"
+                        BorderThickness="1 0"
+                        Classes="Slider" />
+            </Track.Thumb>
+
+          </Track>
+        </Grid>
+
+      </ControlTemplate>
+    </Setter>
+
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal:pointerover /template/ Thumb#HorizontalThumb">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal:pointerover /template/ RepeatButton#PART_DecreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal:pointerover /template/ RepeatButton#PART_IncreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeControlHighlightLowBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal /template/ RepeatButton#PART_DecreaseButton:pressed /template/ Thumb#HorizontalThumb">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderMidBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal /template/ RepeatButton#PART_DecreaseButton:pressed /template/ RepeatButton#PART_DecreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush)}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal /template/ RepeatButton#PART_DecreaseButton:pressed /template/ RepeatButton#PART_IncreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeControlHighlightLowBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal /template/ RepeatButton#PART_IncreaseButton:pressed /template/ Thumb#HorizontalThumb">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderMidBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal /template/ RepeatButton#PART_IncreaseButton:pressed /template/ RepeatButton#PART_DecreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal /template/ RepeatButton#PART_IncreaseButton:pressed /template/ RepeatButton#PART_IncreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeControlHighlightLowBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal /template/ Thumb#HorizontalThumb:pressed /template/ Thumb#HorizontalThumb">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderMidBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal /template/ Thumb#HorizontalThumb:pressed /template/ RepeatButton#PART_DecreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal /template/ Thumb#HorizontalThumb:pressed /template/ RepeatButton#PART_IncreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeControlHighlightLowBrush}" />
+  </Style>
+
+  <!--Thumb.IsDragging not available in avalonia-->
+
+  <!--<Style Selector="Controlz|SliderEx:horizontal /template/ Thumb#HorizontalThumb[IsDragging=true] /template/ Thumb#HorizontalThumb">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderMidBrush)}" />
+  </Style>-->
+
+  <!--<Style Selector="Controlz|SliderEx:horizontal /template/ Controls|Thumb#HorizontalThumb[IsDragging=true] /template/ RepeatButton#PART_DecreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush)}" />
+  </Style>-->
+
+  <!--<Style Selector="Controlz|SliderEx:horizontal /template/ Controls|Thumb#HorizontalThumb[IsDragging=true] /template/ RepeatButton#PART_IncreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeControlHighlightLowBrush}" />
+  </Style>-->
+
+  <Style Selector="Controlz|SliderEx:horizontal:disabled /template/ Thumb#HorizontalThumb">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderHighBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal:disabled /template/ RepeatButton#PART_DecreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeBorderHighBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal:disabled /template/ RepeatButton#PART_IncreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeBorderHighBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal[TickPlacement=TopLeft] /template/ Controlz|TickBar#TopTick">
+    <Setter Property="IsVisible" Value="true" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal[TickPlacement=BottomRight] /template/ Controlz|TickBar#BottomTick">
+    <Setter Property="IsVisible" Value="true" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal[TickPlacement=Both] /template/ Controlz|TickBar#BottomTick">
+    <Setter Property="IsVisible" Value="true" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:horizontal[TickPlacement=Both] /template/ Controlz|TickBar#TopTick">
+    <Setter Property="IsVisible" Value="true" />
+  </Style>
+
+
+  <Style Selector="Controlz|SliderEx:vertical">
+    <Setter Property="MinWidth" Value="20"/>
+    <Setter Property="MinHeight" Value="40"/>
+    <Setter Property="Template" >
+      <ControlTemplate>
+        <Grid x:Name="HorizontalTemplate"
+              Background="{TemplateBinding Background}">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" MinWidth="26" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <Controlz:TickBar x:Name="TopTick"
+                   Grid.Column="0"
+                   Width="4"
+                   Fill="{TemplateBinding Foreground}"
+                   Placement="Left"
+                   IsVisible="False" />
+          <Controlz:TickBar x:Name="BottomTick"
+                   Grid.Column="2"
+                   Width="4"
+                   Fill="{TemplateBinding Foreground}"
+                   Placement="Right"
+                   IsVisible="False" />
+          <Border Name="TrackBackground" Grid.Column="1" Width="4" Margin="0,6" HorizontalAlignment="Center"/>
+          <Track x:Name="PART_Track" Grid.Column="1" Orientation="Vertical" IsDirectionReversed="True">
+            <Track.DecreaseButton>
+              <RepeatButton x:Name="PART_DecreaseButton"
+                            Foreground="{DynamicResource ThemeAccentBrush}"
+                            Classes="VerticalTrackValue"
+                            Command="{x:Static Controlz:SliderEx.DecreaseLargeCommand}"
+                            />
+            </Track.DecreaseButton>
+            <Track.IncreaseButton>
+              <RepeatButton x:Name="PART_IncreaseButton"
+                            Foreground="{DynamicResource ThemeControlHighlightLowBrush)}"
+                            Classes="VerticalTrack"
+                            Command="{x:Static Controlz:SliderEx.IncreaseLargeCommand}"
+                            />
+            </Track.IncreaseButton>
+            <Track.Thumb>
+              <Thumb x:Name="VerticalThumb"
+                                   Width="{DynamicResource VerticalThumb.Width}"
+                                   Height="{DynamicResource VerticalThumb.Height}"
+                                   Background="{DynamicResource ThemeBorderMidBrush)}"
+                                   BorderThickness="0 1"
+                                   Classes="Slider" />
+            </Track.Thumb>
+          </Track>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical:pointerover /template/ Thumb#VerticalThumb">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical:pointerover /template/ RepeatButton#PART_DecreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush)}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical:pointerover /template/ RepeatButton#PART_IncreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeControlHighlightLowBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical:pointerover /template/ RepeatButton#PART_DecreaseButton:pressed /template/ Thumb#VerticalThumb">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderMidBrush)}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical:pointerover /template/ RepeatButton#PART_DecreaseButton:pressed">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical:pointerover /template/ RepeatButton#PART_DecreaseButton:pressed RepeatButton#PART_IncreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeControlHighlightLowBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical:pointerover /template/ RepeatButton#PART_IncreaseButton:pressed /template/ Thumb#VerticalThumb">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderMidBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical:pointerover /template/ RepeatButton#PART_IncreaseButton:pressed RepeatButton#PART_DecreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical:pointerover /template/ RepeatButton#PART_IncreaseButton:pressed">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeControlHighlightLowBrush}" />
+  </Style>
+
+  <!--Thumb.IsDragging not available in avalonia-->
+
+  <!--<Style Selector="Controlz|SliderEx:vertical /template/ Thumb[IsDragging=true]#VerticalThumb">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderMidBrush}" />
+  </Style>-->
+
+  <!--<Style Selector="Controlz|SliderEx:vertical /template/ Thumb[IsDragging=true]#VerticalThumb RepeatButton#PART_DecreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical /template/ Thumb[IsDragging=true]#VerticalThumb RepeatButton#PART_IncreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeControlHighlightLowBrush}" />
+  </Style>-->
+
+  <Style Selector="Controlz|SliderEx:vertical:disabled /template/ Thumb">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderHighBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical:disabled /template/ RepeatButton#PART_DecreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeBorderHighBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical:disabled /template/ RepeatButton#PART_IncreaseButton">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeBorderHighBrush}" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical[TickPlacement=TopLeft] /template/ Controlz|TickBar#TopTick">
+    <Setter Property="IsVisible" Value="true" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical[TickPlacement=BottomRight] /template/ Controlz|TickBar#BottomTick">
+    <Setter Property="IsVisible" Value="true" />
+  </Style>
+
+  <Style Selector="Controlz|SliderEx:vertical[TickPlacement=Both] /template/ Controlz|TickBar#BottomTick">
+    <Setter Property="IsVisible" Value="true" />
+  </Style>
+  <Style Selector="Controlz|SliderEx:vertical[TickPlacement=Both] /template/ Controlz|TickBar#TopTick">
+    <Setter Property="IsVisible" Value="true" />
+  </Style>
+
+</Styles>

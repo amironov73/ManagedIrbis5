@@ -1,0 +1,28 @@
+﻿<Styles
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pg="clr-namespace:Avalonia.ExtendedToolkit.Controls.PropertyGrid;assembly=AM.Avalonia"
+    xmlns:controls="clr-namespace:Avalonia.ExtendedToolkit.Controls.PropertyGrid.Controls;assembly=AM.Avalonia">
+
+  <Style Selector="pg|PropertyGrid">
+    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent3}" />
+    <Setter Property="ItemsBackground" Value="{DynamicResource MahApps.Brushes.White}" />
+    <Setter Property="ItemsForeground" Value="{DynamicResource MahApps.Brushes.Black}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <DockPanel LastChildFill="True" Background="{TemplateBinding Background}">
+            <controls:SearchTextBox DockPanel.Dock="Top"
+                                    Text="{TemplateBinding PropertyFilter, Mode=TwoWay}"
+                                    IsVisible="{TemplateBinding PropertyFilterIsVisible}" />
+
+            <!--{Binding Path=PropertyFilter, RelativeSource={RelativeSource TemplatedParent}}-->
+
+            <ContentControl  Content="{TemplateBinding Layout}"
+                               TextBlock.Foreground="{TemplateBinding Foreground}" />
+          </DockPanel>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</Styles>

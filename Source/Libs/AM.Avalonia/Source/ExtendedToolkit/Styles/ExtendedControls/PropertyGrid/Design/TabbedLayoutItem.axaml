@@ -1,0 +1,204 @@
+﻿<Styles
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:design="clr-namespace:Avalonia.ExtendedToolkit.Controls.PropertyGrid.Design;assembly=AM.Avalonia"
+    >
+
+    <Style Selector="Button.CloseableTabItemButtonStyle">
+    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Gray10}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.TextBox.Border}" />
+    <Setter Property="FontFamily" Value="{DynamicResource MahApps.Fonts.Default}" />
+    <Setter Property="FontSize" Value="{DynamicResource MahApps.Sizes.Font.UpperCaseContent}" />
+    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Black}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <!--<Setter Property="Padding" Value="4"/>-->
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type Button}">
+          <Grid>
+            <Border x:Name="Chrome"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="2" Opacity="0" />
+            <ContentPresenter
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              Margin="{TemplateBinding Padding}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              />
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style Selector="Button.CloseableTabItemButtonStyle:pointerover /template/ Border#Chrome">
+    <!--<Setter Property="Opacity" Value="1"/>-->
+    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent2}" />
+  </Style>
+
+  <Style Selector="Button.CloseableTabItemButtonStyle:pressed /template/ Border#Chrome">
+    <!--<Setter Property="Opacity" Value="1"/>-->
+    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}" />
+  </Style>
+
+  <!--<Style Selector="Button.CloseableTabItemButtonStyle:pressed">
+    <Setter Property="Foreground" Value="White" />
+  </Style>-->
+
+  <Style Selector="Button.CloseableTabItemButtonStyle:disabled">
+    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.IdealForegroundDisabled}" />
+  </Style>
+
+
+
+
+  <Style Selector="design|TabbedLayoutItem">
+    <!--<Setter Property="Background" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type design:TabbedLayout}}, Path=Background, Mode=OneWay}" />-->
+    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Text}"/>
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="6,1,6,1"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Grid >
+            <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="1,1,1,0" >
+              <DockPanel x:Name="ContentPanel">
+                <Button x:Name="PART_Close" HorizontalAlignment="Center"
+                        Margin="3,0,3,0"
+                        VerticalAlignment="Center"
+                        Width="16" Height="16"
+                        DockPanel.Dock="Right"
+                        Classes="CloseableTabItemButtonStyle"
+                        IsVisible="{TemplateBinding CanClose}"
+                        Command="{TemplateBinding ClosePropertyTabCommand}"
+                      >
+                  <Path x:Name="Path" Stretch="Fill"
+                        StrokeThickness="0.5"
+                        Stroke="{DynamicResource MahApps.Brushes.White}"
+                        Fill="{DynamicResource MahApps.Brushes.Text}"
+                        Data="F1 M 2.28484e-007,1.33331L 1.33333,0L 4.00001,2.66669L 6.66667,6.10352e-005L 8,1.33331L 5.33334,4L 8,6.66669L 6.66667,8L 4,5.33331L 1.33333,8L 1.086e-007,6.66669L 2.66667,4L 2.28484e-007,1.33331 Z "
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"/>
+                </Button>
+                <ContentPresenter x:Name="PART_HeaderPresenter"
+                                  Content="{TemplateBinding Header}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Margin="{TemplateBinding Padding}"/>
+              </DockPanel>
+            </Border>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+
+  </Style>
+
+  <!--From Avalonia with changes-->
+  <Style Selector="design|TabbedLayoutItem:selected">
+    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent4}"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem:selected:focus">
+    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent3}"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem:selected:pointerover">
+    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent3}"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem:pointerover">
+    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent2}"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem /template/ Button#PART_Close:pointerover /template/ Path#Path">
+    <Setter Property="Fill" Value="{DynamicResource MahApps.Brushes.Accent3}"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem /template/ Button#PART_Close:pressed /template/ Path#Path">
+    <Setter Property="Fill" Value="#FF9D3838"/>
+  </Style>
+
+  <!--Todo Do we need this?-->
+
+  <!--<Style Selector="design|TabbedLayoutItem:pointerover /template/ Border#Bd">
+    <Setter Property="Background" Value="{DynamicResource TabItemHotBackground}"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem:selected">
+    <Setter Property="ZIndex" Value="1"/>
+  </Style>-->
+
+  <!--<Style Selector="design|TabbedLayoutItem:selected /template/ Border#Bd">
+    <Setter Property="Background" Value="{DynamicResource TabItemSelectedBackground}"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem[IsSelected=false][IsPointerOver=true] /template/ Border#Bd">
+    <Setter Property="BorderBrush" Value="{DynamicResource TabItemHotBorderBrush}"/>
+  </Style>-->
+
+  <Style Selector="design|TabbedLayoutItem[TabStripPlacement=Bottom] /template/ Border#Bd">
+    <Setter Property="BorderThickness" Value="1,0,1,1"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem[TabStripPlacement=Left] /template/ Border#Bd">
+    <Setter Property="BorderThickness" Value="1,1,0,1"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem[TabStripPlacement=Right] /template/ Border#Bd">
+    <Setter Property="BorderThickness" Value="0,1,1,1"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem[IsSelected=true][TabStripPlacement=Top]">
+    <Setter Property="Margin" Value="-2,-2,-2,-1"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem[IsSelected=true][TabStripPlacement=Top] /template/ DockPanel#ContentPanel">
+    <Setter Property="Margin" Value="0,0,0,1"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem[IsSelected=true][TabStripPlacement=Bottom]">
+    <Setter Property="Margin" Value="-2,-1,-2,-2"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem[IsSelected=true][TabStripPlacement=Bottom] /template/ DockPanel#ContentPanel">
+    <Setter Property="Margin" Value="0,1,0,0"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem[IsSelected=true][TabStripPlacement=Left]">
+    <Setter Property="Margin" Value="-2,-2,-1,-2"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem[IsSelected=true][TabStripPlacement=Left] /template/ DockPanel#ContentPanel">
+    <Setter Property="Margin" Value="0,0,1,0"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem[IsSelected=true][TabStripPlacement=Right]">
+    <Setter Property="Margin" Value="-1,-2,-2,-2"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem[IsSelected=true][TabStripPlacement=Right] /template/ DockPanel#ContentPanel">
+    <Setter Property="Margin" Value="1,0,0,0"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem:disabled /template/ Border#Bd">
+    <Setter Property="Background" Value="{DynamicResource TabItemDisabledBackground}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource TabItemDisabledBorderBrush}"/>
+  </Style>
+
+  <Style Selector="design|TabbedLayoutItem:disabled">
+    <!--{DynamicResource {x:Static SystemColors.GrayTextBrushKey}} correct?-->
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+  </Style>
+
+
+</Styles>

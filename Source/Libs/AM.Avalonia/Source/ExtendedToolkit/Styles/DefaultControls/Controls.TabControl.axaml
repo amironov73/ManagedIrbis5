@@ -1,0 +1,84 @@
+﻿<Styles
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="clr-namespace:Avalonia.ExtendedToolkit.Controls;assembly=AM.Avalonia"
+    xmlns:tk="clr-namespace:Avalonia.ExtendedToolkit;assembly=AM.Avalonia"
+    xmlns:converters="clr-namespace:Avalonia.ExtendedToolkit.Converters;assembly=AM.Avalonia"
+    xmlns:Controlz="clr-namespace:Avalonia.Controlz.Controls;assembly=Avalonia.Controlz"
+    xmlns:System="clr-namespace:System;assembly=mscorlib">
+
+    <Style Selector="TabControl">
+        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.White}" />
+        <Setter Property="BorderBrush" Value="{x:Null}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border
+                    Margin="{TemplateBinding Margin}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Background="{TemplateBinding Background}"
+                    HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                    <DockPanel>
+                        <ItemsPresenter
+                            Name="PART_ItemsPresenter"
+                            Items="{TemplateBinding Items}"
+                            ItemsPanel="{TemplateBinding ItemsPanel}"
+                            ItemTemplate="{TemplateBinding ItemTemplate}">
+                        </ItemsPresenter>
+                        <ContentPresenter
+                            Name="PART_SelectedContentHost"
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding SelectedContent}"
+                            ContentTemplate="{TemplateBinding SelectedContentTemplate}">
+                        </ContentPresenter>
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="TabControl[TabStripPlacement=Top]">
+        <Setter Property="Padding" Value="0 4 0 0"/>
+    </Style>
+
+    <Style Selector="TabControl[TabStripPlacement=Top] /template/ ItemsPresenter#PART_ItemsPresenter">
+        <Setter Property="DockPanel.Dock" Value="Top"/>
+    </Style>
+
+    <Style Selector="TabControl[TabStripPlacement=Bottom] /template/ ItemsPresenter#PART_ItemsPresenter">
+        <Setter Property="DockPanel.Dock" Value="Bottom"/>
+    </Style>
+
+    <Style Selector="TabControl[TabStripPlacement=Bottom]">
+        <Setter Property="Padding" Value="0 0 0 4"/>
+    </Style>
+
+    <Style Selector="TabControl[TabStripPlacement=Left] /template/ ItemsPresenter#PART_ItemsPresenter">
+        <Setter Property="DockPanel.Dock" Value="Left"/>
+    </Style>
+
+    <Style Selector="TabControl[TabStripPlacement=Left] /template/ ItemsPresenter#PART_ItemsPresenter > WrapPanel">
+        <Setter Property="Orientation" Value="Vertical"/>
+    </Style>
+
+    <Style Selector="TabControl[TabStripPlacement=Left]">
+        <Setter Property="Padding" Value="4 0 0 0"/>
+    </Style>
+
+    <Style Selector="TabControl[TabStripPlacement=Right] /template/ ItemsPresenter#PART_ItemsPresenter">
+        <Setter Property="DockPanel.Dock" Value="Right"/>
+    </Style>
+
+    <Style Selector="TabControl[TabStripPlacement=Right] /template/ ItemsPresenter#PART_ItemsPresenter > WrapPanel">
+        <Setter Property="Orientation" Value="Vertical"/>
+    </Style>
+
+    <Style Selector="TabControl[TabStripPlacement=Right]">
+        <Setter Property="Padding" Value="0 0 0 4"/>
+    </Style>
+
+
+</Styles>
