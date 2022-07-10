@@ -2,15 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* DrawingOptions.cs -- options for WM_PRINT and WM_PRINTCLIENT messagea
    Ars Magna project, http://arsmagna.ru */
@@ -21,44 +16,41 @@ using System;
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Options for WM_PRINT and WM_PRINTCLIENT messages
+/// </summary>
+[Flags]
+public enum DrawingOptions
 {
     /// <summary>
-    /// Options for WM_PRINT and WM_PRINTCLIENT messages
+    /// Draws the window only if it is visible.
     /// </summary>
-    [Flags]
-    public enum DrawingOptions
-    {
-        /// <summary>
-        /// Draws the window only if it is visible.
-        /// </summary>
-        PRF_CHECKVISIBLE = 0x00000001,
+    PRF_CHECKVISIBLE = 0x00000001,
 
-        /// <summary>
-        /// Draws the nonclient area of the window.
-        /// </summary>
-        PRF_NONCLIENT = 0x00000002,
+    /// <summary>
+    /// Draws the nonclient area of the window.
+    /// </summary>
+    PRF_NONCLIENT = 0x00000002,
 
-        /// <summary>
-        /// Draws the client area of the window.
-        /// </summary>
-        PRF_CLIENT = 0x00000004,
+    /// <summary>
+    /// Draws the client area of the window.
+    /// </summary>
+    PRF_CLIENT = 0x00000004,
 
-        /// <summary>
-        /// Erases the background before drawing the window.
-        /// </summary>
-        PRF_ERASEBKGND = 0x00000008,
+    /// <summary>
+    /// Erases the background before drawing the window.
+    /// </summary>
+    PRF_ERASEBKGND = 0x00000008,
 
-        /// <summary>
-        /// Draws all visible children windows.
-        /// </summary>
-        PRF_CHILDREN = 0x00000010,
+    /// <summary>
+    /// Draws all visible children windows.
+    /// </summary>
+    PRF_CHILDREN = 0x00000010,
 
-        /// <summary>
-        /// Draws all owned windows.
-        /// </summary>
-        PRF_OWNED = 0x00000020
-
-    } // enum DrawingOptions
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Draws all owned windows.
+    /// </summary>
+    PRF_OWNED = 0x00000020
+}
