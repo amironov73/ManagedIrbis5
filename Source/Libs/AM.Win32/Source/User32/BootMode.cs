@@ -2,46 +2,38 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* BootMode.cs -- operating system boot mode
+/* BootMode.cs -- режим загрузки операционной системы
    Ars Magna project, http://arsmagna.ru */
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Режим загрузки операционной системы.
+/// </summary>
+public enum BootMode
 {
     /// <summary>
-    /// Operating system boot mode.
+    /// Неизвестно.
     /// </summary>
-    public enum BootMode
-    {
-        /// <summary>
-        /// Unknown boot mode.
-        /// </summary>
-        UnknownBootMode = -1,
+    UnknownBootMode = -1,
 
-        /// <summary>
-        /// Normal.
-        /// </summary>
-        NormalBoot = 0,
+    /// <summary>
+    /// Обычный режим.
+    /// </summary>
+    NormalBoot = 0,
 
-        /// <summary>
-        /// Failsafe mode.
-        /// </summary>
-        FailSafeBoot = 1,
+    /// <summary>
+    /// Безопасный режим.
+    /// </summary>
+    FailSafeBoot = 1,
 
-        /// <summary>
-        /// Failsafe mode with network support.
-        /// </summary>
-        FailSafeWithNetworkSupportBoot = 2
-
-    } // enum BootMode
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Безопасный режим с поддержкой сети.
+    /// </summary>
+    FailSafeWithNetworkSupportBoot = 2
+}
