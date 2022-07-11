@@ -8,7 +8,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
 
-/* InputLanguageIndicator.cs -- input language indicator
+/* InputLanguageIndicator.cs -- индикатор языка ввода
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,174 +16,168 @@
 
 using System;
 using System.Drawing;
-using System.Globalization;
 using System.Windows.Forms;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Индикатор языка ввода.
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+public sealed class InputLanguageIndicator
+    : Control
 {
+    #region Construction
+
     /// <summary>
-    /// Input language indicator.
+    /// Конструктор.
     /// </summary>
-    [System.ComponentModel.DesignerCategory("Code")]
-    public sealed class InputLanguageIndicator
-        : Control
+    public InputLanguageIndicator()
     {
-        #region Construction
+        SetStyle (ControlStyles.OptimizedDoubleBuffer, true);
+        SetStyle (ControlStyles.Selectable, true);
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public InputLanguageIndicator()
+        ForeColor = Color.White;
+        BackColor = Color.Blue;
+
+        /*
+
+        ContextMenu = new ContextMenu();
+        foreach (InputLanguage language
+            in InputLanguage.InstalledInputLanguages)
         {
-            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-            SetStyle(ControlStyles.Selectable, true);
-
-            ForeColor = Color.White;
-            BackColor = Color.Blue;
-
-            /*
-
-            ContextMenu = new ContextMenu();
-            foreach (InputLanguage language
-                in InputLanguage.InstalledInputLanguages)
-            {
-                CultureInfo culture = language.Culture;
-                string menuText = string.Format
-                    (
-                        "{0} {1}",
-                        culture.TwoLetterISOLanguageName.ToUpperInvariant(),
-                        language.LayoutName
-                    );
-                ContextMenu.MenuItems.Add(menuText, _MenuClick);
-            }
-
-            */
+            CultureInfo culture = language.Culture;
+            string menuText = string.Format
+                (
+                    "{0} {1}",
+                    culture.TwoLetterISOLanguageName.ToUpperInvariant(),
+                    language.LayoutName
+                );
+            ContextMenu.MenuItems.Add(menuText, _MenuClick);
         }
 
-        #endregion
-
-        #region Private members
-
-        private Form? _form;
-
-        private void _MenuClick
-            (
-                object? sender,
-                EventArgs ea
-            )
-        {
-            /*
-
-            MenuItem item = (MenuItem)sender;
-            int index = ContextMenu.MenuItems.IndexOf(item);
-            InputLanguage.CurrentInputLanguage
-                = InputLanguage.InstalledInputLanguages[index];
-            Application.DoEvents();
-            Invalidate();
-
-            */
-        }
-
-        private void _InputLanguageChanged
-            (
-                object? sender,
-                InputLanguageChangedEventArgs e
-            )
-        {
-            Invalidate();
-        }
-
-        private void _ShowContextMenu()
-        {
-            /* ContextMenu.Show(this, new Point(0, 0)); */
-        }
-
-        #endregion
-
-        #region Control members
-
-        /// <inheritdoc cref="Control.DefaultSize" />
-        protected override Size DefaultSize
-        {
-            get
-            {
-                int height = 22;
-                int width = height;
-                return new Size(width, height);
-            }
-        }
-
-        /// <inheritdoc cref="Control.Dispose(bool)" />
-        protected override void Dispose
-            (
-                bool disposing
-            )
-        {
-            base.Dispose(disposing);
-            if (!ReferenceEquals(_form, null))
-            {
-                _form.InputLanguageChanged -= _InputLanguageChanged;
-            }
-        }
-
-        /// <inheritdoc cref="Control.OnKeyDown" />
-        protected override void OnKeyDown
-            (
-                KeyEventArgs e
-            )
-        {
-            base.OnKeyDown(e);
-            switch (e.KeyData)
-            {
-                case Keys.Space:
-                case Keys.Enter:
-                    _ShowContextMenu();
-                    break;
-            }
-        }
-
-        /// <inheritdoc cref="Control.OnPaint" />
-        protected override void OnPaint
-            (
-                PaintEventArgs e
-            )
-        {
-            Graphics g = e.Graphics;
-            Rectangle r = ClientRectangle;
-            using (Brush textBrush = new SolidBrush(ForeColor))
-            using (Brush backBrush = new SolidBrush(BackColor))
-            using (StringFormat format = new StringFormat())
-            {
-                format.Alignment = StringAlignment.Center;
-                format.LineAlignment = StringAlignment.Center;
-                g.FillRectangle(backBrush, r);
-                CultureInfo culture
-                    = InputLanguage.CurrentInputLanguage.Culture;
-                string languageCode
-                    = culture.TwoLetterISOLanguageName.ToUpperInvariant();
-                g.DrawString(languageCode, Font, textBrush, r, format);
-            }
-            base.OnPaint(e);
-        }
-
-        /// <inheritdoc cref="Control.OnParentChanged" />
-        protected override void OnParentChanged
-            (
-                EventArgs e
-            )
-        {
-            base.OnParentChanged(e);
-            _form = FindForm();
-            if (!ReferenceEquals(_form, null))
-            {
-                _form.InputLanguageChanged += _InputLanguageChanged;
-            }
-        }
-
-        #endregion
+        */
     }
+
+    #endregion
+
+    #region Private members
+
+    private Form? _form;
+
+    // private void _MenuClick
+    //     (
+    //         object? sender,
+    //         EventArgs ea
+    //     )
+    // {
+    //     MenuItem item = (MenuItem)sender;
+    //     int index = ContextMenu.MenuItems.IndexOf(item);
+    //     InputLanguage.CurrentInputLanguage
+    //         = InputLanguage.InstalledInputLanguages[index];
+    //     Application.DoEvents();
+    //     Invalidate();
+    // }
+
+    private void _InputLanguageChanged
+        (
+            object? sender,
+            InputLanguageChangedEventArgs e
+        )
+    {
+        Invalidate();
+    }
+
+    // private void _ShowContextMenu()
+    // {
+    //     ContextMenu.Show(this, new Point(0, 0));
+    // }
+
+    #endregion
+
+    #region Control members
+
+    /// <inheritdoc cref="Control.DefaultSize" />
+    protected override Size DefaultSize
+    {
+        get
+        {
+            var height = 22;
+            var width = height;
+            return new Size (width, height);
+        }
+    }
+
+    /// <inheritdoc cref="Control.Dispose(bool)" />
+    protected override void Dispose
+        (
+            bool disposing
+        )
+    {
+        base.Dispose (disposing);
+        if (!ReferenceEquals (_form, null))
+        {
+            _form.InputLanguageChanged -= _InputLanguageChanged;
+        }
+    }
+
+    /// <inheritdoc cref="Control.OnKeyDown" />
+    protected override void OnKeyDown
+        (
+            KeyEventArgs e
+        )
+    {
+        base.OnKeyDown (e);
+        switch (e.KeyData)
+        {
+            case Keys.Space:
+            case Keys.Enter:
+                // _ShowContextMenu();
+                break;
+        }
+    }
+
+    /// <inheritdoc cref="Control.OnPaint" />
+    protected override void OnPaint
+        (
+            PaintEventArgs eventArgs
+        )
+    {
+        var g = eventArgs.Graphics;
+        var r = ClientRectangle;
+        using (var textBrush = new SolidBrush (ForeColor))
+        using (var backBrush = new SolidBrush (BackColor))
+        using (var format = new StringFormat())
+        {
+            format.Alignment = StringAlignment.Center;
+            format.LineAlignment = StringAlignment.Center;
+            g.FillRectangle (backBrush, r);
+            var culture = InputLanguage.CurrentInputLanguage.Culture;
+            var languageCode = culture.TwoLetterISOLanguageName.ToUpperInvariant();
+            g.DrawString (languageCode, Font, textBrush, r, format);
+        }
+
+        base.OnPaint (eventArgs);
+    }
+
+    /// <inheritdoc cref="Control.OnParentChanged" />
+    protected override void OnParentChanged
+        (
+            EventArgs eventArgs
+        )
+    {
+        base.OnParentChanged (eventArgs);
+        _form = FindForm();
+        if (_form is not null)
+        {
+            // TODO: отписать предыдущего родителя
+            _form.InputLanguageChanged += _InputLanguageChanged;
+        }
+    }
+
+    #endregion
 }

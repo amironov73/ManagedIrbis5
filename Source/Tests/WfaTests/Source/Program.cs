@@ -185,6 +185,10 @@ internal sealed class Program
             .SetTitle ("Some WinForms Application")
             .PostConfigure (app =>
             {
+                app.MainForm.AddStatusClock();
+                app.MainForm.AddStatusMemory();
+                app.MainForm.AddStatusLanguage();
+
                 var timer = new Timer()
                 {
                     Interval = 1000,

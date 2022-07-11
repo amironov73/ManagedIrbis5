@@ -96,6 +96,8 @@ public class WinFormsApplication
         MainForm = mainForm;
         MainForm.ShowVersionInfoInTitle();
 
+        InputLanguageUtility.InstallWmInputLanguageRequestFix();
+
         return true;
     }
 

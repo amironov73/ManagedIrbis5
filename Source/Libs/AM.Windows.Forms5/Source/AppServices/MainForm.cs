@@ -4,7 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -15,8 +17,13 @@
 #region Using directives
 
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms;
+
+using AM.Windows.Forms.MarkupExtensions;
 
 using Microsoft.Extensions.Logging;
 
@@ -55,8 +62,16 @@ public class MainForm
     {
         _toolStripContainer = new ToolStripContainer();
         _menuStrip = new MenuStrip();
-        _toolStrip = new ToolStrip();
-        _statusStrip = new StatusStrip();
+        _toolStrip = new ToolStrip
+        {
+            LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow,
+            ShowItemToolTips = true
+        };
+        _statusStrip = new StatusStrip
+        {
+            LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow,
+            ShowItemToolTips = true
+        };
 
         InitializeComponent();
     }
@@ -96,6 +111,7 @@ public class MainForm
     private readonly MenuStrip _menuStrip;
     private readonly ToolStrip _toolStrip;
     private LogBox? _logBox;
+    private IContainer _container = new Container();
 
     private void InitializeComponent()
     {
@@ -247,30 +263,88 @@ public class MainForm
     }
 
     /// <summary>
-    /// Добавление текста в
+    /// Добавление текста в строку статуса.
     /// </summary>
-    public ToolStripLabel AddStatusLabel
+    public StatusLabel AddStatusLabel
         (
             string? text = null,
-            int width = 100
+            int width = 100,
+            bool autoSize = true,
+            ToolStripItemAlignment alignment = ToolStripItemAlignment.Left
         )
     {
         Sure.Positive (width);
 
-        var result = new ToolStripLabel
+        var result = new StatusLabel (text)
         {
-            Text = text,
             Width = width,
-            Padding = new Padding (2)
-        };
-        result.Paint += (_, args) =>
-        {
-            var graphics = args.Graphics;
-            var bounds = args.ClipRectangle;
-            bounds.Inflate (-1, -1);
-            graphics.DrawRectangle (Pens.Black, bounds);
+            AutoSize = autoSize,
+            Alignment = alignment
         };
         _statusStrip.Items.Add (result);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Добавление небольших цифровых часов в строку статуса.
+    /// </summary>
+    public PeriodicStatusLabel AddStatusClock()
+    {
+        var result = new PeriodicStatusLabel
+        {
+            Alignment = ToolStripItemAlignment.Right,
+            ToolTipText = "Текущее время"
+        };
+        _statusStrip.Items.Add (result);
+        result.SetAction (label => label.Text = DateTime.Now.ToString
+            (
+                "HH:mm:ss",
+                CultureInfo.InvariantCulture
+            ));
+
+        return result;
+    }
+
+    /// <summary>
+    /// Добавление небольших цифровых часов в строку статуса.
+    /// </summary>
+    public ToolStripLabel AddStatusMemory()
+    {
+        var result = new PeriodicStatusLabel
+        {
+            Alignment = ToolStripItemAlignment.Right,
+            ToolTipText = "Приватная память приложения"
+        };
+        _statusStrip.Items.Add (result);
+        result.SetAction (label =>
+        {
+            using var process = Process.GetCurrentProcess();
+            var memory = process.PrivateMemorySize64 / 1024L / 1024;
+
+            label.Text = memory.ToString (CultureInfo.InvariantCulture) + "M";
+        });
+
+        return result;
+    }
+
+    /// <summary>
+    /// Добавление индикатора языка ввода..
+    /// </summary>
+    public ToolStripLabel AddStatusLanguage()
+    {
+        var result = new PeriodicStatusLabel
+        {
+            Alignment = ToolStripItemAlignment.Right,
+            ToolTipText = "Язык ввода"
+        };
+        _statusStrip.Items.Add (result);
+        result.SetAction (label =>
+        {
+            var culture = InputLanguage.CurrentInputLanguage.Culture;
+
+            label.Text = culture.TwoLetterISOLanguageName.ToUpperInvariant();
+        });
 
         return result;
     }
