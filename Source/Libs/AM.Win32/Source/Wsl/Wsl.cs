@@ -2,11 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
 /* Wsl.cs -- обертка над WSL API
  * Ars Magna project, http://arsmagna.ru
@@ -21,6 +21,8 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
 #endregion
+
+#pragma warning disable CA1401 // "Метод не должен быть видимым"
 
 #nullable enable
 
@@ -56,11 +58,13 @@ public static class Wsl
     /// <summary>
     /// Получение ветки регистра для WSL.
     /// </summary>
-    public static RegistryKey GetRootRegistryKey() =>
-        Registry.CurrentUser.OpenSubKey (RegistryPath).ThrowIfNull();
+    public static RegistryKey GetRootRegistryKey()
+    {
+        return Registry.CurrentUser.OpenSubKey (RegistryPath).ThrowIfNull();
+    }
 
     /// <summary>
-    /// Перечисление установленных дистрибутивов.
+    /// Перечисление установленных размещений.
     /// </summary>
     public static WslDistribution[] ListDistributions()
     {
@@ -79,21 +83,22 @@ public static class Wsl
         }
 
         return result.ToArray();
-    } // method ListDistributions
+    }
 
     /// <summary>
-    /// Modifies the behavior of a distribution registered with
-    /// the Windows Subsystem for Linux (WSL).
+    /// Модификация поведения размещения, зарегистрированного
+    /// в Windows Subsystem for Linux (WSL).
     /// </summary>
-    /// <param name="distributionName">Unique name representing
-    /// a distribution (for example, "Fabrikam.Distro.10.01").
+    /// <param name="distributionName">Уникальное имч, представляющее
+    /// размещение (например, "Fabrikam.Distro.10.01").
     /// </param>
-    /// <param name="defaultUID">The Linux user ID to use when
-    /// launching new WSL sessions for this distribution.</param>
-    /// <param name="wslDistributionFlags">Flags specifying what
-    /// behavior to use for this distribution.</param>
-    /// <returns>Returns S_OK on success, or a failing
-    /// HRESULT otherwise.</returns>
+    /// <param name="defaultUID">Идентификатор пользователя Linux,
+    /// который должен использоваться при запуске новой сессии WSL.
+    /// </param>
+    /// <param name="wslDistributionFlags">Флаги, определяющие
+    /// поведение размещения.</param>
+    /// <returns>Возвращает S_OK при успехе, в остальных случаях
+    /// HRESULT с кодом ошибки.</returns>
     [DllImport (DllName, CharSet = CharSet.Unicode)]
     public static extern int WslConfigureDistribution
         (
@@ -103,24 +108,24 @@ public static class Wsl
         );
 
     /// <summary>
-    /// Retrieves the current configuration of a distribution
-    /// registered with the Windows Subsystem for Linux (WSL).
+    /// Получение текущей конфигурации размещения, зарегистрированного
+    /// в Windows Subsystem for Linux (WSL).
     /// </summary>
-    /// <param name="distributionName">Unique name representing
-    /// a distribution (for example, "Fabrikam.Distro.10.01").
+    /// <param name="distributionName">Уникальное имя, представляющее
+    /// размещение (например, "Fabrikam.Distro.10.01").
     /// </param>
-    /// <param name="distributionVersion">The version of WSL
-    /// for which this distribution is configured.</param>
-    /// <param name="defaultUID">The default user ID used when
-    /// launching new WSL sessions for this distribution.</param>
-    /// <param name="wslDistributionFlags">The flags governing
-    /// the behavior of this distribution.</param>
-    /// <param name="defaultEnvironmentVariables">The address of
-    /// a pointer to an array of default environment variable strings
-    /// used when launching new WSL sessions for this distribution.
-    /// </param>
-    /// <param name="defaultEnvironmentVariableCount">The number
-    /// of elements in pDefaultEnvironmentVariablesArray.</param>
+    /// <param name="distributionVersion">Версия WSL, для которой
+    /// сконфигурировано размещение.</param>
+    /// <param name="defaultUID">Идентификатор пользователя по
+    /// умолчанию, который будет использоваться для новых сессий,
+    /// запущенных WSL в контексте данного размещения.</param>
+    /// <param name="wslDistributionFlags">Флаги, управляющие
+    /// поведением данного размещения.</param>
+    /// <param name="defaultEnvironmentVariables">Адрес указателя
+    /// с массивом строк окружения, используемым по умолчанию
+    /// в данном размещении. </param>
+    /// <param name="defaultEnvironmentVariableCount">Количество
+    /// элементов в pDefaultEnvironmentVariablesArray.</param>
     /// <returns></returns>
     [DllImport (DllName, CharSet = CharSet.Unicode)]
     public static extern int WslGetDistributionConfiguration
@@ -134,14 +139,14 @@ public static class Wsl
         );
 
     /// <summary>
-    /// Determines if a distribution is registered with the
+    /// Определение, зарегистрировано ли указанное размещение в
     /// Windows Subsystem for Linux (WSL).
     /// </summary>
-    /// <param name="distributionName">Unique name representing
-    /// a distribution (for example, "Fabrikam.Distro.10.01").
+    /// <param name="distributionName">Уникальное имя, представляющее
+    /// размещение (например, "Fabrikam.Distro.10.01").
     /// </param>
-    /// <returns>Returns TRUE if the supplied distribution
-    /// is currently registered, or FALSE otherwise.</returns>
+    /// <returns>Возвращает TRUE, если размещение с указанным именем
+    /// в настоящий момент зарегистрировано, иначе FALSE.</returns>
     [DllImport (DllName, CharSet = CharSet.Unicode)]
     public static extern bool WslIsDistributionRegistered
         (
@@ -149,29 +154,27 @@ public static class Wsl
         );
 
     /// <summary>
-    /// Launches a Windows Subsystem for Linux (WSL) process
-    /// in the context of a particular distribution.
+    /// Запускает процесс Windows Subsystem for Linux (WSL) в контексте
+    /// заданного размещения.
     /// </summary>
-    /// <param name="distributionName">Unique name representing
-    /// a distribution (for example, "Fabrikam.Distro.10.01").
+    /// <param name="distributionName">Уникальное имя, представляющее
+    /// размещение (например, "Fabrikam.Distro.10.01").
     /// </param>
-    /// <param name="command">Command to execute. If no command
-    /// is supplied, launches the default shell.</param>
-    /// <param name="useCurrentWorkingDirectory">Governs whether
-    /// or not the launched process should inherit the calling
-    /// process's working directory. If FALSE, the process
-    /// is started in the WSL default user's home directory ("~").
-    /// </param>
-    /// <param name="stdIn">Handle to use for STDIN.</param>
-    /// <param name="stdOut">Handle to use for STDOUT.</param>
-    /// <param name="stdErr">Handle to use for STDERR.</param>
-    /// <param name="process">Pointer to address to receive
-    /// the process HANDLE associated with the newly-launched
-    /// WSL process.</param>
-    /// <returns>Returns S_OK on success, or a failing HRESULT otherwise.
-    /// </returns>
-    /// <remarks>Caller is responsible for calling <c>CloseHandle</c>
-    /// on the value returned in <c>process</c> on success.</remarks>
+    /// <param name="command">Команда для исполнения. Если не задана
+    /// запускается командная оболочка по умолчанию.</param>
+    /// <param name="useCurrentWorkingDirectory">Будет ли запускаемый
+    /// процесс наследовать рабочую директорию от запускающего
+    /// процесса. Если FALSE, процесс будет запущен в домашней
+    /// папке пользователя по умолчанию ("~").</param>
+    /// <param name="stdIn">Файл, в который перенаправляется STDIN.</param>
+    /// <param name="stdOut">Файд, в который перенаправляется STDOUT.</param>
+    /// <param name="stdErr">Файл, в который перенаправляется STDERR.</param>
+    /// <param name="process">Адрес, по которому будет помещен
+    /// HANDLE запущенного процесса WSL.</param>
+    /// <returns>Возвращает S_OK при успехе, в остальных случаях
+    /// HRESULT с кодом ошибки.</returns>
+    /// <remarks>Вызвающий код отвечает за вызов <c>CloseHandle</c>
+    /// для полученного описателя процесса.</remarks>
     [DllImport (DllName, CharSet = CharSet.Unicode)]
     public static extern int WslLaunch
         (
@@ -185,25 +188,26 @@ public static class Wsl
         );
 
     /// <summary>
-    /// Launches an interactive Windows Subsystem for Linux (WSL)
-    /// process in the context of a particular distribution.
-    /// This differs from WslLaunch in that the end user will
-    /// be able to interact with the newly-created process.
+    /// Запускает интерактивную сессию  Windows Subsystem for Linux
+    /// (WSL) в контексте конкретного размещения.
+    /// Этот вызов отличается от WslLaunch тем, что пользователь
+    /// получает возможность взаимодействия с запущенным процессом.
     /// </summary>
-    /// <param name="distributionName">Unique name representing
-    /// a distribution (for example, "Fabrikam.Distro.10.01").
+    /// <param name="distributionName">Уникальное имя, представляющее
+    /// размещение (например, "Fabrikam.Distro.10.01").
     /// </param>
-    /// <param name="command">Command to execute. If no command
-    /// is supplied, launches the default shell.</param>
-    /// <param name="useCurrentWorkingDirectory">Governs whether
-    /// or not the launched process should inherit the calling
-    /// process's working directory. If FALSE, the process
-    /// is started in the WSL default user's home directory ("~").
-    /// </param>
-    /// <param name="exitCode">Receives the exit code of the process
-    /// after it exits.</param>
-    /// <returns>Returns S_OK on success, or a failing HRESULT
-    /// otherwise.</returns>
+    /// <param name="command">Команда, которая должна быть выполнена.
+    /// Если никакая команда не задана, запускается командная
+    /// оболочка по умолчанию.</param>
+    /// <param name="useCurrentWorkingDirectory">Управляет
+    /// наследованием рабочей папки от запускающего процесса
+    /// к запускаемому. FALSE означает, что запускаемый процесс
+    /// получит в качестве рабочей директории домашнюю папку
+    /// пользователя по умолчанию ("~").</param>
+    /// <param name="exitCode">Принимает код возврата по
+    /// окончании сессии WSL.</param>
+    /// <returns>Возвращает S_OK при успехе, в остальных случаяъ
+    /// HRESULT с кодом ошибки.</returns>
     [DllImport (DllName, CharSet = CharSet.Unicode)]
     public static extern int WslLaunchInteractive
         (
@@ -214,18 +218,18 @@ public static class Wsl
         );
 
     /// <summary>
-    /// Registers a new distribution with the Windows Subsystem
+    /// Регистрирует новое размещение в  indows Subsystem
     /// for Linux (WSL).
     /// </summary>
-    /// <param name="distributionName">Unique name representing
-    /// a distribution (for example, "Fabrikam.Distro.10.01").
+    /// <param name="distributionName">Уникальное имя, представляющее
+    /// размещение (например, "Fabrikam.Distro.10.01").
     /// </param>
-    /// <param name="tarGzFilename">Full path to a .tar.gz file
-    /// containing the file system of the distribution to register.
+    /// <param name="tarGzFilename">Полный путь к файлу .tar.gz,
+    /// содержащему размещение, подлежащее регистрации.
     /// </param>
-    /// <returns>This function can return one of the following values.
-    /// Use the SUCCEEDED and FAILED macros to test the return value
-    /// of this function.</returns>
+    /// <returns>Необходимо применить макро SUCCEEDED и FAILED
+    /// для анализа возвращенного значения.
+    /// </returns>
     [DllImport (DllName, CharSet = CharSet.Unicode)]
     public static extern int WslRegisterDistribution
         (
@@ -234,14 +238,14 @@ public static class Wsl
         );
 
     /// <summary>
-    /// Unregisters a distribution from the Windows Subsystem
+    /// Отменяет регистрацию размещения в Windows Subsystem
     /// for Linux (WSL).
     /// </summary>
-    /// <param name="distributionName">Unique name representing
-    /// a distribution (for example, "Fabrikam.Distro.10.01").
+    /// <param name="distributionName">Уникальное имя, представляющее
+    /// размещение (например, "Fabrikam.Distro.10.01").
     /// </param>
-    /// <returns>Returns S_OK on success, or a failing HRESULT
-    /// otherwise.</returns>
+    /// <returns>Возвращает S_OK при успехе, в остальных случаях
+    /// HRESULT с кодом ошибки.</returns>
     [DllImport (DllName, CharSet = CharSet.Unicode)]
     public static extern int WslUnregisterDistribution
         (
