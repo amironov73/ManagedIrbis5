@@ -23,28 +23,25 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Defines the CF_FILEGROUPDESCRIPTOR clipboard format.
+/// </summary>
+public struct FILEGROUPDESCRIPTORA
 {
     /// <summary>
-    /// Defines the CF_FILEGROUPDESCRIPTOR clipboard format.
+    /// Number of elements in fgd.
     /// </summary>
-    public struct FILEGROUPDESCRIPTORA
-    {
-        /// <summary>
-        /// Number of elements in fgd.
-        /// </summary>
-        public int cItems;
+    public int cItems;
 
-        /// <summary>
-        /// Array of <see cref="FILEDESCRIPTORA"/>
-        ///  structures that contain the file information.
-        /// </summary>
-        /// <remarks>
-        /// SizeConst!!!
-        /// </remarks>
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
-        public FILEDESCRIPTORA[]? fgd;
-
-    } // struct FILEGROUPDESCRIPTORA
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Array of <see cref="FILEDESCRIPTORA"/>
+    ///  structures that contain the file information.
+    /// </summary>
+    /// <remarks>
+    /// SizeConst!!!
+    /// </remarks>
+    [MarshalAs (UnmanagedType.ByValArray, SizeConst = 1)]
+    public FILEDESCRIPTORA[]? fgd;
+}
