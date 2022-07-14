@@ -4,34 +4,30 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
 
-/* MagnaApplicationEventArgs.cs -- аргументы для события для приложения
+/* AccessRecord.cs -- запись в журнале доступа к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
+using AM.Text;
 
 #endregion
 
 #nullable enable
 
-namespace AM.AppServices;
+namespace ManagedIrbis.Proxying;
 
 /// <summary>
-/// Аргументы для события приложения
+/// Запись в журнале доступа к серверу ИРБИС64.
 /// </summary>
-[Serializable]
-public sealed class MagnaApplicationEventArgs
-    : EventArgs
+public sealed class AccessRecord
 {
     #region Properties
 
-    /// <summary>
-    /// Код выхода.
-    /// </summary>
-    public int ExitCode { get; set; }
+
 
     #endregion
 }
