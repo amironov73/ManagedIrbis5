@@ -267,6 +267,27 @@ public static class ListViewExtensions
     }
 
     /// <summary>
+    /// Задание групп.
+    /// </summary>
+    public static TListView Groups<TListView>
+        (
+            this TListView listView,
+            params string[] groups
+        )
+        where TListView: ListView
+    {
+        Sure.NotNull (listView);
+        Sure.NotNull (groups);
+
+        foreach (var group in groups)
+        {
+            listView.Groups.Add (new ListViewGroup (group));
+        }
+
+        return listView;
+    }
+
+    /// <summary>
     /// Задание стиля заголовков.
     /// </summary>
     public static TListView HeaderStyle<TListView>

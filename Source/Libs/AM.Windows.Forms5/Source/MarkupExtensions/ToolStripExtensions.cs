@@ -31,7 +31,6 @@ public static class ToolStripExtensions
     /// <summary>
     /// Добавление элементов в <see cref="ToolStrip"/>.
     /// </summary>
-    /// <returns></returns>
     public static TToolStrip Items<TToolStrip>
         (
             this TToolStrip strip,

@@ -89,14 +89,14 @@ public static class FlowLayoutPanelExtensions
         Sure.NotNull (panel);
         Sure.NotNull (control);
 
-        control.Dock = panel.FlowDirection switch
-        {
-            System.Windows.Forms.FlowDirection.TopDown => DockStyle.Top,
-            System.Windows.Forms.FlowDirection.BottomUp => DockStyle.Bottom,
-            System.Windows.Forms.FlowDirection.LeftToRight => DockStyle.Left,
-            System.Windows.Forms.FlowDirection.RightToLeft => DockStyle.Right,
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        // control.Dock = panel.FlowDirection switch
+        // {
+        //     System.Windows.Forms.FlowDirection.TopDown => DockStyle.Top,
+        //     System.Windows.Forms.FlowDirection.BottomUp => DockStyle.Bottom,
+        //     System.Windows.Forms.FlowDirection.LeftToRight => DockStyle.Left,
+        //     System.Windows.Forms.FlowDirection.RightToLeft => DockStyle.Right,
+        //     _ => throw new ArgumentOutOfRangeException()
+        // };
 
         panel.Controls.Add (control);
 
@@ -140,7 +140,6 @@ public static class FlowLayoutPanelExtensions
 
         return panel;
     }
-
 
     #endregion
 }

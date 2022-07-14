@@ -66,24 +66,6 @@ public static class ToolStripItemExtensions
     }
 
     /// <summary>
-    /// Подписка на событие <see cref="ToolStripItem.Click"/>.
-    /// </summary>
-    public static TToolStripItem Clicked<TToolStripItem>
-        (
-            this TToolStripItem item,
-            EventHandler handler
-        )
-        where TToolStripItem : ToolStripItem
-    {
-        Sure.NotNull (item);
-        Sure.NotNull (handler);
-
-        item.Click += handler;
-
-        return item;
-    }
-
-    /// <summary>
     /// Разрешение/запрещение элемента.
     /// </summary>
     public static TToolStripItem Enabled<TToolStripItem>
@@ -96,6 +78,24 @@ public static class ToolStripItemExtensions
         Sure.NotNull (item);
 
         item.Enabled = enabled;
+
+        return item;
+    }
+
+    /// <summary>
+    /// Подписка на событие <see cref="ToolStripItem.Click"/>.
+    /// </summary>
+    public static TToolStripItem OnClick<TToolStripItem>
+        (
+            this TToolStripItem item,
+            EventHandler handler
+        )
+        where TToolStripItem : ToolStripItem
+    {
+        Sure.NotNull (item);
+        Sure.NotNull (handler);
+
+        item.Click += handler;
 
         return item;
     }
