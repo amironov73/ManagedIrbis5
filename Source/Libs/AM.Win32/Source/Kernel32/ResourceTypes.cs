@@ -2,136 +2,131 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* ResourceTypes.cs -- WIN32 resource types
+/* ResourceTypes.cs -- типы ресурсов приложений WIN32
    Ars Magna project, http://arsmagna.ru */
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Типы ресурсов приложений WIN32..
+/// </summary>
+public enum ResourceTypes
 {
     /// <summary>
-    /// WIN32 resource types.
+    /// Зависящий от устройства курсор.
     /// </summary>
-    public enum ResourceTypes
-    {
-        /// <summary>
-        /// Hardware-dependent cursor resource.
-        /// </summary>
-        RT_CURSOR = 1,
+    RT_CURSOR = 1,
 
-        /// <summary>
-        /// Bitmap resource.
-        /// </summary>
-        RT_BITMAP = 2,
+    /// <summary>
+    /// Растровый ресурс.
+    /// </summary>
+    RT_BITMAP = 2,
 
-        /// <summary>
-        /// Hardware-dependent icon resource.
-        /// </summary>
-        RT_ICON = 3,
+    /// <summary>
+    /// Зависящая от устройства иконка.
+    /// </summary>
+    RT_ICON = 3,
 
-        /// <summary>
-        /// Menu resource.
-        /// </summary>
-        RT_MENU = 4,
+    /// <summary>
+    /// Меню.
+    /// </summary>
+    RT_MENU = 4,
 
-        /// <summary>
-        /// Dialog box.
-        /// </summary>
-        RT_DIALOG = 5,
+    /// <summary>
+    /// Диалоговое окно.
+    /// </summary>
+    RT_DIALOG = 5,
 
-        /// <summary>
-        /// String-table entry.
-        /// </summary>
-        RT_STRING = 6,
+    /// <summary>
+    /// Запись таблицы строк.
+    /// </summary>
+    RT_STRING = 6,
 
-        /// <summary>
-        /// Font directory resource.
-        /// </summary>
-        RT_FONTDIR = 7,
+    /// <summary>
+    /// Каталог шрифтов.
+    /// </summary>
+    RT_FONTDIR = 7,
 
-        /// <summary>
-        /// Font resource.
-        /// </summary>
-        RT_FONT = 8,
+    /// <summary>
+    /// Шрифт.
+    /// </summary>
+    RT_FONT = 8,
 
-        /// <summary>
-        /// Accelerator table.
-        /// </summary>
-        RT_ACCELERATOR = 9,
+    /// <summary>
+    /// Таблица акселератора.
+    /// </summary>
+    RT_ACCELERATOR = 9,
 
-        /// <summary>
-        /// Application-defined resource (raw data).
-        /// </summary>
-        RT_RCDATA = 10,
+    /// <summary>
+    /// Специфичный для приложения ресурс (сырые данные,
+    /// не интерпретируемые Windows).
+    /// </summary>
+    RT_RCDATA = 10,
 
-        /// <summary>
-        /// Message-table entry.
-        /// </summary>
-        RT_MESSAGETABLE = 11,
+    /// <summary>
+    /// Запись таблицы сообщений.
+    /// </summary>
+    RT_MESSAGETABLE = 11,
 
-        /// <summary>
-        /// Hardware-independent cursor resource.
-        /// </summary>
-        RT_GROUP_CURSOR = 12,
+    /// <summary>
+    /// Не зависящий от устройства курсор.
+    /// </summary>
+    RT_GROUP_CURSOR = 12,
 
-        /// <summary>
-        /// Hardware-independent icon resource.
-        /// </summary>
-        RT_GROUP_ICON = 14,
+    /// <summary>
+    /// Не зависящая от устройства иконка.
+    /// </summary>
+    RT_GROUP_ICON = 14,
 
-        /// <summary>
-        /// Version resource.
-        /// </summary>
-        RT_VERSION = 16,
+    /// <summary>
+    /// Информация о версии.
+    /// </summary>
+    RT_VERSION = 16,
 
-        /// <summary>
-        /// <para>Allows a resource editing tool to associate a string
-        /// with an .rc file. Typically, the string is the name of the
-        /// header file that provides symbolic names. The resource
-        /// compiler parses the string but otherwise ignores the value.
-        /// For example,</para>
-        /// <code>1 DLGINCLUDE "foo.h"</code>
-        /// </summary>
-        RT_DLGINCLUDE = 17,
+    /// <summary>
+    /// Включение заголовочного файла.
+    /// <para>Allows a resource editing tool to associate a string
+    /// with an .rc file. Typically, the string is the name of the
+    /// header file that provides symbolic names. The resource
+    /// compiler parses the string but otherwise ignores the value.
+    /// For example,</para>
+    /// <code>1 DLGINCLUDE "foo.h"</code>
+    /// </summary>
+    RT_DLGINCLUDE = 17,
 
-        /// <summary>
-        /// Plug and Play resource.
-        /// </summary>
-        RT_PLUGPLAY = 19,
+    /// <summary>
+    /// Ресурс Plug and Play.
+    /// </summary>
+    RT_PLUGPLAY = 19,
 
-        /// <summary>
-        /// VXD.
-        /// </summary>
-        RT_VXD = 20,
+    /// <summary>
+    /// VXD (драйвер устройства).
+    /// </summary>
+    RT_VXD = 20,
 
-        /// <summary>
-        /// Animated cursor.
-        /// </summary>
-        RT_ANICURSOR = 21,
+    /// <summary>
+    /// Анимированный курсор.
+    /// </summary>
+    RT_ANICURSOR = 21,
 
-        /// <summary>
-        /// Animated icon.
-        /// </summary>
-        RT_ANIICON = 22,
+    /// <summary>
+    /// Анимированная иконка.
+    /// </summary>
+    RT_ANIICON = 22,
 
-        /// <summary>
-        /// HTML.
-        /// </summary>
-        RT_HTML = 23,
+    /// <summary>
+    /// HTML.
+    /// </summary>
+    RT_HTML = 23,
 
-        /// <summary>
-        /// Microsoft® Windows® XP: Side-by-Side Assembly XML Manifest.
-        /// </summary>
-        RT_MANIFEST = 24
-
-    } // enum ResourceTypes
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Начиная с Microsoft® Windows® XP: параллельный (side-by-side)
+    /// XML-манифест сборки.
+    /// </summary>
+    RT_MANIFEST = 24
+}
