@@ -17,13 +17,9 @@
 #region Using directives
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
-
-using AM.Windows.Forms.MarkupExtensions;
 
 using Microsoft.Extensions.Logging;
 
@@ -111,7 +107,6 @@ public class MainForm
     private readonly MenuStrip _menuStrip;
     private readonly ToolStrip _toolStrip;
     private LogBox? _logBox;
-    private IContainer _container = new Container();
 
     private void InitializeComponent()
     {
@@ -314,13 +309,15 @@ public class MainForm
         var result = new PeriodicStatusLabel
         {
             Alignment = ToolStripItemAlignment.Right,
-            ToolTipText = "Приватная память приложения"
+            // ToolTipText = "Приватная память приложения"
+            ToolTipText = "Рабочий набор приложения"
         };
         _statusStrip.Items.Add (result);
         result.SetAction (label =>
         {
             using var process = Process.GetCurrentProcess();
-            var memory = process.PrivateMemorySize64 / 1024L / 1024;
+            //var memory = process.PrivateMemorySize64 / 1024L / 1024;
+            var memory = process.WorkingSet64 / 1024L / 1024;
 
             label.Text = memory.ToString (CultureInfo.InvariantCulture) + "M";
         });
@@ -376,7 +373,7 @@ public class MainForm
         if (!string.IsNullOrEmpty (text) && _logBox is not null)
         {
             _logBox.Output.WriteLine (text);
-            Magna.Application.Logger.LogInformation (text);
+            Magna.Application.Logger.LogInformation ("Main: {Info}", text);
         }
     }
 

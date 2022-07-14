@@ -23,9 +23,8 @@ public class MainWindow
         Height = 300;
         MinHeight = 300;
 
-        var labels = new StackPanel
+        var labels = new WrapPanel
         {
-            Orientation = Orientation.Horizontal,
             Margin = padding,
             Children =
             {

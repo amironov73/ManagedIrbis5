@@ -1,0 +1,58 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:AvaloniaOpac"
+        Width="600" Height="400"
+        x:Class="AvaloniaOpac.MainWindow"
+        Title="Avalonia OPAC">
+
+    <Design.DataContext>
+        <local:MainWindowViewModel />
+    </Design.DataContext>
+
+    <DockPanel>
+        <Grid
+            Background="AliceBlue"
+            DockPanel.Dock="Top"
+            ColumnDefinitions="Auto,*,Auto,Auto"
+            RowDefinitions="Auto">
+            <Label
+                Grid.Column="0" Grid.Row="0"
+                VerticalAlignment="Center"
+                Margin="5"
+                >
+                Ключевое слово
+            </Label>
+            <TextBox
+                Grid.Column="1" Grid.Row="0"
+                Watermark="Введите ключевое слово"
+                Text="{Binding Keyword}"
+                Margin="5">
+            </TextBox>
+            <CheckBox
+                Grid.Column="2" Grid.Row="0"
+                IsChecked="{Binding Truncation}"
+                Margin="5"
+                >
+                усечение
+            </CheckBox>
+            <Button
+                Grid.Column="3" Grid.Row="0"
+                Margin="5"
+                Click="_searchButton_OnClick"
+                >Поиск</Button>
+        </Grid>
+
+        <ListBox
+                Items="{Binding Found}"
+                Margin="5"
+                >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Label Content="{Binding}"></Label>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+
+
+</Window>

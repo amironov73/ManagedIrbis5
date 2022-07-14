@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Avalonia", "AM.Avalonia\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationOne", "ApplicationOne\ApplicationOne.csproj", "{F5E3C102-06B8-40A4-8FD0-AC673DD58D43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaOpac", "AvaloniaOpac\AvaloniaOpac.csproj", "{99802EFC-CA86-4879-A69A-EA2FD419DF01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{F5E3C102-06B8-40A4-8FD0-AC673DD58D43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5E3C102-06B8-40A4-8FD0-AC673DD58D43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5E3C102-06B8-40A4-8FD0-AC673DD58D43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99802EFC-CA86-4879-A69A-EA2FD419DF01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99802EFC-CA86-4879-A69A-EA2FD419DF01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99802EFC-CA86-4879-A69A-EA2FD419DF01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99802EFC-CA86-4879-A69A-EA2FD419DF01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
