@@ -2,37 +2,34 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* ACPowerState.cs -- AC power status.
+/* ACPowerState.cs -- статус электрического питания системы
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32;
 
 /// <summary>
-/// AC power status.
+/// Статус электрического питания системы.
 /// </summary>
 public enum ACPowerStatus
     : byte
 {
     /// <summary>
-    /// Offline.
+    /// Оффлайн, т. е. система запитана от батарей.
     /// </summary>
     Offline = 0,
 
     /// <summary>
-    /// Online.
+    /// Онлайн, т. е. система запистана от сети.
     /// </summary>
     Online = 1,
 
     /// <summary>
-    /// Unknown.
+    /// Неизвестно.
     /// </summary>
     Unknown = 255
 }

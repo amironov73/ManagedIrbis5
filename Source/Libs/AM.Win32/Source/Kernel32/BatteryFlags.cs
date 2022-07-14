@@ -2,15 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* BatteryFlags.cs -- battery charge status.
+/* BatteryFlags.cs -- статус заряда батареи
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -22,39 +17,39 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Battery charge status.
+/// Статус заряда батареи.
 /// </summary>
 [Flags]
 public enum BatteryFlags
     : byte
 {
     /// <summary>
-    /// High.
+    /// Высокий заряд.
     /// </summary>
     High = 1,
 
     /// <summary>
-    /// Low.
+    /// Низкий заряд.
     /// </summary>
     Low = 2,
 
     /// <summary>
-    /// Critical.
+    /// Критически низкий заряд.
     /// </summary>
     Critical = 4,
 
     /// <summary>
-    /// Charging.
+    /// Происходит зарядка от сети.
     /// </summary>
     Charging = 8,
 
     /// <summary>
-    /// No system battery.
+    /// Системная батарея отсутствует.
     /// </summary>
     NoSystemBattery = 128,
 
     /// <summary>
-    /// Unknown.
+    /// Статус неизвестен.
     /// </summary>
     Unknown = 255
 }

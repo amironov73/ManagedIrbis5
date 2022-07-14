@@ -2,17 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* CONSOLE_FONT_INFO.cs -- contains information for a console font
+/* CONSOLE_FONT_INFO.cs -- информация о консольном шрифте
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -25,7 +19,7 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// Contains information for a console font.
+/// Содержит информацию о консольном шрифте.
 /// </summary>
 [Serializable]
 [StructLayout (LayoutKind.Explicit, Size = 8)]

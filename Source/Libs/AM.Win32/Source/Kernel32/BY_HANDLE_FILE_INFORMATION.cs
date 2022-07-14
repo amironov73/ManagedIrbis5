@@ -12,7 +12,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* BY_HANDLE_FILE_INFORMATION.cs --
+/* BY_HANDLE_FILE_INFORMATION.cs -- информация, полученная от функции GetFileInformationByHandle
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -24,14 +24,14 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// Contains information retrieved by the
-/// GetFileInformationByHandle function.
+/// Структура содержит информацию, полученную от функции
+/// <c>GetFileInformationByHandle</c>.
 /// </summary>
 [StructLayout (LayoutKind.Sequential, Size = 52)]
 public struct BY_HANDLE_FILE_INFORMATION
 {
     /// <summary>
-    /// File attributes.
+    /// Атрибуты файла.
     /// </summary>
     public FileAttributes dwFileAttributes;
 

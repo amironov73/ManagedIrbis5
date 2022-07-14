@@ -12,7 +12,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ConsoleAttributes.cs -- attributes for console text
+/* ConsoleAttributes.cs -- атрибуты консольного текста
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -24,59 +24,59 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Attributes for console text.
+/// Атрибуты консольного текста.
 /// </summary>
 [Flags]
 public enum ConsoleAttributes
-    : short
+    : ushort
 {
     /// <summary>
-    /// Text color contains blue.
+    /// Цвет текста содержит синюю компоненту.
     /// </summary>
     FOREGROUND_BLUE = 0x0001,
 
     /// <summary>
-    /// Text color contains green.
+    /// Цвет текста содержит зеленую компоненту.
     /// </summary>
     FOREGROUND_GREEN = 0x0002,
 
     /// <summary>
-    /// Text color contains red.
+    /// Цвет текста содержит красную компоненту.
     /// </summary>
     FOREGROUND_RED = 0x0004,
 
     /// <summary>
-    /// Text color is intensified.
+    /// Интенсивный цвет текста.
     /// </summary>
     FOREGROUND_INTENSITY = 0x0008,
 
     /// <summary>
-    /// Background color contains blue.
+    /// Цвет фона содержит синюю компоненту.
     /// </summary>
     BACKGROUND_BLUE = 0x0010,
 
     /// <summary>
-    /// Background color contains green.
+    /// Цвет фона содержит зеленую компоненту.
     /// </summary>
     BACKGROUND_GREEN = 0x0020,
 
     /// <summary>
-    /// Background color contains red.
+    /// Цвет фона содержит красную компоненту.
     /// </summary>
     BACKGROUND_RED = 0x0040,
 
     /// <summary>
-    /// Background color is intensified.
+    /// Интенсивный цвет фона.
     /// </summary>
     BACKGROUND_INTENSITY = 0x0080,
 
     /// <summary>
-    /// Leading Byte of DBCS.
+    /// Лидирующий байт DBCS.
     /// </summary>
     COMMON_LVB_LEADING_BYTE = 0x0100,
 
     /// <summary>
-    /// Trailing Byte of DBCS.
+    /// Замыкающий байт DBCS.
     /// </summary>
     COMMON_LVB_TRAILING_BYTE = 0x0200,
 
@@ -103,5 +103,5 @@ public enum ConsoleAttributes
     /// <summary>
     /// DBCS: Underscore.
     /// </summary>
-    COMMON_LVB_UNDERSCORE = unchecked ((short)0x8000)
+    COMMON_LVB_UNDERSCORE = 0x8000
 }
