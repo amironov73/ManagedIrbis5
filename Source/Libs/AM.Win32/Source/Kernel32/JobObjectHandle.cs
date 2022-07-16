@@ -12,7 +12,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* JobObjectHandle.cs --
+/* JobObjectHandle.cs -- handle for WindowsJob
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,42 +23,39 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Contains handle for <see cref="WindowsJob"/>.
+/// </summary>
+public sealed class JobObjectHandle
+    : SafeHandle
 {
+    #region Construction
+
     /// <summary>
-    /// Contains handle for <see cref="WindowsJob"/>.
+    /// Constructor.
     /// </summary>
-    public sealed class JobObjectHandle
-        : SafeHandle
+    public JobObjectHandle()
+        : base (IntPtr.Zero, true)
     {
-        #region Construction
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public JobObjectHandle()
-            : base(IntPtr.Zero, true)
-        {
-        }
+    #endregion
 
-        #endregion
+    #region SafeHandle members
 
-        #region SafeHandle members
+    /// <inheritdoc cref="SafeHandle.IsInvalid" />
+    public override bool IsInvalid
+    {
+        get { return (handle == IntPtr.Zero); }
+    }
 
-        /// <inheritdoc cref="SafeHandle.IsInvalid" />
-        public override bool IsInvalid
-        {
-            get { return (handle == IntPtr.Zero); }
-        }
+    /// <inheritdoc cref="SafeHandle.ReleaseHandle" />
+    protected override bool ReleaseHandle()
+    {
+        return Kernel32.CloseHandle (handle);
+    }
 
-        /// <inheritdoc cref="SafeHandle.ReleaseHandle" />
-        protected override bool ReleaseHandle()
-        {
-            return Kernel32.CloseHandle(handle);
-        }
-
-        #endregion
-
-    } // class JobObjectHandle
-
-} // namespace AM.Win32
+    #endregion
+}
