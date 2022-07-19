@@ -2,15 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* ACCEL.cs -- клавиша-акселератор
  * Ars Magna project, http://arsmagna.ru
@@ -24,29 +19,26 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Клавиша-акселератор.
+/// </summary>
+[StructLayout (LayoutKind.Sequential)]
+public struct ACCEL
 {
     /// <summary>
-    /// Клавиша-акселератор.
+    /// The accelerator behavior.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct ACCEL
-    {
-        /// <summary>
-        /// The accelerator behavior.
-        /// </summary>
-        public byte fVirt;
+    public byte fVirt;
 
-        /// <summary>
-        /// The accelerator key.
-        /// </summary>
-        public short key;
+    /// <summary>
+    /// The accelerator key.
+    /// </summary>
+    public short key;
 
-        /// <summary>
-        /// The accelerator identifier.
-        /// </summary>
-        public short cmd;
-
-    } // struct ACCEL
-
-} // namespace AM.Win32
+    /// <summary>
+    /// The accelerator identifier.
+    /// </summary>
+    public short cmd;
+}

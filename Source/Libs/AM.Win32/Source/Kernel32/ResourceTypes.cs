@@ -13,7 +13,7 @@
 namespace AM.Win32;
 
 /// <summary>
-/// Типы ресурсов приложений WIN32..
+/// Типы ресурсов приложений WIN32.
 /// </summary>
 public enum ResourceTypes
 {

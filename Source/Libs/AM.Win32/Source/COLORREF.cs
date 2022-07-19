@@ -2,11 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
 /* COLORREF.cs -- задает RGB-цвет
  * Ars Magna project, http://arsmagna.ru
@@ -21,93 +20,88 @@ using System.Drawing;
 
 #nullable enable
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// The COLORREF value is used to specify an RGB color.
+/// </summary>
+[Serializable]
+public struct COLORREF
 {
+    #region Properties
+
     /// <summary>
-    /// The COLORREF value is used to specify an RGB color.
+    /// Color.
     /// </summary>
-    [Serializable]
-    public struct COLORREF
+    public Color Color
     {
-        #region Properties
-
-        /// <summary>
-        /// Color.
-        /// </summary>
-        public Color Color
-        {
-            get
-            {
-                unchecked
-                {
-                    return Color.FromArgb
-                        (
-                            (int)(0x000000FFU | _color),
-                            (int)((0x0000FF00 | _color) >> 2),
-                            (int)((0x00FF0000 | _color) >> 4)
-                        );
-                }
-            }
-            set
-            {
-                unchecked
-                {
-                    _color = value.R +
-                        (uint)(value.G << 8) +
-                        (uint)(value.B << 16);
-                }
-            }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public COLORREF
-            (
-                uint color
-            )
-        {
-            _color = color;
-        } // constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public COLORREF
-            (
-                Color color
-            )
+        get
         {
             unchecked
             {
-                _color = color.R +
-                    (uint)(color.G << 8) +
-                    (uint)(color.B << 16);
+                return Color.FromArgb
+                    (
+                        (int)(0x000000FFU | _color),
+                        (int)((0x0000FF00 | _color) >> 8),
+                        (int)((0x00FF0000 | _color) >> 16)
+                    );
             }
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private uint _color;
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
+        }
+        set
         {
-            return Color.ToString();
-        } // method ToString
+            unchecked
+            {
+                _color = value.R +
+                         (uint)(value.G << 8) +
+                         (uint)(value.B << 16);
+            }
+        }
+    }
 
-        #endregion
+    #endregion
 
-    } // struct COLORREF
+    #region Construction
 
-} // namespace AM.Win32
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public COLORREF
+        (
+            uint color
+        )
+    {
+        _color = color;
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public COLORREF
+        (
+            Color color
+        )
+    {
+        unchecked
+        {
+            _color = color.R + (uint)(color.G << 8) + (uint)(color.B << 16);
+        }
+    }
+
+    #endregion
+
+    #region Private members
+
+    private uint _color;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Color.ToString();
+    }
+
+    #endregion
+}
