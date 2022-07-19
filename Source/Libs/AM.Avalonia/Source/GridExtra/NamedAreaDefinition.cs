@@ -9,7 +9,7 @@ namespace GridExtra.Avalonia
         public NamedAreaDefinition(string name, int row, int column, int rowSpan, int columnSpan)
             : base(row, column, rowSpan, columnSpan)
         {
-            this.Name = name;
+            Name = name;
         }
     }
 
