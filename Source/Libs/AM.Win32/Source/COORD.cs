@@ -2,11 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+
 
 /* COORD.cs -- координаты ячейки с символом
  * Ars Magna project, http://arsmagna.ru
@@ -21,29 +21,26 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// The COORD structure defines the coordinates of a character cell
+/// in a console screen buffer. The origin of the coordinate system
+/// (0,0) is at the top, left cell of the buffer.
+/// </summary>
+[Serializable]
+[StructLayout (LayoutKind.Explicit, Size = 4)]
+public struct COORD
 {
     /// <summary>
-    /// The COORD structure defines the coordinates of a character cell
-    /// in a console screen buffer. The origin of the coordinate system
-    /// (0,0) is at the top, left cell of the buffer.
+    /// Horizontal coordinate or column value.
     /// </summary>
-    [Serializable]
-    [StructLayout(LayoutKind.Explicit, Size = 4)]
-    public struct COORD
-    {
-        /// <summary>
-        /// Horizontal coordinate or column value.
-        /// </summary>
-        [FieldOffset(0)]
-        public short X;
+    [FieldOffset (0)]
+    public short X;
 
-        /// <summary>
-        /// Vertical coordinate or row value.
-        /// </summary>
-        [FieldOffset(2)]
-        public short Y;
-
-    } // struct COORD
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Vertical coordinate or row value.
+    /// </summary>
+    [FieldOffset (2)]
+    public short Y;
+}
