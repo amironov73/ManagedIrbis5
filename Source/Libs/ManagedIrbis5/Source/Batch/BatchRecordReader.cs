@@ -32,6 +32,8 @@ using AM.Collections;
 
 using ManagedIrbis.Providers;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -113,11 +115,11 @@ public sealed class BatchRecordReader
     {
         if (batchSize < 1)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (BatchRecordReader) + "::Constructor"
-                                               + ": batchSize="
-                                               + batchSize
+                    + ": batchSize={BatchSize}",
+                    batchSize
                 );
 
             throw new ArgumentOutOfRangeException (nameof (batchSize));
@@ -176,10 +178,10 @@ public sealed class BatchRecordReader
     {
         if (batchSize < 1)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (BatchRecordReader) + "::" + nameof (Interval)
-                    + ": batchSize="
+                    + ": batchSize={BatchSize}",
                     + batchSize
                 );
 
@@ -258,11 +260,11 @@ public sealed class BatchRecordReader
     {
         if (batchSize < 1)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (BatchRecordReader) + "::" + nameof (Search)
-                    + ": batchSize="
-                    + batchSize
+                    + ": batchSize={BatchSize}",
+                    batchSize
                 );
 
             throw new ArgumentOutOfRangeException (nameof (batchSize));
@@ -314,11 +316,11 @@ public sealed class BatchRecordReader
     {
         if (batchSize < 1)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (BatchRecordReader) + "::" + nameof (WholeDatabase)
-                    + ": batchSize="
-                    + batchSize
+                    + ": batchSize={BatchSize}",
+                    batchSize
                 );
 
             throw new ArgumentOutOfRangeException (nameof (batchSize));
@@ -386,7 +388,7 @@ public sealed class BatchRecordReader
     /// <inheritdoc cref="IEnumerable{T}.GetEnumerator" />
     public IEnumerator<Record> GetEnumerator()
     {
-        Magna.Trace (nameof (BatchRecordReader) + "::" + nameof (GetEnumerator) + ": start");
+        Magna.Logger.LogTrace (nameof (BatchRecordReader) + "::" + nameof (GetEnumerator) + ": start");
 
         foreach (var package in _chunks)
         {
@@ -403,10 +405,10 @@ public sealed class BatchRecordReader
             }
             catch (Exception exception)
             {
-                Magna.TraceException
+                Magna.Logger.LogError
                     (
-                        nameof (BatchRecordReader) + "::" + nameof (GetEnumerator),
-                        exception
+                        exception,
+                        nameof (BatchRecordReader) + "::" + nameof (GetEnumerator)
                     );
 
                 if (!_HandleException (exception))
@@ -431,7 +433,7 @@ public sealed class BatchRecordReader
 
         ReadComplete.Raise (this);
 
-        Magna.Trace (nameof (BatchRecordReader) + "::" + nameof (GetEnumerator) + ": end");
+        Magna.Logger.LogTrace (nameof (BatchRecordReader) + "::" + nameof (GetEnumerator) + ": end");
     }
 
     [ExcludeFromCodeCoverage]

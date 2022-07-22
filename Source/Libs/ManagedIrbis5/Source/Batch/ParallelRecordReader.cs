@@ -26,300 +26,297 @@ using System.Threading.Tasks;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Batch
+namespace ManagedIrbis.Batch;
+
+/// <summary>
+/// Чтение записей с сервера в параллельных потоках.
+/// </summary>
+public sealed class ParallelRecordReader
+    : IEnumerable<Record>,
+        IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Чтение записей с сервера в параллельных потоках.
+    /// Степень параллелизма.
     /// </summary>
-    public sealed class ParallelRecordReader
-        : IEnumerable<Record>,
-            IDisposable
+    public int Parallelism { get; }
+
+    /// <summary>
+    /// Строка подключения.
+    /// </summary>
+    public string? ConnectionString { get; }
+
+    /// <summary>
+    /// Признак окончания.
+    /// </summary>
+    public bool IsStop => _AllDone();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ParallelRecordReader()
+        : this (-1)
     {
-        #region Properties
+    }
 
-        /// <summary>
-        /// Степень параллелизма.
-        /// </summary>
-        public int Parallelism { get; }
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ParallelRecordReader
+        (
+            int parallelism
+        )
+        : this
+            (
+                parallelism,
+                ConnectionUtility.GetStandardConnectionString()
+                    .ThrowIfNull()
+            )
+    {
+    }
 
-        /// <summary>
-        /// Строка подключения.
-        /// </summary>
-        public string? ConnectionString { get; }
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ParallelRecordReader
+        (
+            int parallelism,
+            string connectionString
+        )
+        : this
+            (
+                parallelism,
+                connectionString,
+                _GetMfnList (connectionString)
+            )
+    {
+    }
 
-        /// <summary>
-        /// Признак окончания.
-        /// </summary>
-        public bool IsStop => _AllDone();
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ParallelRecordReader()
-            : this (-1)
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ParallelRecordReader
+        (
+            int parallelism,
+            string connectionString,
+            int[] mfnList
+        )
+    {
+        if (parallelism <= 0)
         {
+            parallelism = Utility.OptimalParallelism;
         }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ParallelRecordReader
+        ConnectionString = connectionString;
+        Parallelism = Math.Min (mfnList.Length / 1000, parallelism);
+        if (Parallelism < 2)
+        {
+            Parallelism = 2;
+        }
+
+        _Run (mfnList);
+    }
+
+    #endregion
+
+    #region Private members
+
+    private Task[]? _tasks;
+
+    private ConcurrentQueue<Record>? _queue;
+
+    private AutoResetEvent? _event;
+
+    private static int[] _GetMfnList
+        (
+            string connectionString
+        )
+    {
+        using var connection = ConnectionFactory.Shared.CreateSyncConnection();
+        connection.ParseConnectionString (connectionString);
+        connection.Connect();
+
+        var maxMfn = connection.GetMaxMfn() - 1;
+        if (maxMfn <= 0)
+        {
+            throw new IrbisException ("MaxMFN=0");
+        }
+
+        var result = Enumerable.Range (1, maxMfn).ToArray();
+
+        return result;
+    }
+
+    private void _Run
+        (
+            int[] mfnList
+        )
+    {
+        _queue = new ConcurrentQueue<Record>();
+        _event = new AutoResetEvent (false);
+
+        _tasks = new Task[Parallelism];
+        var chunks = ArrayUtility.SplitArray
             (
-                int parallelism
-            )
-            : this
+                mfnList,
+                Parallelism
+            );
+
+        for (var i = 0; i < Parallelism; i++)
+        {
+            var task = new Task
                 (
-                    parallelism,
-                    ConnectionUtility.GetStandardConnectionString()
-                        .ThrowIfNull()
-                )
-        {
+                    _Worker!,
+                    chunks[i]
+                );
+            _tasks[i] = task;
         }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ParallelRecordReader
-            (
-                int parallelism,
-                string connectionString
-            )
-            : this
-                (
-                    parallelism,
-                    connectionString,
-                    _GetMfnList (connectionString)
-                )
+        foreach (var task in _tasks)
         {
+            Thread.Sleep (50);
+            task.Start();
         }
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ParallelRecordReader
+    private void _Worker
+        (
+            object state
+        )
+    {
+        var chunk = (int[])state;
+        var first = chunk.SafeAt (0, -1);
+        var threadId = Environment.CurrentManagedThreadId;
+
+        Magna.Logger.LogTrace
             (
-                int parallelism,
-                string connectionString,
-                int[] mfnList
-            )
+                nameof (ParallelRecordReader) + "::" + nameof (_Worker)
+                + ": first={First}, length={Length}, thread={Thread}",
+                first,
+                chunk.Length,
+                threadId
+            );
+
+        var connectionString = ConnectionString.ThrowIfNull();
+        using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
         {
-            if (parallelism <= 0)
-            {
-                parallelism = Utility.OptimalParallelism;
-            }
-
-            ConnectionString = connectionString;
-            Parallelism = Math.Min (mfnList.Length / 1000, parallelism);
-            if (Parallelism < 2)
-            {
-                Parallelism = 2;
-            }
-
-            _Run (mfnList);
-        }
-
-        #endregion
-
-        #region Private members
-
-        private Task[]? _tasks;
-
-        private ConcurrentQueue<Record>? _queue;
-
-        private AutoResetEvent? _event;
-
-        private static int[] _GetMfnList
-            (
-                string connectionString
-            )
-        {
-            using var connection = ConnectionFactory.Shared.CreateSyncConnection();
             connection.ParseConnectionString (connectionString);
             connection.Connect();
 
-            var maxMfn = connection.GetMaxMfn() - 1;
-            if (maxMfn <= 0)
+            var database = connection.EnsureDatabase();
+            var records = connection.ReadRecords (database, chunk);
+            if (records is not null)
             {
-                throw new IrbisException ("MaxMFN=0");
+                foreach (var record in records)
+                {
+                    _PutRecord (record);
+                }
             }
-
-            var result = Enumerable.Range (1, maxMfn).ToArray();
-
-            return result;
         }
 
-        private void _Run
+        _event?.Set();
+
+        Magna.Logger.LogTrace
             (
-                int[] mfnList
-            )
+                nameof (ParallelRecordReader) + "::" + nameof (_Worker)
+                + ": first={First}, length={Length}, thread={Thread}",
+                first,
+                chunk.Length,
+                +threadId
+            );
+    }
+
+    private void _PutRecord
+        (
+            Record record
+        )
+    {
+        _queue?.Enqueue (record);
+        _event?.Set();
+    }
+
+    private bool _AllDone()
+    {
+        return _queue.ThrowIfNull().IsEmpty
+               && _tasks.ThrowIfNull().All (t => t.IsCompleted);
+    }
+
+    #endregion
+
+    #region IEnumerable<T> members
+
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator" />
+    public IEnumerator<Record> GetEnumerator()
+    {
+        while (true)
         {
-            _queue = new ConcurrentQueue<Record>();
-            _event = new AutoResetEvent (false);
-
-            _tasks = new Task[Parallelism];
-            var chunks = ArrayUtility.SplitArray
-                (
-                    mfnList,
-                    Parallelism
-                );
-
-            for (var i = 0; i < Parallelism; i++)
+            if (IsStop)
             {
-                var task = new Task
-                    (
-                        _Worker!,
-                        chunks[i]
-                    );
-                _tasks[i] = task;
+                yield break;
             }
 
+            if (_queue is not null)
+            {
+                while (_queue.TryDequeue (out var record))
+                {
+                    yield return record;
+                }
+            }
+
+            _event?.Reset();
+
+            _event?.WaitOne (10);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    /// <summary>
+    /// Read all records.
+    /// </summary>
+    public Record[] ReadAll()
+    {
+        var result = new List<Record>();
+
+        foreach (var record in this)
+        {
+            result.Add (record);
+        }
+
+        return result.ToArray();
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public void Dispose()
+    {
+        _event?.Dispose();
+        if (_tasks is not null)
+        {
             foreach (var task in _tasks)
             {
-                Thread.Sleep (50);
-                task.Start();
+                task.Dispose();
             }
         }
-
-        private void _Worker
-            (
-                object state
-            )
-        {
-            var chunk = (int[])state;
-            var first = chunk.SafeAt (0, -1);
-            var threadId = Environment.CurrentManagedThreadId;
-
-            Magna.Trace
-                (
-                    nameof (ParallelRecordReader) + "::" + nameof (_Worker)
-                    + ": first="
-                    + first
-                    + ", length="
-                    + chunk.Length
-                    + ", thread="
-                    + threadId
-                );
-
-            var connectionString = ConnectionString.ThrowIfNull();
-            using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
-            {
-                connection.ParseConnectionString (connectionString);
-                connection.Connect();
-
-                var database = connection.EnsureDatabase();
-                var records = connection.ReadRecords (database, chunk);
-                if (records is not null)
-                {
-                    foreach (var record in records)
-                    {
-                        _PutRecord (record);
-                    }
-                }
-            }
-
-            _event?.Set();
-
-            Magna.Trace
-                (
-                    nameof (ParallelRecordReader) + "::" + nameof (_Worker)
-                    + ": first="
-                    + first
-                    + ", length="
-                    + chunk.Length
-                    + ", thread="
-                    + threadId
-                );
-        }
-
-        private void _PutRecord
-            (
-                Record record
-            )
-        {
-            _queue?.Enqueue (record);
-            _event?.Set();
-        }
-
-        private bool _AllDone()
-        {
-            return _queue.ThrowIfNull().IsEmpty
-                   && _tasks.ThrowIfNull().All (t => t.IsCompleted);
-        }
-
-        #endregion
-
-        #region IEnumerable<T> members
-
-        /// <inheritdoc cref="IEnumerable{T}.GetEnumerator" />
-        public IEnumerator<Record> GetEnumerator()
-        {
-            while (true)
-            {
-                if (IsStop)
-                {
-                    yield break;
-                }
-
-                if (_queue is not null)
-                {
-                    while (_queue.TryDequeue (out var record))
-                    {
-                        yield return record;
-                    }
-                }
-
-                _event?.Reset();
-
-                _event?.WaitOne (10);
-            }
-        }
-
-        [ExcludeFromCodeCoverage]
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        /// <summary>
-        /// Read all records.
-        /// </summary>
-        public Record[] ReadAll()
-        {
-            var result = new List<Record>();
-
-            foreach (var record in this)
-            {
-                result.Add (record);
-            }
-
-            return result.ToArray();
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public void Dispose()
-        {
-            _event?.Dispose();
-            if (_tasks is not null)
-            {
-                foreach (var task in _tasks)
-                {
-                    task.Dispose();
-                }
-            }
-        }
-
-        #endregion
     }
+
+    #endregion
 }

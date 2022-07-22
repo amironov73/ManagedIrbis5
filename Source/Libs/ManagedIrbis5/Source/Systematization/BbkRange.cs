@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using AM;
 using AM.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -72,26 +74,23 @@ public sealed class BbkRange
 
         if (slashPosition == 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "BbkRange::Constructor: "
-                    + "index can't start with /: "
-                    + originalIndex
+                    nameof (BbkRange) + "::Constructor"
+                    + ": index can't start with /: {Index}",
+                    originalIndex
                 );
 
-            throw new BbkException
-                (
-                    "Индекс не может начинаться со слеша"
-                );
+            throw new BbkException ("Индекс не может начинаться со слеша");
         }
 
         if (OriginalIndex.LastIndexOf ('/') != slashPosition)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "BbkRange::Constructor: "
-                    + "more than one /: "
-                    + originalIndex
+                    nameof (BbkRange) + "::Constructor"
+                    + ": more than one /: {Index}",
+                    originalIndex
                 );
 
             throw new BbkException ("Индекс не может содержать "
@@ -102,25 +101,24 @@ public sealed class BbkRange
         var suffixLength = totalLength - slashPosition - 1;
         if (suffixLength == 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "BbkRange::Constructor: "
-                    + "index can't end with /: "
-                    + originalIndex
+                    nameof (BbkRange) + "::Constructor"
+                    + ": index can't end with /: {Index}",
+                    originalIndex
                 );
 
-            throw new BbkException ("Индекс не может "
-                                    + "заканчиваться слэшом");
+            throw new BbkException ("Индекс не может заканчиваться слэшом");
         }
 
         var prefixLenght = slashPosition - suffixLength;
         if (prefixLenght < 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "BbkRange::Constructor: "
-                    + "prefix is shorter than suffix: "
-                    + originalIndex
+                    nameof (BbkRange) + "::Constructor"
+                    + ": prefix is shorter than suffix: {Index}",
+                    originalIndex
                 );
 
             throw new BbkException ("Префикс короче суффикса!");

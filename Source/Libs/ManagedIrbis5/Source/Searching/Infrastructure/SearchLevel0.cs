@@ -13,6 +13,8 @@
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -54,25 +56,22 @@ sealed class SearchLevel0
     {
         get
         {
-            if (!ReferenceEquals(Term, null))
+            if (!ReferenceEquals (Term, null))
             {
                 return new ISearchTree[] { Term };
             }
 
-            if (!ReferenceEquals(Reference, null))
+            if (!ReferenceEquals (Reference, null))
             {
                 return new ISearchTree[] { Reference };
             }
 
-            return new ISearchTree[] { Parenthesis.ThrowIfNull(nameof(Parenthesis)) };
+            return new ISearchTree[] { Parenthesis.ThrowIfNull (nameof (Parenthesis)) };
         }
     }
 
     /// <inheritdoc cref="ISearchTree.Value" />
-    public string? Value
-    {
-        get { return null; }
-    }
+    public string? Value => null;
 
     /// <inheritdoc cref="ISearchTree.Find"/>
     public TermLink[] Find
@@ -82,27 +81,27 @@ sealed class SearchLevel0
     {
         TermLink[] result;
 
-        if (!ReferenceEquals(Term, null))
+        if (!ReferenceEquals (Term, null))
         {
-            result = Term.Find(context);
+            result = Term.Find (context);
         }
-        else if (!ReferenceEquals(Reference, null))
+        else if (!ReferenceEquals (Reference, null))
         {
-            result = Reference.Find(context);
+            result = Reference.Find (context);
         }
-        else if (!ReferenceEquals(Parenthesis, null))
+        else if (!ReferenceEquals (Parenthesis, null))
         {
-            result = Parenthesis.Find(context);
+            result = Parenthesis.Find (context);
         }
         else
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "SearchLevel0::Find: "
-                    + "unexpected situation"
+                    nameof (SearchLevel0) + "::" + nameof (Find)
+                    + ": unexpected situation"
                 );
 
-            throw new IrbisException("Unexpected SearchLevel0");
+            throw new IrbisException ("Unexpected SearchLevel0");
         }
 
         return result;
@@ -120,21 +119,21 @@ sealed class SearchLevel0
         fromChild.Parent = null;
 
         var term = fromChild as SearchTerm;
-        if (!ReferenceEquals(term, null))
+        if (!ReferenceEquals (term, null))
         {
-            Term = (SearchTerm?) toChild;
+            Term = (SearchTerm?)toChild;
         }
 
         var reference = fromChild as SearchReference;
-        if (!ReferenceEquals(reference, null))
+        if (!ReferenceEquals (reference, null))
         {
-            Reference = (SearchReference?) toChild;
+            Reference = (SearchReference?)toChild;
         }
 
         var level7 = fromChild as SearchLevel7;
         if (!ReferenceEquals (level7, null))
         {
-            Parenthesis = (SearchLevel7?) toChild;
+            Parenthesis = (SearchLevel7?)toChild;
         }
 
         if (!ReferenceEquals (toChild, null))
@@ -151,7 +150,7 @@ sealed class SearchLevel0
     public override string ToString() =>
         (
             Term
-            ?? (object?) Reference
+            ?? (object?)Reference
             ?? Parenthesis
         )
         .ToVisibleString();

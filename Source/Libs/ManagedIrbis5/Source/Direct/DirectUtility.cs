@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 using AM;
 using AM.IO;
 
-using ManagedIrbis.Properties;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -246,7 +246,8 @@ public static class DirectUtility
             DirectAccessMode mode
         )
     {
-        Sure.NotNullNorEmpty (fileName, nameof (fileName));
+        Sure.NotNullNorEmpty (fileName);
+        Sure.Defined (mode);
 
         Stream result;
         switch (mode)
@@ -264,11 +265,11 @@ public static class DirectUtility
                 break;
 
             default:
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (DirectoryUtility) + "::" + nameof (OpenFile)
-                        + Resources.UnexpectedMode
-                        + mode
+                        + ": unexpected mode {Mode}",
+                        mode
                     );
 
                 throw new IrbisException ($"Unexpected mode={mode}");

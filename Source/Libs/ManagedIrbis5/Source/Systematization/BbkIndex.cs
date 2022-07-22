@@ -25,6 +25,8 @@ using AM;
 using AM.Collections;
 using AM.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -160,17 +162,14 @@ public sealed class BbkIndex
 
                 if (result.Length == 1)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
                             nameof (BbkIndex) + "::" + nameof (_ParseCombined)
-                            + ": неверный комбинированный индекс: "
-                            + text.ToVisibleString()
+                            + ": неверный комбинированный индекс: {Index}",
+                            text.ToVisibleString()
                         );
 
-                    throw new BbkException
-                        (
-                            "Неверный комбинированный индекс"
-                        );
+                    throw new BbkException ("Неверный комбинированный индекс");
                 }
             }
         }
@@ -207,17 +206,14 @@ public sealed class BbkIndex
 
                 if (result[^1] != ')')
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
                             nameof (BbkIndex) + "::" + nameof (_ParseTerritorial)
-                            + ": незакрытая скобка в территориальном делении: "
-                            + text.ToVisibleString()
+                            + ": незакрытая скобка в территориальном делении: {Text}",
+                            text.ToVisibleString()
                         );
 
-                    throw new BbkException
-                        (
-                            "Незакрытая скобка в территориальном делении"
-                        );
+                    throw new BbkException ("Незакрытая скобка в территориальном делении");
                 }
             }
         }
@@ -275,17 +271,14 @@ public sealed class BbkIndex
 
                 if (result.Length == 1)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
                             nameof (BbkIndex) + "::" + nameof (_ParseSpecial)
-                            + ": неверный код специального типового деления: "
-                            + text.ToVisibleString()
+                            + ": неверный код специального типового деления: {Text}",
+                            text.ToVisibleString()
                         );
 
-                    throw new BbkException
-                        (
-                            "Неверный код специального типового деления"
-                        );
+                    throw new BbkException ("Неверный код специального типового деления");
                 }
             }
         }
@@ -329,17 +322,14 @@ public sealed class BbkIndex
 
                 if (result.Length == 1)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
                             nameof (BbkIndex) + "::" + nameof (_ParseComma)
-                            + ": неверно сформированный индекс: "
-                            + text.ToVisibleString()
+                            + ": неверно сформированный индекс: {Text}",
+                            text.ToVisibleString()
                         );
 
-                    throw new BbkException
-                        (
-                            "Неверно сформированный индекс"
-                        );
+                    throw new BbkException ("Неверно сформированный индекс");
                 }
             }
         }
@@ -364,17 +354,14 @@ public sealed class BbkIndex
 
                 if (result.Length == 1)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
                             nameof (BbkIndex) + "::" + nameof (_ParseSocial)
-                            + ": неверный код социальной системы: "
-                            + text.ToVisibleString()
+                            + ": неверный код социальной системы: {Text}",
+                            text.ToVisibleString()
                         );
 
-                    throw new BbkException
-                        (
-                            "Неверный код социальной системы"
-                        );
+                    throw new BbkException ("Неверный код социальной системы");
                 }
             }
         }
@@ -417,17 +404,14 @@ public sealed class BbkIndex
 
         if (copy[^1] == '.')
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (BbkIndex) + "::" + nameof (_Verify)
-                    + ": индекс оканчивается точкой: "
-                    + text.ToVisibleString()
+                    + ": индекс оканчивается точкой: {Text}",
+                    text.ToVisibleString()
                 );
 
-            throw new BbkException
-                (
-                    "Индекс заканчивается точкой"
-                );
+            throw new BbkException ("Индекс заканчивается точкой");
         }
 
         var length = copy.Length;
@@ -435,17 +419,14 @@ public sealed class BbkIndex
         {
             if (copy[2] != '.')
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (BbkIndex) + "::" + nameof (_Verify)
-                        + ": индекс должен начинаться с двузначной группы: "
-                        + text.ToVisibleString()
+                        + ": индекс должен начинаться с двузначной группы: {Text}",
+                        text.ToVisibleString()
                     );
 
-                throw new BbkException
-                    (
-                        "Индекс должен начинаться с двузначной группы"
-                    );
+                throw new BbkException ("Индекс должен начинаться с двузначной группы");
             }
         }
 
@@ -459,17 +440,14 @@ public sealed class BbkIndex
             {
                 if (count == 0)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
                             nameof (BbkIndex) + "::" + nameof (_Verify)
-                            + ": два разделителя подряд: "
-                            + text.ToVisibleString()
+                            + ": два разделителя подряд: {Text}",
+                            text.ToVisibleString()
                         );
 
-                    throw new BbkException
-                        (
-                            "Два разделителя подряд"
-                        );
+                    throw new BbkException ("Два разделителя подряд");
                 }
 
                 // expression count > 3 is always false
@@ -487,11 +465,11 @@ public sealed class BbkIndex
                 count++;
                 if (count > 3)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
-                            "BbkIndex::_Verify: "
-                            + "слишком длинная группа: "
-                            + text.ToVisibleString()
+                            nameof (BbkIndex) + "::" + nameof (_Verify)
+                            + ": слишком длинная группа: {Text}",
+                            text.ToVisibleString()
                         );
 
                     throw new BbkException
@@ -543,7 +521,7 @@ public sealed class BbkIndex
 
         if (string.IsNullOrEmpty (text))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (BbkIndex) + "::" + nameof (Parse)
                     + ": empty index"
@@ -555,11 +533,11 @@ public sealed class BbkIndex
         var length = text.Length;
         if (length < 2)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (BbkIndex) + "::" + nameof (Parse)
-                    + ": less than two symbols: "
-                    + text.ToVisibleString()
+                    + ": less than two symbols: {Text}",
+                    text.ToVisibleString()
                 );
 
             throw new BbkException
@@ -570,17 +548,14 @@ public sealed class BbkIndex
 
         if (!char.IsDigit (text, 0) || !char.IsDigit (text, 1))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (BbkIndex) + "::" + nameof (Parse)
-                    + ": two first symbols must be digits: "
-                    + text.ToVisibleString()
+                    + ": two first symbols must be digits: {Text}",
+                    text.ToVisibleString()
                 );
 
-            throw new BbkException
-                (
-                    "Первые два символа ББК должны быть цифрами"
-                );
+            throw new BbkException ("Первые два символа ББК должны быть цифрами");
         }
 
         var offset = 2;
@@ -640,11 +615,11 @@ public sealed class BbkIndex
 
                 if (offset == previousOffset)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
                             nameof (BbkIndex) + "::" + nameof (Parse)
-                            + "garbage found: "
-                            + text.ToVisibleString()
+                            + "garbage found: {Text}",
+                            text.ToVisibleString()
                         );
 
                     throw new BbkException

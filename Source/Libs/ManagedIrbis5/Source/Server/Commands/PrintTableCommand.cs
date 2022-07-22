@@ -23,93 +23,94 @@ using System;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Server.Commands
+namespace ManagedIrbis.Server.Commands;
+
+/// <summary>
+/// Формирование таблицы.
+/// </summary>
+public sealed class PrintTableCommand
+    : ServerCommand
 {
+    #region Construction
+
     /// <summary>
-    /// Формирование таблицы.
+    /// Конструктор.
     /// </summary>
-    public sealed class PrintTableCommand
-        : ServerCommand
+    public PrintTableCommand
+        (
+            WorkData data
+        )
+        : base (data)
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PrintTableCommand
-            (
-                WorkData data
-            )
-            : base (data)
-        {
-        }
-
-        #endregion
-
-        #region ServerCommand members
-
-        /// <inheritdoc cref="ServerCommand.Execute" />
-        public override void Execute()
-        {
-            var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute (Data);
-
-            try
-            {
-                var context = engine.RequireContext (Data);
-                Data.Context = context;
-                UpdateContext();
-
-                var request = Data.Request.ThrowIfNull();
-                var database = request.RequireAnsiString();
-                database.NotUsed();
-                var table = request.RequireAnsiString();
-                table.NotUsed();
-                var headers = request.GetUtfString();
-                headers.NotUsed();
-                var mode = request.GetAnsiString();
-                mode.NotUsed();
-                var searchQuery = request.GetUtfString();
-                searchQuery.NotUsed();
-                var minMfn = request.GetInt32();
-                minMfn.NotUsed();
-                var maxMfn = request.GetInt32();
-                maxMfn.NotUsed();
-                var sequentialQuery = request.GetUtfString();
-                sequentialQuery.NotUsed();
-                var mfnList = Array.Empty<int>(); // TODO get mfnList
-                mfnList.NotUsed();
-
-                // TODO implement
-
-                var response = Data.Response.ThrowIfNull (nameof (Data.Response));
-
-                // Код возврата не отправляется
-                response.WriteAnsiString (string.Empty).NewLine();
-                SendResponse();
-            }
-            catch (IrbisException exception)
-            {
-                SendError (exception.ErrorCode);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        nameof (PrintTableCommand) + "::" + nameof (Execute),
-                        exception
-                    );
-
-                SendError (-8888);
-            }
-
-            engine.OnAfterExecute (Data);
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region ServerCommand members
+
+    /// <inheritdoc cref="ServerCommand.Execute" />
+    public override void Execute()
+    {
+        var engine = Data.Engine.ThrowIfNull();
+        engine.OnBeforeExecute (Data);
+
+        try
+        {
+            var context = engine.RequireContext (Data);
+            Data.Context = context;
+            UpdateContext();
+
+            var request = Data.Request.ThrowIfNull();
+            var database = request.RequireAnsiString();
+            database.NotUsed();
+            var table = request.RequireAnsiString();
+            table.NotUsed();
+            var headers = request.GetUtfString();
+            headers.NotUsed();
+            var mode = request.GetAnsiString();
+            mode.NotUsed();
+            var searchQuery = request.GetUtfString();
+            searchQuery.NotUsed();
+            var minMfn = request.GetInt32();
+            minMfn.NotUsed();
+            var maxMfn = request.GetInt32();
+            maxMfn.NotUsed();
+            var sequentialQuery = request.GetUtfString();
+            sequentialQuery.NotUsed();
+            var mfnList = Array.Empty<int>(); // TODO get mfnList
+            mfnList.NotUsed();
+
+            // TODO implement
+
+            var response = Data.Response.ThrowIfNull (nameof (Data.Response));
+
+            // Код возврата не отправляется
+            response.WriteAnsiString (string.Empty).NewLine();
+            SendResponse();
+        }
+        catch (IrbisException exception)
+        {
+            SendError (exception.ErrorCode);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (PrintTableCommand) + "::" + nameof (Execute)
+                );
+
+            SendError (-8888);
+        }
+
+        engine.OnAfterExecute (Data);
+    }
+
+    #endregion
 }

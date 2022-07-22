@@ -15,10 +15,13 @@ using System;
 using System.Text;
 
 using AM;
+using AM.Text;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Direct;
 using ManagedIrbis.Providers;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -148,7 +151,7 @@ public sealed class SearchTerm
 
         var provider = context.Provider;
         var database = provider.EnsureDatabase();
-        var term = Term.ThrowIfNull(nameof(Term));
+        var term = Term.ThrowIfNull (nameof (Term));
         TermLink[] result;
 
         switch (Tail)
@@ -167,11 +170,11 @@ public sealed class SearchTerm
                 break;
 
             default:
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (SearchTerm) + "::" + nameof (Find)
-                        + "unexpected tail: "
-                        + Tail.ToVisibleString()
+                        + ": unexpected tail: {Tail}",
+                        Tail.ToVisibleString()
                     );
 
                 throw new IrbisException ("Unexpected search term tail");
@@ -189,10 +192,10 @@ public sealed class SearchTerm
             ISearchTree? toChild
         )
     {
-        Magna.Error
+        Magna.Logger.LogError
             (
-                "SearchTerm::ReplaceChild: "
-                + "not implemented"
+                nameof (SearchTerm) + "::" + nameof (ReplaceChild)
+                + ": not implemented"
             );
 
         throw new NotImplementedException();
@@ -205,19 +208,20 @@ public sealed class SearchTerm
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
 
-        result.Append('"');
-        result.Append(Term);
-        if (!string.IsNullOrEmpty(Tail))
+        builder.Append ('"');
+        builder.Append (Term);
+        if (!string.IsNullOrEmpty (Tail))
         {
-            result.Append(Tail);
+            builder.Append (Tail);
         }
-        result.Append('"');
-        if (!ReferenceEquals(Context, null))
+
+        builder.Append ('"');
+        if (!ReferenceEquals (Context, null))
         {
-            result.Append("/(");
-            result.Append
+            builder.Append ("/(");
+            builder.Append
                 (
                     string.Join
                         (
@@ -225,10 +229,13 @@ public sealed class SearchTerm
                             Context
                         )
                 );
-            result.Append(')');
+            builder.Append (')');
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

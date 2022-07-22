@@ -19,293 +19,292 @@ using System.Text;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Работа с форматами ИРБИС64.
+/// </summary>
+public static class IrbisFormat
 {
+    #region Constants
+
     /// <summary>
-    /// Работа с форматами ИРБИС64.
+    /// Format ALL.
     /// </summary>
-    public static class IrbisFormat
+    public const string All = "&uf('+0')";
+
+    /// <summary>
+    /// BRIEF format.
+    /// </summary>
+    public const string Brief = "@brief";
+
+    /// <summary>
+    /// IBIS format.
+    /// </summary>
+    public const string Ibis = "@ibiskw_h";
+
+    /// <summary>
+    /// Informational format.
+    /// </summary>
+    public const string Informational = "@info_w";
+
+    /// <summary>
+    /// Optimized format.
+    /// </summary>
+    public const string Optimized = "@";
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Remove comments from the format.
+    /// </summary>
+    public static string? RemoveComments
+        (
+            string? text
+        )
     {
-        #region Constants
+        const char zero = '\0';
 
-        /// <summary>
-        /// Format ALL.
-        /// </summary>
-        public const string All = "&uf('+0')";
-
-        /// <summary>
-        /// BRIEF format.
-        /// </summary>
-        public const string Brief = "@brief";
-
-        /// <summary>
-        /// IBIS format.
-        /// </summary>
-        public const string Ibis = "@ibiskw_h";
-
-        /// <summary>
-        /// Informational format.
-        /// </summary>
-        public const string Informational = "@info_w";
-
-        /// <summary>
-        /// Optimized format.
-        /// </summary>
-        public const string Optimized = "@";
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Remove comments from the format.
-        /// </summary>
-        public static string? RemoveComments
-            (
-                string? text
-            )
+        if (string.IsNullOrEmpty (text))
         {
-            const char zero = '\0';
+            return text;
+        }
 
-            if (string.IsNullOrEmpty(text))
+        if (!text.Contains ("/*"))
+        {
+            return text;
+        }
+
+        int index = 0, length = text.Length;
+        var result = new StringBuilder (length);
+        var state = zero;
+
+        while (index < length)
+        {
+            var c = text[index];
+
+            switch (state)
             {
-                return text;
-            }
+                case '\'':
+                case '"':
+                case '|':
+                    if (c == state)
+                    {
+                        state = zero;
+                    }
 
-            if (!text.Contains("/*"))
-            {
-                return text;
-            }
+                    result.Append (c);
+                    break;
 
-            int index = 0, length = text.Length;
-            var result = new StringBuilder(length);
-            var state = zero;
-
-            while (index < length)
-            {
-                var c = text[index];
-
-                switch (state)
-                {
-                    case '\'':
-                    case '"':
-                    case '|':
-                        if (c == state)
+                default:
+                    if (c == '/')
+                    {
+                        if (index + 1 < length && text[index + 1] == '*')
                         {
-                            state = zero;
-                        }
-                        result.Append(c);
-                        break;
-
-                    default:
-                        if (c == '/')
-                        {
-                            if (index + 1 < length && text[index + 1] == '*')
+                            while (index < length)
                             {
-                                while (index < length)
+                                c = text[index];
+                                if (c == '\r' || c == '\n')
                                 {
-                                    c = text[index];
-                                    if (c == '\r' || c == '\n')
-                                    {
-                                        result.Append(c);
-                                        break;
-                                    }
-
-                                    index++;
+                                    result.Append (c);
+                                    break;
                                 }
+
+                                index++;
                             }
-                            else
-                            {
-                                result.Append(c);
-                            }
-                        }
-                        else if (c == '\'' || c == '"' || c == '|')
-                        {
-                            state = c;
-                            result.Append(c);
                         }
                         else
                         {
-                            result.Append(c);
+                            result.Append (c);
                         }
-                        break;
-                }
-
-                index++;
-            } // while
-
-            return result.ToString();
-
-        } // method RemoveComments
-
-        /// <summary>
-        /// Prepare the dynamic format string.
-        /// </summary>
-        /// <remarks>Dynamic format string
-        /// mustn't contains comments and
-        /// string delimiters (no matter
-        /// real or IRBIS).
-        /// </remarks>
-        public static string? PrepareFormat
-            (
-                string? text
-            )
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return text;
-            }
-
-            text = RemoveComments(text);
-            if (string.IsNullOrEmpty(text))
-            {
-                return text;
-            }
-
-            var length = text.Length;
-            var flag = false;
-            for (var i = 0; i < length; i++)
-            {
-                if (text[i] < ' ')
-                {
-                    flag = true;
-                    break;
-                }
-            }
-
-            if (!flag)
-            {
-                return text;
-            }
-
-            var result = new StringBuilder(length);
-            for (var i = 0; i < length; i++)
-            {
-                var c = text[i];
-                if (c >= ' ')
-                {
-                    result.Append(c);
-                }
-            }
-
-            return result.ToString();
-
-        } // method PrepareFormat
-
-        /// <summary>
-        /// Verify format string.
-        /// </summary>
-        public static bool VerifyFormat
-            (
-                string? text,
-                bool throwOnError
-            )
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                Magna.Error
-                    (
-                        nameof(IrbisFormat) + "::" + nameof(VerifyFormat)
-                        + "text is absent"
-                    );
-
-                if (throwOnError)
-                {
-                    throw new VerificationException("text is absent");
-                }
-
-                return false;
-            }
-
-            foreach (var c in text)
-            {
-                if (c < ' ')
-                {
-                    Magna.Error
-                        (
-                            nameof(IrbisFormat) + "::" + nameof(VerifyFormat)
-                            + "contains forbidden symbols"
-                        );
-                    if (throwOnError)
+                    }
+                    else if (c == '\'' || c == '"' || c == '|')
                     {
-                        throw new VerificationException("contains forbidden symbols");
+                        state = c;
+                        result.Append (c);
+                    }
+                    else
+                    {
+                        result.Append (c);
                     }
 
-                    return false;
-                }
-            } // foreach
+                    break;
+            }
 
-            const char zero = '\0';
-            var state = zero;
-            var index = 0;
-            var length = text.Length;
-            while (index < length)
+            index++;
+        } // while
+
+        return result.ToString();
+    } // method RemoveComments
+
+    /// <summary>
+    /// Prepare the dynamic format string.
+    /// </summary>
+    /// <remarks>Dynamic format string
+    /// mustn't contains comments and
+    /// string delimiters (no matter
+    /// real or IRBIS).
+    /// </remarks>
+    public static string? PrepareFormat
+        (
+            string? text
+        )
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return text;
+        }
+
+        text = RemoveComments (text);
+        if (string.IsNullOrEmpty (text))
+        {
+            return text;
+        }
+
+        var length = text.Length;
+        var flag = false;
+        for (var i = 0; i < length; i++)
+        {
+            if (text[i] < ' ')
             {
-                var c = text[index];
+                flag = true;
+                break;
+            }
+        }
 
-                switch (state)
-                {
-                    case '\'':
-                    case '"':
-                    case '|':
-                        if (c == state)
-                        {
-                            state = zero;
-                        }
-                        break;
+        if (!flag)
+        {
+            return text;
+        }
 
-                    default:
-                        if (c == '/' && index + 1 < length && text[index + 1] == '*')
-                        {
-                            Magna.Error
-                                (
-                                    nameof(IrbisFormat) + "::"
-                                    + nameof(VerifyFormat)
-                                    + "contains comment"
-                                );
-                            if (throwOnError)
-                            {
-                                throw new VerificationException("contains comment");
-                            }
-
-                            return false;
-                        }
-
-                        if (c == '\'' || c == '"' || c == '|')
-                        {
-                            state = c;
-                        }
-                        break;
-                }
-
-                index++;
-            } // while
-
-            if (state != zero)
+        var result = new StringBuilder (length);
+        for (var i = 0; i < length; i++)
+        {
+            var c = text[i];
+            if (c >= ' ')
             {
-                Magna.Error
+                result.Append (c);
+            }
+        }
+
+        return result.ToString();
+    } // method PrepareFormat
+
+    /// <summary>
+    /// Verify format string.
+    /// </summary>
+    public static bool VerifyFormat
+        (
+            string? text,
+            bool throwOnError
+        )
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (IrbisFormat) + "::" + nameof (VerifyFormat)
+                    + ": format text is absent"
+                );
+
+            if (throwOnError)
+            {
+                throw new VerificationException ("format text is absent");
+            }
+
+            return false;
+        }
+
+        foreach (var c in text)
+        {
+            if (c < ' ')
+            {
+                Magna.Logger.LogError
                     (
-                        nameof(IrbisFormat) + "::" + nameof(VerifyFormat)
-                        + "nonclosed literal"
+                        nameof (IrbisFormat) + "::" + nameof (VerifyFormat)
+                        + ": format contains forbidden symbols"
                     );
                 if (throwOnError)
                 {
-                    throw new VerificationException("nonclosed literal");
+                    throw new VerificationException ("format contains forbidden symbols");
                 }
 
                 return false;
-            } // if
+            }
+        }
 
-            return true;
+        const char zero = '\0';
+        var state = zero;
+        var index = 0;
+        var length = text.Length;
+        while (index < length)
+        {
+            var c = text[index];
 
-        } // method VerifyFormat
+            switch (state)
+            {
+                case '\'':
+                case '"':
+                case '|':
+                    if (c == state)
+                    {
+                        state = zero;
+                    }
 
-        #endregion
+                    break;
 
-    } // class IrbisFormat
+                default:
+                    if (c == '/' && index + 1 < length && text[index + 1] == '*')
+                    {
+                        Magna.Logger.LogError
+                            (
+                                nameof (IrbisFormat) + "::" + nameof (VerifyFormat)
+                                + ": format contains comment"
+                            );
+                        if (throwOnError)
+                        {
+                            throw new VerificationException ("format contains comment");
+                        }
 
-} // namespace ManagedIrbis.Infrastructure
+                        return false;
+                    }
+
+                    if (c == '\'' || c == '"' || c == '|')
+                    {
+                        state = c;
+                    }
+
+                    break;
+            }
+
+            index++;
+        }
+
+        if (state != zero)
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (IrbisFormat) + "::" + nameof (VerifyFormat)
+                    + ": nonclosed literal"
+                );
+            if (throwOnError)
+            {
+                throw new VerificationException ("nonclosed literal");
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    #endregion
+}

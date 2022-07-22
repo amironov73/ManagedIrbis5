@@ -26,128 +26,129 @@ using AM.Collections;
 
 using ManagedIrbis.Infrastructure;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Server.Commands
+namespace ManagedIrbis.Server.Commands;
+
+/// <summary>
+/// Чтение файла из серверного контекста.
+/// </summary>
+public sealed class ReadFileCommand
+    : ServerCommand
 {
+    #region Constants
+
     /// <summary>
-    /// Чтение файла из серверного контекста.
+    /// Преамбула для двоичных файлов.
+    /// IRBIS_BINARY_DATA
     /// </summary>
-    public sealed class ReadFileCommand
-        : ServerCommand
+    public static readonly byte[] Preamble =
     {
-        #region Constants
+        73, 82, 66, 73, 83, 95, 66, 73, 78, 65, 82, 89, 95, 68,
+        65, 84, 65
+    };
 
-        /// <summary>
-        /// Преамбула для двоичных файлов.
-        /// IRBIS_BINARY_DATA
-        /// </summary>
-        public static readonly byte[] Preamble =
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ReadFileCommand
+        (
+            WorkData data
+        )
+        : base (data)
+    {
+    }
+
+    #endregion
+
+    #region ServerCommand members
+
+    /// <inheritdoc cref="ServerCommand.Execute" />
+    public override void Execute()
+    {
+        var engine = Data.Engine.ThrowIfNull();
+        engine.OnBeforeExecute (Data);
+
+        try
         {
-            73, 82, 66, 73, 83, 95, 66, 73, 78, 65, 82, 89, 95, 68,
-            65, 84, 65
-        };
+            var context = engine.RequireContext (Data);
+            Data.Context = context;
+            UpdateContext();
 
-        #endregion
+            var request = Data.Request.ThrowIfNull();
+            var response = Data.Response.ThrowIfNull();
 
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ReadFileCommand
-            (
-                WorkData data
-            )
-            : base (data)
-        {
-        }
-
-        #endregion
-
-        #region ServerCommand members
-
-        /// <inheritdoc cref="ServerCommand.Execute" />
-        public override void Execute()
-        {
-            var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute (Data);
-
-            try
+            // Код возврата не отправляется
+            var lines = request.RemainingAnsiStrings();
+            foreach (var line in lines)
             {
-                var context = engine.RequireContext (Data);
-                Data.Context = context;
-                UpdateContext();
-
-                var request = Data.Request.ThrowIfNull();
-                var response = Data.Response.ThrowIfNull();
-
-                // Код возврата не отправляется
-                var lines = request.RemainingAnsiStrings();
-                foreach (var line in lines)
+                try
                 {
-                    try
+                    var specification = FileSpecification.Parse (line);
+                    var filename = engine.ResolveFile (specification);
+                    if (string.IsNullOrEmpty (filename))
                     {
-                        var specification = FileSpecification.Parse (line);
-                        var filename = engine.ResolveFile (specification);
-                        if (string.IsNullOrEmpty (filename))
+                        response.NewLine();
+                    }
+                    else
+                    {
+                        var content = engine.Cache.GetFile (filename);
+                        if (content.IsNullOrEmpty())
                         {
-                            response.NewLine();
+                            content = Array.Empty<byte>();
+                        }
+
+                        if (specification.BinaryFile)
+                        {
+                            response.Memory.Write (Preamble, 0, Preamble.Length);
+                            response.Memory.Write (content, 0, content.Length);
                         }
                         else
                         {
-                            var content = engine.Cache.GetFile (filename);
-                            if (content.IsNullOrEmpty())
-                            {
-                                content = Array.Empty<byte>();
-                            }
-
-                            if (specification.BinaryFile)
-                            {
-                                response.Memory.Write (Preamble, 0, Preamble.Length);
-                                response.Memory.Write (content, 0, content.Length);
-                            }
-                            else
-                            {
-                                IrbisText.WindowsToIrbis (content);
-                                response.Memory.Write (content, 0, content.Length);
-                                response.NewLine();
-                            }
-                        } // else
+                            IrbisText.WindowsToIrbis (content);
+                            response.Memory.Write (content, 0, content.Length);
+                            response.NewLine();
+                        }
                     }
-                    catch (Exception exception)
-                    {
-                        Magna.TraceException
-                            (
-                                nameof (ReadFileCommand) + "::" + nameof (Execute),
-                                exception
-                            );
-                        response.NewLine();
-                    }
-                } // foreach
-
-                SendResponse();
-            }
-            catch (IrbisException exception)
-            {
-                SendError (exception.ErrorCode);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        nameof (ReadFileCommand) + "::" + nameof (Execute),
-                        exception
-                    );
-
-                SendError (-8888);
+                }
+                catch (Exception exception)
+                {
+                    Magna.Logger.LogError
+                        (
+                            exception,
+                            nameof (ReadFileCommand) + "::" + nameof (Execute)
+                        );
+                    response.NewLine();
+                }
             }
 
-            engine.OnAfterExecute (Data);
+            SendResponse();
+        }
+        catch (IrbisException exception)
+        {
+            SendError (exception.ErrorCode);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (ReadFileCommand) + "::" + nameof (Execute)
+                );
+
+            SendError (-8888);
         }
 
-        #endregion
+        engine.OnAfterExecute (Data);
     }
+
+    #endregion
 }

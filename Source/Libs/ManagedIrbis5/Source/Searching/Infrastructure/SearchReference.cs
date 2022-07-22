@@ -17,6 +17,8 @@ using AM;
 
 using ManagedIrbis.Providers;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -88,10 +90,10 @@ internal sealed class SearchReference
     {
         Sure.NotNull (fromChild);
 
-        Magna.Error
+        Magna.Logger.LogError
             (
                 nameof (SearchReference) + "::" + nameof (ReplaceChild)
-                + "not implemented"
+                + ": not implemented"
             );
 
         throw new NotImplementedException();

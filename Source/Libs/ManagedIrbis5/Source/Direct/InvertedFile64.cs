@@ -486,10 +486,10 @@ public class InvertedFile64
             }
             catch (Exception exception)
             {
-                Magna.TraceException
+                Magna.Logger.LogError
                     (
-                        "InvertedFile64::SearchExact",
-                        exception
+                        exception,
+                        nameof (InvertedFile64) + "::" + nameof (SearchExact)
                     );
             }
         }
@@ -652,10 +652,10 @@ public class InvertedFile64
             }
             catch (Exception exception)
             {
-                Magna.TraceException
+                Magna.Logger.LogError
                     (
-                        "InvertedFile64::SearchExact",
-                        exception
+                        exception,
+                        nameof (InvertedFile64) + "::" + nameof (SearchExact)
                     );
             }
         }

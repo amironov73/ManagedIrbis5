@@ -97,7 +97,7 @@ public sealed class XrfFile64
         FileName = Unix.FindFileOrThrow (fileName);
         Mode = mode;
 
-        Magna.Trace (nameof (XrfFile64) + "::Constructor: " + FileName);
+        Magna.Logger.LogTrace (nameof (XrfFile64) + "::Constructor: {FileName}", FileName);
 
         _stream = DirectUtility.OpenFile (fileName, mode);
     }
@@ -252,8 +252,7 @@ public sealed class XrfFile64
     /// <inheritdoc cref="IDisposable.Dispose" />
     public void Dispose()
     {
-        Magna.Trace (nameof (XrfFile64) + "::" + nameof (Dispose)
-                     + ": " + FileName);
+        Magna.Logger.LogTrace (nameof (XrfFile64) + "::" + nameof (Dispose) + ": {FileName}", FileName);
 
         lock (this)
         {

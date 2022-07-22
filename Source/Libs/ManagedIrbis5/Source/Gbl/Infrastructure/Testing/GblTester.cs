@@ -8,6 +8,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* GblTester.cs -- движок прогона тестов для глобальной корректировки записей
@@ -24,197 +25,191 @@ using AM;
 using AM.Collections;
 using AM.ConsoleIO;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure.Testing
+namespace ManagedIrbis.Gbl.Infrastructure.Testing;
+
+/// <summary>
+/// Движок прогона тестов для глобальной корректировки записей.
+/// </summary>
+public sealed class GblTester
 {
+    #region Properties
+
     /// <summary>
-    /// Движок прогона тестов для глобальной корректировки записей.
+    /// Синхронный ИРБИС-провайдер.
     /// </summary>
-    public sealed class GblTester
+    public ISyncProvider Provider { get; private set; }
+
+    /// <summary>
+    /// Имя директории, содержащей тесты.
+    /// </summary>
+    public string Folder { get; private set; }
+
+    /// <summary>
+    /// Коллекция тестов, подлежащих прогону.
+    /// </summary>
+    public NonNullCollection<GblTest> Tests { get; }
+
+    /// <summary>
+    /// Результаты прогона тестов.
+    /// </summary>
+    public NonNullCollection<GblTestResult> Results { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public GblTester
+        (
+            string folder,
+            ISyncProvider provider
+        )
     {
-        #region Properties
+        Sure.NotNullNorEmpty (folder, nameof (folder));
 
-        /// <summary>
-        /// Синхронный ИРБИС-провайдер.
-        /// </summary>
-        public ISyncProvider Provider { get; private set; }
+        Provider = provider;
+        Folder = folder;
+        Tests = new NonNullCollection<GblTest>();
+        Results = new NonNullCollection<GblTestResult>();
+    } // constructor
 
-        /// <summary>
-        /// Имя директории, содержащей тесты.
-        /// </summary>
-        public string Folder { get; private set; }
+    #endregion
 
-        /// <summary>
-        /// Коллекция тестов, подлежащих прогону.
-        /// </summary>
-        public NonNullCollection<GblTest> Tests { get;}
+    #region Public methods
 
-        /// <summary>
-        /// Результаты прогона тестов.
-        /// </summary>
-        public NonNullCollection<GblTestResult> Results { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public GblTester
+    /// <summary>
+    /// Обнаружение тестов.
+    /// </summary>
+    public void DiscoverTests()
+    {
+        var directories = Directory.GetDirectories
             (
-                string folder,
-                ISyncProvider provider
-            )
+                Folder,
+                "*", SearchOption.AllDirectories
+            );
+
+        foreach (var subDir in directories)
         {
-            Sure.NotNullNorEmpty (folder, nameof (folder));
+            if (GblTest.IsDirectoryContainsTest (subDir))
+            {
+                var test = new GblTest (subDir);
+                Tests.Add (test);
+            }
+        }
+    }
 
-            Provider = provider;
-            Folder = folder;
-            Tests = new NonNullCollection<GblTest>();
-            Results = new NonNullCollection<GblTestResult>();
+    /// <summary>
+    /// Прогон указанного теста.
+    /// </summary>
+    public GblTestResult? RunTest
+        (
+            GblTest test
+        )
+    {
+        Sure.NotNull (test, nameof (test));
 
-        } // constructor
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Обнаружение тестов.
-        /// </summary>
-        public void DiscoverTests()
+        GblTestResult? result = null;
+        var name = Path.GetFileName (test.Folder);
+        if (string.IsNullOrEmpty (name))
         {
-            var directories = Directory.GetDirectories
-                (
-                    Folder,
-                    "*", SearchOption.AllDirectories
-                );
-
-            foreach (var subDir in directories)
-            {
-                if (GblTest.IsDirectoryContainsTest (subDir))
-                {
-                    var test = new GblTest(subDir);
-                    Tests.Add (test);
-                }
-            }
-
-        } // method DiscoverTests
-
-        /// <summary>
-        /// Прогон указанного теста.
-        /// </summary>
-        public GblTestResult? RunTest
-            (
-                GblTest test
-            )
-        {
-            Sure.NotNull (test, nameof (test));
-
-            GblTestResult? result = null;
-            var name = Path.GetFileName (test.Folder);
-            if (string.IsNullOrEmpty (name))
-            {
-                throw new GblException ("Can't determine name of test");
-            }
-
-            var foreColor = ConsoleInput.ForegroundColor;
-            ConsoleInput.ForegroundColor = ConsoleColor.Cyan;
-            ConsoleInput.Write ($"{name}: ");
-            ConsoleInput.ForegroundColor = foreColor;
-
-            try
-            {
-                result = test.Run(name);
-
-                ConsoleInput.ForegroundColor = result.Failed
-                    ? ConsoleColor.Red
-                    : ConsoleColor.Green;
-
-                ConsoleInput.Write(" ");
-                ConsoleInput.WriteLine
-                    (
-                        result.Failed
-                            ? "FAIL"
-                            : "OK"
-                    );
-
-                ConsoleInput.ForegroundColor = foreColor;
-
-                //ConsoleInput.WriteLine(new string('=', 70));
-                //ConsoleInput.WriteLine();
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        nameof (GblTester) + "::" + nameof (RunTest),
-                        exception
-                    );
-
-                Debug.WriteLine (exception);
-                ConsoleInput.WriteLine(exception.ToString());
-
-            } // catch
-
-            //ConsoleInput.WriteLine();
-
-            return result;
+            throw new GblException ("Can't determine name of test");
         }
 
-        /// <summary>
-        /// Run the tests.
-        /// </summary>
-        public void RunTests()
+        var foreColor = ConsoleInput.ForegroundColor;
+        ConsoleInput.ForegroundColor = ConsoleColor.Cyan;
+        ConsoleInput.Write ($"{name}: ");
+        ConsoleInput.ForegroundColor = foreColor;
+
+        try
         {
-            foreach (var test in Tests)
-            {
-                test.Provider = Provider;
-                var result = RunTest (test);
-                if (result is not null)
-                {
-                    Results.Add(result);
-                }
-            }
+            result = test.Run (name);
 
-        } // method RunTests
+            ConsoleInput.ForegroundColor = result.Failed
+                ? ConsoleColor.Red
+                : ConsoleColor.Green;
 
-        /// <summary>
-        /// Запись результатов в указанный файл.
-        /// </summary>
-        public void WriteResults
-            (
-                string fileName
-            )
-        {
-            Sure.NotNullNorEmpty (fileName, nameof (fileName));
-
-            /*
-            using (StreamWriter writer = new StreamWriter
+            ConsoleInput.Write (" ");
+            ConsoleInput.WriteLine
                 (
-                    new FileStream
-                    (
-                        fileName,
-                        FileMode.Create,
-                        FileAccess.Write
-                    )
-                ))
+                    result.Failed
+                        ? "FAIL"
+                        : "OK"
+                );
+
+            ConsoleInput.ForegroundColor = foreColor;
+
+            //ConsoleInput.WriteLine(new string('=', 70));
+            //ConsoleInput.WriteLine();
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (GblTester) + "::" + nameof (RunTest)
+                );
+
+            Debug.WriteLine (exception);
+            ConsoleInput.WriteLine (exception.ToString());
+        }
+
+        //ConsoleInput.WriteLine();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Run the tests.
+    /// </summary>
+    public void RunTests()
+    {
+        foreach (var test in Tests)
+        {
+            test.Provider = Provider;
+            var result = RunTest (test);
+            if (result is not null)
             {
-                JArray array = JArray.FromObject(Results);
-                string text = array.ToString(Formatting.Indented);
-                writer.Write(text);
+                Results.Add (result);
             }
+        }
+    }
 
-            */
+    /// <summary>
+    /// Запись результатов в указанный файл.
+    /// </summary>
+    public void WriteResults
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
 
-        } // method WriteResults
+        /*
+        using (StreamWriter writer = new StreamWriter
+            (
+                new FileStream
+                (
+                    fileName,
+                    FileMode.Create,
+                    FileAccess.Write
+                )
+            ))
+        {
+            JArray array = JArray.FromObject(Results);
+            string text = array.ToString(Formatting.Indented);
+            writer.Write(text);
+        }
 
-        #endregion
+        */
+    }
 
-    } // class GblTester
-
-} // namespace ManagedIrbis.Gbl.Infrastructure.Testing
+    #endregion
+}

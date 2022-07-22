@@ -9,13 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* AsnToken.cs --
+/* AsnToken.cs -- единичный токен
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using AM;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -24,7 +24,7 @@ using AM;
 namespace AM.Asn1;
 
 /// <summary>
-///
+/// Единичный токен.
 /// </summary>
 public sealed class AsnToken
 {
@@ -89,22 +89,23 @@ public sealed class AsnToken
     #region Public methods
 
     /// <summary>
-    /// Requires specified kind of token.
+    /// Требует, чтобы токен был только указанного вида.
     /// </summary>
     public AsnToken MustBe
         (
             AsnTokenKind kind
         )
     {
+        Sure.Defined (kind);
+
         if (Kind != kind)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "AsnToken::MustBe: "
-                    + "expecting="
-                    + kind
-                    + ", got="
-                    + Kind
+                    nameof (AsnToken) + "::" + nameof (MustBe)
+                    + ": expecting {Expected}, got {Actual}",
+                    kind,
+                    Kind
                 );
 
             throw new AsnSyntaxException();

@@ -21,6 +21,8 @@ using System.Net.Sockets;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -162,7 +164,11 @@ public sealed class SyncHttpSocket
         }
         catch (Exception exception)
         {
-            Magna.TraceException (nameof (SyncHttpSocket), exception);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (SyncHttpSocket) + "::" + nameof(TransactSync)
+                );
             connection.SetLastError (-100_002);
 
             return default;
@@ -188,7 +194,11 @@ public sealed class SyncHttpSocket
         }
         catch (Exception exception)
         {
-            Magna.TraceException (nameof (SyncHttpSocket), exception);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (SyncHttpSocket) + "::" + nameof(TransactSync)
+                );
             connection.SetLastError (-100_002);
 
             return default;
@@ -215,7 +225,11 @@ public sealed class SyncHttpSocket
         }
         catch (Exception exception)
         {
-            Magna.TraceException (nameof (SyncHttpSocket), exception);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (SyncHttpSocket) + "::" + nameof(TransactSync)
+                );
             connection.SetLastError (-100_002);
 
             return default;

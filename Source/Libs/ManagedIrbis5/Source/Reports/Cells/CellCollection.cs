@@ -27,300 +27,296 @@ using System.Xml.Serialization;
 using AM;
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Reports
-{
-    /// <summary>
-    /// Коллекция ячеек отчета.
-    /// </summary>
-    public sealed class CellCollection
-        : Collection<ReportCell>,
+namespace ManagedIrbis.Reports;
+
+/// <summary>
+/// Коллекция ячеек отчета.
+/// </summary>
+public sealed class CellCollection
+    : Collection<ReportCell>,
         IHandmadeSerializable,
         IReadOnly<CellCollection>,
         IVerifiable,
         IDisposable
+{
+    #region Properties
+
+    /// <summary>
+    /// Band.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    public ReportBand? Band { get; internal set; }
+
+    /// <summary>
+    /// Record.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    public IrbisReport? Report { get; internal set; }
+
+    #endregion
+
+    #region Private members
+
+    internal CellCollection SetReport
+        (
+            IrbisReport? report
+        )
     {
-        #region Properties
+        Report = report;
 
-        /// <summary>
-        /// Band.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public ReportBand? Band { get; internal set; }
-
-        /// <summary>
-        /// Record.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public IrbisReport? Report { get; internal set; }
-
-        #endregion
-
-        #region Private members
-
-        internal CellCollection SetReport
-            (
-                IrbisReport? report
-            )
+        foreach (var cell in this)
         {
-            Report = report;
-
-            foreach (var cell in this)
-            {
-                cell.Report = report;
-            }
-
-            return this;
+            cell.Report = report;
         }
 
-        #endregion
+        return this;
+    }
 
-        #region Public methods
+    #endregion
 
-        /// <summary>
-        /// Add range of <see cref="Field"/>s.
-        /// </summary>
-        public void AddRange
-            (
-                IEnumerable<ReportCell> cells
-            )
+    #region Public methods
+
+    /// <summary>
+    /// Add range of <see cref="Field"/>s.
+    /// </summary>
+    public void AddRange
+        (
+            IEnumerable<ReportCell> cells
+        )
+    {
+        ThrowIfReadOnly();
+
+        foreach (var cell in cells)
         {
-            ThrowIfReadOnly();
+            Add (cell);
+        }
+    }
 
-            foreach (var cell in cells)
-            {
-                Add(cell);
-            }
+    /// <summary>
+    /// Создание клона коллекции.
+    /// </summary>
+    public CellCollection Clone()
+    {
+        var result = new CellCollection
+        {
+            Band = Band,
+            Report = Report
+        };
+
+        foreach (var cell in this)
+        {
+            var clone = cell.Clone();
+            clone.Report = Report;
+            result.Add (clone);
         }
 
-        /// <summary>
-        /// Создание клона коллекции.
-        /// </summary>
-        public CellCollection Clone()
+        return result;
+    }
+
+    /// <summary>
+    /// Find first occurrence of the field with given predicate.
+    /// </summary>
+    public ReportCell? Find (Predicate<ReportCell> predicate) =>
+        this.FirstOrDefault (cell => predicate (cell));
+
+    /// <summary>
+    /// Find all occurrences of the field
+    /// with given predicate.
+    /// </summary>
+    public ReportCell[] FindAll (Predicate<ReportCell> predicate) =>
+        this.Where (cell => predicate (cell)).ToArray();
+
+    #endregion
+
+    #region Collection<T> members
+
+    /// <inheritdoc cref="Collection{T}.ClearItems" />
+    protected override void ClearItems()
+    {
+        ThrowIfReadOnly();
+
+        foreach (var cell in this)
         {
-            var result = new CellCollection
-            {
-                Band = Band,
-                Report = Report
-            };
-
-            foreach (var cell in this)
-            {
-                var clone = cell.Clone();
-                clone.Report = Report;
-                result.Add(clone);
-            }
-
-            return result;
+            cell.Band = null;
+            cell.Report = null;
         }
 
-        /// <summary>
-        /// Find first occurrence of the field with given predicate.
-        /// </summary>
-        public ReportCell? Find (Predicate<ReportCell> predicate) =>
-            this.FirstOrDefault(cell => predicate(cell));
+        base.ClearItems();
+    }
 
-        /// <summary>
-        /// Find all occurrences of the field
-        /// with given predicate.
-        /// </summary>
-        public ReportCell[] FindAll (Predicate<ReportCell> predicate) =>
-            this.Where(cell => predicate(cell)).ToArray();
+    /// <inheritdoc cref="Collection{T}.InsertItem" />
+    protected override void InsertItem
+        (
+            int index,
+            ReportCell item
+        )
+    {
+        ThrowIfReadOnly();
 
-        #endregion
+        item.Band = Band;
+        item.Report = Report;
 
-        #region Collection<T> members
+        base.InsertItem (index, item);
+    }
 
-        /// <inheritdoc cref="Collection{T}.ClearItems" />
-        protected override void ClearItems()
+    /// <inheritdoc cref="Collection{T}.RemoveItem" />
+    protected override void RemoveItem
+        (
+            int index
+        )
+    {
+        ThrowIfReadOnly();
+
+        if (index >= 0 && index < Count)
         {
-            ThrowIfReadOnly();
-
-            foreach (var cell in this)
+            var cell = this[index];
+            if (!ReferenceEquals (cell, null))
             {
                 cell.Band = null;
                 cell.Report = null;
             }
-
-            base.ClearItems();
         }
 
-        /// <inheritdoc cref="Collection{T}.InsertItem" />
-        protected override void InsertItem
+        base.RemoveItem (index);
+    }
+
+    /// <inheritdoc cref="Collection{T}.SetItem" />
+    protected override void SetItem
+        (
+            int index,
+            ReportCell item
+        )
+    {
+        ThrowIfReadOnly();
+
+        item.Band = Band;
+        item.Report = Report;
+
+        base.SetItem (index, item);
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        ThrowIfReadOnly();
+
+        // TODO implement
+
+        ClearItems();
+
+        //RecordField[] array = reader.ReadArray<RecordField>();
+        //AddRange(array);
+
+        Magna.Logger.LogError
             (
-                int index,
-                ReportCell item
-            )
-        {
-            ThrowIfReadOnly();
+                nameof (CellCollection) + "::" + nameof (RestoreFromStream)
+                + ": not implemented"
+            );
 
-            item.Band = Band;
-            item.Report = Report;
+        throw new NotImplementedException();
+    }
 
-            base.InsertItem(index, item);
-        }
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        // TODO implement
 
-        /// <inheritdoc cref="Collection{T}.RemoveItem" />
-        protected override void RemoveItem
+        //writer.WriteArray(this.ToArray());
+
+        Magna.Logger.LogError
             (
-                int index
-            )
+                nameof (CellCollection) + "::" + nameof (SaveToStream)
+                + ": not implemented"
+            );
+
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    #region IReadOnly<T> members
+
+    internal bool _readOnly;
+
+    /// <inheritdoc cref="IReadOnly{T}.ReadOnly" />
+    public bool ReadOnly => _readOnly;
+
+    /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
+    public CellCollection AsReadOnly()
+    {
+        var result = Clone();
+        result.SetReadOnly();
+
+        return result;
+    } // method AsReadOnly
+
+    /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
+    public void SetReadOnly()
+    {
+        _readOnly = true;
+    }
+
+    /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly" />
+    public void ThrowIfReadOnly()
+    {
+        if (ReadOnly)
         {
-            ThrowIfReadOnly();
+            Magna.Logger.LogError (nameof (CellCollection) + "::" + nameof (ThrowIfReadOnly));
 
-            if (index >= 0 && index < Count)
-            {
-                var cell  = this[index];
-                if (!ReferenceEquals(cell, null))
-                {
-                    cell.Band = null;
-                    cell.Report = null;
-                }
-            }
+            throw new ReadOnlyException();
+        }
+    }
 
-            base.RemoveItem(index);
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<CellCollection> (this, throwOnError);
+
+        foreach (var cell in this)
+        {
+            verifier.VerifySubObject (cell);
         }
 
-        /// <inheritdoc cref="Collection{T}.SetItem" />
-        protected override void SetItem
-            (
-                int index,
-                ReportCell item
-            )
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        foreach (var cell in this)
         {
-            ThrowIfReadOnly();
-
-            item.Band = Band;
-            item.Report = Report;
-
-            base.SetItem(index, item);
+            cell.Dispose();
         }
+    }
 
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            ThrowIfReadOnly();
-
-            // TODO implement
-
-            ClearItems();
-            //RecordField[] array = reader.ReadArray<RecordField>();
-            //AddRange(array);
-
-            Magna.Error
-                (
-                    "CellCollection::RestoreFromStream: "
-                    + "not implemented"
-                );
-
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            // TODO implement
-
-            //writer.WriteArray(this.ToArray());
-
-            Magna.Error
-                (
-                    "CellCollection::SaveToStream: "
-                    + "not implemented"
-                );
-
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region IReadOnly<T> members
-
-        internal bool _readOnly;
-
-        /// <inheritdoc cref="IReadOnly{T}.ReadOnly" />
-        public bool ReadOnly { get { return _readOnly; } }
-
-        /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
-        public CellCollection AsReadOnly()
-        {
-            var result = Clone();
-            result.SetReadOnly();
-
-            return result;
-        } // method AsReadOnly
-
-        /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
-        public void SetReadOnly()
-        {
-            _readOnly = true;
-        }
-
-        /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly" />
-        public void ThrowIfReadOnly()
-        {
-            if (ReadOnly)
-            {
-                Magna.Error
-                    (
-                        "CellCollection::ThrowIfReadOnly"
-                    );
-
-                throw new ReadOnlyException();
-            }
-        }
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier
-                = new Verifier<CellCollection>(this, throwOnError);
-
-            foreach (var cell in this)
-            {
-                verifier.VerifySubObject(cell, "cell");
-            }
-
-            return verifier.Result;
-        } // method Verify
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            foreach (var cell in this)
-            {
-                cell.Dispose();
-            }
-        } // method Dispose
-
-        #endregion
-
-    } // class CellCollection
-
-} // namespace ManagedIrbis.Reports
+    #endregion
+}

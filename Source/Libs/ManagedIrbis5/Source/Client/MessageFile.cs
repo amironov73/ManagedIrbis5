@@ -19,6 +19,8 @@ using AM;
 using AM.IO;
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -109,11 +111,11 @@ public sealed class MessageFile
     {
         if (index < 0 || index >= _list.Count)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (MessageFile) + "::" + nameof (GetMessage)
-                    + "missing index="
-                    + index
+                    + ": missing index={Index}",
+                    index
                 );
 
             return string.Format

@@ -16,6 +16,8 @@ using System;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -82,8 +84,11 @@ public sealed class SyncBrokenSocket
             var value = _random.NextDouble();
             if (value < Probability)
             {
-                Magna.Trace (nameof (SyncBrokenSocket) + "::" + nameof (TransactSync)
-                             + ": simulate broken network");
+                Magna.Logger.LogInformation
+                    (
+                        nameof (SyncBrokenSocket) + "::" + nameof (TransactSync)
+                        + ": simulate broken network"
+                    );
                 return null;
             }
         }

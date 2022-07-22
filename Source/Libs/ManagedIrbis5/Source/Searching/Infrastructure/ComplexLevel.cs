@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using AM;
 using AM.Collections;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -112,16 +114,18 @@ internal class ComplexLevel<T>
             ISearchTree? toChild
         )
     {
+        Sure.NotNull (fromChild);
+
         var item = (T) fromChild;
 
         var index = Items.IndexOf (item);
         if (index < 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ComplexLevel<T>) + "::" + nameof (ReplaceChild)
-                    + "child not found: "
-                    + fromChild.ToVisibleString()
+                    + ": child not found: {Child}",
+                    fromChild.ToVisibleString()
                 );
 
             throw new KeyNotFoundException();

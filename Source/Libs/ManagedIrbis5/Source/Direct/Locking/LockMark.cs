@@ -13,96 +13,95 @@
 #region Using directives
 
 using System;
+
 using AM;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+/// <summary>
+/// Тикет блокировки базы данных.
+/// </summary>
+public readonly struct LockMark
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Тикет блокировки базы данных.
+    /// Провайдер.
     /// </summary>
-    public readonly struct LockMark
-        : IDisposable
+    public DirectProvider Provider { get; }
+
+    /// <summary>
+    /// Стратегия.
+    /// </summary>
+    public IDirectLockingStrategy Strategy { get; }
+
+    /// <summary>
+    /// Имя заблокированной базы данных.
+    /// </summary>
+    public string Database { get; }
+
+    /// <summary>
+    /// Признак успешной блокировки.
+    /// </summary>
+    public bool Success { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public LockMark
+        (
+            DirectProvider provider,
+            IDirectLockingStrategy strategy,
+            string database,
+            bool success
+        )
     {
-        #region Properties
+        Provider = provider;
+        Strategy = strategy;
+        Database = database;
+        Success = success;
+    }
 
-        /// <summary>
-        /// Провайдер.
-        /// </summary>
-        public DirectProvider Provider { get; }
+    #endregion
 
-        /// <summary>
-        /// Стратегия.
-        /// </summary>
-        public IDirectLockingStrategy Strategy { get; }
+    #region Public methods
 
-        /// <summary>
-        /// Имя заблокированной базы данных.
-        /// </summary>
-        public string Database { get; }
+    /// <summary>
+    /// Оператор неявного преобразования в логическое значение.
+    /// </summary>
+    public static implicit operator bool (LockMark mark) => mark.Success;
 
-        /// <summary>
-        /// Признак успешной блокировки.
-        /// </summary>
-        public bool Success { get; }
+    #endregion
 
-        #endregion
+    #region IDisposable members
 
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public LockMark
-            (
-                DirectProvider provider,
-                IDirectLockingStrategy strategy,
-                string database,
-                bool success
-            )
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        if (Success)
         {
-            Provider = provider;
-            Strategy = strategy;
-            Database = database;
-            Success = success;
-
-        } // constructor
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Оператор неявного преобразования в логическое значение.
-        /// </summary>
-        public static implicit operator bool(LockMark mark) => mark.Success;
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            if (Success)
+            if (!Strategy.UnlockDatabase (Provider, Database))
             {
-                if (!Strategy.UnlockDatabase(Provider, Database))
-                {
-                    Magna.Warning
-                        (
-                            nameof(LockMark) + "::" + nameof(Dispose)
-                            + $": can't unlock database {Database}"
-                        );
-                }
+                Magna.Logger.LogWarning
+                    (
+                        nameof (LockMark) + "::" + nameof (Dispose)
+                        + ": can't unlock database {Database}",
+                        Database
+                    );
             }
+        }
+    }
 
-        } // method Dispose
-
-        #endregion
-
-    } // struct LockMark
-
-} // namespace ManagedIrbis.Direct
+    #endregion
+}

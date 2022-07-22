@@ -21,191 +21,189 @@ using System.Text;
 
 using AM;
 
-using CM=System.Configuration.ConfigurationManager;
+using Microsoft.Extensions.Logging;
+
+using CM = System.Configuration.ConfigurationManager;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Работа с кодировками, применяемыми в ИРБИС64.
+/// </summary>
+public static class IrbisEncoding
 {
+    #region Properties
+
     /// <summary>
-    /// Работа с кодировками, применяемыми в ИРБИС64.
+    /// Однобайтовая кодировка по умолчанию.
+    /// Как правило, кодовая страница 1251.
     /// </summary>
-    public static class IrbisEncoding
+    public static Encoding Ansi => _ansi;
+
+    /// <summary>
+    /// Однобайтовая OEM-кодировка.
+    /// Как правило, кодовая страница 866.
+    /// </summary>
+    public static Encoding Oem => _oem;
+
+    /// <summary>
+    /// Кодировка UTF-8 без BOM.
+    /// </summary>
+    public static Encoding Utf8 => _utf8;
+
+    #endregion
+
+    #region Construction
+
+    static IrbisEncoding()
     {
-        #region Properties
+        Utility.RegisterEncodingProviders();
+        _ansi = Utility.Windows1251;
+        _oem = Utility.Cp866;
+        _utf8 = new UTF8Encoding
+            (
+                encoderShouldEmitUTF8Identifier: false,
+                throwOnInvalidBytes: true
+            );
+    } // static constructor
 
-        /// <summary>
-        /// Однобайтовая кодировка по умолчанию.
-        /// Как правило, кодовая страница 1251.
-        /// </summary>
-        public static Encoding Ansi => _ansi;
+    #endregion
 
-        /// <summary>
-        /// Однобайтовая OEM-кодировка.
-        /// Как правило, кодовая страница 866.
-        /// </summary>
-        public static Encoding Oem => _oem;
+    #region Private members
 
-        /// <summary>
-        /// Кодировка UTF-8 без BOM.
-        /// </summary>
-        public static Encoding Utf8 => _utf8;
+    private static Encoding _ansi, _oem, _utf8;
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Public methods
 
-        static IrbisEncoding()
+    /// <summary>
+    /// Get encoding by name.
+    /// </summary>
+    public static Encoding ByName
+        (
+            string? name
+        )
+    {
+        if (string.IsNullOrEmpty (name))
         {
-            Utility.RegisterEncodingProviders();
-            _ansi = Utility.Windows1251;
-            _oem = Utility.Cp866;
-            _utf8 = new UTF8Encoding
+            return Utf8;
+        }
+
+        if (name.SameString ("Ansi"))
+        {
+            return Ansi;
+        }
+
+        if (name.SameString ("Dos")
+            || name.SameString ("MsDos")
+            || name.SameString ("Oem"))
+        {
+            return Oem;
+        }
+
+        if (name.SameString ("Utf")
+            || name.SameString ("Utf8")
+            || name.SameString ("Utf-8"))
+        {
+            return Utf8;
+        }
+
+        var result = Encoding.GetEncoding (name);
+
+        return result;
+    } // namespace ByName
+
+    /// <summary>
+    /// Get encoding from config file.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public static Encoding FromConfig
+        (
+            string key
+        )
+    {
+        Sure.NotNullNorEmpty (key, nameof (key));
+
+        var name = CM.AppSettings[key];
+        var result = ByName (name);
+
+        return result;
+    } // method FromConfig
+
+    /// <summary>
+    /// Relax UTF-8 decoder, do not throw exceptions
+    /// on invalid bytes.
+    /// </summary>
+    public static void RelaxUtf8()
+    {
+        _utf8 = new UTF8Encoding
+            (
+                encoderShouldEmitUTF8Identifier: false,
+                throwOnInvalidBytes: false
+            );
+    } // method RelaxUtf8
+
+    /// <summary>
+    /// Strong UTF-8 decoder, throw exceptions
+    /// on invalid bytes.
+    /// </summary>
+    public static void StrongUtf8()
+    {
+        _utf8 = new UTF8Encoding
+            (
+                encoderShouldEmitUTF8Identifier: false,
+                throwOnInvalidBytes: true
+            );
+    } // method StrongUtf8
+
+    /// <summary>
+    /// Override default single-byte encoding.
+    /// </summary>
+    public static void SetAnsiEncoding
+        (
+            Encoding encoding
+        )
+    {
+        if (!encoding.IsSingleByte)
+        {
+            Magna.Logger.LogError
                 (
-                    encoderShouldEmitUTF8Identifier: false,
-                    throwOnInvalidBytes: true
+                    nameof (IrbisEncoding) + "::" + nameof (SetAnsiEncoding)
+                    + ": not single-byte encoding"
                 );
-        } // static constructor
 
-        #endregion
+            throw new ArgumentOutOfRangeException (nameof (encoding));
+        }
 
-        #region Private members
+        _ansi = encoding;
+    }
 
-        private static Encoding _ansi, _oem, _utf8;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Get encoding by name.
-        /// </summary>
-        public static Encoding ByName
-            (
-                string? name
-            )
+    /// <summary>
+    /// Override OEM encoding.
+    /// </summary>
+    public static void SetOemEncoding
+        (
+            Encoding encoding
+        )
+    {
+        if (!encoding.IsSingleByte)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                return Utf8;
-            }
-
-            if (name.SameString("Ansi"))
-            {
-                return Ansi;
-            }
-
-            if (name.SameString("Dos")
-                || name.SameString("MsDos")
-                || name.SameString("Oem"))
-            {
-                return Oem;
-            }
-
-            if (name.SameString("Utf")
-                || name.SameString("Utf8")
-                || name.SameString("Utf-8"))
-            {
-                return Utf8;
-            }
-
-            var result = Encoding.GetEncoding(name);
-
-            return result;
-        } // namespace ByName
-
-        /// <summary>
-        /// Get encoding from config file.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        public static Encoding FromConfig
-            (
-                string key
-            )
-        {
-            Sure.NotNullNorEmpty(key, nameof(key));
-
-            var name = CM.AppSettings[key];
-            var result = ByName(name);
-
-            return result;
-        } // method FromConfig
-
-        /// <summary>
-        /// Relax UTF-8 decoder, do not throw exceptions
-        /// on invalid bytes.
-        /// </summary>
-        public static void RelaxUtf8()
-        {
-            _utf8 = new UTF8Encoding
+            Magna.Logger.LogError
                 (
-                    encoderShouldEmitUTF8Identifier: false,
-                    throwOnInvalidBytes: false
+                    nameof (IrbisEncoding) + "::" + nameof (SetOemEncoding)
+                    + ": not single-byte encoding"
                 );
-        } // method RelaxUtf8
 
-        /// <summary>
-        /// Strong UTF-8 decoder, throw exceptions
-        /// on invalid bytes.
-        /// </summary>
-        public static void StrongUtf8()
-        {
-            _utf8 = new UTF8Encoding
-                (
-                    encoderShouldEmitUTF8Identifier: false,
-                    throwOnInvalidBytes: true
-                );
-        } // method StrongUtf8
+            throw new ArgumentOutOfRangeException (nameof (encoding));
+        }
 
-        /// <summary>
-        /// Override default single-byte encoding.
-        /// </summary>
-        public static void SetAnsiEncoding
-            (
-                Encoding encoding
-            )
-        {
-            if (!encoding.IsSingleByte)
-            {
-                Magna.Error
-                    (
-                        nameof(IrbisEncoding) + "::" + nameof(SetAnsiEncoding)
-                        + ":  not single-byte encoding"
-                    );
+        _oem = encoding;
+    }
 
-                throw new ArgumentOutOfRangeException(nameof(encoding));
-            }
-
-            _ansi = encoding;
-        } // method SetAnsiEncoding
-
-        /// <summary>
-        /// Override OEM encoding.
-        /// </summary>
-        public static void SetOemEncoding
-            (
-                Encoding encoding
-            )
-        {
-            if (!encoding.IsSingleByte)
-            {
-                Magna.Error
-                    (
-                        nameof(IrbisEncoding) + "::" + nameof(SetOemEncoding)
-                        + ":  not single-byte encoding"
-                    );
-
-                throw new ArgumentOutOfRangeException(nameof(encoding));
-            }
-
-            _oem = encoding;
-
-        } // method SetOemEncoding
-
-        #endregion
-
-    } // class IrbisEncoding
-
-} // namespace ManagedIrbis.Infrastructure
+    #endregion
+}

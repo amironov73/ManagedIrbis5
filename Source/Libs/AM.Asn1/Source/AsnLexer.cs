@@ -7,9 +7,10 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
 
-/* AsnLexer.cs --
+/* AsnLexer.cs -- лексически анализатор
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,6 +22,8 @@ using System.Text;
 
 using AM.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -28,7 +31,7 @@ using AM.Text;
 namespace AM.Asn1;
 
 /// <summary>
-///
+/// Лексический анализатор.
 /// </summary>
 public sealed class AsnLexer
 {
@@ -36,12 +39,12 @@ public sealed class AsnLexer
 
     private TextNavigator? _navigator;
 
-    private static char[] _integer =
+    private static readonly char[] _integer =
     {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
     };
 
-    private static char[] _identifier =
+    private static readonly char[] _identifier =
     {
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
@@ -288,10 +291,11 @@ public sealed class AsnLexer
     {
         var message = $"Syntax error at line {Line}, column{Column}";
 
-        Magna.Error
+        Magna.Logger.LogError
             (
-                "AsnLexer::ThrowSyntax: "
-                + message
+                nameof (AsnLexer) + "::" + nameof (ThrowSyntax)
+                + ": {Message}",
+                message
             );
 
         throw new AsnSyntaxException (message);
@@ -611,11 +615,7 @@ public sealed class AsnLexer
         }
 
         return new AsnTokenList (result.ToArray());
-
     } // method Tokenize
 
     #endregion
-
-} // class AsnLexer
-
-// namespace AM.Asn1
+}

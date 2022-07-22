@@ -33,6 +33,8 @@ using AM.Runtime;
 
 using ManagedIrbis.Providers;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -552,11 +554,8 @@ public sealed class ConnectionSettings
 
         foreach (var parameter in parameters)
         {
-            var name = parameter.Name
-                .ThrowIfNull ("parameter.Name")
-                .ToLower();
-            var value = parameter.Value
-                .ThrowIfNull ("parameter.Value");
+            var name = parameter.Name.ThrowIfNull().ToLower();
+            var value = parameter.Value.ThrowIfNull();
 
             switch (name)
             {
@@ -638,12 +637,11 @@ public sealed class ConnectionSettings
                     break;
 
                 default:
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
-                            nameof (ConnectionSettings)
-                            + "::" + nameof (ParseConnectionString)
-                            + "unknown parameter: "
-                            + name
+                            nameof (ConnectionSettings) + "::" + nameof (ParseConnectionString)
+                            + ": unknown parameter: {Name}",
+                            name
                         );
 
                     throw new ArgumentException ($"Unknown parameter: {name}");

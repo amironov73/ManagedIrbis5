@@ -29,6 +29,8 @@ using AM.Text;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -167,8 +169,12 @@ public sealed class UserInfo
                 break;
 
             default:
-                Magna.Debug ($"Unknown ARM code '{code}'");
-                // throw new ArgumentOutOfRangeException();
+                Magna.Logger.LogDebug
+                    (
+                        nameof (UserInfo) + "::" + nameof (_DecodePair)
+                        + ": unknown ARM code {Code}",
+                        code
+                    );
                 break;
         }
     }

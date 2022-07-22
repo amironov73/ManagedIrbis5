@@ -25,6 +25,8 @@ using AM;
 using AM.IO;
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -111,11 +113,11 @@ public struct RecordState
 
         if (parts.Length < 5)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "RecordState::ParseServerAnswer: "
-                    + "bad line format: "
-                    + line
+                    nameof (RecordState) + "::" + nameof (ParseServerAnswer)
+                    + ": bad line format: {Line}",
+                    line
                 );
 
             throw new IrbisException ("bad line format");

@@ -20,6 +20,8 @@ using System.Text;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -89,7 +91,7 @@ public static class SearchUtility
 
         if (first)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (SearchUtility) + "::" + nameof (ConcatTerms)
                     + ": empty list of terms"

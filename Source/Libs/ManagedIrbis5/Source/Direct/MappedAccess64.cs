@@ -19,6 +19,8 @@ using System.IO.MemoryMappedFiles;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -255,10 +257,10 @@ public sealed class MappedAccess64
             }
             catch (Exception exception)
             {
-                Magna.TraceException
+                Magna.Logger.LogError
                     (
-                        nameof (MappedAccess64) + "::" + nameof (SearchReadSimple),
-                        exception
+                        exception,
+                        nameof (MappedAccess64) + "::" + nameof (SearchReadSimple)
                     );
             }
         }

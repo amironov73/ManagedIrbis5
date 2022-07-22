@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* SearchQueryParser.cs --
+/* SearchQueryParser.cs -- парсер поисковых запросов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,6 +15,8 @@ using System;
 using System.Collections.Generic;
 
 using AM;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -160,7 +162,7 @@ public sealed class SearchQueryParser
         foreach (var child in children)
         {
             child.Parent = parent;
-            _AssignParentToChildren(child);
+            _AssignParentToChildren (child);
         }
     }
 
@@ -174,22 +176,23 @@ public sealed class SearchQueryParser
         var token = Tokens.Current;
         if (token.Kind != SearchTokenKind.Term)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "SearchQueryParser::ParseTerm: "
-                    + "unexpected token="
-                    + token.ToVisibleString()
+                    nameof (SearchQueryParser) + "::" + nameof (ParseTerm)
+                    + ": unexpected token={Token}",
+                    token.ToVisibleString()
                 );
 
             throw new SearchSyntaxException();
         }
 
-        var text = token.Text.RequireSyntax("token");
-        if (text.EndsWith("$") || text.EndsWith("@"))
+        var text = token.Text.RequireSyntax ("token");
+        if (text.EndsWith ("$") || text.EndsWith ("@"))
         {
-            result.Tail = text.Substring(text.Length - 1, 1);
-            text = text.Substring(0, text.Length - 1);
+            result.Tail = text.Substring (text.Length - 1, 1);
+            text = text.Substring (0, text.Length - 1);
         }
+
         result.Term = text;
 
         if (!Tokens.MoveNext())
@@ -202,7 +205,8 @@ public sealed class SearchQueryParser
         {
             return result;
         }
-        Tokens.RequireNext(SearchTokenKind.LeftParenthesis);
+
+        Tokens.RequireNext (SearchTokenKind.LeftParenthesis);
         Tokens.RequireNext();
 
         var context = new List<string>();
@@ -217,6 +221,7 @@ public sealed class SearchQueryParser
                 {
                     result.Context = null;
                 }
+
                 Tokens.MoveNext();
 
                 return result;
@@ -230,26 +235,24 @@ public sealed class SearchQueryParser
 
             if (token.Kind != SearchTokenKind.Term)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "SearchQueryParser::ParseTerm: "
-                        + "unexpected token="
-                        + token.ToVisibleString()
+                        nameof (SearchQueryParser) + "::" + nameof (ParseTerm)
+                        + ": unexpected token={Token}",
+                        token.ToVisibleString()
                     );
 
                 throw new SearchSyntaxException();
             }
 
-            if (!string.IsNullOrEmpty(token.Text))
+            if (!string.IsNullOrEmpty (token.Text))
             {
                 context.Add (token.Text);
             }
 
             Tokens.RequireNext();
-
-        } // while
-
-    } // method ParseTerm
+        }
+    }
 
     /// <summary>
     /// Term, Reference or Parenthesis
@@ -288,20 +291,20 @@ public sealed class SearchQueryParser
             Func<TItem> parse,
             SearchTokenKind separator
         )
-        where TLevel: ComplexLevel<TItem>, new()
-        where TItem: class, ISearchTree
+        where TLevel : ComplexLevel<TItem>, new()
+        where TItem : class, ISearchTree
     {
         var result = new TLevel();
 
         var item = parse();
-        result.AddItem(item);
+        result.AddItem (item);
 
         while (!Tokens.IsEof
                && Tokens.Current.Kind == separator)
         {
             Tokens.RequireNext();
             item = parse();
-            result.AddItem(item);
+            result.AddItem (item);
         }
 
         return result;
@@ -315,14 +318,14 @@ public sealed class SearchQueryParser
         var result = new SearchLevel1();
 
         var item = ParseLevel0();
-        result.AddItem(item);
+        result.AddItem (item);
 
         while (!Tokens.IsEof
                && Tokens.Current.Kind == SearchTokenKind.Dot)
         {
             Tokens.RequireNext();
             item = ParseLevel0();
-            result.AddItem(item);
+            result.AddItem (item);
         }
 
         return result;
@@ -410,14 +413,14 @@ public sealed class SearchQueryParser
         {
             Tokens.RequireNext();
             item = ParseLevel6();
-            result.AddItem(item);
+            result.AddItem (item);
 
             if (Tokens.IsEof)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "SearchQueryParser::ParseLevel7: "
-                        + "unexpected end of stream"
+                        nameof (SearchQueryParser) + "::" + nameof (ParseLevel7)
+                        + ": unexpected end of stream"
                     );
 
                 throw new SearchSyntaxException();
@@ -425,11 +428,11 @@ public sealed class SearchQueryParser
 
             if (Tokens.Current.Kind != SearchTokenKind.RightParenthesis)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "SearchQueryParser::ParseLevel7: "
-                        + "unexpected token="
-                        + Tokens.Current.ToVisibleString()
+                        nameof (SearchQueryParser) + "::" + nameof (ParseLevel7)
+                        + ": unexpected token {Token}",
+                        Tokens.Current.ToVisibleString()
                     );
 
                 throw new SearchSyntaxException();
@@ -440,7 +443,7 @@ public sealed class SearchQueryParser
         else
         {
             item = ParseLevel6();
-            result.AddItem(item);
+            result.AddItem (item);
         }
 
         return result;
@@ -463,7 +466,7 @@ public sealed class SearchQueryParser
             result.EntryPoint = entryPoint;
         }
 
-        _AssignParentToChildren(result);
+        _AssignParentToChildren (result);
 
         return result;
     }

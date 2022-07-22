@@ -21,6 +21,8 @@ using System.Net.Sockets;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -67,7 +69,11 @@ public sealed class SyncTcp6Socket
         }
         catch (Exception exception)
         {
-            Magna.TraceException (nameof (SyncTcp6Socket), exception);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (SyncTcp6Socket) + "::" + nameof (TransactSync)
+                );
             connection.SetLastError (-100_002);
 
             return default;
@@ -91,7 +97,11 @@ public sealed class SyncTcp6Socket
         }
         catch (Exception exception)
         {
-            Magna.TraceException (nameof (SyncTcp6Socket), exception);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (SyncTcp6Socket) + "::" + nameof (TransactSync)
+                );
             connection.SetLastError (-100_002);
 
             return default;
@@ -118,7 +128,11 @@ public sealed class SyncTcp6Socket
         }
         catch (Exception exception)
         {
-            Magna.TraceException (nameof (SyncTcp6Socket), exception);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (SyncTcp6Socket) + "::" + nameof (TransactSync)
+                );
             connection.SetLastError (-100_002);
 
             return default;

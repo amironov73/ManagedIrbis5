@@ -20,160 +20,163 @@
 #region Using directives
 
 using System;
-using System.Collections.Concurrent;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 using AM;
 
-using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Server.Sockets;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Server
+namespace ManagedIrbis.Server;
+
+/// <summary>
+/// Рабочий поток, обслуживающий клиентские запросы.
+/// </summary>
+public sealed class ServerWorker
 {
+    #region Properties
+
     /// <summary>
-    /// Рабочий поток, обслуживающий клиентские запросы.
+    /// Данные, необходимые для обслуживания клиента.
     /// </summary>
-    public sealed class ServerWorker
+    public WorkData Data { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ServerWorker
+        (
+            WorkData data
+        )
     {
+        Data = data;
+        data.Started = DateTime.Now;
+        data.Task = new Task (DoWork);
+    } // constructor
 
-        #region Properties
+    #endregion
 
-        /// <summary>
-        /// Данные, необходимые для обслуживания клиента.
-        /// </summary>
-        public WorkData Data { get; private set; }
+    #region Private members
 
-        #endregion
+    private void _WritePacket
+        (
+            string prefix,
+            ReadOnlyMemory<byte>[] chunks
+        )
+    {
+        // TODO async
 
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ServerWorker
+        var engine = Data.Engine.ThrowIfNull (nameof (Data.Engine));
+        var request = Data.Request.ThrowIfNull (nameof (Data.Request));
+        var fileName = Path.Combine
             (
-                WorkData data
-            )
+                engine.WorkDir,
+                $"{prefix}_{request.ClientId}_{request.CommandNumber}.packet"
+            );
+        using var stream = File.Create (fileName);
+        foreach (var chunk in chunks)
         {
-            Data = data;
-            data.Started = DateTime.Now;
-            data.Task = new Task(DoWork);
+            stream.Write (chunk.Span);
+        }
+    }
 
-        } // constructor
+    private void _LogRequest()
+    {
+        var request = Data.Request.ThrowIfNull (nameof (Data.Request));
+        var memory = request.Memory.ThrowIfNull (nameof (request.Memory));
+        var savedPosition = memory.Position;
+        memory.Position = 0;
+        var packet = new ReadOnlyMemory<byte>[1];
+        packet[0] = memory.ToArray();
+        memory.Position = savedPosition;
+        _WritePacket ("rqst", packet);
+    }
 
-        #endregion
+    private void _LogResponse()
+    {
+        var response = Data.Response.ThrowIfNull (nameof (Data.Response));
+        var memory = response.Memory;
+        var savedPosition = memory.Position;
+        memory.Position = 0;
+        var packet = response.Encode (null);
+        memory.Position = savedPosition; //-V3008
+        _WritePacket ("rsps", packet);
+    }
 
-        #region Private members
+    #endregion
 
-        private void _WritePacket
-            (
-                string prefix,
-                ReadOnlyMemory<byte>[] chunks
-            )
+    #region Public methods
+
+    /// <summary>
+    /// Do the work.
+    /// </summary>
+    public void DoWork()
+    {
+        try
         {
-            // TODO async
+            var request = new ClientRequest (Data);
+            Data.Request = request;
 
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-            var request = Data.Request.ThrowIfNull(nameof(Data.Request));
-            var fileName = string.Format
+            _LogRequest();
+
+            var socket = Data.Socket.ThrowIfNull (nameof (Data.Socket));
+            Magna.Logger.LogTrace
                 (
-                    "{0}_{1}_{2}.packet",
-                    prefix,
-                    request.ClientId,
-                    request.CommandNumber
+                    nameof (ServerWorker) + "::" + nameof (DoWork)
+                    + ": begin: address={Address}, command={Command}, "
+                    + "login={Login}, workstation={Workstation}",
+                    socket.GetRemoteAddress(),
+                    request.CommandCode1.ToVisibleString(),
+                    request.Login.ToVisibleString(),
+                    request.Workstation.ToVisibleString()
                 );
-            fileName = Path.Combine(engine.WorkDir, fileName);
-            using (var stream = File.Create(fileName))
-            {
-                foreach (var chunk in chunks)
-                {
-                    stream.Write(chunk.Span);
-                }
-            }
-        }
 
-        private void _LogRequest()
+            var engine = Data.Engine.ThrowIfNull (nameof (Data.Engine));
+            Data.Response = new ServerResponse (Data.Request);
+            Data.Command = engine.Mapper.MapCommand (Data);
+            Data.Command.Execute();
+
+            _LogResponse();
+
+            // TODO залогировать также код возврата
+            Magna.Logger.LogTrace
+                (
+                    nameof (ServerWorker) + "::" + nameof (DoWork)
+                    + ": success: address={Address}, command={Command}, "
+                    + "login={Login}, workstation={Workstation}",
+                    socket.GetRemoteAddress(),
+                    request.CommandCode1.ToVisibleString(),
+                    request.Login.ToVisibleString(),
+                    request.Workstation.ToVisibleString()
+                );
+
+        }
+        catch (Exception exception)
         {
-            var request = Data.Request.ThrowIfNull(nameof(Data.Request));
-            var memory = request.Memory.ThrowIfNull(nameof(request.Memory));
-            var savedPosition = memory.Position;
-            memory.Position = 0;
-            var packet = new ReadOnlyMemory<byte>[1];
-            packet[0] = memory.ToArray();
-            memory.Position = savedPosition;
-            _WritePacket("rqst", packet);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (ServerWorker) + "::" + nameof (DoWork)
+                );
         }
-
-        private void _LogResponse()
+        finally
         {
-            var response = Data.Response.ThrowIfNull(nameof(Data.Response));
-            var memory = response.Memory;
-            var savedPosition = memory.Position;
-            memory.Position = 0;
-            var packet = response.Encode(null);
-            memory.Position = savedPosition; //-V3008
-            _WritePacket("rsps", packet);
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Do the work.
-        /// </summary>
-        public void DoWork()
-        {
-            try
+            // TODO исправить прямой доступ к Data
+            Data.Socket!.DisposeAsync().GetAwaiter().GetResult();
+            lock (Data.Engine!.SyncRoot)
             {
-                var request = new ClientRequest(Data);
-                Data.Request = request;
-
-                _LogRequest();
-
-                var socket = Data.Socket.ThrowIfNull(nameof(Data.Socket));
-                Magna.Trace("ServerWorker::DoWork: request: address="
-                          + socket.GetRemoteAddress()
-                          + ", command=" + request.CommandCode1
-                          + ", login=" + request.Login
-                          + ", workstation=" + request.Workstation);
-
-                var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-                Data.Response = new ServerResponse(Data.Request);
-                Data.Command = engine.Mapper.MapCommand(Data);
-                Data.Command.Execute();
-
-                _LogResponse();
-
-                Magna.Trace("ServerWorker::DoWork: success: address="
-                          + socket.GetRemoteAddress()
-                          + ", command=" + request.CommandCode1
-                          + ", login=" + request.Login
-                          + ", workstation=" + request.Workstation);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException (nameof(ServerWorker) + "::" + nameof(DoWork), exception);
-            }
-            finally
-            {
-                Data.Socket!.DisposeAsync().GetAwaiter().GetResult();
-                lock (Data.Engine!.SyncRoot)
-                {
-                    Data.Engine.Workers.Remove(this);
-                }
+                Data.Engine.Workers.Remove (this);
             }
         }
+    }
 
-        #endregion
-
-    } // class ServerWorker
-
-} // namespace ManagedIrbis.Server
+    #endregion
+}

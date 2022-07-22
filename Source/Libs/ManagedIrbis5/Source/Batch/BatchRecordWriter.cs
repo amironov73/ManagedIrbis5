@@ -33,6 +33,8 @@ using AM;
 
 using ManagedIrbis.Infrastructure;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -98,11 +100,11 @@ public sealed class BatchRecordWriter
     {
         if (capacity < 1)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (BatchRecordWriter) + "::Constructor"
-                                               + ": capacity="
-                                               + capacity
+                    + ": capacity={Capacity}",
+                    capacity
                 );
 
             throw new ArgumentOutOfRangeException (nameof (capacity));

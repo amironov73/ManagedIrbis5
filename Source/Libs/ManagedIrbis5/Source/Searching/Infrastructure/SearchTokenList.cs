@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* SearchTokenList.cs --
+/* SearchTokenList.cs -- список токенов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -13,142 +13,139 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Список токенов.
+/// </summary>
+public sealed class SearchTokenList
 {
+    #region Properties
+
     /// <summary>
-    /// List of tokens.
+    /// Текущий токен.
     /// </summary>
-    public sealed class SearchTokenList
+    internal SearchToken Current => IsEof
+        ? throw new InvalidOperationException()
+        : _tokens[_position];
+
+    /// <summary>
+    /// Достигнут ли конец списка?
+    /// </summary>
+    internal bool IsEof => _position >= _tokens.Length;
+
+    /// <summary>
+    /// Общее количество токенов в списке.
+    /// </summary>
+    public int Length => _tokens.Length;
+
+    #endregion
+
+    #region Constructor
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    internal SearchTokenList
+        (
+            IEnumerable<SearchToken> tokens
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Current token.
-        /// </summary>
-        internal SearchToken Current
-        {
-            get { return _tokens[_position]; }
-        }
-
-        /// <summary>
-        /// EOF reached?
-        /// </summary>
-        internal bool IsEof { get { return _position >= _tokens.Length; } }
-
-        /// <summary>
-        /// How many tokens?
-        /// </summary>
-        public int Length { get { return _tokens.Length; } }
-
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        internal SearchTokenList
-            (
-                IEnumerable<SearchToken> tokens
-            )
-        {
-            _tokens = tokens.ToArray();
-            _position = 0;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private int _position;
-
-        private readonly SearchToken[] _tokens;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Move to next token.
-        /// </summary>
-        internal bool MoveNext()
-        {
-            _position++;
-
-            return _position < _tokens.Length;
-        }
-
-        /// <summary>
-        /// Require next token.
-        /// </summary>
-        internal SearchTokenList RequireNext()
-        {
-            if (!MoveNext())
-            {
-                Magna.Error
-                    (
-                        "SearchTokenList::RequireNext"
-                    );
-
-                throw new SearchSyntaxException();
-            }
-
-            return this;
-        }
-
-        /// <summary>
-        /// Require next token.
-        /// </summary>
-        internal SearchTokenList RequireNext
-            (
-                SearchTokenKind tokenKind
-            )
-        {
-            if (!MoveNext())
-            {
-                Magna.Error
-                    (
-                        nameof(SearchTokenList) + "::" + nameof(RequireNext)
-                        + ": unexpected end of stream"
-                    );
-
-                throw new SearchSyntaxException();
-            }
-
-            if (Current.Kind != tokenKind)
-            {
-                Magna.Error
-                    (
-                        nameof(SearchTokenList) + "::" + nameof(RequireNext)
-                        + ": expected="
-                        + tokenKind
-                        + ", got="
-                        + Current.Kind
-                    );
-
-                throw new SearchSyntaxException();
-            }
-
-            return this;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-            => IsEof ? "(EOF)" : Current.ToString();
-
-        #endregion
+        _tokens = tokens.ToArray();
+        _position = 0;
     }
+
+    #endregion
+
+    #region Private members
+
+    private int _position;
+
+    private readonly SearchToken[] _tokens;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Move to next token.
+    /// </summary>
+    internal bool MoveNext()
+    {
+        _position++;
+
+        return _position < _tokens.Length;
+    }
+
+    /// <summary>
+    /// Require next token.
+    /// </summary>
+    internal SearchTokenList RequireNext()
+    {
+        if (!MoveNext())
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (SearchTokenList) + "::" + nameof (RequireNext)
+                    + ": no next token"
+                );
+
+            throw new SearchSyntaxException ("No next token");
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Require next token.
+    /// </summary>
+    internal SearchTokenList RequireNext
+        (
+            SearchTokenKind tokenKind
+        )
+    {
+        if (!MoveNext())
+        {
+            Magna.Logger.LogError
+                (
+                    nameof(SearchTokenList) + "::" + nameof(RequireNext)
+                    + ": unexpected end of stream"
+                );
+
+            throw new SearchSyntaxException ("Unexpected end of stream");
+        }
+
+        if (Current.Kind != tokenKind)
+        {
+            Magna.Logger.LogError
+                (
+                    nameof(SearchTokenList) + "::" + nameof(RequireNext)
+                    + ": expected={Expected}, got={Actual}",
+                    tokenKind,
+                    Current.Kind
+                );
+
+            throw new SearchSyntaxException();
+        }
+
+        return this;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+        => IsEof ? "(EOF)" : Current.ToString();
+
+    #endregion
 }

@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* SearchQueryUtility.cs --
+/* SearchQueryUtility.cs -- полезные методы для работы с поисковым деревом
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,87 +16,88 @@ using System.Linq;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Полезные методы для работы с поисковым деревом.
+/// </summary>
+public static class SearchQueryUtility
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public static class SearchQueryUtility
+    #region Private members
+
+    internal static List<ISearchTree> GetDescendants
+        (
+            ISearchTree node
+        )
     {
-        #region Private members
+        Sure.NotNull (node);
 
-        internal static List<ISearchTree> GetDescendants
-            (
-                ISearchTree node
-            )
+        var result = new List<ISearchTree>
         {
-            List<ISearchTree> result = new List<ISearchTree>
-            {
-                node
-            };
+            node
+        };
 
-            foreach (ISearchTree child in node.Children)
-            {
-                List<ISearchTree> descendants
-                    = GetDescendants(child);
-                result.AddRange(descendants);
-            }
+        foreach (var child in node.Children)
+        {
+            var descendants = GetDescendants (child);
 
-            return result;
+            result.AddRange (descendants);
         }
 
-        /// <summary>
-        /// Require syntax element.
-        /// </summary>
-        internal static string RequireSyntax
-            (
-                this string? element,
-                string message
-            )
+        return result;
+    }
+
+    /// <summary>
+    /// Require syntax element.
+    /// </summary>
+    internal static string RequireSyntax
+        (
+            this string? element,
+            string message
+        )
+    {
+        if (element is null)
         {
-            if (ReferenceEquals(element, null))
-            {
-                Magna.Error
-                    (
-                        "SearchQueryUtility::RequireSyntax: "
-                        + "required element missing: "
-                        + message
-                    );
+            Magna.Logger.LogError
+                (
+                    nameof (SearchQueryUtility) + "::" + nameof (RequireSyntax)
+                    + ": required element missing: {Message}",
+                    message
+                );
 
-                throw new SearchSyntaxException(message);
-            }
-
-            return element;
+            throw new SearchSyntaxException (message);
         }
 
-        #endregion
+        return element;
+    }
 
-        #region Public methods
+    #endregion
 
-        /// <summary>
-        /// Extract search terms from the query.
-        /// </summary>
-        public static SearchTerm[] ExtractTerms
-            (
-                SearchProgram program
-            )
-        {
-            Sure.NotNull(program, nameof(program));
+    #region Public methods
 
-            List<ISearchTree> nodes = GetDescendants(program);
-            SearchTerm[] result = nodes
-                .OfType<SearchTerm>()
-                .ToArray();
+    /// <summary>
+    /// Extract search terms from the query.
+    /// </summary>
+    public static SearchTerm[] ExtractTerms
+        (
+            SearchProgram program
+        )
+    {
+        Sure.NotNull (program, nameof (program));
 
-            return result;
-        }
+        var nodes = GetDescendants (program);
+        var result = nodes
+            .OfType<SearchTerm>()
+            .ToArray();
 
-        #endregion
+        return result;
+    }
 
-    } // class SearchQueryUtility
-
-} // namespace ManagedIrbis.Infrastructure
+    #endregion
+}

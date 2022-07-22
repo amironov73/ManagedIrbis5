@@ -139,10 +139,17 @@ public sealed class DirectAccess64
         )
     {
         Sure.NotNullNorEmpty (masterFile);
+        Sure.Defined (mode);
 
         _serviceProvider = serviceProvider ?? Magna.Host.Services;
         _logger = (ILogger?) GetService (typeof (ILogger<MstFile64>));
-        _logger?.LogTrace ($"{nameof(DirectAccess64)}::Constructor ({masterFile}, {mode})");
+        _logger?.LogTrace
+            (
+                nameof (DirectAccess64) + "::Constructor"
+                + "masterFile={MasterFile}, mode={Mode}",
+                masterFile,
+                mode
+            );
 
         Database = Path.GetFileNameWithoutExtension (masterFile).ThrowIfNullOrEmpty();
         Mst = new MstFile64
@@ -451,10 +458,10 @@ public sealed class DirectAccess64
             }
             catch (Exception exception)
             {
-                Magna.TraceException
+                _logger?.LogError
                     (
-                        nameof (DirectAccess64) + "::" + nameof (SearchReadSimple),
-                        exception
+                        exception,
+                        nameof (DirectAccess64) + "::" + nameof (SearchReadSimple)
                     );
             }
         }

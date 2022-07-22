@@ -26,174 +26,175 @@ using AM.Text;
 
 using ManagedIrbis.Infrastructure;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Server.Commands
+namespace ManagedIrbis.Server.Commands;
+
+/// <summary>
+/// Чтение библиографической записи.
+/// </summary>
+public sealed class ReadRecordCommand
+    : ServerCommand
 {
+    #region Construction
+
     /// <summary>
-    /// Чтение библиографической записи.
+    /// Конструктор.
     /// </summary>
-    public sealed class ReadRecordCommand
-        : ServerCommand
+    public ReadRecordCommand
+        (
+            WorkData data
+        )
+        : base (data)
     {
-        #region Construction
+    } // constructor
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ReadRecordCommand
+    #endregion
+
+    #region Private members
+
+    /// <summary>
+    /// Кодирование записи в клиентское представление.
+    /// </summary>
+    public static string EncodeRecord
+        (
+            Record record
+        )
+    {
+        var builder = StringBuilderPool.Shared.Get();
+
+        builder.AppendFormat
             (
-                WorkData data
-            )
-            : base (data)
-        {
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        /// <summary>
-        /// Кодирование записи в клиентское представление.
-        /// </summary>
-        public static string EncodeRecord
+                "{0}#{1}",
+                record.Mfn.ToInvariantString(),
+                ((int)record.Status).ToInvariantString()
+            );
+        builder.Append ("\r\n");
+        builder.AppendFormat
             (
-                Record record
-            )
-        {
-            var builder = StringBuilderPool.Shared.Get();
+                "0#{0}",
+                record.Version.ToInvariantString()
+            );
+        builder.Append ("\r\n");
 
+        foreach (var field in record.Fields)
+        {
             builder.AppendFormat
                 (
-                    "{0}#{1}",
-                    record.Mfn.ToInvariantString(),
-                    ((int)record.Status).ToInvariantString()
+                    "{0}#",
+                    field.Tag.ToInvariantString()
                 );
-            builder.Append ("\r\n");
-            builder.AppendFormat
-                (
-                    "0#{0}",
-                    record.Version.ToInvariantString()
-                );
-            builder.Append ("\r\n");
+            builder.Append (field.Value);
 
-            foreach (var field in record.Fields)
+            foreach (var subField in field.Subfields)
             {
                 builder.AppendFormat
                     (
-                        "{0}#",
-                        field.Tag.ToInvariantString()
+                        "{0}{1}{2}",
+                        SubField.Delimiter,
+                        subField.Code,
+                        subField.Value
                     );
-                builder.Append (field.Value);
-
-                foreach (var subField in field.Subfields)
-                {
-                    builder.AppendFormat
-                        (
-                            "{0}{1}{2}",
-                            SubField.Delimiter,
-                            subField.Code,
-                            subField.Value
-                        );
-                }
-
-                builder.Append ("\r\n");
             }
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
+            builder.Append ("\r\n");
         }
 
-        #endregion
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-        #region ServerCommand members
-
-        /// <inheritdoc cref="ServerCommand.Execute" />
-        public override void Execute()
-        {
-            // TODO перейти на RawRecord, если не требуется форматирование
-
-            // В случае физически удаленной записи возвращается 2 строки:
-            // 1-я строка - ZERO
-            // 2-я строка – UTF-8(ЗАПИСЬ ФИЗИЧЕСКИ УДАЛЕНА)
-
-            var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute (Data);
-
-            try
-            {
-                var context = engine.RequireContext (Data);
-                Data.Context = context;
-                UpdateContext();
-
-                var request = Data.Request.ThrowIfNull();
-                var database = request.RequireAnsiString();
-                var mfn = request.GetInt32();
-                var needLock = request.GetInt32();
-                var format = request.GetAutoString();
-                string? formatted = null;
-
-                Record? record;
-                using (var provider = engine.GetProvider (database))
-                {
-                    var parameters = new ReadRecordParameters()
-                    {
-                        Database = database,
-                        Mfn = mfn,
-                        Format = format
-                    };
-                    record = provider.ReadRecord<Record> (parameters);
-
-                    // TODO: забрать результат расформатирования
-                    // formatted = IrbisText.WindowsToIrbis (parameters)
-                }
-
-                if (needLock != 0)
-                {
-                    using var direct = engine.GetDatabase (database);
-                    direct.Xrf.LockRecord (mfn, true);
-                }
-
-                var response = Data.Response.ThrowIfNull();
-
-                // Код возврата
-                response.WriteInt32 (0).NewLine();
-                if (record is not null)
-                {
-                    var recordText = EncodeRecord (record);
-                    response.WriteUtfString (recordText).NewLine();
-                }
-
-                if (!string.IsNullOrEmpty (formatted))
-                {
-                    response.WriteUtfString ("#").NewLine();
-                    response.WriteInt32 (0).NewLine();
-                    response.WriteUtfString (formatted).NewLine();
-                }
-
-                SendResponse();
-            }
-            catch (IrbisException exception)
-            {
-                SendError (exception.ErrorCode);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        nameof (ReadRecordCommand) + "::" + nameof (Execute),
-                        exception
-                    );
-                SendError (-8888);
-            }
-
-            engine.OnAfterExecute (Data);
-        }
-
-        #endregion
+        return result;
     }
+
+    #endregion
+
+    #region ServerCommand members
+
+    /// <inheritdoc cref="ServerCommand.Execute" />
+    public override void Execute()
+    {
+        // TODO перейти на RawRecord, если не требуется форматирование
+
+        // В случае физически удаленной записи возвращается 2 строки:
+        // 1-я строка - ZERO
+        // 2-я строка – UTF-8(ЗАПИСЬ ФИЗИЧЕСКИ УДАЛЕНА)
+
+        var engine = Data.Engine.ThrowIfNull();
+        engine.OnBeforeExecute (Data);
+
+        try
+        {
+            var context = engine.RequireContext (Data);
+            Data.Context = context;
+            UpdateContext();
+
+            var request = Data.Request.ThrowIfNull();
+            var database = request.RequireAnsiString();
+            var mfn = request.GetInt32();
+            var needLock = request.GetInt32();
+            var format = request.GetAutoString();
+            string? formatted = null;
+
+            Record? record;
+            using (var provider = engine.GetProvider (database))
+            {
+                var parameters = new ReadRecordParameters()
+                {
+                    Database = database,
+                    Mfn = mfn,
+                    Format = format
+                };
+                record = provider.ReadRecord<Record> (parameters);
+
+                // TODO: забрать результат расформатирования
+                // formatted = IrbisText.WindowsToIrbis (parameters)
+            }
+
+            if (needLock != 0)
+            {
+                using var direct = engine.GetDatabase (database);
+                direct.Xrf.LockRecord (mfn, true);
+            }
+
+            var response = Data.Response.ThrowIfNull();
+
+            // Код возврата
+            response.WriteInt32 (0).NewLine();
+            if (record is not null)
+            {
+                var recordText = EncodeRecord (record);
+                response.WriteUtfString (recordText).NewLine();
+            }
+
+            if (!string.IsNullOrEmpty (formatted))
+            {
+                response.WriteUtfString ("#").NewLine();
+                response.WriteInt32 (0).NewLine();
+                response.WriteUtfString (formatted).NewLine();
+            }
+
+            SendResponse();
+        }
+        catch (IrbisException exception)
+        {
+            SendError (exception.ErrorCode);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (ReadRecordCommand) + "::" + nameof (Execute)
+                );
+            SendError (-8888);
+        }
+
+        engine.OnAfterExecute (Data);
+    }
+
+    #endregion
 }

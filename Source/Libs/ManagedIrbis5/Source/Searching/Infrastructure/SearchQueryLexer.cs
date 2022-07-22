@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* SearchQueryLexer.cs --
+/* SearchQueryLexer.cs -- лексический анализатор для поискового запроса
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,233 +16,237 @@ using System.Collections.Generic;
 using AM;
 using AM.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Лексический анализатор для поискового запроса.
+/// </summary>
+public static class SearchQueryLexer
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public static class SearchQueryLexer
+    #region Private members
+
+    static readonly char[] _stopChars =
     {
-        #region Private members
+        '(', '/', '\t', ' ', ',', ')', '+', '*'
+    };
 
-        static readonly char[] _stopChars =
+    private static string _TermTail
+        (
+            TextNavigator navigator
+        )
+    {
+        var result = navigator.ReadUntil(_stopChars).ToString();
+        while (navigator.PeekChar() == '/')
         {
-            '(', '/', '\t', ' ', ',', ')', '+', '*'
-        };
-
-        private static string? _TermTail
-            (
-                TextNavigator navigator
-            )
-        {
-            var result = navigator.ReadUntil(_stopChars).ToString();
-            while (navigator.PeekChar() == '/')
+            var c2 = navigator.LookAhead(1);
+            if (c2 == '(' || c2 == '\0')
             {
-                var c2 = navigator.LookAhead(1);
-                if (c2 == '(' || c2 == '\0')
-                {
-                    break;
-                }
-                result = result
-                    + navigator.ReadChar()
-                    + navigator.ReadUntil(_stopChars);
+                break;
             }
-
-            return result;
+            result = result
+                     + navigator.ReadChar()
+                     + navigator.ReadUntil(_stopChars);
         }
 
-        #endregion
+        return result;
+    }
 
-        #region Public methods
+    #endregion
 
-        // =========================================================
+    #region Public methods
 
-        /// <summary>
-        /// Tokenize the text.
-        /// </summary>
-        public static SearchTokenList Tokenize
-            (
-                string text
-            )
+    // =========================================================
+
+    /// <summary>
+    /// Tokenize the text.
+    /// </summary>
+    public static SearchTokenList Tokenize
+        (
+            string text
+        )
+    {
+        Sure.NotNull(text, nameof(text));
+
+        var result = new List<SearchToken>();
+        var navigator = new TextNavigator(text);
+
+        while (!navigator.IsEOF)
         {
-            Sure.NotNull(text, nameof(text));
-
-            var result = new List<SearchToken>();
-            var navigator = new TextNavigator(text);
-
-            while (!navigator.IsEOF)
+            navigator.SkipWhitespace();
+            if (navigator.IsEOF)
             {
-                navigator.SkipWhitespace();
-                if (navigator.IsEOF)
-                {
-                    break;
-                }
+                break;
+            }
 
-                var c = navigator.ReadChar();
-                string value;
-                var position = navigator.Position;
-                SearchTokenKind kind;
-                switch (c)
-                {
-                    case '"':
-                        value = navigator.ReadUntil('"').ToString();
-                        kind = SearchTokenKind.Term;
+            var c = navigator.ReadChar();
+            string value;
+            var position = navigator.Position;
+            SearchTokenKind kind;
+            switch (c)
+            {
+                case '"':
+                    value = navigator.ReadUntil('"').ToString();
+                    kind = SearchTokenKind.Term;
+                    if (navigator.ReadChar() != '"')
+                    {
+                        Magna.Logger.LogError
+                            (
+                                nameof (SearchQueryLexer) + "::" + nameof (Tokenize)
+                                + ": unclosed string: {Text}",
+                                text
+                            );
+
+                        throw new SearchSyntaxException ($"Unclose string: {text}");
+                    }
+
+                    var saved = navigator.SavePosition();
+                    var tail = navigator.ReadUntil('"').ToString();
+                    while (!string.IsNullOrEmpty(tail))
+                    {
                         if (navigator.ReadChar() != '"')
                         {
-                            Magna.Error
-                                (
-                                    "SearchQueryLexer::Tokenize: "
-                                    + "unclosed line"
-                                );
-
-                            throw new SearchSyntaxException();
+                            navigator.RestorePosition(saved);
+                            break;
                         }
 
-                        var saved = navigator.SavePosition();
-                        var tail = navigator.ReadUntil('"').ToString();
-                        while (!string.IsNullOrEmpty(tail))
+                        var trimmed = tail.TrimStart();
+                        var c2 = trimmed.FirstChar();
+                        if (tail.StartsWith("(F)")
+                            || tail.StartsWith("(G)")
+                            || c2.IsOneOf('+', '*', '^', '.', ',', ')', '/'))
                         {
-                            if (navigator.ReadChar() != '"')
-                            {
-                                navigator.RestorePosition(saved);
-                                break;
-                            }
-
-                            var trimmed = tail.TrimStart();
-                            var c2 = trimmed.FirstChar();
-                            if (tail.StartsWith("(F)")
-                                || tail.StartsWith("(G)")
-                                || c2.IsOneOf('+', '*', '^', '.', ',', ')', '/'))
-                            {
-                                navigator.RestorePosition(saved);
-                                break;
-                            }
-                            value = value + '"' + tail;
+                            navigator.RestorePosition(saved);
+                            break;
+                        }
+                        value = value + '"' + tail;
+                        saved = navigator.SavePosition();
+                        while (navigator.PeekChar() == '"')
+                        {
+                            value += navigator.ReadChar();
                             saved = navigator.SavePosition();
-                            while (navigator.PeekChar() == '"')
-                            {
-                                value += navigator.ReadChar();
-                                saved = navigator.SavePosition();
-                            }
-
-                            tail = navigator.ReadUntil('"').ToString();
-                        }
-                        break;
-
-                    case '<':
-                        if (navigator.PeekString(2).ToString() != ".>")
-                        {
-                            throw new SearchSyntaxException();
                         }
 
-                        navigator.ReadChar();
-                        navigator.ReadChar();
+                        tail = navigator.ReadUntil('"').ToString();
+                    }
+                    break;
 
-                        value = navigator.ReadUntil("<.>").ToString();
-                        kind = SearchTokenKind.Term;
-                        if (navigator.ReadString(3).ToString() != "<.>")
-                        {
-                            Magna.Error
-                                (
-                                    "SearchQueryLexer::Tokenize: "
-                                    + "unclosed line"
-                                );
+                case '<':
+                    if (navigator.PeekString(2).ToString() != ".>")
+                    {
+                        throw new SearchSyntaxException();
+                    }
 
-                            throw new SearchSyntaxException();
-                        }
-                        break;
+                    navigator.ReadChar();
+                    navigator.ReadChar();
 
-                    case '#':
-                        value = navigator.ReadWhile('0', '1', '2', '3', '4', '5', '6', '7', '8', '9').ToString();
-                        kind = SearchTokenKind.Hash;
-                        break;
+                    value = navigator.ReadUntil("<.>").ToString();
+                    kind = SearchTokenKind.Term;
+                    if (navigator.ReadString(3).ToString() != "<.>")
+                    {
+                        Magna.Logger.LogError
+                            (
+                                nameof (SearchQueryLexer) + "::" + nameof (Tokenize)
+                                + ": unclosed string: {Text}",
+                                text
+                            );
 
-                    case '+':
+                        throw new SearchSyntaxException ($"Unclosed string: {text}");
+                    }
+                    break;
+
+                case '#':
+                    value = navigator.ReadWhile('0', '1', '2', '3', '4', '5', '6', '7', '8', '9').ToString();
+                    kind = SearchTokenKind.Hash;
+                    break;
+
+                case '+':
+                    value = c.ToString();
+                    kind = SearchTokenKind.Plus;
+                    break;
+
+                case '*':
+                    value = c.ToString();
+                    kind = SearchTokenKind.Star;
+                    break;
+
+                case '^':
+                    value = c.ToString();
+                    kind = SearchTokenKind.Hat;
+                    break;
+
+                case '.':
+                    value = c.ToString();
+                    kind = SearchTokenKind.Dot;
+                    break;
+
+                case '/':
+                    if (navigator.PeekChar().IsOneOf('(', '\0'))
+                    {
                         value = c.ToString();
-                        kind = SearchTokenKind.Plus;
-                        break;
-
-                    case '*':
-                        value = c.ToString();
-                        kind = SearchTokenKind.Star;
-                        break;
-
-                    case '^':
-                        value = c.ToString();
-                        kind = SearchTokenKind.Hat;
-                        break;
-
-                    case '.':
-                        value = c.ToString();
-                        kind = SearchTokenKind.Dot;
-                        break;
-
-                    case '/':
-                        if (navigator.PeekChar().IsOneOf('(', '\0'))
-                        {
-                            value = c.ToString();
-                            kind = SearchTokenKind.Slash;
-                        }
-                        else
-                        {
-                            value = c + _TermTail(navigator);
-                            kind = SearchTokenKind.Term;
-                        }
-                        break;
-
-                    case ',':
-                        value = c.ToString();
-                        kind = SearchTokenKind.Comma;
-                        break;
-
-                    case '(':
-                        string preview = c + navigator.PeekString(2).ToString();
-                        if (preview == "(G)" || preview == "(g)")
-                        {
-                            value = preview;
-                            kind = SearchTokenKind.G;
-                            navigator.ReadChar();
-                            navigator.ReadChar();
-                        }
-                        else if (preview == "(F)" || preview == "(f)")
-                        {
-                            value = preview;
-                            kind = SearchTokenKind.F;
-                            navigator.ReadChar();
-                            navigator.ReadChar();
-                        }
-                        else
-                        {
-                            value = c.ToString();
-                            kind = SearchTokenKind.LeftParenthesis;
-                        }
-                        break;
-
-                    case ')':
-                        value = c.ToString();
-                        kind = SearchTokenKind.RightParenthesis;
-                        break;
-
-                    default:
+                        kind = SearchTokenKind.Slash;
+                    }
+                    else
+                    {
                         value = c + _TermTail(navigator);
                         kind = SearchTokenKind.Term;
-                        break;
-                }
+                    }
+                    break;
 
-                var token = new SearchToken(kind, position, value);
+                case ',':
+                    value = c.ToString();
+                    kind = SearchTokenKind.Comma;
+                    break;
 
-                result.Add(token);
+                case '(':
+                    string preview = c + navigator.PeekString(2).ToString();
+                    if (preview == "(G)" || preview == "(g)")
+                    {
+                        value = preview;
+                        kind = SearchTokenKind.G;
+                        navigator.ReadChar();
+                        navigator.ReadChar();
+                    }
+                    else if (preview == "(F)" || preview == "(f)")
+                    {
+                        value = preview;
+                        kind = SearchTokenKind.F;
+                        navigator.ReadChar();
+                        navigator.ReadChar();
+                    }
+                    else
+                    {
+                        value = c.ToString();
+                        kind = SearchTokenKind.LeftParenthesis;
+                    }
+                    break;
+
+                case ')':
+                    value = c.ToString();
+                    kind = SearchTokenKind.RightParenthesis;
+                    break;
+
+                default:
+                    value = c + _TermTail(navigator);
+                    kind = SearchTokenKind.Term;
+                    break;
             }
 
-            return new SearchTokenList(result);
+            var token = new SearchToken(kind, position, value);
+
+            result.Add(token);
         }
 
-        #endregion
+        return new SearchTokenList(result);
+    }
 
-    } // class SearchQueryLexer
+    #endregion
 
-} // namespace ManagedIrbis.Infrastructure
+} // class SearchQueryLexer
+
+// namespace ManagedIrbis.Infrastructure

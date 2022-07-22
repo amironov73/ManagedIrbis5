@@ -33,6 +33,8 @@ using AM;
 
 using ManagedIrbis.ImportExport;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -91,7 +93,7 @@ public sealed class BatchAccessor
     {
         if (ThrowOnEmptyRecord && record.Fields.Count == 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (BatchAccessor) + "::" + nameof (_ThrowIfEmptyRecord)
                     + ": empty record detected"
@@ -171,14 +173,11 @@ public sealed class BatchAccessor
                     record
                 );
 
-            if (!ReferenceEquals (record, null))
+            if (record is { Deleted: false })
             {
-                if (!record.Deleted)
-                {
-                    T result = func (record);
+                var result = func (record);
 
-                    collection.Add (result);
-                }
+                collection.Add (result);
             }
         }
     }
@@ -198,7 +197,7 @@ public sealed class BatchAccessor
     {
         Sure.NotNull (database ??= Connection.Database);
 
-        int[] array = mfnList.ToArray();
+        var array = mfnList.ToArray();
 
         if (array.Length == 0)
         {
@@ -290,7 +289,7 @@ public sealed class BatchAccessor
     {
         (database ??= Connection.Database).ThrowIfNull();
 
-        int[] array = mfnList.ToArray();
+        var array = mfnList.ToArray();
 
         if (array.Length == 0)
         {

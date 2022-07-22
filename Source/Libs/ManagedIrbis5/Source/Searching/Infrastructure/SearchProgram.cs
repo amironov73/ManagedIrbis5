@@ -15,104 +15,108 @@ using System;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Корень синтаксического дерева поискового запроса.
+/// </summary>
+public sealed class SearchProgram
+    : ISearchTree
 {
+    #region Properties
+
     /// <summary>
-    /// Корень синтаксического дерева поискового запроса.
+    /// No parent.
     /// </summary>
-    public sealed class SearchProgram
-        : ISearchTree
+    public ISearchTree? Parent
     {
-        #region Properties
-
-        /// <summary>
-        /// No parent.
-        /// </summary>
-        public ISearchTree? Parent
+        get => null;
+        set
         {
-            get => null;
-            set { /* Do nothing */ }
+            /* Do nothing */
         }
+    }
 
-        /// <summary>
-        /// Program entry point - root of syntax tree.
-        /// </summary>
-        internal SearchLevel6? EntryPoint { get; set; }
+    /// <summary>
+    /// Program entry point - root of syntax tree.
+    /// </summary>
+    internal SearchLevel6? EntryPoint { get; set; }
 
-        #endregion
+    #endregion
 
-        #region ISearchTree members
+    #region ISearchTree members
 
-        /// <inheritdoc cref="ISearchTree.Children" />
-        ISearchTree[] ISearchTree.Children
+    /// <inheritdoc cref="ISearchTree.Children" />
+    ISearchTree[] ISearchTree.Children
+    {
+        get
         {
-            get
-            {
-                ISearchTree[] result
-                    = ReferenceEquals(EntryPoint, null)
+            ISearchTree[] result
+                = ReferenceEquals (EntryPoint, null)
                     ? new ISearchTree[0]
                     : EntryPoint.Children;
 
-                return result;
-            }
-        }
-
-        /// <inheritdoc cref="ISearchTree.Value" />
-        string? ISearchTree.Value => null;
-
-        /// <inheritdoc cref="ISearchTree.Find"/>
-        public TermLink[] Find
-            (
-                SearchContext context
-            )
-        {
-            TermLink[] result = ReferenceEquals(EntryPoint, null)
-                ? Array.Empty<TermLink>()
-                : EntryPoint.Find(context);
-
             return result;
         }
+    }
 
-        /// <inheritdoc cref="ISearchTree.ReplaceChild"/>
-        public void ReplaceChild
+    /// <inheritdoc cref="ISearchTree.Value" />
+    string? ISearchTree.Value => null;
+
+    /// <inheritdoc cref="ISearchTree.Find"/>
+    public TermLink[] Find
+        (
+            SearchContext context
+        )
+    {
+        TermLink[] result = ReferenceEquals (EntryPoint, null)
+            ? Array.Empty<TermLink>()
+            : EntryPoint.Find (context);
+
+        return result;
+    }
+
+    /// <inheritdoc cref="ISearchTree.ReplaceChild"/>
+    public void ReplaceChild
+        (
+            ISearchTree fromChild,
+            ISearchTree? toChild
+        )
+    {
+        Sure.NotNull (fromChild);
+
+        Magna.Logger.LogError
             (
-                ISearchTree fromChild,
-                ISearchTree? toChild
-            )
-        {
-            Magna.Error
-                (
-                    "SearchProgram::ReplaceChild: "
-                    + "not implemented"
-                );
+                nameof (SearchProgram) + "::" + nameof (ReplaceChild)
+                + ": not implemented"
+            );
 
-            throw new NotImplementedException();
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        if (ReferenceEquals (EntryPoint, null))
+        {
+            return string.Empty;
         }
 
-        #endregion
+        string result = EntryPoint.ToString()
+            .Trim();
 
-        #region Object members
+        return result;
+    }
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            if (ReferenceEquals(EntryPoint, null))
-            {
-                return string.Empty;
-            }
-
-            string result = EntryPoint.ToString()
-                .Trim();
-
-            return result;
-        }
-
-        #endregion
-
-    } // class SearchProgram
-
-} // namespace ManagedIrbis.Infrastructure
+    #endregion
+}

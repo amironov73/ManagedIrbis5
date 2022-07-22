@@ -429,7 +429,11 @@ public class DirectProvider
         if (string.IsNullOrEmpty(result))
         {
             result = null;
-            Magna.Warning ($"File not found: {specification}");
+            Magna.Logger.LogWarning
+                (
+                    "File not found: {Specification}",
+                    specification
+                );
         }
         else
         {
@@ -1015,7 +1019,7 @@ public class DirectProvider
     /// <inheritdoc cref="ISyncProvider.RestartServer"/>
     public bool RestartServer()
     {
-        Magna.Trace (nameof (DirectProvider) + "::" + nameof (RestartServer));
+        Magna.Logger.LogTrace (nameof (DirectProvider) + "::" + nameof (RestartServer));
 
         return true;
     }
@@ -1140,10 +1144,10 @@ public class DirectProvider
         }
         catch (Exception exception)
         {
-            Magna.TraceException
+            Magna.Logger.LogError
                 (
-                    nameof (DirectProvider) + "::" + nameof (WriteTextFile),
-                    exception
+                    exception,
+                    nameof (DirectProvider) + "::" + nameof (WriteTextFile)
                 );
             return false;
         }

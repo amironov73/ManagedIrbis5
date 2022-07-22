@@ -25,6 +25,8 @@ using ManagedIrbis.Direct;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 
+using Microsoft.Extensions.Logging;
+
 using SharpCompress.Archives;
 using SharpCompress.Archives.Rar;
 
@@ -87,7 +89,7 @@ public sealed class LocalCatalogManager
     {
         if (!Directory.Exists (sourcePath))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (LocalCatalogManager) + "::" + nameof (_CopyDatabaseOnly)
                     + ": directory not found: {Directory}",
@@ -194,7 +196,7 @@ public sealed class LocalCatalogManager
 
         if (!Directory.Exists (ibisPath))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (LocalCatalogManager) + "::" + nameof (CreateCatalog)
                     + ": ibisPath doesn't exist: {Path}",
@@ -207,7 +209,7 @@ public sealed class LocalCatalogManager
         var directory = Path.GetDirectoryName (ibisPath);
         if (string.IsNullOrEmpty (directory))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (LocalCatalogManager) + "::" + nameof (CreateCatalog)
                     + ": ibisPath must be full: {Path}",
@@ -220,7 +222,7 @@ public sealed class LocalCatalogManager
         var ibisName = Path.GetFileName (directory);
         if (string.IsNullOrEmpty (ibisName))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (LocalCatalogManager) + "::" + nameof (CreateCatalog)
                     + "ibisPath must be full: {Path}",
@@ -233,7 +235,7 @@ public sealed class LocalCatalogManager
         directory = Path.GetDirectoryName (targetPath);
         if (string.IsNullOrEmpty (directory))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (LocalCatalogManager) + "::" + nameof (CreateCatalog)
                     + "targetPath must be full: {Path}",
@@ -246,7 +248,7 @@ public sealed class LocalCatalogManager
         var targetName = Path.GetFileName (directory);
         if (string.IsNullOrEmpty (targetName))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (LocalCatalogManager) + "::" + nameof (CreateCatalog)
                     + "targetPath must be full: {Path}",
@@ -350,7 +352,7 @@ public sealed class LocalCatalogManager
         Sure.NotNullNorEmpty (sourcePath);
         Sure.NotNullNorEmpty (targetPath);
 
-        Magna.Error
+        Magna.Logger.LogError
             (
                 nameof (LocalCatalogManager) + "::" + nameof (ReplicateCatalog)
                 + ": not implemented"

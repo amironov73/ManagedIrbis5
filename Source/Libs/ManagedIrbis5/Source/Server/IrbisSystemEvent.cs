@@ -24,165 +24,164 @@ using System.Threading;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Server
+namespace ManagedIrbis.Server;
+
+//
+// При старте сервера
+//
+// var systemEvent = new IrbisSystemEvent();
+// if (!systemEvent.CheckOtherServerRunning())
+// {
+//   Облом
+// }
+// systemEvent.SayIamRunning();
+//
+// В конце
+//
+// systemEvent.Dispose();
+//
+
+/// <summary>
+/// Системные события, используемые сервером ИРБИС64
+/// для координации экземпляров сервера.
+/// </summary>
+public sealed class IrbisSystemEvent
+    : IDisposable
 {
-    //
-    // При старте сервера
-    //
-    // var systemEvent = new IrbisSystemEvent();
-    // if (!systemEvent.CheckOtherServerRunning())
-    // {
-    //   Облом
-    // }
-    // systemEvent.SayIamRunning();
-    //
-    // В конце
-    //
-    // systemEvent.Dispose();
-    //
+    #region Constants
 
     /// <summary>
-    /// Системные события, используемые сервером ИРБИС64
-    /// для координации экземпляров сервера.
+    /// Name of the event.
     /// </summary>
-    public sealed class IrbisSystemEvent
-        : IDisposable
+    public const string StartedName = "IRBIS64_STARTED";
+
+    /// <summary>
+    /// Name of the event.
+    /// </summary>
+    public const string StopName = "IRBIS64_STOP_";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// IRBIS64 server started.
+    /// </summary>
+    public EventWaitHandle? StartedEvent { get; }
+
+    /// <summary>
+    /// Stop the IRBIS64 server.
+    /// </summary>
+    public EventWaitHandle? StopEvent { get; }
+
+    /// <summary>
+    /// Флаг, означающий, что создано новое событие
+    /// (а не использовано ранее созданное).
+    /// </summary>
+    public bool Created { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public IrbisSystemEvent()
     {
-        #region Constants
+        StartedEvent = new EventWaitHandle
+            (
+                false,
+                EventResetMode.ManualReset,
+                StartedName,
+                out var created
+            );
+        Created = created;
 
-        /// <summary>
-        /// Name of the event.
-        /// </summary>
-        public const string StartedName = "IRBIS64_STARTED";
+        Magna.Logger.LogTrace
+            (
+                nameof (IrbisSystemEvent) + "::Constructor"
+                + ": created={Time}",
+                created
+            );
 
-        /// <summary>
-        /// Name of the event.
-        /// </summary>
-        public const string StopName = "IRBIS64_STOP_";
+        StopEvent = new EventWaitHandle
+            (
+                false,
+                EventResetMode.ManualReset,
+                StopName
+            );
+    }
 
-        #endregion
+    /// <summary>
+    /// Финализатор.
+    /// </summary>
+    ~IrbisSystemEvent()
+    {
+        Magna.Logger.LogTrace (nameof (IrbisSystemEvent) + "::Destructor");
 
-        #region Properties
+        Dispose();
+    }
 
-        /// <summary>
-        /// IRBIS64 server started.
-        /// </summary>
-        public EventWaitHandle? StartedEvent { get; }
+    #endregion
 
-        /// <summary>
-        /// Stop the IRBIS64 server.
-        /// </summary>
-        public EventWaitHandle? StopEvent { get; }
+    #region Public methods
 
-        /// <summary>
-        /// Флаг, означающий, что создано новое событие
-        /// (а не использовано ранее созданное).
-        /// </summary>
-        public bool Created { get; }
+    /// <summary>
+    /// Проверяет, не запущен ли другой экземпляр сервера ИРБИС64.
+    /// </summary>
+    /// <returns><c>true</c>, если другого экземпляра нет.</returns>
+    public bool CheckOtherServerRunning()
+    {
+        return !StartedEvent.ThrowIfNull().WaitOne (1);
+    }
 
-        #endregion
+    /// <summary>
+    /// Проверяет, не запрошен ли останов сервера ИРБИС64.
+    /// </summary>
+    /// <returns><c>true</c>, если запрошен останов сервера.</returns>
+    public bool CheckStopRequested()
+    {
+        return StopEvent.ThrowIfNull().WaitOne (1);
+    }
 
-        #region Construction
+    /// <summary>
+    /// Запрашивает остановку ранее запущенного экземпляра
+    /// сервера ИРБИС64.
+    /// </summary>
+    public void RequestStop()
+    {
+        StopEvent.ThrowIfNull().Set();
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public IrbisSystemEvent()
-        {
-            StartedEvent = new EventWaitHandle
-                (
-                    false,
-                    EventResetMode.ManualReset,
-                    StartedName,
-                    out var created
-                );
-            Created = created;
+    /// <summary>
+    /// Заявляет "Я, сервер ИРБИС64, не потерплю других серверов
+    /// пред ликом моим".
+    /// </summary>
+    public void SayIamRunning()
+    {
+        StartedEvent.ThrowIfNull().Set();
+    }
 
-            Magna.Trace
-                (
-                    "IrbisSystemEvent::Constructor: "
-                    + StartedName
-                    + ": created="
-                    + created
-                );
+    #endregion
 
-            StopEvent = new EventWaitHandle
-                (
-                    false,
-                    EventResetMode.ManualReset,
-                    StopName
-                );
-        } // constructor
+    #region IDisposable members
 
-        /// <summary>
-        /// Финализатор.
-        /// </summary>
-        ~IrbisSystemEvent()
-        {
-            Magna.Trace
-                (
-                    "IrbisSystemEvent::Destructor"
-                );
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public void Dispose()
+    {
+        Magna.Logger.LogTrace (nameof (IrbisSystemEvent) + "::" + nameof (Dispose));
 
-            Dispose();
-        } // finalizer
+        GC.SuppressFinalize (this);
+        StartedEvent?.Dispose();
+        StopEvent?.Dispose();
+    }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Проверяет, не запущен ли другой экземпляр сервера ИРБИС64.
-        /// </summary>
-        /// <returns><c>true</c>, если другого экземпляра нет.</returns>
-        public bool CheckOtherServerRunning() =>
-            !StartedEvent.ThrowIfNull("StartedEvent").WaitOne(1);
-
-        /// <summary>
-        /// Проверяет, не запрошен ли останов сервера ИРБИС64.
-        /// </summary>
-        /// <returns><c>true</c>, если запрошен останов сервера.</returns>
-        public bool CheckStopRequested() =>
-            StopEvent.ThrowIfNull("StopEvent").WaitOne(1);
-
-        /// <summary>
-        /// Запрашивает остановку ранее запущенного экземпляра
-        /// сервера ИРБИС64.
-        /// </summary>
-        public void RequestStop() =>
-            StopEvent.ThrowIfNull("StopEvent").Set();
-
-        /// <summary>
-        /// Заявляет "Я, сервер ИРБИС64, не потерплю других серверов
-        /// пред ликом моим".
-        /// </summary>
-        public void SayIamRunning() =>
-            StartedEvent.ThrowIfNull("StartedEvent").Set();
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-
-            Magna.Trace
-                (
-                    nameof(IrbisSystemEvent) + "::" + nameof(Dispose)
-                );
-
-            StartedEvent?.Dispose();
-            StopEvent?.Dispose();
-        } // method Dispose
-
-        #endregion
-
-    } // class IrbisSystemEvent
-
-} // namespace ManagedIrbis.Server
+    #endregion
+}

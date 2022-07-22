@@ -33,6 +33,7 @@ using AM.Json;
 using AM.Text.Output;
 
 using Microsoft.CSharp;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -266,7 +267,7 @@ public sealed class TestRunner
 
         if (haveError)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (TestRunner) + "::" + nameof (CompileTests)
                     + ": can't compile"
@@ -305,11 +306,11 @@ public sealed class TestRunner
             {
                 WriteLine (ConsoleColor.Red, "not found!");
 
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (TestRunner) + "::" + nameof (DiscoverTests)
-                        + ": not found: "
-                        + fullPath
+                        + ": not found: {Path}",
+                        fullPath
                     );
 
                 throw new FileNotFoundException (fullPath);
@@ -684,7 +685,7 @@ public sealed class TestRunner
         var workingDirectory = Path.GetDirectoryName (IrbisServerPath);
         if (string.IsNullOrEmpty (workingDirectory))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (TestRunner) + "::" + nameof (StartServer)
                     + ": can't determine working directory"
@@ -814,7 +815,7 @@ public sealed class TestRunner
 
         if (!result)
         {
-            Magna.Error (nameof (TestRunner) + "::" + nameof (Verify));
+            Magna.Logger.LogError (nameof (TestRunner) + "::" + nameof (Verify));
             if (throwOnError)
             {
                 throw new VerificationException();

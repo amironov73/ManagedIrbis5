@@ -20,133 +20,129 @@
 #region Using directives
 
 using System;
-using System.Collections.Concurrent;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AM;
 
-using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Server.Sockets;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Server
+namespace ManagedIrbis.Server;
+
+/// <summary>
+/// Серверный сторожевой таймер.
+/// </summary>
+public sealed class ServerWatchdog
 {
+    #region Constants
+
     /// <summary>
-    /// Серверный сторожевой таймер.
+    /// Default timeout, seconds.
     /// </summary>
-    public sealed class ServerWatchdog
+    public const int DefaultTimeout = 30;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Engine.
+    /// </summary>
+    public ServerEngine Engine { get; }
+
+    /// <summary>
+    /// Cancellation token.
+    /// </summary>
+    public CancellationToken Token { get; }
+
+    /// <summary>
+    /// Corresponding task.
+    /// </summary>
+    public Task Task { get; }
+
+    /// <summary>
+    /// Timeout, seconds.
+    /// </summary>
+    public int Timeout { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ServerWatchdog
+        (
+            ServerEngine engine
+        )
     {
-        #region Constants
+        Engine = engine;
+        Token = engine.GetCancellationToken();
+        Task = MainLoop();
+        Timeout = DefaultTimeout;
+    }
 
-        /// <summary>
-        /// Default timeout, seconds.
-        /// </summary>
-        public const int DefaultTimeout = 30;
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Properties
-
-        /// <summary>
-        /// Engine.
-        /// </summary>
-        public ServerEngine Engine { get; private set; }
-
-        /// <summary>
-        /// Cancellation token.
-        /// </summary>
-        public CancellationToken Token { get; private set; }
-
-        /// <summary>
-        /// Corresponding task.
-        /// </summary>
-        public Task Task { get; private set; }
-
-        /// <summary>
-        /// Timeout, seconds.
-        /// </summary>
-        public int Timeout { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ServerWatchdog
-            (
-                ServerEngine engine
-            )
+    /// <summary>
+    /// Главный цикл.
+    /// </summary>
+    public async Task MainLoop()
+    {
+        if (Timeout <= 0)
         {
-            Engine = engine;
-            Token = engine.GetCancellationToken();
-            Task = MainLoop();
-            Timeout = DefaultTimeout;
+            // TODO is it right decision?
+            return;
+        }
 
-        } // constructor
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Главный цикл.
-        /// </summary>
-        public async Task MainLoop()
+        while (!Token.IsCancellationRequested)
         {
-            if (Timeout <= 0)
-            {
-                // TODO is it right decision?
-                return;
-            }
+            await Task.Yield();
 
-            while (!Token.IsCancellationRequested)
+            try
             {
-                await Task.Yield();
+                ServerWorker[] workers;
 
-                try
+                lock (Engine.SyncRoot)
                 {
-                    ServerWorker[] workers;
-
-                    lock (Engine.SyncRoot)
-                    {
-                        workers = Engine.Workers.ToArray();
-                    }
-
-                    var threshold = DateTime.Now.AddSeconds(-Timeout);
-                    var longRunning = workers
-                        .Where(w => w.Data.Started < threshold)
-                        .ToArray();
-
-                    foreach (var worker in longRunning)
-                    {
-                        var task = worker.Data.Task.ThrowIfNull(nameof(worker.Data.Task));
-                        Magna.Warning($"Long running worker: {task.Id}");
-
-                        // TODO kill long running task?
-                    }
+                    workers = Engine.Workers.ToArray();
                 }
-                catch (Exception exception)
+
+                var threshold = DateTime.Now.AddSeconds (-Timeout);
+                var longRunning = workers
+                    .Where (w => w.Data.Started < threshold)
+                    .ToArray();
+
+                foreach (var worker in longRunning)
                 {
-                    Magna.TraceException
+                    var task = worker.Data.Task.ThrowIfNull (nameof (worker.Data.Task));
+                    Magna.Logger.LogWarning
                         (
-                            nameof(ServerWatchdog) + "::" + nameof(MainLoop),
-                            exception
+                            "Long running worker: {TaskId}",
+                            task.Id
                         );
+
+                    // TODO kill long running task?
                 }
             }
+            catch (Exception exception)
+            {
+                Magna.Logger.LogError
+                    (
+                        exception,
+                        nameof (ServerWatchdog) + "::" + nameof (MainLoop)
+                    );
+            }
+        }
+    }
 
-        } // method MainLoop
-
-        #endregion
-
-    } // class ServerWatchdog
-
-} // namespace ManagedIrbis.Server
+    #endregion
+}
