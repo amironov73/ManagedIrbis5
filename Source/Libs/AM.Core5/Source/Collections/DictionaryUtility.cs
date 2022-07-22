@@ -18,6 +18,8 @@
 using System;
 using System.Collections.Generic;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -50,11 +52,10 @@ public static class DictionaryUtility
         {
             if (ReferenceEquals (dictionary, null))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (DictionaryUtility) + "::" + nameof (MergeWithConflicts)
-                        + ": "
-                        + "dictionary is null"
+                        + ": dictionary is null"
                     );
 
                 throw new ArgumentNullException (nameof (dictionaries));
@@ -91,11 +92,10 @@ public static class DictionaryUtility
         {
             if (ReferenceEquals (dictionary, null))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (DictionaryUtility) + "::" + nameof (MergeFirstValues)
-                        + ": "
-                        + "dictionary is null"
+                        + ": dictionary is null"
                     );
 
                 throw new ArgumentNullException (nameof (dictionaries));
@@ -135,11 +135,10 @@ public static class DictionaryUtility
         {
             if (ReferenceEquals (dictionary, null))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (DictionaryUtility) + "::" + nameof (MergeLastValues)
-                        + ": "
-                        + "dictionary is null"
+                        + ": dictionary is null"
                     );
 
                 throw new ArgumentNullException (nameof (dictionaries));

@@ -22,6 +22,8 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -78,7 +80,7 @@ public static class PayloadGenerator
         }
         catch
         {
-            Magna.Debug (nameof (IsValidQRIban));
+            Magna.Logger.LogDebug (nameof (IsValidQRIban));
         }
 
         return IsValidIban (iban) && foundQrIid;

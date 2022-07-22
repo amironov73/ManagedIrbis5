@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -71,11 +73,11 @@ public static class BarsikSerializer
 
         if (ReferenceEquals(mapping, null))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (BarsikSerializer) + "::" + nameof (Serialize)
-                    + ": unknown node type="
-                    + nodeType.AssemblyQualifiedName
+                    + ": unknown node type {Type}",
+                    nodeType.AssemblyQualifiedName
                 );
 
             throw new BarsikException

@@ -19,6 +19,8 @@ using System;
 using System.IO;
 using System.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -108,10 +110,10 @@ public sealed class StreamOutput
             string configuration
         )
     {
-        Magna.Error
+        Magna.Logger.LogError
             (
-                "StreamOutput::Configure: "
-                + "not implemented"
+                nameof (StreamOutput) + "::" + nameof (Configure)
+                + ": not implemented"
             );
 
         throw new NotImplementedException();

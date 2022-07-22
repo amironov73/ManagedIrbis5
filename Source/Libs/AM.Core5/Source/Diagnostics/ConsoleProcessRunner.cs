@@ -20,6 +20,8 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -109,7 +111,7 @@ public sealed class ConsoleProcessRunner
     {
         if (RunningProcess is { HasExited: false })
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ConsoleProcessRunner) + "::" + nameof (Start)
                     + ": process already running"

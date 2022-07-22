@@ -18,6 +18,8 @@
 using System.IO;
 using System.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -110,13 +112,12 @@ public static class TextReaderUtility
         var result = reader.ReadLine();
         if (ReferenceEquals (result, null))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (TextReaderUtility)
                     + "::"
                     + nameof (RequireLine)
-                    + ": "
-                    + "unexpected end of stream"
+                    + ": unexpected end of stream"
                 );
 
             throw new ArsMagnaException

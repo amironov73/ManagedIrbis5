@@ -25,6 +25,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -160,12 +162,7 @@ public sealed class SimplestDataProcessor<TInput, TOutput>
     /// </summary>
     public void Complete()
     {
-        Magna.Trace
-            (
-                nameof (SimplestDataProcessor<TInput, TOutput>)
-                + "::"
-                + nameof (Complete)
-            );
+        Magna.Logger.LogTrace (nameof (SimplestDataProcessor<TInput, TOutput>) + "::" + nameof (Complete));
 
         _queue.CompleteAdding();
     }
@@ -178,12 +175,7 @@ public sealed class SimplestDataProcessor<TInput, TOutput>
             TInput input
         )
     {
-        Magna.Trace
-            (
-                nameof (SimplestDataProcessor<TInput, TOutput>)
-                + "::"
-                + nameof (Enqueue)
-            );
+        Magna.Logger.LogTrace (nameof (SimplestDataProcessor<TInput, TOutput>) + "::" + nameof (Enqueue));
 
         var item = new Item { Input = input };
         _queue.Add (item);
@@ -194,13 +186,7 @@ public sealed class SimplestDataProcessor<TInput, TOutput>
     /// </summary>
     public void WaitForCompletion()
     {
-        Magna.Trace
-            (
-                nameof (SimplestDataProcessor<TInput, TOutput>)
-                + "::"
-                + nameof (WaitForCompletion)
-                + ": begin"
-            );
+        Magna.Logger.LogTrace (nameof (SimplestDataProcessor<TInput, TOutput>) + "::" + nameof (WaitForCompletion) + ": begin");
 
         while (!_queue.IsCompleted)
         {
@@ -219,12 +205,7 @@ public sealed class SimplestDataProcessor<TInput, TOutput>
             Task.WaitAll (tasks);
         }
 
-        Magna.Trace
-            (
-                nameof (SimplestDataProcessor<TInput, TOutput>)
-                + "::"
-                + nameof (WaitForCompletion) + ": end"
-            );
+        Magna.Logger.LogTrace (nameof (SimplestDataProcessor<TInput, TOutput>) + "::" + nameof (WaitForCompletion) + ": end");
     }
 
     #endregion

@@ -20,6 +20,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -85,10 +87,10 @@ public class EnglishHyphenator
             string theWord
         )
     {
-        Magna.Error
+        Magna.Logger.LogError
             (
-                "EnglishHyphenator::RecognizeWord: "
-                + "not implemented"
+                nameof (EnglishHyphenator) + "::" + nameof (RecognizeWord)
+                + ": not implemented"
             );
 
         throw new NotImplementedException();

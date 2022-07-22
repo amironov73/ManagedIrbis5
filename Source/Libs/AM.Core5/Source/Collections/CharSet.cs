@@ -23,6 +23,8 @@ using System.IO;
 
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -344,10 +346,10 @@ public sealed class CharSet
             {
                 if (i >= len2)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
-                            "CharSet::_Add: "
-                            + "too long"
+                            nameof (CharSet) + "::" + nameof (_Add)
+                            + ": too long"
                         );
 
                     throw new ArgumentException();
@@ -370,10 +372,10 @@ public sealed class CharSet
         {
             if (s[i] == '\\')
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "CharSet::_Add: "
-                        + "unexpected '\\'"
+                        nameof (CharSet) + "::" + nameof (_Add)
+                        + ": unexpected '\\'"
                     );
 
                 throw new ArgumentException();

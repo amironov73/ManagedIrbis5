@@ -20,6 +20,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -97,17 +99,17 @@ public static class InsistentFile
             {
                 lastException = exception;
 
-                Magna.TraceException
+                Magna.Logger.LogError
                     (
-                        nameof (InsistentFile) + "::" + nameof (_Evaluate),
-                        exception
+                        exception,
+                        nameof (InsistentFile) + "::" + nameof (_Evaluate)
                     );
             }
 
             var elapsed = (int)stopwatch.ElapsedMilliseconds;
             if (elapsed > Timeout)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (InsistentFile) + "::" + nameof (_Evaluate)
                         + ": timeout is exhausted"

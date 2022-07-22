@@ -20,6 +20,8 @@ using System.IO;
 
 using AM.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -168,7 +170,11 @@ sealed class Test
         }
         catch (Exception exception)
         {
-            Magna.TraceException (nameof (Test) + "::" + nameof (Run), exception);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (Test) + "::" + nameof (Run)
+                );
 
             result.Failed = true;
             result.Exception = exception.ToString();

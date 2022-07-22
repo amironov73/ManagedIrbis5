@@ -17,6 +17,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -378,7 +380,7 @@ public sealed class Verifier<T>
     /// </summary>
     public void Throw()
     {
-        Magna.Error (nameof (Verifier<T>) + "::" + nameof (Throw));
+        Magna.Logger.LogError (nameof (Verifier<T>) + "::" + nameof (Throw));
 
         throw new VerificationException();
     }
@@ -393,16 +395,17 @@ public sealed class Verifier<T>
     {
         if (!string.IsNullOrEmpty (message))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (Verifier<T>) + "::" + nameof (Throw)
-                    + ": " + message
+                    + ": {Message}",
+                    message
                 );
 
             throw new VerificationException (message);
         }
 
-        Magna.Error (nameof (Verifier<T>) + "::" + nameof (Throw));
+        Magna.Logger.LogError (nameof (Verifier<T>) + "::" + nameof (Throw));
 
         throw new VerificationException();
     }

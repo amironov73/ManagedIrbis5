@@ -22,6 +22,8 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -157,10 +159,10 @@ public class Pair<T1, T2>
             object? value
         )
     {
-        Magna.Error
+        Magna.Logger.LogError
             (
-                "Pair::Add: "
-                + "not supported"
+                nameof (Pair<T1, T2>) + "::Add"
+                + ": not supported"
             );
 
         throw new NotSupportedException();
@@ -187,10 +189,10 @@ public class Pair<T1, T2>
     ///<inheritdoc cref="IList.Clear" />
     void IList.Clear()
     {
-        Magna.Error
+        Magna.Logger.LogError
             (
-                "Pair::Clear: "
-                + "not supported"
+                nameof (Pair<T1, T2>) + "::Clear"
+                + ": not supported"
             );
 
         throw new NotSupportedException();
@@ -202,8 +204,8 @@ public class Pair<T1, T2>
             object? value
         )
     {
-        int index = 0;
-        foreach (object o in this)
+        var index = 0;
+        foreach (var o in this)
         {
             if (!ReferenceEquals(o, null))
             {
@@ -225,10 +227,10 @@ public class Pair<T1, T2>
             object? value
         )
     {
-        Magna.Error
+        Magna.Logger.LogError
             (
-                "Pair::Insert: "
-                + "not supported"
+                nameof (Pair<T1, T2>) + "::Insert"
+                + ": not supported"
             );
 
         throw new NotSupportedException();
@@ -240,10 +242,10 @@ public class Pair<T1, T2>
             object? value
         )
     {
-        Magna.Error
+        Magna.Logger.LogError
             (
-                "Pair::Remove: "
-                + "not supported"
+                nameof (Pair<T1, T2>) + "::Remove"
+                + ": not supported"
             );
 
         throw new NotSupportedException();
@@ -255,10 +257,10 @@ public class Pair<T1, T2>
             int index
         )
     {
-        Magna.Error
+        Magna.Logger.LogError
             (
-                "Pair::RemoveAt: "
-                + "not supported"
+                nameof (Pair<T1, T2>) + "::RemoveAt"
+                + ": not supported"
             );
 
         throw new NotSupportedException();
@@ -278,12 +280,11 @@ public class Pair<T1, T2>
                     return Second;
 
                 default:
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
-                            "Pair::Indexer: "
-                            + "index="
-                            + index
-                            + " is out of range"
+                            nameof (Pair<T1, T2>) + "::Indexer"
+                            + "index={Index} is out of range",
+                            index
                         );
 
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -293,10 +294,10 @@ public class Pair<T1, T2>
         {
             if (_isReadOnly)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "Pair::Indexer: "
-                        + "is read-only"
+                        nameof (Pair<T1, T2>) + "::Indexer"
+                        + ": is read-only"
                     );
 
                 throw new NotSupportedException();
@@ -313,12 +314,11 @@ public class Pair<T1, T2>
                     break;
 
                 default:
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
-                            "Pair::Indexer: "
-                            + "index="
-                            + index
-                            + " is out of range"
+                            nameof (Pair<T1, T2>) + "::Indexer"
+                            + ": index={Index} is out of range",
+                            index
                         );
 
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -400,9 +400,9 @@ public class Pair<T1, T2>
     {
         if (ReadOnly)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "Pair::ThrowIfReadOnly"
+                    nameof (Pair<T1, T2>) + "::" + nameof(ThrowIfReadOnly)
                 );
 
             throw new ReadOnlyException();

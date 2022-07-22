@@ -25,6 +25,8 @@ using System.Resources;
 
 using AM.Core.Properties;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -335,11 +337,11 @@ public static class ReflectionUtility
             );
         if (fieldInfo is null)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ReflectionUtility) + "::" + nameof (GetFieldValue)
-                    + Resources.CantFindField
-                    + fieldName
+                    + ": can't find field {Field}",
+                    fieldName
                 );
 
             throw new ArgumentException (nameof (fieldName));
@@ -426,11 +428,11 @@ public static class ReflectionUtility
             );
         if (fieldInfo is null)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ReflectionUtility) + "::" + nameof (SetFieldValue)
-                    + Resources.CantFindField
-                    + fieldName
+                    + ": can't find field {Field}",
+                    fieldName
                 );
 
             throw new ArgumentException (nameof (fieldName));
@@ -461,11 +463,11 @@ public static class ReflectionUtility
             );
         if (propertyInfo is null)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ReflectionUtility) + "::" + nameof (GetPropertyValue)
-                    + Resources.CantFindProperty
-                    + propertyName
+                    + ": can't find property {Property}",
+                    propertyName
                 );
 
             throw new ArgumentException (nameof (propertyName));
@@ -524,11 +526,11 @@ public static class ReflectionUtility
             );
         if (propertyInfo is null)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ReflectionUtility) + "::" + nameof (SetPropertyValue)
-                    + Resources.CantFindProperty
-                    + propertyName
+                    + ": can't find property {Property}",
+                    propertyName
                 );
 
             throw new ArgumentException (nameof (propertyName));

@@ -23,6 +23,8 @@ using System.Threading.Tasks;
 
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -134,13 +136,10 @@ public sealed class BusyState
             bool newState
         )
     {
-        Magna.Trace
+        Magna.Logger.LogTrace
             (
-                nameof (BusyState)
-                + "::"
-                + nameof (SetState)
-                + ": newState="
-                + newState
+                nameof (BusyState) + "::" + nameof (SetState) + ": newState={NewState}",
+                newState
             );
 
         if (newState != State)
@@ -173,26 +172,12 @@ public sealed class BusyState
     /// </summary>
     public void WaitAndGrab()
     {
-        Magna.Trace
-            (
-                nameof (BusyState)
-                + "::"
-                + nameof (WaitAndGrab)
-                +
-                ": enter"
-            );
+        Magna.Logger.LogTrace (nameof (BusyState) + "::" + nameof (WaitAndGrab) + ": enter");
 
         WaitHandle.WaitOne();
         SetState (true);
 
-        Magna.Trace
-            (
-                nameof (BusyState)
-                + "::"
-                + nameof (WaitAndGrab)
-                +
-                ": return"
-            );
+        Magna.Logger.LogTrace (nameof (BusyState) + "::" + nameof (WaitAndGrab) + ": return");
     }
 
     /// <summary>
@@ -203,26 +188,12 @@ public sealed class BusyState
             TimeSpan timeout
         )
     {
-        Magna.Trace
-            (
-                nameof (BusyState)
-                + "::"
-                + nameof (WaitAndGrab)
-                +
-                ": enter"
-            );
+        Magna.Logger.LogTrace (nameof (BusyState) + "::" + nameof (WaitAndGrab) + ": enter");
 
         var result = WaitHandle.WaitOne (timeout);
         SetState (true);
 
-        Magna.Trace
-            (
-                nameof (BusyState)
-                + "::"
-                + nameof (WaitAndGrab)
-                +
-                ": return"
-            );
+        Magna.Logger.LogTrace (nameof (BusyState) + "::" + nameof (WaitAndGrab) + ": return");
 
         return result;
     }
@@ -232,23 +203,11 @@ public sealed class BusyState
     /// </summary>
     public void Wait()
     {
-        Magna.Trace
-            (
-                nameof (BusyState)
-                + "::"
-                + nameof (Wait)
-                + ": enter"
-            );
+        Magna.Logger.LogTrace (nameof (BusyState) + "::" + nameof (Wait) + ": enter");
 
         WaitHandle.WaitOne();
 
-        Magna.Trace
-            (
-                nameof (BusyState)
-                + "::"
-                + nameof (Wait)
-                + ": return"
-            );
+        Magna.Logger.LogTrace (nameof (BusyState) + "::" + nameof (Wait) + ": return");
     }
 
     /// <summary>
@@ -259,23 +218,11 @@ public sealed class BusyState
             TimeSpan timeout
         )
     {
-        Magna.Trace
-            (
-                nameof (BusyState)
-                + "::"
-                + nameof (Wait)
-                + ": enter"
-            );
+        Magna.Logger.LogTrace (nameof (BusyState) + "::" + nameof (Wait) + ": enter");
 
         var result = WaitHandle.WaitOne (timeout);
 
-        Magna.Trace
-            (
-                nameof (BusyState)
-                + "::"
-                + nameof (Wait)
-                + ": return"
-            );
+        Magna.Logger.LogTrace (nameof (BusyState) + "::" + nameof (Wait) + ": return");
 
         return result;
     }

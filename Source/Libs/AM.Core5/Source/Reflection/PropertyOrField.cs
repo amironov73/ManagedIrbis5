@@ -17,6 +17,8 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -145,15 +147,14 @@ public sealed class PropertyOrField
             MemberInfo memberInfo
         )
     {
-        if (!(memberInfo is PropertyInfo)
-            && !(memberInfo is FieldInfo))
+        if (memberInfo is not System.Reflection.PropertyInfo
+            && memberInfo is not System.Reflection.FieldInfo)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "PropertyOrField::Constructor: "
-                    + "member="
-                    + memberInfo.Name
-                    + "is neither property nor field"
+                    nameof (PropertyOrField) + "::Constructor"
+                    + ": member {Member} is neither property nor field",
+                    memberInfo.Name
                 );
 
             throw new ArgumentException

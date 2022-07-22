@@ -21,6 +21,8 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -363,13 +365,12 @@ public static class ListUtility
     {
         if (ReferenceEquals (list, null))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ListUtility)
                     + "::"
                     + nameof (ThrowIfNullOrEmpty)
-                    + ": "
-                    + "list is null"
+                    + ": list is null"
                 );
 
             throw new ArgumentNullException();
@@ -377,13 +378,12 @@ public static class ListUtility
 
         if (list.Count == 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ListUtility)
                     + "::"
                     + nameof (ThrowIfNullOrEmpty)
-                    + ": "
-                    + "list is empty"
+                    + ": list is empty"
                 );
 
             throw new ArgumentException();
@@ -405,13 +405,12 @@ public static class ListUtility
     {
         if (ReferenceEquals (list, null))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ListUtility)
                     + "::"
                     + nameof (ThrowIfNullOrEmpty)
-                    + ": "
-                    + "list is null"
+                    + ": list is null"
                 );
 
             throw new ArgumentNullException (message);
@@ -419,13 +418,12 @@ public static class ListUtility
 
         if (list.Count == 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ListUtility)
                     + "::"
                     + nameof (ThrowIfNullOrEmpty)
-                    + ": "
-                    + "list is empty"
+                    + ": list is empty"
                 );
 
             throw new ArgumentException (message);
@@ -446,13 +444,12 @@ public static class ListUtility
     {
         if (ReferenceEquals (array, null))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ListUtility)
                     + "::"
                     + nameof (ThrowIfNullOrEmpty)
-                    + ": "
-                    + "array is null"
+                    + ": array is null"
                 );
 
             throw new ArgumentNullException();
@@ -460,13 +457,12 @@ public static class ListUtility
 
         if (array.Length == 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ListUtility)
                     + "::"
                     + nameof (ThrowIfNullOrEmpty)
-                    + ": "
-                    + "array is empty"
+                    + ": array is empty"
                 );
 
             throw new ArgumentException();
@@ -488,13 +484,12 @@ public static class ListUtility
     {
         if (ReferenceEquals (array, null))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ListUtility)
                     + "::"
                     + nameof (ThrowIfNullOrEmpty)
-                    + ": "
-                    + "array is null"
+                    + ": array is null"
                 );
 
             throw new ArgumentNullException (message);
@@ -502,13 +497,12 @@ public static class ListUtility
 
         if (array.Length == 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ListUtility)
                     + "::"
                     + nameof (ThrowIfNullOrEmpty)
-                    + ": "
-                    + "array is empty"
+                    + ": array is empty"
                 );
 
             throw new ArgumentException (message);

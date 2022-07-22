@@ -17,6 +17,8 @@ using System.Drawing;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -85,12 +87,12 @@ public sealed class CardText
 
         if (string.IsNullOrEmpty (Font))
         {
-            Magna.Warning ("Font isn't specified");
+            Magna.Logger.LogWarning ("Font isn't specified");
         }
 
         if (string.IsNullOrEmpty (Color))
         {
-            Magna.Warning ("Color isn't specified");
+            Magna.Logger.LogWarning ("Color isn't specified");
         }
 
         if (!string.IsNullOrEmpty (Font)
@@ -98,8 +100,7 @@ public sealed class CardText
             && !string.IsNullOrEmpty (Text))
         {
             var fontConverter = new FontConverter();
-            using var font = (Font)fontConverter.ConvertFromString (Font)
-                .ThrowIfNull();
+            using var font = (Font)fontConverter.ConvertFromString (Font).ThrowIfNull();
             var colorConverter = new ColorConverter();
             var color = (Color)colorConverter.ConvertFromString (Color)!;
             var text = context.ExpandText (Text);

@@ -23,6 +23,8 @@ using System.Globalization;
 
 using AM.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -961,7 +963,7 @@ public static class Builtins
         var text = ComputeAll (context, args);
         if (!string.IsNullOrEmpty (text))
         {
-            Magna.Trace (text);
+            Magna.Logger.LogTrace ("Builtin trace: {Text}", text);
         }
 
         return null;
@@ -995,7 +997,7 @@ public static class Builtins
         var text = ComputeAll (context, args);
         if (!string.IsNullOrEmpty (text))
         {
-            Magna.Warning (text);
+            Magna.Logger.LogWarning ("Builtin warning: {Text}", text);
         }
 
         return null;

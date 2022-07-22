@@ -44,6 +44,8 @@ using AM.PlatformAbstraction;
 using AM.Reflection;
 using AM.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -71,7 +73,14 @@ public static class Utility
             [CallerLineNumber] int line = 0
         )
     {
-        Magna.Debug ($"variable {variableName} ({member} on {file}: {line}) not used");
+        Magna.Logger.LogDebug
+            (
+                "variable {VariableName} ({Member} on {File}: {Line}) not used",
+                variableName,
+                member,
+                file,
+                line
+            );
     }
 
     /// <summary>
@@ -914,20 +923,19 @@ public static class Utility
             if (!string.IsNullOrEmpty (message))
             {
                 // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        nameof (Utility) + "::" + nameof (ThrowIfEmpty)
-                        + ": "
-                        + message
+                        nameof (Utility) + "::" + nameof (ThrowIfEmpty) + ": {Message}",
+                        message
                     );
 
                 throw new ArgumentException (message);
-            } // if
+            }
 
-            Magna.Error (nameof (Utility) + "::" + nameof (ThrowIfEmpty));
+            Magna.Logger.LogError (nameof (Utility) + "::" + nameof (ThrowIfEmpty));
 
             throw new ArgumentException();
-        } // if
+        }
 
         return memory;
     }
@@ -949,20 +957,20 @@ public static class Utility
             if (!string.IsNullOrEmpty (message))
             {
                 // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (Utility) + "::" + nameof (ThrowIfEmpty)
-                        + ": "
-                        + message
+                        + ": {Message}",
+                        message
                     );
 
                 throw new ArgumentException (message);
-            } // if
+            }
 
-            Magna.Error (nameof (Utility) + "::" + nameof (ThrowIfEmpty));
+            Magna.Logger.LogError (nameof (Utility) + "::" + nameof (ThrowIfEmpty));
 
             throw new ArgumentException();
-        } // if
+        }
 
         return memory;
     }
@@ -985,20 +993,20 @@ public static class Utility
             if (!string.IsNullOrEmpty (message))
             {
                 // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (Utility) + "::" + nameof (ThrowIfNull)
-                        + ": "
-                        + message
+                        + ": {Message}",
+                        message
                     );
 
                 throw new ArgumentException (message);
-            } // if
+            }
 
-            Magna.Error (nameof (Utility) + "::" + nameof (ThrowIfNull));
+            Magna.Logger.LogError (nameof (Utility) + "::" + nameof (ThrowIfNull));
 
             throw new ArgumentException();
-        } // if
+        }
 
         return value;
     }
@@ -4868,11 +4876,11 @@ public static class Utility
             return converted is not null && (bool)converted;
         }
 
-        Magna.Error
+        Magna.Logger.LogError
             (
                 nameof (Utility) + "::" + nameof (ToBoolean)
-                + "bad value="
-                + value
+                + "bad value={Value}",
+                value
             );
 
         throw new FormatException
@@ -5824,10 +5832,10 @@ public static class Utility
                 (
                     ex =>
                     {
-                        Magna.TraceException
+                        Magna.Logger.LogError
                             (
-                                nameof (Utility) + "::" + nameof (Unwrap),
-                                ex
+                                ex,
+                                nameof (Utility) + "::" + nameof (Unwrap)
                             );
 
                         return true;

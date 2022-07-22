@@ -21,6 +21,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -133,7 +135,7 @@ public sealed class VirtualList<T>
 
     private void _ThrowReadonly()
     {
-        Magna.Error (nameof (VirtualList<T>) + "::" + nameof (_ThrowReadonly));
+        Magna.Logger.LogError (nameof (VirtualList<T>) + "::" + nameof (_ThrowReadonly));
         throw new ReadOnlyException();
     }
 

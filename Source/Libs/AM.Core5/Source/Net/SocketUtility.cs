@@ -22,6 +22,8 @@ using System.Net.Sockets;
 
 using AM.Core.Properties;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -60,11 +62,12 @@ public static class SocketUtility
             result = IPAddress.Parse (address);
             if (result.AddressFamily != expectedFamily)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (SocketUtility) + "::" + nameof (ResolveAddress)
-                        + ": expected=" + expectedFamily
-                        + ", got=" + result.AddressFamily
+                        + ": expected={Expected}, got={Got}",
+                        expectedFamily,
+                        result.AddressFamily
                     );
 
                 throw new ArsMagnaException (Resources.CantResolveAddress);
@@ -81,10 +84,10 @@ public static class SocketUtility
 
         if (result is null)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (SocketUtility) + "::" + nameof (ResolveAddress)
-                    + Resources.CantResolveAddress2
+                    + ": can't resolve address"
                 );
 
             throw new ArsMagnaException (Resources.CantResolveAddress);
@@ -140,12 +143,10 @@ public static class SocketUtility
 
             if (readed <= 0)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        nameof (SocketUtility)
-                        + "::"
-                        + nameof (ReceiveExact)
-                        + Resources.ErrorReadingSocket
+                        nameof (SocketUtility) + "::" + nameof (ReceiveExact)
+                        + ": error reading socket"
                     );
 
                 throw new ArsMagnaException (Resources.SocketReadingError);
@@ -193,16 +194,14 @@ public static class SocketUtility
             var readed = socket.Receive (buffer);
             if (readed < 0)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        nameof (SocketUtility)
-                        + "::"
-                        + nameof (ReceiveToEnd)
-                        + Resources.ErrorReadingSocket
+                        nameof (SocketUtility) + "::" + nameof (ReceiveToEnd)
+                        + ": error reading socket"
                     );
 
                 throw new ArsMagnaException (Resources.SocketReadingError);
-            } // if
+            }
 
             if (readed == 0)
             {

@@ -22,6 +22,8 @@ using System.IO;
 using AM.Collections;
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -473,10 +475,10 @@ public static class BinaryReaderUtility
             {
                 if (shift == 5 * 7)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
                             nameof (BinaryReaderUtility) + "::" + nameof (ReadPackedInt32)
-                            + "value too long"
+                            + ": value too long"
                         );
 
                     throw new FormatException();

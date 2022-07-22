@@ -28,6 +28,8 @@ using System.Text;
 using AM.Collections;
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -306,11 +308,11 @@ public class IniFile
             CheckKeyName (line.Key);
             if (ContainsKey (line.Key))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (IniFile) + "::" + nameof (Add)
-                        + ": duplicate key="
-                        + line.Key
+                        + ": duplicate key={Key}",
+                        line.Key
                     );
 
                 throw new ArgumentException ("duplicate key " + line.Key);
@@ -640,7 +642,7 @@ public class IniFile
     public IniFile()
     {
         _sections = new NonNullCollection<Section>();
-        Magna.Trace (nameof (IniFile) + "::Constructor");
+        Magna.Logger.LogTrace (nameof (IniFile) + "::Constructor");
     }
 
     /// <summary>
@@ -656,11 +658,11 @@ public class IniFile
     {
         Sure.NotNullNorEmpty (fileName, nameof (fileName));
 
-        Magna.Trace
+        Magna.Logger.LogTrace
             (
-                nameof (IniFile) + "::Constructor: "
-                                 + "fileName="
-                                 + fileName
+                nameof (IniFile) + "::Constructor"
+                + ": fileName={Filename}",
+                fileName
             );
 
         FileName = fileName;
@@ -683,23 +685,23 @@ public class IniFile
     {
         if (string.IsNullOrEmpty (keyName))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (IniFile) + "::" + nameof (CheckKeyName)
-                    + "keyName="
-                    + keyName.ToVisibleString()
+                    + ": keyName={KeyName}",
+                    keyName.ToVisibleString()
                 );
 
             throw new ArgumentException (nameof (keyName));
         }
 
-        if (keyName.Contains ("="))
+        if (keyName.Contains ('='))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (IniFile) + "::" + nameof (CheckKeyName)
-                    + "keyName="
-                    + keyName
+                    + ": keyName={KeyName}",
+                    keyName
                 );
 
             throw new ArgumentException (nameof (keyName));
@@ -811,11 +813,11 @@ public class IniFile
 
         if (ContainsSection (name))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (IniFile) + "::" + nameof (CreateSection)
-                    + ": duplicate name="
-                    + name
+                    + ": duplicate name={Name}",
+                    name
                 );
 
             throw new ArgumentException ("duplicate name " + name);
@@ -1036,11 +1038,11 @@ public class IniFile
             {
                 if (!line.EndsWith ("]"))
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
                             nameof (IniFile) + "::" + nameof (Read)
-                            + ": unclosed section name="
-                            + line
+                            + ": unclosed section name={Name}",
+                            line
                         );
 
                     throw new FormatException();
@@ -1273,7 +1275,7 @@ public class IniFile
     /// <inheritdoc cref="IDisposable.Dispose" />
     public void Dispose()
     {
-        Magna.Trace (nameof (IniFile) + "::" + nameof (Dispose));
+        Magna.Logger.LogTrace (nameof (IniFile) + "::" + nameof (Dispose));
 
         if (Writable
             && Modified

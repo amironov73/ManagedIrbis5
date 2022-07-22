@@ -21,6 +21,8 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -496,13 +498,10 @@ public sealed class TextNavigator
                 c = ReadChar();
                 if (c == EOF)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
-                            nameof (TextNavigator)
-                            + "::"
-                            + nameof (ReadEscapedUntil)
-                            + ": "
-                            + "unexpected end of stream"
+                            nameof (TextNavigator) + "::" + nameof (ReadEscapedUntil)
+                            + ": unexpected end of stream"
                         );
 
                     throw new FormatException();

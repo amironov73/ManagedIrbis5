@@ -23,6 +23,8 @@ using System.Threading;
 
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -111,12 +113,9 @@ public sealed class StateHolder<T>
             if (!AllowNull &&
                 ReferenceEquals (newValue, null))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        nameof (StateHolder<T>)
-                        +
-                        "::"
-                        + nameof (SetValue)
+                        nameof (StateHolder<T>) + "::" + nameof (SetValue)
                         + ": newValue is null"
                     );
 
@@ -187,11 +186,9 @@ public sealed class StateHolder<T>
 
         if (flag)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    nameof (StateHolder<T>)
-                    + "::"
-                    + nameof (RestoreFromStream)
+                    nameof (StateHolder<T>) + "::" + nameof (RestoreFromStream)
                     + ": not implemented"
                 );
 
@@ -218,11 +215,9 @@ public sealed class StateHolder<T>
 
             if (ReferenceEquals (serializable, null))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        nameof (StateHolder<T>)
-                        + "::"
-                        + nameof (SaveToStream)
+                        nameof (StateHolder<T>) + "::" + nameof (SaveToStream)
                         + ": nonserializable value"
                     );
 

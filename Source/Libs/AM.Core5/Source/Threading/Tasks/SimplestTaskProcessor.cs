@@ -26,6 +26,8 @@ using System.Threading.Tasks;
 
 using AM.Collections;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -97,16 +99,15 @@ public sealed class SimplestTaskProcessor
             int parallelism
         )
     {
-        Magna.Trace (nameof (SimplestTaskProcessor) + "::Constructor");
+        Magna.Logger.LogTrace (nameof (SimplestTaskProcessor) + "::Constructor");
 
         if (parallelism <= 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    nameof (SimplestTaskProcessor)
-                    + "::Constructor: "
-                    + "parallelism="
-                    + parallelism
+                    nameof (SimplestTaskProcessor) + "::Constructor"
+                    + "parallelism={Parallelism}",
+                    parallelism
                 );
 
             throw new ArgumentOutOfRangeException (nameof (parallelism));
@@ -165,12 +166,7 @@ public sealed class SimplestTaskProcessor
     /// </summary>
     public void Complete()
     {
-        Magna.Trace
-            (
-                nameof (SimplestTaskProcessor)
-                + "::"
-                + nameof (Complete)
-            );
+        Magna.Logger.LogTrace (nameof (SimplestTaskProcessor) + "::" + nameof (Complete));
 
         _queue.CompleteAdding();
     }
@@ -183,12 +179,7 @@ public sealed class SimplestTaskProcessor
             Action action
         )
     {
-        Magna.Trace
-            (
-                nameof (SimplestTaskProcessor)
-                + "::"
-                + nameof (Enqueue)
-            );
+        Magna.Logger.LogTrace (nameof (SimplestTaskProcessor) + "::" + nameof (Enqueue));
 
         _queue.Add (action);
     }
@@ -198,13 +189,7 @@ public sealed class SimplestTaskProcessor
     /// </summary>
     public void WaitForCompletion()
     {
-        Magna.Trace
-            (
-                nameof (SimplestTaskProcessor)
-                + "::"
-                + nameof (WaitForCompletion)
-                + ": begin"
-            );
+        Magna.Logger.LogTrace (nameof (SimplestTaskProcessor) + "::" + nameof (WaitForCompletion) + ": begin");
 
         while (!_queue.IsCompleted)
         {
@@ -222,13 +207,7 @@ public sealed class SimplestTaskProcessor
 
         Task.WaitAll (tasks);
 
-        Magna.Trace
-            (
-                nameof (SimplestTaskProcessor)
-                + "::"
-                + nameof (WaitForCompletion)
-                + ": end"
-            );
+        Magna.Logger.LogTrace (nameof (SimplestTaskProcessor) + "::" + nameof (WaitForCompletion) + ": end");
     }
 
     #endregion

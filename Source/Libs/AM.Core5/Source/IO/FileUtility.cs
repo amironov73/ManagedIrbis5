@@ -21,6 +21,8 @@ using System.IO;
 
 using AM.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -381,7 +383,7 @@ public static class FileUtility
 
         // TODO diagnostics
 
-        Magna.Error
+        Magna.Logger.LogError
             (
                 nameof (FileUtility) + "::" + nameof (GetNotExistentFileName)
                 + ": giving up"
@@ -454,18 +456,18 @@ public static class FileUtility
         }
         catch (IOException exception)
         {
-            Magna.TraceException
+            Magna.Logger.LogError
                 (
-                    nameof (FileUtility) + "::" + nameof (TryDelete),
-                    exception
+                    exception,
+                    nameof (FileUtility) + "::" + nameof (TryDelete)
                 );
         }
         catch (UnauthorizedAccessException exception)
         {
-            Magna.TraceException
+            Magna.Logger.LogError
                 (
-                    nameof (FileUtility) + "::" + nameof (TryDelete),
-                    exception
+                    exception,
+                    nameof (FileUtility) + "::" + nameof (TryDelete)
                 );
         }
 
@@ -496,26 +498,26 @@ public static class FileUtility
         }
         catch (FileNotFoundException exception)
         {
-            Magna.TraceException
+            Magna.Logger.LogError
                 (
-                    nameof (FileUtility) + "::" + nameof (TryMove),
-                    exception
+                    exception,
+                    nameof (FileUtility) + "::" + nameof (TryMove)
                 );
         }
         catch (IOException exception)
         {
-            Magna.TraceException
+            Magna.Logger.LogError
                 (
-                    nameof (FileUtility) + "::" + nameof (TryMove),
-                    exception
+                    exception,
+                    nameof (FileUtility) + "::" + nameof (TryMove)
                 );
         }
         catch (UnauthorizedAccessException exception)
         {
-            Magna.TraceException
+            Magna.Logger.LogError
                 (
-                    nameof (FileUtility) + "::" + nameof (TryMove),
-                    exception
+                    exception,
+                    nameof (FileUtility) + "::" + nameof (TryMove)
                 );
         }
 

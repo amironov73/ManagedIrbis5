@@ -19,6 +19,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -154,10 +156,10 @@ public sealed class StringTokenizer
 
         if (!char.IsDigit (c))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "StringTokenizer::_ReadNumber: "
-                    + "floating point format error"
+                    nameof (StringTokenizer) + "::" + nameof (_ReadNumber)
+                    + ": floating point format error"
                 );
 
             throw new TokenizerException ("Floating point format error");

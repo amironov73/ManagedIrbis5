@@ -18,6 +18,8 @@
 
 using System;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -89,7 +91,7 @@ public readonly struct BusyGuard
         {
             if (!State.WaitAndGrab (Timeout))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (BusyGuard)
                         + "::"

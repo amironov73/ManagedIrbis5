@@ -19,6 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -50,12 +52,11 @@ public class CloneableDictionary<TKey, TValue>
         {
             if (keyType.IsAssignableFrom (typeof (ICloneable)))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "CloneableDictionary::Clone: "
-                        + "type "
-                        + keyType.FullName
-                        + " is not cloneable"
+                        nameof (CloneableDictionary<TKey, TValue>) + "::" + nameof (Clone)
+                        + ": type {Type} is not cloneable",
+                        keyType.FullName
                     );
 
                 throw new ArgumentException (keyType.Name);
@@ -68,12 +69,11 @@ public class CloneableDictionary<TKey, TValue>
         {
             if (valueType.IsAssignableFrom (typeof (ICloneable)))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "CloneableDictionary::Clone: "
-                        + "type "
-                        + valueType.FullName
-                        + " is not cloneable"
+                        nameof (CloneableDictionary<TKey, TValue>) + "::" + nameof (Clone)
+                        + "type {Type} is not cloneable",
+                        valueType.FullName
                     );
 
                 throw new ArgumentException (valueType.Name);

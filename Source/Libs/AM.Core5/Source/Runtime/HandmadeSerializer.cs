@@ -21,6 +21,8 @@ using System.Reflection;
 
 using AM.IO;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -171,13 +173,11 @@ public sealed class HandmadeSerializer
                 break;
 
             default:
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        nameof (HandmadeSerializer)
-                        + "::"
-                        + nameof (GetTypeName)
-                        + ": unexpected PrefixLength="
-                        + PrefixLength
+                        nameof (HandmadeSerializer) + "::" + nameof (GetTypeName)
+                        + ": unexpected PrefixLength={PrefixLength}",
+                        PrefixLength
                     );
 
                 throw new InvalidOperationException();
@@ -227,7 +227,7 @@ public sealed class HandmadeSerializer
         var count = array.Length;
         if (count == 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (HandmadeSerializer) + "::" + nameof (Serialize)
                     + ": count=0"

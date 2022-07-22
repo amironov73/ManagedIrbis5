@@ -20,6 +20,8 @@ using System.IO;
 using System.Net;
 using System.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -445,10 +447,10 @@ public static class StreamUtility
         if (length != 0 &&
             stream.Read (buffer, 0, length) != length)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (StreamUtility) + "::" + nameof (ReadExact)
-                    + "unexpected end of stream"
+                    + ": unexpected end of stream"
                 );
 
             throw new IOException ("Unexpected end of stream");
@@ -469,10 +471,10 @@ public static class StreamUtility
         if (!span.IsEmpty &&
             stream.Read (span) != span.Length)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (StreamUtility) + "::" + nameof (ReadExact)
-                    + "unexpected end of stream"
+                    + ": unexpected end of stream"
                 );
 
             throw new IOException ("Unexpected end of stream");

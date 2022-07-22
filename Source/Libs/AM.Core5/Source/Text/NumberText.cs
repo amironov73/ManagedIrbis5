@@ -28,6 +28,8 @@ using System.Text;
 using AM.IO;
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -634,10 +636,11 @@ public sealed class NumberText
             {
                 if (firstBuffer.Length == 0)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
                             nameof (NumberText) + "::" + nameof (ParseRanges)
-                            + ": syntax error"
+                            + ": syntax error: {Text}",
+                            text
                         );
 
                     throw new ArsMagnaException();
@@ -701,10 +704,11 @@ public sealed class NumberText
 
             if (secondBuffer.Length == 0)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (NumberText) + "::" + nameof (ParseRanges)
-                        + ": syntax error"
+                        + ": syntax error: {Text}",
+                        text
                     );
 
                 throw new Exception();
@@ -716,14 +720,12 @@ public sealed class NumberText
             if (Utility.CompareSpans (firstNumber.GetPrefix (0).Span,
                     secondNumber.GetPrefix (0).Span) != 0)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (NumberText) + "::" + nameof (ParseRanges)
-                        + ": prefix mismatch: '"
-                        + firstNumber.GetPrefix (0)
-                        + "' and '"
-                        + secondNumber.GetPrefix (0)
-                        + "'"
+                        + ": prefix mismatch: {First} and {Second}",
+                        firstNumber.GetPrefix (0),
+                        secondNumber.GetPrefix (0)
                     );
 
                 throw new Exception();
@@ -1381,7 +1383,7 @@ public sealed class NumberText
         verifier.Positive (_chunks.Count);
         foreach (var chunk in _chunks)
         {
-            verifier.VerifySubObject (chunk, "chunk");
+            verifier.VerifySubObject (chunk);
         }
 
         return verifier.Result;

@@ -21,6 +21,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -556,7 +558,7 @@ public sealed class ServiceUnit
                     break;
 
                 default:
-                    Magna.Debug ($"Unknown key: {key}");
+                    Magna.Logger.LogDebug ("Unknown key: {Key}", key);
                     break;
             }
         }

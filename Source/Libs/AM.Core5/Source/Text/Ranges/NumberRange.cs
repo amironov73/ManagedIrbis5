@@ -23,6 +23,8 @@ using System.IO;
 
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -136,11 +138,7 @@ public sealed class NumberRange
         navigator.SkipWhile (Delimiters);
         if (navigator.IsEOF)
         {
-            Magna.Error
-                (
-                    nameof (NumberRange) + "::" + nameof (Parse)
-                    + ": unexpected end of text"
-                );
+            Magna.Logger.LogError (nameof (NumberRange) + "::" + nameof (Parse) + ": unexpected end of text");
 
             throw new FormatException();
         }
@@ -149,7 +147,7 @@ public sealed class NumberRange
         var start = navigator.ReadUntil (DelimitersOrMinus).ToString();
         if (string.IsNullOrEmpty (start))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (NumberRange) + "::" + nameof (Parse)
                     + ": start sequence not found"
@@ -164,10 +162,10 @@ public sealed class NumberRange
         {
             navigator.ReadChar();
             navigator.SkipWhitespace();
-            string stop = navigator.ReadUntil (DelimitersOrMinus).ToString();
+            var stop = navigator.ReadUntil (DelimitersOrMinus).ToString();
             if (string.IsNullOrEmpty (stop))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (NumberRange) + "::" + nameof (Parse)
                         + ": stop sequence not found"
@@ -188,7 +186,7 @@ public sealed class NumberRange
 
         if (!navigator.IsEOF)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (NumberRange) + "::" + nameof (Parse)
                     + ": garbage behind the range"
@@ -212,7 +210,7 @@ public sealed class NumberRange
         Stop = Stop.ThrowIfNull();
 
         for (
-                NumberText current = Start;
+                var current = Start;
                 current.CompareTo (Stop) <= 0;
                 current = current.Increment()
             )
@@ -284,7 +282,7 @@ public sealed class NumberRange
         Stop = Stop.ThrowIfNull();
 
         for (
-                NumberText current = Start!;
+                var current = Start!;
                 current.CompareTo (Stop) <= 0;
                 current = current.Clone().Increment()
             )
@@ -340,8 +338,8 @@ public sealed class NumberRange
 
         other = other.ThrowIfNull();
 
-        bool result = Start.Equals (other.Start)
-                      && Stop.Equals (other.Stop);
+        var result = Start.Equals (other.Start)
+                     && Stop.Equals (other.Stop);
 
         return result;
     }

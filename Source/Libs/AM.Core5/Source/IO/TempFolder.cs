@@ -18,6 +18,8 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -102,10 +104,10 @@ public sealed class TempFolder
         }
         catch (Exception exception)
         {
-            Magna.TraceException
+            Magna.Logger.LogError
                 (
-                    nameof (TempFolder) + "::" + nameof (Dispose),
-                    exception
+                    exception,
+                    nameof (TempFolder) + "::" + nameof (Dispose)
                 );
         }
     }

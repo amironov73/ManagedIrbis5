@@ -18,6 +18,8 @@
 using System;
 using System.Collections.Generic;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -162,7 +164,7 @@ public static class ArrayUtility
 
         if (firstArray.Length != secondArray.Length)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ArrayUtility)
                     + "::"
@@ -442,14 +444,13 @@ public static class ArrayUtility
             var item = arrays[i];
             if (ReferenceEquals (item, null))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (ArrayUtility)
                         + "::"
                         + nameof (Merge)
-                        + ": array["
-                        + i
-                        + "] is null"
+                        + ": array item {Index} is null",
+                        i
                     );
 
                 throw new ArgumentNullException (nameof (arrays));

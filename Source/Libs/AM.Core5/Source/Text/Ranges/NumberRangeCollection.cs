@@ -26,6 +26,8 @@ using System.Text;
 using AM.IO;
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -160,10 +162,10 @@ public sealed class NumberRangeCollection
         navigator.SkipWhile (NumberRange.Delimiters);
         if (navigator.IsEOF)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "NumberRangeCollection::Parse: "
-                    + "unexpected end of stream"
+                    nameof (NumberRangeCollection) + "::" + nameof (Parse)
+                    + ": unexpected end of stream"
                 );
 
             throw new FormatException();
@@ -184,10 +186,10 @@ public sealed class NumberRangeCollection
             NumberRange range;
             if (string.IsNullOrEmpty (start))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "NumberRangeCollection::Parse: "
-                        + "empty Start clause"
+                        nameof (NumberRangeCollection) + "::" + nameof (Parse)
+                        + ": empty Start clause"
                     );
 
                 throw new FormatException();
@@ -202,10 +204,10 @@ public sealed class NumberRangeCollection
                     .ReadUntil (NumberRange.Delimiters).ToString();
                 if (string.IsNullOrEmpty (stop))
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
-                            "NumberRangeCollection::Parse: "
-                            + "empty Stop clause"
+                            nameof (NumberRangeCollection) + "::" + nameof (Parse)
+                            + ": empty Stop clause"
                         );
 
                     throw new FormatException();

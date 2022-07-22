@@ -27,6 +27,8 @@ using System.Text;
 using AM.Linq;
 using AM.Security;
 
+using Microsoft.Extensions.Logging;
+
 using CM = System.Configuration.ConfigurationManager;
 
 #endregion
@@ -439,12 +441,11 @@ public static class ConfigurationUtility
     {
         Sure.NotNullNorEmpty (key);
 
-        Magna.Error
+        Magna.Logger.LogError
             (
                 nameof (ConfigurationUtility) + "::" + nameof (RequireKey)
-                + ": key '"
-                + key
-                + "' not set"
+                + ": key {Key} not set",
+                key
             );
 
         throw new ConfigurationErrorsException

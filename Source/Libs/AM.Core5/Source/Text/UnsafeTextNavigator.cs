@@ -19,6 +19,8 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -456,13 +458,10 @@ public unsafe ref struct UnsafeTextNavigator
                 c = ReadChar();
                 if (c == EOF)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
-                            nameof (ValueTextNavigator)
-                            + "::"
-                            + nameof (ReadEscapedUntil)
-                            + ": "
-                            + "unexpected end of stream"
+                            nameof (ValueTextNavigator) + "::" + nameof (ReadEscapedUntil)
+                            + ": unexpected end of stream"
                         );
 
                     throw new FormatException();

@@ -21,6 +21,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -149,12 +151,11 @@ public sealed class EnumMemberInfo
         var result = new List<EnumMemberInfo>();
         if (!enumType.IsEnum)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (EnumMemberInfo) + "::" + nameof (Parse)
-                    + ": type="
-                    + enumType.FullName
-                    + " is not enum"
+                    + ": type {Type} is not enum",
+                    enumType.FullName
                 );
 
             throw new ArgumentException ("enumType");
@@ -172,11 +173,11 @@ public sealed class EnumMemberInfo
                 break;
 
             default:
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (EnumMemberInfo) + "::" + nameof (Parse)
-                        + ": unexpected underlying type="
-                        + underlyingType.FullName
+                        + ": unexpected underlying type {Type}",
+                        underlyingType.FullName
                     );
 
                 throw new ArgumentException ("enumType");

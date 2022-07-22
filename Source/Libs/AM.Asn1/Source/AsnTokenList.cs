@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* AsnTokenList.cs --
+/* AsnTokenList.cs -- список токенов.
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,6 +21,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -28,14 +30,14 @@ using System.Text;
 namespace AM.Asn1;
 
 /// <summary>
-/// List of tokens.
+/// Список токенов.
 /// </summary>
 public sealed class AsnTokenList
 {
     #region Properties
 
     /// <summary>
-    /// Current token.
+    /// Текущий токен.
     /// </summary>
     public AsnToken Current
     {
@@ -146,7 +148,7 @@ public sealed class AsnTokenList
     }
 
     /// <summary>
-    /// Move to next token.
+    /// Перемещение к следующему токену.
     /// </summary>
     public bool MoveNext()
     {
@@ -156,29 +158,21 @@ public sealed class AsnTokenList
 
         if (!result)
         {
-            Magna.Trace
-                (
-                    "AsnTokenList::MoveNext: "
-                    + "end of list"
-                );
+            Magna.Logger.LogTrace (nameof (AsnTokenList) + "::" + nameof (MoveNext) + ": end of list");
         }
 
         return result;
     }
 
     /// <summary>
-    /// Peek next token.
+    /// Подглядывание следующего токена.
     /// </summary>
     public AsnTokenKind Peek()
     {
         var newPosition = _position + 1;
         if (newPosition >= _tokens.Length)
         {
-            Magna.Trace
-                (
-                    "AsnTokenList::Peek: "
-                    + "end of list"
-                );
+            Magna.Logger.LogTrace (nameof (AsnTokenList) + "::" + nameof (Peek) + "end of list");
 
             return AsnTokenKind.None;
         }
@@ -198,7 +192,7 @@ public sealed class AsnTokenList
         if (newPosition < 0
             || newPosition >= _tokens.Length)
         {
-            Magna.Trace
+            Magna.Logger.LogTrace
                 (
                     "AsnTokenList::Peek: "
                     + "end of list"
@@ -217,7 +211,7 @@ public sealed class AsnTokenList
     {
         if (!MoveNext())
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     "AsnTokenList::RequreNext: "
                     + "no next token"
@@ -240,13 +234,12 @@ public sealed class AsnTokenList
         RequireNext();
         if (Current.Kind != kind)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "AsnTokenList::RequireNext: "
-                    + "expected="
-                    + kind
-                    + ", got="
-                    + Current.Kind
+                    nameof (AsnTokenList) + "::" + nameof (RequireNext)
+                    + "expected {Expected}, got {Got}",
+                    kind,
+                    Current.Kind
                 );
 
             throw new AsnSyntaxException (Current);
@@ -385,11 +378,7 @@ public sealed class AsnTokenList
         stack.Verify();
         if (foundPosition < 0)
         {
-            Magna.Trace
-                (
-                    "AsnTokenList::Segment: "
-                    + "not found"
-                );
+            Magna.Logger.LogDebug (nameof (AsnTokenList) + "::" + nameof (Segment) + ": not found");
 
             _position = savePosition;
 
