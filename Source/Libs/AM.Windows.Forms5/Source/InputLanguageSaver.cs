@@ -18,6 +18,8 @@
 using System;
 using System.Windows.Forms;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -48,11 +50,11 @@ namespace AM.Windows.Forms
         {
             PreviousLanguage = InputLanguage.CurrentInputLanguage;
 
-            Magna.Trace
+            Magna.Logger.LogTrace
                 (
-                    "InputLanguageSaver::Constructor: "
-                    + "previous language="
-                    + PreviousLanguage
+                    nameof (InputLanguageSaver) + "::Constructor"
+                    + ": previous language={Language}",
+                    PreviousLanguage
                 );
         }
 
@@ -63,11 +65,11 @@ namespace AM.Windows.Forms
         /// <inheritdoc cref="IDisposable.Dispose" />
         public void Dispose()
         {
-            Magna.Trace
+            Magna.Logger.LogTrace
                 (
-                    "InputLanguageSaver::Dispose: "
-                    + "previous language="
-                    + PreviousLanguage
+                    nameof (InputLanguageSaver) + "::" + nameof (Dispose)
+                    + ": previous language={Language}",
+                    PreviousLanguage
                 );
 
             InputLanguage.CurrentInputLanguage = PreviousLanguage;

@@ -7,19 +7,21 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* AsnTokenList.cs -- список токенов.
+/* AsnTokenList.cs -- список токенов
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+
+using AM.Text;
 
 using Microsoft.Extensions.Logging;
 
@@ -39,31 +41,17 @@ public sealed class AsnTokenList
     /// <summary>
     /// Текущий токен.
     /// </summary>
-    public AsnToken Current
-    {
-        get
-        {
-            AsnToken result;
-            try
-            {
-                result = _tokens[_position];
-            }
-            catch (Exception exception)
-            {
-                throw new AsnSyntaxException (this, exception);
-            }
-
-            return result;
-        }
-    }
+    public AsnToken Current => _position < _tokens.Length
+            ? _tokens[_position]
+            : throw new AsnSyntaxException (this);
 
     /// <summary>
-    /// EOF reached?
+    /// Проверка, не достигнут ли конец списка.
     /// </summary>
     public bool IsEof => _position >= _tokens.Length;
 
     /// <summary>
-    /// How many tokens?
+    /// Общее количество токенов в списке.
     /// </summary>
     public int Length => _tokens.Length;
 
@@ -72,13 +60,15 @@ public sealed class AsnTokenList
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public AsnTokenList
         (
             IEnumerable<AsnToken> tokens
         )
     {
+        Sure.NotNull ((object?) tokens);
+
         _tokens = tokens.ToArray();
         _position = 0;
     }
@@ -95,17 +85,17 @@ public sealed class AsnTokenList
     #region Public methods
 
     /// <summary>
-    /// Add a token.
+    /// Добавление токена в конец списка.
+    /// Крайне не рекомендуется так делать, но если очень нужно, то можно. :)
     /// </summary>
     public void Add
         (
-            AsnTokenKind kind
+            AsnTokenKind tokenKind
         )
     {
-        var token = new AsnToken
-        {
-            Kind = kind
-        };
+        Sure.Defined (tokenKind);
+
+        var token = new AsnToken { Kind = tokenKind };
         var tokens = new List<AsnToken> (_tokens)
         {
             token
@@ -449,11 +439,11 @@ public sealed class AsnTokenList
 
         if (level != 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    "AsnTokenList::Segment: "
-                    + "unbalanced="
-                    + level
+                    nameof (AsnTokenList) + "::" + nameof (Segment)
+                    + ": unbalanced {Level}",
+                    level
                 );
 
             throw new AsnSyntaxException (this);
@@ -461,12 +451,7 @@ public sealed class AsnTokenList
 
         if (foundPosition < 0)
         {
-            Magna.Trace
-                (
-                    "AsnTokenList::Segment: "
-                    + "not found"
-                );
-
+            Magna.Logger.LogTrace (nameof (AsnTokenList) + "::" + nameof (Segment) + ": not found");
             _position = savePosition;
 
             return null;
@@ -488,14 +473,14 @@ public sealed class AsnTokenList
     }
 
     /// <summary>
-    /// Show last tokens.
+    /// Показ последних (по времени) токенов.
     /// </summary>
     public string ShowLastTokens
         (
             int howMany
         )
     {
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         var index = _position - howMany;
         if (index < 0)
         {
@@ -507,20 +492,23 @@ public sealed class AsnTokenList
         {
             if (!first)
             {
-                result.Append (' ');
+                builder.Append (' ');
             }
 
-            result.Append (_tokens[index]);
+            builder.Append (_tokens[index]);
 
             index++;
             first = false;
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
-    /// Get array of tokens.
+    /// Выдача всех токенов в виде массива.
     /// </summary>
     public AsnToken[] ToArray()
     {
@@ -549,12 +537,9 @@ public sealed class AsnTokenList
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        if (IsEof)
-        {
-            return "(EOF)";
-        }
-
-        return $"{_position} of {_tokens.Length}: {Current}";
+        return IsEof
+            ? "(EOF)"
+            : $"{_position} of {_tokens.Length}: {Current}";
     }
 
     #endregion

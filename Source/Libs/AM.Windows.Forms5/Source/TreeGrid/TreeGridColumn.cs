@@ -269,14 +269,14 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Raises the <see cref="DrawCell"/> event.
         /// </summary>
-        /// <param name="args">The <see cref="TreeGridDrawCellEventArgs"/> instance containing the event data.</param>
+        /// <param name="eventArgs">The <see cref="TreeGridDrawCellEventArgs"/> instance containing the event data.</param>
         protected internal virtual void OnDrawCell
             (
-                TreeGridDrawCellEventArgs args
+                TreeGridDrawCellEventArgs eventArgs
             )
         {
-            args.Node.ThrowIfNull().OnDrawCell (args);
-            DrawCell?.Invoke (this, args);
+            eventArgs.Node.ThrowIfNull().OnDrawCell (eventArgs);
+            DrawCell?.Invoke (this, eventArgs);
         }
 
         /// <summary>
@@ -293,10 +293,10 @@ namespace AM.Windows.Forms
         /// <summary>
         ///
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="eventArgs"></param>
         protected internal virtual void OnMouseClick
             (
-                TreeGridMouseEventArgs args
+                TreeGridMouseEventArgs eventArgs
             )
         {
         }

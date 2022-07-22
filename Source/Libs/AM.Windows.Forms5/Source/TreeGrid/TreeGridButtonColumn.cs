@@ -16,6 +16,8 @@ using System;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -52,29 +54,29 @@ public class TreeGridButtonColumn
     /// <inheritdoc cref="TreeGridColumn.OnDrawCell"/>
     protected internal override void OnDrawCell
         (
-            TreeGridDrawCellEventArgs args
+            TreeGridDrawCellEventArgs eventArgs
         )
     {
-        Sure.NotNull (args);
+        Sure.NotNull (eventArgs);
 
-        var graphics = args.Graphics;
+        var graphics = eventArgs.Graphics;
         if (graphics is null)
         {
-            Magna.Debug ("Graphics is null");
+            Magna.Logger.LogDebug (nameof (OnDrawCell) + ": graphics is null");
             return;
         }
 
-        var node = args.Node;
+        var node = eventArgs.Node;
         if (node is null)
         {
-            Magna.Debug ("Node is null");
+            Magna.Logger.LogDebug (nameof (OnDrawCell) + ": node is null");
             return;
         }
 
-        var column = args.Column;
+        var column = eventArgs.Column;
         if (column is null)
         {
-            Magna.Debug ("Column is null");
+            Magna.Logger.LogDebug (nameof (OnDrawCell) + ": column is null");
             return;
         }
 
@@ -82,8 +84,8 @@ public class TreeGridButtonColumn
 
         graphics.FillRectangle
             (
-                args.GetBackgroundBrush(),
-                args.Bounds
+                eventArgs.GetBackgroundBrush(),
+                eventArgs.Bounds
             );
 
         if (!string.IsNullOrEmpty (text))
@@ -91,7 +93,7 @@ public class TreeGridButtonColumn
             ButtonRenderer.DrawButton
                 (
                     graphics,
-                    args.Bounds,
+                    eventArgs.Bounds,
                     text,
                     node.Font,
                     false,
@@ -103,13 +105,13 @@ public class TreeGridButtonColumn
     /// <inheritdoc cref="TreeGridColumn.OnMouseClick"/>
     protected internal override void OnMouseClick
         (
-            TreeGridMouseEventArgs args
+            TreeGridMouseEventArgs eventArgs
         )
     {
-        Sure.NotNull (args);
+        Sure.NotNull (eventArgs);
 
-        Click?.Invoke (this, args);
-        MouseClick?.Invoke (this, args);
+        Click?.Invoke (this, eventArgs);
+        MouseClick?.Invoke (this, eventArgs);
     }
 
     /// <inheritdoc cref="TreeGridColumn.OnMouseDoubleClick"/>

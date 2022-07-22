@@ -10,10 +10,10 @@ using System.Windows.Forms;
 namespace AeroSuite.Controls
 {
     /// <summary>
-    /// A TextBox used for setting & displaying keyboard shortcuts/hotkeys.
+    /// A TextBox used for setting and displaying keyboard shortcuts/hotkeys.
     /// </summary>
     /// <remarks>
-    /// This control implements the 'msctls_hotkey32' common control which means that all the actions are handled by windows internally so that the language is 
+    /// This control implements the 'msctls_hotkey32' common control which means that all the actions are handled by windows internally so that the language is
     /// </remarks>
     [DesignerCategory("Code")]
     [DisplayName("Hotkey Box")]

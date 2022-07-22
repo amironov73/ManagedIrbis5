@@ -2,7 +2,6 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
@@ -18,6 +17,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -47,10 +48,10 @@ public static class ApplicationUtility
 
     private static void _RunFormInNewThread
         (
-            object obj
+            object? obj
         )
     {
-        var form = (Form) obj;
+        var form = (Form) obj.ThrowIfNull();
 
         form.Visible = true;
         form.ShowDialog();
@@ -61,7 +62,7 @@ public static class ApplicationUtility
     #region Public methods
 
     /// <summary>
-    /// (Almost) non-blocking Delay.
+    /// (Почти) неблокирующая задержка.
     /// </summary>
     public static async Task IdleDelay
         (
@@ -71,21 +72,18 @@ public static class ApplicationUtility
         Sure.Positive (milliseconds, nameof (milliseconds));
 
         await Task.Delay (milliseconds);
-    } // method IdleDelay
+    }
 
     /// <summary>
-    /// Run some code in pseudo-async manner.
+    /// Запуск некоторого кода в псевдо-асинхронном режиме.
     /// </summary>
     public static void Run
         (
             Action action
         )
     {
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": entering"
-            );
+        Sure.NotNull (action);
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": entering");
 
         using (var task = Task.Factory.StartNew (action))
         {
@@ -93,15 +91,11 @@ public static class ApplicationUtility
             DiscoverExceptions (task);
         }
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": leaving"
-            );
-    } // method Run
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": leaving");
+    }
 
     /// <summary>
-    /// Run some code in pseudo-async manner.
+    /// Запуск некоторого кода в псевдо-асинхронном режиме.
     /// </summary>
     public static void Run<T>
         (
@@ -111,11 +105,8 @@ public static class ApplicationUtility
     {
         void Interim() => action (argument);
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": entering"
-            );
+        Sure.NotNull (action);
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": entering");
 
         using (var task = Task.Factory.StartNew (Interim))
         {
@@ -123,15 +114,11 @@ public static class ApplicationUtility
             DiscoverExceptions (task);
         }
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": leaving"
-            );
-    } // method Run
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": leaving");
+    }
 
     /// <summary>
-    /// Run some code in pseudo-async manner.
+    /// Запуск некоторого кода в псевдо-асинхронном режиме.
     /// </summary>
     public static void Run<T1, T2>
         (
@@ -142,11 +129,8 @@ public static class ApplicationUtility
     {
         void Interim() => action (argument1, argument2);
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": entering"
-            );
+        Sure.NotNull (action);
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": entering");
 
         using (var task = Task.Factory.StartNew (Interim))
         {
@@ -154,15 +138,11 @@ public static class ApplicationUtility
             DiscoverExceptions (task);
         }
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": leaving"
-            );
-    } // method Run
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": leaving");
+    }
 
     /// <summary>
-    /// Run some code in pseudo-async manner.
+    /// Запуск некоторого кода в псевдо-асинхронном режиме.
     /// </summary>
     public static void Run<T1, T2, T3>
         (
@@ -174,11 +154,8 @@ public static class ApplicationUtility
     {
         void Interim() => action (argument1, argument2, argument3);
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": entering"
-            );
+        Sure.NotNull (action);
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": entering");
 
         using (var task = Task.Factory.StartNew (Interim))
         {
@@ -186,26 +163,19 @@ public static class ApplicationUtility
             DiscoverExceptions (task);
         }
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": leaving"
-            );
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": leaving");
     }
 
     /// <summary>
-    /// Run some code in pseudo-async manner.
+    /// Запуск некоторого кода в псевдо-асинхронном режиме.
     /// </summary>
     public static TResult Run<TResult>
         (
             Func<TResult> func
         )
     {
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": entering"
-            );
+        Sure.NotNull (func);
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": entering");
 
         TResult result;
         using (var task = Task<TResult>.Factory.StartNew (func))
@@ -215,17 +185,13 @@ public static class ApplicationUtility
             result = task.Result;
         }
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": leaving"
-            );
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": leaving");
 
         return result;
     }
 
     /// <summary>
-    /// Run some code in pseudo-async manner.
+    /// Запуск некоторого кода в псевдо-асинхронном режиме.
     /// </summary>
     public static TResult Run<T1, TResult>
         (
@@ -235,11 +201,8 @@ public static class ApplicationUtility
     {
         TResult Interim() => func (argument);
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": entering"
-            );
+        Sure.NotNull (func);
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": entering");
 
         TResult result;
         using (var task = Task<TResult>.Factory.StartNew (Interim))
@@ -249,17 +212,13 @@ public static class ApplicationUtility
             result = task.Result;
         }
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": leaving"
-            );
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": leaving");
 
         return result;
-    } // methor Run
+    }
 
     /// <summary>
-    /// Run some code in pseudo-async manner.
+    /// Запуск некоторого кода в псевдо-асинхронном режиме.
     /// </summary>
     public static TResult Run<T1, T2, TResult>
         (
@@ -270,11 +229,8 @@ public static class ApplicationUtility
     {
         TResult Interim() => func (argument1, argument2);
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": entering"
-            );
+        Sure.NotNull (func);
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": entering");
 
         TResult result;
         using (var task = Task<TResult>.Factory.StartNew (Interim))
@@ -284,23 +240,21 @@ public static class ApplicationUtility
             result = task.Result;
         }
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (Run)
-                + ": leaving"
-            );
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (Run) + ": leaving");
 
         return result;
     }
 
     /// <summary>
-    /// Запуск формы в новом треде
+    /// Запуск формы в новом потоке.
     /// </summary>
     public static void RunNewThread
         (
             this Form form
         )
     {
+        Sure.NotNull (form);
+
         var start = new ParameterizedThreadStart (_RunFormInNewThread);
         var thread = new Thread (start)
         {
@@ -312,13 +266,15 @@ public static class ApplicationUtility
     }
 
     /// <summary>
-    /// Запускает новый UI-поток.
+    /// Запуск нового UI-потока.
     /// </summary>
     public static Thread RunNewUiThread
         (
             ThreadStart start
         )
     {
+        Sure.NotNull (start);
+
         var result = new Thread (start)
         {
             IsBackground = true,
@@ -331,65 +287,50 @@ public static class ApplicationUtility
     }
 
     /// <summary>
-    /// Небольшое ожидание
+    /// Небольшое ожидание.
     /// </summary>
     public static async Task SleepALittle()
     {
         Application.DoEvents();
         await IdleDelay();
-    } // method SleepALittle
+    }
 
     /// <summary>
-    /// Wait for flag.
+    /// Ожидание установки некоторого флага.
     /// </summary>
     public static void WaitFor
         (
             ref bool readyFlag
         )
     {
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": entering"
-            );
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": entering");
 
         while (!readyFlag)
         {
             SleepALittle().Wait();
         }
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": leaving"
-            );
-    } // method WaitFor
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": leaving");
+    }
 
     /// <summary>
-    /// Wait for flag.
+    /// Ожидание установки некоторого флага.
     /// </summary>
     public static void WaitFor
         (
             Func<bool> readyCheck
         )
     {
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": entering"
-            );
+        Sure.NotNull (readyCheck);
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": entering");
 
         while (!readyCheck())
         {
             SleepALittle().Wait();
         }
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": leaving"
-            );
-    } // method WaitFor
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": leaving");
+    }
 
     /// <summary>
     /// Wait for flag.
@@ -399,54 +340,40 @@ public static class ApplicationUtility
             Func<T, bool> readyCheck,
             T argument
         )
-        where T : class
+        where T: class
     {
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": entering"
-            );
+        Sure.NotNull (readyCheck);
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": entering");
 
         while (!readyCheck (argument))
         {
             SleepALittle().Wait();
         }
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": leaving"
-            );
-    } // method WaitFor
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": leaving");
+    }
 
     /// <summary>
-    /// Wait for task.
+    /// Ожидание завершения указанной задачи.
     /// </summary>
     public static void WaitFor
         (
             this IAsyncResult handle
         )
     {
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": entering"
-            );
+        Sure.NotNull (handle);
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": entering");
 
         while (!handle.IsCompleted)
         {
             SleepALittle().Wait();
         }
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": leaving"
-            );
-    } // method WaitFor
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": leaving");
+    }
 
     /// <summary>
-    /// Wait for some tasks.
+    /// Ожидание завершения нескольких задач.
     /// </summary>
     public static void WaitFor
         (
@@ -454,11 +381,14 @@ public static class ApplicationUtility
             params WaitHandle[] handles
         )
     {
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": entering"
-            );
+        Sure.NotNull (handles);
+
+        if (handles.Length == 0)
+        {
+            return;
+        }
+
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": entering");
 
         bool complete;
         do
@@ -473,15 +403,11 @@ public static class ApplicationUtility
             }
         } while (!complete);
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": leaving"
-            );
-    } // method WaitFor
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": leaving");
+    }
 
     /// <summary>
-    /// Wait for some tasks.
+    /// Ожидание завершения нескольких задач.
     /// </summary>
     public static void WaitFor
         (
@@ -489,12 +415,14 @@ public static class ApplicationUtility
             params Task[] tasks
         )
     {
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": entering"
-            );
+        Sure.NotNull (tasks);
 
+        if (tasks.Length == 0)
+        {
+            return;
+        }
+
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": entering");
         bool complete;
         do
         {
@@ -508,12 +436,8 @@ public static class ApplicationUtility
             }
         } while (!complete);
 
-        Magna.Trace
-            (
-                nameof (ApplicationUtility) + "::" + nameof (WaitFor)
-                + ": leaving"
-            );
-    } // method WaitFor
+        Magna.Logger.LogTrace (nameof (ApplicationUtility) + "::" + nameof (WaitFor) + ": leaving");
+    }
 
     /// <summary>
     /// Determines whether secondary screen present.
@@ -578,7 +502,7 @@ public static class ApplicationUtility
         )
     {
         var secondaryScreen = SecondaryScreen;
-        if (secondaryScreen != null)
+        if (secondaryScreen is not null)
         {
             MoveToScreen (secondaryScreen, form);
             return true;

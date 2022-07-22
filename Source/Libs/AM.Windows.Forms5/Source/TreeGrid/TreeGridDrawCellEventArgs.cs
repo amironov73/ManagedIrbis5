@@ -19,225 +19,225 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Аргументы для события, возникающего при перерисовке грида.
+/// </summary>
+public sealed class TreeGridDrawCellEventArgs
+    : EventArgs
 {
+    #region Properties
+
     /// <summary>
-    /// Аргументы для события, возникающего при перерисовке грида.
+    /// Канва для отрисовки.
     /// </summary>
-    public sealed class TreeGridDrawCellEventArgs
-        : EventArgs
+    public Graphics? Graphics { get; set; }
+
+    /// <summary>
+    /// Отрисовываемый грид.
+    /// </summary>
+    public TreeGrid? Grid { get; set; }
+
+    /// <summary>
+    /// Отрисовываемая нода.
+    /// </summary>
+    public TreeGridNode? Node { get; set; }
+
+    /// <summary>
+    /// Отрисовываемая колонка.
+    /// </summary>
+    public TreeGridColumn? Column { get; set; }
+
+    /// <summary>
+    /// Прямоугольник, подлежаший отрисовке.
+    /// </summary>
+    public Rectangle Bounds { get; set; }
+
+    /// <summary>
+    /// Состояние ноды.
+    /// </summary>
+    public TreeGridNodeState State { get; set; }
+
+    /// <summary>
+    /// Переопределение цвета фона.
+    /// </summary>
+    public Brush? BackgroundOverride { get; set; }
+
+    /// <summary>
+    /// Переопределение цвета текста.
+    /// </summary>
+    public Brush? ForegroundOverride { get; set; }
+
+    /// <summary>
+    /// Переопределение текста.
+    /// </summary>
+    public string? TextOverride { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение кисти для текста.
+    /// </summary>
+    public Brush GetForegroundBrush() => ForegroundOverride
+        ?? TreeGridUtilities.GetForegroundBrush
+            (
+                Grid.ThrowIfNull(),
+                Node.ThrowIfNull(),
+                State
+            );
+
+    /// <summary>
+    /// Получение кисти для фона.
+    /// </summary>
+    public Brush GetBackgroundBrush() => BackgroundOverride
+        ?? TreeGridUtilities.GetBackgroundBrush
+            (
+                Grid.ThrowIfNull(),
+                Node.ThrowIfNull(),
+                State
+            );
+
+    /// <summary>
+    /// Получение иконки, отражающей текущее состояние ноды.
+    /// </summary>
+    public Bitmap GetStateBitmap()
     {
-        #region Properties
+        // TODO: восстановить логику
+        // Bitmap result = Node.Expanded
+        //                   ? TreeEdit.Properties.Resources.Open
+        //                   : TreeEdit.Properties.Resources.Closed;
+        // //Icon icon = Icon.FromHandle(openOrClosed.GetHicon());
+        // result.MakeTransparent(Color.White);
+        // return result;
 
-        /// <summary>
-        /// Канва для отрисовки.
-        /// </summary>
-        public Graphics? Graphics { get; set; }
-
-        /// <summary>
-        /// Отрисовываемый грид.
-        /// </summary>
-        public TreeGrid? Grid { get; set; }
-
-        /// <summary>
-        /// Отрисовываемая нода.
-        /// </summary>
-        public TreeGridNode? Node { get; set; }
-
-        /// <summary>
-        /// Отрисовываемая колонка.
-        /// </summary>
-        public TreeGridColumn? Column { get; set; }
-
-        /// <summary>
-        /// Прямоугольник, подлежаший отрисовке.
-        /// </summary>
-        public Rectangle Bounds { get; set; }
-
-        /// <summary>
-        /// Состояние ноды.
-        /// </summary>
-        public TreeGridNodeState State { get; set; }
-
-        /// <summary>
-        /// Переопределение цвета фона.
-        /// </summary>
-        public Brush? BackgroundOverride { get; set; }
-
-        /// <summary>
-        /// Переопределение цвета текста.
-        /// </summary>
-        public Brush? ForegroundOverride { get; set; }
-
-        /// <summary>
-        /// Переопределение текста.
-        /// </summary>
-        public string? TextOverride { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Получение кисти для текста.
-        /// </summary>
-        public Brush GetForegroundBrush () => ForegroundOverride
-            ?? TreeGridUtilities.GetForegroundBrush
-                (
-                    Grid.ThrowIfNull(),
-                    Node.ThrowIfNull(),
-                    State
-                );
-
-        /// <summary>
-        /// Получение кисти для фона.
-        /// </summary>
-        public Brush GetBackgroundBrush () => BackgroundOverride
-            ?? TreeGridUtilities.GetBackgroundBrush
-                (
-                    Grid.ThrowIfNull(),
-                    Node.ThrowIfNull(),
-                    State
-                );
-
-        /// <summary>
-        /// Получение иконки, отражающей текущее состояние ноды.
-        /// </summary>
-        public Bitmap GetStateBitmap ()
-        {
-            // TODO: восстановить логику
-            // Bitmap result = Node.Expanded
-            //                   ? TreeEdit.Properties.Resources.Open
-            //                   : TreeEdit.Properties.Resources.Closed;
-            // //Icon icon = Icon.FromHandle(openOrClosed.GetHicon());
-            // result.MakeTransparent(Color.White);
-            // return result;
-
-            return new Bitmap(16, 16);
-        }
-
-        /// <summary>
-        /// Отрисовка фона.
-        /// </summary>
-        public void DrawBackground()
-        {
-            var brush = GetBackgroundBrush();
-            Graphics.ThrowIfNull().FillRectangle
-                (
-                    brush,
-                    Bounds
-                );
-        }
-
-        /// <summary>
-        /// Отрисовка текста.
-        /// </summary>
-        public void DrawText()
-        {
-            var graphics = Graphics;
-            if (graphics is null)
-            {
-                Magna.Debug("Graphics is null");
-                return;
-            }
-
-            var node = Node;
-            if (node is null)
-            {
-                Magna.Debug("Node is null");
-                return;
-            }
-
-            var column = Column;
-            if (column is null)
-            {
-                Magna.Debug("Column is null");
-                return;
-            }
-
-            var grid = Grid;
-            if (grid is null)
-            {
-                Magna.Debug("Grid is null");
-                return;
-            }
-
-            var brush = GetForegroundBrush();
-
-            var left = Bounds.Left;
-            var index = column._index;
-            string? text = null;
-            if (index == 0)
-            {
-                text = node.Title;
-                left += node.Level * 16;
-
-            }
-            else
-            {
-                object? data = null;
-                if (index - 1 < node.Data.Count)
-                {
-                    data = node.Data[index - 1];
-                }
-
-                if (data != null)
-                {
-                    text = data.ToString();
-                }
-            }
-            var r = new Rectangle
-                (
-                    left,
-                    Bounds.Top,
-                    Bounds.Width - (left - Bounds.Left),
-                    Bounds.Height
-                );
-
-            if (!string.IsNullOrEmpty(text))
-            {
-                using var format = new StringFormat
-                {
-                    Alignment = column.Alignment.ToStringAlignment(),
-                    Trimming = StringTrimming.EllipsisCharacter
-                };
-                format.FormatFlags |= StringFormatFlags.NoWrap;
-                graphics.DrawString
-                    (
-                        text,
-                        grid.Font,
-                        brush,
-                        r,
-                        format
-                    );
-            }
-        }
-
-        /// <summary>
-        /// Draws the frame.
-        /// </summary>
-        public void DrawSelection()
-        {
-            var graphics = Graphics;
-            if (graphics is null)
-            {
-                Magna.Debug("Graphics is null");
-                return;
-            }
-
-            if ((State & TreeGridNodeState.Selected) != 0)
-            {
-                using var pen = new Pen(Color.Black) { DashStyle = DashStyle.Dot };
-                var r = Bounds;
-                r.Inflate(-1, -1);
-                graphics.DrawRectangle(pen, r);
-            }
-        }
-
-        #endregion
+        return new Bitmap (16, 16);
     }
+
+    /// <summary>
+    /// Отрисовка фона.
+    /// </summary>
+    public void DrawBackground()
+    {
+        var brush = GetBackgroundBrush();
+        Graphics.ThrowIfNull().FillRectangle
+            (
+                brush,
+                Bounds
+            );
+    }
+
+    /// <summary>
+    /// Отрисовка текста.
+    /// </summary>
+    public void DrawText()
+    {
+        var graphics = Graphics;
+        if (graphics is null)
+        {
+            Magna.Logger.LogDebug (nameof (DrawText) + ": graphics is null");
+            return;
+        }
+
+        var node = Node;
+        if (node is null)
+        {
+            Magna.Logger.LogDebug (nameof (DrawText) + ": node is null");
+            return;
+        }
+
+        var column = Column;
+        if (column is null)
+        {
+            Magna.Logger.LogDebug (nameof (DrawText) + ": column is null");
+            return;
+        }
+
+        var grid = Grid;
+        if (grid is null)
+        {
+            Magna.Logger.LogDebug (nameof (DrawText) + ": grid is null");
+            return;
+        }
+
+        var brush = GetForegroundBrush();
+        var left = Bounds.Left;
+        var index = column._index;
+        string? text = null;
+        if (index == 0)
+        {
+            text = node.Title;
+            left += node.Level * 16;
+        }
+        else
+        {
+            object? data = null;
+            if (index - 1 < node.Data.Count)
+            {
+                data = node.Data[index - 1];
+            }
+
+            if (data != null)
+            {
+                text = data.ToString();
+            }
+        }
+
+        var r = new Rectangle
+            (
+                left,
+                Bounds.Top,
+                Bounds.Width - (left - Bounds.Left),
+                Bounds.Height
+            );
+
+        if (!string.IsNullOrEmpty (text))
+        {
+            using var format = new StringFormat
+            {
+                Alignment = column.Alignment.ToStringAlignment(),
+                Trimming = StringTrimming.EllipsisCharacter
+            };
+            format.FormatFlags |= StringFormatFlags.NoWrap;
+            graphics.DrawString
+                (
+                    text,
+                    grid.Font,
+                    brush,
+                    r,
+                    format
+                );
+        }
+    }
+
+    /// <summary>
+    /// Draws the frame.
+    /// </summary>
+    public void DrawSelection()
+    {
+        var graphics = Graphics;
+        if (graphics is null)
+        {
+            Magna.Logger.LogDebug (nameof (DrawSelection) + ": graphics is null");
+            return;
+        }
+
+        if ((State & TreeGridNodeState.Selected) != 0)
+        {
+            using var pen = new Pen (Color.Black) { DashStyle = DashStyle.Dot };
+            var r = Bounds;
+            r.Inflate (-1, -1);
+            graphics.DrawRectangle (pen, r);
+        }
+    }
+
+    #endregion
 }

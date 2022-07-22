@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridPalette.cs
+/* TreeGridPalette.cs -- палитра цветов для TreeGrid
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,108 +18,88 @@ using AM.Drawing;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Палитра цветов для <see cref="TreeGrid"/>.
+/// </summary>
+public sealed class TreeGridPalette
+    : Palette
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class TreeGridPalette
-        : Palette
+    public TreeGridPalette()
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public TreeGridPalette()
-        {
-            InitializeFromAttributes();
-        }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets the foreground.
-        /// </summary>
-        /// <value>The foreground.</value>
-        [PaletteColor("Black")]
-        public Tube Foreground
-        {
-            get { return GetTubeFromReflection(); }
-        }
-
-        /// <summary>
-        /// Gets the backrground.
-        /// </summary>
-        /// <value>The backrground.</value>
-        [PaletteColor("White")]
-        public Tube Backrground
-        {
-            get { return GetTubeFromReflection(); }
-        }
-
-        /// <summary>
-        /// Gets the selected foreground.
-        /// </summary>
-        /// <value>The selected foreground.</value>
-        [PaletteColor("White")]
-        public Tube SelectedForeground
-        {
-            get { return GetTubeFromReflection(); }
-        }
-
-        /// <summary>
-        /// Gets the selected background.
-        /// </summary>
-        /// <value>The selected background.</value>
-        [PaletteColor("Blue")]
-        public Tube SelectedBackground
-        {
-            get { return GetTubeFromReflection(); }
-        }
-
-        /// <summary>
-        /// Gets the lines.
-        /// </summary>
-        /// <value>The lines.</value>
-        [PaletteColor("DarkGray")]
-        public Tube Lines
-        {
-            get { return GetTubeFromReflection(); }
-        }
-
-        /// <summary>
-        /// Gets the disabled.
-        /// </summary>
-        /// <value>The disabled.</value>
-        [PaletteColor("Gray")]
-        public Tube Disabled
-        {
-            get { return GetTubeFromReflection(); }
-        }
-
-        /// <summary>
-        /// Gets the header background.
-        /// </summary>
-        /// <value>The header background.</value>
-        [PaletteColor("LightGray")]
-        public Tube HeaderBackground
-        {
-            get { return GetTubeFromReflection(); }
-        }
-
-        /// <summary>
-        /// Gets the header foreground.
-        /// </summary>
-        /// <value>The header foreground.</value>
-        [PaletteColor("Black")]
-        public Tube HeaderForeground
-        {
-            get { return GetTubeFromReflection(); }
-        }
-
-        #endregion
+        InitializeFromAttributes();
     }
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Цвет текста.
+    /// </summary>
+    [PaletteColor ("Black")]
+    public Tube Foreground => GetTubeFromProperty();
+
+    /// <summary>
+    /// Цвет фона.
+    /// </summary>
+    [PaletteColor ("White")]
+    public Tube Backrground => GetTubeFromProperty();
+
+    /// <summary>
+    /// Цвет текста в выбранном узле.
+    /// </summary>
+    [PaletteColor ("White")]
+    public Tube SelectedForeground => GetTubeFromProperty();
+
+    /// <summary>
+    /// Цвет фона в выбранном узле.
+    /// </summary>
+    [PaletteColor ("Blue")]
+    public Tube SelectedBackground => GetTubeFromProperty();
+
+    /// <summary>
+    /// Цвет фона для узла только для чтения.
+    /// </summary>
+    [PaletteColor ("Gray")]
+    public Tube ReadOnlyBackground => GetTubeFromProperty();
+
+    /// <summary>
+    /// Цвет текста для узла только для чтения.
+    /// </summary>
+    [PaletteColor ("DarkGray")]
+    public Tube ReadOnlyForeground => GetTubeFromProperty();
+
+    /// <summary>
+    /// Цвет для линий.
+    /// </summary>
+    [PaletteColor ("DarkGray")]
+    public Tube Lines => GetTubeFromProperty();
+
+    /// <summary>
+    /// Цвет для неактивных узлов.
+    /// </summary>
+    [PaletteColor ("Gray")]
+    public Tube Disabled => GetTubeFromProperty();
+
+    /// <summary>
+    /// Gets the header background.
+    /// </summary>
+    /// <value>The header background.</value>
+    [PaletteColor ("LightGray")]
+    public Tube HeaderBackground => GetTubeFromProperty();
+
+    /// <summary>
+    /// Цвет текста в заголовке.
+    /// </summary>
+    [PaletteColor ("Black")]
+    public Tube HeaderForeground => GetTubeFromProperty();
+
+    #endregion
 }

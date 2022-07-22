@@ -19,10 +19,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -104,8 +104,7 @@ public class Palette
     public void InitializeFromAttributes()
     {
         var properties = GetType()
-            .GetProperties (BindingFlags.Instance
-                            | BindingFlags.Public);
+            .GetProperties (BindingFlags.Instance | BindingFlags.Public);
         foreach (var property in properties)
         {
             var attributes = property.GetCustomAttributes
@@ -123,14 +122,14 @@ public class Palette
     }
 
     /// <summary>
-    ///
+    /// Получение цвета по имени свойства.
     /// </summary>
-    /// <returns></returns>
-    public Tube GetTubeFromReflection()
+    public Tube GetTubeFromProperty
+        (
+            [CallerMemberName] string propertyName = null!
+        )
     {
-        var frame = new StackFrame (1, false);
-        var funcName = frame.GetMethod()!.Name.Substring (4);
-        return this[funcName];
+        return this[propertyName];
     }
 
     /// <inheritdoc cref="Collection{T}.InsertItem"/>
@@ -177,36 +176,48 @@ public class Palette
     }
 
     /// <summary>
-    /// Saves the specified file name.
+    /// Сохранение палитры в файл с указанным именем.
     /// </summary>
-    /// <param name="fileName">Name of the file.</param>
-    public void Save (string fileName)
+    public void Save
+        (
+            string fileName
+        )
     {
+        Sure.NotNullNorEmpty (fileName);
+
         var serializer = new XmlSerializer (typeof (Palette));
         using var writer = new StreamWriter (fileName);
         serializer.Serialize (writer, this);
     }
 
     /// <summary>
-    /// Reads the specified file name.
+    /// Чтение палитры из указанного файла.
     /// </summary>
-    /// <param name="fileName">Name of the file.</param>
-    /// <returns></returns>
-    public static Palette Read (string fileName)
+    public static Palette Read
+        (
+            string fileName
+        )
     {
+        Sure.FileExists (fileName);
+
         var serializer = new XmlSerializer (typeof (Palette));
         using var reader = new StreamReader (fileName);
-        var result = (Palette)serializer.Deserialize (reader)
-            .ThrowIfNull ("serializer.Deserialize");
+        var result = (Palette) serializer.Deserialize (reader).ThrowIfNull ();
+
         return result;
     }
 
     /// <summary>
-    /// Removes the specified name.
+    /// Удаление из палитры цвета с указанным именем.
+    /// Если такого цвета нет, ничего не происходит.
     /// </summary>
-    /// <param name="name">The name.</param>
-    public void Remove (string name)
+    public void Remove
+        (
+            string name
+        )
     {
+        Sure.NotNullNorEmpty (name);
+
         int index;
         for (index = 0; index < Count; index++)
         {
@@ -216,12 +227,10 @@ public class Palette
             }
         }
 
-        if (index >= Count)
+        if (index < Count)
         {
-            throw new KeyNotFoundException();
+            RemoveItem (index);
         }
-
-        RemoveItem (index);
     }
 
     #endregion
@@ -289,12 +298,8 @@ public class Palette
 
         foreach (var item in Items)
         {
-            builder.AppendFormat
-                (
-                    "{0}{1}",
-                    item,
-                    Environment.NewLine
-                );
+            builder.Append (item);
+            builder.Append (Environment.NewLine);
         }
 
         var result = builder.ToString();

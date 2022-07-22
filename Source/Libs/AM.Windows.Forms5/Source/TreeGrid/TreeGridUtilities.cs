@@ -6,215 +6,219 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridUtilities.cs
+/* TreeGridUtilities.cs -- полезные методы для TreeGrid
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Полезные методы для <see cref="TreeGrid"/>.
+/// </summary>
+public static class TreeGridUtilities
 {
+    #region Public methods
+
     /// <summary>
-    ///
+    /// Toes the string alignment.
     /// </summary>
-    public static class TreeGridUtilities
+    /// <param name="alignment">The alignment.</param>
+    /// <returns></returns>
+    public static StringAlignment ToStringAlignment
+        (
+            this TreeGridAlignment alignment
+        )
     {
-        #region Public methods
+        Sure.Defined (alignment);
 
-        /// <summary>
-        /// Toes the string alignment.
-        /// </summary>
-        /// <param name="alignment">The alignment.</param>
-        /// <returns></returns>
-        public static StringAlignment ToStringAlignment
-            (
-                this TreeGridAlignment alignment
-            )
+        var result = alignment switch
         {
-            var result = StringAlignment.Near;
-            switch (alignment)
-            {
-                case TreeGridAlignment.Center:
-                    result = StringAlignment.Center;
-                    break;
-                case TreeGridAlignment.Far:
-                    result = StringAlignment.Far;
-                    break;
-            }
-            return result;
+            TreeGridAlignment.Center => StringAlignment.Center,
+            TreeGridAlignment.Far => StringAlignment.Far,
+            TreeGridAlignment.Near => StringAlignment.Near,
+
+            _ => throw new ArgumentOutOfRangeException (nameof (alignment), alignment, nameof (TreeGridAlignment))
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Получение кисти для отрисовки текста ячейки.
+    /// </summary>
+    public static Brush GetForegroundBrush
+        (
+            TreeGrid grid,
+            TreeGridNode node,
+            TreeGridNodeState state
+        )
+    {
+        Sure.NotNull (grid);
+        Sure.NotNull (node);
+        Sure.Defined (state);
+
+        var result = (node.ForegroundColor == Color.Empty)
+            ? grid.Palette.Foreground.Brush
+            : new SolidBrush (node.ForegroundColor);
+
+        if ((state & TreeGridNodeState.Selected) != 0)
+        {
+            result = grid.Palette.SelectedForeground;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="grid"></param>
-        /// <param name="node"></param>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        public static Brush GetForegroundBrush
-            (
-                TreeGrid grid,
-                TreeGridNode node,
-                TreeGridNodeState state
-            )
+        if ((state & TreeGridNodeState.Disabled) != 0)
         {
-            Brush result = (node.ForegroundColor == Color.Empty)
-                ? grid.Palette.Foreground
-                : new SolidBrush(node.ForegroundColor);
-
-            if ((state & TreeGridNodeState.Selected) != 0)
-            {
-                result = grid.Palette.SelectedForeground;
-            }
-            if ((state & TreeGridNodeState.Disabled) != 0)
-            {
-                result = grid.Palette.Disabled;
-            }
-            if ((state & TreeGridNodeState.ReadOnly) != 0)
-            {
-                //brush = TreeGrid.Palette.
-            }
-
-            return result;
+            result = grid.Palette.Disabled;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="grid"></param>
-        /// <param name="node"></param>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        public static Brush GetBackgroundBrush
-            (
-                TreeGrid grid,
-                TreeGridNode node,
-                TreeGridNodeState state
-            )
+        if ((state & TreeGridNodeState.ReadOnly) != 0)
         {
-            Brush result = (node.BackgroundColor == Color.Empty)
-                ? grid.Palette.Backrground
-                : new SolidBrush(node.BackgroundColor);
-
-            if ((state & TreeGridNodeState.Selected) != 0)
-            {
-                result = grid.Palette.SelectedBackground;
-            }
-
-            return result;
+            result = grid.Palette.ReadOnlyForeground;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="args"></param>
-        /// <param name="layout"></param>
-        public static void DrawTreeCell
-            (
-                TreeGridDrawCellEventArgs args,
-                TreeGridDrawLayout layout
-            )
+        return result;
+    }
+
+    /// <summary>
+    /// Получение кисти для отрисовки фона ячейки.
+    /// </summary>
+    public static Brush GetBackgroundBrush
+        (
+            TreeGrid grid,
+            TreeGridNode node,
+            TreeGridNodeState state
+        )
+    {
+        Sure.NotNull (grid);
+        Sure.NotNull (node);
+        Sure.Defined (state);
+
+        var result = (node.BackgroundColor == Color.Empty)
+            ? grid.Palette.Backrground.Brush
+            : new SolidBrush (node.BackgroundColor);
+
+        if ((state & TreeGridNodeState.Selected) != 0)
         {
-            var node = args.Node;
-            if (node is null)
-            {
-                Magna.Debug("Node is null");
-                return;
-            }
+            result = grid.Palette.SelectedBackground;
+        }
 
-            var grid = args.Grid;
-            if (grid is null)
-            {
-                Magna.Debug("Grid is null");
-                return;
-            }
+        return result;
+    }
 
-            var graphics = args.Graphics;
-            if (graphics is null)
-            {
-                Magna.Debug("Graphics is null");
-                return;
-            }
+    /// <summary>
+    /// Отрисовка ячейки.
+    /// </summary>
+    public static void DrawTreeCell
+        (
+            TreeGridDrawCellEventArgs eventArgs,
+            TreeGridDrawLayout layout
+        )
+    {
+        Sure.NotNull (eventArgs);
+        Sure.NotNull (layout);
 
-            var bounds = args.Bounds;
-            var title = layout.TextOverride
-                        ?? args.TextOverride
-                        ?? node.Title;
+        var node = eventArgs.Node;
+        if (node is null)
+        {
+            Magna.Logger.LogDebug (nameof (DrawTreeCell) + ": node is null");
+            return;
+        }
 
-            graphics.FillRectangle
+        var grid = eventArgs.Grid;
+        if (grid is null)
+        {
+            Magna.Logger.LogDebug (nameof (DrawTreeCell) + ": grid is null");
+            return;
+        }
+
+        var graphics = eventArgs.Graphics;
+        if (graphics is null)
+        {
+            Magna.Logger.LogDebug (nameof (DrawTreeCell) + ": graphics is null");
+            return;
+        }
+
+        var bounds = eventArgs.Bounds;
+        var title = layout.TextOverride ?? eventArgs.TextOverride ?? node.Title;
+
+        graphics.FillRectangle
+            (
+                eventArgs.GetBackgroundBrush(),
+                bounds
+            );
+
+        if (!layout.Expand.IsEmpty)
+        {
+            var openOrClosed = eventArgs.GetStateBitmap();
+            var top = bounds.Top
+                      + (bounds.Height - openOrClosed.Height) / 2;
+
+            graphics.DrawImage
                 (
-                    args.GetBackgroundBrush(),
-                    bounds
+                    openOrClosed,
+                    layout.Expand.Left,
+                    top,
+                    8,
+                    8
                 );
+        }
 
-            if (!layout.Expand.IsEmpty)
-            {
-                var openOrClosed = args.GetStateBitmap();
-                var top = bounds.Top
-                          + (bounds.Height - openOrClosed.Height) / 2;
-
-                graphics.DrawImage
-                    (
-                       openOrClosed,
-                       layout.Expand.Left,
-                       top,
-                       8,
-                       8
-                    );
-            }
-
-            if (!layout.Check.IsEmpty)
-            {
-                CheckBoxRenderer.DrawCheckBox
-                    (
-                        graphics,
-                        layout.Check.Location,
-                        node.Checked
+        if (!layout.Check.IsEmpty)
+        {
+            CheckBoxRenderer.DrawCheckBox
+                (
+                    graphics,
+                    layout.Check.Location,
+                    node.Checked
                         ? CheckBoxState.CheckedNormal
                         : CheckBoxState.UncheckedNormal
-                    );
-            }
+                );
+        }
 
-            if (!layout.Icon.IsEmpty)
+        if (!layout.Icon.IsEmpty)
+        {
+            graphics.DrawIcon
+                (
+                    node.Icon!,
+                    layout.Icon.Left,
+                    layout.Icon.Top
+                );
+        }
+
+        if (!string.IsNullOrEmpty (title))
+        {
+            using var format = new StringFormat
             {
-                graphics.DrawIcon
-                    (
-                       node.Icon!,
-                       layout.Icon.Left,
-                       layout.Icon.Top
-                    );
-            }
+                LineAlignment = StringAlignment.Center,
+                HotkeyPrefix = HotkeyPrefix.None
+            };
+            format.FormatFlags |= StringFormatFlags.NoWrap;
+            format.Trimming = StringTrimming.EllipsisCharacter;
 
-            if (!string.IsNullOrEmpty(title))
-            {
-                using var format = new StringFormat
-                {
-                    LineAlignment = StringAlignment.Center,
-                    HotkeyPrefix = HotkeyPrefix.None
-                };
-                format.FormatFlags |= StringFormatFlags.NoWrap;
-                format.Trimming = StringTrimming.EllipsisCharacter;
-
-                graphics.DrawString
+            graphics.DrawString
                 (
                     title,
                     grid.Font,
-                    args.GetForegroundBrush(),
+                    eventArgs.GetForegroundBrush(),
                     layout.Text,
                     format
                 );
-            }
         }
-
-        #endregion
     }
+
+    #endregion
 }

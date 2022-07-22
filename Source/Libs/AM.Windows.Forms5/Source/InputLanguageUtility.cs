@@ -21,6 +21,8 @@ using System;
 using System.Globalization;
 using System.Windows.Forms;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -48,9 +50,9 @@ public static class InputLanguageUtility
 
         #region IMessageFilter members
 
-        public bool PreFilterMessage(ref Message message)
+        public bool PreFilterMessage (ref Message message)
         {
-            return HandleWmInputLanguageRequest(ref message);
+            return HandleWmInputLanguageRequest (ref message);
         }
 
         #endregion
@@ -73,7 +75,7 @@ public static class InputLanguageUtility
     {
         get
         {
-            var languages= InputLanguage.InstalledInputLanguages;
+            var languages = InputLanguage.InstalledInputLanguages;
             var currentIndex = languages.IndexOf
                 (
                     InputLanguage.CurrentInputLanguage
@@ -83,6 +85,7 @@ public static class InputLanguageUtility
             {
                 nextIndex = 0;
             }
+
             var result = languages[nextIndex];
 
             return result;
@@ -113,7 +116,7 @@ public static class InputLanguageUtility
         }
 
         var nextLanguage = NextLanguage;
-        ChangeInputLanguage(nextLanguage);
+        ChangeInputLanguage (nextLanguage);
     }
 
     /// <summary>
@@ -131,12 +134,13 @@ public static class InputLanguageUtility
         // Exception will be invoked here
         var language = InputLanguage.FromCulture
                 (
-                    new CultureInfo(isoLanguageCode)
+                    new CultureInfo (isoLanguageCode)
                 )
             .ThrowIfNull();
 
-        ChangeInputLanguage(language);
+        ChangeInputLanguage (language);
     }
+
     /// <summary>
     /// Changing current Input Language to a new one passed in the param
     /// </summary>
@@ -153,7 +157,7 @@ public static class InputLanguageUtility
         var language = InputLanguage.FromCulture (new CultureInfo (languageId))
             .ThrowIfNull();
 
-        ChangeInputLanguage(language);
+        ChangeInputLanguage (language);
     }
 
     /// <summary>
@@ -165,16 +169,17 @@ public static class InputLanguageUtility
             InputLanguage inputLanguage
         )
     {
+        Sure.NotNull (inputLanguage);
+
         // Check is this Language really installed.
         // Raise exception to warn if it is not
-        if (InputLanguage.InstalledInputLanguages.IndexOf(inputLanguage) == -1)
+        if (InputLanguage.InstalledInputLanguages.IndexOf (inputLanguage) == -1)
         {
-            Magna.Error
+            Magna.Logger.LogTrace
                 (
-                    "InputLanguageUtility::ChangeInputLanguage: "
-                    + "language="
-                    + inputLanguage
-                    + " not installed"
+                    nameof (InputLanguageUtility) + "::" + nameof (ChangeInputLanguage)
+                    + ": language {Language} not installed",
+                    inputLanguage
                 );
 
             throw new ArgumentOutOfRangeException();
@@ -182,13 +187,6 @@ public static class InputLanguageUtility
 
         // InputLanguage changes here:
         InputLanguage.CurrentInputLanguage = inputLanguage;
-
-        Magna.Trace
-            (
-                "InputLanguageUtility::ChangeInputLanguage: "
-                + "language="
-                + inputLanguage
-            );
     }
 
     /// <summary>
@@ -196,7 +194,7 @@ public static class InputLanguageUtility
     /// </summary>
     public static void SwitchToEnglish()
     {
-        ChangeInputLanguage(AmericanEnglishLanguage);
+        ChangeInputLanguage (AmericanEnglishLanguage);
     }
 
     /// <summary>
@@ -204,7 +202,7 @@ public static class InputLanguageUtility
     /// </summary>
     public static void SwitchToRussian()
     {
-        ChangeInputLanguage(RussianLanguage);
+        ChangeInputLanguage (RussianLanguage);
     }
 
     /// <summary>
@@ -234,7 +232,7 @@ public static class InputLanguageUtility
         if (InputLanguageMessageFilter.Instance is null)
         {
             var instance = new InputLanguageMessageFilter();
-            Application.AddMessageFilter(instance);
+            Application.AddMessageFilter (instance);
             InputLanguageMessageFilter.Instance = instance;
         }
     }
@@ -247,7 +245,7 @@ public static class InputLanguageUtility
     {
         if (InputLanguageMessageFilter.Instance is not null)
         {
-            Application.RemoveMessageFilter(InputLanguageMessageFilter.Instance);
+            Application.RemoveMessageFilter (InputLanguageMessageFilter.Instance);
             InputLanguageMessageFilter.Instance = null;
         }
     }

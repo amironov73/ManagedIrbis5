@@ -17,6 +17,8 @@ using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -94,10 +96,10 @@ public static class WebBrowserUtility
             }
             catch (Exception exception)
             {
-                Magna.TraceException
+                Magna.Logger.LogError
                     (
-                        nameof (WebBrowserUtility) + "::" + nameof (PrepareBrowser),
-                        exception
+                        exception,
+                        nameof (WebBrowserUtility) + "::" + nameof (PrepareBrowser)
                     );
                 return false;
             }
