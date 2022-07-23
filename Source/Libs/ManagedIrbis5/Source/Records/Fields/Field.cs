@@ -37,6 +37,8 @@ using AM.Text;
 
 using ManagedIrbis.Infrastructure;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -870,13 +872,17 @@ public class Field
         }
         catch (Exception exception)
         {
-            Magna.TraceException
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (Field) + "::" + nameof (DecodeBody)
+                );
+            Magna.Logger.LogError
                 (
                     nameof (Field) + "::" + nameof (DecodeBody)
-                    + ": " + exception.GetType() + ": " + exception.Message,
-                    exception
+                    + ": bad line: {Line}",
+                    line.ToString()
                 );
-            Magna.Debug (line.ToString());
 
             throw;
         }
@@ -1444,9 +1450,7 @@ public class Field
             char code
         )
     {
-        SubField? subfield;
-
-        while ((subfield = GetFirstSubField (code)) is not null)
+        while (GetFirstSubField (code) is { } subfield)
         {
             Subfields.Remove (subfield);
         }
@@ -1539,7 +1543,7 @@ public class Field
     {
         if (ReadOnly)
         {
-            Magna.Error (nameof (ThrowIfReadOnly));
+            Magna.Logger.LogError (nameof (Field) + "::" + nameof (ThrowIfReadOnly));
 
             throw new ReadOnlyException();
         }

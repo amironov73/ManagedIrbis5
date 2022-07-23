@@ -19,182 +19,183 @@ using System.Diagnostics.CodeAnalysis;
 using AM;
 using AM.Collections;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Валидация и нормализация меток полей.
+/// </summary>
+public static class FieldTag
 {
+    #region Properties
+
     /// <summary>
-    /// Валидация и нормализация меток полей.
+    /// Бросать исключения при валидации?
     /// </summary>
-    public static class FieldTag
+    [ExcludeFromCodeCoverage]
+    public static bool ThrowOnValidate { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    static FieldTag()
     {
-        #region Properties
+        _goodCharacters = new CharSet().AddRange ('0', '9');
+    }
 
-        /// <summary>
-        /// Бросать исключения при валидации?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public static bool ThrowOnValidate { get; set; }
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Construction
+    /// <summary>
+    /// Символы, которые могут встречаться в метке поля.
+    /// </summary>
+    private static readonly CharSet _goodCharacters;
 
-        static FieldTag()
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Проверка метки поля на валидность.
+    /// </summary>
+    public static bool IsValidTag
+        (
+            string? tag
+        )
+    {
+        if (string.IsNullOrWhiteSpace (tag))
         {
-            _goodCharacters = new CharSet().AddRange('0', '9');
+            return false;
         }
 
-        #endregion
+        var result = _goodCharacters.CheckText (tag)
+                     && Normalize (tag) != "0"
+                     && tag.Length < 6; // ???
 
-        #region Private members
+        return result;
+    }
 
-        /// <summary>
-        /// Символы, которые могут встречаться в метке поля.
-        /// </summary>
-        private static readonly CharSet _goodCharacters;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Проверка метки поля на валидность.
-        /// </summary>
-        public static bool IsValidTag
-            (
-                string? tag
-            )
+    /// <summary>
+    /// Нормализация метки поля.
+    /// Удаляет лидирующие нули, если таковые имеются.
+    /// </summary>
+    public static string? Normalize
+        (
+            string? tag
+        )
+    {
+        if (string.IsNullOrEmpty (tag))
         {
-            if (string.IsNullOrWhiteSpace(tag))
-            {
-                return false;
-            }
+            return tag;
+        }
 
-            var result = _goodCharacters.CheckText(tag)
-                         && Normalize(tag) != "0"
-                         && tag.Length < 6; // ???
-
-            return result;
-
-        } // method IsValidTag
-
-        /// <summary>
-        /// Нормализация метки поля.
-        /// Удаляет лидирующие нули, если таковые имеются.
-        /// </summary>
-        public static string? Normalize
-            (
-                string? tag
-            )
+        var result = tag;
+        while (result.Length > 1 && result.StartsWith ("0"))
         {
-            if (string.IsNullOrEmpty(tag))
-            {
-                return tag;
-            }
+            result = result.Substring (1);
+        }
 
-            var result = tag;
-            while (result.Length > 1 && result.StartsWith("0"))
-            {
-                result = result.Substring(1);
-            }
+        return result;
+    }
 
-            return result;
+    /// <summary>
+    /// Проверка метки поля.
+    /// Может выбросить ислкючение,
+    /// если <paramref name="throwOnError"/> установлено в <c>true</c>.
+    /// </summary>
+    public static bool Verify
+        (
+            string? tag,
+            bool throwOnError
+        )
+    {
+        var result = IsValidTag (tag);
 
-        } // method Normalize
-
-        /// <summary>
-        /// Проверка метки поля.
-        /// Может выбросить ислкючение,
-        /// если <paramref name="throwOnError"/> установлено в <c>true</c>.
-        /// </summary>
-        public static bool Verify
-            (
-                string? tag,
-                bool throwOnError
-            )
+        if (!result)
         {
-            var result = IsValidTag(tag);
+            Magna.Logger.LogError
+                (
+                    nameof (FieldTag) + "::" + nameof (Verify)
+                    + ": vefification error: {Tag}",
+                    tag.ToVisibleString()
+                );
 
-            if (!result)
+            if (throwOnError)
             {
-                Magna.Debug
+                throw new VerificationException
                     (
-                        nameof(FieldTag) + "::" + nameof(Verify)
+                        nameof (FieldTag) + "::" + nameof (Verify)
                         + ": "
                         + tag.ToVisibleString()
                     );
-
-                if (throwOnError)
-                {
-                    throw new VerificationException
-                        (
-                            nameof(FieldTag) + "::" + nameof(Verify)
-                            + ": "
-                            + tag.ToVisibleString()
-                        );
-                }
             }
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method Verify
+    /// <summary>
+    /// Проверка метки поля.
+    /// Может выбросить ислкючение,
+    /// если <paramref name="throwOnError"/> установлено в <c>true</c>.
+    /// </summary>
+    public static bool Verify
+        (
+            int tag,
+            bool throwOnError
+        )
+    {
+        var result = tag > 0;
 
-        /// <summary>
-        /// Проверка метки поля.
-        /// Может выбросить ислкючение,
-        /// если <paramref name="throwOnError"/> установлено в <c>true</c>.
-        /// </summary>
-        public static bool Verify
-            (
-                int tag,
-                bool throwOnError
-            )
+        if (!result)
         {
-            var result = tag > 0;
+            Magna.Logger.LogError
+                (
+                    nameof (FieldTag) + "::" + nameof (Verify)
+                    + ": verification error: {Tag}",
+                    tag.ToInvariantString()
+                );
 
-            if (!result)
+            if (throwOnError)
             {
-                Magna.Debug
+                throw new VerificationException
                     (
-                        nameof(FieldTag) + "::" + nameof(Verify)
+                        nameof (FieldTag) + "::" + nameof (Verify)
                         + ": "
                         + tag.ToInvariantString()
                     );
-
-                if (throwOnError)
-                {
-                    throw new VerificationException
-                    (
-                        nameof(FieldTag) + "::" + nameof(Verify)
-                        + ": "
-                        + tag.ToInvariantString()
-                    );
-                }
             }
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method Verify
+    /// <summary>
+    /// Проверка метки поля.
+    /// Может выбросить исключение,
+    /// если <see cref="ThrowOnValidate"/> установлено в <c>true</c>.
+    /// </summary>
+    public static bool Verify (int tag)
+    {
+        return Verify (tag, ThrowOnValidate);
+    }
 
-        /// <summary>
-        /// Проверка метки поля.
-        /// Может выбросить исключение,
-        /// если <see cref="ThrowOnValidate"/> установлено в <c>true</c>.
-        /// </summary>
-        public static bool Verify (int tag) => Verify(tag, ThrowOnValidate);
+    /// <summary>
+    /// Проверка метки поля.
+    /// Может выбросить исключение,
+    /// если <see cref="ThrowOnValidate"/> установлено в <c>true</c>.
+    /// </summary>
+    public static bool Verify (string? tag)
+    {
+        return Verify (tag, ThrowOnValidate);
+    }
 
-        /// <summary>
-        /// Проверка метки поля.
-        /// Может выбросить исключение,
-        /// если <see cref="ThrowOnValidate"/> установлено в <c>true</c>.
-        /// </summary>
-        public static bool Verify(string? tag) => Verify(tag, ThrowOnValidate);
-
-        #endregion
-
-    } // class FieldTag
-
-} // namespace ManagedIrbis
+    #endregion
+}

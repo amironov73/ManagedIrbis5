@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftFunctionManager.cs --
+/* PftFunctionManager.cs -- менеджер функций для PFT
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,184 +19,190 @@ using System.Collections.Generic;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure
+namespace ManagedIrbis.Pft.Infrastructure;
+
+/// <summary>
+/// Менеджер функций для PFT.
+/// </summary>
+public sealed class PftFunctionManager
 {
+    #region Properties
+
     /// <summary>
-    /// Function manager.
+    /// Реестр функций.
     /// </summary>
-    public sealed class PftFunctionManager
+    public Dictionary<string, FunctionDescriptor> Registry { get; }
+        = new (StringComparer.InvariantCultureIgnoreCase);
+
+    /// <summary>
+    /// Встроенные функции.
+    /// </summary>
+    public static PftFunctionManager BuiltinFunctions { get; } = new ();
+
+    /// <summary>
+    /// Функции, определенные пользователем.
+    /// </summary>
+    public static PftFunctionManager UserFunctions { get; } = new ();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Static constructor.
+    /// </summary>
+    static PftFunctionManager()
     {
-        #region Properties
+        StandardFunctions.Register();
+    }
 
-        /// <summary>
-        /// Function registry.
-        /// </summary>
-        public Dictionary<string, FunctionDescriptor> Registry { get; }
-            = new(StringComparer.InvariantCultureIgnoreCase);
+    #endregion
 
-        /// <summary>
-        /// Builtin functions.
-        /// </summary>
-        public static PftFunctionManager BuiltinFunctions { get; } = new();
+    #region Private members
 
-        /// <summary>
-        /// User defined functions.
-        /// </summary>
-        public static PftFunctionManager UserFunctions { get; } = new();
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Construction
-
-        /// <summary>
-        /// Static constructor.
-        /// </summary>
-        static PftFunctionManager()
+    /// <summary>
+    /// Quick add the function.
+    /// </summary>
+    public PftFunctionManager Add
+        (
+            string name,
+            PftFunction function
+        )
+    {
+        var descriptor = new FunctionDescriptor
         {
-            StandardFunctions.Register();
-        }
+            Name = name,
+            Function = function
+        };
 
-        #endregion
+        Registry.Add (name, descriptor);
 
-        #region Private members
+        return this;
+    }
 
-        #endregion
+    /// <summary>
+    /// Execute specified function.
+    /// </summary>
+    public static void ExecuteFunction
+        (
+            string name,
+            PftContext context,
+            PftNode node,
+            PftNode[] arguments
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+        Sure.NotNull (context);
+        Sure.NotNull (node);
 
-        #region Public methods
-
-        /// <summary>
-        /// Quick add the function.
-        /// </summary>
-        public PftFunctionManager Add
-            (
-                string name,
-                PftFunction function
-            )
-        {
-            var descriptor = new FunctionDescriptor
-            {
-                Name = name,
-                Function = function
-            };
-
-            Registry.Add(name, descriptor);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Execute specified function.
-        /// </summary>
-        public static void ExecuteFunction
-            (
-                string name,
-                PftContext context,
-                PftNode node,
-                PftNode[] arguments
-            )
-        {
-            if (!UserFunctions.Registry.TryGetValue
+        if (!UserFunctions.Registry.TryGetValue
                 (
                     name,
                     out FunctionDescriptor? descriptor
                 ))
-            {
-                if (!BuiltinFunctions.Registry.TryGetValue
+        {
+            if (!BuiltinFunctions.Registry.TryGetValue
                     (
                         name,
                         out descriptor
                     ))
-                {
-                    Magna.Error
-                        (
-                            "PftFunctionManager::ExecuteFunction: "
-                            + "unknown function="
-                            + name.ToVisibleString()
-                        );
+            {
+                Magna.Logger.LogError
+                    (
+                        nameof (PftFunctionManager) + "::" + nameof (ExecuteFunction)
+                        + ": unknown function {Name}",
+                        name
+                    );
 
-                    throw new PftSemanticException
-                        (
-                            "unknown function: "
-                            + name
-                        );
-                }
+                throw new PftSemanticException ("unknown function: " + name);
             }
+        }
 
-            descriptor.Function?.Invoke
+        descriptor.Function?.Invoke
+            (
+                context,
+                node,
+                arguments
+            );
+    }
+
+    /// <summary>
+    /// Find specified function.
+    /// </summary>
+    public FunctionDescriptor? FindFunction
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        Registry.TryGetValue (name, out FunctionDescriptor? result);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Have specified function?
+    /// </summary>
+    public bool HaveFunction
+        (
+            string name
+        )
+    {
+        return Registry.ContainsKey (name);
+    }
+
+    /// <summary>
+    /// Регистрация функции.
+    /// </summary>
+    public void RegisterFunction
+        (
+            string name,
+            PftFunction function
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+        Sure.NotNull (function);
+
+        if (name.IsOneOf (PftUtility.GetReservedWords()))
+        {
+            Magna.Logger.LogError
                 (
-                    context,
-                    node,
-                    arguments
+                    nameof (PftFunctionManager) + "::" + nameof (RegisterFunction)
+                    + ": reserved word {Word}",
+                    name.ToVisibleString()
+                );
+
+            throw new PftException ("Reserved word: " + name);
+        }
+
+        if (HaveFunction (name))
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (PftFunctionManager) + "::" + nameof (RegisterFunction)
+                    + ": already registered {Name}",
+                    name.ToVisibleString()
+                );
+
+            throw new PftException
+                (
+                    "Function already registered: " + name
                 );
         }
 
-        /// <summary>
-        /// Find specified function.
-        /// </summary>
-        public FunctionDescriptor? FindFunction
-            (
-                string name
-            )
-        {
-            Registry.TryGetValue(name, out FunctionDescriptor? result);
-
-            return result;
-        }
-
-        /// <summary>
-        /// Have specified function?
-        /// </summary>
-        public bool HaveFunction
-            (
-                string name
-            )
-        {
-            return Registry.ContainsKey(name);
-        }
-
-        /// <summary>
-        /// Register the function.
-        /// </summary>
-        public void RegisterFunction
-            (
-                string name,
-                PftFunction function
-            )
-        {
-            if (name.IsOneOf(PftUtility.GetReservedWords()))
-            {
-                Magna.Error
-                    (
-                        "PftFunctionManager::RegisterFunction: "
-                        + "reserved word="
-                        + name.ToVisibleString()
-                    );
-
-                throw new PftException("Reserved word: " + name);
-            }
-
-            if (HaveFunction(name))
-            {
-                Magna.Error
-                    (
-                        "PftFunctionManager::RegisterFunction: "
-                        + "already registered: "
-                        + name.ToVisibleString()
-                    );
-
-                throw new PftException
-                    (
-                        "Function already registered: " + name
-                    );
-            }
-
-            Add(name, function);
-        }
-
-        #endregion
+        Add (name, function);
     }
+
+    #endregion
 }

@@ -26,289 +26,287 @@ using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Проверяет, выполняется ли указанное условие хотя бы для одного повторения в группе.
+/// </summary>
+public sealed class PftAny
+    : PftCondition
 {
+    #region Properties
+
     /// <summary>
-    /// Проверяет, выполняется ли указанное условие хотя бы для одного повторения в группе.
+    /// Проверяемое условие.
     /// </summary>
-    public sealed class PftAny
-        : PftCondition
+    public PftCondition? InnerCondition { get; set; }
+
+    /// <inheritdoc cref="PftNode.Children" />
+    public override IList<PftNode> Children
     {
-        #region Properties
-
-        /// <summary>
-        /// Проверяемое условие.
-        /// </summary>
-        public PftCondition? InnerCondition { get; set; }
-
-        /// <inheritdoc cref="PftNode.Children" />
-        public override IList<PftNode> Children
+        get
         {
-            get
+            if (ReferenceEquals (_virtualChildren, null))
             {
-                if (ReferenceEquals (_virtualChildren, null))
+                _virtualChildren = new VirtualChildren();
+                if (!ReferenceEquals (InnerCondition, null))
                 {
-                    _virtualChildren = new VirtualChildren();
-                    if (!ReferenceEquals (InnerCondition, null))
+                    var nodes = new List<PftNode>
                     {
-                        var nodes = new List<PftNode>
-                        {
-                            InnerCondition
-                        };
-                        _virtualChildren.SetChildren (nodes);
-                    }
+                        InnerCondition
+                    };
+                    _virtualChildren.SetChildren (nodes);
                 }
+            }
 
-                return _virtualChildren;
-
-            } // get
-
-            [ExcludeFromCodeCoverage]
-            protected set => Magna.Error
-                (
-                    nameof (PftAny) + "::" + nameof (Children)
-                    + ": set value="
-                    + value.ToVisibleString()
-                );
-
-        } // property Children
-
-        /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax => true;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftAny()
-        {
+            return _virtualChildren;
         }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftAny
-            (
-                PftToken token
-            )
-            : base (token)
+        [ExcludeFromCodeCoverage]
+        protected set
         {
-            token.MustBe (PftTokenKind.Any);
-
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftAny
-            (
-                PftCondition condition
-            )
-        {
-            InnerCondition = condition;
-
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private VirtualChildren? _virtualChildren;
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region ICloneable members
-
-        /// <inheritdoc cref="ICloneable.Clone" />
-        public override object Clone()
-        {
-            var result = (PftAny)base.Clone();
-
-            if (!ReferenceEquals (InnerCondition, null))
-            {
-                result.InnerCondition = (PftCondition)InnerCondition.Clone();
-            }
-
-            return result;
-
-        } // method Clone
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.CompareNode" />
-        internal override void CompareNode
-            (
-                PftNode otherNode
-            )
-        {
-            base.CompareNode (otherNode);
-
-            PftSerializationUtility.CompareNodes
+            Magna.Logger.LogError
                 (
-                    InnerCondition,
-                    ((PftAny)otherNode).InnerCondition
+                    nameof (PftAny) + "::" + nameof (Children)
+                    + ": set value={Value}",
+                    value.ToVisibleString()
+                );
+        }
+    }
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax" />
+    public override bool ExtendedSyntax => true;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftAny()
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftAny
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.Any);
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftAny
+        (
+            PftCondition condition
+        )
+    {
+        Sure.NotNull (condition);
+
+        InnerCondition = condition;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private VirtualChildren? _virtualChildren;
+
+    #endregion
+
+    #region ICloneable members
+
+    /// <inheritdoc cref="ICloneable.Clone" />
+    public override object Clone()
+    {
+        var result = (PftAny) base.Clone();
+
+        if (!ReferenceEquals (InnerCondition, null))
+        {
+            result.InnerCondition = (PftCondition)InnerCondition.Clone();
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.CompareNode" />
+    internal override void CompareNode
+        (
+            PftNode otherNode
+        )
+    {
+        Sure.NotNull (otherNode);
+
+        base.CompareNode (otherNode);
+
+        PftSerializationUtility.CompareNodes
+            (
+                InnerCondition,
+                ((PftAny)otherNode).InnerCondition
+            );
+    }
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        base.Deserialize (reader);
+
+        InnerCondition = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        if (context.CurrentGroup is not null)
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (PftAny) + "::" + nameof (Execute)
+                    + ": nested group detected"
                 );
 
-        } // method CompareNode
+            throw new PftSemanticException ("Nested group");
+        }
 
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
+        var condition = InnerCondition.ThrowIfNull();
+
+        var group = new PftGroup();
+
+        try
         {
-            base.Deserialize (reader);
+            context.CurrentGroup = group;
+            context.VMonitor = false;
 
-            InnerCondition = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+            OnBeforeExecution (context);
 
-        } // method Deserialize
+            var value = false;
 
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            if (context.CurrentGroup != null)
+            for (
+                    context.Index = 0;
+                    context.Index < PftConfig.MaxRepeat;
+                    context.Index++
+                )
             {
-                Magna.Error
-                    (
-                        "PftAny::Execute: "
-                        + "nested group detected"
-                    );
-
-                throw new PftSemanticException ("Nested group");
-            }
-
-            var condition = InnerCondition
-                .ThrowIfNull ("Condition");
-
-            var group = new PftGroup();
-
-            try
-            {
-                context.CurrentGroup = group;
                 context.VMonitor = false;
 
-                OnBeforeExecution (context);
+                condition.Execute (context);
 
-                var value = false;
-
-                for (
-                        context.Index = 0;
-                        context.Index < PftConfig.MaxRepeat;
-                        context.Index++
-                    )
+                if (!context.VMonitor || context.BreakFlag)
                 {
-                    context.VMonitor = false;
-
-                    condition.Execute (context);
-
-                    if (!context.VMonitor || context.BreakFlag)
-                    {
-                        break;
-                    }
-
-                    value = condition.Value;
-                    if (value)
-                    {
-                        break;
-                    }
+                    break;
                 }
 
-                Value = value;
-
-                OnAfterExecution (context);
-            }
-            finally
-            {
-                context.CurrentGroup = null;
+                value = condition.Value;
+                if (value)
+                {
+                    break;
+                }
             }
 
-        } // method Executute
+            Value = value;
 
-        /// <inheritdoc cref="PftNode.GetNodeInfo" />
-        public override PftNodeInfo GetNodeInfo()
+            OnAfterExecution (context);
+        }
+        finally
         {
-            var result = new PftNodeInfo
-            {
-                Node = this,
-                Name = SimplifyTypeName (GetType().Name)
-            };
+            context.CurrentGroup = null;
+        }
+    }
 
-            if (!ReferenceEquals (InnerCondition, null))
-            {
-                result.Children.Add (InnerCondition.GetNodeInfo());
-            }
-
-            return result;
-
-        } // method GetNodeInfo
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
+    /// <inheritdoc cref="PftNode.GetNodeInfo" />
+    public override PftNodeInfo GetNodeInfo()
+    {
+        var result = new PftNodeInfo
         {
-            printer
-                .SingleSpace()
-                .Write ("any(");
-            InnerCondition?.PrettyPrint (printer);
-            printer.Write (')');
+            Node = this,
+            Name = SimplifyTypeName (GetType().Name)
+        };
 
-        } // method PrettyPrint
-
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
+        if (!ReferenceEquals (InnerCondition, null))
         {
-            base.Serialize (writer);
+            result.Children.Add (InnerCondition.GetNodeInfo());
+        }
 
-            PftSerializer.SerializeNullable (writer, InnerCondition);
+        return result;
+    }
 
-        } // method Serialize
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
 
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText() => false;
+        printer
+            .SingleSpace()
+            .Write ("any(");
+        InnerCondition?.PrettyPrint (printer);
+        printer.Write (')');
+    }
 
-        #endregion
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        #region Object members
+        base.Serialize (writer);
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var builder = StringBuilderPool.Shared.Get();
-            builder.Append ("any(");
-            PftUtility.NodesToText (builder, Children);
-            builder.Append (')');
+        PftSerializer.SerializeNullable (writer, InnerCondition);
+    }
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    [DebuggerStepThrough]
+    protected internal override bool ShouldSerializeText() => false;
 
-            return result;
+    #endregion
 
-        } // method ToString
+    #region Object members
 
-        #endregion
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ("any(");
+        PftUtility.NodesToText (builder, Children);
+        builder.Append (')');
 
-    } // class PftAny
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+        return result;
+    }
+
+    #endregion
+}

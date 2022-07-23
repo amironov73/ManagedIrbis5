@@ -18,80 +18,79 @@
 using AM;
 using AM.Collections;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure
+namespace ManagedIrbis.Pft.Infrastructure;
+
+/// <summary>
+/// Форматный выход.
+/// </summary>
+public static class FormatExit
 {
+    #region Properties
+
     /// <summary>
-    /// Форматный выход.
+    /// Реестр форматных выходов.
     /// </summary>
-    public static class FormatExit
+    public static CaseInsensitiveDictionary<IFormatExit> Registry { get; }
+
+    #endregion
+
+    #region Construction
+
+    static FormatExit()
     {
-        #region Properties
+        Registry = new CaseInsensitiveDictionary<IFormatExit>();
 
-        /// <summary>
-        /// Registry.
-        /// </summary>
-        public static CaseInsensitiveDictionary<IFormatExit> Registry
+        var unifor = new Unifor();
+        Registry.Add ("unifor", unifor);
+        Registry.Add ("uf", unifor);
+
+        var umarci = new Umarci();
+        Registry.Add ("umarci", umarci);
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Execute the expression on the given context.
+    /// </summary>
+    public static void Execute
+        (
+            PftContext context,
+            PftNode? node,
+            string name,
+            string? expression
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNullNorEmpty (name);
+
+        if (!Registry.TryGetValue (name, out var formatExit))
         {
-            get; private set;
-        }
-
-        #endregion
-
-        #region Construction
-
-        static FormatExit()
-        {
-            Registry = new CaseInsensitiveDictionary<IFormatExit>();
-
-            Unifor unifor = new Unifor();
-            Registry.Add("unifor", unifor);
-            Registry.Add("uf", unifor);
-
-            Umarci umarci = new Umarci();
-            Registry.Add("umarci", umarci);
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Execute the expression on the given context.
-        /// </summary>
-        public static void Execute
-            (
-                PftContext context,
-                PftNode? node,
-                string name,
-                string? expression
-            )
-        {
-            if (!Registry.TryGetValue(name, out IFormatExit? format))
-            {
-                Magna.Error
-                    (
-                        "FormatExit::Execute: "
-                        + "unknown name="
-                        + name.ToVisibleString()
-                    );
-
-                throw new PftSemanticException("unknown format exit: " + name);
-            }
-
-            format.Execute
+            Magna.Logger.LogError
                 (
-                    context,
-                    node,
-                    expression
+                    nameof (FormatExit) + "::" + nameof (Execute)
+                    + ": unknown name {Name}",
+                    name
                 );
+
+            throw new PftSemanticException ("unknown format exit: " + name);
         }
 
-        #endregion
+        formatExit.Execute
+            (
+                context,
+                node,
+                expression
+            );
+    }
 
-    } // class FormatExit
-
-} // namespace ManagedIrbis.Pft.Infrastructure
+    #endregion
+}

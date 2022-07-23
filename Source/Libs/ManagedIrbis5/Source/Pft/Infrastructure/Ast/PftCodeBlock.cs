@@ -20,189 +20,198 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+//
+// Предоставляет возможность вставить в PFT-скрипт
+// фрагмент кода на C#. Выглядит это так:
+//
+// v100, v200,
+// {{{context.Write(node, "Hello, world!");}}}
+// v300, v400
+//
+// Внутри C#-фрагмента доступны следующие
+// глобальные переменные
+//
+// * context - контекст форматирования
+// * node - текущая нода с C#-кодом
+// * record - текущая MARC-запись
+//
+// В C# заранее импортированы пространства имен
+// System и ManagedIrbis
+//
+
+/// <summary>
+/// Выполнение скриптов на C#.
+/// </summary>
+public sealed class PftCodeBlock
+    : PftNode
 {
-    //
-    // Предоставляет возможность вставить в PFT-скрипт
-    // фрагмент кода на C#. Выглядит это так:
-    //
-    // v100, v200,
-    // {{{context.Write(node, "Hello, world!");}}}
-    // v300, v400
-    //
-    // Внутри C#-фрагмента доступны следующие
-    // глобальные переменные
-    //
-    // * context - контекст форматирования
-    // * node - текущая нода с C#-кодом
-    // * record - текущая MARC-запись
-    //
-    // В C# заранее импортированы пространства имен
-    // System и ManagedIrbis
-    //
+    #region Nested classes
 
     /// <summary>
-    /// Выполнение скриптов на C#.
+    /// Это специальный класс, для глобальных переменных,
+    /// доступных из скрипта.
     /// </summary>
-    public sealed class PftCodeBlock
-        : PftNode
+
+    // ReSharper disable MemberCanBePrivate.Global
+    public class Globals
     {
-        #region Nested classes
+        // ReSharper disable InconsistentNaming
+        // ReSharper disable NotAccessedField.Global
 
         /// <summary>
-        /// Это специальный класс, для глобальных переменных,
-        /// доступных из скрипта.
+        /// Указатель на текущую ноду,
+        /// в которой сосредоточен C#-код.
         /// </summary>
-        // ReSharper disable MemberCanBePrivate.Global
-        public class Globals
+        public PftNode? Node;
+
+        /// <summary>
+        /// Контекст форматирования.
+        /// </summary>
+        public PftContext? Context;
+
+        /// <summary>
+        /// Текущая MARC-запись.
+        /// </summary>
+        public Record? Record;
+
+        // ReSharper restore NotAccessedField.Global
+        // ReSharper restore InconsistentNaming
+    }
+
+    // ReSharper restore MemberCanBePrivate.Global
+
+    #endregion
+
+    #region Properties
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax" />
+    public override bool ExtendedSyntax => true;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftCodeBlock()
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftCodeBlock
+        (
+            string text
+        )
+    {
+        Text = text;
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftCodeBlock
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.TripleCurly);
+
+        if (string.IsNullOrEmpty (token.Text))
         {
-            // ReSharper disable InconsistentNaming
-            // ReSharper disable NotAccessedField.Global
+            Magna.Logger.LogError
+                (
+                    nameof (PftCodeBlock) + "::Constructor"
+                    + ": token text not set"
+                );
 
-            /// <summary>
-            /// Указатель на текущую ноду,
-            /// в которой сосредоточен C#-код.
-            /// </summary>
-            public PftNode? Node;
-
-            /// <summary>
-            /// Контекст форматирования.
-            /// </summary>
-            public PftContext? Context;
-
-            /// <summary>
-            /// Текущая MARC-запись.
-            /// </summary>
-            public Record? Record;
-
-            // ReSharper restore NotAccessedField.Global
-            // ReSharper restore InconsistentNaming
+            throw new PftSyntaxException (token);
         }
-        // ReSharper restore MemberCanBePrivate.Global
 
-        #endregion
+        Text = token.Text;
+    }
 
-        #region Properties
+    #endregion
 
-        /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax => true;
+    #region PftNode members
 
-        #endregion
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
 
-        #region Construction
+        Magna.Logger.LogTrace (nameof (PftCodeBlock) + "::" + nameof (Execute) + ": enter");
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftCodeBlock()
+        OnBeforeExecution (context);
+
+        var text = Text;
+        if (!string.IsNullOrEmpty (text))
         {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftCodeBlock
-            (
-                string text
-            )
-        {
-            Text = text;
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftCodeBlock
-            (
-                PftToken token
-            )
-            : base(token)
-        {
-            token.MustBe(PftTokenKind.TripleCurly);
-
-            if (string.IsNullOrEmpty(token.Text))
+            var globals = new Globals
             {
-                Magna.Error
-                    (
-                        "PftCodeBlock::Constructor: "
-                        + "token text not set"
-                    );
+                Node = this,
+                Context = context,
+                Record = context.Record.ThrowIfNull (nameof (context.Record))
+            };
 
-                throw new PftSyntaxException(token);
-            }
+            var scriptOptions = ScriptOptions.Default
+                .AddImports ("System")
+                .AddReferences (typeof (PftCodeBlock).Assembly)
+                .AddImports ("ManagedIrbis");
 
-            Text = token.Text;
+            CSharpScript.RunAsync
+                (
+                    Text,
+                    scriptOptions,
+                    globals
+                );
         }
 
-        #endregion
+        OnAfterExecution (context);
 
-        #region PftNode members
+        Magna.Logger.LogTrace (nameof (PftCodeBlock) + "::" + nameof (Execute) + ": leave");
+    }
 
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
 
-            Magna.Trace("PftCodeBlock::Execute: compile method");
+        printer.EatWhitespace();
+        printer.EatNewLine();
+        printer
+            .WriteLine()
+            .WriteIndentIfNeeded()
+            .Write ("{{{")
+            .Write (Text)
+            .WriteLine ("}}}");
+    }
 
-            var text = Text;
-            if (!string.IsNullOrEmpty(text))
-            {
-                var globals = new Globals
-                {
-                    Node = this,
-                    Context = context,
-                    Record = context.Record.ThrowIfNull(nameof(context.Record))
-                };
+    #endregion
 
-                var scriptOptions = ScriptOptions.Default
-                    .AddImports("System")
-                    .AddReferences(typeof(PftCodeBlock).Assembly)
-                    .AddImports("ManagedIrbis");
+    #region Object members
 
-                CSharpScript.RunAsync
-                    (
-                        Text,
-                        scriptOptions,
-                        globals
-                    );
+    /// <inheritdoc cref="object.ToString()" />
+    public override string ToString()
+    {
+        return "{{{" + Text + "}}}";
+    }
 
-            }
-
-            OnAfterExecution(context);
-        }
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer.EatWhitespace();
-            printer.EatNewLine();
-            printer
-                .WriteLine()
-                .WriteIndentIfNeeded()
-                .Write("{{{")
-                .Write(Text)
-                .WriteLine("}}}");
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString()" />
-        public override string ToString() => "{{{" + Text + "}}}";
-
-        #endregion
-
-    } // class PftCodeBlock
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #endregion
+}

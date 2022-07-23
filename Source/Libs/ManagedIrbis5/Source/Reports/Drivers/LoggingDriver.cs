@@ -9,7 +9,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* LoggingDriver.cs --
+/* LoggingDriver.cs -- драйвер логирования для отладки отчета
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,156 +17,186 @@
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Reports
+namespace ManagedIrbis.Reports;
+
+/// <summary>
+/// Драйвер логирования для отладки отчета.
+/// </summary>
+public sealed class LoggingDriver
+    : ReportDriver
 {
+    #region Properties
+
     /// <summary>
-    /// Logging driver for report debugging.
+    /// Внутренний драйвер.
     /// </summary>
-    public sealed class LoggingDriver
-        : ReportDriver
+    public ReportDriver InnerDriver { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public LoggingDriver
+        (
+            ReportDriver innerDriver
+        )
     {
-        #region Properties
+        Sure.NotNull (innerDriver);
 
-        /// <summary>
-        /// Inner driver.
-        /// </summary>
-        public ReportDriver InnerDriver { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public LoggingDriver
-            (
-                ReportDriver innerDriver
-            )
-        {
-            InnerDriver = innerDriver;
-        }
-
-        #endregion
-
-        #region ReportDriver members
-
-        /// <inheritdoc cref="ReportDriver.BeginCell"/>
-        public override void BeginCell
-            (
-                ReportContext context,
-                ReportCell cell
-            )
-        {
-            Magna.Trace(string.Format
-                (
-                    "ReportDriver.BeginCell: {0}",
-                    cell
-                ));
-
-            InnerDriver.BeginCell(context, cell);
-        }
-
-        /// <inheritdoc cref="ReportDriver.BeginDocument"/>
-        public override void BeginDocument
-            (
-                ReportContext context,
-                IrbisReport report
-            )
-        {
-            Magna.Trace(string.Format
-                (
-                    "ReportDriver.BeginDocument: {0}",
-                    report
-                ));
-
-            InnerDriver.BeginDocument(context, report);
-        }
-
-        /// <inheritdoc cref="ReportDriver.BeginRow"/>
-        public override void BeginRow
-            (
-                ReportContext context,
-                ReportBand band
-            )
-        {
-            Magna.Trace(string.Format
-                (
-                    "ReportDriver.BeginRow: {0}",
-                    band
-                ));
-
-            InnerDriver.BeginRow(context, band);
-        }
-
-        /// <inheritdoc cref="ReportDriver.EndCell"/>
-        public override void EndCell
-            (
-                ReportContext context,
-                ReportCell cell
-            )
-        {
-            Magna.Trace(string.Format
-                (
-                    "ReportDriver.EndCell: {0}",
-                    cell
-                ));
-
-            InnerDriver.EndCell(context, cell);
-        }
-
-        /// <inheritdoc cref="ReportDriver.EndDocument"/>
-        public override void EndDocument
-            (
-                ReportContext context,
-                IrbisReport report
-            )
-        {
-            Magna.Trace(string.Format
-                (
-                    "ReportDriver.EndDocument: {0}",
-                    report
-                ));
-
-            InnerDriver.EndDocument(context, report);
-        }
-
-        /// <inheritdoc cref="ReportDriver.EndRow"/>
-        public override void EndRow
-            (
-                ReportContext context,
-                ReportBand band
-            )
-        {
-            Magna.Trace(string.Format
-                (
-                    "ReportDriver.EndRow: {0}",
-                    band
-                ));
-
-            InnerDriver.EndRow(context, band);
-        }
-
-        /// <inheritdoc cref="ReportDriver.Write"/>
-        public override void Write
-            (
-                ReportContext context,
-                string? text
-            )
-        {
-            Magna.Trace(string.Format
-                (
-                    "ReportDriver.Write: {0}",
-                    text
-                ));
-
-            InnerDriver.Write(context, text);
-        }
-
-        #endregion
+        InnerDriver = innerDriver;
     }
+
+    #endregion
+
+    #region ReportDriver members
+
+    /// <inheritdoc cref="ReportDriver.BeginCell"/>
+    public override void BeginCell
+        (
+            ReportContext context,
+            ReportCell cell
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (cell);
+
+        Magna.Logger.LogTrace
+            (
+                nameof (LoggingDriver) + "::" + nameof (BeginCell)
+                + ": {Cell}",
+                cell
+            );
+
+        InnerDriver.BeginCell (context, cell);
+    }
+
+    /// <inheritdoc cref="ReportDriver.BeginDocument"/>
+    public override void BeginDocument
+        (
+            ReportContext context,
+            IrbisReport report
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (report);
+
+        Magna.Logger.LogTrace
+            (
+                nameof (LoggingDriver) + "::" + nameof (BeginDocument)
+                + ": {Report}",
+                report
+            );
+
+        InnerDriver.BeginDocument (context, report);
+    }
+
+    /// <inheritdoc cref="ReportDriver.BeginRow"/>
+    public override void BeginRow
+        (
+            ReportContext context,
+            ReportBand band
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (band);
+
+        Magna.Logger.LogTrace
+            (
+                nameof (LoggingDriver) + "::" + nameof (BeginRow)
+                + ": {Band}",
+                band
+            );
+
+        InnerDriver.BeginRow (context, band);
+    }
+
+    /// <inheritdoc cref="ReportDriver.EndCell"/>
+    public override void EndCell
+        (
+            ReportContext context,
+            ReportCell cell
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (cell);
+
+        Magna.Logger.LogTrace
+            (
+                nameof (LoggingDriver) + "::" + nameof (EndCell)
+                + ": {Cell}",
+                cell
+            );
+
+        InnerDriver.EndCell (context, cell);
+    }
+
+    /// <inheritdoc cref="ReportDriver.EndDocument"/>
+    public override void EndDocument
+        (
+            ReportContext context,
+            IrbisReport report
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (report);
+
+        Magna.Logger.LogTrace
+            (
+                nameof (LoggingDriver) + "::" + nameof (EndDocument)
+                + ": {Report}",
+                report
+            );
+
+        InnerDriver.EndDocument (context, report);
+    }
+
+    /// <inheritdoc cref="ReportDriver.EndRow"/>
+    public override void EndRow
+        (
+            ReportContext context,
+            ReportBand band
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (band);
+
+        Magna.Logger.LogTrace
+            (
+                nameof (LoggingDriver) + "::" + nameof (EndRow)
+                + ": {Band}",
+                band
+            );
+
+        InnerDriver.EndRow (context, band);
+    }
+
+    /// <inheritdoc cref="ReportDriver.Write"/>
+    public override void Write
+        (
+            ReportContext context,
+            string? text
+        )
+    {
+        Sure.NotNull (context);
+
+        Magna.Logger.LogTrace
+            (
+                nameof (LoggingDriver) + "::" + nameof (Write)
+                + ": {Text}",
+                text
+            );
+
+        InnerDriver.Write (context, text);
+    }
+
+    #endregion
 }

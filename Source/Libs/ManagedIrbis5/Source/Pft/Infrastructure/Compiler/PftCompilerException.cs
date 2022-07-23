@@ -7,56 +7,60 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftCompilerException.cs --
+/* PftCompilerException.cs -- исключение, выбрасываемое компилятором PFT
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Compiler
+namespace ManagedIrbis.Pft.Infrastructure.Compiler;
+
+/// <summary>
+/// Исключение, выбрасываемое компилятором PFT.
+/// </summary>
+public sealed class PftCompilerException
+    : PftException
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию
     /// </summary>
-    public sealed class PftCompilerException
-        : PftException
+    public PftCompilerException()
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region Object members
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftCompilerException
+        (
+            string message
+        )
+        : base (message)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftCompilerException
+        (
+            string message,
+            Exception innerException
+        )
+        : base (message, innerException)
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
 }

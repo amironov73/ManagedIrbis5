@@ -26,218 +26,222 @@ using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Readers
+namespace ManagedIrbis.Readers;
+
+/// <summary>
+/// Информация о кафедре обслуживания.
+/// </summary>
+[XmlRoot ("chair")]
+[DebuggerDisplay ("{Code} {Title}")]
+public sealed class ChairInfo
+    : IHandmadeSerializable
 {
+    #region Constants
+
     /// <summary>
-    /// Информация о кафедре обслуживания.
+    /// Имя меню с кафедрами по умолчанию.
     /// </summary>
-    [XmlRoot("chair")]
-    [DebuggerDisplay("{Code} {Title}")]
-    public sealed class ChairInfo
-        : IHandmadeSerializable
+    public const string ChairMenu = "kv.mnu";
+
+    /// <summary>
+    /// Имя меню с местами хранения по умолчанию.
+    /// </summary>
+    public const string PlacesMenu = "mhr.mnu";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Код.
+    /// </summary>
+    [XmlAttribute ("code")]
+    [JsonPropertyName ("code")]
+    public string? Code { get; set; }
+
+    /// <summary>
+    /// Название.
+    /// </summary>
+    [XmlAttribute ("title")]
+    [JsonPropertyName ("title")]
+    public string? Title { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ChairInfo()
     {
-        #region Constants
+    }
 
-        /// <summary>
-        /// Имя меню с кафедрами по умолчанию.
-        /// </summary>
-        public const string ChairMenu = "kv.mnu";
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="code">Chair code.</param>
+    public ChairInfo
+        (
+            string code
+        )
+    {
+        Code = code;
+    }
 
-        /// <summary>
-        /// Имя меню с местами хранения по умолчанию.
-        /// </summary>
-        public const string PlacesMenu = "mhr.mnu";
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="code">Chair code.</param>
+    /// <param name="title">Chair title.</param>
+    public ChairInfo
+        (
+            string code,
+            string title
+        )
+    {
+        Code = code;
+        Title = title;
+    }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Public methods
 
-        /// <summary>
-        /// Код.
-        /// </summary>
-        [XmlAttribute("code")]
-        [JsonPropertyName("code")]
-        public string? Code { get; set; }
+    /// <summary>
+    /// Разбор текста меню-файла.
+    /// </summary>
+    public static ChairInfo[] Parse
+        (
+            string? text,
+            bool addAllItem
+        )
+    {
+        text ??= string.Empty;
 
-        /// <summary>
-        /// Название.
-        /// </summary>
-        [XmlAttribute("title")]
-        [JsonPropertyName("title")]
-        public string? Title { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ChairInfo()
+        var result = new List<ChairInfo>();
+        var lines = text.SplitLines();
+        for (var i = 0; i < lines.Length; i += 2)
         {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="code">Chair code.</param>
-        public ChairInfo
-            (
-                string code
-            )
-        {
-            Code = code;
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="code">Chair code.</param>
-        /// <param name="title">Chair title.</param>
-        public ChairInfo
-            (
-                string code,
-                string title
-            )
-        {
-            Code = code;
-            Title = title;
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Разбор текста меню-файла.
-        /// </summary>
-        public static ChairInfo[] Parse
-            (
-                string text,
-                bool addAllItem
-            )
-        {
-            var result = new List<ChairInfo>();
-            var lines = text.SplitLines();
-            for (var i = 0; i < lines.Length; i += 2)
+            if (lines[i].StartsWith ("*"))
             {
-                if (lines[i].StartsWith("*"))
-                {
-                    break;
-                }
-
-                var item = new ChairInfo
-                    {
-                        Code = lines[i],
-                        Title = lines[i + 1]
-                    };
-                result.Add(item);
+                break;
             }
 
-            if (addAllItem)
+            var item = new ChairInfo
             {
-                result.Add
-                    (
-                        new ChairInfo
-                            {
-                                Code = "*",
-                                Title = "Все подразделения"
-                            }
-                    );
-            }
+                Code = lines[i],
+                Title = lines[i + 1]
+            };
+            result.Add (item);
+        }
 
-            return result
-                .OrderBy(item => item.Code)
-                .ToArray();
-        } // method Parse
-
-        /// <summary>
-        /// Загрузка перечня кафедр обслуживания с сервера.
-        /// </summary>
-        public static ChairInfo[] Read
-            (
-                ISyncProvider connection,
-                string fileName = ChairMenu,
-                bool addAllItem = true
-            )
+        if (addAllItem)
         {
-            var specification = new FileSpecification
-                {
-                    Path = IrbisPath.MasterFile,
-                    Database = connection.Database,
-                    FileName = fileName
-                };
-            var content = connection.ReadTextFile
+            result.Add
                 (
-                    specification
+                    new ChairInfo
+                    {
+                        Code = "*",
+                        Title = "Все подразделения"
+                    }
+                );
+        }
+
+        return result
+            .OrderBy (item => item.Code)
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Загрузка перечня кафедр обслуживания с сервера.
+    /// </summary>
+    public static ChairInfo[] Read
+        (
+            ISyncProvider connection,
+            string fileName = ChairMenu,
+            bool addAllItem = true
+        )
+    {
+        Sure.NotNull (connection);
+        Sure.NotNullNorEmpty (fileName);
+
+        var specification = new FileSpecification
+        {
+            Path = IrbisPath.MasterFile,
+            Database = connection.Database,
+            FileName = fileName
+        };
+        var content = connection.ReadTextFile (specification);
+
+        if (string.IsNullOrEmpty (content))
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (ChairInfo) + "::" + nameof (Read)
+                    + ": file is missing or empty: {FileName}",
+                    fileName
                 );
 
-            if (string.IsNullOrEmpty(content))
-            {
-                Magna.Error
-                    (
-                        "ChairInfo::ReadAsync: "
-                        + "file is missing or empty: "
-                        + fileName
-                    );
-
-                throw new IrbisException();
-            }
-
-            var result = Parse(content, addAllItem);
-
-            return result;
-
-        } // method ReadAsync
-
-        /// <summary>
-        /// Should serialize the <see cref="Title"/> field?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeTitle()
-        {
-            return !string.IsNullOrEmpty(Title);
+            // throw new IrbisException($"file is missing or empty {fileName}");
         }
 
-        #endregion
+        var result = Parse (content, addAllItem);
 
-        #region IHandmadeSerializable
+        return result;
+    }
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WriteNullable(Code);
-            writer.WriteNullable(Title);
-        } // method SaveToStream
+    /// <summary>
+    /// Should serialize the <see cref="Title"/> field?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public bool ShouldSerializeTitle() => !string.IsNullOrEmpty (Title);
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Code = reader.ReadNullableString();
-            Title = reader.ReadNullableString();
-        } // method RestoreFromStream
+    #endregion
 
-        #endregion
+    #region IHandmadeSerializable
 
-        #region Object members
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() =>
-            string.IsNullOrEmpty(Title) ? Code.ToVisibleString()
-                : $"{Code.ToVisibleString()} - {Title.ToVisibleString()}";
+        writer.WriteNullable (Code);
+        writer.WriteNullable (Title);
+    }
 
-        #endregion
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
 
-    } // class ChairInfo
+        Code = reader.ReadNullableString();
+        Title = reader.ReadNullableString();
+    }
 
-} // namespace ManagedIrbis.Readers
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return string.IsNullOrEmpty (Title)
+            ? Code.ToVisibleString()
+            : $"{Code.ToVisibleString()} - {Title.ToVisibleString()}";
+    }
+
+    #endregion
+}

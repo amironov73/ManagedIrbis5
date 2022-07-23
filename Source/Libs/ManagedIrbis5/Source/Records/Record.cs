@@ -34,6 +34,8 @@ using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Records;
 
+using Microsoft.Extensions.Logging;
+
 using static ManagedIrbis.RecordStatus;
 
 #endregion
@@ -525,7 +527,11 @@ public sealed class Record
         catch (Exception exception)
         {
             // response.DebugUtf(Console.Error);
-            Magna.Error (nameof (Record) + "::" + nameof (Decode));
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (Record) + "::" + nameof (Decode)
+                );
 
             throw new IrbisException
                 (
@@ -600,10 +606,10 @@ public sealed class Record
         }
         catch (Exception exception)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
+                    exception,
                     nameof (Record) + "::" + nameof (Decode)
-                    + ": " + exception.GetType() + ": " + exception.Message
                 );
 
             Console.Error.WriteLine
@@ -889,8 +895,9 @@ public sealed class Record
             int tag
         )
     {
-        Field? field;
-        while ((field = GetField (tag)) is not null)
+        Sure.Positive (tag);
+
+        while (GetField (tag) is { } field)
         {
             Fields.Remove (field);
         }

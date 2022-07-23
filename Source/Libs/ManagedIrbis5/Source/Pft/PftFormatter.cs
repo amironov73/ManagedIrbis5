@@ -23,177 +23,199 @@ using AM;
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Providers;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft
+namespace ManagedIrbis.Pft;
+
+/// <summary>
+/// Временная заглушка для форматтера.
+/// </summary>
+public class PftFormatter
+    : IPftFormatter
 {
+    #region Properties
+
     /// <summary>
-    /// Временная заглушка для форматтера
+    /// Сколько времени заняло форматирование.
     /// </summary>
-    public class PftFormatter
-        : IPftFormatter
+    public TimeSpan Elapsed { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftFormatter()
+        : this (new PftContext (null))
     {
-        #region Properties
+    }
 
-        /// <summary>
-        /// Сколько времени заняло форматирование.
-        /// </summary>
-        public TimeSpan Elapsed { get; private set; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="context">Корневой контекст.</param>
+    public PftFormatter
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
 
-        #endregion
+        Context = context;
+    }
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public PftFormatter()
-            : this (new PftContext(null))
+    #region IPftFormatter members
+
+    /// <inheritdoc cref="IPftFormatter.Program"/>
+    public PftProgram? Program { get; set; }
+
+    /// <inheritdoc cref="IPftFormatter.SupportsExtendedSyntax"/>
+    public virtual bool SupportsExtendedSyntax { get; }
+
+    /// <summary>
+    /// Контекст, в котором работает форматтер.
+    /// </summary>
+    public PftContext Context { get; set; }
+
+    /// <summary>
+    /// Нормальный результат расформатирования.
+    /// </summary>
+    public string Output => Context.Text;
+
+    /// <summary>
+    /// Поток ошибок.
+    /// </summary>
+    public string Error => Context.Output.ErrorText;
+
+    /// <summary>
+    /// Поток предупреждений.
+    /// </summary>
+    public string Warning => Context.Output.WarningText;
+
+    /// <summary>
+    /// Have error?
+    /// </summary>
+    public bool HaveError => Context.Output.HaveError;
+
+    /// <summary>
+    /// Have warning.
+    /// </summary>
+    public bool HaveWarning => Context.Output.HaveWarning;
+
+    /// <summary>
+    /// Форматирование указанной записи.
+    /// </summary>
+    public virtual string FormatRecord
+        (
+            Record? record
+        )
+    {
+        if (Program is null)
         {
+            Magna.Logger.LogError
+                (
+                    nameof (PftFormatter) + "::" + nameof (FormatRecord)
+                    + ": program was not set"
+                );
+
+            throw new PftException ("Program was not set");
         }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="context">Корневой контекст.</param>
-        public PftFormatter
-            (
-                PftContext context
-            )
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        Context.ClearAll();
+        Context.Record = record;
+        Context.Procedures = Program.Procedures;
+        Program.Execute (Context);
+
+        var result = Context.GetProcessedOutput();
+
+        stopwatch.Stop();
+        Elapsed = stopwatch.Elapsed;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Форматирование записи с указанным MFN.
+    /// </summary>
+    public virtual string FormatRecord
+        (
+            int mfn
+        )
+    {
+        Sure.Positive (mfn);
+
+        return FormatRecord (Context.Provider.ReadRecord (mfn));
+    }
+
+    /// <summary>
+    /// Форматирование записей с указанными MFN.
+    /// </summary>
+    public virtual string[] FormatRecords
+        (
+            IEnumerable<int> mfns
+        )
+    {
+        Sure.NotNull ((object?) mfns);
+
+        var result = new List<string>();
+
+        // TODO: сделать форматирование пачками
+
+        foreach (var mfn in mfns)
         {
-            Context = context;
+            var text = FormatRecord (mfn);
+            result.Add (text);
         }
 
-        #endregion
+        return result.ToArray();
+    }
 
-        #region IPftFormatter members
+    /// <summary>
+    /// Разбор программы.
+    /// </summary>
+    public virtual void ParseProgram
+        (
+            string source
+        )
+    {
+        Sure.NotNull (source);
 
-        /// <inheritdoc cref="IPftFormatter.Program"/>
-        public PftProgram? Program { get; set; }
+        Program = PftUtility.CompileProgram (source);
+    }
 
-        /// <inheritdoc cref="IPftFormatter.SupportsExtendedSyntax"/>
-        public virtual bool SupportsExtendedSyntax { get; }
+    /// <summary>
+    /// Установка провайдера.
+    /// </summary>
+    public virtual void SetProvider
+        (
+            ISyncProvider provider
+        )
+    {
+        Sure.NotNull (provider);
 
-        /// <summary>
-        /// Контекст, в котором работает форматтер.
-        /// </summary>
-        public PftContext Context { get; set; }
+        Context.SetProvider (provider);
+    }
 
-        /// <summary>
-        /// Нормальный результат расформатирования.
-        /// </summary>
-        public string Output => Context.Text;
+    #endregion
 
-        /// <summary>
-        /// Поток ошибок.
-        /// </summary>
-        public string Error => Context.Output.ErrorText;
+    #region IDisposable members
 
-        /// <summary>
-        /// Поток предупреждений.
-        /// </summary>
-        public string Warning => Context.Output.WarningText;
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public virtual void Dispose()
+    {
+        // TODO: implement
+    }
 
-        /// <summary>
-        /// Have error?
-        /// </summary>
-        public bool HaveError => Context.Output.HaveError;
-
-        /// <summary>
-        /// Have warning.
-        /// </summary>
-        public bool HaveWarning => Context.Output.HaveWarning;
-
-        /// <summary>
-        /// Форматирование указанной записи.
-        /// </summary>
-        public virtual string FormatRecord
-            (
-                Record? record
-            )
-        {
-            if (ReferenceEquals(Program, null))
-            {
-                Magna.Error
-                    (
-                        nameof(PftFormatter) + "::" + nameof(FormatRecord)
-                        + ": program was not set"
-                    );
-
-                throw new PftException("Program was not set");
-            }
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            Context.ClearAll();
-            Context.Record = record;
-            Context.Procedures = Program.Procedures;
-            Program.Execute(Context);
-
-            var result = Context.GetProcessedOutput();
-
-            stopwatch.Stop();
-            Elapsed = stopwatch.Elapsed;
-
-            return result;
-
-        } // method FormatRecord
-
-        /// <summary>
-        /// Форматирование записи с указанным MFN.
-        /// </summary>
-        public virtual string FormatRecord ( int mfn ) =>
-            FormatRecord(Context.Provider.ReadRecord(mfn));
-
-        /// <summary>
-        /// Форматирование записей с указанными MFN.
-        /// </summary>
-        public virtual string[] FormatRecords
-            (
-                IEnumerable<int> mfns
-            )
-        {
-            var result = new List<string>();
-
-            // TODO: сделать форматирование пачками
-
-            foreach (var mfn in mfns)
-            {
-                var text = FormatRecord(mfn);
-                result.Add(text);
-            }
-
-            return result.ToArray();
-
-        } // method FormatRecords
-
-        /// <summary>
-        /// Разбор программы.
-        /// </summary>
-        public virtual void ParseProgram (string source) =>
-            Program = PftUtility.CompileProgram(source);
-
-        /// <summary>
-        /// Установка провайдера.
-        /// </summary>
-        public virtual void SetProvider (ISyncProvider provider) =>
-            Context.SetProvider(provider);
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public virtual void Dispose()
-        {
-            // TODO: implement
-        }
-
-        #endregion
-
-    } // class PftFormatter
-
-} // namespace ManagedIrbis.Pft
+    #endregion
+}

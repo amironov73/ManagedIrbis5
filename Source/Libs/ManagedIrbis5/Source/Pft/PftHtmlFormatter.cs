@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftHtmlFormatter.cs --
+/* PftHtmlFormatter.cs -- умеет форматировать PFT в HTML
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,75 +17,76 @@ using AM;
 
 using ManagedIrbis.Pft.Infrastructure;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft
+namespace ManagedIrbis.Pft;
+
+/// <summary>
+/// Умеет форматировать PFT в HTML.
+/// </summary>
+public class PftHtmlFormatter
+    : PftFormatter
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Разделитель текста.
     /// </summary>
-    public class PftHtmlFormatter
-        : PftFormatter
+    public PftTextSeparator Separator { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftHtmlFormatter()
     {
-        #region Properties
-
-        /// <summary>
-        /// Text separator.
-        /// </summary>
-        public PftTextSeparator Separator { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftHtmlFormatter()
-        {
-            Separator = new PftTextSeparator();
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftHtmlFormatter
-            (
-                PftContext context
-            )
-            : base(context)
-        {
-            Separator = new PftTextSeparator();
-        }
-
-        #endregion
-
-        #region PftFormatter members
-
-        /// <inheritdoc cref="PftFormatter.ParseProgram" />
-        public override void ParseProgram
-            (
-                string source
-            )
-        {
-            if (Separator.SeparateText(source))
-            {
-                Magna.Error
-                    (
-                        "PftHtmlFormatter::ParseProgram: "
-                        + "can't separate text"
-                    );
-
-                throw new PftSyntaxException();
-            }
-
-            string prepared = Separator.Accumulator;
-
-            base.ParseProgram(prepared);
-        }
-
-        #endregion
+        Separator = new PftTextSeparator();
     }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftHtmlFormatter
+        (
+            PftContext context
+        )
+        : base (context)
+    {
+        Separator = new PftTextSeparator();
+    }
+
+    #endregion
+
+    #region PftFormatter members
+
+    /// <inheritdoc cref="PftFormatter.ParseProgram" />
+    public override void ParseProgram
+        (
+            string source
+        )
+    {
+        if (Separator.SeparateText (source))
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (PftHtmlFormatter) + "::" + nameof (ParseProgram)
+                    + ": can't separate text"
+                );
+
+            throw new PftSyntaxException();
+        }
+
+        var prepared = Separator.Accumulator;
+
+        base.ParseProgram (prepared);
+    }
+
+    #endregion
 }
