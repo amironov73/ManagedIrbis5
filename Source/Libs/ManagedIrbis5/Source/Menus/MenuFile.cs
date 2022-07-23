@@ -29,6 +29,8 @@ using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -41,7 +43,7 @@ namespace ManagedIrbis.Menus;
 [XmlRoot ("menu")]
 public sealed class MenuFile
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Constants
 
@@ -382,11 +384,11 @@ public sealed class MenuFile
                 break;
 
             default:
-                Magna.Error
+                Magna.Logger.LogError
                     (
                         nameof (MenuFile) + "::" + nameof (SortEntries)
-                        + ": unexpected sortBy="
-                        + sortBy
+                        + ": unexpected sortBy={SortBy}",
+                        sortBy
                     );
                 throw new IrbisException ("Unexpected sortBy=" + sortBy);
         }

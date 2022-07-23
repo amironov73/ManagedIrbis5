@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UseNameofExpression
 
-/* TextMonitoringSink.cs --
+/* TextMonitoringSink.cs -- сбор мониторинга в текстовый поток
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,6 +22,8 @@ using System.IO;
 using AM;
 using AM.Json;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -29,7 +31,7 @@ using AM.Json;
 namespace ManagedIrbis.Monitoring;
 
 /// <summary>
-///
+/// Сбор мониторинга в текстовый поток.
 /// </summary>
 public sealed class TextMonitoringSink
     : MonitoringSink
@@ -37,7 +39,7 @@ public sealed class TextMonitoringSink
     #region Public members
 
     /// <summary>
-    /// Text writer.
+    /// Текстовый поток.
     /// </summary>
     public TextWriter Writer { get; }
 
@@ -46,9 +48,8 @@ public sealed class TextMonitoringSink
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
-    /// <param name="writer"></param>
     public TextMonitoringSink
         (
             TextWriter writer
@@ -78,10 +79,10 @@ public sealed class TextMonitoringSink
         }
         catch (Exception exception)
         {
-            Magna.TraceException
+            Magna.Logger.LogError
                 (
-                    nameof (TeeMonitoringSink) + "::" + nameof (WriteData),
-                    exception
+                    exception,
+                    nameof (TeeMonitoringSink) + "::" + nameof (WriteData)
                 );
 
             return false;

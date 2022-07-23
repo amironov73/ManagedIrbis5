@@ -21,6 +21,8 @@ using System;
 using AM;
 using AM.Collections;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -38,7 +40,7 @@ public sealed class TeeMonitoringSink
     /// <summary>
     /// Collection of sinks.
     /// </summary>
-    public NonNullCollection<MonitoringSink> Sinks { get; private set; }
+    public NonNullCollection<MonitoringSink> Sinks { get; }
 
     #endregion
 
@@ -62,6 +64,8 @@ public sealed class TeeMonitoringSink
             MonitoringData data
         )
     {
+        Sure.NotNull (data);
+
         var result = true;
 
         foreach (var sink in Sinks)
@@ -76,10 +80,10 @@ public sealed class TeeMonitoringSink
             }
             catch (Exception exception)
             {
-                Magna.TraceException
+                Magna.Logger.LogError
                     (
-                        nameof (TeeMonitoringSink) + "::" + nameof (WriteData),
-                        exception
+                        exception,
+                        nameof (TeeMonitoringSink) + "::" + nameof (WriteData)
                     );
             }
         }

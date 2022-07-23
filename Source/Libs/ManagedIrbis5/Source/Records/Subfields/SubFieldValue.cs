@@ -16,103 +16,104 @@
 #region Using directives
 
 using System;
+
 using AM;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Subfield value related routines.
+/// </summary>
+public static class SubFieldValue
 {
+    #region Properties
+
     /// <summary>
-    /// Subfield value related routines.
+    /// Throw exception on verification error.
     /// </summary>
-    public static class SubFieldValue
+    public static bool ThrowOnVerify { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Whether the value valid.
+    /// </summary>
+    public static bool IsValidValue
+        (
+            ReadOnlySpan<char> value
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Throw exception on verification error.
-        /// </summary>
-        public static bool ThrowOnVerify { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Whether the value valid.
-        /// </summary>
-        public static bool IsValidValue
-            (
-                ReadOnlySpan<char> value
-            )
+        foreach (var c in value)
         {
-            foreach (var c in value)
+            if (c == SubField.Delimiter)
             {
-                if (c == SubField.Delimiter)
-                {
-                    return false;
-                }
+                return false;
             }
+        }
 
-            return true;
-        } // method IsValidValue
+        return true;
+    }
 
-        /// <summary>
-        /// SubField value normalization.
-        /// </summary>
-        public static string? Normalize
-            (
-                string? value
-            )
+    /// <summary>
+    /// SubField value normalization.
+    /// </summary>
+    public static string? Normalize
+        (
+            string? value
+        )
+    {
+        if (string.IsNullOrWhiteSpace (value))
         {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return value;
-            }
+            return value;
+        }
 
-            var result = value.Trim();
+        var result = value.Trim();
 
-            return result;
-        } // method Normalize
+        return result;
+    }
 
-        /// <summary>
-        /// Verify subfield value.
-        /// </summary>
-        public static bool Verify (ReadOnlySpan<char> value) =>
-            Verify(value, ThrowOnVerify);
+    /// <summary>
+    /// Verify subfield value.
+    /// </summary>
+    public static bool Verify (ReadOnlySpan<char> value) =>
+        Verify (value, ThrowOnVerify);
 
-        /// <summary>
-        /// Verify subfield value.
-        /// </summary>
-        public static bool Verify
-            (
-                ReadOnlySpan<char> value,
-                bool throwOnError
-            )
+    /// <summary>
+    /// Verify subfield value.
+    /// </summary>
+    public static bool Verify
+        (
+            ReadOnlySpan<char> value,
+            bool throwOnError
+        )
+    {
+        var result = IsValidValue (value);
+
+        if (!result)
         {
-            var result = IsValidValue (value);
+            Magna.Logger.LogDebug
+                (
+                    nameof (SubFieldValue) + "::" + nameof (Verify)
+                    + ": {VerificationError}" ,
+                    value.ToVisibleString()
+                );
 
-            if (!result)
+            if (throwOnError)
             {
-                Magna.Debug
-                    (
-                        nameof(SubFieldValue) + "::" + nameof(Verify)
-                        + ": " + value.ToVisibleString()
-                    );
-
-                if (throwOnError)
-                {
-                    throw new VerificationException(nameof(SubField.Value));
-                }
+                throw new VerificationException (nameof (SubField.Value));
             }
+        }
 
-            return result;
-        } // method Verify
+        return result;
+    }
 
-        #endregion
-
-    } // class SubFieldValue
-
-} // namespace ManagedIrbis
+    #endregion
+}

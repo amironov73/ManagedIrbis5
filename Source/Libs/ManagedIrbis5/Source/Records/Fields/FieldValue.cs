@@ -20,6 +20,8 @@ using System.Diagnostics.CodeAnalysis;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -115,11 +117,11 @@ public static class FieldValue
 
         if (!result)
         {
-            Magna.Debug
+            Magna.Logger.LogError
                 (
                     nameof (FieldValue) + "::" + nameof (Verify)
-                    + ": bad field value="
-                    + value.ToVisibleString()
+                    + ": bad field value={Value}",
+                    value.ToVisibleString()
                 );
 
             if (throwOnError)

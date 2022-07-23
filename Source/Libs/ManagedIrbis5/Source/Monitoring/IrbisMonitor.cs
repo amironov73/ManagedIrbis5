@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UseNameofExpression
 
-/* IrbisMonitor.cs --
+/* IrbisMonitor.cs -- мониторинг работы ИРБИС
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,12 +23,14 @@ using System.Threading.Tasks;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 namespace ManagedIrbis.Monitoring;
 
 /// <summary>
-///
+/// Мониторинг работы ИРБИС.
 /// </summary>
 public sealed class IrbisMonitor
 {
@@ -68,14 +70,14 @@ public sealed class IrbisMonitor
         {
             if (value < 1)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "IrbisMonitor::Interval: "
-                        + "value="
-                        + value
+                        nameof (IrbisMonitor) + "::" + nameof (Interval)
+                        + ": value={Value}",
+                        value
                     );
 
-                throw new ArgumentException ("value");
+                throw new ArgumentException (nameof (value));
             }
 
             _interval = value;
@@ -140,10 +142,10 @@ public sealed class IrbisMonitor
             }
             catch (Exception exception)
             {
-                Magna.TraceException
+                Magna.Logger.LogError
                     (
-                        nameof (IrbisMonitor) + "::" + nameof (_MonitoringRoutine),
-                        exception
+                        exception,
+                        nameof (IrbisMonitor) + "::" + nameof (_MonitoringRoutine)
                     );
             }
 

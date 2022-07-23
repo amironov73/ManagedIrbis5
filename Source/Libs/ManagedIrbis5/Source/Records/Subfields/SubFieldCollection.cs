@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -30,369 +29,361 @@ using AM;
 using AM.IO;
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Коллекция подполей.
+/// Отличается тем, что принципиально не принимает
+/// значения <c>null</c>.
+/// </summary>
+[Serializable]
+[XmlRoot ("subfields")]
+[DebuggerDisplay ("Count={" + nameof (Count) + "}")]
+public sealed class SubFieldCollection
+    : Collection<SubField>,
+        IHandmadeSerializable,
+        IReadOnly<SubFieldCollection>
 {
+    #region Properties
+
     /// <summary>
-    /// Коллекция подполей.
-    /// Отличается тем, что принципиально не принимает
-    /// значения <c>null</c>.
+    /// Field.
     /// </summary>
-    [Serializable]
-    [XmlRoot ("subfields")]
-    [DebuggerDisplay ("Count={" + nameof (Count) + "}")]
-    public sealed class SubFieldCollection
-        : Collection<SubField>,
-            IHandmadeSerializable,
-            IReadOnly<SubFieldCollection>
+    [XmlIgnore]
+    [JsonIgnore]
+    [field: NonSerialized]
+    public Field? Field { get; internal set; }
+
+    #endregion
+
+    #region Construction
+
+    #endregion
+
+    #region Private members
+
+    internal SubFieldCollection SetField
+        (
+            Field newField
+        )
     {
-        #region Properties
+        ThrowIfReadOnly();
 
-        /// <summary>
-        /// Field.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [field: NonSerialized]
-        public Field? Field { get; internal set; }
+        foreach (var subField in this)
+        {
+            subField.Field = newField;
+        }
 
-        #endregion
+        return this;
+    }
 
-        #region Construction
+    /*
+    internal void SetModified()
+    {
+        if (!ReferenceEquals(Field, null))
+        {
+            Field.SetModified();
+        }
+    }
+    */
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Public methods
 
-        internal SubFieldCollection SetField
+    /// <summary>
+    /// Добавление в коллекцию нескольких подполей сразу.
+    /// </summary>
+    public SubFieldCollection AddRange
+        (
+            IEnumerable<SubField> subFields
+        )
+    {
+        ThrowIfReadOnly();
+        Sure.NotNull ((object?) subFields);
+
+        foreach (var subField in subFields)
+        {
+            Add (subField);
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Заимствование полей из другой коллекции.
+    /// </summary>
+    public SubFieldCollection Assign
+        (
+            SubFieldCollection other
+        )
+    {
+        ThrowIfReadOnly();
+        Sure.NotNull (other);
+
+        Clear();
+        Field = other.Field;
+        AddRange (other);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Assign clone.
+    /// </summary>
+    public SubFieldCollection AssignClone
+        (
+            SubFieldCollection other
+        )
+    {
+        ThrowIfReadOnly();
+        Sure.NotNull (other, nameof (other));
+
+        Clear();
+        Field = other.Field;
+        foreach (var subField in other)
+        {
+            Add (subField.Clone());
+        }
+
+        return this;
+    }
+
+
+    /// <summary>
+    /// Создание "глубокой" копии коллекции.
+    /// </summary>
+    public SubFieldCollection Clone()
+    {
+        var result = new SubFieldCollection()
+        {
+            Field = Field
+        };
+
+        foreach (var subField in this)
+        {
+            var clone = subField.Clone();
+            clone.Field = Field;
+            result.Add (clone);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Поиск подполя с помощью предиката.
+    /// </summary>
+    public SubField? Find
+        (
+            Predicate<SubField> predicate
+        )
+    {
+        Sure.NotNull (predicate);
+
+        return this.FirstOrDefault (subField => predicate (subField));
+    }
+
+    /// <summary>
+    /// Отбор подполей с помощью предиката.
+    /// </summary>
+    public SubField[] FindAll
+        (
+            Predicate<SubField> predicate
+        )
+    {
+        Sure.NotNull (predicate);
+
+        return this
+            .Where (subField => predicate (subField))
+            .ToArray();
+    }
+
+    /*
+
+    /// <summary>
+    /// Restore the collection from JSON.
+    /// </summary>
+    public static SubFieldCollection FromJson
+        (
+            string text
+        )
+    {
+        Sure.NotNullNorEmpty(text, nameof(text));
+
+        SubFieldCollection result = JsonConvert.DeserializeObject<SubFieldCollection>
             (
-                Field newField
-            )
+                text
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Convert the collection to JSON.
+    /// </summary>
+    public string ToJson()
+    {
+        string result = JArray.FromObject(this).ToString();
+
+        return result;
+    }
+
+    */
+
+    #endregion
+
+    #region Collection<T> members
+
+    /// <inheritdoc cref="Collection{T}.ClearItems" />
+    protected override void ClearItems()
+    {
+        ThrowIfReadOnly();
+
+        foreach (var subField in this)
         {
-            ThrowIfReadOnly();
-
-            foreach (var subField in this)
-            {
-                subField.Field = newField;
-            }
-
-            return this;
+            subField.Field = null;
         }
 
-        /*
-        internal void SetModified()
+        /* SetModified(); */
+
+        base.ClearItems();
+    }
+
+    /// <inheritdoc cref="Collection{T}.InsertItem" />
+    protected override void InsertItem
+        (
+            int index,
+            SubField item
+        )
+    {
+        ThrowIfReadOnly();
+
+        if (item is null)
         {
-            if (!ReferenceEquals(Field, null))
-            {
-                Field.SetModified();
-            }
-        }
-        */
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавление в коллекцию нескольких подполей сразу.
-        /// </summary>
-        public SubFieldCollection AddRange
-            (
-                IEnumerable<SubField> subFields
-            )
-        {
-            ThrowIfReadOnly();
-
-            foreach (var subField in subFields)
-            {
-                Add (subField);
-            }
-
-            return this;
+            throw new ArgumentNullException (nameof (item));
         }
 
-        /// <summary>
-        /// Заимствование полей из другой коллекции.
-        /// </summary>
-        public SubFieldCollection Assign
-            (
-                SubFieldCollection other
-            )
+        item.Field = Field;
+
+        /* SetModified(); */
+
+        base.InsertItem (index, item);
+    } // method InsertItem
+
+    /// <inheritdoc cref="Collection{T}.RemoveItem" />
+    protected override void RemoveItem
+        (
+            int index
+        )
+    {
+        ThrowIfReadOnly();
+
+        if (index >= 0 && index < Count)
         {
-            ThrowIfReadOnly();
-            Sure.NotNull (other);
+            var subField = this[index];
+            subField.Field = null;
 
-            Clear();
-            Field = other.Field;
-            AddRange (other);
-
-            return this;
+            /* SetModified(); */
         }
 
-        /// <summary>
-        /// Assign clone.
-        /// </summary>
-        public SubFieldCollection AssignClone
-            (
-                SubFieldCollection other
-            )
+        base.RemoveItem (index);
+    } // method RemoveItem
+
+    /// <inheritdoc cref="Collection{T}.SetItem" />
+    protected override void SetItem
+        (
+            int index,
+            SubField? item
+        )
+    {
+        ThrowIfReadOnly();
+
+        if (item is null)
         {
-            ThrowIfReadOnly();
-            Sure.NotNull (other, nameof (other));
-
-            Clear();
-            Field = other.Field;
-            foreach (var subField in other)
-            {
-                Add (subField.Clone());
-            }
-
-            return this;
+            throw new ArgumentNullException (nameof (item));
         }
 
+        item.Field = Field;
 
-        /// <summary>
-        /// Создание "глубокой" копии коллекции.
-        /// </summary>
-        public SubFieldCollection Clone()
+        /* SetModified(); */
+
+        base.SetItem (index, item);
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref= "IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        ThrowIfReadOnly();
+        Sure.NotNull (reader);
+
+        ClearItems();
+        var array = reader.ReadArray<SubField>();
+        AddRange (array);
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WriteArray (this.ToArray());
+    }
+
+    #endregion
+
+    #region IReadOnly<T> members
+
+    /// <inheritdoc cref="IReadOnly{T}.ReadOnly" />
+    public bool ReadOnly { get; internal set; }
+
+    /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
+    public SubFieldCollection AsReadOnly()
+    {
+        var result = Clone();
+        result.SetReadOnly();
+
+        return result;
+    }
+
+    /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly" />
+    public void ThrowIfReadOnly()
+    {
+        if (ReadOnly)
         {
-            var result = new SubFieldCollection()
-            {
-                Field = Field
-            };
-
-            foreach (var subField in this)
-            {
-                var clone = subField.Clone();
-                clone.Field = Field;
-                result.Add (clone);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Поиск подполя с помощью предиката.
-        /// </summary>
-        public SubField? Find
-            (
-                Predicate<SubField> predicate
-            )
-        {
-            Sure.NotNull (predicate);
-
-            return this.FirstOrDefault (subField => predicate (subField));
-        }
-
-        /// <summary>
-        /// Отбор подполей с помощью предиката.
-        /// </summary>
-        public SubField[] FindAll
-            (
-                Predicate<SubField> predicate
-            )
-        {
-            Sure.NotNull (predicate);
-
-            return this
-                .Where (subField => predicate (subField))
-                .ToArray();
-        }
-
-        /*
-
-        /// <summary>
-        /// Restore the collection from JSON.
-        /// </summary>
-        public static SubFieldCollection FromJson
-            (
-                string text
-            )
-        {
-            Sure.NotNullNorEmpty(text, nameof(text));
-
-            SubFieldCollection result = JsonConvert.DeserializeObject<SubFieldCollection>
+            Magna.Logger.LogError
                 (
-                    text
+                    nameof (SubFieldCollection) + "::" + nameof (ThrowIfReadOnly)
                 );
 
-            return result;
+            throw new ReadOnlyException();
         }
+    }
 
-        /// <summary>
-        /// Convert the collection to JSON.
-        /// </summary>
-        public string ToJson()
+    /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
+    public void SetReadOnly()
+    {
+        ReadOnly = true;
+        foreach (var subField in this)
         {
-            string result = JArray.FromObject(this).ToString();
-
-            return result;
+            subField.SetReadOnly();
         }
+    }
 
-        */
-
-        #endregion
-
-        #region Collection<T> members
-
-        /// <inheritdoc cref="Collection{T}.ClearItems" />
-        protected override void ClearItems()
-        {
-            ThrowIfReadOnly();
-
-            foreach (var subField in this)
-            {
-                subField.Field = null;
-            }
-
-            /* SetModified(); */
-
-            base.ClearItems();
-        }
-
-        /// <inheritdoc cref="Collection{T}.InsertItem" />
-        protected override void InsertItem
-            (
-                int index,
-                SubField item
-            )
-        {
-            ThrowIfReadOnly();
-
-            if (item is null)
-            {
-                throw new ArgumentNullException (nameof (item));
-            }
-
-            item.Field = Field;
-
-            /* SetModified(); */
-
-            base.InsertItem (index, item);
-
-        } // method InsertItem
-
-        /// <inheritdoc cref="Collection{T}.RemoveItem" />
-        protected override void RemoveItem
-            (
-                int index
-            )
-        {
-            ThrowIfReadOnly();
-
-            if (index >= 0 && index < Count)
-            {
-                var subField = this[index];
-                subField.Field = null;
-
-                /* SetModified(); */
-            }
-
-            base.RemoveItem (index);
-
-        } // method RemoveItem
-
-        /// <inheritdoc cref="Collection{T}.SetItem" />
-        protected override void SetItem
-            (
-                int index,
-                SubField item
-            )
-        {
-            ThrowIfReadOnly();
-
-            if (item is null)
-            {
-                throw new ArgumentNullException (nameof (item));
-            }
-
-            item.Field = Field;
-
-            /* SetModified(); */
-
-            base.SetItem (index, item);
-
-        } // method SetItem
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref= "IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            ThrowIfReadOnly();
-            Sure.NotNull (reader);
-
-            ClearItems();
-            var array = reader.ReadArray<SubField>();
-            AddRange (array);
-
-        } // method RestoreFromStream
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            Sure.NotNull (writer);
-
-            writer.WriteArray (this.ToArray());
-
-        } // method SaveToStream
-
-        #endregion
-
-        #region IReadOnly<T> members
-
-        /// <inheritdoc cref="IReadOnly{T}.ReadOnly" />
-        public bool ReadOnly { get; internal set; }
-
-        /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
-        public SubFieldCollection AsReadOnly()
-        {
-            var result = Clone();
-            result.SetReadOnly();
-
-            return result;
-
-        } // method AsReadOnly
-
-        /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly" />
-        public void ThrowIfReadOnly()
-        {
-            if (ReadOnly)
-            {
-                Magna.Error
-                    (
-                        nameof (SubFieldCollection) + "::" + nameof (ThrowIfReadOnly)
-                    );
-
-                throw new ReadOnlyException();
-            }
-
-        } // method ThrowIfReadOnly
-
-        /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
-        public void SetReadOnly()
-        {
-            ReadOnly = true;
-            foreach (var subField in this)
-            {
-                subField.SetReadOnly();
-            }
-
-        } // method SetReadOnly
-
-        #endregion
-
-    } // class SubFieldCollection
-
-} // namespace ManagedIrbis
+    #endregion
+}
