@@ -26,6 +26,8 @@ using AM.Text;
 using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -138,6 +140,8 @@ public sealed class GblTest
             string name
         )
     {
+        Sure.NotNull (name);
+
         var result = new GblTestResult
         {
             Name = name,
@@ -198,7 +202,7 @@ public sealed class GblTest
             var output = record.ToPlainText();
             result.Output = output;
 
-            //ConsoleInput.WriteLine(output);
+            // ConsoleInput.WriteLine(output);
 
             if (expected != null)
             {
@@ -220,10 +224,10 @@ public sealed class GblTest
         }
         catch (Exception exception)
         {
-            Magna.TraceException
+            Magna.Logger.LogError
                 (
-                    nameof (GblTest) + "::" + nameof (Run),
-                    exception
+                    exception,
+                    nameof (GblTest) + "::" + nameof (Run)
                 );
 
             result.Failed = true;

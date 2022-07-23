@@ -20,165 +20,134 @@ using AM;
 using AM.IO;
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure
+namespace ManagedIrbis.Gbl.Infrastructure;
+
+//
+// Повторение поля задается одним из способов:
+//
+// * - все повторения
+// F - если используется корректировка по формату
+// N (число) – если корректируется N-ое повторение поля
+// L – если корректируется последнее повторение поля
+// L-N (число) – если корректируется N-ое с конца повторение поля
+//
+// Нумерация повторений начинается с 1.
+//
+
+/// <summary>
+/// Спецификация повторения поля в записи.
+/// </summary>
+public struct RepeatSpecification
+    : IHandmadeSerializable,
+        IVerifiable
 {
-    //
-    // Повторение поля задается одним из способов:
-    //
-    // * - все повторения
-    // F - если используется корректировка по формату
-    // N (число) – если корректируется N-ое повторение поля
-    // L – если корректируется последнее повторение поля
-    // L-N (число) – если корректируется N-ое с конца повторение поля
-    //
-    // Нумерация повторений начинается с 1.
-    //
+    #region Properties
 
     /// <summary>
-    /// Спецификация повторения поля в записи.
+    /// Вид повторения.
     /// </summary>
-    public struct RepeatSpecification
-        : IHandmadeSerializable,
-            IVerifiable
+    [JsonPropertyName ("kind")]
+    public RepeatKind Kind { get; set; }
+
+    /// <summary>
+    /// Number of the repeat.
+    /// </summary>
+    [JsonPropertyName ("index")]
+    [JsonIgnore (Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int Index { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public RepeatSpecification
+        (
+            RepeatKind kind
+        )
+        : this()
     {
-        #region Properties
+        Sure.Defined (kind);
 
-        /// <summary>
-        /// Вид повторения.
-        /// </summary>
-        [JsonPropertyName ("kind")]
-        public RepeatKind Kind { get; set; }
+        Kind = kind;
+    }
 
-        /// <summary>
-        /// Number of the repeat.
-        /// </summary>
-        [JsonPropertyName ("index")]
-        [JsonIgnore (Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public int Index { get; set; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public RepeatSpecification
+        (
+            int index
+        )
+        : this()
+    {
+        Sure.Positive (index);
 
-        #endregion
+        Kind = RepeatKind.Explicit;
+        Index = index;
+    }
 
-        #region Construction
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public RepeatSpecification
+        (
+            RepeatKind kind,
+            int index
+        )
+        : this()
+    {
+        Sure.Defined (kind);
+        Sure.NonNegative (index);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public RepeatSpecification
-            (
-                RepeatKind kind
-            )
-            : this()
+        Kind = kind;
+        Index = index;
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Разбор текстового представления.
+    /// </summary>
+    public static RepeatSpecification Parse
+        (
+            string text
+        )
+    {
+        Sure.NotNullNorEmpty (text);
+
+        var result = new RepeatSpecification();
+        switch (text)
         {
-            Sure.Defined (kind);
+            case "*":
+                result.Kind = RepeatKind.All;
+                break;
 
-            Kind = kind;
+            case "F":
+            case "f":
+                result.Kind = RepeatKind.ByFormat;
+                break;
 
-        } // constructor
+            case "L":
+            case "l":
+                result.Kind = RepeatKind.Last;
+                break;
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public RepeatSpecification
-            (
-                int index
-            )
-            : this()
-        {
-            Sure.Positive (index);
-
-            Kind = RepeatKind.Explicit;
-            Index = index;
-
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public RepeatSpecification
-            (
-                RepeatKind kind,
-                int index
-            )
-            : this()
-        {
-            Sure.Defined (kind);
-            Sure.NonNegative (index);
-
-            Kind = kind;
-            Index = index;
-
-        } // constructor
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Разбор текстового представления.
-        /// </summary>
-        public static RepeatSpecification Parse
-            (
-                string text
-            )
-        {
-            Sure.NotNullNorEmpty (text);
-
-            var result = new RepeatSpecification();
-            switch (text)
-            {
-                case "*":
-                    result.Kind = RepeatKind.All;
-                    break;
-
-                case "F":
-                case "f":
-                    result.Kind = RepeatKind.ByFormat;
-                    break;
-
-                case "L":
-                case "l":
-                    result.Kind = RepeatKind.Last;
-                    break;
-
-                default:
-                    if (uint.TryParse (text, out var index))
+            default:
+                if (uint.TryParse (text, out var index))
+                {
+                    if (index == 0)
                     {
-                        if (index == 0)
-                        {
-                            throw new IrbisException
-                                (
-                                    "Invalid repeat specification: "
-                                    + text
-                                );
-                        }
-
-                        result.Kind = RepeatKind.Explicit;
-                        result.Index = (int)index;
-                    }
-                    else if (text[0] == 'L'
-                             && uint.TryParse
-                                 (
-                                     text.Substring (2),
-                                     out index
-                                 ))
-                    {
-                        result.Kind = RepeatKind.Last;
-                        result.Index = (int)index;
-                    }
-                    else
-                    {
-                        Magna.Error
-                            (
-                                nameof (RepeatSpecification) + "::" + nameof (Parse)
-                                + ": invalid repeat specification="
-                                + text
-                            );
-
-
                         throw new IrbisException
                             (
                                 "Invalid repeat specification: "
@@ -186,110 +155,131 @@ namespace ManagedIrbis.Gbl.Infrastructure
                             );
                     }
 
-                    break;
+                    result.Kind = RepeatKind.Explicit;
+                    result.Index = (int)index;
+                }
+                else if (text[0] == 'L'
+                         && uint.TryParse
+                             (
+                                 text.Substring (2),
+                                 out index
+                             ))
+                {
+                    result.Kind = RepeatKind.Last;
+                    result.Index = (int)index;
+                }
+                else
+                {
+                    Magna.Logger.LogError
+                        (
+                            nameof (RepeatSpecification) + "::" + nameof (Parse)
+                            + ": invalid repeat specification={Specification}",
+                            text
+                        );
 
-            } // switch
 
-            return result;
+                    throw new IrbisException
+                        (
+                            "Invalid repeat specification: "
+                            + text
+                        );
+                }
 
-        } // method Parse
+                break;
+        }
 
-        /// <summary>
-        /// Нужно ли сериализовать поле <see cref="Index"/>?
-        /// </summary>
-        public bool ShouldSerializeIndex() => Index != 0;
+        return result;
+    }
 
-        #endregion
+    /// <summary>
+    /// Нужно ли сериализовать поле <see cref="Index"/>?
+    /// </summary>
+    public bool ShouldSerializeIndex() => Index != 0;
 
-        #region IHandmadeSerializable members
+    #endregion
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        Kind = (RepeatKind)reader.ReadPackedInt32();
+        Index = reader.ReadPackedInt32();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer
+            .WritePackedInt32 ((int)Kind)
+            .WritePackedInt32 (Index);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<RepeatSpecification> (this, throwOnError);
+
+        switch (Kind)
         {
-            Sure.NotNull (reader);
+            case RepeatKind.All:
+                verifier.Assert (Index == 0);
+                break;
 
-            Kind = (RepeatKind)reader.ReadPackedInt32();
-            Index = reader.ReadPackedInt32();
+            case RepeatKind.ByFormat:
+                verifier.Assert (Index == 0);
+                break;
 
-        } // method RestoreFromStream
+            case RepeatKind.Last:
+                verifier.Assert (Index >= 0);
+                break;
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            Sure.NotNull (writer);
+            case RepeatKind.Explicit:
+                verifier.Assert (Index > 0);
+                break;
 
-            writer
-                .WritePackedInt32 ((int)Kind)
-                .WritePackedInt32 (Index);
+            default:
+                verifier.Result = false;
+                break;
+        }
 
-        } // method SaveToStream
+        return verifier.Result;
+    }
 
-        #endregion
+    #endregion
 
-        #region IVerifiable members
+    #region Object members
 
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<RepeatSpecification> (this, throwOnError);
+    /// <inheritdoc cref="ValueType.ToString" />
+    public override string ToString() => Kind switch
+    {
+        RepeatKind.All => "*",
 
-            switch (Kind)
-            {
-                case RepeatKind.All:
-                    verifier.Assert (Index == 0);
-                    break;
+        RepeatKind.ByFormat => "F",
 
-                case RepeatKind.ByFormat:
-                    verifier.Assert (Index == 0);
-                    break;
+        RepeatKind.Last => Index == 0 ? "L" : "L-" + Index.ToInvariantString(),
 
-                case RepeatKind.Last:
-                    verifier.Assert (Index >= 0);
-                    break;
+        RepeatKind.Explicit => Index.ToInvariantString(),
 
-                case RepeatKind.Explicit:
-                    verifier.Assert (Index > 0);
-                    break;
+        _ => $"Kind={Kind}, Index={Index}"
+    };
 
-                default:
-                    verifier.Result = false;
-                    break;
-            }
-
-            return verifier.Result;
-
-        } // method Verify
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="ValueType.ToString" />
-        public override string ToString() => Kind switch
-            {
-                RepeatKind.All => "*",
-
-                RepeatKind.ByFormat => "F",
-
-                RepeatKind.Last => Index == 0 ? "L" : "L-" + Index.ToInvariantString(),
-
-                RepeatKind.Explicit => Index.ToInvariantString(),
-
-                _ => $"Kind={Kind}, Index={Index}"
-
-            };  // method ToString
-
-        #endregion
-
-    } // struct RepeatSpecification
-
-} // namespace ManagedIrbis.Gbl.Infrastructure
+    #endregion
+}

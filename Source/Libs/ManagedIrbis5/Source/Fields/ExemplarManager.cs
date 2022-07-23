@@ -8,6 +8,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* ExemplarManager.cs -- работа с экземплярами книги/журнала/газеты/подшивки и т. д.
@@ -31,6 +32,8 @@ using AM.Text.Output;
 using ManagedIrbis.Batch;
 using ManagedIrbis.Readers;
 using ManagedIrbis.Providers;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -104,6 +107,10 @@ public sealed class ExemplarManager
 
     private readonly AbstractOutput? _output;
 
+    #endregion
+
+    #region Public methods
+
     /// <summary>
     /// Получение года издания.
     /// </summary>
@@ -112,6 +119,8 @@ public sealed class ExemplarManager
             Record record
         )
     {
+        Sure.NotNull (record);
+
         var result = record.FM (210, 'd');
         if (result.IsEmpty())
         {
@@ -157,6 +166,9 @@ public sealed class ExemplarManager
             ExemplarInfo exemplar
         )
     {
+        Sure.NotNull (record);
+        Sure.NotNull (exemplar);
+
         if (!exemplar.Price.IsEmpty())
         {
             return exemplar.Price;
@@ -166,10 +178,6 @@ public sealed class ExemplarManager
 
         return !price.IsEmpty() ? price : string.Empty;
     }
-
-    #endregion
-
-    #region Public methods
 
     /// <summary>
     /// Add given exemplar to the collection.
@@ -213,7 +221,7 @@ public sealed class ExemplarManager
     }
 
     /// <summary>
-    /// Clear the list of exemplars.
+    /// Очистка списка экземпляров.
     /// </summary>
     public ExemplarManager Clear()
     {
@@ -223,13 +231,15 @@ public sealed class ExemplarManager
     }
 
     /// <summary>
-    /// Get bibliographic description.
+    /// Получение библиографического описания для указанной записи.
     /// </summary>
     public string GetDescription
         (
             Record record
         )
     {
+        Sure.NotNull (record);
+
         var result = record.Description;
         if (string.IsNullOrEmpty (result))
         {
@@ -243,7 +253,7 @@ public sealed class ExemplarManager
 
         if (string.IsNullOrEmpty (result))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ExemplarManager) + "::" + nameof (GetDescription)
                     + ": empty description"
@@ -256,7 +266,7 @@ public sealed class ExemplarManager
     }
 
     /// <summary>
-    /// Get bibliographic description.
+    /// Получение библиографического описания для указанного экземпляра.
     /// </summary>
     public string? GetDescription
         (
@@ -264,6 +274,8 @@ public sealed class ExemplarManager
             ExemplarInfo exemplar
         )
     {
+        Sure.NotNull (exemplar);
+
         string? result;
 
         if (!ReferenceEquals (record, null))
@@ -283,7 +295,7 @@ public sealed class ExemplarManager
     }
 
     /// <summary>
-    /// Extend info.
+    /// Получение расширенной информации об указанном экземпляре.
     /// </summary>
     public ExemplarInfo Extend
         (
@@ -291,13 +303,15 @@ public sealed class ExemplarManager
             Record? record
         )
     {
+        Sure.NotNull (exemplar);
+
         if (exemplar.Mfn <= 0)
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     nameof (ExemplarManager) + "::" + nameof (Extend)
-                    + ": MFN="
-                    + exemplar.Mfn
+                    + ": MFN={Mfn}",
+                    exemplar.Mfn
                 );
 
             throw new IrbisException ("MFN <= 0");
@@ -352,7 +366,7 @@ public sealed class ExemplarManager
     }
 
     /// <summary>
-    ///
+    /// Поиск экземпляра по его номеру.
     /// </summary>
     public ExemplarInfo? Find
         (
@@ -372,13 +386,15 @@ public sealed class ExemplarManager
     }
 
     /// <summary>
-    /// Parses the record for exemplars.
+    /// Разбор библиографической записи на экземпляры.
     /// </summary>
     public ExemplarInfo[] FromRecord
         (
             Record record
         )
     {
+        Sure.NotNull (record);
+
         var result = ExemplarInfo.ParseRecord (record);
 
         foreach (var exemplar in result)
@@ -390,14 +406,15 @@ public sealed class ExemplarManager
     }
 
     /// <summary>
-    /// Determines whether the record is newspaper/magazine
-    /// or not.
+    /// Determines whether the record is newspaper/magazine or not.
     /// </summary>
     public bool IsNewspaper
         (
             Record record
         )
     {
+        Sure.NotNull (record);
+
         var worklist = record.FM (920);
         if (worklist.IsEmpty())
         {
@@ -449,23 +466,25 @@ public sealed class ExemplarManager
     }
 
     /// <summary>
-    /// Load from file.
+    /// Загрузка информации из файла.
     /// </summary>
     public void LoadFromFile
         (
             string fileName
         )
     {
+        Sure.FileExists (fileName);
+
         var loaded = SerializationUtility
             .RestoreArrayFromFile<ExemplarInfo> (fileName);
 
         if (ReferenceEquals (loaded, null))
         {
-            Magna.Error
+            Magna.Logger.LogError
                 (
                     "ExemplarManager::LoadFromFile: "
-                    + "failed to load from: "
-                    + fileName
+                    + "failed to load from: {FileName}",
+                    fileName
                 );
 
             throw new IrbisException
@@ -649,7 +668,7 @@ public sealed class ExemplarManager
     }
 
     /// <summary>
-    /// Remove
+    /// Удаление номера из списка экземпляров.
     /// </summary>
     public ExemplarManager Remove
         (

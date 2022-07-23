@@ -30,188 +30,191 @@ using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl
-{
-    /// <summary>
-    /// Файл GBL.
-    /// </summary>
-    [XmlRoot ("gbl")]
-    public sealed class GblFile
-        : IHandmadeSerializable,
+namespace ManagedIrbis.Gbl;
+
+/// <summary>
+/// Файл GBL.
+/// </summary>
+[XmlRoot ("gbl")]
+public sealed class GblFile
+    : IHandmadeSerializable,
         IVerifiable
+{
+    #region Properties
+
+    /// <summary>
+    /// Имя файла.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    public string? FileName { get; set; }
+
+    /// <summary>
+    /// Операторы глобальной корректировки.
+    /// </summary>
+    [XmlElement ("item")]
+    [JsonPropertyName ("items")]
+    public NonNullCollection<GblStatement> Statements { get; } = new ();
+
+    /// <summary>
+    /// Параметры глобальной корректировки.
+    /// </summary>
+    [XmlElement ("parameter")]
+    [JsonPropertyName ("parameters")]
+    public NonNullCollection<GblParameter> Parameters { get; } = new ();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Выполнение всех операторов глобальной корректировки.
+    /// </summary>
+    public void Execute
+        (
+            Record record,
+            ISyncProvider provider
+        )
     {
-        #region Properties
+        Sure.NotNull (record);
+        Sure.NotNull (provider);
 
-        /// <summary>
-        /// Имя файла.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public string? FileName { get; set; }
+        // TODO: implement
+    }
 
-        /// <summary>
-        /// Операторы глобальной корректировки.
-        /// </summary>
-        [XmlElement ("item")]
-        [JsonPropertyName ("items")]
-        public NonNullCollection<GblStatement> Statements { get; } = new();
+    /// <summary>
+    /// Чтение локального файла.
+    /// </summary>
+    public static GblFile ParseLocalFile
+        (
+            string fileName,
+            Encoding? encoding = null
+        )
+    {
+        Sure.FileExists (fileName);
 
-        /// <summary>
-        /// Параметры глобальной корректировки.
-        /// </summary>
-        [XmlElement ("parameter")]
-        [JsonPropertyName ("parameters")]
-        public NonNullCollection<GblParameter> Parameters { get; } = new ();
+        encoding ??= IrbisEncoding.Ansi;
 
-        #endregion
+        using var reader = new StreamReader (fileName, encoding);
+        var result = Decode (reader);
 
-        #region Public methods
+        return result;
+    }
 
-        /// <summary>
-        /// Выполнение всех операторов глобальной корректировки.
-        /// </summary>
-        public void Execute
-            (
-                Record record,
-                ISyncProvider provider
-            )
+    /// <summary>
+    /// Разбор текстового потока.
+    /// </summary>
+    public static GblFile Decode
+        (
+            TextReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        var result = new GblFile();
+
+        var line = reader.RequireLine();
+        var count = line.ParseInt32();
+        for (var i = 0; i < count; i++)
         {
-            // TODO: implement
+            var parameter = GblParameter.Decode (reader);
+            result.Parameters.Add (parameter);
+        }
 
-        } // method Execute
-
-        /// <summary>
-        /// Чтение локального файла.
-        /// </summary>
-        public static GblFile ParseLocalFile
-            (
-                string fileName,
-                Encoding? encoding = null
-            )
+        while (true)
         {
-            encoding ??= IrbisEncoding.Ansi;
-
-            using var reader = new StreamReader(fileName, encoding);
-            var result = Decode(reader);
-
-            return result;
-
-        } // method ParseLocalFile
-
-        /// <summary>
-        /// Разбор текстового потока.
-        /// </summary>
-        public static GblFile Decode
-            (
-                TextReader reader
-            )
-        {
-            var result = new GblFile();
-
-            var line = reader.RequireLine();
-            var count = line.ParseInt32();
-            for (var i = 0; i < count; i++)
+            var statement = GblStatement.ParseStream (reader);
+            if (statement is null)
             {
-                var parameter = GblParameter.Decode (reader);
-                result.Parameters.Add (parameter);
+                break;
             }
 
-            while (true)
-            {
-                var statement = GblStatement.ParseStream (reader);
-                if (statement is null)
-                {
-                    break;
-                }
+            result.Statements.Add (statement);
+        }
 
-                result.Statements.Add (statement);
-            }
+        return result;
+    }
 
-            return result;
+    #endregion
 
-        } // method Decode
+    #region IHandmadeSerializable members
 
-        #endregion
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
 
-        #region IHandmadeSerializable members
+        FileName = reader.ReadNullableString();
+        reader.ReadCollection (Parameters);
+        reader.ReadCollection (Statements);
+    }
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WriteNullable (FileName);
+        writer.Write (Parameters);
+        writer.Write (Statements);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var result = Statements.Count != 0;
+
+        if (result)
         {
-            FileName = reader.ReadNullableString();
-            reader.ReadCollection(Parameters);
-            reader.ReadCollection(Statements);
+            result = Statements.All
+                (
+                    item => item.Verify (throwOnError)
+                );
+        }
 
-        } // method RestoreFromStream
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
+        if (result && Parameters.Count != 0)
         {
-            writer.WriteNullable(FileName);
-            writer.Write(Parameters);
-            writer.Write(Statements);
+            result = Parameters.All
+                (
+                    parameter => parameter.Verify (throwOnError)
+                );
+        }
 
-        } // methodSaveToStream
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify
-            (
-                bool throwOnError
-            )
+        if (!result)
         {
-            var result = Statements.Count != 0;
+            Magna.Logger.LogError
+                (
+                    nameof (GblFile) + "::" + nameof (Verify)
+                    + ": verification error"
+                );
 
-            if (result)
+            if (throwOnError)
             {
-                result = Statements.All
-                    (
-                        item => item.Verify(throwOnError)
-                    );
+                throw new VerificationException();
             }
+        }
 
-            if (result
-                && Parameters.Count != 0)
-            {
-                result = Parameters.All
-                    (
-                        parameter => parameter.Verify(throwOnError)
-                    );
-            }
+        return result;
+    }
 
-            if (!result)
-            {
-                Magna.Error
-                    (
-                        nameof(GblFile) + "::" + nameof(Verify) + ": "
-                        + "verification error"
-                    );
-
-                if (throwOnError)
-                {
-                    throw new VerificationException();
-                }
-            }
-
-            return result;
-
-        } // method Verify
-
-        #endregion
-
-    } // class GblFile
-
-} // namespace ManagedIrbis.Gbl
+    #endregion
+}

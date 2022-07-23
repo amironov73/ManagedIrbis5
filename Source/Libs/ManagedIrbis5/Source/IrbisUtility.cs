@@ -27,6 +27,8 @@ using AM.Collections;
 using AM.Security;
 using AM.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -184,10 +186,10 @@ public static class IrbisUtility
             {
                 if (i >= text.Length - 2)
                 {
-                    Magna.Error
+                    Magna.Logger.LogError
                         (
                             nameof (IrbisUtility) + "::" + nameof (DecodePercentString)
-                            + "unexpected end of stream"
+                            + ": unexpected end of stream"
                         );
 
                     throw new FormatException (nameof (text));
@@ -207,7 +209,7 @@ public static class IrbisUtility
     }
 
     /// <summary>
-    /// Decode string.
+    /// Декодирование строки.
     /// </summary>
     public static string? UrlDecode
         (
