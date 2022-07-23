@@ -16,6 +16,8 @@ using System.Text;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -38,11 +40,16 @@ internal sealed class HeaderParser
 
     #region Public methods
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public HeaderParser
         (
             byte[] data
         )
     {
+        Sure.NotNull (data);
+
         _data = data;
         _offset = 0;
     }
@@ -58,7 +65,7 @@ internal sealed class HeaderParser
             }
         }
 
-        string result = Encoding.Default.GetString
+        var result = Encoding.Default.GetString
             (
                 _data,
                 _offset,
@@ -76,9 +83,10 @@ internal sealed class HeaderParser
 
     public byte[] NextBytes()
     {
-        int remainder = _data.Length - _offset;
-        byte[] result = new byte[remainder];
+        var remainder = _data.Length - _offset;
+        var result = new byte[remainder];
         Array.Copy (_data, _offset, result, 0, remainder);
+
         return result;
     }
 
@@ -91,16 +99,20 @@ internal sealed class HeaderParser
         string[]? result = null;
         try
         {
-            Encoding encoding = utf
+            var encoding = utf
                 ? Encoding.UTF8
                 : Encoding.Default;
-            string text = encoding.GetString (buffer);
+            var text = encoding.GetString (buffer);
             text = text.Replace ("\r\n", "\r");
             result = text.Split (new[] { '\r', '\n' });
         }
         catch (Exception exception)
         {
-            Magna.TraceException (nameof (SplitLines), exception);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (HeaderParser) + "::" + nameof (SplitLines)
+                );
         }
 
         return result;

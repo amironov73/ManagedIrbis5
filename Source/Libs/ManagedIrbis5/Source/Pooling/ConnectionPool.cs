@@ -23,6 +23,8 @@ using System.Threading.Tasks;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -78,7 +80,7 @@ public class ConnectionPool
     /// </summary>
     public ConnectionPool()
     {
-        Magna.Trace (nameof (ConnectionPool) + "::Constructor");
+        Magna.Logger.LogTrace (nameof (ConnectionPool) + "::Constructor");
 
         Capacity = DefaultCapacity;
         ConnectionString = DefaultConnectionString.ThrowIfNull();
@@ -145,10 +147,10 @@ public class ConnectionPool
     {
         if (_activeConnections.Count >= Capacity)
         {
-            Magna.Trace
+            Magna.Logger.LogTrace
                 (
-                    "IrbisConnectionPool::_GetNewClient: "
-                    + "capacity exhausted"
+                    nameof (ConnectionPool) + "::" + nameof (_GetNewClient)
+                    + ": capacity exhausted"
                 );
 
             return null;
@@ -166,10 +168,10 @@ public class ConnectionPool
     {
         if (_idleConnections.Count == 0)
         {
-            Magna.Trace
+            Magna.Logger.LogTrace
                 (
-                    "IrbisConnectionPool::_GetIdleClient: "
-                    + "no idle clients"
+                    nameof (ConnectionPool) + "::" + nameof (_GetIdleClient)
+                    + ": no idle clients"
                 );
 
             return null;
@@ -188,10 +190,10 @@ public class ConnectionPool
         {
             if (!_event.WaitOne())
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "IrbisConnectionPool::_WaitForClient: "
-                        + "WaitOne failed"
+                        nameof (ConnectionPool) + "::" + nameof (_WaitForClient)
+                        + ": WaitOne failed"
                     );
 
                 throw new IrbisException ("WaitOne failed");
@@ -236,10 +238,7 @@ public class ConnectionPool
     /// </summary>
     public Task<ISyncProvider> AcquireConnectionAsync()
     {
-        var result = Task<ISyncProvider>.Factory.StartNew
-            (
-                () => { return AcquireConnection(); }
-            );
+        var result = Task<ISyncProvider>.Factory.StartNew (AcquireConnection);
 
         return result;
     }
@@ -323,13 +322,13 @@ public class ConnectionPool
         {
             if (!_activeConnections.Contains (connection))
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "IrbisConnectionPool::ReleaseConnection: "
-                        + "foreign connection detected"
+                        nameof (ConnectionPool) + "::" + nameof (ReleaseConnection)
+                        + ": foreign connection detected"
                     );
 
-                throw new IrbisException ("Foreign connection");
+                throw new IrbisException ("Foreign connection detected");
             }
 
             _activeConnections.Remove (connection);
@@ -384,10 +383,7 @@ public class ConnectionPool
     /// </summary>
     public Task WaitForAllConnectionsAsync()
     {
-        var result = Task.Factory.StartNew
-            (
-                () => { WaitForAllConnections(); }
-            );
+        var result = Task.Factory.StartNew (WaitForAllConnections);
 
         return result;
     }
@@ -399,19 +395,20 @@ public class ConnectionPool
     /// <inheritdoc cref="IDisposable.Dispose" />
     public void Dispose()
     {
-        Magna.Trace ("IrbisConnectionPool::Dispose: Enter");
+        Magna.Logger.LogTrace (nameof (ConnectionPool) + "::" + nameof (Dispose) + ": enter");
 
         lock (_syncRoot)
         {
             if (_activeConnections.Count != 0)
             {
-                Magna.Error
+                Magna.Logger.LogError
                     (
-                        "IrbisConnectionPool::Dispose: "
-                        + "have active connections"
+                        nameof (ConnectionPool) + "::" + nameof (Dispose)
+                        + ": have active connections: {Count}",
+                        _activeConnections.Count
                     );
 
-                throw new IrbisException ("Have active connections");
+                throw new IrbisException ($"Have active connections: {_activeConnections.Count}");
             }
 
             foreach (var client in _idleConnections)
@@ -420,7 +417,7 @@ public class ConnectionPool
             }
         }
 
-        Magna.Trace ("IrbisConnectionPool::Dispose: Leave");
+        Magna.Logger.LogTrace (nameof (ConnectionPool) + "::" + nameof (Dispose) + ": leave");
     }
 
     #endregion

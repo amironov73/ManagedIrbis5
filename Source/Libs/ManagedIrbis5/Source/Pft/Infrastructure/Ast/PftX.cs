@@ -24,241 +24,239 @@ using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Команда горизонтального позиционирования.
+/// Вставляет n пробелов.
+/// </summary>
+public sealed class PftX
+    : PftNode
 {
+    #region Properties
+
+    /// <inheritdoc cref="PftNode.ConstantExpression" />
+    public override bool ConstantExpression => true;
+
+    /// <inheritdoc cref="PftNode.RequiresConnection" />
+    public override bool RequiresConnection => false;
+
     /// <summary>
-    /// Команда горизонтального позиционирования.
-    /// Вставляет n пробелов.
+    /// Количество добавляемых пробелов.
     /// </summary>
-    public sealed class PftX
-        : PftNode
+    public int Shift { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftX()
     {
-        #region Properties
-
-        /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression => true;
-
-        /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection => false;
-
-        /// <summary>
-        /// Количество добавляемых пробелов.
-        /// </summary>
-        public int Shift { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftX()
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftX
-            (
-                int shift
-            )
-        {
-            Shift = shift;
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftX
-            (
-                PftToken token
-            )
-            : base(token)
-        {
-            token.MustBe(PftTokenKind.X);
-
-            try
-            {
-                Shift = int.Parse
-                (
-                    token.Text.ThrowIfNull("token.Text")
-                );
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        "PftX::Constructor",
-                        exception
-                    );
-
-                throw new PftSyntaxException(token, exception);
-            }
-        }
-
-        #endregion
-
-        #region Private members
-
-        private void _Execute
-            (
-                PftContext context
-            )
-        {
-            if (Shift > 0)
-            {
-                context.Write
-                    (
-                        this,
-                        new string(' ', Shift)
-                    );
-            }
-        }
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.CompareNode" />
-        internal override void CompareNode
-            (
-                PftNode otherNode
-            )
-        {
-            base.CompareNode(otherNode);
-
-            PftX otherX = (PftX) otherNode;
-            bool result = Shift == otherX.Shift;
-
-            if (!result)
-            {
-                throw new PftSerializationException();
-            }
-        }
-
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
-        {
-            compiler.StartMethod(this);
-
-            compiler
-                .WriteIndent()
-                .WriteLine("if (CurrentField != null)")
-                .WriteIndent()
-                .WriteLine("{")
-                .WriteIndent()
-                .IncreaseIndent()
-                .WriteIndent()
-                .WriteLine("if (FirstRepeat(CurrentField))")
-                .WriteIndent()
-                .WriteLine("{")
-                .IncreaseIndent()
-                .WriteIndent()
-                .WriteLine("Context.Write(new string(' ', {0}));", Shift)
-                .DecreaseIndent()
-                .WriteIndent()
-                .WriteLine("}")
-                .DecreaseIndent()
-                .WriteIndent()
-                .WriteLine("}")
-                .WriteIndent()
-                .WriteLine("else")
-                .WriteIndent()
-                .WriteLine("{")
-                .IncreaseIndent()
-                .WriteIndent()
-                .WriteLine("Context.Write(new string(' ', {0}));", Shift)
-                .DecreaseIndent()
-                .WriteIndent()
-                .WriteLine("}");
-
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
-        }
-
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
-        {
-            base.Deserialize(reader);
-
-            Shift = reader.ReadPackedInt32();
-        }
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            if (context.CurrentField != null)
-            {
-                if (context.CurrentField.IsFirstRepeat(context))
-                {
-                    _Execute(context);
-                }
-            }
-            else
-            {
-                _Execute(context);
-            }
-
-            OnAfterExecution(context);
-        }
-
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
-        {
-            base.Serialize(writer);
-
-            writer.WritePackedInt32(Shift);
-        }
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer
-                .SingleSpace()
-                .Write
-                    (
-                        "x{0}", // Всегда в нижнем регистре
-                        Shift.ToInvariantString()
-                    )
-                .SingleSpace();
-        }
-
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        protected internal override bool ShouldSerializeText() => false;
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="PftNode.ToString" />
-        public override string ToString()
-        {
-            return "x" + Shift.ToInvariantString();
-        }
-
-        #endregion
     }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftX
+        (
+            int shift
+        )
+    {
+        Shift = shift;
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftX
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.X);
+
+        try
+        {
+            Shift = int.Parse (token.Text.ThrowIfNull());
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (PftX) + "::Constructor"
+                );
+
+            throw new PftSyntaxException (token, exception);
+        }
+    }
+
+    #endregion
+
+    #region Private members
+
+    private void _Execute
+        (
+            PftContext context
+        )
+    {
+        if (Shift > 0)
+        {
+            context.Write
+                (
+                    this,
+                    new string (' ', Shift)
+                );
+        }
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.CompareNode" />
+    internal override void CompareNode
+        (
+            PftNode otherNode
+        )
+    {
+        base.CompareNode (otherNode);
+
+        PftX otherX = (PftX)otherNode;
+        bool result = Shift == otherX.Shift;
+
+        if (!result)
+        {
+            throw new PftSerializationException();
+        }
+    }
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        compiler.StartMethod (this);
+
+        compiler
+            .WriteIndent()
+            .WriteLine ("if (CurrentField != null)")
+            .WriteIndent()
+            .WriteLine ("{")
+            .WriteIndent()
+            .IncreaseIndent()
+            .WriteIndent()
+            .WriteLine ("if (FirstRepeat(CurrentField))")
+            .WriteIndent()
+            .WriteLine ("{")
+            .IncreaseIndent()
+            .WriteIndent()
+            .WriteLine ("Context.Write(new string(' ', {0}));", Shift)
+            .DecreaseIndent()
+            .WriteIndent()
+            .WriteLine ("}")
+            .DecreaseIndent()
+            .WriteIndent()
+            .WriteLine ("}")
+            .WriteIndent()
+            .WriteLine ("else")
+            .WriteIndent()
+            .WriteLine ("{")
+            .IncreaseIndent()
+            .WriteIndent()
+            .WriteLine ("Context.Write(new string(' ', {0}));", Shift)
+            .DecreaseIndent()
+            .WriteIndent()
+            .WriteLine ("}");
+
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        base.Deserialize (reader);
+
+        Shift = reader.ReadPackedInt32();
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        OnBeforeExecution (context);
+
+        if (context.CurrentField != null)
+        {
+            if (context.CurrentField.IsFirstRepeat (context))
+            {
+                _Execute (context);
+            }
+        }
+        else
+        {
+            _Execute (context);
+        }
+
+        OnAfterExecution (context);
+    }
+
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        base.Serialize (writer);
+
+        writer.WritePackedInt32 (Shift);
+    }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        printer
+            .SingleSpace()
+            .Write
+                (
+                    "x{0}", // Всегда в нижнем регистре
+                    Shift.ToInvariantString()
+                )
+            .SingleSpace();
+    }
+
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    protected internal override bool ShouldSerializeText() => false;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="PftNode.ToString" />
+    public override string ToString()
+    {
+        return "x" + Shift.ToInvariantString();
+    }
+
+    #endregion
 }

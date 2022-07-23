@@ -21,304 +21,304 @@ using System.Linq;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Quality
+namespace ManagedIrbis.Quality;
+
+/// <summary>
+/// Вспомогательные методы для работы с правилами.
+/// </summary>
+public static class RuleUtility
 {
+    #region Public fields
+
     /// <summary>
-    /// Вспомогательные методы для работы с правилами.
+    /// Плохие символы, которые не должны встречаться в записях.
     /// </summary>
-    public static class RuleUtility
+    public static char[] BadCharacters { get; } =
     {
-        #region Public fields
+        // Управляющие символы
+        '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06',
+        '\x07', '\x08', '\x09', '\x0A', '\x0B', '\x0C', '\x0D',
+        '\x0E', '\x0F', '\x10', '\x11', '\x12', '\x13', '\x14',
+        '\x15', '\x16', '\x17', '\x18', '\x19', '\x1A', '\x1B',
+        '\x1C', '\x1D', '\x1E', '\x1F',
 
-        /// <summary>
-        /// Плохие символы, которые не должны встречаться в записях.
-        /// </summary>
-        public static char[] BadCharacters { get; } =
+        '\x7F', '\x80', '\x81', '\x82', '\x83', '\x84', '\x85',
+        '\x86', '\x87', '\x88', '\x89', '\x8A', '\x8B', '\x8C',
+        '\x8D', '\x8E', '\x8F', '\x90', '\x91', '\x92', '\x93',
+        '\x94', '\x95', '\x96', '\x97', '\x98', '\x99', '\x9A',
+        '\x9B', '\x9C', '\x9D', '\x9E', '\x9F',
+
+        // Пунктуация
+        '\xA0', // Non breaking space
+        '\xAD', // Soft hyphen
+
+        // Расширенная пунктуация
+        '\u2000', // En quad
+        '\u2001', // Em quad
+        '\u2002', // En space
+        '\u2003', // Em space
+        '\u2004', // Three per em space
+        '\u2005', // Four per em space
+        '\u2006', // Six per em space
+        '\u2007', // Figure space
+        '\u2008', // Punctuation space
+        '\u2009', // Thin space
+        '\u200A', // Hair space
+        '\u200B', // Zero width space
+        '\u200C', // Zero width non-joiner
+        '\u200D', // Zero width joiner
+        '\u200E', '\u200F',
+
+        '\u2010', // Hyphen
+        '\u2011', // Non breaking hyphen
+        '\u2012', // Figure dash
+        '\u2013', // En dash
+        '\u2014', // Em dash
+        '\u2015', // Horizontal bar
+        '\u2016', // Double vertical line
+        '\u2017', // Double low line
+        '\u2018', // Left single quotation mark
+        '\u2019', // Right single quotation mark
+        '\u201A', // Single low-9 quotation mark
+        '\u201B', // Single high reversed-9 quotation mark
+        '\u201C', // Left double quotation mark
+        '\u201D', // Right double quotation mark
+        '\u201E', // Double low-9 quotation mark
+        '\u201F', // Double high reversed-9 quotation mark
+
+        '\u2028', // Line separator
+        '\u2029', // Paragraph separator
+        '\u202F', // Narrow no-break space
+
+        '\u205F', // Medium mathematical space
+        '\u2060', // Word joiner
+
+        '\u2420', // Symbol for space
+        '\u2422', // Blank symbol
+        '\u2423', // Open box
+
+        '\u3000', // Ideographic space
+
+        '\uFEFF' // Zero width no-break space
+    };
+
+    #endregion
+
+    #region Private members
+
+    /// <summary>
+    /// Разделители в спецификации полей
+    /// </summary>
+    private static readonly char[] _delimiters = { ';', ',', ' ', '\t' };
+
+    private static IEnumerable<Field> _GetField1
+        (
+            IEnumerable<Field> fields,
+            string? oneSpec
+        )
+    {
+        Sure.NotNull ((object?) fields);
+
+        if (string.IsNullOrEmpty (oneSpec))
         {
-            // Управляющие символы
-            '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06',
-            '\x07', '\x08', '\x09', '\x0A', '\x0B', '\x0C', '\x0D',
-            '\x0E', '\x0F', '\x10', '\x11', '\x12', '\x13', '\x14',
-            '\x15', '\x16', '\x17', '\x18', '\x19', '\x1A', '\x1B',
-            '\x1C', '\x1D', '\x1E', '\x1F',
+            return Array.Empty<Field>();
+        }
 
-            '\x7F', '\x80', '\x81', '\x82', '\x83', '\x84', '\x85',
-            '\x86', '\x87', '\x88', '\x89', '\x8A', '\x8B', '\x8C',
-            '\x8D', '\x8E', '\x8F', '\x90', '\x91', '\x92', '\x93',
-            '\x94', '\x95', '\x96', '\x97', '\x98', '\x99', '\x9A',
-            '\x9B', '\x9C', '\x9D', '\x9E', '\x9F',
+        if (oneSpec.Contains ("x"))
+        {
+            oneSpec = oneSpec.Replace ("x", "[0-9]");
+        }
 
-            // Пунктуация
-            '\xA0', // Non breaking space
-            '\xAD', // Soft hyphen
+        if (oneSpec.Contains ("X"))
+        {
+            oneSpec = oneSpec.Replace ("X", "[0-9]");
+        }
 
-            // Расширенная пунктуация
-            '\u2000', // En quad
-            '\u2001', // Em quad
-            '\u2002', // En space
-            '\u2003', // Em space
-            '\u2004', // Three per em space
-            '\u2005', // Four per em space
-            '\u2006', // Six per em space
-            '\u2007', // Figure space
-            '\u2008', // Punctuation space
-            '\u2009', // Thin space
-            '\u200A', // Hair space
-            '\u200B', // Zero width space
-            '\u200C', // Zero width non-joiner
-            '\u200D', // Zero width joiner
-            '\u200E', '\u200F',
+        return oneSpec.Contains ("[")
+            ? fields.GetFieldRegex (oneSpec)
+            : fields.GetField (FastNumber.ParseInt32 (oneSpec));
+    }
 
-            '\u2010', // Hyphen
-            '\u2011', // Non breaking hyphen
-            '\u2012', // Figure dash
-            '\u2013', // En dash
-            '\u2014', // Em dash
-            '\u2015', // Horizontal bar
-            '\u2016', // Double vertical line
-            '\u2017', // Double low line
-            '\u2018', // Left single quotation mark
-            '\u2019', // Right single quotation mark
-            '\u201A', // Single low-9 quotation mark
-            '\u201B', // Single high reversed-9 quotation mark
-            '\u201C', // Left double quotation mark
-            '\u201D', // Right double quotation mark
-            '\u201E', // Double low-9 quotation mark
-            '\u201F', // Double high reversed-9 quotation mark
+    private static IEnumerable<Field> _GetField2
+        (
+            IEnumerable<Field> fields,
+            string allSpec
+        )
+    {
+        Sure.NotNull ((object?) fields);
 
-            '\u2028', // Line separator
-            '\u2029', // Paragraph separator
-            '\u202F', // Narrow no-break space
-
-            '\u205F', // Medium mathematical space
-            '\u2060', // Word joiner
-
-            '\u2420', // Symbol for space
-            '\u2422', // Blank symbol
-            '\u2423', // Open box
-
-            '\u3000', // Ideographic space
-
-            '\uFEFF'  // Zero width no-break space
-
-        }; // property BadCharacters
-
-        #endregion
-
-        #region Private members
-
-        /// <summary>
-        /// Разделители в спецификации полей
-        /// </summary>
-        private static readonly char[] _delimiters = {';', ',', ' ', '\t'};
-
-        // ReSharper disable PossibleMultipleEnumeration
-
-        private static IEnumerable<Field> _GetField1
+        var result = new List<Field>();
+        var parts = allSpec.Split
             (
-                IEnumerable<Field> fields,
-                string oneSpec
-            )
+                _delimiters,
+                StringSplitOptions.RemoveEmptyEntries
+            );
+
+        foreach (var oneSpec in parts)
         {
-            if (string.IsNullOrEmpty (oneSpec))
-            {
-                return Array.Empty<Field>();
-            }
+            result.AddRange (_GetField1 (fields, oneSpec));
+        }
 
-            if (oneSpec.Contains("x"))
-            {
-                oneSpec = oneSpec.Replace("x", "[0-9]");
-            }
+        return result.ToArray();
+    }
 
-            if (oneSpec.Contains("X"))
-            {
-                oneSpec = oneSpec.Replace("X", "[0-9]");
-            }
+    #endregion
 
-            return oneSpec.Contains("[")
-                ? fields.GetFieldRegex(oneSpec)
-                : fields.GetField(FastNumber.ParseInt32(oneSpec));
+    #region Public methods
 
-        } // method _GetField1
+    /// <summary>
+    /// Отбор полей записи согласно заданной спецификации.
+    /// </summary>
+    public static Field[] GetFieldBySpec
+        (
+            this IEnumerable<Field> fields,
+            string? allSpec
+        )
+    {
+        Sure.NotNull ((object?) fields);
 
-        private static IEnumerable<Field> _GetField2
-            (
-                IEnumerable<Field> fields,
-                string allSpec
-            )
+        /*
+
+           Спецификация состоит из двух частей,
+           разделенных восклицательным знаком:
+
+           1. Обязательная часть: поля, включаемые в результат.
+           2. Необязательная часть: поля, исключаемые из результата.
+
+         */
+
+        if (string.IsNullOrEmpty (allSpec))
         {
-            var result = new List<Field>();
+            return Array.Empty<Field>();
+        }
 
-            var parts = allSpec.Split
+        var result = new List<Field>();
+
+        var parts = allSpec.Split ('!');
+        if (parts.Length > 2)
+        {
+            Magna.Logger.LogError
                 (
-                    _delimiters,
-                    StringSplitOptions.RemoveEmptyEntries
+                    nameof (RuleUtility) + "::" + nameof (GetFieldBySpec)
+                    + ": bad spec format={Specification}",
+                    allSpec.ToVisibleString()
                 );
 
-            foreach (var oneSpec in parts)
-            {
-                result.AddRange(_GetField1(fields, oneSpec));
-            }
+            throw new FormatException (nameof (allSpec));
+        }
 
-            return result.ToArray();
-
-        } // method _GetField2
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Отбор полей записи согласно заданной спецификации.
-        /// </summary>
-        public static Field[] GetFieldBySpec
-            (
-                this IEnumerable<Field> fields,
-                string? allSpec
-            )
+        var include = parts[0].Trim (_delimiters);
+        var exclude = parts.Length == 2
+            ? parts[1].Trim (_delimiters)
+            : string.Empty;
+        if (string.IsNullOrEmpty (include))
         {
-            /*
-
-               Спецификация состоит из двух частей,
-               разделенных восклицательным знаком:
-
-               1. Обязательная часть: поля, включаемые в результат.
-               2. Необязательная часть: поля, исключаемые из результата.
-
-             */
-
-            if (string.IsNullOrEmpty (allSpec))
+            if (!string.IsNullOrEmpty (exclude))
             {
-                return Array.Empty<Field>();
+                result.AddRange (fields);
             }
+        }
+        else
+        {
+            result.AddRange (_GetField2 (fields, include));
+        }
 
-            var result = new List<Field>();
-
-            var parts = allSpec.Split ('!');
-            if (parts.Length > 2)
-            {
-                Magna.Error
-                    (
-                        nameof (RuleUtility) + "::" + nameof (GetFieldBySpec)
-                        + "bad spec format="
-                        + allSpec.ToVisibleString()
-                    );
-
-                throw new FormatException (nameof (allSpec));
-            }
-
-            var include = parts[0].Trim (_delimiters);
-            var exclude = parts.Length == 2
-                ? parts[1].Trim(_delimiters)
-                : string.Empty;
-            if (string.IsNullOrEmpty(include))
-            {
-                if (!string.IsNullOrEmpty(exclude))
-                {
-                    result.AddRange(fields);
-                }
-            }
-            else
-            {
-                result.AddRange(_GetField2(fields, include));
-            }
-
+        result = result.Distinct().ToList();
+        if (result.Count != 0)
+        {
             result = result
-                .Distinct()
+                .Except (_GetField2 (fields, exclude))
                 .ToList();
-            if (result.Count != 0)
-            {
-                result = result
-                    .Except(_GetField2(fields, exclude))
-                    .ToList();
-            }
+        }
 
-            return result.ToArray();
+        return result.ToArray();
+    }
 
-        } // method GetFieldBySpec
+    /// <summary>
+    /// Проверка: плохой символ?
+    /// </summary>
+    public static bool IsBadCharacter (char c)
+    {
+        return Array.IndexOf (BadCharacters, c) >= 0;
+    }
 
-        /// <summary>
-        /// Проверка: плохой символ?
-        /// </summary>
-        public static bool IsBadCharacter (char c) => Array.IndexOf (BadCharacters, c) >= 0;
+    /// <summary>
+    /// Индекс первого найденного плохого символа в строке.
+    /// </summary>
+    public static int BadCharacterPosition
+        (
+            string text
+        )
+    {
+        Sure.NotNull (text);
 
-        /// <summary>
-        /// Индекс первого найденного плохого символа в строке.
-        /// </summary>
-        public static int BadCharacterPosition
-            (
-                string text
-            )
+        for (var i = 0; i < text.Length; i++)
         {
-            for (var i = 0; i < text.Length; i++)
+            var c = text[i];
+            if (IsBadCharacter (c))
             {
-                var c = text[i];
-                if (IsBadCharacter(c))
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// Перенумерация полей.
+    /// </summary>
+    public static Record RenumberFields
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        RenumberFields (record, record.Fields);
+
+        return record;
+    }
+
+    /// <summary>
+    /// Перенумерация полей (точнее, повторов).
+    /// </summary>
+    public static void RenumberFields
+        (
+            Record record,
+            IEnumerable<Field> fields
+        )
+    {
+        Sure.NotNull (record);
+        Sure.NotNull ((object?) fields);
+
+        var seen = new List<int>();
+
+        foreach (var field in fields)
+        {
+            field.Record = record;
+            var count = 1;
+            foreach (var s in seen)
+            {
+                if (s == field.Tag)
                 {
-                    return i;
+                    count++;
                 }
             }
 
-            return -1;
-
-        } // method BadCharacterPosition
-
-        /// <summary>
-        /// Перенумерация полей.
-        /// </summary>
-        public static Record RenumberFields
-            (
-                Record record
-            )
-        {
-            RenumberFields
-                (
-                    record,
-                    record.Fields
-                );
-
-            return record;
-
-        } // method RenumberFields
-
-        /// <summary>
-        /// Перенумерация полей (точнее, повторов).
-        /// </summary>
-        public static void RenumberFields
-            (
-                Record record,
-                IEnumerable<Field> fields
-            )
-        {
-            var seen = new List<int>();
-
-            foreach (var field in fields)
+            seen.Add (field.Tag);
+            field.Repeat = count;
+            foreach (var subField in field.Subfields)
             {
-                field.Record = record;
-                var count = 1;
-                foreach (var s in seen)
-                {
-                    if (s == field.Tag)
-                    {
-                        count++;
-                    }
-                }
-                seen.Add (field.Tag);
-                field.Repeat = count;
-                foreach (var subField in field.Subfields)
-                {
-                    subField.Field = field;
-                }
+                subField.Field = field;
             }
+        }
+    }
 
-        } // method RenumberFields
-
-        #endregion
-
-    } // class RuleUtility
-
-} // namespace ManagedIrbis.Quality
+    #endregion
+}

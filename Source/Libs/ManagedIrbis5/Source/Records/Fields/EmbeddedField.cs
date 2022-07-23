@@ -20,91 +20,100 @@ using System.Collections.Generic;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Работа со встроенными полями.
+/// </summary>
+public static class EmbeddedField
 {
+    #region Constants
+
     /// <summary>
-    /// Работа со встроенными полями.
+    /// Код по умолчанию, используемый для встраивания полей.
     /// </summary>
-    public static class EmbeddedField
+    public const char DefaultCode = '1';
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение массива встроенных полей.
+    /// </summary>
+    public static Field[] GetEmbeddedFields
+        (
+            IEnumerable<SubField> subfields,
+            char sign = DefaultCode
+        )
     {
-        #region Constants
+        Sure.NotNull ((object?) subfields);
 
-        /// <summary>
-        /// Код по умолчанию, используемый для встраивания полей.
-        /// </summary>
-        public const char DefaultCode = '1';
+        var result = new List<Field>();
+        Field? found = null;
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Получение массива встроенных полей.
-        /// </summary>
-        public static Field[] GetEmbeddedFields
-            (
-                IEnumerable<SubField> subfields,
-                char sign = DefaultCode
-            )
+        foreach (var subField in subfields)
         {
-            var result = new List<Field>();
-            Field? found = null;
-
-            foreach (var subField in subfields)
+            if (subField.Code == sign)
             {
-                if (subField.Code == sign)
+                if (found is not null)
                 {
-                    if (found is not null)
-                    {
-                        result.Add(found);
-                    }
-
-                    var value = subField.Value;
-                    if (value.IsEmpty())
-                    {
-                        Magna.Error
-                            (
-                                nameof(EmbeddedField) + "::" + nameof(GetEmbeddedFields)
-                                + ": bad format"
-                            );
-
-                        throw new FormatException();
-                    }
-
-                    var tag = int.Parse(value.AsSpan()[..3]);
-                    found = new Field { Tag = tag };
-                    if (tag < 10 && value.Length > 3)
-                    {
-                        found.Value = value.Substring(3);
-                    }
+                    result.Add (found);
                 }
-                else
+
+                var value = subField.Value;
+                if (value.IsEmpty())
                 {
-                    found?.Add(subField.Code, subField.Value);
+                    Magna.Logger.LogError
+                        (
+                            nameof (EmbeddedField) + "::" + nameof (GetEmbeddedFields)
+                            + ": bad format"
+                        );
+
+                    throw new FormatException();
+                }
+
+                var tag = int.Parse (value.AsSpan()[..3]);
+                found = new Field { Tag = tag };
+                if (tag < 10 && value.Length > 3)
+                {
+                    found.Value = value.Substring (3);
                 }
             }
-
-            if (!ReferenceEquals(found, null))
+            else
             {
-                result.Add(found);
+                found?.Add (subField.Code, subField.Value);
             }
+        }
 
-            return result.ToArray();
+        if (!ReferenceEquals (found, null))
+        {
+            result.Add (found);
+        }
 
-        } // method GetEmbeddedFields
+        return result.ToArray();
+    }
 
-        /// <summary>
-        /// Получение встроенных полей с указанным тегом.
-        /// </summary>
-        public static Field[] GetEmbeddedField(this Field field, int tag)
-            => GetEmbeddedFields(field.Subfields).GetField(tag);
+    /// <summary>
+    /// Получение встроенных полей с указанным тегом.
+    /// </summary>
+    public static Field[] GetEmbeddedField
+        (
+            this Field field,
+            int tag
+        )
+    {
+        Sure.NotNull (field);
+        Sure.Positive (tag);
 
-        #endregion
+        return GetEmbeddedFields (field.Subfields).GetField (tag);
+    }
 
-    } // class EmbeddedField
-
-} // namespace ManagedIrbis
+    #endregion
+}

@@ -20,6 +20,8 @@ using System;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -58,7 +60,7 @@ public sealed class PoolGuard
     {
         Sure.NotNull (pool);
 
-        Magna.Trace (nameof(PoolGuard));
+        Magna.Logger.LogTrace (nameof(PoolGuard) + "::Constructor");
 
         Pool = pool;
         Connection = Pool.AcquireConnection();
@@ -86,7 +88,7 @@ public sealed class PoolGuard
     /// <inheritdoc cref="IDisposable.Dispose" />
     public void Dispose()
     {
-        Magna.Trace (nameof (PoolGuard) + "::" + nameof (Dispose));
+        Magna.Logger.LogTrace (nameof (PoolGuard) + "::" + nameof (Dispose));
         Pool.ReleaseConnection (Connection);
     }
 

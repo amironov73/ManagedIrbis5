@@ -4,10 +4,10 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* MethodRunner.cs --
+/* MethodRunner.cs -- запускает методы из динамических библиотек
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,100 +19,101 @@ using System.Text;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
-namespace ManagedIrbis.PlatformSpecific
+namespace ManagedIrbis.PlatformSpecific;
+
+/// <summary>
+/// Умеет запускать методы из динамических библиотек.
+/// </summary>
+[ExcludeFromCodeCoverage]
+internal static class MethodRunner
 {
+    #region Properties
+
     /// <summary>
-    /// Method runner
+    /// Buffer size, bytes.
     /// </summary>
-    [ExcludeFromCodeCoverage]
-    static class MethodRunner
+    public static int BufferSize = 100 * 1024;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Run process and get its output.
+    /// </summary>
+    public static MethodResult RunMethod
+        (
+            string dllName,
+            string methodName,
+            bool winApi,
+            string input
+        )
     {
-        #region Properties
+        Sure.NotNullNorEmpty (dllName);
+        Sure.NotNullNorEmpty (methodName);
 
-        /// <summary>
-        /// Buffer size, bytes.
-        /// </summary>
-        public static int BufferSize = 100*1024;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Run process and get its output.
-        /// </summary>
-        public static MethodResult RunMethod
-            (
-                string dllName,
-                string methodName,
-                bool winApi,
-                string input
-            )
+        var result = new MethodResult
         {
-            MethodResult result = new MethodResult
+            Input = input
+        };
+
+        var buffer = new StringBuilder (BufferSize);
+        buffer.Append (input); // ???
+
+        try
+        {
+            if (winApi)
             {
-                Input = input
-            };
-
-            StringBuilder buffer = new StringBuilder(BufferSize);
-            buffer.Append(input); // ???
-
-            try
-            {
-
-                if (winApi)
-                {
-                    WinapiPluginFunction winapiPlugin
-                        = (WinapiPluginFunction) DllCache
+                var winapiPlugin
+                    = (WinapiPluginFunction)DllCache
                         .CreateDelegate
-                        (
-                            dllName,
-                            methodName,
-                            typeof(WinapiPluginFunction)
-                        );
-                    result.ReturnCode = winapiPlugin
-                        (
-                            input,
-                            buffer,
-                            buffer.Capacity
-                        );
-                }
-                else
-                {
-                    CdeclPluginFunction cdeclPlugin
-                        = (CdeclPluginFunction) DllCache
-                        .CreateDelegate
-                        (
-                            dllName,
-                            methodName,
-                            typeof(CdeclPluginFunction)
-                        );
-                    result.ReturnCode = cdeclPlugin
-                        (
-                            input,
-                            buffer,
-                            buffer.Capacity
-                        );
-                }
-
-                result.Output = buffer.ToString();
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
+                            (
+                                dllName,
+                                methodName,
+                                typeof (WinapiPluginFunction)
+                            );
+                result.ReturnCode = winapiPlugin
                     (
-                        "MethodRunner::RunMethod",
-                        exception
+                        input,
+                        buffer,
+                        buffer.Capacity
+                    );
+            }
+            else
+            {
+                var cdeclPlugin
+                    = (CdeclPluginFunction)DllCache
+                        .CreateDelegate
+                            (
+                                dllName,
+                                methodName,
+                                typeof (CdeclPluginFunction)
+                            );
+                result.ReturnCode = cdeclPlugin
+                    (
+                        input,
+                        buffer,
+                        buffer.Capacity
                     );
             }
 
-            return result;
-
+            result.Output = buffer.ToString();
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (MethodRunner) + "::" + nameof (RunMethod)
+                );
         }
 
-        #endregion
-
+        return result;
     }
+
+    #endregion
 }
