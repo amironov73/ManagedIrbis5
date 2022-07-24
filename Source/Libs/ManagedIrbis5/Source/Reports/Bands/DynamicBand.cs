@@ -17,61 +17,62 @@ using System;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Reports
+namespace ManagedIrbis.Reports;
+
+/// <summary>
+/// Динамическая полоса отчета. Рендеринг происходит в обработчике
+/// события.
+/// </summary>
+public class DynamicBand
+    : ReportBand
 {
+    #region Events
+
     /// <summary>
-    /// Динамическая полоса отчета. Рендеринг происходит в обработчике
-    /// события.
+    /// Raised on band rendering.
     /// </summary>
-    public class DynamicBand
-        : ReportBand
+    public event EventHandler<ReportRenderingEventArgs>? Rendering;
+
+    #endregion
+
+    #region ReportBand members
+
+    /// <inheritdoc cref="ReportBand.Render" />
+    public override void Render
+        (
+            ReportContext context
+        )
     {
-        #region Events
+        Sure.NotNull (context);
 
-        /// <summary>
-        /// Raised on band rendering.
-        /// </summary>
-        public event EventHandler<ReportRenderingEventArgs>? Rendering;
+        OnBeforeRendering (context);
 
-        #endregion
-
-        #region ReportBand members
-
-        /// <inheritdoc cref="ReportBand.Render" />
-        public override void Render
-            (
-                ReportContext context
-            )
+        var rendering = Rendering;
+        if (rendering is not null)
         {
-            OnBeforeRendering(context);
-
-            var rendering = Rendering;
-            if (rendering is not null)
+            try
             {
-                try
-                {
-                    var eventArgs = new ReportRenderingEventArgs(context);
-                    rendering(this, eventArgs);
-                }
-                catch (Exception exception)
-                {
-                    Magna.TraceException
-                        (
-                            nameof(DynamicBand) + "::" + nameof(Render),
-                            exception
-                        );
-                }
+                var eventArgs = new ReportRenderingEventArgs (context);
+                rendering (this, eventArgs);
             }
+            catch (Exception exception)
+            {
+                Magna.Logger.LogError
+                    (
+                        exception,
+                        nameof (DynamicBand) + "::" + nameof (Render)
+                    );
+            }
+        }
 
-            OnAfterRendering(context);
-        } // method Render
+        OnAfterRendering (context);
+    }
 
-        #endregion
-
-    } // class DynamicBand
-
-} // namespace ManagedIrbis.Reports
+    #endregion
+}

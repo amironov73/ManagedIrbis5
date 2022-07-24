@@ -22,201 +22,204 @@ using System.Xml.Serialization;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Reports
-{
-    /// <summary>
-    /// Базовый тип для ячеек отчета.
-    /// </summary>
-    public abstract class ReportCell
-        : IAttributable,
+namespace ManagedIrbis.Reports;
+
+/// <summary>
+/// Базовый тип для ячеек отчета.
+/// </summary>
+public abstract class ReportCell
+    : IAttributable,
         IVerifiable,
         IDisposable
+{
+    #region Events
+
+    /// <summary>
+    /// Raised after <see cref="Compute"/>.
+    /// </summary>
+    public event EventHandler<ReportEventArgs>? AfterCompute;
+
+    /// <summary>
+    /// Raised before <see cref="Compute"/>.
+    /// </summary>
+    public event EventHandler<ReportEventArgs>? BeforeCompute;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Attributes.
+    /// </summary>
+    [XmlArray ("attr")]
+    [JsonPropertyName ("attr")]
+    public ReportAttributes Attributes { get; }
+
+    /// <summary>
+    /// Band.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    public ReportBand? Band { get; internal set; }
+
+    /// <summary>
+    /// Report.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    public IrbisReport? Report { get; internal set; }
+
+    /// <summary>
+    /// Arbitrary user data.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    protected ReportCell()
     {
-        #region Events
+        Magna.Logger.LogTrace (nameof (ReportCell) + "::Constructor");
 
-        /// <summary>
-        /// Raised after <see cref="Compute"/>.
-        /// </summary>
-        public event EventHandler<ReportEventArgs>? AfterCompute;
+        Attributes = new ReportAttributes();
+    }
 
-        /// <summary>
-        /// Raised before <see cref="Compute"/>.
-        /// </summary>
-        public event EventHandler<ReportEventArgs>? BeforeCompute;
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    protected ReportCell
+        (
+            params ReportAttribute[] attributes
+        )
+        : this()
+    {
+        Sure.NotNull (attributes);
 
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Attributes.
-        /// </summary>
-        [XmlArray("attr")]
-        [JsonPropertyName("attr")]
-        public ReportAttributes Attributes { get; }
-
-        /// <summary>
-        /// Band.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public ReportBand? Band { get; internal set; }
-
-        /// <summary>
-        /// Report.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public IrbisReport? Report { get; internal set; }
-
-        /// <summary>
-        /// Arbitrary user data.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public object? UserData { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        protected ReportCell()
+        foreach (var attribute in attributes)
         {
-            Magna.Trace("ReportCell::Constructor");
-
-            Attributes = new ReportAttributes();
+            Attributes.Add
+                (
+                    attribute.Name.ThrowIfNull(),
+                    attribute.Value.ThrowIfNull()
+                );
         }
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        protected ReportCell
-            (
-                params ReportAttribute[] attributes
-            )
-            : this()
-        {
-            foreach (ReportAttribute attribute in attributes)
-            {
-                Attributes.Add
-                    (
-                        attribute.Name.ThrowIfNull("attribute.Name"),
-                        attribute.Value.ThrowIfNull("attribute.Value")
-                    );
-            }
-        }
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Private members
+    /// <summary>
+    /// Called after <see cref="Compute"/>.
+    /// </summary>
+    protected void OnAfterCompute
+        (
+            ReportContext context
+        )
+    {
+        Sure.NotNull (context);
 
-        /// <summary>
-        /// Called after <see cref="Compute"/>.
-        /// </summary>
-        protected void OnAfterCompute
-            (
-                ReportContext context
-            )
-        {
-            ReportEventArgs eventArgs
-                = new ReportEventArgs(context);
-            AfterCompute.Raise(eventArgs);
-        }
+        var eventArgs = new ReportEventArgs (context);
+        AfterCompute.Raise (eventArgs);
+    }
 
-        /// <summary>
-        /// Called before <see cref="Compute"/>.
-        /// </summary>
-        protected void OnBeforeCompute
-            (
-                ReportContext context
-            )
-        {
-            ReportEventArgs eventArgs
-                = new ReportEventArgs(context);
-            BeforeCompute.Raise(eventArgs);
-        }
+    /// <summary>
+    /// Called before <see cref="Compute"/>.
+    /// </summary>
+    protected void OnBeforeCompute
+        (
+            ReportContext context
+        )
+    {
+        Sure.NotNull (context);
 
-        #endregion
+        var eventArgs = new ReportEventArgs (context);
+        BeforeCompute.Raise (eventArgs);
+    }
 
-        #region Public methods
+    #endregion
 
-        /// <summary>
-        /// Clone the cell.
-        /// </summary>
-        public virtual ReportCell Clone()
-        {
-            return (ReportCell) MemberwiseClone();
-        }
+    #region Public methods
 
-        /// <summary>
-        /// Compute value of the cell.
-        /// </summary>
-        public virtual string? Compute
-            (
-                ReportContext context
-            )
-        {
-            OnBeforeCompute(context);
+    /// <summary>
+    /// Clone the cell.
+    /// </summary>
+    public virtual ReportCell Clone()
+    {
+        return (ReportCell)MemberwiseClone();
+    }
 
-            // Nothing to do here
+    /// <summary>
+    /// Compute value of the cell.
+    /// </summary>
+    public virtual string? Compute
+        (
+            ReportContext context
+        )
+    {
+        Sure.NotNull (context);
 
-            OnAfterCompute(context);
+        OnBeforeCompute (context);
 
-            return null;
-        }
+        // Nothing to do here
 
-        /// <summary>
-        /// Render the cell.
-        /// </summary>
-        public virtual void Render
-            (
-                ReportContext context
-            )
-        {
-            // Nothing to do here
-        }
+        OnAfterCompute (context);
 
-        #endregion
+        return null;
+    }
 
-        #region IVerifiable members
+    /// <summary>
+    /// Render the cell.
+    /// </summary>
+    public virtual void Render
+        (
+            ReportContext context
+        )
+    {
+        Sure.NotNull (context);
+    }
 
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            Verifier<ReportCell> verifier
-                = new Verifier<ReportCell>(this, throwOnError);
+    #endregion
 
-            verifier
-                .VerifySubObject(Attributes, "attributes");
+    #region IVerifiable members
 
-            // TODO Add some verification
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<ReportCell> (this, throwOnError);
 
-            return verifier.Result;
-        }
+        verifier
+            .VerifySubObject (Attributes);
 
-        #endregion
+        // TODO Add some verification
 
-        #region IDisposable members
+        return verifier.Result;
+    }
 
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public virtual void Dispose()
-        {
-            // Nothing to do here
-            Magna.Trace("ReportCell::Dispose");
-        }
+    #endregion
 
-        #endregion
+    #region IDisposable members
 
-    } // class ReportCell
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public virtual void Dispose()
+    {
+        Magna.Logger.LogTrace (nameof (ReportCell) + "::" + nameof (Dispose));
+    }
 
-} // namespace ManagedIrbis.Reports
+    #endregion
+}

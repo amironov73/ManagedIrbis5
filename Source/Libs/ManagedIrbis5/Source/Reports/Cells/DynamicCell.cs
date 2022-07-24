@@ -16,99 +16,96 @@ using System;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Reports
+namespace ManagedIrbis.Reports;
+
+/// <summary>
+/// Динамическая ячейка отчета. Рендеринг происходит в обработчике
+/// события.
+/// </summary>
+public class DynamicCell
+    : ReportCell
 {
+    #region Events
+
     /// <summary>
-    /// Динамическая ячейка отчета. Рендеринг происходит в обработчике
-    /// события.
+    /// Raised on cell computation.
     /// </summary>
-    public class DynamicCell
-        : ReportCell
+    public event EventHandler<ReportComputeEventArgs>? Computation;
+
+    /// <summary>
+    /// Raised on cell rendering.
+    /// </summary>
+    public event EventHandler<ReportRenderingEventArgs>? Rendering;
+
+    #endregion
+
+    #region ReportCell members
+
+    /// <inheritdoc cref="ReportCell.Compute"/>
+    public override string? Compute
+        (
+            ReportContext context
+        )
     {
-        #region Events
+        Sure.NotNull (context);
 
-        /// <summary>
-        /// Raised on cell computation.
-        /// </summary>
-        public event EventHandler<ReportComputeEventArgs>? Computation;
+        ReportComputeEventArgs? eventArgs = null;
 
-        /// <summary>
-        /// Raised on cell rendering.
-        /// </summary>
-        public event EventHandler<ReportRenderingEventArgs>? Rendering;
+        OnBeforeCompute (context);
 
-        #endregion
-
-        #region ReportCell members
-
-        /// <inheritdoc cref="ReportCell.Compute"/>
-        public override string? Compute
-            (
-                ReportContext context
-            )
+        var computation = Computation;
+        if (computation is not null)
         {
-            ReportComputeEventArgs? eventArgs = null;
-
-            OnBeforeCompute(context);
-
-            var computation = Computation;
-            if (computation is not null)
+            try
             {
-                try
-                {
-                    eventArgs = new ReportComputeEventArgs(context);
-                    computation(this, eventArgs);
-                }
-                catch (Exception exception)
-                {
-                    Magna.TraceException
-                        (
-                            nameof(DynamicCell) + "::" + nameof(Compute),
-                            exception
-                        );
-                }
+                eventArgs = new ReportComputeEventArgs (context);
+                computation (this, eventArgs);
             }
+            catch (Exception exception)
+            {
+                Magna.Logger.LogError
+                    (
+                        exception,
+                        nameof (DynamicCell) + "::" + nameof (Compute)
+                    );
+            }
+        }
 
-            OnAfterCompute(context);
+        OnAfterCompute (context);
 
-            return eventArgs?.Result;
-        } // method Compute
+        return eventArgs?.Result;
+    }
 
-        /// <inheritdoc cref="ReportCell.Render" />
-        public override void Render
-            (
-                ReportContext context
-            )
+    /// <inheritdoc cref="ReportCell.Render" />
+    public override void Render
+        (
+            ReportContext context
+        )
+    {
+        var rendering = Rendering;
+        if (rendering is not null)
         {
-            var rendering = Rendering;
-            if (rendering is not null)
+            try
             {
-                try
-                {
-                    var eventArgs = new ReportRenderingEventArgs(context);
-                    rendering(this, eventArgs);
-                }
-                catch (Exception exception)
-                {
-                    Magna.TraceException
-                        (
-                            nameof(DynamicCell) + "::" + nameof(Render),
-                            exception
-                        );
-                }
+                var eventArgs = new ReportRenderingEventArgs (context);
+                rendering (this, eventArgs);
             }
-        } // method Render
+            catch (Exception exception)
+            {
+                Magna.Logger.LogError
+                    (
+                        exception,
+                        nameof (DynamicCell) + "::" + nameof (Render)
+                    );
+            }
+        }
+    }
 
-        #endregion
-
-        #region Object members
-
-        #endregion
-
-    } // class DynamicCell
-
-} // namespace ManagedIrbis.Reports
+    #endregion
+}

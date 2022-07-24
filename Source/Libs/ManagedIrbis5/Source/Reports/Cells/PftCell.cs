@@ -21,160 +21,163 @@ using AM;
 
 using ManagedIrbis.Pft;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Reports
+namespace ManagedIrbis.Reports;
+
+/// <summary>
+/// Ячейка с PFT-форматированием.
+/// </summary>
+public class PftCell
+    : ReportCell
 {
+    #region Properties
+
     /// <summary>
-    /// Ячейка с PFT-форматированием.
+    /// PFT-скрипт.
     /// </summary>
-    public class PftCell
-        : ReportCell
+    [JsonPropertyName ("text")]
+    [XmlAttribute ("text")]
+    public string? Text { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftCell()
     {
-        #region Properties
+    }
 
-        /// <summary>
-        /// PFT-скрипт.
-        /// </summary>
-        [JsonPropertyName("text")]
-        [XmlAttribute("text")]
-        public string? Text { get; set; }
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftCell
+        (
+            string format
+        )
+    {
+        Text = format;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Private members
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftCell()
+    private PftFormatter? _formatter;
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region ReportCell members
+
+    /// <inheritdoc cref="ReportCell.Compute"/>
+    public override string? Compute
+        (
+            ReportContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        Magna.Logger.LogTrace (nameof (PftCell) + "::" + nameof (Compute));
+
+        OnBeforeCompute (context);
+
+        var text = Text;
+
+        if (string.IsNullOrEmpty (text))
         {
+            // TODO: Skip or not on empty format?
+
+            return null;
         }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftCell
-            (
-                string format
-            )
+        string? result = null;
+
+        /*
+
+        ConnectedClient connected
+            = context.Provider as ConnectedClient;
+        if (!ReferenceEquals(connected, null))
         {
-            Text = format;
+            var record = context.CurrentRecord;
+            if (!ReferenceEquals(record, null))
+            {
+                result = connected.FormatRecord
+                (
+                    record,
+                    text
+                );
+            }
+        }
+        else
+        {
+            if (ReferenceEquals(_formatter, null))
+            {
+                _formatter = context.GetFormatter(text);
+            }
+
+            context.SetVariables(_formatter);
+
+            result
+                = _formatter.FormatRecord(context.CurrentRecord);
+
+            OnAfterCompute(context);
         }
 
-        #endregion
+        */
 
-        #region Private members
+        return result;
+    }
 
-        private PftFormatter? _formatter;
+    /// <inheritdoc cref="ReportCell.Render" />
+    public override void Render
+        (
+            ReportContext context
+        )
+    {
+        Sure.NotNull (context);
 
-        #endregion
+        Magna.Logger.LogTrace (nameof (PftCell) + "::" + nameof (Render));
 
-        #region Public methods
+        var text = Text;
 
-        #endregion
-
-        #region ReportCell members
-
-        /// <inheritdoc cref="ReportCell.Compute"/>
-        public override string? Compute
-            (
-                ReportContext context
-            )
+        if (string.IsNullOrEmpty (text))
         {
-            Magna.Trace("PftCell::Compute");
+            // TODO: Skip or not on empty format?
 
-            OnBeforeCompute(context);
+            return;
+        }
 
-            var text = Text;
+        var driver = context.Driver;
+        var formatted = Compute (context);
 
-            if (string.IsNullOrEmpty(text))
-            {
-                // TODO: Skip or not on empty format?
+        driver.BeginCell (context, this);
+        driver.Write (context, formatted);
+        driver.EndCell (context, this);
+    }
 
-                return null;
-            }
+    #endregion
 
-            string? result = null;
+    #region IDisposable members
 
-            /*
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public override void Dispose()
+    {
+        base.Dispose();
 
-            ConnectedClient connected
-                = context.Provider as ConnectedClient;
-            if (!ReferenceEquals(connected, null))
-            {
-                var record = context.CurrentRecord;
-                if (!ReferenceEquals(record, null))
-                {
-                    result = connected.FormatRecord
-                    (
-                        record,
-                        text
-                    );
-                }
-            }
-            else
-            {
-                if (ReferenceEquals(_formatter, null))
-                {
-                    _formatter = context.GetFormatter(text);
-                }
+        _formatter?.Dispose();
+        _formatter = null;
+    }
 
-                context.SetVariables(_formatter);
-
-                result
-                    = _formatter.FormatRecord(context.CurrentRecord);
-
-                OnAfterCompute(context);
-            }
-
-            */
-
-            return result;
-        } // method Compute
-
-        /// <inheritdoc cref="ReportCell.Render" />
-        public override void Render
-            (
-                ReportContext context
-            )
-        {
-            Magna.Trace("PftCell::Render");
-
-            var text = Text;
-
-            if (string.IsNullOrEmpty(text))
-            {
-                // TODO: Skip or not on empty format?
-
-                return;
-            }
-
-            var driver = context.Driver;
-            var formatted = Compute(context);
-
-            driver.BeginCell(context, this);
-            driver.Write(context, formatted);
-            driver.EndCell(context, this);
-        } // method Render
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public override void Dispose()
-        {
-            base.Dispose();
-
-            _formatter?.Dispose();
-            _formatter = null;
-        } // method Dispose
-
-        #endregion
-
-    } // class PftCell
-
-} // namespace ManagedIrbis.Reports
+    #endregion
+}

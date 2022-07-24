@@ -21,183 +21,191 @@ using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Безусловный строковый литерал (в одинарных кавычках).
+/// </summary>
+public sealed class PftUnconditionalLiteral
+    : PftNode
 {
-    /// <summary>
-    /// Безусловный строковый литерал (в одинарных кавычках).
-    /// </summary>
-    public sealed class PftUnconditionalLiteral
-        : PftNode
+    #region Properties
+
+    /// <inheritdoc cref="PftNode.ConstantExpression" />
+    public override bool ConstantExpression => true;
+
+    /// <inheritdoc cref="PftNode.Text" />
+    public override string? Text
     {
-        #region Properties
+        get => base.Text;
+        set => base.Text = PftUtility.PrepareText (value);
+    }
 
-        /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression => true;
+    /// <inheritdoc cref="PftNode.RequiresConnection" />
+    public override bool RequiresConnection => false;
 
-        /// <inheritdoc cref="PftNode.Text" />
-        public override string? Text
+    /// <summary>
+    /// Throw an exception when empty literal detected.
+    /// </summary>
+    public static bool ThrowOnEmpty { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Static constructor.
+    /// </summary>
+    static PftUnconditionalLiteral()
+    {
+        ThrowOnEmpty = false;
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftUnconditionalLiteral()
+    {
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftUnconditionalLiteral
+        (
+            string text
+        )
+    {
+        Text = text;
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftUnconditionalLiteral
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.UnconditionalLiteral);
+
+        try
         {
-            get => base.Text;
-            set => base.Text = PftUtility.PrepareText(value);
+            Text = token.Text.ThrowIfNull();
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (PftUnconditionalLiteral) + "::Constructor"
+                );
+
+            throw new PftSyntaxException (token, exception);
         }
 
-        /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection => false;
-
-        /// <summary>
-        /// Throw an exception when empty literal detected.
-        /// </summary>
-        public static bool ThrowOnEmpty { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Static constructor.
-        /// </summary>
-        static PftUnconditionalLiteral()
+        if (string.IsNullOrEmpty (Text) && ThrowOnEmpty)
         {
-            ThrowOnEmpty = false;
+            Magna.Logger.LogError
+                (
+                    nameof (PftUnconditionalLiteral) + "::Constructor"
+                    + ": empty unconditional literal"
+                );
+
+            throw new PftSyntaxException (token);
         }
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftUnconditionalLiteral()
-        {
-        }
+    #endregion
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftUnconditionalLiteral
-            (
-                string text
-            )
-        {
-            Text = text;
-        }
+    #region PftNode members
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftUnconditionalLiteral
-            (
-                PftToken token
-            )
-            : base(token)
-        {
-            token.MustBe(PftTokenKind.UnconditionalLiteral);
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        Sure.NotNull (compiler);
 
-            try
-            {
-                Text = token.Text.ThrowIfNull("token.Text");
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        "PftUnconditionalLiteral::Constructor",
-                        exception
-                    );
-
-                throw new PftSyntaxException(token, exception);
-            }
-
-            if (string.IsNullOrEmpty(Text) && ThrowOnEmpty)
-            {
-                Magna.Error
-                    (
-                        "PftUnconditionalLiteral::Constructor: "
-                        + "empty unconditional literal"
-                    );
-
-                throw new PftSyntaxException(token);
-            }
-        }
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
-        {
-            compiler.StartMethod(this);
-            compiler
-                .WriteIndent()
-                .WriteLine
+        compiler.StartMethod (this);
+        compiler
+            .WriteIndent()
+            .WriteLine
                 (
                     "Context.Write(null,\"{0}\");",
                     Text
                 );
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        var text = Text;
+
+        // Never throw on empty literal
+
+        if (context.UpperMode
+            && !ReferenceEquals (text, null))
+        {
+            text = IrbisText.ToUpper (text);
         }
 
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
+        context.Write
             (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
+                this,
+                text
+            );
 
-            var text = Text;
+        OnAfterExecution (context);
+    }
 
-            // Never throw on empty literal
+    /// <inheritdoc cref="PftNode.Optimize" />
+    public override PftNode Optimize()
+    {
+        // Never optimize!
 
-            if (context.UpperMode
-                && !ReferenceEquals(text, null))
-            {
-                text = IrbisText.ToUpper(text);
-            }
+        return this;
+    }
 
-            context.Write
-                (
-                    this,
-                    text
-                );
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
 
-            OnAfterExecution(context);
-        }
+        printer.Write ('\'')
+            .Write (Text)
+            .Write ('\'');
+    }
 
-        /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
-        {
-            // Never optimize!
+    #endregion
 
-            return this;
-        }
+    #region Object members
 
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer.Write('\'')
-                .Write(Text)
-                .Write('\'');
-        }
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return '\'' + Text + '\'';
+    }
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => '\'' + Text + '\'';
-
-        #endregion
-
-    } // class PftUnconditionalLiteral
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #endregion
+}

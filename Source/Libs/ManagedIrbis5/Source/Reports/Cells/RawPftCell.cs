@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* RawPftCell.cs --
+/* RawPftCell.cs -- ячейка, выводящая отформатированный PFT в "сыром" виде
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,51 +15,51 @@
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Reports
+namespace ManagedIrbis.Reports;
+
+/// <summary>
+/// Ячейка, выводящая отформатированный PFT в "сыром" виде.
+/// </summary>
+public sealed class RawPftCell
+    : PftCell
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public sealed class RawPftCell
-        : PftCell
+    #region PftCell members
+
+    /// <inheritdoc cref="PftCell.Render" />
+    public override void Render
+        (
+            ReportContext context
+        )
     {
-        #region PftCell members
+        Sure.NotNull (context);
 
-        /// <inheritdoc cref="PftCell.Render" />
-        public override void Render
-            (
-                ReportContext context
-            )
+        Magna.Logger.LogTrace (nameof (RawPftCell) + "::" + nameof (Render));
+
+        var text = Text;
+
+        if (string.IsNullOrEmpty (text))
         {
-            Magna.Trace("RawPftCell::Render");
+            // TODO: Skip or not on empty format?
 
-            var text = Text;
+            return;
+        }
 
-            if (string.IsNullOrEmpty(text))
-            {
-                // TODO: Skip or not on empty format?
+        var driver = context.Driver;
+        var formatted = Compute (context);
+        driver.BeginCell (context, this);
+        if (!string.IsNullOrEmpty (formatted))
+        {
+            context.Output.Write (formatted);
+        }
 
-                return;
-            }
+        driver.EndCell (context, this);
+    }
 
-            var driver = context.Driver;
-            var formatted = Compute(context);
-            driver.BeginCell(context, this);
-            if (!string.IsNullOrEmpty(formatted))
-            {
-                context.Output.Write(formatted);
-            }
-
-            driver.EndCell(context, this);
-
-        } // method Render
-
-        #endregion
-
-    } // class RawPftCell
-
-} // namespace ManagedIrbis.Reports
+    #endregion
+}

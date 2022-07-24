@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftVariableReference.cs --
+/* PftVariableReference.cs -- ссылка на переменную в PFT
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,453 +27,471 @@ using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Ссылка на переменную в PFT.
+/// </summary>
+public sealed class PftVariableReference
+    : PftNumeric
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Имя переменной.
     /// </summary>
-    public sealed class PftVariableReference
-        : PftNumeric
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Индекс.
+    /// </summary>
+    public IndexSpecification Index { get; set; }
+
+    /// <summary>
+    /// Код подполя.
+    /// </summary>
+    public char SubFieldCode { get; set; }
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax" />
+    public override bool ExtendedSyntax => true;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftVariableReference()
     {
-        #region Properties
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Name of the variable.
-        /// </summary>
-        public string? Name { get; set; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftVariableReference
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
 
-        /// <summary>
-        /// Index.
-        /// </summary>
-        public IndexSpecification Index { get; set; }
+        Name = name;
+    }
 
-        /// <summary>
-        /// Subfield code.
-        /// </summary>
-        public char SubFieldCode { get; set; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftVariableReference
+        (
+            string name,
+            int index
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+        Sure.NonNegative (index);
 
-        /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax => true;
+        Name = name;
+        Index = IndexSpecification.GetLiteral (index);
+    }
 
-        #endregion
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftVariableReference
+        (
+            string name,
+            char code
+        )
+    {
+        Sure.NotNullNorEmpty (name);
 
-        #region Construction
+        Name = name;
+        SubFieldCode = code;
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftVariableReference()
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftVariableReference
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        Sure.NotNull (token);
+
+        token.MustBe (PftTokenKind.Variable);
+
+        var text = token.Text.ThrowIfNull();
+        if (text.StartsWith ("$"))
         {
+            text = text.Substring (1);
         }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftVariableReference
-            (
-                string name
-            )
-        {
-            Name = name;
-        }
+        Name = text;
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftVariableReference
-            (
-                string name,
-                int index
-            )
-        {
-            Name = name;
-            Index = IndexSpecification.GetLiteral(index);
-        }
+    #endregion
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftVariableReference
-            (
-                string name,
-                char code
-            )
-        {
-            Name = name;
-            SubFieldCode = code;
-        }
+    #region Private members
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftVariableReference
-            (
-                PftToken token
-            )
-            : base(token)
-        {
-            token.MustBe(PftTokenKind.Variable);
+    private static ReadOnlyMemory<char> _ReadTo
+        (
+            TextReader reader,
+            char delimiter
+        )
+    {
+        var result = new StringBuilder();
 
-            var text = token.Text.ThrowIfNull("token.Text");
-            if (text.StartsWith("$"))
+        while (true)
+        {
+            var next = reader.Read();
+            if (next < 0)
             {
-                text = text.Substring(1);
-            }
-            Name = text;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private static ReadOnlyMemory<char> _ReadTo
-            (
-                StringReader reader,
-                char delimiter
-            )
-        {
-            var result = new StringBuilder();
-
-            while (true)
-            {
-                var next = reader.Read();
-                if (next < 0)
-                {
-                    break;
-                }
-                var c = (char)next;
-                if (c == delimiter)
-                {
-                    break;
-                }
-                result.Append(c);
+                break;
             }
 
-            return result.ToString().AsMemory();
+            var c = (char)next;
+            if (c == delimiter)
+            {
+                break;
+            }
+
+            result.Append (c);
         }
 
-        private static Field _ParseLine
-            (
-                string line
-            )
+        return result.ToString().AsMemory();
+    }
+
+    private static Field _ParseLine
+        (
+            string line
+        )
+    {
+        var reader = new StringReader (line);
+        var result = new Field
         {
-            var reader = new StringReader(line);
-            var result = new Field
+            Value = _ReadTo (reader, '^').ToString()
+        };
+
+        while (true)
+        {
+            var next = reader.Read();
+            if (next < 0)
             {
-                Value = _ReadTo(reader, '^').ToString()
+                break;
+            }
+
+            var code = char.ToLower ((char)next);
+            var text = _ReadTo (reader, '^').ToString();
+            var subField = new SubField
+            {
+                Code = code,
+                Value = text
             };
-
-            while (true)
-            {
-                var next = reader.Read();
-                if (next < 0)
-                {
-                    break;
-                }
-
-                var code = char.ToLower((char)next);
-                var text = _ReadTo(reader, '^').ToString();
-                var subField = new SubField
-                {
-                    Code = code,
-                    Value = text
-                };
-                result.Subfields.Add(subField);
-            }
-
-            return result;
+            result.Subfields.Add (subField);
         }
 
-        #endregion
+        return result;
+    }
 
-        #region Public methods
+    #endregion
 
-        /// <summary>
-        /// Do the variable.
-        /// </summary>
-        public static double DoVariable
-            (
-                PftContext context,
-                PftNode node,
-                string name,
-                IndexSpecification index,
-                char subField
-            )
+    #region Public methods
+
+    /// <summary>
+    /// Do the variable.
+    /// </summary>
+    public static double DoVariable
+        (
+            PftContext context,
+            PftNode node,
+            string name,
+            IndexSpecification index,
+            char subField
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (node);
+        Sure.NotNullNorEmpty (name);
+
+        var result = 0.0;
+
+        var variable = context.Variables.GetExistingVariable (name);
+        if (ReferenceEquals (variable, null))
         {
-            var result = 0.0;
+            Magna.Logger.LogError
+                (
+                    nameof (PftVariableReference) + "::" + nameof (DoVariable)
+                    + ": unknown variable {Name}",
+                    name.ToVisibleString()
+                );
 
-            var variable = context.Variables.GetExistingVariable(name);
-            if (ReferenceEquals(variable, null))
+            throw new PftSemanticException
+                (
+                    "unknown variable: " + name
+                );
+        }
+
+        if (variable.IsNumeric)
+        {
+            result = variable.NumericValue;
+            context.Write
+                (
+                    node,
+                    result.ToInvariantString()
+                );
+        }
+        else
+        {
+            var output = variable.StringValue ?? string.Empty;
+
+            if (index.Kind != IndexKind.None)
             {
-                Magna.Error
+                var lines = output.SplitLines();
+
+                lines = PftUtility.GetArrayItem
                     (
-                        "PftVariableReference::DoVariable: "
-                        + "unknown variable="
-                        + name.ToVisibleString()
+                        context,
+                        lines,
+                        index
                     );
 
-                throw new PftSemanticException
-                    (
-                        "unknown variable: " + name
-                    );
-            }
+                if (subField != SubField.NoCode)
+                {
+                    var list = new List<string>();
 
-            if (variable.IsNumeric)
-            {
-                result = variable.NumericValue;
-                context.Write
+                    foreach (var line in lines)
+                    {
+                        var field = _ParseLine (line);
+                        var text = field.GetFirstSubFieldValue
+                            (
+                                subField
+                            );
+                        if (!text.IsEmpty())
+                        {
+                            list.Add (text);
+                        }
+                    }
+
+                    lines = list.ToArray();
+                }
+
+                output = string.Join
                     (
-                        node,
-                        result.ToInvariantString()
+                        Environment.NewLine,
+                        lines
                     );
             }
             else
             {
-                var output = variable.StringValue ?? string.Empty;
-
-                if (index.Kind != IndexKind.None)
+                if (subField != SubField.NoCode)
                 {
                     var lines = output.SplitLines();
 
-                    lines = PftUtility.GetArrayItem
-                        (
-                            context,
-                            lines,
-                            index
-                        );
+                    var list = new List<string>();
 
-                    if (subField != SubField.NoCode)
+                    foreach (var line in lines)
                     {
-                        var list = new List<string>();
-
-                        foreach (var line in lines)
+                        var field = _ParseLine (line);
+                        var text = field.GetFirstSubFieldValue
+                            (
+                                subField
+                            );
+                        if (!text.IsEmpty())
                         {
-                            var field = _ParseLine(line);
-                            var text = field.GetFirstSubFieldValue
-                                (
-                                    subField
-                                );
-                            if (!text.IsEmpty())
-                            {
-                                list.Add(text);
-                            }
+                            list.Add (text);
                         }
-
-                        lines = list.ToArray();
                     }
 
+                    lines = list.ToArray();
                     output = string.Join
                         (
                             Environment.NewLine,
                             lines
                         );
                 }
-                else
-                {
-                    if (subField != SubField.NoCode)
-                    {
-                        var lines = output.SplitLines();
-
-                        var list = new List<string>();
-
-                        foreach (var line in lines)
-                        {
-                            var field = _ParseLine(line);
-                            var text = field.GetFirstSubFieldValue
-                                (
-                                    subField
-                                );
-                            if (!text.IsEmpty())
-                            {
-                                list.Add(text);
-                            }
-                        }
-
-                        lines = list.ToArray();
-                        output = string.Join
-                            (
-                                Environment.NewLine,
-                                lines
-                            );
-                    }
-                }
-
-                context.Write(node, output);
             }
 
-            return result;
+            context.Write (node, output);
         }
 
-        #endregion
-
-        #region ICloneable members
-
-        /// <inheritdoc cref="ICloneable.Clone" />
-        public override object Clone()
-        {
-            var result
-                = (PftVariableReference)base.Clone();
-
-            result.Index = (IndexSpecification)Index.Clone();
-
-            return result;
-        }
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.CompareNode" />
-        internal override void CompareNode
-            (
-                PftNode otherNode
-            )
-        {
-            base.CompareNode(otherNode);
-
-            var otherVariable
-                = (PftVariableReference)otherNode;
-            if (Name != otherVariable.Name
-                || !IndexSpecification.Compare(Index, otherVariable.Index)
-                || SubFieldCode != otherVariable.SubFieldCode)
-            {
-                throw new PftSerializationException();
-            }
-        }
-
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
-        {
-            if (ReferenceEquals(Name, null))
-            {
-                throw new PftCompilerException();
-            }
-
-            var index = compiler.CompileIndex(Index);
-
-            compiler.StartMethod(this);
-
-            compiler
-                .WriteIndent()
-                .WriteLine
-                    (
-                        "double result = PftVariableReference.DoVariable("
-                        + "Context, null, \"{0}\", {1}, '\\x{2:X4}');",
-                        CompilerUtility.Escape(Name),
-                        index.Reference,
-                        (int)SubFieldCode
-                    )
-                .WriteIndent()
-                .WriteLine("return result;");
-
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
-        }
-
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
-        {
-            base.Deserialize(reader);
-
-            Name = reader.ReadNullableString();
-            Index.Deserialize(reader);
-            SubFieldCode = reader.ReadChar();
-        }
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            Value = DoVariable
-                (
-                    context,
-                    this,
-                    Name.ThrowIfNull("Name"),
-                    Index,
-                    SubFieldCode
-                );
-
-            OnAfterExecution(context);
-        }
-
-        /// <inheritdoc cref="PftNode.GetNodeInfo" />
-        public override PftNodeInfo GetNodeInfo()
-        {
-            var result = base.GetNodeInfo();
-
-            if (Index.Kind != IndexKind.None)
-            {
-                result.Children.Add(Index.GetNodeInfo());
-            }
-
-            return result;
-        }
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer.Write(ToString());
-        }
-
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
-        {
-            base.Serialize(writer);
-
-            writer.WriteNullable(Name);
-            Index.Serialize(writer);
-            writer.Write(SubFieldCode);
-        }
-
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        protected internal override bool ShouldSerializeText() => false;
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-
-            result.Append("$");
-            result.Append(Name);
-            if (Index.Kind != IndexKind.None)
-            {
-                result.Append(Index.ToText());
-            }
-
-            if (SubFieldCode != SubField.NoCode)
-            {
-                result.Append('^');
-                result.Append(SubFieldCode);
-            }
-
-
-            return result.ToString();
-        }
-
-        #endregion
+        return result;
     }
+
+    #endregion
+
+    #region ICloneable members
+
+    /// <inheritdoc cref="ICloneable.Clone" />
+    public override object Clone()
+    {
+        var result
+            = (PftVariableReference)base.Clone();
+
+        result.Index = (IndexSpecification)Index.Clone();
+
+        return result;
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.CompareNode" />
+    internal override void CompareNode
+        (
+            PftNode otherNode
+        )
+    {
+        base.CompareNode (otherNode);
+
+        var otherVariable
+            = (PftVariableReference)otherNode;
+        if (Name != otherVariable.Name
+            || !IndexSpecification.Compare (Index, otherVariable.Index)
+            || SubFieldCode != otherVariable.SubFieldCode)
+        {
+            throw new PftSerializationException();
+        }
+    }
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        if (ReferenceEquals (Name, null))
+        {
+            throw new PftCompilerException();
+        }
+
+        var index = compiler.CompileIndex (Index);
+
+        compiler.StartMethod (this);
+
+        compiler
+            .WriteIndent()
+            .WriteLine
+                (
+                    "double result = PftVariableReference.DoVariable("
+                    + "Context, null, \"{0}\", {1}, '\\x{2:X4}');",
+                    CompilerUtility.Escape (Name),
+                    index.Reference,
+                    (int)SubFieldCode
+                )
+            .WriteIndent()
+            .WriteLine ("return result;");
+
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        base.Deserialize (reader);
+
+        Name = reader.ReadNullableString();
+        Index.Deserialize (reader);
+        SubFieldCode = reader.ReadChar();
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        OnBeforeExecution (context);
+
+        Value = DoVariable
+            (
+                context,
+                this,
+                Name.ThrowIfNull(),
+                Index,
+                SubFieldCode
+            );
+
+        OnAfterExecution (context);
+    }
+
+    /// <inheritdoc cref="PftNode.GetNodeInfo" />
+    public override PftNodeInfo GetNodeInfo()
+    {
+        var result = base.GetNodeInfo();
+
+        if (Index.Kind != IndexKind.None)
+        {
+            result.Children.Add (Index.GetNodeInfo());
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        printer.Write (ToString());
+    }
+
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        base.Serialize (writer);
+
+        writer.WriteNullable (Name);
+        Index.Serialize (writer);
+        writer.Write (SubFieldCode);
+    }
+
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    protected internal override bool ShouldSerializeText() => false;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var result = new StringBuilder();
+
+        result.Append ("$");
+        result.Append (Name);
+        if (Index.Kind != IndexKind.None)
+        {
+            result.Append (Index.ToText());
+        }
+
+        if (SubFieldCode != SubField.NoCode)
+        {
+            result.Append ('^');
+            result.Append (SubFieldCode);
+        }
+
+
+        return result.ToString();
+    }
+
+    #endregion
 }
