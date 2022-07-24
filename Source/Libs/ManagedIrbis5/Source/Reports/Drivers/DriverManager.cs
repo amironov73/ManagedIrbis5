@@ -9,7 +9,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* DriverManager.cs --
+/* DriverManager.cs -- управление драйверами отчетов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,138 +17,125 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Reports
+namespace ManagedIrbis.Reports;
+
+/// <summary>
+/// Управление драйверами отчетов.
+/// </summary>
+public static class DriverManager
 {
+    #region Constants
+
     /// <summary>
-    ///
+    /// CSV driver.
     /// </summary>
-    public static class DriverManager
+    public const string Csv = "CSV";
+
+    /// <summary>
+    /// Dataset driver.
+    /// </summary>
+    public const string Dataset = "Dataset";
+
+    /// <summary>
+    /// HTML driver.
+    /// </summary>
+    public const string Html = "HTML";
+
+    /// <summary>
+    /// LaTex driver.
+    /// </summary>
+    public const string Latex = "LaTex";
+
+    /// <summary>
+    /// Markdown driver.
+    /// </summary>
+    public const string Markdown = "Markdown";
+
+    /// <summary>
+    /// Plain text driver.
+    /// </summary>
+    public const string PlainText = "PlainText";
+
+    /// <summary>
+    /// RTf driver.
+    /// </summary>
+    public const string Rtf = "RTF";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Реестр драйверов.
+    /// </summary>
+    public static Dictionary<string, Type> Registry { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Статический конструктор.
+    /// </summary>
+    static DriverManager()
     {
-        #region Constants
-
-        /// <summary>
-        /// CSV driver.
-        /// </summary>
-        public const string Csv = "CSV";
-
-        /// <summary>
-        /// Dataset driver.
-        /// </summary>
-        public const string Dataset = "Dataset";
-
-        /// <summary>
-        /// HTML driver.
-        /// </summary>
-        public const string Html = "HTML";
-
-        /// <summary>
-        /// LaTex driver.
-        /// </summary>
-        public const string Latex = "LaTex";
-
-        /// <summary>
-        /// Markdown driver.
-        /// </summary>
-        public const string Markdown = "Markdown";
-
-        /// <summary>
-        /// Plain text driver.
-        /// </summary>
-        public const string PlainText = "PlainText";
-
-        /// <summary>
-        /// RTf driver.
-        /// </summary>
-        public const string Rtf = "RTF";
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Registry.
-        /// </summary>
-        public static Dictionary<string, Type> Registry
+        Registry = new Dictionary<string, Type>
         {
-            get; private set;
-        }
+            { Dataset, typeof (DatasetDriver) },
+            { Csv, typeof (CsvDriver) },
+            { Html, typeof (HtmlDriver) },
+            { Latex, typeof (LatexDriver) },
+            { Markdown, typeof (MarkdownDriver) },
+            { PlainText, typeof (PlainTextDriver) },
+            { Rtf, typeof (RtfDriver) },
+        };
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Public methods
 
-        static DriverManager()
+    /// <summary>
+    /// Get <see cref="ReportDriver"/> by name.
+    /// </summary>
+    public static ReportDriver? GetDriver
+        (
+            string name,
+            bool throwOnError
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        if (!Registry.TryGetValue (name, out var type))
         {
-            Registry = new Dictionary<string, Type>
+            Magna.Logger.LogError
+                (
+                    nameof (DriverManager) + "::" + nameof (GetDriver)
+                    + ": driver not found: {Name}",
+                    name.ToVisibleString()
+                );
+
+            if (throwOnError)
             {
-#if CLASSIC || NETCORE
-
-                { Dataset, typeof(DatasetDriver) },
-
-#endif
-
-                { Csv, typeof(CsvDriver) },
-                { Html, typeof(HtmlDriver) },
-                { Latex, typeof(LatexDriver) },
-                { Markdown, typeof(MarkdownDriver) },
-                { PlainText, typeof(PlainTextDriver) },
-                { Rtf, typeof(RtfDriver) },
-            };
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Get <see cref="ReportDriver"/> by name.
-        /// </summary>
-        public static ReportDriver? GetDriver
-            (
-                string name,
-                bool throwOnError
-            )
-        {
-            if (!Registry.TryGetValue(name, out var type))
-            {
-                Magna.Error
-                    (
-                        "DriverManager::GetDriver: "
-                        + "driver not found: "
-                        + name.ToVisibleString()
-                    );
-
-                if (throwOnError)
-                {
-                    throw new IrbisException
-                        (
-                            "Driver not found: "
-                            + name.ToVisibleString()
-                        );
-                }
-
-                return null;
+                throw new IrbisException ("driver not found: " + name.ToVisibleString());
             }
 
-            var result = (ReportDriver?) Activator.CreateInstance(type);
-
-            return result;
+            return null;
         }
 
-        #endregion
+        var result = (ReportDriver?) Activator.CreateInstance (type);
+
+        return result;
     }
+
+    #endregion
 }

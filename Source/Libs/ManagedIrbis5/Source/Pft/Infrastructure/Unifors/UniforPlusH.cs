@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforPlusH.cs --
+/* UniforPlusH.cs -- неописанная функция
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,75 +15,80 @@
 
 using System;
 using System.Collections.Generic;
+
 using AM;
+
 using ManagedIrbis.Infrastructure;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Unifors
+namespace ManagedIrbis.Pft.Infrastructure.Unifors;
+
+//
+// ibatrak
+//
+// Неописанная функция unifor('+H')
+// Очень странная функция.
+// Перебирает строку как массив однобайтовых символов.
+// Выкидывает каждый четвертый, в начало строки помещает
+// количество таких групп.
+//
+
+internal static class UniforPlusH
 {
-    //
-    // ibatrak
-    //
-    // Неописанная функция unifor('+H')
-    // Очень странная функция.
-    // Перебирает строку как массив однобайтовых символов.
-    // Выкидывает каждый четвертый, в начало строки помещает
-    // количество таких групп.
-    //
+    #region Public methods
 
-    static class UniforPlusH
+    /// <summary>
+    /// Take every 3 of four bytes
+    /// </summary>
+    public static void Take3Of4
+        (
+            PftContext context,
+            PftNode? node,
+            string? expression
+        )
     {
-        #region Public methods
+        Sure.NotNull (context);
 
-        /// <summary>
-        /// Take every 3 of four bytes
-        /// </summary>
-        public static void Take3Of4
-            (
-                PftContext context,
-                PftNode? node,
-                string? expression
-            )
+        if (string.IsNullOrEmpty (expression))
         {
-            if (string.IsNullOrEmpty(expression))
-            {
-                return;
-            }
+            return;
+        }
 
-            var encoding = IrbisEncoding.Utf8;
-            var bytes = encoding.GetBytes(expression);
-            var list = new List<byte>();
-            var length = bytes.Length < 3
-                ? 0
-                : unchecked((bytes.Length + 3) / 4);
-            list.Add((byte)('0' + length));
-            for (var i = 0; i < bytes.Length; i++)
+        var encoding = IrbisEncoding.Utf8;
+        var bytes = encoding.GetBytes (expression);
+        var list = new List<byte>();
+        var length = bytes.Length < 3
+            ? 0
+            : unchecked ((bytes.Length + 3) / 4);
+        list.Add ((byte)('0' + length));
+        for (var i = 0; i < bytes.Length; i++)
+        {
+            if (i % 4 != 3)
             {
-                if (i % 4 != 3)
-                {
-                    list.Add(bytes[i]);
-                }
-            }
-
-            try
-            {
-                var bytes2 = list.ToArray();
-                var output = encoding.GetString(bytes2, 0, bytes2.Length);
-                context.WriteAndSetFlag(node, output);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        "UniforPlusH::Take3Of4",
-                        exception
-                    );
+                list.Add (bytes[i]);
             }
         }
 
-        #endregion
+        try
+        {
+            var bytes2 = list.ToArray();
+            var output = encoding.GetString (bytes2, 0, bytes2.Length);
+            context.WriteAndSetFlag (node, output);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (UniforPlusH) + "::" + nameof (Take3Of4)
+                );
+        }
     }
+
+    #endregion
 }

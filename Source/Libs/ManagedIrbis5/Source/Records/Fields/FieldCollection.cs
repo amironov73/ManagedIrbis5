@@ -29,377 +29,374 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Коллекция полей записи.
+/// Отличается тем, что принципиально
+/// не принимает значения <c>null</c>.
+/// </summary>
+[Serializable]
+public sealed class FieldCollection
+    : Collection<Field>,
+        IHandmadeSerializable,
+        IReadOnly<FieldCollection>
 {
+    #region Properties
+
     /// <summary>
-    /// Коллекция полей записи.
-    /// Отличается тем, что принципиально
-    /// не принимает значения <c>null</c>.
+    /// Record.
     /// </summary>
-    [Serializable]
-    public sealed class FieldCollection
-        : Collection<Field>,
-            IHandmadeSerializable,
-            IReadOnly<FieldCollection>
+    [JsonIgnore]
+    public Record? Record { get; internal set; }
+
+    #endregion
+
+    #region Private members
+
+    private List<Field> _GetInnerList()
     {
-        #region Properties
+        // ReSharper disable SuspiciousTypeConversion.Global
+        var result = (List<Field>) Items;
 
-        /// <summary>
-        /// Record.
-        /// </summary>
-        [JsonIgnore]
-        public Record? Record { get; internal set; }
+        // ReSharper restore SuspiciousTypeConversion.Global
 
-        #endregion
+        return result;
+    }
 
-        #region Private members
+    private bool _dontRenumber;
 
-        private List<Field> _GetInnerList()
+    internal void _RenumberFields()
+    {
+        if (_dontRenumber)
         {
-            // ReSharper disable SuspiciousTypeConversion.Global
-            var result = (List<Field>)Items;
-
-            // ReSharper restore SuspiciousTypeConversion.Global
-
-            return result;
+            return;
         }
 
-        private bool _dontRenumber;
+        var seen = new DictionaryCounterInt32<int>();
 
-        internal void _RenumberFields()
+        foreach (var field in this)
         {
-            if (_dontRenumber)
-            {
-                return;
-            }
+            var tag = field.Tag;
+            field.Repeat = tag <= 0
+                ? 0
+                : seen.Increment (tag);
+        }
+    }
 
-            var seen = new DictionaryCounterInt32<int>();
-
-            foreach (var field in this)
-            {
-                var tag = field.Tag;
-                field.Repeat = tag <= 0
-                    ? 0
-                    : seen.Increment (tag);
-            }
-
-        } // method _RenumberField
-
-        internal void SetModified()
+    internal void SetModified()
+    {
+        if (Record is not null)
         {
-            if (Record is not null)
-            {
-                Record.Modified = true;
-            }
+            Record.Modified = true;
+        }
+    }
 
-        } // method SetModified
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Public methods
+    /// <summary>
+    /// Add capacity to eliminate reallocations.
+    /// </summary>
+    public void AddCapacity
+        (
+            int delta
+        )
+    {
+        Sure.Positive (delta);
 
-        /// <summary>
-        /// Add capacity to eliminate reallocations.
-        /// </summary>
-        public void AddCapacity
+        var innerList = _GetInnerList();
+        var newCapacity = innerList.Count + delta;
+        if (newCapacity > innerList.Capacity)
+        {
+            innerList.Capacity = newCapacity;
+        }
+    }
+
+    /// <summary>
+    /// Add range of <see cref="Field"/>s.
+    /// </summary>
+    public void AddRange
+        (
+            IEnumerable<Field> fields
+        )
+    {
+        Sure.NotNull ((object?) fields);
+
+        ThrowIfReadOnly();
+
+        if (fields is IList<Field> outer)
+        {
+            var inner = _GetInnerList();
+            var newCapacity = inner.Count + outer.Count;
+            EnsureCapacity (newCapacity);
+        }
+
+        foreach (var field in fields)
+        {
+            Add (field);
+        }
+    }
+
+    /// <summary>
+    /// Применение значения поля к коллекции.
+    /// Только для неповторяющихся полей!
+    /// </summary>
+    public FieldCollection ApplyFieldValue
+        (
+            int tag,
+            string? value
+        )
+    {
+        Sure.Positive (tag);
+
+        var field = this.FirstOrDefault
             (
-                int delta
-            )
+                item => item.Tag == tag
+            );
+
+        if (string.IsNullOrEmpty (value))
         {
-            var innerList = _GetInnerList();
-            var newCapacity = innerList.Count + delta;
-            if (newCapacity > innerList.Capacity)
+            if (field is not null)
             {
-                innerList.Capacity = newCapacity;
+                Remove (field);
             }
-
-        } // method AddCapacity
-
-        /// <summary>
-        /// Add range of <see cref="Field"/>s.
-        /// </summary>
-        public void AddRange
-            (
-                IEnumerable<Field> fields
-            )
+        }
+        else
         {
-            ThrowIfReadOnly();
+            // значение не пустое
 
-            if (fields is IList<Field> outer)
+            if (field is null)
             {
-                var inner = _GetInnerList();
-                var newCapacity = inner.Count + outer.Count;
-                EnsureCapacity (newCapacity);
-            }
-
-            foreach (var field in fields)
-            {
+                field = new Field { Tag = tag };
                 Add (field);
             }
 
-        } // method AddRange
+            field.Value = value;
+        }
 
-        /// <summary>
-        /// Применение значения поля к коллекции.
-        /// Только для неповторяющихся полей!
-        /// </summary>
-        public FieldCollection ApplyFieldValue
-            (
-                int tag,
-                string? value
-            )
+        return this;
+    }
+
+    /// <summary>
+    /// Запрет перенумерации полей перед большим обновлением.
+    /// </summary>
+    public void BeginUpdate()
+    {
+        _dontRenumber = true;
+    }
+
+    /// <summary>
+    /// Создание клона коллекции.
+    /// </summary>
+    public FieldCollection Clone()
+    {
+        var result = new FieldCollection { Record = Record };
+
+        foreach (var field in this)
         {
-            var field = this.FirstOrDefault
-                (
-                    item => item.Tag == tag
-                );
+            var clone = field.Clone();
+            clone.Record = Record;
+            result.Add (clone);
+        }
 
-            if (string.IsNullOrEmpty (value))
-            {
-                if (field is not null)
-                {
-                    Remove (field);
-                }
-            }
-            else
-            {
-                // значение не пустое
+        return result;
+    }
 
-                if (field is null)
-                {
-                    field = new Field { Tag = tag };
-                    Add (field);
-                }
+    /// <summary>
+    /// Разрешение перенумерации полей по окончании большого обновления.
+    /// </summary>
+    public void EndUpdate()
+    {
+        _dontRenumber = false;
+        _RenumberFields();
+    }
 
-                field.Value = value;
-            }
+    /// <summary>
+    /// Убеждаемся, что емкость списка не меньше указанного числа.
+    /// </summary>
+    public void EnsureCapacity
+        (
+            int capacity
+        )
+    {
+        Sure.Positive (capacity);
 
-            return this;
-
-        } // method ApplyFieldValue
-
-        /// <summary>
-        /// Запрет перенумерации полей перед большим обновлением.
-        /// </summary>
-        public void BeginUpdate() => _dontRenumber = true;
-
-        /// <summary>
-        /// Создание клона коллекции.
-        /// </summary>
-        public FieldCollection Clone()
+        var innerList = _GetInnerList();
+        if (innerList.Capacity < capacity)
         {
-            var result = new FieldCollection { Record = Record };
+            innerList.Capacity = capacity;
+        }
+    }
 
-            foreach (var field in this)
-            {
-                var clone = field.Clone();
-                clone.Record = Record;
-                result.Add (clone);
-            }
+    #endregion
 
-            return result;
+    #region Collection<T> members
 
-        } // method Clone
+    /// <inheritdoc cref="Collection{T}.ClearItems" />
+    protected override void ClearItems()
+    {
+        ThrowIfReadOnly();
 
-        /// <summary>
-        /// Разрешение перенумерации полей по окончании большого обновления.
-        /// </summary>
-        public void EndUpdate()
+        foreach (var field in this)
         {
-            _dontRenumber = false;
-            _RenumberFields();
+            field.Record = null;
+        }
 
-        } // method EndUpdate
+        SetModified();
 
-        /// <summary>
-        /// Убеждаемся, что емкость списка не меньше указанного числа.
-        /// </summary>
-        public void EnsureCapacity
-            (
-                int capacity
-            )
+        base.ClearItems();
+    }
+
+    /// <inheritdoc cref="Collection{T}.InsertItem" />
+    protected override void InsertItem
+        (
+            int index,
+            Field item
+        )
+    {
+        Sure.NonNegative (index);
+        Sure.NotNull (item);
+
+        ThrowIfReadOnly();
+        Sure.NotNull (item);
+
+        item.Record = Record;
+
+        base.InsertItem (index, item);
+
+        SetModified();
+
+        _RenumberFields();
+    }
+
+    /// <inheritdoc cref="Collection{T}.RemoveItem" />
+    protected override void RemoveItem
+        (
+            int index
+        )
+    {
+        Sure.NonNegative (index);
+
+        ThrowIfReadOnly();
+
+        if (index >= 0 && index < Count)
         {
-            var innerList = _GetInnerList();
-            if (innerList.Capacity < capacity)
-            {
-                innerList.Capacity = capacity;
-            }
+            var field = this[index];
+            field.Record = null;
+        }
 
-        } // method EnsureCapacity
+        base.RemoveItem (index);
 
-        #endregion
+        SetModified();
 
-        #region Collection<T> members
+        _RenumberFields();
+    }
 
-        /// <inheritdoc cref="Collection{T}.ClearItems" />
-        protected override void ClearItems()
+    /// <inheritdoc cref="Collection{T}.SetItem" />
+    protected override void SetItem
+        (
+            int index,
+            Field? item
+        )
+    {
+        Sure.NonNegative (index);
+
+        ThrowIfReadOnly();
+        Sure.NotNull (item);
+
+        item!.Record = Record;
+
+        base.SetItem (index, item);
+
+        SetModified();
+
+        _RenumberFields();
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        ThrowIfReadOnly();
+
+        ClearItems();
+        var array = reader.ReadArray<Field>();
+        AddRange (array);
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WriteArray (this.ToArray());
+    }
+
+    #endregion
+
+    #region IReadOnly<T> members
+
+    /// <inheritdoc cref="IReadOnly{T}.ReadOnly" />
+    public bool ReadOnly { get; internal set; }
+
+    /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
+    public FieldCollection AsReadOnly()
+    {
+        var result = Clone();
+        result.SetReadOnly();
+
+        return result;
+    }
+
+    /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
+    public void SetReadOnly()
+    {
+        ReadOnly = true;
+        foreach (var field in this)
         {
-            ThrowIfReadOnly();
+            field.SetReadOnly();
+        }
+    }
 
-            foreach (var field in this)
-            {
-                field.Record = null;
-            }
-
-            SetModified();
-
-            base.ClearItems();
-
-        } // method ClearItems
-
-        /// <inheritdoc cref="Collection{T}.InsertItem" />
-        protected override void InsertItem
-            (
-                int index,
-                Field item
-            )
+    /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly" />
+    public void ThrowIfReadOnly()
+    {
+        if (ReadOnly)
         {
-            ThrowIfReadOnly();
-            Sure.NotNull (item);
+            Magna.Logger.LogError (nameof (FieldCollection) + "::" + nameof (ThrowIfReadOnly));
 
-            item.Record = Record;
+            throw new ReadOnlyException();
+        }
+    }
 
-            base.InsertItem (index, item);
+    #endregion
 
-            SetModified();
+    #region Object members
 
-            _RenumberFields();
+    /// <inheritdoc cref="Object.ToString" />
+    public override string ToString()
+    {
+        return string.Join (Environment.NewLine, this);
+    }
 
-        } // method InsertItem
-
-        /// <inheritdoc cref="Collection{T}.RemoveItem" />
-        protected override void RemoveItem
-            (
-                int index
-            )
-        {
-            ThrowIfReadOnly();
-
-            if (index >= 0 && index < Count)
-            {
-                var field = this[index];
-                field.Record = null;
-            }
-
-            base.RemoveItem (index);
-
-            SetModified();
-
-            _RenumberFields();
-
-        } // method RemoveItem
-
-        /// <inheritdoc cref="Collection{T}.SetItem" />
-        protected override void SetItem
-            (
-                int index,
-                Field? item
-            )
-        {
-            ThrowIfReadOnly();
-            Sure.NotNull (item);
-
-            item!.Record = Record;
-
-            base.SetItem (index, item);
-
-            SetModified();
-
-            _RenumberFields();
-
-        } // method SetItem
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            ThrowIfReadOnly();
-
-            ClearItems();
-            var array = reader.ReadArray<Field>();
-            AddRange (array);
-
-        } // method RestoreFromStream
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WriteArray (this.ToArray());
-
-        } // method SaveToStream
-
-        #endregion
-
-        #region IReadOnly<T> members
-
-        /// <inheritdoc cref="IReadOnly{T}.ReadOnly" />
-        public bool ReadOnly { get; internal set; }
-
-        /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
-        public FieldCollection AsReadOnly()
-        {
-            var result = Clone();
-            result.SetReadOnly();
-
-            return result;
-
-        } // method AsReadOnly
-
-        /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
-        public void SetReadOnly()
-        {
-            ReadOnly = true;
-            foreach (var field in this)
-            {
-                field.SetReadOnly();
-            }
-
-        } // method SetReadOnly
-
-        /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly" />
-        public void ThrowIfReadOnly()
-        {
-            if (ReadOnly)
-            {
-                Magna.Error
-                    (
-                        nameof (FieldCollection) + "::" + nameof (ThrowIfReadOnly)
-                    );
-
-                throw new ReadOnlyException();
-            }
-
-        } // method ThrowIfReadOnly
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="Object.ToString" />
-        public override string ToString()
-        {
-            return string.Join
-                (
-                    Environment.NewLine,
-                    this
-                );
-        } // method ToString
-
-        #endregion
-
-    } // class FieldCollection
-
-} // namespace ManagedIrbis
+    #endregion
+}

@@ -7,14 +7,13 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* FieldReference.cs --
+/* FieldReference.cs -- ссылка на поле библиографической записи
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -25,369 +24,378 @@ using AM.Linq;
 using AM.Runtime;
 
 using ManagedIrbis.Pft.Infrastructure;
-
 using ManagedIrbis.Pft.Infrastructure.Ast;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+// Формат ссылки
+// "1" |2|+ v3/4^5[6-7]*8.9 +|10| "11"
+// где
+// 1 - условный префикс-литерал
+// 2 - повторяющийся префикс-литерал
+// v - один из символов: d, n, v
+// 3 - тег поля
+// 4 - тег встроенного поля
+// 5 - код подполя
+// 6 - начальный номер повторения
+// 7 - конечный номер повторения
+// 8 - смещение
+// 9 - длина
+// 10 - повторяющийся суффикс-литерал
+// 11 - условный суффикс-литерал
+
+// Примеры ссылок на поля
+// v200
+// v200^a
+// ". - "v200
+// v300+| - |
+// v701[1-2]
+// v701[2]
+// v701^a*2.2
+// "Отсутствует"n700
+
+/// <summary>
+/// Ссылка на поле библиографической записи.
+/// </summary>
+[DebuggerDisplay ("{" + nameof (Tag) + "}")]
+public sealed class FieldReference
+    : IHandmadeSerializable,
+    IVerifiable
 {
-    // Формат ссылки
-    // "1" |2|+ v3/4^5[6-7]*8.9 +|10| "11"
-    // где
-    // 1 - условный префикс-литерал
-    // 2 - повторяющийся префикс-литерал
-    // v - один из символов: d, n, v
-    // 3 - тег поля
-    // 4 - тег встроенного поля
-    // 5 - код подполя
-    // 6 - начальный номер повторения
-    // 7 - конечный номер повторения
-    // 8 - смещение
-    // 9 - длина
-    // 10 - повторяющийся суффикс-литерал
-    // 11 - условный суффикс-литерал
-
-    // Примеры ссылок на поля
-    // v200
-    // v200^a
-    // ". - "v200
-    // v300+| - |
-    // v701[1-2]
-    // v701[2]
-    // v701^a*2.2
-    // "Отсутствует"n700
-
+    #region Constants
 
     /// <summary>
-    ///
+    /// Нет кода.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(Tag) + "}")]
-    public sealed class FieldReference
-        : IHandmadeSerializable,
-        IVerifiable
+    public const char NoCode = '\0';
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Command.
+    /// </summary>
+    public char Command { get; set; }
+
+    /// <summary>
+    /// Embedded.
+    /// </summary>
+    public string? Embedded { get; set; }
+
+    /// <summary>
+    /// Отступ.
+    /// </summary>
+    public int Indent { get; set; }
+
+    /// <summary>
+    /// Смещение.
+    /// </summary>
+    public int Offset { get; set; }
+
+    /// <summary>
+    /// Длина.
+    /// </summary>
+    public int Length { get; set; }
+
+    /// <summary>
+    /// Subfield.
+    /// </summary>
+    public char SubField { get; set; }
+
+    /// <summary>
+    /// Tag.
+    /// </summary>
+    public int Tag { get; set; }
+
+    /// <summary>
+    /// Tag specification.
+    /// </summary>
+    public string? TagSpecification { get; set; }
+
+    /// <summary>
+    /// Field repeat.
+    /// </summary>
+    public IndexSpecification FieldRepeat { get; set; }
+
+    /// <summary>
+    /// Subfield repeat.
+    /// </summary>
+    public IndexSpecification SubFieldRepeat { get; set; }
+
+    /// <summary>
+    /// Subfield specification.
+    /// </summary>
+    public string? SubFieldSpecification { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public FieldReference()
     {
-        #region Constants
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Нет кода.
-        /// </summary>
-        public const char NoCode = '\0';
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public FieldReference
+        (
+            int tag
+        )
+    {
+        Sure.Positive (tag);
 
-        #endregion
+        Tag = tag;
+    }
 
-        #region Properties
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public FieldReference
+        (
+            int tag,
+            char subField
+        )
+    {
+        Sure.Positive (tag);
 
-        /// <summary>
-        /// Command.
-        /// </summary>
-        public char Command { get; set; }
+        Tag = tag;
+        SubField = subField;
+    }
 
-        /// <summary>
-        /// Embedded.
-        /// </summary>
-        public string? Embedded { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Отступ.
-        /// </summary>
-        public int Indent { get; set; }
+    #region Private members
 
-        /// <summary>
-        /// Смещение.
-        /// </summary>
-        public int Offset { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Длина.
-        /// </summary>
-        public int Length { get; set; }
+    #region Public methods
 
-        /// <summary>
-        /// Subfield.
-        /// </summary>
-        public char SubField { get; set; }
+    /// <summary>
+    /// Apply the specification.
+    /// </summary>
+    public void Apply
+        (
+            FieldSpecification specification
+        )
+    {
+        Sure.NotNull (specification);
 
-        /// <summary>
-        /// Tag.
-        /// </summary>
-        public int Tag { get; set; }
+        Command = specification.Command;
+        Embedded = specification.Embedded;
+        Indent = specification.ParagraphIndent;
+        FieldRepeat = specification.FieldRepeat;
+        SubFieldRepeat = specification.SubFieldRepeat;
+        Offset = specification.Offset;
+        Length = specification.Length;
+        SubField = specification.SubField;
+        Tag = specification.Tag;
+        TagSpecification = specification.TagSpecification;
+        SubFieldSpecification = specification.SubFieldSpecification;
+    }
 
-        /// <summary>
-        /// Tag specification.
-        /// </summary>
-        public string? TagSpecification { get; set; }
+    /// <summary>
+    /// Format the reference against given record.
+    /// </summary>
+    public string Format
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
 
-        /// <summary>
-        /// Field repeat.
-        /// </summary>
-        public IndexSpecification FieldRepeat { get; set; }
-
-        /// <summary>
-        /// Subfield repeat.
-        /// </summary>
-        public IndexSpecification SubFieldRepeat { get; set; }
-
-        /// <summary>
-        /// Subfield specification.
-        /// </summary>
-        public string? SubFieldSpecification { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public FieldReference()
+        var context = new PftContext (null)
         {
+            Record = record
+        };
+        var pft = new PftV();
+        pft.Apply (this);
+        pft.Execute (context);
+        var result = context.Text;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Get unique values of the field.
+    /// </summary>
+    public string[] GetUniqueValues
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var result = GetValues (record)
+            .Distinct()
+            .ToArray();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Get unique values of the field.
+    /// </summary>
+    public string[] GetUniqueValuesIgnoreCase
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var result = GetValues (record)
+            .Distinct (StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Get values of the field.
+    /// </summary>
+    public string[] GetValues
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        string[] result;
+
+        var tag = Tag;
+        if (tag <= 0)
+        {
+            result = Array.Empty<string>();
         }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public FieldReference
-            (
-                int tag
-            )
+        else
         {
-            Tag = tag;
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public FieldReference
-            (
-                int tag,
-                char subField
-            )
-        {
-            Tag = tag;
-            SubField = subField;
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Apply the specification.
-        /// </summary>
-        public void Apply
-            (
-                FieldSpecification specification
-            )
-        {
-            Command = specification.Command;
-            Embedded = specification.Embedded;
-            Indent = specification.ParagraphIndent;
-            FieldRepeat = specification.FieldRepeat;
-            SubFieldRepeat = specification.SubFieldRepeat;
-            Offset = specification.Offset;
-            Length = specification.Length;
-            SubField = specification.SubField;
-            Tag = specification.Tag;
-            TagSpecification = specification.TagSpecification;
-            SubFieldSpecification = specification.SubFieldSpecification;
-        }
-
-        /// <summary>
-        /// Format the reference against given record.
-        /// </summary>
-        public string? Format
-            (
-                Record record
-            )
-        {
-            var context = new PftContext(null)
+            if (SubField == NoCode)
             {
-                Record = record
-            };
-            var pft = new PftV();
-            pft.Apply(this);
-            pft.Execute(context);
-            string result = context.Text;
-
-            return result;
-        }
-
-        /// <summary>
-        /// Get unique values of the field.
-        /// </summary>
-        public string[] GetUniqueValues
-            (
-                Record record
-            )
-        {
-            var result = GetValues(record)
-                .Distinct()
-                .ToArray();
-
-            return result;
-        }
-
-        /// <summary>
-        /// Get unique values of the field.
-        /// </summary>
-        public string[] GetUniqueValuesIgnoreCase
-            (
-                Record record
-            )
-        {
-            var result = GetValues(record)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToArray();
-
-            return result;
-        }
-
-        /// <summary>
-        /// Get values of the field.
-        /// </summary>
-        public string[] GetValues
-            (
-                Record record
-            )
-        {
-            string[] result;
-
-            int tag = Tag;
-            if (tag <= 0)
-            {
-                result = Array.Empty<string>();
+                result = record
+                    .Fields
+                    .GetField (tag)
+                    .Select (field => field.ToText())
+                    .NonEmptyLines()
+                    .ToArray();
             }
             else
             {
-                if (SubField == NoCode)
-                {
-                    result = record
-                        .Fields
-                        .GetField(tag)
-                        .Select(field => field.ToText())
-                        .NonEmptyLines()
-                        .ToArray();
-                }
-                else
-                {
-                    result = record
-                        .FMA(tag, SubField)
-                        .NonEmptyLines()
-                        .ToStringArray();
-                }
+                result = record
+                    .FMA (tag, SubField)
+                    .NonEmptyLines()
+                    .ToStringArray();
             }
-
-            return result;
         }
 
-        /// <summary>
-        /// Parse field specification.
-        /// </summary>
-        public static FieldReference Parse
-            (
-                string specification
-            )
+        return result;
+    }
+
+    /// <summary>
+    /// Parse field specification.
+    /// </summary>
+    public static FieldReference Parse
+        (
+            string specification
+        )
+    {
+        Sure.NotNullNorEmpty (specification);
+
+        FieldReference result;
+
+        try
         {
-            FieldReference result;
-
-            try
-            {
-                var fs = new FieldSpecification();
-                fs.Parse(specification);
-                result = new FieldReference();
-                result.Apply(fs);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        "FieldReference::Parse",
-                        exception
-                    );
-
-                throw;
-
-            } // catch
-
-            return result;
-
-        } // method Parse
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
+            var fs = new FieldSpecification();
+            fs.Parse (specification);
+            result = new FieldReference();
+            result.Apply (fs);
+        }
+        catch (Exception exception)
         {
-            // TODO handle FieldRepeat and SubFieldRepeat
-
-            Command = reader.ReadChar();
-            Embedded = reader.ReadNullableString();
-            Indent = reader.ReadPackedInt32();
-            Length = reader.ReadPackedInt32();
-            Offset = reader.ReadPackedInt32();
-            SubField = reader.ReadChar();
-            Tag = reader.ReadPackedInt32();
-            TagSpecification = reader.ReadNullableString();
-
-        } // method RestoreFromStream
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            // TODO handle FieldRepeat and SubFieldRepeat
-
-            writer.Write(Command);
-            writer
-                .WriteNullable(Embedded)
-                .WritePackedInt32(Indent)
-                .WritePackedInt32(Length)
-                .WritePackedInt32(Offset)
-                .Write(SubField);
-            writer.WritePackedInt32(Tag);
-            writer.WriteNullable(TagSpecification);
-
-        } // method SaveToString
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            Verifier<FieldReference> verifier = new Verifier<FieldReference>
+            Magna.Logger.LogError
                 (
-                    this,
-                    throwOnError
+                    exception,
+                    nameof (FieldRepeat) + "::" + nameof (Parse)
                 );
 
-            verifier
-                .Positive (Tag, nameof (Tag));
+            throw;
+        }
 
-            return verifier.Result;
+        return result;
+    }
 
-        } // method Verify
+    #endregion
 
-        #endregion
+    #region IHandmadeSerializable members
 
-    } // class FieldReference
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
 
-} // namespace ManagedIrbis
+        // TODO handle FieldRepeat and SubFieldRepeat
+
+        Command = reader.ReadChar();
+        Embedded = reader.ReadNullableString();
+        Indent = reader.ReadPackedInt32();
+        Length = reader.ReadPackedInt32();
+        Offset = reader.ReadPackedInt32();
+        SubField = reader.ReadChar();
+        Tag = reader.ReadPackedInt32();
+        TagSpecification = reader.ReadNullableString();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        // TODO handle FieldRepeat and SubFieldRepeat
+
+        writer.Write (Command);
+        writer
+            .WriteNullable (Embedded)
+            .WritePackedInt32 (Indent)
+            .WritePackedInt32 (Length)
+            .WritePackedInt32 (Offset)
+            .Write (SubField);
+        writer.WritePackedInt32 (Tag);
+        writer.WriteNullable (TagSpecification);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<FieldReference> (this, throwOnError);
+
+        verifier
+            .Positive (Tag, nameof (Tag));
+
+        return verifier.Result;
+    }
+
+    #endregion
+}

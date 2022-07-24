@@ -23,449 +23,435 @@ using System.Xml.Serialization;
 using AM;
 using AM.Json;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Reports
-{
-    /// <summary>
-    /// Отчет, строимый на основе запросов к базам данных ИРБИС64.
-    /// </summary>
-    public class IrbisReport
-        : IAttributable,
+namespace ManagedIrbis.Reports;
+
+/// <summary>
+/// Отчет, строимый на основе запросов к базам данных ИРБИС64.
+/// </summary>
+public class IrbisReport
+    : IAttributable,
         IVerifiable,
         IDisposable
+{
+    #region Properties
+
+    /// <summary>
+    /// Attributes.
+    /// </summary>
+    [XmlArray ("attr")]
+    [JsonPropertyName ("attr")]
+    public ReportAttributes Attributes { get; private set; }
+
+    /// <summary>
+    /// Report body band.
+    /// </summary>
+    [XmlElement ("details")]
+    [JsonPropertyName ("details")]
+    public BandCollection<ReportBand> Body { get; set; }
+
+    /// <summary>
+    /// Полоса подвала отчета.
+    /// </summary>
+    [XmlElement ("footer")]
+    [JsonPropertyName ("footer")]
+    public ReportBand? Footer
     {
-        #region Properties
-
-        /// <summary>
-        /// Attributes.
-        /// </summary>
-        [XmlArray("attr")]
-        [JsonPropertyName("attr")]
-        public ReportAttributes Attributes { get; private set; }
-
-        /// <summary>
-        /// Report body band.
-        /// </summary>
-        [XmlElement("details")]
-        [JsonPropertyName("details")]
-        public BandCollection<ReportBand> Body { get; set; }
-
-        /// <summary>
-        /// Полоса подвала отчета.
-        /// </summary>
-        [XmlElement("footer")]
-        [JsonPropertyName("footer")]
-        public ReportBand? Footer
+        get => _footer;
+        set
         {
-            get => _footer;
-            set
+            if (_footer is not null)
             {
-                if (_footer is not null)
-                {
-                    _footer.Report = null;
-                    _footer.Parent = null;
-                }
+                _footer.Report = null;
+                _footer.Parent = null;
+            }
 
-                _footer = value;
-                if (_footer is not null)
-                {
-                    _footer.Report = this;
-                    _footer.Parent = null;
-                }
+            _footer = value;
+            if (_footer is not null)
+            {
+                _footer.Report = this;
+                _footer.Parent = null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Полоса заголовка отчета.
+    /// </summary>
+    [XmlElement ("header")]
+    [JsonPropertyName ("header")]
+    public ReportBand? Header
+    {
+        get => _header;
+        set
+        {
+            if (_header is not null)
+            {
+                _header.Report = null;
+                _header.Parent = null;
+            }
+
+            _header = value;
+            if (_header is not null)
+            {
+                _header.Report = this;
+                _header.Parent = null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Arbitrary user data.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public IrbisReport()
+    {
+        Magna.Logger.LogError (nameof (IrbisReport) + "::Constructor");
+
+        Attributes = new ReportAttributes();
+        Body = new BandCollection<ReportBand> (this, null);
+    }
+
+    #endregion
+
+    #region Private members
+
+    private ReportBand? _footer;
+    private ReportBand? _header;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Render the report.
+    /// </summary>
+    public virtual void Render
+        (
+            ReportContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        Magna.Logger.LogTrace (nameof (IrbisReport) + "::" + nameof (Render));
+
+        context.Output.Clear();
+
+        var driver = context.Driver;
+
+        context.CurrentRecord = null;
+        context.Index = -1;
+
+        driver.BeginDocument (context, this);
+
+        Header?.Render (context);
+        Body.Render (context);
+        Footer?.Render (context);
+
+        driver.EndDocument (context, this);
+    }
+
+    /// <summary>
+    /// Load report from the JSON file.
+    /// </summary>
+    public static IrbisReport LoadJsonFile
+        (
+            string fileName
+        )
+    {
+        /*
+
+        string contents = File.ReadAllText
+            (
+                fileName,
+                IrbisEncoding.Utf8
+            );
+        JsonSerializerSettings settings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Objects,
+
+            // TODO fix it
+            // TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
+
+            TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
+        };
+
+        IrbisReport result
+            = JsonConvert.DeserializeObject<IrbisReport>
+            (
+                contents,
+                settings
+            );
+
+        return result;
+
+        */
+
+        return JsonUtility.ReadObjectFromFile<IrbisReport> (fileName);
+    }
+
+    /// <summary>
+    /// Load report from the JSON file.
+    /// </summary>
+    public static IrbisReport LoadShortJson
+        (
+            string fileName
+        )
+    {
+        /*
+
+        string contents = File.ReadAllText
+            (
+                fileName,
+                IrbisEncoding.Utf8
+            );
+        JObject obj = JObject.Parse(contents);
+
+        var tokens = obj.SelectTokens("$..$type");
+        foreach (JToken token in tokens)
+        {
+            JValue val = (JValue)token;
+
+            string typeName = val.Value.ToString();
+            if (!typeName.Contains('.'))
+            {
+                typeName = "ManagedIrbis.Reports."
+                           + typeName
+                           + ", ManagedIrbis";
+                val.Value = typeName;
             }
         }
 
-        /// <summary>
-        /// Полоса заголовка отчета.
-        /// </summary>
-        [XmlElement("header")]
-        [JsonPropertyName("header")]
-        public ReportBand? Header
+        JsonSerializer serializer = new JsonSerializer
         {
-            get => _header;
-            set
-            {
-                if (_header is not null)
-                {
-                    _header.Report = null;
-                    _header.Parent = null;
-                }
+            TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
+        };
 
-                _header = value;
-                if (_header is not null)
-                {
-                    _header.Report = this;
-                    _header.Parent = null;
-                }
+        IrbisReport result = obj.ToObject<IrbisReport>
+            (
+                serializer
+            );
+
+        return result;
+
+        */
+
+        return JsonUtility.ReadObjectFromFile<IrbisReport> (fileName);
+    }
+
+    /// <summary>
+    /// Save the report to specified file.
+    /// </summary>
+    public void SaveJson
+        (
+            string fileName
+        )
+    {
+        /*
+        JsonSerializerSettings settings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            TypeNameHandling = TypeNameHandling.Objects,
+            TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
+        };
+        string contents = JsonConvert.SerializeObject
+            (
+                this,
+                Formatting.Indented,
+                settings
+            );
+        File.WriteAllText
+            (
+                fileName,
+                contents,
+                IrbisEncoding.Utf8
+            );
+        */
+
+        JsonUtility.SaveObjectToFile (this, fileName);
+    }
+
+    /// <summary>
+    /// Save the report to specified file.
+    /// </summary>
+    public void SaveShortJson
+        (
+            string fileName
+        )
+    {
+        /*
+
+        JsonSerializer serializer = new JsonSerializer
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            TypeNameHandling = TypeNameHandling.Objects,
+            TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
+        };
+        JObject obj = JObject.FromObject
+            (
+                this,
+                serializer
+            );
+
+        var tokens = obj.SelectTokens("$..$type");
+        foreach (JToken token in tokens)
+        {
+            JValue val = (JValue)token;
+
+            Type type = Type.GetType
+                (
+                    val.Value.ToString(),
+                    false
+                );
+            if (!ReferenceEquals(type, null))
+            {
+                val.Value = type.Name;
             }
         }
 
-        /// <summary>
-        /// Arbitrary user data.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public object? UserData { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public IrbisReport()
+        while (true)
         {
-            Magna.Trace("IrbisReport::Constructor");
-
-            Attributes = new ReportAttributes();
-            Body = new BandCollection<ReportBand>(this, null);
-        }
-
-        #endregion
-
-        #region Private members
-
-        private ReportBand? _footer;
-        private ReportBand? _header;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Render the report.
-        /// </summary>
-        public virtual void Render
-            (
-                ReportContext context
-            )
-        {
-            Magna.Trace("IrbisReport::Render");
-
-            context.Output.Clear();
-
-            ReportDriver driver = context.Driver;
-
-            context.CurrentRecord = null;
-            context.Index = -1;
-
-            driver.BeginDocument(context, this);
-
-            if (!ReferenceEquals(Header, null))
+            tokens = obj.SelectTokens("$..attr");
+            var attr = tokens.FirstOrDefault
+                (
+                    a => a.Count() == 1
+                );
+            if (ReferenceEquals(attr, null))
             {
-                Header.Render(context);
+                break;
             }
+            attr.Parent.Remove();
+        }
 
-            Body.Render(context);
-
-            if (!ReferenceEquals(Footer, null))
+        while (true)
+        {
+            tokens = obj.SelectTokens("$..cells");
+            var attr = tokens.FirstOrDefault
+                (
+                    a => a.Count() == 0
+                );
+            if (ReferenceEquals(attr, null))
             {
-                Footer.Render(context);
+                break;
             }
-
-            driver.EndDocument(context, this);
+            attr.Parent.Remove();
         }
 
-        /// <summary>
-        /// Load report from the JSON file.
-        /// </summary>
-        public static IrbisReport LoadJsonFile
+        string contents = obj.ToString(Formatting.Indented);
+        File.WriteAllText
             (
-                 string fileName
-            )
+                fileName,
+                contents,
+                IrbisEncoding.Utf8
+            );
+
+        */
+
+        JsonUtility.SaveObjectToFile (this, fileName);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<IrbisReport> (this, throwOnError);
+
+        verifier.VerifySubObject (Attributes);
+
+        if (Header is not null)
         {
-            /*
-
-            string contents = File.ReadAllText
-                (
-                    fileName,
-                    IrbisEncoding.Utf8
-                );
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Objects,
-
-                // TODO fix it
-                // TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
-
-                TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
-            };
-
-            IrbisReport result
-                = JsonConvert.DeserializeObject<IrbisReport>
-                (
-                    contents,
-                    settings
-                );
-
-            return result;
-
-            */
-
-            return JsonUtility.ReadObjectFromFile<IrbisReport>(fileName);
-        }
-
-        /// <summary>
-        /// Load report from the JSON file.
-        /// </summary>
-        public static IrbisReport LoadShortJson
-            (
-                string fileName
-            )
-        {
-            /*
-
-            string contents = File.ReadAllText
-                (
-                    fileName,
-                    IrbisEncoding.Utf8
-                );
-            JObject obj = JObject.Parse(contents);
-
-            var tokens = obj.SelectTokens("$..$type");
-            foreach (JToken token in tokens)
-            {
-                JValue val = (JValue)token;
-
-                string typeName = val.Value.ToString();
-                if (!typeName.Contains('.'))
-                {
-                    typeName = "ManagedIrbis.Reports."
-                               + typeName
-                               + ", ManagedIrbis";
-                    val.Value = typeName;
-                }
-            }
-
-            JsonSerializer serializer = new JsonSerializer
-            {
-                TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
-            };
-
-            IrbisReport result = obj.ToObject<IrbisReport>
-                (
-                    serializer
-                );
-
-            return result;
-
-            */
-
-            return JsonUtility.ReadObjectFromFile<IrbisReport>(fileName);
-        }
-
-        /// <summary>
-        /// Save the report to specified file.
-        /// </summary>
-        public void SaveJson
-            (
-                string fileName
-            )
-        {
-            /*
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                TypeNameHandling = TypeNameHandling.Objects,
-                TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
-            };
-            string contents = JsonConvert.SerializeObject
-                (
-                    this,
-                    Formatting.Indented,
-                    settings
-                );
-            File.WriteAllText
-                (
-                    fileName,
-                    contents,
-                    IrbisEncoding.Utf8
-                );
-            */
-
-            JsonUtility.SaveObjectToFile(this, fileName);
-        }
-
-        /// <summary>
-        /// Save the report to specified file.
-        /// </summary>
-        public void SaveShortJson
-            (
-                string fileName
-            )
-        {
-            /*
-
-            JsonSerializer serializer = new JsonSerializer
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                TypeNameHandling = TypeNameHandling.Objects,
-                TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
-            };
-            JObject obj = JObject.FromObject
-                (
-                    this,
-                    serializer
-                );
-
-            var tokens = obj.SelectTokens("$..$type");
-            foreach (JToken token in tokens)
-            {
-                JValue val = (JValue)token;
-
-                Type type = Type.GetType
+            verifier
+                .VerifySubObject (Header)
+                .ReferenceEquals
                     (
-                        val.Value.ToString(),
-                        false
-                    );
-                if (!ReferenceEquals(type, null))
-                {
-                    val.Value = type.Name;
-                }
-            }
-
-            while (true)
-            {
-                tokens = obj.SelectTokens("$..attr");
-                var attr = tokens.FirstOrDefault
+                        Header.Parent,
+                        null,
+                        "Header.Parent != null"
+                    )
+                .ReferenceEquals
                     (
-                        a => a.Count() == 1
+                        Header.Report,
+                        this,
+                        "Header.Report != this"
                     );
-                if (ReferenceEquals(attr, null))
-                {
-                    break;
-                }
-                attr.Parent.Remove();
-            }
+        }
 
-            while (true)
-            {
-                tokens = obj.SelectTokens("$..cells");
-                var attr = tokens.FirstOrDefault
+        if (Footer is not null)
+        {
+            verifier
+                .VerifySubObject (Footer)
+                .ReferenceEquals
                     (
-                        a => a.Count() == 0
+                        Footer.Parent,
+                        null,
+                        "Footer.Parent != null"
+                    )
+                .ReferenceEquals
+                    (
+                        Footer.Report,
+                        this,
+                        "Footer.Report != this"
                     );
-                if (ReferenceEquals(attr, null))
-                {
-                    break;
-                }
-                attr.Parent.Remove();
-            }
-
-            string contents = obj.ToString(Formatting.Indented);
-            File.WriteAllText
-                (
-                    fileName,
-                    contents,
-                    IrbisEncoding.Utf8
-                );
-
-            */
-
-            JsonUtility.SaveObjectToFile(this, fileName);
         }
 
-        #endregion
+        verifier.VerifySubObject (Body);
 
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify
-            (
-                bool throwOnError
-            )
+        foreach (var band in Body)
         {
-            Verifier<IrbisReport> verifier
-                = new Verifier<IrbisReport>(this, throwOnError);
-
-            verifier.VerifySubObject(Attributes, "attributes");
-
-            if (!ReferenceEquals(Header, null))
-            {
-                verifier
-                    .VerifySubObject(Header, "header")
-                    .ReferenceEquals
-                        (
-                            Header.Parent,
-                            null,
-                            "Header.Parent != null"
-                        )
-                    .ReferenceEquals
-                        (
-                            Header.Report,
-                            this,
-                            "Header.Report != this"
-                        );
-            }
-
-            if (!ReferenceEquals(Footer, null))
-            {
-                verifier
-                    .VerifySubObject(Footer, "footer")
-                    .ReferenceEquals
-                        (
-                            Footer.Parent,
-                            null,
-                            "Footer.Parent != null"
-                        )
-                    .ReferenceEquals
-                        (
-                            Footer.Report,
-                            this,
-                            "Footer.Report != this"
-                        );
-            }
-
-            verifier.VerifySubObject(Body, "body");
-
-            foreach (ReportBand band in Body)
-            {
-                verifier
-                    .ReferenceEquals
-                        (
-                            band.Parent,
-                            null,
-                            "band.Parent != null"
-                        )
-                    .ReferenceEquals
-                        (
-                            band.Report,
-                            this,
-                            "band.Report != this"
-                        );
-            }
-
-            return verifier.Result;
+            verifier
+                .ReferenceEquals
+                    (
+                        band.Parent,
+                        null,
+                        "band.Parent != null"
+                    )
+                .ReferenceEquals
+                    (
+                        band.Report,
+                        this,
+                        "band.Report != this"
+                    );
         }
 
-        #endregion
+        return verifier.Result;
+    }
 
-        #region IDisposable members
+    #endregion
 
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            Magna.Trace("IrbisReport::Dispose");
+    #region IDisposable members
 
-            if (!ReferenceEquals(Header, null))
-            {
-                Header.Dispose();
-            }
-            if (!ReferenceEquals(Footer, null))
-            {
-                Footer.Dispose();
-            }
-            Body.Dispose();
-        }
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        Magna.Logger.LogTrace (nameof (IrbisReport) + "::" + nameof (Dispose));
 
-        #endregion
+        Header?.Dispose();
+        Footer?.Dispose();
+        Body.Dispose();
+    }
 
-    } // class IrbisReport
-
-} // namespace ManagedIrbis.Reports
+    #endregion
+}
