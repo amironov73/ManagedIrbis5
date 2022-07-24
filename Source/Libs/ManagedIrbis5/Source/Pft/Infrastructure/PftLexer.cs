@@ -4,10 +4,11 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftLexer.cs -- lexer for PFT.
+/* PftLexer.cs -- лексический анализатор для PFT
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,189 +21,210 @@ using System.Text;
 using AM;
 using AM.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure
+namespace ManagedIrbis.Pft.Infrastructure;
+
+/// <summary>
+/// Лексический анализатор для PFT.
+/// </summary>
+public class PftLexer
 {
-    /// <summary>
-    /// Lexer for PFT.
-    /// </summary>
+    #region Private members
 
-    public class PftLexer
+    private TextNavigator? _navigator;
+
+    private static readonly char[] Identifier =
     {
-        #region Private members
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+        'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+        'y', 'z',
 
-        private TextNavigator? _navigator;
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+        'Y', 'Z',
 
-        private static char[] Integer =
-            {
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-            };
+        'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к',
+        'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц',
+        'ч', 'ш', 'щ', 'ь', 'ы', 'ъ', 'э', 'ю', 'я',
 
-        private static readonly char[] Identifier =
-            {
-                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-                'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-                'y', 'z',
+        'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К',
+        'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц',
+        'Ч', 'Ш', 'Щ', 'Ь', 'Ы', 'Ъ', 'Э', 'Ю', 'Я',
 
-                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-                'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-                'Y', 'Z',
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'
+    };
 
-                'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к',
-                'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц',
-                'ч', 'ш', 'щ', 'ь', 'ы', 'ъ', 'э', 'ю', 'я',
+    private int Column => _navigator?.Column ?? 0;
 
-                'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К',
-                'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц',
-                'Ч', 'Ш', 'Щ', 'Ь', 'Ы', 'Ъ', 'Э', 'Ю', 'Я',
+    private bool IsEOF => _navigator?.IsEOF ?? true;
 
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'
-            };
+    private int Line => _navigator?.Line ?? 0;
 
-        private int Column => _navigator?.Column ?? 0;
+    private char PeekChar() => _navigator?.PeekCharNoCrLf() ?? '\0';
 
-        private bool IsEOF => _navigator?.IsEOF ?? true;
+    private char ReadChar() => _navigator?.ReadCharNoCrLf() ?? '\0';
 
-        private int Line => _navigator?.Line ?? 0;
+    private FieldSpecification? ReadField()
+    {
+        var result = new FieldSpecification();
+        var position = _navigator!.SavePosition();
+        _navigator.Move (-1);
 
-        private char PeekChar() => _navigator?.PeekCharNoCrLf() ?? '\0';
-
-        private char ReadChar() => _navigator?.ReadCharNoCrLf() ?? '\0';
-
-        private FieldSpecification? ReadField()
+        if (!result.Parse (_navigator))
         {
-            var result = new FieldSpecification();
-            var position = _navigator!.SavePosition();
-            _navigator.Move(-1);
-
-            if (!result.Parse(_navigator))
-            {
-                _navigator.RestorePosition(position);
-                return null;
-            }
-
-            return result;
+            _navigator.RestorePosition (position);
+            return null;
         }
 
-        private string? ReadIdentifier()
+        return result;
+    }
+
+    private string? ReadIdentifier()
+    {
+        if (IsEOF)
         {
-            if (IsEOF)
-            {
-                return null;
-            }
-
-            var result = new StringBuilder();
-            var reserved = PftUtility.GetReservedWords();
-
-            while (true)
-            {
-                var c = PeekChar();
-                if (c == TextNavigator.EOF
-                    || Array.IndexOf(Identifier, c) < 0)
-                {
-                    break;
-                }
-                result.Append(c);
-                ReadChar();
-                c = _navigator!.PeekChar();
-                if ((c == '\r' || c == '\n')
-                    && Array.IndexOf(reserved, result.ToString()) >= 0)
-                {
-                    break;
-                }
-            }
-
-            return result.ToString();
+            return null;
         }
 
-        private string ReadIdentifier
-            (
-                char initialLetter
-            )
+        var result = new StringBuilder();
+        var reserved = PftUtility.GetReservedWords();
+
+        while (true)
         {
-            if (IsEOF)
-            {
-                return initialLetter.ToString();
-            }
-
-            var result = new StringBuilder();
-            result.Append(initialLetter);
-            var reserved = PftUtility.GetReservedWords();
-
-            while (true)
-            {
-                var c = PeekChar();
-                if (c == TextNavigator.EOF
-                    || Array.IndexOf(Identifier, c) < 0)
-                {
-                    break;
-                }
-                result.Append(c);
-                ReadChar();
-                c = _navigator!.PeekChar();
-                if ((c == '\r' || c == '\n')
-                    && Array.IndexOf(reserved, result.ToString()) >= 0)
-                {
-                    break;
-                }
-            }
-
-            return result.ToString();
-        }
-
-        private string? ReadInteger()
-        {
-            var result = new StringBuilder();
-
             var c = PeekChar();
+            if (c == TextNavigator.EOF
+                || Array.IndexOf (Identifier, c) < 0)
+            {
+                break;
+            }
+
+            result.Append (c);
+            ReadChar();
+            c = _navigator!.PeekChar();
+            if ((c == '\r' || c == '\n')
+                && Array.IndexOf (reserved, result.ToString()) >= 0)
+            {
+                break;
+            }
+        }
+
+        return result.ToString();
+    }
+
+    private string ReadIdentifier
+        (
+            char initialLetter
+        )
+    {
+        if (IsEOF)
+        {
+            return initialLetter.ToString();
+        }
+
+        var result = new StringBuilder();
+        result.Append (initialLetter);
+        var reserved = PftUtility.GetReservedWords();
+
+        while (true)
+        {
+            var c = PeekChar();
+            if (c == TextNavigator.EOF
+                || Array.IndexOf (Identifier, c) < 0)
+            {
+                break;
+            }
+
+            result.Append (c);
+            ReadChar();
+            c = _navigator!.PeekChar();
+            if ((c == '\r' || c == '\n')
+                && Array.IndexOf (reserved, result.ToString()) >= 0)
+            {
+                break;
+            }
+        }
+
+        return result.ToString();
+    }
+
+    private string? ReadInteger()
+    {
+        var result = new StringBuilder();
+
+        var c = PeekChar();
+        if (!c.IsArabicDigit())
+        {
+            return null;
+        }
+
+        result.Append (c);
+        ReadChar();
+
+        while (true)
+        {
+            c = PeekChar();
             if (!c.IsArabicDigit())
             {
-                return null;
+                break;
             }
-            result.Append(c);
+
+            result.Append (c);
             ReadChar();
-
-            while (true)
-            {
-                c = PeekChar();
-                if (!c.IsArabicDigit())
-                {
-                    break;
-                }
-                result.Append(c);
-                ReadChar();
-            }
-
-            return result.ToString();
         }
 
-        private string? ReadFloat()
+        return result.ToString();
+    }
+
+    private string? ReadFloat()
+    {
+        var result = new StringBuilder();
+
+        var dotFound = false;
+        var digitFound = false;
+
+        var c = PeekChar();
+
+        //if (c != '+'
+        //    && c != '-'
+        //    && c != '.'
+        //    && !c.IsArabicDigit())
+        //{
+        //    return null;
+        //}
+        if (c == '.')
         {
-            var result = new StringBuilder();
+            dotFound = true;
+        }
 
-            var dotFound = false;
-            var digitFound = false;
+        if (c.IsArabicDigit())
+        {
+            digitFound = true;
+        }
 
-            var c = PeekChar();
-            //if (c != '+'
-            //    && c != '-'
-            //    && c != '.'
-            //    && !c.IsArabicDigit())
-            //{
-            //    return null;
-            //}
-            if (c == '.')
+        result.Append (c);
+        ReadChar();
+
+        while (true)
+        {
+            c = PeekChar();
+            if (!c.IsArabicDigit())
             {
-                dotFound = true;
+                break;
             }
-            if (c.IsArabicDigit())
-            {
-                digitFound = true;
-            }
-            result.Append(c);
+
+            digitFound = true;
+            result.Append (c);
+            ReadChar();
+        }
+
+        if (!dotFound && c == '.')
+        {
+            result.Append (c);
             ReadChar();
 
             while (true)
@@ -212,252 +234,229 @@ namespace ManagedIrbis.Pft.Infrastructure
                 {
                     break;
                 }
+
                 digitFound = true;
-                result.Append(c);
+                result.Append (c);
                 ReadChar();
             }
+        }
 
-            if (!dotFound && c == '.')
+        if (!digitFound)
+        {
+            ThrowSyntax();
+        }
+
+        if (c == 'E' || c == 'e')
+        {
+            result.Append (c);
+            ReadChar();
+            digitFound = false;
+            c = PeekChar();
+
+            if (c == '+' || c == '-')
             {
-                result.Append(c);
+                result.Append (c);
                 ReadChar();
+                c = PeekChar();
+            }
 
-                while (true)
+            while (true)
+            {
+                c = PeekChar();
+                if (!c.IsArabicDigit())
                 {
-                    c = PeekChar();
-                    if (!c.IsArabicDigit())
-                    {
-                        break;
-                    }
-                    digitFound = true;
-                    result.Append(c);
-                    ReadChar();
+                    break;
                 }
+
+                digitFound = true;
+                result.Append (c);
+                ReadChar();
             }
 
             if (!digitFound)
             {
                 ThrowSyntax();
             }
-
-            if (c == 'E' || c == 'e')
-            {
-                result.Append(c);
-                ReadChar();
-                digitFound = false;
-                c = PeekChar();
-
-                if (c == '+' || c == '-')
-                {
-                    result.Append(c);
-                    ReadChar();
-                    c = PeekChar();
-                }
-
-                while (true)
-                {
-                    c = PeekChar();
-                    if (!c.IsArabicDigit())
-                    {
-                        break;
-                    }
-                    digitFound = true;
-                    result.Append(c);
-                    ReadChar();
-                }
-
-                if (!digitFound)
-                {
-                    ThrowSyntax();
-                }
-            }
-
-            return result.ToString();
         }
 
-        private string ReadTo
-            (
-                char stop
-            )
+        return result.ToString();
+    }
+
+    private string ReadTo
+        (
+            char stop
+        )
+    {
+        var result = _navigator?.ReadUntilNoCrLf (stop);
+        if (ReferenceEquals (result, null))
         {
-            var result = _navigator?.ReadUntilNoCrLf(stop);
-            if (ReferenceEquals(result, null))
+            ThrowSyntax();
+        }
+
+        var c = ReadChar();
+        if (c != stop)
+        {
+            ThrowSyntax();
+        }
+
+        return result!;
+    }
+
+    private void SkipWhitespace() => _navigator?.SkipWhitespace();
+
+    private void ThrowSyntax()
+    {
+        var message = $"Syntax error at line {Line}, column {Column}";
+        Magna.Logger.LogError
+            (
+                nameof (PftLexer) + "::" + nameof (ThrowSyntax)
+                + ": {Message}",
+                message
+            );
+
+        throw new PftSyntaxException (message);
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Tokenize the text.
+    /// </summary>
+    public PftTokenList Tokenize
+        (
+            string text
+        )
+    {
+        var result = new List<PftToken>();
+        _navigator = new TextNavigator (text);
+
+        while (!IsEOF)
+        {
+            SkipWhitespace();
+            if (IsEOF)
             {
-                ThrowSyntax();
+                break;
             }
 
+            var line = Line;
+            var column = Column;
             var c = ReadChar();
-            if (c != stop)
+            char c2, c3;
+            string? value = null;
+            FieldSpecification? field = null;
+            PftTokenKind kind;
+            switch (c)
             {
-                ThrowSyntax();
-            }
-
-            return result!;
-        }
-
-        private void SkipWhitespace() => _navigator?.SkipWhitespace();
-
-        private void ThrowSyntax()
-        {
-            var message = string.Format
-                (
-                    "Syntax error at line {0}, column{1}",
-                    Line,
-                    Column
-                );
-
-            Magna.Error
-                (
-                    "PftLexer::ThrowSyntax: "
-                    + message
-                );
-
-            throw new PftSyntaxException(message);
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Tokenize the text.
-        /// </summary>
-        public PftTokenList Tokenize
-            (
-                string text
-            )
-        {
-            var result = new List<PftToken>();
-            _navigator = new TextNavigator(text);
-
-            while (!IsEOF)
-            {
-                SkipWhitespace();
-                if (IsEOF)
-                {
+                case '\'':
+                    value = ReadTo ('\'');
+                    kind = PftTokenKind.UnconditionalLiteral;
                     break;
-                }
 
-                var line = Line;
-                var column = Column;
-                var c = ReadChar();
-                char c2, c3;
-                string? value = null;
-                FieldSpecification? field = null;
-                PftTokenKind kind;
-                switch (c)
-                {
-                    case '\'':
-                        value = ReadTo('\'');
-                        kind = PftTokenKind.UnconditionalLiteral;
-                        break;
+                case '"':
+                    value = ReadTo ('"');
+                    kind = PftTokenKind.ConditionalLiteral;
+                    break;
 
-                    case '"':
-                        value = ReadTo('"');
-                        kind = PftTokenKind.ConditionalLiteral;
-                        break;
+                case '|':
+                    value = ReadTo ('|');
+                    kind = PftTokenKind.RepeatableLiteral;
+                    break;
 
-                    case '|':
-                        value = ReadTo('|');
-                        kind = PftTokenKind.RepeatableLiteral;
-                        break;
-
-                    case '!':
-                        c2 = PeekChar();
-                        if (c2 == '=')
-                        {
-                            kind = PftTokenKind.NotEqual2;
-                            value = "!=";
-                            ReadChar();
-                            if (PeekChar() == '=')
-                            {
-                                ReadChar();
-                                value = "!==";
-                            }
-                        }
-                        else if (c2 == '~')
-                        {
-                            kind = PftTokenKind.NotEqual2;
-                            value = "!~";
-                            ReadChar();
-                            if (PeekChar() == '~')
-                            {
-                                ReadChar();
-                                value = "!~~";
-                            }
-                        }
-                        else
-                        {
-                            kind = PftTokenKind.Bang;
-                            value = c.ToString();
-                        }
-                        break;
-
-                    case ':':
-                        kind = PftTokenKind.Colon;
-                        value = c.ToString();
-                        if (PeekChar() == ':')
-                        {
-                            ReadChar();
-                            value = "::";
-                        }
-                        break;
-
-                    case ';':
-                        kind = PftTokenKind.Semicolon;
-                        value = c.ToString();
-                        break;
-
-                    case ',':
-                        kind = PftTokenKind.Comma;
-                        value = c.ToString();
-                        break;
-
-                    case '\\':
-                        kind = PftTokenKind.Backslash;
-                        value = c.ToString();
-                        break;
-
-                    case '=':
-                        kind = PftTokenKind.Equals;
-                        value = c.ToString();
+                case '!':
+                    c2 = PeekChar();
+                    if (c2 == '=')
+                    {
+                        kind = PftTokenKind.NotEqual2;
+                        value = "!=";
+                        ReadChar();
                         if (PeekChar() == '=')
                         {
                             ReadChar();
-                            value = "==";
+                            value = "!==";
                         }
-                        break;
-
-                    case '#':
-                        kind = PftTokenKind.Hash;
-                        value = c.ToString();
-                        break;
-
-                    case '%':
-                        kind = PftTokenKind.Percent;
-                        value = c.ToString();
-                        break;
-
-                    case '{':
-                        c2 = PeekChar();
-                        if (c2 == '{')
+                    }
+                    else if (c2 == '~')
+                    {
+                        kind = PftTokenKind.NotEqual2;
+                        value = "!~";
+                        ReadChar();
+                        if (PeekChar() == '~')
                         {
-                            c3 = _navigator.LookAhead(1);
-                            if (c3 == '{')
+                            ReadChar();
+                            value = "!~~";
+                        }
+                    }
+                    else
+                    {
+                        kind = PftTokenKind.Bang;
+                        value = c.ToString();
+                    }
+
+                    break;
+
+                case ':':
+                    kind = PftTokenKind.Colon;
+                    value = c.ToString();
+                    if (PeekChar() == ':')
+                    {
+                        ReadChar();
+                        value = "::";
+                    }
+
+                    break;
+
+                case ';':
+                    kind = PftTokenKind.Semicolon;
+                    value = c.ToString();
+                    break;
+
+                case ',':
+                    kind = PftTokenKind.Comma;
+                    value = c.ToString();
+                    break;
+
+                case '\\':
+                    kind = PftTokenKind.Backslash;
+                    value = c.ToString();
+                    break;
+
+                case '=':
+                    kind = PftTokenKind.Equals;
+                    value = c.ToString();
+                    if (PeekChar() == '=')
+                    {
+                        ReadChar();
+                        value = "==";
+                    }
+
+                    break;
+
+                case '#':
+                    kind = PftTokenKind.Hash;
+                    value = c.ToString();
+                    break;
+
+                case '%':
+                    kind = PftTokenKind.Percent;
+                    value = c.ToString();
+                    break;
+
+                case '{':
+                    c2 = PeekChar();
+                    if (c2 == '{')
+                    {
+                        c3 = _navigator.LookAhead (1);
+                        if (c3 == '{')
+                        {
+                            ReadChar();
+                            ReadChar();
+                            kind = PftTokenKind.TripleCurly;
+                            value = _navigator.ReadTo ("}}}").ToString();
+                            if (string.IsNullOrEmpty (value))
                             {
-                                ReadChar();
-                                ReadChar();
-                                kind = PftTokenKind.TripleCurly;
-                                value = _navigator.ReadTo("}}}").ToString();
-                                if (string.IsNullOrEmpty(value))
-                                {
-                                    ThrowSyntax();
-                                }
-                            }
-                            else
-                            {
-                                kind = PftTokenKind.LeftCurly;
-                                value = c.ToString();
+                                ThrowSyntax();
                             }
                         }
                         else
@@ -465,724 +464,755 @@ namespace ManagedIrbis.Pft.Infrastructure
                             kind = PftTokenKind.LeftCurly;
                             value = c.ToString();
                         }
-                        break;
+                    }
+                    else
+                    {
+                        kind = PftTokenKind.LeftCurly;
+                        value = c.ToString();
+                    }
 
-                    case '[':
-                        c2 = PeekChar();
-                        c3 = _navigator.LookAhead(1);
-                        if (c2 == '[' && c3 == '[')
+                    break;
+
+                case '[':
+                    c2 = PeekChar();
+                    c3 = _navigator.LookAhead (1);
+                    if (c2 == '[' && c3 == '[')
+                    {
+                        ReadChar();
+                        ReadChar();
+                        kind = PftTokenKind.EatOpen;
+                        value = "[[[";
+                    }
+                    else
+                    {
+                        kind = PftTokenKind.LeftSquare;
+                        value = c.ToString();
+                    }
+
+                    break;
+
+                case '(':
+                    kind = PftTokenKind.LeftParenthesis;
+                    value = c.ToString();
+                    break;
+
+                case '}':
+                    kind = PftTokenKind.RightCurly;
+                    value = c.ToString();
+                    break;
+
+                case ']':
+                    c2 = PeekChar();
+                    c3 = _navigator.LookAhead (1);
+                    if (c2 == ']' && c3 == ']')
+                    {
+                        ReadChar();
+                        ReadChar();
+                        kind = PftTokenKind.EatClose;
+                        value = "]]]";
+                    }
+                    else
+                    {
+                        kind = PftTokenKind.RightSquare;
+                        value = c.ToString();
+                    }
+
+                    break;
+
+                case ')':
+                    kind = PftTokenKind.RightParenthesis;
+                    value = c.ToString();
+                    break;
+
+                case '+':
+                    kind = PftTokenKind.Plus;
+                    value = c.ToString();
+                    break;
+
+                case '-':
+                    kind = PftTokenKind.Minus;
+                    value = c.ToString();
+                    break;
+
+                case '*':
+                    kind = PftTokenKind.Star;
+                    value = c.ToString();
+                    break;
+
+                case '~':
+                    kind = PftTokenKind.Tilda;
+                    value = c.ToString();
+                    if (PeekChar() == '~')
+                    {
+                        ReadChar();
+                        value = "~~";
+                    }
+
+                    break;
+
+                case '_':
+                    kind = PftTokenKind.Underscore;
+                    value = c.ToString();
+                    break;
+
+                case '`':
+                    kind = PftTokenKind.GraveAccent;
+                    value = ReadTo ('`');
+                    break;
+
+                case '«':
+                case '»':
+                case '‘':
+                case '’':
+                case '“':
+                case '”':
+                case '‹':
+                case '›':
+                case '–':
+                case '—':
+                case '‰':
+                case '¦':
+                case '§':
+                case '±':
+                    throw new NotImplementedException();
+
+                case '?':
+                    kind = PftTokenKind.Question;
+                    value = c.ToString();
+                    break;
+
+                case '/':
+                    c2 = PeekChar();
+                    if (c2 == '*')
+                    {
+                        ReadChar();
+                        value = _navigator.ReadUntil ('\r', '\n').ToString();
+                        kind = PftTokenKind.Comment;
+                    }
+                    else
+                    {
+                        kind = PftTokenKind.Slash;
+                        value = c.ToString();
+                    }
+
+                    break;
+
+                case '<':
+                    c2 = PeekChar();
+                    if (c2 == '=')
+                    {
+                        kind = PftTokenKind.LessEqual;
+                        value = "<=";
+                        ReadChar();
+                    }
+                    else if (c2 == '<')
+                    {
+                        c3 = _navigator.LookAhead (1);
+                        if (c3 == '<')
                         {
                             ReadChar();
                             ReadChar();
-                            kind = PftTokenKind.EatOpen;
-                            value = "[[[";
-                        }
-                        else
-                        {
-                            kind = PftTokenKind.LeftSquare;
-                            value = c.ToString();
-                        }
-                        break;
-
-                    case '(':
-                        kind = PftTokenKind.LeftParenthesis;
-                        value = c.ToString();
-                        break;
-
-                    case '}':
-                        kind = PftTokenKind.RightCurly;
-                        value = c.ToString();
-                        break;
-
-                    case ']':
-                        c2 = PeekChar();
-                        c3 = _navigator.LookAhead(1);
-                        if (c2 == ']' && c3 == ']')
-                        {
-                            ReadChar();
-                            ReadChar();
-                            kind = PftTokenKind.EatClose;
-                            value = "]]]";
-                        }
-                        else
-                        {
-                            kind = PftTokenKind.RightSquare;
-                            value = c.ToString();
-                        }
-                        break;
-
-                    case ')':
-                        kind = PftTokenKind.RightParenthesis;
-                        value = c.ToString();
-                        break;
-
-                    case '+':
-                        kind = PftTokenKind.Plus;
-                        value = c.ToString();
-                        break;
-
-                    case '-':
-                        kind = PftTokenKind.Minus;
-                        value = c.ToString();
-                        break;
-
-                    case '*':
-                        kind = PftTokenKind.Star;
-                        value = c.ToString();
-                        break;
-
-                    case '~':
-                        kind = PftTokenKind.Tilda;
-                        value = c.ToString();
-                        if (PeekChar() == '~')
-                        {
-                            ReadChar();
-                            value = "~~";
-                        }
-                        break;
-
-                    case '_':
-                        kind = PftTokenKind.Underscore;
-                        value = c.ToString();
-                        break;
-
-                    case '`':
-                        kind = PftTokenKind.GraveAccent;
-                        value = ReadTo('`');
-                        break;
-
-                    case '«':
-                    case '»':
-                    case '‘':
-                    case '’':
-                    case '“':
-                    case '”':
-                    case '‹':
-                    case '›':
-                    case '–':
-                    case '—':
-                    case '‰':
-                    case '¦':
-                    case '§':
-                    case '±':
-                        throw new NotImplementedException();
-
-                    case '?':
-                        kind = PftTokenKind.Question;
-                        value = c.ToString();
-                        break;
-
-                    case '/':
-                        c2 = PeekChar();
-                        if (c2 == '*')
-                        {
-                            ReadChar();
-                            value = _navigator.ReadUntil('\r', '\n').ToString();
-                            kind = PftTokenKind.Comment;
-                        }
-                        else
-                        {
-                            kind = PftTokenKind.Slash;
-                            value = c.ToString();
-                        }
-                        break;
-
-                    case '<':
-                        c2 = PeekChar();
-                        if (c2 == '=')
-                        {
-                            kind = PftTokenKind.LessEqual;
-                            value = "<=";
-                            ReadChar();
-                        }
-                        else if (c2 == '<')
-                        {
-                            c3 = _navigator.LookAhead(1);
-                            if (c3 == '<')
+                            kind = PftTokenKind.TripleLess;
+                            value = _navigator.ReadTo (">>>").ToString();
+                            if (string.IsNullOrEmpty (value))
                             {
-                                ReadChar();
-                                ReadChar();
-                                kind = PftTokenKind.TripleLess;
-                                value = _navigator.ReadTo(">>>").ToString();
-                                if (string.IsNullOrEmpty(value))
-                                {
-                                    ThrowSyntax();
-                                }
+                                ThrowSyntax();
                             }
-                            else
-                            {
-                                kind = PftTokenKind.Less;
-                                value = c.ToString();
-                            }
-                        }
-                        else if (c2 == '>')
-                        {
-                            kind = PftTokenKind.NotEqual1;
-                            value = "<>";
-                            ReadChar();
                         }
                         else
                         {
                             kind = PftTokenKind.Less;
                             value = c.ToString();
                         }
-                        break;
+                    }
+                    else if (c2 == '>')
+                    {
+                        kind = PftTokenKind.NotEqual1;
+                        value = "<>";
+                        ReadChar();
+                    }
+                    else
+                    {
+                        kind = PftTokenKind.Less;
+                        value = c.ToString();
+                    }
 
-                    case '>':
-                        c2 = PeekChar();
-                        if (c2 == '=')
-                        {
-                            kind = PftTokenKind.MoreEqual;
-                            value = ">=";
-                            ReadChar();
-                        }
-                        else
-                        {
-                            kind = PftTokenKind.More;
-                            value = c.ToString();
-                        }
-                        break;
+                    break;
 
-                    case '&':
-                        value = ReadIdentifier();
-                        if (string.IsNullOrEmpty(value))
-                        {
-                            ThrowSyntax();
-                        }
-                        kind = PftTokenKind.Unifor;
-                        break;
+                case '>':
+                    c2 = PeekChar();
+                    if (c2 == '=')
+                    {
+                        kind = PftTokenKind.MoreEqual;
+                        value = ">=";
+                        ReadChar();
+                    }
+                    else
+                    {
+                        kind = PftTokenKind.More;
+                        value = c.ToString();
+                    }
 
-                    case '$':
-                        value = ReadIdentifier();
-                        if (string.IsNullOrEmpty(value))
-                        {
-                            ThrowSyntax();
-                        }
-                        kind = PftTokenKind.Variable;
-                        break;
+                    break;
 
-                    case '@':
-                        value = ReadIdentifier();
-                        if (string.IsNullOrEmpty(value))
-                        {
-                            ThrowSyntax();
-                        }
-                        kind = PftTokenKind.At;
-                        break;
+                case '&':
+                    value = ReadIdentifier();
+                    if (string.IsNullOrEmpty (value))
+                    {
+                        ThrowSyntax();
+                    }
 
-                    case '^':
-                        kind = PftTokenKind.Hat;
-                        value = "^";
-                        break;
+                    kind = PftTokenKind.Unifor;
+                    break;
 
-                    case '\x1C':
-                    case '\u221F':
-                        value = _navigator.ReadUntil('\x1D', '\u2194').ToString();
-                        if (string.IsNullOrEmpty(value)
-                            || !ReadChar().IsOneOf('\x1D', '\u2194'))
-                        {
-                            ThrowSyntax();
-                        }
-                        kind = PftTokenKind.At;
-                        break;
+                case '$':
+                    value = ReadIdentifier();
+                    if (string.IsNullOrEmpty (value))
+                    {
+                        ThrowSyntax();
+                    }
 
-                    case 'a':
-                    case 'A':
-                        value = ReadIdentifier(c);
-                        if (value.Length != 1)
-                        {
-                            goto default;
-                        }
-                        kind = PftTokenKind.A;
-                        value = "a";
-                        break;
+                    kind = PftTokenKind.Variable;
+                    break;
 
-                    case 'c':
-                    case 'C':
-                        value = ReadInteger();
-                        if (!string.IsNullOrEmpty(value))
-                        {
-                            kind = PftTokenKind.C;
-                            break;
-                        }
-                        value = ReadIdentifier(c);
+                case '@':
+                    value = ReadIdentifier();
+                    if (string.IsNullOrEmpty (value))
+                    {
+                        ThrowSyntax();
+                    }
+
+                    kind = PftTokenKind.At;
+                    break;
+
+                case '^':
+                    kind = PftTokenKind.Hat;
+                    value = "^";
+                    break;
+
+                case '\x1C':
+                case '\u221F':
+                    value = _navigator.ReadUntil ('\x1D', '\u2194').ToString();
+                    if (string.IsNullOrEmpty (value)
+                        || !ReadChar().IsOneOf ('\x1D', '\u2194'))
+                    {
+                        ThrowSyntax();
+                    }
+
+                    kind = PftTokenKind.At;
+                    break;
+
+                case 'a':
+                case 'A':
+                    value = ReadIdentifier (c);
+                    if (value.Length != 1)
+                    {
                         goto default;
+                    }
 
-                    case 'd':
-                    case 'D':
-                        field = ReadField();
-                        if (ReferenceEquals(field, null))
-                        {
-                            goto default;
-                        }
-                        value = field.RawText;
-                        kind = PftTokenKind.V;
+                    kind = PftTokenKind.A;
+                    value = "a";
+                    break;
+
+                case 'c':
+                case 'C':
+                    value = ReadInteger();
+                    if (!string.IsNullOrEmpty (value))
+                    {
+                        kind = PftTokenKind.C;
                         break;
+                    }
 
-                    case 'f':
-                    case 'F':
-                        value = ReadIdentifier(c);
-                        if (value.Length != 1)
-                        {
-                            goto default;
-                        }
-                        kind = PftTokenKind.F;
-                        value = "f";
-                        break;
+                    value = ReadIdentifier (c);
+                    goto default;
 
-                    case 'g':
-                    case 'G':
-                        field = ReadField();
-                        if (ReferenceEquals(field, null))
-                        {
-                            goto default;
-                        }
-                        value = field.RawText;
-                        kind = PftTokenKind.V;
-                        break;
+                case 'd':
+                case 'D':
+                    field = ReadField();
+                    if (ReferenceEquals (field, null))
+                    {
+                        goto default;
+                    }
 
-                    case 'l':
-                    case 'L':
-                        value = ReadIdentifier(c);
-                        if (value.Length != 1)
-                        {
-                            goto default;
-                        }
-                        kind = PftTokenKind.L;
-                        value = "l";
-                        break;
+                    value = field.RawText;
+                    kind = PftTokenKind.V;
+                    break;
 
-                    case 'm':
-                    case 'M':
-                        value = ReadIdentifier(c);
-                        var value2 = value.ToLower();
-                        if (value2.Length == 3)
+                case 'f':
+                case 'F':
+                    value = ReadIdentifier (c);
+                    if (value.Length != 1)
+                    {
+                        goto default;
+                    }
+
+                    kind = PftTokenKind.F;
+                    value = "f";
+                    break;
+
+                case 'g':
+                case 'G':
+                    field = ReadField();
+                    if (ReferenceEquals (field, null))
+                    {
+                        goto default;
+                    }
+
+                    value = field.RawText;
+                    kind = PftTokenKind.V;
+                    break;
+
+                case 'l':
+                case 'L':
+                    value = ReadIdentifier (c);
+                    if (value.Length != 1)
+                    {
+                        goto default;
+                    }
+
+                    kind = PftTokenKind.L;
+                    value = "l";
+                    break;
+
+                case 'm':
+                case 'M':
+                    value = ReadIdentifier (c);
+                    var value2 = value.ToLower();
+                    if (value2.Length == 3)
+                    {
+                        if (value2 == "mfn")
                         {
-                            if (value2 == "mfn")
+                            var builder = new StringBuilder();
+
+                            if (PeekChar() == '(')
                             {
-                                var builder = new StringBuilder();
+                                builder.Append ('(');
+                                ReadChar();
 
-                                if (PeekChar() == '(')
+                                var ok = false;
+                                while (!IsEOF)
                                 {
-                                    builder.Append('(');
+                                    c3 = PeekChar();
+                                    builder.Append (c3);
                                     ReadChar();
-
-                                    var ok = false;
-                                    while (!IsEOF)
+                                    if (c3 == ')')
                                     {
-                                        c3 = PeekChar();
-                                        builder.Append(c3);
-                                        ReadChar();
-                                        if (c3 == ')')
-                                        {
-                                            ok = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!ok)
-                                    {
-                                        ThrowSyntax();
+                                        ok = true;
+                                        break;
                                     }
                                 }
 
-                                kind = PftTokenKind.Mfn;
-                                value = "mfn" + builder;
-                                break;
+                                if (!ok)
+                                {
+                                    ThrowSyntax();
+                                }
                             }
-                            if ((value2[1] == 'h'
-                                || value2[1] == 'd'
-                                || value2[1] == 'p')
-                                && (value2[2] == 'l'
-                                    || value2[2] == 'u'))
-                            {
-                                kind = PftTokenKind.Mpl;
-                                break;
-                            }
-                        }
-                        goto default;
 
-                    case 'n':
-                    case 'N':
-                        field = ReadField();
-                        if (ReferenceEquals(field, null))
-                        {
-                            goto default;
-                        }
-                        value = field.RawText;
-                        kind = PftTokenKind.V;
-                        break;
-
-                    case 'p':
-                    case 'P':
-                        value = ReadIdentifier(c);
-                        if (value.Length != 1)
-                        {
-                            goto default;
-                        }
-                        kind = PftTokenKind.P;
-                        value = "p";
-                        break;
-
-                    case 's':
-                    case 'S':
-                        value = ReadIdentifier(c);
-                        if (value.Length != 1)
-                        {
-                            goto default;
-                        }
-                        kind = PftTokenKind.S;
-                        value = "s";
-                        break;
-
-                    case 'v':
-                    case 'V':
-                        field = ReadField();
-                        if (ReferenceEquals(field, null))
-                        {
-                            goto default;
-                        }
-                        value = field.RawText;
-                        kind = PftTokenKind.V;
-                        break;
-
-                    case 'x':
-                    case 'X':
-                        value = ReadInteger();
-                        if (!string.IsNullOrEmpty(value))
-                        {
-                            kind = PftTokenKind.X;
+                            kind = PftTokenKind.Mfn;
+                            value = "mfn" + builder;
                             break;
                         }
-                        value = ReadIdentifier(c);
+
+                        if ((value2[1] == 'h'
+                             || value2[1] == 'd'
+                             || value2[1] == 'p')
+                            && (value2[2] == 'l'
+                                || value2[2] == 'u'))
+                        {
+                            kind = PftTokenKind.Mpl;
+                            break;
+                        }
+                    }
+
+                    goto default;
+
+                case 'n':
+                case 'N':
+                    field = ReadField();
+                    if (ReferenceEquals (field, null))
+                    {
                         goto default;
+                    }
 
-                    case '0':
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7':
-                    case '8':
-                    case '9':
-                    case '.':
-                        _navigator.Move(-1);
-                        value = ReadFloat();
-                        kind = PftTokenKind.Number;
+                    value = field.RawText;
+                    kind = PftTokenKind.V;
+                    break;
+
+                case 'p':
+                case 'P':
+                    value = ReadIdentifier (c);
+                    if (value.Length != 1)
+                    {
+                        goto default;
+                    }
+
+                    kind = PftTokenKind.P;
+                    value = "p";
+                    break;
+
+                case 's':
+                case 'S':
+                    value = ReadIdentifier (c);
+                    if (value.Length != 1)
+                    {
+                        goto default;
+                    }
+
+                    kind = PftTokenKind.S;
+                    value = "s";
+                    break;
+
+                case 'v':
+                case 'V':
+                    field = ReadField();
+                    if (ReferenceEquals (field, null))
+                    {
+                        goto default;
+                    }
+
+                    value = field.RawText;
+                    kind = PftTokenKind.V;
+                    break;
+
+                case 'x':
+                case 'X':
+                    value = ReadInteger();
+                    if (!string.IsNullOrEmpty (value))
+                    {
+                        kind = PftTokenKind.X;
                         break;
+                    }
 
-                    default:
-                        if (string.IsNullOrEmpty(value))
-                        {
-                            _navigator.Move(-1);
-                            value = ReadIdentifier();
-                        }
-                        if (string.IsNullOrEmpty(value))
-                        {
-                            ThrowSyntax();
-                        }
+                    value = ReadIdentifier (c);
+                    goto default;
 
-                        switch (value.ThrowIfNull().ToLower())
-                        {
-                            case "abs":
-                                kind = PftTokenKind.Abs;
-                                value = "abs";
-                                break;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                case '.':
+                    _navigator.Move (-1);
+                    value = ReadFloat();
+                    kind = PftTokenKind.Number;
+                    break;
 
-                            case "all":
-                                kind = PftTokenKind.All;
-                                value = "all";
-                                break;
+                default:
+                    if (string.IsNullOrEmpty (value))
+                    {
+                        _navigator.Move (-1);
+                        value = ReadIdentifier();
+                    }
 
-                            case "and":
-                            case "и":
-                                kind = PftTokenKind.And;
-                                value = "and";
-                                break;
+                    if (string.IsNullOrEmpty (value))
+                    {
+                        ThrowSyntax();
+                    }
 
-                            case "any":
-                                kind = PftTokenKind.Any;
-                                value = "any";
-                                break;
+                    switch (value.ThrowIfNull().ToLower())
+                    {
+                        case "abs":
+                            kind = PftTokenKind.Abs;
+                            value = "abs";
+                            break;
 
-                            case "blank":
-                                kind = PftTokenKind.Blank;
-                                value = "blank";
-                                break;
+                        case "all":
+                            kind = PftTokenKind.All;
+                            value = "all";
+                            break;
 
-                            case "break":
-                                kind = PftTokenKind.Break;
-                                value = "break";
-                                break;
+                        case "and":
+                        case "и":
+                            kind = PftTokenKind.And;
+                            value = "and";
+                            break;
 
-                            case "ceil":
-                                kind = PftTokenKind.Ceil;
-                                value = "ceil";
-                                break;
+                        case "any":
+                            kind = PftTokenKind.Any;
+                            value = "any";
+                            break;
 
-                            case "cseval":
-                                kind = PftTokenKind.CsEval;
-                                value = "cseval";
-                                break;
+                        case "blank":
+                            kind = PftTokenKind.Blank;
+                            value = "blank";
+                            break;
 
-                            case "div":
-                                kind = PftTokenKind.Div;
-                                value = "div";
-                                break;
+                        case "break":
+                            kind = PftTokenKind.Break;
+                            value = "break";
+                            break;
 
-                            case "do":
-                                kind = PftTokenKind.Do;
-                                value = "do";
-                                break;
+                        case "ceil":
+                            kind = PftTokenKind.Ceil;
+                            value = "ceil";
+                            break;
 
-                            case "else":
-                            case "иначе":
-                                kind = PftTokenKind.Else;
-                                value = "else";
-                                break;
+                        case "cseval":
+                            kind = PftTokenKind.CsEval;
+                            value = "cseval";
+                            break;
 
-                            case "empty":
-                                kind = PftTokenKind.Empty;
-                                value = "empty";
-                                break;
+                        case "div":
+                            kind = PftTokenKind.Div;
+                            value = "div";
+                            break;
 
-                            case "end":
-                            case "конец":
-                                kind = PftTokenKind.End;
-                                value = "end";
-                                break;
+                        case "do":
+                            kind = PftTokenKind.Do;
+                            value = "do";
+                            break;
 
-                            case "eval":
-                                kind = PftTokenKind.Eval;
-                                value = "eval";
-                                break;
+                        case "else":
+                        case "иначе":
+                            kind = PftTokenKind.Else;
+                            value = "else";
+                            break;
 
-                            case "fmt":
-                                kind = PftTokenKind.Fmt;
-                                value = "fmt";
-                                break;
+                        case "empty":
+                            kind = PftTokenKind.Empty;
+                            value = "empty";
+                            break;
 
-                            case "false":
-                            case "ложь":
-                                kind = PftTokenKind.False;
-                                value = "false";
-                                break;
+                        case "end":
+                        case "конец":
+                            kind = PftTokenKind.End;
+                            value = "end";
+                            break;
 
-                            case "fi":
-                            case "все":
-                            case "всё":
-                            case "илсе":
-                            case "фи":
-                                kind = PftTokenKind.Fi;
-                                value = "fi";
-                                break;
+                        case "eval":
+                            kind = PftTokenKind.Eval;
+                            value = "eval";
+                            break;
 
-                            case "first":
-                                kind = PftTokenKind.First;
-                                value = "first";
-                                break;
+                        case "fmt":
+                            kind = PftTokenKind.Fmt;
+                            value = "fmt";
+                            break;
 
-                            case "floor":
-                                kind = PftTokenKind.Floor;
-                                value = "floor";
-                                break;
+                        case "false":
+                        case "ложь":
+                            kind = PftTokenKind.False;
+                            value = "false";
+                            break;
 
-                            case "for":
-                            case "для":
-                                kind = PftTokenKind.For;
-                                value = "for";
-                                break;
+                        case "fi":
+                        case "все":
+                        case "всё":
+                        case "илсе":
+                        case "фи":
+                            kind = PftTokenKind.Fi;
+                            value = "fi";
+                            break;
 
-                            case "foreach":
-                                kind = PftTokenKind.ForEach;
-                                value = "foreach";
-                                break;
+                        case "first":
+                            kind = PftTokenKind.First;
+                            value = "first";
+                            break;
 
-                            case "frac":
-                                kind = PftTokenKind.Frac;
-                                value = "frac";
-                                break;
+                        case "floor":
+                            kind = PftTokenKind.Floor;
+                            value = "floor";
+                            break;
 
-                            case "from":
-                                kind = PftTokenKind.From;
-                                value = "from";
-                                break;
+                        case "for":
+                        case "для":
+                            kind = PftTokenKind.For;
+                            value = "for";
+                            break;
 
-                            case "global":
-                                kind = PftTokenKind.Global;
-                                value = "global";
-                                break;
+                        case "foreach":
+                            kind = PftTokenKind.ForEach;
+                            value = "foreach";
+                            break;
 
-                            case "have":
-                                kind = PftTokenKind.Have;
-                                value = "have";
-                                break;
+                        case "frac":
+                            kind = PftTokenKind.Frac;
+                            value = "frac";
+                            break;
 
-                            case "if":
-                            case "если":
-                                kind = PftTokenKind.If;
-                                value = "if";
-                                break;
+                        case "from":
+                            kind = PftTokenKind.From;
+                            value = "from";
+                            break;
 
-                            case "in":
-                                kind = PftTokenKind.In;
-                                value = "in";
-                                break;
+                        case "global":
+                            kind = PftTokenKind.Global;
+                            value = "global";
+                            break;
 
-                            case "last":
-                                kind = PftTokenKind.Last;
-                                value = "last";
-                                break;
+                        case "have":
+                            kind = PftTokenKind.Have;
+                            value = "have";
+                            break;
 
-                            case "local":
-                                kind = PftTokenKind.Local;
-                                value = "local";
-                                break;
+                        case "if":
+                        case "если":
+                            kind = PftTokenKind.If;
+                            value = "if";
+                            break;
 
-                            case "nl":
-                                kind = PftTokenKind.Nl;
-                                value = "nl";
-                                break;
+                        case "in":
+                            kind = PftTokenKind.In;
+                            value = "in";
+                            break;
 
-                            case "not":
-                            case "не":
-                                kind = PftTokenKind.Not;
-                                value = "not";
-                                break;
+                        case "last":
+                            kind = PftTokenKind.Last;
+                            value = "last";
+                            break;
 
-                            case "or":
-                            case "или":
-                                kind = PftTokenKind.Or;
-                                value = "or";
-                                break;
+                        case "local":
+                            kind = PftTokenKind.Local;
+                            value = "local";
+                            break;
 
-                            case "order":
-                                kind = PftTokenKind.Order;
-                                value = "order";
-                                break;
+                        case "nl":
+                            kind = PftTokenKind.Nl;
+                            value = "nl";
+                            break;
 
-                            case "parallel":
-                            case "параллельно":
-                                kind = PftTokenKind.Parallel;
-                                value = "parallel";
-                                break;
+                        case "not":
+                        case "не":
+                            kind = PftTokenKind.Not;
+                            value = "not";
+                            break;
 
-                            case "pow":
-                                kind = PftTokenKind.Pow;
-                                value = "pow";
-                                break;
+                        case "or":
+                        case "или":
+                            kind = PftTokenKind.Or;
+                            value = "or";
+                            break;
 
-                            case "proc":
-                                kind = PftTokenKind.Proc;
-                                value = "proc";
-                                break;
+                        case "order":
+                            kind = PftTokenKind.Order;
+                            value = "order";
+                            break;
 
-                            case "ravr":
-                                kind = PftTokenKind.Ravr;
-                                value = "ravr";
-                                break;
+                        case "parallel":
+                        case "параллельно":
+                            kind = PftTokenKind.Parallel;
+                            value = "parallel";
+                            break;
 
-                            case "ref":
-                                kind = PftTokenKind.Ref;
-                                value = "ref";
-                                break;
+                        case "pow":
+                            kind = PftTokenKind.Pow;
+                            value = "pow";
+                            break;
 
-                            case "rmax":
-                                kind = PftTokenKind.Rmax;
-                                value = "rmax";
-                                break;
+                        case "proc":
+                            kind = PftTokenKind.Proc;
+                            value = "proc";
+                            break;
 
-                            case "rmin":
-                                kind = PftTokenKind.Rmin;
-                                value = "rmin";
-                                break;
+                        case "ravr":
+                            kind = PftTokenKind.Ravr;
+                            value = "ravr";
+                            break;
 
-                            case "round":
-                                kind = PftTokenKind.Round;
-                                value = "round";
-                                break;
+                        case "ref":
+                            kind = PftTokenKind.Ref;
+                            value = "ref";
+                            break;
 
-                            case "rsum":
-                                kind = PftTokenKind.Rsum;
-                                value = "rsum";
-                                break;
+                        case "rmax":
+                            kind = PftTokenKind.Rmax;
+                            value = "rmax";
+                            break;
 
-                            case "select":
-                            case "выбор":
-                                kind = PftTokenKind.Select;
-                                value = "select";
-                                break;
+                        case "rmin":
+                            kind = PftTokenKind.Rmin;
+                            value = "rmin";
+                            break;
 
-                            case "sign":
-                                kind = PftTokenKind.Sign;
-                                value = "sign";
-                                break;
+                        case "round":
+                            kind = PftTokenKind.Round;
+                            value = "round";
+                            break;
 
-                            case "then":
-                            case "то":
-                            case "тогда":
-                                kind = PftTokenKind.Then;
-                                value = "then";
-                                break;
+                        case "rsum":
+                            kind = PftTokenKind.Rsum;
+                            value = "rsum";
+                            break;
 
-                            case "true":
-                            case "истина":
-                                kind = PftTokenKind.True;
-                                value = "true";
-                                break;
+                        case "select":
+                        case "выбор":
+                            kind = PftTokenKind.Select;
+                            value = "select";
+                            break;
 
-                            case "trunc":
-                                kind = PftTokenKind.Trunc;
-                                value = "trunc";
-                                break;
+                        case "sign":
+                            kind = PftTokenKind.Sign;
+                            value = "sign";
+                            break;
 
-                            case "val":
-                                kind = PftTokenKind.Val;
-                                value = "val";
-                                break;
+                        case "then":
+                        case "то":
+                        case "тогда":
+                            kind = PftTokenKind.Then;
+                            value = "then";
+                            break;
 
-                            case "where":
-                                kind = PftTokenKind.Where;
-                                value = "where";
-                                break;
+                        case "true":
+                        case "истина":
+                            kind = PftTokenKind.True;
+                            value = "true";
+                            break;
 
-                            case "while":
-                            case "пока":
-                                kind = PftTokenKind.While;
-                                value = "while";
-                                break;
+                        case "trunc":
+                            kind = PftTokenKind.Trunc;
+                            value = "trunc";
+                            break;
 
-                            case "with":
-                                kind = PftTokenKind.With;
-                                value = "with";
-                                break;
+                        case "val":
+                            kind = PftTokenKind.Val;
+                            value = "val";
+                            break;
 
-                            default:
-                                kind = PftTokenKind.Identifier;
-                                break;
-                        }
+                        case "where":
+                            kind = PftTokenKind.Where;
+                            value = "where";
+                            break;
 
-                        break;
-                }
+                        case "while":
+                        case "пока":
+                            kind = PftTokenKind.While;
+                            value = "while";
+                            break;
 
-                if (kind == PftTokenKind.None) //-V3022
-                {
-                    ThrowSyntax();
-                }
+                        case "with":
+                            kind = PftTokenKind.With;
+                            value = "with";
+                            break;
 
-                var token = new PftToken(kind, line, column, value);
-                if (kind == PftTokenKind.V)
-                {
-                    token.UserData = field;
-                }
+                        default:
+                            kind = PftTokenKind.Identifier;
+                            break;
+                    }
 
-                result.Add(token);
+                    break;
             }
 
-            return new PftTokenList(result.ToArray());
+            if (kind == PftTokenKind.None) //-V3022
+            {
+                ThrowSyntax();
+            }
+
+            var token = new PftToken (kind, line, column, value);
+            if (kind == PftTokenKind.V)
+            {
+                token.UserData = field;
+            }
+
+            result.Add (token);
         }
 
-        #endregion
+        return new PftTokenList (result.ToArray());
     }
+
+    #endregion
 }

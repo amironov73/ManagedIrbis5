@@ -23,87 +23,89 @@ using System;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Server.Commands
+namespace ManagedIrbis.Server.Commands;
+
+/// <summary>
+/// Создание базы данных.
+/// </summary>
+public sealed class CreateDatabaseCommand
+    : ServerCommand
 {
+    #region Construction
+
     /// <summary>
-    /// Создание базы данных.
+    /// Конструктор.
     /// </summary>
-    public sealed class CreateDatabaseCommand
-        : ServerCommand
+    public CreateDatabaseCommand
+        (
+            WorkData data
+        )
+        : base (data)
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public CreateDatabaseCommand
-            (
-                WorkData data
-            )
-            : base (data)
-        {
-        }
-
-        #endregion
-
-        #region ServerCommand members
-
-        /// <inheritdoc cref="ServerCommand.Execute" />
-        public override void Execute()
-        {
-            var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute (Data);
-
-            try
-            {
-                var context = engine.RequireAdministratorContext (Data);
-                Data.Context = context;
-                UpdateContext();
-
-                var request = Data.Request.ThrowIfNull();
-                var database = request.RequireAnsiString();
-                database.NotUsed();
-                var description = request.GetAnsiString();
-                description.NotUsed();
-                var readerAccess = request.GetInt32();
-                readerAccess.NotUsed();
-
-                // Response is (ANSI):
-                // 0
-                // NewDB NEWDB,New database,0 - Создана новая БД NEWDB
-                // CloseDB -
-                // Exit C:\IRBIS64_2015\workdir\1126_0.ibf
-
-                // TODO implement
-
-                var response = Data.Response.ThrowIfNull();
-
-                // Код возврата
-                response.WriteInt32 (0).NewLine();
-                SendResponse();
-            }
-            catch (IrbisException exception)
-            {
-                SendError (exception.ErrorCode);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        nameof (CreateDatabaseCommand) + "::" + nameof (Execute),
-                        exception
-                    );
-
-                SendError (-8888);
-            }
-
-            engine.OnAfterExecute (Data);
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region ServerCommand members
+
+    /// <inheritdoc cref="ServerCommand.Execute" />
+    public override void Execute()
+    {
+        var engine = Data.Engine.ThrowIfNull();
+        engine.OnBeforeExecute (Data);
+
+        try
+        {
+            var context = engine.RequireAdministratorContext (Data);
+            Data.Context = context;
+            UpdateContext();
+
+            var request = Data.Request.ThrowIfNull();
+            var database = request.RequireAnsiString();
+            database.NotUsed();
+            var description = request.GetAnsiString();
+            description.NotUsed();
+            var readerAccess = request.GetInt32();
+            readerAccess.NotUsed();
+
+            // Response is (ANSI):
+            // 0
+            // NewDB NEWDB,New database,0 - Создана новая БД NEWDB
+            // CloseDB -
+            // Exit C:\IRBIS64_2015\workdir\1126_0.ibf
+
+            // TODO implement
+
+            var response = Data.Response.ThrowIfNull();
+
+            // Код возврата
+            response.WriteInt32 (0).NewLine();
+            SendResponse();
+        }
+        catch (IrbisException exception)
+        {
+            SendError (exception.ErrorCode);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (CreateDatabaseCommand) + "::" + nameof (Execute)
+                );
+
+            SendError (-8888);
+        }
+
+        engine.OnAfterExecute (Data);
+    }
+
+    #endregion
 }

@@ -308,7 +308,7 @@ public static class ListUtility
     [Pure]
     public static bool IsNullOrEmpty<T>
         (
-            [NotNullWhen ((false))] this IList<T>? list
+            [NotNullWhen ((false))] this IReadOnlyList<T>? list
         )
     {
         if (list is not null)

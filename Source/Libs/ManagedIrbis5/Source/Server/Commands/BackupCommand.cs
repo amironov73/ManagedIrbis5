@@ -23,76 +23,78 @@ using System;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Server.Commands
+namespace ManagedIrbis.Server.Commands;
+
+/// <summary>
+/// Создание страховой копии мастер-файла.
+/// </summary>
+public sealed class BackupCommand
+    : ServerCommand
 {
+    #region Construction
+
     /// <summary>
-    /// Создание страховой копии мастер-файла.
+    /// Конструктор.
     /// </summary>
-    public sealed class BackupCommand
-        : ServerCommand
+    public BackupCommand
+        (
+            WorkData data
+        )
+        : base (data)
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public BackupCommand
-            (
-                WorkData data
-            )
-            : base (data)
-        {
-        }
-
-        #endregion
-
-        #region ServerCommand members
-
-        /// <inheritdoc cref="ServerCommand.Execute" />
-        public override void Execute()
-        {
-            var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute (Data);
-
-            try
-            {
-                var context = engine.RequireAdministratorContext (Data);
-                Data.Context = context;
-                UpdateContext();
-
-                var request = Data.Request.ThrowIfNull();
-                request.NotUsed();
-
-                // TODO implement
-
-                var response = Data.Response.ThrowIfNull();
-
-                // Код возврата
-                response.WriteInt32 (0).NewLine();
-                SendResponse();
-            }
-            catch (IrbisException exception)
-            {
-                SendError (exception.ErrorCode);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        nameof (BackupCommand) + "::" + nameof (Execute),
-                        exception
-                    );
-
-                SendError (-8888);
-            }
-
-            engine.OnAfterExecute (Data);
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region ServerCommand members
+
+    /// <inheritdoc cref="ServerCommand.Execute" />
+    public override void Execute()
+    {
+        var engine = Data.Engine.ThrowIfNull();
+        engine.OnBeforeExecute (Data);
+
+        try
+        {
+            var context = engine.RequireAdministratorContext (Data);
+            Data.Context = context;
+            UpdateContext();
+
+            var request = Data.Request.ThrowIfNull();
+            request.NotUsed();
+
+            // TODO implement
+
+            var response = Data.Response.ThrowIfNull();
+
+            // Код возврата
+            response.WriteInt32 (0).NewLine();
+            SendResponse();
+        }
+        catch (IrbisException exception)
+        {
+            SendError (exception.ErrorCode);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (BackupCommand) + "::" + nameof (Execute)
+                );
+
+            SendError (-8888);
+        }
+
+        engine.OnAfterExecute (Data);
+    }
+
+    #endregion
 }

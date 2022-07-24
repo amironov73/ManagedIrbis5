@@ -23,79 +23,81 @@ using System;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Server.Commands
+namespace ManagedIrbis.Server.Commands;
+
+/// <summary>
+/// Актуализация записи.
+/// </summary>
+public sealed class ActualizeRecordCommand
+    : ServerCommand
 {
+    #region Construction
+
     /// <summary>
-    /// Актуализация записи.
+    /// Конструктор.
     /// </summary>
-    public sealed class ActualizeRecordCommand
-        : ServerCommand
+    public ActualizeRecordCommand
+        (
+            WorkData data
+        )
+        : base (data)
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ActualizeRecordCommand
-            (
-                WorkData data
-            )
-            : base (data)
-        {
-        }
-
-        #endregion
-
-        #region ServerCommand members
-
-        /// <inheritdoc cref="ServerCommand.Execute" />
-        public override void Execute()
-        {
-            var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute (Data);
-
-            try
-            {
-                var context = engine.RequireContext (Data);
-                Data.Context = context;
-                UpdateContext();
-
-                var request = Data.Request.ThrowIfNull();
-                var database = request.RequireAnsiString();
-                database.NotUsed();
-                var mfn = request.GetInt32();
-                mfn.NotUsed();
-
-                // TODO implement
-
-                var response = Data.Response.ThrowIfNull();
-
-                // Код возврата
-                response.WriteInt32 (0).NewLine();
-                SendResponse();
-            }
-            catch (IrbisException exception)
-            {
-                SendError (exception.ErrorCode);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        nameof (ActualizeRecordCommand) + "::" + nameof (Execute),
-                        exception
-                    );
-
-                SendError (-8888);
-            }
-
-            engine.OnAfterExecute (Data);
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region ServerCommand members
+
+    /// <inheritdoc cref="ServerCommand.Execute" />
+    public override void Execute()
+    {
+        var engine = Data.Engine.ThrowIfNull();
+        engine.OnBeforeExecute (Data);
+
+        try
+        {
+            var context = engine.RequireContext (Data);
+            Data.Context = context;
+            UpdateContext();
+
+            var request = Data.Request.ThrowIfNull();
+            var database = request.RequireAnsiString();
+            database.NotUsed();
+            var mfn = request.GetInt32();
+            mfn.NotUsed();
+
+            // TODO implement
+
+            var response = Data.Response.ThrowIfNull();
+
+            // Код возврата
+            response.WriteInt32 (0).NewLine();
+            SendResponse();
+        }
+        catch (IrbisException exception)
+        {
+            SendError (exception.ErrorCode);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (ActualizeRecordCommand) + "::" + nameof (Execute)
+                );
+
+            SendError (-8888);
+        }
+
+        engine.OnAfterExecute (Data);
+    }
+
+    #endregion
 }

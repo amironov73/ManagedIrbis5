@@ -24,353 +24,377 @@ using System.Linq;
 using AM;
 using AM.Runtime;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Reports
+namespace ManagedIrbis.Reports;
+
+/// <summary>
+/// Коллекция полос отчета.
+/// </summary>
+public sealed class BandCollection<T>
+    : Collection<T>,
+    IHandmadeSerializable,
+    IReadOnly<BandCollection<T>>,
+    IVerifiable,
+    IDisposable
+    where T: ReportBand
 {
+    #region Properties
+
     /// <summary>
-    /// Коллекция полос отчета.
+    /// Родительская полоса.
     /// </summary>
-    public sealed class BandCollection<T>
-        : Collection<T>,
-        IHandmadeSerializable,
-        IReadOnly<BandCollection<T>>,
-        IVerifiable,
-        IDisposable
-        where T: ReportBand
+    public ReportBand? Parent
     {
-        #region Properties
+        get => _parent;
+        internal set => SetParent (value);
+    }
 
-        /// <summary>
-        /// Parent band.
-        /// </summary>
-        public ReportBand? Parent
+    /// <summary>
+    /// Отчет, которому принадлежит полоса.
+    /// </summary>
+    public IrbisReport? Report
+    {
+        get => _report;
+        internal set => SetReport (value);
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public BandCollection()
+        : this (null, null)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public BandCollection
+        (
+            IrbisReport? report,
+            ReportBand? parent
+        )
+    {
+        Report = report;
+        Parent = parent;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private ReportBand? _parent;
+
+    private IrbisReport? _report;
+
+    internal void SetParent
+        (
+            ReportBand? parent
+        )
+    {
+        _parent = parent;
+
+        foreach (var band in this)
         {
-            get => _parent;
-            internal set => SetParent(value);
-        } // property Parent
+            band.Parent = parent;
+        }
+    }
 
-        /// <summary>
-        /// Record.
-        /// </summary>
-        public IrbisReport? Report
+    internal void SetReport
+        (
+            IrbisReport? report
+        )
+    {
+        _report = report;
+
+        foreach (var band in this)
         {
-            get => _report;
-            internal set => SetReport(value);
-        } // property Report
+            band.Report = report;
+        }
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Public methods
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BandCollection()
-            : this (null, null)
+    /// <summary>
+    /// Add range of <see cref="Field"/>s.
+    /// </summary>
+    public void AddRange
+        (
+            IEnumerable<T> bands
+        )
+    {
+        Sure.NotNull ((object?) bands);
+
+        ThrowIfReadOnly();
+
+        foreach (var band in bands)
         {
-        } // constructor
+            Add (band);
+        }
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BandCollection
+    /// <summary>
+    /// Создание клона коллекции.
+    /// </summary>
+    public BandCollection<T> Clone()
+    {
+        var result = new BandCollection<T> (Report, Parent);
+
+        foreach (var band in this)
+        {
+            var clone = (T)band.Clone();
+            result.Add (clone);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Find first occurrence of the field with given predicate.
+    /// </summary>
+    public ReportBand? Find (Predicate<ReportBand> predicate)
+    {
+        return this.FirstOrDefault (band => predicate (band));
+    }
+
+    /// <summary>
+    /// Find all occurrences of the field
+    /// with given predicate.
+    /// </summary>
+    public T[] FindAll (Predicate<ReportBand> predicate)
+    {
+        return this.Where (band => predicate (band)).ToArray();
+    }
+
+    /// <summary>
+    /// Render bands.
+    /// </summary>
+    public void Render
+        (
+            ReportContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        foreach (var band in this)
+        {
+            band.Render (context);
+        }
+    }
+
+    #endregion
+
+    #region Collection<T> members
+
+    /// <inheritdoc cref="Collection{T}.ClearItems" />
+    protected override void ClearItems()
+    {
+        ThrowIfReadOnly();
+
+        foreach (var band in this)
+        {
+            band.Report = null;
+            band.Parent = null;
+        }
+
+        base.ClearItems();
+    }
+
+    /// <inheritdoc cref="Collection{T}.InsertItem" />
+    protected override void InsertItem
+        (
+            int index,
+            T item
+        )
+    {
+        Sure.NonNegative (index);
+        Sure.NotNull (item, nameof (item));
+
+        ThrowIfReadOnly();
+
+        if (item.Report is not null)
+        {
+            throw new IrbisException ("Band already belongs to report");
+        }
+
+        item.Report = Report;
+        item.Parent = Parent;
+
+        base.InsertItem (index, item);
+    }
+
+    /// <inheritdoc cref="Collection{T}.RemoveItem" />
+    protected override void RemoveItem
+        (
+            int index
+        )
+    {
+        Sure.NonNegative (index);
+
+        ThrowIfReadOnly();
+
+        if (index >= 0 && index < Count)
+        {
+            var band = this[index];
+            band.Report = null;
+            band.Parent = null;
+        }
+
+        base.RemoveItem (index);
+    }
+
+    /// <inheritdoc cref="Collection{T}.SetItem" />
+    protected override void SetItem
+        (
+            int index,
+            T item
+        )
+    {
+        Sure.NonNegative (index);
+        Sure.NotNull (item);
+
+        ThrowIfReadOnly();
+
+        if (item.Report is not null)
+        {
+            throw new IrbisException ("Band already belongs to report");
+        }
+
+        item.Report = Report;
+        item.Parent = Parent;
+
+        base.SetItem (index, item);
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        ThrowIfReadOnly();
+        ClearItems();
+
+        // TODO implement
+
+        //RecordField[] array = reader.ReadArray<RecordField>();
+        //AddRange(array);
+
+        Magna.Logger.LogError
             (
-                IrbisReport? report,
-                ReportBand? parent
-            )
-        {
-            Report = report;
-            Parent = parent;
-        } // constructor
+                nameof (BandCollection<T>) + "::" + nameof (RestoreFromStream)
+                + ": not implemented"
+            );
 
-        #endregion
+        throw new NotImplementedException();
+    }
 
-        #region Private members
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        private ReportBand? _parent;
+        // TODO implement
 
-        private IrbisReport? _report;
+        //writer.WriteArray(this.ToArray());
 
-        internal void SetParent
+        Magna.Logger.LogError
             (
-                ReportBand? parent
-            )
+                nameof (BandCollection<T>) + "::" + nameof (SaveToStream)
+                + ": not implemented"
+            );
+
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    #region IReadOnly<T> members
+
+    internal bool _readOnly;
+
+    /// <inheritdoc cref="IReadOnly{T}.ReadOnly" />
+    public bool ReadOnly => _readOnly;
+
+    /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
+    public BandCollection<T> AsReadOnly()
+    {
+        var result = Clone();
+        result.SetReadOnly();
+
+        return result;
+    }
+
+    /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
+    public void SetReadOnly() => _readOnly = true;
+
+    /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly" />
+    public void ThrowIfReadOnly()
+    {
+        if (ReadOnly)
         {
-            _parent = parent;
-
-            foreach (var band in this)
-            {
-                band.Parent = parent;
-            }
-        } // method SetParent
-
-        internal void SetReport
-            (
-                IrbisReport? report
-            )
-        {
-            _report = report;
-
-            foreach (var band in this)
-            {
-                band.Report = report;
-            }
-        } // method SetReport
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Add range of <see cref="Field"/>s.
-        /// </summary>
-        public void AddRange
-            (
-                IEnumerable<T> bands
-            )
-        {
-            ThrowIfReadOnly();
-
-            foreach (var band in bands)
-            {
-                Add(band);
-            }
-        } // method AddRange
-
-        /// <summary>
-        /// Создание клона коллекции.
-        /// </summary>
-        public BandCollection<T> Clone()
-        {
-            var result = new BandCollection<T> (Report, Parent);
-
-            foreach (var band in this)
-            {
-                var clone = (T)band.Clone();
-                result.Add(clone);
-            }
-
-            return result;
-        } // method Clone
-
-        /// <summary>
-        /// Find first occurrence of the field with given predicate.
-        /// </summary>
-        public ReportBand? Find(Predicate<ReportBand> predicate) =>
-            this.FirstOrDefault(band => predicate(band));
-
-        /// <summary>
-        /// Find all occurrences of the field
-        /// with given predicate.
-        /// </summary>
-        public T[] FindAll(Predicate<ReportBand> predicate) =>
-            this.Where(band => predicate(band)).ToArray();
-
-        /// <summary>
-        /// Render bands.
-        /// </summary>
-        public void Render
-            (
-                ReportContext context
-            )
-        {
-            foreach (var band in this)
-            {
-                band.Render(context);
-            }
-        } // method Render
-
-        #endregion
-
-        #region Collection<T> members
-
-        /// <inheritdoc cref="Collection{T}.ClearItems" />
-        protected override void ClearItems()
-        {
-            ThrowIfReadOnly();
-
-            foreach (var band in this)
-            {
-                band.Report = null;
-                band.Parent = null;
-            }
-
-            base.ClearItems();
-        } // method ClearItems
-
-        /// <inheritdoc cref="Collection{T}.InsertItem" />
-        protected override void InsertItem
-            (
-                int index,
-                T item
-            )
-        {
-            ThrowIfReadOnly();
-            Sure.NotNull(item, nameof(item));
-
-            item.Report = Report;
-            item.Parent = Parent;
-
-            base.InsertItem(index, item);
-        } // method InsertItem
-
-        /// <inheritdoc cref="Collection{T}.RemoveItem" />
-        protected override void RemoveItem
-            (
-                int index
-            )
-        {
-            ThrowIfReadOnly();
-
-            if (index >= 0 && index < Count)
-            {
-                var band  = this[index];
-                if (band is not null)
-                {
-                    band.Report = null;
-                    band.Parent = null;
-                }
-            }
-
-            base.RemoveItem(index);
-        } // method RemoveItem
-
-        /// <inheritdoc cref="Collection{T}.SetItem" />
-        protected override void SetItem
-            (
-                int index,
-                T item
-            )
-        {
-            ThrowIfReadOnly();
-            Sure.NotNull(item, nameof(item));
-
-            item.Report = Report;
-            item.Parent = Parent;
-
-            base.SetItem(index, item);
-        } // method SetItem
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            ThrowIfReadOnly();
-            ClearItems();
-
-            // TODO implement
-
-            //RecordField[] array = reader.ReadArray<RecordField>();
-            //AddRange(array);
-
-            Magna.Error
+            Magna.Logger.LogError
                 (
-                    nameof(BandCollection<T>) + "::" + nameof(RestoreFromStream)
-                    + ": not implemented"
+                    nameof (BandCollection<T>) + "::" + nameof (ThrowIfReadOnly)
                 );
 
-            throw new NotImplementedException();
-        } // method RestoreFromStream
+            throw new ReadOnlyException();
+        }
+    }
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<BandCollection<T>> (this, throwOnError);
+
+        foreach (var band in this)
         {
-            // TODO implement
+            verifier.VerifySubObject (band);
+        }
 
-            //writer.WriteArray(this.ToArray());
+        return verifier.Result;
+    }
 
-            Magna.Error
-                (
-                    nameof(BandCollection<T>) + "::" + nameof(SaveToStream)
-                    + ": not implemented"
-                );
+    #endregion
 
-            throw new NotImplementedException();
-        } // method SaveToStream
+    #region IDisposable members
 
-        #endregion
-
-        #region IReadOnly<T> members
-
-        internal bool _readOnly;
-
-        /// <inheritdoc cref="IReadOnly{T}.ReadOnly" />
-        public bool ReadOnly => _readOnly;
-
-        /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
-        public BandCollection<T> AsReadOnly()
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        foreach (var item in Items)
         {
-            var result = Clone();
-            result.SetReadOnly();
+            item.Dispose();
+        }
+    }
 
-            return result;
-        } // method AsReadOnly
-
-        /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
-        public void SetReadOnly() => _readOnly = true;
-
-        /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly" />
-        public void ThrowIfReadOnly()
-        {
-            if (ReadOnly)
-            {
-                Magna.Error
-                    (
-                        nameof(BandCollection<T>) + "::" + nameof(ThrowIfReadOnly)
-                    );
-
-                throw new ReadOnlyException();
-            }
-        } // method ThrowIfReadOnly
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier
-                = new Verifier<BandCollection<T>>(this, throwOnError);
-
-            foreach (var band in this)
-            {
-                verifier.VerifySubObject(band, "band");
-            }
-
-            return verifier.Result;
-        } // method Verify
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            foreach (var item in Items)
-            {
-                item.Dispose();
-            }
-        } // method Dispose
-
-        #endregion
-
-    } // class BandCollection
-
-} // namespace ManagedIrbis.Reports
+    #endregion
+}

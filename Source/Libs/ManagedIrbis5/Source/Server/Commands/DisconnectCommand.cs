@@ -23,72 +23,74 @@ using System;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Server.Commands
+namespace ManagedIrbis.Server.Commands;
+
+/// <summary>
+/// Отключение клиента.
+/// </summary>
+public sealed class DisconnectCommand
+    : ServerCommand
 {
+    #region Construction
+
     /// <summary>
-    /// Отключение клиента.
+    /// Конструктор.
     /// </summary>
-    public sealed class DisconnectCommand
-        : ServerCommand
+    public DisconnectCommand
+        (
+            WorkData data
+        )
+        : base (data)
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public DisconnectCommand
-            (
-                WorkData data
-            )
-            : base (data)
-        {
-        }
-
-        #endregion
-
-        #region ServerCommand members
-
-        /// <inheritdoc cref="ServerCommand.Execute" />
-        public override void Execute()
-        {
-            var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute (Data);
-
-            try
-            {
-                var context = engine.RequireContext (Data);
-                Data.Context = context;
-
-                var response = Data.Response.ThrowIfNull();
-
-                // Код возврата
-                response.WriteInt32 (0).NewLine();
-                SendResponse();
-
-                engine.DestroyContext (context);
-            }
-            catch (IrbisException exception)
-            {
-                SendError (exception.ErrorCode);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        nameof (DisconnectCommand) + "::" + nameof (Execute),
-                        exception
-                    );
-
-                SendError (-8888);
-            }
-
-            engine.OnAfterExecute (Data);
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region ServerCommand members
+
+    /// <inheritdoc cref="ServerCommand.Execute" />
+    public override void Execute()
+    {
+        var engine = Data.Engine.ThrowIfNull();
+        engine.OnBeforeExecute (Data);
+
+        try
+        {
+            var context = engine.RequireContext (Data);
+            Data.Context = context;
+
+            var response = Data.Response.ThrowIfNull();
+
+            // Код возврата
+            response.WriteInt32 (0).NewLine();
+            SendResponse();
+
+            engine.DestroyContext (context);
+        }
+        catch (IrbisException exception)
+        {
+            SendError (exception.ErrorCode);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (DisconnectCommand) + "::" + nameof (Execute)
+                );
+
+            SendError (-8888);
+        }
+
+        engine.OnAfterExecute (Data);
+    }
+
+    #endregion
 }

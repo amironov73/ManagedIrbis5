@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftRsum.cs --
+/* PftRsum.cs -- суммирование элементов списка
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,294 +18,313 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 using AM;
 using AM.IO;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Суммирование элементов списка
+/// </summary>
+public sealed class PftRsum
+    : PftNumeric
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Name of the function.
     /// </summary>
-    public sealed class PftRsum
-        : PftNumeric
+    public string? Name { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftRsum()
     {
-        #region Properties
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Name of the function.
-        /// </summary>
-        public string? Name { get; set; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftRsum
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
 
-        #endregion
+        Name = name;
+    }
 
-        #region Construction
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftRsum
+        (
+            string name,
+            params PftNode[] children
+        )
+    {
+        Sure.NotNullNorEmpty (name);
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftRsum()
+        Name = name;
+        foreach (var node in children)
         {
+            Children.Add (node);
         }
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftRsum
-            (
-                string name
-            )
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftRsum
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        Name = token.Text;
+        if (string.IsNullOrEmpty (Name))
         {
-            Name = name;
+            Magna.Logger.LogError
+                (
+                    nameof (PftRsum) + "::Constructor"
+                    + ": Name={Name}",
+                    Name.ToVisibleString()
+                );
+
+            throw new PftSyntaxException ("Name is null or empty");
         }
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftRsum
-            (
-                string name,
-                params PftNode[] children
-            )
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.CompareNode" />
+    internal override void CompareNode
+        (
+            PftNode otherNode
+        )
+    {
+        base.CompareNode (otherNode);
+
+        var otherRsum = (PftRsum)otherNode;
+        var result = Name == otherRsum.Name;
+        if (!result)
         {
-            Name = name;
-            foreach (var node in children)
-            {
-                Children.Add(node);
-            }
+            throw new PftSerializationException();
         }
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftRsum
-            (
-                PftToken token
-            )
-            : base(token)
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        Sure.NotNull (compiler);
+
+        compiler.CompileNodes (Children);
+
+        var actionName = compiler.CompileAction (Children);
+
+        compiler.StartMethod (this);
+
+        var functionName = Name switch
         {
-            Name = token.Text;
-            if (string.IsNullOrEmpty(Name))
-            {
-                Magna.Error
-                    (
-                        "PftRsum::Constructor: "
-                        + "Name="
-                        + Name.ToVisibleString()
-                    );
+            "rsum" => "Sum",
+            "rmin" => "Min",
+            "rmax" => "Max",
+            "ravr" => "Average",
+            _ => throw new PftCompilerException()
+        };
 
-                throw new PftSyntaxException("Name");
-            }
-        }
+        compiler
+            .WriteIndent()
+            .WriteLine ("double result = 0.0;");
 
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.CompareNode" />
-        internal override void CompareNode
-            (
-                PftNode otherNode
-            )
+        if (!string.IsNullOrEmpty (actionName))
         {
-            base.CompareNode(otherNode);
-
-            var otherRsum = (PftRsum)otherNode;
-            var result = Name == otherRsum.Name;
-            if (!result)
-            {
-                throw new PftSerializationException();
-            }
-        }
-
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
-        {
-            compiler.CompileNodes(Children);
-
-            var actionName = compiler.CompileAction(Children);
-
-            compiler.StartMethod(this);
-
-            var functionName = Name switch
-            {
-                "rsum" => "Sum",
-                "rmin" => "Min",
-                "rmax" => "Max",
-                "ravr" => "Average",
-                _ => throw new PftCompilerException()
-            };
+            compiler
+                .WriteIndent()
+                .Write ("string text = Evaluate({0});", actionName);
 
             compiler
                 .WriteIndent()
-                .WriteLine("double result = 0.0;");
-
-            if (!string.IsNullOrEmpty(actionName))
-            {
-                compiler
-                    .WriteIndent()
-                    .Write("string text = Evaluate({0});", actionName);
-
-                compiler
-                    .WriteIndent()
-                    .WriteLine("double[] values = PftUtility.ExtractNumericValues(text);")
-                    .WriteIndent()
-                    .WriteLine("if (values.Length != 0)")
-                    .WriteIndent()
-                    .WriteLine("{")
-                    .IncreaseIndent()
-                    .WriteIndent()
-                    .WriteLine("result = values.{0}();", functionName)
-                    .DecreaseIndent()
-                    .WriteIndent()
-                    .WriteLine("}");
-            }
-
-            compiler
+                .WriteLine ("double[] values = PftUtility.ExtractNumericValues(text);")
                 .WriteIndent()
-                .WriteLine("return result;");
-
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
+                .WriteLine ("if (values.Length != 0)")
+                .WriteIndent()
+                .WriteLine ("{")
+                .IncreaseIndent()
+                .WriteIndent()
+                .WriteLine ("result = values.{0}();", functionName)
+                .DecreaseIndent()
+                .WriteIndent()
+                .WriteLine ("}");
         }
 
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
+        compiler
+            .WriteIndent()
+            .WriteLine ("return result;");
+
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        base.Deserialize (reader);
+
+        Name = reader.ReadNullableString();
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        Value = 0.0;
+
+        if (!string.IsNullOrEmpty (Name))
         {
-            base.Deserialize(reader);
+            using var guard = new PftContextGuard (context);
 
-            Name = reader.ReadNullableString();
-        }
+            // ibatrak
+            // Оказывается, функции RMIN, RMAX, RAVR и RSUM игнорируют
+            // состояние повторяющейся группы.
+            // То есть, если туда передается поле, то в параметры передается
+            // выражение, слепленное из всех повторений
+            // Ровно так, если бы поле выводилось без повторяющейся группы.
+            // А повторяющаяся группа будет просто играть роль цикла.
 
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
+            // TODO добавить этот глюк в компилируемый код
 
-            Value = 0.0;
+            var nestedContext = guard.ChildContext;
+            nestedContext.Reset();
 
-            if (!string.IsNullOrEmpty(Name))
+            var text = nestedContext.Evaluate (Children);
+            var values = PftUtility.ExtractNumericValues (text);
+            if (values.Length != 0)
             {
-                using var guard = new PftContextGuard(context);
-
-                // ibatrak
-                // Оказывается, функции RMIN, RMAX, RAVR и RSUM игнорируют
-                // состояние повторяющейся группы.
-                // То есть, если туда передается поле, то в параметры передается
-                // выражение, слепленное из всех повторений
-                // Ровно так, если бы поле выводилось без повторяющейся группы.
-                // А повторяющаяся группа будет просто играть роль цикла.
-
-                // TODO добавить этот глюк в компилируемый код
-
-                var nestedContext = guard.ChildContext;
-                nestedContext.Reset();
-
-                var text = nestedContext.Evaluate(Children);
-                var values = PftUtility.ExtractNumericValues(text);
-                if (values.Length != 0)
+                switch (Name)
                 {
-                    switch (Name)
-                    {
-                        case "rsum":
-                            Value = values.Sum();
-                            break;
+                    case "rsum":
+                        Value = values.Sum();
+                        break;
 
-                        case "rmin":
-                            Value = values.Min();
-                            break;
+                    case "rmin":
+                        Value = values.Min();
+                        break;
 
-                        case "rmax":
-                            Value = values.Max();
-                            break;
+                    case "rmax":
+                        Value = values.Max();
+                        break;
 
-                        case "ravr":
-                            Value = values.Average();
-                            break;
+                    case "ravr":
+                        Value = values.Average();
+                        break;
 
-                        default:
-                            Magna.Error
+                    default:
+                        Magna.Logger.LogError
                             (
-                                "PftRsum::Execute: "
-                                + "unexpected function name="
-                                + Name.ToVisibleString()
+                                nameof (PftRsum) + "::" + nameof (Execute)
+                                + ": unexpected function name {Name}",
+                                Name.ToVisibleString()
                             );
 
-                            throw new PftSyntaxException(this);
-                    }
+                        throw new PftSyntaxException (this);
                 }
             }
-
-            OnAfterExecution(context);
         }
 
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer.EatWhitespace();
-            printer
-                .SingleSpace()
-                .Write(Name)
-                .Write('(')
-                .WriteNodes(Children)
-                .Write(')');
-        }
-
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
-        {
-            base.Serialize(writer);
-
-            writer.WriteNullable(Name);
-        }
-
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-            result.Append(Name);
-            result.Append('(');
-            PftUtility.NodesToText(result, Children);
-            result.Append(')');
-
-            return result.ToString();
-        }
-
-        #endregion
+        OnAfterExecution (context);
     }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
+
+        printer.EatWhitespace();
+        printer
+            .SingleSpace()
+            .Write (Name)
+            .Write ('(')
+            .WriteNodes (Children)
+            .Write (')');
+    }
+
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        base.Serialize (writer);
+
+        writer.WriteNullable (Name);
+    }
+
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    [DebuggerStepThrough]
+    protected internal override bool ShouldSerializeText()
+    {
+        return false;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (Name);
+        builder.Append ('(');
+        PftUtility.NodesToText (builder, Children);
+        builder.Append (')');
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
+
+    #endregion
 }

@@ -20,109 +20,112 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 
 using AM;
 using AM.Collections;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Server.Commands
+namespace ManagedIrbis.Server.Commands;
+
+/// <summary>
+/// Получение информации о базе данных.
+/// </summary>
+public sealed class DatabaseInfoCommand
+    : ServerCommand
 {
+    #region Construction
+
     /// <summary>
-    /// Получение информации о базе данных.
+    /// Конструктор.
     /// </summary>
-    public sealed class DatabaseInfoCommand
-        : ServerCommand
+    public DatabaseInfoCommand
+        (
+            WorkData data
+        )
+        : base (data)
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public DatabaseInfoCommand
-            (
-                WorkData data
-            )
-            : base (data)
-        {
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private static void _WriteRecords
-            (
-                ServerResponse response,
-                int[]? mfns
-            )
-        {
-            if (!mfns.IsNullOrEmpty())
-            {
-                var line = string.Join (",", mfns);
-                response.WriteAnsiString (line);
-            }
-
-            response.NewLine();
-        }
-
-        #endregion
-
-        #region ServerCommand members
-
-        /// <inheritdoc cref="ServerCommand.Execute" />
-        public override void Execute()
-        {
-            var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute (Data);
-
-            try
-            {
-                var context = engine.RequireAdministratorContext (Data);
-                Data.Context = context;
-                UpdateContext();
-
-                var request = Data.Request.ThrowIfNull();
-                var database = request.RequireAnsiString();
-
-                DatabaseInfo info;
-                using (var direct = engine.GetDatabase (database))
-                {
-                    info = direct.GetDatabaseInfo();
-                }
-
-                var response = Data.Response.ThrowIfNull();
-
-                // Код возврата
-                response.WriteInt32 (0).NewLine();
-                _WriteRecords (response, info.LogicallyDeletedRecords);
-                _WriteRecords (response, info.PhysicallyDeletedRecords);
-                _WriteRecords (response, info.NonActualizedRecords);
-                _WriteRecords (response, info.LockedRecords);
-                response.WriteInt32 (info.MaxMfn).NewLine();
-                response.WriteInt32 (info.DatabaseLocked ? 1 : 0).NewLine();
-                SendResponse();
-            }
-            catch (IrbisException exception)
-            {
-                SendError (exception.ErrorCode);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        nameof (DatabaseInfoCommand) + "::" + nameof (Execute),
-                        exception
-                    );
-
-                SendError (-8888);
-            }
-
-            engine.OnAfterExecute (Data);
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region Private members
+
+    private static void _WriteRecords
+        (
+            ServerResponse response,
+            IReadOnlyList<int>? mfns
+        )
+    {
+        if (!mfns.IsNullOrEmpty())
+        {
+            var line = string.Join (",", mfns);
+            response.WriteAnsiString (line);
+        }
+
+        response.NewLine();
+    }
+
+    #endregion
+
+    #region ServerCommand members
+
+    /// <inheritdoc cref="ServerCommand.Execute" />
+    public override void Execute()
+    {
+        var engine = Data.Engine.ThrowIfNull();
+        engine.OnBeforeExecute (Data);
+
+        try
+        {
+            var context = engine.RequireAdministratorContext (Data);
+            Data.Context = context;
+            UpdateContext();
+
+            var request = Data.Request.ThrowIfNull();
+            var database = request.RequireAnsiString();
+
+            DatabaseInfo info;
+            using (var direct = engine.GetDatabase (database))
+            {
+                info = direct.GetDatabaseInfo();
+            }
+
+            var response = Data.Response.ThrowIfNull();
+
+            // Код возврата
+            response.WriteInt32 (0).NewLine();
+            _WriteRecords (response, info.LogicallyDeletedRecords);
+            _WriteRecords (response, info.PhysicallyDeletedRecords);
+            _WriteRecords (response, info.NonActualizedRecords);
+            _WriteRecords (response, info.LockedRecords);
+            response.WriteInt32 (info.MaxMfn).NewLine();
+            response.WriteInt32 (info.DatabaseLocked ? 1 : 0).NewLine();
+            SendResponse();
+        }
+        catch (IrbisException exception)
+        {
+            SendError (exception.ErrorCode);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (DatabaseInfoCommand) + "::" + nameof (Execute)
+                );
+
+            SendError (-8888);
+        }
+
+        engine.OnAfterExecute (Data);
+    }
+
+    #endregion
 }

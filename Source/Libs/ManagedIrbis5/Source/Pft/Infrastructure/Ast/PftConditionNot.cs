@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftConditionNot.cs --
+/* PftConditionNot.cs -- составное условие - отрицание
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,250 +16,263 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 
 using AM;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Составное условие - отрицание.
+/// </summary>
+public sealed class PftConditionNot
+    : PftCondition
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Внутренее условие.
     /// </summary>
-    public sealed class PftConditionNot
-        : PftCondition
+    public PftCondition? InnerCondition { get; set; }
+
+    /// <inheritdoc cref="PftNode.Children" />
+    public override IList<PftNode> Children
     {
-        #region Properties
-
-        /// <summary>
-        /// Inner condition
-        /// </summary>
-        public PftCondition? InnerCondition { get; set; }
-
-        /// <inheritdoc cref="PftNode.Children" />
-        public override IList<PftNode> Children
+        get
         {
-            get
+            if (ReferenceEquals (_virtualChildren, null))
             {
-                if (ReferenceEquals (_virtualChildren, null))
+                _virtualChildren = new VirtualChildren();
+                var nodes = new List<PftNode>();
+                if (!ReferenceEquals (InnerCondition, null))
                 {
-                    _virtualChildren = new VirtualChildren();
-                    var nodes = new List<PftNode>();
-                    if (!ReferenceEquals (InnerCondition, null))
-                    {
-                        nodes.Add (InnerCondition);
-                    }
-
-                    _virtualChildren.SetChildren (nodes);
+                    nodes.Add (InnerCondition);
                 }
 
-                return _virtualChildren;
+                _virtualChildren.SetChildren (nodes);
             }
 
-            [ExcludeFromCodeCoverage]
-            protected set => Magna.Error
+            return _virtualChildren;
+        }
+
+        [ExcludeFromCodeCoverage]
+        protected set => Magna.Logger.LogError
+            (
+                nameof (PftConditionNot) + "::" + nameof (Children)
+                + ": set value={Value}",
+                value.ToVisibleString()
+            );
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftConditionNot()
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftConditionNot
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
+
+    #region Private members
+
+    private VirtualChildren? _virtualChildren;
+
+    #endregion
+
+    #region ICloneable members
+
+    /// <inheritdoc cref="PftNode.Clone" />
+    public override object Clone()
+    {
+        var result = (PftConditionNot)base.Clone();
+
+        result._virtualChildren = null;
+
+        if (!ReferenceEquals (InnerCondition, null))
+        {
+            result.InnerCondition
+                = (PftCondition)InnerCondition.Clone();
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.CompareNode" />
+    internal override void CompareNode
+        (
+            PftNode otherNode
+        )
+    {
+        Sure.NotNull (otherNode);
+
+        base.CompareNode (otherNode);
+
+        PftSerializationUtility.CompareNodes
+            (
+                InnerCondition,
+                ((PftConditionNot)otherNode).InnerCondition
+            );
+    }
+
+    /// <inheritdoc cref="PftNode.Compile"/>
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        Sure.NotNull (compiler);
+
+        if (InnerCondition is null)
+        {
+            throw new PftCompilerException();
+        }
+
+        InnerCondition.Compile (compiler);
+
+        compiler.StartMethod (this);
+
+        compiler
+            .WriteIndent()
+            .Write ("bool result = ")
+            .CallNodeMethod (InnerCondition)
+            .WriteLine (";")
+            .WriteIndent()
+            .WriteLine ("return !result;");
+
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        Sure. NotNull (reader);
+
+        base.Deserialize (reader);
+
+        InnerCondition
+            = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        if (ReferenceEquals (InnerCondition, null))
+        {
+            Magna.Logger.LogError
                 (
-                    "PftConditionNot::Children: "
-                    + "set value="
-                    + value.ToVisibleString()
+                    nameof (PftConditionNot) + "::" + nameof (Execute)
+                    + ": inner condition is not set"
                 );
+
+            throw new PftSyntaxException();
         }
 
-        #endregion
+        InnerCondition.Execute (context);
+        Value = !InnerCondition.Value;
 
-        #region Construction
+        OnAfterExecution (context);
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftConditionNot()
+    /// <inheritdoc cref="PftNode.Optimize" />
+    public override PftNode Optimize()
+    {
+        InnerCondition = (PftCondition?) InnerCondition?.Optimize();
+
+        return this;
+    }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
+
+        printer
+            .SingleSpace()
+            .Write ("not")
+            .SingleSpace();
+        if (!ReferenceEquals (InnerCondition, null))
         {
+            InnerCondition.PrettyPrint (printer);
         }
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftConditionNot
-            (
-                [NotNull] PftToken token
-            )
-            : base (token)
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        base.Serialize (writer);
+
+        PftSerializer.SerializeNullable (writer, InnerCondition);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="PftNode.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (" not ");
+        if (!ReferenceEquals (InnerCondition, null))
         {
+            builder.Append (InnerCondition);
         }
 
-        #endregion
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-        #region Private members
+        return result;
+    }
 
-        private VirtualChildren? _virtualChildren;
-
-        #endregion
-
-        #region ICloneable members
-
-        /// <inheritdoc cref="PftNode.Clone" />
-        public override object Clone()
-        {
-            var result = (PftConditionNot)base.Clone();
-
-            result._virtualChildren = null;
-
-            if (!ReferenceEquals (InnerCondition, null))
-            {
-                result.InnerCondition
-                    = (PftCondition)InnerCondition.Clone();
-            }
-
-            return result;
-        }
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.CompareNode" />
-        internal override void CompareNode
-            (
-                PftNode otherNode
-            )
-        {
-            base.CompareNode (otherNode);
-
-            PftSerializationUtility.CompareNodes
-                (
-                    InnerCondition,
-                    ((PftConditionNot)otherNode).InnerCondition
-                );
-        }
-
-        /// <inheritdoc cref="PftNode.Compile"/>
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
-        {
-            if (ReferenceEquals (InnerCondition, null))
-            {
-                throw new PftCompilerException();
-            }
-
-            InnerCondition.Compile (compiler);
-
-            compiler.StartMethod (this);
-
-            compiler
-                .WriteIndent()
-                .Write ("bool result = ")
-                .CallNodeMethod (InnerCondition)
-                .WriteLine (";")
-                .WriteIndent()
-                .WriteLine ("return !result;");
-
-            compiler.EndMethod (this);
-            compiler.MarkReady (this);
-        }
-
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
-        {
-            base.Deserialize (reader);
-
-            InnerCondition
-                = (PftCondition?)PftSerializer.DeserializeNullable (reader);
-        }
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution (context);
-
-            if (ReferenceEquals (InnerCondition, null))
-            {
-                Magna.Error
-                    (
-                        "PftConditionNot::Execute: "
-                        + "InnerCondition not set"
-                    );
-
-                throw new PftSyntaxException();
-            }
-
-            InnerCondition.Execute (context);
-            Value = !InnerCondition.Value;
-
-            OnAfterExecution (context);
-        }
-
-        /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
-        {
-            if (!ReferenceEquals (InnerCondition, null))
-            {
-                InnerCondition = (PftCondition?)InnerCondition.Optimize();
-            }
-
-            return this;
-        }
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer
-                .SingleSpace()
-                .Write ("not")
-                .SingleSpace();
-            if (!ReferenceEquals (InnerCondition, null))
-            {
-                InnerCondition.PrettyPrint (printer);
-            }
-        }
-
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
-        {
-            base.Serialize (writer);
-
-            PftSerializer.SerializeNullable (writer, InnerCondition);
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="PftNode.ToString" />
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-            result.Append (" not ");
-            if (!ReferenceEquals (InnerCondition, null))
-            {
-                result.Append (InnerCondition);
-            }
-
-            return result.ToString();
-        }
-
-        #endregion
-
-    } // class PftConditionNot
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #endregion
+}
