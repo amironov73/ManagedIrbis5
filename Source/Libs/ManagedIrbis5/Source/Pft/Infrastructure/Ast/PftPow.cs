@@ -56,7 +56,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals(_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals(X, null))
                     {
                         nodes.Add(X);
@@ -136,7 +136,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftPow result = (PftPow)base.Clone();
+            var result = (PftPow)base.Clone();
 
             if (!ReferenceEquals(X, null))
             {
@@ -228,7 +228,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = SimplifyTypeName(GetType().Name)
@@ -236,7 +236,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(X, null))
             {
-                PftNodeInfo x = new PftNodeInfo
+                var x = new PftNodeInfo
                 {
                     Node = X,
                     Name = "X"
@@ -247,7 +247,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(Y, null))
             {
-                PftNodeInfo y = new PftNodeInfo
+                var y = new PftNodeInfo
                 {
                     Node = Y,
                     Name = "Y"
@@ -298,7 +298,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("pow(");
             result.Append(X);
             result.Append(',');

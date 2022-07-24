@@ -288,8 +288,8 @@ namespace ManagedIrbis.UserSpace
         {
             var builder = StringBuilderPool.Shared.Get();
             builder.Append ("cseval(");
-            bool first = true;
-            foreach (PftNode child in Children)
+            var first = true;
+            foreach (var child in Children)
             {
                 if (!first)
                 {

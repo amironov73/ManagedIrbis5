@@ -98,7 +98,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Clone" />
         public override object Clone()
         {
-            PftLocal result = (PftLocal) base.Clone();
+            var result = (PftLocal) base.Clone();
 
             result.Names = new NonNullCollection<string>();
             result.Names.AddRange(Names);
@@ -130,17 +130,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            using (PftContextGuard guard = new PftContextGuard(context))
+            using (var guard = new PftContextGuard(context))
             {
-                PftContext localContext = guard.ChildContext;
+                var localContext = guard.ChildContext;
                 localContext.Output = context.Output;
-                PftVariableManager localManager
+                var localManager
                     = new PftVariableManager(context.Variables);
                 localContext.SetVariables(localManager);
 
-                foreach (string name in Names)
+                foreach (var name in Names)
                 {
-                    PftVariable variable = new PftVariable
+                    var variable = new PftVariable
                         (
                             name,
                             false
@@ -162,7 +162,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = "Local",
@@ -173,7 +173,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     )
             };
 
-            foreach (PftNode node in Children)
+            foreach (var node in Children)
             {
                 result.Children.Add(node.GetNodeInfo());
             }
@@ -195,8 +195,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 .WriteIndent()
                 .Write("local ");
 
-            bool first = true;
-            foreach (string name in Names)
+            var first = true;
+            foreach (var name in Names)
             {
                 if (!first)
                 {
@@ -244,7 +244,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("local ");
             result.Append
                 (

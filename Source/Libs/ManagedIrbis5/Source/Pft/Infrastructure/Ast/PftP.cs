@@ -55,7 +55,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals(_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals(Field, null))
                     {
                         nodes.Add(Field);
@@ -259,7 +259,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftP result = (PftP)base.Clone();
+            var result = (PftP)base.Clone();
 
             if (!ReferenceEquals(Field, null))
             {
@@ -299,7 +299,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new PftCompilerException();
             }
 
-            FieldInfo info = compiler.CompileField(Field);
+            var info = compiler.CompileField(Field);
 
             compiler.StartMethod(this);
 
@@ -399,7 +399,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new PftSyntaxException(this);
             }
 
-            string tag = Field.Tag.ThrowIfNull("Field.Tag");
+            var tag = Field.Tag.ThrowIfNull("Field.Tag");
             var record = context.Record;
             var index = context.Index;
 
@@ -466,7 +466,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = SimplifyTypeName(GetType().Name)
@@ -474,7 +474,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(Field, null))
             {
-                PftNodeInfo fieldInfo = new PftNodeInfo
+                var fieldInfo = new PftNodeInfo
                 {
                     Node = Field,
                     Name = "Field"

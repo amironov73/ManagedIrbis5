@@ -167,7 +167,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftFor result = (PftFor)base.Clone();
+            var result = (PftFor)base.Clone();
 
             result._virtualChildren = null;
 
@@ -196,7 +196,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftFor otherFor = (PftFor)otherNode;
+            var otherFor = (PftFor)otherNode;
             PftSerializationUtility.CompareLists
                 (
                     Initialization,
@@ -276,12 +276,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (Initialization.Count != 0)
             {
-                PftNodeInfo init = new PftNodeInfo
+                var init = new PftNodeInfo
                 {
                     Name = "Init"
                 };
                 result.Children.Add(init);
-                foreach (PftNode node in Initialization)
+                foreach (var node in Initialization)
                 {
                     init.Children.Add(node.GetNodeInfo());
                 }
@@ -289,7 +289,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(Condition, null))
             {
-                PftNodeInfo condition = new PftNodeInfo
+                var condition = new PftNodeInfo
                 {
                     Node = Condition,
                     Name = "Condition"
@@ -300,23 +300,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (Loop.Count != 0)
             {
-                PftNodeInfo loop = new PftNodeInfo
+                var loop = new PftNodeInfo
                 {
                     Name = "Loop"
                 };
                 result.Children.Add(loop);
-                foreach (PftNode node in Loop)
+                foreach (var node in Loop)
                 {
                     loop.Children.Add(node.GetNodeInfo());
                 }
             }
 
-            PftNodeInfo body = new PftNodeInfo
+            var body = new PftNodeInfo
             {
                 Name = "Body"
             };
             result.Children.Add(body);
-            foreach (PftNode node in Body)
+            foreach (var node in Body)
             {
                 body.Children.Add(node.GetNodeInfo());
             }

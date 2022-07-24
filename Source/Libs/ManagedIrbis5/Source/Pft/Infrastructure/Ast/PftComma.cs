@@ -105,8 +105,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftPrettyPrinter printer
             )
         {
-            bool newLine = false;
-            string currentLine = printer.GetCurrentLine();
+            var newLine = false;
+            var currentLine = printer.GetCurrentLine();
             if (currentLine.Length == 0
                 || currentLine.ConsistOf(' '))
             {

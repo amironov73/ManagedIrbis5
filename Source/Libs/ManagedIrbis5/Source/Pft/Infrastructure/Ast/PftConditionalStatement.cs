@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftConditionalStatement.cs --
+/* PftConditionalStatement.cs -- условный оператор
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,387 +27,419 @@ using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Условный оператор <code>if условие then ... else fi</code>.
+/// </summary>
+public sealed class PftConditionalStatement
+    : PftNode
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Собственно условие
     /// </summary>
-    public sealed class PftConditionalStatement
-        : PftNode
+    public PftCondition? Condition { get; set; }
+
+    /// <summary>
+    /// Ветвь ИНАЧЕ.
+    /// </summary>
+    public PftNodeCollection ElseBranch { get; private set; }
+
+    /// <summary>
+    /// Ветвь ТОГДА.
+    /// </summary>
+    public PftNodeCollection ThenBranch { get; private set; }
+
+    /// <inheritdoc cref="PftNode.Children" />
+    public override IList<PftNode> Children
     {
-        #region Properties
-
-        /// <summary>
-        /// Condition
-        /// </summary>
-        public PftCondition? Condition { get; set; }
-
-        /// <summary>
-        /// Else branch.
-        /// </summary>
-        [NotNull]
-        public PftNodeCollection ElseBranch { get; private set; }
-
-        /// <summary>
-        /// Then branch.
-        /// </summary>
-        [NotNull]
-        public PftNodeCollection ThenBranch { get; private set; }
-
-        /// <inheritdoc cref="PftNode.Children" />
-        public override IList<PftNode> Children
+        get
         {
-            get
+            if (ReferenceEquals (_virtualChildren, null))
             {
-                if (ReferenceEquals (_virtualChildren, null))
+                _virtualChildren = new VirtualChildren();
+                var nodes = new List<PftNode>();
+                if (!ReferenceEquals (Condition, null))
                 {
-                    _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
-                    if (!ReferenceEquals (Condition, null))
-                    {
-                        nodes.Add (Condition);
-                    }
-
-                    nodes.AddRange (ThenBranch);
-                    nodes.AddRange (ElseBranch);
-                    _virtualChildren.SetChildren (nodes);
+                    nodes.Add (Condition);
                 }
 
-                return _virtualChildren;
-            }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
-
-                Magna.Error
-                    (
-                        "PftConditionalStatement::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
-        }
-
-        /// <inheritdoc cref="PftNode.ComplexExpression" />
-        public override bool ComplexExpression
-        {
-            get { return true; }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftConditionalStatement()
-        {
-            ElseBranch = new PftNodeCollection (this);
-            ThenBranch = new PftNodeCollection (this);
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftConditionalStatement
-            (
-                PftToken token
-            )
-            : base (token)
-        {
-            token.MustBe (PftTokenKind.If);
-
-            ElseBranch = new PftNodeCollection (this);
-            ThenBranch = new PftNodeCollection (this);
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftConditionalStatement
-            (
-                [NotNull] PftCondition condition,
-                params PftNode[] thenBranch
-            )
-            : this()
-        {
-            Condition = condition;
-            foreach (PftNode node in thenBranch)
-            {
-                ThenBranch.Add (node);
-            }
-        }
-
-        #endregion
-
-        #region Private members
-
-        private VirtualChildren? _virtualChildren;
-
-        #endregion
-
-        #region ICloneable members
-
-        /// <inheritdoc cref="ICloneable.Clone" />
-        public override object Clone()
-        {
-            PftConditionalStatement result = (PftConditionalStatement)base.Clone();
-
-            result._virtualChildren = null;
-
-            if (!ReferenceEquals (Condition, null))
-            {
-                result.Condition = (PftCondition)Condition.Clone();
+                nodes.AddRange (ThenBranch);
+                nodes.AddRange (ElseBranch);
+                _virtualChildren.SetChildren (nodes);
             }
 
-            result.ElseBranch = ElseBranch.CloneNodes (result)
-                .ThrowIfNull();
-            result.ThenBranch = ThenBranch.CloneNodes (result)
-                .ThrowIfNull();
-
-            return result;
+            return _virtualChildren;
         }
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.CompareNode" />
-        internal override void CompareNode
-            (
-                PftNode otherNode
-            )
+        [ExcludeFromCodeCoverage]
+        protected set
         {
-            base.CompareNode (otherNode);
+            // Nothing to do here
 
-            PftConditionalStatement otherStatement
-                = (PftConditionalStatement)otherNode;
-            PftSerializationUtility.CompareNodes
+            Magna.Logger.LogError
                 (
-                    Condition,
-                    otherStatement.Condition
-                );
-            PftSerializationUtility.CompareLists
-                (
-                    ThenBranch,
-                    otherStatement.ThenBranch
-                );
-            PftSerializationUtility.CompareLists
-                (
-                    ElseBranch,
-                    otherStatement.ElseBranch
+                    nameof (PftConditionalStatement) + "::" + nameof (Children)
+                    + ": set value={Value}",
+                    value.ToVisibleString()
                 );
         }
+    }
 
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
+    /// <inheritdoc cref="PftNode.ComplexExpression" />
+    public override bool ComplexExpression => true;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftConditionalStatement()
+    {
+        ElseBranch = new PftNodeCollection (this);
+        ThenBranch = new PftNodeCollection (this);
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftConditionalStatement
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.If);
+
+        ElseBranch = new PftNodeCollection (this);
+        ThenBranch = new PftNodeCollection (this);
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftConditionalStatement
+        (
+            PftCondition condition,
+            params PftNode[] thenBranch
+        )
+        : this()
+    {
+        Condition = condition;
+        foreach (var node in thenBranch)
         {
-            if (ReferenceEquals (Condition, null))
-            {
-                throw new PftCompilerException();
-            }
+            ThenBranch.Add (node);
+        }
+    }
 
-            Condition.Compile (compiler);
-            compiler.CompileNodes (ThenBranch);
-            compiler.CompileNodes (ElseBranch);
+    #endregion
 
-            compiler.StartMethod (this);
+    #region Private members
 
+    private VirtualChildren? _virtualChildren;
+
+    #endregion
+
+    #region ICloneable members
+
+    /// <inheritdoc cref="ICloneable.Clone" />
+    public override object Clone()
+    {
+        var result = (PftConditionalStatement)base.Clone();
+
+        result._virtualChildren = null;
+
+        if (!ReferenceEquals (Condition, null))
+        {
+            result.Condition = (PftCondition)Condition.Clone();
+        }
+
+        result.ElseBranch = ElseBranch.CloneNodes (result).ThrowIfNull();
+        result.ThenBranch = ThenBranch.CloneNodes (result).ThrowIfNull();
+
+        return result;
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.CompareNode" />
+    internal override void CompareNode
+        (
+            PftNode otherNode
+        )
+    {
+        Sure.NotNull (otherNode);
+
+        base.CompareNode (otherNode);
+
+        var otherStatement
+            = (PftConditionalStatement)otherNode;
+        PftSerializationUtility.CompareNodes
+            (
+                Condition,
+                otherStatement.Condition
+            );
+        PftSerializationUtility.CompareLists
+            (
+                ThenBranch,
+                otherStatement.ThenBranch
+            );
+        PftSerializationUtility.CompareLists
+            (
+                ElseBranch,
+                otherStatement.ElseBranch
+            );
+    }
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        Sure.NotNull (compiler);
+
+        if (Condition is null)
+        {
+            throw new PftCompilerException();
+        }
+
+        Condition.Compile (compiler);
+        compiler.CompileNodes (ThenBranch);
+        compiler.CompileNodes (ElseBranch);
+
+        compiler.StartMethod (this);
+
+        compiler
+            .WriteIndent()
+            .Write ("bool flag = ")
+            .CallNodeMethod (Condition)
+            .WriteIndent()
+            .WriteLine ("if (flag)")
+            .WriteIndent()
+            .WriteLine ("{")
+            .IncreaseIndent()
+            .CallNodes (ThenBranch)
+            .DecreaseIndent()
+            .WriteIndent()
+            .WriteLine ("}");
+        if (ElseBranch.Count != 0)
+        {
             compiler
                 .WriteIndent()
-                .Write ("bool flag = ")
-                .CallNodeMethod (Condition)
-                .WriteIndent()
-                .WriteLine ("if (flag)")
+                .WriteLine ("else")
                 .WriteIndent()
                 .WriteLine ("{")
                 .IncreaseIndent()
-                .CallNodes (ThenBranch)
+                .CallNodes (ElseBranch)
                 .DecreaseIndent()
                 .WriteIndent()
                 .WriteLine ("}");
-            if (ElseBranch.Count != 0)
-            {
-                compiler
-                    .WriteIndent()
-                    .WriteLine ("else")
-                    .WriteIndent()
-                    .WriteLine ("{")
-                    .IncreaseIndent()
-                    .CallNodes (ElseBranch)
-                    .DecreaseIndent()
-                    .WriteIndent()
-                    .WriteLine ("}");
-            }
-
-            compiler.EndMethod (this);
-            compiler.MarkReady (this);
         }
 
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        base.Deserialize (reader);
+        Condition = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+        PftSerializer.Deserialize (reader, ThenBranch);
+        PftSerializer.Deserialize (reader, ElseBranch);
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        if (Condition is null)
         {
-            base.Deserialize (reader);
-            Condition = (PftCondition?)PftSerializer.DeserializeNullable (reader);
-            PftSerializer.Deserialize (reader, ThenBranch);
-            PftSerializer.Deserialize (reader, ElseBranch);
+            Magna.Logger.LogError
+                (
+                    nameof (PftConditionalStatement) + "::" + nameof (Execute)
+                    + ": condition not set"
+                );
+
+            throw new PftSyntaxException();
         }
 
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
+        if (ThenBranch.Count == 0
+            && ElseBranch.Count == 0)
         {
-            OnBeforeExecution (context);
-
-            if (ReferenceEquals (Condition, null))
-            {
-                Magna.Error
-                    (
-                        "PftConditionalStatement::Execute: "
-                        + "Condition not set"
-                    );
-
-                throw new PftSyntaxException();
-            }
-
-            if (ThenBranch.Count == 0
-                && ElseBranch.Count == 0)
-            {
-                Magna.Warning
-                    (
-                        "PftConditionalStatement::Execute: "
-                        + "Empty Then and Else branches"
-                    );
-            }
-
-            Condition.Execute (context);
-
-            if (Condition.Value)
-            {
-                foreach (PftNode child in ThenBranch)
-                {
-                    child.Execute (context);
-                }
-            }
-            else
-            {
-                foreach (PftNode child in ElseBranch)
-                {
-                    child.Execute (context);
-                }
-            }
-
-            OnAfterExecution (context);
+            Magna.Logger.LogWarning
+                (
+                    nameof (PftConditionalStatement) + "::" + nameof (Execute)
+                    + ": empty Then and Else branches"
+                );
         }
 
-        /// <inheritdoc cref="PftNode.GetNodeInfo" />
-        public override PftNodeInfo GetNodeInfo()
+        Condition.Execute (context);
+
+        if (Condition.Value)
         {
-            PftNodeInfo result = new PftNodeInfo
+            foreach (var child in ThenBranch)
             {
-                Node = this,
-                Name = SimplifyTypeName (GetType().Name)
+                child.Execute (context);
+            }
+        }
+        else
+        {
+            foreach (var child in ElseBranch)
+            {
+                child.Execute (context);
+            }
+        }
+
+        OnAfterExecution (context);
+    }
+
+    /// <inheritdoc cref="PftNode.GetNodeInfo" />
+    public override PftNodeInfo GetNodeInfo()
+    {
+        var result = new PftNodeInfo
+        {
+            Node = this,
+            Name = SimplifyTypeName (GetType().Name)
+        };
+
+        if (!ReferenceEquals (Condition, null))
+        {
+            var conditionNode = new PftNodeInfo
+            {
+                Node = Condition,
+                Name = "Condition"
             };
+            result.Children.Add (conditionNode);
+            conditionNode.Children.Add (Condition.GetNodeInfo());
+        }
 
-            if (!ReferenceEquals (Condition, null))
-            {
-                PftNodeInfo conditionNode = new PftNodeInfo
-                {
-                    Node = Condition,
-                    Name = "Condition"
-                };
-                result.Children.Add (conditionNode);
-                conditionNode.Children.Add (Condition.GetNodeInfo());
-            }
+        var thenNode = new PftNodeInfo
+        {
+            Name = "Then"
+        };
+        foreach (var node in ThenBranch)
+        {
+            thenNode.Children.Add (node.GetNodeInfo());
+        }
 
-            PftNodeInfo thenNode = new PftNodeInfo
+        result.Children.Add (thenNode);
+
+        if (ElseBranch.Count != 0)
+        {
+            var elseNode = new PftNodeInfo
             {
-                Name = "Then"
+                Name = "Else"
             };
-            foreach (PftNode node in ThenBranch)
+            foreach (var node in ElseBranch)
             {
-                thenNode.Children.Add (node.GetNodeInfo());
+                elseNode.Children.Add (node.GetNodeInfo());
             }
 
-            result.Children.Add (thenNode);
-
-            if (ElseBranch.Count != 0)
-            {
-                PftNodeInfo elseNode = new PftNodeInfo
-                {
-                    Name = "Else"
-                };
-                foreach (PftNode node in ElseBranch)
-                {
-                    elseNode.Children.Add (node.GetNodeInfo());
-                }
-
-                result.Children.Add (elseNode);
-            }
-
-            return result;
+            result.Children.Add (elseNode);
         }
 
-        /// <inheritdoc cref="PftNode.Optimize"/>
-        public override PftNode? Optimize()
+        return result;
+    }
+
+    /// <inheritdoc cref="PftNode.Optimize"/>
+    public override PftNode? Optimize()
+    {
+        if (!ReferenceEquals (Condition, null))
         {
-            if (!ReferenceEquals (Condition, null))
-            {
-                Condition = (PftCondition?)Condition.Optimize();
-            }
-
-            ThenBranch.Optimize();
-            ElseBranch.Optimize();
-
-            if (ThenBranch.Count == 0
-                && ElseBranch.Count == 0)
-            {
-                return null;
-            }
-
-            return this;
+            Condition = (PftCondition?)Condition.Optimize();
         }
 
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            //bool needComment = false;
+        ThenBranch.Optimize();
+        ElseBranch.Optimize();
 
+        if (ThenBranch.Count == 0
+            && ElseBranch.Count == 0)
+        {
+            return null;
+        }
+
+        return this;
+    }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        //bool needComment = false;
+
+        printer.EatWhitespace();
+        printer.EatNewLine();
+
+        printer
+            .WriteLine()
+            .WriteIndent()
+            .Write ("if ");
+        if (!ReferenceEquals (Condition, null))
+        {
+            Condition.PrettyPrint (printer);
+        }
+
+        printer
+            .WriteLine()
+            .WriteIndent()
+            .Write ("then ");
+
+        var isComplex = PftUtility.IsComplexExpression (ThenBranch);
+        if (isComplex)
+        {
+            //needComment = true;
+            printer.IncreaseLevel();
             printer.EatWhitespace();
             printer.EatNewLine();
+            printer.WriteLine();
+            printer.WriteIndent();
+        }
 
-            printer
-                .WriteLine()
-                .WriteIndent()
-                .Write ("if ");
-            if (!ReferenceEquals (Condition, null))
+        printer.WriteNodes (ThenBranch);
+        if (isComplex)
+        {
+            printer.DecreaseLevel();
+            printer.WriteLine();
+        }
+
+        if (ElseBranch.Count != 0)
+        {
+            isComplex = PftUtility.IsComplexExpression (ElseBranch);
+            printer.EatNewLine();
+            if (ThenBranch.Count != 0)
             {
-                Condition.PrettyPrint (printer);
+                printer
+                    .WriteLine()
+                    .WriteIndent();
             }
 
-            printer
-                .WriteLine()
-                .WriteIndent()
-                .Write ("then ");
-
-            bool isComplex = PftUtility.IsComplexExpression (ThenBranch);
+            printer.Write ("else ");
             if (isComplex)
             {
                 //needComment = true;
@@ -418,118 +450,89 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 printer.WriteIndent();
             }
 
-            printer.WriteNodes (ThenBranch);
+            printer.WriteNodes (ElseBranch);
             if (isComplex)
             {
                 printer.DecreaseLevel();
                 printer.WriteLine();
             }
-
-            if (ElseBranch.Count != 0)
-            {
-                isComplex = PftUtility.IsComplexExpression (ElseBranch);
-                printer.EatNewLine();
-                if (ThenBranch.Count != 0)
-                {
-                    printer
-                        .WriteLine()
-                        .WriteIndent();
-                }
-
-                printer.Write ("else ");
-                if (isComplex)
-                {
-                    //needComment = true;
-                    printer.IncreaseLevel();
-                    printer.EatWhitespace();
-                    printer.EatNewLine();
-                    printer.WriteLine();
-                    printer.WriteIndent();
-                }
-
-                printer.WriteNodes (ElseBranch);
-                if (isComplex)
-                {
-                    printer.DecreaseLevel();
-                    printer.WriteLine();
-                }
-            }
-
-            printer.EatWhitespace();
-            printer.EatNewLine();
-            printer.WriteLine();
-
-            printer
-                .WriteIndentIfNeeded()
-                .Write ("fi,");
-
-            //if (needComment
-            //    && !ReferenceEquals(Condition, null))
-            //{
-            //    printer.Write(" /* ");
-            //    Condition.PrettyPrint(printer);
-            //}
-
-            printer.WriteLine();
         }
 
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
+        printer.EatWhitespace();
+        printer.EatNewLine();
+        printer.WriteLine();
+
+        printer
+            .WriteIndentIfNeeded()
+            .Write ("fi,");
+
+        //if (needComment
+        //    && !ReferenceEquals(Condition, null))
+        //{
+        //    printer.Write(" /* ");
+        //    Condition.PrettyPrint(printer);
+        //}
+
+        printer.WriteLine();
+    }
+
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        base.Serialize (writer);
+        PftSerializer.SerializeNullable (writer, Condition);
+        PftSerializer.Serialize (writer, ThenBranch);
+        PftSerializer.Serialize (writer, ElseBranch);
+    }
+
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    [DebuggerStepThrough]
+    protected internal override bool ShouldSerializeText()
+    {
+        return false;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="Object.ToString" />
+    public override string ToString()
+    {
+        var result = new StringBuilder();
+        result.Append ("if ");
+        if (!ReferenceEquals (Condition, null))
         {
-            base.Serialize (writer);
-            PftSerializer.SerializeNullable (writer, Condition);
-            PftSerializer.Serialize (writer, ThenBranch);
-            PftSerializer.Serialize (writer, ElseBranch);
+            result.Append (Condition);
         }
 
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
+        result.Append (" then");
+        foreach (var node in ThenBranch)
         {
-            return false;
+            result.Append (' ');
+            result.Append (node);
         }
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="Object.ToString" />
-        public override string ToString()
+        if (ElseBranch.Count != 0)
         {
-            StringBuilder result = new StringBuilder();
-            result.Append ("if ");
-            if (!ReferenceEquals (Condition, null))
-            {
-                result.Append (Condition);
-            }
-
-            result.Append (" then");
-            foreach (PftNode node in ThenBranch)
+            result.Append (" else");
+            foreach (var node in ElseBranch)
             {
                 result.Append (' ');
                 result.Append (node);
             }
-
-            if (ElseBranch.Count != 0)
-            {
-                result.Append (" else");
-                foreach (PftNode node in ElseBranch)
-                {
-                    result.Append (' ');
-                    result.Append (node);
-                }
-            }
-
-            result.Append (" fi");
-
-            return result.ToString();
         }
 
-        #endregion
+        result.Append (" fi");
 
-    } // class PftConditionalStatement
+        return result.ToString();
+    }
 
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #endregion
+
+} // class PftConditionalStatement
+
+// namespace ManagedIrbis.Pft.Infrastructure.Ast

@@ -141,7 +141,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals(_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals(Argument1, null))
                     {
                         nodes.Add(Argument1);
@@ -208,7 +208,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftF result = (PftF) base.Clone();
+            var result = (PftF) base.Clone();
 
             result._virtualChildren = null;
 
@@ -243,7 +243,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftF otherF = (PftF) otherNode;
+            var otherF = (PftF) otherNode;
             PftSerializationUtility.CompareNodes
                 (
                     Argument1,
@@ -359,14 +359,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new PftException("Argument1 is null");
             }
 
-            using (PftContextGuard guard = new PftContextGuard(context))
+            using (var guard = new PftContextGuard(context))
             {
-                PftContext clone = guard.ChildContext;
+                var clone = guard.ChildContext;
 
                 Argument1.Execute(clone);
-                double value = Argument1.Value;
+                var value = Argument1.Value;
 
-                int minWidth = -1;
+                var minWidth = -1;
                 if (!ReferenceEquals(Argument2, null))
                 {
                     clone = guard.PushAgain();
@@ -374,7 +374,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     minWidth = (int) Argument2.Value;
                 }
 
-                int decimalPoints = -1;
+                var decimalPoints = -1;
                 if (!ReferenceEquals(Argument3, null))
                 {
                     clone = guard.PushAgain();
@@ -382,7 +382,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     decimalPoints = (int) Argument3.Value;
                 }
 
-                string result = PftUtility.FormatLikeF
+                var result = PftUtility.FormatLikeF
                     (
                         value,
                         minWidth,
@@ -399,7 +399,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = SimplifyTypeName(GetType().Name)
@@ -407,7 +407,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(Argument1, null))
             {
-                PftNodeInfo node = new PftNodeInfo
+                var node = new PftNodeInfo
                 {
                     Node = Argument1,
                     Name = "Argument1"
@@ -418,7 +418,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(Argument2, null))
             {
-                PftNodeInfo node = new PftNodeInfo
+                var node = new PftNodeInfo
                 {
                     Node = Argument2,
                     Name = "Argument2"
@@ -429,7 +429,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(Argument3, null))
             {
-                PftNodeInfo node = new PftNodeInfo
+                var node = new PftNodeInfo
                 {
                     Node = Argument3,
                     Name = "Argument3"
@@ -496,7 +496,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("f(");
             if (!ReferenceEquals(Argument1, null))
             {

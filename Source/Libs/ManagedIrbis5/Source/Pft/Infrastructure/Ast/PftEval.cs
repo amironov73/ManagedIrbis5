@@ -65,7 +65,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 params PftNode[] children
             )
         {
-            foreach (PftNode child in children)
+            foreach (var child in children)
             {
                 Children.Add(child);
             }
@@ -83,10 +83,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            string expression = context.Evaluate(Children);
+            var expression = context.Evaluate(Children);
             if (!string.IsNullOrEmpty(expression))
             {
-                PftProgram program = PftUtility.CompileProgram(expression);
+                var program = PftUtility.CompileProgram(expression);
                 program.Execute(context);
             }
 
@@ -113,10 +113,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString()" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("eval(");
-            bool first = true;
-            foreach (PftNode child in Children)
+            var first = true;
+            foreach (var child in Children)
             {
                 if (!first)
                 {

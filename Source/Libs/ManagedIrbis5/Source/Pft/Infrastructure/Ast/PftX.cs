@@ -132,8 +132,8 @@ public sealed class PftX
     {
         base.CompareNode (otherNode);
 
-        PftX otherX = (PftX)otherNode;
-        bool result = Shift == otherX.Shift;
+        var otherX = (PftX)otherNode;
+        var result = Shift == otherX.Shift;
 
         if (!result)
         {

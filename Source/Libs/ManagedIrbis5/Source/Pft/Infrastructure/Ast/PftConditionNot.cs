@@ -51,7 +51,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals (_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals (InnerCondition, null))
                     {
                         nodes.Add (InnerCondition);
@@ -107,7 +107,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Clone" />
         public override object Clone()
         {
-            PftConditionNot result = (PftConditionNot)base.Clone();
+            var result = (PftConditionNot)base.Clone();
 
             result._virtualChildren = null;
 
@@ -248,7 +248,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append (" not ");
             if (!ReferenceEquals (InnerCondition, null))
             {

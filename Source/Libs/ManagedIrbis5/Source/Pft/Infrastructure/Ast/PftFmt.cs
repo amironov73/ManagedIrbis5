@@ -221,7 +221,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 return;
             }
 
-            string? defaultFormat = Format.Count == 0
+            var defaultFormat = Format.Count == 0
                 ? "G"
                 : null;
 

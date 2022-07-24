@@ -163,7 +163,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                         (
                             ctx =>
                             {
-                                foreach (PftNode child in Children)
+                                foreach (var child in Children)
                                 {
                                     child.Execute(ctx);
                                 }
@@ -211,7 +211,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftPrettyPrinter printer
             )
         {
-            bool isComplex = PftUtility.IsComplexExpression(Children);
+            var isComplex = PftUtility.IsComplexExpression(Children);
             if (isComplex)
             {
                 printer.EatWhitespace();

@@ -96,7 +96,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Clone" />
         public override object Clone()
         {
-            PftHave result = (PftHave) base.Clone();
+            var result = (PftHave) base.Clone();
 
             if (!ReferenceEquals(Variable, null))
             {
@@ -118,7 +118,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftHave otherHave = (PftHave)otherNode;
+            var otherHave = (PftHave)otherNode;
             PftSerializationUtility.CompareNodes
                 (
                     Variable,
@@ -184,7 +184,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = SimplifyTypeName(GetType().Name)

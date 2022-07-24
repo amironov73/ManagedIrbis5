@@ -309,7 +309,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             printer.Write(" in ");
 
             var first = true;
-            foreach (PftNode node in Sequence)
+            foreach (var node in Sequence)
             {
                 if (!first)
                 {

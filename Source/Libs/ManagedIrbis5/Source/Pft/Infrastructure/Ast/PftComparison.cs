@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftComparison.cs --
+/* PftComparison.cs -- операция сравнения двух операндов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,729 +17,752 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 
 using AM;
 using AM.IO;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Операция сравнения двух операндов
+/// </summary>
+public sealed class PftComparison
+    : PftCondition
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Left operand.
     /// </summary>
-    public sealed class PftComparison
-        : PftCondition
+    public PftNode? LeftOperand { get; set; }
+
+    /// <summary>
+    /// Operation.
+    /// </summary>
+    public string? Operation { get; set; }
+
+    /// <summary>
+    /// Right operand.
+    /// </summary>
+    public PftNode? RightOperand { get; set; }
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax" />
+    public override bool ExtendedSyntax
     {
-        #region Properties
-
-        /// <summary>
-        /// Left operand.
-        /// </summary>
-        public PftNode? LeftOperand { get; set; }
-
-        /// <summary>
-        /// Operation.
-        /// </summary>
-        public string? Operation { get; set; }
-
-        /// <summary>
-        /// Right operand.
-        /// </summary>
-        public PftNode? RightOperand { get; set; }
-
-        /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
+        get
         {
-            get
+            switch (Operation)
             {
-                switch (Operation)
-                {
-                    case "::":
-                    case "~":
-                    case "~~":
-                    case "!~":
-                    case "!~~":
-                    case "==":
-                    case "!==":
-
-                        return true;
-                }
-
-                return base.ExtendedSyntax;
-            }
-        }
-
-        /// <inheritdoc cref="PftNode.Children" />
-        public override IList<PftNode> Children
-        {
-            get
-            {
-                if (ReferenceEquals (_virtualChildren, null))
-                {
-                    _virtualChildren = new VirtualChildren();
-                    var operationNode = new PftNode
-                    {
-                        Text = Operation
-                    };
-                    var nodes = new List<PftNode>
-                    {
-                        LeftOperand!, // TODO: исправить логику
-                        operationNode,
-                        RightOperand! // TODO: исправить логику
-                    };
-                    _virtualChildren.SetChildren (nodes);
-                }
-
-                return _virtualChildren;
-            }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
-            }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftComparison()
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftComparison
-            (
-                PftToken token
-            )
-            : base (token)
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftComparison
-            (
-                PftNode leftOperand,
-                string operation,
-                PftNode rightOperand
-            )
-        {
-            LeftOperand = leftOperand;
-            Operation = operation;
-            RightOperand = rightOperand;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private VirtualChildren? _virtualChildren;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Do the operation.
-        /// </summary>
-        public static bool DoNumericOperation
-            (
-                PftContext context,
-                double leftValue,
-                string operation,
-                double rightValue
-            )
-        {
-            operation = operation.ToLowerInvariant();
-
-            bool result;
-            switch (operation)
-            {
-                case "<":
-                    result = leftValue < rightValue;
-                    break;
-
-                case "<=":
-                    result = leftValue <= rightValue;
-                    break;
-
-                case "=":
-                case "==":
-                    // Original PFT behavior: exact number comparison
-                    // ReSharper disable once CompareOfFloatsByEqualityOperator
-                    result = leftValue == rightValue; //-V3024
-                    break;
-
-                case "!=":
-                case "<>":
-                    // Original PFT behavior: exact number comparison
-                    // ReSharper disable once CompareOfFloatsByEqualityOperator
-                    result = leftValue != rightValue; //-V3024
-                    break;
-
-                case ">":
-                    result = leftValue > rightValue;
-                    break;
-
-                case ">=":
-                    result = leftValue >= rightValue;
-                    break;
-
-                default:
-                    Magna.Error
-                        (
-                            "PftComparison::DoNumericOperation: "
-                            + "unexpected operation: "
-                            + operation
-                        );
-
-                    throw new PftSyntaxException();
-            }
-
-            Magna.Trace
-                (
-                    "PftComparison::DoNumericOperation: left="
-                    + leftValue
-                    + ", operation="
-                    + operation
-                    + ", right="
-                    + rightValue
-                    + ", result="
-                    + result
-                );
-
-            return result;
-        }
-
-        /// <summary>
-        /// Do the operation.
-        /// </summary>
-        public static bool DoStringOperation
-            (
-                PftContext context,
-                string leftValue,
-                string operation,
-                string rightValue
-            )
-        {
-            operation = operation.ToLowerInvariant();
-
-            bool result;
-            switch (operation)
-            {
-                case ":":
-                    result = PftUtility.ContainsSubString
-                        (
-                            leftValue,
-                            rightValue
-                        );
-                    break;
-
                 case "::":
-                    result = PftUtility.ContainsSubStringSensitive
-                        (
-                            leftValue,
-                            rightValue
-                        );
-                    break;
-
-                case "=":
-                    result = leftValue.SameString (rightValue);
-                    break;
-
-                case "==":
-                    result = leftValue.SameStringSensitive
-                        (
-                            rightValue
-                        );
-                    break;
-
-                case "!=":
-                case "<>":
-                    result = !leftValue.SameString
-                        (
-                            rightValue
-                        );
-                    break;
-
-                case "!==":
-                    result = !leftValue.SameStringSensitive
-                        (
-                            rightValue
-                        );
-                    break;
-
-                case "<":
-                    result = PftUtility.CompareStrings
-                                 (
-                                     leftValue,
-                                     rightValue
-                                 )
-                             < 0;
-                    break;
-
-                case "<=":
-                    result = PftUtility.CompareStrings
-                                 (
-                                     leftValue,
-                                     rightValue
-                                 )
-                             <= 0;
-                    break;
-
-                case ">":
-                    result = PftUtility.CompareStrings
-                                 (
-                                     leftValue,
-                                     rightValue
-                                 )
-                             > 0;
-                    break;
-
-                case ">=":
-                    result = PftUtility.CompareStrings
-                                 (
-                                     leftValue,
-                                     rightValue
-                                 )
-                             >= 0;
-                    break;
-
                 case "~":
-                    result = Regex.IsMatch
-                        (
-                            leftValue,
-                            rightValue,
-                            RegexOptions.IgnoreCase
-                        );
-                    break;
-
                 case "~~":
-                    result = Regex.IsMatch
-                        (
-                            leftValue,
-                            rightValue
-                        );
-                    break;
-
                 case "!~":
-                    result = !Regex.IsMatch
-                        (
-                            leftValue,
-                            rightValue,
-                            RegexOptions.IgnoreCase
-                        );
-                    break;
-
                 case "!~~":
-                    result = !Regex.IsMatch
-                        (
-                            leftValue,
-                            rightValue
-                        );
-                    break;
+                case "==":
+                case "!==":
 
-                default:
-                    Magna.Error
-                        (
-                            "PftComparison::DoStringOperation: "
-                            + "unexpected operation: "
-                            + operation
-                        );
-
-                    throw new PftSyntaxException();
+                    return true;
             }
 
-            Magna.Trace
-                (
-                    "PftComparison::DoStringOperation: left="
-                    + leftValue
-                    + ", operation="
-                    + operation
-                    + ", right="
-                    + rightValue
-                    + ", result="
-                    + result
-                );
+            return base.ExtendedSyntax;
+        }
+    }
+
+    /// <inheritdoc cref="PftNode.Children" />
+    public override IList<PftNode> Children
+    {
+        get
+        {
+            if (ReferenceEquals (_virtualChildren, null))
+            {
+                _virtualChildren = new VirtualChildren();
+                var operationNode = new PftNode
+                {
+                    Text = Operation
+                };
+                var nodes = new List<PftNode>
+                {
+                    LeftOperand!, // TODO: исправить логику
+                    operationNode,
+                    RightOperand! // TODO: исправить логику
+                };
+                _virtualChildren.SetChildren (nodes);
+            }
+
+            return _virtualChildren;
+        }
+
+        [ExcludeFromCodeCoverage]
+        protected set
+        {
+            // Nothing to do here
+        }
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftComparison()
+    {
+        // пустое тело метода
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftComparison
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftComparison
+        (
+            PftNode leftOperand,
+            string operation,
+            PftNode rightOperand
+        )
+    {
+        Sure.NotNull (leftOperand);
+        Sure.NotNullNorEmpty (operation);
+        Sure.NotNull (rightOperand);
+
+        LeftOperand = leftOperand;
+        Operation = operation;
+        RightOperand = rightOperand;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private VirtualChildren? _virtualChildren;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Сравнение двух чисел.
+    /// </summary>
+    public static bool DoNumericOperation
+        (
+            PftContext context,
+            double leftValue,
+            string operation,
+            double rightValue
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNullNorEmpty (operation);
+
+        operation = operation.ToLowerInvariant();
+
+        bool result;
+        switch (operation)
+        {
+            case "<":
+                result = leftValue < rightValue;
+                break;
+
+            case "<=":
+                result = leftValue <= rightValue;
+                break;
+
+            case "=":
+            case "==":
+                // Original PFT behavior: exact number comparison
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                result = leftValue == rightValue; //-V3024
+                break;
+
+            case "!=":
+            case "<>":
+                // Original PFT behavior: exact number comparison
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                result = leftValue != rightValue; //-V3024
+                break;
+
+            case ">":
+                result = leftValue > rightValue;
+                break;
+
+            case ">=":
+                result = leftValue >= rightValue;
+                break;
+
+            default:
+                Magna.Logger.LogError
+                    (
+                        nameof (PftComparison) + "::" + nameof (DoNumericOperation)
+                        + ": unexpected operation {Operation}",
+                        operation
+                    );
+
+                throw new PftSyntaxException();
+        }
+
+        Magna.Logger.LogTrace
+            (
+                nameof (PftComparison) + "::" + nameof (DoNumericOperation)
+                + ": left={Left}, operation={Operation}, right={Right}, result={Result}",
+                leftValue,
+                operation,
+                rightValue,
+                result
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Сравнение двух строк.
+    /// </summary>
+    public static bool DoStringOperation
+        (
+            PftContext context,
+            string leftValue,
+            string operation,
+            string rightValue
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNullNorEmpty (operation);
+
+        operation = operation.ToLowerInvariant();
+
+        bool result;
+        switch (operation)
+        {
+            case ":":
+                result = PftUtility.ContainsSubString
+                    (
+                        leftValue,
+                        rightValue
+                    );
+                break;
+
+            case "::":
+                result = PftUtility.ContainsSubStringSensitive
+                    (
+                        leftValue,
+                        rightValue
+                    );
+                break;
+
+            case "=":
+                result = leftValue.SameString (rightValue);
+                break;
+
+            case "==":
+                result = leftValue.SameStringSensitive
+                    (
+                        rightValue
+                    );
+                break;
+
+            case "!=":
+            case "<>":
+                result = !leftValue.SameString
+                    (
+                        rightValue
+                    );
+                break;
+
+            case "!==":
+                result = !leftValue.SameStringSensitive
+                    (
+                        rightValue
+                    );
+                break;
+
+            case "<":
+                result = PftUtility.CompareStrings
+                             (
+                                 leftValue,
+                                 rightValue
+                             )
+                         < 0;
+                break;
+
+            case "<=":
+                result = PftUtility.CompareStrings
+                             (
+                                 leftValue,
+                                 rightValue
+                             )
+                         <= 0;
+                break;
+
+            case ">":
+                result = PftUtility.CompareStrings
+                             (
+                                 leftValue,
+                                 rightValue
+                             )
+                         > 0;
+                break;
+
+            case ">=":
+                result = PftUtility.CompareStrings
+                             (
+                                 leftValue,
+                                 rightValue
+                             )
+                         >= 0;
+                break;
+
+            case "~":
+                result = Regex.IsMatch
+                    (
+                        leftValue,
+                        rightValue,
+                        RegexOptions.IgnoreCase
+                    );
+                break;
+
+            case "~~":
+                result = Regex.IsMatch
+                    (
+                        leftValue,
+                        rightValue
+                    );
+                break;
+
+            case "!~":
+                result = !Regex.IsMatch
+                    (
+                        leftValue,
+                        rightValue,
+                        RegexOptions.IgnoreCase
+                    );
+                break;
+
+            case "!~~":
+                result = !Regex.IsMatch
+                    (
+                        leftValue,
+                        rightValue
+                    );
+                break;
+
+            default:
+                Magna.Logger.LogError
+                    (
+                        nameof (PftComparison) + "::" + nameof (DoStringOperation)
+                        + ": unexpected operation {Operation}",
+                        operation
+                    );
+
+                throw new PftSyntaxException();
+        }
+
+        Magna.Logger.LogTrace
+            (
+                nameof (PftComparison) + "::" + nameof (DoStringOperation)
+                + "left={Left}, operation={Operation}, right={Right}, result={Result}",
+                leftValue,
+                operation,
+                rightValue,
+                result
+            );
+
+        return result;
+    }
+
+    private double GetValue
+        (
+            PftContext context,
+            PftNode node
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (node);
+
+        var stringValue = context.Evaluate (node);
+
+        if (node is not PftNumeric numeric)
+        {
+            double.TryParse (stringValue, out var result);
 
             return result;
         }
 
-        private double GetValue
-            (
-                PftContext context,
-                PftNode node
-            )
+        return numeric.Value;
+    }
+
+    #endregion
+
+    #region ICloneable members
+
+    /// <inheritdoc cref="ICloneable.Clone" />
+    public override object Clone()
+    {
+        var result = (PftComparison)base.Clone();
+
+        result._virtualChildren = null;
+
+        if (!ReferenceEquals (LeftOperand, null))
         {
-            var stringValue = context.Evaluate (node);
-
-            var numeric = node as PftNumeric;
-            if (ReferenceEquals (numeric, null))
-            {
-                double.TryParse (stringValue, out var result);
-
-                return result;
-            }
-
-            return numeric.Value;
+            result.LeftOperand = (PftNode)LeftOperand.Clone();
         }
 
-        #endregion
-
-        #region ICloneable members
-
-        /// <inheritdoc cref="ICloneable.Clone" />
-        public override object Clone()
+        if (!ReferenceEquals (RightOperand, null))
         {
-            var result = (PftComparison)base.Clone();
-
-            result._virtualChildren = null;
-
-            if (!ReferenceEquals (LeftOperand, null))
-            {
-                result.LeftOperand = (PftNode)LeftOperand.Clone();
-            }
-
-            if (!ReferenceEquals (RightOperand, null))
-            {
-                result.RightOperand = (PftNode)RightOperand.Clone();
-            }
-
-            return result;
+            result.RightOperand = (PftNode)RightOperand.Clone();
         }
 
-        #endregion
+        return result;
+    }
 
-        #region PftNode members
+    #endregion
 
-        /// <inheritdoc cref="PftNode.CompareNode" />
-        internal override void CompareNode
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.CompareNode" />
+    internal override void CompareNode
+        (
+            PftNode otherNode
+        )
+    {
+        Sure.NotNull (otherNode);
+
+        base.CompareNode (otherNode);
+
+        var otherComparison = (PftComparison)otherNode;
+        PftSerializationUtility.CompareNodes
             (
-                PftNode otherNode
-            )
+                LeftOperand,
+                otherComparison.LeftOperand
+            );
+        if (Operation != otherComparison.Operation)
         {
-            base.CompareNode (otherNode);
-
-            var otherComparison = (PftComparison)otherNode;
-            PftSerializationUtility.CompareNodes
-                (
-                    LeftOperand,
-                    otherComparison.LeftOperand
-                );
-            if (Operation != otherComparison.Operation)
-            {
-                throw new IrbisException();
-            }
-
-            PftSerializationUtility.CompareNodes
-                (
-                    RightOperand,
-                    otherComparison.RightOperand
-                );
+            throw new IrbisException();
         }
 
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
+        PftSerializationUtility.CompareNodes
             (
-                PftCompiler compiler
-            )
+                RightOperand,
+                otherComparison.RightOperand
+            );
+    }
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        Sure.NotNull (compiler);
+
+        if (ReferenceEquals (LeftOperand, null)
+            || ReferenceEquals (RightOperand, null)
+            || string.IsNullOrEmpty (Operation))
         {
-            if (ReferenceEquals (LeftOperand, null)
-                || ReferenceEquals (RightOperand, null)
-                || string.IsNullOrEmpty (Operation))
-            {
-                throw new PftCompilerException();
-            }
+            throw new PftCompilerException();
+        }
 
-            LeftOperand.Compile (compiler);
-            RightOperand.Compile (compiler);
+        LeftOperand.Compile (compiler);
+        RightOperand.Compile (compiler);
 
-            compiler.StartMethod (this);
+        compiler.StartMethod (this);
 
-            var context = new PftContext (null);
-            if (PftUtility.IsNumeric (context, LeftOperand))
-            {
-                compiler
-                    .WriteIndent()
-                    .Write ("double left = ")
-                    .CallNodeMethod (LeftOperand);
-                compiler
-                    .WriteIndent()
-                    .Write ("double right = ")
-                    .CallNodeMethod (RightOperand);
-                compiler
-                    .WriteIndent()
-                    .WriteLine ("string operation = \"{0}\";", Operation);
-
-                // TODO implement properly
-                compiler
-                    .WriteIndent()
-                    .WriteLine
-                        (
-                            "bool result = PftComparison" +
-                            ".DoNumericOperation(Context, left, operation, right);"
-                        );
-            }
-            else
-            {
-                compiler
-                    .WriteIndent()
-                    .Write ("string left = Evaluate(")
-                    .RefNodeMethod (LeftOperand)
-                    .WriteLine (");");
-                compiler
-                    .WriteIndent()
-                    .Write ("string right = Evaluate(")
-                    .RefNodeMethod (RightOperand)
-                    .WriteLine (");");
-                compiler
-                    .WriteIndent()
-                    .WriteLine ("string operation = \"{0}\";", Operation);
-
-                // TODO implement properly
-                compiler
-                    .WriteIndent()
-                    .WriteLine
-                        (
-                            "bool result = PftComparison" +
-                            ".DoStringOperation(Context, left, operation, right);"
-                        );
-            }
+        var context = new PftContext (null);
+        if (PftUtility.IsNumeric (context, LeftOperand))
+        {
+            compiler
+                .WriteIndent()
+                .Write ("double left = ")
+                .CallNodeMethod (LeftOperand);
 
             compiler
                 .WriteIndent()
-                .WriteLine ("return result;");
+                .Write ("double right = ")
+                .CallNodeMethod (RightOperand);
 
-            compiler.EndMethod (this);
-            compiler.MarkReady (this);
+            compiler
+                .WriteIndent()
+                .WriteLine ("string operation = \"{0}\";", Operation);
+
+            // TODO implement properly
+            compiler
+                .WriteIndent()
+                .WriteLine
+                    (
+                        "bool result = PftComparison" +
+                        ".DoNumericOperation(Context, left, operation, right);"
+                    );
+        }
+        else
+        {
+            compiler
+                .WriteIndent()
+                .Write ("string left = Evaluate(")
+                .RefNodeMethod (LeftOperand)
+                .WriteLine (");");
+            compiler
+                .WriteIndent()
+                .Write ("string right = Evaluate(")
+                .RefNodeMethod (RightOperand)
+                .WriteLine (");");
+            compiler
+                .WriteIndent()
+                .WriteLine ("string operation = \"{0}\";", Operation);
+
+            // TODO implement properly
+            compiler
+                .WriteIndent()
+                .WriteLine
+                    (
+                        "bool result = PftComparison" +
+                        ".DoStringOperation(Context, left, operation, right);"
+                    );
         }
 
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
-        {
-            base.Deserialize (reader);
+        compiler
+            .WriteIndent()
+            .WriteLine ("return result;");
 
-            LeftOperand = PftSerializer.DeserializeNullable (reader);
-            Operation = reader.ReadNullableString();
-            RightOperand = PftSerializer.DeserializeNullable (reader);
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        base.Deserialize (reader);
+
+        LeftOperand = PftSerializer.DeserializeNullable (reader);
+        Operation = reader.ReadNullableString();
+        RightOperand = PftSerializer.DeserializeNullable (reader);
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        var operation = Operation.ThrowIfNull();
+
+        if (LeftOperand is null)
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (PftComparison) + "::" + nameof (Execute)
+                    + ": LeftOperand not set"
+                );
+
+            throw new PftSyntaxException (this);
         }
 
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
+        if (RightOperand is null)
         {
-            OnBeforeExecution (context);
+            Magna.Logger.LogError
+                (
+                    nameof (PftComparison) + "::" + nameof (Execute)
+                    + ": RightOperand not set"
+                );
 
-            var operation = Operation.ThrowIfNull();
+            throw new PftSyntaxException (this);
+        }
 
-            if (ReferenceEquals (LeftOperand, null))
-            {
-                Magna.Error
-                    (
-                        "PftComparison::Execute: "
-                        + "LeftOperand not set"
-                    );
+        var leftNumeric = PftUtility.IsNumeric
+            (
+                context,
+                LeftOperand
+            );
+        var rightNumeric = PftUtility.IsNumeric
+            (
+                context,
+                RightOperand
+            );
 
-                throw new PftSyntaxException (this);
-            }
-
-            if (ReferenceEquals (RightOperand, null))
-            {
-                Magna.Error
-                    (
-                        "PftComparison::Execute: "
-                        + "RightOperand not set"
-                    );
-
-                throw new PftSyntaxException (this);
-            }
-
-            var leftNumeric = PftUtility.IsNumeric
+        if (leftNumeric || rightNumeric)
+        {
+            var leftValue = GetValue (context, LeftOperand);
+            var rightValue = GetValue (context, RightOperand);
+            Value = DoNumericOperation
                 (
                     context,
-                    LeftOperand
+                    leftValue,
+                    operation,
+                    rightValue
                 );
-            var rightNumeric = PftUtility.IsNumeric
+        }
+        else
+        {
+            var leftValue = context.Evaluate (LeftOperand);
+            var rightValue = context.Evaluate (RightOperand);
+            Value = DoStringOperation
                 (
                     context,
-                    RightOperand
+                    leftValue,
+                    operation,
+                    rightValue
                 );
-
-            if (leftNumeric || rightNumeric)
-            {
-                var leftValue = GetValue (context, LeftOperand);
-                var rightValue = GetValue
-                    (
-                        context,
-                        RightOperand.ThrowIfNull ("RightOperand")
-                    );
-                Value = DoNumericOperation
-                    (
-                        context,
-                        leftValue,
-                        operation,
-                        rightValue
-                    );
-            }
-            else
-            {
-                var leftValue = context.Evaluate (LeftOperand);
-                var rightValue = context.Evaluate (RightOperand);
-                Value = DoStringOperation
-                    (
-                        context,
-                        leftValue,
-                        operation,
-                        rightValue
-                    );
-            }
-
-            OnAfterExecution (context);
         }
 
-        /// <inheritdoc cref="PftNode.GetNodeInfo" />
-        public override PftNodeInfo GetNodeInfo()
+        OnAfterExecution (context);
+    }
+
+    /// <inheritdoc cref="PftNode.GetNodeInfo" />
+    public override PftNodeInfo GetNodeInfo()
+    {
+        var result = new PftNodeInfo
         {
-            var result = new PftNodeInfo
+            Node = this,
+            Name = SimplifyTypeName (GetType().Name)
+        };
+
+        if (!ReferenceEquals (LeftOperand, null))
+        {
+            var leftNode = new PftNodeInfo
             {
-                Node = this,
-                Name = SimplifyTypeName (GetType().Name)
+                Node = LeftOperand,
+                Name = "Left"
             };
-
-            if (!ReferenceEquals (LeftOperand, null))
-            {
-                var leftNode = new PftNodeInfo
-                {
-                    Node = LeftOperand,
-                    Name = "Left"
-                };
-                result.Children.Add (leftNode);
-                leftNode.Children.Add (LeftOperand.GetNodeInfo());
-            }
-
-            if (!string.IsNullOrEmpty (Operation))
-            {
-                var operationNode = new PftNodeInfo
-                {
-                    Name = "Operation",
-                    Value = Operation
-                };
-                result.Children.Add (operationNode);
-            }
-
-            if (!ReferenceEquals (RightOperand, null))
-            {
-                var rightNode = new PftNodeInfo
-                {
-                    Node = RightOperand,
-                    Name = "Right"
-                };
-                result.Children.Add (rightNode);
-                rightNode.Children.Add (RightOperand.GetNodeInfo());
-            }
-
-            return result;
+            result.Children.Add (leftNode);
+            leftNode.Children.Add (LeftOperand.GetNodeInfo());
         }
 
-        /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
+        if (!string.IsNullOrEmpty (Operation))
         {
-            if (ReferenceEquals (LeftOperand, null)
-                || ReferenceEquals (RightOperand, null)
-                || string.IsNullOrEmpty (Operation))
+            var operationNode = new PftNodeInfo
             {
-                throw new PftCompilerException();
-            }
-
-            LeftOperand = LeftOperand.Optimize();
-            RightOperand = RightOperand.Optimize();
-
-            return this;
+                Name = "Operation",
+                Value = Operation
+            };
+            result.Children.Add (operationNode);
         }
 
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
+        if (!ReferenceEquals (RightOperand, null))
         {
-            if (!ReferenceEquals (LeftOperand, null))
+            var rightNode = new PftNodeInfo
             {
-                LeftOperand.PrettyPrint (printer);
-            }
-
-            printer.Write (Operation);
-
-            if (!ReferenceEquals (RightOperand, null))
-            {
-                RightOperand.PrettyPrint (printer);
-            }
+                Node = RightOperand,
+                Name = "Right"
+            };
+            result.Children.Add (rightNode);
+            rightNode.Children.Add (RightOperand.GetNodeInfo());
         }
 
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
+        return result;
+    }
+
+    /// <inheritdoc cref="PftNode.Optimize" />
+    public override PftNode Optimize()
+    {
+        if (ReferenceEquals (LeftOperand, null)
+            || ReferenceEquals (RightOperand, null)
+            || string.IsNullOrEmpty (Operation))
         {
-            base.Serialize (writer);
-
-            PftSerializer.SerializeNullable (writer, LeftOperand);
-            writer.WriteNullable (Operation);
-            PftSerializer.SerializeNullable (writer, RightOperand);
+            throw new PftCompilerException();
         }
 
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        protected internal override bool ShouldSerializeText() => false;
+        LeftOperand = LeftOperand.Optimize();
+        RightOperand = RightOperand.Optimize();
 
-        #endregion
+        return this;
+    }
 
-        #region Object members
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
+        if (!ReferenceEquals (LeftOperand, null))
         {
-            var result = new StringBuilder();
-
-            if (!ReferenceEquals (LeftOperand, null))
-            {
-                result.Append (LeftOperand);
-            }
-
-            result.Append (Operation);
-
-            if (!ReferenceEquals (RightOperand, null))
-            {
-                result.Append (RightOperand);
-            }
-
-            return result.ToString();
+            LeftOperand.PrettyPrint (printer);
         }
 
-        #endregion
+        printer.Write (Operation);
 
-    } // class PftComparison
+        if (!ReferenceEquals (RightOperand, null))
+        {
+            RightOperand.PrettyPrint (printer);
+        }
+    }
 
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        base.Serialize (writer);
+
+        PftSerializer.SerializeNullable (writer, LeftOperand);
+        writer.WriteNullable (Operation);
+        PftSerializer.SerializeNullable (writer, RightOperand);
+    }
+
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    protected internal override bool ShouldSerializeText() => false;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+
+        if (LeftOperand is not null)
+        {
+            builder.Append (LeftOperand);
+        }
+
+        builder.Append (Operation);
+
+        if (RightOperand is not null)
+        {
+            builder.Append (RightOperand);
+        }
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
+
+    #endregion
+}

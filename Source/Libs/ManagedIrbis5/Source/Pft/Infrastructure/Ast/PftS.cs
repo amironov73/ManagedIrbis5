@@ -62,7 +62,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 params PftNode[] children
             )
         {
-            foreach (PftNode child in children)
+            foreach (var child in children)
             {
                 Children.Add(child);
             }
@@ -104,7 +104,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Optimize" />
         public override PftNode? Optimize()
         {
-            PftNodeCollection children = (PftNodeCollection)Children;
+            var children = (PftNodeCollection)Children;
             children.Optimize();
 
             if (children.Count == 0)

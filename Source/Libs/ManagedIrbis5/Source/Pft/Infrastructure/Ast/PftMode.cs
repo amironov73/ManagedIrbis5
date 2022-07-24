@@ -281,7 +281,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder("m",3);
+            var result = new StringBuilder("m",3);
 
             char c;
             switch (OutputMode)

@@ -59,7 +59,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     _virtualChildren = new VirtualChildren();
                     if (!ReferenceEquals(InnerCondition, null))
                     {
-                        List<PftNode> nodes = new List<PftNode>
+                        var nodes = new List<PftNode>
                         {
                             InnerCondition
                         };
@@ -136,7 +136,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftLast result = (PftLast)base.Clone();
+            var result = (PftLast)base.Clone();
 
             if (!ReferenceEquals(InnerCondition, null))
             {
@@ -179,10 +179,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new PftSemanticException("Nested group");
             }
 
-            PftCondition condition = InnerCondition
+            var condition = InnerCondition
                 .ThrowIfNull("Condition");
 
-            PftGroup group = new PftGroup();
+            var group = new PftGroup();
 
             try
             {
@@ -225,7 +225,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = SimplifyTypeName(GetType().Name)

@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftConditionAndOr.cs --
+/* PftConditionAndOr.cs -- составное условие И/ИЛИ
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,394 +27,413 @@ using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Составное условие И/ИЛИ.
+/// </summary>
+public sealed class PftConditionAndOr
+    : PftCondition
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Левый операнд.
     /// </summary>
-    public sealed class PftConditionAndOr
-        : PftCondition
+    public PftCondition? LeftOperand { get; set; }
+
+    /// <summary>
+    /// Операция: И или ИЛИ.
+    /// </summary>
+    public string? Operation { get; set; }
+
+    /// <summary>
+    /// Правый операнд.
+    /// </summary>
+    public PftCondition? RightOperand { get; set; }
+
+    /// <inheritdoc cref="PftNode.Children" />
+    public override IList<PftNode> Children
     {
-        #region Properties
-
-        /// <summary>
-        /// Left operand.
-        /// </summary>
-        public PftCondition? LeftOperand { get; set; }
-
-        /// <summary>
-        /// Operation.
-        /// </summary>
-        public string? Operation { get; set; }
-
-        /// <summary>
-        /// Right operand.
-        /// </summary>
-        public PftCondition? RightOperand { get; set; }
-
-        /// <inheritdoc cref="PftNode.Children" />
-        public override IList<PftNode> Children
+        get
         {
-            get
+            if (ReferenceEquals (_virtualChildren, null))
             {
-                if (ReferenceEquals (_virtualChildren, null))
+                _virtualChildren = new VirtualChildren();
+                var nodes = new List<PftNode>();
+                if (!ReferenceEquals (LeftOperand, null))
                 {
-                    _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
-                    if (!ReferenceEquals (LeftOperand, null))
-                    {
-                        nodes.Add (LeftOperand);
-                    }
-
-                    if (!ReferenceEquals (RightOperand, null))
-                    {
-                        nodes.Add (RightOperand);
-                    }
-
-                    _virtualChildren.SetChildren (nodes);
+                    nodes.Add (LeftOperand);
                 }
 
-                return _virtualChildren;
+                if (!ReferenceEquals (RightOperand, null))
+                {
+                    nodes.Add (RightOperand);
+                }
+
+                _virtualChildren.SetChildren (nodes);
             }
 
-            [ExcludeFromCodeCoverage]
-            protected set => Magna.Error
+            return _virtualChildren;
+        }
+
+        [ExcludeFromCodeCoverage]
+        protected set => Magna.Logger.LogError
+            (
+                nameof (PftConditionAndOr) + "::" + nameof (Children)
+                + ": set value={Value}",
+                value.ToVisibleString()
+            );
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftConditionAndOr()
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftConditionAndOr
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
+
+    #region Private members
+
+    private VirtualChildren? _virtualChildren;
+
+    #endregion
+
+    #region ICloneable members
+
+    /// <inheritdoc cref="ICloneable.Clone" />
+    public override object Clone()
+    {
+        var result = (PftConditionAndOr)base.Clone();
+
+        result._virtualChildren = null;
+
+        if (LeftOperand is not null)
+        {
+            result.LeftOperand = (PftCondition)LeftOperand.Clone();
+        }
+
+        if (RightOperand is not null)
+        {
+            result.RightOperand = (PftCondition)RightOperand.Clone();
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.CompareNode" />
+    internal override void CompareNode
+        (
+            PftNode otherNode
+        )
+    {
+        Sure.NotNull (otherNode);
+
+        base.CompareNode (otherNode);
+
+        var otherCondition
+            = (PftConditionAndOr)otherNode;
+        PftSerializationUtility.CompareNodes
+            (
+                LeftOperand,
+                otherCondition.LeftOperand
+            );
+        if (Operation != otherCondition.Operation)
+        {
+            throw new IrbisException();
+        }
+
+        PftSerializationUtility.CompareNodes
+            (
+                RightOperand,
+                otherCondition.RightOperand
+            );
+    }
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        Sure.NotNull (compiler);
+
+        if (LeftOperand is null
+            || RightOperand is null
+            || string.IsNullOrEmpty (Operation))
+        {
+            throw new PftCompilerException();
+        }
+
+        LeftOperand.Compile (compiler);
+        RightOperand.Compile (compiler);
+
+        compiler.StartMethod (this);
+
+        compiler
+            .WriteIndent()
+            .Write ("bool result = ")
+            .RefNodeMethod (LeftOperand)
+            .Write ("() ");
+        if (Operation.SameString ("and"))
+        {
+            compiler.Write ("&&");
+        }
+        else if (Operation.SameString ("or"))
+        {
+            compiler.Write ("||");
+        }
+        else
+        {
+            throw new PftCompilerException();
+        }
+
+        compiler
+            .Write (' ')
+            .RefNodeMethod (RightOperand)
+            .WriteLine ("();")
+            .WriteIndent()
+            .WriteLine ("return result;");
+
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        base.Deserialize (reader);
+
+        LeftOperand = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+        Operation = reader.ReadNullableString();
+        RightOperand = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        if (LeftOperand is null)
+        {
+            Magna.Logger.LogError
                 (
-                    "PftConditionAndOr::Children: "
-                    + "set value="
-                    + value.ToVisibleString()
+                    nameof (PftConditionAndOr) + "::" + nameof (Execute)
+                    + ": LeftOperand not set"
                 );
+
+            throw new PftSyntaxException();
         }
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftConditionAndOr()
+        if (RightOperand is null)
         {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftConditionAndOr
-            (
-                [NotNull] PftToken token
-            )
-            : base (token)
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        private VirtualChildren? _virtualChildren;
-
-        #endregion
-
-        #region ICloneable members
-
-        /// <inheritdoc cref="ICloneable.Clone" />
-        public override object Clone()
-        {
-            PftConditionAndOr result = (PftConditionAndOr)base.Clone();
-
-            result._virtualChildren = null;
-
-            if (!ReferenceEquals (LeftOperand, null))
-            {
-                result.LeftOperand = (PftCondition)LeftOperand.Clone();
-            }
-
-            if (!ReferenceEquals (RightOperand, null))
-            {
-                result.RightOperand = (PftCondition)RightOperand.Clone();
-            }
-
-            return result;
-        }
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.CompareNode" />
-        internal override void CompareNode
-            (
-                PftNode otherNode
-            )
-        {
-            base.CompareNode (otherNode);
-
-            PftConditionAndOr otherCondition
-                = (PftConditionAndOr)otherNode;
-            PftSerializationUtility.CompareNodes
+            Magna.Logger.LogError
                 (
-                    LeftOperand,
-                    otherCondition.LeftOperand
+                    nameof (PftConditionAndOr) + "::" + nameof (Execute)
+                    + ": RightOperand not set"
                 );
-            if (Operation != otherCondition.Operation)
-            {
-                throw new IrbisException();
-            }
 
-            PftSerializationUtility.CompareNodes
+            throw new PftSyntaxException();
+        }
+
+        if (string.IsNullOrEmpty (Operation))
+        {
+            Magna.Logger.LogError
                 (
-                    RightOperand,
-                    otherCondition.RightOperand
+                    nameof (PftConditionAndOr) + "::" + nameof (Execute)
+                    + ": operation not set"
                 );
+
+            throw new PftSyntaxException();
         }
 
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
+
+        LeftOperand.Execute (context);
+        var left = LeftOperand.Value;
+
+        // TODO оптимизация: не вычислять правую часть, если не нужно
+        RightOperand.Execute (context);
+        var right = RightOperand.Value;
+
+        if (Operation.SameString ("and"))
         {
-            if (ReferenceEquals (LeftOperand, null)
-                || ReferenceEquals (RightOperand, null)
-                || string.IsNullOrEmpty (Operation))
-            {
-                throw new PftCompilerException();
-            }
+            left = left && right;
+        }
+        else if (Operation.SameString ("or"))
+        {
+            left = left || right;
+        }
+        else
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (PftConditionAndOr) + "::" + nameof (Execute)
+                    + ": unexpected operation {Operation}",
+                    Operation.ToVisibleString()
+                );
 
-            LeftOperand.Compile (compiler);
-            RightOperand.Compile (compiler);
-
-            compiler.StartMethod (this);
-
-            compiler
-                .WriteIndent()
-                .Write ("bool result = ")
-                .RefNodeMethod (LeftOperand)
-                .Write ("() ");
-            if (Operation.SameString ("and"))
-            {
-                compiler.Write ("&&");
-            }
-            else if (Operation.SameString ("or"))
-            {
-                compiler.Write ("||");
-            }
-            else
-            {
-                throw new PftCompilerException();
-            }
-
-            compiler
-                .Write (' ')
-                .RefNodeMethod (RightOperand)
-                .WriteLine ("();")
-                .WriteIndent()
-                .WriteLine ("return result;");
-
-            compiler.EndMethod (this);
-            compiler.MarkReady (this);
+            throw new PftSyntaxException();
         }
 
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
+        Value = left;
+
+        OnAfterExecution (context);
+    }
+
+    /// <inheritdoc cref="PftNode.GetNodeInfo" />
+    public override PftNodeInfo GetNodeInfo()
+    {
+        var result = new PftNodeInfo
         {
-            base.Deserialize (reader);
+            Node = this,
+            Name = "ConditionAndOr"
+        };
 
-            LeftOperand = (PftCondition?)PftSerializer.DeserializeNullable (reader);
-            Operation = reader.ReadNullableString();
-            RightOperand = (PftCondition?)PftSerializer.DeserializeNullable (reader);
-        }
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
+        if (!ReferenceEquals (LeftOperand, null))
         {
-            OnBeforeExecution (context);
-
-            if (ReferenceEquals (LeftOperand, null))
+            var left = new PftNodeInfo
             {
-                Magna.Error
-                    (
-                        "PftConditionAndOr::Execute: "
-                        + "LeftOperand not set"
-                    );
-
-                throw new PftSyntaxException();
-            }
-
-            LeftOperand.Execute (context);
-            bool left = LeftOperand.Value;
-
-            if (!ReferenceEquals (RightOperand, null))
-            {
-                if (string.IsNullOrEmpty (Operation))
-                {
-                    Magna.Error
-                        (
-                            "PftConditionAndOr::Execute: "
-                            + "Operation not set"
-                        );
-
-                    throw new PftSyntaxException();
-                }
-
-                RightOperand.Execute (context);
-                bool right = RightOperand.Value;
-
-                if (Operation.SameString ("and"))
-                {
-                    left = left && right;
-                }
-                else if (Operation.SameString ("or"))
-                {
-                    left = left || right;
-                }
-                else
-                {
-                    Magna.Error
-                        (
-                            "PftConditionAndOr::Execute: "
-                            + "unexpected operation="
-                            + Operation.ToVisibleString()
-                        );
-
-                    throw new PftSyntaxException();
-                }
-            }
-
-            Value = left;
-
-            OnAfterExecution (context);
-        }
-
-        /// <inheritdoc cref="PftNode.GetNodeInfo" />
-        public override PftNodeInfo GetNodeInfo()
-        {
-            PftNodeInfo result = new PftNodeInfo
-            {
-                Node = this,
-                Name = "ConditionAndOr"
+                Node = LeftOperand,
+                Name = "LeftOperand"
             };
+            result.Children.Add (left);
+            left.Children.Add (LeftOperand.GetNodeInfo());
+        }
 
-            if (!ReferenceEquals (LeftOperand, null))
-            {
-                PftNodeInfo left = new PftNodeInfo
-                {
-                    Node = LeftOperand,
-                    Name = "LeftOperand"
-                };
-                result.Children.Add (left);
-                left.Children.Add (LeftOperand.GetNodeInfo());
-            }
+        var operation = new PftNodeInfo
+        {
+            Name = "Operation",
+            Value = Operation
+        };
+        result.Children.Add (operation);
 
-            PftNodeInfo operation = new PftNodeInfo
+        if (!ReferenceEquals (RightOperand, null))
+        {
+            var right = new PftNodeInfo
             {
-                Name = "Operation",
-                Value = Operation
+                Node = RightOperand,
+                Name = "RightOperand"
             };
-            result.Children.Add (operation);
-
-            if (!ReferenceEquals (RightOperand, null))
-            {
-                PftNodeInfo right = new PftNodeInfo
-                {
-                    Node = RightOperand,
-                    Name = "RightOperand"
-                };
-                result.Children.Add (right);
-                right.Children.Add (RightOperand.GetNodeInfo());
-            }
-
-            return result;
+            result.Children.Add (right);
+            right.Children.Add (RightOperand.GetNodeInfo());
         }
 
-        /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
+        return result;
+    }
+
+    /// <inheritdoc cref="PftNode.Optimize" />
+    public override PftNode Optimize()
+    {
+        if (LeftOperand is not null)
         {
-            if (!ReferenceEquals (LeftOperand, null))
-            {
-                LeftOperand = (PftCondition?)LeftOperand.Optimize();
-            }
-
-            if (!ReferenceEquals (RightOperand, null))
-            {
-                RightOperand = (PftCondition?)RightOperand.Optimize();
-            }
-
-            return this;
+            LeftOperand = (PftCondition?)LeftOperand.Optimize();
         }
 
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
+        if (RightOperand is not null)
         {
-            if (!ReferenceEquals (LeftOperand, null))
-            {
-                LeftOperand.PrettyPrint (printer);
-            }
-
-            printer
-                .SingleSpace()
-                .Write (Operation)
-                .SingleSpace();
-
-            if (!ReferenceEquals (RightOperand, null))
-            {
-                RightOperand.PrettyPrint (printer);
-            }
+            RightOperand = (PftCondition?)RightOperand.Optimize();
         }
 
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
+        return this;
+    }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        if (!ReferenceEquals (LeftOperand, null))
         {
-            base.Serialize (writer);
-
-            PftSerializer.SerializeNullable (writer, LeftOperand);
-            writer.WriteNullable (Operation);
-            PftSerializer.SerializeNullable (writer, RightOperand);
+            LeftOperand.PrettyPrint (printer);
         }
 
-        #endregion
+        printer
+            .SingleSpace()
+            .Write (Operation)
+            .SingleSpace();
 
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
+        if (!ReferenceEquals (RightOperand, null))
         {
-            StringBuilder result = new StringBuilder();
-            if (!ReferenceEquals (LeftOperand, null))
-            {
-                result.Append (LeftOperand);
-            }
+            RightOperand.PrettyPrint (printer);
+        }
+    }
 
-            result.Append (' ');
-            result.Append (Operation);
-            result.Append (' ');
-            if (!ReferenceEquals (RightOperand, null))
-            {
-                result.Append (RightOperand);
-            }
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        base.Serialize (writer);
 
-            return result.ToString();
+        PftSerializer.SerializeNullable (writer, LeftOperand);
+        writer.WriteNullable (Operation);
+        PftSerializer.SerializeNullable (writer, RightOperand);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var result = new StringBuilder();
+        if (!ReferenceEquals (LeftOperand, null))
+        {
+            result.Append (LeftOperand);
         }
 
-        #endregion
+        result.Append (' ');
+        result.Append (Operation);
+        result.Append (' ');
+        if (!ReferenceEquals (RightOperand, null))
+        {
+            result.Append (RightOperand);
+        }
 
-    } // method PftConditionAndOr
+        return result.ToString();
+    }
 
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #endregion
+}

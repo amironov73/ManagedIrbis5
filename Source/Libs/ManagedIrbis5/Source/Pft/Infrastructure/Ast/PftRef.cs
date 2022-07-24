@@ -105,7 +105,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 {
 
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals(Mfn, null))
                     {
                         nodes.Add(Mfn);
@@ -162,7 +162,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             : this()
         {
             Mfn = mfn;
-            foreach (PftNode node in format)
+            foreach (var node in format)
             {
                 Format.Add(node);
             }
@@ -181,7 +181,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftRef result = (PftRef)base.Clone();
+            var result = (PftRef)base.Clone();
 
             if (!ReferenceEquals(Mfn, null))
             {
@@ -205,7 +205,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftRef otherRef = (PftRef)otherNode;
+            var otherRef = (PftRef)otherNode;
             PftSerializationUtility.CompareNodes
                 (
                     Mfn,
@@ -297,8 +297,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             if (!ReferenceEquals(Mfn, null))
             {
                 parentContext.Evaluate(Mfn);
-                int newMfn = (int)Mfn.Value;
-                int oldMfn = 0;
+                var newMfn = (int)Mfn.Value;
+                var oldMfn = 0;
                 var record = parentContext.Record;
                 if (record is not null)
                 {
@@ -333,7 +333,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = SimplifyTypeName(GetType().Name)
@@ -341,7 +341,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(Mfn, null))
             {
-                PftNodeInfo mfnInfo = new PftNodeInfo
+                var mfnInfo = new PftNodeInfo
                 {
                     Node = Mfn,
                     Name = "Mfn"
@@ -350,11 +350,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 mfnInfo.Children.Add(Mfn.GetNodeInfo());
             }
 
-            PftNodeInfo formatInfo = new PftNodeInfo
+            var formatInfo = new PftNodeInfo
             {
                 Name = "Format"
             };
-            foreach (PftNode node in Format)
+            foreach (var node in Format)
             {
                 formatInfo.Children.Add(node.GetNodeInfo());
             }
