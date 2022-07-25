@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforP.cs --
+/* UniforP.cs -- выдать оригинальное повторение поля
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,122 +20,125 @@ using AM;
 
 using ManagedIrbis.Infrastructure;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Unifors
+namespace ManagedIrbis.Pft.Infrastructure.Unifors;
+
+//
+// Выдать заданное оригинальное повторение поля – &uf('P')
+// Вид функции: P.
+// Назначение: Выдать заданное оригинальное повторение поля.
+// PV<tag>^<delim>*<offset>.<length>#<occur>
+// где:
+// <tag> – метка поля;
+// <delim> – разделитель подполя;
+// <offset> – смещение;
+// <length> – длина;
+// <occur> – номер повторения.
+//
+// Примеры:
+//
+// &unifor('Pv200#2')
+// &unifor('Pv910^a#5')
+// &unifor('Pv10^b*2.10#2')
+//
+
+internal static class UniforP
 {
-    //
-    // Выдать заданное оригинальное повторение поля – &uf('P')
-    // Вид функции: P.
-    // Назначение: Выдать заданное оригинальное повторение поля.
-    // PV<tag>^<delim>*<offset>.<length>#<occur>
-    // где:
-    // <tag> – метка поля;
-    // <delim> – разделитель подполя;
-    // <offset> – смещение;
-    // <length> – длина;
-    // <occur> – номер повторения.
-    //
-    // Примеры:
-    //
-    // &unifor('Pv200#2')
-    // &unifor('Pv910^a#5')
-    // &unifor('Pv10^b*2.10#2')
-    //
+    #region Public methods
 
-    static class UniforP
+    /// <summary>
+    /// Get unique field value.
+    /// </summary>
+    public static void UniqueField
+        (
+            PftContext context,
+            PftNode? node,
+            string? expression
+        )
     {
-        #region Public methods
+        Sure.NotNull (context);
 
-        /// <summary>
-        /// Get unique field value.
-        /// </summary>
-        public static void UniqueField
-            (
-                PftContext context,
-                PftNode? node,
-                string? expression
-            )
+        if (!string.IsNullOrEmpty (expression))
         {
-            if (!string.IsNullOrEmpty(expression))
+            try
             {
-                try
+                if (context.Record is { } record)
                 {
-                    var record = context.Record;
-                    if (!ReferenceEquals(record, null))
+                    // ibatrak
+                    // ИРБИС игнорирует код команды в спецификации,
+                    // все работает как v
+                    var command = expression[0];
+                    if (command != 'v' && command != 'V')
                     {
-                        // ibatrak
-                        // ИРБИС игнорирует код команды в спецификации,
-                        // все работает как v
-                        var command = expression[0];
-                        if (command != 'v' && command != 'V')
+                        expression = "v" + expression.Substring (1);
+                    }
+
+                    var specification = new FieldSpecification();
+                    if (specification.ParseUnifor (expression))
+                    {
+                        if (specification.Tag == IrbisGuid.Tag)
                         {
-                            expression = "v" + expression.Substring(1);
+                            // Поле GUID не выводится
+                            return;
                         }
 
-                        var specification = new FieldSpecification();
-                        if (specification.ParseUnifor(expression))
+                        var reference = new FieldReference();
+                        reference.Apply (specification);
+
+                        var array = reference.GetUniqueValues (record);
+                        string? result = null;
+                        switch (reference.FieldRepeat.Kind)
                         {
-                            if (specification.Tag == IrbisGuid.Tag)
-                            {
-                                // Поле GUID не выводится
-                                return;
-                            }
+                            case IndexKind.None:
+                                result = string.Join (",", array);
+                                break;
 
-                            var reference = new FieldReference();
-                            reference.Apply(specification);
+                            case IndexKind.Literal:
+                                result = array.GetOccurrence
+                                    (
+                                        reference.FieldRepeat.Literal - 1
+                                    );
+                                break;
 
-                            var array = reference.GetUniqueValues(record);
-                            string? result = null;
-                            switch (reference.FieldRepeat.Kind)
-                            {
-                                case IndexKind.None:
-                                    result = string.Join(",", array);
-                                    break;
+                            case IndexKind.LastRepeat:
+                                if (array.Length != 0)
+                                {
+                                    result = array[^1];
+                                }
 
-                                case IndexKind.Literal:
-                                    result = array.GetOccurrence
-                                        (
-                                            reference.FieldRepeat.Literal - 1
-                                        );
-                                    break;
+                                break;
 
-                                case IndexKind.LastRepeat:
-                                    if (array.Length != 0)
-                                    {
-                                        result = array[array.Length - 1];
-                                    }
-                                    break;
+                            default:
+                                throw new IrbisException
+                                    (
+                                        "Unexpected repeat: "
+                                        + reference.FieldRepeat.Kind
+                                    );
+                        }
 
-                                default:
-                                    throw new IrbisException
-                                        (
-                                            "Unexpected repeat: "
-                                            + reference.FieldRepeat.Kind
-                                        );
-                            }
-
-                            if (!String.IsNullOrEmpty(result))
-                            {
-                                context.WriteAndSetFlag(node, result);
-                                context.VMonitor = true;
-                            }
+                        if (!string.IsNullOrEmpty (result))
+                        {
+                            context.WriteAndSetFlag (node, result);
+                            context.VMonitor = true;
                         }
                     }
                 }
-                catch (Exception exception)
-                {
-                    Magna.TraceException
-                        (
-                            "UniforP::UniqueField",
-                            exception
-                        );
-                }
+            }
+            catch (Exception exception)
+            {
+                Magna.Logger.LogError
+                    (
+                        exception,
+                        nameof (UniforP) + "::" + nameof (UniqueField)
+                    );
             }
         }
-
-        #endregion
     }
+
+    #endregion
 }

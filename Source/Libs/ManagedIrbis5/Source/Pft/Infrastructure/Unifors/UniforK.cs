@@ -19,111 +19,114 @@ using AM.Text;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Unifors
+namespace ManagedIrbis.Pft.Infrastructure.Unifors;
+
+//
+// Раскодировка через справочник – &uf('K')
+// Вид функции: K.
+// Назначение: Возвращает значение из справочника,
+// соответствующее переданному коду
+// (иными словами, осуществляется раскодировка).
+// Формат (передаваемая строка):
+// K<имя_справочника><разделитель><исх_значение>
+// <разделитель> между<имя_справочника>
+// и <исх_значение> может быть двух видов:
+// \ - раскодировка с учетом регистра,
+// ! - раскодировка без учета регистра.
+//
+// Примеры:
+//
+// &unifor("Kjz.mnu\"v101)
+// &uf('kFIO_SF.MNU!'&uf('av907^b#1'))
+//
+// Вместо разделителя \ может использоваться
+// недокументированный разделитель |, он означает то же самое
+//
+
+internal static class UniforK
 {
-    //
-    // Раскодировка через справочник – &uf('K')
-    // Вид функции: K.
-    // Назначение: Возвращает значение из справочника,
-    // соответствующее переданному коду
-    // (иными словами, осуществляется раскодировка).
-    // Формат (передаваемая строка):
-    // K<имя_справочника><разделитель><исх_значение>
-    // <разделитель> между<имя_справочника>
-    // и <исх_значение> может быть двух видов:
-    // \ - раскодировка с учетом регистра,
-    // ! - раскодировка без учета регистра.
-    //
-    // Примеры:
-    //
-    // &unifor("Kjz.mnu\"v101)
-    // &uf('kFIO_SF.MNU!'&uf('av907^b#1'))
-    //
-    // Вместо разделителя \ может использоваться
-    // недокументированный разделитель |, он означает то же самое
-    //
+    #region Public methods
 
-    static class UniforK
+    /// <summary>
+    /// Get MNU-file entry.
+    /// </summary>
+    public static void GetMenuEntry
+        (
+            PftContext context,
+            PftNode? node,
+            string? expression
+        )
     {
-        #region Public methods
+        Sure.NotNull (context);
 
-        /// <summary>
-        /// Get MNU-file entry.
-        /// </summary>
-        public static void GetMenuEntry
-            (
-                PftContext context,
-                PftNode? node,
-                string? expression
-            )
+        if (!string.IsNullOrEmpty (expression))
         {
-            if (!string.IsNullOrEmpty(expression))
+            var navigator = new TextNavigator (expression);
+            var menuName = navigator.ReadUntil ('\\', '!', '|').ToString();
+            if (string.IsNullOrEmpty (menuName))
             {
-                var navigator = new TextNavigator(expression);
-                string menuName = navigator.ReadUntil('\\', '!', '|').ToString();
-                if (string.IsNullOrEmpty(menuName))
-                {
-                    return;
-                }
+                return;
+            }
 
-                var separator = navigator.ReadChar();
-                if (separator != '\\'
-                    && separator != '!'
-                    && separator != '|')
-                {
-                    return;
-                }
+            var separator = navigator.ReadChar();
+            if (separator != '\\'
+                && separator != '!'
+                && separator != '|')
+            {
+                return;
+            }
 
-                string key = navigator.GetRemainingText().ToString();
-                if (string.IsNullOrEmpty(key))
-                {
-                    return;
-                }
+            var key = navigator.GetRemainingText().ToString();
+            if (string.IsNullOrEmpty (key))
+            {
+                return;
+            }
 
-                var specification = new FileSpecification
-                    {
-                        Path = IrbisPath.MasterFile,
-                        Database = context.Provider.Database,
-                        FileName = menuName
-                    };
-                var menu = context.Provider.ReadMenuFile
+            var specification = new FileSpecification
+            {
+                Path = IrbisPath.MasterFile,
+                Database = context.Provider.Database,
+                FileName = menuName
+            };
+            var menu = context.Provider.ReadMenuFile
+                (
+                    specification
+                );
+            if (menu is null)
+            {
+                Magna.Logger.LogError
                     (
+                        nameof (UniforK) + "::" + nameof (GetMenuEntry)
+                        + ": missing menu file {Specification}",
                         specification
                     );
-                if (ReferenceEquals(menu, null))
-                {
-                    Magna.Warning
-                        (
-                            "Missing menu file: " + specification
-                        );
-                }
-                else
-                {
-                    string? output = null;
-
-                    switch (separator)
-                    {
-                        case '\\':
-                        case '|': // nondocumented but used in scripts
-                            output = menu.GetStringSensitive(key);
-                            break;
-
-                        case '!':
-                            output = menu.GetString(key);
-                            break;
-                    }
-
-                    context.WriteAndSetFlag(node, output);
-                }
             }
-        } // method GetMenuEntry
+            else
+            {
+                string? output = null;
 
-        #endregion
+                switch (separator)
+                {
+                    case '\\':
+                    case '|': // nondocumented but used in scripts
+                        output = menu.GetStringSensitive (key);
+                        break;
 
-    } // class UniforK
+                    case '!':
+                        output = menu.GetString (key);
+                        break;
+                }
 
-} // namespace ManagedIrbis.Pft.Infrastructure.Unifors
+                context.WriteAndSetFlag (node, output);
+            }
+        }
+    }
+
+    #endregion
+}

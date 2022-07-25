@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforL.cs --
+/* UniforL.cs -- вернуть окончание термина
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,88 +17,91 @@ using System;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Unifors
+namespace ManagedIrbis.Pft.Infrastructure.Unifors;
+
+//
+// Вернуть окончание термина – &uf('L')
+// Вид функции: L.
+// Назначение: Вернуть окончание термина.
+// Формат (передаваемая строка):
+// L<начало_термина>
+//
+// Пример:
+//
+// &unifor('L', 'JAZ=', 'рус')
+//
+// выдаст 'СКИЙ'
+//
+
+internal static class UniforL
 {
-    //
-    // Вернуть окончание термина – &uf('L')
-    // Вид функции: L.
-    // Назначение: Вернуть окончание термина.
-    // Формат (передаваемая строка):
-    // L<начало_термина>
-    //
-    // Пример:
-    //
-    // &unifor('L', 'JAZ=', 'рус')
-    //
-    // выдаст 'СКИЙ'
-    //
+    #region Public methods
 
-    static class UniforL
+    public static void ContinueTerm
+        (
+            PftContext context,
+            PftNode? node,
+            string? expression
+        )
     {
-        #region Public methods
+        Sure.NotNull (context);
 
-        public static void ContinueTerm
-            (
-                PftContext context,
-                PftNode? node,
-                string? expression
-            )
+        if (string.IsNullOrEmpty (expression))
         {
-            if (string.IsNullOrEmpty(expression))
-            {
-                return;
-            }
-
-            expression = expression.ToUpperInvariant();
-
-            var provider = context.Provider;
-            var parameters = new TermParameters
-            {
-                Database = provider.Database,
-                StartTerm = expression,
-                NumberOfTerms = 10
-            };
-
-            Term[]? terms;
-            try
-            {
-                terms = provider.ReadTerms(parameters);
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        "UniforL::ContinueTerm",
-                        exception
-                    );
-
-                return;
-            }
-
-            if (terms is null || terms.Length == 0)
-            {
-                return;
-            }
-
-            var firstTerm = terms[0].Text;
-            if (string.IsNullOrEmpty(firstTerm))
-            {
-                return;
-            }
-
-            if (!firstTerm.StartsWith(expression))
-            {
-                return;
-            }
-
-            var result = firstTerm.Substring(expression.Length);
-            context.WriteAndSetFlag(node, result);
+            return;
         }
 
-        #endregion
+        expression = expression.ToUpperInvariant();
+
+        var provider = context.Provider;
+        var parameters = new TermParameters
+        {
+            Database = provider.Database,
+            StartTerm = expression,
+            NumberOfTerms = 10
+        };
+
+        Term[]? terms;
+        try
+        {
+            terms = provider.ReadTerms (parameters);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (UniforL) + "::" + nameof (ContinueTerm)
+                );
+
+            return;
+        }
+
+        if (terms is null || terms.Length == 0)
+        {
+            return;
+        }
+
+        var firstTerm = terms[0].Text;
+        if (string.IsNullOrEmpty (firstTerm))
+        {
+            return;
+        }
+
+        if (!firstTerm.StartsWith (expression))
+        {
+            return;
+        }
+
+        var result = firstTerm[expression.Length..];
+        context.WriteAndSetFlag (node, result);
     }
+
+    #endregion
 }
