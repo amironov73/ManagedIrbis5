@@ -18,140 +18,144 @@ using System.Collections.Generic;
 using AM;
 using AM.Collections;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Параллельная версия "with"
+/// </summary>
+public sealed class PftParallelWith
+    : PftNode
 {
+    #region Properties
+
     /// <summary>
-    /// Параллельная версия "with"
+    /// Variable reference.
     /// </summary>
-    public sealed class PftParallelWith
-        : PftNode
+    public PftVariableReference? Variable { get; set; }
+
+    /// <summary>
+    /// Fields.
+    /// </summary>
+    public NonNullCollection<FieldSpecification> Fields { get; private set; }
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax"/>
+    public override bool ExtendedSyntax => true;
+
+    /// <inheritdoc cref="PftNode.Children"/>
+    public override IList<PftNode> Children
     {
-        #region Properties
-
-        /// <summary>
-        /// Variable reference.
-        /// </summary>
-        public PftVariableReference? Variable { get; set; }
-
-        /// <summary>
-        /// Fields.
-        /// </summary>
-        public NonNullCollection<FieldSpecification> Fields { get; private set; }
-
-        /// <inheritdoc cref="PftNode.ExtendedSyntax"/>
-        public override bool ExtendedSyntax => true;
-
-        /// <inheritdoc cref="PftNode.Children"/>
-        public override IList<PftNode> Children
+        get
         {
-            get
+            if (ReferenceEquals (_virtualChildren, null))
             {
-                if (ReferenceEquals(_virtualChildren, null))
+                _virtualChildren = new VirtualChildren();
+                var nodes = new List<PftNode>();
+                if (!ReferenceEquals (Variable, null))
                 {
-
-                    _virtualChildren = new VirtualChildren();
-                    var nodes = new List<PftNode>();
-                    if (!ReferenceEquals(Variable, null))
-                    {
-                        nodes.Add(Variable);
-                    }
-                    _virtualChildren.SetChildren(nodes);
+                    nodes.Add (Variable);
                 }
 
-                return _virtualChildren;
+                _virtualChildren.SetChildren (nodes);
             }
-            protected set => Magna.Error
+
+            return _virtualChildren;
+        }
+        protected set
+        {
+            Magna.Logger.LogError
                 (
-                    "PftParallelWith::Children: "
-                    + "set value="
-                    + value.ToVisibleString()
+                    nameof (PftParallelWith) + "::" + nameof (Children)
+                    + ": set value={Value}",
+                    value.ToVisibleString()
                 );
-        } // property Children
+        }
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Construction
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftParallelWith()
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftParallelWith()
+    {
+        Fields = new ();
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftParallelWith
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.Parallel);
+        Fields = new ();
+    }
+
+    #endregion
+
+    #region Private members
+
+    private VirtualChildren? _virtualChildren;
+
+    #endregion
+
+    #region ICloneable members
+
+    /// <inheritdoc cref="PftNode.Clone" />
+    public override object Clone()
+    {
+        var result = (PftParallelWith)base.Clone();
+
+        result._virtualChildren = null;
+
+        if (Variable is not null)
         {
-            Fields = new();
-        } // constructor
+            result.Variable = (PftVariableReference) Variable.Clone();
+        }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftParallelWith
-            (
-                PftToken token
-            )
-            : base(token)
+        result.Fields = new NonNullCollection<FieldSpecification>();
+        foreach (var field in Fields)
         {
-            token.MustBe(PftTokenKind.Parallel);
-            Fields = new();
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private VirtualChildren? _virtualChildren;
-
-        #endregion
-
-        #region ICloneable members
-
-        /// <inheritdoc cref="PftNode.Clone" />
-        public override object Clone()
-        {
-            var result = (PftParallelWith)base.Clone();
-
-            result._virtualChildren = null;
-
-            if (!ReferenceEquals(Variable, null))
-            {
-                result.Variable = (PftVariableReference)Variable.Clone();
-            }
-
-            result.Fields = new NonNullCollection<FieldSpecification>();
-            foreach (var field in Fields)
-            {
-                result.Fields.Add
+            result.Fields.Add
                 (
                     (FieldSpecification)field.Clone()
                 );
-            }
+        }
 
-            return result;
-        } // method Clone
+        return result;
+    }
 
-        #endregion
+    #endregion
 
-        #region PftNode members
+    #region PftNode members
 
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
 
-            base.Execute(context);
+        OnBeforeExecution (context);
 
-            // TODO: implement
+        base.Execute (context);
 
-            OnAfterExecution(context);
-        } // method Execute
+        // TODO: implement
 
-        #endregion
+        OnAfterExecution (context);
+    }
 
-    } // class PftParallelWith
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #endregion
+}

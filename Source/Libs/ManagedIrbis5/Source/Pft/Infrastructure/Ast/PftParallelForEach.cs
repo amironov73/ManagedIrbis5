@@ -24,291 +24,297 @@ using AM.Linq;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Параллельная версия цикла "для каждого".
+/// <example>
+/// parallel foreach $x in (v692^g,/)
+/// do
+///     $x, #
+///     if $x:'2010' then break fi
+/// end
+/// </example>
+/// </summary>
+public sealed class PftParallelForEach
+    : PftNode
 {
+    #region Properties
+
     /// <summary>
-    /// Параллельная версия цикла "для каждого".
-    /// <example>
-    /// parallel foreach $x in (v692^g,/)
-    /// do
-    ///     $x, #
-    ///     if $x:'2010' then break fi
-    /// end
-    /// </example>
+    /// Variable reference.
     /// </summary>
-    public sealed class PftParallelForEach
-        : PftNode
+    public PftVariableReference? Variable { get; set; }
+
+    /// <summary>
+    /// Sequence.
+    /// </summary>
+    public PftNodeCollection Sequence { get; private set; }
+
+    /// <summary>
+    /// Body.
+    /// </summary>
+    public PftNodeCollection Body { get; private set; }
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax" />
+    public override bool ExtendedSyntax => true;
+
+    /// <inheritdoc cref="PftNode.ComplexExpression" />
+    public override bool ComplexExpression => true;
+
+    /// <inheritdoc cref="PftNode.Children" />
+    public override IList<PftNode> Children
     {
-        #region Properties
-
-        /// <summary>
-        /// Variable reference.
-        /// </summary>
-        public PftVariableReference? Variable { get; set; }
-
-        /// <summary>
-        /// Sequence.
-        /// </summary>
-        public PftNodeCollection Sequence { get; private set; }
-
-        /// <summary>
-        /// Body.
-        /// </summary>
-        public PftNodeCollection Body { get; private set; }
-
-        /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax => true;
-
-        /// <inheritdoc cref="PftNode.ComplexExpression" />
-        public override bool ComplexExpression => true;
-
-        /// <inheritdoc cref="PftNode.Children" />
-        public override IList<PftNode> Children
+        get
         {
-            get
+            if (ReferenceEquals (_virtualChildren, null))
             {
-                if (ReferenceEquals(_virtualChildren, null))
-                {
-                    _virtualChildren = new VirtualChildren();
-                    var nodes = new List<PftNode>();
-                    nodes.AddRange(Sequence);
-                    nodes.AddRange(Body);
-                    _virtualChildren.SetChildren(nodes);
-                }
-
-                return _virtualChildren;
+                _virtualChildren = new VirtualChildren();
+                var nodes = new List<PftNode>();
+                nodes.AddRange (Sequence);
+                nodes.AddRange (Body);
+                _virtualChildren.SetChildren (nodes);
             }
-            protected set => Magna.Error
+
+            return _virtualChildren;
+        }
+        protected set
+        {
+            Magna.Logger.LogError
                 (
-                    "PftParallelForEach::Children: "
-                    + "set value="
-                    + value.ToVisibleString()
+                    nameof (PftParallelForEach) + "::" + nameof (Children)
+                    + ": set value={Value}",
+                    value.ToVisibleString()
                 );
-        } // property Children
+        }
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Construction
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftParallelForEach()
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftParallelForEach()
+    {
+        Sequence = new PftNodeCollection (this);
+        Body = new PftNodeCollection (this);
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftParallelForEach
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.Parallel);
+
+        Sequence = new PftNodeCollection (this);
+        Body = new PftNodeCollection (this);
+    }
+
+    #endregion
+
+    #region Private members
+
+    private VirtualChildren? _virtualChildren;
+
+    private string[] GetSequence
+        (
+            PftContext context
+        )
+    {
+        var result = new List<string>();
+        foreach (var node in Sequence)
         {
-            Sequence = new PftNodeCollection(this);
-            Body = new PftNodeCollection(this);
-        } // constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftParallelForEach
-            (
-                PftToken token
-            )
-            : base(token)
-        {
-            token.MustBe(PftTokenKind.Parallel);
-
-            Sequence = new PftNodeCollection(this);
-            Body = new PftNodeCollection(this);
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private VirtualChildren? _virtualChildren;
-
-        private string[] GetSequence
-            (
-                PftContext context
-            )
-        {
-            var result = new List<string>();
-
-            foreach (var node in Sequence)
+            var text = context.Evaluate (node);
+            if (!string.IsNullOrEmpty (text))
             {
-                var text = context.Evaluate(node);
-                if (!string.IsNullOrEmpty(text))
-                {
-                    var lines = text.SplitLines()
-                        .NonEmptyLines()
-                        .ToArray();
-                    result.AddRange(lines);
-                }
+                var lines = text.SplitLines()
+                    .NonEmptyLines()
+                    .ToArray();
+                result.AddRange (lines);
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    #endregion
+
+    #region ICloneable members
+
+    /// <inheritdoc cref="ICloneable.Clone" />
+    public override object Clone()
+    {
+        var result = (PftParallelForEach) base.Clone();
+
+        result._virtualChildren = null;
+
+        result.Sequence = Sequence.CloneNodes (result).ThrowIfNull();
+        result.Body = Body.CloneNodes (result).ThrowIfNull();
+
+        if (Variable is not null)
+        {
+            result.Variable = (PftVariableReference) Variable.Clone();
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        var variable = Variable.ThrowIfNull();
+        var name = variable.Name.ThrowIfNull();
+
+        var items = GetSequence (context);
+        try
+        {
+            // TODO: implement properly
+            foreach (var item in items)
+            {
+                context.Variables.SetVariable (name, item);
+
+                context.Execute (Body);
+            }
+        }
+        catch (PftBreakException exception)
+        {
+            // It was break operator
+
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (PftParallelForEach) + "::" + nameof (Execute)
+                );
+        }
+
+        OnAfterExecution (context);
+    }
+
+    /// <inheritdoc cref="PftNode.GetNodeInfo" />
+    public override PftNodeInfo GetNodeInfo()
+    {
+        var result = new PftNodeInfo
+        {
+            Node = this,
+            Name = "ParallelForEach"
+        };
+
+        if (!ReferenceEquals (Variable, null))
+        {
+            result.Children.Add (Variable.GetNodeInfo());
+        }
+
+        var sequence = new PftNodeInfo
+        {
+            Name = "Sequence"
+        };
+        result.Children.Add (sequence);
+        foreach (var node in Sequence)
+        {
+            sequence.Children.Add (node.GetNodeInfo());
+        }
+
+        var body = new PftNodeInfo
+        {
+            Name = "Body"
+        };
+        result.Children.Add (body);
+        foreach (var node in Body)
+        {
+            body.Children.Add (node.GetNodeInfo());
+        }
+
+        return result;
+    } // method GetNodeInfo
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        printer.EatWhitespace();
+        printer.EatNewLine();
+
+        printer
+            .WriteLine()
+            .WriteIndent()
+            .Write ("parallel foreach ");
+
+        Variable?.PrettyPrint (printer);
+        printer.Write (" in ");
+
+        var first = true;
+        foreach (var node in Sequence)
+        {
+            if (!first)
+            {
+                printer.Write (", ");
             }
 
-            return result.ToArray();
-        } // method GetSequence
+            node.PrettyPrint (printer);
+            first = false;
+        }
 
-        #endregion
+        printer
+            .WriteIndent()
+            .WriteLine ("do");
 
-        #region ICloneable members
+        printer.IncreaseLevel();
+        printer.WriteNodes (Body);
+        printer.DecreaseLevel();
+        printer.EatWhitespace();
+        printer.EatNewLine();
+        printer.WriteLine();
+        printer
+            .WriteIndent()
+            .WriteLine ("end");
+    } // method PrettyPrint
 
-        /// <inheritdoc cref="ICloneable.Clone" />
-        public override object Clone()
-        {
-            var result = (PftParallelForEach)base.Clone();
+    #endregion
 
-            result._virtualChildren = null;
+    #region Object members
 
-            result.Sequence = Sequence.CloneNodes(result).ThrowIfNull();
-            result.Body = Body.CloneNodes(result).ThrowIfNull();
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var result = new StringBuilder();
+        result.Append ("parallel foreach ");
+        result.Append (Variable);
+        result.Append (" in ");
+        PftUtility.NodesToText (result, Sequence);
+        result.Append (" do ");
+        PftUtility.NodesToText (result, Body);
+        result.Append (" end");
 
-            if (!ReferenceEquals(Variable, null))
-            {
-                result.Variable = (PftVariableReference)Variable.Clone();
-            }
+        return result.ToString();
+    } // method ToString
 
-            return result;
-        } // method Clone
+    #endregion
+} // class ParallelForEach
 
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            var variable = Variable.ThrowIfNull("variable");
-            var name = variable.Name.ThrowIfNull("variable.Name");
-
-            var items = GetSequence(context);
-            try
-            {
-                // TODO: implement properly
-                foreach (var item in items)
-                {
-                    context.Variables.SetVariable(name, item);
-
-                    context.Execute(Body);
-                }
-            }
-            catch (PftBreakException exception)
-            {
-                // It was break operator
-
-                Magna.TraceException
-                    (
-                        "PftParallelForEach::Execute",
-                        exception
-                    );
-            }
-
-            OnAfterExecution(context);
-        } // method Execute
-
-        /// <inheritdoc cref="PftNode.GetNodeInfo" />
-        public override PftNodeInfo GetNodeInfo()
-        {
-            var result = new PftNodeInfo
-            {
-                Node = this,
-                Name = "ParallelForEach"
-            };
-
-            if (!ReferenceEquals(Variable, null))
-            {
-                result.Children.Add(Variable.GetNodeInfo());
-            }
-
-            var sequence = new PftNodeInfo
-            {
-                Name = "Sequence"
-            };
-            result.Children.Add(sequence);
-            foreach (var node in Sequence)
-            {
-                sequence.Children.Add(node.GetNodeInfo());
-            }
-
-            var body = new PftNodeInfo
-            {
-                Name = "Body"
-            };
-            result.Children.Add(body);
-            foreach (var node in Body)
-            {
-                body.Children.Add(node.GetNodeInfo());
-            }
-
-            return result;
-        } // method GetNodeInfo
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer.EatWhitespace();
-            printer.EatNewLine();
-
-            printer
-                .WriteLine()
-                .WriteIndent()
-                .Write("parallel foreach ");
-
-            Variable?.PrettyPrint(printer);
-            printer.Write(" in ");
-
-            var first = true;
-            foreach (var node in Sequence)
-            {
-                if (!first)
-                {
-                    printer.Write(", ");
-                }
-                node.PrettyPrint(printer);
-                first = false;
-            }
-
-            printer
-                .WriteIndent()
-                .WriteLine("do");
-
-            printer.IncreaseLevel();
-            printer.WriteNodes(Body);
-            printer.DecreaseLevel();
-            printer.EatWhitespace();
-            printer.EatNewLine();
-            printer.WriteLine();
-            printer
-                .WriteIndent()
-                .WriteLine("end");
-        } // method PrettyPrint
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-            result.Append("parallel foreach ");
-            result.Append(Variable);
-            result.Append(" in ");
-            PftUtility.NodesToText(result, Sequence);
-            result.Append(" do ");
-            PftUtility.NodesToText(result, Body);
-            result.Append(" end");
-
-            return result.ToString();
-        } // method ToString
-
-        #endregion
-
-    } // class ParallelForEach
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+// namespace ManagedIrbis.Pft.Infrastructure.Ast
