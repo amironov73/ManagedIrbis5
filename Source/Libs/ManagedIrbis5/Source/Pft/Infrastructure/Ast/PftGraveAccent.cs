@@ -19,163 +19,164 @@ using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+//
+// ibatrak
+// Оказывается, в isis есть 2 явных варианта безусловного литерала
+// 1) с символами одинарной кавычки 'test me'
+// 2) с символами обратной кавычки, не знаю как правильно назвать,
+// в php этот символ используется для вызова шелл команд.
+// `test me`
+// Эта же фишка перекочевала в ирбис, но ... написать о ней
+// в документации забыли :)
+//
+
+/// <summary>
+/// Обратная кавычка.
+/// </summary>
+public sealed class PftGraveAccent
+    : PftNode
 {
-    //
-    // ibatrak
-    // Оказывается, в isis есть 2 явных варианта безусловного литерала
-    // 1) с символами одинарной кавычки 'test me'
-    // 2) с символами обратной кавычки, не знаю как правильно назвать,
-    // в php этот символ используется для вызова шелл команд.
-    // `test me`
-    // Эта же фишка перекочевала в ирбис, но ... написать о ней
-    // в документации забыли :)
-    //
+    #region Properties
+
+    /// <inheritdoc cref="PftNode.ConstantExpression" />
+    public override bool ConstantExpression => true;
+
+    /// <inheritdoc cref="PftNode.Text" />
+    public override string? Text
+    {
+        get => base.Text;
+        set => base.Text = PftUtility.PrepareText (value);
+    }
+
+    /// <inheritdoc cref="PftNode.RequiresConnection" />
+    public override bool RequiresConnection => false;
+
+    #endregion
+
+    #region Construction
 
     /// <summary>
-    /// Обратная кавычка.
+    /// Constructor.
     /// </summary>
-    public sealed class PftGraveAccent
-        : PftNode
+    public PftGraveAccent()
     {
-        #region Properties
+    } // constructor
 
-        /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression => true;
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftGraveAccent
+        (
+            string text
+        )
+    {
+        Text = text;
+    } // constructor
 
-        /// <inheritdoc cref="PftNode.Text" />
-        public override string? Text
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftGraveAccent
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.GraveAccent);
+
+        try
         {
-            get => base.Text;
-            set => base.Text = PftUtility.PrepareText(value);
+            Text = token.Text.ThrowIfNull();
         }
-
-        /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection => false;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftGraveAccent()
+        catch (Exception exception)
         {
-        } // constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftGraveAccent
-            (
-                string text
-            )
-        {
-            Text = text;
-        } // constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftGraveAccent
-            (
-                PftToken token
-            )
-            : base(token)
-        {
-            token.MustBe(PftTokenKind.GraveAccent);
-
-            try
-            {
-                Text = token.Text.ThrowIfNull("token.Text");
-            }
-            catch (Exception exception)
-            {
-                Magna.TraceException
-                    (
-                        "PftGraveAccent::Constructor",
-                        exception
-                    );
-
-                throw new PftSyntaxException(token, exception);
-            }
-        } // constructor
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
-        {
-            compiler.StartMethod(this);
-            compiler
-                .WriteIndent()
-                .WriteLine
-                    (
-                        "Context.Write(null,\"{0}\");",
-                        Text
-                    );
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
-        } // method Compile
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            // TODO just for a while
-            var text = Text;
-
-            // Never throw on empty literal
-
-            if (context.UpperMode
-                && !ReferenceEquals(text, null))
-            {
-                text = IrbisText.ToUpper(text);
-            }
-
-            context.Write
+            Magna.Logger.LogError
                 (
-                    this,
-                    text
+                    exception,
+                    nameof (PftGraveAccent) + "::Constructor"
                 );
 
-            OnAfterExecution(context);
-        } // method Execute
+            throw new PftSyntaxException (token, exception);
+        }
+    }
 
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        compiler.StartMethod (this);
+        compiler
+            .WriteIndent()
+            .WriteLine
+                (
+                    "Context.Write(null,\"{0}\");",
+                    Text
+                );
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    } // method Compile
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        OnBeforeExecution (context);
+
+        // TODO just for a while
+        var text = Text;
+
+        // Never throw on empty literal
+
+        if (context.UpperMode
+            && !ReferenceEquals (text, null))
         {
-            printer.Write('`')
-                .Write(Text)
-                .Write('`');
-        } // method PrettyPrint
+            text = IrbisText.ToUpper (text);
+        }
 
-        #endregion
+        context.Write
+            (
+                this,
+                text
+            );
 
-        #region Object members
+        OnAfterExecution (context);
+    } // method Execute
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => '`' + Text + '`';
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        printer.Write ('`')
+            .Write (Text)
+            .Write ('`');
+    } // method PrettyPrint
 
-        #endregion
+    #endregion
 
-    } // class PftGraveAccent
+    #region Object members
 
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString() => '`' + Text + '`';
+
+    #endregion
+} // class PftGraveAccent
+
+// namespace ManagedIrbis.Pft.Infrastructure.Ast

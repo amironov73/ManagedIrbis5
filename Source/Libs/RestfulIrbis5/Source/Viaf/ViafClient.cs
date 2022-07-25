@@ -18,120 +18,140 @@ using System.Text.Json;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 using RestSharp;
 
 #endregion
 
 #nullable enable
 
-namespace RestfulIrbis.Viaf
+namespace RestfulIrbis.Viaf;
+
+//
+// VIAF (англ. Virtual International Authority File - Виртуальный
+// международный авторитетный файл) - виртуальный каталог
+// международного нормативного контроля (информации о произведениях
+// и их авторах). В разработке проекта участвовало несколько
+// крупнейших мировых библиотек, в том числе Немецкая национальная
+// библиотека, Библиотека Конгресса США.
+//
+// VIAF является международно признанной системой классификации.
+// Это совместный проект нескольких национальных библиотек и управляется
+// Онлайновым компьютерным библиотечным центром (OCLC).
+// Проект был инициирован Немецкой национальной библиотекой
+// и Библиотекой Конгресса США. Проект основан в 2000 году.
+//
+
+/// <summary>
+/// VIAF requester.
+/// </summary>
+public class ViafClient
 {
-    //
-    // VIAF (англ. Virtual International Authority File - Виртуальный
-    // международный авторитетный файл) - виртуальный каталог
-    // международного нормативного контроля (информации о произведениях
-    // и их авторах). В разработке проекта участвовало несколько
-    // крупнейших мировых библиотек, в том числе Немецкая национальная
-    // библиотека, Библиотека Конгресса США.
-    //
-    // VIAF является международно признанной системой классификации.
-    // Это совместный проект нескольких национальных библиотек и управляется
-    // Онлайновым компьютерным библиотечным центром (OCLC).
-    // Проект был инициирован Немецкой национальной библиотекой
-    // и Библиотекой Конгресса США. Проект основан в 2000 году.
-    //
+    #region Constants
 
     /// <summary>
-    /// VIAF requester.
+    /// Base URL.
     /// </summary>
-    public class ViafClient
+    public const string BaseUrl = "http://www.viaf.org/";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Connection
+    /// </summary>
+    public RestClient Connection { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public ViafClient()
+        : this (BaseUrl)
     {
-        #region Constants
-
-        /// <summary>
-        /// Base URL.
-        /// </summary>
-        public const string BaseUrl = "http://www.viaf.org/";
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Connection
-        /// </summary>
-        public RestClient Connection { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public ViafClient()
-            : this (BaseUrl)
-        {
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ViafClient
-            (
-                string baseUrl
-            )
-        {
-            Magna.Trace ($"{nameof (ViafClient)}: constructor: {baseUrl}");
-
-            Connection = new RestClient (baseUrl);
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Get suggestions for the name.
-        /// </summary>
-        public ViafSuggestResult[] GetSuggestions
-            (
-                string name
-            )
-        {
-            Sure.NotNullNorEmpty (name);
-
-            Magna.Trace (nameof (ViafClient) + "::" + nameof (GetSuggestions));
-
-            var request = new RestRequest ("/viaf/AutoSuggest?query={name}");
-            request.AddUrlSegment ("name", name);
-            var response = Connection.Execute (request);
-            var viaf = JsonSerializer.Deserialize<ViafSuggestResponse> (response.Content)
-                .ThrowIfNull();
-
-            return viaf.SuggestResults.ThrowIfNull();
-        }
-
-        /// <summary>
-        /// Get Authority Cluster Data.
-        /// </summary>
-        public ViafData GetAuthorityClusterData
-            (
-                string recordId
-            )
-        {
-            Magna.Trace (nameof (ViafClient) + "::" + nameof (GetAuthorityClusterData));
-
-            var request = new RestRequest ("/viaf/{id}/");
-            request.AddUrlSegment ("id", recordId);
-            request.AddHeader ("Accept", "application/json");
-            var response = Connection.Execute (request);
-            var obj =  JsonDocument.Parse (response.Content);
-            var result = ViafData.Parse (obj);
-
-            return result;
-        }
-
-        #endregion
     }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ViafClient
+        (
+            string baseUrl
+        )
+    {
+        Sure.NotNullNorEmpty (baseUrl);
+
+        Magna.Logger.LogTrace
+            (
+                nameof (ViafClient) + "::Constructor"
+                + ": base url={Url}",
+                baseUrl
+            );
+
+        Connection = new RestClient (baseUrl);
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Get suggestions for the name.
+    /// </summary>
+    public ViafSuggestResult[] GetSuggestions
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        Magna.Logger.LogTrace
+            (
+                nameof (ViafClient) + "::" + nameof (GetSuggestions)
+                + ": name={Name}",
+                name
+            );
+
+        var request = new RestRequest ("/viaf/AutoSuggest?query={name}");
+        request.AddUrlSegment ("name", name);
+        var response = Connection.Execute (request);
+        var viaf = JsonSerializer.Deserialize<ViafSuggestResponse> (response.Content)
+            .ThrowIfNull();
+
+        return viaf.SuggestResults.ThrowIfNull();
+    }
+
+    /// <summary>
+    /// Get Authority Cluster Data.
+    /// </summary>
+    public ViafData GetAuthorityClusterData
+        (
+            string recordId
+        )
+    {
+        Sure.NotNullNorEmpty (recordId);
+
+        Magna.Logger.LogTrace
+            (
+                nameof (ViafClient) + "::" + nameof (GetAuthorityClusterData)
+                + ": record id={Id}",
+                recordId
+            );
+
+        var request = new RestRequest ("/viaf/{id}/");
+        request.AddUrlSegment ("id", recordId);
+        request.AddHeader ("Accept", "application/json");
+        var response = Connection.Execute (request);
+        var obj =  JsonDocument.Parse (response.Content);
+        var result = ViafData.Parse (obj);
+
+        return result;
+    }
+
+    #endregion
 }

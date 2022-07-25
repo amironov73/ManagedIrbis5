@@ -12,263 +12,269 @@
 
 #region Using directives
 
-using System.Text;
-
 using AM;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Повторяющаяся группа.
+/// </summary>
+public sealed class PftGroup
+    : PftNode
 {
+    #region Properties
+
     /// <summary>
-    /// Повторяющаяся группа.
+    /// Throw an exception when empty group detected?
     /// </summary>
-    public sealed class PftGroup
-        : PftNode
+    public static bool ThrowOnEmpty { get; set; }
+
+    /// <inheritdoc cref="PftNode.ComplexExpression"/>
+    public override bool ComplexExpression => true;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Static constructor.
+    /// </summary>
+    static PftGroup()
     {
-        #region Properties
+        ThrowOnEmpty = false;
+    }
 
-        /// <summary>
-        /// Throw an exception when empty group detected?
-        /// </summary>
-        public static bool ThrowOnEmpty { get; set; }
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftGroup()
+    {
+    } // constructor
 
-        /// <inheritdoc cref="PftNode.ComplexExpression"/>
-        public override bool ComplexExpression => true;
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftGroup
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.LeftParenthesis);
+    } // constructor
 
-        #endregion
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftGroup
+        (
+            params PftNode[] children
+        )
+        : base (children)
+    {
+    } // constructor
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Static constructor.
-        /// </summary>
-        static PftGroup()
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        compiler.CompileNodes (Children);
+
+        var actionName = compiler.CompileAction (Children);
+
+        compiler.StartMethod (this);
+
+        if (!string.IsNullOrEmpty (actionName))
         {
-            ThrowOnEmpty = false;
+            compiler
+                .WriteIndent()
+                .WriteLine ("DoGroup({0});", actionName);
         }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftGroup()
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    } // method Compile
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        if (context.CurrentGroup is not null)
         {
-        } // constructor
+            Magna.Logger.LogError
+                (
+                    nameof (PftGroup) + "::" + nameof (Execute)
+                    + ": nested group detected at {Token}",
+                    this
+                );
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftGroup
-            (
-                PftToken token
-            )
-            : base(token)
+            throw new PftSemanticException
+                (
+                    "Nested group detected: "
+                    + this
+                );
+        }
+
+        if (Children.Count == 0)
         {
-            token.MustBe(PftTokenKind.LeftParenthesis);
-        } // constructor
+            Magna.Logger.LogTrace
+                (
+                    nameof (PftGroup) + "::" + nameof (Execute)
+                    + ": empty group detected at {Token}",
+                    this
+                );
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftGroup
-            (
-                params PftNode[] children
-            )
-            : base(children)
-        {
-        } // constructor
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
-        {
-            compiler.CompileNodes(Children);
-
-            var actionName = compiler.CompileAction(Children);
-
-            compiler.StartMethod(this);
-
-            if (!string.IsNullOrEmpty(actionName))
+            if (ThrowOnEmpty)
             {
-                compiler
-                    .WriteIndent()
-                    .WriteLine("DoGroup({0});", actionName);
-            }
-
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
-        } // method Compile
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            if (!ReferenceEquals(context.CurrentGroup, null))
-            {
-                Magna.Error
-                    (
-                        nameof(PftGroup) + "::" + nameof(Execute)
-                        + ": nested group detected: "
-                        + this
-                    );
-
                 throw new PftSemanticException
                     (
-                        "Nested group: "
+                        "Empty group detected: "
                         + this
                     );
             }
+        }
 
-            if (Children.Count == 0)
-            {
-                Magna.Error
-                    (
-                        nameof(PftGroup) + "::" + nameof(Execute)
-                        + ": empty group detected: "
-                        + this
-                    );
+        try
+        {
+            context.CurrentGroup = this;
 
-                if (ThrowOnEmpty)
-                {
-                    throw new PftSemanticException
-                        (
-                            "Empty group: "
-                            + this
-                        );
-                }
-            }
+            OnBeforeExecution (context);
 
             try
             {
-                context.CurrentGroup = this;
-
-                OnBeforeExecution(context);
-
-                try
-                {
-                    context.DoRepeatableAction
-                        (
-                            ctx =>
+                context.DoRepeatableAction
+                    (
+                        ctx =>
+                        {
+                            foreach (var child in Children)
                             {
-                                foreach (var child in Children)
-                                {
-                                    child.Execute(ctx);
-                                }
+                                child.Execute (ctx);
                             }
-                        );
-                }
-                catch (PftBreakException exception)
-                {
-                    // It was break operator
-
-                    Magna.TraceException
-                        (
-                            "PftGroup::Execute",
-                            exception
-                        );
-                }
-
-                OnAfterExecution(context);
+                        }
+                    );
             }
-            finally
+            catch (PftBreakException exception)
             {
-                context.CurrentGroup = null;
-            }
-        } // method Execute
+                // It was break operator
 
-        /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode? Optimize()
+                Magna.Logger.LogWarning
+                    (
+                        exception,
+                        nameof (PftGroup) + "::" + nameof (Execute)
+                    );
+            }
+
+            OnAfterExecution (context);
+        }
+        finally
         {
-            var children = (PftNodeCollection) Children;
-            children.Optimize();
+            context.CurrentGroup = null;
+        }
+    }
 
-            if (children.Count == 0)
-            {
-                // Take the node away from the AST
+    /// <inheritdoc cref="PftNode.Optimize" />
+    public override PftNode? Optimize()
+    {
+        var children = (PftNodeCollection)Children;
+        children.Optimize();
 
-                return null;
-            }
-
-            return this;
-        } // method Optimize
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
+        if (children.Count == 0)
         {
-            var isComplex = PftUtility.IsComplexExpression(Children);
-            if (isComplex)
-            {
-                printer.EatWhitespace();
-                printer.EatNewLine();
-                printer.WriteLine();
-                printer
-                    .WriteIndent()
-                    .Write('(');
-                printer.IncreaseLevel();
-                printer.WriteLine();
-                printer.WriteIndent();
-            }
-            else
-            {
-                printer
-                    .WriteIndentIfNeeded()
-                    .Write("( ");
-            }
-            base.PrettyPrint(printer);
-            if (isComplex)
-            {
-                printer.EatWhitespace();
-                printer.EatNewLine();
-                printer.WriteLine()
-                    .DecreaseLevel()
-                    .WriteIndent()
-                    .Write(')')
-                    .WriteLine();
-            }
-            else
-            {
-                printer
-                    .WriteIndentIfNeeded()
-                    .Write(')');
-            }
-        } // method PrettyPrint
+            // Take the node away from the AST
 
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        protected internal override bool ShouldSerializeText() => false;
+            return null;
+        }
 
-        #endregion
+        return this;
+    }
 
-        #region Object members
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
+        var isComplex = PftUtility.IsComplexExpression (Children);
+        if (isComplex)
         {
-            var result = new StringBuilder();
-            result.Append('(');
-            PftUtility.NodesToText(result, Children);
-            result.Append(')');
+            printer.EatWhitespace();
+            printer.EatNewLine();
+            printer.WriteLine();
+            printer
+                .WriteIndent()
+                .Write ('(');
+            printer.IncreaseLevel();
+            printer.WriteLine();
+            printer.WriteIndent();
+        }
+        else
+        {
+            printer
+                .WriteIndentIfNeeded()
+                .Write ("( ");
+        }
 
-            return result.ToString();
-        } // method ToString
+        base.PrettyPrint (printer);
+        if (isComplex)
+        {
+            printer.EatWhitespace();
+            printer.EatNewLine();
+            printer.WriteLine()
+                .DecreaseLevel()
+                .WriteIndent()
+                .Write (')')
+                .WriteLine();
+        }
+        else
+        {
+            printer
+                .WriteIndentIfNeeded()
+                .Write (')');
+        }
+    }
 
-        #endregion
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    protected internal override bool ShouldSerializeText() => false;
 
-    } // class PftGroup
+    #endregion
 
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ('(');
+        PftUtility.NodesToText (builder, Children);
+        builder.Append (')');
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
+
+    #endregion
+}

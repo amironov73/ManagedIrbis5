@@ -17,77 +17,85 @@ using AM;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Сирота - ложная ссылка на поле/подполе.
+/// </summary>
+public sealed class PftOrphan
+    : PftField
 {
-    /// <summary>
-    /// Сирота - ложная ссылка на поле/подполе.
-    /// </summary>
-    public sealed class PftOrphan
-        : PftField
+    #region Properties
+
+    /// <inheritdoc cref="PftNode.ConstantExpression" />
+    public override bool ConstantExpression => true;
+
+    /// <inheritdoc cref="PftNode.RequiresConnection" />
+    public override bool RequiresConnection => false;
+
+    #endregion
+
+    #region Private members
+
+    private bool _traced;
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftField.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
     {
-        #region Properties
+        Sure.NotNull (compiler);
 
-        /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression => true;
+        compiler.StartMethod (this);
 
-        /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection => false;
+        // Nothing to do here
 
-        #endregion
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
 
-        #region Private members
+    /// <inheritdoc cref="PftField.GetAffectedFields" />
+    public override int[] GetAffectedFields() => Array.Empty<int>();
 
-        private bool _traced;
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
 
-        #endregion
+        OnBeforeExecution (context);
 
-        #region PftNode members
+        // Nothing to do here
 
-        /// <inheritdoc cref="PftField.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
+        if (!_traced)
         {
-            compiler.StartMethod(this);
+            Magna.Logger.LogTrace
+                (
+                    nameof (PftOrphan) + "::" + nameof (Execute)
+                    + ": at {Token}",
+                    this
+                );
+            _traced = true;
+        }
 
-            // Nothing to do here
+        OnAfterExecution (context);
+    } // method Execute
 
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
-        } // method Compile
+    /// <inheritdoc cref="PftNode.Optimize" />
+    public override PftNode? Optimize() => null;
 
-        /// <inheritdoc cref="PftField.GetAffectedFields" />
-        public override int[] GetAffectedFields() => Array.Empty<int>();
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            // Nothing to do here
-
-            if (!_traced)
-            {
-                Magna.Trace(nameof(PftOrphan) + "::" + nameof(Execute));
-                _traced = true;
-            }
-
-            OnAfterExecution(context);
-        } // method Execute
-
-        /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode? Optimize() => null;
-
-        #endregion
-
-    } // method PftOrphan
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #endregion
+}

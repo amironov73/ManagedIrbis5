@@ -264,17 +264,6 @@ public sealed class PftConditionAndOr
             throw new PftSyntaxException();
         }
 
-        if (RightOperand is null)
-        {
-            Magna.Logger.LogError
-                (
-                    nameof (PftConditionAndOr) + "::" + nameof (Execute)
-                    + ": RightOperand not set"
-                );
-
-            throw new PftSyntaxException();
-        }
-
         if (string.IsNullOrEmpty (Operation))
         {
             Magna.Logger.LogError
@@ -286,32 +275,34 @@ public sealed class PftConditionAndOr
             throw new PftSyntaxException();
         }
 
-
         LeftOperand.Execute (context);
         var left = LeftOperand.Value;
 
         // TODO оптимизация: не вычислять правую часть, если не нужно
-        RightOperand.Execute (context);
-        var right = RightOperand.Value;
+        if (RightOperand is not null)
+        {
+            RightOperand.Execute (context);
+            var right = RightOperand.Value;
 
-        if (Operation.SameString ("and"))
-        {
-            left = left && right;
-        }
-        else if (Operation.SameString ("or"))
-        {
-            left = left || right;
-        }
-        else
-        {
-            Magna.Logger.LogError
-                (
-                    nameof (PftConditionAndOr) + "::" + nameof (Execute)
-                    + ": unexpected operation {Operation}",
-                    Operation.ToVisibleString()
-                );
+            if (Operation.SameString ("and"))
+            {
+                left = left && right;
+            }
+            else if (Operation.SameString ("or"))
+            {
+                left = left || right;
+            }
+            else
+            {
+                Magna.Logger.LogError
+                    (
+                        nameof (PftConditionAndOr) + "::" + nameof (Execute)
+                        + ": unexpected operation {Operation}",
+                        Operation.ToVisibleString()
+                    );
 
-            throw new PftSyntaxException();
+                throw new PftSyntaxException();
+            }
         }
 
         Value = left;

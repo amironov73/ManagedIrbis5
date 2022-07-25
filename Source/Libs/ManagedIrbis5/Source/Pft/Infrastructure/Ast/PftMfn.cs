@@ -22,196 +22,212 @@ using AM.IO;
 
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Для вывода номера записи в файле документов служит
+/// команда MFN, формат которой:
+///
+/// MFN или MFN(d),
+///
+/// где d - количество выводимых на экран цифр.
+/// Если параметр(d) опущен, то по умолчанию
+/// предполагается 6 цифр.
+/// </summary>
+public sealed class PftMfn
+    : PftNumeric
 {
+    #region Constants
+
     /// <summary>
-    /// Для вывода номера записи в файле документов служит
-    /// команда MFN, формат которой:
-    ///
-    /// MFN или MFN(d),
-    ///
-    /// где d - количество выводимых на экран цифр.
-    /// Если параметр(d) опущен, то по умолчанию
-    /// предполагается 6 цифр.
+    /// Default width.
     /// </summary>
-    public sealed class PftMfn
-        : PftNumeric
+    public const int DefaultWidth = 10;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Width of the output.
+    /// </summary>
+    public int Width { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftMfn()
     {
-        #region Constants
+        Width = DefaultWidth;
+    }
 
-        /// <summary>
-        /// Default width.
-        /// </summary>
-        public const int DefaultWidth = 10;
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftMfn
+        (
+            int width
+        )
+    {
+        Sure.Positive (width);
 
-        #endregion
+        Width = width;
+    }
 
-        #region Properties
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftMfn
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.Mfn);
 
-        /// <summary>
-        /// Width of the output.
-        /// </summary>
-        public int Width { get; set; }
+        Width = DefaultWidth;
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftMfn()
+        try
         {
-            Width = DefaultWidth;
-        } // constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftMfn
-            (
-                int width
-            )
-        {
-            Sure.Positive(width, nameof(width));
-
-            Width = width;
-        } // constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftMfn
-            (
-                PftToken token
-            )
-            : base(token)
-        {
-            token.MustBe(PftTokenKind.Mfn);
-
-            Width = DefaultWidth;
-
-            try
+            var text = token.Text;
+            if (!string.IsNullOrEmpty (text))
             {
-                var text = token.Text;
-                if (!string.IsNullOrEmpty(text))
+                if (text.Length > 3)
                 {
-                    if (text.Length > 3)
+                    text = text.Substring (3);
+                    text = text.TrimStart ('(').TrimEnd (')');
+
+                    Width = int.Parse (text);
+                    if (Width <= 0)
                     {
-                        text = text.Substring(3);
-                        text = text.TrimStart('(').TrimEnd(')');
+                        Magna.Logger.LogError
+                            (
+                                nameof (PftMfn) + "::Constructor"
+                                + ": width={Width}",
+                                Width
+                            );
 
-                        Width = int.Parse(text);
-                        if (Width <= 0)
-                        {
-                            Magna.Error
-                                (
-                                    "PftMfn::Constructor: "
-                                    + "Width="
-                                    + Width
-                                );
-
-                            throw new PftSyntaxException(token);
-                        }
+                        throw new PftSyntaxException (token);
                     }
                 }
             }
-            catch (Exception exception)
-            {
-                Magna.TraceException
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (PftMfn) + "::Constructor"
+                );
+
+            throw new PftSyntaxException (token, exception);
+        }
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        base.Deserialize (reader);
+
+        Width = reader.ReadPackedInt32();
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        Value = 0.0;
+
+        if (context.Record is { } record)
+        {
+            Value = record.Mfn;
+
+            var text = Width == 0
+                ? record.Mfn.ToInvariantString()
+                : record.Mfn.ToString
                     (
-                        "PftMfn::Constructor",
-                        exception
+                        new string ('0', Width),
+                        CultureInfo.InvariantCulture
                     );
 
-                throw new PftSyntaxException(token, exception);
-            }
+            context.Write
+                (
+                    this,
+                    text
+                );
+        }
 
-        } // constructor
+        OnAfterExecution (context);
+    }
 
-        #endregion
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        #region PftNode members
+        base.Serialize (writer);
 
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
+        writer.WritePackedInt32 (Width);
+    }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
+
+        printer.Write ("mfn");
+        if (Width > 0
+            && Width != DefaultWidth)
         {
-            base.Deserialize(reader);
+            printer.Write ('(')
+                .Write (Width)
+                .Write (')');
+        }
+    }
 
-            Width = reader.ReadPackedInt32();
-        } // method Deserialize
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    protected internal override bool ShouldSerializeText() => false;
 
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
+    #endregion
 
-            Value = 0.0;
+    #region Object members
 
-            if (context.Record is { } record)
-            {
-                Value = record.Mfn;
+    /// <inheritdoc cref="PftNode.ToString"/>
+    public override string ToString()
+    {
+        return Width.ToInvariantString ("mfn#");
+    }
 
-                var text = Width == 0
-                    ? record.Mfn.ToInvariantString()
-                    : record.Mfn.ToString
-                        (
-                            new string('0', Width),
-                            CultureInfo.InvariantCulture
-                        );
-
-                context.Write
-                    (
-                        this,
-                        text
-                    );
-            }
-
-            OnAfterExecution(context);
-        } // method Execute
-
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
-        {
-            base.Serialize(writer);
-
-            writer.WritePackedInt32(Width);
-        } // method Serialize
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer.Write("mfn");
-            if (Width > 0
-                && Width != DefaultWidth)
-            {
-                printer.Write('(')
-                    .Write(Width)
-                    .Write(')');
-            }
-        } // method PrettyPrint
-
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        protected internal override bool ShouldSerializeText() => false;
-
-        #endregion
-
-    } // class PftMfn
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #endregion
+}

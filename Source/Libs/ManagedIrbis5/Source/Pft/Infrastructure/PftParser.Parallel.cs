@@ -7,139 +7,135 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftParser.Parallel.cs --
+/* PftParser.Parallel.cs -- часть PFT-парсера, связанная с параллельностью
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
 
 using ManagedIrbis.Pft.Infrastructure.Ast;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure
+namespace ManagedIrbis.Pft.Infrastructure;
+
+//
+// Часть PFT-парсера, связанная с параллельностью.
+//
+partial class PftParser
 {
-    partial class PftParser
+    //=================================================
+
+    private PftNode ParseParallel()
     {
+        PftNode result;
 
-        //=================================================
-
-        private PftNode ParseParallel()
+        var nextToken = Tokens.Peek();
+        switch (nextToken)
         {
-            PftNode result;
+            case PftTokenKind.LeftParenthesis:
+                result = ParseParallelGroup();
+                break;
 
-            PftTokenKind nextToken = Tokens.Peek();
-            switch (nextToken)
-            {
-                case PftTokenKind.LeftParenthesis:
-                    result = ParseParallelGroup();
-                    break;
+            case PftTokenKind.For:
+                result = ParseParallelFor();
+                break;
 
-                case PftTokenKind.For:
-                    result = ParseParallelFor();
-                    break;
+            case PftTokenKind.ForEach:
+                result = ParseParallelForEach();
+                break;
 
-                case PftTokenKind.ForEach:
-                    result = ParseParallelForEach();
-                    break;
+            case PftTokenKind.With:
+                result = ParseParallelWith();
+                break;
 
-                case PftTokenKind.With:
-                    result = ParseParallelWith();
-                    break;
-
-                default:
-                    Magna.Error
-                        (
-                            "PftParser::ParseParallel: "
-                            + "unexpected token="
-                            + nextToken
-                        );
-
-                    throw new PftSyntaxException(Tokens);
-            }
-
-            return result;
-        }
-
-        //=================================================
-
-        /// <summary>
-        /// For loop.
-        /// </summary>
-        /// <example>
-        /// parallel for $x=0; $x &lt; 10; $x = $x+1;
-        /// do
-        ///     $x, ') ',
-        ///     'Прикольно же!'
-        ///     #
-        /// end
-        /// </example>
-        private PftNode ParseParallelFor()
-        {
-            PftParallelFor result = new PftParallelFor(Tokens.Current);
-
-            return result;
-        }
-
-        //=================================================
-
-        private PftNode ParseParallelForEach()
-        {
-            PftParallelForEach result = new PftParallelForEach(Tokens.Current);
-
-            return result;
-        }
-
-        //=================================================
-
-        private PftNode ParseParallelGroup()
-        {
-            PftParallelGroup result = new PftParallelGroup(Tokens.Current);
-
-            if (_inGroup)
-            {
-                Magna.Error
+            default:
+                Magna.Logger.LogError
                     (
-                        "PftParser::ParseParallelGroup: "
-                        + "nested group detected"
+                        nameof (PftParser) + "::" + nameof (ParseParallel)
+                        + ": unexpected token {Token}",
+                        nextToken
                     );
 
-                throw new PftSyntaxException("no nested group enabled");
-            }
-
-            try
-            {
-                _inGroup = true;
-
-                Tokens.RequireNext();
-                ParseCall2(result);
-            }
-            finally
-            {
-                _inGroup = false;
-            }
-
-            return result;
+                throw new PftSyntaxException (Tokens);
         }
 
-        //=================================================
+        return result;
+    }
 
-        private PftNode ParseParallelWith()
+    //=================================================
+
+    /// <summary>
+    /// For loop.
+    /// </summary>
+    /// <example>
+    /// parallel for $x=0; $x &lt; 10; $x = $x+1;
+    /// do
+    ///     $x, ') ',
+    ///     'Прикольно же!'
+    ///     #
+    /// end
+    /// </example>
+    private PftNode ParseParallelFor()
+    {
+        var result = new PftParallelFor (Tokens.Current);
+
+        return result;
+    }
+
+    //=================================================
+
+    private PftNode ParseParallelForEach()
+    {
+        var result = new PftParallelForEach (Tokens.Current);
+
+        return result;
+    }
+
+    //=================================================
+
+    private PftNode ParseParallelGroup()
+    {
+        var result = new PftParallelGroup (Tokens.Current);
+
+        if (_inGroup)
         {
-            PftParallelWith result = new PftParallelWith(Tokens.Current);
+            Magna.Logger.LogError
+                (
+                    nameof (PftParser) + "::" + nameof (ParseParallelGroup)
+                    + ": nested group detected"
+                );
 
-            return result;
+            throw new PftSyntaxException ("no nested group enabled");
         }
 
+        try
+        {
+            _inGroup = true;
+
+            Tokens.RequireNext();
+            ParseCall2 (result);
+        }
+        finally
+        {
+            _inGroup = false;
+        }
+
+        return result;
+    }
+
+    //=================================================
+
+    private PftNode ParseParallelWith()
+    {
+        var result = new PftParallelWith (Tokens.Current);
+
+        return result;
     }
 }

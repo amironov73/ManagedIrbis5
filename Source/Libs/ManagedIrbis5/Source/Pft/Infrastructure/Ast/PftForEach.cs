@@ -22,355 +22,370 @@ using System.Text;
 
 using AM;
 using AM.Linq;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// foreach $x in (v692^g,/)
+/// do
+///     $x, #
+///     if $x:'2010' then break fi
+/// end
+/// </summary>
+public sealed class PftForEach
+    : PftNode
 {
+    #region Properties
+
     /// <summary>
-    /// foreach $x in (v692^g,/)
-    /// do
-    ///     $x, #
-    ///     if $x:'2010' then break fi
-    /// end
+    /// Variable reference.
     /// </summary>
-    public sealed class PftForEach
-        : PftNode
+    public PftVariableReference? Variable { get; set; }
+
+    /// <summary>
+    /// Sequence.
+    /// </summary>
+    public PftNodeCollection Sequence { get; private set; }
+
+    /// <summary>
+    /// Body.
+    /// </summary>
+    public PftNodeCollection Body { get; private set; }
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax" />
+    public override bool ExtendedSyntax => true;
+
+    /// <inheritdoc cref="PftNode.ComplexExpression"/>
+    public override bool ComplexExpression => true;
+
+    /// <inheritdoc cref="PftNode.Children" />
+    public override IList<PftNode> Children
     {
-        #region Properties
-
-        /// <summary>
-        /// Variable reference.
-        /// </summary>
-        public PftVariableReference? Variable { get; set; }
-
-        /// <summary>
-        /// Sequence.
-        /// </summary>
-        public PftNodeCollection Sequence { get; private set; }
-
-        /// <summary>
-        /// Body.
-        /// </summary>
-        public PftNodeCollection Body { get; private set; }
-
-        /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax => true;
-
-        /// <inheritdoc cref="PftNode.ComplexExpression"/>
-        public override bool ComplexExpression => true;
-
-        /// <inheritdoc cref="PftNode.Children" />
-        public override IList<PftNode> Children
+        get
         {
-            get
+            if (ReferenceEquals (_virtualChildren, null))
             {
-                if (ReferenceEquals(_virtualChildren, null))
-                {
-                    _virtualChildren = new VirtualChildren();
-                    var nodes = new List<PftNode>();
-                    nodes.AddRange(Sequence);
-                    nodes.AddRange(Body);
-                    _virtualChildren.SetChildren(nodes);
-                }
-
-                return _virtualChildren;
-            }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
-
-                Magna.Error
-                    (
-                        "PftForEach::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
-        } // property Children
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftForEach()
-        {
-            Sequence = new PftNodeCollection(this);
-            Body = new PftNodeCollection(this);
-        } // constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftForEach
-            (
-                PftToken token
-            )
-            : base(token)
-        {
-            token.MustBe(PftTokenKind.ForEach);
-
-            Sequence = new PftNodeCollection(this);
-            Body = new PftNodeCollection(this);
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private VirtualChildren? _virtualChildren;
-
-        private string[] GetSequence
-            (
-                PftContext context
-            )
-        {
-            var result = new List<string>();
-
-            foreach (var node in Sequence)
-            {
-                var text = context.Evaluate(node);
-                if (!string.IsNullOrEmpty(text))
-                {
-                    var lines = text.SplitLines()
-                        .NonEmptyLines()
-                        .ToArray();
-                    result.AddRange(lines);
-                }
+                _virtualChildren = new VirtualChildren();
+                var nodes = new List<PftNode>();
+                nodes.AddRange (Sequence);
+                nodes.AddRange (Body);
+                _virtualChildren.SetChildren (nodes);
             }
 
-            return result.ToArray();
-        } // method GetSequence
+            return _virtualChildren;
+        }
 
-        #endregion
-
-        #region ICloneable members
-
-        /// <inheritdoc cref="ICloneable.Clone" />
-        public override object Clone()
+        [ExcludeFromCodeCoverage]
+        protected set
         {
-            var result = (PftForEach)base.Clone();
-            result._virtualChildren = null;
-            result.Sequence = Sequence.CloneNodes(result).ThrowIfNull();
-            result.Body = Body.CloneNodes(result).ThrowIfNull();
+            // Nothing to do here
 
-            if (Variable is { } variable)
-            {
-                result.Variable = (PftVariableReference)variable.Clone();
-            }
-
-            return result;
-        } // method Clone
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.CompareNode"/>
-        internal override void CompareNode
-            (
-                PftNode otherNode
-            )
-        {
-            base.CompareNode(otherNode);
-
-            var otherForEach = (PftForEach) otherNode;
-            PftSerializationUtility.CompareNodes
+            Magna.Logger.LogError
                 (
-                    Variable,
-                    otherForEach.Variable
+                    nameof (PftForEach) + "::" + nameof (Children)
+                    + ": set value={Value}",
+                    value.ToVisibleString()
                 );
-            PftSerializationUtility.CompareLists
+        }
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftForEach()
+    {
+        Sequence = new PftNodeCollection (this);
+        Body = new PftNodeCollection (this);
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftForEach
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.ForEach);
+
+        Sequence = new PftNodeCollection (this);
+        Body = new PftNodeCollection (this);
+    }
+
+    #endregion
+
+    #region Private members
+
+    private VirtualChildren? _virtualChildren;
+
+    private string[] GetSequence
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        var result = new List<string>();
+        foreach (var node in Sequence)
+        {
+            var text = context.Evaluate (node);
+            if (!string.IsNullOrEmpty (text))
+            {
+                var lines = text.SplitLines()
+                    .NonEmptyLines()
+                    .ToArray();
+                result.AddRange (lines);
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    #endregion
+
+    #region ICloneable members
+
+    /// <inheritdoc cref="ICloneable.Clone" />
+    public override object Clone()
+    {
+        var result = (PftForEach )base.Clone();
+        result._virtualChildren = null;
+        result.Sequence = Sequence.CloneNodes (result).ThrowIfNull();
+        result.Body = Body.CloneNodes (result).ThrowIfNull();
+
+        if (Variable is not null)
+        {
+            result.Variable = (PftVariableReference) Variable.Clone();
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.CompareNode"/>
+    internal override void CompareNode
+        (
+            PftNode otherNode
+        )
+    {
+        Sure.NotNull (otherNode);
+
+        base.CompareNode (otherNode);
+
+        var otherForEach = (PftForEach) otherNode;
+        PftSerializationUtility.CompareNodes
+            (
+                Variable,
+                otherForEach.Variable
+            );
+        PftSerializationUtility.CompareLists
+            (
+                Sequence,
+                otherForEach.Sequence
+            );
+        PftSerializationUtility.CompareLists
+            (
+                Body,
+                otherForEach.Body
+            );
+    }
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        base.Deserialize (reader);
+
+        Variable = (PftVariableReference?) PftSerializer.DeserializeNullable (reader);
+        PftSerializer.Deserialize (reader, Sequence);
+        PftSerializer.Deserialize (reader, Body);
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        var variable = Variable.ThrowIfNull();
+        var name = variable.Name.ThrowIfNull();
+
+        var items = GetSequence (context);
+        try
+        {
+            foreach (var item in items)
+            {
+                context.Variables.SetVariable (name, item);
+
+                context.Execute (Body);
+            }
+        }
+        catch (PftBreakException exception)
+        {
+            // It was break operator
+
+            Magna.Logger.LogTrace
                 (
-                    Sequence,
-                    otherForEach.Sequence
+                    exception,
+                    nameof (PftForEach) + "::" + nameof (Execute)
                 );
-            PftSerializationUtility.CompareLists
-                (
-                    Body,
-                    otherForEach.Body
-                );
-        } // method CompareNode
+        }
 
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
+        OnAfterExecution (context);
+    }
+
+    /// <inheritdoc cref="PftNode.GetNodeInfo" />
+    public override PftNodeInfo GetNodeInfo()
+    {
+        var result = new PftNodeInfo
         {
-            base.Deserialize(reader);
+            Node = this,
+            Name = "ForEach"
+        };
 
-            Variable = (PftVariableReference?) PftSerializer.DeserializeNullable(reader);
-            PftSerializer.Deserialize(reader, Sequence);
-            PftSerializer.Deserialize(reader, Body);
-        } // method Deserialize
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
+        if (!ReferenceEquals (Variable, null))
         {
-            OnBeforeExecution(context);
+            result.Children.Add (Variable.GetNodeInfo());
+        }
 
-            var variable = Variable.ThrowIfNull(nameof(Variable));
-            var name = variable.Name
-                .ThrowIfNull(nameof(Variable) + "." + nameof(variable.Name));
-
-            var items = GetSequence(context);
-            try
-            {
-                foreach (var item in items)
-                {
-                    context.Variables.SetVariable(name, item);
-
-                    context.Execute(Body);
-                }
-            }
-            catch (PftBreakException exception)
-            {
-                // It was break operator
-
-                Magna.TraceException
-                    (
-                        "PftForEach::Execute",
-                        exception
-                    );
-            }
-
-            OnAfterExecution(context);
-        } // method Execute
-
-        /// <inheritdoc cref="PftNode.GetNodeInfo" />
-        public override PftNodeInfo GetNodeInfo()
+        var sequence = new PftNodeInfo
         {
-            var result = new PftNodeInfo
-            {
-                Node = this,
-                Name = "ForEach"
-            };
+            Name = "Sequence"
+        };
 
-            if (!ReferenceEquals(Variable, null))
-            {
-                result.Children.Add(Variable.GetNodeInfo());
-            }
+        result.Children.Add (sequence);
 
-            var sequence = new PftNodeInfo
-            {
-                Name = "Sequence"
-            };
+        foreach (var node in Sequence)
+        {
+            sequence.Children.Add (node.GetNodeInfo());
+        }
 
-            result.Children.Add(sequence);
+        var body = new PftNodeInfo
+        {
+            Name = "Body"
+        };
 
-            foreach (var node in Sequence)
+        result.Children.Add (body);
+        foreach (var node in Body)
+        {
+            body.Children.Add (node.GetNodeInfo());
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
+
+        printer.EatWhitespace();
+        printer.EatNewLine();
+
+        printer
+            .WriteLine()
+            .WriteIndent()
+            .Write ("foreach ");
+
+        Variable?.PrettyPrint (printer);
+        printer.Write (" in ");
+
+        var first = true;
+        foreach (var node in Sequence)
+        {
+            if (!first)
             {
-                sequence.Children.Add(node.GetNodeInfo());
+                printer.Write (", ");
             }
 
-            var body = new PftNodeInfo
-            {
-                Name = "Body"
-            };
+            node.PrettyPrint (printer);
+            first = false;
+        }
 
-            result.Children.Add(body);
-            foreach (var node in Body)
-            {
-                body.Children.Add(node.GetNodeInfo());
-            }
+        printer
+            .WriteIndent()
+            .WriteLine ("do");
 
-            return result;
-        } // method GetNodeInfo
+        printer.IncreaseLevel();
+        printer.WriteNodes (Body);
+        printer.DecreaseLevel();
+        printer.EatWhitespace();
+        printer.EatNewLine();
+        printer.WriteLine();
+        printer
+            .WriteIndent()
+            .WriteLine ("end");
+    } // method PrettyPrint
 
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer.EatWhitespace();
-            printer.EatNewLine();
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-            printer
-                .WriteLine()
-                .WriteIndent()
-                .Write("foreach ");
+        base.Serialize (writer);
 
-            Variable?.PrettyPrint(printer);
-            printer.Write(" in ");
+        PftSerializer.SerializeNullable (writer, Variable);
+        PftSerializer.Serialize (writer, Sequence);
+        PftSerializer.Serialize (writer, Body);
+    }
 
-            var first = true;
-            foreach (var node in Sequence)
-            {
-                if (!first)
-                {
-                    printer.Write(", ");
-                }
-                node.PrettyPrint(printer);
-                first = false;
-            }
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    protected internal override bool ShouldSerializeText() => false;
 
-            printer
-                .WriteIndent()
-                .WriteLine("do");
+    #endregion
 
-            printer.IncreaseLevel();
-            printer.WriteNodes(Body);
-            printer.DecreaseLevel();
-            printer.EatWhitespace();
-            printer.EatNewLine();
-            printer.WriteLine();
-            printer
-                .WriteIndent()
-                .WriteLine("end");
-        } // method PrettyPrint
+    #region Object members
 
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
-        {
-            base.Serialize(writer);
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ("foreach ");
+        builder.Append (Variable);
+        builder.Append (" in ");
+        PftUtility.NodesToText (builder, Sequence);
+        builder.Append (" do ");
+        PftUtility.NodesToText (builder, Body);
+        builder.Append (" end");
 
-            PftSerializer.SerializeNullable(writer, Variable);
-            PftSerializer.Serialize(writer, Sequence);
-            PftSerializer.Serialize(writer, Body);
-        } // method Serialize
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        protected internal override bool ShouldSerializeText() => false;
+        return result;
+    }
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-            result.Append("foreach ");
-            result.Append(Variable);
-            result.Append(" in ");
-            PftUtility.NodesToText(result, Sequence);
-            result.Append(" do ");
-            PftUtility.NodesToText(result, Body);
-            result.Append(" end");
-
-            return result.ToString();
-        } // method ToString
-
-        #endregion
-
-    } // class PftForEach
-
-} // namespace ManagedIrbis.Pft.Interface.Ast
+    #endregion
+}

@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 using AM;
 using AM.Text;
@@ -189,9 +188,9 @@ public sealed class PftRef
     {
         var result = (PftRef) base.Clone();
 
-        if (Mfn is null)
+        if (Mfn is not null)
         {
-            result.Mfn = (PftNumeric)Mfn.Clone();
+            result.Mfn = (PftNumeric) Mfn.Clone();
         }
 
         result.Format = Format.CloneNodes (result).ThrowIfNull();

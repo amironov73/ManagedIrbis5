@@ -227,7 +227,7 @@ public sealed class FieldCollection
             int capacity
         )
     {
-        Sure.Positive (capacity);
+        Sure.NonNegative (capacity);
 
         var innerList = _GetInnerList();
         if (innerList.Capacity < capacity)

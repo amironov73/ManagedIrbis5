@@ -120,7 +120,7 @@ public class DirectUtilityTest
     }
 
     [TestMethod]
-    [ExpectedException (typeof (IrbisException))]
+    [ExpectedException (typeof (ArgumentOutOfRangeException))]
     [Description ("Открытие файла в неверном формате")]
     public void DirectUtility_OpenFile_4()
     {
@@ -172,8 +172,8 @@ public class DirectUtilityTest
         var stream = mmf.CreateViewStream (0, 100, MemoryMappedFileAccess.Read);
         try
         {
-            const int expected = unchecked ((int) 0xEFBBBF23);
-            var actual = stream.ReadNetworkInt32 ();
+            const int expected = unchecked ((int)0xEFBBBF23);
+            var actual = stream.ReadNetworkInt32();
             Assert.AreEqual (expected, actual);
         }
         finally
@@ -213,7 +213,7 @@ public class DirectUtilityTest
         try
         {
             const long expected = 0x3639323AEFBBBF23;
-            var actual = stream.ReadNetworkInt64 ();
+            var actual = stream.ReadNetworkInt64();
             Assert.AreEqual (expected, actual);
         }
         finally

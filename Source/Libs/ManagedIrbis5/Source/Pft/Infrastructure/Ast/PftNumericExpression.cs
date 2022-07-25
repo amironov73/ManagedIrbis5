@@ -16,457 +16,482 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 
 using AM;
 using AM.IO;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Математическое выражение.
+/// </summary>
+public sealed class PftNumericExpression
+    : PftNumeric
 {
+    #region Properties
+
     /// <summary>
-    /// Математическое выражение
+    /// Left operand.
     /// </summary>
-    public sealed class PftNumericExpression
-        : PftNumeric
+    public PftNumeric? LeftOperand { get; set; }
+
+    /// <summary>
+    /// Operation.
+    /// </summary>
+    public string? Operation { get; set; }
+
+    /// <summary>
+    /// Right operand.
+    /// </summary>
+    public PftNumeric? RightOperand { get; set; }
+
+    /// <inheritdoc cref="PftNode.Children" />
+    public override IList<PftNode> Children
     {
-        #region Properties
-
-        /// <summary>
-        /// Left operand.
-        /// </summary>
-        public PftNumeric? LeftOperand { get; set; }
-
-        /// <summary>
-        /// Operation.
-        /// </summary>
-        public string? Operation { get; set; }
-
-        /// <summary>
-        /// Right operand.
-        /// </summary>
-        public PftNumeric? RightOperand { get; set; }
-
-        /// <inheritdoc cref="PftNode.Children" />
-        public override IList<PftNode> Children
+        get
         {
-            get
+            if (ReferenceEquals (_virtualChildren, null))
             {
-                if (ReferenceEquals(_virtualChildren, null))
+                _virtualChildren = new VirtualChildren();
+                var nodes = new List<PftNode>();
+                if (!ReferenceEquals (LeftOperand, null))
                 {
-                    _virtualChildren = new VirtualChildren();
-                    var nodes = new List<PftNode>();
-                    if (!ReferenceEquals(LeftOperand, null))
-                    {
-                        nodes.Add(LeftOperand);
-                    }
-                    if (!ReferenceEquals(RightOperand, null))
-                    {
-                        nodes.Add(RightOperand);
-                    }
-                    _virtualChildren.SetChildren(nodes);
+                    nodes.Add (LeftOperand);
                 }
 
-                return _virtualChildren;
+                if (!ReferenceEquals (RightOperand, null))
+                {
+                    nodes.Add (RightOperand);
+                }
+
+                _virtualChildren.SetChildren (nodes);
             }
-            protected set => Magna.Error
+
+            return _virtualChildren;
+        }
+
+        [ExcludeFromCodeCoverage]
+        protected set
+        {
+            Magna.Logger.LogError
                 (
-                    "PftNumericExpression::Children: "
-                    + "set value="
-                    + value.ToVisibleString()
+                    nameof (PftNumericExpression) + "::" + nameof (Children)
+                    + ": set value={Value}",
+                    value.ToVisibleString()
+                );
+        }
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftNumericExpression()
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftNumericExpression
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftNumericExpression
+        (
+            PftNumeric leftOperand,
+            string operation,
+            PftNumeric rightOperand
+        )
+    {
+        Sure.NotNull (leftOperand);
+        Sure.NotNullNorEmpty (operation);
+        Sure.NotNull (rightOperand);
+
+        LeftOperand = leftOperand;
+        Operation = operation;
+        RightOperand = rightOperand;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private VirtualChildren? _virtualChildren;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Do the operation.
+    /// </summary>
+    public static double DoOperation
+        (
+            PftContext context,
+            double leftValue,
+            string operation,
+            double rightValue
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNullNorEmpty (operation);
+
+        operation = operation.ToLowerInvariant();
+
+        double result;
+        switch (operation)
+        {
+            case "+":
+                result = leftValue + rightValue;
+                break;
+
+            case "-":
+                result = leftValue - rightValue;
+                break;
+
+            case "*":
+                result = leftValue * rightValue;
+                break;
+
+            case "/":
+                result = leftValue / rightValue;
+                break;
+
+            case "%":
+                // ReSharper disable PossibleLossOfFraction
+                result = (int) leftValue % (int) rightValue;
+
+                // ReSharper enable PossibleLossOfFraction
+                break;
+
+            case "div":
+                // ReSharper disable PossibleLossOfFraction
+                result = (int) leftValue / (int) rightValue;
+
+                // ReSharper enable PossibleLossOfFraction
+                break;
+
+            default:
+                Magna.Logger.LogError
+                    (
+                        nameof (PftNumericExpression) + "::" + nameof (DoOperation)
+                        + ": unexpected operation={Operation}",
+                        operation
+                    );
+
+                throw new PftSyntaxException ("Unexpected operation " + operation);
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region ICloneable members
+
+    /// <inheritdoc cref="ICloneable.Clone" />
+    public override object Clone()
+    {
+        var result = (PftNumericExpression) base.Clone();
+
+        if (LeftOperand is not null)
+        {
+            result.LeftOperand = (PftNumeric) LeftOperand.Clone();
+        }
+
+        if (RightOperand is not null)
+        {
+            result.RightOperand = (PftNumeric) RightOperand.Clone();
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.CompareNode" />
+    internal override void CompareNode
+        (
+            PftNode otherNode
+        )
+    {
+        Sure.NotNull (otherNode);
+
+        base.CompareNode (otherNode);
+
+        var otherExpression = (PftNumericExpression) otherNode;
+        PftSerializationUtility.CompareNodes
+            (
+                LeftOperand,
+                otherExpression.LeftOperand
+            );
+        PftSerializationUtility.CompareNodes
+            (
+                RightOperand,
+                otherExpression.RightOperand
+            );
+        if (Operation != otherExpression.Operation)
+        {
+            throw new IrbisException();
+        }
+    }
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        Sure.NotNull (compiler);
+
+        if (LeftOperand is null
+            || RightOperand is null
+            || string.IsNullOrEmpty (Operation))
+        {
+            throw new PftCompilerException();
+        }
+
+        LeftOperand.Compile (compiler);
+        RightOperand.Compile (compiler);
+
+        compiler.StartMethod (this);
+
+        compiler
+            .WriteIndent()
+            .WriteLine ("PftContext previousContext = StartEvaluate();");
+
+        compiler
+            .WriteIndent()
+            .Write ("double left = ")
+            .CallNodeMethod (LeftOperand)
+            .WriteLine();
+        compiler
+            .WriteIndent()
+            .Write ("double right = ")
+            .CallNodeMethod (RightOperand)
+            .WriteLine();
+        compiler
+            .WriteIndent()
+            .WriteLine
+                (
+                    "double result = left {0} right;",
+                    Operation
+                );
+        compiler
+            .WriteIndent()
+            .WriteLine ("EndEvaluate(previousContext);")
+            .WriteIndent()
+            .WriteLine ("return result;");
+
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        base.Deserialize (reader);
+
+        LeftOperand = (PftNumeric?) PftSerializer.DeserializeNullable (reader);
+        Operation = reader.ReadNullableString();
+        RightOperand = (PftNumeric?) PftSerializer.DeserializeNullable (reader);
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        if (LeftOperand is null)
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (PftNumericExpression) + "::" + nameof (Execute)
+                    + ": left operand is not specified"
+                );
+
+            throw new PftSyntaxException (this);
+        }
+
+        if (string.IsNullOrEmpty (Operation))
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (PftNumericExpression) + "::" + nameof (Execute)
+                    + ": operation is not specified"
+                );
+
+            throw new PftSyntaxException (this);
+        }
+
+        if (RightOperand is null)
+        {
+            Magna.Logger.LogError
+                (
+                    nameof (PftNumericExpression) + "::" + nameof (Execute)
+                    + ": right operand is not specified"
+                );
+
+            throw new PftSyntaxException (this);
+        }
+
+        using (var guard = new PftContextGuard (context))
+        {
+            var clone = guard.ChildContext;
+            clone.Evaluate (LeftOperand);
+            var leftValue = LeftOperand.Value;
+            clone.Evaluate (RightOperand);
+            var rightValue = RightOperand.Value;
+            Value = DoOperation
+                (
+                    context,
+                    leftValue,
+                    Operation.ThrowIfNull(),
+                    rightValue
                 );
         }
 
-        #endregion
+        OnAfterExecution (context);
+    }
 
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftNumericExpression()
+    /// <inheritdoc cref="PftNode.GetNodeInfo" />
+    public override PftNodeInfo GetNodeInfo()
+    {
+        var result = new PftNodeInfo
         {
-        } // constructor
+            Node = this,
+            Name = SimplifyTypeName (GetType().Name)
+        };
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftNumericExpression
-            (
-                [NotNull] PftToken token
-            )
-            : base(token)
+        if (LeftOperand is not null)
         {
-        } // constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftNumericExpression
-            (
-                [NotNull] PftNumeric leftOperand,
-                [NotNull] string operation,
-                [NotNull] PftNumeric rightOperand
-            )
-        {
-            LeftOperand = leftOperand;
-            Operation = operation;
-            RightOperand = rightOperand;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private VirtualChildren? _virtualChildren;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Do the operation.
-        /// </summary>
-        public static double DoOperation
-            (
-                [NotNull] PftContext context,
-                double leftValue,
-                [NotNull] string operation,
-                double rightValue
-            )
-        {
-            operation = operation.ToLowerInvariant();
-
-            double result;
-            switch (operation)
+            var leftNode = new PftNodeInfo
             {
-                case "+":
-                    result = leftValue + rightValue;
-                    break;
-
-                case "-":
-                    result = leftValue - rightValue;
-                    break;
-
-                case "*":
-                    result = leftValue * rightValue;
-                    break;
-
-                case "/":
-                    result = leftValue / rightValue;
-                    break;
-
-                case "%":
-                    // ReSharper disable PossibleLossOfFraction
-                    result = (int)leftValue % (int)rightValue;
-                    // ReSharper enable PossibleLossOfFraction
-                    break;
-
-                case "div":
-                    // ReSharper disable PossibleLossOfFraction
-                    result = (int)leftValue / (int)rightValue;
-                    // ReSharper enable PossibleLossOfFraction
-                    break;
-
-                default:
-                    Magna.Error
-                        (
-                            nameof(PftNumericExpression) + "::" + nameof(DoOperation)
-                            + ": unexpected operation="
-                            + operation
-                        );
-
-                    throw new PftSyntaxException();
-            }
-
-            return result;
-        } // method DoOperation
-
-        #endregion
-
-        #region ICloneable members
-
-        /// <inheritdoc cref="ICloneable.Clone" />
-        public override object Clone()
-        {
-            var result = (PftNumericExpression) base.Clone();
-
-            if (LeftOperand is { } left)
-            {
-                result.LeftOperand = (PftNumeric) left.Clone();
-            }
-
-            if (RightOperand is { } right)
-            {
-                result.RightOperand = (PftNumeric) right.Clone();
-            }
-
-            return result;
-        } // method Clone
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.CompareNode" />
-        internal override void CompareNode
-            (
-                PftNode otherNode
-            )
-        {
-            base.CompareNode(otherNode);
-
-            var otherExpression = (PftNumericExpression) otherNode;
-            PftSerializationUtility.CompareNodes
-                (
-                    LeftOperand,
-                    otherExpression.LeftOperand
-                );
-            PftSerializationUtility.CompareNodes
-                (
-                    RightOperand,
-                    otherExpression.RightOperand
-                );
-            if (Operation != otherExpression.Operation)
-            {
-                throw new IrbisException();
-            }
-        } // method CompareNode
-
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
-        {
-            if (ReferenceEquals(LeftOperand, null)
-                || ReferenceEquals(RightOperand, null)
-                || string.IsNullOrEmpty(Operation))
-            {
-                throw new PftCompilerException();
-            }
-
-            LeftOperand.Compile(compiler);
-            RightOperand.Compile(compiler);
-
-            compiler.StartMethod(this);
-
-            compiler
-                .WriteIndent()
-                .WriteLine("PftContext previousContext = StartEvaluate();");
-
-            compiler
-                .WriteIndent()
-                .Write("double left = ")
-                .CallNodeMethod(LeftOperand)
-                .WriteLine();
-            compiler
-                .WriteIndent()
-                .Write("double right = ")
-                .CallNodeMethod(RightOperand)
-                .WriteLine();
-            compiler
-                .WriteIndent()
-                .WriteLine
-                    (
-                        "double result = left {0} right;",
-                        Operation
-                    );
-            compiler
-                .WriteIndent()
-                .WriteLine("EndEvaluate(previousContext);")
-                .WriteIndent()
-                .WriteLine("return result;");
-
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
-        } // method Compile
-
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
-        {
-            base.Deserialize(reader);
-
-            LeftOperand = (PftNumeric?) PftSerializer.DeserializeNullable(reader);
-            Operation = reader.ReadNullableString();
-            RightOperand = (PftNumeric?) PftSerializer.DeserializeNullable(reader);
-        } // method Deserialize
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            if (LeftOperand is null)
-            {
-                Magna.Error
-                    (
-                        nameof(PftNumericExpression) + "::" + nameof(Execute)
-                        + ": LeftOperand not specified"
-                    );
-
-                throw new PftSyntaxException(this);
-            }
-
-            if (string.IsNullOrEmpty(Operation))
-            {
-                Magna.Error
-                    (
-                        nameof(PftNumericExpression) + "::" + nameof(Execute)
-                        + ": Operation not specified"
-                    );
-
-                throw new PftSyntaxException(this);
-            }
-
-            if (RightOperand is null)
-            {
-                Magna.Error
-                    (
-                        nameof(PftNumericExpression) + "::" + nameof(Execute)
-                        + ": RightOperand not specified"
-                    );
-
-                throw new PftSyntaxException(this);
-            }
-
-            using (var guard = new PftContextGuard(context))
-            {
-                var clone = guard.ChildContext;
-                clone.Evaluate(LeftOperand);
-                var leftValue = LeftOperand.Value;
-                clone.Evaluate(RightOperand);
-                var rightValue = RightOperand.Value;
-                Value = DoOperation
-                    (
-                        context,
-                        leftValue,
-                        Operation.ThrowIfNull(),
-                        rightValue
-                    );
-            }
-
-            OnAfterExecution(context);
-        } // method Execute
-
-        /// <inheritdoc cref="PftNode.GetNodeInfo" />
-        public override PftNodeInfo GetNodeInfo()
-        {
-            var result = new PftNodeInfo
-            {
-                Node = this,
-                Name = SimplifyTypeName(GetType().Name)
+                Node = LeftOperand,
+                Name = "Left"
             };
+            result.Children.Add (leftNode);
+            leftNode.Children.Add (LeftOperand.GetNodeInfo());
+        }
 
-            if (LeftOperand is { } left)
-            {
-                var leftNode = new PftNodeInfo
-                {
-                    Node = left,
-                    Name = "Left"
-                };
-                result.Children.Add(leftNode);
-                leftNode.Children.Add(LeftOperand.GetNodeInfo());
-            }
-
-            if (!string.IsNullOrEmpty(Operation))
-            {
-                var operationNode = new PftNodeInfo
-                {
-                    Name = "Operation",
-                    Value = Operation
-                };
-                result.Children.Add(operationNode);
-            }
-
-            if (RightOperand is { } right)
-            {
-                var rightNode = new PftNodeInfo
-                {
-                    Node = right,
-                    Name = "Right"
-                };
-                result.Children.Add(rightNode);
-                rightNode.Children.Add(RightOperand.GetNodeInfo());
-            }
-
-            return result;
-        } // method GetNodeInfo
-
-        /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
+        if (!string.IsNullOrEmpty (Operation))
         {
-            if (LeftOperand is { } left)
+            var operationNode = new PftNodeInfo
             {
-                LeftOperand = (PftNumeric?) left.Optimize();
-            }
+                Name = "Operation",
+                Value = Operation
+            };
+            result.Children.Add (operationNode);
+        }
 
-            if (RightOperand is { } right)
+        if (RightOperand is not null)
+        {
+            var rightNode = new PftNodeInfo
             {
-                RightOperand = (PftNumeric?) right.Optimize();
-            }
+                Node = RightOperand,
+                Name = "Right"
+            };
+            result.Children.Add (rightNode);
+            rightNode.Children.Add (RightOperand.GetNodeInfo());
+        }
 
-            return this;
-        } // method Optimize
+        return result;
+    }
 
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            LeftOperand?.PrettyPrint(printer);
-            printer.Write(" {0} ", Operation ?? String.Empty);
-            RightOperand?.PrettyPrint(printer);
-        } // method PrettyPrint
+    /// <inheritdoc cref="PftNode.Optimize" />
+    public override PftNode Optimize()
+    {
+        LeftOperand = (PftNumeric?)LeftOperand?.Optimize();
+        RightOperand = (PftNumeric?)RightOperand?.Optimize();
 
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
-        {
-            base.Serialize(writer);
+        return this;
+    }
 
-            PftSerializer.SerializeNullable(writer, LeftOperand);
-            writer.WriteNullable(Operation);
-            PftSerializer.SerializeNullable(writer, RightOperand);
-        } // method Serialize
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
 
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        protected internal override bool ShouldSerializeText() => false;
+        LeftOperand?.PrettyPrint (printer);
+        printer.Write (" {0} ", Operation ?? string.Empty);
+        RightOperand?.PrettyPrint (printer);
+    }
 
-        #endregion
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        #region Object members
+        base.Serialize (writer);
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-            result.Append(LeftOperand);
-            result.Append(Operation);
-            result.Append(RightOperand);
+        PftSerializer.SerializeNullable (writer, LeftOperand);
+        writer.WriteNullable (Operation);
+        PftSerializer.SerializeNullable (writer, RightOperand);
+    }
 
-            return result.ToString();
-        } // method ToString
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    protected internal override bool ShouldSerializeText() => false;
 
-        #endregion
+    #endregion
 
-    } // class PftNumericExpression
+    #region Object members
 
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (LeftOperand);
+        builder.Append (Operation);
+        builder.Append (RightOperand);
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
+
+    #endregion
+}

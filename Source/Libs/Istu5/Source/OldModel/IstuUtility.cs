@@ -27,6 +27,7 @@ using LinqToDB.Data;
 using LinqToDB.DataProvider.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -49,6 +50,8 @@ public static class IstuUtility
             this IServiceCollection services
         )
     {
+        Sure.NotNull (services);
+
         services.AddTransient<Storehouse>();
 
         services.AddTransient<IAttendanceManager, AttendanceManager>();
@@ -68,6 +71,8 @@ public static class IstuUtility
             string connectionString
         )
     {
+        Sure.NotNullNorEmpty (connectionString);
+
         try
         {
             var result = SqlServerTools.CreateDataConnection (connectionString);
@@ -76,7 +81,11 @@ public static class IstuUtility
         }
         catch (Exception exception)
         {
-            Magna.TraceException (nameof (IstuUtility) + "::" + nameof (GetMsSqlConnection), exception);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (IstuUtility) + "::" + nameof (GetMsSqlConnection)
+                );
             throw;
         }
     }

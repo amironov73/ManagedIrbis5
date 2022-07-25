@@ -20,6 +20,8 @@ using AM;
 
 using ManagedIrbis.Server;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -43,21 +45,43 @@ static class Program
     {
         try
         {
-            Magna.Info ("START");
+            Magna.Logger.LogInformation
+                (
+                    nameof (Program) + "::" + nameof (RunServer)
+                    + ": START"
+                );
 
             await using (Engine = ServerUtility.CreateEngine (args))
             {
                 ServerUtility.DumpEngineSettings (Engine);
-                Magna.Info ("Entering server main loop");
+                Magna.Logger.LogInformation
+                    (
+                        nameof (Program) + "::" + nameof (RunServer)
+                        + ": Entering server main loop"
+                    );
+
                 await Engine.MainLoop();
-                Magna.Info ("Leave server main loop");
+
+                Magna.Logger.LogInformation
+                    (
+                        nameof (Program) + "::" + nameof (RunServer)
+                        + ": Leaving server main loop"
+                    );
             }
 
-            Magna.Info ("STOP");
+            Magna.Logger.LogInformation
+                (
+                    nameof (Program) + "::" + nameof (RunServer)
+                    + ": STOP"
+                );
         }
         catch (Exception exception)
         {
-            Magna.TraceException (nameof (Program) + "::" + nameof (RunServer), exception);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    nameof (Program) + "::" + nameof (RunServer)
+                );
         }
     }
 
