@@ -181,6 +181,7 @@ public sealed class GblBuilderTest
     {
         var provider = new NullProvider();
         var builder = new GblBuilder();
+        provider.SetConnected (true);
         builder.Nop();
 
         var result = builder.Execute (provider, "IBIS", "A=NONE");

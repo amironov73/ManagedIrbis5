@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 
@@ -59,7 +60,15 @@ public static class SyncProviderUtility
             string? database = default
         )
     {
-        return connection.ActualizeRecord (new () { Database = database, Mfn = 0 });
+        Sure.NotNull (connection);
+        connection.EnsureConnected();
+
+        var parameters = new ActualizeRecordParameters
+        {
+            Mfn = 0,
+            Database = connection.EnsureDatabase (database)
+        };
+        return connection.ActualizeRecord (parameters);
     }
 
     /// <summary>
@@ -71,6 +80,10 @@ public static class SyncProviderUtility
             string fileName
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNullNorEmpty (fileName);
+        connection.EnsureConnected();
+
         connection.FormatRecord ($"&if('+9K{fileName}')", 1);
     }
 
@@ -83,15 +96,14 @@ public static class SyncProviderUtility
             int mfn
         )
     {
+        Sure.NotNull (connection);
+        Sure.Positive (mfn);
+        connection.EnsureConnected();
+
         var record = connection.ReadRecord (mfn);
-        if (record is null)
+        if (record is null || record.Deleted)
         {
             return false;
-        }
-
-        if (record.Deleted)
-        {
-            return true;
         }
 
         record.Status |= RecordStatus.LogicallyDeleted;
@@ -118,12 +130,15 @@ public static class SyncProviderUtility
     /// <summary>
     /// Подстановка имени текущей базы данных, если она не задана явно.
     /// </summary>
+    [Pure]
     public static string EnsureDatabase
         (
             this IIrbisProvider connection,
             string? database = null
         )
     {
+        Sure.NotNull (connection);
+
         return string.IsNullOrEmpty (database)
             ? string.IsNullOrEmpty (connection.Database)
                 ? throw new ArgumentException (nameof (connection.Database))
@@ -142,6 +157,8 @@ public static class SyncProviderUtility
         )
     {
         Sure.NotNull (connection);
+        Sure.NotNull (format);
+        connection.EnsureConnected();
 
         var parameters = new FormatRecordParameters
         {
@@ -165,6 +182,11 @@ public static class SyncProviderUtility
             Record record
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull (format);
+        Sure.NotNull (record);
+        connection.EnsureConnected();
+
         var parameters = new FormatRecordParameters
         {
             Database = connection.Database,
@@ -187,6 +209,11 @@ public static class SyncProviderUtility
             string format
         )
     {
+        Sure.NotNull (conneciton);
+        Sure.NotNull (mfns);
+        Sure.NotNull (format);
+        conneciton.EnsureConnected();
+
         var parameters = new FormatRecordParameters
         {
             Database = conneciton.Database,
@@ -208,6 +235,10 @@ public static class SyncProviderUtility
             string listFile = "dbnam3.mnu"
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNullNorEmpty (listFile);
+        connection.EnsureConnected();
+
         var specification = new FileSpecification
         {
             Path = IrbisPath.Data,
@@ -227,6 +258,9 @@ public static class SyncProviderUtility
             int mfn
         )
     {
+        Sure.NotNull (connection);
+        Sure.NonNegative (mfn);
+
         var parameters = new ReadRecordParameters
         {
             Mfn = mfn,
@@ -245,10 +279,9 @@ public static class SyncProviderUtility
             string prefix
         )
     {
-        if (!connection.CheckProviderState())
-        {
-            return Array.Empty<Term>();
-        }
+        Sure.NotNull (connection);
+        Sure.NotNull (prefix);
+        connection.EnsureConnected();
 
         prefix = prefix.ToUpperInvariant();
         var result = new List<Term>();
@@ -304,6 +337,10 @@ public static class SyncProviderUtility
             FileSpecification specification
         )
     {
+        Sure.NotNull (connection);
+        Sure.VerifyNotNull (specification);
+        connection.EnsureConnected();
+
         var content = connection.ReadTextFile (specification);
         if (content is null)
         {
@@ -324,6 +361,10 @@ public static class SyncProviderUtility
             FileSpecification specification
         )
     {
+        Sure.NotNull (provider);
+        Sure.VerifyNotNull (specification);
+        provider.EnsureConnected();
+
         var content = provider.ReadTextFile (specification);
         if (content is null)
         {
@@ -346,6 +387,10 @@ public static class SyncProviderUtility
             FileSpecification specification
         )
     {
+        Sure.NotNull (provider);
+        Sure.VerifyNotNull (specification);
+        provider.EnsureConnected();
+
         var content = provider.ReadTextFile (specification);
         if (content is null)
         {
@@ -368,6 +413,10 @@ public static class SyncProviderUtility
             FileSpecification specification
         )
     {
+        Sure.NotNull (provider);
+        Sure.VerifyNotNull (specification);
+        provider.EnsureConnected();
+
         var text = provider.ReadTextFile (specification);
         if (text is null)
         {
@@ -388,6 +437,10 @@ public static class SyncProviderUtility
             int mfn
         )
     {
+        Sure.NotNull (connection);
+        Sure.Positive (mfn);
+        connection.EnsureConnected();
+
         var parameters = new ReadRecordParameters
         {
             Database = connection.Database,
@@ -418,6 +471,10 @@ public static class SyncProviderUtility
             int mfn
         )
     {
+        Sure.NotNull (connection);
+        Sure.Positive (mfn);
+        connection.EnsureConnected();
+
         var parameters = new ReadRecordParameters
         {
             Database = connection.Database,
@@ -437,13 +494,12 @@ public static class SyncProviderUtility
             IEnumerable<int> batch
         )
     {
-        if (!connection.CheckProviderState())
-        {
-            return null;
-        }
+        Sure.NotNull (connection);
+        Sure.NotNull ((object?) batch);
+        connection.EnsureConnected();
+        database = connection.EnsureDatabase (database);
 
-        int[] mfns = batch is int[] array ? array : batch.ToArray();
-
+        var mfns = batch as int[] ?? batch.ToArray();
         switch (mfns.Length)
         {
             case 0:
@@ -453,7 +509,14 @@ public static class SyncProviderUtility
                 // TODO: use database parameter
 
                 return Sequence
-                    .FromItem (connection.ReadRecord (mfns[0]))
+                    .FromItem
+                        (
+                            connection.ReadRecord (new ReadRecordParameters
+                                {
+                                    Database = database,
+                                    Mfn = mfns[0]
+                                })
+                        )
                     .NonNullItems()
                     .ToArray();
         }
@@ -507,6 +570,11 @@ public static class SyncProviderUtility
             int numberOfTerms
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull (startTerm);
+        Sure.NonNegative (numberOfTerms);
+        connection.EnsureConnected();
+
         var parameters = new TermParameters
         {
             Database = connection.Database,
@@ -527,6 +595,10 @@ public static class SyncProviderUtility
             int mfn
         )
     {
+        Sure.NotNull (connection);
+        Sure.Positive (mfn);
+        connection.EnsureConnected();
+
         return connection.ReadRecord (mfn)
                ?? throw new IrbisException ($"Record not found: MFN={mfn}");
     }
@@ -541,6 +613,10 @@ public static class SyncProviderUtility
             string expression
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull (expression);
+        connection.EnsureConnected();
+
         return connection.SearchReadOneRecord (expression)
                ?? throw new IrbisException ($"Record not found: expression={expression}");
     }
@@ -555,6 +631,10 @@ public static class SyncProviderUtility
             FileSpecification specification
         )
     {
+        Sure.NotNull (connection);
+        Sure.VerifyNotNull (specification);
+        connection.EnsureConnected();
+
         return connection.ReadTextFile (specification)
                ?? throw new IrbisException ($"File not found: {specification}");
     }
@@ -569,6 +649,10 @@ public static class SyncProviderUtility
             FileSpecification specification
         )
     {
+        Sure.NotNull (connection);
+        Sure.VerifyNotNull (specification);
+        connection.EnsureConnected();
+
         return connection.ReadFstFile (specification)
                ?? throw new IrbisException ($"FST not found: {specification}");
     }
@@ -583,6 +667,10 @@ public static class SyncProviderUtility
             FileSpecification specification
         )
     {
+        Sure.NotNull (connection);
+        Sure.VerifyNotNull (specification);
+        connection.EnsureConnected();
+
         return connection.ReadIniFile (specification)
                ?? throw new IrbisException ($"INI not found: {specification}");
     }
@@ -597,6 +685,10 @@ public static class SyncProviderUtility
             FileSpecification specification
         )
     {
+        Sure.NotNull (connection);
+        Sure.VerifyNotNull (specification);
+        connection.EnsureConnected();
+
         return connection.ReadMenuFile (specification)
                ?? throw new IrbisException ($"Menu not found: {specification}");
     }
@@ -611,6 +703,10 @@ public static class SyncProviderUtility
             FileSpecification specification
         )
     {
+        Sure.NotNull (connection);
+        Sure.VerifyNotNull (specification);
+        connection.EnsureConnected();
+
         return connection.ReadParFile (specification)
                ?? throw new IrbisException ($"PAR not found: {specification}");
     }
@@ -624,6 +720,10 @@ public static class SyncProviderUtility
             string expression
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull (expression);
+        connection.EnsureConnected();
+
         var parameters = new SearchParameters
         {
             Database = connection.Database,
@@ -644,10 +744,9 @@ public static class SyncProviderUtility
             string expression
         )
     {
-        if (!connection.CheckProviderState())
-        {
-            return -1;
-        }
+        Sure.NotNull (connection);
+        Sure.NotNull (expression);
+        connection.EnsureConnected();
 
         var parameters = new SearchParameters
         {
@@ -671,6 +770,10 @@ public static class SyncProviderUtility
             string expression
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull (expression);
+        connection.EnsureConnected();
+
         var parameters = new SearchParameters
         {
             Expression = expression,
@@ -697,6 +800,10 @@ public static class SyncProviderUtility
             string expression
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull (expression);
+        connection.EnsureConnected();
+
         var parameters = new SearchParameters
         {
             Expression = expression,
@@ -722,6 +829,10 @@ public static class SyncProviderUtility
             bool dontParse = false
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull (record);
+        connection.EnsureConnected();
+
         var parameters = new WriteRecordParameters
         {
             Record = record,

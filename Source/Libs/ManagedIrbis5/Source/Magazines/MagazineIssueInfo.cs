@@ -40,7 +40,7 @@ using ManagedIrbis.Fields;
 namespace ManagedIrbis.Magazines;
 
 /// <summary>
-/// Сведения о номере журнала
+/// Сведения о номере журнала.
 /// </summary>
 [XmlRoot ("issue")]
 [DebuggerDisplay ("{Year} {Number} {Supplement}")]
@@ -53,17 +53,17 @@ public sealed class MagazineIssueInfo
     /// <summary>
     /// MFN записи.
     /// </summary>
+    [DisplayName ("MFN")]
     [XmlAttribute ("mfn")]
     [JsonPropertyName ("mfn")]
-    [Description ("MFN")]
     public int Mfn { get; set; }
 
     /// <summary>
     /// Шифр записи.
     /// </summary>
+    [DisplayName ("Шифр в базе")]
     [XmlAttribute ("index")]
     [JsonPropertyName ("index")]
-    [Description ("Шифр в базе")]
     public string? Index { get; set; }
 
     /// <summary>
@@ -71,12 +71,13 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("description")]
     [JsonPropertyName ("description")]
-    [Description ("Библиографическое описание")]
+    [DisplayName ("Библиографическое описание")]
     public string? Description { get; set; }
 
     /// <summary>
     /// Шифр документа в базе. Поле 903.
     /// </summary>
+    [DisplayName ("Шифр документа")]
     [XmlAttribute ("document-code")]
     [JsonPropertyName ("document-code")]
     public string? DocumentCode { get; set; }
@@ -84,17 +85,17 @@ public sealed class MagazineIssueInfo
     /// <summary>
     /// Шифр журнала. Поле 933.
     /// </summary>
+    [DisplayName ("Шифр журнала")]
     [XmlAttribute ("magazine-code")]
     [JsonPropertyName ("magazine-code")]
-    [Description ("Шифр журнала")]
     public string? MagazineCode { get; set; }
 
     /// <summary>
     /// Год. Поле 934.
     /// </summary>
+    [DisplayName ("Год")]
     [XmlAttribute ("year")]
     [JsonPropertyName ("year")]
-    [Description ("Год")]
     public string? Year { get; set; }
 
     /// <summary>
@@ -102,7 +103,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("volume")]
     [JsonPropertyName ("volume")]
-    [Description ("Том (если есть)")]
+    [DisplayName ("Том (если есть)")]
     public string? Volume { get; set; }
 
     /// <summary>
@@ -110,7 +111,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("number")]
     [JsonPropertyName ("number")]
-    [Description ("Номер, часть")]
+    [DisplayName ("Номер, часть")]
     public string? Number { get; set; }
 
     /// <summary>
@@ -119,26 +120,14 @@ public sealed class MagazineIssueInfo
     [XmlIgnore]
     [JsonIgnore]
     [Browsable (false)]
-    public string? NumberForSorting
-    {
-        get
-        {
-            var result = Number;
-            if (!string.IsNullOrEmpty (result))
-            {
-                result = result.Trim();
-            }
-
-            return result;
-        }
-    }
+    public string? NumberForSorting => Number?.Trim();
 
     /// <summary>
     /// Дополнение к номеру. Поле 931^c.
     /// </summary>
     [XmlAttribute ("supplement")]
     [JsonPropertyName ("supplement")]
-    [Description ("Дополнение к номеру")]
+    [DisplayName ("Дополнение к номеру")]
     public string? Supplement { get; set; }
 
     /// <summary>
@@ -147,7 +136,7 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlAttribute ("worksheet")]
     [JsonPropertyName ("worksheet")]
-    [Description ("Рабочий лист")]
+    [DisplayName ("Рабочий лист")]
     public string? Worksheet { get; set; }
 
     /// <summary>
@@ -155,23 +144,23 @@ public sealed class MagazineIssueInfo
     /// </summary>
     [XmlElement ("article")]
     [JsonPropertyName ("articles")]
-    [Description ("Расписанное оглавление")]
+    [DisplayName ("Расписанное оглавление")]
     public MagazineArticleInfo[]? Articles { get; set; }
 
     /// <summary>
     /// Экземпляры. Поле 910.
     /// </summary>
     [XmlElement ("exemplar")]
+    [DisplayName ("Экземпляры")]
     [JsonPropertyName ("exemplars")]
-    [Description ("Экземпляры")]
     public ExemplarInfo[]? Exemplars { get; set; }
 
     /// <summary>
-    /// Количество выдач.
+    /// Количество выдач. Поле 999.
     /// </summary>
     [XmlElement ("loanCount")]
     [JsonPropertyName ("loanCount")]
-    [Description ("Количество выдач")]
+    [DisplayName ("Количество выдач")]
     public int LoanCount { get; set; }
 
     /// <summary>
@@ -183,7 +172,7 @@ public sealed class MagazineIssueInfo
     public bool IsBinding => Worksheet.SameString ("NJK");
 
     /// <summary>
-    /// Record.
+    /// Библиографическая запись.
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]
@@ -285,8 +274,7 @@ public sealed class MagazineIssueInfo
             .AddNonEmptyField (920, Worksheet)
             .AddNonEmptyField (999, LoanCount.ToString());
 
-        var articles = Articles;
-        if (!ReferenceEquals (articles, null))
+        if (Articles is { } articles)
         {
             foreach (var article in articles)
             {
@@ -294,8 +282,7 @@ public sealed class MagazineIssueInfo
             }
         }
 
-        var exemplars = Exemplars;
-        if (!ReferenceEquals (exemplars, null))
+        if (Exemplars is { } exemplars)
         {
             foreach (var exemplar in exemplars)
             {

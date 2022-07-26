@@ -2,15 +2,12 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* MagazineCumulation.cs -- данные о кумуляции номеров
+/* MagazineCumulation.cs -- данные о кумуляции номеров журнала
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -34,7 +31,7 @@ using AM.Runtime;
 namespace ManagedIrbis.Magazines;
 
 /// <summary>
-/// Данные о кумуляции номеров. Поле 909.
+/// Данные о кумуляции номеров журнала. Поле 909.
 /// </summary>
 [XmlRoot ("cumulation")]
 public sealed class MagazineCumulation
@@ -60,6 +57,7 @@ public sealed class MagazineCumulation
     /// <summary>
     /// Год. Подполе Q.
     /// </summary>
+    [DisplayName ("Год")]
     [XmlAttribute ("year")]
     [JsonPropertyName ("year")]
     public string? Year { get; set; }
@@ -67,6 +65,7 @@ public sealed class MagazineCumulation
     /// <summary>
     /// Том. Подполе F.
     /// </summary>
+    [DisplayName ("Том")]
     [XmlAttribute ("volume")]
     [JsonPropertyName ("volume")]
     public string? Volume { get; set; }
@@ -74,6 +73,7 @@ public sealed class MagazineCumulation
     /// <summary>
     /// Место хранения. Подполе D.
     /// </summary>
+    [DisplayName ("Место хранения")]
     [XmlAttribute ("place")]
     [JsonPropertyName ("place")]
     public string? Place { get; set; }
@@ -81,6 +81,7 @@ public sealed class MagazineCumulation
     /// <summary>
     /// Кумулированные номера. Подполе H.
     /// </summary>
+    [DisplayName ("Кумулированные номера")]
     [XmlAttribute ("numbers")]
     [JsonPropertyName ("numbers")]
     public string? Numbers { get; set; }
@@ -88,6 +89,7 @@ public sealed class MagazineCumulation
     /// <summary>
     /// Номер комплекта. Подполе K.
     /// </summary>
+    [DisplayName ("Номер комплекта")]
     [XmlAttribute ("set")]
     [JsonPropertyName ("set")]
     public string? ComplectNumber { get; set; }
@@ -95,6 +97,7 @@ public sealed class MagazineCumulation
     /// <summary>
     /// Неопознанные подполя.
     /// </summary>
+    [Browsable (false)]
     [XmlElement ("unknown")]
     [JsonPropertyName ("unknown")]
     public SubField[]? UnknownSubFields { get; set; }
@@ -177,7 +180,7 @@ public sealed class MagazineCumulation
 
         return record.Fields
             .GetField (tag)
-            .Select (field => ParseField (field))
+            .Select (ParseField)
             .ToArray();
     }
 
@@ -187,12 +190,11 @@ public sealed class MagazineCumulation
     [ExcludeFromCodeCoverage]
     public bool ShouldSerializeUnknownSubFields()
     {
-        return !ReferenceEquals (UnknownSubFields, null)
-               && UnknownSubFields.Length != 0;
+        return UnknownSubFields is { Length: not 0 };
     }
 
     /// <summary>
-    /// Convert back to <see cref="Field"/>.
+    /// Преобразование в поле записи <see cref="Field"/>.
     /// </summary>
     public Field ToField()
     {

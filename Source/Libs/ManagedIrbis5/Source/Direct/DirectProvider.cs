@@ -48,7 +48,7 @@ namespace ManagedIrbis.Direct;
 /// </summary>
 public class DirectProvider
     : ISyncProvider,
-    ISetLastError
+        ISetLastError
 {
     #region Events
 
@@ -82,13 +82,14 @@ public class DirectProvider
     /// <summary>
     /// Fall-forward path.
     /// </summary>
-    public string? FallForwardPath { get; set;}
+    public string? FallForwardPath { get; set; }
 
     #endregion
 
     #region ISupportLogging members
 
     /// <inheritdoc cref="ISupportLogging.Logger"/>
+
     // TODO implement
     public ILogger? Logger => _logger;
 
@@ -130,8 +131,8 @@ public class DirectProvider
         _caching = caching ?? new TransientCaching();
         _locking = locking ?? new NullLocking();
         _serviceProvider = serviceProvider;
-        _logger = (ILogger?) GetService (typeof(ILogger<MstFile64>));
-        _logger?.LogTrace ($"{nameof(DirectProvider)}::Constructor ({rootPath}, {mode})");
+        _logger = (ILogger?)GetService (typeof (ILogger<MstFile64>));
+        _logger?.LogTrace ($"{nameof (DirectProvider)}::Constructor ({rootPath}, {mode})");
 
         var fullPath = Path.GetFullPath (rootPath);
         if (!Directory.Exists (fullPath))
@@ -170,7 +171,7 @@ public class DirectProvider
     {
         Sure.NotNullNorEmpty (databaseName);
 
-        _logger?.LogTrace ($"{nameof(DirectProvider)}::{nameof(LockUp)} ({databaseName})");
+        _logger?.LogTrace ($"{nameof (DirectProvider)}::{nameof (LockUp)} ({databaseName})");
 
         var success = _locking.LockDatabase (this, databaseName);
         var result = new LockMark (this, _locking, databaseName, success);
@@ -188,8 +189,8 @@ public class DirectProvider
     {
         // TODO: искать в Deposit_User
 
-        var result = Unix.FindFile(DirectUtility.CombinePath(DataPath, "Deposit", fileName));
-        if (!File.Exists(result))
+        var result = Unix.FindFile (DirectUtility.CombinePath (DataPath, "Deposit", fileName));
+        if (!File.Exists (result))
         {
             result = null;
         }
@@ -217,14 +218,14 @@ public class DirectProvider
         else
         {
             result = Unix.FindFile
-                (
-                    DirectUtility.CombinePath
-                        (
-                            databasePath,
-                            fileName
-                        )
-                )
-                ?? Deposit (fileName);
+                         (
+                             DirectUtility.CombinePath
+                                 (
+                                     databasePath,
+                                     fileName
+                                 )
+                         )
+                     ?? Deposit (fileName);
         }
 
         return result;
@@ -314,8 +315,8 @@ public class DirectProvider
             return default;
         }
 
-        var result = Path.GetFullPath(DirectUtility.CombinePath(RootPath, mstPath));
-        if (result.EndsWith(Path.DirectorySeparatorChar))
+        var result = Path.GetFullPath (DirectUtility.CombinePath (RootPath, mstPath));
+        if (result.EndsWith (Path.DirectorySeparatorChar))
         {
             result = result.Substring (0, result.Length - 1);
         }
@@ -353,8 +354,8 @@ public class DirectProvider
     /// <summary>
     /// Поиск файла по его спецификации.
     /// </summary>
-    public string? MapFile(IrbisPath path, string database, string fileName) =>
-        MapFile(new FileSpecification {Path = path, Database = database, FileName = fileName});
+    public string? MapFile (IrbisPath path, string database, string fileName) =>
+        MapFile (new FileSpecification { Path = path, Database = database, FileName = fileName });
 
     /// <summary>
     /// Поиск файла по его спецификации.
@@ -382,13 +383,13 @@ public class DirectProvider
         var fileName = specification.FileName;
         if (string.IsNullOrEmpty (fileName))
         {
-            throw new IrbisException (nameof(fileName));
+            throw new IrbisException (nameof (fileName));
         }
 
         if (forReading
-            && !string.IsNullOrEmpty(FallForwardPath))
+            && !string.IsNullOrEmpty (FallForwardPath))
         {
-            result = Unix.FindFile(DirectUtility.CombinePath (FallForwardPath, fileName));
+            result = Unix.FindFile (DirectUtility.CombinePath (FallForwardPath, fileName));
             if (result is not null)
             {
                 return Path.GetFullPath (result);
@@ -397,7 +398,7 @@ public class DirectProvider
 
         var database = specification.Database
                        ?? Database
-                       ?? throw new IrbisException(nameof(Database));
+                       ?? throw new IrbisException (nameof (Database));
 
         result = specification.Path switch
         {
@@ -409,7 +410,7 @@ public class DirectProvider
                 DatabaseOrDeposit (fileName, database),
 
             // TODO: мапить согласно PAR-файлу
-            (IrbisPath) 11 => fileName,
+            (IrbisPath)11 => fileName,
 
             _ => throw new IrbisException()
         };
@@ -426,7 +427,7 @@ public class DirectProvider
             result = Unix.FindFile (DirectUtility.CombinePath (FallBackPath, fileName));
         }
 
-        if (string.IsNullOrEmpty(result))
+        if (string.IsNullOrEmpty (result))
         {
             result = null;
             Magna.Logger.LogWarning
@@ -437,7 +438,7 @@ public class DirectProvider
         }
         else
         {
-            result = Path.GetFullPath(result);
+            result = Path.GetFullPath (result);
         }
 
         return result;
@@ -513,7 +514,7 @@ public class DirectProvider
     {
         Sure.VerifyNotNull (specification);
 
-        var fullPath = MapFile(specification);
+        var fullPath = MapFile (specification);
 
         return fullPath is not null;
     }
@@ -522,11 +523,7 @@ public class DirectProvider
     public string GetGeneration() => "64";
 
     /// <inheritdoc cref="IIrbisProvider.PlatformAbstraction"/>
-    public PlatformAbstractionLayer PlatformAbstraction
-    {
-        get;
-        set;
-    }
+    public PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
     /// <inheritdoc cref="IIrbisProvider.Configure"/>
     public void Configure
@@ -569,9 +566,10 @@ public class DirectProvider
     /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
-        _logger?.LogTrace($"{nameof (DirectProvider)}::{nameof (Dispose)}");
+        _logger?.LogTrace ($"{nameof (DirectProvider)}::{nameof (Dispose)}");
 
-        Disposing.Raise(this);
+        IsConnected = false;
+        Disposing.Raise (this);
         _access.Dispose();
     }
 
@@ -596,7 +594,7 @@ public class DirectProvider
             bool busy
         )
     {
-        Busy.SetState(busy);
+        Busy.SetState (busy);
     }
 
     /// <summary>
@@ -613,7 +611,7 @@ public class DirectProvider
     /// <summary>
     /// Установка кода ошибки.
     /// </summary>
-    private void SetLastError(int code)
+    private void SetLastError (int code)
     {
         LastError = code;
     }
@@ -668,7 +666,7 @@ public class DirectProvider
     /// <inheritdoc cref="ISyncProvider.Connect"/>
     public bool Connect()
     {
-        // TODO: что делать?
+        IsConnected = true;
 
         return true;
     }
@@ -749,7 +747,7 @@ public class DirectProvider
             var result = new List<string> (records.Length);
             foreach (var record in records)
             {
-                result.Add(FormatRecord (program, record));
+                result.Add (FormatRecord (program, record));
             }
 
             parameters.Result = result.ToArray();
@@ -875,7 +873,7 @@ public class DirectProvider
     {
         var text = ReadTextFile (IrbisPath.Data, "client_m.mnu");
 
-        return string.IsNullOrEmpty(text) ? default : UserInfo.Parse (text);
+        return string.IsNullOrEmpty (text) ? default : UserInfo.Parse (text);
     }
 
     /// <inheritdoc cref="ISyncProvider.NoOperation"/>
@@ -925,7 +923,7 @@ public class DirectProvider
         (
             ReadRecordParameters parameters
         )
-        where T: class, IRecord, new()
+        where T : class, IRecord, new()
     {
         Sure.NotNull (parameters);
 
@@ -1089,7 +1087,7 @@ public class DirectProvider
             string? databaseName = default
         )
     {
-        Sure.NotNull ((object?) mfnList);
+        Sure.NotNull ((object?)mfnList);
 
         using var accessProxy = GetAccessor (databaseName);
         foreach (var mfn in mfnList)
@@ -1106,7 +1104,7 @@ public class DirectProvider
             IEnumerable<string> lines
         )
     {
-        Sure.NotNull ((object?) lines);
+        Sure.NotNull ((object?)lines);
 
         throw new NotImplementedException();
     }
@@ -1117,7 +1115,7 @@ public class DirectProvider
             IEnumerable<UserInfo> users
         )
     {
-        Sure.NotNull ((object?) users);
+        Sure.NotNull ((object?)users);
 
         throw new NotImplementedException();
     }
@@ -1170,7 +1168,7 @@ public class DirectProvider
         }
 
         using var accessProxy = GetAccessor();
-        accessProxy.Accessor.WriteRecord ((Record) record);
+        accessProxy.Accessor.WriteRecord ((Record)record);
 
         return true;
     }
@@ -1180,7 +1178,7 @@ public class DirectProvider
     #region ISetLastError members
 
     /// <inheritdoc cref="ISetLastError.SetLastError"/>
-    int ISetLastError.SetLastError(int code)
+    int ISetLastError.SetLastError (int code)
     {
         return LastError = code;
     }

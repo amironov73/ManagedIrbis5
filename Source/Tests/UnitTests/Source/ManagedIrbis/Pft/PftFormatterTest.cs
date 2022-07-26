@@ -144,6 +144,8 @@ public sealed class PftFormatterTest
     public void PftFormatter_FormatRecord_2()
     {
         using var provider = GetProvider();
+        provider.Connect();
+
         var context = new PftContext (null);
         context.SetProvider (provider);
         using var formatter = new PftFormatter (context)
@@ -160,6 +162,8 @@ public sealed class PftFormatterTest
     public void PftFormatter_FormatRecords_1()
     {
         using var provider = GetProvider();
+        provider.Connect();
+
         var context = new PftContext (null);
         context.SetProvider (provider);
         using var formatter = new PftFormatter (context)
