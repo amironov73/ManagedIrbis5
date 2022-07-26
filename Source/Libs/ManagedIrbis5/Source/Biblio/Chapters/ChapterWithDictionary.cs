@@ -106,17 +106,18 @@ public class ChapterWithDictionary
             BiblioChapter chapter
         )
     {
+        Sure.NotNull (context);
+        Sure.NotNull (chapter);
+
         var log = context.Log;
         var processor = context.Processor.ThrowIfNull();
 
-        var settings = Settings;
-        if (!ReferenceEquals (settings, null))
+        if (Settings is { } settings)
         {
             var pattern = settings.GetSetting ("chapterFilter");
             if (!string.IsNullOrEmpty (pattern))
             {
-                var title = chapter.Title;
-                if (!ReferenceEquals (title, null))
+                if (chapter.Title is { } title)
                 {
                     if (!Regex.IsMatch (title, pattern))
                     {
@@ -128,9 +129,7 @@ public class ChapterWithDictionary
             }
         }
 
-        var items = chapter.Items;
-        if (!ReferenceEquals (items, null)
-            && items.Count != 0)
+        if (chapter.Items is { Count: not 0 } items)
         {
             log.WriteLine ("Gather terms from chapter {0}", chapter);
 
@@ -246,14 +245,10 @@ public class ChapterWithDictionary
 
         foreach (var term in Terms)
         {
-            var title = term.Title.ThrowIfNull();
-            var item = term.Item;
-            if (ReferenceEquals (item, null))
+            if (term is { Title: { } title, Item: { } item })
             {
-                continue;
+                Dictionary.Add (title, item.Number);
             }
-
-            Dictionary.Add (title, item.Number);
         }
 
         log.WriteLine ("End build dictionary {0}", this);

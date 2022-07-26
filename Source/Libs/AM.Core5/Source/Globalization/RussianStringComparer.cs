@@ -84,21 +84,21 @@ public class RussianStringComparer
 
     private string? _Replace
         (
-            string? str
+            string? text
         )
     {
-        if (ReferenceEquals(str, null))
+        if (string.IsNullOrEmpty (text))
         {
             return null;
         }
 
         if (ConsiderYo)
         {
-            str = str.Replace('ё', 'е')
-                .Replace('Ё', 'Е');
+            text = text.Replace ('ё', 'е')
+                .Replace ('Ё', 'Е');
         }
 
-        return str;
+        return text;
     }
 
     #endregion
@@ -112,10 +112,10 @@ public class RussianStringComparer
             string? y
         )
     {
-        var xCopy = _Replace(x);
-        var yCopy = _Replace(y);
+        var xCopy = _Replace (x);
+        var yCopy = _Replace (y);
 
-        return _innerComparer ( xCopy, yCopy );
+        return _innerComparer (xCopy, yCopy);
     }
 
     /// <inheritdoc cref="StringComparer.Equals(string?,string?)" />
@@ -125,10 +125,10 @@ public class RussianStringComparer
             string? y
         )
     {
-        var xCopy = _Replace(x);
-        var yCopy = _Replace(y);
+        var xCopy = _Replace (x);
+        var yCopy = _Replace (y);
 
-        return _innerComparer ( xCopy, yCopy ) == 0;
+        return _innerComparer (xCopy, yCopy) == 0;
     }
 
     /// <inheritdoc cref="StringComparer.GetHashCode(string)"/>
@@ -137,15 +137,14 @@ public class RussianStringComparer
             string obj
         )
     {
-        var objCopy = _Replace(obj);
+        var objCopy = _Replace (obj);
 
-        if (IgnoreCase
-            && !ReferenceEquals(objCopy, null))
+        if (IgnoreCase && objCopy is not null)
         {
             objCopy = objCopy.ToUpper();
         }
 
-        return ReferenceEquals(objCopy, null)
+        return objCopy is null
             ? 0
             : objCopy.GetHashCode();
     }

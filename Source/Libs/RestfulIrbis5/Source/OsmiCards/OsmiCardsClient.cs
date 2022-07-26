@@ -223,7 +223,6 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Запросить информацию по карте.
         /// </summary>
-        [CanBeNull]
         public OsmiCard GetCardInfo
             (
                 string cardNumber
@@ -250,7 +249,6 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Запросить "сырую" информацию по карте.
         /// </summary>
-        [CanBeNull]
         public JObject GetRawCard
             (
                 string cardNumber

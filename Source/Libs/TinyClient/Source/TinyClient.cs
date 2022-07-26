@@ -2863,7 +2863,6 @@ namespace ManagedIrbis
         ///// <summary>
         ///// Значение первого поля с указанным тегом или <c>null</c>.
         ///// </summary>
-        //[CanBeNull]
         //public static string GetFirstFieldValue
         //    (
         //        this IEnumerable<RecordField> fields,

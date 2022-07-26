@@ -254,7 +254,7 @@ public sealed class MxExecutive
 
     private bool _ExecuteLine
         (
-            [NotNull] TextNavigator navigator
+            TextNavigator navigator
         )
     {
         navigator.SkipWhitespace();

@@ -32,27 +32,27 @@ public static class ProcessUtility
     /// Запуск процесса с перехватом всего консольного вывода
     /// в строковую переменную.
     /// </summary>
-    /// <param name="info">Настройки для запуска процесса.</param>
+    /// <param name="processStartInfo">Настройки для запуска процесса.</param>
     /// <param name="standardInput">Если не <c>null</c>, задает
     /// содержимое стандартного ввода.</param>
     /// <returns>Содержимое стандартного вывода.</returns>
     [ExcludeFromCodeCoverage]
     public static string RunAndReadStandardOutput
         (
-            ProcessStartInfo info,
+            ProcessStartInfo processStartInfo,
             string? standardInput = default
         )
     {
-        Sure.NotNull (info);
+        Sure.NotNull (processStartInfo);
 
-        info.UseShellExecute = false;
-        info.RedirectStandardOutput = true;
+        processStartInfo.UseShellExecute = false;
+        processStartInfo.RedirectStandardOutput = true;
         if (standardInput is not null)
         {
-            info.RedirectStandardInput = true;
+            processStartInfo.RedirectStandardInput = true;
         }
 
-        using var process = new Process { StartInfo = info };
+        using var process = new Process { StartInfo = processStartInfo };
         if (standardInput is not null)
         {
             process.StandardInput.Write (standardInput);
@@ -82,40 +82,42 @@ public static class ProcessUtility
     {
         Sure.NotNullNorEmpty (fileName);
 
-        var psi = new ProcessStartInfo
+        var processStartInfo = new ProcessStartInfo
             (
                 fileName,
                 arguments
             );
 
-        return RunAndReadStandardOutput (psi, standardInput);
+        return RunAndReadStandardOutput (processStartInfo, standardInput);
     }
 
     /// <summary>
     /// Запуск процесса с перехватом всего консольного вывода
     /// в строковую переменную.
     /// </summary>
-    /// <param name="info">Настройки для запуска процесса.</param>
+    /// <param name="processStartInfo">Настройки для запуска процесса.</param>
     /// <param name="standardInput">Если не <c>null</c>, задает
     /// содержимое стандартного ввода.</param>
     /// <returns>Содержимого стандартных потоков вывода и ошибок.
     /// </returns>
     public static (string, string) RunAndReadStandardOutputAndError
         (
-            ProcessStartInfo info,
+            ProcessStartInfo processStartInfo,
             string? standardInput = null
         )
     {
-        info.UseShellExecute = false;
-        info.RedirectStandardOutput = true;
-        info.RedirectStandardError = true;
-        if (!ReferenceEquals (standardInput, null))
+        Sure.NotNull (processStartInfo);
+
+        processStartInfo.UseShellExecute = false;
+        processStartInfo.RedirectStandardOutput = true;
+        processStartInfo.RedirectStandardError = true;
+        if (standardInput is not null)
         {
-            info.RedirectStandardInput = true;
+            processStartInfo.RedirectStandardInput = true;
         }
 
-        using var process = new Process { StartInfo = info };
-        if (!ReferenceEquals (standardInput, null))
+        using var process = new Process { StartInfo = processStartInfo };
+        if (standardInput is not null)
         {
             process.StandardInput.Write (standardInput);
         }
@@ -155,20 +157,20 @@ public static class ProcessUtility
     /// <summary>
     /// Запускает процесс и ожидает его завершения.
     /// </summary>
-    /// <param name="info">Настройки запуска программы.</param>
+    /// <param name="processStartInfo">Настройки запуска программы.</param>
     /// <param name="milliseconds">Сколько миллисекунд ожидать.
     /// Неположительные значения = бесконечно.</param>
     /// <returns>Код, вовращенный процессом.
     /// Если с процессом не сложилось, возвращается -1.</returns>
     public static int RunAndWait
         (
-            ProcessStartInfo info,
+            ProcessStartInfo processStartInfo,
             int milliseconds = -1
         )
     {
-        Sure.NotNull (info);
+        Sure.NotNull (processStartInfo);
 
-        using var process = new Process { StartInfo = info };
+        using var process = new Process { StartInfo = processStartInfo };
         process.Start();
         if (milliseconds >= 0)
         {
@@ -203,12 +205,12 @@ public static class ProcessUtility
     {
         Sure.NotNullNorEmpty (fileName);
 
-        var psi = new ProcessStartInfo (fileName, arguments)
+        var processStartInfo = new ProcessStartInfo (fileName, arguments)
         {
             UseShellExecute = false
         };
 
-        return RunAndWait (psi, milliseconds);
+        return RunAndWait (processStartInfo, milliseconds);
     }
 
     #endregion

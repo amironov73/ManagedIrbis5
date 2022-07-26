@@ -39,12 +39,12 @@ public sealed class ConsoleProcessRunner
     #region Properties
 
     /// <summary>
-    /// Gets the receiver.
+    /// Ресивер, принимающий консольный вывод процесса.
     /// </summary>
     public IConsoleOutputReceiver? Receiver { get; private set; }
 
     /// <summary>
-    /// Gets the running process.
+    /// Собственно запущенный процесс.
     /// </summary>
     public Process? RunningProcess { get; private set; }
 
@@ -53,7 +53,7 @@ public sealed class ConsoleProcessRunner
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public ConsoleProcessRunner
         (
@@ -70,23 +70,22 @@ public sealed class ConsoleProcessRunner
     private void _OutputDataReceived
         (
             object? sender,
-            DataReceivedEventArgs e
+            DataReceivedEventArgs eventArgs
         )
     {
-        if (Receiver != null && e.Data != null)
+        if (Receiver is not null && eventArgs.Data is not null)
         {
-            Receiver.ReceiveConsoleOutput (e.Data);
+            Receiver.ReceiveConsoleOutput (eventArgs.Data);
         }
     }
 
     private void _ProcessExited
         (
             object? sender,
-            EventArgs e
+            EventArgs eventArgs
         )
     {
-        var process = RunningProcess;
-        if (!ReferenceEquals (process, null))
+        if (RunningProcess is { } process)
         {
             process.OutputDataReceived -= _OutputDataReceived;
             process.Exited -= _ProcessExited;
@@ -109,6 +108,8 @@ public sealed class ConsoleProcessRunner
             string arguments
         )
     {
+        Sure.NotNullNorEmpty (fileName);
+
         if (RunningProcess is { HasExited: false })
         {
             Magna.Logger.LogError
@@ -173,6 +174,7 @@ public sealed class ConsoleProcessRunner
     public void Dispose()
     {
         RunningProcess?.Dispose();
+        RunningProcess = default;
     }
 
     #endregion

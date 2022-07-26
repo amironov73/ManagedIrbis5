@@ -69,7 +69,7 @@ public class ChapterWithRecords
             Record record
         )
     {
-        if (!ReferenceEquals (chapter.Items, null))
+        if (chapter.Items is not null)
         {
             foreach (var item in chapter.Items)
             {
@@ -82,11 +82,9 @@ public class ChapterWithRecords
 
         foreach (var child in chapter.Children)
         {
-            var subChapter = child as MenuSubChapter;
-            if (!ReferenceEquals (subChapter, null))
+            if (child is MenuSubChapter subChapter)
             {
-                var found = _FindItem (subChapter, record);
-                if (!ReferenceEquals (found, null))
+                if (_FindItem (subChapter, record) is { } found)
                 {
                     return found;
                 }
@@ -102,7 +100,7 @@ public class ChapterWithRecords
         )
     {
         BiblioChapter rootChapter = this;
-        while (!ReferenceEquals (rootChapter.Parent, null))
+        while (rootChapter.Parent is not null)
         {
             rootChapter = rootChapter.Parent;
         }

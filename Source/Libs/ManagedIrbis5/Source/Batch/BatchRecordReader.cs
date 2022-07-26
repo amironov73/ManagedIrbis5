@@ -352,7 +352,7 @@ public sealed class BatchRecordReader
         }
 
         return result;
-    } // method WholeDatabase
+    }
 
     /// <summary>
     /// Read whole database
@@ -372,7 +372,7 @@ public sealed class BatchRecordReader
                 batchSize
             );
 
-        if (!ReferenceEquals (action, null))
+        if (action is not null)
         {
             EventHandler batchHandler = (_, _) => action (result);
             result.BatchRead += batchHandler;

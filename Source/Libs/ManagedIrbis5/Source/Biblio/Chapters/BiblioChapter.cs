@@ -132,23 +132,18 @@ public class BiblioChapter
         )
         where TChapter : BiblioChapter
     {
-        var chapter = this;
-        while (!ReferenceEquals (chapter, null))
+        for (var chapter = this; chapter is not null; chapter = chapter.Parent)
         {
-            var subChapter = chapter as TChapter;
-            if (!ReferenceEquals (subChapter, null))
+            if (chapter is TChapter subChapter)
             {
-                var result = func (subChapter);
-                if (!ReferenceEquals (result, null))
+                if (func (subChapter) is { } result)
                 {
                     return result;
                 }
             }
-
-            chapter = chapter.Parent;
         }
 
-        return default (TResult);
+        return default;
     }
 
     /// <summary>
@@ -364,7 +359,7 @@ public class BiblioChapter
     {
         var items = Items;
 
-        if (!ReferenceEquals (items, null))
+        if (items is not null)
         {
             foreach (var item in items)
             {

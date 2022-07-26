@@ -32,6 +32,7 @@ using System.Linq;
 using AM;
 
 using ManagedIrbis.ImportExport;
+using ManagedIrbis.Providers;
 
 using Microsoft.Extensions.Logging;
 
@@ -91,6 +92,8 @@ public sealed class BatchAccessor
             string line
         )
     {
+        Sure.NotNull (record);
+
         if (ThrowOnEmptyRecord && record.Fields.Count == 0)
         {
             Magna.Logger.LogError
@@ -139,7 +142,7 @@ public sealed class BatchAccessor
                     result
                 );
 
-            if (!ReferenceEquals (result, null))
+            if (result is not null)
             {
                 _ThrowIfEmptyRecord (result, line);
 
@@ -195,10 +198,9 @@ public sealed class BatchAccessor
             IEnumerable<int> mfnList
         )
     {
-        Sure.NotNull (database ??= Connection.Database);
+        database = Connection.EnsureDatabase (database);
 
         var array = mfnList.ToArray();
-
         if (array.Length == 0)
         {
             return Array.Empty<Record>();
@@ -287,7 +289,7 @@ public sealed class BatchAccessor
             Func<Record, T> func
         )
     {
-        (database ??= Connection.Database).ThrowIfNull();
+        database = Connection.EnsureDatabase (database);
 
         var array = mfnList.ToArray();
 

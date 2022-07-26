@@ -183,7 +183,7 @@ public sealed class BatchRecordFormatter
     {
         var handler = Exception;
 
-        if (ReferenceEquals (handler, null))
+        if (handler is null)
         {
             return false;
         }
