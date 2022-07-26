@@ -2,12 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
 
-/* LngFile.cs -- лингвистический файл
+/* LngFile.cs -- лингвистический файл ВЕБ-ИРБИС
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -84,11 +82,11 @@ namespace ManagedIrbis.Lng;
 //
 
 /// <summary>
-/// Лингвистический файл.
+/// Лингвистический файл ВЕБ-ИРБИС.
 /// </summary>
 public sealed class LngFile
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Properties
 
@@ -116,7 +114,7 @@ public sealed class LngFile
             string translation
         )
     {
-        Sure.NotNull (original);
+        Sure.NotNullNorEmpty (original);
         Sure.NotNull (translation);
 
         _dictionary.Add (original, translation);
@@ -127,7 +125,10 @@ public sealed class LngFile
     /// <summary>
     /// Очистка словаря.
     /// </summary>
-    public void Clear() => _dictionary.Clear();
+    public void Clear()
+    {
+        _dictionary.Clear();
+    }
 
     /// <summary>
     /// Получение перевода текста.
@@ -137,15 +138,16 @@ public sealed class LngFile
             string text
         )
     {
-        _dictionary.TryGetValue (text, out var result);
+        Sure.NotNullNorEmpty (text);
 
+        _dictionary.TryGetValue (text, out var result);
         if (string.IsNullOrEmpty (result))
         {
             result = text;
         }
 
         return result;
-    } // method GetTranslation
+    }
 
     /// <summary>
     /// Чтение из текстового потока <see cref="TextReader"/>.
@@ -164,7 +166,7 @@ public sealed class LngFile
                 Magna.Logger.LogError
                     (
                         nameof (LngFile) + "::" + nameof (ParseText)
-                        + ": duplicate key: {Key}",
+                        + ": duplicate key: '{Key}'",
                         key
                     );
             }
@@ -200,7 +202,7 @@ public sealed class LngFile
         result.ParseText (reader);
 
         return result;
-    } // method ReadLocalFile
+    }
 
     /// <summary>
     /// Сохранение содержимого в текстовый поток <see cref="TextWriter"/>.
@@ -217,7 +219,7 @@ public sealed class LngFile
             writer.WriteLine (pair.Key);
             writer.WriteLine (pair.Value);
         }
-    } // method WriteTo
+    }
 
     /// <summary>
     /// Сохранение содержимого в локальный файл.
@@ -250,7 +252,7 @@ public sealed class LngFile
         while (true)
         {
             var key = reader.ReadNullableString();
-            if (ReferenceEquals (key, null))
+            if (key is null)
             {
                 break;
             }
@@ -275,7 +277,7 @@ public sealed class LngFile
             writer.WriteNullable (pair.Value);
         }
 
-        writer.WriteNullable ((string?)null);
+        writer.WriteNullable ((string?) null);
     }
 
     #endregion

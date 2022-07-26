@@ -317,7 +317,7 @@ public sealed class AsyncConnection
     /// <returns>Признак успешного завершения операции.</returns>
     public async Task<bool> ReconnectAsync()
     {
-        if (Connected)
+        if (IsConnected)
         {
             await DisconnectAsync();
         }
@@ -336,7 +336,7 @@ public sealed class AsyncConnection
     {
         using var response = await ExecuteAsync ("STOP");
         var result = response is not null;
-        Connected = false;
+        IsConnected = false;
 
         return result;
     }
@@ -383,7 +383,7 @@ public sealed class AsyncConnection
     /// <inheritdoc cref="IAsyncProvider.ConnectAsync"/>
     public async Task<bool> ConnectAsync()
     {
-        if (Connected)
+        if (IsConnected)
         {
             return true;
         }
@@ -427,7 +427,7 @@ public sealed class AsyncConnection
             var remainingText = response.RemainingText (IrbisEncoding.Ansi);
             var reader = new StringReader (remainingText);
             IniFile.Read (reader);
-            Connected = true;
+            IsConnected = true;
         }
         finally
         {
@@ -491,7 +491,7 @@ public sealed class AsyncConnection
     /// <inheritdoc cref="IAsyncProvider.DisconnectAsync"/>
     public async Task<bool> DisconnectAsync()
     {
-        if (Connected)
+        if (IsConnected)
         {
             await OnDisposingAsync();
 
@@ -508,7 +508,7 @@ public sealed class AsyncConnection
                     );
             }
 
-            Connected = false;
+            IsConnected = false;
         }
 
         return true;

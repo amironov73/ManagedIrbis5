@@ -332,7 +332,7 @@ public class ConnectionPool
             }
 
             _activeConnections.Remove (connection);
-            if (connection.Connected)
+            if (connection.IsConnected)
             {
                 _idleConnections.Add (connection);
             }

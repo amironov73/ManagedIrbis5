@@ -49,7 +49,7 @@ public sealed class InMemoryProviderTest
         using var provider = new InMemoryProvider (resources, serviceProvider);
         Assert.AreSame (resources, provider.Resources);
         Assert.IsNotNull (provider.Databases);
-        Assert.IsFalse (provider.Connected);
+        Assert.IsFalse (provider.IsConnected);
     }
 
     [TestMethod]
@@ -109,7 +109,7 @@ public sealed class InMemoryProviderTest
     {
         using var provider = _GetProvider();
         provider.Connect();
-        Assert.IsTrue (provider.Connected);
+        Assert.IsTrue (provider.IsConnected);
         Assert.AreEqual (0, provider.LastError);
     }
 
@@ -147,10 +147,10 @@ public sealed class InMemoryProviderTest
     {
         using var provider = _GetProvider();
         provider.Connect();
-        Assert.IsTrue (provider.Connected);
+        Assert.IsTrue (provider.IsConnected);
         Assert.AreEqual (0, provider.LastError);
         provider.Disconnect();
-        Assert.IsFalse (provider.Connected);
+        Assert.IsFalse (provider.IsConnected);
         Assert.AreEqual (0, provider.LastError);
     }
 

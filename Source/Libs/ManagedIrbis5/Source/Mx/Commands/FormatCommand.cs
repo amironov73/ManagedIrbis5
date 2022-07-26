@@ -74,7 +74,7 @@ namespace ManagedIrbis.Mx.Commands
             {
                 executive.DescriptionFormat = argument;
 
-                if (executive.Provider.Connected
+                if (executive.Provider.IsConnected
                     && executive.Records.Count != 0)
                 {
                     var mfns = executive.Records.Select(r => r.Mfn)

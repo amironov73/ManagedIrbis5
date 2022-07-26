@@ -110,7 +110,7 @@ namespace ManagedIrbis.WinForms
                 try
                 {
                     connection.Connect();
-                    if (connection.Connected)
+                    if (connection.IsConnected)
                     {
                         return true;
                     }
@@ -139,7 +139,7 @@ namespace ManagedIrbis.WinForms
                 try
                 {
                     connection.Connect();
-                    if (connection.Connected)
+                    if (connection.IsConnected)
                     {
                         return true;
                     }

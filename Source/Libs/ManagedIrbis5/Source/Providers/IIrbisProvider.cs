@@ -29,89 +29,86 @@ using AM.Threading;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Наиболее общий интерфейс подключения к серверу ИРБИС64
+/// для мокирования
+/// </summary>
+public interface IIrbisProvider
+    : IDisposable,
+    IAsyncDisposable,
+    IServiceProvider,
+    IGetLastError,
+    ISupportLogging,
+    ICancellable
 {
+    #region Events
+
     /// <summary>
-    /// Наиболее общий интерфейс подключения к серверу ИРБИС64
-    /// для мокирования
+    /// Событие, возникающее при освобождении провайдера.
     /// </summary>
-    public interface IIrbisProvider
-        : IDisposable,
-        IAsyncDisposable,
-        IServiceProvider,
-        IGetLastError,
-        ISupportLogging,
-        ICancellable
-    {
-        #region Events
+    event EventHandler? Disposing;
 
-        /// <summary>
-        /// Событие, возникающее при освобождении провайдера.
-        /// </summary>
-        event EventHandler? Disposing;
+    #endregion
 
-        #endregion
+    #region Properties
 
-        #region Properties
+    /// <summary>
+    /// Имя текущей базы данных. Значение по умолчанию <c>"IBIS"</c>,
+    /// что соответствует базе данных электронного каталога
+    /// в стандартной конфигурации ИРБИС64.
+    /// Имя текущей базы можно менять неограниченное число раз.
+    /// Имя не должно быть пустым и не должно содержать символов,
+    /// не являющихся алфавитно-цифровыми.
+    /// Сервер ИРБИС64, работающий на Windows, <b>не различает</b>
+    /// регистр символов в имени базы данных.
+    /// Сервер ИРБИС64, работающий на Linux, <b>различает</b>
+    /// регистр символов в имени базы данных.
+    /// </summary>
+    string? Database { get; set; }
 
-        /// <summary>
-        /// Имя текущей базы данных. Значение по умолчанию <c>"IBIS"</c>,
-        /// что соответствует базе данных электронного каталога
-        /// в стандартной конфигурации ИРБИС64.
-        /// Имя текущей базы можно менять неограниченное число раз.
-        /// Имя не должно быть пустым и не должно содержать символов,
-        /// не являющихся алфавитно-цифровыми.
-        /// Сервер ИРБИС64, работающий на Windows, <b>не различает</b>
-        /// регистр символов в имени базы данных.
-        /// Сервер ИРБИС64, работающий на Linux, <b>различает</b>
-        /// регистр символов в имени базы данных.
-        /// </summary>
-        string? Database { get; set; }
+    /// <summary>
+    /// Признак успешного подключения к серверу.
+    /// Автоматически устанавливается/сбрасывается клиентом.
+    /// </summary>
+    bool IsConnected { get; }
 
-        /// <summary>
-        /// Признак успешного подключения к серверу.
-        /// Автоматически устанавливается/сбрасывается клиентом.
-        /// </summary>
-        bool Connected { get; }
+    /// <summary>
+    /// Слой абстракции от платформы.
+    /// </summary>
+    PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
-        /// <summary>
-        /// Слой абстракции от платформы.
-        /// </summary>
-        PlatformAbstractionLayer PlatformAbstraction { get; set; }
+    #endregion
 
-        #endregion
+    #region Methods
 
-        #region Methods
+    /// <summary>
+    /// Проверка состояния провайдера.
+    /// </summary>
+    bool CheckProviderState();
 
-        /// <summary>
-        /// Проверка состояния провайдера.
-        /// </summary>
-        bool CheckProviderState();
+    /// <summary>
+    /// Конфигурация провайдера.
+    /// </summary>
+    /// <param name="configurationString">
+    /// Строка с параметрами конфигурации.
+    /// </param>
+    void Configure
+        (
+            string configurationString
+        );
 
-        /// <summary>
-        /// Конфигурация провайдера.
-        /// </summary>
-        /// <param name="configurationString">
-        /// Строка с параметрами конфигурации.
-        /// </param>
-        void Configure
-            (
-                string configurationString
-            );
+    /// <summary>
+    /// Поколение провайдера.
+    /// </summary>
+    /// <returns>64</returns>
+    string GetGeneration();
 
-        /// <summary>
-        /// Поколение провайдера.
-        /// </summary>
-        /// <returns>64</returns>
-        string GetGeneration();
+    /// <summary>
+    /// Получение хэндла для ожидания.
+    /// </summary>
+    public WaitHandle GetWaitHandle();
 
-        /// <summary>
-        /// Получение хэндла для ожидания.
-        /// </summary>
-        public WaitHandle GetWaitHandle();
-
-        #endregion
-
-    } // interface IIrbisProvider
-
-} // namespace ManagedIrbis
+    #endregion
+}

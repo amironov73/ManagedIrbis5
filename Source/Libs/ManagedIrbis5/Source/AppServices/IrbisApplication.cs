@@ -201,7 +201,7 @@ public class IrbisApplication
     protected virtual bool ConnectToServer()
     {
         Connection.Connect();
-        if (!Connection.Connected)
+        if (!Connection.IsConnected)
         {
             Logger.LogError ("Can't connect");
             Logger.LogInformation

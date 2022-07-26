@@ -2,10 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
 
 /* LngUtility.cs -- методы для работы с лингвистическими файлами
  * Ars Magna project, http://arsmagna.ru
@@ -16,6 +15,8 @@
 using System.IO;
 using System.Threading.Tasks;
 
+using AM;
+
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 
@@ -23,65 +24,67 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis.Lng
+namespace ManagedIrbis.Lng;
+
+/// <summary>
+/// Методы для работы с лингвистическими файлами.
+/// </summary>
+public static class LngUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Методы для работы с лингвистическими файлами.
+    /// Загрузка лингвистического файла с сервера (синхронная версия).
     /// </summary>
-    public static class LngUtility
+    public static LngFile? ReadLngFile
+        (
+            this ISyncProvider provider,
+            FileSpecification specification
+        )
     {
-        #region Public methods
+        Sure.NotNull (provider);
+        Sure.NotNull (specification);
+        provider.EnsureConnected();
 
-        /// <summary>
-        /// Загрузка лингвистического файла с сервера
-        /// (синхронная версия).
-        /// </summary>
-        public static LngFile? ReadLngFile
-            (
-                this ISyncProvider provider,
-                FileSpecification specification
-            )
+        var content = provider.ReadTextFile (specification);
+        if (string.IsNullOrEmpty (content))
         {
-            var content = provider.ReadTextFile(specification);
-            if (string.IsNullOrEmpty(content))
-            {
-                return null;
-            }
+            return null;
+        }
 
-            using var reader = new StringReader(content);
-            var result = new LngFile();
-            result.ParseText(reader);
+        using var reader = new StringReader (content);
+        var result = new LngFile();
+        result.ParseText (reader);
 
-            return result;
+        return result;
+    }
 
-        } // method ReadLngFile
+    /// <summary>
+    /// Загрузка лингвистического файла с сервера
+    /// (асинхронная версия).
+    /// </summary>
+    public static async Task<LngFile?> ReadOptFileAsync
+        (
+            this IAsyncProvider provider,
+            FileSpecification specification
+        )
+    {
+        Sure.NotNull (provider);
+        Sure.NotNull (specification);
+        provider.EnsureConnected();
 
-        /// <summary>
-        /// Загрузка лингвистического файла с сервера
-        /// (асинхронная версия).
-        /// </summary>
-        public static async Task<LngFile?> ReadOptFileAsync
-            (
-                this IAsyncProvider provider,
-                FileSpecification specification
-            )
+        var content = await provider.ReadTextFileAsync (specification);
+        if (string.IsNullOrEmpty (content))
         {
-            var content = await provider.ReadTextFileAsync(specification);
-            if (string.IsNullOrEmpty(content))
-            {
-                return null;
-            }
+            return null;
+        }
 
-            using var reader = new StringReader(content);
-            var result = new LngFile();
-            result.ParseText(reader);
+        using var reader = new StringReader (content);
+        var result = new LngFile();
+        result.ParseText (reader);
 
-            return result;
+        return result;
+    }
 
-        } // method ReadLngFileAsync
-
-        #endregion
-
-    } // class LngUtility
-
-} // namespace ManagedIrbis.Lng
+    #endregion
+}

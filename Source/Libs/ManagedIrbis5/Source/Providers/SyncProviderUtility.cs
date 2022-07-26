@@ -27,7 +27,6 @@ using AM.Collections;
 using AM.IO;
 using AM.Linq;
 
-using ManagedIrbis.Direct;
 using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
@@ -98,6 +97,22 @@ public static class SyncProviderUtility
         record.Status |= RecordStatus.LogicallyDeleted;
 
         return connection.WriteRecord (record, dontParse: true);
+    }
+
+    /// <summary>
+    /// Проверка, что соединение с сервером установлено.
+    /// </summary>
+    public static void EnsureConnected
+        (
+            this IIrbisProvider connection
+        )
+    {
+        Sure.NotNull (connection);
+
+        if (!connection.IsConnected)
+        {
+            throw new IrbisException ("Inactive connection detected");
+        }
     }
 
     /// <summary>

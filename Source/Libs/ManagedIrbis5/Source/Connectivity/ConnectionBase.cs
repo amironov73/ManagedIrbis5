@@ -78,8 +78,8 @@ public abstract class ConnectionBase
         protected internal set => _queryId = value;
     }
 
-    /// <inheritdoc cref="IIrbisProvider.Connected"/>
-    public bool Connected { get; protected internal set; }
+    /// <inheritdoc cref="IIrbisProvider.IsConnected"/>
+    public bool IsConnected { get; protected internal set; }
 
     /// <inheritdoc cref="IGetLastError.LastError"/>
     public int LastError { get; protected internal set; }
@@ -204,7 +204,7 @@ public abstract class ConnectionBase
     /// </summary>
     protected void OnDisposing()
     {
-        if (Connected)
+        if (IsConnected)
         {
             Disposing.Raise (this);
         }
@@ -215,7 +215,7 @@ public abstract class ConnectionBase
     /// </summary>
     protected async ValueTask OnDisposingAsync()
     {
-        if (Connected)
+        if (IsConnected)
         {
             await Disposing.RaiseAsync (this);
         }
@@ -306,12 +306,12 @@ public abstract class ConnectionBase
     /// <inheritdoc cref="IIrbisProvider.CheckProviderState"/>
     public bool CheckProviderState()
     {
-        if (!Connected)
+        if (!IsConnected)
         {
             LastError = -100_500;
         }
 
-        return Connected;
+        return IsConnected;
     }
 
     /// <inheritdoc cref="IIrbisProvider.Configure"/>

@@ -48,7 +48,7 @@ class Program
         using var connection = ConnectionFactory.Shared.CreateSyncConnection();
         connection.ParseConnectionString (connectionString);
         connection.Connect();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             Console.WriteLine (IrbisException.GetErrorDescription (connection.LastError));
             return 1;

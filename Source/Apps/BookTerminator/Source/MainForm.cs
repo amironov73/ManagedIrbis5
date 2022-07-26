@@ -156,7 +156,7 @@ public sealed partial class MainForm
         Connection.ParseConnectionString (connectionString);
         await Connection.ConnectAsync();
 
-        if (!Connection.Connected)
+        if (!Connection.IsConnected)
         {
             await ShowErrorHtml ("Невозможно подключиться к серверу ИРБИС64");
             WriteLine ("Can't connect");
@@ -354,7 +354,7 @@ public sealed partial class MainForm
             EventArgs e
         )
     {
-        if (Connection.Connected)
+        if (Connection.IsConnected)
         {
             await Connection.NoOperationAsync();
             WriteLine ("NOP");

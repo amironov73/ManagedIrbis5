@@ -299,7 +299,7 @@ public class SyncConnection
     /// </summary>
     public bool Reconnect()
     {
-        if (Connected)
+        if (IsConnected)
         {
             Disconnect();
         }
@@ -317,7 +317,7 @@ public class SyncConnection
     {
         using var response = ExecuteSync ("STOP");
         var result = response is not null;
-        Connected = false;
+        IsConnected = false;
 
         return result;
     } // method StopServer
@@ -344,7 +344,7 @@ public class SyncConnection
     /// <inheritdoc cref="ISyncProvider.Connect"/>
     public bool Connect()
     {
-        if (Connected)
+        if (IsConnected)
         {
             return true;
         }
@@ -391,7 +391,7 @@ public class SyncConnection
             var remainingText = response.RemainingText (IrbisEncoding.Ansi);
             var reader = new StringReader (remainingText);
             IniFile.Read (reader);
-            Connected = true;
+            IsConnected = true;
         }
         finally
         {
@@ -434,7 +434,7 @@ public class SyncConnection
     /// <inheritdoc cref="ISyncProvider.Disconnect"/>
     public bool Disconnect()
     {
-        if (Connected)
+        if (IsConnected)
         {
             try
             {
@@ -451,7 +451,7 @@ public class SyncConnection
                     );
             }
 
-            Connected = false;
+            IsConnected = false;
         }
 
         return true;

@@ -67,7 +67,7 @@ public sealed class NullProvider
     /// <summary>
     /// Вручную задаем состояние подключения.
     /// </summary>
-    public void SetConnected (bool connected) => Connected = connected;
+    public void SetConnected (bool connected) => IsConnected = connected;
 
     /// <summary>
     /// Вручную устанавливаем код ошибки.
@@ -101,8 +101,8 @@ public sealed class NullProvider
     /// <inheritdoc cref="IIrbisProvider.Database"/>
     public string? Database { get; set; } = "IBIS";
 
-    /// <inheritdoc cref="IIrbisProvider.Connected"/>
-    public bool Connected { get; private set; }
+    /// <inheritdoc cref="IIrbisProvider.IsConnected"/>
+    public bool IsConnected { get; private set; }
 
     /// <inheritdoc cref="IGetLastError.LastError"/>
     public int LastError { get; private set; }

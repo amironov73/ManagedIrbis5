@@ -335,7 +335,7 @@ namespace ManagedIrbis.Sql
         public string? Database { get; set; }
 
         /// <inheritdoc />
-        public bool Connected { get; }
+        public bool IsConnected { get; }
 
         /// <inheritdoc />
         public PlatformAbstractionLayer PlatformAbstraction { get; set; }

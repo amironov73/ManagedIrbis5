@@ -79,7 +79,7 @@ internal sealed class Program
         try
         {
             using var connection = context.Connection.ThrowIfNull();
-            if (!connection.Connect() || !connection.Connected)
+            if (!connection.Connect() || !connection.IsConnected)
             {
                 context.Success = false;
                 return;

@@ -107,7 +107,7 @@ namespace ManagedIrbis.WinForms
         {
             lock (_lock)
             {
-                if (Connection.Connected
+                if (Connection.IsConnected
                     && !Connection.Busy)
                 {
                     Connection.NoOperation();

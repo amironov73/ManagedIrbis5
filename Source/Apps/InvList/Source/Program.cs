@@ -76,7 +76,7 @@ class Program
             _connection.ParseConnectionString (_connectionString);
             _connection.Connect();
 
-            if (!_connection.Connected)
+            if (!_connection.IsConnected)
             {
                 Console.Error.WriteLine ("Can't connect");
                 Console.Error.WriteLine (IrbisException.GetErrorDescription (_connection.LastError));

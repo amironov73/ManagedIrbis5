@@ -580,7 +580,7 @@ public sealed class IrbisLib
             connection = (SyncConnection) _CreateConnection (context);
         }
 
-        if (connection.Connected)
+        if (connection.IsConnected)
         {
             return true;
         }
@@ -1182,7 +1182,7 @@ public sealed class IrbisLib
             return false;
         }
 
-        return connection.Connected;
+        return connection.IsConnected;
     }
 
     /// <summary>
@@ -1379,7 +1379,7 @@ public sealed class IrbisLib
             return false;
         }
 
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return false;
         }

@@ -63,7 +63,7 @@ class Program
             provider.ParseConnectionString (connectionString);
             provider.Connect();
 
-            if (!provider.Connected)
+            if (!provider.IsConnected)
             {
                 Console.Error.WriteLine ("Can't connect");
                 return 1;

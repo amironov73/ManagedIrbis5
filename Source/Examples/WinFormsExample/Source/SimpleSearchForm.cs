@@ -53,7 +53,7 @@ public partial class SimpleSearchForm
     {
         InitializeComponent();
         Engine = new ClientEngine();
-        if (!Engine.Provider.Connected)
+        if (!Engine.Provider.IsConnected)
         {
             var errorMessage = IrbisException.GetErrorDescription (Engine.Provider.LastError);
             errorMessage = $"Not connected: {errorMessage}";

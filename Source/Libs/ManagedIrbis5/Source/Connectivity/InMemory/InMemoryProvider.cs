@@ -226,8 +226,8 @@ public sealed class InMemoryProvider
     /// <inheritdoc cref="IIrbisProvider.Database"/>
     public string? Database { get; set; }
 
-    /// <inheritdoc cref="IIrbisProvider.Connected"/>
-    public bool Connected { get; private set; }
+    /// <inheritdoc cref="IIrbisProvider.IsConnected"/>
+    public bool IsConnected { get; private set; }
 
     /// <inheritdoc cref="IGetLastError.LastError"/>
     public int LastError { get; private set; }
@@ -273,7 +273,7 @@ public sealed class InMemoryProvider
     /// <inheritdoc cref="ISyncProvider.Connect"/>
     public bool Connect()
     {
-        Connected = true;
+        IsConnected = true;
         LastError = SoFarSoGood;
 
         return true;
@@ -332,7 +332,7 @@ public sealed class InMemoryProvider
     /// <inheritdoc cref="ISyncProvider.Disconnect"/>
     public bool Disconnect()
     {
-        Connected = false;
+        IsConnected = false;
         LastError = SoFarSoGood;
 
         return true;

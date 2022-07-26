@@ -77,7 +77,7 @@ public partial class MainForm
         await Run (() =>
         {
             using var provider = GetProvider();
-            if (!provider.Connected)
+            if (!provider.IsConnected)
             {
                 return;
             }

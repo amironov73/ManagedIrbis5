@@ -173,7 +173,7 @@ public class CommandLineUtilityTest
 
         // TODO: придумать, как замочить Busy
         // Assert.IsFalse(connection.Busy);
-        Assert.IsFalse (connection.Connected);
+        Assert.IsFalse (connection.IsConnected);
         Assert.AreEqual ("testHost", connection.Host);
         Assert.AreEqual ((ushort)5555, connection.Port);
         Assert.AreEqual ("librarian", connection.Username);
@@ -198,7 +198,7 @@ public class CommandLineUtilityTest
 
         // TODO: придумать, как замочить Busy
         // Assert.IsFalse(connection.Busy);
-        Assert.IsFalse (connection.Connected);
+        Assert.IsFalse (connection.IsConnected);
         Assert.AreEqual ("127.0.0.1", connection.Host);
         Assert.AreEqual ((ushort)6666, connection.Port);
         Assert.IsNull (connection.Username);
@@ -234,7 +234,7 @@ public class CommandLineUtilityTest
 
         // TODO: придумать, как замочить Busy
         // Assert.IsFalse(connection.Busy);
-        Assert.IsFalse (connection.Connected);
+        Assert.IsFalse (connection.IsConnected);
         Assert.AreEqual ("testHost", connection.Host);
         Assert.AreEqual ((ushort)5555, connection.Port);
         Assert.AreEqual ("librarian", connection.Username);
@@ -294,7 +294,7 @@ public class CommandLineUtilityTest
 
         // TODO: придумать, как замочить Busy
         // Assert.IsFalse(connection.Busy);
-        Assert.IsFalse (connection.Connected);
+        Assert.IsFalse (connection.IsConnected);
         Assert.AreEqual ("testHost", connection.Host);
         Assert.AreEqual ((ushort)5555, connection.Port);
         Assert.AreEqual ("librarian", connection.Username);
@@ -314,7 +314,7 @@ public class CommandLineUtilityTest
 
         // TODO: придумать, как замочить Busy
         // Assert.IsFalse(connection.Busy);
-        Assert.IsFalse (connection.Connected);
+        Assert.IsFalse (connection.IsConnected);
         Assert.IsNull (connection.Host);
         Assert.AreEqual (0, connection.Port);
         Assert.IsNull (connection.Username);

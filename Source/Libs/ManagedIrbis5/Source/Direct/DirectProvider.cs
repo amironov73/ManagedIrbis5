@@ -607,7 +607,7 @@ public class DirectProvider
             bool state
         )
     {
-        Connected = state;
+        IsConnected = state;
     }
 
     /// <summary>
@@ -621,8 +621,8 @@ public class DirectProvider
     /// <inheritdoc cref="IIrbisProvider.Database"/>
     public string? Database { get; set; } = "IBIS";
 
-    /// <inheritdoc cref="IIrbisProvider.Connected"/>
-    public bool Connected { get; private set; }
+    /// <inheritdoc cref="IIrbisProvider.IsConnected"/>
+    public bool IsConnected { get; private set; }
 
     /// <inheritdoc cref="ICancellable.Busy"/>
     public BusyState Busy { get; private set; }

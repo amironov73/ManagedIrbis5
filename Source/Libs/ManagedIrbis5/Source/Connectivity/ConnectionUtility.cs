@@ -285,7 +285,7 @@ public static class ConnectionUtility
     {
         Sure.NotNull (provider);
 
-        if (provider.Connected)
+        if (provider.IsConnected)
         {
             throw new InvalidOperationException ("Already connected");
         }
@@ -315,7 +315,7 @@ public static class ConnectionUtility
     {
         Sure.NotNull (connection);
 
-        if (connection.Connected)
+        if (connection.IsConnected)
         {
             throw new InvalidOperationException ("Already connected");
         }
@@ -342,7 +342,7 @@ public static class ConnectionUtility
     {
         Sure.NotNull (connection);
 
-        if (connection.Connected)
+        if (connection.IsConnected)
         {
             throw new InvalidOperationException ("Already connected");
         }

@@ -255,7 +255,7 @@ public sealed class ConnectionSettings
     {
         Sure.NotNull (connection);
 
-        if (connection is IIrbisProvider { Connected: true })
+        if (connection is IIrbisProvider { IsConnected: true })
         {
             throw new IrbisException ("Already connected");
         }
@@ -308,7 +308,7 @@ public sealed class ConnectionSettings
     {
         Sure.NotNull (provider);
 
-        if (provider.Connected)
+        if (provider.IsConnected)
         {
             throw new IrbisException ("Already connected");
         }

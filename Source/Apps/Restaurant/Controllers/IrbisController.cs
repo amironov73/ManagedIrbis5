@@ -166,7 +166,7 @@ public sealed class IrbisController
         database = WebUtility.UrlDecode (database);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -225,7 +225,7 @@ public sealed class IrbisController
         }
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -272,7 +272,7 @@ public sealed class IrbisController
         format = WebUtility.UrlDecode (format);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -328,7 +328,7 @@ public sealed class IrbisController
         format = WebUtility.UrlDecode (format);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -368,7 +368,7 @@ public sealed class IrbisController
         spec ??= "dbnam3.mnu";
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -396,7 +396,7 @@ public sealed class IrbisController
         pattern = WebUtility.UrlDecode (pattern);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -424,7 +424,7 @@ public sealed class IrbisController
             );
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -464,7 +464,7 @@ public sealed class IrbisController
         database = WebUtility.UrlDecode (database);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -497,7 +497,7 @@ public sealed class IrbisController
         database = WebUtility.UrlDecode (database);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -539,7 +539,7 @@ public sealed class IrbisController
         fileName = WebUtility.UrlDecode (fileName);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -585,7 +585,7 @@ public sealed class IrbisController
         }
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -623,7 +623,7 @@ public sealed class IrbisController
         fileName = WebUtility.UrlDecode (fileName);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -667,7 +667,7 @@ public sealed class IrbisController
 
         var number = count.SafeToInt32 (100);
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -709,7 +709,7 @@ public sealed class IrbisController
         fileName = WebUtility.UrlDecode (fileName);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -736,7 +736,7 @@ public sealed class IrbisController
             );
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -769,7 +769,7 @@ public sealed class IrbisController
         // TODO поддержать стандартный сценарий поиска
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -807,7 +807,7 @@ public sealed class IrbisController
         database = WebUtility.UrlDecode (database);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -867,7 +867,7 @@ public sealed class IrbisController
         database = WebUtility.UrlDecode (database);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -925,7 +925,7 @@ public sealed class IrbisController
         database = WebUtility.UrlDecode (database);
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -974,7 +974,7 @@ public sealed class IrbisController
             );
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -1000,7 +1000,7 @@ public sealed class IrbisController
             );
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
@@ -1026,7 +1026,7 @@ public sealed class IrbisController
             );
 
         using var connection = GetConnection();
-        if (!connection.Connected)
+        if (!connection.IsConnected)
         {
             return Problem ("Can't connect to IRBIS64");
         }
