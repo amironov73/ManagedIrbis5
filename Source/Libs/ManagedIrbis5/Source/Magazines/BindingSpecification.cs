@@ -13,6 +13,7 @@
 #region Using directives
 
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
@@ -182,6 +183,7 @@ public sealed class BindingSpecification
     /// <summary>
     /// Формирование шифра документа для указанного выпуска.
     /// </summary>
+    [Pure]
     public string BuildIndex
         (
             string issueNumber
@@ -201,6 +203,7 @@ public sealed class BindingSpecification
     #region IVerifiable members
 
     /// <inheritdoc cref="IVerifiable.Verify"/>
+    [Pure]
     public bool Verify
         (
             bool throwOnError

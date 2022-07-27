@@ -15,6 +15,7 @@
 
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -249,6 +250,7 @@ public sealed class MagazineCumulation
     #region IVerifiable members
 
     /// <inheritdoc cref="IVerifiable.Verify" />
+    [Pure]
     public bool Verify
         (
             bool throwOnError

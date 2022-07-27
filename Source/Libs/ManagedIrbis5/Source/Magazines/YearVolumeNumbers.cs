@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
@@ -16,10 +17,15 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
+using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
+using AM.IO;
+using AM.Runtime;
+using AM.Text;
 
 #endregion
 
@@ -32,6 +38,8 @@ namespace ManagedIrbis.Magazines;
 /// </summary>
 [XmlRoot ("issues")]
 public sealed class YearVolumeNumbers
+    : IVerifiable,
+    IHandmadeSerializable
 {
     #region Properties
 
@@ -42,7 +50,7 @@ public sealed class YearVolumeNumbers
     [JsonPropertyName ("year")]
     [DisplayName ("Год выхода")]
     [Description ("Год выхода (обязательный)")]
-    public string Year { get; }
+    public string? Year { get; set; }
 
     /// <summary>
     /// Номер тома. Необязательный элемент.
@@ -51,7 +59,7 @@ public sealed class YearVolumeNumbers
     [JsonPropertyName ("volume")]
     [DisplayName ("Том")]
     [Description ("Номер тома (необязательный)")]
-    public string? Volume { get; }
+    public string? Volume { get; set; }
 
     /// <summary>
     /// Номер выпуска. Обязательный элемент.
@@ -60,11 +68,19 @@ public sealed class YearVolumeNumbers
     [JsonPropertyName ("numbers")]
     [DisplayName ("Номера")]
     [Description ("Номер выпусков (обязательные)")]
-    public string[] Numbers { get; }
+    public string[]? Numbers { get; set; }
 
     #endregion
 
     #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public YearVolumeNumbers()
+    {
+        // пустое тело конструктора
+    }
 
     /// <summary>
     /// Конструктор.
@@ -104,28 +120,120 @@ public sealed class YearVolumeNumbers
 
     #endregion
 
+    #region Public methods
+
+    /// <summary>
+    /// Разбор текстового представления выпуска.
+    /// </summary>
+    public void Parse
+        (
+            ReadOnlySpan<char> text
+        )
+    {
+        const StringSplitOptions options = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
+        var navigator = new ValueTextNavigator (text);
+
+        var year = navigator.ReadUntil ('/');
+        var part1 = navigator.ReadUntil ('/');
+        var part2 = navigator.GetRemainingText();
+
+        if (part1.IsEmpty)
+        {
+            throw new FormatException();
+        }
+
+        Year = year.ToString();
+        if (part2.IsEmpty)
+        {
+            Volume = null;
+            Numbers = part1.ToString().Split (',', options);
+        }
+        else
+        {
+            Volume = part1.ToString();
+            Numbers = part2.ToString().Split (',', options);
+        }
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        Year = reader.ReadNullableString();
+        Volume = reader.ReadNullableString();
+        Numbers = reader.ReadNullableStringArray();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WriteNullable (Year);
+        writer.WriteNullable (Volume);
+        writer.WriteNullableArray (Numbers);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    [Pure]
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<YearVolumeNumbers> (this, throwOnError);
+
+        verifier
+            .NotNullNorEmpty (Year)
+            .NotNull (Numbers)
+            .Assert (Numbers!.Length != 0);
+
+        return verifier.Result;
+    }
+
+    #endregion
+
     #region Object members
 
     /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
-        // ReSharper disable NonReadonlyMemberInGetHashCode
         var hash = new HashCode();
         hash.Add (Year);
         hash.Add (Volume);
-        foreach (var number in Numbers)
+
+        if (Numbers is not null)
         {
-            hash.Add (number);
+            foreach (var number in Numbers)
+            {
+                hash.Add (number);
+            }
         }
 
         return hash.ToHashCode();
-        // ReSharper restore NonReadonlyMemberInGetHashCode
     }
 
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        var numbers = string.Join (',', Numbers);
+        var numbers = Numbers is null
+            ? string.Empty
+            : string.Join (',', Numbers);
 
         return string.IsNullOrEmpty (Volume)
             ? $"{Year}/{numbers}"

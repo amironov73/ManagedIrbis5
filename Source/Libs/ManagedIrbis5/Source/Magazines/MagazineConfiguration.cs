@@ -40,7 +40,7 @@ namespace ManagedIrbis.Magazines;
 [XmlRoot ("magazine-configuration")]
 public sealed class MagazineConfiguration
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Constants
 
@@ -57,7 +57,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (933)]
     [JsonPropertyName ("code")]
-    [Description ("Шифр СИ или журнала")]
+    [DisplayName ("Шифр СИ или журнала")]
     public int MagazineTag { get; set; } = 933;
 
     /// <summary>
@@ -67,7 +67,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (903)]
     [JsonPropertyName ("index")]
-    [Description ("Шифр выпуска")]
+    [DisplayName ("Шифр выпуска")]
     public int IndexTag { get; set; } = 903;
 
     /// <summary>
@@ -77,7 +77,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (934)]
     [JsonPropertyName ("year")]
-    [Description ("Год")]
+    [DisplayName ("Год")]
     public int YearTag { get; set; } = 934;
 
     /// <summary>
@@ -87,7 +87,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (935)]
     [JsonPropertyName ("volume")]
-    [Description ("Том")]
+    [DisplayName ("Том")]
     public int VolumeTag { get; set; } = 935;
 
     /// <summary>
@@ -97,7 +97,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (936)]
     [JsonPropertyName ("number")]
-    [Description ("Номер, часть")]
+    [DisplayName ("Номер, часть")]
     public int NumberTag { get; set; } = 936;
 
     /// <summary>
@@ -107,7 +107,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (931)]
     [JsonPropertyName ("addition")]
-    [Description ("Дополнение к номеру")]
+    [DisplayName ("Дополнение к номеру")]
     public int AdditionTag { get; set; } = 931;
 
     /// <summary>
@@ -117,7 +117,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (910)]
     [JsonPropertyName ("exemplar")]
-    [Description ("Сведения об экземплярах")]
+    [DisplayName ("Сведения об экземплярах")]
     public int ExemplarTag { get; set; } = 910;
 
     /// <summary>
@@ -127,7 +127,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (922)]
     [JsonPropertyName ("article")]
-    [Description ("Статьи из журнала")]
+    [DisplayName ("Статьи из журнала")]
     public int ArticleTag { get; set; } = 922;
 
     /// <summary>
@@ -137,7 +137,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (110)]
     [JsonPropertyName ("info")]
-    [Description ("Кодированная информация")]
+    [DisplayName ("Кодированная информация")]
     public int InfoTag { get; set; } = 110;
 
     /// <summary>
@@ -147,7 +147,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (11)]
     [JsonPropertyName ("issn")]
-    [Description ("ISSN")]
+    [DisplayName ("ISSN")]
     public int IssnTag { get; set; } = 11;
 
     /// <summary>
@@ -157,7 +157,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (909)]
     [JsonPropertyName ("cumulation")]
-    [Description ("Зарегистрированные поступления")]
+    [DisplayName ("Зарегистрированные поступления")]
     public int CumulationTag { get; set; } = 909;
 
     /// <summary>
@@ -167,7 +167,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (901)]
     [JsonPropertyName ("ordered")]
-    [Description ("Заказанные экземпляры")]
+    [DisplayName ("Заказанные экземпляры")]
     public int OrderedTag { get; set; } = 901;
 
     /// <summary>
@@ -177,7 +177,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (203)]
     [JsonPropertyName ("field203")]
-    [Description ("Вид содержания")]
+    [DisplayName ("Вид содержания")]
     public int Tag203 { get; set; } = 203;
 
     /// <summary>
@@ -187,7 +187,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (907)]
     [JsonPropertyName ("operator")]
-    [Description ("Технология")]
+    [DisplayName ("Технология")]
     public int OperatorTag { get; set; } = 907;
 
     /// <summary>
@@ -197,7 +197,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (102)]
     [JsonPropertyName ("country")]
-    [Description ("Код страны")]
+    [DisplayName ("Код страны")]
     public int CountryTag { get; set; } = 102;
 
     /// <summary>
@@ -207,7 +207,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (101)]
     [JsonPropertyName ("language")]
-    [Description ("Язык основного текста")]
+    [DisplayName ("Язык основного текста")]
     public int LanguageTag { get; set; } = 101;
 
     /// <summary>
@@ -217,7 +217,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (920)]
     [JsonPropertyName ("worksheet")]
-    [Description ("Рабочий лист")]
+    [DisplayName ("Рабочий лист")]
     public int WorksheetTag { get; set; } = 920;
 
     /// <summary>
@@ -227,7 +227,7 @@ public sealed class MagazineConfiguration
     [Category (Magazine)]
     [DefaultValue (999)]
     [JsonPropertyName ("rental")]
-    [Description ("Количество выдач")]
+    [DisplayName ("Количество выдач")]
     public int RentalTag { get; set; } = 999;
 
     #endregion

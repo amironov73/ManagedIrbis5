@@ -15,7 +15,9 @@
 
 #region Using directives
 
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -60,6 +62,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlAttribute ("index")]
     [JsonPropertyName ("index")]
+    [DisplayName ("Шифр в базе")]
     public string? Index { get; set; }
 
     /// <summary>
@@ -67,6 +70,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlAttribute ("description")]
     [JsonPropertyName ("description")]
+    [DisplayName ("Описание")]
     public string? Description { get; set; }
 
     /// <summary>
@@ -74,6 +78,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlAttribute ("title")]
     [JsonPropertyName ("title")]
+    [DisplayName ("Заглавие")]
     public string? Title { get; set; }
 
     /// <summary>
@@ -82,6 +87,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlAttribute ("sub-title")]
     [JsonPropertyName ("sub-title")]
+    [DisplayName ("Подзаголовочные сведения")]
     public string? SubTitle { get; set; }
 
     /// <summary>
@@ -90,6 +96,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlAttribute ("series-number")]
     [JsonPropertyName ("series-number")]
+    [DisplayName ("Выпуск серии")]
     public string? SeriesNumber { get; set; }
 
     /// <summary>
@@ -98,6 +105,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlAttribute ("series-title")]
     [JsonPropertyName ("series-title")]
+    [DisplayName ("Серия")]
     public string? SeriesTitle { get; set; }
 
     /// <summary>
@@ -106,6 +114,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]
+    [Browsable (false)]
     public string ExtendedTitle
     {
         get
@@ -136,6 +145,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlAttribute ("magazine-type")]
     [JsonPropertyName ("magazine-type")]
+    [DisplayName ("Тип")]
     public string? MagazineType { get; set; }
 
     /// <summary>
@@ -147,6 +157,7 @@ public sealed class MagazineInfo
     /// </remarks>
     [XmlAttribute ("magazine-kind")]
     [JsonPropertyName ("magazine-kind")]
+    [DisplayName ("Вид")]
     public string? MagazineKind { get; set; }
 
     /// <summary>
@@ -154,6 +165,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlAttribute ("periodicity")]
     [JsonPropertyName ("periodicity")]
+    [DisplayName ("Периодичность (число)")]
     public string? Periodicity { get; set; }
 
     /// <summary>
@@ -161,13 +173,15 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlElement ("cumulation")]
     [JsonPropertyName ("cumulation")]
+    [DisplayName ("Кумуляция")]
     public MagazineCumulation[]? Cumulation { get; set; }
 
     /// <summary>
-    /// Сведения о заказах (поквартальные). Поле 901.
+    /// Сведения о заказах. Поле 901.
     /// </summary>
     [XmlElement ("order")]
     [JsonPropertyName ("orders")]
+    [DisplayName ("Сведения о заказах")]
     public OrderedExemplarInfo[]? OrdererExemplars { get; set; }
 
     /// <summary>
@@ -175,6 +189,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlElement ("quarterly")]
     [JsonPropertyName ("quarterly")]
+    [DisplayName ("Сведения о заказах (поквартальные)")]
     public QuarterlyOrderInfo[]? QuarterlyOrders { get; set; }
 
     /// <summary>
@@ -182,6 +197,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlElement ("mfn")]
     [JsonPropertyName ("mfn")]
+    [DisplayName ("MFN")]
     public int Mfn { get; set; }
 
     /// <summary>
@@ -189,6 +205,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]
+    [Browsable (false)]
     public bool IsNewspaper => MagazineKind.SameString (NewspaperKindCode);
 
     /// <summary>
@@ -196,6 +213,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]
+    [Browsable (false)]
     public Record? Record { get; set; }
 
     /// <summary>
@@ -203,6 +221,7 @@ public sealed class MagazineInfo
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]
+    [Browsable (false)]
     public object? UserData { get; set; }
 
     #endregion
@@ -363,6 +382,7 @@ public sealed class MagazineInfo
     #region IVerifiable members
 
     /// <inheritdoc cref="IVerifiable.Verify" />
+    [Pure]
     public bool Verify
         (
             bool throwOnError

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
@@ -16,10 +17,14 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
+using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
+using AM.IO;
+using AM.Runtime;
 using AM.Text;
 
 #endregion
@@ -35,7 +40,8 @@ namespace ManagedIrbis.Magazines;
 public sealed class YearVolumeNumber
     : IVerifiable,
     IEquatable<YearVolumeNumber>,
-    IComparable<YearVolumeNumber>
+    IComparable<YearVolumeNumber>,
+    IHandmadeSerializable
 {
     #region Properties
 
@@ -44,7 +50,7 @@ public sealed class YearVolumeNumber
     /// </summary>
     [XmlAttribute ("year")]
     [JsonPropertyName ("year")]
-    [Description ("Год выхода")]
+    [DisplayName ("Год выхода")]
     public string? Year { get; set; }
 
     /// <summary>
@@ -52,7 +58,7 @@ public sealed class YearVolumeNumber
     /// </summary>
     [XmlAttribute ("volume")]
     [JsonPropertyName ("volume")]
-    [Description ("Номер тома (необязательный)")]
+    [DisplayName ("Номер тома (необязательный)")]
     public string? Volume { get; set; }
 
     /// <summary>
@@ -60,7 +66,7 @@ public sealed class YearVolumeNumber
     /// </summary>
     [XmlAttribute ("number")]
     [JsonPropertyName ("number")]
-    [Description ("Номер выпуска (обязательный)")]
+    [DisplayName ("Номер выпуска (обязательный)")]
     public string? Number { get; set; }
 
     #endregion
@@ -72,6 +78,7 @@ public sealed class YearVolumeNumber
     /// </summary>
     public YearVolumeNumber()
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -202,9 +209,40 @@ public sealed class YearVolumeNumber
 
     #endregion
 
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        Year = reader.ReadNullableString();
+        Volume = reader.ReadNullableString();
+        Number = reader.ReadNullableString();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WriteNullable (Year);
+        writer.WriteNullable (Volume);
+        writer.WriteNullable (Number);
+    }
+
+    #endregion
+
     #region IVerifiable members
 
     /// <inheritdoc cref="IVerifiable.Verify"/>
+    [Pure]
     public bool Verify
         (
             bool throwOnError
@@ -226,9 +264,7 @@ public sealed class YearVolumeNumber
     /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
-        // ReSharper disable NonReadonlyMemberInGetHashCode
         return HashCode.Combine (Year, Volume, Number);
-        // ReSharper restore NonReadonlyMemberInGetHashCode
     }
 
     /// <inheritdoc cref="object.ToString"/>

@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -319,6 +320,7 @@ public sealed class QuarterlyOrderInfo
     #region IVerifiable members
 
     /// <inheritdoc cref="IVerifiable.Verify" />
+    [Pure]
     public bool Verify
         (
             bool throwOnError

@@ -17,6 +17,7 @@
 #region Using directives
 
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -78,6 +79,7 @@ public sealed class BindingConfiguration
     /// <summary>
     /// Проверка места хранения на возможность добавления в подшивку.
     /// </summary>
+    [Pure]
     public bool CheckPlace
         (
             string? place
@@ -90,6 +92,7 @@ public sealed class BindingConfiguration
     /// <summary>
     /// Проверка статуса экземпляра на возможность добавления в подшивку.
     /// </summary>
+    [Pure]
     public bool CheckStatus
         (
             string? status
@@ -102,6 +105,7 @@ public sealed class BindingConfiguration
     /// <summary>
     /// Проверка рабочего листа на возможность добавления в подшивку.
     /// </summary>
+    [Pure]
     public bool CheckWorksheet
         (
             string? worksheet
@@ -114,6 +118,7 @@ public sealed class BindingConfiguration
     /// <summary>
     /// Получение конфигурации по умолчанию.
     /// </summary>
+    [Pure]
     public static BindingConfiguration GetDefault()
     {
         return new ();
@@ -181,6 +186,7 @@ public sealed class BindingConfiguration
     #region IVerifiable members
 
     /// <inheritdoc cref="IVerifiable.Verify"/>
+    [Pure]
     public bool Verify
         (
             bool throwOnError

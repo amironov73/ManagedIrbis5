@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 #endregion
 
@@ -31,6 +32,7 @@ public static class MagazineComparer
     public class ByTitle : IComparer<MagazineInfo>
     {
         /// <inheritdoc cref="IComparer{T}.Compare"/>
+        [Pure]
         public int Compare (MagazineInfo? x, MagazineInfo? y)
         {
             return string.Compare (x?.Title, y?.Title, StringComparison.CurrentCulture);

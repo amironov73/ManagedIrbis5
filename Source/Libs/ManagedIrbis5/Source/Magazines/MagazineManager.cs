@@ -288,16 +288,17 @@ public sealed class MagazineManager
         (
             MagazineInfo magazine,
             string year,
-            string volume,
+            string? volume,
             string number
         )
     {
         Sure.VerifyNotNull (magazine);
         Sure.NotNullNorEmpty (year);
-        Sure.NotNullNorEmpty (volume);
         Sure.NotNullNorEmpty (number);
 
-        var index = magazine.BuildIssueIndex (year, volume, number);
+        var index = string.IsNullOrEmpty (volume)
+            ? magazine.BuildIssueIndex (year, number)
+            : magazine.BuildIssueIndex (year, volume, number);
         var record = _GetRecordByIndex (index);
 
         return record is null ? null : MagazineIssueInfo.Parse (record);
