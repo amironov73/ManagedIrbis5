@@ -44,8 +44,8 @@ namespace ManagedIrbis.Direct;
 /// </summary>
 public class InvertedFile64
     : IDisposable,
-        ISupportLogging,
-        IServiceProvider
+    ISupportLogging,
+    IServiceProvider
 {
     #region Constants
 
@@ -376,7 +376,7 @@ public class InvertedFile64
                     var found = false;
                     var beyond = false;
 
-                    if (ReferenceEquals (currentNode, null))
+                    if (currentNode is null)
                     {
                         break;
                     }
@@ -408,7 +408,7 @@ public class InvertedFile64
                         }
                     }
 
-                    if (ReferenceEquals (goodItem, null))
+                    if (goodItem is null)
                     {
                         break;
                     }
@@ -441,12 +441,12 @@ public class InvertedFile64
                 }
 
                 FOUND:
-                if (!ReferenceEquals (goodItem, null))
+                if (goodItem is not null)
                 {
                     var count = parameters.NumberOfTerms;
                     while (count > 0)
                     {
-                        if (ReferenceEquals (currentNode, null))
+                        if (currentNode is null)
                         {
                             break;
                         }
@@ -565,7 +565,7 @@ public class InvertedFile64
                     var found = false;
                     var beyond = false;
 
-                    if (ReferenceEquals (currentNode, null))
+                    if (currentNode is null)
                     {
                         break;
                     }
@@ -593,7 +593,7 @@ public class InvertedFile64
                         }
                     }
 
-                    if (ReferenceEquals (goodItem, null))
+                    if (goodItem is null)
                     {
                         break;
                     }
@@ -692,7 +692,7 @@ public class InvertedFile64
                 var found = false;
                 var beyond = false;
 
-                if (ReferenceEquals (currentNode, null))
+                if (currentNode is null)
                 {
                     break;
                 }
@@ -753,7 +753,7 @@ public class InvertedFile64
 
                 while (true)
                 {
-                    if (ReferenceEquals (currentNode, null))
+                    if (currentNode is null)
                     {
                         break;
                     }
@@ -879,29 +879,23 @@ public class InvertedFile64
 
         // TODO implement properly
 
-        // ReSharper disable ConditionIsAlwaysTrueOrFalse
-        // ReSharper disable AssignNullToNotNullAttribute
-
-        if (!ReferenceEquals (Ifp, null))
+        if (Ifp is not null)
         {
             Ifp.Dispose();
             Ifp = null;
         }
 
-        if (!ReferenceEquals (L01, null))
+        if (L01 is not null)
         {
             L01.Dispose();
             L01 = null;
         }
 
-        if (!ReferenceEquals (N01, null))
+        if (N01 is not null)
         {
             N01.Dispose();
             N01 = null;
         }
-
-        // ReSharper restore AssignNullToNotNullAttribute
-        // ReSharper restore ConditionIsAlwaysTrueOrFalse
     }
 
     #endregion

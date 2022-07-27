@@ -323,7 +323,7 @@ public sealed class MappedInvertedFile64
                     var found = false;
                     var beyond = false;
 
-                    if (ReferenceEquals (currentNode, null))
+                    if (currentNode is null)
                     {
                         break;
                     }
@@ -355,7 +355,7 @@ public sealed class MappedInvertedFile64
                         }
                     }
 
-                    if (ReferenceEquals (goodItem, null))
+                    if (goodItem is null)
                     {
                         break;
                     }
@@ -388,12 +388,12 @@ public sealed class MappedInvertedFile64
                 }
 
                 FOUND:
-                if (!ReferenceEquals (goodItem, null))
+                if (goodItem is not null)
                 {
                     var count = parameters.NumberOfTerms;
                     while (count > 0)
                     {
-                        if (ReferenceEquals (currentNode, null))
+                        if (currentNode is null)
                         {
                             break;
                         }
@@ -473,7 +473,7 @@ public sealed class MappedInvertedFile64
                     var found = false;
                     var beyond = false;
 
-                    if (ReferenceEquals (currentNode, null))
+                    if (currentNode is null)
                     {
                         break;
                     }
@@ -494,14 +494,13 @@ public sealed class MappedInvertedFile64
                         goodItem = item;
                         found = true;
 
-                        if (compareResult == 0
-                            && currentNode.IsLeaf)
+                        if (compareResult == 0 && currentNode.IsLeaf)
                         {
                             goto FOUND;
                         }
                     }
 
-                    if (ReferenceEquals (goodItem, null))
+                    if (goodItem is null)
                     {
                         break;
                     }
@@ -598,7 +597,7 @@ public sealed class MappedInvertedFile64
                 var found = false;
                 var beyond = false;
 
-                if (ReferenceEquals (currentNode, null))
+                if (currentNode is null)
                 {
                     break;
                 }
@@ -659,7 +658,7 @@ public sealed class MappedInvertedFile64
 
                 while (true)
                 {
-                    if (ReferenceEquals (currentNode, null))
+                    if (currentNode is null)
                     {
                         break;
                     }

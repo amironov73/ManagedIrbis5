@@ -150,7 +150,7 @@ public static class ConnectionUtility
     /// </summary>
     public static string? GetStandardConnectionString()
     {
-        if (!ReferenceEquals (DefaultConnectionString, null))
+        if (!string.IsNullOrEmpty (DefaultConnectionString))
         {
             return DefaultConnectionString;
         }
