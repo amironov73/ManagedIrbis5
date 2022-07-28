@@ -2,7 +2,7 @@
 // Простановка статуса "временно не выдается" на книги ФКХ без меток
 //
 
-connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+connect ("host=192.168.3.2;port=6666;user=miron;password=miron;db=IBIS;")
 if (!is_connected())
 {
     error ("Not connected")
@@ -12,6 +12,7 @@ if (!is_connected())
 //=================================
 
 FOND = "ФКХ"
+GOOD_WORKSHEETS = ["PAZK", "SPEC", "PVK", "IBIS", "AUNTD"]
 
 processed = 0
 index = 0
@@ -30,8 +31,7 @@ foreach (book in foundRecords)
     need_write = false
 
     worksheet = fm (book, 920)
-    if (worksheet same "PAZK" or worksheet same "SPEC" or worksheet same "PVK"
-        or worksheet same "MUSP" or worksheet same "IBIS" or worksheet same "AUNTD")
+    if (worksheet same GOOD_WORKSHEETS)
     {
         foreach (exemplar in exemplars)
         {

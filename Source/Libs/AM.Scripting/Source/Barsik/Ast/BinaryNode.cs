@@ -87,9 +87,28 @@ internal sealed class BinaryNode
             return leftChar.SameChar (rightChar);
         }
 
-        if (left is string leftString && right is string rightString)
+        if (left is string leftString)
         {
-            return leftString.SameString (rightString);
+            if (right is string rightString)
+            {
+                return leftString.SameString (rightString);
+            }
+
+            if (right is IEnumerable enumerable)
+            {
+                foreach (var one in enumerable)
+                {
+                    if (one is string rightOne)
+                    {
+                        if (leftString.SameString (rightOne))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
         }
 
         throw new NotImplementedException();
