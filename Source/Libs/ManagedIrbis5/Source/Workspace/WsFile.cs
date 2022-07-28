@@ -26,310 +26,309 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Workspace
-{
-    /// <summary>
-    /// Рабочий лист.
-    /// </summary>
-    [XmlRoot("worksheet")]
-    public sealed class WsFile
-        : IHandmadeSerializable,
+namespace ManagedIrbis.Workspace;
+
+/// <summary>
+/// Рабочий лист.
+/// </summary>
+[XmlRoot ("worksheet")]
+public sealed class WsFile
+    : IHandmadeSerializable,
         IVerifiable
+{
+    #region Properties
+
+    /// <summary>
+    /// Имя рабочего листа.
+    /// </summary>
+    [XmlAttribute ("name")]
+    [JsonPropertyName ("name")]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Страницы рабочего листа.
+    /// </summary>
+    [XmlArray ("pages")]
+    [XmlArrayItem ("page")]
+    [JsonPropertyName ("pages")]
+    public NonNullCollection<WorksheetPage> Pages { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public WsFile()
     {
-        #region Properties
+        Pages = new NonNullCollection<WorksheetPage>();
+    }
 
-        /// <summary>
-        /// Имя рабочего листа.
-        /// </summary>
-        [XmlAttribute("name")]
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Страницы рабочего листа.
-        /// </summary>
-        [XmlArray("pages")]
-        [XmlArrayItem("page")]
-        [JsonPropertyName("pages")]
-        public NonNullCollection<WorksheetPage> Pages { get; private set; }
+    #region Public methods
 
-        #endregion
+    /// <summary>
+    /// Разбор потока.
+    /// </summary>
+    public static WsFile ParseStream
+        (
+            TextReader reader
+        )
+    {
+        var result = new WsFile();
+        var count = int.Parse (reader.RequireLine());
 
-        #region Construction
+        var pairs = new Pair<string, int>[count];
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public WsFile()
+        for (var i = 0; i < count; i++)
         {
-            Pages = new NonNullCollection<WorksheetPage>();
+            var name = reader.ReadLine();
+            pairs[i] = new Pair<string, int> (name);
         }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Разбор потока.
-        /// </summary>
-        public static WsFile ParseStream
-            (
-                TextReader reader
-            )
+        for (var i = 0; i < count; i++)
         {
-            var result = new WsFile();
-            var count = int.Parse(reader.RequireLine());
-
-            var pairs = new Pair<string, int>[count];
-
-            for (var i = 0; i < count; i++)
-            {
-                var name = reader.ReadLine();
-                pairs[i] = new Pair<string, int>(name);
-            }
-            for (var i = 0; i < count; i++)
-            {
-                var text = reader.ReadLine().ThrowIfNull("text");
-                var length = int.Parse(text);
-                pairs[i].Second = length;
-            }
-
-            for (var i = 0; i < count; i++)
-            {
-                var name = pairs[i].First.ThrowIfNull("name");
-                var page = WorksheetPage.ParseStream
-                    (
-                        reader,
-                        name,
-                        pairs[i].Second
-                    );
-                result.Pages.Add(page);
-            }
-
-            return result;
+            var text = reader.ReadLine().ThrowIfNull ("text");
+            var length = int.Parse (text);
+            pairs[i].Second = length;
         }
 
-        /// <summary>
-        /// Read from server.
-        /// </summary>
-        public static WsFile? ReadFromServer
-            (
-                ISyncProvider provider,
-                FileSpecification specification
-            )
+        for (var i = 0; i < count; i++)
         {
-            var content = provider.ReadTextFile(specification);
-            if (string.IsNullOrEmpty(content))
-            {
-                return null;
-            }
+            var name = pairs[i].First.ThrowIfNull ("name");
+            var page = WorksheetPage.ParseStream
+                (
+                    reader,
+                    name,
+                    pairs[i].Second
+                );
+            result.Pages.Add (page);
+        }
 
-            WsFile result;
+        return result;
+    }
 
-            using (var reader = new StringReader(content))
-            {
-                result = ParseStream(reader);
-                result.Name = specification.FileName;
-            }
+    /// <summary>
+    /// Read from server.
+    /// </summary>
+    public static WsFile? ReadFromServer
+        (
+            ISyncProvider provider,
+            FileSpecification specification
+        )
+    {
+        var content = provider.ReadTextFile (specification);
+        if (string.IsNullOrEmpty (content))
+        {
+            return null;
+        }
 
-            for (var i = 0; i < result.Pages.Count; )
+        WsFile result;
+
+        using (var reader = new StringReader (content))
+        {
+            result = ParseStream (reader);
+            result.Name = specification.FileName;
+        }
+
+        for (var i = 0; i < result.Pages.Count;)
+        {
+            var page = result.Pages[i];
+            var name = page.Name.ThrowIfNull();
+            if (name.StartsWith ("@"))
             {
-                var page = result.Pages[i];
-                var name = page.Name.ThrowIfNull("page.Name");
-                if (name.StartsWith("@"))
+                var extension = Path.GetExtension (specification.FileName);
+                var nestedSpecification = new FileSpecification
                 {
-                    var extension = Path.GetExtension(specification.FileName);
-                    var nestedSpecification = new FileSpecification
-                        {
-                            Path = specification.Path,
-                            Database = specification.Database,
-                            FileName = name.Substring(1) + extension
-                        };
-                    var nestedFile = ReadFromServer
-                        (
-                            provider,
-                            nestedSpecification
-                        );
-                    if (ReferenceEquals(nestedFile, null))
-                    {
-                        // TODO: somehow report error
-                        i++;
-                    }
-                    else
-                    {
-                        result.Pages.RemoveAt(i);
-                        for (var j = 0; j < nestedFile.Pages.Count; j++)
-                        {
-                            result.Pages.Insert
-                                (
-                                    i + j,
-                                    nestedFile.Pages[j]
-                                );
-                        }
-                    }
+                    Path = specification.Path,
+                    Database = specification.Database,
+                    FileName = name.Substring (1) + extension
+                };
+                var nestedFile = ReadFromServer
+                    (
+                        provider,
+                        nestedSpecification
+                    );
+                if (ReferenceEquals (nestedFile, null))
+                {
+                    // TODO: somehow report error
+                    i++;
                 }
                 else
                 {
-                    i++;
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Fixup nested worksheets for local file.
-        /// </summary>
-        public static WsFile FixupLocalFile
-            (
-                string fileName,
-                Encoding encoding,
-                WsFile wsFile
-            )
-        {
-            for (var i = 0; i < wsFile.Pages.Count; )
-            {
-                var page = wsFile.Pages[i];
-                var name = page.Name.ThrowIfNull("page.Name");
-                if (name.StartsWith("@"))
-                {
-                    var directory = Path.GetDirectoryName(fileName)
-                                    ?? string.Empty;
-                    var extension = Path.GetExtension(fileName);
-                    var nestedName = Path.Combine
-                        (
-                            directory,
-                            name.Substring(1) + extension
-                        );
-                    var nestedFile = ReadLocalFile
-                        (
-                            nestedName,
-                            encoding
-                        );
-                    wsFile.Pages.RemoveAt(i);
+                    result.Pages.RemoveAt (i);
                     for (var j = 0; j < nestedFile.Pages.Count; j++)
                     {
-                        wsFile.Pages.Insert
+                        result.Pages.Insert
                             (
                                 i + j,
                                 nestedFile.Pages[j]
                             );
                     }
                 }
-                else
+            }
+            else
+            {
+                i++;
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Fixup nested worksheets for local file.
+    /// </summary>
+    public static WsFile FixupLocalFile
+        (
+            string fileName,
+            Encoding encoding,
+            WsFile wsFile
+        )
+    {
+        for (var i = 0; i < wsFile.Pages.Count;)
+        {
+            var page = wsFile.Pages[i];
+            var name = page.Name.ThrowIfNull();
+            if (name.StartsWith ("@"))
+            {
+                var directory = Path.GetDirectoryName (fileName)
+                                ?? string.Empty;
+                var extension = Path.GetExtension (fileName);
+                var nestedName = Path.Combine
+                    (
+                        directory,
+                        name.Substring (1) + extension
+                    );
+                var nestedFile = ReadLocalFile
+                    (
+                        nestedName,
+                        encoding
+                    );
+                wsFile.Pages.RemoveAt (i);
+                for (var j = 0; j < nestedFile.Pages.Count; j++)
                 {
-                    i++;
+                    wsFile.Pages.Insert
+                        (
+                            i + j,
+                            nestedFile.Pages[j]
+                        );
                 }
             }
-
-            return wsFile;
-        }
-
-        /// <summary>
-        /// Считывание из локального файла.
-        /// </summary>
-        public static WsFile ReadLocalFile
-            (
-                string fileName,
-                Encoding encoding
-            )
-        {
-            using var reader = TextReaderUtility.OpenRead
-                (
-                    fileName,
-                    encoding
-                );
-            var result = ParseStream(reader);
-            result.Name = Path.GetFileName(fileName);
-
-            return result;
-        }
-
-        /// <summary>
-        /// Считывание из локального файла.
-        /// </summary>
-        public static WsFile ReadLocalFile
-            (
-                string fileName
-            )
-        {
-            return ReadLocalFile
-                (
-                    fileName,
-                    IrbisEncoding.Ansi
-                );
-        }
-
-        /// <summary>
-        /// Should serialize the <see cref="Pages"/> collection?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializePages()
-        {
-            return Pages.Count != 0;
-        }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Name = reader.ReadNullableString();
-            Pages = reader.ReadNonNullCollection<WorksheetPage>();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WriteNullable(Name);
-            writer.Write(Pages);
-        }
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<WsFile>(this, throwOnError);
-
-            foreach (var page in Pages)
+            else
             {
-                verifier.VerifySubObject(page, "page");
+                i++;
             }
-
-            return verifier.Result;
         }
 
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Name.ToVisibleString();
-        }
-
-        #endregion
+        return wsFile;
     }
+
+    /// <summary>
+    /// Считывание из локального файла.
+    /// </summary>
+    public static WsFile ReadLocalFile
+        (
+            string fileName,
+            Encoding encoding
+        )
+    {
+        using var reader = TextReaderUtility.OpenRead
+            (
+                fileName,
+                encoding
+            );
+        var result = ParseStream (reader);
+        result.Name = Path.GetFileName (fileName);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Считывание из локального файла.
+    /// </summary>
+    public static WsFile ReadLocalFile
+        (
+            string fileName
+        )
+    {
+        return ReadLocalFile
+            (
+                fileName,
+                IrbisEncoding.Ansi
+            );
+    }
+
+    /// <summary>
+    /// Should serialize the <see cref="Pages"/> collection?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public bool ShouldSerializePages()
+    {
+        return Pages.Count != 0;
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Name = reader.ReadNullableString();
+        Pages = reader.ReadNonNullCollection<WorksheetPage>();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        writer.WriteNullable (Name);
+        writer.WriteCollection (Pages);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<WsFile> (this, throwOnError);
+
+        foreach (var page in Pages)
+        {
+            verifier.VerifySubObject (page);
+        }
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Name.ToVisibleString();
+    }
+
+    #endregion
 }

@@ -43,11 +43,11 @@ namespace UnitTests.AM.IO
 
             var expected = new NonNullCollection<Dummy>
             {
-                new Dummy { Value = 123 },
-                new Dummy { Value = 456 },
-                new Dummy { Value = 789 }
+                new() { Value = 123 },
+                new() { Value = 456 },
+                new() { Value = 789 }
             };
-            BinaryWriterUtility.Write (writer, expected);
+            BinaryWriterUtility.WriteCollection (writer, expected);
 
             var bytes = stream.ToArray();
             stream = new MemoryStream (bytes);
@@ -614,7 +614,7 @@ namespace UnitTests.AM.IO
 
             var actual = BinaryReaderUtility.ReadNullableInt32Array (reader);
             Assert.IsNotNull (actual);
-            Assert.AreEqual (expected.Length, actual!.Length);
+            Assert.AreEqual (expected.Length, actual.Length);
             for (var i = 0; i < expected.Length; i++)
             {
                 Assert.AreEqual (expected[i], actual[i]);
@@ -657,7 +657,7 @@ namespace UnitTests.AM.IO
 
             var actual = BinaryReaderUtility.ReadNullableStringArray (reader);
             Assert.IsNotNull (actual);
-            Assert.AreEqual (expected.Length, actual!.Length);
+            Assert.AreEqual (expected.Length, actual.Length);
             for (var i = 0; i < expected.Length; i++)
             {
                 Assert.AreEqual (expected[i], actual[i]);
@@ -700,7 +700,7 @@ namespace UnitTests.AM.IO
 
             var actual = BinaryReaderUtility.ReadNullableArray<Dummy> (reader);
             Assert.IsNotNull (actual);
-            Assert.AreEqual (expected.Length, actual!.Length);
+            Assert.AreEqual (expected.Length, actual.Length);
             for (var i = 0; i < expected.Length; i++)
             {
                 var item1 = expected[i];

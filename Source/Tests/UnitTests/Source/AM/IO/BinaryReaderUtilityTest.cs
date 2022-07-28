@@ -37,22 +37,22 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void BinaryReaderUtility_ReadCollectionT_1()
         {
-            MemoryStream stream = new MemoryStream();
-            BinaryWriter writer = new BinaryWriter (stream);
+            var stream = new MemoryStream();
+            var writer = new BinaryWriter (stream);
 
-            NonNullCollection<Dummy> expected = new NonNullCollection<Dummy>
+            var expected = new NonNullCollection<Dummy>
             {
-                new Dummy { Value = 123 },
-                new Dummy { Value = 456 },
-                new Dummy { Value = 789 }
+                new() { Value = 123 },
+                new() { Value = 456 },
+                new() { Value = 789 }
             };
-            BinaryWriterUtility.Write (writer, expected);
+            BinaryWriterUtility.WriteCollection (writer, expected);
 
-            byte[] bytes = stream.ToArray();
+            var bytes = stream.ToArray();
             stream = new MemoryStream (bytes);
-            BinaryReader reader = new BinaryReader (stream);
+            var reader = new BinaryReader (stream);
 
-            NonNullCollection<Dummy> actual = new NonNullCollection<Dummy>();
+            var actual = new NonNullCollection<Dummy>();
             BinaryReaderUtility.ReadCollection (reader, actual);
             Assert.AreEqual (expected.Count, actual.Count);
             Assert.AreEqual (expected[0].Value, actual[0].Value);
@@ -65,8 +65,8 @@ namespace UnitTests.AM.IO
         public void BinaryReaderUtility_ReadPackedInt32_1()
         {
             byte[] bytes = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-            MemoryStream stream = new MemoryStream (bytes);
-            BinaryReader reader = new BinaryReader (stream);
+            var stream = new MemoryStream (bytes);
+            var reader = new BinaryReader (stream);
             BinaryReaderUtility.ReadPackedInt32 (reader);
         }
 
@@ -74,9 +74,9 @@ namespace UnitTests.AM.IO
         public void BinaryReaderUtility_ReadString_1()
         {
             byte[] bytes = { 72, 101, 108, 108, 111 };
-            MemoryStream stream = new MemoryStream (bytes);
-            BinaryReader reader = new BinaryReader (stream);
-            string actual = BinaryReaderUtility.ReadString (reader, 5);
+            var stream = new MemoryStream (bytes);
+            var reader = new BinaryReader (stream);
+            var actual = BinaryReaderUtility.ReadString (reader, 5);
             Assert.AreEqual ("Hello", actual);
         }
     }

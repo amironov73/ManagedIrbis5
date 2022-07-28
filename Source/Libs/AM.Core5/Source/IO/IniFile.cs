@@ -41,9 +41,9 @@ namespace AM.IO;
 /// </summary>
 public class IniFile
     : MarshalByRefObject,
-        IHandmadeSerializable,
-        IEnumerable<IniFile.Section>,
-        IDisposable
+    IHandmadeSerializable,
+    IEnumerable<IniFile.Section>,
+    IDisposable
 {
     #region Nested classes
 
@@ -552,7 +552,7 @@ public class IniFile
             )
         {
             writer.WriteNullable (_name);
-            writer.Write (_lines);
+            writer.WriteCollection (_lines);
         }
 
         #endregion

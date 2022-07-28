@@ -27,197 +27,194 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Workspace
-{
-    /// <summary>
-    /// Вложенный рабочий лист.
-    /// </summary>
-    [XmlRoot("wss")]
-    [DebuggerDisplay("{" + nameof(Name) + "}")]
-    public sealed class WssFile
-        : IHandmadeSerializable,
+namespace ManagedIrbis.Workspace;
+
+/// <summary>
+/// Вложенный рабочий лист.
+/// </summary>
+[XmlRoot ("wss")]
+[DebuggerDisplay ("{" + nameof (Name) + "}")]
+public sealed class WssFile
+    : IHandmadeSerializable,
         IVerifiable
+{
+    #region Properties
+
+    /// <summary>
+    /// Имя рабочего листа.
+    /// </summary>
+    [XmlAttribute ("name")]
+    [JsonPropertyName ("name")]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Элементы рабочего листа.
+    /// </summary>
+    [XmlArray ("items")]
+    [XmlArrayItem ("item")]
+    [JsonPropertyName ("items")]
+    public NonNullCollection<WorksheetItem> Items { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор
+    /// </summary>
+    public WssFile()
     {
-        #region Properties
+        Items = new NonNullCollection<WorksheetItem>();
+    }
 
-        /// <summary>
-        /// Имя рабочего листа.
-        /// </summary>
-        [XmlAttribute("name")]
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Элементы рабочего листа.
-        /// </summary>
-        [XmlArray("items")]
-        [XmlArrayItem("item")]
-        [JsonPropertyName("items")]
-        public NonNullCollection<WorksheetItem> Items { get; private set; }
+    #region Public methods
 
-        #endregion
+    /// <summary>
+    /// Разбор потока.
+    /// </summary>
+    public static WssFile ParseStream
+        (
+            TextReader reader
+        )
+    {
+        var result = new WssFile();
 
-        #region Construction
+        var count = int.Parse (reader.RequireLine());
 
-        /// <summary>
-        /// Конструктор
-        /// </summary>
-        public WssFile()
+        for (var i = 0; i < count; i++)
         {
-            Items = new NonNullCollection<WorksheetItem>();
+            var item = WorksheetItem.ParseStream (reader);
+            result.Items.Add (item);
         }
 
-        #endregion
+        return result;
+    }
 
-        #region Public methods
-
-        /// <summary>
-        /// Разбор потока.
-        /// </summary>
-        public static WssFile ParseStream
-            (
-                TextReader reader
-            )
+    /// <summary>
+    /// Read from server.
+    /// </summary>
+    public static WssFile? ReadFromServer
+        (
+            ISyncProvider provider,
+            FileSpecification specification
+        )
+    {
+        var content = provider.ReadTextFile (specification);
+        if (string.IsNullOrEmpty (content))
         {
-            var result = new WssFile();
-
-            var count = int.Parse(reader.RequireLine());
-
-            for (var i = 0; i < count; i++)
-            {
-                var item = WorksheetItem.ParseStream(reader);
-                result.Items.Add(item);
-            }
-
-            return result;
+            return null;
         }
 
-        /// <summary>
-        /// Read from server.
-        /// </summary>
-        public static WssFile? ReadFromServer
-            (
-                ISyncProvider provider,
-                FileSpecification specification
-            )
-        {
-            var content = provider.ReadTextFile(specification);
-            if (string.IsNullOrEmpty(content))
-            {
-                return null;
-            }
+        using var reader = new StringReader (content);
+        return ParseStream (reader);
+    }
 
-            using var reader = new StringReader(content);
-            return ParseStream(reader);
-        }
-
-        /// <summary>
-        /// Считывание из локального файла.
-        /// </summary>
-        public static WssFile ReadLocalFile
-            (
-                string fileName,
-                Encoding encoding
-            )
-        {
-            using var reader = TextReaderUtility.OpenRead
+    /// <summary>
+    /// Считывание из локального файла.
+    /// </summary>
+    public static WssFile ReadLocalFile
+        (
+            string fileName,
+            Encoding encoding
+        )
+    {
+        using var reader = TextReaderUtility.OpenRead
             (
                 fileName,
                 encoding
             );
-            var result = ParseStream(reader);
+        var result = ParseStream (reader);
 
-            result.Name = Path.GetFileName(fileName);
+        result.Name = Path.GetFileName (fileName);
 
-            return result;
-        }
-
-        /// <summary>
-        /// Считывание из локального файла.
-        /// </summary>
-        public static WssFile ReadLocalFile
-            (
-                string fileName
-            )
-        {
-            return ReadLocalFile
-                (
-                    fileName,
-                    IrbisEncoding.Ansi
-                );
-        }
-
-        /// <summary>
-        /// Should serialize the <see cref="Items"/> collection?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeItems()
-        {
-            return Items.Count != 0;
-        }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Name = reader.ReadNullableString();
-            Items = reader.ReadNonNullCollection<WorksheetItem>();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WriteNullable(Name);
-            writer.Write(Items);
-        }
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier
-                = new Verifier<WssFile>(this, throwOnError);
-
-            foreach (var item in Items)
-            {
-                verifier.VerifySubObject(item, "item");
-            }
-
-            return verifier.Result;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Name.ToVisibleString();
-        }
-
-        #endregion
+        return result;
     }
+
+    /// <summary>
+    /// Считывание из локального файла.
+    /// </summary>
+    public static WssFile ReadLocalFile
+        (
+            string fileName
+        )
+    {
+        return ReadLocalFile
+            (
+                fileName,
+                IrbisEncoding.Ansi
+            );
+    }
+
+    /// <summary>
+    /// Should serialize the <see cref="Items"/> collection?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public bool ShouldSerializeItems()
+    {
+        return Items.Count != 0;
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Name = reader.ReadNullableString();
+        Items = reader.ReadNonNullCollection<WorksheetItem>();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        writer.WriteNullable (Name);
+        writer.WriteCollection (Items);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<WssFile> (this, throwOnError);
+
+        foreach (var item in Items)
+        {
+            verifier.VerifySubObject (item);
+        }
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Name.ToVisibleString();
+    }
+
+    #endregion
 }

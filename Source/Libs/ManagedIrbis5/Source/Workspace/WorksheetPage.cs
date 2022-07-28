@@ -9,7 +9,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* WorksheetPage.cs --
+/* WorksheetPage.cs -- вкладка рабочего листа
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -30,171 +30,161 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.Workspace
+namespace ManagedIrbis.Workspace;
+
+/// <summary>
+/// Вкладка рабочего листа.
+/// </summary>
+[XmlRoot ("page")]
+public sealed class WorksheetPage
+    : IHandmadeSerializable,
+    IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Имя страницы.
     /// </summary>
-    [XmlRoot("page")]
-    public sealed class WorksheetPage
-        : IHandmadeSerializable,
-        IVerifiable
+    [XmlElement ("name")]
+    [JsonPropertyName ("name")]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Элементы страницы.
+    /// </summary>
+    [XmlElement ("item")]
+    [JsonPropertyName ("items")]
+    public NonNullCollection<WorksheetItem> Items { get; private set; }
+
+    /// <summary>
+    /// Arbitrary user data.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public WorksheetPage()
     {
-        #region Properties
-
-        /// <summary>
-        /// Имя страницы.
-        /// </summary>
-        [XmlElement("name")]
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Элементы страницы.
-        /// </summary>
-        [XmlElement("item")]
-        [JsonPropertyName("items")]
-        public NonNullCollection<WorksheetItem> Items { get; private set; }
-
-        /// <summary>
-        /// Arbitrary user data.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable(false)]
-        public object? UserData { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public WorksheetPage()
-        {
-            Items = new NonNullCollection<WorksheetItem>();
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Encode the page.
-        /// </summary>
-        public void Encode
-            (
-                TextWriter writer
-            )
-        {
-            foreach (WorksheetItem item in Items)
-            {
-                item.Encode(writer);
-            }
-        }
-
-        /// <summary>
-        /// Разбор потока.
-        /// </summary>
-        public static WorksheetPage ParseStream
-            (
-                TextReader reader,
-                string name,
-                int count
-            )
-        {
-            var result = new WorksheetPage
-            {
-                Name = name
-            };
-
-            for (int i = 0; i < count; i++)
-            {
-                WorksheetItem item = WorksheetItem.ParseStream(reader);
-                result.Items.Add(item);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Should serialize the <see cref="Items"/> collection?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeItems()
-        {
-            return Items.Count != 0;
-        }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Name = reader.ReadNullableString();
-            Items = reader.ReadNonNullCollection<WorksheetItem>();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WriteNullable(Name);
-            writer.Write(Items);
-        }
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            Verifier<WorksheetPage> verifier
-                = new Verifier<WorksheetPage>(this, throwOnError);
-
-            verifier
-                .NotNullNorEmpty(Name, "Name")
-                .Assert
-                    (
-                        Items.Count != 0,
-                        "Items.Count != 0"
-                    );
-
-            foreach (WorksheetItem item in Items)
-            {
-                verifier.VerifySubObject
-                    (
-                        item,
-                        "Item"
-                    );
-            }
-
-            return verifier.Result;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Name.ToVisibleString();
-        }
-
-        #endregion
+        Items = new NonNullCollection<WorksheetItem>();
     }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Encode the page.
+    /// </summary>
+    public void Encode
+        (
+            TextWriter writer
+        )
+    {
+        foreach (var item in Items)
+        {
+            item.Encode (writer);
+        }
+    }
+
+    /// <summary>
+    /// Разбор потока.
+    /// </summary>
+    public static WorksheetPage ParseStream
+        (
+            TextReader reader,
+            string name,
+            int count
+        )
+    {
+        var result = new WorksheetPage
+        {
+            Name = name
+        };
+
+        for (var i = 0; i < count; i++)
+        {
+            var item = WorksheetItem.ParseStream (reader);
+            result.Items.Add (item);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Should serialize the <see cref="Items"/> collection?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    [EditorBrowsable (EditorBrowsableState.Never)]
+    public bool ShouldSerializeItems()
+    {
+        return Items.Count != 0;
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Name = reader.ReadNullableString();
+        Items = reader.ReadNonNullCollection<WorksheetItem>();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        writer.WriteNullable (Name);
+        writer.WriteCollection (Items);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<WorksheetPage> (this, throwOnError);
+
+        verifier
+            .NotNullNorEmpty (Name)
+            .Assert (Items.Count != 0);
+
+        foreach (var item in Items)
+        {
+            verifier.VerifySubObject (item, "Item");
+        }
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Name.ToVisibleString();
+    }
+
+    #endregion
 }

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
@@ -36,22 +37,6 @@ public static class BinaryWriterUtility
     #region Public methods
 
     /// <summary>
-    /// Write the <see cref="NonNullCollection{T}"/>
-    /// to the stream.
-    /// </summary>
-    public static BinaryWriter Write<T>
-        (
-            this BinaryWriter writer,
-            NonNullCollection<T> collection
-        )
-        where T : class, IHandmadeSerializable, new()
-    {
-        writer.WriteArray (collection.ToArray());
-
-        return writer;
-    }
-
-    /// <summary>
     /// Write nullable 8-bit integer.
     /// </summary>
     public static BinaryWriter Write
@@ -60,6 +45,8 @@ public static class BinaryWriterUtility
             byte? value
         )
     {
+        Sure.NotNull (writer);
+
         if (value.HasValue)
         {
             writer.Write (true);
@@ -82,6 +69,8 @@ public static class BinaryWriterUtility
             short? value
         )
     {
+        Sure.NotNull (writer);
+
         if (value.HasValue)
         {
             writer.Write (true);
@@ -104,6 +93,8 @@ public static class BinaryWriterUtility
             int? value
         )
     {
+        Sure.NotNull (writer);
+
         if (value.HasValue)
         {
             writer.Write (true);
@@ -126,6 +117,8 @@ public static class BinaryWriterUtility
             long? value
         )
     {
+        Sure.NotNull (writer);
+
         if (value.HasValue)
         {
             writer.Write (true);
@@ -148,6 +141,8 @@ public static class BinaryWriterUtility
             decimal? value
         )
     {
+        Sure.NotNull (writer);
+
         if (value.HasValue)
         {
             writer.Write (true);
@@ -170,6 +165,8 @@ public static class BinaryWriterUtility
             DateTime value
         )
     {
+        Sure.NotNull (writer);
+
         var ticks = value.ToBinary();
         writer.Write (ticks);
 
@@ -185,6 +182,8 @@ public static class BinaryWriterUtility
             DateTime? value
         )
     {
+        Sure.NotNull (writer);
+
         if (value.HasValue)
         {
             writer.Write (true);
@@ -207,6 +206,8 @@ public static class BinaryWriterUtility
             double? value
         )
     {
+        Sure.NotNull (writer);
+
         if (value.HasValue)
         {
             writer.Write (true);
@@ -218,7 +219,7 @@ public static class BinaryWriterUtility
         }
 
         return writer;
-    } // method Write
+    }
 
     /// <summary>
     /// Запись строки в виде ReadOnlyMemory.
@@ -229,12 +230,14 @@ public static class BinaryWriterUtility
             ReadOnlyMemory<char> memory
         )
     {
+        Sure.NotNull (writer);
+
         var length = memory.Length;
         writer.WritePackedInt32 (length);
         writer.Write (memory.Span);
 
         return writer;
-    } // method Write
+    }
 
     /// <summary>
     /// Write array of bytes.
@@ -245,11 +248,14 @@ public static class BinaryWriterUtility
             byte[] array
         )
     {
+        Sure.NotNull (writer);
+        Sure.NotNull (array);
+
         writer.WritePackedInt32 (array.Length);
         writer.Write (array);
 
         return writer;
-    } // method Write
+    }
 
     /// <summary>
     /// Write array of 16-bit integers.
@@ -260,6 +266,9 @@ public static class BinaryWriterUtility
             short[] array
         )
     {
+        Sure.NotNull (writer);
+        Sure.NotNull (array);
+
         writer.WritePackedInt32 (array.Length);
         for (var i = 0; i < array.Length; i++)
         {
@@ -278,6 +287,9 @@ public static class BinaryWriterUtility
             int[] array
         )
     {
+        Sure.NotNull (writer);
+        Sure.NotNull (array);
+
         writer.WritePackedInt32 (array.Length);
         for (var i = 0; i < array.Length; i++)
         {
@@ -296,6 +308,9 @@ public static class BinaryWriterUtility
             long[] array
         )
     {
+        Sure.NotNull (writer);
+        Sure.NotNull (array);
+
         writer.WritePackedInt32 (array.Length);
         for (var i = 0; i < array.Length; i++)
         {
@@ -314,6 +329,9 @@ public static class BinaryWriterUtility
             string[] array
         )
     {
+        Sure.NotNull (writer);
+        Sure.NotNull (array);
+
         writer.WritePackedInt32 (array.Length);
         for (var i = 0; i < array.Length; i++)
         {
@@ -333,6 +351,9 @@ public static class BinaryWriterUtility
         )
         where T : IHandmadeSerializable, new()
     {
+        Sure.NotNull (writer);
+        Sure.NotNull (array);
+
         writer.WritePackedInt32 (array.Length);
         for (var i = 0; i < array.Length; i++)
         {
@@ -353,6 +374,9 @@ public static class BinaryWriterUtility
         )
         where T : class, IHandmadeSerializable, new()
     {
+        Sure.NotNull (writer);
+        Sure.NotNull (collection);
+
         writer.WritePackedInt32 (collection.Count);
         for (var i = 0; i < collection.Count; i++)
         {
@@ -392,7 +416,7 @@ public static class BinaryWriterUtility
             string? value
         )
     {
-        if (!ReferenceEquals (value, null))
+        if (value is not null)
         {
             writer.Write (true);
             writer.Write (value);
@@ -414,7 +438,9 @@ public static class BinaryWriterUtility
             int[]? array
         )
     {
-        if (ReferenceEquals (array, null))
+        Sure.NotNull (writer);
+
+        if (array is null)
         {
             writer.Write (false);
         }
@@ -440,7 +466,9 @@ public static class BinaryWriterUtility
             string[]? array
         )
     {
-        if (ReferenceEquals (array, null))
+        Sure.NotNull (writer);
+
+        if (array is null)
         {
             writer.Write (false);
         }
@@ -466,7 +494,9 @@ public static class BinaryWriterUtility
             ReadOnlyMemory<char>[]? array
         )
     {
-        if (ReferenceEquals (array, null))
+        Sure.NotNull (writer);
+
+        if (array is null)
         {
             writer.Write (false);
         }
@@ -493,7 +523,9 @@ public static class BinaryWriterUtility
         )
         where T : IHandmadeSerializable
     {
-        if (ReferenceEquals (array, null))
+        Sure.NotNull (writer);
+
+        if (array is null)
         {
             writer.Write (false);
         }

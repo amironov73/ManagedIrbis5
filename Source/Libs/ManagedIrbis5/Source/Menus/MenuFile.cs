@@ -439,7 +439,7 @@ public sealed class MenuFile
         Sure.NotNull (writer);
 
         writer.WriteNullable (FileName);
-        writer.Write (Entries);
+        writer.WriteCollection (Entries);
     }
 
     #endregion

@@ -167,8 +167,8 @@ public sealed class GblFile
         Sure.NotNull (writer);
 
         writer.WriteNullable (FileName);
-        writer.Write (Parameters);
-        writer.Write (Statements);
+        writer.WriteCollection (Parameters);
+        writer.WriteCollection (Statements);
     }
 
     #endregion

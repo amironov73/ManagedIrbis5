@@ -39,7 +39,7 @@ namespace ManagedIrbis.Trees;
 [DebuggerDisplay ("{" + nameof (Value) + "}")]
 public sealed class TreeLine
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Properties
 
@@ -198,7 +198,7 @@ public sealed class TreeLine
         Sure.NotNull (writer);
 
         writer.WriteNullable (Value);
-        writer.Write (Children);
+        writer.WriteCollection (Children);
     }
 
     #endregion

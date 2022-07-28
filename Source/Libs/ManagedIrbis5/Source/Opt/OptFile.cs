@@ -365,7 +365,7 @@ public sealed class OptFile
     {
         Sure.NotNull (writer);
 
-        writer.Write (Lines);
+        writer.WriteCollection (Lines);
         writer.WritePackedInt32 (WorksheetLength);
         writer.WritePackedInt32 (WorksheetTag);
     }

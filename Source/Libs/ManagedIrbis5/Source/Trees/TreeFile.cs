@@ -42,7 +42,7 @@ namespace ManagedIrbis.Trees;
 /// </summary>
 public sealed class TreeFile
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Constants
 
@@ -297,7 +297,7 @@ public sealed class TreeFile
         Sure.NotNull (writer);
 
         writer.WriteNullable (FileName);
-        writer.Write (Roots);
+        writer.WriteCollection (Roots);
     }
 
     #endregion
