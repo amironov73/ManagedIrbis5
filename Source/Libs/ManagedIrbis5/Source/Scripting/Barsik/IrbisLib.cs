@@ -954,7 +954,7 @@ public sealed class IrbisLib
     /// <summary>
     /// Простой доступ к полям записи.
     /// </summary>
-    public static dynamic? GetConnectionString
+    public static dynamic GetConnectionString
         (
             Context context,
             dynamic?[] args
@@ -963,7 +963,7 @@ public sealed class IrbisLib
         var application = new IrbisApplication (Magna.Args);
         application.BuildConnectionSettings();
 
-        return application.Settings?.ToString();
+        return application.Settings.ToString();
     }
 
     /// <summary>

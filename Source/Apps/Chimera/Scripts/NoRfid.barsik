@@ -1,0 +1,75 @@
+﻿//
+// Простановка статуса "временно не выдается" на книги ФКХ без меток
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+FOND = "ФКХ"
+
+processed = 0
+index = 0
+
+//=================================
+
+foundMfn = search_all ("MHR=" + FOND + " * V=KN * STEX=0")
+println ("Found: ", len (foundMfn))
+
+foundRecords = batch_read (foundMfn)
+foreach (book in foundRecords)
+{
+    index++
+    print (index, ") ")
+    exemplars = get_exemplars (book)
+    need_write = false
+
+    worksheet = fm (book, 920)
+    if (worksheet same "PAZK" or worksheet same "SPEC" or worksheet same "PVK"
+        or worksheet same "MUSP" or worksheet same "IBIS" or worksheet same "AUNTD")
+    {
+        foreach (exemplar in exemplars)
+        {
+            number = exemplar.Number
+            place = exemplar.Place
+            status = exemplar.Status
+            barcode = exemplar.Barcode
+            if (status == "0" and place == FOND and !barcode)
+            {
+                if (!need_write)
+                {
+                    processed++
+                }
+
+                print (exemplar.Number, " ")
+
+                field = exemplar.Field
+                field.SetSubFieldValue ('a', "5")
+                field.SetSubFieldValue ('c', null)
+
+                need_write = true
+            }
+        }
+    }
+
+    if (need_write)
+    {
+         write_record (book)
+    }
+
+    println()
+}
+
+//=================================
+
+println()
+println ("=> ", processed)
+
+//=================================
+
+disconnect()

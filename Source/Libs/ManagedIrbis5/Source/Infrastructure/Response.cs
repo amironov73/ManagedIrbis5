@@ -290,7 +290,7 @@ public sealed class Response
         while (true)
         {
             var one = ReadByte();
-            if (one == 0)
+            if (one is 0 or 10 or 30)
             {
                 break;
             }
@@ -302,11 +302,6 @@ public sealed class Response
                     ReadByte();
                 }
 
-                break;
-            }
-
-            if (one == 10)
-            {
                 break;
             }
 

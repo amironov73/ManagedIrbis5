@@ -3,7 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
@@ -73,7 +72,7 @@ public sealed class ExemplarInfo
     [SubField ('a')]
     [XmlAttribute ("status")]
     [JsonPropertyName ("status")]
-    [Description ("Статус экземпляра")]
+    [DisplayName ("Статус экземпляра")]
     public string? Status { get; set; }
 
     /// <summary>
@@ -82,7 +81,7 @@ public sealed class ExemplarInfo
     [SubField ('b')]
     [XmlAttribute ("number")]
     [JsonPropertyName ("number")]
-    [Description ("Инвентарный номер")]
+    [DisplayName ("Инвентарный номер")]
     public string? Number { get; set; }
 
     /// <summary>
@@ -91,7 +90,7 @@ public sealed class ExemplarInfo
     [SubField ('c')]
     [XmlAttribute ("date")]
     [JsonPropertyName ("date")]
-    [Description ("Дата поступления")]
+    [DisplayName ("Дата поступления")]
     public string? Date { get; set; }
 
     /// <summary>
@@ -100,7 +99,7 @@ public sealed class ExemplarInfo
     [SubField ('d')]
     [XmlAttribute ("place")]
     [JsonPropertyName ("place")]
-    [Description ("Место хранения")]
+    [DisplayName ("Место хранения")]
     public string? Place { get; set; }
 
     /// <summary>
@@ -109,7 +108,7 @@ public sealed class ExemplarInfo
     [SubField ('q')]
     [XmlAttribute ("collection")]
     [JsonPropertyName ("collection")]
-    [Description ("Наименование коллекции")]
+    [DisplayName ("Наименование коллекции")]
     public string? Collection { get; set; }
 
     /// <summary>
@@ -118,7 +117,7 @@ public sealed class ExemplarInfo
     [SubField ('r')]
     [XmlAttribute ("shelf-index")]
     [JsonPropertyName ("shelf-index")]
-    [Description ("Расстановочный шифр")]
+    [DisplayName ("Расстановочный шифр")]
     public string? ShelfIndex { get; set; }
 
     /// <summary>
@@ -127,7 +126,7 @@ public sealed class ExemplarInfo
     [SubField ('e')]
     [XmlAttribute ("price")]
     [JsonPropertyName ("price")]
-    [Description ("Цена экземпляра")]
+    [DisplayName ("Цена экземпляра")]
     public string? Price { get; set; }
 
     /// <summary>
@@ -136,7 +135,7 @@ public sealed class ExemplarInfo
     [SubField ('h')]
     [XmlAttribute ("barcode")]
     [JsonPropertyName ("barcode")]
-    [Description ("Штрих-код/радиометка")]
+    [DisplayName ("Штрих-код/радиометка")]
     public string? Barcode { get; set; }
 
     /// <summary>
@@ -145,7 +144,7 @@ public sealed class ExemplarInfo
     [SubField ('1')]
     [XmlAttribute ("amount")]
     [JsonPropertyName ("amount")]
-    [Description ("Число экземпляров")]
+    [DisplayName ("Число экземпляров")]
     public string? Amount { get; set; }
 
     /// <summary>
@@ -154,7 +153,7 @@ public sealed class ExemplarInfo
     [SubField ('t')]
     [XmlAttribute ("purpose")]
     [JsonPropertyName ("purpose")]
-    [Description ("Специальное назначение фонда")]
+    [DisplayName ("Специальное назначение фонда")]
     public string? Purpose { get; set; }
 
     /// <summary>
@@ -163,7 +162,7 @@ public sealed class ExemplarInfo
     [SubField ('=')]
     [XmlAttribute ("coefficient")]
     [JsonPropertyName ("coefficient")]
-    [Description ("Коэффициент многоразового использования")]
+    [DisplayName ("Коэффициент многоразового использования")]
     public string? Coefficient { get; set; }
 
     /// <summary>
@@ -172,7 +171,7 @@ public sealed class ExemplarInfo
     [SubField ('4')]
     [XmlAttribute ("off-balance")]
     [JsonPropertyName ("off-balance")]
-    [Description ("Экземпляры не на баланс")]
+    [DisplayName ("Экземпляры не на баланс")]
     public string? OffBalance { get; set; }
 
     /// <summary>
@@ -181,7 +180,7 @@ public sealed class ExemplarInfo
     [SubField ('u')]
     [XmlAttribute ("ksu-number1")]
     [JsonPropertyName ("ksu-number1")]
-    [Description ("Номер записи КСУ")]
+    [DisplayName ("Номер записи КСУ")]
     public string? KsuNumber1 { get; set; }
 
     /// <summary>
@@ -190,7 +189,7 @@ public sealed class ExemplarInfo
     [SubField ('y')]
     [XmlAttribute ("act-number1")]
     [JsonPropertyName ("act-number1")]
-    [Description ("Номер акта")]
+    [DisplayName ("Номер акта")]
     public string? ActNumber1 { get; set; }
 
     /// <summary>
@@ -199,7 +198,7 @@ public sealed class ExemplarInfo
     [SubField ('f')]
     [XmlAttribute ("channel")]
     [JsonPropertyName ("channel")]
-    [Description ("Канал поступления")]
+    [DisplayName ("Канал поступления")]
     public string? Channel { get; set; }
 
     /// <summary>
@@ -208,7 +207,7 @@ public sealed class ExemplarInfo
     [SubField ('2')]
     [XmlAttribute ("on-hand")]
     [JsonPropertyName ("on-hand")]
-    [Description ("Число выданных экземпляров")]
+    [DisplayName ("Число выданных экземпляров")]
     public string? OnHand { get; set; }
 
     /// <summary>
@@ -217,7 +216,7 @@ public sealed class ExemplarInfo
     [SubField ('v')]
     [XmlAttribute ("act-number2")]
     [JsonPropertyName ("act-number2")]
-    [Description ("Номер акта списания")]
+    [DisplayName ("Номер акта списания")]
     public string? ActNumber2 { get; set; }
 
     /// <summary>
@@ -226,7 +225,7 @@ public sealed class ExemplarInfo
     [SubField ('x')]
     [XmlAttribute ("write-off")]
     [JsonPropertyName ("write-off")]
-    [Description ("Количество списываемых экземпляров")]
+    [DisplayName ("Количество списываемых экземпляров")]
     public string? WriteOff { get; set; }
 
     /// <summary>
@@ -235,7 +234,7 @@ public sealed class ExemplarInfo
     [SubField ('k')]
     [XmlAttribute ("completion")]
     [JsonPropertyName ("completion")]
-    [Description ("Количество экземпляров для докомплектования")]
+    [DisplayName ("Количество экземпляров для докомплектования")]
     public string? Completion { get; set; }
 
     /// <summary>
@@ -244,7 +243,7 @@ public sealed class ExemplarInfo
     [SubField ('w')]
     [XmlAttribute ("act-number3")]
     [JsonPropertyName ("act-number3")]
-    [Description ("Номер акта передачи")]
+    [DisplayName ("Номер акта передачи")]
     public string? ActNumber3 { get; set; }
 
     /// <summary>
@@ -253,7 +252,7 @@ public sealed class ExemplarInfo
     [SubField ('z')]
     [XmlAttribute ("moving")]
     [JsonPropertyName ("moving")]
-    [Description ("Количество передаваемых экземпляров")]
+    [DisplayName ("Количество передаваемых экземпляров")]
     public string? Moving { get; set; }
 
     /// <summary>
@@ -262,7 +261,7 @@ public sealed class ExemplarInfo
     [SubField ('m')]
     [XmlAttribute ("new-place")]
     [JsonPropertyName ("new-place")]
-    [Description ("Новое место хранения")]
+    [DisplayName ("Новое место хранения")]
     public string? NewPlace { get; set; }
 
     /// <summary>
@@ -271,7 +270,7 @@ public sealed class ExemplarInfo
     [SubField ('s')]
     [XmlAttribute ("checked-date")]
     [JsonPropertyName ("checked-date")]
-    [Description ("Дата проверки фонда")]
+    [DisplayName ("Дата проверки фонда")]
     public string? CheckedDate { get; set; }
 
     /// <summary>
@@ -280,7 +279,7 @@ public sealed class ExemplarInfo
     [SubField ('0')]
     [XmlAttribute ("checked-amount")]
     [JsonPropertyName ("checked-amount")]
-    [Description ("Число проверенных экземпляров")]
+    [DisplayName ("Число проверенных экземпляров")]
     public string? CheckedAmount { get; set; }
 
     /// <summary>
@@ -289,7 +288,7 @@ public sealed class ExemplarInfo
     [SubField ('!')]
     [XmlAttribute ("real-place")]
     [JsonPropertyName ("real-place")]
-    [Description ("Реальное место нахождения книги")]
+    [DisplayName ("Реальное место нахождения книги")]
     public string? RealPlace { get; set; }
 
     /// <summary>
@@ -298,7 +297,7 @@ public sealed class ExemplarInfo
     [SubField ('p')]
     [XmlAttribute ("binding-index")]
     [JsonPropertyName ("binding-index")]
-    [Description ("Шифр подшивки")]
+    [DisplayName ("Шифр подшивки")]
     public string? BindingIndex { get; set; }
 
     /// <summary>
@@ -307,7 +306,7 @@ public sealed class ExemplarInfo
     [SubField ('i')]
     [XmlAttribute ("binding-number")]
     [JsonPropertyName ("binding-number")]
-    [Description ("Инвентарный номер подшивки")]
+    [DisplayName ("Инвентарный номер подшивки")]
     public string? BindingNumber { get; set; }
 
     /// <summary>
@@ -586,9 +585,12 @@ public sealed class ExemplarInfo
             int tagNumber = ExemplarTag
         )
     {
+        Sure.NotNull (record);
+        Sure.Positive (tagNumber);
+
         var result = record.Fields
             .GetField (tagNumber)
-            .Select (field => ParseField (field))
+            .Select (ParseField)
             .ToArray();
 
         foreach (var exemplar in result)
