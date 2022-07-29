@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* InputBoxTest.cs --
@@ -23,37 +24,30 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class InputBoxTest
+    : IFormsTest
 {
-    public sealed class InputBoxTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
+        var theValue = "Default value";
+        var dialogResult = InputBox.Query
             (
-                IWin32Window? ownerWindow
-            )
-        {
-            var theValue = "Default value";
-            var dialogResult = InputBox.Query
-                (
-                    "Testing the components",
-                    "Enter something",
-                    "Please, enter something",
-                    ref theValue
-                );
+                "Testing the components",
+                "Enter something",
+                "Please, enter something",
+                ref theValue
+            );
 
-            var text = string.Format
-                (
-                    "Result: {0}{1}Value: {2}",
-                    dialogResult,
-                    Environment.NewLine,
-                    theValue
-                );
-            MessageBox.Show(text);
-        }
-
-        #endregion
+        var text = $"Result: {dialogResult}{Environment.NewLine}Value: {theValue}";
+        MessageBox.Show(text);
     }
+
+    #endregion
 }

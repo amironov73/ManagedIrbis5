@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* InputDialog.cs -- dialog that allows the user to input a sinlge text value
  * Ars Magna project, http://arsmagna.ru
  */
 
