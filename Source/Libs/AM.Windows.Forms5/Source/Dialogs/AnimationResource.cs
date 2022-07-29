@@ -39,7 +39,9 @@ public sealed class AnimationResource
     public AnimationResource (string resourceFile, int resourceId)
     {
         if (resourceFile == null)
+        {
             throw new ArgumentNullException ("resourceFile");
+        }
 
         ResourceFile = resourceFile;
         ResourceId = resourceId;
@@ -71,7 +73,9 @@ public sealed class AnimationResource
     public static AnimationResource GetShellAnimation (ShellAnimation animation)
     {
         if (!Enum.IsDefined (typeof (ShellAnimation), animation))
+        {
             throw new ArgumentOutOfRangeException ("animation");
+        }
 
         return new AnimationResource ("shell32.dll", (int)animation);
     }
@@ -84,8 +88,11 @@ public sealed class AnimationResource
         {
             int error = Marshal.GetLastWin32Error();
             if (error == NativeMethods.ErrorFileNotFound)
+            {
                 throw new FileNotFoundException (string.Format (CultureInfo.CurrentCulture,
                     Resources.FileNotFoundFormat, ResourceFile));
+            }
+
             throw new Win32Exception (error);
         }
 

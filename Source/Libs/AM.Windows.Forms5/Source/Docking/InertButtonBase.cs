@@ -43,7 +43,9 @@ public abstract class InertButtonBase : Control
         private set
         {
             if (m_isMouseOver == value)
+            {
                 return;
+            }
 
             m_isMouseOver = value;
             Invalidate();
@@ -58,7 +60,9 @@ public abstract class InertButtonBase : Control
         private set
         {
             if (m_isMouseDown == value)
+            {
                 return;
+            }
 
             m_isMouseDown = value;
             Invalidate();
@@ -75,35 +79,45 @@ public abstract class InertButtonBase : Control
         base.OnMouseMove (e);
         bool over = ClientRectangle.Contains (e.X, e.Y);
         if (IsMouseOver != over)
+        {
             IsMouseOver = over;
+        }
     }
 
     protected override void OnMouseEnter (EventArgs e)
     {
         base.OnMouseEnter (e);
         if (!IsMouseOver)
+        {
             IsMouseOver = true;
+        }
     }
 
     protected override void OnMouseLeave (EventArgs e)
     {
         base.OnMouseLeave (e);
         if (IsMouseOver)
+        {
             IsMouseOver = false;
+        }
     }
 
     protected override void OnMouseDown (MouseEventArgs e)
     {
         base.OnMouseLeave (e);
         if (!IsMouseDown)
+        {
             IsMouseDown = true;
+        }
     }
 
     protected override void OnMouseUp (MouseEventArgs e)
     {
         base.OnMouseLeave (e);
         if (IsMouseDown)
+        {
             IsMouseDown = false;
+        }
     }
 
     protected override void OnPaint (PaintEventArgs e)
@@ -167,11 +181,15 @@ public abstract class InertButtonBase : Control
     public void RefreshChanges()
     {
         if (IsDisposed)
+        {
             return;
+        }
 
         bool mouseOver = ClientRectangle.Contains (PointToClient (Control.MousePosition));
         if (mouseOver != IsMouseOver)
+        {
             IsMouseOver = mouseOver;
+        }
 
         OnRefreshChanges();
     }

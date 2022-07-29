@@ -37,7 +37,9 @@ internal sealed class LocalizedDescriptionAttribute : DescriptionAttribute
                 string key = base.Description;
                 DescriptionValue = ResourceHelper.GetString (key);
                 if (DescriptionValue == null)
+                {
                     DescriptionValue = String.Empty;
+                }
 
                 m_initialized = true;
             }

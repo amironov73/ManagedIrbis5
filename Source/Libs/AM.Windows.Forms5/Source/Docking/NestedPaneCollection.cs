@@ -55,28 +55,41 @@ public sealed class NestedPaneCollection : ReadOnlyCollection<DockPane>
     internal void Add (DockPane pane)
     {
         if (pane == null)
+        {
             return;
+        }
 
         NestedPaneCollection oldNestedPanes =
             (pane.NestedPanesContainer == null) ? null : pane.NestedPanesContainer.NestedPanes;
         if (oldNestedPanes != null)
+        {
             oldNestedPanes.InternalRemove (pane);
+        }
+
         Items.Add (pane);
         if (oldNestedPanes != null)
+        {
             oldNestedPanes.CheckFloatWindowDispose();
+        }
     }
 
     private void CheckFloatWindowDispose()
     {
         if (Count != 0 || Container.DockState != DockState.Float)
+        {
             return;
+        }
 
         FloatWindow floatWindow = (FloatWindow)Container;
         if (floatWindow.Disposing || floatWindow.IsDisposed)
+        {
             return;
+        }
 
         if (Win32Helper.IsRunningOnMono)
+        {
             return;
+        }
 
         AM.Windows.Forms.Docking.Win32.NativeMethods.PostMessage (((FloatWindow)Container).Handle,
             FloatWindow.WM_CHECKDISPOSE, 0, 0);
@@ -89,7 +102,9 @@ public sealed class NestedPaneCollection : ReadOnlyCollection<DockPane>
     public void SwitchPaneWithFirstChild (DockPane pane)
     {
         if (!Contains (pane))
+        {
             return;
+        }
 
         NestedDockingStatus statusPane = pane.NestedDockingStatus;
         DockPane lastNestedPane = null;
@@ -111,13 +126,22 @@ public sealed class NestedPaneCollection : ReadOnlyCollection<DockPane>
 
             DockAlignment newAlignment;
             if (lastNestedDock.Alignment == DockAlignment.Left)
+            {
                 newAlignment = DockAlignment.Right;
+            }
             else if (lastNestedDock.Alignment == DockAlignment.Right)
+            {
                 newAlignment = DockAlignment.Left;
+            }
             else if (lastNestedDock.Alignment == DockAlignment.Top)
+            {
                 newAlignment = DockAlignment.Bottom;
+            }
             else
+            {
                 newAlignment = DockAlignment.Top;
+            }
+
             double newProportion = 1 - lastNestedDock.Proportion;
 
             lastNestedDock.SetStatus (this, statusPane.PreviousPane, statusPane.Alignment, statusPane.Proportion);
@@ -125,7 +149,9 @@ public sealed class NestedPaneCollection : ReadOnlyCollection<DockPane>
             {
                 NestedDockingStatus status = this[i].NestedDockingStatus;
                 if (status.PreviousPane == pane)
+                {
                     status.SetStatus (this, lastNestedPane, status.Alignment, status.Proportion);
+                }
             }
 
             statusPane.SetStatus (this, lastNestedPane, newAlignment, newProportion);
@@ -141,7 +167,9 @@ public sealed class NestedPaneCollection : ReadOnlyCollection<DockPane>
     private void InternalRemove (DockPane pane)
     {
         if (!Contains (pane))
+        {
             return;
+        }
 
         NestedDockingStatus statusPane = pane.NestedDockingStatus;
         DockPane lastNestedPane = null;
@@ -165,11 +193,15 @@ public sealed class NestedPaneCollection : ReadOnlyCollection<DockPane>
             {
                 NestedDockingStatus status = this[i].NestedDockingStatus;
                 if (status.PreviousPane == pane)
+                {
                     status.SetStatus (this, lastNestedPane, status.Alignment, status.Proportion);
+                }
             }
         }
         else
+        {
             Items.Remove (pane);
+        }
 
         statusPane.SetStatus (null, null, DockAlignment.Left, 0.5);
         statusPane.SetDisplayingStatus (false, null, DockAlignment.Left, 0.5);
@@ -180,7 +212,9 @@ public sealed class NestedPaneCollection : ReadOnlyCollection<DockPane>
     {
         for (int i = Count - 1; i >= 0; i--)
             if (this[i] != pane)
+            {
                 return this[i];
+            }
 
         return null;
     }

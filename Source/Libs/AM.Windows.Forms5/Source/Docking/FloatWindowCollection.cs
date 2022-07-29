@@ -29,7 +29,9 @@ public class FloatWindowCollection : ReadOnlyCollection<FloatWindow>
     internal int Add (FloatWindow fw)
     {
         if (Items.Contains (fw))
+        {
             return Items.IndexOf (fw);
+        }
 
         Items.Add (fw);
         return Count - 1;

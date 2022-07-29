@@ -1,17 +1,10 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* MystemRunner.cs -- запускает mystem и разбирает результаты
  * Ars Magna project, http://arsmagna.ru
@@ -24,6 +17,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+
+using AM.Text;
 
 using Newtonsoft.Json;
 
@@ -75,7 +70,7 @@ public sealed class MystemRunner
         TransferEncoding = OperatingSystem.IsWindows()
             ? Encoding.GetEncoding ("cp866")
             : Encoding.UTF8;
-    } // constructor
+    }
 
     #endregion
 
@@ -90,10 +85,11 @@ public sealed class MystemRunner
             StreamReader reader
         )
     {
+        Sure.NotNull (reader);
+
         var result = new List<MystemResult>();
 
-        string? line;
-        while ((line = reader.ReadLine()) != null)
+        while (reader.ReadLine() is { } line)
         {
             var one = JsonConvert.DeserializeObject<MystemResult[]> (line);
             if (one is not null)
@@ -103,13 +99,15 @@ public sealed class MystemRunner
         }
 
         return result.ToArray();
-    } // method DecodeResult
+    }
 
     /// <summary>
     /// Получение имени программы с учетом операционной системы.
     /// </summary>
-    public static string GetDefaultMystemName() =>
-        OperatingSystem.IsWindows() ? "mystem.exe" : "mystem";
+    public static string GetDefaultMystemName()
+    {
+        return OperatingSystem.IsWindows() ? "mystem.exe" : "mystem";
+    }
 
     /// <summary>
     /// Запускает анализ текста и выдаёт результаты.
@@ -120,16 +118,19 @@ public sealed class MystemRunner
             string text
         )
     {
-        var commandLine = new StringBuilder();
-        commandLine.Append (MystemOptions);
-        commandLine.Append (" -e " +
-                            TransferEncoding.HeaderName);
-        commandLine.Append (" --format json");
+        Sure.NotNullNorEmpty (text);
+
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (MystemOptions);
+        builder.Append (" -e " + TransferEncoding.HeaderName);
+        builder.Append (" --format json");
+        var commandLine = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
         var startInfo = new ProcessStartInfo
             (
                 MystemPath,
-                commandLine.ToString()
+                commandLine
             )
             {
                 CreateNoWindow = true,
@@ -147,9 +148,7 @@ public sealed class MystemRunner
         var result = DecodeResults (process.StandardOutput);
 
         return result;
-    } // method Run
+    }
 
     #endregion
-} // class MystemRunner
-
-// namespace AM.AOT.Stemming
+}

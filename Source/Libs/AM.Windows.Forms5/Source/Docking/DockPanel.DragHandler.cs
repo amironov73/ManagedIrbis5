@@ -47,7 +47,9 @@ partial class DockPanel
         protected bool BeginDrag()
         {
             if (DragControl == null)
+            {
                 return false;
+            }
 
             StartMousePosition = Control.MousePosition;
 
@@ -92,13 +94,21 @@ partial class DockPanel
             if (PatchController.EnableActiveXFix == false)
             {
                 if (m.Msg == (int)Win32.Msgs.WM_MOUSEMOVE)
+                {
                     OnDragging();
+                }
                 else if (m.Msg == (int)Win32.Msgs.WM_LBUTTONUP)
+                {
                     EndDrag (false);
+                }
                 else if (m.Msg == (int)Win32.Msgs.WM_CAPTURECHANGED)
+                {
                     EndDrag (!Win32Helper.IsRunningOnMono);
+                }
                 else if (m.Msg == (int)Win32.Msgs.WM_KEYDOWN && (int)m.WParam == (int)Keys.Escape)
+                {
                     EndDrag (true);
+                }
             }
 
             return OnPreFilterMessage (ref m);
@@ -109,13 +119,21 @@ partial class DockPanel
             if (PatchController.EnableActiveXFix == true)
             {
                 if (m.Msg == (int)Win32.Msgs.WM_MOUSEMOVE)
+                {
                     OnDragging();
+                }
                 else if (m.Msg == (int)Win32.Msgs.WM_LBUTTONUP)
+                {
                     EndDrag (false);
+                }
                 else if (m.Msg == (int)Win32.Msgs.WM_CAPTURECHANGED)
+                {
                     EndDrag (!Win32Helper.IsRunningOnMono);
+                }
                 else if (m.Msg == (int)Win32.Msgs.WM_KEYDOWN && (int)m.WParam == (int)Keys.Escape)
+                {
                     EndDrag (true);
+                }
             }
 
             return false;
@@ -132,7 +150,9 @@ partial class DockPanel
             }
 
             if (m.Msg == (int)Win32.Msgs.WM_CANCELMODE || m.Msg == (int)Win32.Msgs.WM_CAPTURECHANGED)
+            {
                 EndDrag (true);
+            }
 
             base.WndProc (ref m);
         }
@@ -169,7 +189,9 @@ partial class DockPanel
         {
             if ((m.Msg == (int)Win32.Msgs.WM_KEYDOWN || m.Msg == (int)Win32.Msgs.WM_KEYUP) &&
                 ((int)m.WParam == (int)Keys.ControlKey || (int)m.WParam == (int)Keys.ShiftKey))
+            {
                 OnDragging();
+            }
 
             return base.OnPreFilterMessage (ref m);
         }

@@ -20,7 +20,9 @@ namespace Manina.Windows.Forms
                     selector.Nodes.Add(node);
 
                     if (page == control.SelectedPage)
+                    {
                         selector.SelectedNode = node;
+                    }
                 }
             }
         }

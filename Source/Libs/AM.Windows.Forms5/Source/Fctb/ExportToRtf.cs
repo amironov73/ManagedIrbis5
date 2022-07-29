@@ -76,6 +76,7 @@ public class ExportToRtf
         for (var i = 0; i < _textBox!.Styles.Length; i++)
         {
             if (_textBox.Styles[i] != null && ((int)styleIndex & mask) != 0)
+            {
                 if (_textBox.Styles[i].IsExportable)
                 {
                     var style = _textBox.Styles[i];
@@ -83,12 +84,15 @@ public class ExportToRtf
 
                     var isTextStyle = style is TextStyle;
                     if (isTextStyle)
+                    {
                         if (!hasTextStyle || _textBox.AllowSeveralTextStyleDrawing)
                         {
                             hasTextStyle = true;
                             textStyle = style as TextStyle;
                         }
+                    }
                 }
+            }
 
             mask = mask << 1;
         }
@@ -236,7 +240,9 @@ public class ExportToRtf
                 {
                     temporary.AppendLine (@"\line");
                     if (IncludeLineNumbers)
+                    {
                         temporary.AppendFormat (@"{{\cf{1} {0}}}\tab", i + 2, lineNumberColor);
+                    }
                 }
 
                 currentLine = p.Line;
@@ -260,9 +266,14 @@ public class ExportToRtf
                     var ch = c.c;
                     var code = (int)ch;
                     if (code < 128)
+                    {
                         temporary.Append (c.c);
+                    }
                     else
+                    {
                         temporary.AppendFormat (@"{{\u{0}}}", code);
+                    }
+
                     break;
             }
         }

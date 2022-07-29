@@ -2,14 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* MystemResult.cs -- результат анализа для одного слова
  * Ars Magna project, http://arsmagna.ru
@@ -17,8 +11,9 @@
 
 #region Using directives
 
-using System.Text;
 using System.Text.Json.Serialization;
+
+using AM.Text;
 
 #endregion
 
@@ -46,20 +41,21 @@ public sealed class MystemResult
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        var result = new StringBuilder();
-        result.Append (Text);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (Text);
 
         if (Analysis is not null)
         {
-            foreach (MystemAnalysis analysis in Analysis)
+            foreach (var analysis in Analysis)
             {
-                result.Append ("; ");
-                result.Append (analysis);
+                builder.Append ("; ");
+                builder.Append (analysis);
             }
         }
 
-        return result.ToString();
-    } // method ToString
-} // class MystemResult
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-// namespace AM.AOT.Stemming
+        return result;
+    }
+}

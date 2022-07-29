@@ -73,9 +73,20 @@ internal sealed class HotkeyWrapper
     public Keys ToKeyData()
     {
         var res = Key;
-        if (_ctrl) res |= Keys.Control;
-        if (_alt) res |= Keys.Alt;
-        if (_shift) res |= Keys.Shift;
+        if (_ctrl)
+        {
+            res |= Keys.Control;
+        }
+
+        if (_alt)
+        {
+            res |= Keys.Alt;
+        }
+
+        if (_shift)
+        {
+            res |= Keys.Shift;
+        }
 
         return res;
     }
@@ -85,9 +96,20 @@ internal sealed class HotkeyWrapper
         get
         {
             var res = "";
-            if (_ctrl) res += "Ctrl + ";
-            if (_shift) res += "Shift + ";
-            if (_alt) res += "Alt + ";
+            if (_ctrl)
+            {
+                res += "Ctrl + ";
+            }
+
+            if (_shift)
+            {
+                res += "Shift + ";
+            }
+
+            if (_alt)
+            {
+                res += "Alt + ";
+            }
 
             return res.Trim (' ', '+');
         }

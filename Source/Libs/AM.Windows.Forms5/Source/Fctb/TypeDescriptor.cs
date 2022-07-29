@@ -69,9 +69,13 @@ class FCTBTypeDescriptor : CustomTypeDescriptor
 
         for (var i = 0; i < coll.Count; i++)
             if (coll[i].Name == "TextChanged") //instead of TextChanged slip BindingTextChanged for binding
+            {
                 list[i] = new FooTextChangedDescriptor (coll[i]);
+            }
             else
+            {
                 list[i] = coll[i];
+            }
 
         return new EventDescriptorCollection (list);
     }

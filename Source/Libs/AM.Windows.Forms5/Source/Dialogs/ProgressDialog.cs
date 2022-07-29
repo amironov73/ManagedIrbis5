@@ -93,7 +93,9 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     public ProgressDialog (IContainer container)
     {
         if (container != null)
+        {
             container.Add (this);
+        }
 
         InitializeComponent();
 
@@ -103,7 +105,9 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
 
         // Set a default animation for XP.
         if (!NativeMethods.IsWindowsVistaOrLater)
+        {
             Animation = AnimationResource.GetShellAnimation (ShellAnimation.FlyingPapers);
+        }
     }
 
     /// <summary>
@@ -151,7 +155,9 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
         {
             _text = value;
             if (_dialog != null)
+            {
                 _dialog.SetLine (1, Text, UseCompactPathsForText, IntPtr.Zero);
+            }
         }
     }
 
@@ -183,7 +189,9 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
         {
             _useCompactPathsForText = value;
             if (_dialog != null)
+            {
                 _dialog.SetLine (1, Text, UseCompactPathsForText, IntPtr.Zero);
+            }
         }
     }
 
@@ -212,7 +220,9 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
         {
             _description = value;
             if (_dialog != null)
+            {
                 _dialog.SetLine (2, Description, UseCompactPathsForDescription, IntPtr.Zero);
+            }
         }
     }
 
@@ -244,7 +254,9 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
         {
             _useCompactPathsForDescription = value;
             if (_dialog != null)
+            {
                 _dialog.SetLine (2, Description, UseCompactPathsForDescription, IntPtr.Zero);
+            }
         }
     }
 
@@ -680,9 +692,14 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     public void ReportProgress (int percentProgress, string text, string description, object userState)
     {
         if (percentProgress < 0 || percentProgress > 100)
+        {
             throw new ArgumentOutOfRangeException ("percentProgress");
+        }
+
         if (_dialog == null)
+        {
             throw new InvalidOperationException (Resources.ProgressDialogNotRunningError);
+        }
 
         // we need to cache the latest percentProgress so IProgress<string>.Report(text) can report the percent progress correctly.
         _percentProgress = percentProgress;
@@ -699,7 +716,9 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     {
         DoWorkEventHandler handler = DoWork;
         if (handler != null)
+        {
             handler (this, e);
+        }
     }
 
     /// <summary>
@@ -710,7 +729,9 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     {
         RunWorkerCompletedEventHandler handler = RunWorkerCompleted;
         if (handler != null)
+        {
             handler (this, e);
+        }
     }
 
     /// <summary>
@@ -721,13 +742,17 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
     {
         ProgressChangedEventHandler handler = ProgressChanged;
         if (handler != null)
+        {
             handler (this, e);
+        }
     }
 
     private void RunProgressDialog (IntPtr owner, object argument)
     {
         if (_backgroundWorker.IsBusy)
+        {
             throw new InvalidOperationException (Resources.ProgressDialogRunning);
+        }
 
         if (Animation != null)
         {
@@ -751,16 +776,24 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
         _dialog = new Interop.ProgressDialog();
         _dialog.SetTitle (WindowTitle);
         if (Animation != null)
+        {
             _dialog.SetAnimation (_currentAnimationModuleHandle, (ushort)Animation.ResourceId);
+        }
 
         if (CancellationText.Length > 0)
+        {
             _dialog.SetCancelMsg (CancellationText, null);
+        }
+
         _dialog.SetLine (1, Text, UseCompactPathsForText, IntPtr.Zero);
         _dialog.SetLine (2, Description, UseCompactPathsForDescription, IntPtr.Zero);
 
         ProgressDialogFlags flags = ProgressDialogFlags.Normal;
         if (owner != IntPtr.Zero)
+        {
             flags |= ProgressDialogFlags.Modal;
+        }
+
         switch (ProgressBarStyle)
         {
             case ProgressBarStyle.None:
@@ -768,18 +801,31 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
                 break;
             case ProgressBarStyle.MarqueeProgressBar:
                 if (NativeMethods.IsWindowsVistaOrLater)
+                {
                     flags |= ProgressDialogFlags.MarqueeProgress;
+                }
                 else
+                {
                     flags |= ProgressDialogFlags.NoProgressBar; // Older than Vista doesn't support marquee.
+                }
+
                 break;
         }
 
         if (ShowTimeRemaining)
+        {
             flags |= ProgressDialogFlags.AutoTime;
+        }
+
         if (!ShowCancelButton)
+        {
             flags |= ProgressDialogFlags.NoCancel;
+        }
+
         if (!MinimizeBox)
+        {
             flags |= ProgressDialogFlags.NoMinimize;
+        }
 
         _ownerHandle = owner;
         _dialog.StartProgressDialog (owner, null, flags, IntPtr.Zero);
@@ -803,7 +849,9 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
         }
 
         if (_ownerHandle != IntPtr.Zero)
+        {
             NativeMethods.EnableWindow (_ownerHandle, true);
+        }
 
         OnRunWorkerCompleted (new RunWorkerCompletedEventArgs ((!e.Cancelled && e.Error == null) ? e.Result : null,
             e.Error, e.Cancelled));
@@ -822,9 +870,15 @@ public partial class ProgressDialog : Component, IProgress<int>, IProgress<strin
             if (data != null)
             {
                 if (data.Text != null)
+                {
                     Text = data.Text;
+                }
+
                 if (data.Description != null)
+                {
                     Description = data.Description;
+                }
+
                 OnProgressChanged (new ProgressChangedEventArgs (e.ProgressPercentage, data.UserState));
             }
         }

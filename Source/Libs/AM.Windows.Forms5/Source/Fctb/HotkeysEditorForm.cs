@@ -57,7 +57,9 @@ public sealed partial class HotkeysEditorForm
     {
         var res = ((int)key1 & 0xff).CompareTo ((int)key2 & 0xff);
         if (res == 0)
+        {
             res = key1.CompareTo (key2);
+        }
 
         return res;
     }
@@ -142,7 +144,9 @@ public sealed partial class HotkeysEditorForm
     {
         for (var i = dgv.RowCount - 1; i >= 0; i--)
             if (dgv.Rows[i].Selected)
+            {
                 dgv.Rows.RemoveAt (i);
+            }
     }
 
     private void HotkeysEditorForm_FormClosing

@@ -17,7 +17,8 @@
 #region Using directives
 
 using System;
-using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -111,22 +112,26 @@ public class SlovenianUpnQr : Payload
 
     public override string ToString()
     {
-        var _sb = new StringBuilder();
-        _sb.Append ("UPNQR");
-        _sb.Append ('\n').Append ('\n').Append ('\n').Append ('\n').Append ('\n');
-        _sb.Append (_payerName).Append ('\n');
-        _sb.Append (_payerAddress).Append ('\n');
-        _sb.Append (_payerPlace).Append ('\n');
-        _sb.Append (_amount).Append ('\n').Append ('\n').Append ('\n');
-        _sb.Append (_code.ToUpper()).Append ('\n');
-        _sb.Append (_purpose).Append ('\n');
-        _sb.Append (_deadLine).Append ('\n');
-        _sb.Append (_recipientIban.ToUpper()).Append ('\n');
-        _sb.Append (_recipientSiModel).Append (_recipientSiReference).Append ('\n');
-        _sb.Append (_recipientName).Append ('\n');
-        _sb.Append (_recipientAddress).Append ('\n');
-        _sb.Append (_recipientPlace).Append ('\n');
-        _sb.AppendFormat ("{0:000}", CalculateChecksum()).Append ('\n');
-        return _sb.ToString();
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ("UPNQR");
+        builder.Append ('\n').Append ('\n').Append ('\n').Append ('\n').Append ('\n');
+        builder.Append (_payerName).Append ('\n');
+        builder.Append (_payerAddress).Append ('\n');
+        builder.Append (_payerPlace).Append ('\n');
+        builder.Append (_amount).Append ('\n').Append ('\n').Append ('\n');
+        builder.Append (_code.ToUpper()).Append ('\n');
+        builder.Append (_purpose).Append ('\n');
+        builder.Append (_deadLine).Append ('\n');
+        builder.Append (_recipientIban.ToUpper()).Append ('\n');
+        builder.Append (_recipientSiModel).Append (_recipientSiReference).Append ('\n');
+        builder.Append (_recipientName).Append ('\n');
+        builder.Append (_recipientAddress).Append ('\n');
+        builder.Append (_recipientPlace).Append ('\n');
+        builder.AppendFormat ("{0:000}", CalculateChecksum()).Append ('\n');
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 }

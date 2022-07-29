@@ -141,7 +141,11 @@ public class DropDownControl
     /// <param name="dropDownItem"></param>
     public void InitializeDropDown (Control dropDownItem)
     {
-        if (_dropDownItem != null) throw new Exception ("The drop down item has already been implemented!");
+        if (_dropDownItem != null)
+        {
+            throw new Exception ("The drop down item has already been implemented!");
+        }
+
         _DesignView = false;
         DropState = DropStateOption.Closed;
         Size = _AnchorSize;
@@ -149,7 +153,11 @@ public class DropDownControl
 
         //removes the dropDown item from the controls list so it
         //won't be seen until the drop-down window is active
-        if (Controls.Contains (dropDownItem)) Controls.Remove (dropDownItem);
+        if (Controls.Contains (dropDownItem))
+        {
+            Controls.Remove (dropDownItem);
+        }
+
         _dropDownItem = dropDownItem;
     }
 
@@ -195,7 +203,10 @@ public class DropDownControl
 
             _DesignView = value;
 
-            if (_DesignView) Size = storedSize;
+            if (_DesignView)
+            {
+                Size = storedSize;
+            }
             else
             {
                 storedSize = Size;
@@ -227,7 +238,10 @@ public class DropDownControl
     {
         base.OnResize (e);
         _AnchorSize.Width = Width;
-        if (_DesignView) storedSize = Size;
+        if (_DesignView)
+        {
+            storedSize = Size;
+        }
         else
         {
             _AnchorSize.Height = Height;
@@ -274,7 +288,10 @@ public class DropDownControl
     {
         get
         {
-            if (dropContainer != null) return false;
+            if (dropContainer != null)
+            {
+                return false;
+            }
 
             if (dropContainer == null && closedWhileInControl)
             {
@@ -292,10 +309,15 @@ public class DropDownControl
     protected void OpenDropDown()
     {
         if (_dropDownItem == null)
+        {
             throw new NotImplementedException (
                 "The drop down item has not been initialized!  Use the InitializeDropDown() method to do so.");
+        }
 
-        if (!CanDrop) return;
+        if (!CanDrop)
+        {
+            return;
+        }
 
         dropContainer = new DropDownContainer (_dropDownItem) { Bounds = GetDropDownBounds() };
         dropContainer.DropStateChange += new DropDownContainer.DropWindowArgs (DropContainer_DropStateChange);
@@ -365,14 +387,26 @@ public class DropDownControl
         Rectangle workingArea = Screen.GetWorkingArea (screenBounds);
 
         //make sure we're completely in the top-left working area
-        if (screenBounds.X < workingArea.X) screenBounds.X = workingArea.X;
-        if (screenBounds.Y < workingArea.Y) screenBounds.Y = workingArea.Y;
+        if (screenBounds.X < workingArea.X)
+        {
+            screenBounds.X = workingArea.X;
+        }
+
+        if (screenBounds.Y < workingArea.Y)
+        {
+            screenBounds.Y = workingArea.Y;
+        }
 
         //make sure we're not extended past the working area's right /bottom edge
         if (screenBounds.Right > workingArea.Right && workingArea.Width > screenBounds.Width)
+        {
             screenBounds.X = workingArea.Right - screenBounds.Width;
+        }
+
         if (screenBounds.Bottom > workingArea.Bottom && workingArea.Height > screenBounds.Height)
+        {
             screenBounds.Y = workingArea.Bottom - screenBounds.Height;
+        }
 
         return screenBounds;
     }
@@ -422,7 +456,10 @@ public class DropDownControl
         if (dropContainer != null)
         {
             dropContainer.Freeze = true;
-            if (!remainVisible) dropContainer.Visible = false;
+            if (!remainVisible)
+            {
+                dropContainer.Visible = false;
+            }
         }
     }
 
@@ -434,7 +471,10 @@ public class DropDownControl
         if (dropContainer != null)
         {
             dropContainer.Freeze = false;
-            if (!dropContainer.Visible) dropContainer.Visible = true;
+            if (!dropContainer.Visible)
+            {
+                dropContainer.Visible = true;
+            }
         }
     }
 

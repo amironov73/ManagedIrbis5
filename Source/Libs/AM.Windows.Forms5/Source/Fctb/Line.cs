@@ -45,9 +45,14 @@ public class Line
             var spacesCount = 0;
             for (var i = 0; i < Count; i++)
                 if (this[i].c == ' ')
+                {
                     spacesCount++;
+                }
                 else
+                {
                     break;
+                }
+
             return spacesCount;
         }
     }
@@ -158,7 +163,10 @@ public class Line
     public virtual void RemoveRange (int index, int count)
     {
         if (index >= Count)
+        {
             return;
+        }
+
         chars.RemoveRange (index, Math.Min (Count - index, count));
     }
 

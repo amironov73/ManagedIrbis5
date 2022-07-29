@@ -13,11 +13,19 @@ namespace AeroSuite.AnimationEngine
             return (startValue, targetValue, progress) =>
             {
                 if (startValue == null)
+                {
                     throw new ArgumentNullException("startValue", "The start value must not be null.");
+                }
+
                 if (targetValue == null)
+                {
                     throw new ArgumentNullException("targetValue", "The target value must not be null.");
+                }
+
                 if (startValue.Count != targetValue.Count)
+                {
                     throw new ArgumentOutOfRangeException("targetValue", "The target value item count must be equal to the start value item count.");
+                }
 
                 return startValue.Zip(targetValue, (start, target) => originalFactory(start, target, progress)).ToList();
             };
@@ -28,11 +36,19 @@ namespace AeroSuite.AnimationEngine
             return (startValue, targetValue, progress) =>
             {
                 if (startValue == null)
+                {
                     throw new ArgumentNullException("startValue", "The start value must not be null.");
+                }
+
                 if (targetValue == null)
+                {
                     throw new ArgumentNullException("targetValue", "The target value must not be null.");
+                }
+
                 if (startValue.Length != targetValue.Length)
+                {
                     throw new ArgumentOutOfRangeException("targetValue", "The target value item count must be equal to the start value item count.");
+                }
 
                 return startValue.Zip(targetValue, (start, target) => originalFactory(start, target, progress)).ToArray();
             };

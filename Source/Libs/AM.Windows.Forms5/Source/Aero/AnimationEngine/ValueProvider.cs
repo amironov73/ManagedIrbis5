@@ -96,7 +96,11 @@ namespace AeroSuite.AnimationEngine
             get
             {
                 double progress = this.CurrentProgress;
-                if (progress >= 1) return this.TargetValue;
+                if (progress >= 1)
+                {
+                    return this.TargetValue;
+                }
+
                 return this.ValueFactory(this.StartValue, this.TargetValue, this.EasingMethod(progress));
             }
         }
@@ -113,7 +117,10 @@ namespace AeroSuite.AnimationEngine
             {
                 var currentDuration = DateTime.Now - this.StartTime;
                 if (currentDuration >= this.Duration)
+                {
                     return 1;
+                }
+
                 return currentDuration.TotalMilliseconds/ this.Duration.TotalMilliseconds;
             }
         }

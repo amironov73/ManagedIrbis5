@@ -60,7 +60,9 @@ static class DialogHelper
         }
 
         if (height < textMinimumHeight)
+        {
             height = textMinimumHeight;
+        }
 
         int newWidth = width + horizontalSpacing;
         int newHeight = height + verticalSpacing;
@@ -78,7 +80,9 @@ static class DialogHelper
         // If this happens the text won't display correctly, but even at 800x600 you need
         // to put so much text in the input box for this to happen that I don't care.
         if (newWidth > 0.9 * workingArea.Width)
+        {
             newWidth = (int)(0.9 * workingArea.Width);
+        }
 
         return new Size (newWidth, newHeight);
     }
@@ -97,12 +101,17 @@ static class DialogHelper
             Rectangle textSize = renderer.GetTextExtent (dc, textRect, text, flags);
             location = location + new Size (0, textSize.Height);
             if (!measureOnly)
+            {
                 renderer.DrawText (dc, textSize, text, false, flags);
+            }
         }
         else
         {
             if (!measureOnly)
+            {
                 TextRenderer.DrawText (dc, text, fallbackFont, textRect, SystemColors.WindowText, flags);
+            }
+
             Size textSize = TextRenderer.MeasureText (dc, text, fallbackFont,
                 new Size (textRect.Width, textRect.Height), flags);
             location = location + new Size (0, textSize.Height);
@@ -113,13 +122,17 @@ static class DialogHelper
         Font mainInstructionFallbackFont, Font contentFallbackFont, bool measureOnly, int width)
     {
         if (!string.IsNullOrEmpty (mainInstruction))
+        {
             DrawText (dc, mainInstruction, AdditionalVisualStyleElements.TextStyle.MainInstruction,
                 mainInstructionFallbackFont, ref location, measureOnly, width);
+        }
 
         if (!string.IsNullOrEmpty (content))
         {
             if (!string.IsNullOrEmpty (mainInstruction))
+            {
                 content = Environment.NewLine + content;
+            }
 
             DrawText (dc, content, AdditionalVisualStyleElements.TextStyle.BodyText, contentFallbackFont,
                 ref location, measureOnly, width);

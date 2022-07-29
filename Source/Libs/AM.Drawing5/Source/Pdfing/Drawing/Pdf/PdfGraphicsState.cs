@@ -45,7 +45,7 @@ namespace PdfSharpCore.Drawing.Pdf
 
         public PdfGraphicsState Clone()
         {
-            PdfGraphicsState state = (PdfGraphicsState)MemberwiseClone();
+            var state = (PdfGraphicsState)MemberwiseClone();
             return state;
         }
 
@@ -85,8 +85,8 @@ namespace PdfSharpCore.Drawing.Pdf
         {
             const string frmt2 = Config.SignificantFigures2;
             const string format = Config.SignificantFigures3;
-            XColor color = pen.Color;
-            bool overPrint = pen.Overprint;
+            var color = pen.Color;
+            var overPrint = pen.Overprint;
             color = ColorSpaceHelper.EnsureColorMode(colorMode, color);
 
             if (_realizedLineWith != pen._width)
@@ -118,11 +118,11 @@ namespace PdfSharpCore.Drawing.Pdf
 
             if (_realizedDashStyle != pen._dashStyle || pen._dashStyle == XDashStyle.Custom)
             {
-                double dot = pen.Width;
-                double dash = 3 * dot;
+                var dot = pen.Width;
+                var dash = 3 * dot;
 
                 // Line width 0 is not recommended but valid.
-                XDashStyle dashStyle = pen.DashStyle;
+                var dashStyle = pen.DashStyle;
                 if (dot == 0)
                     dashStyle = XDashStyle.Solid;
 
@@ -150,9 +150,9 @@ namespace PdfSharpCore.Drawing.Pdf
 
                     case XDashStyle.Custom:
                         {
-                            StringBuilder pdf = new StringBuilder("[", 256);
-                            int len = pen._dashPattern == null ? 0 : pen._dashPattern.Length;
-                            for (int idx = 0; idx < len; idx++)
+                            var pdf = new StringBuilder("[", 256);
+                            var len = pen._dashPattern == null ? 0 : pen._dashPattern.Length;
+                            for (var idx = 0; idx < len; idx++)
                             {
                                 if (idx > 0)
                                     pdf.Append(' ');
@@ -165,7 +165,7 @@ namespace PdfSharpCore.Drawing.Pdf
                                 pdf.Append(PdfEncoders.ToString(0.2 * pen._width));
                             }
                             pdf.AppendFormat(CultureInfo.InvariantCulture, "]{0:" + format + "} d\n", pen._dashOffset * pen._width);
-                            string pattern = pdf.ToString();
+                            var pattern = pdf.ToString();
 
                             // BUG: drice2@ageone.de reported a realizing problem
                             // HACK: I remove the if clause
@@ -203,8 +203,8 @@ namespace PdfSharpCore.Drawing.Pdf
 
             if (_renderer.Owner.Version >= 14 && (_realizedStrokeColor.A != color.A || _realizedStrokeOverPrint != overPrint))
             {
-                PdfExtGState extGState = _renderer.Owner.ExtGStateTable.GetExtGStateStroke(color.A, overPrint);
-                string gs = _renderer.Resources.AddExtGState(extGState);
+                var extGState = _renderer.Owner.ExtGStateTable.GetExtGStateStroke(color.A, overPrint);
+                var gs = _renderer.Resources.AddExtGState(extGState);
                 _renderer.AppendFormatString("{0} gs\n", gs);
 
                 // Must create transparency group.
@@ -227,11 +227,11 @@ namespace PdfSharpCore.Drawing.Pdf
             // Rendering mode 2 is used for bold simulation.
             // Reference: TABLE 5.3  Text rendering modes / Page 402
 
-            XSolidBrush solidBrush = brush as XSolidBrush;
+            var solidBrush = brush as XSolidBrush;
             if (solidBrush != null)
             {
-                XColor color = solidBrush.Color;
-                bool overPrint = solidBrush.Overprint;
+                var color = solidBrush.Color;
+                var overPrint = solidBrush.Overprint;
 
                 if (renderingMode == 0)
                 {
@@ -255,11 +255,11 @@ namespace PdfSharpCore.Drawing.Pdf
                 if (brush is XBaseGradientBrush gradientBrush)
                 {
                     Debug.Assert(UnrealizedCtm.IsIdentity, "Must realize ctm first.");
-                    XMatrix matrix = _renderer.DefaultViewMatrix;
+                    var matrix = _renderer.DefaultViewMatrix;
                     matrix.Prepend(EffectiveCtm);
-                    PdfShadingPattern pattern = new PdfShadingPattern(_renderer.Owner);
+                    var pattern = new PdfShadingPattern(_renderer.Owner);
                     pattern.SetupFromBrush(gradientBrush, matrix, _renderer);
-                    string name = _renderer.Resources.AddPattern(pattern);
+                    var name = _renderer.Resources.AddPattern(pattern);
                     if (isForPen)
                     {
                         _renderer.AppendFormatString("/Pattern CS\n", name);
@@ -302,8 +302,8 @@ namespace PdfSharpCore.Drawing.Pdf
             if (_renderer.Owner.Version >= 14 && (_realizedFillColor.A != color.A || _realizedNonStrokeOverPrint != overPrint))
             {
 
-                PdfExtGState extGState = _renderer.Owner.ExtGStateTable.GetExtGStateNonStroke(color.A, overPrint);
-                string gs = _renderer.Resources.AddExtGState(extGState);
+                var extGState = _renderer.Owner.ExtGStateTable.GetExtGStateNonStroke(color.A, overPrint);
+                var gs = _renderer.Resources.AddExtGState(extGState);
                 _renderer.AppendFormatString("{0} gs\n", gs);
 
                 // Must create transparency group.
@@ -316,7 +316,7 @@ namespace PdfSharpCore.Drawing.Pdf
 
         internal void RealizeNonStrokeTransparency(double transparency, PdfColorMode colorMode)
         {
-            XColor color = _realizedFillColor;
+            var color = _realizedFillColor;
             color.A = transparency;
             RealizeFillColor(color, _realizedNonStrokeOverPrint, colorMode);
         }
@@ -356,7 +356,7 @@ namespace PdfSharpCore.Drawing.Pdf
             }
             else  // _realizedRenderingMode is 2.
             {
-                double charSpace = font.Size * Const.BoldEmphasis;
+                var charSpace = font.Size * Const.BoldEmphasis;
                 if (_realizedCharSpace != charSpace)
                 {
                     _renderer.AppendFormatDouble("{0:" + format + "} Tc\n", charSpace);
@@ -365,7 +365,7 @@ namespace PdfSharpCore.Drawing.Pdf
             }
 
             _realizedFont = null;
-            string fontName = _renderer.GetFontName(font, out _realizedFont);
+            var fontName = _renderer.GetFontName(font, out _realizedFont);
             if (fontName != _realizedFontName || _realizedFontSize != font.Size)
             {
                 if (_renderer.Gfx.PageDirection == XPageDirection.Downwards)
@@ -443,7 +443,7 @@ namespace PdfSharpCore.Drawing.Pdf
             if (matrixOrder == XMatrixOrder.Append)
                 throw new NotImplementedException("XMatrixOrder.Append");
 #endif
-            XMatrix transform = value;
+            var transform = value;
             if (_renderer.Gfx.PageDirection == XPageDirection.Downwards)
             {
                 // Take chirality into account and
@@ -468,7 +468,7 @@ namespace PdfSharpCore.Drawing.Pdf
 
                 const string format = Config.SignificantFigures7;
 
-                double[] matrix = UnrealizedCtm.GetElements();
+                var matrix = UnrealizedCtm.GetElements();
                 // Use up to six decimal digits to prevent round up problems.
                 _renderer.AppendFormatArgs("{0:" + format + "} {1:" + format + "} {2:" + format + "} {3:" + format + "} {4:" + format + "} {5:" + format + "} cm\n",
                     matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], matrix[5]);
@@ -486,7 +486,7 @@ namespace PdfSharpCore.Drawing.Pdf
 
         public void SetAndRealizeClipRect(XRect clipRect)
         {
-            XGraphicsPath clipPath = new XGraphicsPath();
+            var clipPath = new XGraphicsPath();
             clipPath.AddRectangle(clipRect);
             RealizeClipPath(clipPath);
         }

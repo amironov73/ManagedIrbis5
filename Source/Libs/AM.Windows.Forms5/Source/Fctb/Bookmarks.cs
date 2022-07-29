@@ -85,7 +85,9 @@ public class Bookmarks
                 var was = e.Index <= 0;
                 foreach (var b in items)
                     if (b.LineIndex == e.Index - 1)
+                    {
                         was = true;
+                    }
 
                 if (was)
                 {
@@ -93,7 +95,9 @@ public class Bookmarks
                     i--;
                 }
                 else
+                {
                     items[i].LineIndex = e.Index - 1;
+                }
 
                 //if (items[i].LineIndex == e.Index + e.Count - 1)
                 //{
@@ -127,7 +131,9 @@ public class Bookmarks
             else if (items[i].LineIndex == e.Index - 1 && e.Count == 1)
             {
                 if (textBox[e.Index - 1].StartSpacesCount == textBox[e.Index - 1].Count)
+                {
                     items[i].LineIndex = items[i].LineIndex + e.Count;
+                }
             }
         }
     }

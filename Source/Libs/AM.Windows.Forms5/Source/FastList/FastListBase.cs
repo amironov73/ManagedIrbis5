@@ -201,7 +201,11 @@ public class FastListBase
         get => _showScrollBar;
         set
         {
-            if (value == _showScrollBar) return;
+            if (value == _showScrollBar)
+            {
+                return;
+            }
+
             _showScrollBar = value;
             buildNeeded = true;
             Invalidate();
@@ -400,11 +404,15 @@ public class FastListBase
 
         var i = index;
         if (i >= ItemCount)
+        {
             i = ItemCount - 1;
+        }
 
         if (i < 0)
+        {
             res = Rectangle.FromLTRB (ClientRectangle.Left + Padding.Left, ClientRectangle.Top + Padding.Top - 2,
                 ClientRectangle.Right - Padding.Right, ClientRectangle.Top + Padding.Top - 1);
+        }
         else
         {
             var y = GetItemY (i);
@@ -414,7 +422,9 @@ public class FastListBase
                 y + h);
 
             if (index >= _itemCount)
+            {
                 res.Offset (0, (index - _itemCount + 1) * ItemHeightDefault);
+            }
         }
 
         res.Offset (-HorizontalScroll.Value, -VerticalScroll.Value);
@@ -450,14 +460,19 @@ public class FastListBase
             }
         }
         else
+        {
             return base.IsInputKey (keyData);
+        }
     }
 
     protected override void OnKeyDown (KeyEventArgs e)
     {
         base.OnKeyDown (e);
 
-        if (e.Handled) return;
+        if (e.Handled)
+        {
+            return;
+        }
 
         CancelDelayedAction();
 
@@ -465,21 +480,33 @@ public class FastListBase
         {
             case Keys.Up:
                 if (e.Control)
+                {
                     ScrollUp();
+                }
                 else
+                {
                     SelectPrev();
+                }
+
                 break;
 
             case Keys.Down:
                 if (e.Control)
+                {
                     ScrollDown();
+                }
                 else
+                {
                     SelectNext();
+                }
+
                 break;
 
             case Keys.PageUp:
                 if (e.Control)
+                {
                     ScrollPageUp();
+                }
                 else if (SelectedItemIndexes.Count > 0)
                 {
                     var i = SelectedItemIndexes.First();
@@ -492,7 +519,9 @@ public class FastListBase
 
             case Keys.PageDown:
                 if (e.Control)
+                {
                     ScrollPageDown();
+                }
                 else if (SelectedItemIndexes.Count > 0)
                 {
                     var i = SelectedItemIndexes.First();
@@ -505,16 +534,26 @@ public class FastListBase
 
             case Keys.Home:
                 if (e.Control)
+                {
                     ScrollToItem (0);
+                }
                 else
+                {
                     SelectItem (0);
+                }
+
                 break;
 
             case Keys.End:
                 if (e.Control)
+                {
                     ScrollToItem (ItemCount - 1);
+                }
                 else
+                {
                     SelectItem (ItemCount - 1);
+                }
+
                 break;
 
             case Keys.Enter:
@@ -525,9 +564,13 @@ public class FastListBase
                     {
                         var val = GetItemChecked (SelectedItemIndexes.First());
                         if (val)
+                        {
                             UncheckSelected();
+                        }
                         else
+                        {
                             CheckSelected();
+                        }
                     }
                 }
                 else if (ShowExpandBoxes)
@@ -536,9 +579,13 @@ public class FastListBase
                     {
                         var itemIndex = SelectedItemIndexes.First();
                         if (GetItemExpanded (itemIndex))
+                        {
                             CollapseItem (itemIndex);
+                        }
                         else
+                        {
                             ExpandItem (itemIndex);
+                        }
                     }
                 }
 
@@ -601,16 +648,23 @@ public class FastListBase
         var item = PointToItemInfo (e.Location);
 
         if (item == null)
+        {
             return;
+        }
 
         if (e.Button == MouseButtons.Left && item.X_Text <= e.Location.X)
+        {
             if (SelectedItemIndexes.Count == 1 && SelectedItemIndexes.Contains (item.ItemIndex))
+            {
                 if (!Readonly && CanEditItem (item.ItemIndex))
                 {
                     CreateDelayedAction (() => OnStartEdit (item.ItemIndex), 500);
                 }
+            }
+        }
 
         if (AllowSelectItems)
+        {
             if (e.Button == MouseButtons.Left && item.X_Icon <= e.Location.X)
             {
                 //Select
@@ -622,8 +676,11 @@ public class FastListBase
                 }
 
                 if (!AllowDragItems || !MultiSelect)
+                {
                     OnMouseSelectItem (e, item);
+                }
             }
+        }
 
         if (ShowCheckBoxes && e.Button == MouseButtons.Left)
         {
@@ -709,7 +766,9 @@ public class FastListBase
         base.OnMouseMove (e);
 
         if (e.Button != MouseButtons.None)
+        {
             CancelDelayedAction();
+        }
 
         if (e.Button == MouseButtons.Left && mouseCanSelectArea)
         {
@@ -729,14 +788,20 @@ public class FastListBase
                 }
 
                 if (e.Location.Y <= Padding.Top + ItemHeightDefault / 2)
+                {
                     ScrollUp();
+                }
                 else if (e.Location.Y >= ClientSize.Height - Padding.Bottom - +ItemHeightDefault / 2)
+                {
                     ScrollDown();
+                }
 
                 Invalidate();
             }
             else
+            {
                 mouseSelectArea = Rectangle.Empty;
+            }
         }
         else if (e.Button == System.Windows.Forms.MouseButtons.Left && AllowDragItems &&
                  (Math.Abs (lastMouseClick.X - e.Location.X) > 2 || Math.Abs (lastMouseClick.Y - e.Location.Y) > 2))
@@ -746,7 +811,10 @@ public class FastListBase
             if (info != null)
             {
                 if (!SelectedItemIndexes.Contains (info.ItemIndex))
+                {
                     SelectItem (info.ItemIndex);
+                }
+
                 OnItemDrag (new HashSet<int> (SelectedItemIndexes));
             }
         }
@@ -759,7 +827,9 @@ public class FastListBase
             {
                 var i = -1;
                 if (info != null)
+                {
                     i = info.ItemIndex;
+                }
 
                 if (currentHotTrackingIndex != i)
                 {
@@ -771,7 +841,10 @@ public class FastListBase
             if (info != null && info.X_EndText == info.X_End)
             {
                 if (_toolTip.Tag != info.Text && ShowToolTips)
+                {
                     _toolTip.Show (info.Text, this, info.X_Text - 3, info.Y - 2, 2000);
+                }
+
                 _toolTip.Tag = info.Text;
             }
             else
@@ -850,9 +923,13 @@ public class FastListBase
     protected virtual void OnExpandBoxClick (VisibleItemInfo info)
     {
         if (info.Expanded)
+        {
             CollapseItem (info.ItemIndex);
+        }
         else
+        {
             ExpandItem (info.ItemIndex);
+        }
     }
 
     public virtual bool CollapseItem (int itemIndex)
@@ -893,15 +970,21 @@ public class FastListBase
     protected virtual void OnCheckboxClick (VisibleItemInfo info)
     {
         if (GetItemChecked (info.ItemIndex))
+        {
             UncheckItem (info.ItemIndex);
+        }
         else
+        {
             CheckItem (info.ItemIndex);
+        }
     }
 
     public virtual bool CheckItem (int itemIndex)
     {
         if (GetItemChecked (itemIndex))
+        {
             return true;
+        }
 
         Invalidate();
 
@@ -927,7 +1010,9 @@ public class FastListBase
     public virtual bool UncheckItem (int itemIndex)
     {
         if (!GetItemChecked (itemIndex))
+        {
             return true;
+        }
 
         Invalidate();
 
@@ -1012,13 +1097,19 @@ public class FastListBase
     public virtual bool UnselectItem (int itemIndex)
     {
         if (itemIndex < 0 || itemIndex >= ItemCount)
+        {
             return false;
+        }
 
         if (!SelectedItemIndexes.Contains (itemIndex))
+        {
             return true;
+        }
 
         if (!CanUnselectItem (itemIndex))
+        {
             return false;
+        }
 
         SelectedItemIndexes.Remove (itemIndex);
         OnItemUnselected (itemIndex);
@@ -1030,7 +1121,9 @@ public class FastListBase
     {
         foreach (var i in SelectedItemIndexes)
             if (!CanUnselectItem (i))
+            {
                 return false;
+            }
 
         var list = new List<int> (SelectedItemIndexes);
 
@@ -1047,10 +1140,14 @@ public class FastListBase
     public virtual bool SelectItem (int itemIndex, bool unselectOtherItems = true)
     {
         if (itemIndex < 0 || itemIndex >= ItemCount)
+        {
             return false;
+        }
 
         if (!CanSelectItem (itemIndex))
+        {
             return false;
+        }
 
         var contains = SelectedItemIndexes.Contains (itemIndex);
 
@@ -1058,8 +1155,12 @@ public class FastListBase
         {
             foreach (var i in SelectedItemIndexes)
                 if (i != itemIndex)
+                {
                     if (!CanUnselectItem (i))
+                    {
                         return false;
+                    }
+                }
 
             var list = new List<int> (SelectedItemIndexes);
 
@@ -1076,7 +1177,9 @@ public class FastListBase
         SelectedItemIndexes.Add (itemIndex);
 
         if (!contains)
+        {
             OnItemSelected (itemIndex);
+        }
 
         ScrollToItem (itemIndex);
 
@@ -1087,8 +1190,12 @@ public class FastListBase
     {
         foreach (var i in SelectedItemIndexes)
             if (i < from || i > to)
+            {
                 if (!CanUnselectItem (i))
+                {
                     return false;
+                }
+            }
 
         var list = new List<int> (SelectedItemIndexes);
 
@@ -1103,11 +1210,13 @@ public class FastListBase
 
         for (int i = from; i <= to; i++)
             if (!SelectedItemIndexes.Contains (i))
+            {
                 if (CanSelectItem (i))
                 {
                     SelectedItemIndexes.Add (i);
                     OnItemSelected (i);
                 }
+            }
 
         Invalidate();
 
@@ -1122,15 +1231,21 @@ public class FastListBase
     public bool SelectNext (bool unselectOtherItems = true)
     {
         if (SelectedItemIndexes.Count == 0)
+        {
             return false;
+        }
 
         var index = SelectedItemIndexes.Max() + 1;
         if (index >= ItemCount)
+        {
             return false;
+        }
 
         var res = SelectItem (index, unselectOtherItems);
         if (res)
+        {
             ScrollToItem (index);
+        }
 
         return res;
     }
@@ -1138,15 +1253,21 @@ public class FastListBase
     public bool SelectPrev (bool unselectOtherItems = true)
     {
         if (SelectedItemIndexes.Count == 0)
+        {
             return false;
+        }
 
         var index = SelectedItemIndexes.Min() - 1;
         if (index < 0)
+        {
             return false;
+        }
 
         var res = SelectItem (index, unselectOtherItems);
         if (res)
+        {
             ScrollToItem (index);
+        }
 
         return res;
     }
@@ -1178,9 +1299,13 @@ public class FastListBase
         DrawItems (e.Graphics);
 
         if (_lastDragAndDropEffect == null)
+        {
             DrawMouseSelectedArea (e.Graphics);
+        }
         else
+        {
             DrawDragOverInsertEffect (e.Graphics, _lastDragAndDropEffect);
+        }
 
         base.OnPaint (e);
 
@@ -1200,7 +1325,10 @@ public class FastListBase
         var c2 = Color.Transparent;
 
         if (!visibleItemInfos.ContainsKey (e.ItemIndex))
+        {
             return;
+        }
+
         var info = visibleItemInfos[e.ItemIndex];
         var rect = new Rectangle (info.X_ExpandBox, info.Y, 1000, info.Height);
 
@@ -1213,14 +1341,20 @@ public class FastListBase
 
             case InsertEffect.InsertBefore:
                 if (e.ItemIndex <= 0)
+                {
                     rect.Offset (0, 2);
+                }
+
                 using (var pen = new Pen (c1, 2) { DashStyle = DashStyle.Dash })
                     gr.DrawLine (pen, rect.Left, rect.Top, rect.Right, rect.Top);
                 break;
 
             case InsertEffect.InsertAfter:
                 if (e.ItemIndex < 0)
+                {
                     rect.Offset (0, 2);
+                }
+
                 using (var pen = new Pen (c1, 2) { DashStyle = DashStyle.Dash })
                     gr.DrawLine (pen, rect.Left, rect.Bottom, rect.Right, rect.Bottom);
                 break;
@@ -1260,7 +1394,9 @@ public class FastListBase
         {
             var info = visibleItemInfos[i] = CalcVisibleItemInfo (gr, i);
             if (info.Y > ClientSize.Height)
+            {
                 break;
+            }
 
             DrawItem (gr, info);
         }
@@ -1278,12 +1414,20 @@ public class FastListBase
         DrawItemBackgound (gr, info);
 
         if (_lastDragAndDropEffect == null) //do not draw selection when drag&drop over the control
+        {
             if (!IsEditMode) //do not draw selection when edit mode
+            {
                 if (SelectedItemIndexes.Contains (info.ItemIndex))
+                {
                     DrawSelection (gr, info);
+                }
+            }
+        }
 
         if (HotTracking && info.ItemIndex == currentHotTrackingIndex)
+        {
             DrawItemHotTracking (gr, info);
+        }
 
 
         DrawItemIcons (gr, info);
@@ -1302,8 +1446,10 @@ public class FastListBase
         }
 
         if (rect.Width > 0 && rect.Height > 0)
+        {
             using (var pen = new Pen (c1))
                 gr.DrawRectangle (pen, rect);
+        }
     }
 
     [Browsable (false)]
@@ -1331,12 +1477,14 @@ public class FastListBase
         }
 
         if (rect.Width > 0 && rect.Height > 0)
+        {
             using (var brush = new LinearGradientBrush (rect, c2, c1, LinearGradientMode.Vertical))
             using (var pen = new Pen (c1))
             {
                 gr.FillRectangle (brush, Rectangle.FromLTRB (rect.Left, rect.Top, rect.Right + 1, rect.Bottom + 1));
                 gr.DrawRectangle (pen, rect);
             }
+        }
     }
 
     /// <summary>
@@ -1398,8 +1546,10 @@ public class FastListBase
         var backColor = info.BackColor;
 
         if (backColor != Color.Empty)
+        {
             using (var brush = new SolidBrush (backColor))
                 gr.FillRectangle (brush, info.TextAndIconRect);
+        }
     }
 
     protected virtual VisibleItemInfo CalcVisibleItemInfo (Graphics gr, int itemIndex)
@@ -1426,10 +1576,14 @@ public class FastListBase
     public int YToIndex (int y)
     {
         if (y < Padding.Top)
+        {
             return -1;
+        }
 
         if (ItemCount <= 0)
+        {
             return -1;
+        }
 
         int i = 0;
 
@@ -1448,7 +1602,9 @@ public class FastListBase
         }
 
         if (i >= ItemCount)
+        {
             return -1;
+        }
 
         return i;
     }
@@ -1466,7 +1622,9 @@ public class FastListBase
     protected int YToIndexAround (int y)
     {
         if (ItemCount <= 0)
+        {
             return -1;
+        }
 
         var i = 0;
 
@@ -1485,10 +1643,14 @@ public class FastListBase
         }
 
         if (i < 0)
+        {
             i = 0;
+        }
 
         if (i >= ItemCount)
+        {
             i = ItemCount - 1;
+        }
 
         return i;
     }
@@ -1499,7 +1661,9 @@ public class FastListBase
     public int PointToIndex (Point p)
     {
         if (p.X < Padding.Left || p.X > ClientRectangle.Right - Padding.Right)
+        {
             return -1;
+        }
 
         var y = p.Y + VerticalScroll.Value;
 
@@ -1613,11 +1777,23 @@ public class FastListBase
             X = list.Padding.Left;
             var x = list.GetItemIndent (itemIndex) + list.Padding.Left;
             X_ExpandBox = x;
-            if (list.ShowExpandBoxes) x += list.ImageExpand.Width + 2;
+            if (list.ShowExpandBoxes)
+            {
+                x += list.ImageExpand.Width + 2;
+            }
+
             X_CheckBox = x;
-            if (list.ShowCheckBoxes) x += list.ImageCheckBoxOn.Width + 2;
+            if (list.ShowCheckBoxes)
+            {
+                x += list.ImageCheckBoxOn.Width + 2;
+            }
+
             X_Icon = x;
-            if (list.ShowIcons) x += list.IconSize.Width + 2;
+            if (list.ShowIcons)
+            {
+                x += list.IconSize.Width + 2;
+            }
+
             X_Text = x;
             x += (int)gr.MeasureString (Text, list.Font).Width + 1;
             X_End = list.ClientSize.Width - list.Padding.Right - 2;
@@ -1905,14 +2081,20 @@ public class FastListBase
             if (_showScrollBar)
             {
                 if (!base.AutoScroll)
+                {
                     base.AutoScroll = true;
+                }
+
                 Size newSize = value;
                 base.AutoScrollMinSize = newSize;
             }
             else
             {
                 if (base.AutoScroll)
+                {
                     base.AutoScroll = false;
+                }
+
                 base.AutoScrollMinSize = new Size (0, 0);
                 VerticalScroll.Visible = false;
                 HorizontalScroll.Visible = false;
@@ -1937,7 +2119,9 @@ public class FastListBase
             base.AutoScrollMinSize += new Size (1, 0);
         }
         else
+        {
             AutoScrollMinSize = AutoScrollMinSize;
+        }
 
         if (IsHandleCreated)
         {
@@ -1998,14 +2182,22 @@ public class FastListBase
         int h = HorizontalScroll.Value;
 
         if (rect.Bottom > ClientRectangle.Height)
+        {
             v += rect.Bottom - ClientRectangle.Height;
+        }
         else if (rect.Top < Padding.Top)
+        {
             v += rect.Top - Padding.Top;
+        }
 
         if (rect.Right > ClientRectangle.Width)
+        {
             h += rect.Right - ClientRectangle.Width;
+        }
         else if (rect.Left < Padding.Left)
+        {
             h += rect.Left - Padding.Left;
+        }
 
         //
         v = Math.Max (VerticalScroll.Minimum, v);
@@ -2056,7 +2248,9 @@ public class FastListBase
     protected override void OnScroll (ScrollEventArgs se)
     {
         if (se.ScrollOrientation == ScrollOrientation.VerticalScroll)
+        {
             VerticalScroll.Value = Math.Max (VerticalScroll.Minimum, Math.Min (VerticalScroll.Maximum, se.NewValue));
+        }
 
         UpdateScrollbars();
         Invalidate();
@@ -2087,7 +2281,9 @@ public class FastListBase
     public virtual void OnStartEdit (int itemIndex, string startValue = null)
     {
         if (!visibleItemInfos.ContainsKey (itemIndex))
+        {
             return;
+        }
 
         var info = visibleItemInfos[itemIndex];
 

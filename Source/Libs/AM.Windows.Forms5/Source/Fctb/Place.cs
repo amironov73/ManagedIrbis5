@@ -127,9 +127,21 @@ public struct Place
             Place p2
         )
     {
-        if (p1.Line < p2.Line) return true;
-        if (p1.Line > p2.Line) return false;
-        if (p1.Column < p2.Column) return true;
+        if (p1.Line < p2.Line)
+        {
+            return true;
+        }
+
+        if (p1.Line > p2.Line)
+        {
+            return false;
+        }
+
+        if (p1.Column < p2.Column)
+        {
+            return true;
+        }
+
         return false;
     }
 
@@ -142,10 +154,26 @@ public struct Place
             Place p2
         )
     {
-        if (p1.Equals (p2)) return true;
-        if (p1.Line < p2.Line) return true;
-        if (p1.Line > p2.Line) return false;
-        if (p1.Column < p2.Column) return true;
+        if (p1.Equals (p2))
+        {
+            return true;
+        }
+
+        if (p1.Line < p2.Line)
+        {
+            return true;
+        }
+
+        if (p1.Line > p2.Line)
+        {
+            return false;
+        }
+
+        if (p1.Column < p2.Column)
+        {
+            return true;
+        }
+
         return false;
     }
 
@@ -158,9 +186,21 @@ public struct Place
             Place p2
         )
     {
-        if (p1.Line > p2.Line) return true;
-        if (p1.Line < p2.Line) return false;
-        if (p1.Column > p2.Column) return true;
+        if (p1.Line > p2.Line)
+        {
+            return true;
+        }
+
+        if (p1.Line < p2.Line)
+        {
+            return false;
+        }
+
+        if (p1.Column > p2.Column)
+        {
+            return true;
+        }
+
         return false;
     }
 
@@ -173,10 +213,26 @@ public struct Place
             Place p2
         )
     {
-        if (p1.Equals (p2)) return true;
-        if (p1.Line > p2.Line) return true;
-        if (p1.Line < p2.Line) return false;
-        if (p1.Column > p2.Column) return true;
+        if (p1.Equals (p2))
+        {
+            return true;
+        }
+
+        if (p1.Line > p2.Line)
+        {
+            return true;
+        }
+
+        if (p1.Line < p2.Line)
+        {
+            return false;
+        }
+
+        if (p1.Column > p2.Column)
+        {
+            return true;
+        }
+
         return false;
     }
 

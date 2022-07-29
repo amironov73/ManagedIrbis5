@@ -95,7 +95,9 @@ public partial class CredentialDialog : Component
     public CredentialDialog (IContainer container)
     {
         if (container != null)
+        {
             container.Add (this);
+        }
 
         InitializeComponent();
     }
@@ -480,7 +482,9 @@ public partial class CredentialDialog : Component
     public DialogResult ShowDialog (IntPtr owner)
     {
         if (string.IsNullOrEmpty (_target))
+        {
             throw new InvalidOperationException (Resources.CredentialEmptyTargetError);
+        }
 
         UserName = "";
         Password = "";
@@ -493,7 +497,7 @@ public partial class CredentialDialog : Component
             return DialogResult.OK;
         }
 
-        bool storedCredentials = false;
+        var storedCredentials = false;
         if (ShowSaveCheckBox && RetrieveCredentials())
         {
             IsSaveChecked = true;
@@ -507,12 +511,17 @@ public partial class CredentialDialog : Component
             storedCredentials = true;
         }
 
-        IntPtr ownerHandle = owner == IntPtr.Zero ? NativeMethods.GetActiveWindow() : owner;
+        var ownerHandle = owner == IntPtr.Zero ? NativeMethods.GetActiveWindow() : owner;
         bool result;
         if (NativeMethods.IsWindowsVistaOrLater)
+        {
             result = PromptForCredentialsCredUIWin (ownerHandle, storedCredentials);
+        }
         else
+        {
             result = PromptForCredentialsCredUI (ownerHandle, storedCredentials);
+        }
+
         return result ? DialogResult.OK : DialogResult.Cancel;
     }
 
@@ -556,9 +565,14 @@ public partial class CredentialDialog : Component
     {
         IntPtr ownerHandle;
         if (owner == null)
+        {
             ownerHandle = NativeMethods.GetActiveWindow();
+        }
         else
+        {
             ownerHandle = owner.Handle;
+        }
+
         return ShowDialog (ownerHandle);
     }
 
@@ -578,7 +592,9 @@ public partial class CredentialDialog : Component
     public void ConfirmCredentials (bool confirm)
     {
         if (_confirmTarget == null || _confirmTarget != Target)
+        {
             throw new InvalidOperationException (Resources.CredentialPromptNotCalled);
+        }
 
         _confirmTarget = null;
 
@@ -631,17 +647,25 @@ public partial class CredentialDialog : Component
         byte[] additionalEntropy = null)
     {
         if (target == null)
+        {
             throw new ArgumentNullException ("target");
-        if (target.Length == 0)
-            throw new ArgumentException (Resources.CredentialEmptyTargetError, "target");
-        if (credential == null)
-            throw new ArgumentNullException ("credential");
+        }
 
-        NativeMethods.CREDENTIAL c = new NativeMethods.CREDENTIAL();
+        if (target.Length == 0)
+        {
+            throw new ArgumentException (Resources.CredentialEmptyTargetError, "target");
+        }
+
+        if (credential == null)
+        {
+            throw new ArgumentNullException ("credential");
+        }
+
+        var c = new NativeMethods.CREDENTIAL();
         c.UserName = credential.UserName;
         c.TargetName = target;
         c.Persist = NativeMethods.CredPersist.Enterprise;
-        byte[] encryptedPassword = EncryptPassword (credential.Password, additionalEntropy);
+        var encryptedPassword = EncryptPassword (credential.Password, additionalEntropy);
         c.CredentialBlob = Marshal.AllocHGlobal (encryptedPassword.Length);
         try
         {
@@ -649,7 +673,9 @@ public partial class CredentialDialog : Component
             c.CredentialBlobSize = (uint)encryptedPassword.Length;
             c.Type = NativeMethods.CredTypes.CRED_TYPE_GENERIC;
             if (!NativeMethods.CredWrite (ref c, 0))
+            {
                 throw new CredentialException (Marshal.GetLastWin32Error());
+            }
         }
         finally
         {
@@ -679,25 +705,32 @@ public partial class CredentialDialog : Component
     public static NetworkCredential RetrieveCredential (string target, byte[] additionalEntropy = null)
     {
         if (target == null)
+        {
             throw new ArgumentNullException ("target");
-        if (target.Length == 0)
-            throw new ArgumentException (Resources.CredentialEmptyTargetError, "target");
+        }
 
-        NetworkCredential cred = RetrieveCredentialFromApplicationInstanceCache (target);
+        if (target.Length == 0)
+        {
+            throw new ArgumentException (Resources.CredentialEmptyTargetError, "target");
+        }
+
+        var cred = RetrieveCredentialFromApplicationInstanceCache (target);
         if (cred != null)
+        {
             return cred;
+        }
 
         IntPtr credential;
-        bool result = NativeMethods.CredRead (target, NativeMethods.CredTypes.CRED_TYPE_GENERIC, 0, out credential);
-        int error = Marshal.GetLastWin32Error();
+        var result = NativeMethods.CredRead (target, NativeMethods.CredTypes.CRED_TYPE_GENERIC, 0, out credential);
+        var error = Marshal.GetLastWin32Error();
         if (result)
         {
             try
             {
-                NativeMethods.CREDENTIAL c =
+                var c =
                     (NativeMethods.CREDENTIAL)Marshal.PtrToStructure (credential,
                         typeof (NativeMethods.CREDENTIAL));
-                byte[] encryptedPassword = new byte[c.CredentialBlobSize];
+                var encryptedPassword = new byte[c.CredentialBlobSize];
                 Marshal.Copy (c.CredentialBlob, encryptedPassword, 0, encryptedPassword.Length);
                 cred = new NetworkCredential (c.UserName, DecryptPassword (encryptedPassword, additionalEntropy));
             }
@@ -710,7 +743,10 @@ public partial class CredentialDialog : Component
         }
 
         if (error == (int)NativeMethods.CredUIReturnCodes.ERROR_NOT_FOUND)
+        {
             return null;
+        }
+
         throw new CredentialException (error);
     }
 
@@ -730,9 +766,14 @@ public partial class CredentialDialog : Component
     public static NetworkCredential RetrieveCredentialFromApplicationInstanceCache (string target)
     {
         if (target == null)
+        {
             throw new ArgumentNullException ("target");
+        }
+
         if (target.Length == 0)
+        {
             throw new ArgumentException (Resources.CredentialEmptyTargetError, "target");
+        }
 
         lock (_applicationInstanceCredentialCache)
         {
@@ -765,11 +806,16 @@ public partial class CredentialDialog : Component
     public static bool DeleteCredential (string target)
     {
         if (target == null)
+        {
             throw new ArgumentNullException ("target");
-        if (target.Length == 0)
-            throw new ArgumentException (Resources.CredentialEmptyTargetError, "target");
+        }
 
-        bool found = false;
+        if (target.Length == 0)
+        {
+            throw new ArgumentException (Resources.CredentialEmptyTargetError, "target");
+        }
+
+        var found = false;
         lock (_applicationInstanceCredentialCache)
         {
             found = _applicationInstanceCredentialCache.Remove (target);
@@ -781,9 +827,11 @@ public partial class CredentialDialog : Component
         }
         else
         {
-            int error = Marshal.GetLastWin32Error();
+            var error = Marshal.GetLastWin32Error();
             if (error != (int)NativeMethods.CredUIReturnCodes.ERROR_NOT_FOUND)
+            {
                 throw new CredentialException (error);
+            }
         }
 
         return found;
@@ -796,7 +844,9 @@ public partial class CredentialDialog : Component
     protected virtual void OnUserNameChanged (EventArgs e)
     {
         if (UserNameChanged != null)
+        {
             UserNameChanged (this, e);
+        }
     }
 
     /// <summary>
@@ -806,24 +856,28 @@ public partial class CredentialDialog : Component
     protected virtual void OnPasswordChanged (EventArgs e)
     {
         if (PasswordChanged != null)
+        {
             PasswordChanged (this, e);
+        }
     }
 
     private bool PromptForCredentialsCredUI (IntPtr owner, bool storedCredentials)
     {
-        NativeMethods.CREDUI_INFO info = CreateCredUIInfo (owner, true);
-        NativeMethods.CREDUI_FLAGS flags = NativeMethods.CREDUI_FLAGS.GENERIC_CREDENTIALS |
-                                           NativeMethods.CREDUI_FLAGS.DO_NOT_PERSIST |
-                                           NativeMethods.CREDUI_FLAGS.ALWAYS_SHOW_UI;
+        var info = CreateCredUIInfo (owner, true);
+        var flags = NativeMethods.CREDUI_FLAGS.GENERIC_CREDENTIALS |
+                    NativeMethods.CREDUI_FLAGS.DO_NOT_PERSIST |
+                    NativeMethods.CREDUI_FLAGS.ALWAYS_SHOW_UI;
         if (ShowSaveCheckBox)
+        {
             flags |= NativeMethods.CREDUI_FLAGS.SHOW_SAVE_CHECK_BOX;
+        }
 
-        StringBuilder user = new StringBuilder (NativeMethods.CREDUI_MAX_USERNAME_LENGTH);
+        var user = new StringBuilder (NativeMethods.CREDUI_MAX_USERNAME_LENGTH);
         user.Append (UserName);
-        StringBuilder pw = new StringBuilder (NativeMethods.CREDUI_MAX_PASSWORD_LENGTH);
+        var pw = new StringBuilder (NativeMethods.CREDUI_MAX_PASSWORD_LENGTH);
         pw.Append (Password);
 
-        NativeMethods.CredUIReturnCodes result = NativeMethods.CredUIPromptForCredentials (ref info, Target,
+        var result = NativeMethods.CredUIPromptForCredentials (ref info, Target,
             IntPtr.Zero, 0, user, NativeMethods.CREDUI_MAX_USERNAME_LENGTH, pw,
             NativeMethods.CREDUI_MAX_PASSWORD_LENGTH, ref _isSaveChecked, flags);
         switch (result)
@@ -838,7 +892,9 @@ public partial class CredentialDialog : Component
                     // If the credential was stored previously but the user has now cleared the save checkbox,
                     // we want to delete the credential.
                     if (storedCredentials && !IsSaveChecked)
+                    {
                         DeleteCredential (Target);
+                    }
                 }
 
                 return true;
@@ -851,13 +907,15 @@ public partial class CredentialDialog : Component
 
     private bool PromptForCredentialsCredUIWin (IntPtr owner, bool storedCredentials)
     {
-        NativeMethods.CREDUI_INFO info = CreateCredUIInfo (owner, false);
-        NativeMethods.CredUIWinFlags flags = NativeMethods.CredUIWinFlags.Generic;
+        var info = CreateCredUIInfo (owner, false);
+        var flags = NativeMethods.CredUIWinFlags.Generic;
         if (ShowSaveCheckBox)
+        {
             flags |= NativeMethods.CredUIWinFlags.Checkbox;
+        }
 
-        IntPtr inBuffer = IntPtr.Zero;
-        IntPtr outBuffer = IntPtr.Zero;
+        var inBuffer = IntPtr.Zero;
+        var outBuffer = IntPtr.Zero;
         try
         {
             uint inBufferSize = 0;
@@ -869,25 +927,30 @@ public partial class CredentialDialog : Component
                     inBuffer = Marshal.AllocCoTaskMem ((int)inBufferSize);
                     if (!NativeMethods.CredPackAuthenticationBuffer (0, UserName, Password, inBuffer,
                             ref inBufferSize))
+                    {
                         throw new CredentialException (Marshal.GetLastWin32Error());
+                    }
                 }
             }
 
             uint outBufferSize;
             uint package = 0;
-            NativeMethods.CredUIReturnCodes result = NativeMethods.CredUIPromptForWindowsCredentials (ref info, 0,
+            var result = NativeMethods.CredUIPromptForWindowsCredentials (ref info, 0,
                 ref package, inBuffer, inBufferSize, out outBuffer, out outBufferSize, ref _isSaveChecked, flags);
             switch (result)
             {
                 case NativeMethods.CredUIReturnCodes.NO_ERROR:
-                    StringBuilder userName = new StringBuilder (NativeMethods.CREDUI_MAX_USERNAME_LENGTH);
-                    StringBuilder password = new StringBuilder (NativeMethods.CREDUI_MAX_PASSWORD_LENGTH);
-                    uint userNameSize = (uint)userName.Capacity;
-                    uint passwordSize = (uint)password.Capacity;
+                    var userName = new StringBuilder (NativeMethods.CREDUI_MAX_USERNAME_LENGTH);
+                    var password = new StringBuilder (NativeMethods.CREDUI_MAX_PASSWORD_LENGTH);
+                    var userNameSize = (uint)userName.Capacity;
+                    var passwordSize = (uint)password.Capacity;
                     uint domainSize = 0;
                     if (!NativeMethods.CredUnPackAuthenticationBuffer (0, outBuffer, outBufferSize, userName,
                             ref userNameSize, null, ref domainSize, password, ref passwordSize))
+                    {
                         throw new CredentialException (Marshal.GetLastWin32Error());
+                    }
+
                     UserName = userName.ToString();
                     Password = password.ToString();
                     if (ShowSaveCheckBox)
@@ -897,7 +960,9 @@ public partial class CredentialDialog : Component
                         // If the credential was stored previously but the user has now cleared the save checkbox,
                         // we want to delete the credential.
                         if (storedCredentials && !IsSaveChecked)
+                        {
                             DeleteCredential (Target);
+                        }
                     }
 
                     return true;
@@ -910,15 +975,20 @@ public partial class CredentialDialog : Component
         finally
         {
             if (inBuffer != IntPtr.Zero)
+            {
                 Marshal.FreeCoTaskMem (inBuffer);
+            }
+
             if (outBuffer != IntPtr.Zero)
+            {
                 Marshal.FreeCoTaskMem (outBuffer);
+            }
         }
     }
 
     private NativeMethods.CREDUI_INFO CreateCredUIInfo (IntPtr owner, bool downlevelText)
     {
-        NativeMethods.CREDUI_INFO info = new NativeMethods.CREDUI_INFO();
+        var info = new NativeMethods.CREDUI_INFO();
         info.cbSize = Marshal.SizeOf (info);
         info.hwndParent = owner;
         if (downlevelText)
@@ -928,11 +998,18 @@ public partial class CredentialDialog : Component
             {
                 case DownlevelTextMode.MainInstructionAndContent:
                     if (MainInstruction.Length == 0)
+                    {
                         info.pszMessageText = Content;
+                    }
                     else if (Content.Length == 0)
+                    {
                         info.pszMessageText = MainInstruction;
+                    }
                     else
+                    {
                         info.pszMessageText = MainInstruction + Environment.NewLine + Environment.NewLine + Content;
+                    }
+
                     break;
                 case DownlevelTextMode.MainInstructionOnly:
                     info.pszMessageText = MainInstruction;
@@ -954,7 +1031,7 @@ public partial class CredentialDialog : Component
 
     private bool RetrieveCredentials()
     {
-        NetworkCredential credential = RetrieveCredential (Target, AdditionalEntropy);
+        var credential = RetrieveCredential (Target, AdditionalEntropy);
         if (credential != null)
         {
             UserName = credential.UserName;
@@ -967,7 +1044,7 @@ public partial class CredentialDialog : Component
 
     private static byte[] EncryptPassword (string password, byte[] additionalEntropy)
     {
-        byte[] protectedData = ProtectedData.Protect (Encoding.UTF8.GetBytes (password), additionalEntropy,
+        var protectedData = ProtectedData.Protect (Encoding.UTF8.GetBytes (password), additionalEntropy,
             DataProtectionScope.CurrentUser);
         return protectedData;
     }
@@ -989,7 +1066,7 @@ public partial class CredentialDialog : Component
     {
         if (UseApplicationInstanceCredentialCache)
         {
-            NetworkCredential credential = RetrieveCredentialFromApplicationInstanceCache (Target);
+            var credential = RetrieveCredentialFromApplicationInstanceCache (Target);
             if (credential != null)
             {
                 UserName = credential.UserName;

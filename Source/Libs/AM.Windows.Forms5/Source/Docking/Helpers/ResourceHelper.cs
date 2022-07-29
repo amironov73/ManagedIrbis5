@@ -27,8 +27,11 @@ internal static class ResourceHelper
         get
         {
             if (_resourceManager == null)
+            {
                 _resourceManager = new ResourceManager ("WeifenLuo.WinFormsUI.Docking.Strings",
                     typeof (ResourceHelper).Assembly);
+            }
+
             return _resourceManager;
         }
     }

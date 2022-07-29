@@ -425,7 +425,10 @@ internal static class NativeMethods
         Guid guid = new Guid ("43826d1e-e718-42ee-bc55-a1e261c37bfe"); // IID_IShellItem
         int hr = SHCreateItemFromParsingName (path, IntPtr.Zero, ref guid, out item);
         if (hr != 0)
+        {
             throw new Win32Exception (hr);
+        }
+
         return (IShellItem)item;
     }
 

@@ -149,7 +149,9 @@ namespace AM.Windows.Forms.Docking
         internal void ResetAutoHideStripControl()
         {
             if (m_autoHideStripControl != null)
+            {
                 m_autoHideStripControl.Dispose();
+            }
 
             m_autoHideStripControl = null;
         }
@@ -163,11 +165,15 @@ namespace AM.Windows.Forms.Docking
         private void MdiClient_Layout (object sender, LayoutEventArgs e)
         {
             if (DocumentStyle != DocumentStyle.DockingMdi)
+            {
                 return;
+            }
 
             foreach (DockPane pane in Panes)
                 if (pane.DockState == DockState.Document)
+                {
                     pane.SetContentBounds();
+                }
 
             InvalidateWindowRegion();
         }
@@ -215,7 +221,9 @@ namespace AM.Windows.Forms.Docking
             get
             {
                 if (Win32Helper.IsRunningOnMono && m_allowEndUserDocking)
+                {
                     m_allowEndUserDocking = false;
+                }
 
                 return m_allowEndUserDocking;
             }
@@ -223,7 +231,9 @@ namespace AM.Windows.Forms.Docking
             set
             {
                 if (Win32Helper.IsRunningOnMono && value)
+                {
                     throw new InvalidOperationException ("AllowEndUserDocking can only be false if running on Mono");
+                }
 
                 m_allowEndUserDocking = value;
             }
@@ -239,15 +249,20 @@ namespace AM.Windows.Forms.Docking
             get
             {
                 if (Win32Helper.IsRunningOnMono && m_allowEndUserDocking)
+                {
                     m_allowEndUserDocking = false;
+                }
+
                 return m_allowEndUserNestedDocking;
             }
 
             set
             {
                 if (Win32Helper.IsRunningOnMono && value)
+                {
                     throw new InvalidOperationException (
                         "AllowEndUserNestedDocking can only be false if running on Mono");
+                }
 
                 m_allowEndUserNestedDocking = value;
             }
@@ -278,7 +293,9 @@ namespace AM.Windows.Forms.Docking
             set
             {
                 if (m_rightToLeftLayout == value)
+                {
                     return;
+                }
 
                 m_rightToLeftLayout = value;
                 foreach (FloatWindow floatWindow in FloatWindows)
@@ -304,7 +321,9 @@ namespace AM.Windows.Forms.Docking
             set
             {
                 if (m_showDocumentIcon == value)
+                {
                     return;
+                }
 
                 m_showDocumentIcon = value;
                 Refresh();
@@ -384,17 +403,23 @@ namespace AM.Windows.Forms.Docking
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException (nameof (value));
+                }
 
                 if (Math.Abs (value - m_dockBottomPortion) < double.Epsilon)
+                {
                     return;
+                }
 
                 m_dockBottomPortion = value;
 
                 if (m_dockBottomPortion < 1 && m_dockTopPortion < 1)
                 {
                     if (m_dockTopPortion + m_dockBottomPortion > 1)
+                    {
                         m_dockTopPortion = 1 - m_dockBottomPortion;
+                    }
                 }
 
                 PerformLayout();
@@ -413,17 +438,23 @@ namespace AM.Windows.Forms.Docking
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException (nameof (value));
+                }
 
                 if (Math.Abs (value - m_dockLeftPortion) < double.Epsilon)
+                {
                     return;
+                }
 
                 m_dockLeftPortion = value;
 
                 if (m_dockLeftPortion < 1 && m_dockRightPortion < 1)
                 {
                     if (m_dockLeftPortion + m_dockRightPortion > 1)
+                    {
                         m_dockRightPortion = 1 - m_dockLeftPortion;
+                    }
                 }
 
                 PerformLayout();
@@ -442,17 +473,23 @@ namespace AM.Windows.Forms.Docking
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException (nameof (value));
+                }
 
                 if (Math.Abs (value - m_dockRightPortion) < double.Epsilon)
+                {
                     return;
+                }
 
                 m_dockRightPortion = value;
 
                 if (m_dockLeftPortion < 1 && m_dockRightPortion < 1)
                 {
                     if (m_dockLeftPortion + m_dockRightPortion > 1)
+                    {
                         m_dockLeftPortion = 1 - m_dockRightPortion;
+                    }
                 }
 
                 PerformLayout();
@@ -471,17 +508,23 @@ namespace AM.Windows.Forms.Docking
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException (nameof (value));
+                }
 
                 if (Math.Abs (value - m_dockTopPortion) < double.Epsilon)
+                {
                     return;
+                }
 
                 m_dockTopPortion = value;
 
                 if (m_dockTopPortion < 1 && m_dockBottomPortion < 1)
                 {
                     if (m_dockTopPortion + m_dockBottomPortion > 1)
+                    {
                         m_dockBottomPortion = 1 - m_dockTopPortion;
+                    }
                 }
 
                 PerformLayout();
@@ -499,30 +542,46 @@ namespace AM.Windows.Forms.Docking
             if (dockStyle == DockStyle.Left)
             {
                 if (fullPanelEdge)
+                {
                     DockWindows[DockState.DockLeft].SendToBack();
+                }
                 else
+                {
                     DockWindows[DockState.DockLeft].BringToFront();
+                }
             }
             else if (dockStyle == DockStyle.Right)
             {
                 if (fullPanelEdge)
+                {
                     DockWindows[DockState.DockRight].SendToBack();
+                }
                 else
+                {
                     DockWindows[DockState.DockRight].BringToFront();
+                }
             }
             else if (dockStyle == DockStyle.Top)
             {
                 if (fullPanelEdge)
+                {
                     DockWindows[DockState.DockTop].SendToBack();
+                }
                 else
+                {
                     DockWindows[DockState.DockTop].BringToFront();
+                }
             }
             else if (dockStyle == DockStyle.Bottom)
             {
                 if (fullPanelEdge)
+                {
                     DockWindows[DockState.DockBottom].SendToBack();
+                }
                 else
+                {
                     DockWindows[DockState.DockBottom].BringToFront();
+                }
             }
         }
 
@@ -561,7 +620,9 @@ namespace AM.Windows.Forms.Docking
                 foreach (IDockContent content in Contents)
                 {
                     if (content.DockHandler.DockState == DockState.Document)
+                    {
                         yield return content;
+                    }
                 }
             }
         }
@@ -602,13 +663,19 @@ namespace AM.Windows.Forms.Docking
             set
             {
                 if (value == m_documentStyle)
+                {
                     return;
+                }
 
                 if (!Enum.IsDefined (typeof (DocumentStyle), value))
+                {
                     throw new InvalidEnumArgumentException();
+                }
 
                 if (value == DocumentStyle.SystemMdi && DockWindows[DockState.Document].VisibleNestedPanes.Count > 0)
+                {
                     throw new InvalidEnumArgumentException();
+                }
 
                 m_documentStyle = value;
 
@@ -621,7 +688,9 @@ namespace AM.Windows.Forms.Docking
                 foreach (IDockContent content in Contents)
                 {
                     if (content.DockHandler.DockState == DockState.Document)
+                    {
                         content.DockHandler.SetPaneAndVisible (content.DockHandler.Pane);
+                    }
                 }
 
                 PerformMdiClientLayout();
@@ -657,9 +726,14 @@ namespace AM.Windows.Forms.Docking
                     : (int)(width * m_dockRightPortion);
 
                 if (dockLeftSize < MeasurePane.MinSize)
+                {
                     dockLeftSize = MeasurePane.MinSize;
+                }
+
                 if (dockRightSize < MeasurePane.MinSize)
+                {
                     dockRightSize = MeasurePane.MinSize;
+                }
 
                 if (dockLeftSize + dockRightSize > width - MeasurePane.MinSize)
                 {
@@ -680,9 +754,14 @@ namespace AM.Windows.Forms.Docking
                     : (int)(height * m_dockBottomPortion);
 
                 if (dockTopSize < MeasurePane.MinSize)
+                {
                     dockTopSize = MeasurePane.MinSize;
+                }
+
                 if (dockBottomSize < MeasurePane.MinSize)
+                {
                     dockBottomSize = MeasurePane.MinSize;
+                }
 
                 if (dockTopSize + dockBottomSize > height - MeasurePane.MinSize)
                 {
@@ -750,7 +829,9 @@ namespace AM.Windows.Forms.Docking
             base.OnPaint (e);
 
             if (DockBackColor.ToArgb() == BackColor.ToArgb())
+            {
                 return;
+            }
 
             Graphics g = e.Graphics;
             SolidBrush bgBrush = new SolidBrush (DockBackColor);
@@ -760,7 +841,9 @@ namespace AM.Windows.Forms.Docking
         internal void AddContent (IDockContent content)
         {
             if (content == null)
+            {
                 throw (new ArgumentNullException());
+            }
 
             if (!Contents.Contains (content))
             {
@@ -772,7 +855,9 @@ namespace AM.Windows.Forms.Docking
         internal void AddPane (DockPane pane)
         {
             if (Panes.Contains (pane))
+            {
                 return;
+            }
 
             Panes.Add (pane);
         }
@@ -780,7 +865,9 @@ namespace AM.Windows.Forms.Docking
         internal void AddFloatWindow (FloatWindow floatWindow)
         {
             if (FloatWindows.Contains (floatWindow))
+            {
                 return;
+            }
 
             FloatWindows.Add (floatWindow);
         }
@@ -790,19 +877,32 @@ namespace AM.Windows.Forms.Docking
             DockPadding.All = Theme.Measures.DockPadding;
             int standard = AutoHideStripControl.MeasureHeight();
             if (AutoHideStripControl.GetNumberOfPanes (DockState.DockLeftAutoHide) > 0)
+            {
                 DockPadding.Left = standard;
+            }
+
             if (AutoHideStripControl.GetNumberOfPanes (DockState.DockRightAutoHide) > 0)
+            {
                 DockPadding.Right = standard;
+            }
+
             if (AutoHideStripControl.GetNumberOfPanes (DockState.DockTopAutoHide) > 0)
+            {
                 DockPadding.Top = standard;
+            }
+
             if (AutoHideStripControl.GetNumberOfPanes (DockState.DockBottomAutoHide) > 0)
+            {
                 DockPadding.Bottom = standard;
+            }
         }
 
         internal void RemoveContent (IDockContent content)
         {
             if (content == null)
+            {
                 throw (new ArgumentNullException());
+            }
 
             if (Contents.Contains (content))
             {
@@ -814,7 +914,9 @@ namespace AM.Windows.Forms.Docking
         internal void RemovePane (DockPane pane)
         {
             if (!Panes.Contains (pane))
+            {
                 return;
+            }
 
             Panes.Remove (pane);
         }
@@ -822,14 +924,20 @@ namespace AM.Windows.Forms.Docking
         internal void RemoveFloatWindow (FloatWindow floatWindow)
         {
             if (!FloatWindows.Contains (floatWindow))
+            {
                 return;
+            }
 
             FloatWindows.Remove (floatWindow);
             if (FloatWindows.Count != 0)
+            {
                 return;
+            }
 
             if (ParentForm == null)
+            {
                 return;
+            }
 
             ParentForm.Focus();
         }
@@ -838,24 +946,41 @@ namespace AM.Windows.Forms.Docking
         {
             int oldIndex = Panes.IndexOf (pane);
             if (oldIndex == -1)
+            {
                 throw (new ArgumentException (Strings.DockPanel_SetPaneIndex_InvalidPane));
+            }
 
             if (index < 0 || index > Panes.Count - 1)
+            {
                 if (index != -1)
+                {
                     throw (new ArgumentOutOfRangeException (Strings.DockPanel_SetPaneIndex_InvalidIndex));
+                }
+            }
 
             if (oldIndex == index)
+            {
                 return;
+            }
+
             if (oldIndex == Panes.Count - 1 && index == -1)
+            {
                 return;
+            }
 
             Panes.Remove (pane);
             if (index == -1)
+            {
                 Panes.Add (pane);
+            }
             else if (oldIndex < index)
+            {
                 Panes.AddAt (pane, index - 1);
+            }
             else
+            {
                 Panes.AddAt (pane, index);
+            }
         }
 
         public void SuspendLayout (bool allWindows)
@@ -863,7 +988,9 @@ namespace AM.Windows.Forms.Docking
             FocusManager.SuspendFocusTracking();
             SuspendLayout();
             if (allWindows)
+            {
                 SuspendMdiClientLayout();
+            }
         }
 
         public void ResumeLayout (bool performLayout, bool allWindows)
@@ -871,7 +998,9 @@ namespace AM.Windows.Forms.Docking
             FocusManager.ResumeFocusTracking();
             ResumeLayout (performLayout);
             if (allWindows)
+            {
                 ResumeMdiClientLayout (performLayout);
+            }
         }
 
         internal Form ParentForm
@@ -879,7 +1008,9 @@ namespace AM.Windows.Forms.Docking
             get
             {
                 if (!IsParentFormValid())
+                {
                     throw new InvalidOperationException (Strings.DockPanel_ParentForm_Invalid);
+                }
 
                 return GetMdiClientController().ParentForm;
             }
@@ -888,10 +1019,14 @@ namespace AM.Windows.Forms.Docking
         private bool IsParentFormValid()
         {
             if (DocumentStyle == DocumentStyle.DockingSdi || DocumentStyle == DocumentStyle.DockingWindow)
+            {
                 return true;
+            }
 
             if (!MdiClientExists)
+            {
                 GetMdiClientController().RenewMdiClient();
+            }
 
             return (MdiClientExists);
         }
@@ -908,9 +1043,14 @@ namespace AM.Windows.Forms.Docking
             Control parent;
             if (DocumentStyle == DocumentStyle.DockingMdi ||
                 DocumentStyle == DocumentStyle.SystemMdi)
+            {
                 parent = this.Parent;
+            }
             else
+            {
                 parent = this;
+            }
+
             if (AutoHideWindow.Parent != parent)
             {
                 AutoHideWindow.Parent = parent;
@@ -923,7 +1063,9 @@ namespace AM.Windows.Forms.Docking
             base.OnVisibleChanged (e);
 
             if (Visible)
+            {
                 SetMdiClient();
+            }
         }
 
         private Rectangle SystemMdiClientBounds
@@ -931,7 +1073,9 @@ namespace AM.Windows.Forms.Docking
             get
             {
                 if (!IsParentFormValid() || !Visible)
+                {
                     return Rectangle.Empty;
+                }
 
                 Rectangle rect = ParentForm.RectangleToClient (RectangleToScreen (DocumentWindowBounds));
                 return rect;
@@ -950,7 +1094,10 @@ namespace AM.Windows.Forms.Docking
                 }
 
                 if (DockWindows[DockState.DockRight].Visible)
+                {
                     rectDocumentBounds.Width -= DockWindows[DockState.DockRight].Width;
+                }
+
                 if (DockWindows[DockState.DockTop].Visible)
                 {
                     rectDocumentBounds.Y += DockWindows[DockState.DockTop].Height;
@@ -958,7 +1105,9 @@ namespace AM.Windows.Forms.Docking
                 }
 
                 if (DockWindows[DockState.DockBottom].Visible)
+                {
                     rectDocumentBounds.Height -= DockWindows[DockState.DockBottom].Height;
+                }
 
                 return rectDocumentBounds;
             }
@@ -969,10 +1118,14 @@ namespace AM.Windows.Forms.Docking
         private void InvalidateWindowRegion()
         {
             if (DesignMode)
+            {
                 return;
+            }
 
             if (m_dummyControlPaintEventHandler == null)
+            {
                 m_dummyControlPaintEventHandler = new PaintEventHandler (DummyControl_Paint);
+            }
 
             DummyControl.Paint += m_dummyControlPaintEventHandler;
             DummyControl.Invalidate();
@@ -987,12 +1140,18 @@ namespace AM.Windows.Forms.Docking
         private void UpdateWindowRegion()
         {
             if (this.DocumentStyle == DocumentStyle.DockingMdi)
+            {
                 UpdateWindowRegion_ClipContent();
+            }
             else if (this.DocumentStyle == DocumentStyle.DockingSdi ||
                      this.DocumentStyle == DocumentStyle.DockingWindow)
+            {
                 UpdateWindowRegion_FullDocumentArea();
+            }
             else if (this.DocumentStyle == DocumentStyle.SystemMdi)
+            {
                 UpdateWindowRegion_EmptyDocumentArea();
+            }
         }
 
         private void UpdateWindowRegion_FullDocumentArea()
@@ -1012,7 +1171,9 @@ namespace AM.Windows.Forms.Docking
             foreach (DockPane pane in this.Panes)
             {
                 if (!pane.Visible || pane.DockState != DockState.Document)
+                {
                     continue;
+                }
 
                 count++;
             }
@@ -1028,7 +1189,9 @@ namespace AM.Windows.Forms.Docking
             foreach (DockPane pane in this.Panes)
             {
                 if (!pane.Visible || pane.DockState != DockState.Document)
+                {
                     continue;
+                }
 
                 rects[i] = RectangleToClient (pane.RectangleToScreen (pane.ContentRectangle));
                 i++;
@@ -1042,12 +1205,16 @@ namespace AM.Windows.Forms.Docking
         private void SetRegion (Rectangle[] clipRects)
         {
             if (!IsClipRectsChanged (clipRects))
+            {
                 return;
+            }
 
             m_clipRects = clipRects;
 
             if (m_clipRects == null || m_clipRects.GetLength (0) == 0)
+            {
                 Region = null;
+            }
             else
             {
                 Region region = new Region (new Rectangle (0, 0, this.Width, this.Height));
@@ -1065,9 +1232,13 @@ namespace AM.Windows.Forms.Docking
         private bool IsClipRectsChanged (Rectangle[] clipRects)
         {
             if (clipRects == null && m_clipRects == null)
+            {
                 return false;
+            }
             else if ((clipRects == null) != (m_clipRects == null))
+            {
                 return true;
+            }
 
             foreach (Rectangle rect in clipRects)
             {
@@ -1082,7 +1253,9 @@ namespace AM.Windows.Forms.Docking
                 }
 
                 if (!matched)
+                {
                     return true;
+                }
             }
 
             foreach (Rectangle rect2 in m_clipRects)
@@ -1098,7 +1271,9 @@ namespace AM.Windows.Forms.Docking
                 }
 
                 if (!matched)
+                {
                     return true;
+                }
             }
 
             return false;
@@ -1118,7 +1293,9 @@ namespace AM.Windows.Forms.Docking
         {
             EventHandler handler = (EventHandler)Events[ActiveAutoHideContentChangedEvent];
             if (handler != null)
+            {
                 handler (this, e);
+            }
         }
 
         private void m_autoHideWindow_ActiveContentChanged (object sender, EventArgs e)
@@ -1141,7 +1318,9 @@ namespace AM.Windows.Forms.Docking
         {
             EventHandler<DockContentEventArgs> handler = (EventHandler<DockContentEventArgs>)Events[ContentAddedEvent];
             if (handler != null)
+            {
                 handler (this, e);
+            }
         }
 
         private static readonly object ContentRemovedEvent = new object();
@@ -1159,7 +1338,9 @@ namespace AM.Windows.Forms.Docking
             EventHandler<DockContentEventArgs>
                 handler = (EventHandler<DockContentEventArgs>)Events[ContentRemovedEvent];
             if (handler != null)
+            {
                 handler (this, e);
+            }
         }
 
         internal void ResetDockWindows()

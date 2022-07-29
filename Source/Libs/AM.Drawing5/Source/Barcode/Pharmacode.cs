@@ -14,7 +14,7 @@
 
 #region Using directives
 
-using System.Text;
+using AM.Text;
 
 #endregion
 
@@ -47,29 +47,32 @@ public class Pharmacode
         Sure.NotNull (data);
 
         var text = data.Message.ThrowIfNull();
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         var number = text.ParseInt32();
 
         do
         {
             if ((number & 1) == 0)
             {
-                result.Insert (0, Thick);
+                builder.Insert (0, Thick);
                 number = (number - 2) / 2;
             }
             else
             {
-                result.Insert (0, Thin);
+                builder.Insert (0, Thin);
                 number = (number - 1) / 2;
             }
 
             if (number != 0)
             {
-                result.Insert (0, Gap);
+                builder.Insert (0, Gap);
             }
         } while (number != 0);
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <inheritdoc cref="LinearBarcodeBase.Verify"/>

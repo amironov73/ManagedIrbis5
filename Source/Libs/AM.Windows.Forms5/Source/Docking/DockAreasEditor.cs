@@ -41,22 +41,43 @@ internal class DockAreasEditor : UITypeEditor
             {
                 DockAreas dockAreas = 0;
                 if (checkBoxFloat.Checked)
+                {
                     dockAreas |= DockAreas.Float;
+                }
+
                 if (checkBoxDockLeft.Checked)
+                {
                     dockAreas |= DockAreas.DockLeft;
+                }
+
                 if (checkBoxDockRight.Checked)
+                {
                     dockAreas |= DockAreas.DockRight;
+                }
+
                 if (checkBoxDockTop.Checked)
+                {
                     dockAreas |= DockAreas.DockTop;
+                }
+
                 if (checkBoxDockBottom.Checked)
+                {
                     dockAreas |= DockAreas.DockBottom;
+                }
+
                 if (checkBoxDockFill.Checked)
+                {
                     dockAreas |= DockAreas.Document;
+                }
 
                 if (dockAreas == 0)
+                {
                     return m_oldDockAreas;
+                }
                 else
+                {
                     return dockAreas;
+                }
             }
         }
 
@@ -121,19 +142,39 @@ internal class DockAreasEditor : UITypeEditor
         {
             m_oldDockAreas = dockAreas;
             if ((dockAreas & DockAreas.DockLeft) != 0)
+            {
                 checkBoxDockLeft.Checked = true;
+            }
+
             if ((dockAreas & DockAreas.DockRight) != 0)
+            {
                 checkBoxDockRight.Checked = true;
+            }
+
             if ((dockAreas & DockAreas.DockTop) != 0)
+            {
                 checkBoxDockTop.Checked = true;
+            }
+
             if ((dockAreas & DockAreas.DockTop) != 0)
+            {
                 checkBoxDockTop.Checked = true;
+            }
+
             if ((dockAreas & DockAreas.DockBottom) != 0)
+            {
                 checkBoxDockBottom.Checked = true;
+            }
+
             if ((dockAreas & DockAreas.Document) != 0)
+            {
                 checkBoxDockFill.Checked = true;
+            }
+
             if ((dockAreas & DockAreas.Float) != 0)
+            {
                 checkBoxFloat.Checked = true;
+            }
         }
     }
 
@@ -147,7 +188,9 @@ internal class DockAreasEditor : UITypeEditor
     public override object EditValue (ITypeDescriptorContext context, IServiceProvider provider, object value)
     {
         if (m_ui == null)
+        {
             m_ui = new DockAreasEditor.DockAreasEditorControl();
+        }
 
         m_ui.SetStates ((DockAreas)value);
 

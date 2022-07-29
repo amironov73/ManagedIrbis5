@@ -52,7 +52,9 @@ public class DocumentMap
         set
         {
             if (_target != null)
+            {
                 UnSubscribe (_target);
+            }
 
             _target = value;
             if (value != null)
@@ -264,19 +266,25 @@ public class DocumentMap
         var zoom = this.Scale * 100 / _target.Zoom;
 
         if (zoom <= float.Epsilon)
+        {
             return;
+        }
 
         //calc startPlace
         var r = _target.VisibleRange;
         if (_startPlace.Line > r.Start.Line)
+        {
             _startPlace.Line = r.Start.Line;
+        }
         else
         {
             var endP = _target.PlaceToPoint (r.End);
             endP.Offset (0, -(int)(ClientSize.Height / zoom) + _target.CharHeight);
             var pp = _target.PointToPlace (endP);
             if (pp.Line > _startPlace.Line)
+            {
                 _startPlace.Line = pp.Line;
+            }
         }
 
         _startPlace.Column = 0;

@@ -302,11 +302,15 @@ public class HtmlToolTip : ToolTip
 
         // adjust if tooltip is outside form bounds
         if (mousePos.X + size.Width > screenBounds.Right)
+        {
             mousePos.X = Math.Max(screenBounds.Right - size.Width - 5, screenBounds.Left + 3);
+        }
 
         const int yOffset = 20;
         if (mousePos.Y + size.Height + yOffset > screenBounds.Bottom)
+        {
             mousePos.Y = Math.Max(screenBounds.Bottom - size.Height - yOffset - 3, screenBounds.Top + 2);
+        }
 
 #if !MONO
         // move the tooltip window to new location
@@ -322,7 +326,9 @@ public class HtmlToolTip : ToolTip
     {
         var handler = LinkClicked;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 #endif
 
@@ -333,7 +339,9 @@ public class HtmlToolTip : ToolTip
     {
         var handler = RenderError;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -343,7 +351,9 @@ public class HtmlToolTip : ToolTip
     {
         var handler = StylesheetLoad;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -353,7 +363,9 @@ public class HtmlToolTip : ToolTip
     {
         var handler = ImageLoad;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
 #if !MONO
@@ -429,7 +441,9 @@ public class HtmlToolTip : ToolTip
             _linkHandlingTimer = null;
 
             if (_htmlContainer != null)
+            {
                 _htmlContainer.LinkClicked -= OnLinkClicked;
+            }
         }
 #endif
     }

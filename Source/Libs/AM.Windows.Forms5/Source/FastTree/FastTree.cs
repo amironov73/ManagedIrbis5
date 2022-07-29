@@ -177,8 +177,10 @@ public class FastTree
     protected override void OnItemChecked (int itemIndex)
     {
         if (NodeCheckedStateChanged != null)
+        {
             NodeCheckedStateChanged (this,
                 new NodeCheckedStateChangedEventArgs { Node = nodes[itemIndex], Checked = true });
+        }
 
         base.OnItemChecked (itemIndex);
     }
@@ -186,8 +188,10 @@ public class FastTree
     protected override void OnItemUnchecked (int itemIndex)
     {
         if (NodeCheckedStateChanged != null)
+        {
             NodeCheckedStateChanged (this,
                 new NodeCheckedStateChangedEventArgs { Node = nodes[itemIndex], Checked = false });
+        }
 
         base.OnItemUnchecked (itemIndex);
     }
@@ -195,7 +199,9 @@ public class FastTree
     protected override void OnItemTextPushed (int itemIndex, string text)
     {
         if (NodeTextPushed != null)
+        {
             NodeTextPushed (this, new NodeTextPushedEventArgs { Node = nodes[itemIndex], Text = text });
+        }
 
         base.OnItemTextPushed (itemIndex, text);
     }
@@ -209,14 +215,18 @@ public class FastTree
     protected virtual void OnNodeExpanded (object node)
     {
         if (NodeExpandedStateChanged != null)
+        {
             NodeExpandedStateChanged (this, new NodeExpandedStateChangedEventArgs { Node = node, Expanded = true });
+        }
     }
 
     protected override void OnItemCollapsed (int itemIndex)
     {
         if (NodeExpandedStateChanged != null)
+        {
             NodeExpandedStateChanged (this,
                 new NodeExpandedStateChangedEventArgs { Node = nodes[itemIndex], Expanded = false });
+        }
 
         base.OnItemCollapsed (itemIndex);
     }
@@ -224,8 +234,10 @@ public class FastTree
     protected override void OnItemSelected (int itemIndex)
     {
         if (NodeSelectedStateChanged != null)
+        {
             NodeSelectedStateChanged (this,
                 new NodeSelectedStateChangedEventArgs { Node = nodes[itemIndex], Selected = true });
+        }
 
         base.OnItemSelected (itemIndex);
     }
@@ -233,8 +245,10 @@ public class FastTree
     protected override void OnItemUnselected (int itemIndex)
     {
         if (NodeSelectedStateChanged != null)
+        {
             NodeSelectedStateChanged (this,
                 new NodeSelectedStateChangedEventArgs { Node = nodes[itemIndex], Selected = false });
+        }
 
         base.OnItemUnselected (itemIndex);
     }
@@ -400,9 +414,13 @@ public class FastTree
 
         //build list of expanded nodes
         if (ShowRootNode)
+        {
             AddNode (root, 0);
+        }
         else
+        {
             AddNodeChildren (root, 0);
+        }
 
         //restore indexes of selected and checked nodes
         var newExpanded = new HashSet<object>();
@@ -411,9 +429,21 @@ public class FastTree
         for (int i = 0; i < nodes.Count; i++)
         {
             var node = nodes[i];
-            if (selected.Contains (node)) SelectedItemIndexes.Add (i);
-            if (check.Contains (node)) CheckedItemIndex.Add (i);
-            if (expandedNodes.Contains (node)) newExpanded.Add (node);
+            if (selected.Contains (node))
+            {
+                SelectedItemIndexes.Add (i);
+            }
+
+            if (check.Contains (node))
+            {
+                CheckedItemIndex.Add (i);
+            }
+
+            if (expandedNodes.Contains (node))
+            {
+                newExpanded.Add (node);
+            }
+
             hasChildren[i] = GetNodeChildren (nodes[i]).Cast<object>().Any();
         }
 
@@ -425,13 +455,17 @@ public class FastTree
     public void Rebuild()
     {
         if (root != null)
+        {
             Build (root);
+        }
     }
 
     private void AddNode (object node, int level)
     {
         if (node == null || !GetNodeVisibility (node))
+        {
             return;
+        }
 
         //
         nodes.Add (node);
@@ -439,7 +473,9 @@ public class FastTree
 
         //
         if (expandedNodes.Contains (node))
+        {
             AddNodeChildren (node, level + 1);
+        }
     }
 
     private void AddNodeChildren (object node, int level)
@@ -455,14 +491,18 @@ public class FastTree
             var arg = new NodeChildrenNeededEventArgs() { Node = node };
             NodeChildrenNeeded (this, arg);
             if (arg.Children != null)
+            {
                 foreach (var child in arg.Children)
                     yield return child;
+            }
         }
         else if (node is IEnumerable)
         {
             if (!(node is string))
+            {
                 foreach (var child in node as IEnumerable)
                     yield return child;
+            }
         }
     }
 
@@ -472,7 +512,11 @@ public class FastTree
 
     public virtual object GetNodeByIndex (int index)
     {
-        if (index < 0 || index >= nodes.Count) return null;
+        if (index < 0 || index >= nodes.Count)
+        {
+            return null;
+        }
+
         return nodes[index];
     }
 
@@ -484,18 +528,25 @@ public class FastTree
     public override bool ExpandItem (int itemIndex)
     {
         if (itemIndex < 0 || itemIndex >= nodes.Count)
+        {
             return false;
+        }
 
         var list = GetNodeChildren (nodes[itemIndex]).Cast<object>().ToList();
         if (list.Count > 0)
+        {
             if (CanExpandItem (itemIndex))
             {
                 expandedNodes.Add (nodes[itemIndex]);
                 Build (root);
                 if (itemIndex < nodes.Count)
+                {
                     OnItemExpanded (itemIndex);
+                }
+
                 return true;
             }
+        }
 
         return false;
     }
@@ -516,7 +567,9 @@ public class FastTree
     protected virtual bool CollapseItem (int itemIndex, bool build)
     {
         if (itemIndex < 0 || itemIndex >= nodes.Count)
+        {
             return false;
+        }
 
         if (CanCollapseItem (itemIndex))
         {
@@ -529,30 +582,47 @@ public class FastTree
             var from = itemIndex + 1;
             var to = i - 1;
             if (to < from)
+            {
                 return true;
+            }
 
             //check selection, checked
             foreach (var j in SelectedItemIndexes)
                 if (j >= from && j <= to)
+                {
                     if (!CanUnselectItem (j))
+                    {
                         return false;
+                    }
+                }
 
             foreach (var j in CheckedItemIndex)
                 if (j >= from && j <= to)
+                {
                     if (!CanUncheckItem (j))
+                    {
                         return false;
+                    }
+                }
 
             for (var j = from; j <= to; j++)
                 if (expandedNodes.Contains (nodes[j]))
+                {
                     if (!CanCollapseItem (j))
+                    {
                         return false;
+                    }
+                }
 
             //unselect, uncheck
             for (int j = from; j <= to; j++)
             {
                 UnselectItem (j);
                 if (UncheckChildWhenCollapsed)
+                {
                     UncheckItem (j);
+                }
+
                 if (expandedNodes.Contains (nodes[j]))
                 {
                     expandedNodes.Remove (nodes[j]);
@@ -566,7 +636,10 @@ public class FastTree
             //
             OnItemCollapsed (itemIndex);
             if (build)
+            {
                 Build (root);
+            }
+
             return true;
         }
 
@@ -612,17 +685,21 @@ public class FastTree
     {
         var list = GetNodeChildren (node).Cast<object>().ToList();
         if (list.Count > 0)
+        {
             if (CanExpandNode (node))
             {
                 expandedNodes.Add (node);
                 OnNodeExpanded (node);
 
                 if (maxExpandLevelCount > 1)
+                {
                     foreach (var child in list)
                         ExpandNodeAndChildren (child, maxExpandLevelCount - 1);
+                }
 
                 return true;
             }
+        }
 
         return false;
     }
@@ -640,7 +717,9 @@ public class FastTree
             return false;
         }
         else
+        {
             return ExpandItem (nodes.IndexOf (node));
+        }
     }
 
     public bool ExpandNode (object node, int maxExpandLevelCount)
@@ -656,7 +735,9 @@ public class FastTree
             return false;
         }
         else
+        {
             return ExpandItem (nodes.IndexOf (node));
+        }
     }
 
     public bool CollapseNode (object node)
@@ -667,10 +748,14 @@ public class FastTree
     public void ExpandAll()
     {
         if (ShowRootNode)
+        {
             ExpandNodeAndChildren (root, int.MaxValue);
+        }
         else
+        {
             foreach (var child in GetNodeChildren (root))
                 ExpandNodeAndChildren (child, int.MaxValue);
+        }
 
         Build (root);
     }
@@ -681,7 +766,9 @@ public class FastTree
 
         for (int i = nodes.Count - 1; i >= 0; i--)
             if (expandedNodes.Contains (nodes[i]))
+            {
                 res &= CollapseItem (i, false);
+            }
 
         Build (root);
 
@@ -695,7 +782,9 @@ public class FastTree
     {
         var itemIndex = nodes.IndexOf (node);
         if (itemIndex < 0)
+        {
             yield break;
+        }
 
         foreach (var i in GetItemExpandedChildren (itemIndex, onlyFirstLevel))
             yield return nodes[i];
@@ -711,7 +800,10 @@ public class FastTree
         while (i < nodes.Count && levels[i] > level)
         {
             if ((!onlyFirstLevel) || (levels[i] == level + 1))
+            {
                 yield return i;
+            }
+
             i++;
         }
     }
@@ -725,7 +817,9 @@ public class FastTree
     {
         var itemIndex = GetItemIndexOfNode (node);
         if (itemIndex < 0 || itemIndex >= ItemCount)
+        {
             return false;
+        }
 
         var y = GetItemY (itemIndex);
         var height = GetItemHeight (itemIndex);
@@ -778,7 +872,9 @@ public class FastTree
     public override bool CheckItem (int itemIndex)
     {
         if (GetItemChecked (itemIndex))
+        {
             return true;
+        }
 
         Invalidate();
 
@@ -786,7 +882,10 @@ public class FastTree
         {
             if (NodeCheckStateNeeded ==
                 null) //add to CheckedItemIndex only if handler of NodeCheckStateNeeded is not assigned
+            {
                 CheckedItemIndex.Add (itemIndex);
+            }
+
             OnItemChecked (itemIndex);
             return true;
         }
@@ -806,13 +905,17 @@ public class FastTree
         var c3 = BackColor;
 
         if (!visibleItemInfos.ContainsKey (e.ItemIndex))
+        {
             return;
+        }
 
         gr.ResetClip();
         var info = visibleItemInfos[e.ItemIndex];
         var rect = new Rectangle (info.X_ExpandBox + 1, info.Y, 10000, info.Height);
         if (e.ItemIndex <= 0)
+        {
             rect.Offset (0, 2);
+        }
 
         switch (e.InsertEffect)
         {

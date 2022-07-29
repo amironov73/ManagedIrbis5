@@ -56,9 +56,13 @@ partial class DockPanel
             {
                 DragForm.Bounds = rect;
                 if (rect == Rectangle.Empty)
+                {
                     DragForm.Region = new Region (Rectangle.Empty);
+                }
                 else if (DragForm.Region != null)
+                {
                     DragForm.Region = null;
+                }
             }
         }
 
@@ -117,7 +121,9 @@ partial class DockPanel
             Outline.Close();
 
             if (!abort)
+            {
                 DragSource.MoveSplitter (GetMovingOffset (Control.MousePosition));
+            }
 
             DragSource.EndDrag();
             DockPanel.ResumeLayout (true, true);
@@ -127,9 +133,13 @@ partial class DockPanel
         {
             Rectangle rect = GetSplitterOutlineBounds (ptMouse);
             if (DragSource.IsVertical)
+            {
                 return rect.X - RectSplitter.X;
+            }
             else
+            {
                 return rect.Y - RectSplitter.Y;
+            }
         }
 
         private Rectangle GetSplitterOutlineBounds (Point ptMouse)
@@ -138,7 +148,9 @@ partial class DockPanel
 
             Rectangle rect = RectSplitter;
             if (rectLimit.Width <= 0 || rectLimit.Height <= 0)
+            {
                 return rect;
+            }
 
             if (DragSource.IsVertical)
             {
@@ -152,13 +164,24 @@ partial class DockPanel
             }
 
             if (rect.Left < rectLimit.Left)
+            {
                 rect.X = rectLimit.X;
+            }
+
             if (rect.Top < rectLimit.Top)
+            {
                 rect.Y = rectLimit.Y;
+            }
+
             if (rect.Right > rectLimit.Right)
+            {
                 rect.X -= rect.Right - rectLimit.Right;
+            }
+
             if (rect.Bottom > rectLimit.Bottom)
+            {
                 rect.Y -= rect.Bottom - rectLimit.Bottom;
+            }
 
             return rect;
         }
@@ -169,7 +192,10 @@ partial class DockPanel
     private SplitterDragHandler GetSplitterDragHandler()
     {
         if (m_splitterDragHandler == null)
+        {
             m_splitterDragHandler = new SplitterDragHandler (this);
+        }
+
         return m_splitterDragHandler;
     }
 

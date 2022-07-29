@@ -108,7 +108,10 @@ public class FastList
         {
             if (ItemCheckStateNeeded ==
                 null) //add to CheckedItemIndex only if handler of ItemCheckStateNeeded is not assigned
+            {
                 CheckedItemIndex.Add (itemIndex);
+            }
+
             OnItemChecked (itemIndex);
             return true;
         }
@@ -422,8 +425,10 @@ public class FastList
     protected override void OnItemExpanded (int itemIndex)
     {
         if (ItemExpandedStateChanged != null)
+        {
             ItemExpandedStateChanged (this,
                 new ItemExpandedStateChangedEventArgs { ItemIndex = itemIndex, Expanded = true });
+        }
 
         base.OnItemExpanded (itemIndex);
     }
@@ -431,8 +436,10 @@ public class FastList
     protected override void OnItemCollapsed (int itemIndex)
     {
         if (ItemExpandedStateChanged != null)
+        {
             ItemExpandedStateChanged (this,
                 new ItemExpandedStateChangedEventArgs { ItemIndex = itemIndex, Expanded = false });
+        }
 
         base.OnItemCollapsed (itemIndex);
     }
@@ -440,8 +447,10 @@ public class FastList
     protected override void OnItemSelected (int itemIndex)
     {
         if (ItemSelectedStateChanged != null)
+        {
             ItemSelectedStateChanged (this,
                 new ItemSelectedStateChangedEventArgs { ItemIndex = itemIndex, Selected = true });
+        }
 
         base.OnItemSelected (itemIndex);
     }
@@ -449,7 +458,9 @@ public class FastList
     protected override void OnItemTextPushed (int itemIndex, string text)
     {
         if (ItemTextPushed != null)
+        {
             ItemTextPushed (this, new ItemTextPushedEventArgs { ItemIndex = itemIndex, Text = text });
+        }
 
         base.OnItemTextPushed (itemIndex, text);
     }
@@ -457,8 +468,10 @@ public class FastList
     protected override void OnItemUnselected (int itemIndex)
     {
         if (ItemSelectedStateChanged != null)
+        {
             ItemSelectedStateChanged (this,
                 new ItemSelectedStateChangedEventArgs { ItemIndex = itemIndex, Selected = false });
+        }
 
         base.OnItemUnselected (itemIndex);
     }
@@ -466,9 +479,13 @@ public class FastList
     protected override void OnItemDrag (HashSet<int> itemIndex)
     {
         if (ItemDrag != null)
+        {
             ItemDrag (this, new ItemDragEventArgs { ItemIndex = itemIndex });
+        }
         else
+        {
             DoDragDrop (itemIndex, DragDropEffects.Copy);
+        }
 
         base.OnItemDrag (itemIndex);
     }
@@ -476,9 +493,13 @@ public class FastList
     protected override void DrawItem (Graphics gr, VisibleItemInfo info)
     {
         if (PaintItem != null)
+        {
             PaintItem (this, new PaintItemContentEventArgs { Graphics = gr, Info = info });
+        }
         else
+        {
             base.DrawItem (gr, info);
+        }
     }
 
     protected override void OnDragOverItem (DragOverItemEventArgs eventArgs)

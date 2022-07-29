@@ -32,9 +32,13 @@ namespace AeroSuite.Controls
             this.AutoSize = true;
             this.Font = new Font(SystemFonts.MessageBoxFont.FontFamily, 12); //Need to find a way to get this information from the system (via visual styles)
             if (PlatformHelper.VistaOrHigher && PlatformHelper.VisualStylesEnabled)
+            {
                 this.ForeColor = new VisualStyleRenderer("TextStyle", 1, 0).GetColor(ColorProperty.TextColor);
+            }
             else
+            {
                 this.ForeColor = SystemColors.Highlight;
+            }
         }
 
         /// <summary>

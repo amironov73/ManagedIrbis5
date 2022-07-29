@@ -17,8 +17,16 @@ internal class RangeInfo
     {
         get
         {
-            if (End.Line < Start.Line) return End.Column;
-            if (End.Line > Start.Line) return Start.Column;
+            if (End.Line < Start.Line)
+            {
+                return End.Column;
+            }
+
+            if (End.Line > Start.Line)
+            {
+                return Start.Column;
+            }
+
             return Math.Min (End.Column, Start.Column);
         }
     }

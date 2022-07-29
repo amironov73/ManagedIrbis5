@@ -127,7 +127,9 @@ public class SyntaxTextBox
         var theProvider =
             prov.GetType().GetField ("Provider", BindingFlags.NonPublic | BindingFlags.Instance).GetValue (prov);
         if (theProvider.GetType() != typeof (FCTBDescriptionProvider))
+        {
             TypeDescriptor.AddProvider (new FCTBDescriptionProvider (GetType()), GetType());
+        }
 
         //drawing optimization
         SetStyle (
@@ -140,7 +142,10 @@ public class SyntaxTextBox
         //create one line
         InitTextSource (CreateTextSource());
         if (lines.Count == 0)
+        {
             lines.InsertLine (0, lines.CreateLine());
+        }
+
         _selection = new TextRange (this) { Start = new Place (0, 0) };
 
         //default settings
@@ -648,7 +653,9 @@ public class SyntaxTextBox
             if (!value)
 
                 //clear line's IsChanged property
+            {
                 lines.ClearIsChanged();
+            }
 
             isChanged = value;
         }
@@ -1126,7 +1133,10 @@ public class SyntaxTextBox
         {
             language = value;
             if (SyntaxHighlighter != null)
+            {
                 SyntaxHighlighter.InitStyleSchema (language);
+            }
+
             Invalidate();
         }
     }
@@ -1251,7 +1261,9 @@ public class SyntaxTextBox
         set
         {
             if (value == sourceTextBox)
+            {
                 return;
+            }
 
             sourceTextBox = value;
 
@@ -1299,7 +1311,9 @@ public class SyntaxTextBox
         set
         {
             if (value == _selection)
+            {
                 return;
+            }
 
             _selection.BeginUpdate();
             _selection.Start = value.Start;
@@ -1344,7 +1358,11 @@ public class SyntaxTextBox
         get { return _scrollBars; }
         set
         {
-            if (value == _scrollBars) return;
+            if (value == _scrollBars)
+            {
+                return;
+            }
+
             _scrollBars = value;
             needRecalc = true;
             Invalidate();
@@ -1362,7 +1380,11 @@ public class SyntaxTextBox
         get { return multiline; }
         set
         {
-            if (multiline == value) return;
+            if (multiline == value)
+            {
+                return;
+            }
+
             multiline = value;
             needRecalc = true;
             if (multiline)
@@ -1375,7 +1397,10 @@ public class SyntaxTextBox
                 base.AutoScroll = false;
                 ShowScrollBars = false;
                 if (lines.Count > 1)
+                {
                     lines.RemoveLine (1, lines.Count - 1);
+                }
+
                 lines.Manager.ClearHistory();
             }
 
@@ -1394,10 +1419,17 @@ public class SyntaxTextBox
         get { return _wordWrap; }
         set
         {
-            if (_wordWrap == value) return;
+            if (_wordWrap == value)
+            {
+                return;
+            }
+
             _wordWrap = value;
             if (_wordWrap)
+            {
                 Selection.ColumnSelectionMode = false;
+            }
+
             NeedRecalc (false, true);
 
             //RecalcWordWrap(0, LinesCount - 1);
@@ -1416,7 +1448,11 @@ public class SyntaxTextBox
         get { return wordWrapMode; }
         set
         {
-            if (wordWrapMode == value) return;
+            if (wordWrapMode == value)
+            {
+                return;
+            }
+
             wordWrapMode = value;
             NeedRecalc (false, true);
 
@@ -1504,7 +1540,10 @@ public class SyntaxTextBox
         get
         {
             if (LinesCount == 0)
+            {
                 return "";
+            }
+
             var sel = new TextRange (this);
             sel.SelectAll();
             return sel.Text;
@@ -1513,7 +1552,9 @@ public class SyntaxTextBox
         set
         {
             if (value == Text && value != "")
+            {
                 return;
+            }
 
             SetAsCurrentTB();
 
@@ -1538,7 +1579,10 @@ public class SyntaxTextBox
         get
         {
             if (LinesCount == 0)
+            {
                 return 0;
+            }
+
             var sel = new TextRange (this);
             sel.SelectAll();
             return sel.Length;
@@ -1618,7 +1662,9 @@ public class SyntaxTextBox
         set
         {
             if (value > 0)
+            {
                 Selection.End = PositionToPlace (SelectionStart + value);
+            }
         }
     }
 
@@ -1659,7 +1705,9 @@ public class SyntaxTextBox
         var sizeM = GetCharSize (BaseFont, 'M');
         var sizeDot = GetCharSize (BaseFont, '.');
         if (sizeM != sizeDot)
+        {
             BaseFont = new Font ("Courier New", BaseFont.SizeInPoints, FontStyle.Regular, GraphicsUnit.Point);
+        }
 
         //clac size
         var size = GetCharSize (BaseFont, 'M');
@@ -1682,7 +1730,10 @@ public class SyntaxTextBox
             if (_scrollBars)
             {
                 if (!base.AutoScroll)
+                {
                     base.AutoScroll = true;
+                }
+
                 var newSize = value;
                 if (WordWrap && WordWrapMode != WordWrapMode.Custom)
                 {
@@ -1695,7 +1746,10 @@ public class SyntaxTextBox
             else
             {
                 if (base.AutoScroll)
+                {
                     base.AutoScroll = false;
+                }
+
                 base.AutoScrollMinSize = new Size (0, 0);
                 VerticalScroll.Visible = false;
                 HorizontalScroll.Visible = false;
@@ -1708,11 +1762,15 @@ public class SyntaxTextBox
         get
         {
             if (_scrollBars)
+            {
                 return base.AutoScrollMinSize;
+            }
             else
 
                 //return new Size(HorizontalScroll.Maximum, VerticalScroll.Maximum);
+            {
                 return localAutoScrollMinSize;
+            }
         }
     }
 
@@ -1774,7 +1832,10 @@ public class SyntaxTextBox
         {
             selectionColor = value;
             if (selectionColor.A == 255)
+            {
                 selectionColor = Color.FromArgb (60, selectionColor);
+            }
+
             SelectionStyle = new SelectionStyle (new SolidBrush (selectionColor));
             Invalidate();
         }
@@ -1841,7 +1902,9 @@ public class SyntaxTextBox
     public void ClearHints()
     {
         if (Hints != null)
+        {
             Hints.Clear();
+        }
     }
 
     /// <summary>
@@ -1857,7 +1920,9 @@ public class SyntaxTextBox
         var hint = new Hint (range, innerControl, inline, dock);
         Hints.Add (hint);
         if (scrollToHint)
+        {
             hint.DoVisible();
+        }
 
         return hint;
     }
@@ -1885,7 +1950,9 @@ public class SyntaxTextBox
         var hint = new Hint (range, text, inline, dock);
         Hints.Add (hint);
         if (scrollToHint)
+        {
             hint.DoVisible();
+        }
 
         return hint;
     }
@@ -1907,7 +1974,9 @@ public class SyntaxTextBox
     public virtual void OnHintClick (Hint hint)
     {
         if (HintClick != null)
+        {
             HintClick (this, new HintClickEventArgs (hint));
+        }
     }
 
     private void timer3_Tick (object sender, EventArgs e)
@@ -1919,9 +1988,14 @@ public class SyntaxTextBox
     protected virtual void OnToolTip()
     {
         if (ToolTip == null)
+        {
             return;
+        }
+
         if (ToolTipNeeded == null)
+        {
             return;
+        }
 
         //get place under mouse
         var place = PointToPlace (lastMouseCoord);
@@ -1930,7 +2004,9 @@ public class SyntaxTextBox
         var p = PlaceToPoint (place);
         if (Math.Abs (p.X - lastMouseCoord.X) > CharWidth * 2 ||
             Math.Abs (p.Y - lastMouseCoord.Y) > CharHeight * 2)
+        {
             return;
+        }
 
         //get word under mouse
         var r = new TextRange (this, place, place);
@@ -1961,7 +2037,9 @@ public class SyntaxTextBox
         needRiseVisibleRangeChangedDelayed = true;
         ResetTimer (_timer1);
         if (VisibleRangeChanged != null)
+        {
             VisibleRangeChanged (this, new EventArgs());
+        }
     }
 
     /// <summary>
@@ -1971,9 +2049,13 @@ public class SyntaxTextBox
     public new void Invalidate()
     {
         if (InvokeRequired)
+        {
             BeginInvoke (new MethodInvoker (Invalidate));
+        }
         else
+        {
             base.Invalidate();
+        }
     }
 
     protected virtual void OnCharSizeChanged()
@@ -2175,7 +2257,9 @@ public class SyntaxTextBox
             var s = (ushort)this[place].style;
             for (var i = 0; i < 16; i++)
                 if ((s & ((ushort)1) << i) != 0)
+                {
                     result.Add (Styles[i]);
+                }
 #endif
         }
 
@@ -2209,7 +2293,9 @@ public class SyntaxTextBox
         LineInfos.Clear();
         ClearHints();
         if (Bookmarks != null)
+        {
             Bookmarks.Clear();
+        }
 
         lines = ts;
 
@@ -2248,7 +2334,9 @@ public class SyntaxTextBox
     private void ts_RecalcNeeded (object sender, TextSource.TextChangedEventArgs e)
     {
         if (e.iFromLine == e.iToLine && !WordWrap && lines.Count > minLinesForAccuracy)
+        {
             RecalcScrollByOneLine (e.iFromLine);
+        }
         else
         {
             NeedRecalc (false, WordWrap);
@@ -2287,19 +2375,27 @@ public class SyntaxTextBox
         }
 
         if (forced)
+        {
             Recalc();
+        }
     }
 
     private void ts_TextChanged (object sender, TextSource.TextChangedEventArgs e)
     {
         if (e.iFromLine == e.iToLine && !WordWrap)
+        {
             RecalcScrollByOneLine (e.iFromLine);
+        }
         else
+        {
             needRecalc = true;
+        }
 
         Invalidate();
         if (TextSource.CurrentTextBox == this)
+        {
             OnTextChanged (e.iFromLine, e.iToLine);
+        }
     }
 
     private void ts_LineRemoved (object sender, LineRemovedEventArgs e)
@@ -2312,10 +2408,14 @@ public class SyntaxTextBox
     {
         var newState = VisibleState.Visible;
         if (e.Index >= 0 && e.Index < LineInfos.Count && LineInfos[e.Index].VisibleState == VisibleState.Hidden)
+        {
             newState = VisibleState.Hidden;
+        }
 
         if (e.Count > 100000)
+        {
             LineInfos.Capacity = LineInfos.Count + e.Count + 1000;
+        }
 
         var temp = new LineInfo[e.Count];
         for (var i = 0; i < e.Count; i++)
@@ -2335,7 +2435,9 @@ public class SyntaxTextBox
         }*/
 
         if (e.Count > 1000000)
+        {
             GC.Collect();
+        }
 
         OnLineInserted (e.Index, e.Count);
     }
@@ -2349,11 +2451,13 @@ public class SyntaxTextBox
         var iLine = -1;
         for (var i = 0; i < LinesCount; i++)
             if (lines.IsLineLoaded (i))
+            {
                 if (lines[i].LastVisit > lastNavigatedDateTime && lines[i].LastVisit < min)
                 {
                     min = lines[i].LastVisit;
                     iLine = i;
                 }
+            }
 
         if (iLine >= 0)
         {
@@ -2361,7 +2465,9 @@ public class SyntaxTextBox
             return true;
         }
         else
+        {
             return false;
+        }
     }
 
     /// <summary>
@@ -2373,11 +2479,13 @@ public class SyntaxTextBox
         var iLine = -1;
         for (var i = 0; i < LinesCount; i++)
             if (lines.IsLineLoaded (i))
+            {
                 if (lines[i].LastVisit < lastNavigatedDateTime && lines[i].LastVisit > max)
                 {
                     max = lines[i].LastVisit;
                     iLine = i;
                 }
+            }
 
         if (iLine >= 0)
         {
@@ -2385,7 +2493,9 @@ public class SyntaxTextBox
             return true;
         }
         else
+        {
             return false;
+        }
     }
 
     /// <summary>
@@ -2393,7 +2503,11 @@ public class SyntaxTextBox
     /// </summary>
     public void Navigate (int iLine)
     {
-        if (iLine >= LinesCount) return;
+        if (iLine >= LinesCount)
+        {
+            return;
+        }
+
         lastNavigatedDateTime = lines[iLine].LastVisit;
         Selection.Start = new Place (0, iLine);
         DoSelectionVisible();
@@ -2412,7 +2526,10 @@ public class SyntaxTextBox
         {
             needRiseTextChangedDelayed = false;
             if (_delayedTextChangedRange == null)
+            {
                 return;
+            }
+
             _delayedTextChangedRange = Range.GetIntersectionWith (_delayedTextChangedRange);
             _delayedTextChangedRange.Expand();
             OnTextChangedDelayed (_delayedTextChangedRange);
@@ -2444,7 +2561,9 @@ public class SyntaxTextBox
     public virtual void OnTextChangedDelayed (TextRange changedRange)
     {
         if (TextChangedDelayed != null)
+        {
             TextChangedDelayed (this, new TextChangedEventArgs (changedRange));
+        }
     }
 
     public virtual void OnSelectionChangedDelayed()
@@ -2454,9 +2573,14 @@ public class SyntaxTextBox
         //highlight brackets
         ClearBracketsPositions();
         if (LeftBracket != '\x0' && RightBracket != '\x0')
+        {
             HighlightBrackets (LeftBracket, RightBracket, ref leftBracketPosition, ref rightBracketPosition);
+        }
+
         if (LeftBracket2 != '\x0' && RightBracket2 != '\x0')
+        {
             HighlightBrackets (LeftBracket2, RightBracket2, ref leftBracketPosition2, ref rightBracketPosition2);
+        }
 
         //remember last visit time
         if (Selection.IsEmpty && Selection.Start.Line < LinesCount)
@@ -2469,13 +2593,17 @@ public class SyntaxTextBox
         }
 
         if (SelectionChangedDelayed != null)
+        {
             SelectionChangedDelayed (this, new EventArgs());
+        }
     }
 
     public virtual void OnVisibleRangeChangedDelayed()
     {
         if (VisibleRangeChangedDelayed != null)
+        {
             VisibleRangeChangedDelayed (this, new EventArgs());
+        }
     }
 
     Dictionary<Timer, Timer> timersToReset = new Dictionary<Timer, Timer>();
@@ -2490,9 +2618,13 @@ public class SyntaxTextBox
 
         timer.Stop();
         if (IsHandleCreated)
+        {
             timer.Start();
+        }
         else
+        {
             timersToReset[timer] = timer;
+        }
     }
 
     protected override void OnHandleCreated (EventArgs e)
@@ -2511,11 +2643,16 @@ public class SyntaxTextBox
     /// <returns>Layer index of this style</returns>
     public int AddStyle (Style style)
     {
-        if (style == null) return -1;
+        if (style == null)
+        {
+            return -1;
+        }
 
         var i = GetStyleIndex (style);
         if (i >= 0)
+        {
             return i;
+        }
 
         i = CheckStylesBufferSize();
         Styles[i] = style;
@@ -2534,11 +2671,15 @@ public class SyntaxTextBox
         int i;
         for (i = Styles.Length - 1; i >= 0; i--)
             if (Styles[i] != null)
+            {
                 break;
+            }
 
         i++;
         if (i >= Styles.Length)
+        {
             throw new Exception ("Maximum count of Styles is exceeded.");
+        }
 
         return i;
     }
@@ -2589,14 +2730,23 @@ public class SyntaxTextBox
     public virtual void ShowReplaceDialog (string findText)
     {
         if (ReadOnly)
+        {
             return;
+        }
+
         if (replaceForm == null)
+        {
             replaceForm = new ReplaceForm (this);
+        }
 
         if (findText != null)
+        {
             replaceForm.tbFind.Text = findText;
+        }
         else if (!Selection.IsEmpty && Selection.Start.Line == Selection.End.Line)
+        {
             replaceForm.tbFind.Text = Selection.Text;
+        }
 
         replaceForm.tbFind.SelectAll();
         replaceForm.Show();
@@ -2611,7 +2761,9 @@ public class SyntaxTextBox
     public int GetLineLength (int iLine)
     {
         if (iLine < 0 || iLine >= lines.Count)
+        {
             throw new ArgumentOutOfRangeException (nameof (iLine), "Line index out of range");
+        }
 
         return lines[iLine].Count;
     }
@@ -2623,7 +2775,9 @@ public class SyntaxTextBox
     public TextRange GetLine (int iLine)
     {
         if (iLine < 0 || iLine >= lines.Count)
+        {
             throw new ArgumentOutOfRangeException (nameof (iLine), "Line index out of range");
+        }
 
         var sel = new TextRange (this);
         sel.Start = new Place (0, iLine);
@@ -2637,7 +2791,10 @@ public class SyntaxTextBox
     public virtual void Copy()
     {
         if (Selection.IsEmpty)
+        {
             Selection.Expand();
+        }
+
         if (!Selection.IsEmpty)
         {
             var data = new DataObject();
@@ -2767,7 +2924,9 @@ public class SyntaxTextBox
         var thread = new Thread (() =>
         {
             if (Clipboard.ContainsText())
+            {
                 text = Clipboard.GetText();
+            }
         });
         thread.SetApartmentState (ApartmentState.STA);
         thread.Start();
@@ -2784,13 +2943,19 @@ public class SyntaxTextBox
             Pasting (this, args);
 
             if (args.Cancel)
+            {
                 text = string.Empty;
+            }
             else
+            {
                 text = args.InsertingText;
+            }
         }
 
         if (!string.IsNullOrEmpty (text))
+        {
             InsertText (text);
+        }
     }
 
     /// <summary>
@@ -2807,9 +2972,13 @@ public class SyntaxTextBox
     public void GoEnd()
     {
         if (lines.Count > 0)
+        {
             Selection.Start = new Place (lines[lines.Count - 1].Count, lines.Count - 1);
+        }
         else
+        {
             Selection.Start = new Place (0, 0);
+        }
 
         DoCaretVisible();
     }
@@ -2893,24 +3062,37 @@ public class SyntaxTextBox
     public virtual void InsertText (string text, bool jumpToCaret)
     {
         if (text == null)
+        {
             return;
+        }
+
         if (text == "\r")
+        {
             text = "\n";
+        }
 
         lines.Manager.BeginAutoUndoCommands();
         try
         {
             if (!Selection.IsEmpty)
+            {
                 lines.Manager.ExecuteCommand (new ClearSelectedCommand (TextSource));
+            }
 
             //insert virtual spaces
             if (this.TextSource.Count > 0)
+            {
                 if (Selection.IsEmpty && Selection.Start.Column > GetLineLength (Selection.Start.Line) && VirtualSpace)
+                {
                     InsertVirtualSpaces();
+                }
+            }
 
             lines.Manager.ExecuteCommand (new InsertTextCommand (TextSource, text));
             if (_updating <= 0 && jumpToCaret)
+            {
                 DoCaretVisible();
+            }
         }
         finally
         {
@@ -2936,7 +3118,9 @@ public class SyntaxTextBox
     public virtual TextRange InsertText (string text, Style style, bool jumpToCaret)
     {
         if (text == null)
+        {
             return null;
+        }
 
         //remember last caret position
         var last = Selection.Start > Selection.End ? Selection.End : Selection.Start;
@@ -2960,7 +3144,9 @@ public class SyntaxTextBox
     public virtual TextRange InsertTextAndRestoreSelection (TextRange replaceRange, string text, Style style)
     {
         if (text == null)
+        {
             return null;
+        }
 
         var oldStart = PlaceToPosition (Selection.Start);
         var oldEnd = PlaceToPosition (Selection.End);
@@ -2995,7 +3181,9 @@ public class SyntaxTextBox
     public virtual void AppendText (string text, Style style)
     {
         if (text == null)
+        {
             return;
+        }
 
         Selection.ColumnSelectionMode = false;
 
@@ -3007,9 +3195,13 @@ public class SyntaxTextBox
         try
         {
             if (lines.Count > 0)
+            {
                 Selection.Start = new Place (lines[lines.Count - 1].Count, lines.Count - 1);
+            }
             else
+            {
                 Selection.Start = new Place (0, 0);
+            }
 
             //remember last caret position
             var last = Selection.Start;
@@ -3017,7 +3209,9 @@ public class SyntaxTextBox
             lines.Manager.ExecuteCommand (new InsertTextCommand (TextSource, text));
 
             if (style != null)
+            {
                 new TextRange (this, last, Selection.Start).SetStyle (style);
+            }
         }
         finally
         {
@@ -3054,7 +3248,9 @@ public class SyntaxTextBox
         {
             var i = GetStyleIndex (style);
             if (i >= 0)
+            {
                 mask |= TextRange.ToStyleIndex (i);
+            }
         }
 
         return mask;
@@ -3064,7 +3260,10 @@ public class SyntaxTextBox
     {
         var i = GetStyleIndex (style);
         if (i < 0)
+        {
             i = AddStyle (style);
+        }
+
         return i;
     }
 
@@ -3085,16 +3284,22 @@ public class SyntaxTextBox
     protected override void WndProc (ref Message m)
     {
         if (m.Msg == WM_HSCROLL || m.Msg == WM_VSCROLL)
+        {
             if (m.WParam.ToInt32() != SB_ENDSCROLL)
+            {
                 Invalidate();
+            }
+        }
 
         base.WndProc (ref m);
 
         if (ImeAllowed)
+        {
             if (m.Msg == WM_IME_SETCONTEXT && m.WParam.ToInt32() == 1)
             {
                 ImmAssociateContext (Handle, m_hImc);
             }
+        }
     }
 
     List<Control> tempHintsList = new List<Control>();
@@ -3126,7 +3331,9 @@ public class SyntaxTextBox
             (this as Control).ResumeLayout (false);
 
             if (!Focused)
+            {
                 Focus();
+            }
         }
     }
 
@@ -3139,15 +3346,19 @@ public class SyntaxTextBox
             //align by line height
             var newValue = se.NewValue;
             if (alignByLines)
+            {
                 newValue = (int)(Math.Ceiling (1d * newValue / CharHeight) * CharHeight);
+            }
 
             //
             VerticalScroll.Value = Math.Max (VerticalScroll.Minimum, Math.Min (VerticalScroll.Maximum, newValue));
         }
 
         if (se.ScrollOrientation == ScrollOrientation.HorizontalScroll)
+        {
             HorizontalScroll.Value =
                 Math.Max (HorizontalScroll.Minimum, Math.Min (HorizontalScroll.Maximum, se.NewValue));
+        }
 
         UpdateScrollbars();
 
@@ -3171,11 +3382,15 @@ public class SyntaxTextBox
         try
         {
             if (!Selection.IsEmpty)
+            {
                 lines.Manager.ExecuteCommand (new ClearSelectedCommand (TextSource));
+            }
 
             //insert virtual spaces
             if (Selection.IsEmpty && Selection.Start.Column > GetLineLength (Selection.Start.Line) && VirtualSpace)
+            {
                 InsertVirtualSpaces();
+            }
 
             //insert char
             lines.Manager.ExecuteCommand (new InsertCharCommand (TextSource, c));
@@ -3225,17 +3440,27 @@ public class SyntaxTextBox
 
         lines.Manager.ExecuteCommand (new ClearSelectedCommand (TextSource));
         if (Selection.Start.Line == 0)
+        {
             if (!Selection.GoRightThroughFolded())
+            {
                 return;
+            }
+        }
+
         if (Selection.Start.Line > 0)
+        {
             lines.Manager.ExecuteCommand (new InsertCharCommand (TextSource, '\b')); //backspace
+        }
+
         Invalidate();
     }
 
     private void Recalc()
     {
         if (!needRecalc)
+        {
             return;
+        }
 
 #if debug
             var sw = Stopwatch.StartNew();
@@ -3250,12 +3475,16 @@ public class SyntaxTextBox
 
         // If there are reserved character for line numbers: correct this
         if (this.ReservedCountOfLineNumberChars + 1 > charsForLineNumber)
+        {
             charsForLineNumber = this.ReservedCountOfLineNumberChars + 1;
+        }
 
         if (Created)
         {
             if (ShowLineNumbers)
+            {
                 LeftIndent += charsForLineNumber * CharWidth + minLeftIndent + 1;
+            }
 
             //calc wordwrapping
             if (needRecalcWordWrap)
@@ -3265,7 +3494,9 @@ public class SyntaxTextBox
             }
         }
         else
+        {
             needRecalc = true;
+        }
 
         //calc max line length and count of wordWrapLines
         TextHeight = 0;
@@ -3289,6 +3520,7 @@ public class SyntaxTextBox
         //adjust AutoScrollMinSize
         minWidth = LeftIndent + (maxLineLength) * CharWidth + 2 + Paddings.Left + Paddings.Right;
         if (_wordWrap)
+        {
             switch (WordWrapMode)
             {
                 case WordWrapMode.WordWrapControlWidth:
@@ -3304,22 +3536,29 @@ public class SyntaxTextBox
                     minWidth = LeftIndent + PreferredLineWidth * CharWidth + 2 + Paddings.Left + Paddings.Right;
                     break;
             }
+        }
     }
 
     private void RecalcScrollByOneLine (int iLine)
     {
         if (iLine >= lines.Count)
+        {
             return;
+        }
 
         var maxLineLength = lines[iLine].Count;
         if (this.maxLineLength < maxLineLength && !WordWrap)
+        {
             this.maxLineLength = maxLineLength;
+        }
 
         int minWidth;
         CalcMinAutosizeWidth (out minWidth, ref maxLineLength);
 
         if (AutoScrollMinSize.Width < minWidth)
+        {
             AutoScrollMinSize = new Size (minWidth, AutoScrollMinSize.Height);
+        }
     }
 
     private int RecalcMaxLineLength()
@@ -3336,7 +3575,10 @@ public class SyntaxTextBox
             var lineLength = lines.GetLineLength (i);
             var lineInfo = LineInfos[i];
             if (lineLength > maxLineLength && lineInfo.VisibleState == VisibleState.Visible)
+            {
                 maxLineLength = lineLength;
+            }
+
             lineInfo.startY = TextHeight;
             TextHeight += lineInfo.WordWrapStringsCount * charHeight + lineInfo.bottomPadding;
             LineInfos[i] = lineInfo;
@@ -3350,6 +3592,7 @@ public class SyntaxTextBox
     private int GetMaxLineWordWrapedWidth()
     {
         if (_wordWrap)
+        {
             switch (wordWrapMode)
             {
                 case WordWrapMode.WordWrapControlWidth:
@@ -3359,6 +3602,7 @@ public class SyntaxTextBox
                 case WordWrapMode.CharWrapPreferredWidth:
                     return LeftIndent + PreferredLineWidth * CharWidth + 2 + Paddings.Left + Paddings.Right;
             }
+        }
 
         return int.MaxValue;
     }
@@ -3392,7 +3636,9 @@ public class SyntaxTextBox
             if (lines.IsLineLoaded (iLine))
             {
                 if (!_wordWrap)
+                {
                     LineInfos[iLine].CutOffPositions.Clear();
+                }
                 else
                 {
                     var li = LineInfos[iLine];
@@ -3404,12 +3650,16 @@ public class SyntaxTextBox
                     if (WordWrapMode == WordWrapMode.Custom)
                     {
                         if (WordWrapNeeded != null)
+                        {
                             WordWrapNeeded (this,
                                 new WordWrapNeededEventArgs (li.CutOffPositions, ImeAllowed, lines[iLine]));
+                        }
                     }
                     else
+                    {
                         CalcCutOffs (li.CutOffPositions, maxCharsPerLine, maxCharsPerLine - li.wordWrapIndent,
                             ImeAllowed, charWrap, lines[iLine]);
+                    }
 
                     LineInfos[iLine] = li;
                 }
@@ -3424,8 +3674,15 @@ public class SyntaxTextBox
     public static void CalcCutOffs (List<int> cutOffPositions, int maxCharsPerLine, int maxCharsPerSecondaryLine,
         bool allowIME, bool charWrap, Line line)
     {
-        if (maxCharsPerSecondaryLine < 1) maxCharsPerSecondaryLine = 1;
-        if (maxCharsPerLine < 1) maxCharsPerLine = 1;
+        if (maxCharsPerSecondaryLine < 1)
+        {
+            maxCharsPerSecondaryLine = 1;
+        }
+
+        if (maxCharsPerLine < 1)
+        {
+            maxCharsPerLine = 1;
+        }
 
         var segmentLength = 0;
         var cutOff = 0;
@@ -3448,7 +3705,9 @@ public class SyntaxTextBox
                 }
                 else if (!char.IsLetterOrDigit (c) && c != '_' && c != '\'' && c != '\xa0'
                          && ((c != '.' && c != ',') || !char.IsDigit (line[i + 1].c))) //dot before digit
+                {
                     cutOff = Math.Min (i + 1, line.Count - 1);
+                }
             }
 
             segmentLength++;
@@ -3456,7 +3715,10 @@ public class SyntaxTextBox
             if (segmentLength == maxCharsPerLine)
             {
                 if (cutOff == 0 || (cutOffPositions.Count > 0 && cutOff == cutOffPositions[cutOffPositions.Count - 1]))
+                {
                     cutOff = i + 1;
+                }
+
                 cutOffPositions.Add (cutOff);
                 segmentLength = 1 + i - cutOff;
                 maxCharsPerLine = maxCharsPerSecondaryLine;
@@ -3519,18 +3781,28 @@ public class SyntaxTextBox
         var h = HorizontalScroll.Value;
 
         if (rect.Bottom > ClientRectangle.Height)
+        {
             v += rect.Bottom - ClientRectangle.Height;
+        }
         else if (rect.Top < 0)
+        {
             v += rect.Top;
+        }
 
         if (rect.Right > ClientRectangle.Width)
+        {
             h += rect.Right - ClientRectangle.Width;
+        }
         else if (rect.Left < LeftIndent)
+        {
             h += rect.Left - LeftIndent;
+        }
 
         //
         if (!Multiline)
+        {
             v = 0;
+        }
 
         //
         v = Math.Max (VerticalScroll.Minimum, v); // was 0
@@ -3540,9 +3812,14 @@ public class SyntaxTextBox
         try
         {
             if (VerticalScroll.Visible || !ShowScrollBars)
+            {
                 VerticalScroll.Value = Math.Min (v, VerticalScroll.Maximum);
+            }
+
             if (HorizontalScroll.Visible || !ShowScrollBars)
+            {
                 HorizontalScroll.Value = Math.Min (h, HorizontalScroll.Maximum);
+            }
         }
         catch (ArgumentOutOfRangeException)
         {
@@ -3556,7 +3833,9 @@ public class SyntaxTextBox
 
         //
         if (oldV != VerticalScroll.Value)
+        {
             OnVisibleRangeChanged();
+        }
     }
 
     /// <summary>
@@ -3569,10 +3848,14 @@ public class SyntaxTextBox
             OnMagicUpdateScrollBars();
         }
         else
+        {
             PerformLayout();
+        }
 
         if (IsHandleCreated)
+        {
             BeginInvoke ((MethodInvoker)OnScrollbarsUpdated);
+        }
     }
 
     private void OnMagicUpdateScrollBars()
@@ -3591,7 +3874,9 @@ public class SyntaxTextBox
     protected virtual void OnScrollbarsUpdated()
     {
         if (ScrollbarsUpdated != null)
+        {
             ScrollbarsUpdated (this, EventArgs.Empty);
+        }
     }
 
     /// <summary>
@@ -3623,10 +3908,14 @@ public class SyntaxTextBox
     public void DoSelectionVisible()
     {
         if (LineInfos[Selection.End.Line].VisibleState != VisibleState.Visible)
+        {
             ExpandBlock (Selection.End.Line);
+        }
 
         if (LineInfos[Selection.Start.Line].VisibleState != VisibleState.Visible)
+        {
             ExpandBlock (Selection.Start.Line);
+        }
 
         Recalc();
         DoVisibleRectangle (new Rectangle (PlaceToPoint (new Place (0, Selection.End.Line)),
@@ -3661,10 +3950,14 @@ public class SyntaxTextBox
             Math.Min (range.End.Line, range.Start.Line + ClientSize.Height / CharHeight));
 
         if (LineInfos[range.End.Line].VisibleState != VisibleState.Visible)
+        {
             ExpandBlock (range.End.Line);
+        }
 
         if (LineInfos[range.Start.Line].VisibleState != VisibleState.Visible)
+        {
             ExpandBlock (range.Start.Line);
+        }
 
         Recalc();
         var h = (1 + range.End.Line - range.Start.Line) * CharHeight;
@@ -3686,11 +3979,19 @@ public class SyntaxTextBox
         base.OnKeyUp (e);
 
         if (e.KeyCode == Keys.ShiftKey)
+        {
             lastModifiers &= ~Keys.Shift;
+        }
+
         if (e.KeyCode == Keys.Alt)
+        {
             lastModifiers &= ~Keys.Alt;
+        }
+
         if (e.KeyCode == Keys.ControlKey)
+        {
             lastModifiers &= ~Keys.Control;
+        }
     }
 
 
@@ -3699,12 +4000,16 @@ public class SyntaxTextBox
     protected override void OnKeyDown (KeyEventArgs e)
     {
         if (_middleClickScrollingActivated)
+        {
             return;
+        }
 
         base.OnKeyDown (e);
 
         if (Focused) //???
+        {
             lastModifiers = e.Modifiers;
+        }
 
         _handledChar = false;
 
@@ -3715,7 +4020,9 @@ public class SyntaxTextBox
         }
 
         if (ProcessKey (e.KeyData))
+        {
             return;
+        }
 
         e.Handled = true;
 
@@ -3751,20 +4058,29 @@ public class SyntaxTextBox
         var a = new KeyEventArgs (keyData);
 
         if (a.KeyCode == Keys.Tab && !AcceptsTab)
+        {
             return false;
+        }
 
 
         if (_macroManager != null)
+        {
             if (!HotkeyMapping.ContainsKey (keyData) || (HotkeyMapping[keyData] != ActionCode.MacroExecute &&
-                                                          HotkeyMapping[keyData] != ActionCode.MacroRecord))
+                                                         HotkeyMapping[keyData] != ActionCode.MacroRecord))
+            {
                 _macroManager.ProcessKey (keyData);
+            }
+        }
 
         if (HotkeyMapping.ContainsKey (keyData))
         {
             var act = HotkeyMapping[keyData];
             DoAction (act);
             if (scrollActions.ContainsKey (act))
+            {
                 return true;
+            }
+
             if (keyData == Keys.Tab || keyData == (Keys.Tab | Keys.Shift))
             {
                 _handledChar = true;
@@ -3775,20 +4091,29 @@ public class SyntaxTextBox
         {
             //
             if (a.KeyCode == Keys.Alt)
+            {
                 return true;
+            }
 
             if ((a.Modifiers & Keys.Control) != 0)
+            {
                 return true;
+            }
 
             if ((a.Modifiers & Keys.Alt) != 0)
             {
                 if ((MouseButtons & MouseButtons.Left) != 0)
+                {
                     CheckAndChangeSelectionType();
+                }
+
                 return true;
             }
 
             if (a.KeyCode == Keys.ShiftKey)
+            {
                 return true;
+            }
         }
 
         return false;
@@ -3829,9 +4154,14 @@ public class SyntaxTextBox
 
             case ActionCode.FindNext:
                 if (findForm == null || findForm.tbFind.Text == "")
+                {
                     ShowFindDialog();
+                }
                 else
+                {
                     findForm.FindNext (findForm.tbFind.Text);
+                }
+
                 break;
 
             case ActionCode.ReplaceDialog:
@@ -3848,12 +4178,18 @@ public class SyntaxTextBox
 
             case ActionCode.Cut:
                 if (!Selection.ReadOnly)
+                {
                     Cut();
+                }
+
                 break;
 
             case ActionCode.Paste:
                 if (!Selection.ReadOnly)
+                {
                     Paste();
+                }
+
                 break;
 
             case ActionCode.SelectAll:
@@ -3862,22 +4198,34 @@ public class SyntaxTextBox
 
             case ActionCode.Undo:
                 if (!ReadOnly)
+                {
                     Undo();
+                }
+
                 break;
 
             case ActionCode.Redo:
                 if (!ReadOnly)
+                {
                     Redo();
+                }
+
                 break;
 
             case ActionCode.LowerCase:
                 if (!Selection.ReadOnly)
+                {
                     LowerCase();
+                }
+
                 break;
 
             case ActionCode.UpperCase:
                 if (!Selection.ReadOnly)
+                {
                     UpperCase();
+                }
+
                 break;
 
             case ActionCode.IndentDecrease:
@@ -3888,11 +4236,15 @@ public class SyntaxTextBox
                     {
                         var line = this[sel.Start.Line];
                         if (sel.Start.Column == 0 && sel.End.Column == line.Count)
+                        {
                             Selection = new TextRange (this, line.StartSpacesCount, sel.Start.Line, line.Count,
                                 sel.Start.Line);
+                        }
                         else if (sel.Start.Column == line.Count && sel.End.Column == 0)
+                        {
                             Selection = new TextRange (this, line.Count, sel.Start.Line, line.StartSpacesCount,
                                 sel.Start.Line);
+                        }
                     }
 
 
@@ -3919,18 +4271,25 @@ public class SyntaxTextBox
                             Selection = new TextRange (this, this[sel.Start.Line].StartSpacesCount, sel.End.Line,
                                 this[sel.Start.Line].Count, sel.End.Line); //select whole line
                             if (inverted)
+                            {
                                 Selection.Inverse();
+                            }
                         }
                     }
                     else
+                    {
                         ProcessKey ('\t', Keys.None);
+                    }
                 }
 
                 break;
 
             case ActionCode.AutoIndentChars:
                 if (!Selection.ReadOnly)
+                {
                     DoAutoIndentChars (Selection.Start.Line);
+                }
+
                 break;
 
             case ActionCode.NavigateBackward:
@@ -3959,14 +4318,22 @@ public class SyntaxTextBox
 
             case ActionCode.ClearWordLeft:
                 if (OnKeyPressing ('\b')) //KeyPress event processed key
+                {
                     break;
+                }
+
                 if (!Selection.ReadOnly)
                 {
                     if (!Selection.IsEmpty)
+                    {
                         ClearSelected();
+                    }
+
                     Selection.GoWordLeft (true);
                     if (!Selection.ReadOnly)
+                    {
                         ClearSelected();
+                    }
                 }
 
                 OnKeyPressed ('\b');
@@ -3974,23 +4341,34 @@ public class SyntaxTextBox
 
             case ActionCode.ReplaceMode:
                 if (!ReadOnly)
+                {
                     isReplaceMode = !isReplaceMode;
+                }
+
                 break;
 
             case ActionCode.DeleteCharRight:
                 if (!Selection.ReadOnly)
                 {
                     if (OnKeyPressing ((char)0xff)) //KeyPress event processed key
+                    {
                         break;
+                    }
+
                     if (!Selection.IsEmpty)
+                    {
                         ClearSelected();
+                    }
                     else
                     {
                         //if line contains only spaces then delete line
                         if (this[Selection.Start.Line].StartSpacesCount == this[Selection.Start.Line].Count)
+                        {
                             RemoveSpacesAfterCaret();
+                        }
 
                         if (!Selection.IsReadOnlyRightChar())
+                        {
                             if (Selection.GoRightThroughFolded())
                             {
                                 var iLine = Selection.Start.Line;
@@ -3999,13 +4377,20 @@ public class SyntaxTextBox
 
                                 //if removed \n then trim spaces
                                 if (iLine != Selection.Start.Line && AutoIndent)
+                                {
                                     if (Selection.Start.Column > 0)
+                                    {
                                         RemoveSpacesAfterCaret();
+                                    }
+                                }
                             }
+                        }
                     }
 
                     if (AutoIndentChars)
+                    {
                         DoAutoIndentChars (Selection.Start.Line);
+                    }
 
                     OnKeyPressed ((char)0xff);
                 }
@@ -4014,14 +4399,22 @@ public class SyntaxTextBox
 
             case ActionCode.ClearWordRight:
                 if (OnKeyPressing ((char)0xff)) //KeyPress event processed key
+                {
                     break;
+                }
+
                 if (!Selection.ReadOnly)
                 {
                     if (!Selection.IsEmpty)
+                    {
                         ClearSelected();
+                    }
+
                     Selection.GoWordRight (true);
                     if (!Selection.ReadOnly)
+                    {
                         ClearSelected();
+                    }
                 }
 
                 OnKeyPressed ((char)0xff);
@@ -4046,7 +4439,10 @@ public class SyntaxTextBox
             case ActionCode.GoLeftColumnSelectionMode:
                 CheckAndChangeSelectionType();
                 if (Selection.ColumnSelectionMode)
+                {
                     Selection.GoLeft_ColumnSelectionMode();
+                }
+
                 Invalidate();
                 break;
 
@@ -4069,7 +4465,10 @@ public class SyntaxTextBox
             case ActionCode.GoRightColumnSelectionMode:
                 CheckAndChangeSelectionType();
                 if (Selection.ColumnSelectionMode)
+                {
                     Selection.GoRight_ColumnSelectionMode();
+                }
+
                 Invalidate();
                 break;
 
@@ -4086,13 +4485,19 @@ public class SyntaxTextBox
             case ActionCode.GoUpColumnSelectionMode:
                 CheckAndChangeSelectionType();
                 if (Selection.ColumnSelectionMode)
+                {
                     Selection.GoUp_ColumnSelectionMode();
+                }
+
                 Invalidate();
                 break;
 
             case ActionCode.MoveSelectedLinesUp:
                 if (!Selection.ColumnSelectionMode)
+                {
                     MoveSelectedLinesUp();
+                }
+
                 break;
 
             case ActionCode.GoDown:
@@ -4108,13 +4513,19 @@ public class SyntaxTextBox
             case ActionCode.GoDownColumnSelectionMode:
                 CheckAndChangeSelectionType();
                 if (Selection.ColumnSelectionMode)
+                {
                     Selection.GoDown_ColumnSelectionMode();
+                }
+
                 Invalidate();
                 break;
 
             case ActionCode.MoveSelectedLinesDown:
                 if (!Selection.ColumnSelectionMode)
+                {
                     MoveSelectedLinesDown();
+                }
+
                 break;
             case ActionCode.GoPageUp:
                 Selection.GoPageUp (false);
@@ -4173,16 +4584,24 @@ public class SyntaxTextBox
             case ActionCode.ClearHints:
                 ClearHints();
                 if (MacroManager != null)
+                {
                     MacroManager.IsRecording = false;
+                }
+
                 break;
 
             case ActionCode.MacroRecord:
                 if (MacroManager != null)
                 {
                     if (MacroManager.AllowMacroRecordingByUser)
+                    {
                         MacroManager.IsRecording = !MacroManager.IsRecording;
+                    }
+
                     if (MacroManager.IsRecording)
+                    {
                         MacroManager.ClearMacros();
+                    }
                 }
 
                 break;
@@ -4223,7 +4642,9 @@ public class SyntaxTextBox
     protected virtual void OnCustomAction (CustomActionEventArgs e)
     {
         if (CustomAction != null)
+        {
             CustomAction (this, e);
+        }
     }
 
     Font originalFont;
@@ -4317,7 +4738,9 @@ public class SyntaxTextBox
     public virtual void BookmarkLine (int iLine)
     {
         if (!bookmarks.Contains (iLine))
+        {
             bookmarks.Add (iLine);
+        }
     }
 
     /// <summary>
@@ -4355,7 +4778,9 @@ public class SyntaxTextBox
             Selection.End = new Place (prevSelection.End.Column, prevSelection.End.Line + 1);
         }
         else
+        {
             Selection = prevSelection;
+        }
     }
 
     /// <summary>
@@ -4385,7 +4810,9 @@ public class SyntaxTextBox
             Selection.End = new Place (prevSelection.End.Column, prevSelection.End.Line - 1);
         }
         else
+        {
             Selection = prevSelection;
+        }
     }
 
     private void GoHome (bool shift)
@@ -4396,7 +4823,9 @@ public class SyntaxTextBox
             var iLine = Selection.Start.Line;
             var spaces = this[iLine].StartSpacesCount;
             if (Selection.Start.Column <= spaces)
+            {
                 Selection.GoHome (shift);
+            }
             else
             {
                 Selection.GoHome (shift);
@@ -4470,19 +4899,28 @@ public class SyntaxTextBox
     public virtual void CommentSelected (string commentPrefix)
     {
         if (string.IsNullOrEmpty (commentPrefix))
+        {
             return;
+        }
+
         Selection.Normalize();
         var isCommented = lines[Selection.Start.Line].Text.TrimStart().StartsWith (commentPrefix);
         if (isCommented)
+        {
             RemoveLinePrefix (commentPrefix);
+        }
         else
+        {
             InsertLinePrefix (commentPrefix);
+        }
     }
 
     public void OnKeyPressing (KeyPressEventArgs args)
     {
         if (KeyPressing != null)
+        {
             KeyPressing (this, args);
+        }
     }
 
     private bool OnKeyPressing (char c)
@@ -4503,18 +4941,26 @@ public class SyntaxTextBox
     {
         var args = new KeyPressEventArgs (c);
         if (KeyPressed != null)
+        {
             KeyPressed (this, args);
+        }
     }
 
     protected override bool ProcessMnemonic (char charCode)
     {
         if (_middleClickScrollingActivated)
+        {
             return false;
+        }
 
         if (Focused)
+        {
             return ProcessKey (charCode, lastModifiers) || base.ProcessMnemonic (charCode);
+        }
         else
+        {
             return false;
+        }
     }
 
     const int WM_CHAR = 0x102;
@@ -4522,7 +4968,9 @@ public class SyntaxTextBox
     protected override bool ProcessKeyMessage (ref Message m)
     {
         if (m.Msg == WM_CHAR)
+        {
             ProcessMnemonic (Convert.ToChar (m.WParam.ToInt32()));
+        }
 
         return base.ProcessKeyMessage (ref m);
     }
@@ -4533,10 +4981,14 @@ public class SyntaxTextBox
     public virtual bool ProcessKey (char c, Keys modifiers)
     {
         if (_handledChar)
+        {
             return true;
+        }
 
         if (_macroManager != null)
+        {
             _macroManager.ProcessKey (c, modifiers);
+        }
         /*  !!!!
         if (c == ' ')
             return true;*/
@@ -4545,21 +4997,33 @@ public class SyntaxTextBox
         if (c == '\b' && (modifiers == Keys.None || modifiers == Keys.Shift || (modifiers & Keys.Alt) != 0))
         {
             if (ReadOnly || !Enabled)
+            {
                 return false;
+            }
 
             if (OnKeyPressing (c))
+            {
                 return true;
+            }
 
             if (Selection.ReadOnly)
+            {
                 return false;
+            }
 
             if (!Selection.IsEmpty)
+            {
                 ClearSelected();
+            }
             else if (!Selection.IsReadOnlyLeftChar()) //is not left char readonly?
+            {
                 InsertChar ('\b');
+            }
 
             if (AutoIndentChars)
+            {
                 DoAutoIndentChars (Selection.Start.Line);
+            }
 
             OnKeyPressed ('\b');
             return true;
@@ -4570,10 +5034,14 @@ public class SyntaxTextBox
             return true;*/
 
         if (char.IsControl (c) && c != '\r' && c != '\t')
+        {
             return false;
+        }
 
         if (ReadOnly || !Enabled)
+        {
             return false;
+        }
 
 
         if (modifiers != Keys.None &&
@@ -4582,23 +5050,33 @@ public class SyntaxTextBox
             modifiers != (Keys.Shift | Keys.Control | Keys.Alt) && //SHIFT + ALT + CTRL is special chars (AltGr)
             (modifiers != (Keys.Alt) || char.IsLetterOrDigit (c)) //may be ALT+LetterOrDigit is mnemonic code
            )
+        {
             return false; //do not process Ctrl+? and Alt+? keys
+        }
 
         var sourceC = c;
         if (OnKeyPressing (sourceC)) //KeyPress event processed key
+        {
             return true;
+        }
 
         //
         if (Selection.ReadOnly)
+        {
             return false;
+        }
 
         //
         if (c == '\r' && !AcceptsReturn)
+        {
             return false;
+        }
 
         //replace \r on \n
         if (c == '\r')
+        {
             c = '\n';
+        }
 
         //replace mode? select forward char
         if (IsReplaceMode)
@@ -4611,15 +5089,21 @@ public class SyntaxTextBox
         if (!Selection.ReadOnly)
         {
             if (!DoAutocompleteBrackets (c))
+            {
                 InsertChar (c);
+            }
         }
 
         //do autoindent
         if (c == '\n' || AutoIndentExistingLines)
+        {
             DoAutoIndentIfNeed();
+        }
 
         if (AutoIndentChars)
+        {
             DoAutoIndentChars (Selection.Start.Line);
+        }
 
         DoCaretVisible();
         Invalidate();
@@ -4679,7 +5163,9 @@ public class SyntaxTextBox
         for (var i = iLine; i >= 0; i--)
         {
             if (spaces != this[i].StartSpacesCount)
+            {
                 break;
+            }
 
             var text = this[i].Text;
             var m = regex.Match (text);
@@ -4689,16 +5175,22 @@ public class SyntaxTextBox
                 texts[i] = text;
 
                 if (captures[i].Count > maxCapturesCount)
+                {
                     maxCapturesCount = captures[i].Count;
+                }
             }
             else
+            {
                 break;
+            }
         }
 
         for (var i = iLine + 1; i < LinesCount; i++)
         {
             if (spaces != this[i].StartSpacesCount)
+            {
                 break;
+            }
 
             var text = this[i].Text;
             var m = regex.Match (text);
@@ -4708,10 +5200,14 @@ public class SyntaxTextBox
                 texts[i] = text;
 
                 if (captures[i].Count > maxCapturesCount)
+                {
                     maxCapturesCount = captures[i].Count;
+                }
             }
             else
+            {
                 break;
+            }
         }
 
         var changed = new Dictionary<int, bool>();
@@ -4725,7 +5221,10 @@ public class SyntaxTextBox
             {
                 var caps = captures[i];
                 if (caps.Count <= iCapture)
+                {
                     continue;
+                }
+
                 var dist = 0;
                 var cap = caps[iCapture];
 
@@ -4735,40 +5234,60 @@ public class SyntaxTextBox
                 while (index > 0 && text[index - 1] == ' ') index--;
 
                 if (iCapture == 0)
+                {
                     dist = index;
+                }
                 else
+                {
                     dist = index - caps[iCapture - 1].Index - 1;
+                }
 
                 if (dist > maxDist)
+                {
                     maxDist = dist;
+                }
             }
 
             //insert whitespaces
             foreach (var i in new List<int> (texts.Keys))
             {
                 if (captures[i].Count <= iCapture)
+                {
                     continue;
+                }
 
                 var dist = 0;
                 var cap = captures[i][iCapture];
 
                 if (iCapture == 0)
+                {
                     dist = cap.Index;
+                }
                 else
+                {
                     dist = cap.Index - captures[i][iCapture - 1].Index - 1;
+                }
 
                 var addSpaces = maxDist - dist + 1; //+1 because min space count is 1
 
                 if (addSpaces == 0)
+                {
                     continue;
+                }
 
                 if (oldSel.Start.Line == i && oldSel.Start.Column > cap.Index)
+                {
                     oldSel.Start = new Place (oldSel.Start.Column + addSpaces, i);
+                }
 
                 if (addSpaces > 0)
+                {
                     texts[i] = texts[i].Insert (cap.Index, new string (' ', addSpaces));
+                }
                 else
+                {
                     texts[i] = texts[i].Remove (cap.Index + addSpaces, -addSpaces);
+                }
 
                 changed[i] = true;
                 was = true;
@@ -4789,7 +5308,9 @@ public class SyntaxTextBox
                 {
                     Selection = new TextRange (this, 0, i, this[i].Count, i);
                     if (!Selection.ReadOnly)
+                    {
                         InsertText (texts[i]);
+                    }
                 }
 
             Selection = oldSel;
@@ -4807,12 +5328,14 @@ public class SyntaxTextBox
         if (AutoCompleteBrackets)
         {
             if (!Selection.ColumnSelectionMode)
+            {
                 for (var i = 1; i < _autoCompleteBracketsList.Length; i += 2)
                     if (c == _autoCompleteBracketsList[i] && c == Selection.CharAfterStart)
                     {
                         Selection.GoRight();
                         return true;
                     }
+            }
 
             for (var i = 0; i < _autoCompleteBracketsList.Length; i += 2)
                 if (c == _autoCompleteBracketsList[i])
@@ -4840,8 +5363,11 @@ public class SyntaxTextBox
                 { ColumnSelectionMode = true };
             InsertChar (right);
             if (range.IsEmpty)
+            {
                 Selection = new TextRange (this, range.End.Column + 1, range.Start.Line, range.End.Column + 1,
                     range.End.Line) { ColumnSelectionMode = true };
+            }
+
             EndAutoUndo();
             Selection.EndUpdate();
         }
@@ -4851,7 +5377,9 @@ public class SyntaxTextBox
             Selection.GoLeft();
         }
         else
+        {
             InsertText (left + SelectedText + right);
+        }
 
         return true;
     }
@@ -4863,7 +5391,9 @@ public class SyntaxTextBox
     protected virtual void FindChar (char c)
     {
         if (c == '\r')
+        {
             c = '\n';
+        }
 
         var r = Selection.Clone();
         while (r.GoRight())
@@ -4880,7 +5410,10 @@ public class SyntaxTextBox
     public virtual void DoAutoIndentIfNeed()
     {
         if (Selection.ColumnSelectionMode)
+        {
             return;
+        }
+
         if (AutoIndent)
         {
             DoCaretVisible();
@@ -4896,7 +5429,10 @@ public class SyntaxTextBox
     private void RemoveSpacesAfterCaret()
     {
         if (!Selection.IsEmpty)
+        {
             return;
+        }
+
         var end = Selection.Start;
         while (Selection.CharAfterStart == ' ')
             Selection.GoRight (true);
@@ -4909,7 +5445,10 @@ public class SyntaxTextBox
     public virtual void DoAutoIndent (int iLine)
     {
         if (Selection.ColumnSelectionMode)
+        {
             return;
+        }
+
         var oldStart = Selection.Start;
 
         //
@@ -4919,14 +5458,21 @@ public class SyntaxTextBox
         var spaces = lines[iLine].StartSpacesCount;
         var needToInsert = needSpaces - spaces;
         if (needToInsert < 0)
+        {
             needToInsert = -Math.Min (-needToInsert, spaces);
+        }
 
         //insert start spaces
         if (needToInsert == 0)
+        {
             return;
+        }
+
         Selection.Start = new Place (0, iLine);
         if (needToInsert > 0)
+        {
             InsertText (new String (' ', needToInsert));
+        }
         else
         {
             Selection.Start = new Place (0, iLine);
@@ -4942,15 +5488,24 @@ public class SyntaxTextBox
     /// </summary>
     public virtual int CalcAutoIndent (int iLine)
     {
-        if (iLine < 0 || iLine >= LinesCount) return 0;
+        if (iLine < 0 || iLine >= LinesCount)
+        {
+            return 0;
+        }
 
 
         var calculator = AutoIndentNeeded;
         if (calculator == null)
+        {
             if (Language != Language.Custom && SyntaxHighlighter != null)
+            {
                 calculator = SyntaxHighlighter.AutoIndentNeeded;
+            }
             else
+            {
                 calculator = CalcAutoIndentShiftByCodeFolding;
+            }
+        }
 
         var needSpaces = 0;
 
@@ -4964,7 +5519,9 @@ public class SyntaxTextBox
             calculator (this, args);
             stack.Push (args);
             if (args.Shift == 0 && args.AbsoluteIndentation == 0 && args.LineText.Trim() != "")
+            {
                 break;
+            }
         }
 
         var indent = lines[i >= 0 ? i : 0].StartSpacesCount;
@@ -4972,9 +5529,13 @@ public class SyntaxTextBox
         {
             var arg = stack.Pop();
             if (arg.AbsoluteIndentation != 0)
+            {
                 indent = arg.AbsoluteIndentation + arg.ShiftNextLines;
+            }
             else
+            {
                 indent += arg.ShiftNextLines;
+            }
         }
 
         //clalc shift for current line
@@ -5025,7 +5586,9 @@ public class SyntaxTextBox
         {
             var count = lines[i].StartSpacesCount;
             if (count < result)
+            {
                 result = count;
+            }
         }
 
         return result;
@@ -5037,14 +5600,18 @@ public class SyntaxTextBox
     protected int GetMaxStartSpacesCount (int fromLine, int toLine)
     {
         if (fromLine > toLine)
+        {
             return 0;
+        }
 
         var result = 0;
         for (var i = fromLine; i <= toLine; i++)
         {
             var count = lines[i].StartSpacesCount;
             if (count > result)
+            {
                 result = count;
+            }
         }
 
         return result;
@@ -5087,7 +5654,9 @@ public class SyntaxTextBox
         {
             var keys = keyData & Keys.KeyCode;
             if (keys == Keys.Return)
+            {
                 return true;
+            }
         }
 
         if ((keyData & Keys.Alt) != Keys.Alt)
@@ -5151,10 +5720,14 @@ public class SyntaxTextBox
     public void DrawText (Graphics gr, Place start, Size size)
     {
         if (needRecalc)
+        {
             Recalc();
+        }
 
         if (needRecalcFoldingLines)
+        {
             RecalcFoldingLines();
+        }
 
         var startPoint = PlaceToPoint (start);
         var startY = startPoint.Y + VerticalScroll.Value;
@@ -5172,11 +5745,19 @@ public class SyntaxTextBox
 
             //
             if (lineInfo.startY > startY + size.Height)
+            {
                 break;
+            }
+
             if (lineInfo.startY + lineInfo.WordWrapStringsCount * CharHeight < startY)
+            {
                 continue;
+            }
+
             if (lineInfo.VisibleState == VisibleState.Hidden)
+            {
                 continue;
+            }
 
             var y = lineInfo.startY - startY;
 
@@ -5185,9 +5766,13 @@ public class SyntaxTextBox
 
             //draw line background
             if (lineInfo.VisibleState == VisibleState.Visible)
+            {
                 if (line.BackgroundBrush != null)
+                {
                     gr.FillRectangle (line.BackgroundBrush,
                         new Rectangle (0, y, size.Width, CharHeight * lineInfo.WordWrapStringsCount));
+                }
+            }
 
             //
             gr.SmoothingMode = SmoothingMode.AntiAlias;
@@ -5212,10 +5797,15 @@ public class SyntaxTextBox
     protected override void OnPaint (PaintEventArgs e)
     {
         if (needRecalc)
+        {
             Recalc();
+        }
 
         if (needRecalcFoldingLines)
+        {
             RecalcFoldingLines();
+        }
+
         visibleMarkers.Clear();
         e.Graphics.SmoothingMode = SmoothingMode.None;
 
@@ -5243,8 +5833,10 @@ public class SyntaxTextBox
         //left
         e.Graphics.FillRectangle (paddingBrush, LeftIndentLine, 0, LeftIndent - LeftIndentLine - 1, ClientSize.Height);
         if (HorizontalScroll.Value <= Paddings.Left)
+        {
             e.Graphics.FillRectangle (paddingBrush, LeftIndent - HorizontalScroll.Value - 2, 0,
                 Math.Max (0, Paddings.Left - 1), ClientSize.Height);
+        }
 
         //
         var leftTextIndent = Math.Max (LeftIndent, LeftIndent + Paddings.Left - HorizontalScroll.Value);
@@ -5253,10 +5845,13 @@ public class SyntaxTextBox
         //draw indent area
         e.Graphics.FillRectangle (indentBrush, 0, 0, LeftIndentLine, ClientSize.Height);
         if (LeftIndent > minLeftIndent)
+        {
             e.Graphics.DrawLine (servicePen, LeftIndentLine, 0, LeftIndentLine, ClientSize.Height);
+        }
 
         //draw preferred line width
         if (PreferredLineWidth > 0)
+        {
             e.Graphics.DrawLine (servicePen,
                 new Point (
                     LeftIndent + Paddings.Left + PreferredLineWidth * CharWidth -
@@ -5264,6 +5859,7 @@ public class SyntaxTextBox
                 new Point (
                     LeftIndent + Paddings.Left + PreferredLineWidth * CharWidth -
                     HorizontalScroll.Value + 1, textAreaRect.Bottom - 1));
+        }
 
         //draw text area border
         DrawTextAreaBorder (e.Graphics);
@@ -5275,7 +5871,9 @@ public class SyntaxTextBox
         //
         var x = LeftIndent + Paddings.Left - HorizontalScroll.Value;
         if (x < LeftIndent)
+        {
             firstChar++;
+        }
 
         //create dictionary of bookmarks
         var bookmarksByLineIndex = new Dictionary<int, Bookmark>();
@@ -5296,11 +5894,19 @@ public class SyntaxTextBox
 
             //
             if (lineInfo.startY > VerticalScroll.Value + ClientSize.Height)
+            {
                 break;
+            }
+
             if (lineInfo.startY + lineInfo.WordWrapStringsCount * CharHeight < VerticalScroll.Value)
+            {
                 continue;
+            }
+
             if (lineInfo.VisibleState == VisibleState.Hidden)
+            {
                 continue;
+            }
 
             var y = lineInfo.startY - VerticalScroll.Value;
 
@@ -5309,21 +5915,31 @@ public class SyntaxTextBox
 
             //draw line background
             if (lineInfo.VisibleState == VisibleState.Visible)
+            {
                 if (line.BackgroundBrush != null)
+                {
                     e.Graphics.FillRectangle (line.BackgroundBrush,
                         new Rectangle (textAreaRect.Left, y, textAreaRect.Width,
                             CharHeight * lineInfo.WordWrapStringsCount));
+                }
+            }
 
             //draw current line background
             if (CurrentLineColor != Color.Transparent && iLine == Selection.Start.Line)
+            {
                 if (Selection.IsEmpty)
+                {
                     e.Graphics.FillRectangle (currentLineBrush,
                         new Rectangle (textAreaRect.Left, y, textAreaRect.Width, CharHeight));
+                }
+            }
 
             //draw changed line marker
             if (ChangedLineColor != Color.Transparent && line.IsChanged)
+            {
                 e.Graphics.FillRectangle (changedLineBrush,
                     new RectangleF (-10, y, LeftIndent - minLeftIndent - 2 + 10, CharHeight + 1));
+            }
 
             //
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -5331,16 +5947,20 @@ public class SyntaxTextBox
             //
             //draw bookmark
             if (bookmarksByLineIndex.ContainsKey (iLine))
+            {
                 bookmarksByLineIndex[iLine].Paint (e.Graphics,
                     new Rectangle (LeftIndent, y, Width,
                         CharHeight * lineInfo.WordWrapStringsCount));
+            }
 
             //OnPaintLine event
             if (lineInfo.VisibleState == VisibleState.Visible)
+            {
                 OnPaintLine (new PaintLineEventArgs (iLine,
                     new Rectangle (LeftIndent, y, Width,
                         CharHeight * lineInfo.WordWrapStringsCount),
                     e.Graphics, e.ClipRectangle));
+            }
 
             //draw line number
             if (ShowLineNumbers)
@@ -5360,20 +5980,26 @@ public class SyntaxTextBox
             var markerSize = (int)(defaultMarkerSize * _zoom / 100f);
             var markerRadius = markerSize / 2;
             if (lineInfo.VisibleState == VisibleState.StartOfHiddenBlock)
+            {
                 visibleMarkers.Add (new ExpandFoldingMarker (iLine,
                     new Rectangle (LeftIndentLine - markerRadius, y + CharHeight / 2 - markerRadius + 1, markerSize,
                         markerSize)));
+            }
 
             if (!string.IsNullOrEmpty (line.FoldingStartMarker) && lineInfo.VisibleState == VisibleState.Visible &&
                 string.IsNullOrEmpty (line.FoldingEndMarker))
+            {
                 visibleMarkers.Add (new CollapseFoldingMarker (iLine,
                     new Rectangle (LeftIndentLine - markerRadius, y + CharHeight / 2 - markerRadius + 1, markerSize,
                         markerSize)));
+            }
 
             if (lineInfo.VisibleState == VisibleState.Visible && !string.IsNullOrEmpty (line.FoldingEndMarker) &&
                 string.IsNullOrEmpty (line.FoldingStartMarker))
+            {
                 e.Graphics.DrawLine (servicePen, LeftIndentLine, y + CharHeight * lineInfo.WordWrapStringsCount - 1,
                     LeftIndentLine + 4, y + CharHeight * lineInfo.WordWrapStringsCount - 1);
+            }
 
             //draw wordwrap strings of line
             for (var iWordWrapLine = 0; iWordWrapLine < lineInfo.WordWrapStringsCount; iWordWrapLine++)
@@ -5382,11 +6008,15 @@ public class SyntaxTextBox
 
                 // break if too long line (important for extremly big lines)
                 if (y > VerticalScroll.Value + ClientSize.Height)
+                {
                     break;
+                }
 
                 // continue if wordWrapLine isn't seen yet (important for extremly big lines)
                 if (lineInfo.startY + iWordWrapLine * CharHeight < VerticalScroll.Value)
+                {
                     continue;
+                }
 
                 //indent
                 var indent = iWordWrapLine == 0 ? 0 : lineInfo.wordWrapIndent * CharWidth;
@@ -5400,10 +6030,13 @@ public class SyntaxTextBox
 
         //draw folding lines
         if (ShowFoldingLines)
+        {
             DrawFoldingLines (e, startLine, endLine);
+        }
 
         //draw column selection
         if (Selection.ColumnSelectionMode)
+        {
             if (SelectionStyle.BackgroundBrush is SolidBrush)
             {
                 var color = ((SolidBrush)SelectionStyle.BackgroundBrush).Color;
@@ -5415,6 +6048,7 @@ public class SyntaxTextBox
                             Math.Max (p1.X, p2.X),
                             Math.Max (p1.Y, p2.Y) + CharHeight));
             }
+        }
 
         //draw brackets highlighting
         if (BracketsStyle != null && leftBracketPosition != null && rightBracketPosition != null)
@@ -5434,6 +6068,7 @@ public class SyntaxTextBox
 
         //draw folding indicator
         if ((_startFoldingLine >= 0 || _endFoldingLine >= 0) && Selection.Start == Selection.End)
+        {
             if (_endFoldingLine < LineInfos.Count)
             {
                 //folding indicator
@@ -5447,6 +6082,7 @@ public class SyntaxTextBox
                 using (var indicatorPen = new Pen (Color.FromArgb (100, FoldingIndicatorColor), 4))
                     e.Graphics.DrawLine (indicatorPen, LeftIndent - 5, startFoldingY, LeftIndent - 5, endFoldingY);
             }
+        }
 
         //draw hint's brackets
         PaintHintBrackets (e.Graphics);
@@ -5468,19 +6104,23 @@ public class SyntaxTextBox
                     e.Graphics.FillRectangle (brush, car.X, car.Y, carWidth, caretHeight + 1);
             }
             else
+            {
                 using (var pen = new Pen (CaretColor))
                     e.Graphics.DrawLine (pen, car.X, car.Y, car.X, car.Y + caretHeight);
+            }
 
             var caretRect = new Rectangle (HorizontalScroll.Value + car.X, VerticalScroll.Value + car.Y, carWidth,
                 caretHeight + 1);
 
             if (CaretBlinking)
+            {
                 if (prevCaretRect != caretRect || !ShowScrollBars)
                 {
                     CreateCaret (Handle, 0, carWidth, caretHeight + 1);
                     SetCaretPos (car.X, car.Y);
                     ShowCaret (Handle);
                 }
+            }
 
             prevCaretRect = caretRect;
         }
@@ -5492,14 +6132,20 @@ public class SyntaxTextBox
 
         //draw disabled mask
         if (!Enabled)
+        {
             using (var brush = new SolidBrush (DisabledColor))
                 e.Graphics.FillRectangle (brush, ClientRectangle);
+        }
 
         if (MacroManager.IsRecording)
+        {
             DrawRecordingHint (e.Graphics);
+        }
 
         if (_middleClickScrollingActivated)
+        {
             DrawMiddleClickScrolling (e.Graphics);
+        }
 
         //dispose resources
         servicePen.Dispose();
@@ -5572,7 +6218,9 @@ public class SyntaxTextBox
     private void DrawTextAreaBorder (Graphics graphics)
     {
         if (TextAreaBorder == TextAreaBorderType.None)
+        {
             return;
+        }
 
         var rect = TextAreaRect;
 
@@ -5605,7 +6253,9 @@ public class SyntaxTextBox
             var p2 = PlaceToPoint (r.End);
             if (GetVisibleState (r.Start.Line) != VisibleState.Visible ||
                 GetVisibleState (r.End.Line) != VisibleState.Visible)
+            {
                 continue;
+            }
 
             using (var pen = new Pen (hint.BorderColor))
             {
@@ -5655,22 +6305,31 @@ public class SyntaxTextBox
                     int y2;
 
                     if (iLine.Value >= LinesCount)
+                    {
                         y2 = LineInfos[LinesCount - 1].startY + CharHeight - VerticalScroll.Value;
+                    }
                     else if (LineInfos[iLine.Value].VisibleState == VisibleState.Visible)
                     {
                         var d = 0;
                         var spaceCount = line.StartSpacesCount;
                         if (lines[iLine.Value].Count <= spaceCount || lines[iLine.Value][spaceCount].c == ' ')
+                        {
                             d = CharHeight;
+                        }
+
                         y2 = LineInfos[iLine.Value].startY - VerticalScroll.Value + d;
                     }
                     else
+                    {
                         continue;
+                    }
 
                     var x = LeftIndent + Paddings.Left + line.StartSpacesCount * CharWidth - HorizontalScroll.Value;
                     if (x >= LeftIndent + Paddings.Left)
+                    {
                         e.Graphics.DrawLine (pen, x, y >= 0 ? y : 0, x,
                             y2 < ClientSize.Height ? y2 : ClientSize.Height);
+                    }
                 }
     }
 
@@ -5721,7 +6380,10 @@ public class SyntaxTextBox
 
         //draw selection
         if (SelectionHighlightingForLineBreaksEnabled && iWordWrapLine == lineInfo.WordWrapStringsCount - 1)
+        {
             lastChar++; //draw selection for CR
+        }
+
         if (!Selection.IsEmpty && lastChar >= firstChar)
         {
             gr.SmoothingMode = SmoothingMode.None;
@@ -5750,7 +6412,10 @@ public class SyntaxTextBox
                     if (!hasTextStyle || !isTextStyle || AllowSeveralTextStyleDrawing)
 
                         //cancelling secondary rendering by TextStyle
+                    {
                         style.Draw (gr, pos, range); //rendering
+                    }
+
                     hasTextStyle |= isTextStyle;
                 }
 
@@ -5759,7 +6424,9 @@ public class SyntaxTextBox
 
             //draw by default renderer
             if (!hasTextStyle)
+            {
                 DefaultStyle.Draw (gr, pos, range);
+            }
         }
     }
 
@@ -5840,7 +6507,9 @@ public class SyntaxTextBox
                 }
 
                 if (Selection.IsEmpty || !Selection.Contains (p) || this[p.Line].Count <= p.Column || ReadOnly)
+                {
                     OnMouseClickText (e);
+                }
                 else
                 {
                     mouseIsDragDrop = true;
@@ -5882,13 +6551,19 @@ public class SyntaxTextBox
         else
         {
             if (VirtualSpace)
+            {
                 Selection.Start = PointToPlaceSimple (e.Location);
+            }
             else
+            {
                 Selection.Start = PointToPlace (e.Location);
+            }
         }
 
         if ((lastModifiers & Keys.Shift) != 0)
+        {
             Selection.End = oldEnd;
+        }
 
         CheckAndChangeSelectionType();
 
@@ -5948,9 +6623,13 @@ public class SyntaxTextBox
 
             int offset;
             if ((countLines == -1) || (countLines > numberOfVisibleLines))
+            {
                 offset = CharHeight * numberOfVisibleLines;
+            }
             else
+            {
                 offset = CharHeight * countLines;
+            }
 
             var newScrollPos = VerticalScroll.Value - Math.Sign (direction) * offset;
 
@@ -6004,7 +6683,11 @@ public class SyntaxTextBox
         using var gr = Graphics.FromHwnd (Handle);
         var dpi = gr.DpiY;
         var newPoints = points + step * 72f / dpi;
-        if (newPoints < 1f) return;
+        if (newPoints < 1f)
+        {
+            return;
+        }
+
         var k = newPoints / originalFont.SizeInPoints;
         Zoom = (int)Math.Round (100 * k);
     }
@@ -6044,7 +6727,10 @@ public class SyntaxTextBox
         var points = originalFont.SizeInPoints;
         points *= coefficient;
 
-        if (points < 1f || points > 300f) return;
+        if (points < 1f || points > 300f)
+        {
+            return;
+        }
 
         var oldFont = Font;
         SetFont (new Font (Font.FontFamily, points, Font.Style, GraphicsUnit.Point));
@@ -6054,7 +6740,10 @@ public class SyntaxTextBox
 
         //restore first displayed line
         if (iLine < LinesCount)
+        {
             VerticalScroll.Value = Math.Min (VerticalScroll.Maximum, LineInfos[iLine].startY - Paddings.Top);
+        }
+
         UpdateScrollbars();
 
         //
@@ -6081,7 +6770,9 @@ public class SyntaxTextBox
         base.OnMouseMove (e);
 
         if (_middleClickScrollingActivated)
+        {
             return;
+        }
 
         if (lastMouseCoord != e.Location)
         {
@@ -6104,9 +6795,13 @@ public class SyntaxTextBox
         {
             Place place;
             if (Selection.ColumnSelectionMode || VirtualSpace)
+            {
                 place = PointToPlaceSimple (e.Location);
+            }
             else
+            {
                 place = PointToPlace (e.Location);
+            }
 
             if (isLineSelect)
             {
@@ -6140,7 +6835,9 @@ public class SyntaxTextBox
                     Selection.ColumnSelectionMode = true;
                 }
                 else
+                {
                     Selection.Start = place;
+                }
 
                 Selection.End = oldEnd;
                 Selection.EndUpdate();
@@ -6152,13 +6849,19 @@ public class SyntaxTextBox
 
         var marker = FindVisualMarkerForPoint (e.Location);
         if (marker != null)
+        {
             base.Cursor = marker.Cursor;
+        }
         else
         {
             if (e.Location.X < LeftIndentLine || isLineSelect)
+            {
                 base.Cursor = Cursors.Arrow;
+            }
             else
+            {
                 base.Cursor = defaultCursor;
+            }
         }
     }
 
@@ -6196,18 +6899,26 @@ public class SyntaxTextBox
         {
             var c = lines[p.Line][i].c;
             if (char.IsLetterOrDigit (c) || c == '_')
+            {
                 toX = i + 1;
+            }
             else
+            {
                 break;
+            }
         }
 
         for (var i = p.Column - 1; i >= 0; i--)
         {
             var c = lines[p.Line][i].c;
             if (char.IsLetterOrDigit (c) || c == '_')
+            {
                 fromX = i;
+            }
             else
+            {
                 break;
+            }
         }
 
         Selection = new TextRange (this, toX, p.Line, fromX, p.Line);
@@ -6217,8 +6928,16 @@ public class SyntaxTextBox
     {
         var i = LineInfos.BinarySearch (new LineInfo (-10), new LineYComparer (y));
         i = i < 0 ? -i - 2 : i;
-        if (i < 0) return 0;
-        if (i > lines.Count - 1) return lines.Count - 1;
+        if (i < 0)
+        {
+            return 0;
+        }
+
+        if (i > lines.Count - 1)
+        {
+            return lines.Count - 1;
+        }
+
         return i;
     }
 
@@ -6233,7 +6952,9 @@ public class SyntaxTextBox
         point.Offset (-LeftIndent - Paddings.Left, 0);
         var iLine = YtoLineIndex (point.Y);
         if (iLine < 0)
+        {
             return Place.Empty;
+        }
 
         var y = 0;
 
@@ -6241,13 +6962,20 @@ public class SyntaxTextBox
         {
             y = LineInfos[iLine].startY + LineInfos[iLine].WordWrapStringsCount * CharHeight;
             if (y > point.Y && LineInfos[iLine].VisibleState == VisibleState.Visible)
+            {
                 break;
+            }
         }
 
         if (iLine >= lines.Count)
+        {
             iLine = lines.Count - 1;
+        }
+
         if (LineInfos[iLine].VisibleState != VisibleState.Visible)
+        {
             iLine = FindPrevVisibleLine (iLine);
+        }
 
         //
         var iWordWrapLine = LineInfos[iLine].WordWrapStringsCount;
@@ -6266,20 +6994,30 @@ public class SyntaxTextBox
             y -= CharHeight;
         } while (y > point.Y);
 
-        if (iWordWrapLine < 0) iWordWrapLine = 0;
+        if (iWordWrapLine < 0)
+        {
+            iWordWrapLine = 0;
+        }
 
         //
         var start = LineInfos[iLine].GetWordWrapStringStartPosition (iWordWrapLine);
         var finish = LineInfos[iLine].GetWordWrapStringFinishPosition (iWordWrapLine, lines[iLine]);
         var x = (int)Math.Round ((float)point.X / CharWidth);
         if (iWordWrapLine > 0)
+        {
             x -= LineInfos[iLine].wordWrapIndent;
+        }
 
         x = x < 0 ? start : start + x;
         if (x > finish)
+        {
             x = finish + 1;
+        }
+
         if (x > lines[iLine].Count)
+        {
             x = lines[iLine].Count;
+        }
 
         return new Place (x, iLine);
     }
@@ -6290,7 +7028,11 @@ public class SyntaxTextBox
         point.Offset (-LeftIndent - Paddings.Left, 0);
         var iLine = YtoLineIndex (point.Y);
         var x = (int)Math.Round ((float)point.X / CharWidth);
-        if (x < 0) x = 0;
+        if (x < 0)
+        {
+            x = 0;
+        }
+
         return new Place (x, iLine);
     }
 
@@ -6363,7 +7105,10 @@ public class SyntaxTextBox
     public void BeginUpdate()
     {
         if (_updating == 0)
+        {
             _updatingRange = null;
+        }
+
         _updating++;
     }
 
@@ -6463,7 +7208,9 @@ public class SyntaxTextBox
     {
         for (var iLine = range.Start.Line; iLine <= range.End.Line; iLine++)
             if (iLine >= 0 && iLine < lines.Count)
+            {
                 FoldedBlocks.Remove (this[iLine].UniqueId);
+            }
     }
 
 
@@ -6471,7 +7218,9 @@ public class SyntaxTextBox
     {
         for (var iLine = range.Start.Line; iLine <= range.End.Line; iLine++)
             if (iLine >= 0 && iLine < lines.Count)
+            {
                 lines[iLine].IsChanged = true;
+            }
     }
 
     /// <summary>
@@ -6481,7 +7230,9 @@ public class SyntaxTextBox
     {
         //find folding markers for highlighting
         if (HighlightFoldingIndicator)
+        {
             HighlightFoldings();
+        }
 
         //
         needRiseSelectionChangedDelayed = true;
@@ -6494,7 +7245,9 @@ public class SyntaxTextBox
     private void HighlightFoldings()
     {
         if (LinesCount == 0)
+        {
             return;
+        }
 
         //
         var prevStartFoldingLine = _startFoldingLine;
@@ -6510,7 +7263,9 @@ public class SyntaxTextBox
             var hasEndMarker = lines.LineHasFoldingEndMarker (i);
 
             if (hasEndMarker && hasStartMarker)
+            {
                 continue;
+            }
 
             if (hasStartMarker)
             {
@@ -6523,7 +7278,9 @@ public class SyntaxTextBox
             }
 
             if (hasEndMarker && i != Selection.Start.Line)
+            {
                 counter++;
+            }
         }
 
         if (_startFoldingLine >= 0)
@@ -6531,7 +7288,9 @@ public class SyntaxTextBox
             //find end of block
             _endFoldingLine = FindEndOfFoldingBlock (_startFoldingLine, maxLinesForFolding);
             if (_endFoldingLine == _startFoldingLine)
+            {
                 _endFoldingLine = -1;
+            }
         }
 
         if (_startFoldingLine != prevStartFoldingLine || _endFoldingLine != prevEndFoldingLine)
@@ -6546,7 +7305,9 @@ public class SyntaxTextBox
     protected virtual void OnFoldingHighlightChanged()
     {
         if (FoldingHighlightChanged != null)
+        {
             FoldingHighlightChanged (this, EventArgs.Empty);
+        }
     }
 
     /// <inheritdoc cref="Control.OnGotFocus"/>
@@ -6602,23 +7363,34 @@ public class SyntaxTextBox
     public Place PositionToPlace (int pos)
     {
         if (pos < 0)
+        {
             return new Place (0, 0);
+        }
 
         for (var i = 0; i < lines.Count; i++)
         {
             var lineLength = lines[i].Count + Environment.NewLine.Length;
             if (pos < lines[i].Count)
+            {
                 return new Place (pos, i);
+            }
+
             if (pos < lineLength)
+            {
                 return new Place (lines[i].Count, i);
+            }
 
             pos -= lineLength;
         }
 
         if (lines.Count > 0)
+        {
             return new Place (lines[lines.Count - 1].Count, lines.Count - 1);
+        }
         else
+        {
             return new Place (0, 0);
+        }
 
         //throw new ArgumentOutOfRangeException("Position out of range");
     }
@@ -6639,7 +7411,10 @@ public class SyntaxTextBox
     public Point PlaceToPoint (Place place)
     {
         if (place.Line >= LineInfos.Count)
+        {
             return new Point();
+        }
+
         var y = LineInfos[place.Line].startY;
 
         //
@@ -6647,7 +7422,9 @@ public class SyntaxTextBox
         y += iWordWrapIndex * CharHeight;
         var x = (place.Column - LineInfos[place.Line].GetWordWrapStringStartPosition (iWordWrapIndex)) * CharWidth;
         if (iWordWrapIndex > 0)
+        {
             x += LineInfos[place.Line].wordWrapIndent * CharWidth;
+        }
 
         //
         y = y - VerticalScroll.Value;
@@ -6886,9 +7663,14 @@ public class SyntaxTextBox
     public virtual void CollapseFoldingBlock (int iLine)
     {
         if (iLine < 0 || iLine >= lines.Count)
+        {
             throw new ArgumentOutOfRangeException ("Line index out of range");
+        }
+
         if (string.IsNullOrEmpty (lines[iLine].FoldingStartMarker))
+        {
             throw new ArgumentOutOfRangeException ("This line is not folding start line");
+        }
 
         //find end of block
         var i = FindEndOfFoldingBlock (iLine);
@@ -6920,19 +7702,25 @@ public class SyntaxTextBox
                 for (i = iStartLine /*+1*/; i < LinesCount; i++)
                 {
                     if (lines.LineHasFoldingStartMarker (i))
+                    {
                         stack.Push (lines[i].FoldingStartMarker);
+                    }
 
                     if (lines.LineHasFoldingEndMarker (i))
                     {
                         var m = lines[i].FoldingEndMarker;
                         while (stack.Count > 0 && stack.Pop() != m) ;
                         if (stack.Count == 0)
+                        {
                             return i;
+                        }
                     }
 
                     maxLines--;
                     if (maxLines < 0)
+                    {
                         return i;
+                    }
                 }
 
                 break;
@@ -6945,15 +7733,21 @@ public class SyntaxTextBox
                         var m = lines[i].FoldingEndMarker;
                         while (stack.Count > 0 && stack.Pop() != m) ;
                         if (stack.Count == 0)
+                        {
                             return i;
+                        }
                     }
 
                     if (lines.LineHasFoldingStartMarker (i))
+                    {
                         stack.Push (lines[i].FoldingStartMarker);
+                    }
 
                     maxLines--;
                     if (maxLines < 0)
+                    {
                         return i;
+                    }
                 }
 
                 break;
@@ -6969,7 +7763,10 @@ public class SyntaxTextBox
     public string GetLineFoldingStartMarker (int iLine)
     {
         if (lines.LineHasFoldingStartMarker (iLine))
+        {
             return lines[iLine].FoldingStartMarker;
+        }
+
         return null;
     }
 
@@ -6979,17 +7776,25 @@ public class SyntaxTextBox
     public string GetLineFoldingEndMarker (int iLine)
     {
         if (lines.LineHasFoldingEndMarker (iLine))
+        {
             return lines[iLine].FoldingEndMarker;
+        }
+
         return null;
     }
 
     protected virtual void RecalcFoldingLines()
     {
         if (!needRecalcFoldingLines)
+        {
             return;
+        }
+
         needRecalcFoldingLines = false;
         if (!ShowFoldingLines)
+        {
             return;
+        }
 
         foldingPairs.Clear();
 
@@ -7004,7 +7809,9 @@ public class SyntaxTextBox
             var hasEndMarker = lines.LineHasFoldingEndMarker (i);
 
             if (hasEndMarker && hasStartMarker)
+            {
                 continue;
+            }
 
             if (hasStartMarker)
             {
@@ -7019,7 +7826,9 @@ public class SyntaxTextBox
                     var iStartLine = stack.Pop();
                     foldingPairs[iStartLine] = i;
                     if (m == lines[iStartLine].FoldingStartMarker)
+                    {
                         break;
+                    }
                 }
             }
         }
@@ -7036,7 +7845,9 @@ public class SyntaxTextBox
         var from = Math.Min (fromLine, toLine);
         var to = Math.Max (fromLine, toLine);
         if (from == to)
+        {
             return;
+        }
 
         //hide lines
         for (var i = from + 1; i <= to; i++)
@@ -7049,7 +7860,10 @@ public class SyntaxTextBox
         to = Math.Max (fromLine, toLine);
         var newLine = FindNextVisibleLine (to);
         if (newLine == to)
+        {
             newLine = FindPrevVisibleLine (from);
+        }
+
         Selection.Start = new Place (0, newLine);
 
         //
@@ -7061,38 +7875,57 @@ public class SyntaxTextBox
 
     internal int FindNextVisibleLine (int iLine)
     {
-        if (iLine >= lines.Count - 1) return iLine;
+        if (iLine >= lines.Count - 1)
+        {
+            return iLine;
+        }
+
         var old = iLine;
         do
             iLine++;
         while (iLine < lines.Count - 1 && LineInfos[iLine].VisibleState != VisibleState.Visible);
 
         if (LineInfos[iLine].VisibleState != VisibleState.Visible)
+        {
             return old;
+        }
         else
+        {
             return iLine;
+        }
     }
 
 
     internal int FindPrevVisibleLine (int iLine)
     {
-        if (iLine <= 0) return iLine;
+        if (iLine <= 0)
+        {
+            return iLine;
+        }
+
         var old = iLine;
         do
             iLine--;
         while (iLine > 0 && LineInfos[iLine].VisibleState != VisibleState.Visible);
 
         if (LineInfos[iLine].VisibleState != VisibleState.Visible)
+        {
             return old;
+        }
         else
+        {
             return iLine;
+        }
     }
 
     private VisualMarker FindVisualMarkerForPoint (Point p)
     {
         foreach (var m in visibleMarkers)
             if (m.rectangle.Contains (p))
+            {
                 return m;
+            }
+
         return null;
     }
 
@@ -7128,7 +7961,9 @@ public class SyntaxTextBox
 
         var startChar = 0; // Only move selection when in 'ColumnSelectionMode'
         if (Selection.ColumnSelectionMode)
+        {
             startChar = Math.Min (Selection.End.Column, Selection.Start.Column);
+        }
 
         BeginUpdate();
         Selection.BeginUpdate();
@@ -7144,12 +7979,20 @@ public class SyntaxTextBox
         var to = Selection.End.Line;
 
         if (!Selection.ColumnSelectionMode)
+        {
             if (Selection.End.Column == 0)
+            {
                 to--;
+            }
+        }
 
         for (var i = from; i <= to; i++)
         {
-            if (lines[i].Count == 0) continue;
+            if (lines[i].Count == 0)
+            {
+                continue;
+            }
+
             Selection.Start = new Place (startChar, i);
             lines.Manager.ExecuteCommand (new InsertTextCommand (TextSource, new String (' ', TabLength)));
         }
@@ -7171,7 +8014,9 @@ public class SyntaxTextBox
         lines.Manager.EndAutoUndoCommands();
 
         if (carretAtEnd)
+        {
             Selection.Inverse();
+        }
 
         needRecalc = true;
         Selection.EndUpdate();
@@ -7192,7 +8037,9 @@ public class SyntaxTextBox
 
         var startCharIndex = 0;
         if (Selection.ColumnSelectionMode)
+        {
             startCharIndex = Math.Min (Selection.End.Column, Selection.Start.Column);
+        }
 
         BeginUpdate();
         Selection.BeginUpdate();
@@ -7207,8 +8054,12 @@ public class SyntaxTextBox
         var to = Selection.End.Line;
 
         if (!Selection.ColumnSelectionMode)
+        {
             if (Selection.End.Column == 0)
+            {
                 to--;
+            }
+        }
 
         var numberOfDeletedWhitespacesOfFirstLine = 0;
         var numberOfDeletetWhitespacesOfLastLine = 0;
@@ -7216,7 +8067,9 @@ public class SyntaxTextBox
         for (var i = from; i <= to; i++)
         {
             if (startCharIndex > lines[i].Count)
+            {
                 continue;
+            }
 
             // Select first characters from the line
             var endIndex = Math.Min (this.lines[i].Count, startCharIndex + this.TabLength);
@@ -7242,7 +8095,9 @@ public class SyntaxTextBox
 
             // Remove marked/selected whitespace characters
             if (!Selection.IsEmpty)
+            {
                 this.ClearSelected();
+            }
         }
 
         // Restore selection
@@ -7274,7 +8129,9 @@ public class SyntaxTextBox
     protected virtual void DecreaseIndentOfSingleLine()
     {
         if (this.Selection.Start.Line != this.Selection.End.Line)
+        {
             return;
+        }
 
         // Remeber current selection infos
         var currentSelection = this.Selection.Clone();
@@ -7336,7 +8193,10 @@ public class SyntaxTextBox
     public virtual void DoAutoIndent()
     {
         if (Selection.ColumnSelectionMode)
+        {
             return;
+        }
+
         var r = Selection.Clone();
         r.Normalize();
 
@@ -7443,7 +8303,10 @@ public class SyntaxTextBox
     public virtual void OnVisualMarkerClick (MouseEventArgs args, StyleVisualMarker marker)
     {
         if (VisualMarkerClick != null)
+        {
             VisualMarkerClick (this, new VisualMarkerEventArgs (marker.Style, marker, args));
+        }
+
         marker.Style.OnVisualMarkerClick (this, new VisualMarkerEventArgs (marker.Style, marker, args));
     }
 
@@ -7473,7 +8336,10 @@ public class SyntaxTextBox
             var iStart = (marker as FoldedAreaMarker).iLine;
             var iEnd = FindEndOfFoldingBlock (iStart);
             if (iEnd < 0)
+            {
                 return;
+            }
+
             Selection.BeginUpdate();
             Selection.Start = new Place (0, iStart);
             Selection.End = new Place (lines[iEnd].Count, iEnd);
@@ -7522,9 +8388,14 @@ public class SyntaxTextBox
         ref TextRange rightBracketPosition)
     {
         if (!Selection.IsEmpty)
+        {
             return;
+        }
+
         if (LinesCount == 0)
+        {
             return;
+        }
 
         //
         var oldLeftBracketPosition = leftBracketPosition;
@@ -7539,7 +8410,9 @@ public class SyntaxTextBox
 
         if (oldLeftBracketPosition != leftBracketPosition ||
             oldRightBracketPosition != rightBracketPosition)
+        {
             Invalidate();
+        }
     }
 
     /// <summary>
@@ -7557,8 +8430,16 @@ public class SyntaxTextBox
         var maxIterations = maxBracketSearchIterations;
         while (range.GoLeftThroughFolded()) //move caret left
         {
-            if (range.CharAfterStart == leftBracket) counter++;
-            if (range.CharAfterStart == rightBracket) counter--;
+            if (range.CharAfterStart == leftBracket)
+            {
+                counter++;
+            }
+
+            if (range.CharAfterStart == rightBracket)
+            {
+                counter--;
+            }
+
             if (counter == 1)
             {
                 range.Start = new Place (range.Start.Column + (!includeBrackets ? 1 : 0), range.Start.Line);
@@ -7568,7 +8449,10 @@ public class SyntaxTextBox
 
             //
             maxIterations--;
-            if (maxIterations <= 0) break;
+            if (maxIterations <= 0)
+            {
+                break;
+            }
         }
 
         //
@@ -7577,8 +8461,16 @@ public class SyntaxTextBox
         maxIterations = maxBracketSearchIterations;
         do
         {
-            if (range.CharAfterStart == leftBracket) counter++;
-            if (range.CharAfterStart == rightBracket) counter--;
+            if (range.CharAfterStart == leftBracket)
+            {
+                counter++;
+            }
+
+            if (range.CharAfterStart == rightBracket)
+            {
+                counter--;
+            }
+
             if (counter == -1)
             {
                 range.End = new Place (range.Start.Column + (includeBrackets ? 1 : 0), range.Start.Line);
@@ -7588,22 +8480,34 @@ public class SyntaxTextBox
 
             //
             maxIterations--;
-            if (maxIterations <= 0) break;
+            if (maxIterations <= 0)
+            {
+                break;
+            }
         } while (range.GoRightThroughFolded()); //move caret right
 
         if (leftBracketPosition != null && rightBracketPosition != null)
+        {
             return new TextRange (this, leftBracketPosition.Start, rightBracketPosition.End);
+        }
         else
+        {
             return null;
+        }
     }
 
     private void HighlightBrackets2 (char LeftBracket, char RightBracket, ref TextRange leftBracketPosition,
         ref TextRange rightBracketPosition)
     {
         if (!Selection.IsEmpty)
+        {
             return;
+        }
+
         if (LinesCount == 0)
+        {
             return;
+        }
 
         //
         var oldLeftBracketPosition = leftBracketPosition;
@@ -7619,8 +8523,16 @@ public class SyntaxTextBox
                 range.Start.Line);
             while (range.GoLeftThroughFolded()) //move caret left
             {
-                if (range.CharAfterStart == LeftBracket) counter++;
-                if (range.CharAfterStart == RightBracket) counter--;
+                if (range.CharAfterStart == LeftBracket)
+                {
+                    counter++;
+                }
+
+                if (range.CharAfterStart == RightBracket)
+                {
+                    counter--;
+                }
+
                 if (counter == 0)
                 {
                     //highlighting
@@ -7632,7 +8544,10 @@ public class SyntaxTextBox
 
                 //
                 maxIterations--;
-                if (maxIterations <= 0) break;
+                if (maxIterations <= 0)
+                {
+                    break;
+                }
             }
         }
 
@@ -7641,14 +8556,23 @@ public class SyntaxTextBox
         counter = 0;
         maxIterations = maxBracketSearchIterations;
         if (!found)
+        {
             if (range.CharAfterStart == LeftBracket)
             {
                 leftBracketPosition = new TextRange (this, range.Start.Column, range.Start.Line, range.Start.Column + 1,
                     range.Start.Line);
                 do
                 {
-                    if (range.CharAfterStart == LeftBracket) counter++;
-                    if (range.CharAfterStart == RightBracket) counter--;
+                    if (range.CharAfterStart == LeftBracket)
+                    {
+                        counter++;
+                    }
+
+                    if (range.CharAfterStart == RightBracket)
+                    {
+                        counter--;
+                    }
+
                     if (counter == 0)
                     {
                         //highlighting
@@ -7660,12 +8584,18 @@ public class SyntaxTextBox
 
                     //
                     maxIterations--;
-                    if (maxIterations <= 0) break;
+                    if (maxIterations <= 0)
+                    {
+                        break;
+                    }
                 } while (range.GoRightThroughFolded()); //move caret right
             }
+        }
 
         if (oldLeftBracketPosition != leftBracketPosition || oldRightBracketPosition != rightBracketPosition)
+        {
             Invalidate();
+        }
     }
 
     /// <summary>
@@ -7681,10 +8611,17 @@ public class SyntaxTextBox
         foreach (var r in range1.GetRanges (regexPattern, options))
         {
             res = r;
-            if (!backward) break;
+            if (!backward)
+            {
+                break;
+            }
         }
 
-        if (res == null) return false;
+        if (res == null)
+        {
+            return false;
+        }
+
         Selection = res;
         Invalidate();
         return true;
@@ -7710,9 +8647,13 @@ public class SyntaxTextBox
         if (SyntaxHighlighter != null)
         {
             if (Language == Language.Custom && !string.IsNullOrEmpty (DescriptionFile))
+            {
                 SyntaxHighlighter.HighlightSyntax (DescriptionFile, range);
+            }
             else
+            {
                 SyntaxHighlighter.HighlightSyntax (Language, range);
+            }
         }
     }
 
@@ -7745,10 +8686,14 @@ public class SyntaxTextBox
         exporter.IncludeLineNumbers = settings.IncludeLineNumbers;
 
         if (range == null)
+        {
             range = Range;
+        }
 
         if (range.Text == string.Empty)
+        {
             return;
+        }
 
         //change visible range
         _visibleRange = range;
@@ -7756,9 +8701,14 @@ public class SyntaxTextBox
         {
             //call handlers for VisibleRange
             if (VisibleRangeChanged != null)
+            {
                 VisibleRangeChanged (this, new EventArgs());
+            }
+
             if (VisibleRangeChangedDelayed != null)
+            {
                 VisibleRangeChangedDelayed (this, new EventArgs());
+            }
         }
         finally
         {
@@ -7808,16 +8758,24 @@ public class SyntaxTextBox
             {
                 //show print dialog
                 if (settings.ShowPrintPreviewDialog)
+                {
                     wb.ShowPrintPreviewDialog();
+                }
                 else
                 {
                     if (settings.ShowPageSetupDialog)
+                    {
                         wb.ShowPageSetupDialog();
+                    }
 
                     if (settings.ShowPrintDialog)
+                    {
                         wb.ShowPrintDialog();
+                    }
                     else
+                    {
                         wb.Print();
+                    }
                 }
             }
             finally
@@ -7883,16 +8841,23 @@ window.status = ""#print"";
         if (disposing)
         {
             if (SyntaxHighlighter != null)
+            {
                 SyntaxHighlighter.Dispose();
+            }
+
             _timer1.Dispose();
             _timer2.Dispose();
             middleClickScrollingTimer.Dispose();
 
             if (findForm != null)
+            {
                 findForm.Dispose();
+            }
 
             if (replaceForm != null)
+            {
                 replaceForm.Dispose();
+            }
             /*
             if (Font != null)
                 Font.Dispose();
@@ -7901,17 +8866,23 @@ window.status = ""#print"";
                 originalFont.Dispose();*/
 
             if (TextSource != null)
+            {
                 TextSource.Dispose();
+            }
 
             if (ToolTip != null)
+            {
                 ToolTip.Dispose();
+            }
         }
     }
 
     protected virtual void OnPaintLine (PaintLineEventArgs e)
     {
         if (PaintLine != null)
+        {
             PaintLine (this, e);
+        }
     }
 
     internal void OnLineInserted (int index)
@@ -7922,14 +8893,20 @@ window.status = ""#print"";
     internal void OnLineInserted (int index, int count)
     {
         if (LineInserted != null)
+        {
             LineInserted (this, new LineInsertedEventArgs (index, count));
+        }
     }
 
     internal void OnLineRemoved (int index, int count, List<int> removedLineIds)
     {
         if (count > 0)
+        {
             if (LineRemoved != null)
+            {
                 LineRemoved (this, new LineRemovedEventArgs (index, count, removedLineIds));
+            }
+        }
     }
 
     /// <summary>
@@ -7967,9 +8944,13 @@ window.status = ""#print"";
         {
             var enc = EncodingDetector.DetectTextFileEncoding (fileName);
             if (enc != null)
+            {
                 OpenFile (fileName, enc);
+            }
             else
+            {
                 OpenFile (fileName, Encoding.Default);
+            }
         }
         catch
         {
@@ -8088,7 +9069,9 @@ window.status = ""#print"";
     public void OnUndoRedoStateChanged()
     {
         if (UndoRedoStateChanged != null)
+        {
             UndoRedoStateChanged (this, EventArgs.Empty);
+        }
     }
 
     /// <summary>
@@ -8110,9 +9093,15 @@ window.status = ""#print"";
     {
         TextSource.Manager.ExecuteCommand (new RemoveLinesCommand (TextSource, iLines));
         if (iLines.Count > 0)
+        {
             IsChanged = true;
+        }
+
         if (LinesCount == 0)
+        {
             Text = "";
+        }
+
         NeedRecalc();
         Invalidate();
     }
@@ -8158,7 +9147,10 @@ window.status = ""#print"";
         if (e.Data.GetDataPresent (DataFormats.Text))
         {
             if (ParentForm != null)
+            {
                 ParentForm.Activate();
+            }
+
             Focus();
             var p = PointToClient (new Point (e.X, e.Y));
             var text = e.Data.GetData (DataFormats.Text).ToString();
@@ -8176,11 +9168,15 @@ window.status = ""#print"";
 
         // Abort, if insertRange is read only
         if (insertRange.ReadOnly)
+        {
             return;
+        }
 
         // Abort, if dragged range contains target place
         if ((_draggedRange != null) && (_draggedRange.Contains (place) == true))
+        {
             return;
+        }
 
         // Determine, if the dragged string should be copied or moved
         var copyMode =
@@ -8291,11 +9287,15 @@ window.status = ""#print"";
 
         // Abort, if insertRange is read only
         if (insertRange.ReadOnly)
+        {
             return;
+        }
 
         // Abort, if dragged range contains target place
         if ((_draggedRange != null) && (_draggedRange.Contains (place) == true))
+        {
             return;
+        }
 
         // Determine, if the dragged string should be copied or moved
         var copyMode =
@@ -8434,7 +9434,9 @@ window.status = ""#print"";
 
                 // Select inserted text
                 if (!_draggedRange.ColumnSelectionMode)
+                {
                     Selection = new TextRange (this, startPosition, endPosition);
+                }
                 else
                 {
                     if ((copyMode == false) &&
@@ -8479,7 +9481,9 @@ window.status = ""#print"";
             var p = PointToClient (new Point (e.X, e.Y));
             Selection.Start = PointToPlace (p);
             if (p.Y < 6 && VerticalScroll.Visible && VerticalScroll.Value > 0)
+            {
                 VerticalScroll.Value = Math.Max (0, VerticalScroll.Value - _charHeight);
+            }
 
             DoCaretVisible();
             Invalidate();
@@ -8514,8 +9518,13 @@ window.status = ""#print"";
         if (!_middleClickScrollingActivated)
         {
             if ((!HorizontalScroll.Visible) && (!VerticalScroll.Visible))
+            {
                 if (ShowScrollBars)
+                {
                     return;
+                }
+            }
+
             _middleClickScrollingActivated = true;
             _middleClickScrollingOriginPoint = e.Location;
             _middleClickScrollingOriginScroll = new Point (HorizontalScroll.Value, VerticalScroll.Value);
@@ -8575,10 +9584,14 @@ window.status = ""#print"";
     void middleClickScrollingTimer_Tick (object sender, EventArgs e)
     {
         if (IsDisposed)
+        {
             return;
+        }
 
         if (!_middleClickScrollingActivated)
+        {
             return;
+        }
 
         var currentMouseLocation = PointToClient (Cursor.Position);
 
@@ -8588,8 +9601,15 @@ window.status = ""#print"";
         var distanceX = this._middleClickScrollingOriginPoint.X - currentMouseLocation.X;
         var distanceY = this._middleClickScrollingOriginPoint.Y - currentMouseLocation.Y;
 
-        if (!VerticalScroll.Visible && ShowScrollBars) distanceY = 0;
-        if (!HorizontalScroll.Visible && ShowScrollBars) distanceX = 0;
+        if (!VerticalScroll.Visible && ShowScrollBars)
+        {
+            distanceY = 0;
+        }
+
+        if (!HorizontalScroll.Visible && ShowScrollBars)
+        {
+            distanceX = 0;
+        }
 
         var angleInDegree = 180 - Math.Atan2 (distanceY, distanceX) * 180 / Math.PI;
         var distance = Math.Sqrt (Math.Pow (distanceX, 2) + Math.Pow (distanceY, 2));
@@ -8598,21 +9618,37 @@ window.status = ""#print"";
         if (distance > 10)
         {
             if (angleInDegree >= 325 || angleInDegree <= 35)
+            {
                 this.middleClickScollDirection = ScrollDirection.Right;
+            }
             else if (angleInDegree <= 55)
+            {
                 this.middleClickScollDirection = ScrollDirection.Right | ScrollDirection.Up;
+            }
             else if (angleInDegree <= 125)
+            {
                 this.middleClickScollDirection = ScrollDirection.Up;
+            }
             else if (angleInDegree <= 145)
+            {
                 this.middleClickScollDirection = ScrollDirection.Up | ScrollDirection.Left;
+            }
             else if (angleInDegree <= 215)
+            {
                 this.middleClickScollDirection = ScrollDirection.Left;
+            }
             else if (angleInDegree <= 235)
+            {
                 this.middleClickScollDirection = ScrollDirection.Left | ScrollDirection.Down;
+            }
             else if (angleInDegree <= 305)
+            {
                 this.middleClickScollDirection = ScrollDirection.Down;
+            }
             else
+            {
                 this.middleClickScollDirection = ScrollDirection.Down | ScrollDirection.Right;
+            }
         }
         else
         {
@@ -8669,10 +9705,14 @@ window.status = ""#print"";
         if ((middleClickScollDirection & (ScrollDirection.Down | ScrollDirection.Up)) > 0)
 
             //DoScrollVertical(1 + Math.Abs(yScrollOffset), Math.Sign(distanceY));
+        {
             OnScroll (yea, false);
+        }
 
         if ((middleClickScollDirection & (ScrollDirection.Right | ScrollDirection.Left)) > 0)
+        {
             OnScroll (xea);
+        }
 
         // Enable drawing
         SendMessage (Handle, WM_SETREDRAW, 1, 0);
@@ -8703,13 +9743,28 @@ window.status = ""#print"";
             gr.TranslateTransform (p.X, p.Y);
             gr.FillEllipse (inverseColorBrush, -2, -2, 4, 4);
 
-            if (ableToScrollVertically) DrawTriangle (gr, inverseColorBrush);
+            if (ableToScrollVertically)
+            {
+                DrawTriangle (gr, inverseColorBrush);
+            }
+
             gr.RotateTransform (90);
-            if (ableToScrollHorizontally) DrawTriangle (gr, inverseColorBrush);
+            if (ableToScrollHorizontally)
+            {
+                DrawTriangle (gr, inverseColorBrush);
+            }
+
             gr.RotateTransform (90);
-            if (ableToScrollVertically) DrawTriangle (gr, inverseColorBrush);
+            if (ableToScrollVertically)
+            {
+                DrawTriangle (gr, inverseColorBrush);
+            }
+
             gr.RotateTransform (90);
-            if (ableToScrollHorizontally) DrawTriangle (gr, inverseColorBrush);
+            if (ableToScrollHorizontally)
+            {
+                DrawTriangle (gr, inverseColorBrush);
+            }
 
             gr.Restore (state);
         }
@@ -8741,9 +9796,13 @@ window.status = ""#print"";
         public int Compare (LineInfo x, LineInfo y)
         {
             if (x.startY == -10)
+            {
                 return -y.startY.CompareTo (Y);
+            }
             else
+            {
                 return x.startY.CompareTo (Y);
+            }
         }
 
         #endregion

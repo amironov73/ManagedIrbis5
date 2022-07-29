@@ -60,7 +60,9 @@ public class VistaSaveFileDialog : VistaFileDialog
     public VistaSaveFileDialog (bool forceDownlevel)
     {
         if (forceDownlevel || !IsVistaFileDialogSupported)
+        {
             DownlevelDialog = new SaveFileDialog();
+        }
     }
 
     #region Public Properties
@@ -82,15 +84,22 @@ public class VistaSaveFileDialog : VistaFileDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return ((SaveFileDialog)DownlevelDialog).CreatePrompt;
+            }
+
             return GetOption (NativeMethods.FOS.FOS_CREATEPROMPT);
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 ((SaveFileDialog)DownlevelDialog).CreatePrompt = value;
+            }
             else
+            {
                 SetOption (NativeMethods.FOS.FOS_CREATEPROMPT, value);
+            }
         }
     }
 
@@ -111,15 +120,22 @@ public class VistaSaveFileDialog : VistaFileDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return ((SaveFileDialog)DownlevelDialog).OverwritePrompt;
+            }
+
             return GetOption (NativeMethods.FOS.FOS_OVERWRITEPROMPT);
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 ((SaveFileDialog)DownlevelDialog).OverwritePrompt = value;
+            }
             else
+            {
                 SetOption (NativeMethods.FOS.FOS_OVERWRITEPROMPT, value);
+            }
         }
     }
 
@@ -147,10 +163,16 @@ public class VistaSaveFileDialog : VistaFileDialog
     public Stream OpenFile()
     {
         if (DownlevelDialog != null)
+        {
             return ((SaveFileDialog)DownlevelDialog).OpenFile();
+        }
+
         string fileName = FileName;
         if (string.IsNullOrEmpty (fileName))
+        {
             throw new ArgumentNullException ("FileName");
+        }
+
         return new FileStream (fileName, FileMode.Create, FileAccess.ReadWrite);
     }
 

@@ -55,7 +55,10 @@ internal sealed class PenAdapter : RPen
                 case RDashStyle.Dash:
                     _pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
                     if (Width < 2)
+                    {
                         _pen.DashPattern = new[] { 4, 4f }; // better looking
+                    }
+
                     break;
                 case RDashStyle.Dot:
                     _pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;

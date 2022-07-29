@@ -119,13 +119,17 @@ public class MacroManager
     internal void ProcessKey (Keys keyData)
     {
         if (IsRecording)
+        {
             AddKeyToMacros (keyData);
+        }
     }
 
     internal void ProcessKey (char c, Keys modifiers)
     {
         if (IsRecording)
+        {
             AddCharToMacros (c, modifiers);
+        }
     }
 
     /// <summary>
@@ -175,7 +179,9 @@ public class MacroManager
             ClearMacros();
 
             if (string.IsNullOrEmpty (value))
+            {
                 return;
+            }
 
             var doc = new XmlDocument();
             doc.LoadXml (value);
@@ -186,6 +192,7 @@ public class MacroManager
             var kc = new KeysConverter();
 
             if (list != null)
+            {
                 foreach (XmlElement node in list)
                 {
                     var ca = node.GetAttributeNode ("char");
@@ -193,13 +200,20 @@ public class MacroManager
                     if (ca != null)
                     {
                         if (ka != null)
+                        {
                             AddCharToMacros ((char)int.Parse (ca.Value), (Keys)kc.ConvertFromString (ka.Value));
+                        }
                         else
+                        {
                             AddCharToMacros ((char)int.Parse (ca.Value), Keys.None);
+                        }
                     }
                     else if (ka != null)
+                    {
                         AddKeyToMacros ((Keys)kc.ConvertFromString (ka.Value));
+                    }
                 }
+            }
 
             Thread.CurrentThread.CurrentUICulture = cult;
         }

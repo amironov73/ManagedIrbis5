@@ -98,7 +98,10 @@ public class MultiRangeCommand
             var c = _cmd.Clone();
             c.Execute();
             if (textSource.CurrentTextBox.Selection.End.Column > iChar)
+            {
                 iChar = textSource.CurrentTextBox.Selection.End.Column;
+            }
+
             _commandsByRanges.Add (c);
         }
     }

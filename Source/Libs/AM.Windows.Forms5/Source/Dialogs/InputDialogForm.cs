@@ -71,7 +71,10 @@ partial class InputDialogForm : ExtendedForm
         get { return _inputTextBox.Multiline; }
         set
         {
-            if (value == _inputTextBox.Multiline) return;
+            if (value == _inputTextBox.Multiline)
+            {
+                return;
+            }
 
             _inputTextBox.Multiline = value;
 
@@ -122,7 +125,9 @@ partial class InputDialogForm : ExtendedForm
     protected virtual void OnOkButtonClicked (OkButtonClickedEventArgs e)
     {
         if (OkButtonClicked != null)
+        {
             OkButtonClicked (this, e);
+        }
     }
 
     protected override void ScaleControl (SizeF factor, BoundsSpecified specified)
@@ -183,6 +188,8 @@ partial class InputDialogForm : ExtendedForm
         OkButtonClickedEventArgs okButtonClickedEventArgs = new OkButtonClickedEventArgs (_inputTextBox.Text, this);
         OnOkButtonClicked (okButtonClickedEventArgs);
         if (!okButtonClickedEventArgs.Cancel)
+        {
             DialogResult = DialogResult.OK;
+        }
     }
 }

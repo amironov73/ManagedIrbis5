@@ -104,9 +104,15 @@ public abstract class AutoHideStripBase : Control
             {
                 IDockContent content = DockPane.DisplayingContents[index];
                 if (content == null)
+                {
                     throw new ArgumentOutOfRangeException (nameof (index));
+                }
+
                 if (content.DockHandler.AutoHideTab == null)
+                {
                     content.DockHandler.AutoHideTab = (DockPanel.AutoHideStripControl.CreateTab (content));
+                }
+
                 return content.DockHandler.AutoHideTab as Tab;
             }
         }
@@ -124,7 +130,9 @@ public abstract class AutoHideStripBase : Control
         public int IndexOf (Tab tab)
         {
             if (tab == null)
+            {
                 return -1;
+            }
 
             return IndexOf (tab.Content);
         }
@@ -160,7 +168,10 @@ public abstract class AutoHideStripBase : Control
             get
             {
                 if (DockPane.AutoHideTabs == null)
+                {
                     DockPane.AutoHideTabs = new TabCollection (DockPane);
+                }
+
                 return DockPane.AutoHideTabs as TabCollection;
             }
         }
@@ -223,7 +234,9 @@ public abstract class AutoHideStripBase : Control
                     for (int i = 0; i < m_states.Length; i++)
                     {
                         if (m_states[i].DockState == dockState)
+                        {
                             return m_states[i];
+                        }
                     }
 
                     throw new ArgumentOutOfRangeException (nameof (dockState));
@@ -233,12 +246,16 @@ public abstract class AutoHideStripBase : Control
             public bool ContainsPane (DockPane pane)
             {
                 if (pane.IsHidden)
+                {
                     return false;
+                }
 
                 for (int i = 0; i < m_states.Length; i++)
                 {
                     if (m_states[i].DockState == pane.DockState && m_states[i].Selected)
+                    {
                         return true;
+                    }
                 }
 
                 return false;
@@ -277,7 +294,9 @@ public abstract class AutoHideStripBase : Control
                 foreach (DockPane pane in DockPanel.Panes)
                 {
                     if (States.ContainsPane (pane))
+                    {
                         count++;
+                    }
                 }
 
                 return count;
@@ -292,12 +311,17 @@ public abstract class AutoHideStripBase : Control
                 foreach (DockPane pane in DockPanel.Panes)
                 {
                     if (!States.ContainsPane (pane))
+                    {
                         continue;
+                    }
 
                     if (count == index)
                     {
                         if (pane.AutoHidePane == null)
+                        {
                             pane.AutoHidePane = DockPanel.AutoHideStripControl.CreatePane (pane);
+                        }
+
                         return pane.AutoHidePane as Pane;
                     }
 
@@ -316,16 +340,22 @@ public abstract class AutoHideStripBase : Control
         public int IndexOf (Pane pane)
         {
             if (pane == null)
+            {
                 return -1;
+            }
 
             int index = 0;
             foreach (DockPane dockPane in DockPanel.Panes)
             {
                 if (!States.ContainsPane (pane.DockPane))
+                {
                     continue;
+                }
 
                 if (pane == dockPane.AutoHidePane)
+                {
                     return index;
+                }
 
                 index++;
             }
@@ -372,15 +402,25 @@ public abstract class AutoHideStripBase : Control
     protected PaneCollection GetPanes (DockState dockState)
     {
         if (dockState == DockState.DockTopAutoHide)
+        {
             return PanesTop;
+        }
         else if (dockState == DockState.DockBottomAutoHide)
+        {
             return PanesBottom;
+        }
         else if (dockState == DockState.DockLeftAutoHide)
+        {
             return PanesLeft;
+        }
         else if (dockState == DockState.DockRightAutoHide)
+        {
             return PanesRight;
+        }
         else
+        {
             throw new ArgumentOutOfRangeException (nameof (dockState));
+        }
     }
 
     internal int GetNumberOfPanes (DockState dockState)
@@ -460,20 +500,28 @@ public abstract class AutoHideStripBase : Control
     protected internal Rectangle GetTabStripRectangle (DockState dockState)
     {
         if (dockState == DockState.DockTopAutoHide)
+        {
             return new Rectangle (RectangleTopLeft.Width, 0,
                 Width - RectangleTopLeft.Width - RectangleTopRight.Width, RectangleTopLeft.Height);
+        }
 
         if (dockState == DockState.DockBottomAutoHide)
+        {
             return new Rectangle (RectangleBottomLeft.Width, Height - RectangleBottomLeft.Height,
                 Width - RectangleBottomLeft.Width - RectangleBottomRight.Width, RectangleBottomLeft.Height);
+        }
 
         if (dockState == DockState.DockLeftAutoHide)
+        {
             return new Rectangle (0, RectangleTopLeft.Height, RectangleTopLeft.Width,
                 Height - RectangleTopLeft.Height - RectangleBottomLeft.Height);
+        }
 
         if (dockState == DockState.DockRightAutoHide)
+        {
             return new Rectangle (Width - RectangleTopRight.Width, RectangleTopRight.Height,
                 RectangleTopRight.Width, Height - RectangleTopRight.Height - RectangleBottomRight.Height);
+        }
 
         return Rectangle.Empty;
     }
@@ -485,7 +533,9 @@ public abstract class AutoHideStripBase : Control
         get
         {
             if (m_displayingArea == null)
+            {
                 m_displayingArea = new GraphicsPath();
+            }
 
             return m_displayingArea;
         }
@@ -510,11 +560,15 @@ public abstract class AutoHideStripBase : Control
         base.OnMouseDown (e);
 
         if (e.Button != MouseButtons.Left)
+        {
             return;
+        }
 
         IDockContent content = HitTest();
         if (content == null)
+        {
             return;
+        }
 
         SetActiveAutoHideContent (content);
 
@@ -526,7 +580,9 @@ public abstract class AutoHideStripBase : Control
         base.OnMouseHover (e);
 
         if (!DockPanel.ShowAutoHideContentOnHover)
+        {
             return;
+        }
 
         // IMPORTANT: VS2003/2005 themes only.
         IDockContent content = HitTest();
@@ -539,10 +595,16 @@ public abstract class AutoHideStripBase : Control
     private void SetActiveAutoHideContent (IDockContent content)
     {
         if (content != null)
+        {
             if (DockPanel.ActiveAutoHideContent != content)
+            {
                 DockPanel.ActiveAutoHideContent = content;
+            }
             else if (!DockPanel.ShowAutoHideContentOnHover)
+            {
                 DockPanel.ActiveAutoHideContent = null; // IMPORTANT: Not needed for VS2003/2005 themes.
+            }
+        }
     }
 
     protected override void OnLayout (LayoutEventArgs levent)
@@ -554,7 +616,9 @@ public abstract class AutoHideStripBase : Control
     internal void RefreshChanges()
     {
         if (IsDisposed)
+        {
             return;
+        }
 
         SetRegion();
         OnRefreshChanges();
@@ -594,7 +658,9 @@ public abstract class AutoHideStripBase : Control
     internal static Rectangle ToScreen (Rectangle rectangle, Control parent)
     {
         if (parent == null)
+        {
             return rectangle;
+        }
 
         return new Rectangle (parent.PointToScreen (new Point (rectangle.Left, rectangle.Top)),
             new Size (rectangle.Width, rectangle.Height));
@@ -651,7 +717,9 @@ public abstract class AutoHideStripBase : Control
             foreach (var rectangle in rectangles)
             {
                 if (rectangle.Value.Contains (point))
+                {
                     return new AutoHideStripAccessibleObject (_strip, rectangle.Key, this);
+                }
             }
 
             return null;

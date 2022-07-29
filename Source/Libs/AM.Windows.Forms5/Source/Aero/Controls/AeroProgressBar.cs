@@ -179,7 +179,11 @@ namespace AeroSuite.Controls
             get
             {
                 var param = base.CreateParams;
-                if (PlatformHelper.VistaOrHigher) param.Style |= PBS_SMOOTHREVERSE;
+                if (PlatformHelper.VistaOrHigher)
+                {
+                    param.Style |= PBS_SMOOTHREVERSE;
+                }
+
                 return param;
             }
         }

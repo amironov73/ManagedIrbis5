@@ -146,8 +146,15 @@ public class TextRange
 
     public bool Contains (Place place)
     {
-        if (place.Line < Math.Min (_start.Line, _end.Line)) return false;
-        if (place.Line > Math.Max (_start.Line, _end.Line)) return false;
+        if (place.Line < Math.Min (_start.Line, _end.Line))
+        {
+            return false;
+        }
+
+        if (place.Line > Math.Max (_start.Line, _end.Line))
+        {
+            return false;
+        }
 
         var s = _start;
         var e = _end;
@@ -162,12 +169,22 @@ public class TextRange
 
         if (ColumnSelectionMode)
         {
-            if (place.Column < s.Column || place.Column > e.Column) return false;
+            if (place.Column < s.Column || place.Column > e.Column)
+            {
+                return false;
+            }
         }
         else
         {
-            if (place.Line == s.Line && place.Column < s.Column) return false;
-            if (place.Line == e.Line && place.Column > e.Column) return false;
+            if (place.Line == s.Line && place.Column < s.Column)
+            {
+                return false;
+            }
+
+            if (place.Line == e.Line && place.Column > e.Column)
+            {
+                return false;
+            }
         }
 
         return true;
@@ -182,7 +199,9 @@ public class TextRange
     public virtual TextRange GetIntersectionWith (TextRange range)
     {
         if (ColumnSelectionMode)
+        {
             return GetIntersectionWith_ColumnSelectionMode (range);
+        }
 
         var r1 = this.Clone();
         var r2 = range.Clone();
@@ -191,7 +210,10 @@ public class TextRange
         var newStart = r1.Start > r2.Start ? r1.Start : r2.Start;
         var newEnd = r1.End < r2.End ? r1.End : r2.End;
         if (newEnd < newStart)
+        {
             return new TextRange (_textBox, _start, _start);
+        }
+
         return _textBox.GetRange (newStart, newEnd);
     }
 
@@ -221,7 +243,9 @@ public class TextRange
 
         Start = new Place (0, 0);
         if (_textBox.LinesCount == 0)
+        {
             Start = new Place (0, 0);
+        }
         else
         {
             _end = new Place (0, 0);
@@ -229,7 +253,9 @@ public class TextRange
         }
 
         if (this == _textBox.Selection)
+        {
             _textBox.Invalidate();
+        }
     }
 
     /// <summary>
@@ -271,13 +297,18 @@ public class TextRange
         get
         {
             if (ColumnSelectionMode)
+            {
                 return Text_ColumnSelectionMode;
+            }
 
             var fromLine = Math.Min (_end.Line, _start.Line);
             var toLine = Math.Max (_end.Line, _start.Line);
             var fromChar = FromX;
             var toChar = ToX;
-            if (fromLine < 0) return null;
+            if (fromLine < 0)
+            {
+                return null;
+            }
 
             //
             var sb = new StringBuilder();
@@ -288,7 +319,9 @@ public class TextRange
                 for (var x = fromX; x <= toX; x++)
                     sb.Append (_textBox[y][x].c);
                 if (y != toLine && fromLine != toLine)
+                {
                     sb.AppendLine();
+                }
             }
 
             return sb.ToString();
@@ -300,12 +333,17 @@ public class TextRange
         get
         {
             if (ColumnSelectionMode)
+            {
                 return Length_ColumnSelectionMode (false);
+            }
 
             var fromLine = Math.Min (_end.Line, _start.Line);
             var toLine = Math.Max (_end.Line, _start.Line);
             var cnt = 0;
-            if (fromLine < 0) return 0;
+            if (fromLine < 0)
+            {
+                return 0;
+            }
 
             for (var y = fromLine; y <= toLine; y++)
             {
@@ -315,7 +353,9 @@ public class TextRange
                 cnt += toX - fromX + 1;
 
                 if (y != toLine && fromLine != toLine)
+                {
                     cnt += Environment.NewLine.Length;
+                }
             }
 
             return cnt;
@@ -327,9 +367,13 @@ public class TextRange
         get
         {
             if (ColumnSelectionMode)
+            {
                 return Length_ColumnSelectionMode (true);
+            }
             else
+            {
                 return Length;
+            }
         }
     }
 
@@ -364,11 +408,13 @@ public class TextRange
                 }
 
                 if (y != toLine && fromLine != toLine)
+                {
                     foreach (var c in Environment.NewLine)
                     {
                         sb.Append (c);
                         charIndexToPlace.Add (new Place (_textBox[y].Count /*???*/, y));
                     }
+                }
             }
         }
 
@@ -389,7 +435,10 @@ public class TextRange
         get
         {
             if (Start.Column >= _textBox[Start.Line].Count)
+            {
                 return '\n';
+            }
+
             return _textBox[Start.Line][Start.Column].c;
         }
     }
@@ -402,9 +451,15 @@ public class TextRange
         get
         {
             if (Start.Column > _textBox[Start.Line].Count)
+            {
                 return '\n';
+            }
+
             if (Start.Column <= 0)
+            {
                 return '\n';
+            }
+
             return _textBox[Start.Line][Start.Column - 1].c;
         }
     }
@@ -415,7 +470,10 @@ public class TextRange
     public string GetCharsBeforeStart (int charsCount)
     {
         var pos = _textBox.PlaceToPosition (Start) - charsCount;
-        if (pos < 0) pos = 0;
+        if (pos < 0)
+        {
+            pos = 0;
+        }
 
         return new TextRange (_textBox, _textBox.PositionToPlace (pos), Start).Text;
     }
@@ -444,8 +502,16 @@ public class TextRange
     {
         get
         {
-            if (_end.Line < _start.Line) return _end.Column;
-            if (_end.Line > _start.Line) return _start.Column;
+            if (_end.Line < _start.Line)
+            {
+                return _end.Column;
+            }
+
+            if (_end.Line > _start.Line)
+            {
+                return _start.Column;
+            }
+
             return Math.Min (_end.Column, _start.Column);
         }
     }
@@ -457,8 +523,16 @@ public class TextRange
     {
         get
         {
-            if (_end.Line < _start.Line) return _start.Column;
-            if (_end.Line > _start.Line) return _end.Column;
+            if (_end.Line < _start.Line)
+            {
+                return _start.Column;
+            }
+
+            if (_end.Line > _start.Line)
+            {
+                return _end.Column;
+            }
+
             return Math.Max (_end.Column, _start.Column);
         }
     }
@@ -491,15 +565,23 @@ public class TextRange
     public virtual bool GoRightThroughFolded()
     {
         if (ColumnSelectionMode)
+        {
             return GoRightThroughFolded_ColumnSelectionMode();
+        }
 
         if (_start.Line >= _textBox.LinesCount - 1 && _start.Column >= _textBox[_textBox.LinesCount - 1].Count)
+        {
             return false;
+        }
 
         if (_start.Column < _textBox[_start.Line].Count)
+        {
             _start.Offset (1, 0);
+        }
         else
+        {
             _start = new Place (0, _start.Line + 1);
+        }
 
         _preferedPos = -1;
         _end = _start;
@@ -529,12 +611,18 @@ public class TextRange
         ColumnSelectionMode = false;
 
         if (_start.Column == 0 && _start.Line == 0)
+        {
             return false;
+        }
 
         if (_start.Column > 0)
+        {
             _start.Offset (-1, 0);
+        }
         else
+        {
             _start = new Place (_textBox[_start.Line - 1].Count, _start.Line - 1);
+        }
 
         _preferedPos = -1;
         _end = _start;
@@ -547,26 +635,36 @@ public class TextRange
         ColumnSelectionMode = false;
 
         if (!shift)
+        {
             if (_start > _end)
             {
                 Start = End;
                 return;
             }
+        }
 
         if (_start.Column != 0 || _start.Line != 0)
         {
             if (_start.Column > 0 && _textBox.LineInfos[_start.Line].VisibleState == VisibleState.Visible)
+            {
                 _start.Offset (-1, 0);
+            }
             else
             {
                 var i = _textBox.FindPrevVisibleLine (_start.Line);
-                if (i == _start.Line) return;
+                if (i == _start.Line)
+                {
+                    return;
+                }
+
                 _start = new Place (_textBox[i].Count, i);
             }
         }
 
         if (!shift)
+        {
             _end = _start;
+        }
 
         OnSelectionChanged();
 
@@ -578,26 +676,36 @@ public class TextRange
         ColumnSelectionMode = false;
 
         if (!shift)
+        {
             if (_start < _end)
             {
                 Start = End;
                 return;
             }
+        }
 
         if (_start.Line < _textBox.LinesCount - 1 || _start.Column < _textBox[_textBox.LinesCount - 1].Count)
         {
             if (_start.Column < _textBox[_start.Line].Count && _textBox.LineInfos[_start.Line].VisibleState == VisibleState.Visible)
+            {
                 _start.Offset (1, 0);
+            }
             else
             {
                 var i = _textBox.FindNextVisibleLine (_start.Line);
-                if (i == _start.Line) return;
+                if (i == _start.Line)
+                {
+                    return;
+                }
+
                 _start = new Place (0, i);
             }
         }
 
         if (!shift)
+        {
             _end = _start;
+        }
 
         OnSelectionChanged();
 
@@ -609,22 +717,34 @@ public class TextRange
         ColumnSelectionMode = false;
 
         if (!shift)
+        {
             if (_start.Line > _end.Line)
             {
                 Start = End;
                 return;
             }
+        }
 
         if (_preferedPos < 0)
+        {
             _preferedPos = _start.Column - _textBox.LineInfos[_start.Line]
                 .GetWordWrapStringStartPosition (_textBox.LineInfos[_start.Line].GetWordWrapStringIndex (_start.Column));
+        }
 
         var iWW = _textBox.LineInfos[_start.Line].GetWordWrapStringIndex (_start.Column);
         if (iWW == 0)
         {
-            if (_start.Line <= 0) return;
+            if (_start.Line <= 0)
+            {
+                return;
+            }
+
             var i = _textBox.FindPrevVisibleLine (_start.Line);
-            if (i == _start.Line) return;
+            if (i == _start.Line)
+            {
+                return;
+            }
+
             _start.Line = i;
             iWW = _textBox.LineInfos[_start.Line].WordWrapStringsCount;
         }
@@ -634,11 +754,15 @@ public class TextRange
             var finish = _textBox.LineInfos[_start.Line].GetWordWrapStringFinishPosition (iWW - 1, _textBox[_start.Line]);
             _start.Column = _textBox.LineInfos[_start.Line].GetWordWrapStringStartPosition (iWW - 1) + _preferedPos;
             if (_start.Column > finish + 1)
+            {
                 _start.Column = finish + 1;
+            }
         }
 
         if (!shift)
+        {
             _end = _start;
+        }
 
         OnSelectionChanged();
     }
@@ -648,8 +772,10 @@ public class TextRange
         ColumnSelectionMode = false;
 
         if (_preferedPos < 0)
+        {
             _preferedPos = _start.Column - _textBox.LineInfos[_start.Line]
                 .GetWordWrapStringStartPosition (_textBox.LineInfos[_start.Line].GetWordWrapStringIndex (_start.Column));
+        }
 
         var pageHeight = _textBox.ClientRectangle.Height / _textBox.CharHeight - 1;
 
@@ -658,11 +784,18 @@ public class TextRange
             var iWW = _textBox.LineInfos[_start.Line].GetWordWrapStringIndex (_start.Column);
             if (iWW == 0)
             {
-                if (_start.Line <= 0) break;
+                if (_start.Line <= 0)
+                {
+                    break;
+                }
 
                 //pass hidden
                 var newLine = _textBox.FindPrevVisibleLine (_start.Line);
-                if (newLine == _start.Line) break;
+                if (newLine == _start.Line)
+                {
+                    break;
+                }
+
                 _start.Line = newLine;
                 iWW = _textBox.LineInfos[_start.Line].WordWrapStringsCount;
             }
@@ -672,12 +805,16 @@ public class TextRange
                 var finish = _textBox.LineInfos[_start.Line].GetWordWrapStringFinishPosition (iWW - 1, _textBox[_start.Line]);
                 _start.Column = _textBox.LineInfos[_start.Line].GetWordWrapStringStartPosition (iWW - 1) + _preferedPos;
                 if (_start.Column > finish + 1)
+                {
                     _start.Column = finish + 1;
+                }
             }
         }
 
         if (!shift)
+        {
             _end = _start;
+        }
 
         OnSelectionChanged();
     }
@@ -687,24 +824,35 @@ public class TextRange
         ColumnSelectionMode = false;
 
         if (!shift)
+        {
             if (_start.Line < _end.Line)
             {
                 Start = End;
                 return;
             }
+        }
 
         if (_preferedPos < 0)
+        {
             _preferedPos = _start.Column - _textBox.LineInfos[_start.Line]
                 .GetWordWrapStringStartPosition (_textBox.LineInfos[_start.Line].GetWordWrapStringIndex (_start.Column));
+        }
 
         var iWW = _textBox.LineInfos[_start.Line].GetWordWrapStringIndex (_start.Column);
         if (iWW >= _textBox.LineInfos[_start.Line].WordWrapStringsCount - 1)
         {
-            if (_start.Line >= _textBox.LinesCount - 1) return;
+            if (_start.Line >= _textBox.LinesCount - 1)
+            {
+                return;
+            }
 
             //pass hidden
             var i = _textBox.FindNextVisibleLine (_start.Line);
-            if (i == _start.Line) return;
+            if (i == _start.Line)
+            {
+                return;
+            }
+
             _start.Line = i;
             iWW = -1;
         }
@@ -714,11 +862,15 @@ public class TextRange
             var finish = _textBox.LineInfos[_start.Line].GetWordWrapStringFinishPosition (iWW + 1, _textBox[_start.Line]);
             _start.Column = _textBox.LineInfos[_start.Line].GetWordWrapStringStartPosition (iWW + 1) + _preferedPos;
             if (_start.Column > finish + 1)
+            {
                 _start.Column = finish + 1;
+            }
         }
 
         if (!shift)
+        {
             _end = _start;
+        }
 
         OnSelectionChanged();
     }
@@ -728,8 +880,10 @@ public class TextRange
         ColumnSelectionMode = false;
 
         if (_preferedPos < 0)
+        {
             _preferedPos = _start.Column - _textBox.LineInfos[_start.Line]
                 .GetWordWrapStringStartPosition (_textBox.LineInfos[_start.Line].GetWordWrapStringIndex (_start.Column));
+        }
 
         var pageHeight = _textBox.ClientRectangle.Height / _textBox.CharHeight - 1;
 
@@ -738,11 +892,18 @@ public class TextRange
             var iWW = _textBox.LineInfos[_start.Line].GetWordWrapStringIndex (_start.Column);
             if (iWW >= _textBox.LineInfos[_start.Line].WordWrapStringsCount - 1)
             {
-                if (_start.Line >= _textBox.LinesCount - 1) break;
+                if (_start.Line >= _textBox.LinesCount - 1)
+                {
+                    break;
+                }
 
                 //pass hidden
                 var newLine = _textBox.FindNextVisibleLine (_start.Line);
-                if (newLine == _start.Line) break;
+                if (newLine == _start.Line)
+                {
+                    break;
+                }
+
                 _start.Line = newLine;
                 iWW = -1;
             }
@@ -752,12 +913,16 @@ public class TextRange
                 var finish = _textBox.LineInfos[_start.Line].GetWordWrapStringFinishPosition (iWW + 1, _textBox[_start.Line]);
                 _start.Column = _textBox.LineInfos[_start.Line].GetWordWrapStringStartPosition (iWW + 1) + _preferedPos;
                 if (_start.Column > finish + 1)
+                {
                     _start.Column = finish + 1;
+                }
             }
         }
 
         if (!shift)
+        {
             _end = _start;
+        }
 
         OnSelectionChanged();
     }
@@ -767,15 +932,21 @@ public class TextRange
         ColumnSelectionMode = false;
 
         if (_start.Line < 0)
+        {
             return;
+        }
 
         if (_textBox.LineInfos[_start.Line].VisibleState != VisibleState.Visible)
+        {
             return;
+        }
 
         _start = new Place (0, _start.Line);
 
         if (!shift)
+        {
             _end = _start;
+        }
 
         OnSelectionChanged();
 
@@ -787,14 +958,21 @@ public class TextRange
         ColumnSelectionMode = false;
 
         if (_start.Line < 0)
+        {
             return;
+        }
+
         if (_textBox.LineInfos[_start.Line].VisibleState != VisibleState.Visible)
+        {
             return;
+        }
 
         _start = new Place (_textBox[_start.Line].Count, _start.Line);
 
         if (!shift)
+        {
             _end = _start;
+        }
 
         OnSelectionChanged();
 
@@ -853,7 +1031,9 @@ public class TextRange
     public void SetStyle (StyleIndex styleLayer, string regexPattern, RegexOptions options)
     {
         if (Math.Abs (Start.Line - End.Line) > 1000)
+        {
             options |= SyntaxHighlighter.RegexCompiledOption;
+        }
 
         //
         foreach (var range in GetRanges (regexPattern, options))
@@ -885,7 +1065,10 @@ public class TextRange
         var toLine = Math.Max (End.Line, Start.Line);
         var fromChar = FromX;
         var toChar = ToX;
-        if (fromLine < 0) return;
+        if (fromLine < 0)
+        {
+            return;
+        }
 
         //
         for (var y = fromLine; y <= toLine; y++)
@@ -943,7 +1126,10 @@ public class TextRange
         foreach (var range in GetRanges (foldingPattern, options))
         {
             if (range.Start.Line > 0)
+            {
                 _textBox[range.Start.Line - 1].FoldingEndMarker = foldingPattern;
+            }
+
             _textBox[range.Start.Line].FoldingStartMarker = foldingPattern;
         }
 
@@ -983,7 +1169,9 @@ public class TextRange
             //try get 'range' group, otherwise use group 0
             var group = m.Groups["range"];
             if (!group.Success)
+            {
                 group = m.Groups[0];
+            }
 
             //
             r.Start = charIndexToPlace[group.Index];
@@ -1028,13 +1216,17 @@ public class TextRange
             //
             var r = new TextRange (_textBox, new Place (0, iLine), new Place (_textBox[iLine].Count, iLine));
             if (iLine == Start.Line || iLine == End.Line)
+            {
                 r = r.GetIntersectionWith (this);
+            }
 
             foreach (var foundRange in r.GetRanges (regex))
                 yield return foundRange;
 
             if (!isLineLoaded)
+            {
                 fts.UnloadLine (iLine);
+            }
         }
     }
 
@@ -1064,7 +1256,9 @@ public class TextRange
             //
             var r = new TextRange (_textBox, new Place (0, iLine), new Place (_textBox[iLine].Count, iLine));
             if (iLine == Start.Line || iLine == End.Line)
+            {
                 r = r.GetIntersectionWith (this);
+            }
 
             var list = new List<TextRange>();
 
@@ -1075,7 +1269,9 @@ public class TextRange
                 yield return list[i];
 
             if (!isLineLoaded)
+            {
                 fts.UnloadLine (iLine);
+            }
         }
     }
 
@@ -1098,7 +1294,9 @@ public class TextRange
             //try get 'range' group, otherwise use group 0
             var group = m.Groups["range"];
             if (!group.Success)
+            {
                 group = m.Groups[0];
+            }
 
             //
             r.Start = charIndexToPlace[group.Index];
@@ -1132,7 +1330,10 @@ public class TextRange
         var toLine = Math.Max (End.Line, Start.Line);
         var fromChar = FromX;
         var toChar = ToX;
-        if (fromLine < 0) return;
+        if (fromLine < 0)
+        {
+            return;
+        }
 
         //
         for (var y = fromLine; y <= toLine; y++)
@@ -1159,7 +1360,10 @@ public class TextRange
         //set code to chars
         var fromLine = Math.Min (End.Line, Start.Line);
         var toLine = Math.Max (End.Line, Start.Line);
-        if (fromLine < 0) return;
+        if (fromLine < 0)
+        {
+            return;
+        }
 
         //
         for (var y = fromLine; y <= toLine; y++)
@@ -1178,8 +1382,12 @@ public class TextRange
 
         //
         if (_textBox.Selection == this)
+        {
             if (_updating == 0)
+            {
                 _textBox.OnSelectionChanged();
+            }
+        }
     }
 
     /// <summary>
@@ -1197,7 +1405,9 @@ public class TextRange
     {
         _updating--;
         if (_updating == 0)
+        {
             OnSelectionChanged();
+        }
     }
 
     /// <summary>
@@ -1242,7 +1452,10 @@ public class TextRange
         var toLine = Math.Max (_end.Line, _start.Line);
         var fromChar = FromX;
         var toChar = ToX;
-        if (fromLine < 0) yield break;
+        if (fromLine < 0)
+        {
+            yield break;
+        }
 
         //
         for (var y = fromLine; y <= toLine; y++)
@@ -1277,7 +1490,10 @@ public class TextRange
             var toLine = Math.Max (_end.Line, _start.Line);
             var fromChar = FromX;
             var toChar = ToX;
-            if (fromLine < 0) yield break;
+            if (fromLine < 0)
+            {
+                yield break;
+            }
 
             //
             for (var y = fromLine; y <= toLine; y++)
@@ -1318,13 +1534,18 @@ public class TextRange
         while (r.GoLeftThroughFolded())
         {
             if (!allowLineBreaks && r.CharAfterStart == '\n')
+            {
                 break;
+            }
+
             if (r.Start.Column < _textBox.GetLineLength (r.Start.Line))
+            {
                 if ((_textBox[r.Start].style & mask) == 0)
                 {
                     r.GoRightThroughFolded();
                     break;
                 }
+            }
         }
 
         var startFragment = r.Start;
@@ -1335,10 +1556,17 @@ public class TextRange
         do
         {
             if (!allowLineBreaks && r.CharAfterStart == '\n')
+            {
                 break;
+            }
+
             if (r.Start.Column < _textBox.GetLineLength (r.Start.Line))
+            {
                 if ((_textBox[r.Start].style & mask) == 0)
+                {
                     break;
+                }
+            }
         } while (r.GoRightThroughFolded());
 
         var endFragment = r.Start;
@@ -1375,7 +1603,9 @@ public class TextRange
         do
         {
             if (!regex.IsMatch (r.CharAfterStart.ToString()))
+            {
                 break;
+            }
         } while (r.GoRightThroughFolded());
 
         var endFragment = r.Start;
@@ -1419,12 +1649,17 @@ public class TextRange
         }
 
         if (!wasIdentifier && (!wasSpace || range.CharBeforeStart != '\n'))
+        {
             range.GoLeft (shift);
+        }
+
         this.Start = range.Start;
         this.End = range.End;
 
         if (_textBox.LineInfos[Start.Line].VisibleState != VisibleState.Visible)
+        {
             GoRight (shift);
+        }
     }
 
     public void GoWordRight (bool shift, bool goToStartOfNextWord = false)
@@ -1465,18 +1700,24 @@ public class TextRange
             }
 
             if (!wasIdentifier)
+            {
                 range.GoRight (shift);
+            }
 
             if (goToStartOfNextWord && !wasSpace)
+            {
                 while (IsSpaceChar (range.CharAfterStart))
                     range.GoRight (shift);
+            }
         }
 
         this.Start = range.Start;
         this.End = range.End;
 
         if (_textBox.LineInfos[Start.Line].VisibleState != VisibleState.Visible)
+        {
             GoLeft (shift);
+        }
     }
 
     internal void GoFirst (bool shift)
@@ -1485,10 +1726,14 @@ public class TextRange
 
         _start = new Place (0, 0);
         if (_textBox.LineInfos[Start.Line].VisibleState != VisibleState.Visible)
+        {
             _textBox.ExpandBlock (Start.Line);
+        }
 
         if (!shift)
+        {
             _end = _start;
+        }
 
         OnSelectionChanged();
     }
@@ -1499,10 +1744,14 @@ public class TextRange
 
         _start = new Place (_textBox[_textBox.LinesCount - 1].Count, _textBox.LinesCount - 1);
         if (_textBox.LineInfos[Start.Line].VisibleState != VisibleState.Visible)
+        {
             _textBox.ExpandBlock (Start.Line);
+        }
 
         if (!shift)
+        {
             _end = _start;
+        }
 
         OnSelectionChanged();
     }
@@ -1536,7 +1785,9 @@ public class TextRange
         for (var y = rect.StartLine; y <= rect.EndLine; y++)
         {
             if (rect.StartChar > _textBox[y].Count && !includeEmpty)
+            {
                 continue;
+            }
 
             var r = new TextRange (_textBox, rect.StartChar, y, Math.Min (rect.EndChar, _textBox[y].Count), y);
             yield return r;
@@ -1552,7 +1803,10 @@ public class TextRange
     {
         get
         {
-            if (_textBox.ReadOnly) return true;
+            if (_textBox.ReadOnly)
+            {
+                return true;
+            }
 
             ReadOnlyStyle readonlyStyle = null;
             foreach (var style in _textBox.Styles)
@@ -1580,7 +1834,10 @@ public class TextRange
                                 var left = line[sr._start.Column - 1];
                                 var right = line[sr._start.Column];
                                 if ((left.style & si) != 0 &&
-                                    (right.style & si) != 0) return true; //we are between readonly chars
+                                    (right.style & si) != 0)
+                                {
+                                    return true; //we are between readonly chars
+                                }
                             }
                         }
                     }
@@ -1589,13 +1846,20 @@ public class TextRange
                         var left = line[_start.Column - 1];
                         var right = line[_start.Column];
                         if ((left.style & si) != 0 &&
-                            (right.style & si) != 0) return true; //we are between readonly chars
+                            (right.style & si) != 0)
+                        {
+                            return true; //we are between readonly chars
+                        }
                     }
                 }
                 else
+                {
                     foreach (var c in Chars)
                         if ((c.style & si) != 0) //found char with ReadonlyStyle
+                        {
                             return true;
+                        }
+                }
             }
 
             return false;
@@ -1614,13 +1878,19 @@ public class TextRange
 
             //create ReadOnlyStyle
             if (readonlyStyle == null)
+            {
                 readonlyStyle = new ReadOnlyStyle();
+            }
 
             //set/clear style
             if (value)
+            {
                 SetStyle (readonlyStyle);
+            }
             else
+            {
                 ClearStyle (readonlyStyle);
+            }
         }
     }
 
@@ -1630,16 +1900,27 @@ public class TextRange
     /// <returns></returns>
     public bool IsReadOnlyLeftChar()
     {
-        if (_textBox.ReadOnly) return true;
+        if (_textBox.ReadOnly)
+        {
+            return true;
+        }
 
         var r = Clone();
 
         r.Normalize();
-        if (r._start.Column == 0) return false;
+        if (r._start.Column == 0)
+        {
+            return false;
+        }
+
         if (ColumnSelectionMode)
+        {
             r.GoLeft_ColumnSelectionMode();
+        }
         else
+        {
             r.GoLeft (true);
+        }
 
         return r.ReadOnly;
     }
@@ -1650,16 +1931,27 @@ public class TextRange
     /// <returns></returns>
     public bool IsReadOnlyRightChar()
     {
-        if (_textBox.ReadOnly) return true;
+        if (_textBox.ReadOnly)
+        {
+            return true;
+        }
 
         var r = Clone();
 
         r.Normalize();
-        if (r._end.Column >= _textBox[_end.Line].Count) return false;
+        if (r._end.Column >= _textBox[_end.Line].Count)
+        {
+            return false;
+        }
+
         if (ColumnSelectionMode)
+        {
             r.GoRight_ColumnSelectionMode();
+        }
         else
+        {
             r.GoRight (true);
+        }
 
         return r.ReadOnly;
     }
@@ -1676,33 +1968,45 @@ public class TextRange
             while (r.GoLeft() && r._start >= Start)
             {
                 if (r.Start.Column < _textBox[r.Start.Line].Count)
+                {
                     yield return r.Start;
+                }
             }
 
             r = new TextRange (this._textBox, End, End);
             while (r.GoLeft() && r._start >= startPlace)
             {
                 if (r.Start.Column < _textBox[r.Start.Line].Count)
+                {
                     yield return r.Start;
+                }
             }
         }
         else
         {
             var r = new TextRange (this._textBox, startPlace, startPlace);
             if (startPlace < End)
+            {
                 do
                 {
                     if (r.Start.Column < _textBox[r.Start.Line].Count)
+                    {
                         yield return r.Start;
+                    }
                 } while (r.GoRight());
+            }
 
             r = new TextRange (this._textBox, Start, Start);
             if (r.Start < startPlace)
+            {
                 do
                 {
                     if (r.Start.Column < _textBox[r.Start.Line].Count)
+                    {
                         yield return r.Start;
+                    }
                 } while (r.GoRight() && r.Start < startPlace);
+            }
         }
     }
 
@@ -1711,10 +2015,15 @@ public class TextRange
     private TextRange GetIntersectionWith_ColumnSelectionMode (TextRange range)
     {
         if (range.Start.Line != range.End.Line)
+        {
             return new TextRange (_textBox, Start, Start);
+        }
+
         var rect = Bounds;
         if (range.Start.Line < rect.StartLine || range.Start.Line > rect.EndLine)
+        {
             return new TextRange (_textBox, Start, Start);
+        }
 
         return new TextRange (_textBox, rect.StartChar, range.Start.Line, rect.EndChar, range.Start.Line)
             .GetIntersectionWith (range);
@@ -1732,7 +2041,9 @@ public class TextRange
             }
 
         if (endOfLines)
+        {
             return false;
+        }
 
         var start = Start;
         var end = End;
@@ -1749,7 +2060,10 @@ public class TextRange
     private IEnumerable<Place> GetEnumerator_ColumnSelectionMode()
     {
         var bounds = Bounds;
-        if (bounds.StartLine < 0) yield break;
+        if (bounds.StartLine < 0)
+        {
+            yield break;
+        }
 
         //
         for (var y = bounds.StartLine; y <= bounds.EndLine; y++)
@@ -1757,7 +2071,9 @@ public class TextRange
             for (var x = bounds.StartChar; x < bounds.EndChar; x++)
             {
                 if (x < _textBox[y].Count)
+                {
                     yield return new Place (x, y);
+                }
             }
         }
     }
@@ -1768,7 +2084,10 @@ public class TextRange
         {
             var sb = new StringBuilder();
             var bounds = Bounds;
-            if (bounds.StartLine < 0) return "";
+            if (bounds.StartLine < 0)
+            {
+                return "";
+            }
 
             //
             for (var y = bounds.StartLine; y <= bounds.EndLine; y++)
@@ -1776,11 +2095,15 @@ public class TextRange
                 for (var x = bounds.StartChar; x < bounds.EndChar; x++)
                 {
                     if (x < _textBox[y].Count)
+                    {
                         sb.Append (_textBox[y][x].c);
+                    }
                 }
 
                 if (bounds.EndLine != bounds.StartLine && y != bounds.EndLine)
+                {
                     sb.AppendLine();
+                }
             }
 
             return sb.ToString();
@@ -1790,7 +2113,11 @@ public class TextRange
     private int Length_ColumnSelectionMode (bool withNewLines)
     {
         var bounds = Bounds;
-        if (bounds.StartLine < 0) return 0;
+        if (bounds.StartLine < 0)
+        {
+            return 0;
+        }
+
         var cnt = 0;
 
         //
@@ -1799,11 +2126,15 @@ public class TextRange
             for (var x = bounds.StartChar; x < bounds.EndChar; x++)
             {
                 if (x < _textBox[y].Count)
+                {
                     cnt++;
+                }
             }
 
             if (withNewLines && bounds.EndLine != bounds.StartLine && y != bounds.EndLine)
+            {
                 cnt += Environment.NewLine.Length;
+            }
         }
 
         return cnt;
@@ -1829,7 +2160,9 @@ public class TextRange
     internal void GoLeft_ColumnSelectionMode()
     {
         if (End.Column > 0)
+        {
             End = new Place (End.Column - 1, End.Line);
+        }
     }
 
     #endregion

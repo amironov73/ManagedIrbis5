@@ -41,19 +41,25 @@ public class FastTreeNode
         set
         {
             if (parent == value)
+            {
                 return;
+            }
 
             SetParent (value);
 
             if (parent != null)
+            {
                 parent.children.Add (this);
+            }
         }
     }
 
     protected virtual void SetParent (FastTreeNode value)
     {
         if (parent != null && parent != value)
+        {
             parent.children.Remove (this);
+        }
 
         parent = value;
     }
@@ -67,7 +73,10 @@ public class FastTreeNode
     public virtual void AddNode (FastTreeNode node)
     {
         if (node.Parent != this)
+        {
             children.Add (node);
+        }
+
         SetParent (this);
     }
 
@@ -80,7 +89,10 @@ public class FastTreeNode
     public virtual void InsertNodeBefore (FastTreeNode existsNode, FastTreeNode node)
     {
         var i = children.IndexOf (existsNode);
-        if (i < 0) i = 0;
+        if (i < 0)
+        {
+            i = 0;
+        }
 
         InsertNode (i, node);
     }
@@ -98,14 +110,21 @@ public class FastTreeNode
         for (int i = 0; i < children.Count; i++)
         {
             if (hash.Contains (children[i]))
+            {
                 j++;
+            }
             else
+            {
                 children[i].SetParent (null);
+            }
+
             children[i] = children[i + j];
         }
 
         if (j > 0)
+        {
             children.RemoveRange (children.Count - j, j);
+        }
     }
 
     public virtual void AddNode (IEnumerable<FastTreeNode> nodes)
@@ -126,7 +145,9 @@ public class FastTreeNode
     {
         var i = children.IndexOf (existsNode);
         if (i < 0)
+        {
             i = 0;
+        }
 
         InsertNode (i, nodes);
     }

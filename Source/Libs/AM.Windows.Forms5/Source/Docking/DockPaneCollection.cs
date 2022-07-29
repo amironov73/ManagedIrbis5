@@ -29,7 +29,9 @@ public class DockPaneCollection : ReadOnlyCollection<DockPane>
     internal int Add (DockPane pane)
     {
         if (Items.Contains (pane))
+        {
             return Items.IndexOf (pane);
+        }
 
         Items.Add (pane);
         return Count - 1;
@@ -38,10 +40,14 @@ public class DockPaneCollection : ReadOnlyCollection<DockPane>
     internal void AddAt (DockPane pane, int index)
     {
         if (index < 0 || index > Items.Count - 1)
+        {
             return;
+        }
 
         if (Contains (pane))
+        {
             return;
+        }
 
         Items.Insert (index, pane);
     }

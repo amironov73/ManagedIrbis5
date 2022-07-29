@@ -14,7 +14,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -67,7 +68,8 @@ public static class KernelUtility
         )
     {
         const int bufferSize = 4 * 1024;
-        StringBuilder builder = new StringBuilder (bufferSize);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (bufferSize);
         Kernel32.FormatMessage
             (
                 FormatMessageFlags.FORMAT_MESSAGE_FROM_SYSTEM,
@@ -79,7 +81,10 @@ public static class KernelUtility
                 0
             );
 
-        return builder.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -126,8 +131,8 @@ public static class KernelUtility
             IntPtr handle
         )
     {
-        int highPart = 0;
-        uint lowPart = Kernel32.GetFileSize (handle, ref highPart);
+        var highPart = 0;
+        var lowPart = Kernel32.GetFileSize (handle, ref highPart);
 
         return ((long)highPart << 32) | lowPart;
     }
@@ -140,13 +145,17 @@ public static class KernelUtility
             string longName
         )
     {
-        var buffer = new StringBuilder { Capacity = 300 };
-        if (Kernel32.GetShortPathName (longName, buffer, buffer.Capacity) <= 0)
-        {
-            throw new Win32Exception();
-        }
+        Sure.NotNullNorEmpty (longName);
 
-        return buffer.ToString();
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (300);
+        var code = Kernel32.GetShortPathName (longName, builder, builder.Capacity);
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return code > 0
+            ? result
+            : throw new Win32Exception();
     }
 
     /// <summary>

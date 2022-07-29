@@ -59,15 +59,27 @@ public class MethodAutocompleteItem
     {
         var i = fragmentText.LastIndexOf ('.');
         if (i < 0)
+        {
             return CompareResult.Hidden;
+        }
+
         var lastPart = fragmentText.Substring (i + 1);
         _firstPart = fragmentText.Substring (0, i);
 
-        if (lastPart == "") return CompareResult.Visible;
-        if (Text.StartsWith (lastPart, StringComparison.InvariantCultureIgnoreCase))
-            return CompareResult.VisibleAndSelected;
-        if (_lowercaseText.Contains (lastPart.ToLower()))
+        if (lastPart == "")
+        {
             return CompareResult.Visible;
+        }
+
+        if (Text.StartsWith (lastPart, StringComparison.InvariantCultureIgnoreCase))
+        {
+            return CompareResult.VisibleAndSelected;
+        }
+
+        if (_lowercaseText.Contains (lastPart.ToLower()))
+        {
+            return CompareResult.Visible;
+        }
 
         return CompareResult.Hidden;
     }

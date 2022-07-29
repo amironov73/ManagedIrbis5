@@ -129,7 +129,9 @@ public class FileTextSource
         Clear();
 
         if (_stream != null)
+        {
             _stream.Dispose();
+        }
 
         SaveEOL = Environment.NewLine;
 
@@ -204,7 +206,9 @@ public class FileTextSource
         }
 
         if (length > 2000000)
+        {
             GC.Collect();
+        }
 
         var temp = new Line[100];
 
@@ -233,7 +237,9 @@ public class FileTextSource
         //
         NeedRecalc (new TextChangedEventArgs (0, linesCount - 1));
         if (CurrentTextBox.WordWrap)
+        {
             OnRecalcWordWrap (new TextChangedEventArgs (0, linesCount - 1));
+        }
     }
 
     #endregion
@@ -306,6 +312,7 @@ public class FileTextSource
     public void CloseFile()
     {
         if (_stream != null)
+        {
             try
             {
                 _stream.Dispose();
@@ -314,6 +321,7 @@ public class FileTextSource
             {
                 ;
             }
+        }
 
         _stream = null;
     }
@@ -348,9 +356,13 @@ public class FileTextSource
                 var lineIsChanged = lines[i] != null && lines[i].IsChanged;
 
                 if (lineIsChanged)
+                {
                     line = lines[i].Text;
+                }
                 else
+                {
                     line = sourceLine;
+                }
 
                 //call event handler
                 if (LinePushed != null)
@@ -359,14 +371,18 @@ public class FileTextSource
                     LinePushed (this, args);
 
                     if (args.SavedText != null)
+                    {
                         line = args.SavedText;
+                    }
                 }
 
                 //save line to file
                 sw.Write (line);
 
                 if (i < Count - 1)
+                {
                     sw.Write (SaveEOL);
+                }
 
                 sw.Flush();
             }
@@ -382,7 +398,9 @@ public class FileTextSource
 
         //delete target file
         if (File.Exists (fileName))
+        {
             File.Delete (fileName);
+        }
 
         //rename temp file
         File.Move (tempFileName, fileName);
@@ -398,7 +416,10 @@ public class FileTextSource
         string line;
         var filePos = _sourceFileLinePositions[i];
         if (filePos < 0)
+        {
             return "";
+        }
+
         _stream.Seek (filePos, SeekOrigin.Begin);
         sr.DiscardBufferedData();
         line = sr.ReadLine();
@@ -409,7 +430,9 @@ public class FileTextSource
     {
         foreach (var line in lines)
             if (line != null)
+            {
                 line.IsChanged = false;
+            }
     }
 
     public override Line this [int i]
@@ -417,9 +440,13 @@ public class FileTextSource
         get
         {
             if (base.lines[i] != null)
+            {
                 return lines[i];
+            }
             else
+            {
                 LoadLineFromSourceFile (i);
+            }
 
             return lines[i];
         }
@@ -434,7 +461,9 @@ public class FileTextSource
 
         var s = sr.ReadLine();
         if (s == null)
+        {
             s = "";
+        }
 
         //call event handler
         if (LineNeeded != null)
@@ -443,7 +472,9 @@ public class FileTextSource
             LineNeeded (this, args);
             s = args.DisplayedLineText;
             if (s == null)
+            {
                 return;
+            }
         }
 
         foreach (var c in s)
@@ -451,7 +482,9 @@ public class FileTextSource
         base.lines[i] = line;
 
         if (CurrentTextBox.WordWrap)
+        {
             OnRecalcWordWrap (new TextChangedEventArgs (i, i));
+        }
     }
 
     public override void InsertLine (int index, Line line)
@@ -474,9 +507,13 @@ public class FileTextSource
     public override int GetLineLength (int index)
     {
         if (base.lines[index] == null)
+        {
             return 0;
+        }
         else
+        {
             return base.lines[index].Count;
+        }
     }
 
     /// <summary>
@@ -498,15 +535,21 @@ public class FileTextSource
     public override bool LineHasFoldingEndMarker (int index)
     {
         if (lines[index] == null)
+        {
             return false;
+        }
         else
+        {
             return !string.IsNullOrEmpty (lines[index].FoldingEndMarker);
+        }
     }
 
     public override void Dispose()
     {
         if (_stream != null)
+        {
             _stream.Dispose();
+        }
 
         _timer.Dispose();
     }
@@ -514,7 +557,9 @@ public class FileTextSource
     internal void UnloadLine (int iLine)
     {
         if (lines[iLine] != null && !lines[iLine].IsChanged)
+        {
             lines[iLine] = null;
+        }
     }
 }
 

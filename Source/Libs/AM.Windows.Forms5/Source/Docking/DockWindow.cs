@@ -127,14 +127,18 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
 
             // exclude the splitter
             else if (DockState == DockState.DockLeft)
+            {
                 rect.Width -= DockPanel.Theme.Measures.SplitterSize;
+            }
             else if (DockState == DockState.DockRight)
             {
                 rect.X += DockPanel.Theme.Measures.SplitterSize;
                 rect.Width -= DockPanel.Theme.Measures.SplitterSize;
             }
             else if (DockState == DockState.DockTop)
+            {
                 rect.Height -= DockPanel.Theme.Measures.SplitterSize;
+            }
             else if (DockState == DockState.DockBottom)
             {
                 rect.Y += DockPanel.Theme.Measures.SplitterSize;
@@ -151,7 +155,9 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
         if (VisibleNestedPanes.Count == 0)
         {
             if (Visible)
+            {
                 Visible = false;
+            }
         }
         else if (!Visible)
         {
@@ -184,9 +190,13 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
             Rectangle rectLimit = DockPanel.DockArea;
             Point location;
             if ((Control.ModifierKeys & Keys.Shift) == 0)
+            {
                 location = Location;
+            }
             else
+            {
                 location = DockPanel.DockArea.Location;
+            }
 
             if (((ISplitterDragSource)this).IsVertical)
             {
@@ -194,7 +204,9 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
                 rectLimit.Width -= 2 * MeasurePane.MinSize;
                 rectLimit.Y = location.Y;
                 if ((Control.ModifierKeys & Keys.Shift) == 0)
+                {
                     rectLimit.Height = Height;
+                }
             }
             else
             {
@@ -202,7 +214,9 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
                 rectLimit.Height -= 2 * MeasurePane.MinSize;
                 rectLimit.X = location.X;
                 if ((Control.ModifierKeys & Keys.Shift) == 0)
+                {
                     rectLimit.Width = Width;
+                }
             }
 
             return DockPanel.RectangleToScreen (rectLimit);
@@ -212,36 +226,54 @@ public partial class DockWindow : Panel, INestedPanesContainer, ISplitterHost
     void ISplitterDragSource.MoveSplitter (int offset)
     {
         if ((Control.ModifierKeys & Keys.Shift) != 0)
+        {
             SendToBack();
+        }
 
         Rectangle rectDockArea = DockPanel.DockArea;
         if (DockState == DockState.DockLeft && rectDockArea.Width > 0)
         {
             if (DockPanel.DockLeftPortion > 1)
+            {
                 DockPanel.DockLeftPortion = Width + offset;
+            }
             else
+            {
                 DockPanel.DockLeftPortion += ((double)offset) / (double)rectDockArea.Width;
+            }
         }
         else if (DockState == DockState.DockRight && rectDockArea.Width > 0)
         {
             if (DockPanel.DockRightPortion > 1)
+            {
                 DockPanel.DockRightPortion = Width - offset;
+            }
             else
+            {
                 DockPanel.DockRightPortion -= ((double)offset) / (double)rectDockArea.Width;
+            }
         }
         else if (DockState == DockState.DockBottom && rectDockArea.Height > 0)
         {
             if (DockPanel.DockBottomPortion > 1)
+            {
                 DockPanel.DockBottomPortion = Height - offset;
+            }
             else
+            {
                 DockPanel.DockBottomPortion -= ((double)offset) / (double)rectDockArea.Height;
+            }
         }
         else if (DockState == DockState.DockTop && rectDockArea.Height > 0)
         {
             if (DockPanel.DockTopPortion > 1)
+            {
                 DockPanel.DockTopPortion = Height + offset;
+            }
             else
+            {
                 DockPanel.DockTopPortion += ((double)offset) / (double)rectDockArea.Height;
+            }
         }
     }
 

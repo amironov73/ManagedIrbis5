@@ -211,7 +211,9 @@ public class AutocompleteListView
     private void AdjustScroll()
     {
         if (_oldItemCount == visibleItems.Count)
+        {
             return;
+        }
 
         var needHeight = ItemHeight * visibleItems.Count + 1;
         Height = Math.Min (needHeight, MaximumSize.Height);
@@ -452,7 +454,9 @@ public class AutocompleteListView
     private void DoSelectedVisible()
     {
         if (FocusedItem != null)
+        {
             SetToolTip (FocusedItem);
+        }
 
         var y = FocusedItemIndex * ItemHeight - VerticalScroll.Value;
         if (y < 0)
@@ -693,7 +697,10 @@ public class AutocompleteListView
                 item.Parent = Menu;
                 var res = item.Compare (text);
                 if (res != CompareResult.Hidden)
+                {
                     visibleItems.Add (item);
+                }
+
                 if (res == CompareResult.VisibleAndSelected && !foundSelected)
                 {
                     foundSelected = true;
@@ -716,7 +723,9 @@ public class AutocompleteListView
                 var args = new CancelEventArgs();
                 Menu.OnOpening (args);
                 if (!args.Cancel)
+                {
                     Menu.Show (_textBox, point);
+                }
             }
 
             DoSelectedVisible();

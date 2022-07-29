@@ -110,6 +110,8 @@ public class DragForm : Form
         Show();
 
         if (bActivate)
+        {
             Activate();
+        }
     }
 }

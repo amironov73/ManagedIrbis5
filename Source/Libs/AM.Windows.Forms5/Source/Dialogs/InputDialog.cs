@@ -77,7 +77,9 @@ public partial class InputDialog : Component, IBindableComponent
     public InputDialog (IContainer container)
     {
         if (container != null)
+        {
             container.Add (this);
+        }
 
         InitializeComponent();
     }
@@ -201,7 +203,9 @@ public partial class InputDialog : Component, IBindableComponent
     protected virtual void OnInputChanged (EventArgs e)
     {
         if (InputChanged != null)
+        {
             InputChanged (this, e);
+        }
     }
 
     /// <summary>
@@ -211,7 +215,9 @@ public partial class InputDialog : Component, IBindableComponent
     protected virtual void OnOkButtonClicked (OkButtonClickedEventArgs e)
     {
         if (OkButtonClicked != null)
+        {
             OkButtonClicked (this, e);
+        }
     }
 
     /// <summary>
@@ -243,7 +249,9 @@ public partial class InputDialog : Component, IBindableComponent
 
             DialogResult result = frm.ShowDialog (owner);
             if (result == DialogResult.OK)
+            {
                 Input = frm.Input;
+            }
 
             return result;
         }

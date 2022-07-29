@@ -58,11 +58,16 @@ public sealed class ClearSelectedCommand
         var toLine = Math.Max (end.Line, start.Line);
         var fromChar = tb.Selection.FromX;
         var toChar = tb.Selection.ToX;
-        if (fromLine < 0) return;
+        if (fromLine < 0)
+        {
+            return;
+        }
 
         //
         if (fromLine == toLine)
+        {
             ts[fromLine].RemoveRange (fromChar, toChar - fromChar);
+        }
         else
         {
             ts[fromLine].RemoveRange (fromChar, ts[fromLine].Count - fromChar);
@@ -105,7 +110,9 @@ public sealed class ClearSelectedCommand
         string temp = null;
         textSource.OnTextChanging (ref temp);
         if (temp == "")
+        {
             throw new ArgumentOutOfRangeException();
+        }
 
         _deletedText = tb.Selection.Text;
         ClearSelected (textSource);

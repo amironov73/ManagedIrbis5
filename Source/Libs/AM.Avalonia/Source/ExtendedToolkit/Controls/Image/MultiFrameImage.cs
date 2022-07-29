@@ -9,7 +9,7 @@ namespace Avalonia.ExtendedToolkit.Controls
     //ported from https://github.com/MahApps/MahApps.Metro
 
     /// <summary>
-    /// Mutiframe image
+    /// Multi-frame image
     /// </summary>
     public class MultiFrameImage : Image
     {

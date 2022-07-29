@@ -73,7 +73,9 @@ partial class DockPanel
             protected void OnHookInvoked (HookEventArgs e)
             {
                 if (HookInvoked != null)
+                {
                     HookInvoked (this, e);
+                }
             }
 
             public LocalWindowsHook (Win32.HookType hook)
@@ -86,8 +88,10 @@ partial class DockPanel
             public IntPtr CoreHookProc (int code, IntPtr wParam, IntPtr lParam)
             {
                 if (code < 0)
+                {
                     return AM.Windows.Forms.Docking.Win32.NativeMethods.CallNextHookEx (m_hHook, code, wParam,
                         lParam);
+                }
 
                 // Let clients determine what to do
                 HookEventArgs e = new HookEventArgs();
@@ -104,7 +108,9 @@ partial class DockPanel
             public void Install()
             {
                 if (m_hHook != IntPtr.Zero)
+                {
                     Uninstall();
+                }
 
                 int threadId = Win32.NativeMethods.GetCurrentThreadId();
                 m_hHook = Win32.NativeMethods.SetWindowsHookEx (m_hookType, m_filterFunc, IntPtr.Zero, threadId);
@@ -147,7 +153,10 @@ partial class DockPanel
         {
             m_dockPanel = dockPanel;
             if (Win32Helper.IsRunningOnMono)
+            {
                 return;
+            }
+
             m_hookEventHandler = new LocalWindowsHook.HookEventHandler (HookEventHandler);
 
             // Ensure the windows hook has been created for this thread
@@ -210,10 +219,16 @@ partial class DockPanel
             }
 
             if (content == null)
+            {
                 return;
+            }
+
             DockContentHandler handler = content.DockHandler;
             if (handler.Form.IsDisposed)
+            {
                 return; // Should not reach here, but better than throwing an exception
+            }
+
             if (ContentContains (content, handler.ActiveWindowHandle))
             {
                 if (!Win32Helper.IsRunningOnMono)
@@ -223,13 +238,19 @@ partial class DockPanel
             }
 
             if (handler.Form.ContainsFocus)
+            {
                 return;
+            }
 
             if (handler.Form.SelectNextControl (handler.Form.ActiveControl, true, true, true, true))
+            {
                 return;
+            }
 
             if (Win32Helper.IsRunningOnMono)
+            {
                 return;
+            }
 
             // Since DockContent Form is not selectalbe, use Win32 SetFocus instead
             Win32.NativeMethods.SetFocus (handler.Form.Handle);
@@ -245,7 +266,9 @@ partial class DockPanel
         public void AddToList (IDockContent content)
         {
             if (ListContent.Contains (content) || IsInActiveList (content))
+            {
                 return;
+            }
 
             ListContent.Add (content);
         }
@@ -253,9 +276,14 @@ partial class DockPanel
         public void RemoveFromList (IDockContent content)
         {
             if (IsInActiveList (content))
+            {
                 RemoveFromActiveList (content);
+            }
+
             if (ListContent.Contains (content))
+            {
                 ListContent.Remove (content);
+            }
         }
 
         private IDockContent m_lastActiveContent = null;
@@ -275,31 +303,44 @@ partial class DockPanel
         {
             IDockContent last = LastActiveContent;
             if (last == content)
+            {
                 return;
+            }
 
             DockContentHandler handler = content.DockHandler;
 
             if (IsInActiveList (content))
+            {
                 RemoveFromActiveList (content);
+            }
 
             handler.PreviousActive = last;
             handler.NextActive = null;
             LastActiveContent = content;
             if (last != null)
+            {
                 last.DockHandler.NextActive = LastActiveContent;
+            }
         }
 
         private void RemoveFromActiveList (IDockContent content)
         {
             if (LastActiveContent == content)
+            {
                 LastActiveContent = content.DockHandler.PreviousActive;
+            }
 
             IDockContent prev = content.DockHandler.PreviousActive;
             IDockContent next = content.DockHandler.NextActive;
             if (prev != null)
+            {
                 prev.DockHandler.NextActive = next;
+            }
+
             if (next != null)
+            {
                 next.DockHandler.PreviousActive = prev;
+            }
 
             content.DockHandler.PreviousActive = null;
             content.DockHandler.NextActive = null;
@@ -309,23 +350,35 @@ partial class DockPanel
         {
             DockContentHandler handler = content.DockHandler;
             if (!handler.Form.ContainsFocus)
+            {
                 return;
+            }
 
             if (IsFocusTrackingSuspended)
+            {
                 DockPanel.DummyControl.Focus();
+            }
 
             if (LastActiveContent == content)
             {
                 IDockContent prev = handler.PreviousActive;
                 if (prev != null)
+                {
                     Activate (prev);
+                }
                 else if (ListContent.Count > 0)
+                {
                     Activate (ListContent[ListContent.Count - 1]);
+                }
             }
             else if (LastActiveContent != null)
+            {
                 Activate (LastActiveContent);
+            }
             else if (ListContent.Count > 0)
+            {
                 Activate (ListContent[ListContent.Count - 1]);
+            }
         }
 
         private static bool ContentContains (IDockContent content, IntPtr hWnd)
@@ -333,7 +386,9 @@ partial class DockPanel
             Control control = Control.FromChildHandle (hWnd);
             for (Control parent = control; parent != null; parent = parent.Parent)
                 if (parent == content.DockHandler.Form)
+                {
                     return true;
+                }
 
             return false;
         }
@@ -343,19 +398,25 @@ partial class DockPanel
         public void SuspendFocusTracking()
         {
             if (m_disposed)
+            {
                 return;
+            }
 
             if (m_countSuspendFocusTracking++ == 0)
             {
                 if (!Win32Helper.IsRunningOnMono)
+                {
                     sm_localWindowsHook.HookInvoked -= m_hookEventHandler;
+                }
             }
         }
 
         public void ResumeFocusTracking()
         {
             if (m_disposed || m_countSuspendFocusTracking == 0)
+            {
                 return;
+            }
 
             if (--m_countSuspendFocusTracking == 0)
             {
@@ -366,10 +427,14 @@ partial class DockPanel
                 }
 
                 if (!Win32Helper.IsRunningOnMono)
+                {
                     sm_localWindowsHook.HookInvoked += m_hookEventHandler;
+                }
 
                 if (!InRefreshActiveWindow)
+                {
                     RefreshActiveWindow();
+                }
             }
         }
 
@@ -388,10 +453,14 @@ partial class DockPanel
                 IntPtr wParam = Marshal.ReadIntPtr (e.lParam, IntPtr.Size * 2);
                 DockPane pane = GetPaneFromHandle (wParam);
                 if (pane == null)
+                {
                     RefreshActiveWindow();
+                }
             }
             else if (msg == Win32.Msgs.WM_SETFOCUS || msg == Win32.Msgs.WM_MDIACTIVATE)
+            {
                 RefreshActiveWindow();
+            }
         }
 
         private DockPane GetPaneFromHandle (IntPtr hWnd)
@@ -404,14 +473,20 @@ partial class DockPanel
             {
                 content = control as IDockContent;
                 if (content != null)
+                {
                     content.DockHandler.ActiveWindowHandle = hWnd;
+                }
 
                 if (content != null && content.DockHandler.DockPanel == DockPanel)
+                {
                     return content.DockHandler.Pane;
+                }
 
                 pane = control as DockPane;
                 if (pane != null && pane.DockPanel == DockPanel)
+                {
                     break;
+                }
             }
 
             return pane;
@@ -448,11 +523,19 @@ partial class DockPanel
             m_inRefreshActiveWindow = false;
 
             if (oldActiveContent != ActiveContent)
+            {
                 DockPanel.OnActiveContentChanged (EventArgs.Empty);
+            }
+
             if (oldActiveDocument != ActiveDocument)
+            {
                 DockPanel.OnActiveDocumentChanged (EventArgs.Empty);
+            }
+
             if (oldActivePane != ActivePane)
+            {
                 DockPanel.OnActivePaneChanged (EventArgs.Empty);
+            }
         }
 
         private DockPane m_activePane = null;
@@ -468,15 +551,21 @@ partial class DockPanel
                 ? null
                 : GetPaneFromHandle (Win32.NativeMethods.GetFocus());
             if (m_activePane == value)
+            {
                 return;
+            }
 
             if (m_activePane != null)
+            {
                 m_activePane.SetIsActivated (false);
+            }
 
             m_activePane = value;
 
             if (m_activePane != null)
+            {
                 m_activePane.SetIsActivated (true);
+            }
         }
 
         private IDockContent m_activeContent = null;
@@ -491,10 +580,14 @@ partial class DockPanel
             IDockContent value = ActivePane == null ? null : ActivePane.ActiveContent;
 
             if (m_activeContent == value)
+            {
                 return;
+            }
 
             if (m_activeContent != null)
+            {
                 m_activeContent.DockHandler.IsActivated = false;
+            }
 
             m_activeContent = value;
 
@@ -502,7 +595,9 @@ partial class DockPanel
             {
                 m_activeContent.DockHandler.IsActivated = true;
                 if (!DockHelper.IsDockStateAutoHide ((m_activeContent.DockHandler.DockState)))
+                {
                     AddLastToActiveList (m_activeContent);
+                }
             }
         }
 
@@ -518,29 +613,43 @@ partial class DockPanel
             DockPane value = null;
 
             if (ActivePane != null && ActivePane.DockState == DockState.Document)
+            {
                 value = ActivePane;
+            }
 
             if (value == null && DockPanel.DockWindows != null)
             {
                 if (ActiveDocumentPane == null)
+                {
                     value = DockPanel.DockWindows[DockState.Document].DefaultPane;
+                }
                 else if (ActiveDocumentPane.DockPanel != DockPanel ||
                          ActiveDocumentPane.DockState != DockState.Document)
+                {
                     value = DockPanel.DockWindows[DockState.Document].DefaultPane;
+                }
                 else
+                {
                     value = ActiveDocumentPane;
+                }
             }
 
             if (m_activeDocumentPane == value)
+            {
                 return;
+            }
 
             if (m_activeDocumentPane != null)
+            {
                 m_activeDocumentPane.SetIsActiveDocumentPane (false);
+            }
 
             m_activeDocumentPane = value;
 
             if (m_activeDocumentPane != null)
+            {
                 m_activeDocumentPane.SetIsActiveDocumentPane (true);
+            }
         }
 
         private IDockContent m_activeDocument = null;
@@ -555,7 +664,9 @@ partial class DockPanel
             IDockContent value = ActiveDocumentPane == null ? null : ActiveDocumentPane.ActiveContent;
 
             if (m_activeDocument == value)
+            {
                 return;
+            }
 
             m_activeDocument = value;
         }
@@ -614,7 +725,9 @@ partial class DockPanel
     {
         EventHandler handler = (EventHandler)Events[ActiveDocumentChangedEvent];
         if (handler != null)
+        {
             handler (this, e);
+        }
     }
 
     private static readonly object ActiveContentChangedEvent = new object();
@@ -631,7 +744,9 @@ partial class DockPanel
     {
         EventHandler handler = (EventHandler)Events[ActiveContentChangedEvent];
         if (handler != null)
+        {
             handler (this, e);
+        }
     }
 
     private static readonly object DocumentDraggedEvent = new object();
@@ -648,7 +763,9 @@ partial class DockPanel
     {
         EventHandler handler = (EventHandler)Events[DocumentDraggedEvent];
         if (handler != null)
+        {
             handler (this, EventArgs.Empty);
+        }
     }
 
     private static readonly object ActivePaneChangedEvent = new object();
@@ -665,6 +782,8 @@ partial class DockPanel
     {
         EventHandler handler = (EventHandler)Events[ActivePaneChangedEvent];
         if (handler != null)
+        {
             handler (this, e);
+        }
     }
 }

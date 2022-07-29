@@ -122,7 +122,10 @@ public abstract class DockPaneStripBase : Control
             {
                 IDockContent content = DockPane.DisplayingContents[index];
                 if (content == null)
+                {
                     throw (new ArgumentOutOfRangeException (nameof (index)));
+                }
+
                 return content.DockHandler.GetTab (DockPane.TabStripControl);
             }
         }
@@ -140,7 +143,9 @@ public abstract class DockPaneStripBase : Control
         public int IndexOf (Tab tab)
         {
             if (tab == null)
+            {
                 return -1;
+            }
 
             return DockPane.DisplayingContents.IndexOf (tab.Content);
         }
@@ -182,7 +187,9 @@ public abstract class DockPaneStripBase : Control
     internal void RefreshChanges()
     {
         if (IsDisposed)
+        {
             return;
+        }
 
         OnRefreshChanges();
     }
@@ -234,7 +241,9 @@ public abstract class DockPaneStripBase : Control
                 {
                     // Test if the content should be active
                     if (MouseDownActivateTest (e))
+                    {
                         DockPane.ActiveContent = content;
+                    }
                 }
             }
         }
@@ -252,14 +261,20 @@ public abstract class DockPaneStripBase : Control
         base.OnMouseMove (e);
 
         if (e.Button != MouseButtons.Left || _dragBox.Contains (e.Location))
+        {
             return;
+        }
 
         if (DockPane.ActiveContent == null)
+        {
             return;
+        }
 
         if (DockPane.DockPanel.AllowEndUserDocking && DockPane.AllowDockDragAndDrop &&
             DockPane.ActiveContent.DockHandler.AllowEndUserDocking)
+        {
             DockPane.DockPanel.BeginDrag (DockPane.ActiveContent.DockHandler);
+        }
     }
 
     protected bool HasTabPageContextMenu
@@ -280,7 +295,9 @@ public abstract class DockPaneStripBase : Control
             IDockContent content = Tabs[index].Content;
             DockPane.CloseContent (content);
             if (PatchController.EnableSelectClosestOnClose == true)
+            {
                 SelectClosestPane (index);
+            }
 
             return true;
         }
@@ -295,7 +312,9 @@ public abstract class DockPaneStripBase : Control
             index = index - 1;
 
             if (index >= 0 || index < Tabs.Count)
+            {
                 DockPane.ActiveContent = Tabs[index].Content;
+            }
         }
     }
 
@@ -304,7 +323,9 @@ public abstract class DockPaneStripBase : Control
         base.OnMouseUp (e);
 
         if (e.Button == MouseButtons.Right)
+        {
             ShowTabPageContextMenu (new Point (e.X, e.Y));
+        }
     }
 
     [SecurityPermission (SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
@@ -319,7 +340,9 @@ public abstract class DockPaneStripBase : Control
             {
                 IDockContent content = Tabs[index].Content;
                 if (content.DockHandler.CheckDockState (!content.DockHandler.IsFloat) != DockState.Unknown)
+                {
                     content.DockHandler.IsFloat = !content.DockHandler.IsFloat;
+                }
             }
 
             return;
@@ -338,7 +361,9 @@ public abstract class DockPaneStripBase : Control
         {
             IDockContent content = Tabs[index].Content;
             if (DockPane.ActiveContent != content)
+            {
                 DockPane.ActiveContent = content;
+            }
         }
     }
 
@@ -355,7 +380,9 @@ public abstract class DockPaneStripBase : Control
     internal static Rectangle ToScreen (Rectangle rectangle, Control parent)
     {
         if (parent == null)
+        {
             return rectangle;
+        }
 
         return new Rectangle (parent.PointToScreen (new Point (rectangle.Left, rectangle.Top)),
             new Size (rectangle.Width, rectangle.Height));
@@ -398,7 +425,9 @@ public abstract class DockPaneStripBase : Control
             {
                 Rectangle rectangle = _strip.GetTabBounds (tab);
                 if (ToScreen (rectangle, _strip).Contains (point))
+                {
                     return new DockPaneStripTabAccessibleObject (_strip, tab, this);
+                }
             }
 
             return null;

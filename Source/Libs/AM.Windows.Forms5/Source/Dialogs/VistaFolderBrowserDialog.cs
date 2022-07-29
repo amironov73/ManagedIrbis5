@@ -62,9 +62,13 @@ public sealed class VistaFolderBrowserDialog : CommonDialog
     public VistaFolderBrowserDialog()
     {
         if (!IsVistaFolderDialogSupported)
+        {
             _downlevelDialog = new FolderBrowserDialog();
+        }
         else
+        {
             Reset();
+        }
     }
 
     #region Public Properties
@@ -96,15 +100,22 @@ public sealed class VistaFolderBrowserDialog : CommonDialog
         get
         {
             if (_downlevelDialog != null)
+            {
                 return _downlevelDialog.Description;
+            }
+
             return _description;
         }
         set
         {
             if (_downlevelDialog != null)
+            {
                 _downlevelDialog.Description = value;
+            }
             else
+            {
                 _description = value ?? String.Empty;
+            }
         }
     }
 
@@ -125,15 +136,22 @@ public sealed class VistaFolderBrowserDialog : CommonDialog
         get
         {
             if (_downlevelDialog != null)
+            {
                 return _downlevelDialog.RootFolder;
+            }
+
             return _rootFolder;
         }
         set
         {
             if (_downlevelDialog != null)
+            {
                 _downlevelDialog.RootFolder = value;
+            }
             else
+            {
                 _rootFolder = value;
+            }
         }
     }
 
@@ -153,15 +171,22 @@ public sealed class VistaFolderBrowserDialog : CommonDialog
         get
         {
             if (_downlevelDialog != null)
+            {
                 return _downlevelDialog.SelectedPath;
+            }
+
             return _selectedPath;
         }
         set
         {
             if (_downlevelDialog != null)
+            {
                 _downlevelDialog.SelectedPath = value;
+            }
             else
+            {
                 _selectedPath = value ?? string.Empty;
+            }
         }
     }
 
@@ -183,15 +208,22 @@ public sealed class VistaFolderBrowserDialog : CommonDialog
         get
         {
             if (_downlevelDialog != null)
+            {
                 return _downlevelDialog.ShowNewFolderButton;
+            }
+
             return _showNewFolderButton;
         }
         set
         {
             if (_downlevelDialog != null)
+            {
                 _downlevelDialog.ShowNewFolderButton = value;
+            }
             else
+            {
                 _showNewFolderButton = value;
+            }
         }
     }
 
@@ -250,9 +282,11 @@ public sealed class VistaFolderBrowserDialog : CommonDialog
     protected override bool RunDialog (IntPtr hwndOwner)
     {
         if (_downlevelDialog != null)
+        {
             return _downlevelDialog.ShowDialog (hwndOwner == IntPtr.Zero
                 ? null
                 : new WindowHandleWrapper (hwndOwner)) == DialogResult.OK;
+        }
 
         IFileDialog dialog = null;
         try
@@ -263,9 +297,13 @@ public sealed class VistaFolderBrowserDialog : CommonDialog
             if (result < 0)
             {
                 if ((uint)result == (uint)HRESULT.ERROR_CANCELLED)
+                {
                     return false;
+                }
                 else
+                {
                     throw Marshal.GetExceptionForHR (result);
+                }
             }
 
             GetResult (dialog);
@@ -274,7 +312,9 @@ public sealed class VistaFolderBrowserDialog : CommonDialog
         finally
         {
             if (dialog != null)
+            {
                 Marshal.FinalReleaseComObject (dialog);
+            }
         }
     }
 
@@ -287,7 +327,9 @@ public sealed class VistaFolderBrowserDialog : CommonDialog
         try
         {
             if (disposing && _downlevelDialog != null)
+            {
                 _downlevelDialog.Dispose();
+            }
         }
         finally
         {

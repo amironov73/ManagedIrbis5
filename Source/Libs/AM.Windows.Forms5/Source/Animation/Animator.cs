@@ -203,24 +203,34 @@ public class Animator : Component, IExtenderProvider
 
                     foreach (var item in queue)
                     {
-                        if (item.IsActive) wasActive = true;
+                        if (item.IsActive)
+                        {
+                            wasActive = true;
+                        }
 
                         if (item.controller != null && item.controller.IsCompleted)
+                        {
                             completed.Add (item);
+                        }
                         else
                         {
                             if (item.IsActive)
                             {
                                 if ((DateTime.Now - item.ActivateTime).TotalMilliseconds > MaxAnimationTime)
+                                {
                                     completed.Add (item);
+                                }
                                 else
+                                {
                                     actived.Add (item);
+                                }
                             }
                         }
                     }
 
                     //start next animation
                     if (!wasActive)
+                    {
                         foreach (var item in queue)
                             if (!item.IsActive)
                             {
@@ -228,6 +238,7 @@ public class Animator : Component, IExtenderProvider
                                 item.IsActive = true;
                                 break;
                             }
+                    }
                 }
 
                 //completed
@@ -250,7 +261,10 @@ public class Animator : Component, IExtenderProvider
                 if (count == 0)
                 {
                     if (completed.Count > 0)
+                    {
                         OnAllAnimationsCompleted();
+                    }
+
                     CheckRequests();
                 }
             }
@@ -275,18 +289,27 @@ public class Animator : Component, IExtenderProvider
                 if (item.control != null)
                 {
                     if (dict.ContainsKey (item.control))
+                    {
                         toRemove.Add (dict[item.control]);
+                    }
+
                     dict[item.control] = item;
                 }
                 else
+                {
                     toRemove.Add (item);
+                }
 
             foreach (var item in dict.Values)
             {
                 if (item.control != null && !IsStateOK (item.control, item.mode))
+                {
                     RepairState (item.control, item.mode);
+                }
                 else
+                {
                     toRemove.Add (item);
+                }
             }
 
             foreach (var item in toRemove)
@@ -324,6 +347,7 @@ public class Animator : Component, IExtenderProvider
     private void DoAnimation (QueueItem item)
     {
         if (Monitor.TryEnter (item))
+        {
             try
             {
                 if (item.controller == null)
@@ -333,13 +357,17 @@ public class Animator : Component, IExtenderProvider
                 }
 
                 if (item.controller.IsCompleted)
+                {
                     return;
+                }
+
                 item.controller.BuildNextFrame();
             }
             catch
             {
                 OnCompleted (item);
             }
+        }
     }
 
     private void InitDefaultAnimation (AnimationType animationType)
@@ -499,11 +527,17 @@ public class Animator : Component, IExtenderProvider
             lock (queue)
                 foreach (var item in queue)
                     if (item.control == control && item.mode == AnimateMode.BeginUpdate)
+                    {
                         if (item.controller == null)
+                        {
                             wait = true;
+                        }
+                    }
 
             if (wait)
+            {
                 Application.DoEvents();
+            }
         } while (wait);
     }
 
@@ -566,7 +600,9 @@ public class Animator : Component, IExtenderProvider
                     }
 
             if (!flag)
+            {
                 return;
+            }
 
             Application.DoEvents();
         }
@@ -609,7 +645,9 @@ public class Animator : Component, IExtenderProvider
         )
     {
         if (animation == null)
+        {
             animation = DefaultAnimation;
+        }
 
         if (control is IFakeControl)
         {
@@ -666,7 +704,9 @@ public class Animator : Component, IExtenderProvider
     void OnFramePainted (object sender, PaintEventArgs e)
     {
         if (FramePainted != null)
+        {
             FramePainted (sender, e);
+        }
     }
 
     protected virtual void OnMouseDown (object sender, MouseEventArgs e)
@@ -680,7 +720,9 @@ public class Animator : Component, IExtenderProvider
 
             //
             if (MouseDown != null)
+            {
                 MouseDown (sender, new MouseEventArgs (e.Button, e.Clicks, l.X, l.Y, e.Delta));
+            }
         }
         catch
         {
@@ -690,17 +732,25 @@ public class Animator : Component, IExtenderProvider
     protected virtual void OnNonLinearTransformNeeded (object sender, NonLinearTransfromNeededEventArg e)
     {
         if (NonLinearTransfromNeeded != null)
+        {
             NonLinearTransfromNeeded (this, e);
+        }
         else
+        {
             e.UseDefaultTransform = true;
+        }
     }
 
     protected virtual void OnTransformNeeded (object sender, TransfromNeededEventArg e)
     {
         if (TransfromNeeded != null)
+        {
             TransfromNeeded (this, e);
+        }
         else
+        {
             e.UseDefaultMatrix = true;
+        }
     }
 
     /// <summary>
@@ -719,6 +769,7 @@ public class Animator : Component, IExtenderProvider
         foreach (var item in items)
         {
             if (item.control != null)
+            {
                 item.control.BeginInvoke (new MethodInvoker (() =>
                 {
                     switch (item.mode)
@@ -731,12 +782,16 @@ public class Animator : Component, IExtenderProvider
                             break;
                     }
                 }));
+            }
+
             OnAnimationCompleted (new AnimationCompletedEventArg
                 { Animation = item.animation, Control = item.control, Mode = item.mode });
         }
 
         if (items.Count > 0)
+        {
             OnAllAnimationsCompleted();
+        }
     }
 
     protected virtual void OnAnimationCompleted
@@ -770,10 +825,16 @@ public class Animator : Component, IExtenderProvider
             get { return isActive; }
             set
             {
-                if (isActive == value) return;
+                if (isActive == value)
+                {
+                    return;
+                }
+
                 isActive = value;
                 if (value)
+                {
                     ActivateTime = DateTime.Now;
+                }
             }
         }
 
@@ -781,7 +842,10 @@ public class Animator : Component, IExtenderProvider
         {
             StringBuilder sb = new StringBuilder();
             if (control != null)
+            {
                 sb.Append (control.GetType().Name + " ");
+            }
+
             sb.Append (mode);
             return sb.ToString();
         }
@@ -794,9 +858,13 @@ public class Animator : Component, IExtenderProvider
     public DecorationType GetDecoration (Control control)
     {
         if (DecorationByControls.ContainsKey (control))
+        {
             return DecorationByControls[control].DecorationType;
+        }
         else
+        {
             return DecorationType.None;
+        }
     }
 
     public void SetDecoration (Control control, DecorationType decoration)
@@ -805,13 +873,19 @@ public class Animator : Component, IExtenderProvider
         if (decoration == DecorationType.None)
         {
             if (wrapper != null)
+            {
                 wrapper.Dispose();
+            }
+
             DecorationByControls.Remove (control);
         }
         else
         {
             if (wrapper == null)
+            {
                 wrapper = new DecorationControl (decoration, control);
+            }
+
             wrapper.DecorationType = decoration;
             DecorationByControls[control] = wrapper;
         }

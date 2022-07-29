@@ -63,9 +63,15 @@ public sealed class InsertCharCommand
         {
             case '\n':
                 if (!ts.CurrentTextBox.AllowInsertRemoveLines)
+                {
                     throw new ArgumentOutOfRangeException ("Cant insert this char in ColumnRange mode");
+                }
+
                 if (ts.Count == 0)
+                {
                     InsertLine (ts);
+                }
+
                 InsertLine (ts);
                 break;
 
@@ -74,13 +80,22 @@ public sealed class InsertCharCommand
 
             case '\b': //backspace
                 if (tb.Selection.Start.Column == 0 && tb.Selection.Start.Line == 0)
+                {
                     return;
+                }
+
                 if (tb.Selection.Start.Column == 0)
                 {
                     if (!ts.CurrentTextBox.AllowInsertRemoveLines)
+                    {
                         throw new ArgumentOutOfRangeException ("Cant insert this char in ColumnRange mode");
+                    }
+
                     if (tb.LineInfos[tb.Selection.Start.Line - 1].VisibleState != VisibleState.Visible)
+                    {
                         tb.ExpandBlock (tb.Selection.Start.Line - 1);
+                    }
+
                     deletedChar = '\n';
                     MergeLines (tb.Selection.Start.Line - 1, ts);
                 }
@@ -96,7 +111,9 @@ public sealed class InsertCharCommand
             case '\t':
                 var spaceCountNextTabStop = tb.TabLength - (tb.Selection.Start.Column % tb.TabLength);
                 if (spaceCountNextTabStop == 0)
+                {
                     spaceCountNextTabStop = tb.TabLength;
+                }
 
                 for (var i = 0; i < spaceCountNextTabStop; i++)
                 {
@@ -175,14 +192,21 @@ public sealed class InsertCharCommand
         var s = c.ToString();
         textSource.OnTextChanging (ref s);
         if (s.Length == 1)
+        {
             c = s[0];
+        }
 
         if (String.IsNullOrEmpty (s))
+        {
             throw new ArgumentOutOfRangeException();
+        }
 
 
         if (textSource.Count == 0)
+        {
             InsertLine (textSource);
+        }
+
         InsertChar (c, ref deletedChar, textSource);
 
         textSource.NeedRecalc (new TextSource.TextChangedEventArgs (textSource.CurrentTextBox.Selection.Start.Line,
@@ -195,12 +219,18 @@ public sealed class InsertCharCommand
         var tb = ts.CurrentTextBox;
 
         if (!tb.Multiline && tb.LinesCount > 0)
+        {
             return;
+        }
 
         if (ts.Count == 0)
+        {
             ts.InsertLine (0, ts.CreateLine());
+        }
         else
+        {
             BreakLines (tb.Selection.Start.Line, tb.Selection.Start.Column, ts);
+        }
 
         tb.Selection.Start = new Place (0, tb.Selection.Start.Line + 1);
         ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));
@@ -214,7 +244,10 @@ public sealed class InsertCharCommand
         var tb = ts.CurrentTextBox;
 
         if (i + 1 >= ts.Count)
+        {
             return;
+        }
+
         tb.ExpandBlock (i);
         tb.ExpandBlock (i + 1);
         var pos = ts[i].Count;
@@ -225,7 +258,9 @@ public sealed class InsertCharCommand
             ts.RemoveLine(i);
         else*/
         if (ts[i + 1].Count == 0)
+        {
             ts.RemoveLine (i + 1);
+        }
         else
         {
             ts[i].AddRange (ts[i + 1]);

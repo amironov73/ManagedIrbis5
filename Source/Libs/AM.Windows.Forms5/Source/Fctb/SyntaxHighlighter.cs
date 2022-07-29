@@ -534,7 +534,9 @@ public class SyntaxHighlighter
             var doc = new XmlDocument();
             var file = xmLdescriptionFile;
             if (!File.Exists (file))
+            {
                 file = Path.Combine (AppDomain.CurrentDomain.BaseDirectory, Path.GetFileName (file));
+            }
 
             doc.LoadXml (File.ReadAllText (file));
             desc = ParseXmlDescription (doc);
@@ -599,7 +601,9 @@ public class SyntaxHighlighter
         tb.CalcAutoIndentShiftByCodeFolding(sender, args);*/
         //block {}
         if (Regex.IsMatch (args.LineText, @"^[^""']*\{.*\}[^""']*$"))
+        {
             return;
+        }
 
         //start of block {}
         if (Regex.IsMatch (args.LineText, @"^[^""']*\{"))
@@ -618,11 +622,13 @@ public class SyntaxHighlighter
 
         //is unclosed operator in previous line ?
         if (Regex.IsMatch (args.PrevLineText, @"^\s*(if|for|foreach|while|[\}\s]*else)\b[^{]*$"))
+        {
             if (!Regex.IsMatch (args.PrevLineText, @"(;\s*$)|(;\s*//)")) //operator is unclosed
             {
                 args.Shift = args.TabLength;
                 return;
             }
+        }
     }
 
     protected void SQLAutoIndentNeeded
@@ -672,7 +678,9 @@ public class SyntaxHighlighter
 
         // then ...
         if (Regex.IsMatch (args.LineText, @"\b(Then)\s*\S+", RegexOptions.IgnoreCase))
+        {
             return;
+        }
 
         //start of operator block
         if (Regex.IsMatch (args.LineText, @"^\s*(If|While|For|Do|Try|With|Using|Select)\b", RegexOptions.IgnoreCase))
@@ -700,7 +708,9 @@ public class SyntaxHighlighter
     {
         //block {}
         if (Regex.IsMatch (args.LineText, @"^[^""']*\{.*\}[^""']*$"))
+        {
             return;
+        }
 
         //start of block {}
         if (Regex.IsMatch (args.LineText, @"^[^""']*\{"))
@@ -734,11 +744,13 @@ public class SyntaxHighlighter
 
         //is unclosed operator in previous line ?
         if (Regex.IsMatch (args.PrevLineText, @"^\s*(if|for|foreach|while|[\}\s]*else)\b[^{]*$"))
+        {
             if (!Regex.IsMatch (args.PrevLineText, @"(;\s*$)|(;\s*//)")) //operator is unclosed
             {
                 args.Shift = args.TabLength;
                 return;
             }
+        }
     }
 
     /// <summary>
@@ -766,7 +778,11 @@ public class SyntaxHighlighter
     /// <param name="style">Style to add</param>
     public virtual void AddResilientStyle (Style style)
     {
-        if (resilientStyles.Contains (style)) return;
+        if (resilientStyles.Contains (style))
+        {
+            return;
+        }
+
         currentTb.CheckStylesBufferSize(); // Prevent buffer overflow
         resilientStyles.Add (style);
     }
@@ -802,11 +818,15 @@ public class SyntaxHighlighter
             }
 
             if (brackets.Attributes["strategy"] == null || brackets.Attributes["strategy"].Value == "")
+            {
                 desc.bracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+            }
             else
+            {
                 desc.bracketsHighlightStrategy =
                     (BracketsHighlightStrategy)Enum.Parse (typeof (BracketsHighlightStrategy),
                         brackets.Attributes["strategy"].Value);
+            }
         }
 
         var styleByName = new Dictionary<string, Style>();
@@ -837,7 +857,9 @@ public class SyntaxHighlighter
         //options
         var optionsA = foldingNode.Attributes["options"];
         if (optionsA != null)
+        {
             folding.options = (RegexOptions)Enum.Parse (typeof (RegexOptions), optionsA.Value);
+        }
 
         return folding;
     }
@@ -853,14 +875,22 @@ public class SyntaxHighlighter
 
         //Style
         if (styleA == null)
+        {
             throw new Exception ("Rule must contain style name.");
+        }
+
         if (!styles.ContainsKey (styleA.Value))
+        {
             throw new Exception ("Style '" + styleA.Value + "' is not found.");
+        }
+
         rule.style = styles[styleA.Value];
 
         //options
         if (optionsA != null)
+        {
             rule.options = (RegexOptions)Enum.Parse (typeof (RegexOptions), optionsA.Value);
+        }
 
         return rule;
     }
@@ -876,15 +906,22 @@ public class SyntaxHighlighter
         //colors
         SolidBrush foreBrush = null;
         if (colorA != null)
+        {
             foreBrush = new SolidBrush (ParseColor (colorA.Value));
+        }
+
         SolidBrush backBrush = null;
         if (backColorA != null)
+        {
             backBrush = new SolidBrush (ParseColor (backColorA.Value));
+        }
 
         //fontStyle
         var fontStyle = FontStyle.Regular;
         if (fontStyleA != null)
+        {
             fontStyle = (FontStyle)Enum.Parse (typeof (FontStyle), fontStyleA.Value);
+        }
 
         return new TextStyle (foreBrush, backBrush, fontStyle);
     }
@@ -894,13 +931,19 @@ public class SyntaxHighlighter
         if (s.StartsWith ("#"))
         {
             if (s.Length <= 7)
+            {
                 return Color.FromArgb (255,
                     Color.FromArgb (Int32.Parse (s.Substring (1), NumberStyles.AllowHexSpecifier)));
+            }
             else
+            {
                 return Color.FromArgb (Int32.Parse (s.Substring (1), NumberStyles.AllowHexSpecifier));
+            }
         }
         else
+        {
             return Color.FromName (s);
+        }
     }
 
     public void HighlightSyntax (SyntaxDescriptor desc, TextRange range)
@@ -1107,7 +1150,9 @@ public class SyntaxHighlighter
 
         //
         if (CSharpStringRegex == null)
+        {
             InitCShaprRegex();
+        }
 
         //string highlighting
         range.SetStyle (StringStyle, CSharpStringRegex);
@@ -1137,7 +1182,9 @@ public class SyntaxHighlighter
 
             //do XML highlighting
             if (HTMLTagRegex == null)
+            {
                 InitHTMLRegex();
+            }
 
             //
             r.SetStyle (CommentStyle);
@@ -1201,7 +1248,9 @@ public class SyntaxHighlighter
 
         //
         if (VBStringRegex == null)
+        {
             InitVBRegex();
+        }
 
         //string highlighting
         range.SetStyle (StringStyle, VBStringRegex);
@@ -1278,7 +1327,9 @@ public class SyntaxHighlighter
 
         //
         if (HTMLTagRegex == null)
+        {
             InitHTMLRegex();
+        }
 
         //comment highlighting
         range.SetStyle (CommentStyle, HTMLCommentRegex1);
@@ -1420,7 +1471,9 @@ public class SyntaxHighlighter
 
                 // if this line has no markers - set marker
                 if (string.IsNullOrEmpty (fctb[iLine].FoldingStartMarker))
+                {
                     fctb[iLine].FoldingStartMarker = tag.Marker;
+                }
             }
             else
             {
@@ -1434,13 +1487,17 @@ public class SyntaxHighlighter
                     {
                         //remove marker, because same line can not be folding
                         if (fctb[iLine].FoldingStartMarker == tag.Marker) //was it our marker?
+                        {
                             fctb[iLine].FoldingStartMarker = null;
+                        }
                     }
                     else
                     {
                         //set end folding marker
                         if (string.IsNullOrEmpty (fctb[iLine].FoldingEndMarker))
+                        {
                             fctb[iLine].FoldingEndMarker = tag.Marker;
+                        }
                     }
                 }
             }
@@ -1504,7 +1561,9 @@ public class SyntaxHighlighter
 
         //
         if (SQLStringRegex == null)
+        {
             InitSQLRegex();
+        }
 
         //comment highlighting
         range.SetStyle (CommentStyle, SQLCommentRegex1);
@@ -1588,7 +1647,9 @@ public class SyntaxHighlighter
 
         //
         if (PHPStringRegex == null)
+        {
             InitPHPRegex();
+        }
 
         //string highlighting
         range.SetStyle (StringStyle, PHPStringRegex);
@@ -1655,7 +1716,9 @@ public class SyntaxHighlighter
 
         //
         if (JScriptStringRegex == null)
+        {
             InitJScriptRegex();
+        }
 
         //string highlighting
         range.SetStyle (StringStyle, JScriptStringRegex);
@@ -1722,7 +1785,9 @@ public class SyntaxHighlighter
 
         //
         if (LuaStringRegex == null)
+        {
             InitLuaRegex();
+        }
 
         //string highlighting
         range.SetStyle (StringStyle, LuaStringRegex);
@@ -1761,7 +1826,9 @@ public class SyntaxHighlighter
 
         // then ...
         if (Regex.IsMatch (args.LineText, @"\b(then)\s*\S+"))
+        {
             return;
+        }
 
         //start of operator block
         if (Regex.IsMatch (args.LineText, @"^\s*(function|do|for|while|repeat|if)\b"))
@@ -1807,7 +1874,9 @@ public class SyntaxHighlighter
 
         //
         if (JSONStringRegex == null)
+        {
             InitJSONRegex();
+        }
 
         //keyword highlighting
         range.SetStyle (KeywordStyle, JSONKeywordRegex);

@@ -72,7 +72,9 @@ namespace Manina.Windows.Forms
                     if (page != null)
                     {
                         if (DesignerHost != null)
+                        {
                             return (Page.PageDesigner)DesignerHost.GetDesigner(page);
+                        }
                     }
                     return null;
                 }
@@ -93,7 +95,9 @@ namespace Manina.Windows.Forms
                     Control.SelectedPage = page;
 
                     if (SelectionService != null)
+                    {
                         SelectionService.SetSelectedComponents(new Component[] { Control.SelectedPage });
+                    }
                 }
             }
 
@@ -113,11 +117,16 @@ namespace Manina.Windows.Forms
 
                             DesignerHost.DestroyComponent(page);
                             if (index == Control.Pages.Count)
+                            {
                                 index = Control.Pages.Count - 1;
+                            }
+
                             Control.SelectedIndex = index;
 
                             if (SelectionService != null)
+                            {
                                 SelectionService.SetSelectedComponents(new Component[] { Control.SelectedPage });
+                            }
                         }
                     }
                 }
@@ -161,24 +170,34 @@ namespace Manina.Windows.Forms
             {
                 var pageDesigner = CurrentPageDesigner;
                 if (pageDesigner == null)
+                {
                     base.OnDragEnter(de);
+                }
                 else
+                {
                     pageDesigner.OnDragEnter(de);
+                }
             }
 
             protected override void OnDragOver(DragEventArgs de)
             {
                 var pageDesigner = CurrentPageDesigner;
                 if (pageDesigner == null)
+                {
                     base.OnDragOver(de);
+                }
                 else
                 {
                     Point pt = Control.PointToClient(new Point(de.X, de.Y));
 
                     if (pageDesigner.Control.DisplayRectangle.Contains(pt))
+                    {
                         pageDesigner.OnDragOver(de);
+                    }
                     else
+                    {
                         de.Effect = DragDropEffects.None;
+                    }
                 }
             }
 
@@ -186,36 +205,52 @@ namespace Manina.Windows.Forms
             {
                 var pageDesigner = CurrentPageDesigner;
                 if (pageDesigner == null)
+                {
                     base.OnDragLeave(e);
+                }
                 else
+                {
                     pageDesigner.OnDragLeave(e);
+                }
             }
 
             protected override void OnDragDrop(DragEventArgs de)
             {
                 var pageDesigner = CurrentPageDesigner;
                 if (pageDesigner == null)
+                {
                     base.OnDragDrop(de);
+                }
                 else
+                {
                     pageDesigner.OnDragDrop(de);
+                }
             }
 
             protected override void OnGiveFeedback(GiveFeedbackEventArgs e)
             {
                 var pageDesigner = CurrentPageDesigner;
                 if (pageDesigner == null)
+                {
                     base.OnGiveFeedback(e);
+                }
                 else
+                {
                     pageDesigner.OnGiveFeedback(e);
+                }
             }
 
             protected override void OnDragComplete(DragEventArgs de)
             {
                 var pageDesigner = CurrentPageDesigner;
                 if (pageDesigner == null)
+                {
                     base.OnDragComplete(de);
+                }
                 else
+                {
                     pageDesigner.OnDragComplete(de);
+                }
             }
             #endregion
         }

@@ -101,6 +101,7 @@ public class ExportToHtml
         for (var i = 0; i < _textBox!.Styles.Length; i++)
         {
             if (_textBox.Styles[i] != null && ((int) styleIndex & mask) != 0)
+            {
                 if (_textBox.Styles[i].IsExportable)
                 {
                     var style = _textBox.Styles[i];
@@ -108,12 +109,15 @@ public class ExportToHtml
 
                     var isTextStyle = style is TextStyle;
                     if (isTextStyle)
+                    {
                         if (!hasTextStyle || _textBox.AllowSeveralTextStyleDrawing)
                         {
                             hasTextStyle = true;
                             textStyle = style as TextStyle;
                         }
+                    }
                 }
+            }
 
             mask = mask << 1;
         }
@@ -248,7 +252,9 @@ public class ExportToHtml
                 {
                     temporary.Append (UseBr ? "<br>" : "\r\n");
                     if (IncludeLineNumbers)
+                    {
                         temporary.AppendFormat ("<span class=lineNumber>{0}</span>  ", i + 2);
+                    }
                 }
 
                 currentLine = p.Line;
@@ -259,7 +265,9 @@ public class ExportToHtml
             {
                 case ' ':
                     if ((hasNonSpace || !UseForwardNbsp) && !UseNbsp)
+                    {
                         goto default;
+                    }
 
                     temporary.Append ("&nbsp;");
                     break;
@@ -286,7 +294,9 @@ public class ExportToHtml
         Flush (builder, temporary, currentStyleId);
 
         if (UseOriginalFont)
+        {
             builder.Append ("</font>");
+        }
 
         //build styles
         if (UseStyleTag)

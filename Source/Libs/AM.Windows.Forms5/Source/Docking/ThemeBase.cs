@@ -51,12 +51,16 @@ public abstract class ThemeBase : Component
     public void ApplyTo (ToolStrip toolStrip)
     {
         if (toolStrip == null)
+        {
             return;
+        }
 
         _stripBefore[toolStrip] =
             new KeyValuePair<ToolStripRenderMode, ToolStripRenderer> (toolStrip.RenderMode, toolStrip.Renderer);
         if (ToolStripRenderer != null)
+        {
             toolStrip.Renderer = ToolStripRenderer;
+        }
 
         if (Win32Helper.IsRunningOnMono)
         {
@@ -112,13 +116,19 @@ public abstract class ThemeBase : Component
         }
 
         if (dockPanel.Panes.Count > 0)
+        {
             throw new InvalidOperationException (Strings.Theme_PaneNotClosed);
+        }
 
         if (dockPanel.FloatWindows.Count > 0)
+        {
             throw new InvalidOperationException (Strings.Theme_FloatWindowNotClosed);
+        }
 
         if (dockPanel.Contents.Count > 0)
+        {
             throw new InvalidOperationException (Strings.Theme_DockContentNotClosed);
+        }
 
         if (ColorPalette == null)
         {
@@ -161,7 +171,9 @@ public abstract class ThemeBase : Component
             if (cache.Key == ToolStripRenderMode.Custom)
             {
                 if (cache.Value != null)
+                {
                     strip.Renderer = cache.Value;
+                }
             }
             else
             {
@@ -173,7 +185,9 @@ public abstract class ThemeBase : Component
         if (_managerBefore.Key == ToolStripManagerRenderMode.Custom)
         {
             if (_managerBefore.Value != null)
+            {
                 ToolStripManager.Renderer = _managerBefore.Value;
+            }
         }
         else
         {

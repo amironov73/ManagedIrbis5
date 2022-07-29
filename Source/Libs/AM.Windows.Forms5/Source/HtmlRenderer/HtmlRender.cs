@@ -377,7 +377,9 @@ public static class HtmlRender
         EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad = null, EventHandler<HtmlImageLoadEventArgs> imageLoad = null)
     {
         if (backgroundColor == Color.Transparent)
+        {
             throw new ArgumentOutOfRangeException("backgroundColor", "Transparent background in not supported");
+        }
 
         // create the final image to render into
         var image = new Bitmap(size.Width, size.Height, PixelFormat.Format32bppArgb);
@@ -461,10 +463,14 @@ public static class HtmlRender
         EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad = null, EventHandler<HtmlImageLoadEventArgs> imageLoad = null)
     {
         if (backgroundColor == Color.Transparent)
+        {
             throw new ArgumentOutOfRangeException("backgroundColor", "Transparent background in not supported");
+        }
 
         if (string.IsNullOrEmpty(html))
+        {
             return new Bitmap(0, 0, PixelFormat.Format32bppArgb);
+        }
 
         using (var container = new HtmlContainer())
         {
@@ -472,9 +478,15 @@ public static class HtmlRender
             container.AvoidImagesLateLoading = true;
 
             if (stylesheetLoad != null)
+            {
                 container.StylesheetLoad += stylesheetLoad;
+            }
+
             if (imageLoad != null)
+            {
                 container.ImageLoad += imageLoad;
+            }
+
             container.SetHtml(html, cssData);
 
             var finalSize = MeasureHtmlByRestrictions(container, minSize, maxSize);
@@ -583,7 +595,9 @@ public static class HtmlRender
         EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad = null, EventHandler<HtmlImageLoadEventArgs> imageLoad = null)
     {
         if (string.IsNullOrEmpty(html))
+        {
             return new Bitmap(0, 0, PixelFormat.Format32bppArgb);
+        }
 
         using (var container = new HtmlContainer())
         {
@@ -592,9 +606,15 @@ public static class HtmlRender
             container.UseGdiPlusTextRendering = true;
 
             if (stylesheetLoad != null)
+            {
                 container.StylesheetLoad += stylesheetLoad;
+            }
+
             if (imageLoad != null)
+            {
                 container.ImageLoad += imageLoad;
+            }
+
             container.SetHtml(html, cssData);
 
             var finalSize = MeasureHtmlByRestrictions(container, minSize, maxSize);
@@ -642,9 +662,14 @@ public static class HtmlRender
                 container.UseGdiPlusTextRendering = useGdiPlusTextRendering;
 
                 if (stylesheetLoad != null)
+                {
                     container.StylesheetLoad += stylesheetLoad;
+                }
+
                 if (imageLoad != null)
+                {
                     container.ImageLoad += imageLoad;
+                }
 
                 container.SetHtml(html, cssData);
                 container.PerformLayout(g);
@@ -670,7 +695,10 @@ public static class HtmlRender
         {
             var sizeInt = HtmlRendererUtils.MeasureHtmlByRestrictions(mg, htmlContainer.HtmlContainerInt, Utils.Convert(minSize), Utils.Convert(maxSize));
             if (maxSize.Width < 1 && sizeInt.Width > 4096)
+            {
                 sizeInt.Width = 4096;
+            }
+
             return Utils.ConvertRound(sizeInt);
         }
     }
@@ -744,9 +772,14 @@ public static class HtmlRender
                 container.UseGdiPlusTextRendering = useGdiPlusTextRendering;
 
                 if (stylesheetLoad != null)
+                {
                     container.StylesheetLoad += stylesheetLoad;
+                }
+
                 if (imageLoad != null)
+                {
                     container.ImageLoad += imageLoad;
+                }
 
                 container.SetHtml(html, cssData);
                 container.PerformLayout(g);

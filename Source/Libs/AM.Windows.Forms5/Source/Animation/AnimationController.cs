@@ -133,7 +133,9 @@ public class AnimationController
 
         TimeStep = timeStep * (animation.TimeCoefficient == 0f ? 1f : animation.TimeCoefficient);
         if (TimeStep == 0f)
+        {
             timeStep = 0.01f;
+        }
 
         switch (animationMode)
         {
@@ -265,8 +267,16 @@ public class AnimationController
         Frame = OnNonLinearTransformNeeded();
 
         var time = CurrentTime + TimeStep;
-        if (time > _animation.MaxTime) time = _animation.MaxTime;
-        if (time < _animation.MinTime) time = _animation.MinTime;
+        if (time > _animation.MaxTime)
+        {
+            time = _animation.MaxTime;
+        }
+
+        if (time < _animation.MinTime)
+        {
+            time = _animation.MinTime;
+        }
+
         CurrentTime = time;
 
         FramePainting?.Invoke (this, e);
@@ -304,20 +314,35 @@ public class AnimationController
         var bounds = GetBounds();
         var w = bounds.Width;
         var h = bounds.Height;
-        if (w == 0) w = 1;
-        if (h == 1) h = 1;
+        if (w == 0)
+        {
+            w = 1;
+        }
+
+        if (h == 1)
+        {
+            h = 1;
+        }
+
         var bmp = new Bitmap (w, h);
 
         var clientRect = new Rectangle (0, 0, bmp.Width, bmp.Height);
         var ea = new PaintEventArgs (Graphics.FromImage (bmp), clientRect);
         if (clip)
+        {
             ea.Graphics.SetClip (clipRect);
+        }
 
         for (var i = control.Parent.Controls.Count - 1; i >= 0; i--)
         {
             var c = control.Parent.Controls[i];
-            if (c == control && !includeForeground) break;
+            if (c == control && !includeForeground)
+            {
+                break;
+            }
+
             if (c.Visible && !c.IsDisposed)
+            {
                 if (c.Bounds.IntersectsWith (bounds))
                 {
                     using (var cb = new Bitmap (c.Width, c.Height))
@@ -328,8 +353,12 @@ public class AnimationController
                         ea.Graphics.DrawImage (cb, c.Left - bounds.Left, c.Top - bounds.Top, c.Width, c.Height);
                     }
                 }
+            }
 
-            if (c == control) break;
+            if (c == control)
+            {
+                break;
+            }
         }
 
         ea.Graphics.Dispose();
@@ -498,11 +527,16 @@ public class AnimationController
     public void Hide()
     {
         if (DoubleBitmap != null)
+        {
             try
             {
                 DoubleBitmap.BeginInvoke (new MethodInvoker (() =>
                 {
-                    if (DoubleBitmap.Visible) DoubleBitmap.Hide();
+                    if (DoubleBitmap.Visible)
+                    {
+                        DoubleBitmap.Hide();
+                    }
+
                     DoubleBitmap.Parent = null;
 
                     //DoubleBitmap.Dispose();
@@ -511,6 +545,7 @@ public class AnimationController
             catch
             {
             }
+        }
     }
 
     /// <summary>

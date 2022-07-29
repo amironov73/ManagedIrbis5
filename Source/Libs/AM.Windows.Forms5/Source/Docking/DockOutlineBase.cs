@@ -139,7 +139,9 @@ public abstract class DockOutlineBase
             m_dockTo != m_oldDockTo ||
             m_dock != m_oldDock ||
             m_contentIndex != m_oldContentIndex)
+        {
             OnShow();
+        }
     }
 
     public void Show()

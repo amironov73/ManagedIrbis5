@@ -141,9 +141,14 @@ namespace AeroSuite.Controls
             {
                 var innerRect = new Rectangle(4, 4, this.Width - 8, this.Height - 8);
                 if (this.Type == NavigationButtonType.Back)
+                {
                     gp.AddLines(new PointF[] { new PointF(innerRect.X + innerRect.Width * 0.5f, innerRect.Y + innerRect.Height * 0.25f), new PointF(innerRect.X + innerRect.Width * 0.25f, innerRect.Y + innerRect.Height * 0.5f), new PointF(innerRect.X + innerRect.Width * 0.5f, innerRect.Y + innerRect.Height * 0.75f) });
+                }
                 else
+                {
                     gp.AddLines(new PointF[] { new PointF(innerRect.X + innerRect.Width * 0.5f, innerRect.Y + innerRect.Height * 0.25f), new PointF(innerRect.X + innerRect.Width * 0.75f, innerRect.Y + innerRect.Height * 0.5f), new PointF(innerRect.X + innerRect.Width * 0.5f, innerRect.Y + innerRect.Height * 0.75f) });
+                }
+
                 gp.StartFigure();
                 gp.AddLine(new PointF(innerRect.X + innerRect.Width * 0.25f, innerRect.Y + innerRect.Height * 0.5f), new PointF(innerRect.X + innerRect.Width * 0.75f, innerRect.Y + innerRect.Height * 0.5f));
 

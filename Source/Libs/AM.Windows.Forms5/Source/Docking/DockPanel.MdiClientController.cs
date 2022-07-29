@@ -45,7 +45,9 @@ partial class DockPanel
             if (disposing)
             {
                 if (Site != null && Site.Container != null)
+                {
                     Site.Container.Remove (this);
+                }
 
                 Disposed?.Invoke (this, EventArgs.Empty);
             }
@@ -62,7 +64,9 @@ partial class DockPanel
                 // the .NET vernacular of an AutoScroll property.
                 m_autoScroll = value;
                 if (MdiClient != null)
+                {
                     UpdateStyles();
+                }
             }
         }
 
@@ -72,18 +76,24 @@ partial class DockPanel
             {
                 // Error-check the enum.
                 if (!Enum.IsDefined (typeof (BorderStyle), value))
+                {
                     throw new InvalidEnumArgumentException();
+                }
 
                 m_borderStyle = value;
 
                 if (MdiClient == null)
+                {
                     return;
+                }
 
                 // This property can actually be visible in design-mode,
                 // but to keep it consistent with the others,
                 // prevent this from being show at design-time.
                 if (Site != null && Site.DesignMode)
+                {
                     return;
+                }
 
                 // There is no BorderStyle property exposed by the MdiClient class,
                 // but this can be controlled by Win32 functions. A Win32 ExStyle
@@ -156,7 +166,9 @@ partial class DockPanel
                 m_parentForm = value;
 
                 if (m_parentForm == null)
+                {
                     return;
+                }
 
                 // If the parent form has not been created yet,
                 // wait to initialize the MDI client until it is.
@@ -166,7 +178,9 @@ partial class DockPanel
                     RefreshProperties();
                 }
                 else
+                {
                     m_parentForm.HandleCreated += new EventHandler (ParentFormHandleCreated);
+                }
 
                 m_parentForm.MdiChildActivate += new EventHandler (ParentFormMdiChildActivate);
             }
@@ -180,7 +194,9 @@ partial class DockPanel
                 m_site = value;
 
                 if (m_site == null)
+                {
                     return;
+                }
 
                 // If the component is dropped onto a form during design-time,
                 // set the ParentForm property.
@@ -189,7 +205,9 @@ partial class DockPanel
                 {
                     Form parent = host.RootComponent as Form;
                     if (parent != null)
+                    {
                         ParentForm = parent;
+                    }
                 }
             }
         }
@@ -213,21 +231,27 @@ partial class DockPanel
         {
             // Raise the HandleAssigned event.
             if (HandleAssigned != null)
+            {
                 HandleAssigned (this, e);
+            }
         }
 
         protected virtual void OnMdiChildActivate (EventArgs e)
         {
             // Raise the MdiChildActivate event
             if (MdiChildActivate != null)
+            {
                 MdiChildActivate (this, e);
+            }
         }
 
         protected virtual void OnLayout (LayoutEventArgs e)
         {
             // Raise the Layout event
             if (Layout != null)
+            {
                 Layout (this, e);
+            }
         }
 
         public event PaintEventHandler Paint;
@@ -236,7 +260,9 @@ partial class DockPanel
         {
             // Raise the Paint event.
             if (Paint != null)
+            {
                 Paint (this, e);
+            }
         }
 
         protected override void WndProc (ref Message m)
@@ -302,7 +328,9 @@ partial class DockPanel
             }
 
             if (ParentForm == null)
+            {
                 return;
+            }
 
             // Get the MdiClient from the parent form.
             foreach (Control control in ParentForm.Controls)
@@ -312,7 +340,9 @@ partial class DockPanel
 
                 m_mdiClient = control as MdiClient;
                 if (m_mdiClient == null)
+                {
                     continue;
+                }
 
                 // Assign the MdiClient Handle to the NativeWindow.
                 ReleaseHandle();
@@ -342,6 +372,7 @@ partial class DockPanel
             // control's Invalidate method does not affect the non-client area.
             // Instead use a Win32 call to signal the style has changed.
             if (!Win32Helper.IsRunningOnMono)
+            {
                 Win32.NativeMethods.SetWindowPos (MdiClient.Handle, IntPtr.Zero, 0, 0, 0, 0,
                     Win32.FlagsSetWindowPos.SWP_NOACTIVATE |
                     Win32.FlagsSetWindowPos.SWP_NOMOVE |
@@ -349,6 +380,7 @@ partial class DockPanel
                     Win32.FlagsSetWindowPos.SWP_NOZORDER |
                     Win32.FlagsSetWindowPos.SWP_NOOWNERZORDER |
                     Win32.FlagsSetWindowPos.SWP_FRAMECHANGED);
+            }
         }
     }
 
@@ -370,11 +402,15 @@ partial class DockPanel
     private void ParentFormMdiChildActivate (object sender, EventArgs e)
     {
         if (GetMdiClientController().ParentForm == null)
+        {
             return;
+        }
 
         IDockContent content = GetMdiClientController().ParentForm.ActiveMdiChild as IDockContent;
         if (content == null)
+        {
             return;
+        }
 
         if (content.DockHandler.DockPanel == this && content.DockHandler.Pane != null)
         {
@@ -402,19 +438,25 @@ partial class DockPanel
     private void SuspendMdiClientLayout()
     {
         if (GetMdiClientController().MdiClient != null)
+        {
             GetMdiClientController().MdiClient.SuspendLayout();
+        }
     }
 
     private void ResumeMdiClientLayout (bool perform)
     {
         if (GetMdiClientController().MdiClient != null)
+        {
             GetMdiClientController().MdiClient.ResumeLayout (perform);
+        }
     }
 
     private void PerformMdiClientLayout()
     {
         if (GetMdiClientController().MdiClient != null)
+        {
             GetMdiClientController().MdiClient.PerformLayout();
+        }
     }
 
     // Called when:
@@ -430,14 +472,18 @@ partial class DockPanel
             controller.AutoScroll = false;
             controller.BorderStyle = BorderStyle.None;
             if (MdiClientExists)
+            {
                 controller.MdiClient.Dock = DockStyle.Fill;
+            }
         }
         else if (DocumentStyle == DocumentStyle.DockingSdi || DocumentStyle == DocumentStyle.DockingWindow)
         {
             controller.AutoScroll = true;
             controller.BorderStyle = BorderStyle.Fixed3D;
             if (MdiClientExists)
+            {
                 controller.MdiClient.Dock = DockStyle.Fill;
+            }
         }
         else if (this.DocumentStyle == DocumentStyle.SystemMdi)
         {
@@ -454,8 +500,12 @@ partial class DockPanel
     internal Rectangle RectangleToMdiClient (Rectangle rect)
     {
         if (MdiClientExists)
+        {
             return GetMdiClientController().MdiClient.RectangleToClient (rect);
+        }
         else
+        {
             return Rectangle.Empty;
+        }
     }
 }

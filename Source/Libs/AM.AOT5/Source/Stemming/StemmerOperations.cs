@@ -35,9 +35,8 @@ public class StemmerOperations
     internal int bra;
     internal int ket;
 
-
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     protected StemmerOperations()
     {
@@ -71,7 +70,7 @@ public class StemmerOperations
     /// </summary>
     protected string GetCurrent()
     {
-        string result = current.ToString();
+        var result = current.ToString();
 
         // Make a new StringBuffer.  If we reuse the old one, and a user of
         // the library keeps a reference to the buffer returned (for example,
@@ -107,7 +106,7 @@ public class StemmerOperations
         if (cursor >= limit) return false;
 
         //           char ch = current.charAt(cursor);
-        int ch = (int)current[cursor];
+        var ch = (int)current[cursor];
         if (ch > max || ch < min) return false;
 
         //           ch -= min;
@@ -125,7 +124,7 @@ public class StemmerOperations
         if (cursor <= limit_backward) return false;
 
         //           char ch = current.charAt(cursor - 1);
-        int ch = (int)current[cursor - 1];
+        var ch = (int)current[cursor - 1];
         if (ch > max || ch < min) return false;
         ch -= min;
         if ((s[ch >> 3] & (0X1 << (ch & 0X7))) == 0) return false;
@@ -141,7 +140,7 @@ public class StemmerOperations
         if (cursor >= limit) return false;
 
         //           char ch = current.charAt(cursor);
-        int ch = (int)current[cursor];
+        var ch = (int)current[cursor];
         if (ch > max || ch < min)
         {
             cursor++;
@@ -166,7 +165,7 @@ public class StemmerOperations
         if (cursor <= limit_backward) return false;
 
         //           char ch = current.charAt(cursor - 1);
-        int ch = (int)current[cursor - 1];
+        var ch = (int)current[cursor - 1];
         if (ch > max || ch < min)
         {
             cursor--;
@@ -191,7 +190,7 @@ public class StemmerOperations
         if (cursor >= limit) return false;
 
         //           char ch = current.charAt(cursor);
-        int ch = (int)current[cursor];
+        var ch = (int)current[cursor];
         if (ch > max || ch < min) return false;
         cursor++;
         return true;
@@ -205,7 +204,7 @@ public class StemmerOperations
         if (cursor <= limit_backward) return false;
 
         //           char ch = current.charAt(cursor - 1);
-        int ch = (int)current[cursor - 1];
+        var ch = (int)current[cursor - 1];
         if (ch > max || ch < min) return false;
         cursor--;
         return true;
@@ -219,7 +218,7 @@ public class StemmerOperations
         if (cursor >= limit) return false;
 
         //           char ch = current.charAt(cursor);
-        int ch = (int)current[cursor];
+        var ch = (int)current[cursor];
         if (!(ch > max || ch < min)) return false;
         cursor++;
         return true;
@@ -233,7 +232,7 @@ public class StemmerOperations
         if (cursor <= limit_backward) return false;
 
         //           char ch = current.charAt(cursor - 1);
-        int ch = (int)current[cursor - 1];
+        var ch = (int)current[cursor - 1];
         if (!(ch > max || ch < min)) return false;
         cursor--;
         return true;
@@ -296,22 +295,22 @@ public class StemmerOperations
     /// </summary>
     internal int find_among (Among[] v, int v_size)
     {
-        int i = 0;
-        int j = v_size;
+        var i = 0;
+        var j = v_size;
 
-        int c = cursor;
-        int l = limit;
+        var c = cursor;
+        var l = limit;
 
-        int common_i = 0;
-        int common_j = 0;
+        var common_i = 0;
+        var common_j = 0;
 
-        bool first_key_inspected = false;
+        var first_key_inspected = false;
         while (true)
         {
-            int k = i + ((j - i) >> 1);
-            int diff = 0;
-            int common = common_i < common_j ? common_i : common_j; // smaller
-            Among w = v[k];
+            var k = i + ((j - i) >> 1);
+            var diff = 0;
+            var common = common_i < common_j ? common_i : common_j; // smaller
+            var w = v[k];
             int i2;
 
             for (i2 = common; i2 < w.s_size; i2++)
@@ -353,7 +352,7 @@ public class StemmerOperations
 
         while (true)
         {
-            Among w = v[i];
+            var w = v[i];
             if (common_i >= w.s_size)
             {
                 cursor = c + w.s_size;
@@ -388,19 +387,19 @@ public class StemmerOperations
 
     internal int find_among_b (Among[] v, int v_size)
     {
-        int i = 0;
-        int j = v_size;
-        int c = cursor;
-        int lb = limit_backward;
-        int common_i = 0;
-        int common_j = 0;
-        bool first_key_inspected = false;
+        var i = 0;
+        var j = v_size;
+        var c = cursor;
+        var lb = limit_backward;
+        var common_i = 0;
+        var common_j = 0;
+        var first_key_inspected = false;
         while (true)
         {
-            int k = i + ((j - i) >> 1);
-            int diff = 0;
-            int common = common_i < common_j ? common_i : common_j;
-            Among w = v[k];
+            var k = i + ((j - i) >> 1);
+            var diff = 0;
+            var common = common_i < common_j ? common_i : common_j;
+            var w = v[k];
             int i2;
             for (i2 = w.s_size - 1 - common; i2 >= 0; i2--)
             {
@@ -438,7 +437,7 @@ public class StemmerOperations
 
         while (true)
         {
-            Among w = v[i];
+            var w = v[i];
             if (common_i >= w.s_size)
             {
                 cursor = c - w.s_size;
@@ -482,7 +481,7 @@ public class StemmerOperations
             string s
         )
     {
-        int adjustment = s.Length - (c_ket - c_bra);
+        var adjustment = s.Length - (c_ket - c_bra);
 
         //           current.replace(c_bra, c_ket, s);
         current = StringBufferReplace (c_bra, c_ket, current, s);
@@ -500,8 +499,8 @@ public class StemmerOperations
             string s1
         )
     {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < start; i++)
+        var sb = new StringBuilder();
+        for (var i = 0; i < start; i++)
         {
 #if WINMOBILE || PocketPC
                 string tmp = s[i].ToString();
@@ -519,7 +518,7 @@ public class StemmerOperations
         sb.Insert (sb.Length, s1);
 
         //           }
-        for (int i = end; i < s.Length; i++)
+        for (var i = end; i < s.Length; i++)
         {
 #if WINMOBILE || PocketPC
                 string tmp = s[i].ToString();
@@ -601,7 +600,7 @@ public class StemmerOperations
             string s
         )
     {
-        int adjustment = ReplaceS (c_bra, c_ket, s);
+        var adjustment = ReplaceS (c_bra, c_ket, s);
         if (c_bra <= bra) bra += adjustment;
         if (c_bra <= ket) ket += adjustment;
     }
@@ -629,7 +628,7 @@ public class StemmerOperations
         )
     {
         SliceCheck();
-        int len = ket - bra;
+        var len = ket - bra;
 
         //           s.replace(0, s.length(), current.substring(bra, ket));
         //           int lengh = string.IsNullOrEmpty(s.ToString())!= true ? s.Length : 0;
@@ -702,7 +701,7 @@ public class StemmerOperations
     /// </summary>
     protected void RemoveDerivational()
     {
-        int len = current.Length;
+        var len = current.Length;
         if ((len > 8) &&
             current.ToString().Substring (len - 6, 6).Equals ("obinec"))
         {
@@ -921,7 +920,7 @@ public class StemmerOperations
     /// </summary>
     protected void RemoveAugmentative()
     {
-        int len = current.Length;
+        var len = current.Length;
 
         //
         if ((len > 6) &&
@@ -955,7 +954,7 @@ public class StemmerOperations
     /// </summary>
     protected void RemoveDiminutive()
     {
-        int len = current.Length;
+        var len = current.Length;
 
         //
         if ((len > 7) &&
@@ -1077,7 +1076,7 @@ public class StemmerOperations
     /// </summary>
     protected void RemoveComparative()
     {
-        int len = current.Length;
+        var len = current.Length;
 
         //
         if ((len > 5) &&
@@ -1094,7 +1093,7 @@ public class StemmerOperations
 
     private void Palatalise()
     {
-        int len = current.Length;
+        var len = current.Length;
 
         if (current.ToString().Substring (len - 2, 2).Equals ("ci") ||
             current.ToString().Substring (len - 2, 2).Equals ("ce") ||
@@ -1147,7 +1146,7 @@ public class StemmerOperations
     /// </summary>
     protected void RemovePossessives()
     {
-        int len = current.Length;
+        var len = current.Length;
 
         if (len > 5)
         {
@@ -1178,7 +1177,7 @@ public class StemmerOperations
     /// </summary>
     protected void RemoveCase()
     {
-        int len = current.Length;
+        var len = current.Length;
 
         //
         if ((len > 7) &&

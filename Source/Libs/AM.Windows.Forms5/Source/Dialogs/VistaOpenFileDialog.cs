@@ -64,7 +64,9 @@ public class VistaOpenFileDialog : VistaFileDialog
     public VistaOpenFileDialog (bool forceDownlevel)
     {
         if (forceDownlevel || !IsVistaFileDialogSupported)
+        {
             DownlevelDialog = new OpenFileDialog();
+        }
     }
 
     #region Public Properties
@@ -98,13 +100,18 @@ public class VistaOpenFileDialog : VistaFileDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return ((OpenFileDialog)DownlevelDialog).Multiselect;
+            }
+
             return GetOption (NativeMethods.FOS.FOS_ALLOWMULTISELECT);
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 ((OpenFileDialog)DownlevelDialog).Multiselect = value;
+            }
 
             SetOption (NativeMethods.FOS.FOS_ALLOWMULTISELECT, value);
         }
@@ -127,15 +134,22 @@ public class VistaOpenFileDialog : VistaFileDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return ((OpenFileDialog)DownlevelDialog).ShowReadOnly;
+            }
+
             return _showReadOnly;
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 ((OpenFileDialog)DownlevelDialog).ShowReadOnly = value;
+            }
             else
+            {
                 _showReadOnly = value;
+            }
         }
     }
 
@@ -152,15 +166,22 @@ public class VistaOpenFileDialog : VistaFileDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return ((OpenFileDialog)DownlevelDialog).ReadOnlyChecked;
+            }
+
             return _readOnlyChecked;
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 ((OpenFileDialog)DownlevelDialog).ReadOnlyChecked = value;
+            }
             else
+            {
                 _readOnlyChecked = value;
+            }
         }
     }
 
@@ -190,10 +211,16 @@ public class VistaOpenFileDialog : VistaFileDialog
     public Stream OpenFile()
     {
         if (DownlevelDialog != null)
+        {
             return ((OpenFileDialog)DownlevelDialog).OpenFile();
+        }
+
         string fileName = FileName;
         if (string.IsNullOrEmpty (fileName))
+        {
             throw new ArgumentNullException ("FileName");
+        }
+
         return new FileStream (fileName, FileMode.Open, FileAccess.Read);
     }
 
@@ -241,7 +268,9 @@ public class VistaOpenFileDialog : VistaFileDialog
             FileNamesInternal = fileNames;
         }
         else
+        {
             FileNamesInternal = null;
+        }
 
         if (ShowReadOnly)
         {

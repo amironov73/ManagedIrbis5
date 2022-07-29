@@ -201,7 +201,9 @@ public class Hints : ICollection<Hint>, IDisposable
             var toDelete = new List<Control>();
             foreach (Control item in _textBox.Controls)
                 if (item is UnfocusablePanel)
+                {
                     toDelete.Add (item);
+                }
 
             foreach (var item in toDelete)
                 _textBox.Controls.Remove (item);

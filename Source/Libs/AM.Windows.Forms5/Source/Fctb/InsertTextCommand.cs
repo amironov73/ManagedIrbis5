@@ -79,9 +79,13 @@ public sealed class InsertTextCommand
             {
                 var c = insertedText[i];
                 if (c == '\r' && (i >= len - 1 || insertedText[i + 1] != '\n'))
+                {
                     InsertCharCommand.InsertChar ('\n', ref cc, ts);
+                }
                 else
+                {
                     InsertCharCommand.InsertChar (c, ref cc, ts);
+                }
             }
 
             ts.NeedRecalc (new TextSource.TextChangedEventArgs (0, 1));

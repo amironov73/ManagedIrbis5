@@ -60,7 +60,9 @@ internal sealed class ContextMenuAdapter : RContextMenu
     public override void RemoveLastDivider()
     {
         if (_contextMenu.Items[_contextMenu.Items.Count - 1].Text == string.Empty)
+        {
             _contextMenu.Items.RemoveAt(_contextMenu.Items.Count - 1);
+        }
     }
 
     public override void Show(RControl parent, RPoint location)

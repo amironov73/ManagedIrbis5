@@ -33,11 +33,17 @@ public partial class VisualStudioToolStripExtender : Component, IExtenderProvide
 
         public ToolStripProperties (ToolStrip toolstrip)
         {
-            if (toolstrip == null) throw new ArgumentNullException (nameof (toolstrip));
+            if (toolstrip == null)
+            {
+                throw new ArgumentNullException (nameof (toolstrip));
+            }
+
             strip = toolstrip;
 
             if (strip is MenuStrip)
+            {
                 SaveMenuStripText();
+            }
         }
 
         public VsVersion VsVersion
@@ -96,7 +102,9 @@ public partial class VisualStudioToolStripExtender : Component, IExtenderProvide
     public VsVersion GetStyle (ToolStrip strip)
     {
         if (strips.ContainsKey (strip))
+        {
             return strips[strip].VsVersion;
+        }
 
         return VsVersion.Unknown;
     }
@@ -118,7 +126,9 @@ public partial class VisualStudioToolStripExtender : Component, IExtenderProvide
         if (theme == null)
         {
             if (DefaultRenderer != null)
+            {
                 strip.Renderer = DefaultRenderer;
+            }
         }
         else
         {

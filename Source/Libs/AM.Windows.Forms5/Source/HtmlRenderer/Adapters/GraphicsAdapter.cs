@@ -208,9 +208,13 @@ internal sealed class GraphicsAdapter : RGraphics
                 charFit = i - 1;
                 RSize pSize = MeasureString(str.Substring(0, i), font);
                 if (pSize.Height <= size.Height && pSize.Width < maxWidth)
+                {
                     charFitWidth = pSize.Width;
+                }
                 else
+                {
                     break;
+                }
             }
         }
         else
@@ -275,10 +279,14 @@ internal sealed class GraphicsAdapter : RGraphics
     {
         ReleaseHdc();
         if (_releaseGraphics)
+        {
             _g.Dispose();
+        }
 
         if (_useGdiPlusTextRendering && _setRtl)
+        {
             _stringFormat2.FormatFlags ^= StringFormatFlags.DirectionRightToLeft;
+        }
     }
 
 
@@ -402,7 +410,9 @@ internal sealed class GraphicsAdapter : RGraphics
         if (_setRtl)
         {
             if (!rtl)
+            {
                 Win32Utils.SetTextAlign(_hdc, Win32Utils.TextAlignDefault);
+            }
         }
         else if (rtl)
         {
@@ -453,7 +463,9 @@ internal sealed class GraphicsAdapter : RGraphics
         if (_setRtl)
         {
             if (!rtl)
+            {
                 _stringFormat2.FormatFlags ^= StringFormatFlags.DirectionRightToLeft;
+            }
         }
         else if (rtl)
         {

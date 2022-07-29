@@ -125,7 +125,11 @@ namespace AeroSuite.Controls
             get
             {
                 var param = base.CreateParams;
-                if (PlatformHelper.VistaOrHigher) param.Style |= BS_COMMANDLINK;
+                if (PlatformHelper.VistaOrHigher)
+                {
+                    param.Style |= BS_COMMANDLINK;
+                }
+
                 return param;
             }
         }

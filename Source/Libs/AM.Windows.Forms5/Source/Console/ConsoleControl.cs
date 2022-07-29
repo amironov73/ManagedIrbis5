@@ -267,7 +267,7 @@ public sealed class ConsoleControl
         _inputBuffer = new StringBuilder();
         _historyList = new List<string>();
         _historyPosition = 0;
-    } // constructor
+    }
 
     #endregion
 

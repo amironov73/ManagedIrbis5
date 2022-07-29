@@ -82,11 +82,18 @@ public sealed class RemoveLinesCommand
             InsertTextCommand.InsertText (text, textSource);
             textSource[iLine].IsChanged = true;
             if (iLine < textSource.Count - 1)
+            {
                 textSource[iLine + 1].IsChanged = true;
+            }
             else
+            {
                 textSource[iLine - 1].IsChanged = true;
+            }
+
             if (text.Trim() != string.Empty)
+            {
                 textSource.OnTextChanged (iLine, iLine);
+            }
         }
 
         //tb.EndUpdate();

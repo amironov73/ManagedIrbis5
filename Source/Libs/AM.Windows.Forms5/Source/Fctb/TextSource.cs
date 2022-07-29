@@ -139,9 +139,13 @@ public class TextSource
         Manager = new CommandManager (this);
 
         if (Enum.GetUnderlyingType (typeof (StyleIndex)) == typeof (UInt32))
+        {
             Styles = new Style[32];
+        }
         else
+        {
             Styles = new Style[16];
+        }
 
         InitDefaultStyle();
     }
@@ -252,9 +256,13 @@ public class TextSource
 
         //
         if (count > 0)
+        {
             if (IsNeedBuildRemovedLineIds)
+            {
                 for (var i = 0; i < count; i++)
                     removedLineIds.Add (this[index + i].UniqueId);
+            }
+        }
 
         //
         lines.RemoveRange (index, count);
@@ -335,7 +343,9 @@ public class TextSource
             TextChanging (this, args);
             text = args.InsertingText;
             if (args.Cancel)
+            {
                 text = string.Empty;
+            }
         }
 
         ;

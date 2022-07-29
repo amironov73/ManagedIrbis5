@@ -25,14 +25,18 @@ public static class MetafileExtensions
         int bufferSize = GetEnhMetaFileBits(enfMetafileHandle, 0, null); // Get required buffer size.
         byte[] buffer = new byte[bufferSize]; // Allocate sufficient buffer
         if (GetEnhMetaFileBits(enfMetafileHandle, bufferSize, buffer) <= 0) // Get raw metafile data.
+        {
             throw new SystemException("Fail");
+        }
 
         FileStream ms = File.Open(fileName, FileMode.Create);
         ms.Write(buffer, 0, bufferSize);
         ms.Close();
         ms.Dispose();
         if (!DeleteEnhMetaFile(enfMetafileHandle)) //free handle
+        {
             throw new SystemException("Fail Free");
+        }
     }
 
     [DllImport("gdi32")]

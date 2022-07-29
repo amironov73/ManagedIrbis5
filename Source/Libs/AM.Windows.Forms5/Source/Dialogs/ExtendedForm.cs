@@ -206,7 +206,9 @@ public class ExtendedForm : Form
     {
         EventHandler handler = DwmCompositionChanged;
         if (handler != null)
+        {
             handler (this, e);
+        }
     }
 
     /// <summary>
@@ -250,10 +252,14 @@ public class ExtendedForm : Form
                 }
             }
             else
+            {
                 PaintGlassArea (pevent, Brushes.Black);
+            }
         }
         else
+        {
             base.OnPaintBackground (pevent);
+        }
     }
 
     /// <summary>
@@ -264,7 +270,9 @@ public class ExtendedForm : Form
     {
         base.OnResize (e);
         if (_glassMargin.All != 0)
+        {
             Invalidate();
+        }
     }
 
     /// <summary>
@@ -311,7 +319,10 @@ public class ExtendedForm : Form
             case NativeMethods.WM_DWMCOMPOSITIONCHANGED:
                 // If the DWM has been disabled we don't need to do anything; if it was enabled we need to set the glass margins.
                 if (_glassMargin.All != 0)
+                {
                     EnableGlass();
+                }
+
                 OnDwmCompositionChanged (EventArgs.Empty);
                 m.Result = IntPtr.Zero;
                 break;
@@ -330,18 +341,28 @@ public class ExtendedForm : Form
         if (width != 1f)
         {
             if (newMargin.Left > 0)
+            {
                 newMargin.Left = (int)Math.Round (newMargin.Left * width);
+            }
+
             if (newMargin.Right > 0)
+            {
                 newMargin.Right = (int)Math.Round (newMargin.Right * width);
+            }
         }
 
         float height = factor.Height;
         if (height != 1f)
         {
             if (newMargin.Top > 0)
+            {
                 newMargin.Top = (int)Math.Round (newMargin.Top * height);
+            }
+
             if (newMargin.Bottom > 0)
+            {
                 newMargin.Bottom = (int)Math.Round (newMargin.Bottom * height);
+            }
         }
 
         GlassMargin = newMargin;
@@ -361,7 +382,9 @@ public class ExtendedForm : Form
     {
         if (_glassMargin.Left == -1 && _glassMargin.Top == -1 && _glassMargin.Right == -1 &&
             _glassMargin.Bottom == -1)
+        {
             pevent.Graphics.FillRectangle (brush, pevent.ClipRectangle);
+        }
         else
         {
             Rectangle rect = new Rectangle (_glassMargin.Left, _glassMargin.Top,
@@ -369,22 +392,35 @@ public class ExtendedForm : Form
             pevent.Graphics.FillRectangle (new SolidBrush (BackColor), rect);
 
             if (_glassMargin.Left != 0)
+            {
                 pevent.Graphics.FillRectangle (brush, new Rectangle (0, 0, _glassMargin.Left, ClientSize.Height));
+            }
+
             if (_glassMargin.Right != 0)
+            {
                 pevent.Graphics.FillRectangle (brush,
                     new Rectangle (ClientSize.Width - _glassMargin.Right, 0, ClientSize.Width, ClientSize.Height));
+            }
+
             if (_glassMargin.Top != 0)
+            {
                 pevent.Graphics.FillRectangle (brush, new Rectangle (0, 0, ClientSize.Width, _glassMargin.Top));
+            }
+
             if (_glassMargin.Bottom != 0)
+            {
                 pevent.Graphics.FillRectangle (brush,
                     new Rectangle (0, ClientSize.Height - _glassMargin.Bottom, ClientSize.Width,
                         ClientSize.Height));
+            }
         }
     }
 
     private void SystemEvents_UserPreferenceChanged (object sender, UserPreferenceChangedEventArgs e)
     {
         if (e.Category == UserPreferenceCategory.Window && _useSystemFont)
+        {
             Font = SystemFonts.IconTitleFont;
+        }
     }
 }

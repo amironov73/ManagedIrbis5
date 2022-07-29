@@ -121,9 +121,11 @@ partial class DockPanel
                 get
                 {
                     if (m_paneDiamond == null)
+                    {
                         m_paneDiamond =
                             m_dragHandler.DockPanel.Theme.Extender.PaneIndicatorFactory.CreatePaneIndicator (
                                 m_dragHandler.DockPanel.Theme);
+                    }
 
                     return m_paneDiamond;
                 }
@@ -136,9 +138,11 @@ partial class DockPanel
                 get
                 {
                     if (m_panelLeft == null)
+                    {
                         m_panelLeft =
                             m_dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory.CreatePanelIndicator (
                                 DockStyle.Left, m_dragHandler.DockPanel.Theme);
+                    }
 
                     return m_panelLeft;
                 }
@@ -151,9 +155,11 @@ partial class DockPanel
                 get
                 {
                     if (m_panelRight == null)
+                    {
                         m_panelRight =
                             m_dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory.CreatePanelIndicator (
                                 DockStyle.Right, m_dragHandler.DockPanel.Theme);
+                    }
 
                     return m_panelRight;
                 }
@@ -166,9 +172,11 @@ partial class DockPanel
                 get
                 {
                     if (m_panelTop == null)
+                    {
                         m_panelTop =
                             m_dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory.CreatePanelIndicator (
                                 DockStyle.Top, m_dragHandler.DockPanel.Theme);
+                    }
 
                     return m_panelTop;
                 }
@@ -181,9 +189,11 @@ partial class DockPanel
                 get
                 {
                     if (m_panelBottom == null)
+                    {
                         m_panelBottom =
                             m_dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory.CreatePanelIndicator (
                                 DockStyle.Bottom, m_dragHandler.DockPanel.Theme);
+                    }
 
                     return m_panelBottom;
                 }
@@ -196,9 +206,11 @@ partial class DockPanel
                 get
                 {
                     if (m_panelFill == null)
+                    {
                         m_panelFill =
                             m_dragHandler.DockPanel.Theme.Extender.PanelIndicatorFactory.CreatePanelIndicator (
                                 DockStyle.Fill, m_dragHandler.DockPanel.Theme);
+                    }
 
                     return m_panelFill;
                 }
@@ -212,7 +224,9 @@ partial class DockPanel
                 set
                 {
                     if (m_fullPanelEdge == value)
+                    {
                         return;
+                    }
 
                     m_fullPanelEdge = value;
                     RefreshChanges();
@@ -237,12 +251,16 @@ partial class DockPanel
                 internal set
                 {
                     if (m_dockPane == value)
+                    {
                         return;
+                    }
 
                     DockPane oldDisplayingPane = DisplayingPane;
                     m_dockPane = value;
                     if (oldDisplayingPane != DisplayingPane)
+                    {
                         RefreshChanges();
+                    }
                 }
             }
 
@@ -254,10 +272,14 @@ partial class DockPanel
                 set
                 {
                     if (m_hitTest == value)
+                    {
                         return;
+                    }
 
                     if (m_hitTest != null)
+                    {
                         m_hitTest.Status = DockStyle.None;
+                    }
 
                     m_hitTest = value;
                 }
@@ -303,7 +325,9 @@ partial class DockPanel
                     region.Union (PanelLeft.Bounds);
                 }
                 else
+                {
                     PanelLeft.Visible = false;
+                }
 
                 if (ShouldPanelIndicatorVisible (DockState.DockRight))
                 {
@@ -314,7 +338,9 @@ partial class DockPanel
                     region.Union (PanelRight.Bounds);
                 }
                 else
+                {
                     PanelRight.Visible = false;
+                }
 
                 if (ShouldPanelIndicatorVisible (DockState.DockTop))
                 {
@@ -324,7 +350,9 @@ partial class DockPanel
                     region.Union (PanelTop.Bounds);
                 }
                 else
+                {
                     PanelTop.Visible = false;
+                }
 
                 if (ShouldPanelIndicatorVisible (DockState.DockBottom))
                 {
@@ -334,7 +362,9 @@ partial class DockPanel
                     region.Union (PanelBottom.Bounds);
                 }
                 else
+                {
                     PanelBottom.Visible = false;
+                }
 
                 if (ShouldPanelIndicatorVisible (DockState.Document))
                 {
@@ -347,7 +377,9 @@ partial class DockPanel
                     region.Union (PanelFill.Bounds);
                 }
                 else
+                {
                     PanelFill.Visible = false;
+                }
 
                 if (ShouldPaneDiamondVisible())
                 {
@@ -372,7 +404,9 @@ partial class DockPanel
                     }
                 }
                 else
+                {
                     PaneDiamond.Visible = false;
+                }
 
                 Region = region;
             }
@@ -380,10 +414,14 @@ partial class DockPanel
             private bool ShouldPanelIndicatorVisible (DockState dockState)
             {
                 if (!Visible)
+                {
                     return false;
+                }
 
                 if (DockPanel.DockWindows[dockState].Visible)
+                {
                     return false;
+                }
 
                 return DragHandler.DragSource.IsDockStateValid (dockState);
             }
@@ -391,10 +429,14 @@ partial class DockPanel
             private bool ShouldPaneDiamondVisible()
             {
                 if (DockPane == null)
+                {
                     return false;
+                }
 
                 if (!DockPanel.AllowEndUserNestedDocking)
+                {
                     return false;
+                }
 
                 return DragHandler.DragSource.CanDockTo (DockPane);
             }
@@ -416,26 +458,44 @@ partial class DockPanel
                 DockPane = DockHelper.PaneAtPoint (pt, DockPanel);
 
                 if (TestDrop (PanelLeft, pt) != DockStyle.None)
+                {
                     HitTestResult = PanelLeft;
+                }
                 else if (TestDrop (PanelRight, pt) != DockStyle.None)
+                {
                     HitTestResult = PanelRight;
+                }
                 else if (TestDrop (PanelTop, pt) != DockStyle.None)
+                {
                     HitTestResult = PanelTop;
+                }
                 else if (TestDrop (PanelBottom, pt) != DockStyle.None)
+                {
                     HitTestResult = PanelBottom;
+                }
                 else if (TestDrop (PanelFill, pt) != DockStyle.None)
+                {
                     HitTestResult = PanelFill;
+                }
                 else if (TestDrop (PaneDiamond, pt) != DockStyle.None)
+                {
                     HitTestResult = PaneDiamond;
+                }
                 else
+                {
                     HitTestResult = null;
+                }
 
                 if (HitTestResult != null)
                 {
                     if (HitTestResult is IPaneIndicator)
+                    {
                         DragHandler.Outline.Show (DockPane, HitTestResult.Status);
+                    }
                     else
+                    {
                         DragHandler.Outline.Show (DockPanel, HitTestResult.Status, FullPanelEdge);
+                    }
                 }
             }
 
@@ -538,18 +598,24 @@ partial class DockPanel
                 {
                     DockPane pane = DockHelper.PaneAtPoint (Control.MousePosition, DockPanel);
                     if (pane != null && DragSource.IsDockStateValid (pane.DockState))
+                    {
                         pane.TestDrop (DragSource, Outline);
+                    }
                 }
 
                 if (!Outline.FlagTestDrop && DragSource.IsDockStateValid (DockState.Float))
                 {
                     FloatWindow floatWindow = DockHelper.FloatWindowAtPoint (Control.MousePosition, DockPanel);
                     if (floatWindow != null)
+                    {
                         floatWindow.TestDrop (DragSource, Outline);
+                    }
                 }
             }
             else
+            {
                 Indicator.DockPane = DockHelper.PaneAtPoint (Control.MousePosition, DockPanel);
+            }
 
             if (!Outline.FlagTestDrop)
             {
@@ -568,16 +634,22 @@ partial class DockPanel
                 Outline.Show();
             }
             else
+            {
                 Cursor.Current = DragControl.Cursor;
+            }
         }
 
         private void EndDrag (bool abort)
         {
             if (abort)
+            {
                 return;
+            }
 
             if (!Outline.FloatWindowBounds.IsEmpty)
+            {
                 DragSource.FloatAt (Outline.FloatWindowBounds);
+            }
             else if (Outline.DockTo is DockPane)
             {
                 DockPane pane = Outline.DockTo as DockPane;
@@ -597,7 +669,10 @@ partial class DockPanel
     private DockDragHandler GetDockDragHandler()
     {
         if (m_dockDragHandler == null)
+        {
             m_dockDragHandler = new DockDragHandler (this);
+        }
+
         return m_dockDragHandler;
     }
 

@@ -203,7 +203,10 @@ namespace Manina.Windows.Forms
             {
                 var rect = base.ClientRectangle;
                 if (BorderStyle != BorderStyle.None)
+                {
                     rect.Inflate(-1, -1);
+                }
+
                 return rect;
             }
         }
@@ -282,7 +285,9 @@ namespace Manina.Windows.Forms
         public void GoBack()
         {
             if (CanGoBack)
+            {
                 SelectedIndex = SelectedIndex - 1;
+            }
         }
 
         /// <summary>
@@ -291,7 +296,9 @@ namespace Manina.Windows.Forms
         public void GoNext()
         {
             if (CanGoNext)
+            {
                 SelectedIndex = SelectedIndex + 1;
+            }
         }
         #endregion
 
@@ -330,17 +337,26 @@ namespace Manina.Windows.Forms
             int index = (page == null) ? -1 : Pages.IndexOf(page);
 
             if (page != null && index == -1)
+            {
                 throw new ArgumentException("Page is not found in the page collection.");
+            }
             else if (page == null && Pages.Count != 0)
+            {
                 throw new ArgumentException("Cannot set SelectedPage to null if the control has at least one page.");
+            }
             else if (selectedPage != null && page != null && selectedPage == page)
+            {
                 return;
+            }
 
             if (selectedPage != null && selectedPage.CausesValidation)
             {
                 PageValidatingEventArgs pve = new PageValidatingEventArgs(selectedPage);
                 OnPageValidating(pve);
-                if (allowModify && pve.Cancel) return;
+                if (allowModify && pve.Cancel)
+                {
+                    return;
+                }
 
                 OnPageValidated(new PageEventArgs(selectedPage));
             }
@@ -348,7 +364,10 @@ namespace Manina.Windows.Forms
             PageChangingEventArgs pce = new PageChangingEventArgs(selectedPage, page);
             OnPageChanging(pce);
             // Check if the page change is cancelled by user
-            if (allowModify && pce.Cancel) return;
+            if (allowModify && pce.Cancel)
+            {
+                return;
+            }
 
             // Check if the current page is modified by user
             if (allowModify)
@@ -357,9 +376,13 @@ namespace Manina.Windows.Forms
                 index = (page == null) ? -1 : Pages.IndexOf(page);
 
                 if (page != null && index == -1)
+                {
                     throw new ArgumentException("Page is not found in the page collection.");
+                }
                 else if (page == null && Pages.Count != 0)
+                {
                     throw new ArgumentException("Cannot set SelectedPage to null if the control has at least one page.");
+                }
             }
 
             lastSelectedPage = selectedPage;
@@ -370,10 +393,14 @@ namespace Manina.Windows.Forms
             UpdatePages();
 
             if (lastSelectedPage != null)
+            {
                 OnPageHidden(new PageEventArgs(lastSelectedPage));
+            }
 
             if (selectedPage != null)
+            {
                 OnPageShown(new PageEventArgs(selectedPage));
+            }
 
             OnPageChanged(new PageChangedEventArgs(lastSelectedPage, selectedPage));
         }
@@ -399,9 +426,13 @@ namespace Manina.Windows.Forms
             e.Graphics.Clear(BackColor);
 
             if (BorderStyle == BorderStyle.FixedSingle)
+            {
                 ControlPaint.DrawBorder(e.Graphics, base.ClientRectangle, Color.Black, ButtonBorderStyle.Solid);
+            }
             else if (BorderStyle == BorderStyle.Fixed3D)
+            {
                 ControlPaint.DrawBorder3D(e.Graphics, base.ClientRectangle, Border3DStyle.SunkenOuter);
+            }
 
             base.OnPaint(e);
         }
@@ -418,7 +449,9 @@ namespace Manina.Windows.Forms
             base.OnInvalidated(e);
 
             if (SelectedPage != null)
+            {
                 SelectedPage.Invalidate(e.InvalidRect);
+            }
         }
         #endregion
     }

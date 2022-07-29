@@ -39,7 +39,9 @@ public class DockContent : Form, IDockContent
     private void DockContent_ParentChanged (object Sender, EventArgs e)
     {
         if (this.Parent != null)
+        {
             this.Font = this.Parent.Font;
+        }
     }
 
     private DockContentHandler m_dockHandler = null;
@@ -247,9 +249,14 @@ public class DockContent : Form, IDockContent
         if (DockPanel != null)
         {
             if (MainMenuStrip != null)
+            {
                 DockPanel.Theme.ApplyTo (MainMenuStrip);
+            }
+
             if (ContextMenuStrip != null)
+            {
                 DockPanel.Theme.ApplyTo (ContextMenuStrip);
+            }
         }
     }
 

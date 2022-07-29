@@ -410,7 +410,9 @@ public class HtmlPanel : ScrollableControl
     public void ClearSelection()
     {
         if (_htmlContainer != null)
+        {
             _htmlContainer.ClearSelection();
+        }
     }
 
 
@@ -521,7 +523,9 @@ public class HtmlPanel : ScrollableControl
     {
         base.OnMouseMove(e);
         if (_htmlContainer != null)
+        {
             _htmlContainer.HandleMouseMove(this, e);
+        }
     }
 
     /// <summary>
@@ -531,7 +535,9 @@ public class HtmlPanel : ScrollableControl
     {
         base.OnMouseLeave(e);
         if (_htmlContainer != null)
+        {
             _htmlContainer.HandleMouseLeave(this);
+        }
     }
 
     /// <summary>
@@ -541,7 +547,9 @@ public class HtmlPanel : ScrollableControl
     {
         base.OnMouseDown(e);
         if (_htmlContainer != null)
+        {
             _htmlContainer.HandleMouseDown(this, e);
+        }
     }
 
     /// <summary>
@@ -551,7 +559,9 @@ public class HtmlPanel : ScrollableControl
     {
         base.OnMouseUp(e);
         if (_htmlContainer != null)
+        {
             _htmlContainer.HandleMouseUp(this, e);
+        }
     }
 
     /// <summary>
@@ -561,7 +571,9 @@ public class HtmlPanel : ScrollableControl
     {
         base.OnMouseDoubleClick(e);
         if (_htmlContainer != null)
+        {
             _htmlContainer.HandleMouseDoubleClick(this, e);
+        }
     }
 
     /// <summary>
@@ -571,7 +583,10 @@ public class HtmlPanel : ScrollableControl
     {
         base.OnKeyDown(e);
         if (_htmlContainer != null)
+        {
             _htmlContainer.HandleKeyDown(this, e);
+        }
+
         if (e.KeyCode == Keys.Up)
         {
             VerticalScroll.Value = Math.Max(VerticalScroll.Value - 70, VerticalScroll.Minimum);
@@ -625,7 +640,9 @@ public class HtmlPanel : ScrollableControl
     {
         var handler = LoadComplete;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -635,7 +652,9 @@ public class HtmlPanel : ScrollableControl
     {
         var handler = LinkClicked;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -645,7 +664,9 @@ public class HtmlPanel : ScrollableControl
     {
         var handler = RenderError;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -655,7 +676,9 @@ public class HtmlPanel : ScrollableControl
     {
         var handler = StylesheetLoad;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -665,7 +688,9 @@ public class HtmlPanel : ScrollableControl
     {
         var handler = ImageLoad;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -674,7 +699,10 @@ public class HtmlPanel : ScrollableControl
     protected virtual void OnRefresh(HtmlRefreshEventArgs e)
     {
         if (e.Layout)
+        {
             PerformLayout();
+        }
+
         Invalidate();
     }
 
@@ -798,9 +826,13 @@ public class HtmlPanel : ScrollableControl
     private void OnRenderError(object sender, HtmlRenderErrorEventArgs e)
     {
         if (InvokeRequired)
+        {
             Invoke(new MethodInvoker(() => OnRenderError(e)));
+        }
         else
+        {
             OnRenderError(e);
+        }
     }
 
     private void OnStylesheetLoad(object sender, HtmlStylesheetLoadEventArgs e)
@@ -816,9 +848,13 @@ public class HtmlPanel : ScrollableControl
     private void OnRefresh(object sender, HtmlRefreshEventArgs e)
     {
         if (InvokeRequired)
+        {
             Invoke(new MethodInvoker(() => OnRefresh(e)));
+        }
         else
+        {
             OnRefresh(e);
+        }
     }
 
     private void OnScrollChange(object sender, HtmlScrollEventArgs e)

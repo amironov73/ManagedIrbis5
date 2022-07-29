@@ -60,7 +60,9 @@ public abstract class DockPaneCaptionBase : Control
         base.OnMouseUp (e);
 
         if (e.Button == MouseButtons.Right)
+        {
             ShowTabPageContextMenu (new Point (e.X, e.Y));
+        }
     }
 
     protected override void OnMouseDown (MouseEventArgs e)
@@ -89,9 +91,13 @@ public abstract class DockPaneCaptionBase : Control
             }
 
             if (DockPane.IsFloat)
+            {
                 DockPane.RestoreToPanel();
+            }
             else
+            {
                 DockPane.Float();
+            }
         }
 
         base.WndProc (ref m);
@@ -100,7 +106,9 @@ public abstract class DockPaneCaptionBase : Control
     internal void RefreshChanges()
     {
         if (IsDisposed)
+        {
             return;
+        }
 
         OnRefreshChanges();
     }

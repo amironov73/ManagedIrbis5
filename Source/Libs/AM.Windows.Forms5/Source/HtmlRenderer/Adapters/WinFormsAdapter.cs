@@ -67,13 +67,21 @@ internal sealed class WinFormsAdapter : RAdapter
     {
         Brush solidBrush;
         if (color == RColor.White)
+        {
             solidBrush = Brushes.White;
+        }
         else if (color == RColor.Black)
+        {
             solidBrush = Brushes.Black;
+        }
         else if (color.A < 1)
+        {
             solidBrush = Brushes.Transparent;
+        }
         else
+        {
             solidBrush = new SolidBrush(Utils.Convert(color));
+        }
 
         return new BrushAdapter(solidBrush, false);
     }

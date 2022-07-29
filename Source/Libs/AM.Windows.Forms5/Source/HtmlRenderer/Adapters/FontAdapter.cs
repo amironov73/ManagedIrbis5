@@ -70,7 +70,10 @@ internal sealed class FontAdapter : RFont
         get
         {
             if (_hFont == IntPtr.Zero)
+            {
                 _hFont = _font.ToHfont();
+            }
+
             return _hFont;
         }
     }

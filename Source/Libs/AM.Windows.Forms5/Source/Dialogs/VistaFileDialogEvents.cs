@@ -31,7 +31,9 @@ class VistaFileDialogEvents : IFileDialogEvents, IFileDialogControlEvents
     public VistaFileDialogEvents (VistaFileDialog dialog)
     {
         if (dialog == null)
+        {
             throw new ArgumentNullException ("dialog");
+        }
 
         _dialog = dialog;
     }
@@ -41,7 +43,10 @@ class VistaFileDialogEvents : IFileDialogEvents, IFileDialogControlEvents
     public HRESULT OnFileOk (IFileDialog pfd)
     {
         if (_dialog.DoFileOk (pfd))
+        {
             return HRESULT.S_OK;
+        }
+
         return HRESULT.S_FALSE;
     }
 
@@ -84,7 +89,9 @@ class VistaFileDialogEvents : IFileDialogEvents, IFileDialogControlEvents
     public void OnButtonClicked (IFileDialogCustomize pfdc, int dwIDCtl)
     {
         if (dwIDCtl == VistaFileDialog.HelpButtonId)
+        {
             _dialog.DoHelpRequest();
+        }
     }
 
     public void OnCheckButtonToggled (IFileDialogCustomize pfdc, int dwIDCtl, bool bChecked)

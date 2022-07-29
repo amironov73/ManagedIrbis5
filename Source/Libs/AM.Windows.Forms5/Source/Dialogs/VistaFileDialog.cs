@@ -112,15 +112,22 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.AddExtension;
+            }
+
             return _addExtension;
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.AddExtension = value;
+            }
             else
+            {
                 _addExtension = value;
+            }
         }
     }
 
@@ -138,15 +145,22 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.CheckFileExists;
+            }
+
             return GetOption (NativeMethods.FOS.FOS_FILEMUSTEXIST);
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.CheckFileExists = value;
+            }
             else
+            {
                 SetOption (NativeMethods.FOS.FOS_FILEMUSTEXIST, value);
+            }
         }
     }
 
@@ -165,15 +179,22 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.CheckPathExists;
+            }
+
             return GetOption (NativeMethods.FOS.FOS_PATHMUSTEXIST);
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.CheckPathExists = value;
+            }
             else
+            {
                 SetOption (NativeMethods.FOS.FOS_PATHMUSTEXIST, value);
+            }
         }
     }
 
@@ -189,23 +210,35 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.DefaultExt;
+            }
+
             if (_defaultExt != null)
+            {
                 return _defaultExt;
+            }
+
             return string.Empty;
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.DefaultExt = value;
+            }
             else
             {
                 if (value != null)
                 {
                     if (value.StartsWith (".", StringComparison.Ordinal))
+                    {
                         value = value.Substring (1);
+                    }
                     else if (value.Length == 0)
+                    {
                         value = null;
+                    }
                 }
 
                 _defaultExt = value;
@@ -230,15 +263,22 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.DereferenceLinks;
+            }
+
             return !GetOption (NativeMethods.FOS.FOS_NODEREFERENCELINKS);
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.DereferenceLinks = value;
+            }
             else
+            {
                 SetOption (NativeMethods.FOS.FOS_NODEREFERENCELINKS, !value);
+            }
         }
     }
 
@@ -256,16 +296,24 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.FileName;
+            }
 
             if (_fileNames == null || _fileNames.Length == 0 || string.IsNullOrEmpty (_fileNames[0]))
+            {
                 return string.Empty;
+            }
+
             return _fileNames[0];
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.FileName = value;
+            }
+
             _fileNames = new string[1];
             _fileNames[0] = value;
         }
@@ -286,7 +334,10 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.FileNames;
+            }
+
             return FileNamesInternal;
         }
     }
@@ -307,13 +358,18 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.Filter;
+            }
+
             return _filter;
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.Filter = value;
+            }
             else
             {
                 if (value != _filter)
@@ -322,10 +378,14 @@ public abstract class VistaFileDialog : CommonDialog
                     {
                         string[] filterElements = value.Split (new[] { '|' });
                         if (filterElements == null || filterElements.Length % 2 != 0)
+                        {
                             throw new ArgumentException (Resources.InvalidFilterString);
+                        }
                     }
                     else
+                    {
                         value = null;
+                    }
 
                     _filter = value;
                 }
@@ -346,15 +406,22 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.FilterIndex;
+            }
+
             return _filterIndex;
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.FilterIndex = value;
+            }
             else
+            {
                 _filterIndex = value;
+            }
         }
     }
 
@@ -370,18 +437,27 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.InitialDirectory;
+            }
 
             if (_initialDirectory != null)
+            {
                 return _initialDirectory;
+            }
+
             return string.Empty;
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.InitialDirectory = value;
+            }
             else
+            {
                 _initialDirectory = value;
+            }
         }
     }
 
@@ -400,15 +476,22 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.RestoreDirectory;
+            }
+
             return GetOption (NativeMethods.FOS.FOS_NOCHANGEDIR);
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.RestoreDirectory = value;
+            }
             else
+            {
                 SetOption (NativeMethods.FOS.FOS_NOCHANGEDIR, value);
+            }
         }
     }
 
@@ -425,15 +508,22 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.ShowHelp;
+            }
+
             return _showHelp;
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.ShowHelp = value;
+            }
             else
+            {
                 _showHelp = value;
+            }
         }
     }
 
@@ -449,17 +539,27 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.Title;
+            }
+
             if (_title != null)
+            {
                 return _title;
+            }
+
             return string.Empty;
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.Title = value;
+            }
             else
+            {
                 _title = value;
+            }
         }
     }
 
@@ -477,15 +577,22 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.SupportMultiDottedExtensions;
+            }
+
             return _supportMultiDottedExtensions;
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.SupportMultiDottedExtensions = value;
+            }
             else
+            {
                 _supportMultiDottedExtensions = value;
+            }
         }
     }
 
@@ -503,15 +610,22 @@ public abstract class VistaFileDialog : CommonDialog
         get
         {
             if (DownlevelDialog != null)
+            {
                 return DownlevelDialog.ValidateNames;
+            }
+
             return !GetOption (NativeMethods.FOS.FOS_NOVALIDATE);
         }
         set
         {
             if (DownlevelDialog != null)
+            {
                 DownlevelDialog.ValidateNames = value;
+            }
             else
+            {
                 SetOption (NativeMethods.FOS.FOS_NOVALIDATE, !value);
+            }
         }
     }
 
@@ -570,7 +684,9 @@ public abstract class VistaFileDialog : CommonDialog
     public override void Reset()
     {
         if (DownlevelDialog != null)
+        {
             DownlevelDialog.Reset();
+        }
         else
         {
             _fileNames = null;
@@ -609,17 +725,24 @@ public abstract class VistaFileDialog : CommonDialog
     protected override bool RunDialog (IntPtr hwndOwner)
     {
         if (DownlevelDialog != null)
+        {
             return DownlevelDialog.ShowDialog (
                 hwndOwner == IntPtr.Zero ? null : new WindowHandleWrapper (hwndOwner)) == DialogResult.OK;
+        }
+
         return RunFileDialog (hwndOwner);
     }
 
     internal void SetOption (NativeMethods.FOS option, bool value)
     {
         if (value)
+        {
             _options |= option;
+        }
         else
+        {
             _options &= ~option;
+        }
     }
 
     internal bool GetOption (NativeMethods.FOS option)
@@ -646,7 +769,9 @@ public abstract class VistaFileDialog : CommonDialog
     {
         CancelEventHandler handler = (CancelEventHandler)Events[EventFileOk];
         if (handler != null)
+        {
             handler (this, e);
+        }
     }
 
     /// <summary>
@@ -658,7 +783,9 @@ public abstract class VistaFileDialog : CommonDialog
         try
         {
             if (disposing && DownlevelDialog != null)
+            {
                 DownlevelDialog.Dispose();
+            }
         }
         finally
         {
@@ -680,7 +807,10 @@ public abstract class VistaFileDialog : CommonDialog
         IWin32Window owner = _hwndOwner == IntPtr.Zero ? null : new WindowHandleWrapper (_hwndOwner);
         MessageBoxOptions options = 0;
         if (Thread.CurrentThread.CurrentUICulture.TextInfo.IsRightToLeft)
+        {
             options |= MessageBoxOptions.RightAlign | MessageBoxOptions.RtlReading;
+        }
+
         return MessageBox.Show (owner, text, caption, buttons, icon, MessageBoxDefaultButton.Button1, options) ==
                DialogResult.Yes;
     }
@@ -721,7 +851,9 @@ public abstract class VistaFileDialog : CommonDialog
             dialog.SetFileTypes ((uint)filter.Length, filter);
 
             if (_filterIndex > 0 && _filterIndex <= filter.Length)
+            {
                 dialog.SetFileTypeIndex ((uint)_filterIndex);
+            }
         }
 
         // Default extension
@@ -784,9 +916,13 @@ public abstract class VistaFileDialog : CommonDialog
             if (result < 0)
             {
                 if ((uint)result == (uint)HRESULT.ERROR_CANCELLED)
+                {
                     return false;
+                }
                 else
+                {
                     throw Marshal.GetExceptionForHR (result);
+                }
             }
 
             return true;
@@ -795,7 +931,9 @@ public abstract class VistaFileDialog : CommonDialog
         {
             _hwndOwner = IntPtr.Zero;
             if (dialog != null)
+            {
                 Marshal.FinalReleaseComObject (dialog);
+            }
         }
     }
 

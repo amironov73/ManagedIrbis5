@@ -354,11 +354,16 @@ public class VisualStudioToolStripRenderer : ToolStripProfessionalRenderer
         // IMPORTANT: not 100% accurate as the color change should only happen when the overflow menu is hovered.
         // here color change happens when the overflow menu is displayed.
         if (e.Item.Pressed)
+        {
             _palette.CommandBarMenuPopupDefault.BackgroundTop =
                 _palette.CommandBarToolbarOverflowPressed.Background;
+        }
+
         base.OnRenderOverflowButtonBackground (e);
         if (e.Item.Pressed)
+        {
             _palette.CommandBarMenuPopupDefault.BackgroundTop = cache;
+        }
     }
 
     protected override void OnRenderArrow (ToolStripArrowRenderEventArgs e)
@@ -640,7 +645,9 @@ public class VisualStudioToolStripRenderer : ToolStripProfessionalRenderer
         // then return a capsule instead of a lozenge 
 
         if (radius >= (Math.Min (baseRect.Width, baseRect.Height)) / 2.0)
+        {
             return GetCapsule (baseRect);
+        }
 
         // create the arc for the rectangle sides and declare 
         // a graphics path object for the drawing 

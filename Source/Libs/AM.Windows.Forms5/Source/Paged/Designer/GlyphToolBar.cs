@@ -208,7 +208,10 @@ namespace Manina.Windows.Forms
             {
                 tooltipTimer.Stop();
                 if (lastHotButton != null)
+                {
                     lastHotButton.ShowToolTip = true;
+                }
+
                 Refresh();
             }
             #endregion
@@ -230,7 +233,9 @@ namespace Manina.Windows.Forms
             public void UpdateLayout()
             {
                 if (BehaviorService == null)
+                {
                     return;
+                }
 
                 Point pt = BehaviorService.ControlToAdornerWindow(Control);
 
@@ -268,7 +273,9 @@ namespace Manina.Windows.Forms
             public void Refresh()
             {
                 if (Visible && Adorner != null)
+                {
                     Adorner.Invalidate();
+                }
             }
             #endregion
 
@@ -328,7 +335,10 @@ namespace Manina.Windows.Forms
                     lastHotButton = currentHotButton;
                 }
 
-                if (needsPaint) Refresh();
+                if (needsPaint)
+                {
+                    Refresh();
+                }
 
                 return insideToolbar || hasHit ? Cursors.Default : null;
             }
@@ -343,7 +353,9 @@ namespace Manina.Windows.Forms
                 Rectangle bounds = Bounds;
 
                 if (!pe.ClipRectangle.IntersectsWith(bounds))
+                {
                     return;
+                }
 
                 using (Brush brush = new SolidBrush(BackColor))
                 using (Pen pen = new Pen(BorderColor))

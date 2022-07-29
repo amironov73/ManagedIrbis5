@@ -45,7 +45,9 @@ public partial class ReplaceForm
         try
         {
             if (!Find(tbFind.Text))
+            {
                 MessageBox.Show("Not found");
+            }
         }
         catch (Exception ex)
         {
@@ -57,9 +59,15 @@ public partial class ReplaceForm
     {
         var opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
         if (!cbRegex.Checked)
+        {
             pattern = Regex.Escape(pattern);
+        }
+
         if (cbWholeWord.Checked)
+        {
             pattern = "\\b" + pattern + "\\b";
+        }
+
         //
         var range = tb.Selection.IsEmpty? tb.Range.Clone() : tb.Selection.Clone();
         //
@@ -74,9 +82,15 @@ public partial class ReplaceForm
     {
         var opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
         if (!cbRegex.Checked)
+        {
             pattern = Regex.Escape(pattern);
+        }
+
         if (cbWholeWord.Checked)
+        {
             pattern = "\\b" + pattern + "\\b";
+        }
+
         //
         var range = tb.Selection.Clone();
         range.Normalize();
@@ -89,9 +103,14 @@ public partial class ReplaceForm
         //
         range.Start = range.End;
         if (range.Start >= startPlace)
+        {
             range.End = new Place(tb.GetLineLength(tb.LinesCount - 1), tb.LinesCount - 1);
+        }
         else
+        {
             range.End = startPlace;
+        }
+
         //
         foreach (var r in range.GetRangesByLines(pattern, opt))
         {
@@ -112,9 +131,14 @@ public partial class ReplaceForm
     private void tbFind_KeyPress(object sender, KeyPressEventArgs e)
     {
         if (e.KeyChar == '\r')
+        {
             btFindNext_Click(sender, null);
+        }
+
         if (e.KeyChar == '\x1b')
+        {
             Hide();
+        }
     }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData) // David
@@ -142,8 +166,13 @@ public partial class ReplaceForm
         try
         {
             if (tb.SelectionLength != 0)
+            {
                 if (!tb.Selection.ReadOnly)
+                {
                     tb.InsertText(tbReplace.Text);
+                }
+            }
+
             btFindNext_Click(sender, null);
         }
         catch (Exception ex)
@@ -170,11 +199,14 @@ public partial class ReplaceForm
                 }
             //replace
             if (!ro)
+            {
                 if (ranges.Count > 0)
                 {
                     tb.TextSource.Manager.ExecuteCommand(new ReplaceTextCommand(tb.TextSource, ranges, tbReplace.Text));
                     tb.Selection.Start = new Place(0, 0);
                 }
+            }
+
             //
             tb.Invalidate();
             MessageBox.Show(ranges.Count + " occurrence(s) replaced");

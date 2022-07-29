@@ -79,7 +79,9 @@ public class SnippetAutocompleteItem
         //move caret position right and find char ^
         while (e.Tb.Selection.CharBeforeStart != '^')
             if (!e.Tb.Selection.GoRightThroughFolded())
+            {
                 break;
+            }
 
         //remove char ^
         e.Tb.Selection.GoLeft (true);
@@ -100,7 +102,9 @@ public class SnippetAutocompleteItem
     {
         if (Text.StartsWith (fragmentText, StringComparison.InvariantCultureIgnoreCase) &&
             Text != fragmentText)
+        {
             return CompareResult.Visible;
+        }
 
         return CompareResult.Hidden;
     }

@@ -54,7 +54,10 @@ public sealed class ReplaceMultipleTextCommand
         ranges.Sort ((r1, r2) =>
         {
             if (r1.ReplacedRange.Start.Line == r2.ReplacedRange.Start.Line)
+            {
                 return r1.ReplacedRange.Start.Column.CompareTo (r2.ReplacedRange.Start.Column);
+            }
+
             return r1.ReplacedRange.Start.Line.CompareTo (r2.ReplacedRange.Start.Line);
         });
 

@@ -128,14 +128,20 @@ public class CommandManager
     internal void Redo()
     {
         if (_redoStack.Count == 0)
+        {
             return;
+        }
+
         UndoableCommand cmd;
         BeginDisableCommands(); //prevent text changing into handlers
         try
         {
             cmd = _redoStack.Pop();
             if (TextSource.CurrentTextBox.Selection.ColumnSelectionMode)
+            {
                 TextSource.CurrentTextBox.Selection.ColumnSelectionMode = false;
+            }
+
             TextSource.CurrentTextBox.Selection.Start = cmd.sel.Start;
             TextSource.CurrentTextBox.Selection.End = cmd.sel.End;
             cmd.Execute();

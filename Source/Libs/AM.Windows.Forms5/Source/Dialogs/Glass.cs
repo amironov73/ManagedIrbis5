@@ -95,10 +95,14 @@ public static class Glass
     public static void ExtendFrameIntoClientArea (this IWin32Window window, Padding glassMargin)
     {
         if (!IsDwmCompositionEnabled)
+        {
             throw new NotSupportedException (Resources.GlassNotSupportedError);
+        }
 
         if (window == null)
+        {
             throw new ArgumentNullException ("window");
+        }
 
         NativeMethods.MARGINS margins = new NativeMethods.MARGINS (glassMargin);
         NativeMethods.DwmExtendFrameIntoClientArea (window.Handle, ref margins);
@@ -126,14 +130,24 @@ public static class Glass
         Padding padding, Color foreColor, int glowSize, TextFormatFlags textFormat)
     {
         if (!IsDwmCompositionEnabled)
+        {
             throw new NotSupportedException (Resources.GlassNotSupportedError);
+        }
 
         if (dc == null)
+        {
             throw new ArgumentNullException ("dc");
+        }
+
         if (text == null)
+        {
             throw new ArgumentNullException ("text");
+        }
+
         if (font == null)
+        {
             throw new ArgumentNullException ("font");
+        }
 
         IntPtr primaryHdc = dc.GetHdc();
         try
@@ -183,14 +197,24 @@ public static class Glass
     public static Size MeasureCompositedText (IDeviceContext dc, string text, Font font, TextFormatFlags textFormat)
     {
         if (!IsDwmCompositionEnabled)
+        {
             throw new NotSupportedException (Resources.GlassNotSupportedError);
+        }
 
         if (dc == null)
+        {
             throw new ArgumentNullException ("dc");
+        }
+
         if (text == null)
+        {
             throw new ArgumentNullException ("text");
+        }
+
         if (font == null)
+        {
             throw new ArgumentNullException ("font");
+        }
 
         IntPtr primaryHdc = dc.GetHdc();
         try

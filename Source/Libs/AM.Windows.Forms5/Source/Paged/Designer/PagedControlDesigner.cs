@@ -161,7 +161,9 @@ namespace Manina.Windows.Forms
                 Control.Move += Control_Move;
 
                 if (SelectionService != null)
+                {
                     SelectionService.SelectionChanged += SelectionService_SelectionChanged;
+                }
             }
 
             public override void InitializeNewComponent(IDictionary defaultValues)
@@ -187,10 +189,14 @@ namespace Manina.Windows.Forms
                     removePageButton.Click -= RemovePageButton_Click;
 
                     if (BehaviorService != null)
+                    {
                         BehaviorService.Adorners.Remove(toolbarAdorner);
+                    }
 
                     if (SelectionService != null)
+                    {
                         SelectionService.SelectionChanged -= SelectionService_SelectionChanged;
+                    }
 
                     toolbar.Dispose();
                 }
@@ -222,7 +228,9 @@ namespace Manina.Windows.Forms
             {
                 toolbarAdorner = new Adorner();
                 if (BehaviorService != null)
+                {
                     BehaviorService.Adorners.Add(toolbarAdorner);
+                }
 
                 toolbar = new GlyphToolBar(BehaviorService, this, toolbarAdorner);
 
@@ -278,9 +286,13 @@ namespace Manina.Windows.Forms
                 if (SelectionService != null && SelectionService.PrimarySelection != null)
                 {
                     if (SelectionService.PrimarySelection == Control)
+                    {
                         showAdorner = true;
+                    }
                     else if (SelectionService.PrimarySelection is Page page && page.Parent == Control)
+                    {
                         showAdorner = true;
+                    }
                 }
 
                 toolbarAdorner.Enabled = toolbar.Visible && showAdorner;

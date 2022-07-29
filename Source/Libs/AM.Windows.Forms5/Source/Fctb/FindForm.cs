@@ -49,9 +49,14 @@ public partial class FindForm : Form
         {
             var opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
             if (!cbRegex.Checked)
+            {
                 pattern = Regex.Escape (pattern);
+            }
+
             if (cbWholeWord.Checked)
+            {
                 pattern = "\\b" + pattern + "\\b";
+            }
 
             //
             var range = tb.Selection.Clone();
@@ -67,9 +72,13 @@ public partial class FindForm : Form
             //
             range.Start = range.End;
             if (range.Start >= startPlace)
+            {
                 range.End = new Place (tb.GetLineLength (tb.LinesCount - 1), tb.LinesCount - 1);
+            }
             else
+            {
                 range.End = startPlace;
+            }
 
             //
             foreach (var r in range.GetRangesByLines (pattern, opt))

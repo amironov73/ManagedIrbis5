@@ -190,11 +190,13 @@ namespace AM.Windows.Forms
             if (value)
             {
                 if (!DraggedControls.ContainsKey(control.Handle))
+                {
                     DraggedControls.Add
                         (
                             control.Handle,
                             new DraggedControl(control)
                         );
+                }
             }
             else
             {

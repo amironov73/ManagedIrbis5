@@ -83,7 +83,9 @@ public sealed class VisibleNestedPaneCollection : ReadOnlyCollection<DockPane>
     private void Remove (DockPane pane)
     {
         if (!Contains (pane))
+        {
             return;
+        }
 
         NestedDockingStatus statusPane = pane.NestedDockingStatus;
         DockPane lastNestedPane = null;
@@ -121,19 +123,25 @@ public sealed class VisibleNestedPaneCollection : ReadOnlyCollection<DockPane>
                 if (PatchController.EnableDisplayingPaneFix == true)
                 {
                     if (status.DisplayingPreviousPane == pane)
+                    {
                         status.SetDisplayingStatus (true, lastNestedPane, status.DisplayingAlignment,
                             status.DisplayingProportion);
+                    }
                 }
                 else
                 {
                     if (status.PreviousPane == pane)
+                    {
                         status.SetDisplayingStatus (true, lastNestedPane, status.DisplayingAlignment,
                             status.DisplayingProportion);
+                    }
                 }
             }
         }
         else
+        {
             Items.Remove (pane);
+        }
 
         statusPane.SetDisplayingStatus (false, null, DockAlignment.Left, 0.5);
     }
@@ -141,7 +149,9 @@ public sealed class VisibleNestedPaneCollection : ReadOnlyCollection<DockPane>
     private void CalculateBounds()
     {
         if (Count == 0)
+        {
             return;
+        }
 
         this[0].NestedDockingStatus.SetDisplayingBounds (Container.DisplayingRectangle,
             Container.DisplayingRectangle, Rectangle.Empty);
@@ -197,7 +207,9 @@ public sealed class VisibleNestedPaneCollection : ReadOnlyCollection<DockPane>
                 rectThis.Height = rect.Height - rectPrev.Height - rectSplitter.Height;
             }
             else
+            {
                 rectThis = Rectangle.Empty;
+            }
 
             rectSplitter.Intersect (rect);
             rectThis.Intersect (rect);

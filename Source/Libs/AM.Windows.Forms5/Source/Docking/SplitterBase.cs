@@ -37,18 +37,30 @@ public class SplitterBase : Control
             base.Dock = value;
 
             if (Dock == DockStyle.Left || Dock == DockStyle.Right)
+            {
                 Width = SplitterSize;
+            }
             else if (Dock == DockStyle.Top || Dock == DockStyle.Bottom)
+            {
                 Height = SplitterSize;
+            }
             else
+            {
                 Bounds = Rectangle.Empty;
+            }
 
             if (Dock == DockStyle.Left || Dock == DockStyle.Right)
+            {
                 Cursor = Cursors.VSplit;
+            }
             else if (Dock == DockStyle.Top || Dock == DockStyle.Bottom)
+            {
                 Cursor = Cursors.HSplit;
+            }
             else
+            {
                 Cursor = Cursors.Default;
+            }
 
             ResumeLayout();
         }
@@ -64,7 +76,9 @@ public class SplitterBase : Control
         base.OnMouseDown (e);
 
         if (e.Button != MouseButtons.Left)
+        {
             return;
+        }
 
         StartDrag();
     }
@@ -77,7 +91,9 @@ public class SplitterBase : Control
     {
         // eat the WM_MOUSEACTIVATE message
         if (m.Msg == (int)Win32.Msgs.WM_MOUSEACTIVATE)
+        {
             return;
+        }
 
         base.WndProc (ref m);
     }

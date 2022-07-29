@@ -46,7 +46,10 @@ public sealed class ReplaceTextCommand
         ranges.Sort ((r1, r2) =>
         {
             if (r1.Start.Line == r2.Start.Line)
+            {
                 return r1.Start.Column.CompareTo (r2.Start.Column);
+            }
+
             return r1.Start.Line.CompareTo (r2.Start.Line);
         });
 
@@ -79,11 +82,16 @@ public sealed class ReplaceTextCommand
         var toLine = Math.Max (end.Line, start.Line);
         var fromChar = tb.Selection.FromX;
         var toChar = tb.Selection.ToX;
-        if (fromLine < 0) return;
+        if (fromLine < 0)
+        {
+            return;
+        }
 
         //
         if (fromLine == toLine)
+        {
             ts[fromLine].RemoveRange (fromChar, toChar - fromChar);
+        }
         else
         {
             ts[fromLine].RemoveRange (fromChar, ts[fromLine].Count - fromChar);

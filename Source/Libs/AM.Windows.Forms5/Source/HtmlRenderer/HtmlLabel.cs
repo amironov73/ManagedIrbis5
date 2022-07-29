@@ -443,7 +443,9 @@ public class HtmlLabel : Control
     public void ClearSelection()
     {
         if (_htmlContainer != null)
+        {
             _htmlContainer.ClearSelection();
+        }
     }
 
 
@@ -525,7 +527,9 @@ public class HtmlLabel : Control
     {
         base.OnMouseMove(e);
         if (_htmlContainer != null)
+        {
             _htmlContainer.HandleMouseMove(this, e);
+        }
     }
 
     /// <summary>
@@ -535,7 +539,9 @@ public class HtmlLabel : Control
     {
         base.OnMouseDown(e);
         if (_htmlContainer != null)
+        {
             _htmlContainer.HandleMouseDown(this, e);
+        }
     }
 
     /// <summary>
@@ -545,7 +551,9 @@ public class HtmlLabel : Control
     {
         base.OnMouseLeave(e);
         if (_htmlContainer != null)
+        {
             _htmlContainer.HandleMouseLeave(this);
+        }
     }
 
     /// <summary>
@@ -555,7 +563,9 @@ public class HtmlLabel : Control
     {
         base.OnMouseUp(e);
         if (_htmlContainer != null)
+        {
             _htmlContainer.HandleMouseUp(this, e);
+        }
     }
 
     /// <summary>
@@ -565,7 +575,9 @@ public class HtmlLabel : Control
     {
         base.OnMouseDoubleClick(e);
         if (_htmlContainer != null)
+        {
             _htmlContainer.HandleMouseDoubleClick(this, e);
+        }
     }
 
     /// <summary>
@@ -577,7 +589,9 @@ public class HtmlLabel : Control
 
         var handler = BorderStyleChanged;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -587,7 +601,9 @@ public class HtmlLabel : Control
     {
         var handler = LoadComplete;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -597,7 +613,9 @@ public class HtmlLabel : Control
     {
         var handler = LinkClicked;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -607,7 +625,9 @@ public class HtmlLabel : Control
     {
         var handler = RenderError;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -617,7 +637,9 @@ public class HtmlLabel : Control
     {
         var handler = StylesheetLoad;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -627,7 +649,9 @@ public class HtmlLabel : Control
     {
         var handler = ImageLoad;
         if (handler != null)
+        {
             handler(this, e);
+        }
     }
 
     /// <summary>
@@ -636,7 +660,10 @@ public class HtmlLabel : Control
     protected virtual void OnRefresh(HtmlRefreshEventArgs e)
     {
         if (e.Layout)
+        {
             PerformLayout();
+        }
+
         Invalidate();
     }
 
@@ -701,9 +728,13 @@ public class HtmlLabel : Control
     private void OnRenderError(object sender, HtmlRenderErrorEventArgs e)
     {
         if (InvokeRequired)
+        {
             Invoke(new MethodInvoker(() => OnRenderError(e)));
+        }
         else
+        {
             OnRenderError(e);
+        }
     }
 
     private void OnStylesheetLoad(object sender, HtmlStylesheetLoadEventArgs e)
@@ -719,9 +750,13 @@ public class HtmlLabel : Control
     private void OnRefresh(object sender, HtmlRefreshEventArgs e)
     {
         if (InvokeRequired)
+        {
             Invoke(new MethodInvoker(() => OnRefresh(e)));
+        }
         else
+        {
             OnRefresh(e);
+        }
     }
 
     #endregion

@@ -57,8 +57,16 @@ public static class TransformHelper
         e.Matrix.Translate (center.X, center.Y);
         var kx = 1f - animation.ScaleCoefficient.X * e.CurrentTime;
         var ky = 1f - animation.ScaleCoefficient.X * e.CurrentTime;
-        if (Math.Abs (kx) <= 0.001f) kx = 0.001f;
-        if (Math.Abs (ky) <= 0.001f) ky = 0.001f;
+        if (Math.Abs (kx) <= 0.001f)
+        {
+            kx = 0.001f;
+        }
+
+        if (Math.Abs (ky) <= 0.001f)
+        {
+            ky = 0.001f;
+        }
+
         e.Matrix.Scale (kx, ky);
         e.Matrix.Translate (-center.X, -center.Y);
     }
@@ -139,8 +147,16 @@ public static class TransformHelper
         var a = e.CurrentTime;
         var count = pixels.Length;
         var opacity = 1 - e.CurrentTime;
-        if (opacity < 0f) opacity = 0f;
-        if (opacity > 1f) opacity = 1f;
+        if (opacity < 0f)
+        {
+            opacity = 0f;
+        }
+
+        if (opacity > 1f)
+        {
+            opacity = 1f;
+        }
+
         var mkx = animation.MosaicCoefficient.X;
         var mky = animation.MosaicCoefficient.Y;
 
@@ -181,6 +197,7 @@ public static class TransformHelper
             var newY = y + (int)(a * (buffer[j].Y + yi * msy));
 
             if (newX >= 0 && newX < sx)
+            {
                 if (newY >= 0 && newY < sy)
                 {
                     var newI = newY * s + newX * BytesPerPixel;
@@ -189,6 +206,7 @@ public static class TransformHelper
                     pixels[newI + 2] = pixelsBuffer[i + 2];
                     pixels[newI + 3] = (byte)(pixelsBuffer[i + 3] * opacity);
                 }
+            }
         }
     }
 
@@ -225,11 +243,15 @@ public static class TransformHelper
                 var newY = a - x;
                 var d = a - x - y;
                 if (d < -20)
+                {
                     d = -20;
+                }
 
                 var newI = newY * s + newX * BytesPerPixel;
                 if (newX >= 0 && newY >= 0)
+                {
                     if (newI >= 0 && newI < count)
+                    {
                         if (pixels[i + 3] > 0)
                         {
                             pixels[newI + 0] = (byte)Math.Min (255, d + 250 + pixels[i + 0] / 10);
@@ -237,6 +259,8 @@ public static class TransformHelper
                             pixels[newI + 2] = (byte)Math.Min (255, d + 250 + pixels[i + 2] / 10);
                             pixels[newI + 3] = 230;
                         }
+                    }
+                }
 
                 pixels[i + 3] = (byte)(0);
             }
@@ -332,7 +356,10 @@ public static class TransformHelper
 
         e.Matrix.Translate (center.X, center.Y);
         if (e.CurrentTime > animation.RotateLimit)
+        {
             e.Matrix.Rotate (360 * (e.CurrentTime - animation.RotateLimit) * animation.RotateCoefficient);
+        }
+
         e.Matrix.Translate (-center.X, -center.Y);
     }
 
@@ -360,7 +387,10 @@ public static class TransformHelper
         {
             var sourceY = (int)(beginY - 1 - dy - (y - beginY));
             if (sourceY < 0)
+            {
                 break;
+            }
+
             var sourceX = x;
             var sourceI = sourceY * s + sourceX * BytesPerPixel;
             var outI = y * s + x * BytesPerPixel;

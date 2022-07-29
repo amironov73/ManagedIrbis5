@@ -28,7 +28,10 @@ namespace Manina.Windows.Forms
                     controls.SetChildIndex(value, index + owner.FirstPageIndex);
                     controls.FromPageCollection = false;
 
-                    if (owner.SelectedIndex == index) owner.ChangePage(value, false);
+                    if (owner.SelectedIndex == index)
+                    {
+                        owner.ChangePage(value, false);
+                    }
 
                     owner.UpdatePages();
                     owner.OnUpdateUIControls(new EventArgs());
@@ -74,7 +77,9 @@ namespace Manina.Windows.Forms
             public void Clear()
             {
                 if (Count == 0)
+                {
                     return;
+                }
 
                 var toRemove = new List<Page>();
                 for (int i = 0; i < Count; i++)
@@ -93,7 +98,10 @@ namespace Manina.Windows.Forms
                 {
                     controls.Remove(page);
                     if (page.Visible)
+                    {
                         owner.OnPageHidden(new PageEventArgs(page));
+                    }
+
                     owner.OnPageRemoved(new PageEventArgs(page));
                 }
                 controls.FromPageCollection = false;
@@ -141,7 +149,9 @@ namespace Manina.Windows.Forms
                     controls.FromPageCollection = false;
 
                     if (insertBeforeSelected)
+                    {
                         owner.selectedIndex = owner.selectedIndex + 1;
+                    }
 
                     owner.UpdatePages();
                     owner.OnUpdateUIControls(new EventArgs());
