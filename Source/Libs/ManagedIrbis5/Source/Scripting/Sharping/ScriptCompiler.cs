@@ -29,6 +29,7 @@ using System.Text;
 
 using AM;
 using AM.Collections;
+using AM.IO;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -390,7 +391,7 @@ internal class Program : IrbisApplication
     {
         Sure.NotNull (compilation);
 
-        using var stream = new MemoryStream();
+        using var stream = MemoryCenter.GetMemoryStream();
         if (!EmitAssemblyToStream (compilation, stream))
         {
             return null;

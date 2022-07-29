@@ -15,7 +15,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -67,23 +68,27 @@ namespace ManagedIrbis.Biblio
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            var result = new StringBuilder();
-            result.Append(Title);
-            result.Append(' ');
-            int[] refs = References.ToArray();
-            Array.Sort(refs);
-            bool first = true;
-            foreach (int reference in refs)
+            var builder = StringBuilderPool.Shared.Get();
+            builder.Append (Title);
+            builder.Append (' ');
+            var refs = References.ToArray();
+            Array.Sort (refs);
+            var first = true;
+            foreach (var reference in refs)
             {
                 if (!first)
                 {
-                    result.Append(", ");
+                    builder.Append (", ");
                 }
-                result.Append(reference);
+
+                builder.Append (reference);
                 first = false;
             }
 
-            return result.ToString();
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
         }
 
         #endregion

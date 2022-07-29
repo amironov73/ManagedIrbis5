@@ -13,19 +13,10 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 using AM.Text;
 
 #endregion
@@ -41,9 +32,9 @@ namespace ManagedIrbis.Biblio
     {
         #region Private members
 
-        private static char[] _delimiters = { '.', '!', '?', ')', ':', '}' };
+        private static readonly char[] _delimiters = { '.', '!', '?', ')', ':', '}' };
 
-        private static Regex _commandRegex = new Regex (@"\\[a-z]\d+$");
+        private static readonly Regex _commandRegex = new (@"\\[a-z]\d+$");
 
         private static void _AddDot
             (
@@ -57,7 +48,7 @@ namespace ManagedIrbis.Biblio
                 builder.Append (line);
                 if (!string.IsNullOrEmpty (line))
                 {
-                    char lastChar = line.LastChar();
+                    var lastChar = line.LastChar();
                     if (!lastChar.IsOneOf (_delimiters)
                         && !_commandRegex.IsMatch (line))
                     {
@@ -81,7 +72,8 @@ namespace ManagedIrbis.Biblio
         {
             Sure.NotNull (text);
 
-            var result = new StringBuilder (text.Length + 10);
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (text.Length + 10);
             var navigator = new TextNavigator (text);
             string? line;
             while (!navigator.IsEOF)
@@ -93,32 +85,35 @@ namespace ManagedIrbis.Biblio
                 }
 
                 var recent = navigator.RecentText (4).ToString();
-                bool par = false;
+                var par = false;
                 if (recent == "\\par")
                 {
                     if (navigator.PeekChar() == 'd')
                     {
-                        result.Append (line);
-                        result.Append ("\\par");
-                        result.Append (navigator.ReadChar());
+                        builder.Append (line);
+                        builder.Append ("\\par");
+                        builder.Append (navigator.ReadChar());
                         continue;
                     }
 
                     par = true;
                 }
 
-                _AddDot (result, line);
+                _AddDot (builder, line);
 
                 if (par)
                 {
-                    result.Append ("\\par");
+                    builder.Append ("\\par");
                 }
             }
 
             line = navigator.GetRemainingText().ToString();
-            _AddDot (result, line);
+            _AddDot (builder, line);
 
-            return result.ToString();
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
         }
 
         #endregion

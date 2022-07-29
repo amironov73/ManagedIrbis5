@@ -369,7 +369,7 @@ public static class PftSerializer
     {
         Sure.NotNull (rootNode);
 
-        // TODO Think about MemoryManager.GetMemoryStream
+        // TODO Think about MemoryCenter.GetMemoryStream
         var memory = new MemoryStream();
 
         using (var compressor = new DeflateStream (memory, CompressionMode.Compress))

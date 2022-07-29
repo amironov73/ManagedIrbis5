@@ -16,10 +16,10 @@
 #region Using directives
 
 using System;
-using System.Text;
 using System.Text.Json.Serialization;
 
 using AM;
+using AM.Text;
 
 using ManagedIrbis.Reports;
 
@@ -112,15 +112,21 @@ public class BiblioChapter
             string text
         )
     {
-        var result = new StringBuilder (text);
-        result.Replace ("[", string.Empty);
-        result.Replace ("]", string.Empty);
-        result.Replace ("\"", string.Empty);
-        result.Replace ("«", string.Empty);
-        result.Replace ("»", string.Empty);
-        result.Replace ("...", string.Empty);
+        Sure.NotNull (text);
 
-        return result.ToString();
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (text);
+        builder.Replace ("[", string.Empty);
+        builder.Replace ("]", string.Empty);
+        builder.Replace ("\"", string.Empty);
+        builder.Replace ("«", string.Empty);
+        builder.Replace ("»", string.Empty);
+        builder.Replace ("...", string.Empty);
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>

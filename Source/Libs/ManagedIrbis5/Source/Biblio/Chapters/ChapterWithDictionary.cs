@@ -291,6 +291,8 @@ public class ChapterWithDictionary
             BiblioContext context
         )
     {
+        Sure.NotNull (context);
+
         var log = context.Log;
         log.WriteLine ("Begin render {0}", this);
 

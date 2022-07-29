@@ -18,11 +18,11 @@
 
 using System;
 using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 using AM;
+using AM.Text;
 
 using ManagedIrbis.Reports;
 
@@ -115,7 +115,7 @@ public class SimpleChapter
         integers[2] = (number % 1000000 - number % 1000) / 1000;
         integers[3] = number % 1000;
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         for (var i = 0; i < 4; i++)
         {
             if (integers[i] != 0)
@@ -125,39 +125,39 @@ public class SimpleChapter
                     switch ((integers[i] - integers[i] % 100) / 100)
                     {
                         case 1:
-                            result.Append (" сто");
+                            builder.Append (" сто");
                             break;
 
                         case 2:
-                            result.Append (" двести");
+                            builder.Append (" двести");
                             break;
 
                         case 3:
-                            result.Append (" триста");
+                            builder.Append (" триста");
                             break;
 
                         case 4:
-                            result.Append (" четыреста");
+                            builder.Append (" четыреста");
                             break;
 
                         case 5:
-                            result.Append (" пятьсот");
+                            builder.Append (" пятьсот");
                             break;
 
                         case 6:
-                            result.Append (" шестьсот");
+                            builder.Append (" шестьсот");
                             break;
 
                         case 7:
-                            result.Append (" семьсот");
+                            builder.Append (" семьсот");
                             break;
 
                         case 8:
-                            result.Append (" восемьсот");
+                            builder.Append (" восемьсот");
                             break;
 
                         case 9:
-                            result.Append (" девятьсот");
+                            builder.Append (" девятьсот");
                             break;
                     }
                 }
@@ -167,35 +167,35 @@ public class SimpleChapter
                     switch ((integers[i] % 100 - integers[i] % 100 % 10) / 10)
                     {
                         case 2:
-                            result.Append (" двадцать");
+                            builder.Append (" двадцать");
                             break;
 
                         case 3:
-                            result.Append (" тридцать");
+                            builder.Append (" тридцать");
                             break;
 
                         case 4:
-                            result.Append (" сорок");
+                            builder.Append (" сорок");
                             break;
 
                         case 5:
-                            result.Append (" пятьдесят");
+                            builder.Append (" пятьдесят");
                             break;
 
                         case 6:
-                            result.Append (" шестьдесят");
+                            builder.Append (" шестьдесят");
                             break;
 
                         case 7:
-                            result.Append (" семьдесят");
+                            builder.Append (" семьдесят");
                             break;
 
                         case 8:
-                            result.Append (" восемьдесят");
+                            builder.Append (" восемьдесят");
                             break;
 
                         case 9:
-                            result.Append (" девяносто");
+                            builder.Append (" девяносто");
                             break;
                     }
                 }
@@ -203,104 +203,104 @@ public class SimpleChapter
                 switch (integers[i] % 100)
                 {
                     case 1:
-                        result.Append (i == 2 ? " одна" : " один");
+                        builder.Append (i == 2 ? " одна" : " один");
                         break;
 
                     case 2:
-                        result.Append (i == 2 ? " две" : " два");
+                        builder.Append (i == 2 ? " две" : " два");
                         break;
 
                     case 3:
-                        result.Append (" три");
+                        builder.Append (" три");
                         break;
 
                     case 4:
-                        result.Append (" четыре");
+                        builder.Append (" четыре");
                         break;
 
                     case 5:
-                        result.Append (" пять");
+                        builder.Append (" пять");
                         break;
 
                     case 6:
-                        result.Append (" шесть");
+                        builder.Append (" шесть");
                         break;
 
                     case 7:
-                        result.Append (" семь");
+                        builder.Append (" семь");
                         break;
 
                     case 8:
-                        result.Append (" восемь");
+                        builder.Append (" восемь");
                         break;
 
                     case 9:
-                        result.Append (" девять");
+                        builder.Append (" девять");
                         break;
 
                     case 10:
-                        result.Append (" десять");
+                        builder.Append (" десять");
                         break;
 
                     case 11:
-                        result.Append (" одиннадцать");
+                        builder.Append (" одиннадцать");
                         break;
 
                     case 12:
-                        result.Append (" двенадцать");
+                        builder.Append (" двенадцать");
                         break;
 
                     case 13:
-                        result.Append (" тринадцать");
+                        builder.Append (" тринадцать");
                         break;
 
                     case 14:
-                        result.Append (" четырнадцать");
+                        builder.Append (" четырнадцать");
                         break;
 
                     case 15:
-                        result.Append (" пятнадцать");
+                        builder.Append (" пятнадцать");
                         break;
 
                     case 16:
-                        result.Append (" шестнадцать");
+                        builder.Append (" шестнадцать");
                         break;
 
                     case 17:
-                        result.Append (" семнадцать");
+                        builder.Append (" семнадцать");
                         break;
 
                     case 18:
-                        result.Append (" восемнадцать");
+                        builder.Append (" восемнадцать");
                         break;
 
                     case 19:
-                        result.Append (" девятнадцать");
+                        builder.Append (" девятнадцать");
                         break;
                 }
 
                 if (integers[i] % 100 >= 10 && integers[i] % 100 <= 19)
                 {
-                    result.Append ($" ");
-                    result.Append (strings[i, 2]);
-                    result.Append (' ');
+                    builder.Append ($" ");
+                    builder.Append (strings[i, 2]);
+                    builder.Append (' ');
                 }
                 else
                 {
                     switch (integers[i] % 100)
                     {
                         case 1:
-                            result.Append (' ');
-                            result.Append (strings[i, 0]);
-                            result.Append (' ');
+                            builder.Append (' ');
+                            builder.Append (strings[i, 0]);
+                            builder.Append (' ');
                             break;
 
                         case 2:
                         case 3:
                         case 4:
-                            result.Append (' ');
-                            result.Append (strings[i, 1]);
-                            result.Append (' ');
+                            builder.Append (' ');
+                            builder.Append (strings[i, 1]);
+                            builder.Append (' ');
                             break;
 
                         case 5:
@@ -308,16 +308,19 @@ public class SimpleChapter
                         case 7:
                         case 8:
                         case 9:
-                            result.Append (' ');
-                            result.Append (strings[i, 2]);
-                            result.Append (' ');
+                            builder.Append (' ');
+                            builder.Append (strings[i, 2]);
+                            builder.Append (' ');
                             break;
                     }
                 }
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

@@ -27,6 +27,7 @@ using System.Text;
 
 using AM;
 using AM.Collections;
+using AM.IO;
 
 #endregion
 
@@ -286,15 +287,10 @@ public sealed class Response
     /// </summary>
     public byte[] ReadLine()
     {
-        using var result = new MemoryStream();
+        using var result = MemoryCenter.GetMemoryStream();
         while (true)
         {
             var one = ReadByte();
-            if (one is 0 or 10 or 30)
-            {
-                break;
-            }
-
             if (one == 13)
             {
                 if (Peek() == 10)
@@ -302,6 +298,11 @@ public sealed class Response
                     ReadByte();
                 }
 
+                break;
+            }
+
+            if (one < ' ')
+            {
                 break;
             }
 

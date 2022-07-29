@@ -16,9 +16,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using AM;
+using AM.Text;
 
 using ManagedIrbis.Reports;
 
@@ -172,6 +172,8 @@ public class ChapterWithRecords
             BiblioContext context
         )
     {
+        Sure.NotNull (context);
+
         var log = context.Log;
         var processor = context.Processor.ThrowIfNull();
         var report = processor.Report.ThrowIfNull();
@@ -201,7 +203,7 @@ public class ChapterWithRecords
                 .Distinct()
                 .ToList();
 
-            var builder = new StringBuilder();
+            var builder = StringBuilderPool.Shared.Get();
             builder.Append ("См. также: {\\i ");
             var first = true;
             foreach (var item in items)
@@ -216,9 +218,11 @@ public class ChapterWithRecords
             }
 
             builder.Append ('}');
+            var text = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
 
             report.Body.Add (new ParagraphBand());
-            report.Body.Add (new ParagraphBand (builder.ToString()));
+            report.Body.Add (new ParagraphBand (text));
         }
     }
 

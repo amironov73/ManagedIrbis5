@@ -59,21 +59,24 @@ namespace ManagedIrbis.Biblio
                 return text;
             }
 
-            var result = new StringBuilder();
+            var builder = StringBuilderPool.Shared.Get();
             var navigator = new TextNavigator (text);
-            ReadDigit (navigator, result);
-            ReadDigit (navigator, result);
-            ReadDigit (navigator, result);
-            ReadDigit (navigator, result);
+            ReadDigit (navigator, builder);
+            ReadDigit (navigator, builder);
+            ReadDigit (navigator, builder);
+            ReadDigit (navigator, builder);
 
             while (navigator.IsDigit())
             {
                 navigator.ReadChar();
             }
 
-            result.Append (navigator.GetRemainingText());
+            builder.Append (navigator.GetRemainingText());
 
-            return result.ToString();
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
         }
 
         private static bool _IsOfficial
@@ -185,7 +188,7 @@ namespace ManagedIrbis.Biblio
 
             foreach (var item in this)
             {
-                verifier.VerifySubObject (item, "item");
+                verifier.VerifySubObject (item);
             }
 
             return verifier.Result;

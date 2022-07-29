@@ -19,11 +19,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
-using System.IO;
 using System.Text;
 
 using AM;
 using AM.Collections;
+using AM.IO;
 using AM.Security;
 using AM.Text;
 
@@ -174,7 +174,7 @@ public static class IrbisUtility
         }
 
         var predictedLength = text.Length / 2;
-        using var stream = new MemoryStream (predictedLength);
+        using var stream = MemoryCenter.GetMemoryStream (predictedLength);
         for (var i = 0; i < text.Length; i++)
         {
             var c = text[i];

@@ -107,7 +107,7 @@ sealed class QueryStream
             string? value
         )
     {
-        value ??= String.Empty;
+        value ??= string.Empty;
         var converted = IrbisEncoding.Utf8.GetBytes (value);
         Write (converted);
         NewLine();

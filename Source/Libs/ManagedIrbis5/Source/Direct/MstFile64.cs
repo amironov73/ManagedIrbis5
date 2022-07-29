@@ -32,426 +32,418 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+//
+// Extract from official documentation:
+// http://sntnarciss.ru/irbis/spravka/wtcp006001020.htm
+//
+// Первая запись в файле документов – управляющая запись,
+// которая формируется(в момент определения базы данных
+// или при ее инициализации) и поддерживается автоматически.
+// Ее содержание следующее:
+// Число бит Параметр
+// 32        CTLMFN – резерв;
+// 32        NXTMFN –номер записи файла документов,
+//           назначаемый для следующей записи,
+//           создаваемой в базе данных;
+// 32        NXT_LOW – младшее слово смещения на свободное место
+//           в файле; (всегда указывает на конец файла MST)
+// 32        NXT_HIGH – старшее слово смещения на свободное
+//           место в файле
+// 32        MFTYPE – резерв;
+// 32        RECCNT – резерв;
+// 32        MFCXX1 – резерв;
+// 32        MFCXX2 – резерв;
+// 32        MFCXX3 – индикатор блокировки базы данных
+//           (0 – нет, >0 – да).
+//
+
+/// <summary>
+/// Direct reads MST file.
+/// </summary>
+public sealed class MstFile64
+    : IDisposable,
+    ISupportLogging,
+    IServiceProvider
 {
-    //
-    // Extract from official documentation:
-    // http://sntnarciss.ru/irbis/spravka/wtcp006001020.htm
-    //
-    // Первая запись в файле документов – управляющая запись,
-    // которая формируется(в момент определения базы данных
-    // или при ее инициализации) и поддерживается автоматически.
-    // Ее содержание следующее:
-    // Число бит Параметр
-    // 32        CTLMFN – резерв;
-    // 32        NXTMFN –номер записи файла документов,
-    //           назначаемый для следующей записи,
-    //           создаваемой в базе данных;
-    // 32        NXT_LOW – младшее слово смещения на свободное место
-    //           в файле; (всегда указывает на конец файла MST)
-    // 32        NXT_HIGH – старшее слово смещения на свободное
-    //           место в файле
-    // 32        MFTYPE – резерв;
-    // 32        RECCNT – резерв;
-    // 32        MFCXX1 – резерв;
-    // 32        MFCXX2 – резерв;
-    // 32        MFCXX3 – индикатор блокировки базы данных
-    //           (0 – нет, >0 – да).
-    //
+    #region Properties
 
     /// <summary>
-    /// Direct reads MST file.
+    /// How many data to preload?
     /// </summary>
-    public sealed class MstFile64
-        : IDisposable,
-        ISupportLogging,
-        IServiceProvider
+    public static int PreloadLength = 10 * 1024;
+
+    /// <summary>
+    /// Control record.
+    /// </summary>
+    public MstControlRecord64 ControlRecord { get; internal set; }
+
+    /// <summary>
+    /// File name.
+    /// </summary>
+    public string FileName { get; }
+
+    /// <summary>
+    /// Access mode.
+    /// </summary>
+    public DirectAccessMode Mode { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public MstFile64
+        (
+            string fileName,
+            DirectAccessMode mode = DirectAccessMode.Exclusive,
+            IServiceProvider? serviceProvider = null
+        )
     {
-        #region Properties
+        Sure.NotNullNorEmpty (fileName);
 
-        /// <summary>
-        /// How many data to preload?
-        /// </summary>
-        public static int PreloadLength = 10 * 1024;
+        _serviceProvider = serviceProvider ?? Magna.Host.Services;
+        _logger = (ILogger?) GetService (typeof (ILogger<MstFile64>));
+        _logger?.LogTrace ($"{nameof (MstFile64)}::Constructor ({fileName}, {mode})");
 
-        /// <summary>
-        /// Control record.
-        /// </summary>
-        public MstControlRecord64 ControlRecord { get; internal set; }
+        FileName = Unix.FindFileOrThrow (fileName);
+        Mode = mode;
 
-        /// <summary>
-        /// File name.
-        /// </summary>
-        public string FileName { get; private set; }
+        _lockObject = new object();
+        _stream = DirectUtility.OpenFile (fileName, mode);
 
-        /// <summary>
-        /// Access mode.
-        /// </summary>
-        public DirectAccessMode Mode { get; private set; }
+        ControlRecord = MstControlRecord64.Read (_stream);
+        _lockFlag = ControlRecord.Blocked != 0;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Private members
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public MstFile64
-            (
-                string fileName,
-                DirectAccessMode mode = DirectAccessMode.Exclusive,
-                IServiceProvider? serviceProvider = null
-            )
+    private ILogger? _logger;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly object _lockObject;
+    private bool _lockFlag;
+    private Stream _stream;
+
+    private static void _AppendStream
+        (
+            Stream source,
+            Stream target,
+            int amount
+        )
+    {
+        if (amount <= 0)
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            throw new IOException();
+        }
 
-            _serviceProvider = serviceProvider ?? Magna.Host.Services;
-            _logger = (ILogger?) GetService(typeof(ILogger<MstFile64>));
-            _logger?.LogTrace($"{nameof(MstFile64)}::Constructor ({fileName}, {mode})");
+        var savedPosition = target.Position;
+        target.Position = target.Length;
 
-            FileName = Unix.FindFileOrThrow(fileName);
-            Mode = mode;
-
-            _lockObject = new object();
-            _stream = DirectUtility.OpenFile(fileName, mode);
-
-            ControlRecord = MstControlRecord64.Read(_stream);
-            _lockFlag = ControlRecord.Blocked != 0;
-
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private ILogger? _logger;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly object _lockObject;
-        private bool _lockFlag;
-        private Stream _stream;
-
-        private static void _AppendStream
-            (
-                Stream source,
-                Stream target,
-                int amount
-            )
+        var buffer = new byte[amount];
+        var readed = source.Read (buffer, 0, amount);
+        if (readed <= 0)
         {
-            if (amount <= 0)
-            {
-                throw new IOException();
-            }
+            throw new IOException();
+        }
 
-            var savedPosition = target.Position;
-            target.Position = target.Length;
+        target.Write (buffer, 0, readed);
+        target.Position = savedPosition;
+    }
 
-            var buffer = new byte[amount];
-            var readed = source.Read(buffer, 0, amount);
-            if (readed <= 0)
-            {
-                throw new IOException();
-            }
+    #endregion
 
-            target.Write(buffer, 0, readed);
-            target.Position = savedPosition;
+    #region Public methods
 
-        } // method AppendStream
+    /// <summary>
+    /// Read the record (with preload optimization).
+    /// </summary>
+    public MstRecord64 ReadRecord
+        (
+            long position
+        )
+    {
+        _logger?.LogTrace ($"{nameof (MstFile64)}::{nameof (ReadRecord)} ({position})");
 
-        #endregion
+        MemoryStream memory;
+        MstRecordLeader64 leader;
 
-        #region Public methods
-
-        /// <summary>
-        /// Read the record (with preload optimization).
-        /// </summary>
-        public MstRecord64 ReadRecord
-            (
-                long position
-            )
+        lock (_lockObject)
         {
-            _logger?.LogTrace($"{nameof(MstFile64)}::{nameof(ReadRecord)} ({position})");
+            _stream.Seek (position, SeekOrigin.Begin);
 
-            MemoryStream memory;
-            MstRecordLeader64 leader;
+            memory = new MemoryStream (PreloadLength);
+            _AppendStream (_stream, memory, PreloadLength);
+            memory.Position = 0;
 
-            lock (_lockObject)
+            leader = MstRecordLeader64.Read (memory);
+            var amountToRead = (int)(leader.Length - memory.Length);
+            if (amountToRead > 0)
             {
-                _stream.Seek(position, SeekOrigin.Begin);
-
-                memory = new MemoryStream(PreloadLength);
-                _AppendStream(_stream, memory, PreloadLength);
-                memory.Position = 0;
-
-                leader = MstRecordLeader64.Read(memory);
-                var amountToRead = (int)(leader.Length - memory.Length);
-                if (amountToRead > 0)
-                {
-                    _AppendStream(_stream, memory, amountToRead);
-                }
+                _AppendStream (_stream, memory, amountToRead);
             }
+        }
 
-            var encoding = IrbisEncoding.Utf8;
-            var dictionary = new List<MstDictionaryEntry64>(leader.Nvf);
+        var encoding = IrbisEncoding.Utf8;
+        var dictionary = new List<MstDictionaryEntry64> (leader.Nvf);
 
-            var bytes = memory.ToArray();
-            for (var i = 0; i < leader.Nvf; i++)
+        var bytes = memory.ToArray();
+        for (var i = 0; i < leader.Nvf; i++)
+        {
+            var entry = new MstDictionaryEntry64
             {
-                var entry = new MstDictionaryEntry64
-                {
-                    Tag = memory.ReadInt32Network(),
-                    Position = memory.ReadInt32Network(),
-                    Length = memory.ReadInt32Network()
-                };
-                var endOffset = leader.Base + entry.Position;
-                entry.Text = encoding.GetString(bytes, endOffset, entry.Length);
-                dictionary.Add(entry);
-            }
-
-            var result = new MstRecord64
-            {
-                Leader = leader,
-                Dictionary = dictionary
+                Tag = memory.ReadInt32Network(),
+                Position = memory.ReadInt32Network(),
+                Length = memory.ReadInt32Network()
             };
+            var endOffset = leader.Base + entry.Position;
+            entry.Text = encoding.GetString (bytes, endOffset, entry.Length);
+            dictionary.Add (entry);
+        }
+
+        var result = new MstRecord64
+        {
+            Leader = leader,
+            Dictionary = dictionary
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Чтение записи в виде массива байтов.
+    /// </summary>
+    public unsafe byte[]? ReadRecordBytes
+        (
+            long position
+        )
+    {
+        const int LeaderSize = MstRecordLeader64.LeaderSize;
+
+        _logger?.LogTrace ($"{nameof (MstFile64)}::{nameof (ReadRecordBytes)} ({position})");
+
+        byte[]? result;
+        lock (_lockObject)
+        {
+            _stream.Seek (position, SeekOrigin.Begin);
+
+            Span<byte> leaderBytes = stackalloc byte[LeaderSize];
+            if (_stream.Read (leaderBytes) != LeaderSize)
+            {
+                return null;
+            }
+
+            var leader = MstRecordLeader64.Parse (leaderBytes);
+            result = new byte [leader.Length];
+            leaderBytes.CopyTo (result);
+
+            var remaining = leader.Length - LeaderSize;
+            if (_stream.Read (result, LeaderSize, remaining) != remaining)
+            {
+                return null;
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Блокировка базы данных в целом.
+    /// </summary>
+    public void LockDatabase
+        (
+            bool flag
+        )
+    {
+        lock (_lockObject)
+        {
+            var buffer = new byte[4];
+
+            _stream.Position = MstControlRecord64.LockFlagPosition;
+
+            //StreamUtility.Lock(_stream, 0, MstControlRecord64.RecordSize);
+
+            if (flag)
+            {
+                buffer[0] = 1;
+            }
+
+            _stream.Write (buffer, 0, buffer.Length);
+
+            //StreamUtility.Unlock(_stream, 0, MstControlRecord64.RecordSize);
+
+            _lockFlag = flag;
+        }
+    }
+
+    /// <summary>
+    /// Чтение флага блокировки базы данных в целом.
+    /// </summary>
+    public bool ReadDatabaseLockedFlag()
+    {
+        lock (_lockObject)
+        {
+            var buffer = new byte[4];
+
+            _stream.Position = MstControlRecord64.LockFlagPosition;
+            _stream.Read (buffer, 0, buffer.Length);
+
+            var result = Convert.ToBoolean
+                (
+                    BitConverter.ToInt32 (buffer, 0)
+                );
+            _lockFlag = result;
 
             return result;
+        }
+    }
 
-        } // method ReadRecord
-
-        /// <summary>
-        /// Чтение записи в виде массива байтов.
-        /// </summary>
-        public unsafe byte[]? ReadRecordBytes
-            (
-                long position
-            )
+    /// <summary>
+    /// Read record leader only.
+    /// </summary>
+    public MstRecordLeader64 ReadLeader
+        (
+            long position
+        )
+    {
+        lock (_lockObject)
         {
-            const int LeaderSize = MstRecordLeader64.LeaderSize;
-
-            _logger?.LogTrace ($"{nameof(MstFile64)}::{nameof(ReadRecordBytes)} ({position})");
-
-            byte[]? result;
-            lock (_lockObject)
-            {
-                _stream.Seek (position, SeekOrigin.Begin);
-
-                Span<byte> leaderBytes = stackalloc byte [LeaderSize];
-                if (_stream.Read (leaderBytes) != LeaderSize)
-                {
-                    return null;
-                }
-
-                var leader = MstRecordLeader64.Parse (leaderBytes);
-                result = new byte [leader.Length];
-                leaderBytes.CopyTo (result);
-
-                var remaining = leader.Length - LeaderSize;
-                if (_stream.Read (result, LeaderSize, remaining) != remaining)
-                {
-                    return null;
-                }
-            }
+            _stream.Position = position;
+            var result = MstRecordLeader64.Read (_stream);
 
             return result;
+        }
+    }
 
-        } // method ReadRecord
-
-        /// <summary>
-        /// Блокировка базы данных в целом.
-        /// </summary>
-        public void LockDatabase
-            (
-                bool flag
-            )
+    /// <summary>
+    /// Reopen file.
+    /// </summary>
+    public void ReopenFile
+        (
+            DirectAccessMode mode
+        )
+    {
+        if (Mode != mode)
         {
             lock (_lockObject)
             {
-                var buffer = new byte[4];
+                Mode = mode;
 
-                _stream.Position = MstControlRecord64.LockFlagPosition;
-
-                //StreamUtility.Lock(_stream, 0, MstControlRecord64.RecordSize);
-
-                if (flag)
-                {
-                    buffer[0] = 1;
-                }
-
-                _stream.Write(buffer, 0, buffer.Length);
-
-                //StreamUtility.Unlock(_stream, 0, MstControlRecord64.RecordSize);
-
-                _lockFlag = flag;
-            }
-
-        } // method LockDatabase
-
-        /// <summary>
-        /// Чтение флага блокировки базы данных в целом.
-        /// </summary>
-        public bool ReadDatabaseLockedFlag()
-        {
-            lock (_lockObject)
-            {
-                var buffer = new byte[4];
-
-                _stream.Position = MstControlRecord64.LockFlagPosition;
-                _stream.Read(buffer, 0, buffer.Length);
-
-                var result = Convert.ToBoolean
-                    (
-                        BitConverter.ToInt32(buffer, 0)
-                    );
-                _lockFlag = result;
-
-                return result;
-            }
-
-        } // method ReadDatabaseLockedFlag
-
-        /// <summary>
-        /// Read record leader only.
-        /// </summary>
-        public MstRecordLeader64 ReadLeader
-            (
-                long position
-            )
-        {
-            lock (_lockObject)
-            {
-                _stream.Position = position;
-                var result = MstRecordLeader64.Read(_stream);
-
-                return result;
-            }
-
-        } // method ReadLeader
-
-        /// <summary>
-        /// Reopen file.
-        /// </summary>
-        public void ReopenFile
-            (
-                DirectAccessMode mode
-            )
-        {
-            if (Mode != mode)
-            {
-                lock (_lockObject)
-                {
-                    Mode = mode;
-
-                    _stream.Dispose();
-                    _stream = DirectUtility.OpenFile(FileName, mode);
-                }
-            }
-
-        } // method ReopenFile
-
-        /// <summary>
-        /// Update control record.
-        /// </summary>
-        public void UpdateControlRecord
-            (
-                bool reread
-            )
-        {
-            lock (_lockObject)
-            {
-                _stream.Position = 0;
-                if (reread)
-                {
-                    ControlRecord = MstControlRecord64.Read(_stream);
-                    _stream.Position = 0;
-                }
-
-                var control = ControlRecord;
-                control.NextPosition = _stream.Length;
-                ControlRecord = control;
-                control.Write(_stream);
-                _lockFlag = ControlRecord.Blocked != 0;
-                _stream.Flush();
-            }
-
-        } // method UpdateControlRecord
-
-        /// <summary>
-        /// Update therecord leader.
-        /// </summary>
-        public void UpdateLeader
-            (
-                MstRecordLeader64 leader,
-                long position
-            )
-        {
-            lock (_lockObject)
-            {
-                _stream.Position = position;
-                leader.Write(_stream);
-                _stream.Flush();
-            }
-
-        } // method UpdateLeader
-
-        /// <summary>
-        /// Write the record.
-        /// </summary>
-        public long WriteRecord
-            (
-                MstRecord64 record
-            )
-        {
-            lock (_lockObject)
-            {
-                var position = _stream.Length;
-                _stream.Position = position;
-
-                record.Prepare();
-                record.Write(_stream);
-                _stream.Flush();
-
-                return position;
-            }
-
-        } // method WriteRecord
-
-        #endregion
-
-        #region ISupportLogging members
-
-        /// <inheritdoc cref="ISupportLogging.Logger"/>
-        // TODO implement
-        public ILogger? Logger => _logger;
-
-        /// <inheritdoc cref="ISupportLogging.SetLogger"/>
-        public void SetLogger (ILogger? logger)
-            => _logger = logger;
-
-        #endregion
-
-        #region IServiceProvider members
-
-        /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService(Type serviceType)
-            => _serviceProvider.GetService(serviceType);
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public void Dispose()
-        {
-            _logger?.LogTrace($"{nameof(MstFile64)}::Dispose");
-            lock (_lockObject)
-            {
                 _stream.Dispose();
+                _stream = DirectUtility.OpenFile (FileName, mode);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Update control record.
+    /// </summary>
+    public void UpdateControlRecord
+        (
+            bool reread
+        )
+    {
+        lock (_lockObject)
+        {
+            _stream.Position = 0;
+            if (reread)
+            {
+                ControlRecord = MstControlRecord64.Read (_stream);
+                _stream.Position = 0;
             }
 
-        } // method Dispose
+            var control = ControlRecord;
+            control.NextPosition = _stream.Length;
+            ControlRecord = control;
+            control.Write (_stream);
+            _lockFlag = ControlRecord.Blocked != 0;
+            _stream.Flush();
+        }
+    }
 
-        #endregion
+    /// <summary>
+    /// Update therecord leader.
+    /// </summary>
+    public void UpdateLeader
+        (
+            MstRecordLeader64 leader,
+            long position
+        )
+    {
+        lock (_lockObject)
+        {
+            _stream.Position = position;
+            leader.Write (_stream);
+            _stream.Flush();
+        }
+    }
 
-    } // class MstFile64
+    /// <summary>
+    /// Write the record.
+    /// </summary>
+    public long WriteRecord
+        (
+            MstRecord64 record
+        )
+    {
+        lock (_lockObject)
+        {
+            var position = _stream.Length;
+            _stream.Position = position;
 
-} // namespace ManagedIrbis.Direct
+            record.Prepare();
+            record.Write (_stream);
+            _stream.Flush();
 
+            return position;
+        }
+    }
+
+    #endregion
+
+    #region ISupportLogging members
+
+    /// <inheritdoc cref="ISupportLogging.Logger"/>
+
+    // TODO implement
+    public ILogger? Logger => _logger;
+
+    /// <inheritdoc cref="ISupportLogging.SetLogger"/>
+    public void SetLogger (ILogger? logger)
+        => _logger = logger;
+
+    #endregion
+
+    #region IServiceProvider members
+
+    /// <inheritdoc cref="IServiceProvider.GetService"/>
+    public object? GetService
+        (
+            Type serviceType
+        )
+    {
+        Sure.NotNull (serviceType);
+
+        return _serviceProvider.GetService (serviceType);
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public void Dispose()
+    {
+        _logger?.LogTrace ($"{nameof (MstFile64)}::Dispose");
+        lock (_lockObject)
+        {
+            _stream.Dispose();
+        }
+    }
+
+    #endregion
+}

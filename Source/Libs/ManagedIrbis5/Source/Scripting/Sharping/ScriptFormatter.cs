@@ -26,6 +26,7 @@ using System.Reflection;
 using System.Text;
 
 using AM;
+using AM.IO;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -171,7 +172,7 @@ public sealed class ScriptFormatter
                 localOptions.References,
                 compilationOptions
             );
-        var memory = new MemoryStream();
+        using var memory = MemoryCenter.GetMemoryStream();
         var emit = compilation.Emit (memory);
         if (!emit.Success)
         {
@@ -200,6 +201,8 @@ public sealed class ScriptFormatter
             string sourceCode
         )
     {
+        Sure.NotNull (sourceCode);
+
         var binary = _cache?.GetAssembly (sourceCode);
         if (binary is null)
         {
