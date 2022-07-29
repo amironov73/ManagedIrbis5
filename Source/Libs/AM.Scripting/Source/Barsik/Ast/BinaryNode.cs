@@ -14,8 +14,9 @@
 
 using System;
 using System.Collections;
-using System.Text;
 using System.Text.RegularExpressions;
+
+using AM.Text;
 
 #endregion
 
@@ -208,13 +209,16 @@ internal sealed class BinaryNode
             if (right is int length)
             {
                 // как в питоне
-                var builder = new StringBuilder();
+                var builder = StringBuilderPool.Shared.Get();
                 for (var i = 0; i < length; i++)
                 {
                     builder.Append (str);
                 }
 
-                return builder.ToString();
+                var result = builder.ToString();
+                StringBuilderPool.Shared.Return (builder);
+
+                return result;
             }
         }
 

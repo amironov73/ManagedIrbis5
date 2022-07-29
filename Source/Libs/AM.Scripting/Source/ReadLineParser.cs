@@ -15,6 +15,8 @@
 
 using System.Text;
 
+using AM.Text;
+
 using Pidgin;
 
 #endregion
@@ -61,7 +63,6 @@ internal sealed class ReadLineParser
         )
     {
         result = null!;
-        var builder = new StringBuilder();
 
         if (!state.HasCurrent)
         {
@@ -69,6 +70,7 @@ internal sealed class ReadLineParser
             return false;
         }
 
+        var builder = StringBuilderPool.Shared.Get();
         while (state.HasCurrent)
         {
             // state.DumpChar();
@@ -90,6 +92,7 @@ internal sealed class ReadLineParser
 
         // state.DumpChar();
         result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
         return true;
     }

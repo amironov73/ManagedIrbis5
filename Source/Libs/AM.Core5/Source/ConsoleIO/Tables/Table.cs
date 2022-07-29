@@ -16,6 +16,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using AM.Text;
+
 #endregion
 
 #nullable enable
@@ -151,7 +153,9 @@ public sealed class Table
             object title
         )
     {
-        var titleText = title.ToString().ThrowIfNull();
+        Sure.NotNull (title);
+
+        var titleText = title.ToInvariantString().ThrowIfNull();
         _columns.Add (new ColumnHeader (titleText));
 
         return this;
@@ -167,6 +171,8 @@ public sealed class Table
             params object[] values
         )
     {
+        Sure.NotNull (values);
+
         _rows.Add (values);
 
         return this;
@@ -211,19 +217,22 @@ public sealed class Table
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         var widths = CountWidth();
-        FormatRow (result, widths, _columns);
-        result.AppendLine();
-        DividerLine (result, widths);
-        result.AppendLine();
+        FormatRow (builder, widths, _columns);
+        builder.AppendLine();
+        DividerLine (builder, widths);
+        builder.AppendLine();
         foreach (var row in _rows)
         {
-            FormatRow (result, widths, row);
-            result.AppendLine();
+            FormatRow (builder, widths, row);
+            builder.AppendLine();
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

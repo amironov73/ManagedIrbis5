@@ -17,7 +17,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using AM.Text;
 
@@ -63,14 +62,12 @@ public static class ParameterUtility
     {
         Sure.NotNull (parameters);
 
-        var result = new StringBuilder();
-
+        var builder = StringBuilderPool.Shared.Get();
         char[] badNameCharacters = { NameSeparator };
         char[] badValueCharacters = { ValueSeparator };
-
         foreach (var parameter in parameters)
         {
-            result.Append
+            builder.Append
                 (
                     Utility.Mangle
                         (
@@ -79,8 +76,8 @@ public static class ParameterUtility
                             badNameCharacters
                         )
                 );
-            result.Append (NameSeparator);
-            result.Append
+            builder.Append (NameSeparator);
+            builder.Append
                 (
                     Utility.Mangle
                         (
@@ -89,10 +86,13 @@ public static class ParameterUtility
                             badValueCharacters
                         )
                 );
-            result.Append (ValueSeparator);
+            builder.Append (ValueSeparator);
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>

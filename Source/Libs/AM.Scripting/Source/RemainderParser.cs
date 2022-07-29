@@ -11,7 +11,7 @@
 
 #region Using directives
 
-using System.Text;
+using AM.Text;
 
 using Pidgin;
 
@@ -38,13 +38,14 @@ internal sealed class RemainderParser
             out string result
         )
     {
-        var builder = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         while (state.HasCurrent)
         {
             builder.Append (state.ReadChar());
         }
 
         result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
         return true;
     }

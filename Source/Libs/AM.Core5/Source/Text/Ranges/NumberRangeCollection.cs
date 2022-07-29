@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 using AM.IO;
 using AM.Runtime;
@@ -377,9 +376,8 @@ public sealed class NumberRangeCollection
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         var first = true;
-
         foreach (var item in _items)
         {
             var text = item.ToString();
@@ -387,15 +385,18 @@ public sealed class NumberRangeCollection
             {
                 if (!first)
                 {
-                    result.Append (Delimiter);
+                    builder.Append (Delimiter);
                 }
 
-                result.Append (text);
+                builder.Append (text);
                 first = false;
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

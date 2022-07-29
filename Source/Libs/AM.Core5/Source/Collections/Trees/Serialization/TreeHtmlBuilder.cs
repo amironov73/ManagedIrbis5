@@ -67,7 +67,13 @@ namespace TreeCollections
         /// <param name="maxRelativeDepth">Max depth of traversal (relative to root)</param>
         /// <param name="includeRoot">Include relative root in HTML</param>
         /// <returns></returns>
-        public string ToHtml (TNode root, Func<TNode, bool> allowNext, int maxRelativeDepth, bool includeRoot = true)
+        public string ToHtml
+            (
+                TNode root,
+                Func<TNode, bool> allowNext,
+                int maxRelativeDepth,
+                bool includeRoot = true
+            )
         {
             if (!allowNext (root) || maxRelativeDepth < 0) return string.Empty;
 

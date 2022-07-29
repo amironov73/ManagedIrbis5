@@ -17,8 +17,9 @@
 
 #region Using directives
 
-using System.Text;
 using System.Text.RegularExpressions;
+
+using AM.Text;
 
 #endregion
 
@@ -44,7 +45,8 @@ public static class MailUtility
     {
         Sure.NotNullNorEmpty (email);
 
-        var result = new StringBuilder (email.Length);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (email.Length);
         foreach (var c in email)
         {
             // Пробелов и служебных символов вообще не должно быть
@@ -61,116 +63,119 @@ public static class MailUtility
                 // да и выглядят на мелком шрифте почти одинаково,
                 // поэтому запятую часто вводят вместо точки.
                 case ',':
-                    result.Append ('.');
+                    builder.Append ('.');
                     break;
 
                 case 'А':
-                    result.Append ('A');
+                    builder.Append ('A');
                     break;
 
                 case 'а':
-                    result.Append ('a');
+                    builder.Append ('a');
                     break;
 
                 case 'В':
-                    result.Append ('B');
+                    builder.Append ('B');
                     break;
 
                 case 'в':
-                    result.Append ('b');
+                    builder.Append ('b');
                     break;
 
                 case 'С':
-                    result.Append ('C');
+                    builder.Append ('C');
                     break;
 
                 case 'с':
-                    result.Append ('c');
+                    builder.Append ('c');
                     break;
 
                 case 'Е':
-                    result.Append ('E');
+                    builder.Append ('E');
                     break;
 
                 case 'е':
-                    result.Append ('e');
+                    builder.Append ('e');
                     break;
 
                 case 'Н':
-                    result.Append ('H');
+                    builder.Append ('H');
                     break;
 
                 case 'п':
-                    result.Append ('n');
+                    builder.Append ('n');
                     break;
 
                 case 'К':
-                    result.Append ('K');
+                    builder.Append ('K');
                     break;
 
                 case 'к':
-                    result.Append ('k');
+                    builder.Append ('k');
                     break;
 
                 case 'М':
-                    result.Append ('M');
+                    builder.Append ('M');
                     break;
 
                 case 'м':
-                    result.Append ('m');
+                    builder.Append ('m');
                     break;
 
                 case 'О':
-                    result.Append ('O');
+                    builder.Append ('O');
                     break;
 
                 case 'о':
-                    result.Append ('o');
+                    builder.Append ('o');
                     break;
 
                 case 'Р':
-                    result.Append ('P');
+                    builder.Append ('P');
                     break;
 
                 case 'р':
-                    result.Append ('p');
+                    builder.Append ('p');
                     break;
 
                 case 'Т':
-                    result.Append ('T');
+                    builder.Append ('T');
                     break;
 
                 case 'т':
-                    result.Append ('t');
+                    builder.Append ('t');
                     break;
 
                 case 'Х':
-                    result.Append ('x');
+                    builder.Append ('x');
                     break;
 
                 case 'х':
-                    result.Append ('x');
+                    builder.Append ('x');
                     break;
 
                 case 'У':
-                    result.Append ('Y');
+                    builder.Append ('Y');
                     break;
 
                 case 'у':
-                    result.Append ('y');
+                    builder.Append ('y');
                     break;
 
                 default:
                     if (c < 256)
                     {
-                        result.Append (c);
+                        builder.Append (c);
                     }
 
                     break;
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>

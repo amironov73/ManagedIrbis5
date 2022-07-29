@@ -17,7 +17,8 @@
 
 using System;
 using System.IO;
-using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -149,23 +150,25 @@ public static class PathUtility
             }
         }
 
-        var relativePath = new StringBuilder();
-
+        var builder = StringBuilderPool.Shared.Get();
         for (var i = 0; i < baseParts.Length - offset; i++)
         {
-            relativePath.Append ("..");
-            relativePath.Append (mainSeparator);
+            builder.Append ("..");
+            builder.Append (mainSeparator);
         }
 
         for (var i = offset; i < absoluteParts.Length - 1; i++)
         {
-            relativePath.Append (absoluteParts[i]);
-            relativePath.Append (mainSeparator);
+            builder.Append (absoluteParts[i]);
+            builder.Append (mainSeparator);
         }
 
-        relativePath.Append (absoluteParts[^1]);
+        builder.Append (absoluteParts[^1]);
 
-        return relativePath.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>

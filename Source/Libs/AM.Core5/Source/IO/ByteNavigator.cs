@@ -19,6 +19,8 @@ using System;
 using System.IO;
 using System.Text;
 
+using AM.Text;
+
 #endregion
 
 #nullable enable
@@ -400,8 +402,7 @@ public sealed class ByteNavigator
             return null;
         }
 
-        var result = new StringBuilder();
-
+        var builder = StringBuilderPool.Shared.Get();
         while (!IsEOF)
         {
             var c = PeekChar();
@@ -410,7 +411,7 @@ public sealed class ByteNavigator
                 break;
             }
             c = ReadChar();
-            result.Append(c);
+            builder.Append(c);
         }
 
         if (!IsEOF)
@@ -428,7 +429,10 @@ public sealed class ByteNavigator
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>

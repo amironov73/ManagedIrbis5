@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Text;
 
 #endregion
 
@@ -70,17 +69,20 @@ public abstract class Hyphenator
             int[] positions
         )
     {
-        var result = new StringBuilder();
-        for (int i = 0; i < word.Length; i++)
+        var builder = StringBuilderPool.Shared.Get();
+        for (var i = 0; i < word.Length; i++)
         {
-            result.Append (word[i]);
+            builder.Append (word[i]);
             if (Array.IndexOf (positions, i) >= 0)
             {
-                result.Append ('-');
+                builder.Append ('-');
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

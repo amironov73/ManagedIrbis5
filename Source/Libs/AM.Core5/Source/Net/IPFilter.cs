@@ -19,7 +19,8 @@
 
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -124,20 +125,23 @@ public sealed class IPFilter
             return "*";
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         var first = true;
         foreach (var range in Ranges)
         {
             if (!first)
             {
-                result.Append (';');
+                builder.Append (';');
             }
 
-            result.Append (range);
+            builder.Append (range);
             first = false;
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

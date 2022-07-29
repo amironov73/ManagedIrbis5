@@ -27,6 +27,7 @@ using System.Text;
 
 using AM.Collections;
 using AM.Runtime;
+using AM.Text;
 
 using Microsoft.Extensions.Logging;
 
@@ -572,17 +573,20 @@ public class IniFile
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            var result = new StringBuilder();
-            result
-                .AppendFormat ("[{0}]", Name)
+            var builder = StringBuilderPool.Shared.Get();
+            builder
+                .Append ($"[{Name}]")
                 .AppendLine();
 
             foreach (var line in _lines)
             {
-                result.AppendLine (line.ToString());
+                builder.AppendLine (line.ToString());
             }
 
-            return result.ToString();
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
         }
 
         #endregion
@@ -1025,8 +1029,7 @@ public class IniFile
         _sections.Clear();
         Section? section = null;
 
-        string? line;
-        while ((line = reader.ReadLine()) != null)
+        while (reader.ReadLine() is { } line)
         {
             line = line.Trim();
             if (string.IsNullOrEmpty (line))
