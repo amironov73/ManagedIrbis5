@@ -15,9 +15,8 @@
 
 #region Using directives
 
-using System.Text;
-
 using AM;
+using AM.Text;
 
 using Microsoft.Extensions.Logging;
 
@@ -35,27 +34,27 @@ public static class IrbisFormat
     #region Constants
 
     /// <summary>
-    /// Format ALL.
+    /// Формат ALL.
     /// </summary>
     public const string All = "&uf('+0')";
 
     /// <summary>
-    /// BRIEF format.
+    /// Формат BRIEF.
     /// </summary>
     public const string Brief = "@brief";
 
     /// <summary>
-    /// IBIS format.
+    /// Формат IBIS.
     /// </summary>
     public const string Ibis = "@ibiskw_h";
 
     /// <summary>
-    /// Informational format.
+    /// Информационный формат.
     /// </summary>
     public const string Informational = "@info_w";
 
     /// <summary>
-    /// Optimized format.
+    /// Оптимизированный формат..
     /// </summary>
     public const string Optimized = "@";
 
@@ -64,7 +63,7 @@ public static class IrbisFormat
     #region Public methods
 
     /// <summary>
-    /// Remove comments from the format.
+    /// Удаление пробелов из формата.
     /// </summary>
     public static string? RemoveComments
         (
@@ -84,7 +83,7 @@ public static class IrbisFormat
         }
 
         int index = 0, length = text.Length;
-        var result = new StringBuilder (length);
+        var builder = StringBuilderPool.Shared.Get();
         var state = zero;
 
         while (index < length)
@@ -101,7 +100,7 @@ public static class IrbisFormat
                         state = zero;
                     }
 
-                    result.Append (c);
+                    builder.Append (c);
                     break;
 
                 default:
@@ -114,7 +113,7 @@ public static class IrbisFormat
                                 c = text[index];
                                 if (c == '\r' || c == '\n')
                                 {
-                                    result.Append (c);
+                                    builder.Append (c);
                                     break;
                                 }
 
@@ -123,30 +122,34 @@ public static class IrbisFormat
                         }
                         else
                         {
-                            result.Append (c);
+                            builder.Append (c);
                         }
                     }
-                    else if (c == '\'' || c == '"' || c == '|')
+                    else if (c is '\'' or '"' or '|')
                     {
                         state = c;
-                        result.Append (c);
+                        builder.Append (c);
                     }
                     else
                     {
-                        result.Append (c);
+                        builder.Append (c);
                     }
 
                     break;
             }
 
             index++;
-        } // while
+        }
 
-        return result.ToString();
-    } // method RemoveComments
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
 
     /// <summary>
-    /// Prepare the dynamic format string.
+    /// Подготовка динамического формата к отправке
+    /// в составе клиентского запроса на сервер.
     /// </summary>
     /// <remarks>Dynamic format string
     /// mustn't contains comments and
@@ -185,21 +188,24 @@ public static class IrbisFormat
             return text;
         }
 
-        var result = new StringBuilder (length);
+        var builder = StringBuilderPool.Shared.Get();
         for (var i = 0; i < length; i++)
         {
             var c = text[i];
             if (c >= ' ')
             {
-                result.Append (c);
+                builder.Append (c);
             }
         }
 
-        return result.ToString();
-    } // method PrepareFormat
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
 
     /// <summary>
-    /// Verify format string.
+    /// Верификация строки запроса.
     /// </summary>
     public static bool VerifyFormat
         (

@@ -21,10 +21,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 using AM;
 using AM.IO;
+using AM.Text;
 
 #endregion
 
@@ -378,13 +378,13 @@ public sealed class IfpRecord64
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        var builder = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         foreach (var link in Links)
         {
             builder.AppendLine (link.ToString());
         }
 
-        return string.Format
+        var result = string.Format
             (
                 "LowOffset: {0}, HighOffset: {1}, TotalLinkCount: {2}, "
                 + "BlockLinkCount: {3}, Capacity: {4}\r\nItems: {5}",
@@ -395,6 +395,9 @@ public sealed class IfpRecord64
                 Capacity,
                 builder
             );
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

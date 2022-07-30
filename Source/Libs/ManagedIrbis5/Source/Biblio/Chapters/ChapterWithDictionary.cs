@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Json.Serialization;
 
@@ -96,9 +95,9 @@ public class ChapterWithDictionary
 
     #region Private members
 
-    private static char[] _charactersToTrim = { '[', ']' };
+    private static readonly char[] _charactersToTrim = { '[', ']' };
 
-    private static char[] _lineDelimiters = { '\r', '\n', '\u001F' };
+    private static readonly char[] _lineDelimiters = { '\r', '\n', '\u001F' };
 
     private void _ChapterToTerms
         (
@@ -303,9 +302,9 @@ public class ChapterWithDictionary
         RenderTitle (context);
 
         var keys = Dictionary.Keys.ToArray();
-        var items = keys.Select (k => CleanOrder (k)).ToArray();
+        var items = keys.Select (CleanOrder).ToArray();
         Array.Sort (items, keys); //-V3066
-        var builder = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         foreach (var key in keys)
         {
             log.Write (".");
@@ -369,6 +368,7 @@ public class ChapterWithDictionary
             builder.Append ('}');
 
             var description = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
             if (!string.IsNullOrEmpty (description))
             {
                 // TODO implement properly!!!
