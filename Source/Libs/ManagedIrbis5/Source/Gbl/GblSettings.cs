@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMethodReturnValue.Global
 
 /* GblSettings.cs -- settings for GBL
@@ -15,17 +16,22 @@
 #region Using directives
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
 
 using AM;
 using AM.Collections;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 #endregion
 
@@ -38,7 +44,7 @@ namespace ManagedIrbis.Gbl;
 /// </summary>
 public sealed class GblSettings
     : IVerifiable,
-    IHandmadeSerializable
+        IHandmadeSerializable
 {
     #region Constants
 
@@ -52,79 +58,103 @@ public sealed class GblSettings
     #region Properties
 
     /// <summary>
-    /// Actualize records after processing.
+    /// Актуализировать записи после обработки?
     /// </summary>
     [JsonPropertyName ("actualize")]
+    [DisplayName ("Актуализация")]
+    [Description ("Актуализировать записи после обработки?")]
     public bool Actualize { get; set; } = true;
 
     /// <summary>
-    /// Process 'autoin.gbl'.
+    /// Выполнить также 'autoin.gbl'?
     /// </summary>
     [JsonPropertyName ("autoin")]
+    [DisplayName ("Выполнять autoin?")]
+    [Description ("Выполнять также autoin.gbl?")]
     public bool Autoin { get; set; }
 
     /// <summary>
-    /// Database name.
+    /// Имя базы данных.
     /// </summary>
     [JsonPropertyName ("database")]
+    [DisplayName ("База данных")]
+    [Description ("Имя базы данныхх")]
     public string? Database { get; set; }
 
     /// <summary>
-    /// File name.
+    /// Имя (серверного) файла.
     /// </summary>
     [JsonPropertyName ("fileName")]
+    [DisplayName ("Имя файла")]
+    [Description ("Имя файла")]
     public string? FileName { get; set; }
 
     /// <summary>
-    /// First record MFN.
+    /// MFN первой записи.
     /// </summary>
     [JsonPropertyName ("firstRecord")]
+    [DisplayName ("Первая запись")]
+    [Description ("MFN первой записи")]
     public int FirstRecord { get; set; } = 1;
 
     /// <summary>
-    /// Provide formal control.
+    /// Включение формально-логического контроля.
     /// </summary>
     [JsonPropertyName ("formalControl")]
+    [DisplayName ("ФЛК")]
+    [Description ("Формально-логический контроль")]
     public bool FormalControl { get; set; }
 
     /// <summary>
-    /// Maximal MFN.
+    /// Максимальный MFN.
     /// </summary>
-    /// <remarks>0 means 'all records in the database'.
+    /// <remarks>0 означает 'все записи в базе данных'.
     /// </remarks>
     [JsonPropertyName ("maxMfn")]
+    [DisplayName ("Максимальный MFN")]
+    [Description ("Максимальный MFN")]
     public int MaxMfn { get; set; }
 
     /// <summary>
-    /// List of MFN to process.
+    /// Список MFN, подлежащих обработке.
     /// </summary>
     [JsonPropertyName ("mfnList")]
+    [DisplayName ("Список MFN")]
+    [Description ("Список MFN, подлежащих обработке")]
     public int[]? MfnList { get; set; }
 
     /// <summary>
-    /// Minimal MFN.
+    /// Минимальный MFN.
     /// </summary>
-    /// <remarks>0 means 'all records in the database'.
+    /// <remarks>0 означает 'все записи в базе данных'.
     /// </remarks>
     [JsonPropertyName ("minMfn")]
+    [DisplayName ("Минимальный MFN")]
+    [Description ("Минимальный MFN")]
     public int MinMfn { get; set; }
 
     /// <summary>
-    /// Number of records to process.
+    /// Количество записей, подлежащих обработке.
     /// </summary>
     [JsonPropertyName ("numberOfRecords")]
+    [DisplayName ("Количество записей")]
+    [Description ("Количество записей, подлежащиз обработке")]
     public int NumberOfRecords { get; set; }
 
     /// <summary>
-    /// Search expression.
+    /// Поисковое выражение, отбирающее записи для обработки.
     /// </summary>
     [JsonPropertyName ("searchExpression")]
+    [DisplayName ("Поисковое выражение")]
+    [Description ("Поисковое выражение, отбирающее записи для обработки")]
     public string? SearchExpression { get; set; }
 
     /// <summary>
-    /// Statements.
+    /// Операторы глобальной корректировки.
     /// </summary>
     [JsonPropertyName ("statements")]
+    [DisplayName ("Операторы")]
+    [Description ("Операторы глобальной корректировки")]
     public NonNullCollection<GblStatement> Statements { get; private set; } = new ();
 
     #endregion
@@ -136,14 +166,22 @@ public sealed class GblSettings
     /// </summary>
     public GblSettings()
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
     /// Конструктор.
     /// </summary>
     /// <param name="connection">Настроенное подключение.</param>
-    public GblSettings (ISyncProvider connection) =>
-        Database = connection.Database;
+    public GblSettings
+        (
+            IIrbisProvider connection
+        )
+    {
+        Sure.NotNull (connection);
+
+        Database = connection.Database; // не надо EnsureDatabase
+    }
 
     /// <summary>
     /// Конструктор.
@@ -152,17 +190,22 @@ public sealed class GblSettings
     /// <param name="statements">Операторы ГК.</param>
     public GblSettings
         (
-            ISyncProvider connection,
+            IIrbisProvider connection,
             IEnumerable<GblStatement> statements
         )
-        : this (connection) => Statements.AddRange (statements);
+        : this (connection)
+    {
+        Sure.NotNull ((object?) statements);
+
+        Statements.AddRange (statements);
+    }
 
     #endregion
 
     #region Public methods
 
     /// <summary>
-    /// Кодирование пользовательского запроса.
+    /// Кодирование клиентского запроса.
     /// </summary>
     public void Encode<T>
         (
@@ -177,7 +220,7 @@ public sealed class GblSettings
         }
         else
         {
-            var builder = new StringBuilder();
+            var builder = StringBuilderPool.Shared.Get();
 
             // "!" здесь означает, что передавать будем в UTF-8
             builder.Append ('!');
@@ -195,6 +238,7 @@ public sealed class GblSettings
 
             builder.Append (Delimiter);
             query.AddUtf (builder.ToString());
+            StringBuilderPool.Shared.Return (builder);
         }
 
         // отбор записей на основе поиска
@@ -232,31 +276,27 @@ public sealed class GblSettings
         {
             query.AddAnsi ("&");
         }
-    } // method Encode
-
-    /*
+    }
 
     /// <summary>
-    /// Restore settings from JSON string.
+    /// Восстановление настроек из JSON-строки.
     /// </summary>
     public static GblSettings FromJson
         (
             string text
         )
     {
-        Sure.NotNullNorEmpty(text, nameof(text));
+        Sure.NotNullNorEmpty (text);
 
-        GblSettings result = JsonConvert
-            .DeserializeObject<GblSettings>(text);
+        var result = JsonConvert.DeserializeObject<GblSettings> (text)
+            .ThrowIfNull();
 
         return result;
     }
 
-    */
-
     /// <summary>
-    /// Create <see cref="GblSettings"/>
-    /// for given interval of MFN.
+    /// Создание настроек <see cref="GblSettings"/>
+    /// для заданного интервала MFN.
     /// </summary>
     public static GblSettings ForInterval
         (
@@ -266,6 +306,11 @@ public sealed class GblSettings
             IEnumerable<GblStatement> statements
         )
     {
+        Sure.NotNull (connection);
+        Sure.NonNegative (minMfn);
+        Sure.NonNegative (maxMfn);
+        Sure.NotNull ((object?) statements);
+
         var result = new GblSettings (connection, statements)
         {
             MinMfn = minMfn,
@@ -273,11 +318,11 @@ public sealed class GblSettings
         };
 
         return result;
-    } // method ForInterval
+    }
 
     /// <summary>
-    /// Create <see cref="GblSettings"/>
-    /// for given interval of MFN.
+    /// Создание настроек <see cref="GblSettings"/>
+    /// для заданного интервала MFN.
     /// </summary>
     public static GblSettings ForInterval
         (
@@ -288,19 +333,24 @@ public sealed class GblSettings
             IEnumerable<GblStatement> statements
         )
     {
+        Sure.NotNull (connection);
+        Sure.NonNegative (minMfn);
+        Sure.NonNegative (maxMfn);
+        Sure.NotNull ((object?) statements);
+
         var result = new GblSettings (connection, statements)
         {
-            Database = database,
+            Database = connection.EnsureDatabase (database),
             MinMfn = minMfn,
             MaxMfn = maxMfn
         };
 
         return result;
-    } // method ForInterval
+    }
 
     /// <summary>
-    /// Create <see cref="GblSettings"/>
-    /// for given list of MFN.
+    /// Создание настроек <see cref="GblSettings"/>
+    /// для заданного списка MFN.
     /// </summary>
     public static GblSettings ForList
         (
@@ -309,17 +359,21 @@ public sealed class GblSettings
             IEnumerable<GblStatement> statements
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull ((object?) mfnList);
+        Sure.NotNull ((object?) statements);
+
         var result = new GblSettings (connection, statements)
         {
             MfnList = mfnList.ToArray()
         };
 
         return result;
-    } // method ForList
+    }
 
     /// <summary>
-    /// Create <see cref="GblSettings"/>
-    /// for given list of MFN.
+    /// Создание настроек <see cref="GblSettings"/>
+    /// для заданного спика MFN.
     /// </summary>
     public static GblSettings ForList
         (
@@ -329,18 +383,22 @@ public sealed class GblSettings
             IEnumerable<GblStatement> statements
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull ((object?) mfnList);
+        Sure.NotNull ((object?) statements);
+
         var result = new GblSettings (connection, statements)
         {
-            Database = database,
+            Database = connection.EnsureDatabase (database),
             MfnList = mfnList.ToArray()
         };
 
         return result;
-    } // method ForList
+    }
 
     /// <summary>
-    /// Create <see cref="GblSettings"/>
-    /// for given list of MFN.
+    /// Сокздание настроек <see cref="GblSettings"/>
+    /// для заданного списка MFN.
     /// </summary>
     public static GblSettings ForList
         (
@@ -349,18 +407,21 @@ public sealed class GblSettings
             IEnumerable<int> mfnList
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull ((object?) mfnList);
+
         var result = new GblSettings (connection)
         {
-            Database = database,
+            Database = connection.EnsureDatabase (database),
             MfnList = mfnList.ToArray()
         };
 
         return result;
-    } // method ForList
+    }
 
     /// <summary>
-    /// Create <see cref="GblSettings"/>
-    /// for given searchExpression.
+    /// Создание настроек <see cref="GblSettings"/>
+    /// по заданному поисковому выражению.
     /// </summary>
     public static GblSettings ForSearchExpression
         (
@@ -369,17 +430,20 @@ public sealed class GblSettings
             IEnumerable<GblStatement> statements
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull ((object?) statements);
+
         var result = new GblSettings (connection, statements)
         {
             SearchExpression = searchExpression
         };
 
         return result;
-    } // method ForSearchExpression
+    }
 
     /// <summary>
-    /// Create <see cref="GblSettings"/>
-    /// for given searchExpression.
+    /// Создание настроек <see cref="GblSettings"/>
+    /// по заданному поисковому выражению.
     /// </summary>
     public static GblSettings ForSearchExpression
         (
@@ -389,17 +453,20 @@ public sealed class GblSettings
             IEnumerable<GblStatement> statements
         )
     {
+        Sure.NotNull (connection);
+        Sure.NotNull ((object?) statements);
+
         var result = new GblSettings (connection, statements)
         {
-            Database = database,
+            Database = connection.EnsureDatabase (database),
             SearchExpression = searchExpression
         };
 
         return result;
-    } // method ForSearchExpression
+    }
 
     /// <summary>
-    /// Set (server) file name.
+    /// Задание (серверного) имени файла.
     /// </summary>
     public GblSettings SetFileName
         (
@@ -409,11 +476,11 @@ public sealed class GblSettings
         FileName = fileName;
 
         return this;
-    } // method SetFileName
+    }
 
     /// <summary>
-    /// Set first record and number of records
-    /// to process.
+    /// Задание MFN первой записи и общего количества
+    /// обрабатываемых записей.
     /// </summary>
     public GblSettings SetRange
         (
@@ -421,17 +488,17 @@ public sealed class GblSettings
             int numberOfRecords
         )
     {
-        Sure.NonNegative (firstRecord, nameof (firstRecord));
-        Sure.NonNegative (numberOfRecords, nameof (numberOfRecords));
+        Sure.NonNegative (firstRecord);
+        Sure.NonNegative (numberOfRecords);
 
         FirstRecord = firstRecord;
         NumberOfRecords = numberOfRecords;
 
         return this;
-    } // method SetRange
+    }
 
     /// <summary>
-    /// Set search expression.
+    /// Задание поискового выражения.
     /// </summary>
     public GblSettings SetSearchExpression
         (
@@ -441,22 +508,18 @@ public sealed class GblSettings
         SearchExpression = searchExpression;
 
         return this;
-    } // method SetSearchExpression
-
-    /*
+    }
 
     /// <summary>
-    /// Convert settings to JSON string.
+    /// Представление настроке в виде JSON-строки.
     /// </summary>
     public string ToJson()
     {
-        string result = JObject.FromObject(this)
-            .ToString(Formatting.None);
+        var result = JObject.FromObject (this)
+            .ToString (Newtonsoft.Json.Formatting.None);
 
         return result;
     }
-
-    */
 
     #endregion
 
@@ -468,6 +531,8 @@ public sealed class GblSettings
             BinaryReader reader
         )
     {
+        Sure.NotNull (reader);
+
         Actualize = reader.ReadBoolean();
         Autoin = reader.ReadBoolean();
         Database = reader.ReadNullableString();
@@ -480,7 +545,7 @@ public sealed class GblSettings
         NumberOfRecords = reader.ReadPackedInt32();
         SearchExpression = reader.ReadNullableString();
         Statements = reader.ReadNonNullCollection<GblStatement>();
-    } // method RestoreFromStream
+    }
 
     /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
     public void SaveToStream
@@ -488,6 +553,8 @@ public sealed class GblSettings
             BinaryWriter writer
         )
     {
+        Sure.NotNull (writer);
+
         writer.Write (Actualize);
         writer.Write (Autoin);
         writer.WriteNullable (Database);

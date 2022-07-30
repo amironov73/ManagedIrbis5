@@ -6,145 +6,149 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* GblNodeCollection.cs --
+/* GblNodeCollection.cs -- коллекция GBL-узлов
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.Collections.ObjectModel;
-using System.Text;
 
 using AM;
 using AM.Collections;
+using AM.Text;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure
+namespace ManagedIrbis.Gbl.Infrastructure;
+
+/// <summary>
+/// Коллекция GBL-узлов.
+/// </summary>
+public sealed class GblNodeCollection
+    : NonNullCollection<GblNode>
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Узел-родитель.
     /// </summary>
-    public sealed class GblNodeCollection
-        : NonNullCollection<GblNode>
+    public GblNode? Parent { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public GblNodeCollection
+        (
+            GblNode? parent
+        )
     {
-        #region Properties
+        Parent = parent;
+    }
 
-        /// <summary>
-        /// Parent node.
-        /// </summary>
-        public GblNode? Parent { get; }
+    #endregion
 
-        #endregion
+    #region Collection<T> members
 
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public GblNodeCollection
-            (
-                GblNode? parent
-            )
+    /// <inheritdoc cref="Collection{T}.ClearItems" />
+    protected override void ClearItems()
+    {
+        foreach (var node in this)
         {
-            Parent = parent;
-        }
-
-        #endregion
-
-        #region Collection<T> members
-
-        /// <inheritdoc cref="Collection{T}.ClearItems" />
-        protected override void ClearItems()
-        {
-            foreach (GblNode node in this)
-            {
-                node.Parent = null;
-            }
-
-            base.ClearItems();
-        }
-
-        /// <inheritdoc cref="NonNullCollection{T}.InsertItem" />
-        protected override void InsertItem
-            (
-                int index,
-                GblNode item
-            )
-        {
-            Sure.NotNull(item, nameof(item));
-
-            if (!ReferenceEquals(item.Parent, null))
-            {
-                if (!ReferenceEquals(item.Parent, Parent))
-                {
-                    throw new IrbisException();
-                }
-            }
-
-            item.Parent = Parent;
-            base.InsertItem(index, item);
-        }
-
-        /// <inheritdoc cref="NonNullCollection{T}.SetItem" />
-        protected override void SetItem
-            (
-                int index,
-                GblNode item
-            )
-        {
-            Sure.NotNull(item, nameof(item));
-
-            if (!ReferenceEquals(item.Parent, null))
-            {
-                if (!ReferenceEquals(item.Parent, Parent))
-                {
-                    throw new IrbisException();
-                }
-            }
-
-            if (index < Count)
-            {
-                GblNode previousItem = this[index];
-                if (!ReferenceEquals(previousItem, item))
-                {
-                    previousItem.Parent = null;
-                }
-            }
-
-            item.Parent = Parent;
-            base.SetItem(index, item);
-        }
-
-        /// <inheritdoc cref="Collection{T}.RemoveItem" />
-        protected override void RemoveItem
-            (
-                int index
-            )
-        {
-            GblNode node = this[index];
             node.Parent = null;
-
-            base.RemoveItem(index);
         }
 
-        #endregion
+        base.ClearItems();
+    }
 
-        #region Object members
+    /// <inheritdoc cref="NonNullCollection{T}.InsertItem" />
+    protected override void InsertItem
+        (
+            int index,
+            GblNode item
+        )
+    {
+        Sure.NonNegative (index);
+        Sure.NotNull (item);
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
+        if (item.Parent is not null)
         {
-            var result = new StringBuilder();
-            GblUtility.NodesToText(result, this);
-
-            return result.ToString();
+            if (!ReferenceEquals (item.Parent, Parent))
+            {
+                throw new IrbisException();
+            }
         }
 
-        #endregion
+        item.Parent = Parent;
+        base.InsertItem (index, item);
+    }
 
-    } // class GblNodeCollection
+    /// <inheritdoc cref="NonNullCollection{T}.SetItem" />
+    protected override void SetItem
+        (
+            int index,
+            GblNode item
+        )
+    {
+        Sure.InRange (index, this);
+        Sure.NotNull (item);
 
-} // namespace ManagedIrbis.Gbl.Infrastructure
+        if (item.Parent is not null)
+        {
+            if (!ReferenceEquals (item.Parent, Parent))
+            {
+                throw new IrbisException();
+            }
+        }
+
+        if (index < Count)
+        {
+            var previousItem = this[index];
+            if (!ReferenceEquals (previousItem, item))
+            {
+                previousItem.Parent = null;
+            }
+        }
+
+        item.Parent = Parent;
+        base.SetItem (index, item);
+    }
+
+    /// <inheritdoc cref="Collection{T}.RemoveItem" />
+    protected override void RemoveItem
+        (
+            int index
+        )
+    {
+        Sure.InRange (index, this);
+
+        var node = this[index];
+        node.Parent = null;
+
+        base.RemoveItem (index);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        GblUtility.NodesToText (builder, this);
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
+
+    #endregion
+}

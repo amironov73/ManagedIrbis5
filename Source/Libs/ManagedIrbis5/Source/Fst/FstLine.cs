@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* FstLine.cs -- FST file line
+/* FstLine.cs -- строка FST-файла
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,13 +17,13 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 using ManagedIrbis.Infrastructure;
 
@@ -44,18 +44,18 @@ namespace ManagedIrbis.Fst;
 //
 
 /// <summary>
-/// FST file line.
+/// Строка FST-файла.
 /// </summary>
 [XmlRoot ("line")]
 [DebuggerDisplay ("{Tag} {Method} {Format}")]
 public sealed class FstLine
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Properties
 
     /// <summary>
-    /// Line number.
+    /// Номер строки.
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]
@@ -63,34 +63,31 @@ public sealed class FstLine
     public int LineNumber { get; set; }
 
     /// <summary>
-    /// Field tag.
+    /// Метка поля.
     /// </summary>
     [XmlAttribute ("tag")]
     [JsonPropertyName ("tag")]
-    [Description ("Метка поля")]
     [DisplayName ("Метка поля")]
     public int Tag { get; set; }
 
     /// <summary>
-    /// Index method.
+    /// Метод индексирования.
     /// </summary>
     [XmlAttribute ("method")]
     [JsonPropertyName ("method")]
-    [Description ("Метод")]
-    [DisplayName ("Метод")]
+    [DisplayName ("Метод индексирования")]
     public FstIndexMethod Method { get; set; }
 
     /// <summary>
-    /// Format itself.
+    /// Собственно формат.
     /// </summary>
     [XmlElement ("format")]
     [JsonPropertyName ("format")]
-    [Description ("Формат")]
     [DisplayName ("Формат")]
     public string? Format { get; set; }
 
     /// <summary>
-    /// Arbitrary user data.
+    /// Произвольные пользовательские данные.
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]
@@ -103,7 +100,7 @@ public sealed class FstLine
     #region Public methods
 
     /// <summary>
-    /// Parse one line from the stream.
+    /// Чтение и разбор одной строки из потока.
     /// </summary>
     public static FstLine? ParseStream
         (
@@ -115,8 +112,7 @@ public sealed class FstLine
         string? line;
         while (true)
         {
-            line = reader.ReadLine();
-            if (ReferenceEquals (line, null))
+            if ((line = reader.ReadLine()) is null)
             {
                 return null;
             }
@@ -170,24 +166,19 @@ public sealed class FstLine
     }
 
     /// <summary>
-    /// Convert line to the IRBIS format.
+    /// Конвертация строки в формат ИРБИС.
     /// </summary>
     public string ToFormat()
     {
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ($"mpl,'{Tag}',/,");
+        builder.Append (IrbisFormat.PrepareFormat (Format));
+        builder.Append (",'\x07'");
 
-        result.AppendFormat
-            (
-                "mpl,'{0}',/,",
-                Tag
-            );
-        result.Append
-            (
-                IrbisFormat.PrepareFormat (Format)
-            );
-        result.Append (",'\x07'");
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-        return result.ToString();
+        return result;
     }
 
     #endregion

@@ -283,7 +283,7 @@ public static class IrbisFormat
                         return false;
                     }
 
-                    if (c == '\'' || c == '"' || c == '|')
+                    if (c is '\'' or '"' or '|')
                     {
                         state = c;
                     }

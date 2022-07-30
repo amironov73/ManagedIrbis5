@@ -23,162 +23,169 @@ using AM;
 using AM.Collections;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Fst
+namespace ManagedIrbis.Fst;
+
+/// <summary>
+/// Работа с FST-скриптом.
+/// </summary>
+[XmlRoot ("fst")]
+[DebuggerDisplay ("FileName = {FileName}")]
+public sealed class FstFile
+    : IHandmadeSerializable,
+    IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    /// FST file handling
+    /// Имя файла (для идентификации).
     /// </summary>
-    [XmlRoot("fst")]
-    [DebuggerDisplay("FileName = {FileName}")]
-    public sealed class FstFile
-        : IHandmadeSerializable,
-        IVerifiable
+    [XmlAttribute ("fileName")]
+    [JsonPropertyName ("fileName")]
+    public string? FileName { get; set; }
+
+    /// <summary>
+    /// Строки FST-файла.
+    /// </summary>
+    [XmlElement ("line")]
+    [JsonPropertyName ("lines")]
+    public NonNullCollection<FstLine> Lines { get; } = new ();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Соединение форматов в одну строку.
+    /// </summary>
+    public string ConcatenateFormat()
     {
-        #region Properties
+        var builder = StringBuilderPool.Shared.Get();
 
-        /// <summary>
-        /// File name (for identification only).
-        /// </summary>
-        [XmlAttribute("fileName")]
-        [JsonPropertyName("fileName")]
-        public string? FileName { get; set; }
-
-        /// <summary>
-        /// Lines of the file.
-        /// </summary>
-        [XmlElement("line")]
-        [JsonPropertyName("lines")]
-        public NonNullCollection<FstLine> Lines { get; } = new();
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Build concatenated format string.
-        /// </summary>
-        public string ConcatenateFormat()
+        foreach (var line in Lines)
         {
-            var result = new StringBuilder();
-
-            foreach (var line in Lines)
-            {
-                result.Append(line.ToFormat());
-            }
-
-            return result.ToString();
-        } // method ConcatenateFormat
-
-        /// <summary>
-        /// Parse the stream.
-        /// </summary>
-        public static FstFile ParseStream
-            (
-                TextReader reader
-            )
-        {
-            var result = new FstFile();
-            var lineNumber = 1;
-            FstLine? line;
-            while ((line = FstLine.ParseStream(reader)) != null)
-            {
-                line.LineNumber = lineNumber;
-                result.Lines.Add(line);
-                lineNumber++;
-            }
-
-            return result;
-        } // method ParseStream
-
-        /// <summary>
-        /// Parse local file.
-        /// </summary>
-        public static FstFile ParseLocalFile
-            (
-                string fileName,
-                Encoding encoding
-            )
-        {
-            using TextReader reader = TextReaderUtility.OpenRead
-                (
-                    fileName,
-                    encoding
-                );
-            var result = ParseStream(reader);
-            result.FileName = Path.GetFileName(fileName);
-
-            return result;
-        } // method ParseLocalFile
-
-        /// <summary>
-        /// Should serialize the <see cref="Lines"/> collection?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeLines()
-        {
-            return Lines.Count != 0;
+            builder.Append (line.ToFormat());
         }
 
-        #endregion
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-        #region IHandmadeSerializable members
+        return result;
+    }
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
+    /// <summary>
+    /// Разбор потокового представления скрипта.
+    /// </summary>
+    public static FstFile ParseStream
+        (
+            TextReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        var result = new FstFile();
+        var lineNumber = 1;
+        while (FstLine.ParseStream (reader) is { } line)
         {
-            FileName = reader.ReadNullableString();
-            reader.ReadCollection(Lines);
-        } // method RestoreFromStream
+            line.LineNumber = lineNumber;
+            result.Lines.Add (line);
+            lineNumber++;
+        }
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
+        return result;
+    }
+
+    /// <summary>
+    /// Чтение локального файла.
+    /// </summary>
+    public static FstFile ParseLocalFile
+        (
+            string fileName,
+            Encoding encoding
+        )
+    {
+        Sure.FileExists (fileName);
+        Sure.NotNull (encoding);
+
+        using TextReader reader = new StreamReader (fileName, encoding);
+        var result = ParseStream (reader);
+        result.FileName = fileName;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Should serialize the <see cref="Lines"/> collection?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public bool ShouldSerializeLines()
+    {
+        return Lines.Count != 0;
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        FileName = reader.ReadNullableString();
+        reader.ReadCollection (Lines);
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WriteNullable (FileName);
+        writer.WriteCollection (Lines);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<FstFile> (this, throwOnError);
+
+        verifier.Assert (Lines.Count != 0);
+        foreach (var line in Lines)
         {
-            writer.WriteNullable(FileName);
-            writer.WriteCollection(Lines);
+            verifier.VerifySubObject (line);
+        }
 
-        } // method SaveToStream
+        return verifier.Result;
+    }
 
-        #endregion
+    #endregion
 
-        #region IVerifiable members
+    #region Object members
 
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<FstFile> (this, throwOnError);
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return FileName.ToVisibleString();
+    }
 
-            verifier.Assert (Lines.Count != 0, "Lines.Count != 0");
-            foreach (var line in Lines)
-            {
-                verifier.VerifySubObject (line);
-            }
-
-            return verifier.Result;
-        } // method Verify
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => FileName.ToVisibleString();
-
-        #endregion
-
-    } // class FstFile
-
-} // namespace ManagedIrbis.Fst
+    #endregion
+}
