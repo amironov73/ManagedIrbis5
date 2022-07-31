@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 using AM.Text;
 
@@ -82,7 +81,7 @@ public sealed class AsnLexer
             return null;
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
 
         //string[] reserved = AsnUtility.GetReservedWords();
 
@@ -95,7 +94,7 @@ public sealed class AsnLexer
                 break;
             }
 
-            result.Append (c);
+            builder.Append (c);
             ReadChar();
             c = PeekChar();
             if (c == '\r' || c == '\n')
@@ -104,7 +103,10 @@ public sealed class AsnLexer
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     private string ReadIdentifier
@@ -117,8 +119,8 @@ public sealed class AsnLexer
             return initialLetter.ToString();
         }
 
-        var result = new StringBuilder();
-        result.Append (initialLetter);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (initialLetter);
 
         // string[] reserved = AsnUtility.GetReservedWords();
 
@@ -131,7 +133,7 @@ public sealed class AsnLexer
                 break;
             }
 
-            result.Append (c);
+            builder.Append (c);
             ReadChar();
             c = PeekChar();
             if (c == '\r' || c == '\n')
@@ -140,12 +142,15 @@ public sealed class AsnLexer
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     private string? ReadInteger()
     {
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
 
         var c = PeekChar();
         if (!c.IsArabicDigit())
@@ -153,7 +158,7 @@ public sealed class AsnLexer
             return null;
         }
 
-        result.Append (c);
+        builder.Append (c);
         ReadChar();
 
         while (true)
@@ -164,16 +169,19 @@ public sealed class AsnLexer
                 break;
             }
 
-            result.Append (c);
+            builder.Append (c);
             ReadChar();
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     private string? ReadFloat()
     {
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
 
         var dotFound = false;
         var digitFound = false;
@@ -189,7 +197,7 @@ public sealed class AsnLexer
             digitFound = true;
         }
 
-        result.Append (c);
+        builder.Append (c);
         ReadChar();
 
         while (true)
@@ -201,13 +209,13 @@ public sealed class AsnLexer
             }
 
             digitFound = true;
-            result.Append (c);
+            builder.Append (c);
             ReadChar();
         }
 
         if (!dotFound && c == '.')
         {
-            result.Append (c);
+            builder.Append (c);
             ReadChar();
 
             while (true)
@@ -219,7 +227,7 @@ public sealed class AsnLexer
                 }
 
                 digitFound = true;
-                result.Append (c);
+                builder.Append (c);
                 ReadChar();
             }
         }
@@ -231,14 +239,14 @@ public sealed class AsnLexer
 
         if (c == 'E' || c == 'e')
         {
-            result.Append (c);
+            builder.Append (c);
             ReadChar();
             digitFound = false;
             c = PeekChar();
 
             if (c == '+' || c == '-')
             {
-                result.Append (c);
+                builder.Append (c);
                 ReadChar();
                 PeekChar();
             }
@@ -252,7 +260,7 @@ public sealed class AsnLexer
                 }
 
                 digitFound = true;
-                result.Append (c);
+                builder.Append (c);
                 ReadChar();
             }
 
@@ -262,7 +270,10 @@ public sealed class AsnLexer
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     private string ReadTo

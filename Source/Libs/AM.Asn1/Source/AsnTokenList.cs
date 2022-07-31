@@ -19,7 +19,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 using AM.Text;
 
@@ -520,14 +519,17 @@ public sealed class AsnTokenList
     /// </summary>
     public string ToText()
     {
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
 
         foreach (var token in _tokens)
         {
-            result.Append (token.Text);
+            builder.Append (token.Text);
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

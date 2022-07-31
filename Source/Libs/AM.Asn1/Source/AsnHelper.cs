@@ -10,16 +10,12 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* AsnUtility.cs --
+/* AsnHelper.cs -- полезные методы
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Text;
 
 #endregion
@@ -29,9 +25,12 @@ using System.Text;
 namespace AM.Asn1;
 
 /// <summary>
-///
+/// Полезные методы.
 /// </summary>
-public static class AsnUtility
+/// <remarks>
+/// Тип <see cref="AsnUtility"/> уже есть в сборке <c>AM.Core</c>.
+/// </remarks>
+public static class AsnHelper
 {
     #region Public methods
 
@@ -113,6 +112,24 @@ public static class AsnUtility
     }
 
     //=================================================
+
+    /// <summary>
+    /// Преобразование коллекции узлов в текст.
+    /// </summary>
+    public static void NodesToText
+        (
+            StringBuilder builder,
+            AsnNodeCollection collection
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (collection);
+
+        foreach (var node in collection)
+        {
+            builder.Append (node);
+        }
+    }
 
     #endregion
 }

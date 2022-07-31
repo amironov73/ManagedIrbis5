@@ -499,39 +499,23 @@ public class StemmerOperations
             string s1
         )
     {
-        var sb = new StringBuilder();
+        var builder = new StringBuilder();
         for (var i = 0; i < start; i++)
         {
-#if WINMOBILE || PocketPC
-                string tmp = s[i].ToString();
-                sb.Insert(sb.Length, tmp);
-
-#else
-
-            sb.Insert (sb.Length, s[i]);
-
-#endif
+            builder.Insert (builder.Length, s[i]);
         }
 
         //           for (int i = 1; i < end - start + 1; i++)
         //           {
-        sb.Insert (sb.Length, s1);
+        builder.Insert (builder.Length, s1);
 
         //           }
         for (var i = end; i < s.Length; i++)
         {
-#if WINMOBILE || PocketPC
-                string tmp = s[i].ToString();
-                sb.Insert(sb.Length, tmp);
-
-#else
-
-            sb.Insert (sb.Length, s[i]);
-
-#endif
+            builder.Insert (builder.Length, s[i]);
         }
 
-        return sb;
+        return builder;
 
         //string temp = s.ToString();
         //temp = temp.Substring(start - 1, end - start + 1);

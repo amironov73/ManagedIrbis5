@@ -18,7 +18,8 @@
 #region Using directives
 
 using System.Collections.Generic;
-using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -157,14 +158,17 @@ public class AsnNode
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
 
         foreach (var child in Children)
         {
-            result.Append (child);
+            builder.Append (child);
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

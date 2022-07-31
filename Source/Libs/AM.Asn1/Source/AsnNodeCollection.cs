@@ -16,9 +16,9 @@
 #region Using directives
 
 using System.Collections.ObjectModel;
-using System.Text;
 
 using AM.Collections;
+using AM.Text;
 
 #endregion
 
@@ -151,11 +151,13 @@ public sealed class AsnNodeCollection
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
+        AsnHelper.NodesToText (builder, this);
 
-        // AsnUtility.NodesToText(result, this);
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-        return result.ToString();
+        return result;
     }
 
     #endregion
