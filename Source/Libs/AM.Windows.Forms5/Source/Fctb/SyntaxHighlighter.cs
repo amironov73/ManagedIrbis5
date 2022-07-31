@@ -88,9 +88,14 @@ public class SyntaxHighlighter
     /// </summary>
     public readonly Style BlackStyle = new TextStyle (Brushes.Black, null, FontStyle.Regular);
 
-    //
+    /// <summary>
+    ///
+    /// </summary>
     protected readonly Dictionary<string, SyntaxDescriptor> descByXMLfileNames = new ();
 
+    /// <summary>
+    ///
+    /// </summary>
     protected readonly List<Style> resilientStyles = new (5);
 
     #nullable enable
@@ -546,6 +551,9 @@ public class SyntaxHighlighter
         HighlightSyntax (desc, range);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public virtual void AutoIndentNeeded
         (
             object sender,
@@ -590,6 +598,9 @@ public class SyntaxHighlighter
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void PHPAutoIndentNeeded
         (
             object sender,
@@ -631,6 +642,9 @@ public class SyntaxHighlighter
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void SQLAutoIndentNeeded
         (
             object sender,
@@ -641,6 +655,9 @@ public class SyntaxHighlighter
         tb.CalcAutoIndentShiftByCodeFolding (sender, args);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void HTMLAutoIndentNeeded
         (
             object sender,
@@ -651,12 +668,18 @@ public class SyntaxHighlighter
         tb.CalcAutoIndentShiftByCodeFolding (sender, args);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void XMLAutoIndentNeeded (object sender, AutoIndentEventArgs args)
     {
         var tb = sender as SyntaxTextBox;
         tb.CalcAutoIndentShiftByCodeFolding (sender, args);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void VBAutoIndentNeeded (object sender, AutoIndentEventArgs args)
     {
         //end of block
@@ -704,6 +727,9 @@ public class SyntaxHighlighter
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void CSharpAutoIndentNeeded (object sender, AutoIndentEventArgs args)
     {
         //block {}
@@ -793,31 +819,31 @@ public class SyntaxHighlighter
         var brackets = doc.SelectSingleNode ("doc/brackets");
         if (brackets != null)
         {
-            if (brackets.Attributes["left"] == null || brackets.Attributes["right"] == null ||
-                brackets.Attributes["left"].Value == "" || brackets.Attributes["right"].Value == "")
+            if (brackets.Attributes!["left"] == null || brackets.Attributes["right"] == null ||
+                brackets.Attributes["left"]!.Value == "" || brackets.Attributes["right"]!.Value == "")
             {
                 desc.leftBracket = '\x0';
                 desc.rightBracket = '\x0';
             }
             else
             {
-                desc.leftBracket = brackets.Attributes["left"].Value[0];
-                desc.rightBracket = brackets.Attributes["right"].Value[0];
+                desc.leftBracket = brackets.Attributes["left"]!.Value[0];
+                desc.rightBracket = brackets.Attributes["right"]!.Value[0];
             }
 
             if (brackets.Attributes["left2"] == null || brackets.Attributes["right2"] == null ||
-                brackets.Attributes["left2"].Value == "" || brackets.Attributes["right2"].Value == "")
+                brackets.Attributes["left2"]!.Value == "" || brackets.Attributes["right2"]!.Value == "")
             {
                 desc.leftBracket2 = '\x0';
                 desc.rightBracket2 = '\x0';
             }
             else
             {
-                desc.leftBracket2 = brackets.Attributes["left2"].Value[0];
-                desc.rightBracket2 = brackets.Attributes["right2"].Value[0];
+                desc.leftBracket2 = brackets.Attributes["left2"]!.Value[0];
+                desc.rightBracket2 = brackets.Attributes["right2"]!.Value[0];
             }
 
-            if (brackets.Attributes["strategy"] == null || brackets.Attributes["strategy"].Value == "")
+            if (brackets.Attributes["strategy"] == null || brackets.Attributes["strategy"]!.Value == "")
             {
                 desc.bracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
             }
@@ -825,34 +851,37 @@ public class SyntaxHighlighter
             {
                 desc.bracketsHighlightStrategy =
                     (BracketsHighlightStrategy)Enum.Parse (typeof (BracketsHighlightStrategy),
-                        brackets.Attributes["strategy"].Value);
+                        brackets.Attributes["strategy"]!.Value);
             }
         }
 
         var styleByName = new Dictionary<string, Style>();
 
-        foreach (XmlNode style in doc.SelectNodes ("doc/style"))
+        foreach (XmlNode style in doc.SelectNodes ("doc/style")!)
         {
             var s = ParseStyle (style);
-            styleByName[style.Attributes["name"].Value] = s;
+            styleByName[style.Attributes!["name"]!.Value] = s;
             desc.styles.Add (s);
         }
 
-        foreach (XmlNode rule in doc.SelectNodes ("doc/rule"))
+        foreach (XmlNode rule in doc.SelectNodes ("doc/rule")!)
             desc.rules.Add (ParseRule (rule, styleByName));
-        foreach (XmlNode folding in doc.SelectNodes ("doc/folding"))
+        foreach (XmlNode folding in doc.SelectNodes ("doc/folding")!)
             desc.foldings.Add (ParseFolding (folding));
 
         return desc;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected static FoldingDesc ParseFolding (XmlNode foldingNode)
     {
         var folding = new FoldingDesc();
 
         //regex
-        folding.startMarkerRegex = foldingNode.Attributes["start"].Value;
-        folding.finishMarkerRegex = foldingNode.Attributes["finish"].Value;
+        folding.startMarkerRegex = foldingNode.Attributes!["start"]!.Value;
+        folding.finishMarkerRegex = foldingNode.Attributes["finish"]!.Value;
 
         //options
         var optionsA = foldingNode.Attributes["options"];
@@ -864,13 +893,16 @@ public class SyntaxHighlighter
         return folding;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected static RuleDesc ParseRule (XmlNode ruleNode, Dictionary<string, Style> styles)
     {
         var rule = new RuleDesc();
         rule.pattern = ruleNode.InnerText;
 
         //
-        var styleA = ruleNode.Attributes["style"];
+        var styleA = ruleNode.Attributes!["style"];
         var optionsA = ruleNode.Attributes["options"];
 
         //Style
@@ -895,22 +927,25 @@ public class SyntaxHighlighter
         return rule;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected static Style ParseStyle (XmlNode styleNode)
     {
-        var typeA = styleNode.Attributes["type"];
+        var typeA = styleNode.Attributes!["type"];
         var colorA = styleNode.Attributes["color"];
         var backColorA = styleNode.Attributes["backColor"];
         var fontStyleA = styleNode.Attributes["fontStyle"];
         var nameA = styleNode.Attributes["name"];
 
         //colors
-        SolidBrush foreBrush = null;
+        SolidBrush foreBrush = null!;
         if (colorA != null)
         {
             foreBrush = new SolidBrush (ParseColor (colorA.Value));
         }
 
-        SolidBrush backBrush = null;
+        SolidBrush backBrush = null!;
         if (backColorA != null)
         {
             backBrush = new SolidBrush (ParseColor (backColorA.Value));
@@ -926,6 +961,9 @@ public class SyntaxHighlighter
         return new TextStyle (foreBrush, backBrush, fontStyle);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected static Color ParseColor (string s)
     {
         if (s.StartsWith ("#"))
@@ -946,6 +984,9 @@ public class SyntaxHighlighter
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void HighlightSyntax (SyntaxDescriptor desc, TextRange range)
     {
         //set style order
@@ -983,6 +1024,9 @@ public class SyntaxHighlighter
         RestoreBrackets (range._textBox, oldBrackets);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void RestoreBrackets (SyntaxTextBox tb, char[] oldBrackets)
     {
         tb.LeftBracket = oldBrackets[0];
@@ -991,11 +1035,17 @@ public class SyntaxHighlighter
         tb.RightBracket2 = oldBrackets[3];
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected char[] RememberBrackets (SyntaxTextBox tb)
     {
         return new[] { tb.LeftBracket, tb.RightBracket, tb.LeftBracket2, tb.RightBracket2 };
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void InitCShaprRegex()
     {
         //CSharpStringRegex = new Regex( @"""""|@""""|''|@"".*?""|(?<!@)(?<range>"".*?[^\\]"")|'.*?[^\\]'", RegexCompiledOption);
@@ -1049,6 +1099,9 @@ public class SyntaxHighlighter
                 RegexCompiledOption);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void InitStyleSchema (Language lang)
     {
         switch (lang)
@@ -1062,6 +1115,7 @@ public class SyntaxHighlighter
                 KeywordStyle = BlueStyle;
                 CommentTagStyle = GrayStyle;
                 break;
+
             case Language.VB:
                 StringStyle = BrownStyle;
                 CommentStyle = GreenStyle;
@@ -1069,6 +1123,7 @@ public class SyntaxHighlighter
                 ClassNameStyle = BoldStyle;
                 KeywordStyle = BlueStyle;
                 break;
+
             case Language.HTML:
                 CommentStyle = GreenStyle;
                 TagBracketStyle = BlueStyle;
@@ -1077,6 +1132,7 @@ public class SyntaxHighlighter
                 AttributeValueStyle = BlueStyle;
                 HtmlEntityStyle = RedStyle;
                 break;
+
             case Language.XML:
                 CommentStyle = GreenStyle;
                 XmlTagBracketStyle = BlueStyle;
@@ -1086,12 +1142,14 @@ public class SyntaxHighlighter
                 XmlEntityStyle = RedStyle;
                 XmlCDataStyle = BlackStyle;
                 break;
+
             case Language.JS:
                 StringStyle = BrownStyle;
                 CommentStyle = GreenStyle;
                 NumberStyle = MagentaStyle;
                 KeywordStyle = BlueStyle;
                 break;
+
             case Language.Lua:
                 StringStyle = BrownStyle;
                 CommentStyle = GreenStyle;
@@ -1099,6 +1157,7 @@ public class SyntaxHighlighter
                 KeywordStyle = BlueBoldStyle;
                 FunctionsStyle = MaroonStyle;
                 break;
+
             case Language.PHP:
                 StringStyle = RedStyle;
                 CommentStyle = GreenStyle;
@@ -1108,6 +1167,7 @@ public class SyntaxHighlighter
                 KeywordStyle2 = BlueStyle;
                 KeywordStyle3 = GrayStyle;
                 break;
+
             case Language.SQL:
                 StringStyle = RedStyle;
                 CommentStyle = GreenStyle;
@@ -1118,6 +1178,7 @@ public class SyntaxHighlighter
                 VariableStyle = MaroonStyle;
                 TypesStyle = BrownStyle;
                 break;
+
             case Language.JSON:
                 StringStyle = BrownStyle;
                 NumberStyle = MagentaStyle;
@@ -1213,6 +1274,9 @@ public class SyntaxHighlighter
         range.SetFoldingMarkers (@"/\*", @"\*/"); //allow to collapse comment block
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void InitVBRegex()
     {
         VBStringRegex = new Regex (@"""""|"".*?[^\\]""", RegexCompiledOption);
@@ -1287,6 +1351,9 @@ public class SyntaxHighlighter
             RegexOptions.Multiline | RegexOptions.IgnoreCase);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void InitHTMLRegex()
     {
         HTMLCommentRegex1 = new Regex (@"(<!--.*?-->)|(<!--.*)", RegexOptions.Singleline | RegexCompiledOption);
@@ -1366,6 +1433,9 @@ public class SyntaxHighlighter
         range.SetFoldingMarkers ("<tr", "</tr>", RegexOptions.IgnoreCase);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void InitXMLRegex()
     {
         XMLCommentRegex1 = new Regex (@"(<!--.*?-->)|(<!--.*)", RegexOptions.Singleline | RegexCompiledOption);
@@ -1516,6 +1586,9 @@ public class SyntaxHighlighter
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void InitSQLRegex()
     {
         SQLStringRegex = new Regex (@"""""|''|"".*?[^\\]""|'.*?[^\\]'", RegexCompiledOption);
@@ -1602,6 +1675,9 @@ public class SyntaxHighlighter
         range.SetFoldingMarkers (@"/\*", @"\*/"); //allow to collapse comment block
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void InitPHPRegex()
     {
         PHPStringRegex = new Regex (@"""""|''|"".*?[^\\]""|'.*?[^\\]'", RegexCompiledOption);
@@ -1678,6 +1754,9 @@ public class SyntaxHighlighter
         range.SetFoldingMarkers (@"/\*", @"\*/"); //allow to collapse comment block
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void InitJScriptRegex()
     {
         JScriptStringRegex = new Regex (@"""""|''|"".*?[^\\]""|'.*?[^\\]'", RegexCompiledOption);
@@ -1742,6 +1821,9 @@ public class SyntaxHighlighter
         range.SetFoldingMarkers (@"/\*", @"\*/"); //allow to collapse comment block
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void InitLuaRegex()
     {
         LuaStringRegex = new Regex (@"""""|''|"".*?[^\\]""|'.*?[^\\]'", RegexCompiledOption);

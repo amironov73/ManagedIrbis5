@@ -3,7 +3,11 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable FieldCanBeMadeReadOnly.Local
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Local
+// ReSharper disable UnusedMember.Local
 
 /* PlatformType.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -20,26 +24,87 @@ using System.Runtime.InteropServices;
 
 namespace Fctb;
 
+/// <summary>
+///
+/// </summary>
 public static class PlatformType
 {
+    /// <summary>
+    ///
+    /// </summary>
     const ushort PROCESSOR_ARCHITECTURE_INTEL = 0;
+
+    /// <summary>
+    ///
+    /// </summary>
     const ushort PROCESSOR_ARCHITECTURE_IA64 = 6;
+
+    /// <summary>
+    ///
+    /// </summary>
     const ushort PROCESSOR_ARCHITECTURE_AMD64 = 9;
+
+    /// <summary>
+    ///
+    /// </summary>
     const ushort PROCESSOR_ARCHITECTURE_UNKNOWN = 0xFFFF;
 
     [StructLayout (LayoutKind.Sequential)]
     struct SYSTEM_INFO
     {
+        /// <summary>
+        ///
+        /// </summary>
         public ushort wProcessorArchitecture;
+
+        /// <summary>
+        ///
+        /// </summary>
         public ushort wReserved;
+
+        /// <summary>
+        ///
+        /// </summary>
         public uint dwPageSize;
+
+        /// <summary>
+        ///
+        /// </summary>
         public IntPtr lpMinimumApplicationAddress;
+
+        /// <summary>
+        ///
+        /// </summary>
         public IntPtr lpMaximumApplicationAddress;
+
+        /// <summary>
+        ///
+        /// </summary>
         public UIntPtr dwActiveProcessorMask;
+
+        /// <summary>
+        ///
+        /// </summary>
         public uint dwNumberOfProcessors;
+
+        /// <summary>
+        ///
+        /// </summary>
         public uint dwProcessorType;
+
+        /// <summary>
+        ///
+        /// </summary>
         public uint dwAllocationGranularity;
+
+        /// <summary>
+        ///
+        /// </summary>
         public ushort wProcessorLevel;
+
+        /// <summary>
+        ///
+        /// </summary>
         public ushort wProcessorRevision;
     };
 
@@ -49,6 +114,9 @@ public static class PlatformType
     [DllImport ("kernel32.dll")]
     static extern void GetSystemInfo (ref SYSTEM_INFO lpSystemInfo);
 
+    /// <summary>
+    ///
+    /// </summary>
     public static Platform GetOperationSystemPlatform()
     {
         var sysInfo = new SYSTEM_INFO();
@@ -81,9 +149,23 @@ public static class PlatformType
     }
 }
 
+/// <summary>
+///
+/// </summary>
 public enum Platform
 {
+    /// <summary>
+    ///
+    /// </summary>
     X86,
+
+    /// <summary>
+    ///
+    /// </summary>
     X64,
+
+    /// <summary>
+    ///
+    /// </summary>
     Unknown
 }

@@ -43,12 +43,6 @@ public class FileTextSource
 
     #endregion
 
-    #region Propeties
-
-
-
-    #endregion
-
     #region Construction
 
     /// <summary>
@@ -64,7 +58,7 @@ public class FileTextSource
         _timer.Tick += timer_Tick;
         _timer.Enabled = true;
 
-        SaveEOL = Environment.NewLine;
+        SaveEol = Environment.NewLine;
     }
 
     #endregion
@@ -73,7 +67,7 @@ public class FileTextSource
 
     private List<int> _sourceFileLinePositions = new ();
 
-    private FileStream _stream;
+    private FileStream? _stream;
 
     private Encoding _encoding;
 
@@ -88,7 +82,7 @@ public class FileTextSource
         var count = 0;
         for (var i = 0; i < Count; i++)
         {
-            if (base.lines[i] != null && !base.lines[i].IsChanged && Math.Abs (i - iFinishVisibleLine) > margin)
+            if (lines[i] != null && !lines[i].IsChanged && Math.Abs (i - iFinishVisibleLine) > margin)
             {
                 lines[i] = null;
                 count++;
@@ -96,7 +90,7 @@ public class FileTextSource
         }
     }
 
-    void timer_Tick
+    private void timer_Tick
         (
             object? sender,
             EventArgs e
@@ -133,7 +127,7 @@ public class FileTextSource
             _stream.Dispose();
         }
 
-        SaveEOL = Environment.NewLine;
+        SaveEol = Environment.NewLine;
 
         //read lines of file
         _stream = new FileStream (fileName, FileMode.Open);
@@ -145,7 +139,7 @@ public class FileTextSource
 
         //first line
         _sourceFileLinePositions.Add ((int)_stream.Position);
-        base.lines.Add (null);
+        lines.Add (null);
 
         //other lines
         _sourceFileLinePositions.Capacity = (int)(length / 7 + 1000);
@@ -187,13 +181,13 @@ public class FileTextSource
             if (b == 10) // \n
             {
                 _sourceFileLinePositions.Add ((int)_stream.Position);
-                base.lines.Add (null);
+                lines.Add (null);
             }
             else if (prev == 13) // \r (Mac format)
             {
                 _sourceFileLinePositions.Add ((int)prevPos);
-                base.lines.Add (null);
-                SaveEOL = "\r";
+                lines.Add (null);
+                SaveEol = "\r";
             }
 
             prev = b;
@@ -202,7 +196,7 @@ public class FileTextSource
         if (prev == 13)
         {
             _sourceFileLinePositions.Add ((int)prevPos);
-            base.lines.Add (null);
+            lines.Add (null);
         }
 
         if (length > 2000000)
@@ -212,14 +206,14 @@ public class FileTextSource
 
         var temp = new Line[100];
 
-        var c = base.lines.Count;
-        base.lines.AddRange (temp);
-        base.lines.TrimExcess();
-        base.lines.RemoveRange (c, temp.Length);
+        var c = lines.Count;
+        lines.AddRange (temp);
+        lines.TrimExcess();
+        lines.RemoveRange (c, temp.Length);
 
 
         var temp2 = new int[100];
-        c = base.lines.Count;
+        c = lines.Count;
         _sourceFileLinePositions.AddRange (temp2);
         _sourceFileLinePositions.TrimExcess();
         _sourceFileLinePositions.RemoveRange (c, temp.Length);
@@ -272,7 +266,7 @@ public class FileTextSource
     private static Encoding DefineEncoding
         (
             Encoding encoding,
-            FileStream stream
+            Stream stream
         )
     {
         var bytesPerSignature = 0;
@@ -309,6 +303,9 @@ public class FileTextSource
         return encoding;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void CloseFile()
     {
         if (_stream != null)
@@ -329,7 +326,7 @@ public class FileTextSource
     /// <summary>
     /// End Of Line characters used for saving
     /// </summary>
-    public string SaveEOL { get; set; }
+    public string SaveEol { get; set; }
 
     public override void SaveToFile (string fileName, Encoding encoding)
     {
@@ -340,7 +337,7 @@ public class FileTextSource
         var dir = Path.GetDirectoryName (fileName);
         var tempFileName = Path.Combine (dir, Path.GetFileNameWithoutExtension (fileName) + ".tmp");
 
-        var sr = new StreamReader (_stream, _encoding);
+        var sr = new StreamReader (_stream!, _encoding);
         using (var tempFs = new FileStream (tempFileName, FileMode.Create))
         using (var sw = new StreamWriter (tempFs, encoding))
         {
@@ -353,11 +350,11 @@ public class FileTextSource
                 var sourceLine = ReadLine (sr, i); //read line from source file
                 string line;
 
-                var lineIsChanged = lines[i] != null && lines[i].IsChanged;
+                var lineIsChanged = lines[i] != null && lines[i]!.IsChanged;
 
                 if (lineIsChanged)
                 {
-                    line = lines[i].Text;
+                    line = lines[i]!.Text;
                 }
                 else
                 {
@@ -381,7 +378,7 @@ public class FileTextSource
 
                 if (i < Count - 1)
                 {
-                    sw.Write (SaveEOL);
+                    sw.Write (SaveEol);
                 }
 
                 sw.Flush();
@@ -408,7 +405,7 @@ public class FileTextSource
         //binding to new file
         _sourceFileLinePositions = newLinePos;
         _stream = new FileStream (fileName, FileMode.Open);
-        this._encoding = encoding;
+        _encoding = encoding;
     }
 
     private string ReadLine (StreamReader sr, int i)
@@ -426,6 +423,9 @@ public class FileTextSource
         return line;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public override void ClearIsChanged()
     {
         foreach (var line in lines)
@@ -435,20 +435,23 @@ public class FileTextSource
             }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public override Line this [int i]
     {
         get
         {
-            if (base.lines[i] != null)
+            if (lines[i] != null)
             {
-                return lines[i];
+                return lines[i]!;
             }
             else
             {
                 LoadLineFromSourceFile (i);
             }
 
-            return lines[i];
+            return lines[i]!;
         }
         set { throw new NotImplementedException(); }
     }
@@ -456,7 +459,7 @@ public class FileTextSource
     private void LoadLineFromSourceFile (int i)
     {
         var line = CreateLine();
-        _stream.Seek (_sourceFileLinePositions[i], SeekOrigin.Begin);
+        _stream!.Seek (_sourceFileLinePositions[i], SeekOrigin.Begin);
         var sr = new StreamReader (_stream, _encoding);
 
         var s = sr.ReadLine();
@@ -479,7 +482,7 @@ public class FileTextSource
 
         foreach (var c in s)
             line.Add (new Character (c));
-        base.lines[i] = line;
+        lines[i] = line;
 
         if (CurrentTextBox.WordWrap)
         {
@@ -487,38 +490,40 @@ public class FileTextSource
         }
     }
 
+    /// <inheritdoc cref="TextSource.InsertLine"/>
     public override void InsertLine (int index, Line line)
     {
         _sourceFileLinePositions.Insert (index, -1);
         base.InsertLine (index, line);
     }
 
+    /// <inheritdoc cref="TextSource.RemoveLine(int,int)"/>
     public override void RemoveLine (int index, int count)
     {
         _sourceFileLinePositions.RemoveRange (index, count);
         base.RemoveLine (index, count);
     }
 
+    /// <inheritdoc cref="TextSource.Clear"/>
     public override void Clear()
     {
         base.Clear();
     }
 
+    /// <inheritdoc cref="TextSource.GetLineLength"/>
     public override int GetLineLength (int index)
     {
-        if (base.lines[index] == null)
+        if (lines[index] == null)
         {
             return 0;
         }
         else
         {
-            return base.lines[index].Count;
+            return lines[index].Count;
         }
     }
 
-    /// <summary>
-    ///
-    /// </summary>
+    /// <inheritdoc cref="TextSource.LineHasFoldingStartMarker"/>
     public override bool LineHasFoldingStartMarker (int index)
     {
         if (lines[index] == null)
@@ -526,12 +531,10 @@ public class FileTextSource
             return false;
         }
 
-        return !string.IsNullOrEmpty (lines[index].FoldingStartMarker);
+        return !string.IsNullOrEmpty (lines[index]!.FoldingStartMarker);
     }
 
-    /// <summary>
-    ///
-    /// </summary>
+    /// <inheritdoc cref="TextSource.LineHasFoldingEndMarker"/>
     public override bool LineHasFoldingEndMarker (int index)
     {
         if (lines[index] == null)
@@ -540,10 +543,11 @@ public class FileTextSource
         }
         else
         {
-            return !string.IsNullOrEmpty (lines[index].FoldingEndMarker);
+            return !string.IsNullOrEmpty (lines[index]!.FoldingEndMarker);
         }
     }
 
+    /// <inheritdoc cref="TextSource.Dispose"/>
     public override void Dispose()
     {
         if (_stream != null)
@@ -556,7 +560,7 @@ public class FileTextSource
 
     internal void UnloadLine (int iLine)
     {
-        if (lines[iLine] != null && !lines[iLine].IsChanged)
+        if (lines[iLine] != null && !lines[iLine]!.IsChanged)
         {
             lines[iLine] = null;
         }

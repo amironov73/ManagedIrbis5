@@ -85,7 +85,7 @@ public class Hints : ICollection<Hint>, IDisposable
 
     private void OnTextBoxVisibleRangeChanged
         (
-            object sender,
+            object? sender,
             EventArgs e
         )
     {
@@ -98,7 +98,7 @@ public class Hints : ICollection<Hint>, IDisposable
         foreach (var item in _items)
         {
             LayoutHint (item);
-            item.HostPanel.Invalidate();
+            item.HostPanel!.Invalidate();
         }
     }
 
@@ -111,12 +111,12 @@ public class Hints : ICollection<Hint>, IDisposable
         {
             if (hint.Range.Start.Line < _textBox.LineInfos.Count - 1)
             {
-                hint.HostPanel.Top = _textBox.LineInfos[hint.Range.Start.Line + 1].startY - hint.TopPadding -
+                hint.HostPanel!.Top = _textBox.LineInfos[hint.Range.Start.Line + 1].startY - hint.TopPadding -
                                      hint.HostPanel.Height - _textBox.VerticalScroll.Value;
             }
             else
             {
-                hint.HostPanel.Top = _textBox.TextHeight + _textBox.Paddings.Top - hint.HostPanel.Height - _textBox.VerticalScroll.Value;
+                hint.HostPanel!.Top = _textBox.TextHeight + _textBox.Paddings.Top - hint.HostPanel.Height - _textBox.VerticalScroll.Value;
             }
         }
         else
@@ -130,7 +130,7 @@ public class Hints : ICollection<Hint>, IDisposable
             {
                 var y = _textBox.LineInfos[hint.Range.Start.Line].startY - _textBox.VerticalScroll.Value + _textBox.CharHeight;
 
-                if (y + hint.HostPanel.Height + 1 > _textBox.ClientRectangle.Bottom)
+                if (y + hint.HostPanel!.Height + 1 > _textBox.ClientRectangle.Bottom)
                 {
                     hint.HostPanel.Top = Math.Max (0,
                         _textBox.LineInfos[hint.Range.Start.Line].startY - _textBox.VerticalScroll.Value - hint.HostPanel.Height);
@@ -142,7 +142,7 @@ public class Hints : ICollection<Hint>, IDisposable
             }
             else
             {
-                hint.HostPanel.Top = _textBox.LineInfos[hint.Range.Start.Line + 1].startY - _textBox.VerticalScroll.Value;
+                hint.HostPanel!.Top = _textBox.LineInfos[hint.Range.Start.Line + 1].startY - _textBox.VerticalScroll.Value;
                 if (hint.HostPanel.Bottom > _textBox.ClientRectangle.Bottom)
                 {
                     hint.HostPanel.Top = _textBox.LineInfos[hint.Range.Start.Line + 1].startY - _textBox.CharHeight -
@@ -172,6 +172,7 @@ public class Hints : ICollection<Hint>, IDisposable
 
     #endregion
 
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
         _textBox.TextChanged -= OnTextBoxTextChanged;
@@ -179,10 +180,13 @@ public class Hints : ICollection<Hint>, IDisposable
         _textBox.VisibleRangeChanged -= OnTextBoxVisibleRangeChanged;
     }
 
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
     public IEnumerator<Hint> GetEnumerator()
     {
         foreach (var item in _items)
+        {
             yield return item;
+        }
     }
 
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -200,13 +204,17 @@ public class Hints : ICollection<Hint>, IDisposable
         {
             var toDelete = new List<Control>();
             foreach (Control item in _textBox.Controls)
+            {
                 if (item is UnfocusablePanel)
                 {
                     toDelete.Add (item);
                 }
+            }
 
             foreach (var item in toDelete)
+            {
                 _textBox.Controls.Remove (item);
+            }
 
             for (var i = 0; i < _textBox.LineInfos.Count; i++)
             {
@@ -234,7 +242,7 @@ public class Hints : ICollection<Hint>, IDisposable
         {
             var li = _textBox.LineInfos[hint.Range.Start.Line];
             hint.TopPadding = li.bottomPadding;
-            li.bottomPadding += hint.HostPanel.Height;
+            li.bottomPadding += hint.HostPanel!.Height;
             _textBox.LineInfos[hint.Range.Start.Line] = li;
             _textBox.NeedRecalc (true);
         }
@@ -243,7 +251,7 @@ public class Hints : ICollection<Hint>, IDisposable
 
         _textBox.OnVisibleRangeChanged();
 
-        hint.HostPanel.Parent = _textBox;
+        hint.HostPanel!.Parent = _textBox;
 
         _textBox.Select();
         _textBox.ActiveControl = null;
@@ -258,6 +266,11 @@ public class Hints : ICollection<Hint>, IDisposable
         return _items.Contains (item);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="array"></param>
+    /// <param name="arrayIndex"></param>
     public void CopyTo (Hint[] array, int arrayIndex)
     {
         _items.CopyTo (array, arrayIndex);
@@ -266,16 +279,16 @@ public class Hints : ICollection<Hint>, IDisposable
     /// <summary>
     /// Count of hints
     /// </summary>
-    public int Count
-    {
-        get { return _items.Count; }
-    }
+    public int Count => _items.Count;
 
-    public bool IsReadOnly
-    {
-        get { return false; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public bool IsReadOnly => false;
 
+    /// <summary>
+    ///
+    /// </summary>
     public bool Remove (Hint item)
     {
         throw new NotImplementedException();

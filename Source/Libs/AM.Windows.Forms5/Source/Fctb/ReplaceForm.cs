@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 
 /* ReplaceForm.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -22,45 +23,55 @@ using System.Collections.Generic;
 
 namespace Fctb;
 
+/// <summary>
+///
+/// </summary>
 public partial class ReplaceForm
     : Form
 {
-    SyntaxTextBox tb;
-    bool firstSearch = true;
-    Place startPlace;
+    private readonly SyntaxTextBox _textBox;
+    private bool _firstSearch = true;
+    private Place _startPlace;
 
-    public ReplaceForm(SyntaxTextBox tb)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="textBox"></param>
+    public ReplaceForm (SyntaxTextBox textBox)
     {
         InitializeComponent();
-        this.tb = tb;
+        this._textBox = textBox;
     }
 
-    private void btClose_Click(object sender, EventArgs e)
+    private void btClose_Click (object sender, EventArgs e)
     {
         Close();
     }
 
-    private void btFindNext_Click(object sender, EventArgs e)
+    private void btFindNext_Click (object sender, EventArgs e)
     {
         try
         {
-            if (!Find(tbFind.Text))
+            if (!Find (tbFind.Text))
             {
-                MessageBox.Show("Not found");
+                MessageBox.Show ("Not found");
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message);
+            MessageBox.Show (ex.Message);
         }
     }
 
-    public List<TextRange> FindAll(string pattern)
+    /// <summary>
+    ///
+    /// </summary>
+    public List<TextRange> FindAll (string pattern)
     {
         var opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
         if (!cbRegex.Checked)
         {
-            pattern = Regex.Escape(pattern);
+            pattern = Regex.Escape (pattern);
         }
 
         if (cbWholeWord.Checked)
@@ -69,21 +80,25 @@ public partial class ReplaceForm
         }
 
         //
-        var range = tb.Selection.IsEmpty? tb.Range.Clone() : tb.Selection.Clone();
+        var range = _textBox.Selection.IsEmpty ? _textBox.Range.Clone() : _textBox.Selection.Clone();
+
         //
         var list = new List<TextRange>();
-        foreach (var r in range.GetRangesByLines(pattern, opt))
-            list.Add(r);
+        foreach (var r in range.GetRangesByLines (pattern, opt))
+            list.Add (r);
 
         return list;
     }
 
-    public bool Find(string pattern)
+    /// <summary>
+    ///
+    /// </summary>
+    public bool Find (string pattern)
     {
         var opt = cbMatchCase.Checked ? RegexOptions.None : RegexOptions.IgnoreCase;
         if (!cbRegex.Checked)
         {
-            pattern = Regex.Escape(pattern);
+            pattern = Regex.Escape (pattern);
         }
 
         if (cbWholeWord.Checked)
@@ -92,47 +107,51 @@ public partial class ReplaceForm
         }
 
         //
-        var range = tb.Selection.Clone();
+        var range = _textBox.Selection.Clone();
         range.Normalize();
+
         //
-        if (firstSearch)
+        if (_firstSearch)
         {
-            startPlace = range.Start;
-            firstSearch = false;
+            _startPlace = range.Start;
+            _firstSearch = false;
         }
+
         //
         range.Start = range.End;
-        if (range.Start >= startPlace)
+        if (range.Start >= _startPlace)
         {
-            range.End = new Place(tb.GetLineLength(tb.LinesCount - 1), tb.LinesCount - 1);
+            range.End = new Place (_textBox.GetLineLength (_textBox.LinesCount - 1), _textBox.LinesCount - 1);
         }
         else
         {
-            range.End = startPlace;
+            range.End = _startPlace;
         }
 
         //
-        foreach (var r in range.GetRangesByLines(pattern, opt))
+        foreach (var r in range.GetRangesByLines (pattern, opt))
         {
-            tb.Selection.Start = r.Start;
-            tb.Selection.End = r.End;
-            tb.DoSelectionVisible();
-            tb.Invalidate();
+            _textBox.Selection.Start = r.Start;
+            _textBox.Selection.End = r.End;
+            _textBox.DoSelectionVisible();
+            _textBox.Invalidate();
             return true;
         }
-        if (range.Start >= startPlace && startPlace > Place.Empty)
+
+        if (range.Start >= _startPlace && _startPlace > Place.Empty)
         {
-            tb.Selection.Start = new Place(0, 0);
-            return Find(pattern);
+            _textBox.Selection.Start = new Place (0, 0);
+            return Find (pattern);
         }
+
         return false;
     }
 
-    private void tbFind_KeyPress(object sender, KeyPressEventArgs e)
+    private void tbFind_KeyPress (object sender, KeyPressEventArgs e)
     {
         if (e.KeyChar == '\r')
         {
-            btFindNext_Click(sender, null);
+            btFindNext_Click (sender, null);
         }
 
         if (e.KeyChar == '\x1b')
@@ -141,54 +160,57 @@ public partial class ReplaceForm
         }
     }
 
-    protected override bool ProcessCmdKey(ref Message msg, Keys keyData) // David
+    protected override bool ProcessCmdKey (ref Message msg, Keys keyData) // David
     {
         if (keyData == Keys.Escape)
         {
             this.Close();
             return true;
         }
-        return base.ProcessCmdKey(ref msg, keyData);
+
+        return base.ProcessCmdKey (ref msg, keyData);
     }
 
-    private void ReplaceForm_FormClosing(object sender, FormClosingEventArgs e)
+    private void ReplaceForm_FormClosing (object sender, FormClosingEventArgs e)
     {
         if (e.CloseReason == CloseReason.UserClosing)
         {
             e.Cancel = true;
             Hide();
         }
-        this.tb.Focus();
+
+        this._textBox.Focus();
     }
 
-    private void btReplace_Click(object sender, EventArgs e)
+    private void btReplace_Click (object sender, EventArgs e)
     {
         try
         {
-            if (tb.SelectionLength != 0)
+            if (_textBox.SelectionLength != 0)
             {
-                if (!tb.Selection.ReadOnly)
+                if (!_textBox.Selection.ReadOnly)
                 {
-                    tb.InsertText(tbReplace.Text);
+                    _textBox.InsertText (tbReplace.Text);
                 }
             }
 
-            btFindNext_Click(sender, null);
+            btFindNext_Click (sender, null);
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message);
+            MessageBox.Show (ex.Message);
         }
     }
 
-    private void btReplaceAll_Click(object sender, EventArgs e)
+    private void btReplaceAll_Click (object sender, EventArgs e)
     {
         try
         {
-            tb.Selection.BeginUpdate();
+            _textBox.Selection.BeginUpdate();
 
             //search
-            var ranges = FindAll(tbFind.Text);
+            var ranges = FindAll (tbFind.Text);
+
             //check readonly
             var ro = false;
             foreach (var r in ranges)
@@ -197,28 +219,31 @@ public partial class ReplaceForm
                     ro = true;
                     break;
                 }
+
             //replace
             if (!ro)
             {
                 if (ranges.Count > 0)
                 {
-                    tb.TextSource.Manager.ExecuteCommand(new ReplaceTextCommand(tb.TextSource, ranges, tbReplace.Text));
-                    tb.Selection.Start = new Place(0, 0);
+                    _textBox.TextSource.Manager.ExecuteCommand (new ReplaceTextCommand (_textBox.TextSource, ranges,
+                        tbReplace.Text));
+                    _textBox.Selection.Start = new Place (0, 0);
                 }
             }
 
             //
-            tb.Invalidate();
-            MessageBox.Show(ranges.Count + " occurrence(s) replaced");
+            _textBox.Invalidate();
+            MessageBox.Show (ranges.Count + " occurrence(s) replaced");
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message);
+            MessageBox.Show (ex.Message);
         }
-        tb.Selection.EndUpdate();
+
+        _textBox.Selection.EndUpdate();
     }
 
-    protected override void OnActivated(EventArgs e)
+    protected override void OnActivated (EventArgs e)
     {
         tbFind.Focus();
         ResetSerach();
@@ -226,10 +251,10 @@ public partial class ReplaceForm
 
     void ResetSerach()
     {
-        firstSearch = true;
+        _firstSearch = true;
     }
 
-    private void cbMatchCase_CheckedChanged(object sender, EventArgs e)
+    private void cbMatchCase_CheckedChanged (object sender, EventArgs e)
     {
         ResetSerach();
     }

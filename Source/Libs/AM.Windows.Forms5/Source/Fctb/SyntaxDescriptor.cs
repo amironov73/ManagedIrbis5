@@ -21,18 +21,53 @@ using System;
 
 namespace Fctb;
 
+/// <summary>
+///
+/// </summary>
 public class SyntaxDescriptor
     : IDisposable
 {
+    /// <summary>
+    ///
+    /// </summary>
     public char leftBracket = '(';
-    public char rightBracket = ')';
-    public char leftBracket2 = '{';
-    public char rightBracket2 = '}';
-    public BracketsHighlightStrategy bracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
-    public readonly List<Style> styles = new List<Style>();
-    public readonly List<RuleDesc> rules = new List<RuleDesc>();
-    public readonly List<FoldingDesc> foldings = new List<FoldingDesc>();
 
+    /// <summary>
+    ///
+    /// </summary>
+    public char rightBracket = ')';
+
+    /// <summary>
+    ///
+    /// </summary>
+    public char leftBracket2 = '{';
+
+    /// <summary>
+    ///
+    /// </summary>
+    public char rightBracket2 = '}';
+
+    /// <summary>
+    ///
+    /// </summary>
+    public BracketsHighlightStrategy bracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public readonly List<Style> styles = new ();
+
+    /// <summary>
+    ///
+    /// </summary>
+    public readonly List<RuleDesc> rules = new ();
+
+    /// <summary>
+    ///
+    /// </summary>
+    public readonly List<FoldingDesc> foldings = new ();
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
         foreach (var style in styles)
@@ -40,13 +75,34 @@ public class SyntaxDescriptor
     }
 }
 
+/// <summary>
+///
+/// </summary>
 public class RuleDesc
 {
+    /// <summary>
+    ///
+    /// </summary>
     Regex regex;
+
+    /// <summary>
+    ///
+    /// </summary>
     public string pattern;
+
+    /// <summary>
+    ///
+    /// </summary>
     public RegexOptions options = RegexOptions.None;
+
+    /// <summary>
+    ///
+    /// </summary>
     public Style style;
 
+    /// <summary>
+    ///
+    /// </summary>
     public Regex Regex
     {
         get
@@ -61,9 +117,23 @@ public class RuleDesc
     }
 }
 
+/// <summary>
+///
+/// </summary>
 public class FoldingDesc
 {
+    /// <summary>
+    ///
+    /// </summary>
     public string startMarkerRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     public string finishMarkerRegex;
+
+    /// <summary>
+    ///
+    /// </summary>
     public RegexOptions options = RegexOptions.None;
 }

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* Ruler.cs -- линейка
  * Ars Magna project, http://arsmagna.ru
@@ -38,17 +39,29 @@ public partial class Ruler
 
     #endregion
 
+    /// <summary>
+    ///
+    /// </summary>
     [DefaultValue (typeof (Color), "ControlLight")]
     public Color BackColor2 { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     [DefaultValue (typeof (Color), "DarkGray")]
     public Color TickColor { get; set; }
 
+    /// <summary>
+    ///
+    /// </summary>
     [DefaultValue (typeof (Color), "Black")]
     public Color CaretTickColor { get; set; }
 
     private SyntaxTextBox? _target;
 
+    /// <summary>
+    ///
+    /// </summary>
     [Description ("Target FastColoredTextBox")]
     public SyntaxTextBox? Target
     {
@@ -94,11 +107,18 @@ public partial class Ruler
 
     #region Control members
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnTargetChanged()
     {
         TargetChanged?.Invoke (this, EventArgs.Empty);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="target"></param>
     protected virtual void UnSubscribe
         (
             SyntaxTextBox target
@@ -109,6 +129,10 @@ public partial class Ruler
         target.VisibleRangeChanged -= target_VisibleRangeChanged;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="target"></param>
     protected virtual void Subscribe
         (
             SyntaxTextBox target
@@ -119,7 +143,7 @@ public partial class Ruler
         target.VisibleRangeChanged += target_VisibleRangeChanged;
     }
 
-    void target_VisibleRangeChanged
+    private void target_VisibleRangeChanged
         (
             object? sender,
             EventArgs e
@@ -128,7 +152,7 @@ public partial class Ruler
         Invalidate();
     }
 
-    void target_SelectionChanged
+    private void target_SelectionChanged
         (
             object? sender,
             EventArgs e
@@ -137,6 +161,9 @@ public partial class Ruler
         Invalidate();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void target_Scroll
         (
             object? sender,

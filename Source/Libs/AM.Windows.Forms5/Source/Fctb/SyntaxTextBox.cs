@@ -132,9 +132,14 @@ public class SyntaxTextBox
         }
 
         //drawing optimization
-        SetStyle (
-            ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer |
-            ControlStyles.ResizeRedraw, true);
+        SetStyle
+            (
+                ControlStyles.AllPaintingInWmPaint
+                | ControlStyles.UserPaint
+                | ControlStyles.OptimizedDoubleBuffer
+                | ControlStyles.ResizeRedraw,
+                true
+            );
 
         //append monospace font
         Font = new Font (FontFamily.GenericMonospace, 9.75f);
@@ -1574,6 +1579,9 @@ public class SyntaxTextBox
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public int TextLength
     {
         get
@@ -2627,11 +2635,15 @@ public class SyntaxTextBox
         }
     }
 
+    /// <inheritdoc cref="Control.OnHandleCreated"/>
     protected override void OnHandleCreated (EventArgs e)
     {
         base.OnHandleCreated (e);
         foreach (var timer in new List<Timer> (timersToReset.Keys))
+        {
             ResetTimer (timer);
+        }
+
         timersToReset.Clear();
 
         OnScrollbarsUpdated();
@@ -3030,7 +3042,9 @@ public class SyntaxTextBox
     public void ClearStyle (StyleIndex styleIndex)
     {
         foreach (var line in lines)
+        {
             line.ClearStyle (styleIndex);
+        }
 
         for (var i = 0; i < LineInfos.Count; i++)
             SetVisibleState (i, VisibleState.Visible);
@@ -3312,7 +3326,9 @@ public class SyntaxTextBox
             (this as Control).SuspendLayout();
 
             foreach (Control c in Controls)
+            {
                 tempHintsList.Add (c);
+            }
 
             Controls.Clear();
         }
@@ -3324,7 +3340,9 @@ public class SyntaxTextBox
         if (!ShowScrollBars && Hints.Count > 0)
         {
             foreach (var c in tempHintsList)
+            {
                 Controls.Add (c);
+            }
 
             tempHintsList.Clear();
 
@@ -3337,6 +3355,9 @@ public class SyntaxTextBox
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public void OnScroll (ScrollEventArgs se, bool alignByLines)
     {
         HideHints();
@@ -5304,6 +5325,7 @@ public class SyntaxTextBox
             TextSource.Manager.ExecuteCommand (new SelectCommand (TextSource));
 
             foreach (var i in texts.Keys)
+            {
                 if (changed.ContainsKey (i))
                 {
                     Selection = new TextRange (this, 0, i, this[i].Count, i);
@@ -5312,6 +5334,7 @@ public class SyntaxTextBox
                         InsertText (texts[i]);
                     }
                 }
+            }
 
             Selection = oldSel;
 
@@ -5878,7 +5901,9 @@ public class SyntaxTextBox
         //create dictionary of bookmarks
         var bookmarksByLineIndex = new Dictionary<int, Bookmark>();
         foreach (var item in bookmarks)
+        {
             bookmarksByLineIndex[item.LineIndex] = item;
+        }
 
         //
         var startLine = YtoLineIndex (VerticalScroll.Value);
@@ -6296,6 +6321,7 @@ public class SyntaxTextBox
         e.Graphics.SmoothingMode = SmoothingMode.None;
         using (var pen = new Pen (Color.FromArgb (200, ServiceLinesColor)) { DashStyle = DashStyle.Dot })
             foreach (var iLine in foldingPairs)
+            {
                 if (iLine.Key < endLine && iLine.Value > startLine)
                 {
                     var line = lines[iLine.Key];
@@ -6331,6 +6357,7 @@ public class SyntaxTextBox
                             y2 < ClientSize.Height ? y2 : ClientSize.Height);
                     }
                 }
+            }
     }
 
     /// <summary>
@@ -7921,10 +7948,12 @@ public class SyntaxTextBox
     private VisualMarker FindVisualMarkerForPoint (Point p)
     {
         foreach (var m in visibleMarkers)
+        {
             if (m.rectangle.Contains (p))
             {
                 return m;
             }
+        }
 
         return null;
     }
@@ -8300,6 +8329,9 @@ public class SyntaxTextBox
         lines.Manager.EndAutoUndoCommands();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public virtual void OnVisualMarkerClick (MouseEventArgs args, StyleVisualMarker marker)
     {
         if (VisualMarkerClick != null)
@@ -8310,6 +8342,9 @@ public class SyntaxTextBox
         marker.Style.OnVisualMarkerClick (this, new VisualMarkerEventArgs (marker.Style, marker, args));
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnMarkerClick (MouseEventArgs args, VisualMarker marker)
     {
         if (marker is StyleVisualMarker)
@@ -8349,6 +8384,9 @@ public class SyntaxTextBox
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnMarkerDoubleClick (VisualMarker marker)
     {
         if (marker is FoldedAreaMarker)
@@ -8361,23 +8399,29 @@ public class SyntaxTextBox
 
     private void ClearBracketsPositions()
     {
-        leftBracketPosition = null;
-        rightBracketPosition = null;
-        leftBracketPosition2 = null;
-        rightBracketPosition2 = null;
+        leftBracketPosition = null!;
+        rightBracketPosition = null!;
+        leftBracketPosition2 = null!;
+        rightBracketPosition2 = null!;
     }
 
     /// <summary>
     /// Highlights brackets around caret
     /// </summary>
-    private void HighlightBrackets (char LeftBracket, char RightBracket, ref TextRange leftBracketPosition,
-        ref TextRange rightBracketPosition)
+    private void HighlightBrackets
+        (
+            char LeftBracket,
+            char RightBracket,
+            ref TextRange leftBracketPosition,
+            ref TextRange rightBracketPosition
+        )
     {
         switch (BracketsHighlightStrategy)
         {
             case BracketsHighlightStrategy.Strategy1:
                 HighlightBrackets1 (LeftBracket, RightBracket, ref leftBracketPosition, ref rightBracketPosition);
                 break;
+
             case BracketsHighlightStrategy.Strategy2:
                 HighlightBrackets2 (LeftBracket, RightBracket, ref leftBracketPosition, ref rightBracketPosition);
                 break;
@@ -9081,7 +9125,9 @@ window.status = ""#print"";
     {
         var iLines = new List<int>();
         foreach (var r in Range.GetRangesByLines (searchPattern, options))
+        {
             iLines.Add (r.Start.Line);
+        }
 
         return iLines;
     }
