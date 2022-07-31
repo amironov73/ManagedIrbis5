@@ -16,7 +16,6 @@
 #region Using directives
 
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
 
 #endregion
@@ -45,88 +44,92 @@ public static class HtmlText
             return text;
         }
 
-        var result = new StringBuilder (text.Length);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (text.Length);
 
         foreach (var c in text)
         {
             switch (c)
             {
                 case '"':
-                    result.Append ("&quot;");
+                    builder.Append ("&quot;");
                     break;
 
                 case '#':
-                    result.Append ("&num;");
+                    builder.Append ("&num;");
                     break;
 
                 case '&':
-                    result.Append ("&amp;");
+                    builder.Append ("&amp;");
                     break;
 
                 case '\'':
-                    result.Append ("&apos;");
+                    builder.Append ("&apos;");
                     break;
 
                 case '<':
-                    result.Append ("&lt;");
+                    builder.Append ("&lt;");
                     break;
 
                 case '>':
-                    result.Append ("&gt;");
+                    builder.Append ("&gt;");
                     break;
 
                 case '\x00A0':
                     // non-breaking space
-                    result.Append ("&nbsp;");
+                    builder.Append ("&nbsp;");
                     break;
 
                 case '\x00A2':
                     // cent sign
-                    result.Append ("&cent;");
+                    builder.Append ("&cent;");
                     break;
 
                 case '\x00A3':
                     // pound sign
-                    result.Append ("&pound;");
+                    builder.Append ("&pound;");
                     break;
 
                 case '\x00A5':
                     // yen sign
-                    result.Append ("&yen;");
+                    builder.Append ("&yen;");
                     break;
 
                 case '\x00A7':
                     // section sign
-                    result.Append ("&sect;");
+                    builder.Append ("&sect;");
                     break;
 
                 case '\x00A9':
                     // copyright sign
-                    result.Append ("&copy;");
+                    builder.Append ("&copy;");
                     break;
 
                 case '\x00AD':
                     // soft hyphen
-                    result.Append ("&shy;");
+                    builder.Append ("&shy;");
                     break;
 
                 case '\x00AE':
                     // registered sign
-                    result.Append ("&reg;");
+                    builder.Append ("&reg;");
                     break;
 
                 case '\x20AC':
                     // euro sign
-                    result.Append ("&euro;");
+                    builder.Append ("&euro;");
                     break;
 
                 default:
-                    result.Append (c);
+                    builder.Append (c);
                     break;
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>

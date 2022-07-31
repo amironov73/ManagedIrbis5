@@ -71,7 +71,7 @@ public ref struct ValueTextNavigator
     /// Текст закончился?
     /// </summary>
     [Pure]
-    public bool IsEOF => _position >= _text.Length;
+    public bool IsEOF => Position >= _text.Length;
 
     /// <summary>
     /// Общая длина текста в символах.
@@ -83,7 +83,7 @@ public ref struct ValueTextNavigator
     /// Текущая позиция в тексте.
     /// </summary>
     [Pure]
-    public int Position => _position;
+    public int Position { get; private set; }
 
     /// <summary>
     /// Текст, хранимый в навигаторе.
@@ -105,7 +105,7 @@ public ref struct ValueTextNavigator
         )
     {
         _text = text;
-        _position = 0;
+        Position = 0;
     }
 
     #endregion
@@ -113,7 +113,6 @@ public ref struct ValueTextNavigator
     #region Private members
 
     private readonly ReadOnlySpan<char> _text;
-    private int _position;
 
     #endregion
 
@@ -127,7 +126,7 @@ public ref struct ValueTextNavigator
     {
         var result = new ValueTextNavigator (_text)
         {
-            _position = _position
+            Position = Position
         };
 
         return result;
@@ -161,7 +160,7 @@ public ref struct ValueTextNavigator
     {
         return IsEOF
             ? new ReadOnlySpan<char>()
-            : _text.Slice (_position);
+            : _text.Slice (Position);
     }
 
     /// <summary>
@@ -251,7 +250,7 @@ public ref struct ValueTextNavigator
     [Pure]
     public char LookAhead()
     {
-        var ahead = _position + 1;
+        var ahead = Position + 1;
         return ahead >= _text.Length
             ? EOF
             : _text[ahead];
@@ -269,7 +268,7 @@ public ref struct ValueTextNavigator
     {
         Sure.NonNegative (distance);
 
-        var ahead = _position + distance;
+        var ahead = Position + distance;
         return ahead >= _text.Length
             ? EOF
             : _text[ahead];
@@ -282,7 +281,7 @@ public ref struct ValueTextNavigator
     [Pure]
     public char LookBehind()
     {
-        return _position == 0 ? EOF : _text[_position - 1];
+        return Position == 0 ? EOF : _text[Position - 1];
     }
 
     /// <summary>
@@ -301,9 +300,9 @@ public ref struct ValueTextNavigator
     {
         Sure.Positive (distance);
 
-        return _position < distance
+        return Position < distance
             ? EOF
-            : _text[_position - distance];
+            : _text[Position - distance];
     }
 
     /// <summary>
@@ -318,7 +317,7 @@ public ref struct ValueTextNavigator
             int distance
         )
     {
-        _position = Math.Max (0, Math.Min (_position + distance, _text.Length));
+        Position = Math.Max (0, Math.Min (Position + distance, _text.Length));
     }
 
     /// <summary>
@@ -327,9 +326,9 @@ public ref struct ValueTextNavigator
     [Pure]
     public char PeekChar()
     {
-        return _position >= _text.Length
+        return Position >= _text.Length
             ? EOF
-            : _text[_position];
+            : _text[Position];
     }
 
     /// <summary>
@@ -353,7 +352,7 @@ public ref struct ValueTextNavigator
             return ReadOnlySpan<char>.Empty;
         }
 
-        var start = _position;
+        var start = Position;
         for (var i = 0; i < length; i++)
         {
             var c = ReadChar();
@@ -363,8 +362,8 @@ public ref struct ValueTextNavigator
             }
         }
 
-        var result = _text.Slice (start, _position - start);
-        _position = start;
+        var result = _text.Slice (start, Position - start);
+        Position = start;
 
         return result;
     }
@@ -380,9 +379,9 @@ public ref struct ValueTextNavigator
             char stopChar
         )
     {
-        var position = _position;
+        var position = Position;
         var result = ReadTo (stopChar);
-        _position = position;
+        Position = position;
 
         return result;
     }
@@ -398,9 +397,9 @@ public ref struct ValueTextNavigator
             params char[] stopChars
         )
     {
-        var position = _position;
+        var position = Position;
         var result = ReadTo (stopChars);
-        _position = position;
+        Position = position;
 
         return result;
     }
@@ -416,9 +415,9 @@ public ref struct ValueTextNavigator
             char stopChar
         )
     {
-        var position = _position;
+        var position = Position;
         var result = ReadUntil (stopChar);
-        _position = position;
+        Position = position;
 
         return result;
     }
@@ -434,9 +433,9 @@ public ref struct ValueTextNavigator
             params char[] stopChars
         )
     {
-        var position = _position;
+        var position = Position;
         var result = ReadUntil (stopChars);
-        _position = position;
+        Position = position;
 
         return result;
     }
@@ -448,12 +447,9 @@ public ref struct ValueTextNavigator
     /// </summary>
     public char ReadChar()
     {
-        if (_position >= _text.Length)
-        {
-            return EOF;
-        }
-
-        return _text[_position++];
+        return Position >= _text.Length
+            ? EOF
+            : _text[Position++];
     }
 
     /// <summary>
@@ -479,7 +475,7 @@ public ref struct ValueTextNavigator
             return null;
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         while (true)
         {
             var c = ReadChar();
@@ -499,10 +495,11 @@ public ref struct ValueTextNavigator
                             + ": unexpected end of stream"
                         );
 
+                    StringBuilderPool.Shared.Return (builder);
                     throw new FormatException();
                 }
 
-                result.Append (c);
+                builder.Append (c);
             }
             else if (c == stopChar)
             {
@@ -510,11 +507,14 @@ public ref struct ValueTextNavigator
             }
             else
             {
-                result.Append (c);
+                builder.Append (c);
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -535,7 +535,7 @@ public ref struct ValueTextNavigator
             return ReadOnlySpan<char>.Empty;
         }
 
-        var start = _position;
+        var start = Position;
         if (PeekChar() != openChar)
         {
             return ReadOnlySpan<char>.Empty;
@@ -548,7 +548,7 @@ public ref struct ValueTextNavigator
             var c = ReadChar();
             if (c == EOF)
             {
-                _position = start;
+                Position = start;
                 return ReadOnlySpan<char>.Empty;
             }
 
@@ -561,7 +561,7 @@ public ref struct ValueTextNavigator
         return _text.Slice
             (
                 start,
-                _position - start
+                Position - start
             );
     }
 
@@ -583,7 +583,7 @@ public ref struct ValueTextNavigator
             return ReadOnlySpan<char>.Empty;
         }
 
-        var start = _position;
+        var start = Position;
         if (!openChars.Contains (PeekChar()))
         {
             return ReadOnlySpan<char>.Empty;
@@ -596,7 +596,7 @@ public ref struct ValueTextNavigator
             var c = ReadChar();
             if (c == EOF)
             {
-                _position = start;
+                Position = start;
                 return ReadOnlySpan<char>.Empty;
             }
 
@@ -609,7 +609,7 @@ public ref struct ValueTextNavigator
         return _text.Slice
             (
                 start,
-                _position - start
+                Position - start
             );
     }
 
@@ -625,7 +625,7 @@ public ref struct ValueTextNavigator
             return ReadOnlySpan<char>.Empty;
         }
 
-        var startPosition = _position;
+        var startPosition = Position;
         while (IsDigit())
         {
             ReadChar();
@@ -634,7 +634,7 @@ public ref struct ValueTextNavigator
         return _text.Slice
             (
                 startPosition,
-                _position - startPosition
+                Position - startPosition
             );
     }
 
@@ -643,7 +643,7 @@ public ref struct ValueTextNavigator
     /// </summary>
     public ReadOnlySpan<char> ReadLine()
     {
-        var startPosition = _position;
+        var startPosition = Position;
         while (!IsEOF)
         {
             var c = PeekChar();
@@ -655,7 +655,7 @@ public ref struct ValueTextNavigator
             ReadChar();
         }
 
-        var stopPosition = _position;
+        var stopPosition = Position;
         if (!IsEOF)
         {
             var c = PeekChar();
@@ -690,7 +690,7 @@ public ref struct ValueTextNavigator
     {
         Sure.Positive (length);
 
-        var startPosition = _position;
+        var startPosition = Position;
         for (var i = 0; i < length; i++)
         {
             var c = ReadChar();
@@ -703,7 +703,7 @@ public ref struct ValueTextNavigator
         return Substring
             (
                 startPosition,
-                _position - startPosition
+                Position - startPosition
             );
     }
 
@@ -718,7 +718,7 @@ public ref struct ValueTextNavigator
             char stopChar
         )
     {
-        var startPosition = _position;
+        var startPosition = Position;
         while (true)
         {
             var c = ReadChar();
@@ -731,7 +731,7 @@ public ref struct ValueTextNavigator
         return Substring
             (
                 startPosition,
-                length: _position - startPosition
+                length: Position - startPosition
             );
     }
 
@@ -749,7 +749,7 @@ public ref struct ValueTextNavigator
     {
         Sure.NotEmpty (stopString);
 
-        var savePosition = _position;
+        var savePosition = Position;
         var length = 0;
         while (true)
         {
@@ -757,14 +757,14 @@ public ref struct ValueTextNavigator
             var c = ReadChar();
             if (c == EOF)
             {
-                _position = savePosition;
+                Position = savePosition;
                 return ReadOnlySpan<char>.Empty;
             }
 
             length++;
             if (length >= stopString.Length)
             {
-                var start = _position - stopString.Length;
+                var start = Position - stopString.Length;
                 for (var i = 0; i < stopString.Length; i++)
                 {
                     if (_text[start + i] != stopString[i])
@@ -780,7 +780,7 @@ public ref struct ValueTextNavigator
         return Substring
             (
                 savePosition,
-                _position - savePosition - stopString.Length
+                Position - savePosition - stopString.Length
             );
     }
 
@@ -798,7 +798,7 @@ public ref struct ValueTextNavigator
     {
         Sure.NotEmpty (stopString);
 
-        var savePosition = _position;
+        var savePosition = Position;
         var length = 0;
         while (true)
         {
@@ -806,14 +806,14 @@ public ref struct ValueTextNavigator
             var c = ReadChar();
             if (c == EOF)
             {
-                _position = savePosition;
+                Position = savePosition;
                 return ReadOnlySpan<char>.Empty;
             }
 
             length++;
             if (length >= stopString.Length)
             {
-                var start = _position - stopString.Length;
+                var start = Position - stopString.Length;
                 for (var i = 0; i < stopString.Length; i++)
                 {
                     if (!_text[start + i].SameChar (stopString[i]))
@@ -829,7 +829,7 @@ public ref struct ValueTextNavigator
         return Substring
             (
                 savePosition,
-                _position - savePosition - stopString.Length
+                Position - savePosition - stopString.Length
             );
     }
 
@@ -844,7 +844,7 @@ public ref struct ValueTextNavigator
             params char[] stopChars
         )
     {
-        var start = _position;
+        var start = Position;
         while (true)
         {
             var c = ReadChar();
@@ -857,8 +857,8 @@ public ref struct ValueTextNavigator
 
         var result = _text.Slice
             (
-                start: start,
-                length: _position - start
+                start,
+                Position - start
             );
         return result;
     }
@@ -874,7 +874,7 @@ public ref struct ValueTextNavigator
             char stopChar
         )
     {
-        var start = _position;
+        var start = Position;
         while (true)
         {
             var c = PeekChar();
@@ -889,7 +889,7 @@ public ref struct ValueTextNavigator
         return _text.Slice
             (
                 start,
-                _position - start
+                Position - start
             );
     }
 
@@ -907,7 +907,7 @@ public ref struct ValueTextNavigator
     {
         Sure.NotEmpty (stopString);
 
-        var position = _position;
+        var position = Position;
         var length = 0;
         while (true)
         {
@@ -915,14 +915,14 @@ public ref struct ValueTextNavigator
             var c = ReadChar();
             if (c == EOF)
             {
-                _position = position;
+                Position = position;
                 return ReadOnlySpan<char>.Empty;
             }
 
             length++;
             if (length >= stopString.Length)
             {
-                var start = _position - stopString.Length;
+                var start = Position - stopString.Length;
                 for (var i = 0; i < stopString.Length; i++)
                 {
                     if (_text[start + i] != stopString[i])
@@ -938,9 +938,9 @@ public ref struct ValueTextNavigator
         var result = _text.Slice
             (
                 position,
-                _position - position - stopString.Length
+                Position - position - stopString.Length
             );
-        _position -= stopString.Length;
+        Position -= stopString.Length;
 
         return result;
     }
@@ -956,7 +956,7 @@ public ref struct ValueTextNavigator
             params char[] stopChars
         )
     {
-        var savePosition = _position;
+        var savePosition = Position;
         while (true)
         {
             var c = PeekChar();
@@ -972,7 +972,7 @@ public ref struct ValueTextNavigator
         return _text.Slice
             (
                 savePosition,
-                _position - savePosition
+                Position - savePosition
             );
     }
 
@@ -990,14 +990,14 @@ public ref struct ValueTextNavigator
             ReadOnlySpan<char> stopChars
         )
     {
-        var start = _position;
+        var start = Position;
         var level = 0;
         while (true)
         {
             var c = PeekChar();
             if (c == EOF)
             {
-                _position = start;
+                Position = start;
                 return ReadOnlySpan<char>.Empty;
             }
 
@@ -1029,7 +1029,7 @@ public ref struct ValueTextNavigator
         return _text.Slice
             (
                 start,
-                _position - start
+                Position - start
             );
     }
 
@@ -1044,7 +1044,7 @@ public ref struct ValueTextNavigator
             char goodChar
         )
     {
-        var startPosition = _position;
+        var startPosition = Position;
         while (true)
         {
             var c = PeekChar();
@@ -1059,7 +1059,7 @@ public ref struct ValueTextNavigator
         return _text.Slice
             (
                 startPosition,
-                _position - startPosition
+                Position - startPosition
             );
     }
 
@@ -1074,7 +1074,7 @@ public ref struct ValueTextNavigator
             params char[] goodChars
         )
     {
-        var start = _position;
+        var start = Position;
         while (true)
         {
             var c = PeekChar();
@@ -1090,7 +1090,7 @@ public ref struct ValueTextNavigator
         return _text.Slice
             (
                 start,
-                _position - start
+                Position - start
             );
     }
 
@@ -1102,7 +1102,7 @@ public ref struct ValueTextNavigator
     /// </returns>
     public ReadOnlySpan<char> ReadWord()
     {
-        var startPosition = _position;
+        var startPosition = Position;
         while (true)
         {
             var c = PeekChar();
@@ -1118,7 +1118,7 @@ public ref struct ValueTextNavigator
         return _text.Slice
             (
                 startPosition,
-                _position - startPosition
+                Position - startPosition
             );
     }
 
@@ -1135,7 +1135,7 @@ public ref struct ValueTextNavigator
             params char[] additionalWordCharacters
         )
     {
-        var savePosition = _position;
+        var savePosition = Position;
         while (true)
         {
             var c = PeekChar();
@@ -1152,7 +1152,7 @@ public ref struct ValueTextNavigator
         return _text.Slice
             (
                 savePosition,
-                _position - savePosition
+                Position - savePosition
             );
     }
 
@@ -1167,7 +1167,7 @@ public ref struct ValueTextNavigator
             int length
         )
     {
-        var start = _position - length;
+        var start = Position - length;
         if (start < 0)
         {
             length += start;

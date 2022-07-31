@@ -23,7 +23,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 using AM.IO;
 using AM.Runtime;
@@ -53,7 +52,7 @@ public sealed class NumberText
     /// </summary>
     class Chunk
         : IHandmadeSerializable,
-            IVerifiable
+        IVerifiable
     {
         #region Properties
 
@@ -115,6 +114,8 @@ public sealed class NumberText
                 Chunk other
             )
         {
+            Sure.NotNull (other);
+
             var result = Utility.CompareSpans
                 (
                     Prefix.Span,
@@ -153,7 +154,7 @@ public sealed class NumberText
                 BinaryReader reader
             )
         {
-            Sure.NotNull (reader, nameof (reader));
+            Sure.NotNull (reader);
 
             Prefix = reader.ReadOnlyMemory();
             Value = reader.ReadPackedInt64();
@@ -166,7 +167,7 @@ public sealed class NumberText
                 BinaryWriter writer
             )
         {
-            Sure.NotNull (writer, nameof (writer));
+            Sure.NotNull (writer);
 
             writer
                 .Write (Prefix)
@@ -218,7 +219,7 @@ public sealed class NumberText
             StringBuilderPool.Shared.Return (builder);
 
             return result;
-        } // method ToString
+        }
 
         #endregion
     }
@@ -357,8 +358,15 @@ public sealed class NumberText
     /// <summary>
     /// Добавляем фрагмент в конец числа.
     /// </summary>
-    public NumberText AppendChunk (string? prefix, long value, int length = 0) =>
-        AppendChunk (prefix.AsMemory(), value, length);
+    public NumberText AppendChunk
+        (
+            string? prefix,
+            long value,
+            int length = 0
+        )
+    {
+        return AppendChunk (prefix.AsMemory(), value, length);
+    }
 
 
     /// <summary>
@@ -622,8 +630,8 @@ public sealed class NumberText
 
         var reader = new StringReader (text);
 
-        var firstBuffer = new StringBuilder();
-        var secondBuffer = new StringBuilder();
+        var firstBuffer = StringBuilderPool.Shared.Get();
+        var secondBuffer = StringBuilderPool.Shared.Get();
         NumberText firstNumber;
 
         BEGIN:
@@ -642,6 +650,9 @@ public sealed class NumberText
                             + ": syntax error: {Text}",
                             text
                         );
+
+                    StringBuilderPool.Shared.Return (firstBuffer);
+                    StringBuilderPool.Shared.Return (secondBuffer);
 
                     throw new ArsMagnaException();
                 }
@@ -711,6 +722,9 @@ public sealed class NumberText
                         text
                     );
 
+                StringBuilderPool.Shared.Return (firstBuffer);
+                StringBuilderPool.Shared.Return (secondBuffer);
+
                 throw new Exception();
             }
 
@@ -727,6 +741,9 @@ public sealed class NumberText
                         firstNumber.GetPrefix (0),
                         secondNumber.GetPrefix (0)
                     );
+
+                StringBuilderPool.Shared.Return (firstBuffer);
+                StringBuilderPool.Shared.Return (secondBuffer);
 
                 throw new Exception();
             }
@@ -745,6 +762,9 @@ public sealed class NumberText
         {
             goto BEGIN;
         }
+
+        StringBuilderPool.Shared.Return (firstBuffer);
+        StringBuilderPool.Shared.Return (secondBuffer);
     }
 
     /// <summary>

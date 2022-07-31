@@ -141,12 +141,16 @@ public static class NewLine
             return text;
         }
 
-        var result = new StringBuilder (text);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (text);
 
-        result.Replace (CarriageReturn, string.Empty);
-        result.Replace (LineFeed, string.Empty);
+        builder.Replace (CarriageReturn, string.Empty);
+        builder.Replace (LineFeed, string.Empty);
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
