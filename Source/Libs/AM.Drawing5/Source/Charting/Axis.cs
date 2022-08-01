@@ -448,8 +448,11 @@ public abstract class Axis
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
+    public virtual void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         info.AddValue ("schema", schema);
 

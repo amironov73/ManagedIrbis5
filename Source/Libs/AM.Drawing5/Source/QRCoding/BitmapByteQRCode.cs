@@ -121,7 +121,10 @@ public class BitmapByteQRCode
     private byte[] HexColorToByteArray(string colorString)
     {
         if (colorString.StartsWith("#"))
+        {
             colorString = colorString.Substring(1);
+        }
+
         byte[] byteColor = new byte[colorString.Length / 2];
         for (int i = 0; i < byteColor.Length; i++)
             byteColor[i] = byte.Parse(colorString.Substring(i * 2, 2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);

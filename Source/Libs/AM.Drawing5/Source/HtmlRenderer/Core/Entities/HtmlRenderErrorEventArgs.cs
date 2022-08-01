@@ -22,7 +22,7 @@ namespace AM.Drawing.HtmlRenderer.Core.Entities;
 /// <summary>
 /// Raised when an error occurred during html rendering.
 /// </summary>
-public sealed class HtmlRenderErrorEventArgs 
+public sealed class HtmlRenderErrorEventArgs
     : EventArgs
 {
     /// <summary>
@@ -38,7 +38,7 @@ public sealed class HtmlRenderErrorEventArgs
     /// <summary>
     /// the exception that occurred (can be null)
     /// </summary>
-    private readonly Exception _exception;
+    private readonly Exception? _exception;
 
     /// <summary>
     /// Init.
@@ -46,7 +46,12 @@ public sealed class HtmlRenderErrorEventArgs
     /// <param name="type">the type of error to report</param>
     /// <param name="message">the error message</param>
     /// <param name="exception">optional: the exception that occurred</param>
-    public HtmlRenderErrorEventArgs(HtmlRenderErrorType type, string message, Exception exception = null)
+    public HtmlRenderErrorEventArgs
+        (
+            HtmlRenderErrorType type,
+            string message,
+            Exception? exception = null
+        )
     {
         _type = type;
         _message = message;

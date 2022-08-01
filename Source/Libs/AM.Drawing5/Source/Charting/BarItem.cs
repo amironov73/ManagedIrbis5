@@ -172,7 +172,7 @@ public class BarItem
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        var sch = info.GetInt32 ("schema2");
 
         _bar = (Bar)info.GetValue ("bar", typeof (Bar));
     }
@@ -182,8 +182,11 @@ public class BarItem
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
@@ -244,7 +247,7 @@ public class BarItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    override public void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
+    public override void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
     {
         _bar.Draw (g, pane, rect, scaleFactor, true, false, null);
     }
@@ -294,26 +297,34 @@ public class BarItem
     /// <param name="isBold">true for a bold font type, false otherwise</param>
     /// <param name="isItalic">true for an italic font type, false otherwise</param>
     /// <param name="isUnderline">true for an underline font type, false otherwise</param>
-    public static void CreateBarLabels (GraphPane pane, bool isBarCenter, string valueFormat,
-        string fontFamily, float fontSize, Color fontColor, bool isBold, bool isItalic,
-        bool isUnderline)
+    public static void CreateBarLabels
+        (
+            GraphPane pane,
+            bool isBarCenter,
+            string valueFormat,
+            string fontFamily,
+            float fontSize,
+            Color fontColor,
+            bool isBold,
+            bool isItalic,
+            bool isUnderline
+        )
     {
-        bool isVertical = pane.BarSettings.Base == BarBase.X;
+        var isVertical = pane.BarSettings.Base == BarBase.X;
 
         // keep a count of the number of BarItems
-        int curveIndex = 0;
+        var curveIndex = 0;
 
         // Get a valuehandler to do some calculations for us
-        ValueHandler valueHandler = new ValueHandler (pane, true);
+        var valueHandler = new ValueHandler (pane, true);
 
         // Loop through each curve in the list
-        foreach (CurveItem curve in pane.CurveList)
+        foreach (var curve in pane.CurveList)
         {
             // work with BarItems only
-            BarItem bar = curve as BarItem;
-            if (bar != null)
+            if (curve is BarItem bar)
             {
-                IPointList points = curve.Points;
+                var points = curve.Points;
 
                 // ADD JKB 9/21/07
                 // The labelOffset should depend on whether the curve is YAxis or Y2Axis.
@@ -321,11 +332,11 @@ public class BarItem
                 // Make the gap between the bars and the labels = 1.5% of the axis range
                 float labelOffset;
 
-                Scale scale = curve.ValueAxis (pane).Scale;
+                var scale = curve.ValueAxis (pane).Scale;
                 labelOffset = (float)(scale._max - scale._min) * 0.015f;
 
                 // Loop through each point in the BarItem
-                for (int i = 0; i < points.Count; i++)
+                for (var i = 0; i < points.Count; i++)
                 {
                     // Get the high, low and base values for the current bar
                     // note that this method will automatically calculate the "effective"
@@ -335,12 +346,12 @@ public class BarItem
 
                     // Get the value that corresponds to the center of the bar base
                     // This method figures out how the bars are positioned within a cluster
-                    float centerVal = (float)valueHandler.BarCenterValue (bar,
+                    var centerVal = (float)valueHandler.BarCenterValue (bar,
                         bar.GetBarWidth (pane), i, baseVal, curveIndex);
 
                     // Create a text label -- note that we have to go back to the original point
                     // data for this, since hiVal and lowVal could be "effective" values from a bar stack
-                    string barLabelText = (isVertical ? points[i].Y : points[i].X).ToString (valueFormat);
+                    var barLabelText = (isVertical ? points[i].Y : points[i].X).ToString (valueFormat);
 
                     // Calculate the position of the label -- this is either the X or the Y coordinate
                     // depending on whether they are horizontal or vertical bars, respectively
@@ -405,24 +416,24 @@ public class BarItem
         if (i < 0 || i >= _points.Count)
             return false;
 
-        Axis valueAxis = ValueAxis (pane);
-        Axis baseAxis = BaseAxis (pane);
+        var valueAxis = ValueAxis (pane);
+        var baseAxis = BaseAxis (pane);
 
         // pixBase = pixel value for the bar center on the base axis
         // pixHiVal = pixel value for the bar top on the value axis
         // pixLowVal = pixel value for the bar bottom on the value axis
         float pixBase, pixHiVal, pixLowVal;
 
-        float clusterWidth = pane.BarSettings.GetClusterWidth();
-        float barWidth = GetBarWidth (pane);
-        float clusterGap = pane._barSettings.MinClusterGap * barWidth;
-        float barGap = barWidth * pane._barSettings.MinBarGap;
+        var clusterWidth = pane.BarSettings.GetClusterWidth();
+        var barWidth = GetBarWidth (pane);
+        var clusterGap = pane._barSettings.MinClusterGap * barWidth;
+        var barGap = barWidth * pane._barSettings.MinBarGap;
 
         // curBase = the scale value on the base axis of the current bar
         // curHiVal = the scale value on the value axis of the current bar
         // curLowVal = the scale value of the bottom of the bar
         double curBase, curLowVal, curHiVal;
-        ValueHandler valueHandler = new ValueHandler (pane, false);
+        var valueHandler = new ValueHandler (pane, false);
         valueHandler.GetValues (this, i, out curBase, out curLowVal, out curHiVal);
 
         // Any value set to double max is invalid and should be skipped
@@ -440,8 +451,8 @@ public class BarItem
             pixBase = baseAxis.Scale.Transform (_isOverrideOrdinal, i, curBase);
 
             // Calculate the pixel location for the side of the bar (on the base axis)
-            float pixSide = pixBase - clusterWidth / 2.0F + clusterGap / 2.0F +
-                            pane.CurveList.GetBarItemPos (pane, this) * (barWidth + barGap);
+            var pixSide = pixBase - clusterWidth / 2.0F + clusterGap / 2.0F +
+                          pane.CurveList.GetBarItemPos (pane, this) * (barWidth + barGap);
 
             // Draw the bar
             if (baseAxis is XAxis || baseAxis is X2Axis)

@@ -15,7 +15,6 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -158,8 +157,8 @@ public class LineBase
     /// <seealso cref="GradientFill"/>
     public Color Color
     {
-        get { return _color; }
-        set { _color = value; }
+        get => _color;
+        set => _color = value;
     }
 
     /// <summary>
@@ -171,8 +170,8 @@ public class LineBase
     /// <seealso cref="DashOff" />
     public DashStyle Style
     {
-        get { return _style; }
-        set { _style = value; }
+        get => _style;
+        set => _style = value;
     }
 
     /// <summary>
@@ -369,7 +368,7 @@ public class LineBase
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema0");
+        var sch = info.GetInt32 ("schema0");
 
         _width = info.GetSingle ("width");
         _style = (DashStyle)info.GetValue ("style", typeof (DashStyle));
@@ -389,8 +388,11 @@ public class LineBase
     /// serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the
     /// serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
+    public virtual void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         info.AddValue ("schema0", schema0);
 
@@ -449,14 +451,15 @@ public class LineBase
     /// </param>
     /// <returns>A <see cref="Pen" /> object with the properties of this <see cref="LineBase" />
     /// </returns>
-    public Pen GetPen (PaneBase pane, float scaleFactor, PointPair dataValue)
+    public Pen GetPen (PaneBase pane, float scaleFactor, PointPair? dataValue)
     {
-        Color color = _color;
+        var color = _color;
         if (_gradientFill.IsGradientValueType)
+        {
             color = _gradientFill.GetGradientColor (dataValue);
+        }
 
-        Pen pen = new Pen (color,
-            pane.ScaledPenWidth (_width, scaleFactor));
+        var pen = new Pen (color, pane.ScaledPenWidth (_width, scaleFactor));
 
         pen.DashStyle = _style;
 
@@ -465,13 +468,15 @@ public class LineBase
             if (_dashOff > 1e-10 && _dashOn > 1e-10)
             {
                 pen.DashStyle = DashStyle.Custom;
-                float[] pattern = new float[2];
+                var pattern = new float[2];
                 pattern[0] = _dashOn;
                 pattern[1] = _dashOff;
                 pen.DashPattern = pattern;
             }
             else
+            {
                 pen.DashStyle = DashStyle.Solid;
+            }
         }
 
         return pen;

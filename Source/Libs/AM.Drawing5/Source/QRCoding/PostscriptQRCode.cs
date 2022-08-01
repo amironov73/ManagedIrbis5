@@ -166,7 +166,10 @@ public class PostscriptQRCode
         for (var xi = offset; xi < offset + drawableModulesCount; xi++)
         {
             if (xi > offset)
+            {
                 psFile += "nl\n";
+            }
+
             for (var yi = offset; yi < offset + drawableModulesCount; yi++)
             {
                 psFile += (this.QrCodeData.ModuleMatrix[xi][yi] ? "f " : "b ");

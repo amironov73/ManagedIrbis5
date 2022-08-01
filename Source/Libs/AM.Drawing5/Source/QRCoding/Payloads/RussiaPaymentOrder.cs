@@ -127,7 +127,10 @@ public class RussiaPaymentOrder
         //Add optional fields, if filled
         var optionalFieldsList = GetOptionalFieldsAsList();
         if (optionalFieldsList.Count > 0)
+        {
             ret += $"|{string.Join ("|", optionalFieldsList.ToArray())}";
+        }
+
         ret += separator;
 
         //Encode return string as byte[] with correct CharacterSet
@@ -135,8 +138,11 @@ public class RussiaPaymentOrder
         var cp = characterSet.ToString().Replace ("_", "-");
         byte[] bytesOut = Encoding.Convert (Encoding.UTF8, Encoding.GetEncoding (cp), Encoding.UTF8.GetBytes (ret));
         if (bytesOut.Length > 300)
+        {
             throw new RussiaPaymentOrderException (
                 $"Data too long. Payload must not exceed 300 bytes, but actually is {bytesOut.Length} bytes long. Remove additional data fields or shorten strings/values.");
+        }
+
         return bytesOut;
     }
 
@@ -161,7 +167,9 @@ public class RussiaPaymentOrder
         {
             if (!mandatoryValues.Any (x => x.Contains (sepCandidate)) &&
                 !optionalValues.Any (x => x.Contains (sepCandidate)))
+            {
                 return sepCandidate;
+            }
         }
 
         throw new RussiaPaymentOrderException ("No valid separator found.");
@@ -230,12 +238,17 @@ public class RussiaPaymentOrder
     private static string ValidateInput (string input, string fieldname, string[] patterns, string errorText = null)
     {
         if (input == null)
+        {
             throw new RussiaPaymentOrderException ($"The input for '{fieldname}' must not be null.");
+        }
+
         foreach (var pattern in patterns)
         {
             if (!Regex.IsMatch (input, pattern))
+            {
                 throw new RussiaPaymentOrderException (errorText ??
                                                        $"The input for '{fieldname}' ({input}) doesn't match the pattern {pattern}");
+            }
         }
 
         return input;

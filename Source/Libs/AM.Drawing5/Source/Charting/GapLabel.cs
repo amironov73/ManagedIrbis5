@@ -143,8 +143,11 @@ public class GapLabel
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
 

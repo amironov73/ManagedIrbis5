@@ -57,7 +57,7 @@ internal class CssBox
     /// <summary>
     /// the html tag that is associated with this css box, null if anonymous box
     /// </summary>
-    private readonly HtmlTag _htmltag;
+    private readonly HtmlTag? _htmltag;
 
     private readonly List<CssRect> _boxWords = new ();
     private readonly List<CssBox> _boxes = new ();
@@ -97,7 +97,11 @@ internal class CssBox
     /// </summary>
     /// <param name="parentBox">optional: the parent of this css box in html</param>
     /// <param name="tag">optional: the html tag associated with this css box</param>
-    public CssBox (CssBox? parentBox, HtmlTag tag)
+    public CssBox
+        (
+            CssBox? parentBox,
+            HtmlTag? tag
+        )
     {
         if (parentBox != null)
         {
@@ -413,9 +417,9 @@ internal class CssBox
     /// <param name="tag">optional: the html tag to define the box</param>
     /// <param name="before">optional: to insert as specific location in parent box</param>
     /// <returns>the new box</returns>
-    public static CssBox CreateBox (CssBox parent, HtmlTag tag = null, CssBox before = null)
+    public static CssBox CreateBox (CssBox parent, HtmlTag? tag = null, CssBox? before = null)
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
+        Sure.NotNull (parent);
 
         var newBox = new CssBox (parent, tag);
         newBox.InheritStyle();

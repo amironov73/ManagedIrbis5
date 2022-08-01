@@ -91,14 +91,20 @@ public sealed class Mms
             case MMSEncoding.MMSTO:
                 var queryStringMmsTo = string.Empty;
                 if (!string.IsNullOrEmpty (_subject))
+                {
                     queryStringMmsTo = $"?subject={Uri.EscapeDataString (_subject)}";
+                }
+
                 returnVal = $"mmsto:{_number}{queryStringMmsTo}";
                 break;
 
             case MMSEncoding.MMS:
                 var queryStringMms = string.Empty;
                 if (!string.IsNullOrEmpty (_subject))
+                {
                     queryStringMms = $"?body={Uri.EscapeDataString (_subject)}";
+                }
+
                 returnVal = $"mms:{_number}{queryStringMms}";
                 break;
         }

@@ -246,7 +246,7 @@ public class BarSettings
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        var sch = info.GetInt32 ("schema");
 
         _minClusterGap = info.GetSingle ("minClusterGap");
         _minBarGap = info.GetSingle ("minBarGap");
@@ -261,8 +261,11 @@ public class BarSettings
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
+    public virtual void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         info.AddValue ("schema", schema);
 
@@ -299,34 +302,36 @@ public class BarSettings
     /// <seealso cref="MinClusterGap"/>
     public void CalcClusterScaleWidth()
     {
-        Axis baseAxis = BarBaseAxis();
+        var baseAxis = BarBaseAxis();
 
         // First, calculate the clusterScaleWidth for BarItem objects
         if (_clusterScaleWidthAuto && !baseAxis.Scale.IsAnyOrdinal)
         {
-            double minStep = double.MaxValue;
+            var minStep = double.MaxValue;
 
-            foreach (CurveItem curve in _ownerPane.CurveList)
+            foreach (var curve in _ownerPane.CurveList)
             {
-                IPointList list = curve.Points;
+                var list = curve.Points;
 
                 if (curve is BarItem)
                 {
-                    double step = GetMinStepSize (curve.Points, baseAxis);
+                    var step = GetMinStepSize (curve.Points, baseAxis);
                     minStep = step < minStep ? step : minStep;
                 }
             }
 
             if (minStep == double.MaxValue)
+            {
                 minStep = 1.0;
+            }
 
             _clusterScaleWidth = minStep;
         }
 
         // Second, calculate the sizes of any HiLowBarItem and JapaneseCandleStickItem objects
-        foreach (CurveItem curve in _ownerPane.CurveList)
+        foreach (var curve in _ownerPane.CurveList)
         {
-            IPointList list = curve.Points;
+            var list = curve.Points;
 
 //				if ( curve is HiLowBarItem &&
 //						(curve as HiLowBarItem).Bar.IsAutoSize )
@@ -359,37 +364,49 @@ public class BarSettings
     /// <returns>The minimum increment between bars along the base axis</returns>
     internal static double GetMinStepSize (IPointList list, Axis baseAxis)
     {
-        double minStep = double.MaxValue;
+        var minStep = double.MaxValue;
 
         if (list.Count <= 0 || baseAxis._scale.IsAnyOrdinal)
-            return 1.0;
-
-        PointPair lastPt = list[0];
-        for (int i = 1; i < list.Count; i++)
         {
-            PointPair pt = list[i];
+            return 1.0;
+        }
+
+        var lastPt = list[0];
+        for (var i = 1; i < list.Count; i++)
+        {
+            var pt = list[i];
             if (!pt.IsInvalid || !lastPt.IsInvalid)
             {
                 double step;
                 if (baseAxis is XAxis || baseAxis is X2Axis)
+                {
                     step = pt.X - lastPt.X;
+                }
                 else
+                {
                     step = pt.Y - lastPt.Y;
+                }
 
                 if (step > 0 && step < minStep)
+                {
                     minStep = step;
+                }
             }
 
             lastPt = pt;
         }
 
-        double range = baseAxis.Scale._maxLinearized - baseAxis.Scale._minLinearized;
+        var range = baseAxis.Scale._maxLinearized - baseAxis.Scale._minLinearized;
         if (range <= 0)
+        {
             minStep = 1.0;
+        }
 
-//			else if ( minStep <= 0 || minStep < 0.001 * range || minStep > range )
+        //			else if ( minStep <= 0 || minStep < 0.001 * range || minStep > range )
         else if (minStep <= 0 || minStep > range)
+        {
             minStep = 0.1 * range;
+        }
 
         return minStep;
     }
@@ -425,13 +442,21 @@ public class BarSettings
     {
         Axis barAxis;
         if (_base == BarBase.Y)
+        {
             barAxis = _ownerPane.YAxis;
+        }
         else if (_base == BarBase.Y2)
+        {
             barAxis = _ownerPane.Y2Axis;
+        }
         else if (_base == BarBase.X2)
+        {
             barAxis = _ownerPane.X2Axis;
+        }
         else
+        {
             barAxis = _ownerPane.XAxis;
+        }
 
         return barAxis;
     }

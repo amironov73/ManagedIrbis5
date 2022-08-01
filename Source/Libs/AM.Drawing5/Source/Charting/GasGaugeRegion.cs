@@ -129,8 +129,11 @@ public class GasGaugeRegion
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
@@ -157,7 +160,13 @@ public class GasGaugeRegion
     /// <param name="color">The display color for this <see cref="GasGaugeRegion"/> instance.</param>
     /// <param name="minVal">The minimum value of this <see cref="GasGaugeNeedle"/>.</param>
     /// <param name="maxVal">The maximum value of this <see cref="GasGaugeNeedle"/>.</param>
-    public GasGaugeRegion (string label, double minVal, double maxVal, Color color)
+    public GasGaugeRegion
+        (
+            string label,
+            double minVal,
+            double maxVal,
+            Color color
+        )
         : base (label)
     {
         MinValue = minVal;
@@ -213,18 +222,15 @@ public class GasGaugeRegion
     /// <summary>
     /// Gets or sets the SlicePath of this <see cref="GasGaugeRegion"/>
     /// </summary>
-    public GraphicsPath SlicePath
-    {
-        get { return _slicePath; }
-    }
+    public GraphicsPath SlicePath => _slicePath;
 
     /// <summary>
     /// Gets or sets the LabelDetail of this <see cref="GasGaugeRegion"/>
     /// </summary>
     public TextObj LabelDetail
     {
-        get { return _labelDetail; }
-        set { _labelDetail = value; }
+        get => _labelDetail;
+        set => _labelDetail = value;
     }
 
     /// <summary>
@@ -232,8 +238,8 @@ public class GasGaugeRegion
     /// </summary>
     public Border Border
     {
-        get { return (_border); }
-        set { _border = value; }
+        get => (_border);
+        set => _border = value;
     }
 
     /// <summary>
@@ -254,8 +260,8 @@ public class GasGaugeRegion
     /// </summary>
     public Fill Fill
     {
-        get { return _fill; }
-        set { _fill = value; }
+        get => _fill;
+        set => _fill = value;
     }
 
     /// <summary>
@@ -263,8 +269,8 @@ public class GasGaugeRegion
     /// </summary>
     private float SweepAngle
     {
-        get { return _sweepAngle; }
-        set { _sweepAngle = value; }
+        get => _sweepAngle;
+        set => _sweepAngle = value;
     }
 
     /// <summary>
@@ -272,8 +278,8 @@ public class GasGaugeRegion
     /// </summary>
     private float StartAngle
     {
-        get { return (_startAngle); }
-        set { _startAngle = value; }
+        get => (_startAngle);
+        set => _startAngle = value;
     }
 
     /// <summary>
@@ -281,8 +287,8 @@ public class GasGaugeRegion
     /// </summary>
     public double MinValue
     {
-        get { return (_minValue); }
-        set { _minValue = value > 0 ? value : 0; }
+        get => _minValue;
+        set => _minValue = value > 0 ? value : 0;
     }
 
     /// <summary>
@@ -290,8 +296,8 @@ public class GasGaugeRegion
     /// </summary>
     public double MaxValue
     {
-        get { return (_maxValue); }
-        set { _maxValue = value > 0 ? value : 0; }
+        get => _maxValue;
+        set => _maxValue = value > 0 ? value : 0;
     }
 
     /// <summary>

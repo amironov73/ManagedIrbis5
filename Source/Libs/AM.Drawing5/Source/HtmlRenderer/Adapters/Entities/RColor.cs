@@ -12,7 +12,8 @@
 #region Using directives
 
 using System;
-using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -37,8 +38,7 @@ public struct RColor
 
     #endregion
 
-
-    private RColor(long value)
+    private RColor (long value)
     {
         _value = value;
     }
@@ -48,7 +48,7 @@ public struct RColor
     /// </summary>
     public static RColor Transparent
     {
-        get { return new RColor(0); }
+        get { return new RColor (0); }
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public struct RColor
     /// </summary>
     public static RColor Black
     {
-        get { return FromArgb(0, 0, 0); }
+        get { return FromArgb (0, 0, 0); }
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public struct RColor
     /// </summary>
     public static RColor White
     {
-        get { return FromArgb(255, 255, 255); }
+        get { return FromArgb (255, 255, 255); }
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public struct RColor
     /// </summary>
     public static RColor WhiteSmoke
     {
-        get { return FromArgb(245, 245, 245); }
+        get { return FromArgb (245, 245, 245); }
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public struct RColor
     /// </summary>
     public static RColor LightGray
     {
-        get { return FromArgb(211, 211, 211); }
+        get { return FromArgb (211, 211, 211); }
     }
 
     /// <summary>
@@ -140,7 +140,7 @@ public struct RColor
     ///     The <see cref="RColor" /> that is to the right of the equality operator.
     /// </param>
     /// <filterpriority>3</filterpriority>
-    public static bool operator ==(RColor left, RColor right)
+    public static bool operator == (RColor left, RColor right)
     {
         return left._value == right._value;
     }
@@ -158,7 +158,7 @@ public struct RColor
     ///     The <see cref="RColor" /> that is to the right of the inequality operator.
     /// </param>
     /// <filterpriority>3</filterpriority>
-    public static bool operator !=(RColor left, RColor right)
+    public static bool operator != (RColor left, RColor right)
     {
         return !(left == right);
     }
@@ -177,13 +177,13 @@ public struct RColor
     ///     <paramref name="alpha" />, <paramref name="red" />, <paramref name="green" />, or <paramref name="blue" /> is less than 0 or greater than 255.
     /// </exception>
     /// <filterpriority>1</filterpriority>
-    public static RColor FromArgb(int alpha, int red, int green, int blue)
+    public static RColor FromArgb (int alpha, int red, int green, int blue)
     {
-        CheckByte(alpha);
-        CheckByte(red);
-        CheckByte(green);
-        CheckByte(blue);
-        return new RColor((uint)(red << 16 | green << 8 | blue | alpha << 24) & (long)uint.MaxValue);
+        CheckByte (alpha);
+        CheckByte (red);
+        CheckByte (green);
+        CheckByte (blue);
+        return new RColor ((uint)(red << 16 | green << 8 | blue | alpha << 24) & (long)uint.MaxValue);
     }
 
     /// <summary>
@@ -205,80 +205,60 @@ public struct RColor
     ///     <paramref name="red" />, <paramref name="green" />, or <paramref name="blue" /> is less than 0 or greater than 255.
     /// </exception>
     /// <filterpriority>1</filterpriority>
-    public static RColor FromArgb(int red, int green, int blue)
+    public static RColor FromArgb (int red, int green, int blue)
     {
-        return FromArgb(byte.MaxValue, red, green, blue);
+        return FromArgb (byte.MaxValue, red, green, blue);
     }
 
-    /// <summary>
-    ///     Tests whether the specified object is a <see cref="RColor" /> structure and is equivalent to this
-    ///     <see
-    ///         cref="RColor" />
-    ///     structure.
-    /// </summary>
-    /// <returns>
-    ///     true if <paramref name="obj" /> is a <see cref="RColor" /> structure equivalent to this
-    ///     <see
-    ///         cref="RColor" />
-    ///     structure; otherwise, false.
-    /// </returns>
-    /// <param name="obj">The object to test. </param>
-    /// <filterpriority>1</filterpriority>
-    public override bool Equals(object obj)
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
+    public override bool Equals (object? obj)
     {
-        if (obj is RColor)
-        {
-            var color = (RColor)obj;
-            return _value == color._value;
-        }
-        return false;
+        return obj is RColor color && _value == color._value;
     }
 
-    /// <summary>
-    ///     Returns a hash code for this <see cref="RColor" /> structure.
-    /// </summary>
-    /// <returns>
-    ///     An integer value that specifies the hash code for this <see cref="RColor" />.
-    /// </returns>
-    /// <filterpriority>1</filterpriority>
+    /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
         return _value.GetHashCode();
     }
 
-    /// <summary>
-    ///     Converts this <see cref="RColor" /> structure to a human-readable string.
-    /// </summary>
+    /// <inheritdoc cref="ValueType.ToString"/>
     public override string ToString()
     {
-        var stringBuilder = new StringBuilder(32);
-        stringBuilder.Append(GetType().Name);
-        stringBuilder.Append(" [");
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (32);
+        builder.Append (GetType().Name);
+        builder.Append (" [");
         if (_value != 0)
         {
-            stringBuilder.Append("A=");
-            stringBuilder.Append(A);
-            stringBuilder.Append(", R=");
-            stringBuilder.Append(R);
-            stringBuilder.Append(", G=");
-            stringBuilder.Append(G);
-            stringBuilder.Append(", B=");
-            stringBuilder.Append(B);
+            builder.Append ("A=");
+            builder.Append (A);
+            builder.Append (", R=");
+            builder.Append (R);
+            builder.Append (", G=");
+            builder.Append (G);
+            builder.Append (", B=");
+            builder.Append (B);
         }
         else
-            stringBuilder.Append("Empty");
-        stringBuilder.Append("]");
-        return stringBuilder.ToString();
+            builder.Append ("Empty");
+
+        builder.Append (']');
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
 
     #region Private methods
 
-    private static void CheckByte(int value)
+    private static void CheckByte (int value)
     {
-        if (value >= 0 && value <= byte.MaxValue)
+        if (value is >= 0 and <= byte.MaxValue)
             return;
-        throw new ArgumentException("InvalidEx2BoundArgument");
+        throw new ArgumentException ("InvalidEx2BoundArgument");
     }
 
     #endregion

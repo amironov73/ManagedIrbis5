@@ -27,10 +27,10 @@ namespace PdfSharpCore.Drawing
     ///<summary>
     /// Represents a RGB, CMYK, or gray scale color.
     /// </summary>
-    [DebuggerDisplay("clr=(A={A}, R={R}, G={G}, B={B} C={C}, M={M}, Y={Y}, K={K})")]
+    [DebuggerDisplay ("clr=(A={A}, R={R}, G={G}, B={B} C={C}, M={M}, Y={Y}, K={K})")]
     public struct XColor
     {
-        XColor(uint argb)
+        XColor (uint argb)
         {
             _cs = XColorSpace.Rgb;
             _a = (byte)((argb >> 24) & 0xff) / 255f;
@@ -43,10 +43,11 @@ namespace PdfSharpCore.Drawing
             _k = 0;
             _gs = 0;
             RgbChanged();
+
             //_cs.GetType(); // Suppress warning
         }
 
-        XColor(byte alpha, byte red, byte green, byte blue)
+        XColor (byte alpha, byte red, byte green, byte blue)
         {
             _cs = XColorSpace.Rgb;
             _a = alpha / 255f;
@@ -59,10 +60,11 @@ namespace PdfSharpCore.Drawing
             _k = 0;
             _gs = 0;
             RgbChanged();
+
             //_cs.GetType(); // Suppress warning
         }
 
-        XColor(double alpha, double cyan, double magenta, double yellow, double black)
+        XColor (double alpha, double cyan, double magenta, double yellow, double black)
         {
             _cs = XColorSpace.Cmyk;
             _a = (float)(alpha > 1 ? 1 : (alpha < 0 ? 0 : alpha));
@@ -77,11 +79,12 @@ namespace PdfSharpCore.Drawing
             CmykChanged();
         }
 
-        XColor(double cyan, double magenta, double yellow, double black)
-            : this(1.0, cyan, magenta, yellow, black)
-        { }
+        XColor (double cyan, double magenta, double yellow, double black)
+            : this (1.0, cyan, magenta, yellow, black)
+        {
+        }
 
-        XColor(double gray)
+        XColor (double gray)
         {
             _cs = XColorSpace.GrayScale;
             if (gray < 0)
@@ -100,24 +103,26 @@ namespace PdfSharpCore.Drawing
             _k = 0;
             GrayChanged();
         }
-        internal XColor(XKnownColor knownColor)
-            : this(XKnownColorTable.KnownColorToArgb(knownColor))
-        { }
 
-        /// <summary>
-        /// Creates an XColor structure from a 32-bit ARGB value.
-        /// </summary>
-        public static XColor FromArgb(int argb)
+        internal XColor (XKnownColor knownColor)
+            : this (XKnownColorTable.KnownColorToArgb (knownColor))
         {
-            return new XColor((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)(argb));
         }
 
         /// <summary>
         /// Creates an XColor structure from a 32-bit ARGB value.
         /// </summary>
-        public static XColor FromArgb(uint argb)
+        public static XColor FromArgb (int argb)
         {
-            return new XColor((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)(argb));
+            return new XColor ((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)(argb));
+        }
+
+        /// <summary>
+        /// Creates an XColor structure from a 32-bit ARGB value.
+        /// </summary>
+        public static XColor FromArgb (uint argb)
+        {
+            return new XColor ((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)(argb));
         }
 
         // from System.Drawing.Color
@@ -131,30 +136,30 @@ namespace PdfSharpCore.Drawing
         /// Creates an XColor structure from the specified 8-bit color values (red, green, and blue).
         /// The alpha value is implicitly 255 (fully opaque).
         /// </summary>
-        public static XColor FromArgb(int red, int green, int blue)
+        public static XColor FromArgb (int red, int green, int blue)
         {
-            CheckByte(red, "red");
-            CheckByte(green, "green");
-            CheckByte(blue, "blue");
-            return new XColor(255, (byte)red, (byte)green, (byte)blue);
+            CheckByte (red, "red");
+            CheckByte (green, "green");
+            CheckByte (blue, "blue");
+            return new XColor (255, (byte)red, (byte)green, (byte)blue);
         }
 
         /// <summary>
         /// Creates an XColor structure from the four ARGB component (alpha, red, green, and blue) values.
         /// </summary>
-        public static XColor FromArgb(int alpha, int red, int green, int blue)
+        public static XColor FromArgb (int alpha, int red, int green, int blue)
         {
-            CheckByte(alpha, "alpha");
-            CheckByte(red, "red");
-            CheckByte(green, "green");
-            CheckByte(blue, "blue");
-            return new XColor((byte)alpha, (byte)red, (byte)green, (byte)blue);
+            CheckByte (alpha, "alpha");
+            CheckByte (red, "red");
+            CheckByte (green, "green");
+            CheckByte (blue, "blue");
+            return new XColor ((byte)alpha, (byte)red, (byte)green, (byte)blue);
         }
 
         /// <summary>
         /// Creates an XColor structure from the specified alpha value and color.
         /// </summary>
-        public static XColor FromArgb(int alpha, XColor color)
+        public static XColor FromArgb (int alpha, XColor color)
         {
             color.A = ((byte)alpha) / 255.0;
             return color;
@@ -163,39 +168,39 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Creates an XColor structure from the specified CMYK values.
         /// </summary>
-        public static XColor FromCmyk(double cyan, double magenta, double yellow, double black)
+        public static XColor FromCmyk (double cyan, double magenta, double yellow, double black)
         {
-            return new XColor(cyan, magenta, yellow, black);
+            return new XColor (cyan, magenta, yellow, black);
         }
 
         /// <summary>
         /// Creates an XColor structure from the specified CMYK values.
         /// </summary>
-        public static XColor FromCmyk(double alpha, double cyan, double magenta, double yellow, double black)
+        public static XColor FromCmyk (double alpha, double cyan, double magenta, double yellow, double black)
         {
-            return new XColor(alpha, cyan, magenta, yellow, black);
+            return new XColor (alpha, cyan, magenta, yellow, black);
         }
 
         /// <summary>
         /// Creates an XColor structure from the specified gray value.
         /// </summary>
-        public static XColor FromGrayScale(double grayScale)
+        public static XColor FromGrayScale (double grayScale)
         {
-            return new XColor(grayScale);
+            return new XColor (grayScale);
         }
 
         /// <summary>
         /// Creates an XColor from the specified pre-defined color.
         /// </summary>
-        public static XColor FromKnownColor(XKnownColor color)
+        public static XColor FromKnownColor (XKnownColor color)
         {
-            return new XColor(color);
+            return new XColor (color);
         }
 
         /// <summary>
         /// Creates an XColor from the specified name of a pre-defined color.
         /// </summary>
-        public static XColor FromName(string name)
+        public static XColor FromName (string name)
         {
             return Empty;
         }
@@ -208,8 +213,8 @@ namespace PdfSharpCore.Drawing
             get { return _cs; }
             set
             {
-                if (!Enum.IsDefined(typeof(XColorSpace), value))
-                    throw new InvalidEnumArgumentException("value", (int)value, typeof(XColorSpace));
+                if (!Enum.IsDefined (typeof (XColorSpace), value))
+                    throw new InvalidEnumArgumentException ("value", (int)value, typeof (XColorSpace));
                 _cs = value;
             }
         }
@@ -223,23 +228,24 @@ namespace PdfSharpCore.Drawing
         }
 
         /// <summary>
-        /// Determines whether the specified object is a Color structure and is equivalent to this 
+        /// Determines whether the specified object is a Color structure and is equivalent to this
         /// Color structure.
         /// </summary>
-        public override bool Equals(object obj)
+        public override bool Equals (object? obj)
         {
             // ReSharper disable CompareOfFloatsByEqualityOperator
-            if (obj is XColor)
+            if (obj is XColor color)
             {
-                XColor color = (XColor)obj;
                 if (_r == color._r && _g == color._g && _b == color._b &&
-                  _c == color._c && _m == color._m && _y == color._y && _k == color._k &&
-                  _gs == color._gs)
+                    _c == color._c && _m == color._m && _y == color._y && _k == color._k &&
+                    _gs == color._gs)
                 {
                     return _a == color._a;
                 }
             }
+
             return false;
+
             // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
@@ -250,13 +256,14 @@ namespace PdfSharpCore.Drawing
         {
             // ReSharper disable NonReadonlyFieldInGetHashCode
             return ((byte)(_a * 255)) ^ _r ^ _g ^ _b;
+
             // ReSharper restore NonReadonlyFieldInGetHashCode
         }
 
         /// <summary>
         /// Determines whether two colors are equal.
         /// </summary>
-        public static bool operator ==(XColor left, XColor right)
+        public static bool operator == (XColor left, XColor right)
         {
             // ReSharper disable CompareOfFloatsByEqualityOperator
             if (left._r == right._r && left._g == right._g && left._b == right._b &&
@@ -265,14 +272,16 @@ namespace PdfSharpCore.Drawing
             {
                 return left._a == right._a;
             }
+
             return false;
+
             // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
         /// <summary>
         /// Determines whether two colors are not equal.
         /// </summary>
-        public static bool operator !=(XColor left, XColor right)
+        public static bool operator != (XColor left, XColor right)
         {
             return !(left == right);
         }
@@ -282,7 +291,7 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         public bool IsKnownColor
         {
-            get { return XKnownColorTable.IsKnownColor(Argb); }
+            get { return XKnownColorTable.IsKnownColor (Argb); }
         }
 
         /// <summary>
@@ -325,6 +334,7 @@ namespace PdfSharpCore.Drawing
             if (value7 < 0)
                 value7 += 360;
             return value7;
+
             // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
@@ -360,6 +370,7 @@ namespace PdfSharpCore.Drawing
             if (value6 <= 0.5)
                 return (value4 - value5) / (value4 + value5);
             return (value4 - value5) / ((2f - value4) - value5);
+
             // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
@@ -399,7 +410,7 @@ namespace PdfSharpCore.Drawing
             int c = 255 - _r;
             int m = 255 - _g;
             int y = 255 - _b;
-            int k = Math.Min(c, Math.Min(m, y));
+            int k = Math.Min (c, Math.Min (m, y));
             if (k == 255)
                 _c = _m = _y = 0;
             else
@@ -409,7 +420,9 @@ namespace PdfSharpCore.Drawing
                 _m = (m - k) / black;
                 _y = (y - k) / black;
             }
+
             _k = _gs = k / 255f;
+
             // ReSharper restore LocalVariableHidesMember
         }
 
@@ -421,10 +434,10 @@ namespace PdfSharpCore.Drawing
             _cs = XColorSpace.Cmyk;
             float black = _k * 255;
             float factor = 255f - black;
-            _r = (byte)(255 - Math.Min(255f, _c * factor + black));
-            _g = (byte)(255 - Math.Min(255f, _m * factor + black));
-            _b = (byte)(255 - Math.Min(255f, _y * factor + black));
-            _gs = (float)(1 - Math.Min(1.0, 0.3f * _c + 0.59f * _m + 0.11 * _y + _k));
+            _r = (byte)(255 - Math.Min (255f, _c * factor + black));
+            _g = (byte)(255 - Math.Min (255f, _m * factor + black));
+            _b = (byte)(255 - Math.Min (255f, _y * factor + black));
+            _gs = (float)(1 - Math.Min (1.0, 0.3f * _c + 0.59f * _m + 0.11 * _y + _k));
         }
 
         ///<summary>
@@ -445,7 +458,7 @@ namespace PdfSharpCore.Drawing
         // Properties
 
         /// <summary>
-        /// Gets or sets the alpha value the specifies the transparency. 
+        /// Gets or sets the alpha value the specifies the transparency.
         /// The value is in the range from 1 (opaque) to 0 (completely transparent).
         /// </summary>
         public double A
@@ -468,7 +481,11 @@ namespace PdfSharpCore.Drawing
         public byte R
         {
             get { return _r; }
-            set { _r = value; RgbChanged(); }
+            set
+            {
+                _r = value;
+                RgbChanged();
+            }
         }
 
         /// <summary>
@@ -477,7 +494,11 @@ namespace PdfSharpCore.Drawing
         public byte G
         {
             get { return _g; }
-            set { _g = value; RgbChanged(); }
+            set
+            {
+                _g = value;
+                RgbChanged();
+            }
         }
 
         /// <summary>
@@ -486,7 +507,11 @@ namespace PdfSharpCore.Drawing
         public byte B
         {
             get { return _b; }
-            set { _b = value; RgbChanged(); }
+            set
+            {
+                _b = value;
+                RgbChanged();
+            }
         }
 
         /// <summary>
@@ -580,9 +605,11 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Gets or sets the gray scale value.
         /// </summary>
+
         // ReSharper disable InconsistentNaming
         public double GS
-        // ReSharper restore InconsistentNaming
+
+            // ReSharper restore InconsistentNaming
         {
             get { return _gs; }
             set
@@ -609,42 +636,42 @@ namespace PdfSharpCore.Drawing
         {
             get
             {
-                return String.Format(CultureInfo.InvariantCulture,
-                  "{0};{1};{2};{3};{4};{5};{6};{7};{8}", _r, _g, _b, _c, _m, _y, _k, _gs, _a);
+                return String.Format (CultureInfo.InvariantCulture,
+                    "{0};{1};{2};{3};{4};{5};{6};{7};{8}", _r, _g, _b, _c, _m, _y, _k, _gs, _a);
             }
             set
             {
-                string[] values = value.Split(';');
-                _r = byte.Parse(values[0], CultureInfo.InvariantCulture);
-                _g = byte.Parse(values[1], CultureInfo.InvariantCulture);
-                _b = byte.Parse(values[2], CultureInfo.InvariantCulture);
-                _c = float.Parse(values[3], CultureInfo.InvariantCulture);
-                _m = float.Parse(values[4], CultureInfo.InvariantCulture);
-                _y = float.Parse(values[5], CultureInfo.InvariantCulture);
-                _k = float.Parse(values[6], CultureInfo.InvariantCulture);
-                _gs = float.Parse(values[7], CultureInfo.InvariantCulture);
-                _a = float.Parse(values[8], CultureInfo.InvariantCulture);
+                string[] values = value.Split (';');
+                _r = byte.Parse (values[0], CultureInfo.InvariantCulture);
+                _g = byte.Parse (values[1], CultureInfo.InvariantCulture);
+                _b = byte.Parse (values[2], CultureInfo.InvariantCulture);
+                _c = float.Parse (values[3], CultureInfo.InvariantCulture);
+                _m = float.Parse (values[4], CultureInfo.InvariantCulture);
+                _y = float.Parse (values[5], CultureInfo.InvariantCulture);
+                _k = float.Parse (values[6], CultureInfo.InvariantCulture);
+                _gs = float.Parse (values[7], CultureInfo.InvariantCulture);
+                _a = float.Parse (values[8], CultureInfo.InvariantCulture);
             }
         }
 
-        static void CheckByte(int val, string name)
+        static void CheckByte (int val, string name)
         {
             if (val < 0 || val > 0xFF)
-                throw new ArgumentException(PSSR.InvalidValue(val, name, 0, 255));
+                throw new ArgumentException (PSSR.InvalidValue (val, name, 0, 255));
         }
 
         XColorSpace _cs;
 
-        float _a;  // alpha
+        float _a; // alpha
 
-        byte _r;   // \
-        byte _g;   // |--- RGB
-        byte _b;   // /
+        byte _r; // \
+        byte _g; // |--- RGB
+        byte _b; // /
 
-        float _c;  // \
-        float _m;  // |--- CMYK
-        float _y;  // |
-        float _k;  // /
+        float _c; // \
+        float _m; // |--- CMYK
+        float _y; // |
+        float _k; // /
 
         float _gs; // >--- gray scale
     }

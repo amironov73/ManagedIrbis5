@@ -91,14 +91,20 @@ public sealed class Sms
             case SMSEncoding.SMS:
                 var queryString = string.Empty;
                 if (!string.IsNullOrEmpty (_subject))
+                {
                     queryString = $"?body={Uri.EscapeDataString (_subject)}";
+                }
+
                 returnVal = $"sms:{_number}{queryString}";
                 break;
 
             case SMSEncoding.SMS_iOS:
                 var queryStringiOS = string.Empty;
                 if (!string.IsNullOrEmpty (_subject))
+                {
                     queryStringiOS = $";body={Uri.EscapeDataString (_subject)}";
+                }
+
                 returnVal = $"sms:{_number}{queryStringiOS}";
                 break;
 

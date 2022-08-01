@@ -82,7 +82,7 @@ public abstract class RAdapter
     /// </summary>
     protected RAdapter()
     {
-        _fontsHandler = new FontsHandler(this);
+        _fontsHandler = new FontsHandler (this);
     }
 
     /// <summary>
@@ -90,7 +90,10 @@ public abstract class RAdapter
     /// </summary>
     public CssData DefaultCssData
     {
-        get { return _defaultCssData ?? (_defaultCssData = CssData.Parse(this, CssDefaults.DefaultStyleSheet, false)); }
+        get
+        {
+            return _defaultCssData ?? (_defaultCssData = CssData.Parse (this, CssDefaults.DefaultStyleSheet, false));
+        }
     }
 
     /// <summary>
@@ -98,10 +101,10 @@ public abstract class RAdapter
     /// </summary>
     /// <param name="colorName">the color name</param>
     /// <returns>color value</returns>
-    public RColor GetColor(string colorName)
+    public RColor GetColor (string colorName)
     {
-        ArgChecker.AssertArgNotNullOrEmpty(colorName, "colorName");
-        return GetColorInt(colorName);
+        ArgChecker.AssertArgNotNullOrEmpty (colorName, "colorName");
+        return GetColorInt (colorName);
     }
 
     /// <summary>
@@ -109,13 +112,14 @@ public abstract class RAdapter
     /// </summary>
     /// <param name="color">the color to get pen for</param>
     /// <returns>pen instance</returns>
-    public RPen GetPen(RColor color)
+    public RPen GetPen (RColor color)
     {
         RPen pen;
-        if (!_penCache.TryGetValue(color, out pen))
+        if (!_penCache.TryGetValue (color, out pen))
         {
-            _penCache[color] = pen = CreatePen(color);
+            _penCache[color] = pen = CreatePen (color);
         }
+
         return pen;
     }
 
@@ -124,13 +128,14 @@ public abstract class RAdapter
     /// </summary>
     /// <param name="color">the color to get brush for</param>
     /// <returns>brush instance</returns>
-    public RBrush GetSolidBrush(RColor color)
+    public RBrush GetSolidBrush (RColor color)
     {
         RBrush brush;
-        if (!_brushesCache.TryGetValue(color, out brush))
+        if (!_brushesCache.TryGetValue (color, out brush))
         {
-            _brushesCache[color] = brush = CreateSolidBrush(color);
+            _brushesCache[color] = brush = CreateSolidBrush (color);
         }
+
         return brush;
     }
 
@@ -142,9 +147,9 @@ public abstract class RAdapter
     /// <param name="color2">the end color of the gradient</param>
     /// <param name="angle">the angle to move the gradient from start color to end color in the rectangle</param>
     /// <returns>linear gradient color brush instance</returns>
-    public RBrush GetLinearGradientBrush(RRect rect, RColor color1, RColor color2, double angle)
+    public RBrush GetLinearGradientBrush (RRect rect, RColor color1, RColor color2, double angle)
     {
-        return CreateLinearGradientBrush(rect, color1, color2, angle);
+        return CreateLinearGradientBrush (rect, color1, color2, angle);
     }
 
     /// <summary>
@@ -152,10 +157,10 @@ public abstract class RAdapter
     /// </summary>
     /// <param name="image">the image returned from load event</param>
     /// <returns>converted image or null</returns>
-    public RImage ConvertImage(object image)
+    public RImage ConvertImage (object image)
     {
         // TODO:a remove this by creating better API.
-        return ConvertImageInt(image);
+        return ConvertImageInt (image);
     }
 
     /// <summary>
@@ -163,9 +168,9 @@ public abstract class RAdapter
     /// </summary>
     /// <param name="memoryStream">the stream to create image from</param>
     /// <returns>new image instance</returns>
-    public RImage ImageFromStream(Stream memoryStream)
+    public RImage ImageFromStream (Stream memoryStream)
     {
-        return ImageFromStreamInt(memoryStream);
+        return ImageFromStreamInt (memoryStream);
     }
 
     /// <summary>
@@ -173,18 +178,18 @@ public abstract class RAdapter
     /// </summary>
     /// <param name="font">the font name to check</param>
     /// <returns>true - font exists by given family name, false - otherwise</returns>
-    public bool IsFontExists(string font)
+    public bool IsFontExists (string font)
     {
-        return _fontsHandler.IsFontExists(font);
+        return _fontsHandler.IsFontExists (font);
     }
 
     /// <summary>
     /// Adds a font family to be used.
     /// </summary>
     /// <param name="fontFamily">The font family to add.</param>
-    public void AddFontFamily(RFontFamily fontFamily)
+    public void AddFontFamily (RFontFamily fontFamily)
     {
-        _fontsHandler.AddFontFamily(fontFamily);
+        _fontsHandler.AddFontFamily (fontFamily);
     }
 
     /// <summary>
@@ -194,9 +199,9 @@ public abstract class RAdapter
     /// </summary>
     /// <param name="fromFamily">the font family to replace</param>
     /// <param name="toFamily">the font family to replace with</param>
-    public void AddFontFamilyMapping(string fromFamily, string toFamily)
+    public void AddFontFamilyMapping (string fromFamily, string toFamily)
     {
-        _fontsHandler.AddFontFamilyMapping(fromFamily, toFamily);
+        _fontsHandler.AddFontFamilyMapping (fromFamily, toFamily);
     }
 
     /// <summary>
@@ -206,9 +211,9 @@ public abstract class RAdapter
     /// <param name="size">font size</param>
     /// <param name="style">font style</param>
     /// <returns>font instance</returns>
-    public RFont GetFont(string family, double size, RFontStyle style)
+    public RFont GetFont (string family, double size, RFontStyle style)
     {
-        return _fontsHandler.GetCachedFont(family, size, style);
+        return _fontsHandler.GetCachedFont (family, size, style);
     }
 
     /// <summary>
@@ -218,10 +223,13 @@ public abstract class RAdapter
     {
         if (_loadImage == null)
         {
-            var stream = typeof(HtmlRendererUtils).Assembly.GetManifestResourceStream("AM.Drawing.HtmlRenderer.Core.Utils.ImageLoad.png");
+            var stream =
+                typeof (HtmlRendererUtils).Assembly.GetManifestResourceStream (
+                    "AM.Drawing.HtmlRenderer.Core.Utils.ImageLoad.png");
             if (stream != null)
-                _loadImage = ImageFromStream(stream);
+                _loadImage = ImageFromStream (stream);
         }
+
         return _loadImage;
     }
 
@@ -232,10 +240,13 @@ public abstract class RAdapter
     {
         if (_errorImage == null)
         {
-            var stream = typeof(HtmlRendererUtils).Assembly.GetManifestResourceStream("AM.Drawing.HtmlRenderer.Core.Utils.ImageError.png");
+            var stream =
+                typeof (HtmlRendererUtils).Assembly.GetManifestResourceStream (
+                    "AM.Drawing.HtmlRenderer.Core.Utils.ImageError.png");
             if (stream != null)
-                _errorImage = ImageFromStream(stream);
+                _errorImage = ImageFromStream (stream);
         }
+
         return _errorImage;
     }
 
@@ -247,9 +258,9 @@ public abstract class RAdapter
     /// <param name="html">the html data</param>
     /// <param name="plainText">the plain text data</param>
     /// <returns>drag-drop data object</returns>
-    public object GetClipboardDataObject(string html, string plainText)
+    public object GetClipboardDataObject (string html, string plainText)
     {
-        return GetClipboardDataObjectInt(html, plainText);
+        return GetClipboardDataObjectInt (html, plainText);
     }
 
     /// <summary>
@@ -257,9 +268,9 @@ public abstract class RAdapter
     /// Not relevant for platforms that don't render HTML on UI element.
     /// </summary>
     /// <param name="text">the text to set</param>
-    public void SetToClipboard(string text)
+    public void SetToClipboard (string text)
     {
-        SetToClipboardInt(text);
+        SetToClipboardInt (text);
     }
 
     /// <summary>
@@ -268,9 +279,9 @@ public abstract class RAdapter
     /// </summary>
     /// <param name="html">the html data</param>
     /// <param name="plainText">the plain text data</param>
-    public void SetToClipboard(string html, string plainText)
+    public void SetToClipboard (string html, string plainText)
     {
-        SetToClipboardInt(html, plainText);
+        SetToClipboardInt (html, plainText);
     }
 
     /// <summary>
@@ -278,9 +289,9 @@ public abstract class RAdapter
     /// Not relevant for platforms that don't render HTML on UI element.
     /// </summary>
     /// <param name="image">the image object to set to clipboard</param>
-    public void SetToClipboard(RImage image)
+    public void SetToClipboard (RImage image)
     {
-        SetToClipboardInt(image);
+        SetToClipboardInt (image);
     }
 
     /// <summary>
@@ -301,9 +312,15 @@ public abstract class RAdapter
     /// <param name="name">the name of the image for save dialog</param>
     /// <param name="extension">the extension of the image for save dialog</param>
     /// <param name="control">optional: the control to show the dialog on</param>
-    public void SaveToFile(RImage image, string name, string extension, RControl control = null)
+    public void SaveToFile
+        (
+            RImage image,
+            string name,
+            string extension,
+            RControl? control = null
+        )
     {
-        SaveToFileInt(image, name, extension, control);
+        SaveToFileInt (image, name, extension, control);
     }
 
     /// <summary>
@@ -313,9 +330,9 @@ public abstract class RAdapter
     /// <param name="size">font size</param>
     /// <param name="style">font style</param>
     /// <returns>font instance</returns>
-    internal RFont CreateFont(string family, double size, RFontStyle style)
+    internal RFont CreateFont (string family, double size, RFontStyle style)
     {
-        return CreateFontInt(family, size, style);
+        return CreateFontInt (family, size, style);
     }
 
     /// <summary>
@@ -326,9 +343,9 @@ public abstract class RAdapter
     /// <param name="size">font size</param>
     /// <param name="style">font style</param>
     /// <returns>font instance</returns>
-    internal RFont CreateFont(RFontFamily family, double size, RFontStyle style)
+    internal RFont CreateFont (RFontFamily family, double size, RFontStyle style)
     {
-        return CreateFontInt(family, size, style);
+        return CreateFontInt (family, size, style);
     }
 
 
@@ -339,21 +356,21 @@ public abstract class RAdapter
     /// </summary>
     /// <param name="colorName">the color name</param>
     /// <returns>color value</returns>
-    protected abstract RColor GetColorInt(string colorName);
+    protected abstract RColor GetColorInt (string colorName);
 
     /// <summary>
     /// Get cached pen instance for the given color.
     /// </summary>
     /// <param name="color">the color to get pen for</param>
     /// <returns>pen instance</returns>
-    protected abstract RPen CreatePen(RColor color);
+    protected abstract RPen CreatePen (RColor color);
 
     /// <summary>
     /// Get cached solid brush instance for the given color.
     /// </summary>
     /// <param name="color">the color to get brush for</param>
     /// <returns>brush instance</returns>
-    protected abstract RBrush CreateSolidBrush(RColor color);
+    protected abstract RBrush CreateSolidBrush (RColor color);
 
     /// <summary>
     /// Get linear gradient color brush from <paramref name="color1"/> to <paramref name="color2"/>.
@@ -363,21 +380,21 @@ public abstract class RAdapter
     /// <param name="color2">the end color of the gradient</param>
     /// <param name="angle">the angle to move the gradient from start color to end color in the rectangle</param>
     /// <returns>linear gradient color brush instance</returns>
-    protected abstract RBrush CreateLinearGradientBrush(RRect rect, RColor color1, RColor color2, double angle);
+    protected abstract RBrush CreateLinearGradientBrush (RRect rect, RColor color1, RColor color2, double angle);
 
     /// <summary>
     /// Convert image object returned from <see cref="HtmlImageLoadEventArgs"/> to <see cref="RImage"/>.
     /// </summary>
     /// <param name="image">the image returned from load event</param>
     /// <returns>converted image or null</returns>
-    protected abstract RImage ConvertImageInt(object image);
+    protected abstract RImage ConvertImageInt (object image);
 
     /// <summary>
     /// Create an <see cref="RImage"/> object from the given stream.
     /// </summary>
     /// <param name="memoryStream">the stream to create image from</param>
     /// <returns>new image instance</returns>
-    protected abstract RImage ImageFromStreamInt(Stream memoryStream);
+    protected abstract RImage ImageFromStreamInt (Stream memoryStream);
 
     /// <summary>
     /// Get font instance by given font family name, size and style.
@@ -386,7 +403,7 @@ public abstract class RAdapter
     /// <param name="size">font size</param>
     /// <param name="style">font style</param>
     /// <returns>font instance</returns>
-    protected abstract RFont CreateFontInt(string family, double size, RFontStyle style);
+    protected abstract RFont CreateFontInt (string family, double size, RFontStyle style);
 
     /// <summary>
     /// Get font instance by given font family instance, size and style.<br/>
@@ -396,7 +413,7 @@ public abstract class RAdapter
     /// <param name="size">font size</param>
     /// <param name="style">font style</param>
     /// <returns>font instance</returns>
-    protected abstract RFont CreateFontInt(RFontFamily family, double size, RFontStyle style);
+    protected abstract RFont CreateFontInt (RFontFamily family, double size, RFontStyle style);
 
     /// <summary>
     /// Get data object for the given html and plain text data.<br />
@@ -405,7 +422,7 @@ public abstract class RAdapter
     /// <param name="html">the html data</param>
     /// <param name="plainText">the plain text data</param>
     /// <returns>drag-drop data object</returns>
-    protected virtual object GetClipboardDataObjectInt(string html, string plainText)
+    protected virtual object GetClipboardDataObjectInt (string html, string plainText)
     {
         throw new NotImplementedException();
     }
@@ -414,7 +431,7 @@ public abstract class RAdapter
     /// Set the given text to the clipboard
     /// </summary>
     /// <param name="text">the text to set</param>
-    protected virtual void SetToClipboardInt(string text)
+    protected virtual void SetToClipboardInt (string text)
     {
         throw new NotImplementedException();
     }
@@ -424,7 +441,7 @@ public abstract class RAdapter
     /// </summary>
     /// <param name="html">the html data</param>
     /// <param name="plainText">the plain text data</param>
-    protected virtual void SetToClipboardInt(string html, string plainText)
+    protected virtual void SetToClipboardInt (string html, string plainText)
     {
         throw new NotImplementedException();
     }
@@ -433,7 +450,7 @@ public abstract class RAdapter
     /// Set the given image to clipboard.
     /// </summary>
     /// <param name="image"></param>
-    protected virtual void SetToClipboardInt(RImage image)
+    protected virtual void SetToClipboardInt (RImage image)
     {
         throw new NotImplementedException();
     }
@@ -454,7 +471,13 @@ public abstract class RAdapter
     /// <param name="name">the name of the image for save dialog</param>
     /// <param name="extension">the extension of the image for save dialog</param>
     /// <param name="control">optional: the control to show the dialog on</param>
-    protected virtual void SaveToFileInt(RImage image, string name, string extension, RControl control = null)
+    protected virtual void SaveToFileInt
+        (
+            RImage image,
+            string name,
+            string extension,
+            RControl? control = null
+        )
     {
         throw new NotImplementedException();
     }

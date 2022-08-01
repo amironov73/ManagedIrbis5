@@ -26,7 +26,7 @@ namespace PdfSharpCore.Drawing
     /// </summary>
     public sealed class XImageFormat
     {
-        XImageFormat(Guid guid)
+        XImageFormat (Guid guid)
         {
             _guid = guid;
         }
@@ -36,27 +36,20 @@ namespace PdfSharpCore.Drawing
             get { return _guid; }
         }
 
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object.
-        /// </summary>
-        public override bool Equals(object obj)
+        /// <inheritdoc cref="object.Equals(object?)"/>
+        public override bool Equals (object? obj)
         {
-            XImageFormat format = obj as XImageFormat;
-            if (format == null)
-                return false;
-            return _guid == format._guid;
+            return obj is XImageFormat format && _guid == format._guid;
         }
 
-        /// <summary>
-        /// Returns the hash code for this instance.
-        /// </summary>
+        /// <inheritdoc cref="object.GetHashCode"/>
         public override int GetHashCode()
         {
             return _guid.GetHashCode();
         }
 
         /// <summary>
-        /// Gets the Portable Network Graphics (PNG) image format. 
+        /// Gets the Portable Network Graphics (PNG) image format.
         /// </summary>
         public static XImageFormat Png
         {
@@ -120,12 +113,23 @@ namespace PdfSharpCore.Drawing
         //ImageFormat.icon = new ImageFormat(new Guid("{b96b3cb5-0728-11d3-9d7b-0000f81ef32e}"));
 
         // #??? Why Guids?
-        private static readonly XImageFormat _png = new XImageFormat(new Guid("{B96B3CAF-0728-11D3-9D7B-0000F81EF32E}"));
-        private static readonly XImageFormat _gif = new XImageFormat(new Guid("{B96B3CB0-0728-11D3-9D7B-0000F81EF32E}"));
-        private static readonly XImageFormat _jpeg = new XImageFormat(new Guid("{B96B3CAE-0728-11D3-9D7B-0000F81EF32E}"));
-        private static readonly XImageFormat _tiff = new XImageFormat(new Guid("{B96B3CB1-0728-11D3-9D7B-0000F81EF32E}"));
-        private static readonly XImageFormat _icon = new XImageFormat(new Guid("{B96B3CB5-0728-11D3-9D7B-0000F81EF32E}"));
+        private static readonly XImageFormat _png =
+            new XImageFormat (new Guid ("{B96B3CAF-0728-11D3-9D7B-0000F81EF32E}"));
+
+        private static readonly XImageFormat _gif =
+            new XImageFormat (new Guid ("{B96B3CB0-0728-11D3-9D7B-0000F81EF32E}"));
+
+        private static readonly XImageFormat _jpeg =
+            new XImageFormat (new Guid ("{B96B3CAE-0728-11D3-9D7B-0000F81EF32E}"));
+
+        private static readonly XImageFormat _tiff =
+            new XImageFormat (new Guid ("{B96B3CB1-0728-11D3-9D7B-0000F81EF32E}"));
+
+        private static readonly XImageFormat _icon =
+            new XImageFormat (new Guid ("{B96B3CB5-0728-11D3-9D7B-0000F81EF32E}"));
+
         // not GDI+ conform
-        private static readonly XImageFormat _pdf = new XImageFormat(new Guid("{84570158-DBF0-4C6B-8368-62D6A3CA76E0}"));
+        private static readonly XImageFormat _pdf =
+            new XImageFormat (new Guid ("{84570158-DBF0-4C6B-8368-62D6A3CA76E0}"));
     }
 }

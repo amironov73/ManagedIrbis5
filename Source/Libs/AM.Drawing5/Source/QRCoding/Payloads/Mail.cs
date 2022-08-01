@@ -77,9 +77,15 @@ public sealed class Mail
             case MailEncoding.MAILTO:
                 var parts = new List<string>();
                 if (!string.IsNullOrEmpty (_subject))
+                {
                     parts.Add ("subject=" + Uri.EscapeDataString (_subject));
+                }
+
                 if (!string.IsNullOrEmpty (_message))
+                {
                     parts.Add ("body=" + Uri.EscapeDataString (_message));
+                }
+
                 var queryString = parts.Any() ? $"?{string.Join ("&", parts.ToArray())}" : "";
                 returnVal = $"mailto:{_mailReceiver}{queryString}";
                 break;

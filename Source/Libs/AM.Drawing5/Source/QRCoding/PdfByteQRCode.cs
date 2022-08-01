@@ -21,6 +21,7 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+
 using static AM.Drawing.QRCoding.QRCodeGenerator;
 
 #endregion
@@ -33,28 +34,36 @@ namespace AM.Drawing.QRCoding;
 /// <summary>
 /// QR-код в виде PDF.
 /// </summary>
-[System.Runtime.Versioning.SupportedOSPlatform("windows")]
+[System.Runtime.Versioning.SupportedOSPlatform ("windows")]
 public class PdfByteQRCode
     : AbstractQRCode,
-    IDisposable
+        IDisposable
 {
     private readonly byte[] pdfBinaryComment = new byte[] { 0x25, 0xe2, 0xe3, 0xcf, 0xd3 };
 
     /// <summary>
     /// Constructor without params to be used in COM Objects connections
     /// </summary>
-    public PdfByteQRCode() { }
+    public PdfByteQRCode()
+    {
+    }
 
-    public PdfByteQRCode(QRCodeData data) : base(data) { }
+    /// <summary>
+    ///
+    /// </summary>
+    public PdfByteQRCode (QRCodeData data)
+        : base (data)
+    {
+    }
 
     /// <summary>
     /// Creates a PDF document with a black &amp; white QR code
     /// </summary>
     /// <param name="pixelsPerModule"></param>
     /// <returns></returns>
-    public byte[] GetGraphic(int pixelsPerModule)
+    public byte[] GetGraphic (int pixelsPerModule)
     {
-        return GetGraphic(pixelsPerModule, "#000000", "#ffffff");
+        return GetGraphic (pixelsPerModule, "#000000", "#ffffff");
     }
 
     /// <summary>
@@ -62,13 +71,17 @@ public class PdfByteQRCode
     /// </summary>
     /// <param name="colorString">Color in HEX format like #ffffff</param>
     /// <returns></returns>
-    private byte[] HexColorToByteArray(string colorString)
+    private byte[] HexColorToByteArray (string colorString)
     {
-        if (colorString.StartsWith("#"))
-            colorString = colorString.Substring(1);
-        byte[] byteColor = new byte[colorString.Length / 2];
-        for (int i = 0; i < byteColor.Length; i++)
-            byteColor[i] = byte.Parse(colorString.Substring(i * 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        if (colorString.StartsWith ("#"))
+        {
+            colorString = colorString.Substring (1);
+        }
+
+        var byteColor = new byte[colorString.Length / 2];
+        for (var i = 0; i < byteColor.Length; i++)
+            byteColor[i] = byte.Parse (colorString.Substring (i * 2, 2), NumberStyles.HexNumber,
+                CultureInfo.InvariantCulture);
         return byteColor;
     }
 
@@ -81,31 +94,34 @@ public class PdfByteQRCode
     /// <param name="dpi"></param>
     /// <param name="jpgQuality"></param>
     /// <returns></returns>
-    public byte[] GetGraphic(int pixelsPerModule, string darkColorHtmlHex, string lightColorHtmlHex, int dpi = 150, long jpgQuality = 85)
+    public byte[] GetGraphic (int pixelsPerModule, string darkColorHtmlHex, string lightColorHtmlHex, int dpi = 150,
+        long jpgQuality = 85)
     {
         byte[] jpgArray = null, pngArray = null;
         var imgSize = QrCodeData.ModuleMatrix.Count * pixelsPerModule;
-        var pdfMediaSize = (imgSize * 72 / dpi).ToString(CultureInfo.InvariantCulture);
+        var pdfMediaSize = (imgSize * 72 / dpi).ToString (CultureInfo.InvariantCulture);
 
         //Get QR code image
-        using (var qrCode = new PngByteQRCode(QrCodeData))
+        using (var qrCode = new PngByteQRCode (QrCodeData))
         {
-            pngArray = qrCode.GetGraphic(pixelsPerModule, HexColorToByteArray(darkColorHtmlHex), HexColorToByteArray(lightColorHtmlHex));
+            pngArray = qrCode.GetGraphic (pixelsPerModule, HexColorToByteArray (darkColorHtmlHex),
+                HexColorToByteArray (lightColorHtmlHex));
         }
 
         //Create image and transofrm to JPG
         using (var msPng = new MemoryStream())
         {
-            msPng.Write(pngArray, 0, pngArray.Length);
-            var img = System.Drawing.Image.FromStream(msPng);
+            msPng.Write (pngArray, 0, pngArray.Length);
+            var img = System.Drawing.Image.FromStream (msPng);
             using (var msJpeg = new MemoryStream())
             {
                 // Create JPEG with specified quality
-                var jpgImageCodecInfo = ImageCodecInfo.GetImageEncoders().First(x => x.MimeType == "image/jpeg");
-                var jpgEncoderParameters = new EncoderParameters(1) {
-                    Param = new EncoderParameter[]{ new EncoderParameter(Encoder.Quality, jpgQuality) }
+                var jpgImageCodecInfo = ImageCodecInfo.GetImageEncoders().First (x => x.MimeType == "image/jpeg");
+                var jpgEncoderParameters = new EncoderParameters (1)
+                {
+                    Param = new EncoderParameter[] { new EncoderParameter (Encoder.Quality, jpgQuality) }
                 };
-                img.Save(msJpeg, jpgImageCodecInfo, jpgEncoderParameters);
+                img.Save (msJpeg, jpgImageCodecInfo, jpgEncoderParameters);
                 jpgArray = msJpeg.ToArray();
             }
         }
@@ -113,20 +129,20 @@ public class PdfByteQRCode
         //Create PDF document
         using (var stream = new MemoryStream())
         {
-            var writer = new StreamWriter(stream, System.Text.Encoding.GetEncoding("ASCII"));
+            var writer = new StreamWriter (stream, System.Text.Encoding.GetEncoding ("ASCII"));
 
             var xrefs = new List<long>();
 
-            writer.Write("%PDF-1.5\r\n");
+            writer.Write ("%PDF-1.5\r\n");
             writer.Flush();
 
-            stream.Write(pdfBinaryComment, 0, pdfBinaryComment.Length);
+            stream.Write (pdfBinaryComment, 0, pdfBinaryComment.Length);
             writer.WriteLine();
 
             writer.Flush();
-            xrefs.Add(stream.Position);
+            xrefs.Add (stream.Position);
 
-            writer.Write(
+            writer.Write (
                     xrefs.Count.ToString() + " 0 obj\r\n" +
                     "<<\r\n" +
                     "/Type /Catalog\r\n" +
@@ -136,9 +152,9 @@ public class PdfByteQRCode
                 );
 
             writer.Flush();
-            xrefs.Add(stream.Position);
+            xrefs.Add (stream.Position);
 
-            writer.Write(
+            writer.Write (
                     xrefs.Count.ToString() + " 0 obj\r\n" +
                     "<<\r\n" +
                     "/Count 1\r\n" +
@@ -160,9 +176,9 @@ public class PdfByteQRCode
                     "Q";
 
             writer.Flush();
-            xrefs.Add(stream.Position);
+            xrefs.Add (stream.Position);
 
-            writer.Write(
+            writer.Write (
                     xrefs.Count.ToString() + " 0 obj\r\n" +
                     "<< /Length " + X.Length.ToString() + " >>\r\n" +
                     "stream\r\n" +
@@ -171,9 +187,9 @@ public class PdfByteQRCode
                 );
 
             writer.Flush();
-            xrefs.Add(stream.Position);
+            xrefs.Add (stream.Position);
 
-            writer.Write(
+            writer.Write (
                     xrefs.Count.ToString() + " 0 obj\r\n" +
                     "<<\r\n" +
                     "/Name /Im1\r\n" +
@@ -187,17 +203,17 @@ public class PdfByteQRCode
                     "stream\r\n"
                 );
             writer.Flush();
-            stream.Write(jpgArray, 0, jpgArray.Length);
-            writer.Write(
+            stream.Write (jpgArray, 0, jpgArray.Length);
+            writer.Write (
                     "\r\n" +
                     "endstream\r\n" +
                     "endobj\r\n"
                 );
 
             writer.Flush();
-            xrefs.Add(stream.Position);
+            xrefs.Add (stream.Position);
 
-            writer.Write(
+            writer.Write (
                     xrefs.Count.ToString() + " 0 obj\r\n" +
                     jpgArray.Length.ToString() + " endobj\r\n"
                 );
@@ -205,16 +221,16 @@ public class PdfByteQRCode
             writer.Flush();
             var startxref = stream.Position;
 
-            writer.Write(
+            writer.Write (
                     "xref\r\n" +
                     "0 " + (xrefs.Count + 1).ToString() + "\r\n" +
                     "0000000000 65535 f\r\n"
                 );
 
             foreach (var refValue in xrefs)
-                writer.Write(refValue.ToString("0000000000") + " 00000 n\r\n");
+                writer.Write (refValue.ToString ("0000000000") + " 00000 n\r\n");
 
-            writer.Write(
+            writer.Write (
                     "trailer\r\n" +
                     "<<\r\n" +
                     "/Size " + (xrefs.Count + 1).ToString() + "\r\n" +
@@ -234,27 +250,26 @@ public class PdfByteQRCode
     }
 }
 
-[System.Runtime.Versioning.SupportedOSPlatform("windows")]
+[System.Runtime.Versioning.SupportedOSPlatform ("windows")]
 public static class PdfByteQRCodeHelper
 {
-    public static byte[] GetQRCode(string plainText, int pixelsPerModule, string darkColorHtmlHex,
+    public static byte[] GetQRCode (string plainText, int pixelsPerModule, string darkColorHtmlHex,
         string lightColorHtmlHex, ECCLevel eccLevel, bool forceUtf8 = false, bool utf8BOM = false,
         EciMode eciMode = EciMode.Default, int requestedVersion = -1)
     {
         using (var qrGenerator = new QRCodeGenerator())
         using (
-            var qrCodeData = qrGenerator.CreateQrCode(plainText, eccLevel, forceUtf8, utf8BOM, eciMode,
+            var qrCodeData = qrGenerator.CreateQrCode (plainText, eccLevel, forceUtf8, utf8BOM, eciMode,
                 requestedVersion))
-        using (var qrCode = new PdfByteQRCode(qrCodeData))
-            return qrCode.GetGraphic(pixelsPerModule, darkColorHtmlHex, lightColorHtmlHex);
+        using (var qrCode = new PdfByteQRCode (qrCodeData))
+            return qrCode.GetGraphic (pixelsPerModule, darkColorHtmlHex, lightColorHtmlHex);
     }
 
-    public static byte[] GetQRCode(string txt, ECCLevel eccLevel, int size)
+    public static byte[] GetQRCode (string txt, ECCLevel eccLevel, int size)
     {
         using (var qrGen = new QRCodeGenerator())
-        using (var qrCode = qrGen.CreateQrCode(txt, eccLevel))
-        using (var qrBmp = new PdfByteQRCode(qrCode))
-            return qrBmp.GetGraphic(size);
-
+        using (var qrCode = qrGen.CreateQrCode (txt, eccLevel))
+        using (var qrBmp = new PdfByteQRCode (qrCode))
+            return qrBmp.GetGraphic (size);
     }
 }

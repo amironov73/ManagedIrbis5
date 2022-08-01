@@ -63,10 +63,11 @@ public sealed class CssBlock
     /// <param name="properties">the CSS block properties and values</param>
     /// <param name="selectors">optional: additional selectors to used in hierarchy</param>
     /// <param name="hover">optional: is the css block has :hover pseudo-class</param>
-    public CssBlock(string @class, Dictionary<string, string> properties, List<CssBlockSelectorItem> selectors = null, bool hover = false)
+    public CssBlock (string @class, Dictionary<string, string> properties, List<CssBlockSelectorItem> selectors = null,
+        bool hover = false)
     {
-        ArgChecker.AssertArgNotNullOrEmpty(@class, "@class");
-        ArgChecker.AssertArgNotNull(properties, "properties");
+        ArgChecker.AssertArgNotNullOrEmpty (@class, "@class");
+        ArgChecker.AssertArgNotNull (properties, "properties");
 
         _class = @class;
         _selectors = selectors;
@@ -111,9 +112,9 @@ public sealed class CssBlock
     /// Other block properties can overwrite this block properties.
     /// </summary>
     /// <param name="other">the css block to merge with</param>
-    public void Merge(CssBlock other)
+    public void Merge (CssBlock other)
     {
-        ArgChecker.AssertArgNotNull(other, "other");
+        ArgChecker.AssertArgNotNull (other, "other");
 
         foreach (var prop in other._properties.Keys)
         {
@@ -127,7 +128,8 @@ public sealed class CssBlock
     /// <returns>new CssBlock with same data</returns>
     public CssBlock Clone()
     {
-        return new CssBlock(_class, new Dictionary<string, string>(_properties), _selectors != null ? new List<CssBlockSelectorItem>(_selectors) : null);
+        return new CssBlock (_class, new Dictionary<string, string> (_properties),
+            _selectors != null ? new List<CssBlockSelectorItem> (_selectors) : null);
     }
 
     /// <summary>
@@ -135,28 +137,45 @@ public sealed class CssBlock
     /// </summary>
     /// <param name="other">the other block to compare to</param>
     /// <returns>true - the two blocks are the same, false - otherwise</returns>
-    public bool Equals(CssBlock other)
+    public bool Equals (CssBlock other)
     {
-        if (ReferenceEquals(null, other))
+        if (ReferenceEquals (null, other))
+        {
             return false;
-        if (ReferenceEquals(this, other))
-            return true;
-        if (!Equals(other._class, _class))
-            return false;
+        }
 
-        if (!Equals(other._properties.Count, _properties.Count))
+        if (ReferenceEquals (this, other))
+        {
+            return true;
+        }
+
+        if (!Equals (other._class, _class))
+        {
             return false;
+        }
+
+        if (!Equals (other._properties.Count, _properties.Count))
+        {
+            return false;
+        }
 
         foreach (var property in _properties)
         {
-            if (!other._properties.ContainsKey(property.Key))
+            if (!other._properties.ContainsKey (property.Key))
+            {
                 return false;
-            if (!Equals(other._properties[property.Key], property.Value))
+            }
+
+            if (!Equals (other._properties[property.Key], property.Value))
+            {
                 return false;
+            }
         }
 
-        if (!EqualsSelector(other))
+        if (!EqualsSelector (other))
+        {
             return false;
+        }
 
         return true;
     }
@@ -166,31 +185,51 @@ public sealed class CssBlock
     /// </summary>
     /// <param name="other">the other block to compare to</param>
     /// <returns>true - the selectors on blocks are the same, false - otherwise</returns>
-    public bool EqualsSelector(CssBlock other)
+    public bool EqualsSelector (CssBlock other)
     {
-        if (ReferenceEquals(null, other))
+        if (ReferenceEquals (null, other))
+        {
             return false;
-        if (ReferenceEquals(this, other))
+        }
+
+        if (ReferenceEquals (this, other))
+        {
             return true;
+        }
 
         if (other.Hover != Hover)
+        {
             return false;
+        }
+
         if (other._selectors == null && _selectors != null)
+        {
             return false;
+        }
+
         if (other._selectors != null && _selectors == null)
+        {
             return false;
+        }
 
         if (other._selectors != null && _selectors != null)
         {
-            if (!Equals(other._selectors.Count, _selectors.Count))
+            if (!Equals (other._selectors.Count, _selectors.Count))
+            {
                 return false;
+            }
 
             for (int i = 0; i < _selectors.Count; i++)
             {
-                if (!Equals(other._selectors[i].Class, _selectors[i].Class))
+                if (!Equals (other._selectors[i].Class, _selectors[i].Class))
+                {
                     return false;
-                if (!Equals(other._selectors[i].DirectParent, _selectors[i].DirectParent))
+                }
+
+                if (!Equals (other._selectors[i].DirectParent, _selectors[i].DirectParent))
+                {
                     return false;
+                }
             }
         }
 
@@ -202,15 +241,24 @@ public sealed class CssBlock
     /// </summary>
     /// <param name="obj">the other block to compare to</param>
     /// <returns>true - the two blocks are the same, false - otherwise</returns>
-    public override bool Equals(object obj)
+    public override bool Equals (object? obj)
     {
-        if (ReferenceEquals(null, obj))
+        if (ReferenceEquals (null, obj))
+        {
             return false;
-        if (ReferenceEquals(this, obj))
+        }
+
+        if (ReferenceEquals (this, obj))
+        {
             return true;
-        if (obj.GetType() != typeof(CssBlock))
+        }
+
+        if (obj.GetType() != typeof (CssBlock))
+        {
             return false;
-        return Equals((CssBlock)obj);
+        }
+
+        return Equals ((CssBlock)obj);
     }
 
     /// <summary>
@@ -221,7 +269,8 @@ public sealed class CssBlock
     {
         unchecked
         {
-            return ((_class != null ? _class.GetHashCode() : 0) * 397) ^ (_properties != null ? _properties.GetHashCode() : 0);
+            return ((_class != null ? _class.GetHashCode() : 0) * 397) ^
+                   (_properties != null ? _properties.GetHashCode() : 0);
         }
     }
 
@@ -233,8 +282,9 @@ public sealed class CssBlock
         var str = _class + " { ";
         foreach (var property in _properties)
         {
-            str += string.Format("{0}={1}; ", property.Key, property.Value);
+            str += string.Format ("{0}={1}; ", property.Key, property.Value);
         }
+
         return str + " }";
     }
 }

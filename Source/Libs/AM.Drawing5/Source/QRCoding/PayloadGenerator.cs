@@ -58,7 +58,10 @@ public static class PayloadGenerator
             var start = i * 7 + offset;
             var n = (i == 0 ? "" : m.ToString()) + sum.Substring (start, Math.Min (9 - offset, sum.Length - start));
             if (!int.TryParse (n, NumberStyles.Any, CultureInfo.InvariantCulture, out m))
+            {
                 break;
+            }
+
             m = m % 97;
         }
 
