@@ -154,13 +154,13 @@ public class SamplePointList
             case SampleType.VelocityAvg:
                 double timeDiff = sample.Time.ToOADate() - ((Sample)list[0]).Time.ToOADate();
                 if (timeDiff <= 0)
-                    return PointPair.Missing;
+                    return PointPairBase.Missing;
                 else
                     return (sample.Position - ((Sample)list[0]).Position) / timeDiff;
             case SampleType.VelocityInst:
                 return sample.Velocity;
             default:
-                return PointPair.Missing;
+                return PointPairBase.Missing;
         }
     }
 
@@ -177,7 +177,7 @@ public class SamplePointList
     // generic Clone: just call the typesafe version
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -212,7 +212,7 @@ public class SamplePointList
         YType = rhs.YType;
 
         // Don't duplicate the data values, just copy the reference to the ArrayList
-        this.list = rhs.list;
+        list = rhs.list;
 
         //foreach ( Sample sample in rhs )
         //	list.Add( sample );

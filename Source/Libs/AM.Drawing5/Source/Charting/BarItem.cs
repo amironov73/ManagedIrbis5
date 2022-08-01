@@ -140,7 +140,7 @@ public class BarItem
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -222,7 +222,7 @@ public class BarItem
         // Pass the drawing onto the bar class
         if (_isVisible)
             _bar.DrawBars (g, pane, this, BaseAxis (pane), ValueAxis (pane),
-                this.GetBarWidth (pane), pos, scaleFactor);
+                GetBarWidth (pane), pos, scaleFactor);
     }
 
     /// <summary>
@@ -445,11 +445,11 @@ public class BarItem
 
             // Draw the bar
             if (baseAxis is XAxis || baseAxis is X2Axis)
-                coords = String.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
+                coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
                     pixSide, pixLowVal,
                     pixSide + barWidth, pixHiVal);
             else
-                coords = String.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
+                coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
                     pixLowVal, pixSide,
                     pixHiVal, pixSide + barWidth);
 

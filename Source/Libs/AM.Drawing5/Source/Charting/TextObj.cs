@@ -299,7 +299,7 @@ public class TextObj
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -394,7 +394,7 @@ public class TextObj
             //	this.FontSpec.Draw( g, pane.IsPenWidthScaled, this.text, pix.X, pix.Y,
             //		this.location.AlignH, this.location.AlignV, scaleFactor );
             //else
-            this.FontSpec.Draw (g, pane, _text, pix.X, pix.Y,
+            FontSpec.Draw (g, pane, _text, pix.X, pix.Y,
                 _location.AlignH, _location.AlignV, scaleFactor, _layoutArea);
         }
     }
@@ -430,7 +430,7 @@ public class TextObj
         PointF pix = _location.Transform (pane);
 
         return _fontSpec.PointInBox (pt, g, _text, pix.X, pix.Y,
-            _location.AlignH, _location.AlignV, scaleFactor, this.LayoutArea);
+            _location.AlignH, _location.AlignV, scaleFactor, LayoutArea);
     }
 
     /// <summary>
@@ -447,7 +447,7 @@ public class TextObj
             _location.AlignV, scaleFactor, new SizeF());
 
         shape = "poly";
-        coords = String.Format ("{0:f0},{1:f0},{2:f0},{3:f0},{4:f0},{5:f0},{6:f0},{7:f0},",
+        coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0},{4:f0},{5:f0},{6:f0},{7:f0},",
             pts[0].X, pts[0].Y, pts[1].X, pts[1].Y,
             pts[2].X, pts[2].Y, pts[3].X, pts[3].Y);
     }

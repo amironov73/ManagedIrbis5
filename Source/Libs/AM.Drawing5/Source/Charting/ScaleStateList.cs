@@ -38,7 +38,7 @@ public class ScaleStateList
     public ScaleStateList (YAxisList list)
     {
         foreach (Axis axis in list)
-            this.Add (new ScaleState (axis));
+            Add (new ScaleState (axis));
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ public class ScaleStateList
     public ScaleStateList (Y2AxisList list)
     {
         foreach (Axis axis in list)
-            this.Add (new ScaleState (axis));
+            Add (new ScaleState (axis));
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class ScaleStateList
     {
         foreach (ScaleState item in rhs)
         {
-            this.Add (item.Clone());
+            Add (item.Clone());
         }
     }
 
@@ -73,7 +73,7 @@ public class ScaleStateList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public class ScaleStateList
     /// <returns>true if a difference is found, false otherwise</returns>
     public bool IsChanged (YAxisList list)
     {
-        int count = Math.Min (list.Count, this.Count);
+        int count = Math.Min (list.Count, Count);
         for (int i = 0; i < count; i++)
             if (this[i].IsChanged (list[i]))
                 return true;
@@ -115,7 +115,7 @@ public class ScaleStateList
     /// <returns>true if a difference is found, false otherwise</returns>
     public bool IsChanged (Y2AxisList list)
     {
-        int count = Math.Min (list.Count, this.Count);
+        int count = Math.Min (list.Count, Count);
         for (int i = 0; i < count; i++)
             if (this[i].IsChanged (list[i]))
                 return true;
@@ -153,7 +153,7 @@ public class ScaleStateList
     /// <param name="list"></param>
     public void ApplyScale (YAxisList list)
     {
-        int count = Math.Min (list.Count, this.Count);
+        int count = Math.Min (list.Count, Count);
         for (int i = 0; i < count; i++)
             this[i].ApplyScale (list[i]);
     }
@@ -164,7 +164,7 @@ public class ScaleStateList
     /// <param name="list"></param>
     public void ApplyScale (Y2AxisList list)
     {
-        int count = Math.Min (list.Count, this.Count);
+        int count = Math.Min (list.Count, Count);
         for (int i = 0; i < count; i++)
             this[i].ApplyScale (list[i]);
     }

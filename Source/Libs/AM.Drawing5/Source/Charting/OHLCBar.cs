@@ -51,7 +51,7 @@ public class OHLCBar
     /// calculated automatically based on the minimum axis scale step size between
     /// bars.  Use the public property <see cref="IsAutoSize" /> to access this value.
     /// </summary>
-    [CLSCompliant (false)] protected Boolean _isAutoSize;
+    [CLSCompliant (false)] protected bool _isAutoSize;
 
     /// <summary>
     /// The result of the autosize calculation, which is the size of the bars in
@@ -85,7 +85,7 @@ public class OHLCBar
         /// <summary>
         /// The default value for the <see cref="OHLCBar.IsAutoSize" /> property.
         /// </summary>
-        public static Boolean IsAutoSize = true;
+        public static bool IsAutoSize = true;
     }
 
     #endregion
@@ -135,7 +135,7 @@ public class OHLCBar
     /// calculated automatically based on the minimum axis scale step size between
     /// bars.
     /// </summary>
-    public Boolean IsAutoSize
+    public bool IsAutoSize
     {
         get { return _isAutoSize; }
         set { _isAutoSize = value; }
@@ -187,7 +187,7 @@ public class OHLCBar
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -280,7 +280,7 @@ public class OHLCBar
         float pixOpen, float pixClose,
         float halfSize, Pen pen)
     {
-        if (pixBase != PointPair.Missing)
+        if (pixBase != PointPairBase.Missing)
         {
             if (isXBase)
             {
@@ -353,8 +353,8 @@ public class OHLCBar
                     double date = pt.X;
                     double high = pt.Y;
                     double low = pt.Z;
-                    double open = PointPair.Missing;
-                    double close = PointPair.Missing;
+                    double open = PointPairBase.Missing;
+                    double close = PointPairBase.Missing;
                     if (pt is StockPoint)
                     {
                         open = (pt as StockPoint).Open;
@@ -375,17 +375,17 @@ public class OHLCBar
                         //pixBase = baseAxis.Scale.Transform( curve.IsOverrideOrdinal, i, date );
                         pixHigh = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, high);
                         pixLow = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, low);
-                        if (PointPair.IsValueInvalid (open))
-                            pixOpen = Single.MaxValue;
+                        if (PointPairBase.IsValueInvalid (open))
+                            pixOpen = float.MaxValue;
                         else
                             pixOpen = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, open);
 
-                        if (PointPair.IsValueInvalid (close))
-                            pixClose = Single.MaxValue;
+                        if (PointPairBase.IsValueInvalid (close))
+                            pixClose = float.MaxValue;
                         else
                             pixClose = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, close);
 
-                        if (!curve.IsSelected && this._gradientFill.IsGradientValueType)
+                        if (!curve.IsSelected && _gradientFill.IsGradientValueType)
                         {
                             using (Pen tPen = GetPen (pane, scaleFactor, pt))
                                 Draw (g, pane, baseAxis is XAxis || baseAxis is X2Axis,

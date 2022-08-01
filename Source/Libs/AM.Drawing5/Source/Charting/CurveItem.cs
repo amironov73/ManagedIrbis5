@@ -190,7 +190,7 @@ namespace AM.Drawing.Charting
             _isX2Axis = false;
             _isVisible = true;
             _isOverrideOrdinal = false;
-            this.Tag = null;
+            Tag = null;
             _yAxisIndex = 0;
             _link = new Link();
         }
@@ -227,9 +227,9 @@ namespace AM.Drawing.Charting
             _yAxisIndex = rhs._yAxisIndex;
 
             if (rhs.Tag is ICloneable)
-                this.Tag = ((ICloneable)rhs.Tag).Clone();
+                Tag = ((ICloneable)rhs.Tag).Clone();
             else
-                this.Tag = rhs.Tag;
+                Tag = rhs.Tag;
 
             _points = (IPointList)rhs.Points.Clone();
 
@@ -599,7 +599,7 @@ namespace AM.Drawing.Charting
             get
             {
                 if (_points == null)
-                    return new PointPair (PointPair.Missing, PointPair.Missing);
+                    return new PointPair (PointPairBase.Missing, PointPairBase.Missing);
                 else
                     return (_points)[index];
             }
@@ -678,7 +678,7 @@ namespace AM.Drawing.Charting
         /// <param name="y">The Y coordinate value</param>
         public void AddPoint (double x, double y)
         {
-            this.AddPoint (new PointPair (x, y));
+            AddPoint (new PointPair (x, y));
         }
 
         /// <summary>
@@ -694,7 +694,7 @@ namespace AM.Drawing.Charting
         public void AddPoint (PointPair point)
         {
             if (_points == null)
-                this.Points = new PointPairList();
+                Points = new PointPairList();
 
             if (_points is IPointListEdit)
                 (_points as IPointListEdit).Add (point);
@@ -816,7 +816,7 @@ namespace AM.Drawing.Charting
         /// </summary>
         public void MakeUnique()
         {
-            this.MakeUnique (ColorSymbolRotator.StaticInstance);
+            MakeUnique (ColorSymbolRotator.StaticInstance);
         }
 
         /// <summary>
@@ -831,7 +831,7 @@ namespace AM.Drawing.Charting
         /// </param>
         virtual public void MakeUnique (ColorSymbolRotator rotator)
         {
-            this.Color = rotator.NextColor;
+            Color = rotator.NextColor;
         }
 
         /// <summary>
@@ -875,11 +875,11 @@ namespace AM.Drawing.Charting
             double yUBound = double.MaxValue;
 
             // initialize the values to outrageous ones to start
-            xMin = yMin = Double.MaxValue;
-            xMax = yMax = Double.MinValue;
+            xMin = yMin = double.MaxValue;
+            xMax = yMax = double.MinValue;
 
-            Axis yAxis = this.GetYAxis (pane);
-            Axis xAxis = this.GetXAxis (pane);
+            Axis yAxis = GetYAxis (pane);
+            Axis xAxis = GetXAxis (pane);
             if (yAxis == null || xAxis == null)
                 return;
 
@@ -892,8 +892,8 @@ namespace AM.Drawing.Charting
             }
 
 
-            bool isZIncluded = this.IsZIncluded (pane);
-            bool isXIndependent = this.IsXIndependent (pane);
+            bool isZIncluded = IsZIncluded (pane);
+            bool isXIndependent = IsXIndependent (pane);
             bool isXLog = xAxis.Scale.IsLog;
             bool isYLog = yAxis.Scale.IsLog;
             bool isXOrdinal = xAxis.Scale.IsAnyOrdinal;
@@ -902,9 +902,9 @@ namespace AM.Drawing.Charting
 
             // Loop over each point in the arrays
             //foreach ( PointPair point in this.Points )
-            for (int i = 0; i < this.Points.Count; i++)
+            for (int i = 0; i < Points.Count; i++)
             {
-                PointPair point = this.Points[i];
+                PointPair point = Points[i];
 
                 double curX = isXOrdinal ? i + 1 : point.X;
                 double curY = isYOrdinal ? i + 1 : point.Y;
@@ -919,13 +919,13 @@ namespace AM.Drawing.Charting
                 // ignoreInitial becomes false at the first non-zero
                 // Y value
                 if (ignoreInitial && curY != 0 &&
-                    curY != PointPair.Missing)
+                    curY != PointPairBase.Missing)
                     ignoreInitial = false;
 
                 if (!ignoreInitial &&
                     !outOfBounds &&
-                    curX != PointPair.Missing &&
-                    curY != PointPair.Missing)
+                    curX != PointPairBase.Missing &&
+                    curY != PointPairBase.Missing)
                 {
                     if (curX < xMin)
                         xMin = curX;
@@ -936,14 +936,14 @@ namespace AM.Drawing.Charting
                     if (curY > yMax)
                         yMax = curY;
 
-                    if (isZIncluded && isXIndependent && curZ != PointPair.Missing)
+                    if (isZIncluded && isXIndependent && curZ != PointPairBase.Missing)
                     {
                         if (curZ < yMin)
                             yMin = curZ;
                         if (curZ > yMax)
                             yMax = curZ;
                     }
-                    else if (isZIncluded && curZ != PointPair.Missing)
+                    else if (isZIncluded && curZ != PointPairBase.Missing)
                     {
                         if (curZ < xMin)
                             xMin = curZ;
@@ -1170,7 +1170,7 @@ namespace AM.Drawing.Charting
             /// <param name="index">The index number of the point on which to sort</param>
             public Comparer (SortType type, int index)
             {
-                this.sortType = type;
+                sortType = type;
                 this.index = index;
             }
 
@@ -1199,21 +1199,21 @@ namespace AM.Drawing.Charting
 
                 if (sortType == SortType.XValues)
                 {
-                    lVal = (l != null) ? System.Math.Abs (l[index].X) : PointPair.Missing;
-                    rVal = (r != null) ? System.Math.Abs (r[index].X) : PointPair.Missing;
+                    lVal = (l != null) ? Math.Abs (l[index].X) : PointPairBase.Missing;
+                    rVal = (r != null) ? Math.Abs (r[index].X) : PointPairBase.Missing;
                 }
                 else
                 {
-                    lVal = (l != null) ? System.Math.Abs (l[index].Y) : PointPair.Missing;
-                    rVal = (r != null) ? System.Math.Abs (r[index].Y) : PointPair.Missing;
+                    lVal = (l != null) ? Math.Abs (l[index].Y) : PointPairBase.Missing;
+                    rVal = (r != null) ? Math.Abs (r[index].Y) : PointPairBase.Missing;
                 }
 
-                if (lVal == PointPair.Missing || Double.IsInfinity (lVal) || Double.IsNaN (lVal))
+                if (lVal == PointPairBase.Missing || double.IsInfinity (lVal) || double.IsNaN (lVal))
                     l = null;
-                if (rVal == PointPair.Missing || Double.IsInfinity (rVal) || Double.IsNaN (rVal))
+                if (rVal == PointPairBase.Missing || double.IsInfinity (rVal) || double.IsNaN (rVal))
                     r = null;
 
-                if ((l == null && r == null) || (System.Math.Abs (lVal - rVal) < 1e-10))
+                if ((l == null && r == null) || (Math.Abs (lVal - rVal) < 1e-10))
                     return 0;
                 else if (l == null && r != null)
                     return -1;

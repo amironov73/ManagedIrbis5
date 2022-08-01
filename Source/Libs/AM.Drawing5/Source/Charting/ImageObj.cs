@@ -193,7 +193,7 @@ public class ImageObj
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -236,8 +236,11 @@ public class ImageObj
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
@@ -339,7 +342,7 @@ public class ImageObj
         RectangleF pixRect = _location.TransformRect (pane);
 
         shape = "rect";
-        coords = String.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
+        coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
             pixRect.Left, pixRect.Top, pixRect.Right, pixRect.Bottom);
     }
 

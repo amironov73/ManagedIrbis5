@@ -194,7 +194,7 @@ public class GasGaugeRegion
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -421,7 +421,7 @@ public class GasGaugeRegion
                 g.FillPie (Fill.MakeBrush (_boundingRectangle), tRect.X, tRect.Y, tRect.Width, tRect.Height,
                     -StartAngle, -SweepAngle);
 
-                if (this.Border.IsVisible)
+                if (Border.IsVisible)
                 {
                     Pen borderPen = _border.GetPen (pane, scaleFactor);
                     g.DrawPie (borderPen, tRect.X, tRect.Y, tRect.Width, tRect.Height,
@@ -485,7 +485,7 @@ public class GasGaugeRegion
     /// <returns>true if it's a valid point, false otherwise</returns>
     public override bool GetCoords (GraphPane pane, int i, out string coords)
     {
-        coords = String.Empty;
+        coords = string.Empty;
         return false;
     }
 
@@ -581,7 +581,7 @@ public class GasGaugeRegion
 
         nonExpRect.Inflate (-(float)0.05F * nonExpRect.Height, -(float)0.05 * nonExpRect.Width);
 
-        GasGaugeRegion.CalculateGasGuageParameters (pane);
+        CalculateGasGuageParameters (pane);
 
         foreach (CurveItem curve in pane.CurveList)
         {

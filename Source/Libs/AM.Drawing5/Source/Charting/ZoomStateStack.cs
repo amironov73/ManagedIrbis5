@@ -53,7 +53,7 @@ public class ZoomStateStack
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public class ZoomStateStack
     /// <value>true for an empty stack, false otherwise</value>
     public bool IsEmpty
     {
-        get { return this.Count == 0; }
+        get { return Count == 0; }
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public class ZoomStateStack
     public ZoomState Push (GraphPane pane, ZoomState.StateType type)
     {
         ZoomState state = new ZoomState (pane, type);
-        this.Add (state);
+        Add (state);
         return state;
     }
 
@@ -100,7 +100,7 @@ public class ZoomStateStack
     /// parameter).</returns>
     public ZoomState Push (ZoomState state)
     {
-        this.Add (state);
+        Add (state);
         return state;
     }
 
@@ -115,10 +115,10 @@ public class ZoomStateStack
     /// available (the stack was empty).</returns>
     public ZoomState Pop (GraphPane pane)
     {
-        if (!this.IsEmpty)
+        if (!IsEmpty)
         {
-            ZoomState state = (ZoomState)this[this.Count - 1];
-            this.RemoveAt (this.Count - 1);
+            ZoomState state = (ZoomState)this[Count - 1];
+            RemoveAt (Count - 1);
 
             state.ApplyState (pane);
             return state;
@@ -138,10 +138,10 @@ public class ZoomStateStack
     /// available (the stack was empty).</returns>
     public ZoomState PopAll (GraphPane pane)
     {
-        if (!this.IsEmpty)
+        if (!IsEmpty)
         {
             ZoomState state = (ZoomState)this[0];
-            this.Clear();
+            Clear();
 
             state.ApplyState (pane);
 
@@ -160,8 +160,8 @@ public class ZoomStateStack
     {
         get
         {
-            if (!this.IsEmpty)
-                return (ZoomState)this[this.Count - 1];
+            if (!IsEmpty)
+                return (ZoomState)this[Count - 1];
             else
                 return null;
         }

@@ -48,7 +48,7 @@ public class PaneList
     {
         foreach (GraphPane item in rhs)
         {
-            this.Add (item.Clone());
+            Add (item.Clone());
         }
     }
 
@@ -59,7 +59,7 @@ public class PaneList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -194,7 +194,7 @@ public class PaneList
         int index = 0;
         foreach (GraphPane pane in this)
         {
-            if (String.Compare (pane.Title.Text, title, true) == 0)
+            if (string.Compare (pane.Title.Text, title, true) == 0)
                 return index;
             index++;
         }
@@ -219,7 +219,7 @@ public class PaneList
         foreach (GraphPane pane in this)
         {
             if (pane.Tag is string &&
-                String.Compare ((string)pane.Tag, tagStr, true) == 0)
+                string.Compare ((string)pane.Tag, tagStr, true) == 0)
                 return index;
             index++;
         }

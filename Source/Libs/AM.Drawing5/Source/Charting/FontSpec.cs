@@ -289,7 +289,7 @@ public class FontSpec
             if (value != _family)
             {
                 _family = value;
-                Remake (_scaledSize / _size, this.Size, ref _scaledSize, ref _font);
+                Remake (_scaledSize / _size, Size, ref _scaledSize, ref _font);
             }
         }
     }
@@ -307,7 +307,7 @@ public class FontSpec
             if (value != _isBold)
             {
                 _isBold = value;
-                Remake (_scaledSize / _size, this.Size, ref _scaledSize, ref _font);
+                Remake (_scaledSize / _size, Size, ref _scaledSize, ref _font);
             }
         }
     }
@@ -325,7 +325,7 @@ public class FontSpec
             if (value != _isItalic)
             {
                 _isItalic = value;
-                Remake (_scaledSize / _size, this.Size, ref _scaledSize, ref _font);
+                Remake (_scaledSize / _size, Size, ref _scaledSize, ref _font);
             }
         }
     }
@@ -343,7 +343,7 @@ public class FontSpec
             if (value != _isUnderline)
             {
                 _isUnderline = value;
-                Remake (_scaledSize / _size, this.Size, ref _scaledSize, ref _font);
+                Remake (_scaledSize / _size, Size, ref _scaledSize, ref _font);
             }
         }
     }
@@ -608,7 +608,7 @@ public class FontSpec
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -643,7 +643,7 @@ public class FontSpec
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        var sch = info.GetInt32 ("schema");
 
         _fontColor = (Color)info.GetValue ("fontColor", typeof (Color));
         _family = info.GetString ("family");
@@ -672,8 +672,11 @@ public class FontSpec
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
+    public virtual void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         info.AddValue ("schema", schema);
         info.AddValue ("fontColor", _fontColor);
@@ -715,19 +718,19 @@ public class FontSpec
     /// <param name="font">A reference to the <see cref="Font"/> object</param>
     private void Remake (float scaleFactor, float size, ref float scaledSize, ref Font font)
     {
-        float newSize = size * scaleFactor;
+        var newSize = size * scaleFactor;
 
-        float oldSize = (font == null) ? 0.0f : font.Size;
+        var oldSize = (font == null) ? 0.0f : font.Size;
 
         // Regenerate the font only if the size has changed significantly
         if (font == null ||
             Math.Abs (newSize - oldSize) > 0.1 ||
-            font.Name != this.Family ||
+            font.Name != Family ||
             font.Bold != _isBold ||
             font.Italic != _isItalic ||
             font.Underline != _isUnderline)
         {
-            FontStyle style = FontStyle.Regular;
+            var style = FontStyle.Regular;
             style = (_isBold ? FontStyle.Bold : style) |
                     (_isItalic ? FontStyle.Italic : style) |
                     (_isUnderline ? FontStyle.Underline : style);
@@ -751,7 +754,7 @@ public class FontSpec
     /// </returns>
     public Font GetFont (float scaleFactor)
     {
-        Remake (scaleFactor, this.Size, ref _scaledSize, ref _font);
+        Remake (scaleFactor, Size, ref _scaledSize, ref _font);
         return _font;
     }
 
@@ -795,7 +798,7 @@ public class FontSpec
         float y, AlignH alignH, AlignV alignV,
         float scaleFactor)
     {
-        this.Draw (g, pane, text, x, y, alignH, alignV,
+        Draw (g, pane, text, x, y, alignH, alignV,
             scaleFactor, new SizeF());
     }
 
@@ -841,8 +844,8 @@ public class FontSpec
         // make sure the font size is properly scaled
         //Remake( scaleFactor, this.Size, ref this.scaledSize, ref this.font );
 
-        SmoothingMode sModeSave = g.SmoothingMode;
-        TextRenderingHint sHintSave = g.TextRenderingHint;
+        var sModeSave = g.SmoothingMode;
+        var sHintSave = g.TextRenderingHint;
         if (_isAntiAlias)
         {
             g.SmoothingMode = SmoothingMode.HighQuality;
@@ -856,7 +859,7 @@ public class FontSpec
             sizeF = MeasureString (g, text, scaleFactor, layoutArea);
 
         // Save the old transform matrix for later restoration
-        Matrix saveMatrix = g.Transform;
+        var saveMatrix = g.Transform;
         g.Transform = SetupMatrix (g.Transform, x, y, sizeF, alignH, alignV, _angle);
 
         // Create a rectangle representing the border around the
@@ -864,7 +867,7 @@ public class FontSpec
         // TopCenter position, the rectangle is drawn based on
         // the TopLeft position.  Therefore, move the rectangle
         // width/2 to the left to align it properly
-        RectangleF rectF = new RectangleF (-sizeF.Width / 2.0F, 0.0F,
+        var rectF = new RectangleF (-sizeF.Width / 2.0F, 0.0F,
             sizeF.Width, sizeF.Height);
 
         // If the background is to be filled, fill it
@@ -875,7 +878,7 @@ public class FontSpec
 
         // make a center justified StringFormat alignment
         // for drawing the text
-        StringFormat strFormat = new StringFormat();
+        var strFormat = new StringFormat();
         strFormat.Alignment = _stringAlignment;
 
         //			if ( this.stringAlignment == StringAlignment.Far )
@@ -889,20 +892,20 @@ public class FontSpec
         // CenterTop of the text needs to be.
         if (_isDropShadow)
         {
-            float xShift = (float)(Math.Cos (_dropShadowAngle) *
-                                   _dropShadowOffset * _font.Height);
-            float yShift = (float)(Math.Sin (_dropShadowAngle) *
-                                   _dropShadowOffset * _font.Height);
-            RectangleF rectD = rectF;
+            var xShift = (float)(Math.Cos (_dropShadowAngle) *
+                                 _dropShadowOffset * _font.Height);
+            var yShift = (float)(Math.Sin (_dropShadowAngle) *
+                                 _dropShadowOffset * _font.Height);
+            var rectD = rectF;
             rectD.Offset (xShift, yShift);
 
             // make a solid brush for rendering the font itself
-            using (SolidBrush brushD = new SolidBrush (_dropShadowColor))
+            using (var brushD = new SolidBrush (_dropShadowColor))
                 g.DrawString (text, _font, brushD, rectD, strFormat);
         }
 
         // make a solid brush for rendering the font itself
-        using (SolidBrush brush = new SolidBrush (_fontColor))
+        using (var brush = new SolidBrush (_fontColor))
         {
             // Draw the actual text.  Note that the coordinate system
             // is set up such that 0,0 is at the location where the
@@ -956,8 +959,8 @@ public class FontSpec
         float y, AlignH alignH, AlignV alignV,
         float scaleFactor)
     {
-        SmoothingMode sModeSave = g.SmoothingMode;
-        TextRenderingHint sHintSave = g.TextRenderingHint;
+        var sModeSave = g.SmoothingMode;
+        var sHintSave = g.TextRenderingHint;
         if (_isAntiAlias)
         {
             g.SmoothingMode = SmoothingMode.HighQuality;
@@ -965,26 +968,26 @@ public class FontSpec
         }
 
         // make sure the font size is properly scaled
-        Remake (scaleFactor, this.Size, ref _scaledSize, ref _font);
-        float scaledSuperSize = _scaledSize * Default.SuperSize;
-        Remake (scaleFactor, this.Size * Default.SuperSize, ref scaledSuperSize,
+        Remake (scaleFactor, Size, ref _scaledSize, ref _font);
+        var scaledSuperSize = _scaledSize * Default.SuperSize;
+        Remake (scaleFactor, Size * Default.SuperSize, ref scaledSuperSize,
             ref _superScriptFont);
 
         // Get the width and height of the text
-        SizeF size10 = g.MeasureString ("10", _font);
-        SizeF sizeText = g.MeasureString (text, _superScriptFont);
-        SizeF totSize = new SizeF (size10.Width + sizeText.Width,
+        var size10 = g.MeasureString ("10", _font);
+        var sizeText = g.MeasureString (text, _superScriptFont);
+        var totSize = new SizeF (size10.Width + sizeText.Width,
             size10.Height + sizeText.Height * Default.SuperShift);
-        float charWidth = g.MeasureString ("x", _superScriptFont).Width;
+        var charWidth = g.MeasureString ("x", _superScriptFont).Width;
 
         // Save the old transform matrix for later restoration
-        Matrix saveMatrix = g.Transform;
+        var saveMatrix = g.Transform;
 
         g.Transform = SetupMatrix (g.Transform, x, y, totSize, alignH, alignV, _angle);
 
         // make a center justified StringFormat alignment
         // for drawing the text
-        StringFormat strFormat = new StringFormat();
+        var strFormat = new StringFormat();
         strFormat.Alignment = _stringAlignment;
 
         // Create a rectangle representing the border around the
@@ -992,7 +995,7 @@ public class FontSpec
         // TopCenter position, the rectangle is drawn based on
         // the TopLeft position.  Therefore, move the rectangle
         // width/2 to the left to align it properly
-        RectangleF rectF = new RectangleF (-totSize.Width / 2.0F, 0.0F,
+        var rectF = new RectangleF (-totSize.Width / 2.0F, 0.0F,
             totSize.Width, totSize.Height);
 
         // If the background is to be filled, fill it
@@ -1002,7 +1005,7 @@ public class FontSpec
         _border.Draw (g, pane, scaleFactor, rectF);
 
         // make a solid brush for rendering the font itself
-        using (SolidBrush brush = new SolidBrush (_fontColor))
+        using (var brush = new SolidBrush (_fontColor))
         {
             // Draw the actual text.  Note that the coordinate system
             // is set up such that 0,0 is at the location where the
@@ -1039,7 +1042,7 @@ public class FontSpec
     /// <returns>The scaled font height, in pixels</returns>
     public float GetHeight (float scaleFactor)
     {
-        Remake (scaleFactor, this.Size, ref _scaledSize, ref _font);
+        Remake (scaleFactor, Size, ref _scaledSize, ref _font);
         float height = _font.Height;
         if (_isDropShadow)
             height += (float)(Math.Sin (_dropShadowAngle) * _dropShadowOffset * _font.Height);
@@ -1063,7 +1066,7 @@ public class FontSpec
     /// <returns>The scaled font width, in pixels</returns>
     public float GetWidth (Graphics g, float scaleFactor)
     {
-        Remake (scaleFactor, this.Size, ref _scaledSize, ref _font);
+        Remake (scaleFactor, Size, ref _scaledSize, ref _font);
         return g.MeasureString ("x", _font).Width;
     }
 
@@ -1085,8 +1088,8 @@ public class FontSpec
     /// <returns>The scaled text width, in pixels</returns>
     public float GetWidth (Graphics g, string text, float scaleFactor)
     {
-        Remake (scaleFactor, this.Size, ref _scaledSize, ref _font);
-        float width = g.MeasureString (text, _font).Width;
+        Remake (scaleFactor, Size, ref _scaledSize, ref _font);
+        var width = g.MeasureString (text, _font).Width;
         if (_isDropShadow)
             width += (float)(Math.Cos (_dropShadowAngle) * _dropShadowOffset * _font.Height);
         return width;
@@ -1112,8 +1115,8 @@ public class FontSpec
     /// a <see cref="SizeF"/> struct</returns>
     public SizeF MeasureString (Graphics g, string text, float scaleFactor)
     {
-        Remake (scaleFactor, this.Size, ref _scaledSize, ref _font);
-        SizeF size = g.MeasureString (text, _font);
+        Remake (scaleFactor, Size, ref _scaledSize, ref _font);
+        var size = g.MeasureString (text, _font);
         if (_isDropShadow)
         {
             size.Width += (float)(Math.Cos (_dropShadowAngle) *
@@ -1153,8 +1156,8 @@ public class FontSpec
     /// a <see cref="SizeF"/> struct</returns>
     public SizeF MeasureString (Graphics g, string text, float scaleFactor, SizeF layoutArea)
     {
-        Remake (scaleFactor, this.Size, ref _scaledSize, ref _font);
-        SizeF size = g.MeasureString (text, _font, layoutArea);
+        Remake (scaleFactor, Size, ref _scaledSize, ref _font);
+        var size = g.MeasureString (text, _font, layoutArea);
         if (_isDropShadow)
         {
             size.Width += (float)(Math.Cos (_dropShadowAngle) *
@@ -1229,10 +1232,10 @@ public class FontSpec
         else
             s = MeasureString (g, text, scaleFactor, layoutArea);
 
-        float cs = (float)Math.Abs (Math.Cos (_angle * Math.PI / 180.0));
-        float sn = (float)Math.Abs (Math.Sin (_angle * Math.PI / 180.0));
+        var cs = (float)Math.Abs (Math.Cos (_angle * Math.PI / 180.0));
+        var sn = (float)Math.Abs (Math.Sin (_angle * Math.PI / 180.0));
 
-        SizeF s2 = new SizeF (s.Width * cs + s.Height * sn,
+        var s2 = new SizeF (s.Width * cs + s.Height * sn,
             s.Width * sn + s.Height * cs);
 
         return s2;
@@ -1267,13 +1270,13 @@ public class FontSpec
     public SizeF BoundingBoxTenPower (Graphics g, string text, float scaleFactor)
     {
         //Remake( scaleFactor, this.Size, ref this.scaledSize, ref this.font );
-        float scaledSuperSize = _scaledSize * Default.SuperSize;
-        Remake (scaleFactor, this.Size * Default.SuperSize, ref scaledSuperSize,
+        var scaledSuperSize = _scaledSize * Default.SuperSize;
+        Remake (scaleFactor, Size * Default.SuperSize, ref scaledSuperSize,
             ref _superScriptFont);
 
         // Get the width and height of the text
-        SizeF size10 = MeasureString (g, "10", scaleFactor);
-        SizeF sizeText = g.MeasureString (text, _superScriptFont);
+        var size10 = MeasureString (g, "10", scaleFactor);
+        var sizeText = g.MeasureString (text, _superScriptFont);
 
         if (_isDropShadow)
         {
@@ -1283,14 +1286,14 @@ public class FontSpec
                                        _dropShadowOffset * _superScriptFont.Height);
         }
 
-        SizeF totSize = new SizeF (size10.Width + sizeText.Width,
+        var totSize = new SizeF (size10.Width + sizeText.Width,
             size10.Height + sizeText.Height * Default.SuperShift);
 
 
-        float cs = (float)Math.Abs (Math.Cos (_angle * Math.PI / 180.0));
-        float sn = (float)Math.Abs (Math.Sin (_angle * Math.PI / 180.0));
+        var cs = (float)Math.Abs (Math.Cos (_angle * Math.PI / 180.0));
+        var sn = (float)Math.Abs (Math.Sin (_angle * Math.PI / 180.0));
 
-        SizeF s2 = new SizeF (totSize.Width * cs + totSize.Height * sn,
+        var s2 = new SizeF (totSize.Width * cs + totSize.Height * sn,
             totSize.Width * sn + totSize.Height * cs);
 
         return s2;
@@ -1370,7 +1373,7 @@ public class FontSpec
         float scaleFactor, SizeF layoutArea)
     {
         // make sure the font size is properly scaled
-        Remake (scaleFactor, this.Size, ref _scaledSize, ref _font);
+        Remake (scaleFactor, Size, ref _scaledSize, ref _font);
 
         // Get the width and height of the text
         SizeF sizeF;
@@ -1380,15 +1383,15 @@ public class FontSpec
             sizeF = g.MeasureString (text, _font, layoutArea);
 
         // Create a bounding box rectangle for the text
-        RectangleF rect = new RectangleF (new PointF (-sizeF.Width / 2.0F, 0.0F), sizeF);
+        var rect = new RectangleF (new PointF (-sizeF.Width / 2.0F, 0.0F), sizeF);
 
         // Build a transform matrix that inverts that drawing transform
         // in this manner, the point is brought back to the box, rather
         // than vice-versa.  This allows the container check to be a simple
         // RectangleF.Contains, since the rectangle won't be rotated.
-        Matrix matrix = GetMatrix (x, y, sizeF, alignH, alignV, _angle);
+        var matrix = GetMatrix (x, y, sizeF, alignH, alignV, _angle);
 
-        PointF[] pts = new PointF[1];
+        var pts = new PointF[1];
         pts[0] = pt;
         matrix.TransformPoints (pts);
 
@@ -1443,7 +1446,7 @@ public class FontSpec
         // in this manner, the point is brought back to the box, rather
         // than vice-versa.  This allows the container check to be a simple
         // RectangleF.Contains, since the rectangle won't be rotated.
-        Matrix matrix = new Matrix();
+        var matrix = new Matrix();
 
         // In this case, the bounding box is anchored to the
         // top-left of the text box.  Handle the alignment
@@ -1516,7 +1519,7 @@ public class FontSpec
         float scaleFactor, SizeF layoutArea)
     {
         // make sure the font size is properly scaled
-        Remake (scaleFactor, this.Size, ref _scaledSize, ref _font);
+        Remake (scaleFactor, Size, ref _scaledSize, ref _font);
 
         // Get the width and height of the text
         SizeF sizeF;
@@ -1526,12 +1529,12 @@ public class FontSpec
             sizeF = g.MeasureString (text, _font, layoutArea);
 
         // Create a bounding box rectangle for the text
-        RectangleF rect = new RectangleF (new PointF (-sizeF.Width / 2.0F, 0.0F), sizeF);
+        var rect = new RectangleF (new PointF (-sizeF.Width / 2.0F, 0.0F), sizeF);
 
-        Matrix matrix = new Matrix();
+        var matrix = new Matrix();
         SetupMatrix (matrix, x, y, sizeF, alignH, alignV, _angle);
 
-        PointF[] pts = new PointF[4];
+        var pts = new PointF[4];
         pts[0] = new PointF (rect.Left, rect.Top);
         pts[1] = new PointF (rect.Right, rect.Top);
         pts[2] = new PointF (rect.Right, rect.Bottom);

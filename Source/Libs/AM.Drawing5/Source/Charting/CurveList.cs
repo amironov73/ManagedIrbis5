@@ -164,11 +164,11 @@ public class CurveList
     /// <param name="rhs">The XAxis object from which to copy</param>
     public CurveList (CurveList rhs)
     {
-        this.maxPts = rhs.maxPts;
+        maxPts = rhs.maxPts;
 
         foreach (CurveItem item in rhs)
         {
-            this.Add ((CurveItem)((ICloneable)item).Clone());
+            Add ((CurveItem)((ICloneable)item).Clone());
         }
     }
 
@@ -179,7 +179,7 @@ public class CurveList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -203,7 +203,7 @@ public class CurveList
     {
         get
         {
-            for (int i = this.Count - 1; i >= 0; i--)
+            for (int i = Count - 1; i >= 0; i--)
                 yield return this[i];
         }
     }
@@ -215,7 +215,7 @@ public class CurveList
     {
         get
         {
-            for (int i = 0; i < this.Count; i++)
+            for (int i = 0; i < Count; i++)
                 yield return this[i];
         }
     }
@@ -310,7 +310,7 @@ public class CurveList
         int index = 0;
         foreach (CurveItem p in this)
         {
-            if (String.Compare (p._label._text, label, true) == 0)
+            if (string.Compare (p._label._text, label, true) == 0)
                 return index;
             index++;
         }
@@ -335,7 +335,7 @@ public class CurveList
         foreach (CurveItem p in this)
         {
             if (p.Tag is string &&
-                String.Compare ((string)p.Tag, tag, true) == 0)
+                string.Compare ((string)p.Tag, tag, true) == 0)
                 return index;
             index++;
         }
@@ -349,7 +349,7 @@ public class CurveList
     /// </summary>
     public void Sort (SortType type, int index)
     {
-        this.Sort (new CurveItem.Comparer (type, index));
+        Sort (new CurveItem.Comparer (type, index));
     }
 
     /// <summary>
@@ -375,7 +375,7 @@ public class CurveList
             return -1;
 
         CurveItem curve = this[index];
-        this.RemoveAt (index);
+        RemoveAt (index);
 
         index += relativePos;
         if (index < 0)
@@ -587,8 +587,8 @@ public class CurveList
         out double tYMinVal, out double tXMaxVal, out double tYMaxVal)
     {
         // initialize the values to outrageous ones to start
-        tXMinVal = tYMinVal = Double.MaxValue;
-        tXMaxVal = tYMaxVal = Double.MinValue;
+        tXMinVal = tYMinVal = double.MaxValue;
+        tXMaxVal = tYMaxVal = double.MinValue;
 
         ValueHandler valueHandler = new ValueHandler (pane, false);
         Axis baseAxis = curve.BaseAxis (pane);
@@ -602,7 +602,7 @@ public class CurveList
             double x = isXBase ? baseVal : hiVal;
             double y = isXBase ? hiVal : baseVal;
 
-            if (x != PointPair.Missing && y != PointPair.Missing && lowVal != PointPair.Missing)
+            if (x != PointPairBase.Missing && y != PointPairBase.Missing && lowVal != PointPairBase.Missing)
             {
                 if (x < tXMinVal)
                     tXMinVal = x;
@@ -657,7 +657,7 @@ public class CurveList
         //Bar.ResetBarStack();
 
         // Count the number of BarItems in the curvelist
-        int pos = this.NumBars;
+        int pos = NumBars;
 
         // sorted overlay bars are a special case, since they are sorted independently at each
         // ordinal position.
@@ -670,7 +670,7 @@ public class CurveList
                     tempList.Add ((CurveItem)curve);
 
             // Loop through the bars, graphing each ordinal position separately
-            for (int i = 0; i < this.maxPts; i++)
+            for (int i = 0; i < maxPts; i++)
             {
                 // At each ordinal position, sort the curves according to the value axis value
                 tempList.Sort (pane._barSettings.Base == BarBase.X ? SortType.YValues : SortType.XValues, i);
@@ -688,7 +688,7 @@ public class CurveList
         // The reverse order is done so that curves that are later in the list are plotted behind
         // curves that are earlier in the list
 
-        for (int i = this.Count - 1; i >= 0; i--)
+        for (int i = Count - 1; i >= 0; i--)
         {
             CurveItem curve = this[i];
 

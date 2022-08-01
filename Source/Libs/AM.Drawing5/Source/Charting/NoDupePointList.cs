@@ -204,7 +204,7 @@ public class NoDupePointList
     // generic Clone: just call the typesafe version
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>

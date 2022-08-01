@@ -303,7 +303,7 @@ public class Symbol
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -395,7 +395,7 @@ public class Symbol
     {
         // Only draw if the symbol is visible
         if (_isVisible &&
-            this.Type != SymbolType.None &&
+            Type != SymbolType.None &&
             x < 100000 && x > -100000 &&
             y < 100000 && y > -100000)
         {
@@ -453,7 +453,7 @@ public class Symbol
 
         // Only draw if the symbol is visible
         if (_isVisible &&
-            this.Type != SymbolType.None &&
+            Type != SymbolType.None &&
             x < 100000 && x > -100000 &&
             y < 100000 && y > -100000)
         {
@@ -462,8 +462,8 @@ public class Symbol
                 g.SmoothingMode = SmoothingMode.HighQuality;
 
             using (Pen pen = _border.GetPen (pane, scaleFactor, dataValue))
-            using (GraphicsPath path = this.MakePath (g, scaleFactor))
-            using (Brush brush = this.Fill.MakeBrush (path.GetBounds(), dataValue))
+            using (GraphicsPath path = MakePath (g, scaleFactor))
+            using (Brush brush = Fill.MakeBrush (path.GetBounds(), dataValue))
             {
                 DrawSymbol (g, x, y, path, pen, brush);
             }
@@ -659,12 +659,12 @@ public class Symbol
                         //   by zero, etc.
                         // Also, any value <= zero on a log scale is invalid
 
-                        if (curX != PointPair.Missing &&
-                            curY != PointPair.Missing &&
-                            !System.Double.IsNaN (curX) &&
-                            !System.Double.IsNaN (curY) &&
-                            !System.Double.IsInfinity (curX) &&
-                            !System.Double.IsInfinity (curY) &&
+                        if (curX != PointPairBase.Missing &&
+                            curY != PointPairBase.Missing &&
+                            !double.IsNaN (curX) &&
+                            !double.IsNaN (curY) &&
+                            !double.IsInfinity (curX) &&
+                            !double.IsInfinity (curY) &&
                             (curX > 0 || !xIsLog) &&
                             (!yIsLog || curY > 0.0) &&
                             (xIsOrdinal || (curX >= xMin && curX <= xMax)))
@@ -688,13 +688,13 @@ public class Symbol
                             {
                                 using (Brush tBrush = _fill.MakeBrush (rect, points[i]))
                                 using (Pen tPen = _border.GetPen (pane, scaleFactor, points[i]))
-                                    this.DrawSymbol (g, tmpX, tmpY, path, tPen, tBrush);
+                                    DrawSymbol (g, tmpX, tmpY, path, tPen, tBrush);
                             }
                             else
                             {
                                 // Otherwise, the brush is already defined
                                 // Draw the symbol at the specified pixel location
-                                this.DrawSymbol (g, tmpX, tmpY, path, pen, brush);
+                                DrawSymbol (g, tmpX, tmpY, path, pen, brush);
                             }
                         }
                     }

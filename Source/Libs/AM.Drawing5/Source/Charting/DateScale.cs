@@ -263,7 +263,7 @@ class DateScale
     /// </returns>
     override internal double CalcBaseTic()
     {
-        if (_baseTic != PointPair.Missing)
+        if (_baseTic != PointPairBase.Missing)
             return _baseTic;
         else
         {
@@ -472,9 +472,9 @@ class DateScale
             if (_isPreventLabelOverlap)
             {
                 // Calculate the maximum number of labels
-                double maxLabels = (double)this.CalcMaxLabels (g, pane, scaleFactor);
+                double maxLabels = (double)CalcMaxLabels (g, pane, scaleFactor);
 
-                if (maxLabels < this.CalcNumTics())
+                if (maxLabels < CalcNumTics())
                     _majorStep = CalcDateStepSize (_max - _min, maxLabels);
             }
         }
@@ -540,7 +540,7 @@ class DateScale
                 if (tempStep == 1.0)
                     scale._minorStep = 0.25;
                 else
-                    scale._minorStep = Scale.CalcStepSize (tempStep, targetSteps);
+                    scale._minorStep = CalcStepSize (tempStep, targetSteps);
             }
         }
         else if (range > Default.RangeYearMonth)
@@ -874,7 +874,7 @@ class DateScale
     override internal string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
-            _format = Scale.Default.Format;
+            _format = Default.Format;
 
         return XDate.ToString (dVal, _format);
     }

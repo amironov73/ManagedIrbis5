@@ -200,7 +200,7 @@ public class SampleMultiPointList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -225,7 +225,7 @@ public class SampleMultiPointList
         get
         {
             double xVal, yVal;
-            if (index >= 0 && index < this.Count)
+            if (index >= 0 && index < Count)
             {
                 // grab the specified PerformanceData struct
                 PerformanceData perfData = (PerformanceData)DataCollection[index];
@@ -237,12 +237,12 @@ public class SampleMultiPointList
             }
             else
             {
-                xVal = PointPair.Missing;
-                yVal = PointPair.Missing;
+                xVal = PointPairBase.Missing;
+                yVal = PointPairBase.Missing;
             }
 
             // insert the values into a pointpair and return
-            return new PointPair (xVal, yVal, PointPair.Missing, null);
+            return new PointPair (xVal, yVal, PointPairBase.Missing, null);
         }
     }
 

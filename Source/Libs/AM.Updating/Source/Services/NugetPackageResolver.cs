@@ -73,7 +73,9 @@ public class NugetPackageResolver : IPackageResolver
             // Check resource type
             var resourceType = resourceJson.GetProperty ("@type").GetString();
             if (string.Equals (resourceType, "PackageBaseAddress/3.0.0", StringComparison.OrdinalIgnoreCase))
-                return resourceJson.GetProperty ("@id").GetString();
+            {
+                return resourceJson.GetProperty ("@id").GetString().ThrowIfNull();
+            }
         }
 
         // Resource not found
@@ -97,7 +99,9 @@ public class NugetPackageResolver : IPackageResolver
             var versionText = versionJson.GetString();
 
             if (Version.TryParse (versionText, out var version))
+            {
                 versions.Add (version);
+            }
         }
 
         return versions.ToArray();
@@ -119,7 +123,9 @@ public class NugetPackageResolver : IPackageResolver
 
         // If status code is 404 then this version doesn't exist
         if (response.StatusCode == HttpStatusCode.NotFound)
+        {
             throw new PackageNotFoundException (version);
+        }
 
         // Ensure success status code otherwise
         response.EnsureSuccessStatusCode();

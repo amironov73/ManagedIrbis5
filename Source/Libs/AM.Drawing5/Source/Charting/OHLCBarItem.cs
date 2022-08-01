@@ -142,7 +142,7 @@ public class OHLCBarItem
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -224,8 +224,8 @@ public class OHLCBarItem
     {
         if (_isVisible)
         {
-            _bar.Draw (g, pane, this, this.BaseAxis (pane),
-                this.ValueAxis (pane), scaleFactor);
+            _bar.Draw (g, pane, this, BaseAxis (pane),
+                ValueAxis (pane), scaleFactor);
         }
     }
 
@@ -319,11 +319,11 @@ public class OHLCBarItem
 
             // Draw the bar
             if (baseAxis is XAxis || baseAxis is X2Axis)
-                coords = String.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
+                coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
                     pixSide, pixLow,
                     pixSide + halfSize * 2, pixHigh);
             else
-                coords = String.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
+                coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
                     pixLow, pixSide,
                     pixHigh, pixSide + halfSize * 2);
 

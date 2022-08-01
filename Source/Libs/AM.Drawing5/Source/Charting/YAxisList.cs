@@ -44,7 +44,7 @@ public class YAxisList
     {
         foreach (YAxis item in rhs)
         {
-            this.Add (item.Clone());
+            Add (item.Clone());
         }
     }
 
@@ -55,7 +55,7 @@ public class YAxisList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public class YAxisList
     /// <value>An <see cref="Axis"/> object reference.</value>
     public new YAxis this [int index]
     {
-        get { return (((index < 0 || index >= this.Count) ? null : base[index])); }
+        get { return (((index < 0 || index >= Count) ? null : base[index])); }
     }
 
     /// <summary>
@@ -119,7 +119,7 @@ public class YAxisList
         int index = 0;
         foreach (YAxis axis in this)
         {
-            if (String.Compare (axis.Title._text, title, true) == 0)
+            if (string.Compare (axis.Title._text, title, true) == 0)
                 return index;
             index++;
         }
@@ -145,7 +145,7 @@ public class YAxisList
         foreach (YAxis axis in this)
         {
             if (axis.Tag is string &&
-                String.Compare ((string)axis.Tag, tagStr, true) == 0)
+                string.Compare ((string)axis.Tag, tagStr, true) == 0)
                 return index;
             index++;
         }

@@ -210,7 +210,7 @@ public class JapaneseCandleStick
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -325,7 +325,7 @@ public class JapaneseCandleStick
     {
         //float halfSize = (int) ( _size * scaleFactor / 2.0f + 0.5f );
 
-        if (pixBase != PointPair.Missing && Math.Abs (pixLow) < 1000000 &&
+        if (pixBase != PointPairBase.Missing && Math.Abs (pixLow) < 1000000 &&
             Math.Abs (pixHigh) < 1000000)
         {
             RectangleF rect;
@@ -423,8 +423,8 @@ public class JapaneseCandleStick
                     double date = pt.X;
                     double high = pt.Y;
                     double low = pt.Z;
-                    double open = PointPair.Missing;
-                    double close = PointPair.Missing;
+                    double open = PointPairBase.Missing;
+                    double close = PointPairBase.Missing;
                     if (pt is StockPoint)
                     {
                         open = (pt as StockPoint).Open;
@@ -445,17 +445,17 @@ public class JapaneseCandleStick
                         //pixBase = baseAxis.Scale.Transform( curve.IsOverrideOrdinal, i, date );
                         pixHigh = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, high);
                         pixLow = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, low);
-                        if (PointPair.IsValueInvalid (open))
-                            pixOpen = Single.MaxValue;
+                        if (PointPairBase.IsValueInvalid (open))
+                            pixOpen = float.MaxValue;
                         else
                             pixOpen = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, open);
 
-                        if (PointPair.IsValueInvalid (close))
-                            pixClose = Single.MaxValue;
+                        if (PointPairBase.IsValueInvalid (close))
+                            pixClose = float.MaxValue;
                         else
                             pixClose = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, close);
 
-                        if (!curve.IsSelected && this._gradientFill.IsGradientValueType)
+                        if (!curve.IsSelected && _gradientFill.IsGradientValueType)
                         {
                             using (Pen tPen = GetPen (pane, scaleFactor, pt))
                                 Draw (g, pane, baseAxis is XAxis || baseAxis is X2Axis,

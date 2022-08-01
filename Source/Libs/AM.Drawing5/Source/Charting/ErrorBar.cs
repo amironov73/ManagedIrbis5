@@ -208,7 +208,7 @@ public class ErrorBar
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -356,7 +356,7 @@ public class ErrorBar
         float pixBase, pixValue, pixLowValue;
         double scaleBase, scaleValue, scaleLowValue;
 
-        if (curve.Points != null && this.IsVisible)
+        if (curve.Points != null && IsVisible)
         {
             using (Pen pen = !curve.IsSelected
                        ? new Pen (_color, _penWidth)
@@ -384,7 +384,7 @@ public class ErrorBar
                         //if ( this.fill.IsGradientValueType )
                         //	brush = fill.MakeBrush( _rect, _points[i] );
 
-                        this.Draw (g, pane, baseAxis is XAxis || baseAxis is X2Axis, pixBase, pixValue,
+                        Draw (g, pane, baseAxis is XAxis || baseAxis is X2Axis, pixBase, pixValue,
                             pixLowValue, scaleFactor, pen, curve.IsSelected,
                             curve.Points[i]);
                     }

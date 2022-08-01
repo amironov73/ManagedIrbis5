@@ -103,12 +103,12 @@ public class StockPoint
         string tag)
         : base (date, high)
     {
-        this.Low = low;
-        this.Open = open;
-        this.Close = close;
-        this.Vol = vol;
-        this.ColorValue = PointPair.Missing;
-        this.Tag = tag;
+        Low = low;
+        Open = open;
+        Close = close;
+        Vol = vol;
+        ColorValue = Missing;
+        Tag = tag;
     }
 
     /// <summary>
@@ -118,16 +118,16 @@ public class StockPoint
     public StockPoint (StockPoint rhs)
         : base (rhs)
     {
-        this.Low = rhs.Low;
-        this.Open = rhs.Open;
-        this.Close = rhs.Close;
-        this.Vol = rhs.Vol;
-        this.ColorValue = rhs.ColorValue;
+        Low = rhs.Low;
+        Open = rhs.Open;
+        Close = rhs.Close;
+        Vol = rhs.Vol;
+        ColorValue = rhs.ColorValue;
 
         if (rhs.Tag is ICloneable)
-            this.Tag = ((ICloneable)rhs.Tag).Clone();
+            Tag = ((ICloneable)rhs.Tag).Clone();
         else
-            this.Tag = rhs.Tag;
+            Tag = rhs.Tag;
     }
 
     /// <summary>
@@ -140,17 +140,17 @@ public class StockPoint
         if (rhs is StockPoint)
         {
             StockPoint pt = rhs as StockPoint;
-            this.Open = pt.Open;
-            this.Close = pt.Close;
-            this.Vol = pt.Vol;
-            this.ColorValue = rhs.ColorValue;
+            Open = pt.Open;
+            Close = pt.Close;
+            Vol = pt.Vol;
+            ColorValue = rhs.ColorValue;
         }
         else
         {
-            this.Open = PointPair.Missing;
-            this.Close = PointPair.Missing;
-            this.Vol = PointPair.Missing;
-            this.ColorValue = PointPair.Missing;
+            Open = Missing;
+            Close = Missing;
+            Vol = Missing;
+            ColorValue = Missing;
         }
     }
 
@@ -251,21 +251,21 @@ public class StockPoint
     {
         get
         {
-            return this.Date == PointPair.Missing ||
-                   this.Close == PointPair.Missing ||
-                   this.Open == PointPair.Missing ||
-                   this.High == PointPair.Missing ||
-                   this.Low == PointPair.Missing ||
-                   Double.IsInfinity (this.Date) ||
-                   Double.IsInfinity (this.Close) ||
-                   Double.IsInfinity (this.Open) ||
-                   Double.IsInfinity (this.High) ||
-                   Double.IsInfinity (this.Low) ||
-                   Double.IsNaN (this.Date) ||
-                   Double.IsNaN (this.Close) ||
-                   Double.IsNaN (this.Open) ||
-                   Double.IsNaN (this.High) ||
-                   Double.IsNaN (this.Low);
+            return Date == Missing ||
+                   Close == Missing ||
+                   Open == Missing ||
+                   High == Missing ||
+                   Low == Missing ||
+                   double.IsInfinity (Date) ||
+                   double.IsInfinity (Close) ||
+                   double.IsInfinity (Open) ||
+                   double.IsInfinity (High) ||
+                   double.IsInfinity (Low) ||
+                   double.IsNaN (Date) ||
+                   double.IsNaN (Close) ||
+                   double.IsNaN (Open) ||
+                   double.IsNaN (High) ||
+                   double.IsNaN (Low);
         }
     }
 
@@ -281,7 +281,7 @@ public class StockPoint
     /// <returns>A string representation of the <see cref="StockPoint" />.</returns>
     override public string ToString (bool isShowAll)
     {
-        return this.ToString (PointPair.DefaultFormat, isShowAll);
+        return ToString (DefaultFormat, isShowAll);
     }
 
     /// <summary>
@@ -296,13 +296,13 @@ public class StockPoint
     /// <param name="isShowAll">true to show all the value coordinates</param>
     override public string ToString (string format, bool isShowAll)
     {
-        return "( " + XDate.ToString (this.Date, "g") +
-               ", " + this.Close.ToString (format) +
+        return "( " + XDate.ToString (Date, "g") +
+               ", " + Close.ToString (format) +
                (isShowAll
                    ? (
-                       ", " + this.Low.ToString (format) +
-                       ", " + this.Open.ToString (format) +
-                       ", " + this.Close.ToString (format))
+                       ", " + Low.ToString (format) +
+                       ", " + Open.ToString (format) +
+                       ", " + Close.ToString (format))
                    : "") + " )";
     }
 

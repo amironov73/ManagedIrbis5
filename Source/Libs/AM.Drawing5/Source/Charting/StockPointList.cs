@@ -63,7 +63,7 @@ public class StockPointList
         for (int i = 0; i < rhs.Count; i++)
         {
             StockPoint pt = new StockPoint (rhs[i]);
-            this.Add (pt);
+            Add (pt);
         }
     }
 
@@ -74,7 +74,7 @@ public class StockPointList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -121,8 +121,8 @@ public class StockPointList
     /// <returns>The zero-based ordinal index where the point was added in the list.</returns>
     public void Add (double date, double high)
     {
-        Add (new StockPoint (date, high, PointPair.Missing, PointPair.Missing,
-            PointPair.Missing, PointPair.Missing));
+        Add (new StockPoint (date, high, PointPairBase.Missing, PointPairBase.Missing,
+            PointPairBase.Missing, PointPairBase.Missing));
     }
 
     /// <summary>

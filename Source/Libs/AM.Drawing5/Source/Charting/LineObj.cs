@@ -85,8 +85,8 @@ public class LineObj
         : base (x1, y1, x2 - x1, y2 - y1)
     {
         _line = new LineBase (color);
-        this.Location.AlignH = AlignH.Left;
-        this.Location.AlignV = AlignV.Top;
+        Location.AlignH = AlignH.Left;
+        Location.AlignV = AlignV.Top;
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ public class LineObj
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -179,8 +179,11 @@ public class LineObj
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
 
@@ -218,8 +221,8 @@ public class LineObj
     {
         // Convert the arrow coordinates from the user coordinate system
         // to the screen coordinate system
-        PointF pix1 = this.Location.TransformTopLeft (pane);
-        PointF pix2 = this.Location.TransformBottomRight (pane);
+        PointF pix1 = Location.TransformTopLeft (pane);
+        PointF pix2 = Location.TransformBottomRight (pane);
 
         if (pix1.X > -10000 && pix1.X < 100000 && pix1.Y > -100000 && pix1.Y < 100000 &&
             pix2.X > -10000 && pix2.X < 100000 && pix2.Y > -100000 && pix2.Y < 100000)
@@ -329,7 +332,7 @@ public class LineObj
         matrix.TransformPoints (pts);
 
         shape = "poly";
-        coords = String.Format ("{0:f0},{1:f0},{2:f0},{3:f0},{4:f0},{5:f0},{6:f0},{7:f0},",
+        coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0},{4:f0},{5:f0},{6:f0},{7:f0},",
             pts[0].X, pts[0].Y, pts[1].X, pts[1].Y,
             pts[2].X, pts[2].Y, pts[3].X, pts[3].Y);
     }

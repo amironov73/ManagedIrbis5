@@ -516,7 +516,7 @@ public abstract class PaneBase
     public PaneBase ShallowClone()
     {
         // return a shallow copy
-        return this.MemberwiseClone() as PaneBase;
+        return MemberwiseClone() as PaneBase;
     }
 
     #endregion
@@ -610,7 +610,7 @@ public abstract class PaneBase
             return;
 
         // calculate scaleFactor on "normal" pane size (BaseDimension)
-        float scaleFactor = this.CalcScaleFactor();
+        float scaleFactor = CalcScaleFactor();
 
         // Fill the pane background and draw a border around it
         DrawPaneFrame (g, scaleFactor);
@@ -845,7 +845,7 @@ public abstract class PaneBase
         using (Graphics bitmapGraphics = Graphics.FromImage (bitmap))
         {
             bitmapGraphics.TranslateTransform (-_rect.Left, -_rect.Top);
-            this.Draw (bitmapGraphics);
+            Draw (bitmapGraphics);
         }
 
         return bitmap;
@@ -917,7 +917,7 @@ public abstract class PaneBase
         SetAntiAliasMode (g, antiAlias);
 
         // This is actually a shallow clone, so we don't duplicate all the data, curveLists, etc.
-        PaneBase tempPane = this.ShallowClone();
+        PaneBase tempPane = ShallowClone();
 
         // Clone the Chart object for GraphPanes so we don't mess up the minPix and maxPix values or
         // the rect/ChartRect calculations of the original
@@ -948,9 +948,9 @@ public abstract class PaneBase
         Bitmap bm = new Bitmap (1, 1);
         using (Graphics bmg = Graphics.FromImage (bm))
         {
-            this.ReSize (bmg, this.Rect);
+            ReSize (bmg, Rect);
             SetAntiAliasMode (bmg, antiAlias);
-            this.Draw (bmg);
+            Draw (bmg);
         }
     }
 
@@ -982,7 +982,7 @@ public abstract class PaneBase
             using (Graphics metafileGraphics = Graphics.FromImage (metafile))
             {
                 //metafileGraphics.TranslateTransform( -_rect.Left, -_rect.Top );
-                metafileGraphics.PageUnit = System.Drawing.GraphicsUnit.Pixel;
+                metafileGraphics.PageUnit = GraphicsUnit.Pixel;
                 PointF P = new PointF (width, height);
                 PointF[] PA = new PointF[] { P };
                 metafileGraphics.TransformPoints (CoordinateSpace.Page, CoordinateSpace.Device, PA);
@@ -1036,7 +1036,7 @@ public abstract class PaneBase
             using (Graphics metafileGraphics = Graphics.FromImage (metafile))
             {
                 metafileGraphics.TranslateTransform (-_rect.Left, -_rect.Top);
-                metafileGraphics.PageUnit = System.Drawing.GraphicsUnit.Pixel;
+                metafileGraphics.PageUnit = GraphicsUnit.Pixel;
                 PointF P = new PointF (_rect.Width, _rect.Height);
                 PointF[] PA = new PointF[] { P };
                 metafileGraphics.TransformPoints (CoordinateSpace.Page, CoordinateSpace.Device, PA);
@@ -1044,7 +1044,7 @@ public abstract class PaneBase
                 //metafileGraphics.PageScale = 1f;
 
                 // output
-                this.Draw (metafileGraphics);
+                Draw (metafileGraphics);
 
                 g.ReleaseHdc (hdc);
                 return metafile;
@@ -1215,11 +1215,11 @@ public abstract class PaneBase
         else if (coord == CoordType.XChartFractionYPaneFraction)
         {
             ptPix.X = (float)(chartRect.Left + x * chartRect.Width);
-            ptPix.Y = (float)(this.Rect.Top + y * _rect.Height);
+            ptPix.Y = (float)(Rect.Top + y * _rect.Height);
         }
         else if (coord == CoordType.XPaneFractionYChartFraction)
         {
-            ptPix.X = (float)(this.Rect.Left + x * _rect.Width);
+            ptPix.X = (float)(Rect.Left + x * _rect.Width);
             ptPix.Y = (float)(chartRect.Top + y * chartRect.Height);
         }
         else // PaneFraction

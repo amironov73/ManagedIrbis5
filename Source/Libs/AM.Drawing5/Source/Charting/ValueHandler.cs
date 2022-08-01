@@ -97,9 +97,9 @@ public class ValueHandler
     public static bool GetValues (GraphPane pane, CurveItem curve, int iPt,
         out double baseVal, out double lowVal, out double hiVal)
     {
-        hiVal = PointPair.Missing;
-        lowVal = PointPair.Missing;
-        baseVal = PointPair.Missing;
+        hiVal = PointPairBase.Missing;
+        lowVal = PointPairBase.Missing;
+        baseVal = PointPairBase.Missing;
 
         if (curve == null || curve.Points.Count <= iPt || !curve.IsVisible)
             return false;
@@ -127,7 +127,7 @@ public class ValueHandler
                 // Sum the value for the current curve only if it is a bar
                 if (tmpCurve.IsBar && tmpCurve.IsVisible)
                 {
-                    curVal = PointPair.Missing;
+                    curVal = PointPairBase.Missing;
 
                     // For non-ordinal curves, find a matching base value (must match exactly)
                     if (curve.IsOverrideOrdinal || !baseAxis._scale.IsAnyOrdinal)
@@ -160,10 +160,10 @@ public class ValueHandler
                     }
 
                     // If it's a missing value, skip it
-                    if (curVal == PointPair.Missing)
+                    if (curVal == PointPairBase.Missing)
                     {
-                        positiveStack = PointPair.Missing;
-                        negativeStack = PointPair.Missing;
+                        positiveStack = PointPairBase.Missing;
+                        negativeStack = PointPairBase.Missing;
                     }
 
                     // the current curve is the target curve, save the summed values for later
@@ -173,8 +173,8 @@ public class ValueHandler
                         if (curVal >= 0)
                         {
                             lowVal = positiveStack;
-                            hiVal = (curVal == PointPair.Missing || positiveStack == PointPair.Missing)
-                                ? PointPair.Missing
+                            hiVal = (curVal == PointPairBase.Missing || positiveStack == PointPairBase.Missing)
+                                ? PointPairBase.Missing
                                 : positiveStack + curVal;
                         }
 
@@ -182,8 +182,8 @@ public class ValueHandler
                         else
                         {
                             hiVal = negativeStack;
-                            lowVal = (curVal == PointPair.Missing || negativeStack == PointPair.Missing)
-                                ? PointPair.Missing
+                            lowVal = (curVal == PointPairBase.Missing || negativeStack == PointPairBase.Missing)
+                                ? PointPairBase.Missing
                                 : negativeStack + curVal;
                         }
                     }
@@ -191,12 +191,12 @@ public class ValueHandler
                     // Add all positive values to the positive stack, and negative values to the
                     // negative stack
                     if (curVal >= 0)
-                        positiveStack = (curVal == PointPair.Missing || positiveStack == PointPair.Missing)
-                            ? PointPair.Missing
+                        positiveStack = (curVal == PointPairBase.Missing || positiveStack == PointPairBase.Missing)
+                            ? PointPairBase.Missing
                             : positiveStack + curVal;
                     else
-                        negativeStack = (curVal == PointPair.Missing || negativeStack == PointPair.Missing)
-                            ? PointPair.Missing
+                        negativeStack = (curVal == PointPairBase.Missing || negativeStack == PointPairBase.Missing)
+                            ? PointPairBase.Missing
                             : negativeStack + curVal;
                 }
             }
@@ -204,7 +204,7 @@ public class ValueHandler
             // if the curve is a PercentStack type, then calculate the percent for this bar
             // based on the total height of the stack
             if (pane._barSettings.Type == BarType.PercentStack &&
-                hiVal != PointPair.Missing && lowVal != PointPair.Missing)
+                hiVal != PointPairBase.Missing && lowVal != PointPairBase.Missing)
             {
                 // Use the total magnitude of the positive plus negative bar stacks to determine
                 // the percentage value
@@ -224,8 +224,8 @@ public class ValueHandler
                 }
             }
 
-            if (baseVal == PointPair.Missing || lowVal == PointPair.Missing ||
-                hiVal == PointPair.Missing)
+            if (baseVal == PointPairBase.Missing || lowVal == PointPairBase.Missing ||
+                hiVal == PointPairBase.Missing)
                 return false;
             else
                 return true;
@@ -244,7 +244,7 @@ public class ValueHandler
                 // make sure the curve is a Line type
                 if (tmpCurve is LineItem && tmpCurve.IsVisible)
                 {
-                    curVal = PointPair.Missing;
+                    curVal = PointPairBase.Missing;
 
                     // For non-ordinal curves, find a matching base value (must match exactly)
                     if (curve.IsOverrideOrdinal || !baseAxis._scale.IsAnyOrdinal)
@@ -269,8 +269,8 @@ public class ValueHandler
                     }
 
                     // if the current value is missing, then the rest of the stack is missing
-                    if (curVal == PointPair.Missing)
-                        stack = PointPair.Missing;
+                    if (curVal == PointPairBase.Missing)
+                        stack = PointPairBase.Missing;
 
                     // if the current curve is the target curve, save the values
                     if (tmpCurve == curve)
@@ -284,21 +284,21 @@ public class ValueHandler
 //								hiVal = curVal;
 //							}
 //							else
-                        hiVal = (curVal == PointPair.Missing || stack == PointPair.Missing)
-                            ? PointPair.Missing
+                        hiVal = (curVal == PointPairBase.Missing || stack == PointPairBase.Missing)
+                            ? PointPairBase.Missing
                             : stack + curVal;
                     }
 
                     // sum all the curves to a single total.  This includes both positive and
                     // negative values (unlike the bar stack type).
-                    stack = (curVal == PointPair.Missing || stack == PointPair.Missing)
-                        ? PointPair.Missing
+                    stack = (curVal == PointPairBase.Missing || stack == PointPairBase.Missing)
+                        ? PointPairBase.Missing
                         : stack + curVal;
                 }
             }
 
-            if (baseVal == PointPair.Missing || lowVal == PointPair.Missing ||
-                hiVal == PointPair.Missing)
+            if (baseVal == PointPairBase.Missing || lowVal == PointPairBase.Missing ||
+                hiVal == PointPairBase.Missing)
                 return false;
             else
                 return true;
@@ -323,8 +323,8 @@ public class ValueHandler
         if (curve is BarItem && valueAxis._scale.IsLog && lowVal == 0)
             lowVal = valueAxis._scale._min;
 
-        if (baseVal == PointPair.Missing || hiVal == PointPair.Missing ||
-            (lowVal == PointPair.Missing && (curve is ErrorBarItem ||
+        if (baseVal == PointPairBase.Missing || hiVal == PointPairBase.Missing ||
+            (lowVal == PointPairBase.Missing && (curve is ErrorBarItem ||
                                              curve is HiLowBarItem)))
             return false;
         else

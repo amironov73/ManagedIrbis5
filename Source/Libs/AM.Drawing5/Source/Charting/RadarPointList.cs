@@ -61,7 +61,7 @@ public class RadarPointList
     {
         get
         {
-            int count = this.Count;
+            int count = Count;
 
             // The last point is a repeat of the first point
             if (index == count - 1)
@@ -82,7 +82,7 @@ public class RadarPointList
         }
         set
         {
-            int count = this.Count;
+            int count = Count;
 
             // The last point is a repeat of the first point
             if (index == count - 1)
@@ -149,7 +149,7 @@ public class RadarPointList
     public RadarPointList (RadarPointList rhs)
     {
         for (int i = 0; i < rhs.Count; i++)
-            this.Add (rhs.GetAt (i));
+            Add (rhs.GetAt (i));
     }
 
     /// <summary>
@@ -159,7 +159,7 @@ public class RadarPointList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -206,7 +206,7 @@ public class RadarPointList
     /// <returns>The zero-based ordinal index where the point was added in the list.</returns>
     public void Add (double r, double z)
     {
-        Add (new PointPair (PointPair.Missing, r, z));
+        Add (new PointPair (PointPairBase.Missing, r, z));
     }
 
     #endregion

@@ -48,7 +48,7 @@ public class PdfByteQRCode
     public PdfByteQRCode(QRCodeData data) : base(data) { }
 
     /// <summary>
-    /// Creates a PDF document with a black & white QR code
+    /// Creates a PDF document with a black &amp; white QR code
     /// </summary>
     /// <param name="pixelsPerModule"></param>
     /// <returns></returns>

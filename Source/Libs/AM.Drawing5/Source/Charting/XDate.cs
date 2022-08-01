@@ -1467,7 +1467,7 @@ public struct XDate
         if (!(target is XDate))
             throw new ArgumentException();
 
-        return (this.XLDate).CompareTo (((XDate)target).XLDate);
+        return (XLDate).CompareTo (((XDate)target).XLDate);
     }
 
     #endregion
@@ -1547,7 +1547,7 @@ public struct XDate
     /// <returns>A string representation of the date</returns>
     public string ToString (string fmtStr)
     {
-        return ToString (this.XLDate, fmtStr);
+        return ToString (XLDate, fmtStr);
     }
 
     /// <summary>

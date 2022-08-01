@@ -282,7 +282,7 @@ public class Line
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -377,7 +377,7 @@ public class Line
     public void Draw (Graphics g, GraphPane pane, CurveItem curve, float scaleFactor)
     {
         // If the line is being shown, draw it
-        if (this.IsVisible)
+        if (IsVisible)
         {
             //How to handle fill vs nofill?
             //if ( isSelected )
@@ -389,7 +389,7 @@ public class Line
 
             if (curve is StickItem)
                 DrawSticks (g, pane, curve, scaleFactor);
-            else if (this.IsSmooth || this.Fill.IsVisible)
+            else if (IsSmooth || Fill.IsVisible)
                 DrawSmoothFilledCurve (g, pane, curve, scaleFactor);
             else
                 DrawCurve (g, pane, curve, scaleFactor);
@@ -427,7 +427,7 @@ public class Line
     public void DrawSegment (Graphics g, GraphPane pane, float x1, float y1,
         float x2, float y2, float scaleFactor)
     {
-        if (_isVisible && !this.Color.IsEmpty)
+        if (_isVisible && !Color.IsEmpty)
         {
             using (Pen pen = GetPen (pane, scaleFactor))
             {
@@ -472,12 +472,12 @@ public class Line
             {
                 PointPair pt = curve.Points[i];
 
-                if (pt.X != PointPair.Missing &&
-                    pt.Y != PointPair.Missing &&
-                    !System.Double.IsNaN (pt.X) &&
-                    !System.Double.IsNaN (pt.Y) &&
-                    !System.Double.IsInfinity (pt.X) &&
-                    !System.Double.IsInfinity (pt.Y) &&
+                if (pt.X != PointPairBase.Missing &&
+                    pt.Y != PointPairBase.Missing &&
+                    !double.IsNaN (pt.X) &&
+                    !double.IsNaN (pt.Y) &&
+                    !double.IsInfinity (pt.X) &&
+                    !double.IsInfinity (pt.Y) &&
                     (!xAxis._scale.IsLog || pt.X > 0.0) &&
                     (!yAxis._scale.IsLog || pt.Y > 0.0))
                 {
@@ -491,7 +491,7 @@ public class Line
                         if (pixY < pane.Chart._rect.Top)
                             pixY = pane.Chart._rect.Top;
 
-                        if (!curve.IsSelected && this._gradientFill.IsGradientValueType)
+                        if (!curve.IsSelected && _gradientFill.IsGradientValueType)
                         {
                             using (Pen tPen = GetPen (pane, scaleFactor, pt))
                                 g.DrawLine (tPen, pixX, pixY, pixX, basePix);
@@ -540,14 +540,14 @@ public class Line
         int count;
         IPointList points = curve.Points;
 
-        if (this.IsVisible && !this.Color.IsEmpty && points != null &&
+        if (IsVisible && !Color.IsEmpty && points != null &&
             BuildPointsArray (pane, curve, out arrPoints, out count) &&
             count > 2)
         {
             float tension = _isSmooth ? _smoothTension : 0f;
 
             // Fill the curve if needed
-            if (this.Fill.IsVisible)
+            if (Fill.IsVisible)
             {
                 Axis yAxis = curve.GetYAxis (pane);
 
@@ -562,7 +562,7 @@ public class Line
                     using (Brush brush = source._fill.MakeBrush (rect))
                     {
                         if (pane.LineType == LineType.Stack && yAxis.Scale._min < 0 &&
-                            this.IsFirstLine (pane, curve))
+                            IsFirstLine (pane, curve))
                         {
                             float zeroPix = yAxis.Scale.Transform (0);
                             RectangleF tRect = pane.Chart._rect;
@@ -679,7 +679,7 @@ public class Line
 
         using (Pen pen = source.GetPen (pane, scaleFactor))
         {
-            if (points != null && !_color.IsEmpty && this.IsVisible)
+            if (points != null && !_color.IsEmpty && IsVisible)
             {
                 //bool lastOut = false;
                 bool isOut;
@@ -700,8 +700,8 @@ public class Line
                     {
                         if (!valueHandler.GetValues (curve, i, out curX, out lowVal, out curY))
                         {
-                            curX = PointPair.Missing;
-                            curY = PointPair.Missing;
+                            curX = PointPairBase.Missing;
+                            curY = PointPairBase.Missing;
                         }
                     }
                     else
@@ -714,12 +714,12 @@ public class Line
                     // This is used for calculated values that are out of range, divide
                     //   by zero, etc.
                     // Also, any value <= zero on a log scale is invalid
-                    if (curX == PointPair.Missing ||
-                        curY == PointPair.Missing ||
-                        System.Double.IsNaN (curX) ||
-                        System.Double.IsNaN (curY) ||
-                        System.Double.IsInfinity (curX) ||
-                        System.Double.IsInfinity (curY) ||
+                    if (curX == PointPairBase.Missing ||
+                        curY == PointPairBase.Missing ||
+                        double.IsNaN (curX) ||
+                        double.IsNaN (curY) ||
+                        double.IsInfinity (curX) ||
+                        double.IsInfinity (curY) ||
                         (xIsLog && curX <= 0.0) ||
                         (yIsLog && curY <= 0.0))
                     {
@@ -762,25 +762,25 @@ public class Line
                                         lastX, lastY, tmpX, tmpY);
                                 else if (!isOut)
                                 {
-                                    if (!curve.IsSelected && this._gradientFill.IsGradientValueType)
+                                    if (!curve.IsSelected && _gradientFill.IsGradientValueType)
                                     {
                                         using (Pen tPen = GetPen (pane, scaleFactor, lastPt))
                                         {
-                                            if (this.StepType == StepType.NonStep)
+                                            if (StepType == StepType.NonStep)
                                             {
                                                 g.DrawLine (tPen, lastX, lastY, tmpX, tmpY);
                                             }
-                                            else if (this.StepType == StepType.ForwardStep)
+                                            else if (StepType == StepType.ForwardStep)
                                             {
                                                 g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
                                                 g.DrawLine (tPen, tmpX, lastY, tmpX, tmpY);
                                             }
-                                            else if (this.StepType == StepType.RearwardStep)
+                                            else if (StepType == StepType.RearwardStep)
                                             {
                                                 g.DrawLine (tPen, lastX, lastY, lastX, tmpY);
                                                 g.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
                                             }
-                                            else if (this.StepType == StepType.ForwardSegment)
+                                            else if (StepType == StepType.ForwardSegment)
                                             {
                                                 g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
                                             }
@@ -792,25 +792,25 @@ public class Line
                                     }
                                     else
                                     {
-                                        if (this.StepType == StepType.NonStep)
+                                        if (StepType == StepType.NonStep)
                                         {
                                             g.DrawLine (pen, lastX, lastY, tmpX, tmpY);
                                         }
-                                        else if (this.StepType == StepType.ForwardStep)
+                                        else if (StepType == StepType.ForwardStep)
                                         {
                                             g.DrawLine (pen, lastX, lastY, tmpX, lastY);
                                             g.DrawLine (pen, tmpX, lastY, tmpX, tmpY);
                                         }
-                                        else if (this.StepType == StepType.RearwardStep)
+                                        else if (StepType == StepType.RearwardStep)
                                         {
                                             g.DrawLine (pen, lastX, lastY, lastX, tmpY);
                                             g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                                         }
-                                        else if (this.StepType == StepType.ForwardSegment)
+                                        else if (StepType == StepType.ForwardSegment)
                                         {
                                             g.DrawLine (pen, lastX, lastY, tmpX, lastY);
                                         }
-                                        else if (this.StepType == StepType.RearwardSegment)
+                                        else if (StepType == StepType.RearwardSegment)
                                         {
                                             g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                                         }
@@ -891,7 +891,7 @@ public class Line
 
         using (Pen pen = source.GetPen (pane, scaleFactor))
         {
-            if (points != null && !_color.IsEmpty && this.IsVisible)
+            if (points != null && !_color.IsEmpty && IsVisible)
             {
                 //bool lastOut = false;
                 bool isOut;
@@ -904,8 +904,8 @@ public class Line
                     {
                         if (!valueHandler.GetValues (curve, i, out curX, out lowVal, out curY))
                         {
-                            curX = PointPair.Missing;
-                            curY = PointPair.Missing;
+                            curX = PointPairBase.Missing;
+                            curY = PointPairBase.Missing;
                         }
                     }
                     else
@@ -918,12 +918,12 @@ public class Line
                     // This is used for calculated values that are out of range, divide
                     //   by zero, etc.
                     // Also, any value <= zero on a log scale is invalid
-                    if (curX == PointPair.Missing ||
-                        curY == PointPair.Missing ||
-                        System.Double.IsNaN (curX) ||
-                        System.Double.IsNaN (curY) ||
-                        System.Double.IsInfinity (curX) ||
-                        System.Double.IsInfinity (curY) ||
+                    if (curX == PointPairBase.Missing ||
+                        curY == PointPairBase.Missing ||
+                        double.IsNaN (curX) ||
+                        double.IsNaN (curY) ||
+                        double.IsInfinity (curX) ||
+                        double.IsInfinity (curY) ||
                         (xIsLog && curX <= 0.0) ||
                         (yIsLog && curY <= 0.0))
                     {
@@ -955,25 +955,25 @@ public class Line
                                         lastX, lastY, tmpX, tmpY);
                                 else if (!isOut)
                                 {
-                                    if (!curve.IsSelected && this._gradientFill.IsGradientValueType)
+                                    if (!curve.IsSelected && _gradientFill.IsGradientValueType)
                                     {
                                         using (Pen tPen = GetPen (pane, scaleFactor, lastPt))
                                         {
-                                            if (this.StepType == StepType.NonStep)
+                                            if (StepType == StepType.NonStep)
                                             {
                                                 g.DrawLine (tPen, lastX, lastY, tmpX, tmpY);
                                             }
-                                            else if (this.StepType == StepType.ForwardStep)
+                                            else if (StepType == StepType.ForwardStep)
                                             {
                                                 g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
                                                 g.DrawLine (tPen, tmpX, lastY, tmpX, tmpY);
                                             }
-                                            else if (this.StepType == StepType.RearwardStep)
+                                            else if (StepType == StepType.RearwardStep)
                                             {
                                                 g.DrawLine (tPen, lastX, lastY, lastX, tmpY);
                                                 g.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
                                             }
-                                            else if (this.StepType == StepType.ForwardSegment)
+                                            else if (StepType == StepType.ForwardSegment)
                                             {
                                                 g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
                                             }
@@ -985,25 +985,25 @@ public class Line
                                     }
                                     else
                                     {
-                                        if (this.StepType == StepType.NonStep)
+                                        if (StepType == StepType.NonStep)
                                         {
                                             g.DrawLine (pen, lastX, lastY, tmpX, tmpY);
                                         }
-                                        else if (this.StepType == StepType.ForwardStep)
+                                        else if (StepType == StepType.ForwardStep)
                                         {
                                             g.DrawLine (pen, lastX, lastY, tmpX, lastY);
                                             g.DrawLine (pen, tmpX, lastY, tmpX, tmpY);
                                         }
-                                        else if (this.StepType == StepType.RearwardStep)
+                                        else if (StepType == StepType.RearwardStep)
                                         {
                                             g.DrawLine (pen, lastX, lastY, lastX, tmpY);
                                             g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                                         }
-                                        else if (this.StepType == StepType.ForwardSegment)
+                                        else if (StepType == StepType.ForwardSegment)
                                         {
                                             g.DrawLine (pen, lastX, lastY, tmpX, lastY);
                                         }
-                                        else if (this.StepType == StepType.RearwardSegment)
+                                        else if (StepType == StepType.RearwardSegment)
                                         {
                                             g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                                         }
@@ -1104,25 +1104,25 @@ public class Line
             else 		// non-step
                 g.DrawLine( pen, lastX, lastY, tmpX, tmpY );
             */
-            if (!curve.IsSelected && this._gradientFill.IsGradientValueType)
+            if (!curve.IsSelected && _gradientFill.IsGradientValueType)
             {
                 using (Pen tPen = GetPen (pane, scaleFactor, lastPt))
                 {
-                    if (this.StepType == StepType.NonStep)
+                    if (StepType == StepType.NonStep)
                     {
                         g.DrawLine (tPen, lastX, lastY, tmpX, tmpY);
                     }
-                    else if (this.StepType == StepType.ForwardStep)
+                    else if (StepType == StepType.ForwardStep)
                     {
                         g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
                         g.DrawLine (tPen, tmpX, lastY, tmpX, tmpY);
                     }
-                    else if (this.StepType == StepType.RearwardStep)
+                    else if (StepType == StepType.RearwardStep)
                     {
                         g.DrawLine (tPen, lastX, lastY, lastX, tmpY);
                         g.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
                     }
-                    else if (this.StepType == StepType.ForwardSegment)
+                    else if (StepType == StepType.ForwardSegment)
                     {
                         g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
                     }
@@ -1134,25 +1134,25 @@ public class Line
             }
             else
             {
-                if (this.StepType == StepType.NonStep)
+                if (StepType == StepType.NonStep)
                 {
                     g.DrawLine (pen, lastX, lastY, tmpX, tmpY);
                 }
-                else if (this.StepType == StepType.ForwardStep)
+                else if (StepType == StepType.ForwardStep)
                 {
                     g.DrawLine (pen, lastX, lastY, tmpX, lastY);
                     g.DrawLine (pen, tmpX, lastY, tmpX, tmpY);
                 }
-                else if (this.StepType == StepType.RearwardStep)
+                else if (StepType == StepType.RearwardStep)
                 {
                     g.DrawLine (pen, lastX, lastY, lastX, tmpY);
                     g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                 }
-                else if (this.StepType == StepType.ForwardSegment)
+                else if (StepType == StepType.ForwardSegment)
                 {
                     g.DrawLine (pen, lastX, lastY, tmpX, lastY);
                 }
-                else if (this.StepType == StepType.RearwardSegment)
+                else if (StepType == StepType.RearwardSegment)
                 {
                     g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                 }
@@ -1185,7 +1185,7 @@ public class Line
         count = 0;
         IPointList points = curve.Points;
 
-        if (this.IsVisible && !this.Color.IsEmpty && points != null)
+        if (IsVisible && !Color.IsEmpty && points != null)
         {
             int index = 0;
             float curX,
@@ -1222,7 +1222,7 @@ public class Line
                         y = points[i].Y;
                     }
 
-                    if (x == PointPair.Missing || y == PointPair.Missing)
+                    if (x == PointPairBase.Missing || y == PointPairBase.Missing)
                         continue;
 
                     // Transform the user scale values to pixel locations
@@ -1237,13 +1237,13 @@ public class Line
                     // Add the pixel value pair into the points array
                     // Two points are added for step type curves
                     // ignore step-type setting for smooth curves
-                    if (_isSmooth || index == 0 || this.StepType == StepType.NonStep)
+                    if (_isSmooth || index == 0 || StepType == StepType.NonStep)
                     {
                         arrPoints[index].X = curX;
                         arrPoints[index].Y = curY;
                     }
-                    else if (this.StepType == StepType.ForwardStep ||
-                             this.StepType == StepType.ForwardSegment)
+                    else if (StepType == StepType.ForwardStep ||
+                             StepType == StepType.ForwardSegment)
                     {
                         arrPoints[index].X = curX;
                         arrPoints[index].Y = lastY;
@@ -1251,8 +1251,8 @@ public class Line
                         arrPoints[index].X = curX;
                         arrPoints[index].Y = curY;
                     }
-                    else if (this.StepType == StepType.RearwardStep ||
-                             this.StepType == StepType.RearwardSegment)
+                    else if (StepType == StepType.RearwardStep ||
+                             StepType == StepType.RearwardSegment)
                     {
                         arrPoints[index].X = lastX;
                         arrPoints[index].Y = curY;
@@ -1307,7 +1307,7 @@ public class Line
         count = 0;
         IPointList points = curve.Points;
 
-        if (this.IsVisible && !this.Color.IsEmpty && points != null)
+        if (IsVisible && !Color.IsEmpty && points != null)
         {
             int index = 0;
             float curX,
@@ -1334,7 +1334,7 @@ public class Line
                     // Get the user scale values for the current point
                     valueHandler.GetValues (curve, i, out x, out y, out hiVal);
 
-                    if (x == PointPair.Missing || y == PointPair.Missing)
+                    if (x == PointPairBase.Missing || y == PointPairBase.Missing)
                         continue;
 
                     // Transform the user scale values to pixel locations
@@ -1346,12 +1346,12 @@ public class Line
                     // Add the pixel value pair into the points array
                     // Two points are added for step type curves
                     // ignore step-type setting for smooth curves
-                    if (_isSmooth || index == 0 || this.StepType == StepType.NonStep)
+                    if (_isSmooth || index == 0 || StepType == StepType.NonStep)
                     {
                         arrPoints[index].X = curX;
                         arrPoints[index].Y = curY;
                     }
-                    else if (this.StepType == StepType.ForwardStep)
+                    else if (StepType == StepType.ForwardStep)
                     {
                         arrPoints[index].X = curX;
                         arrPoints[index].Y = lastY;
@@ -1359,7 +1359,7 @@ public class Line
                         arrPoints[index].X = curX;
                         arrPoints[index].Y = curY;
                     }
-                    else if (this.StepType == StepType.RearwardStep)
+                    else if (StepType == StepType.RearwardStep)
                     {
                         arrPoints[index].X = lastX;
                         arrPoints[index].Y = curY;

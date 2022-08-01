@@ -183,7 +183,7 @@ class LinearAsOrdinalScale
     override internal string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
-            _format = Scale.Default.Format;
+            _format = Default.Format;
 
         double val;
 

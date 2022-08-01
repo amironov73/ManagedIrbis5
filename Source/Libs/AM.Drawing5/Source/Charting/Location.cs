@@ -275,7 +275,7 @@ public class Location
     /// <value>A <see cref="PointF"/> in <see cref="CoordinateFrame"/> units.</value>
     public PointF BottomRight
     {
-        get { return new PointF ((float)this.X2, (float)this.Y2); }
+        get { return new PointF ((float)X2, (float)Y2); }
 
         //set { this.X2 = value.X; this.Y2 = value.Y; }
     }
@@ -390,7 +390,7 @@ public class Location
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -560,7 +560,7 @@ public class Location
     /// <value>A <see cref="PointF"/> in pixel units.</value>
     public PointF TransformBottomRight (PaneBase pane)
     {
-        return Transform (pane, this.X2, this.Y2, _coordinateFrame);
+        return Transform (pane, X2, Y2, _coordinateFrame);
     }
 
     /// <summary>

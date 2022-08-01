@@ -109,7 +109,7 @@ public class TextScale
     /// </returns>
     override internal double CalcBaseTic()
     {
-        if (_baseTic != PointPair.Missing)
+        if (_baseTic != PointPairBase.Missing)
             return _baseTic;
         else
             return 1.0;
@@ -221,7 +221,7 @@ public class TextScale
             else if (_textLabels != null)
             {
                 // Calculate the maximum number of labels
-                double maxLabels = (double)this.CalcMaxLabels (g, pane, scaleFactor);
+                double maxLabels = (double)CalcMaxLabels (g, pane, scaleFactor);
 
                 // Calculate a step size based on the width of the labels
                 double tmpStep = Math.Ceiling ((_max - _min) / maxLabels);
@@ -271,7 +271,7 @@ public class TextScale
     override internal string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
-            _format = Scale.Default.Format;
+            _format = Default.Format;
 
         index *= (int)_majorStep;
         if (_textLabels == null || index < 0 || index >= _textLabels.Length)

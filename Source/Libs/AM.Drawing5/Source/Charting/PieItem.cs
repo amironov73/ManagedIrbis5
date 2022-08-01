@@ -330,9 +330,9 @@ public class PieItem
         {
             _labelType = value;
             if (value == PieLabelType.None)
-                this.LabelDetail.IsVisible = false;
+                LabelDetail.IsVisible = false;
             else
-                this.LabelDetail.IsVisible = true;
+                LabelDetail.IsVisible = true;
         }
     }
 
@@ -456,7 +456,7 @@ public class PieItem
     {
         _pieValue = rhs._pieValue;
         _fill = rhs._fill.Clone();
-        this.Border = rhs._border.Clone();
+        Border = rhs._border.Clone();
         _displacement = rhs._displacement;
         _labelDetail = rhs._labelDetail.Clone();
         _labelType = rhs._labelType;
@@ -471,7 +471,7 @@ public class PieItem
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -607,7 +607,7 @@ public class PieItem
 
                 Fill tFill = _fill;
                 Border tBorder = _border;
-                if (this.IsSelected)
+                if (IsSelected)
                 {
                     tFill = Selection.Fill;
                     tBorder = Selection.Border;
@@ -615,19 +615,19 @@ public class PieItem
 
                 using (Brush brush = tFill.MakeBrush (_boundingRectangle))
                 {
-                    g.FillPie (brush, tRect.X, tRect.Y, tRect.Width, tRect.Height, this.StartAngle,
-                        this.SweepAngle);
+                    g.FillPie (brush, tRect.X, tRect.Y, tRect.Width, tRect.Height, StartAngle,
+                        SweepAngle);
 
                     //add GraphicsPath for hit testing
                     _slicePath.AddPie (tRect.X, tRect.Y, tRect.Width, tRect.Height,
-                        this.StartAngle, this.SweepAngle);
+                        StartAngle, SweepAngle);
 
-                    if (this.Border.IsVisible)
+                    if (Border.IsVisible)
                     {
                         using (Pen borderPen = tBorder.GetPen (pane, scaleFactor))
                         {
                             g.DrawPie (borderPen, tRect.X, tRect.Y, tRect.Width, tRect.Height,
-                                this.StartAngle, this.SweepAngle);
+                                StartAngle, SweepAngle);
                         }
                     }
 
@@ -713,7 +713,7 @@ public class PieItem
             //modify the rect to determine if any of the labels need to be wrapped....
             //first see if there's any exploded slices and if so, what's the max displacement...
             //also, might as well get all the display params we can
-            PieItem.CalculatePieChartParams (pane, ref maxDisplacement);
+            CalculatePieChartParams (pane, ref maxDisplacement);
 
             if (maxDisplacement != 0) //need new rectangle if any slice exploded
                 CalcNewBaseRect (maxDisplacement, ref nonExplRect);
@@ -746,8 +746,8 @@ public class PieItem
     {
         //pie exploded out along the slice bisector - modify upper left of bounding rect to account for displacement
         //keep height and width same
-        explRect.X += (float)(this.Displacement * explRect.Width / 2 * Math.Cos (_midAngle * Math.PI / 180));
-        explRect.Y += (float)(this.Displacement * explRect.Height / 2 * Math.Sin (_midAngle * Math.PI / 180));
+        explRect.X += (float)(Displacement * explRect.Width / 2 * Math.Cos (_midAngle * Math.PI / 180));
+        explRect.Y += (float)(Displacement * explRect.Height / 2 * Math.Sin (_midAngle * Math.PI / 180));
     }
 
     /// <summary>
@@ -782,7 +782,7 @@ public class PieItem
             curve.SweepAngle = (float)(360 * curve.Value / pieTotalValue);
             curve.MidAngle = curve.StartAngle + curve.SweepAngle / 2;
             nextStartAngle = curve._startAngle + curve._sweepAngle;
-            PieItem.BuildLabelString (curve);
+            BuildLabelString (curve);
         }
     }
 
@@ -809,7 +809,7 @@ public class PieItem
         if (!_labelDetail.IsVisible)
             return;
 
-        using (Pen labelPen = this.Border.GetPen (pane, scaleFactor))
+        using (Pen labelPen = Border.GetPen (pane, scaleFactor))
         {
             //draw line from intersection point to pivot point -
             g.DrawLine (labelPen, _intersectionPoint, _pivotPoint);
@@ -1090,7 +1090,7 @@ public class PieItem
         // x,y location)
         matrix.Translate (pt.X, pt.Y);
 
-        matrix.Rotate (this.StartAngle);
+        matrix.Rotate (StartAngle);
 
         //One mark every 5'ish degrees
         int count = (int)Math.Floor (SweepAngle / 5) + 1;
@@ -1108,10 +1108,10 @@ public class PieItem
 
         matrix.TransformPoints (pts);
 
-        coords = String.Format ("{0:f0},{1:f0},{2:f0},{3:f0},",
+        coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0},",
             pts[0].X, pts[0].Y, pts[1].X, pts[1].Y);
         for (int j = 2; j < count + 2; j++)
-            coords += String.Format (j > count ? "{0:f0},{1:f0}" : "{0:f0},{1:f0},", pts[j].X, pts[j].Y);
+            coords += string.Format (j > count ? "{0:f0},{1:f0}" : "{0:f0},{1:f0},", pts[j].X, pts[j].Y);
 
         return true;
     }

@@ -155,7 +155,7 @@ class OrdinalScale
             if (scale._majorStepAuto)
             {
                 // Calculate the step size based on targetSteps
-                scale._majorStep = Scale.CalcStepSize (scale._max - scale._min,
+                scale._majorStep = CalcStepSize (scale._max - scale._min,
                     (scale._ownerAxis is XAxis || scale._ownerAxis is X2Axis)
                         ? Default.TargetXSteps
                         : Default.TargetYSteps);
@@ -180,7 +180,7 @@ class OrdinalScale
 
             // Calculate the new minor step size
             if (scale._minorStepAuto)
-                scale._minorStep = Scale.CalcStepSize (scale._majorStep,
+                scale._minorStep = CalcStepSize (scale._majorStep,
                     (scale._ownerAxis is XAxis || scale._ownerAxis is X2Axis)
                         ? Default.TargetMinorXSteps
                         : Default.TargetMinorYSteps);

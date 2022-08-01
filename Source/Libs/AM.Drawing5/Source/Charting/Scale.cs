@@ -689,7 +689,7 @@ abstract public class Scale
         _minorStep = 0.1;
         _exponent = 1.0;
         _mag = 0;
-        _baseTic = PointPair.Missing;
+        _baseTic = PointPairBase.Missing;
 
         _minGrace = Default.MinGrace;
         _maxGrace = Default.MaxGrace;
@@ -1047,7 +1047,7 @@ abstract public class Scale
     {
         get
         {
-            AxisType type = this.Type;
+            AxisType type = Type;
 
             return type == AxisType.Ordinal ||
                    type == AxisType.Text ||
@@ -1870,7 +1870,7 @@ abstract public class Scale
     virtual internal string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
-            _format = Scale.Default.Format;
+            _format = Default.Format;
 
         // linear or ordinal is the default behavior
         // this method is overridden for other Scale types
@@ -1934,7 +1934,7 @@ abstract public class Scale
                 string tmpStr = _ownerAxis.MakeLabelEventWorks (pane, i, dVal);
 
                 SizeF sizeF;
-                if (this.IsLog && _isUseTenPower)
+                if (IsLog && _isUseTenPower)
                     sizeF = _fontSpec.BoundingBoxTenPower (g, tmpStr,
                         scaleFactor);
                 else
@@ -2031,7 +2031,7 @@ abstract public class Scale
     /// </returns>
     virtual internal double CalcBaseTic()
     {
-        if (_baseTic != PointPair.Missing)
+        if (_baseTic != PointPairBase.Missing)
             return _baseTic;
         else if (IsAnyOrdinal)
         {
@@ -2279,7 +2279,7 @@ abstract public class Scale
         string tmpStr = _ownerAxis.MakeLabelEventWorks (pane, i, dVal);
 
         float height;
-        if (this.IsLog && _isUseTenPower)
+        if (IsLog && _isUseTenPower)
             height = _fontSpec.BoundingBoxTenPower (g, tmpStr, scaleFactor).Height;
         else
             height = _fontSpec.BoundingBox (g, tmpStr, scaleFactor).Height;
@@ -2304,7 +2304,7 @@ abstract public class Scale
         else
             av = _alignH == AlignH.Left ? AlignV.Top : (_alignH == AlignH.Right ? AlignV.Bottom : AlignV.Center);
 
-        if (this.IsLog && _isUseTenPower)
+        if (IsLog && _isUseTenPower)
             _fontSpec.DrawTenPower (g, pane, tmpStr,
                 pixVal, textCenter,
                 ah, av,
@@ -2493,16 +2493,16 @@ abstract public class Scale
         double maxVal = _rangeMax;
 
         // Make sure that minVal and maxVal are legitimate values
-        if (Double.IsInfinity (minVal) || Double.IsNaN (minVal) || minVal == Double.MaxValue)
+        if (double.IsInfinity (minVal) || double.IsNaN (minVal) || minVal == double.MaxValue)
             minVal = 0.0;
-        if (Double.IsInfinity (maxVal) || Double.IsNaN (maxVal) || maxVal == Double.MaxValue)
+        if (double.IsInfinity (maxVal) || double.IsNaN (maxVal) || maxVal == double.MaxValue)
             maxVal = 0.0;
 
         // if the scales are autoranged, use the actual data values for the range
         double range = maxVal - minVal;
 
         // "Grace" is applied to the numeric axis types only
-        bool numType = !this.IsAnyOrdinal;
+        bool numType = !IsAnyOrdinal;
 
         // For autoranged values, assign the value.  If appropriate, adjust the value by the
         // "Grace" value.
@@ -2571,7 +2571,7 @@ abstract public class Scale
     /// </param>
     public int CalcMaxLabels (Graphics g, GraphPane pane, float scaleFactor)
     {
-        SizeF size = this.GetScaleMaxSpace (g, pane, scaleFactor, false);
+        SizeF size = GetScaleMaxSpace (g, pane, scaleFactor, false);
 
         // The font angles are already set such that the Width is parallel to the appropriate (X or Y)
         // axis.  Therefore, we always use size.Width.
@@ -2635,11 +2635,11 @@ abstract public class Scale
     internal void SetScaleMag (double min, double max, double step)
     {
         // set the scale magnitude if required
-        if (this._magAuto)
+        if (_magAuto)
         {
             // Find the optimal scale display multiple
-            double minMag = Math.Floor (Math.Log10 (Math.Abs (this._min)));
-            double maxMag = Math.Floor (Math.Log10 (Math.Abs (this._max)));
+            double minMag = Math.Floor (Math.Log10 (Math.Abs (_min)));
+            double maxMag = Math.Floor (Math.Log10 (Math.Abs (_max)));
 
             double mag = Math.Max (maxMag, minMag);
 
@@ -2650,19 +2650,19 @@ abstract public class Scale
             }
 
             // Use a power of 10 that is a multiple of 3 (engineering scale)
-            this._mag = (int)(Math.Floor (mag / 3.0) * 3.0);
+            _mag = (int)(Math.Floor (mag / 3.0) * 3.0);
         }
 
         // Calculate the appropriate number of dec places to display if required
-        if (this._formatAuto)
+        if (_formatAuto)
         {
-            int numDec = 0 - (int)(Math.Floor (Math.Log10 (this._majorStep)) - this._mag);
+            int numDec = 0 - (int)(Math.Floor (Math.Log10 (_majorStep)) - _mag);
             if (numDec < 0)
             {
                 numDec = 0;
             }
 
-            this._format = "f" + numDec.ToString (CultureInfo.InvariantCulture);
+            _format = "f" + numDec.ToString (CultureInfo.InvariantCulture);
         }
     }
 
@@ -2791,7 +2791,7 @@ abstract public class Scale
     /// <param name="axis">The <see cref="Axis"/> for which to set the range</param>
     internal void SetRange (GraphPane pane, Axis axis)
     {
-        if (_rangeMin >= Double.MaxValue || _rangeMax <= Double.MinValue)
+        if (_rangeMin >= double.MaxValue || _rangeMax <= double.MinValue)
         {
             // If this is a Y axis, and the main Y axis is valid, use it for defaults
             if (axis != pane.XAxis && axis != pane.X2Axis &&
@@ -2921,7 +2921,7 @@ abstract public class Scale
     public float Transform (bool isOverrideOrdinal, int i, double x)
     {
         // ordinal types ignore the X value, and just use the ordinal position
-        if (this.IsAnyOrdinal && i >= 0 && !isOverrideOrdinal)
+        if (IsAnyOrdinal && i >= 0 && !isOverrideOrdinal)
             x = (double)i + 1.0;
         return Transform (x);
     }

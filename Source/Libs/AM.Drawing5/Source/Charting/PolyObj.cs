@@ -160,7 +160,7 @@ public class PolyObj
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -249,7 +249,7 @@ public class PolyObj
                 // Fill or draw the symbol as required
                 if (_fill.IsVisible)
                 {
-                    using (Brush brush = this.Fill.MakeBrush (path.GetBounds()))
+                    using (Brush brush = Fill.MakeBrush (path.GetBounds()))
                         g.FillPath (brush, path);
                 }
 

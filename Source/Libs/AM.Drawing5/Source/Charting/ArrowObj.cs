@@ -182,7 +182,7 @@ public class ArrowObj
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -215,7 +215,7 @@ public class ArrowObj
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema3");
+        var sch = info.GetInt32 ("schema3");
 
         _size = info.GetSingle ("size");
         _isArrowHead = info.GetBoolean ("isArrowHead");
@@ -226,8 +226,11 @@ public class ArrowObj
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema3", schema2);
@@ -264,23 +267,23 @@ public class ArrowObj
     {
         // Convert the arrow coordinates from the user coordinate system
         // to the screen coordinate system
-        PointF pix1 = this.Location.TransformTopLeft (pane);
-        PointF pix2 = this.Location.TransformBottomRight (pane);
+        var pix1 = Location.TransformTopLeft (pane);
+        var pix2 = Location.TransformBottomRight (pane);
 
         if (pix1.X > -10000 && pix1.X < 100000 && pix1.Y > -100000 && pix1.Y < 100000 &&
             pix2.X > -10000 && pix2.X < 100000 && pix2.Y > -100000 && pix2.Y < 100000)
         {
             // get a scaled size for the arrowhead
-            float scaledSize = (float)(_size * scaleFactor);
+            var scaledSize = (float)(_size * scaleFactor);
 
             // calculate the length and the angle of the arrow "vector"
             double dy = pix2.Y - pix1.Y;
             double dx = pix2.X - pix1.X;
-            float angle = (float)Math.Atan2 (dy, dx) * 180.0F / (float)Math.PI;
-            float length = (float)Math.Sqrt (dx * dx + dy * dy);
+            var angle = (float)Math.Atan2 (dy, dx) * 180.0F / (float)Math.PI;
+            var length = (float)Math.Sqrt (dx * dx + dy * dy);
 
             // Save the old transform matrix
-            Matrix transform = g.Transform;
+            var transform = g.Transform;
 
             // Move the coordinate system so it is located at the starting point
             // of this arrow
@@ -291,7 +294,7 @@ public class ArrowObj
             g.RotateTransform (angle);
 
             // get a pen according to this arrow properties
-            using (Pen pen = _line.GetPen (pane, scaleFactor))
+            using (var pen = _line.GetPen (pane, scaleFactor))
 
                 //new Pen( _color, pane.ScaledPenWidth( _penWidth, scaleFactor ) ) )
             {
@@ -305,8 +308,8 @@ public class ArrowObj
 
                     // Create a polygon representing the arrowhead based on the scaled
                     // size
-                    PointF[] polyPt = new PointF[4];
-                    float hsize = scaledSize / 3.0F;
+                    var polyPt = new PointF[4];
+                    var hsize = scaledSize / 3.0F;
                     polyPt[0].X = length;
                     polyPt[0].Y = 0;
                     polyPt[1].X = length - scaledSize;
@@ -315,7 +318,7 @@ public class ArrowObj
                     polyPt[2].Y = -hsize;
                     polyPt[3] = polyPt[0];
 
-                    using (SolidBrush brush = new SolidBrush (_line._color))
+                    using (var brush = new SolidBrush (_line._color))
 
                         // render the arrowhead
                         g.FillPolygon (brush, polyPt);

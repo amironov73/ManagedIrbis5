@@ -200,7 +200,7 @@ public class RollingPointPairList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -326,7 +326,7 @@ public class RollingPointPairList
     /// </param>
     public void RemoveAt (int index)
     {
-        int count = this.Count;
+        int count = Count;
 
         if (index >= count || index < 0)
             throw new ArgumentOutOfRangeException();
@@ -360,13 +360,13 @@ public class RollingPointPairList
     /// or greater than the total available items in the queue</param>
     public void RemoveRange (int index, int count)
     {
-        int totalCount = this.Count;
+        int totalCount = Count;
 
         if (index >= totalCount || index < 0 || count < 0 || count > totalCount)
             throw new ArgumentOutOfRangeException();
 
         for (int i = 0; i < count; i++)
-            this.RemoveAt (index);
+            RemoveAt (index);
     }
 
     /// <summary>
@@ -473,7 +473,7 @@ public class RollingPointPairList
     /// <param name="y">The Y value</param>
     public void Add (double x, double y)
     {
-        Add (x, y, PointPair.Missing, null);
+        Add (x, y, PointPairBase.Missing, null);
     }
 
     /// <summary>
@@ -496,7 +496,7 @@ public class RollingPointPairList
     /// <param name="tag">The Tag value for the PointPair</param>
     public void Add (double x, double y, object tag)
     {
-        Add (x, y, PointPair.Missing, tag);
+        Add (x, y, PointPairBase.Missing, tag);
     }
 
     /// <summary>
@@ -548,14 +548,14 @@ public class RollingPointPairList
             else if (i < x.Length)
                 point.X = x[i];
             else
-                point.X = PointPair.Missing;
+                point.X = PointPairBase.Missing;
 
             if (y == null)
                 point.Y = (double)i + 1.0;
             else if (i < y.Length)
                 point.Y = y[i];
             else
-                point.Y = PointPair.Missing;
+                point.Y = PointPairBase.Missing;
 
             Add (point);
         }
@@ -594,21 +594,21 @@ public class RollingPointPairList
             else if (i < x.Length)
                 point.X = x[i];
             else
-                point.X = PointPair.Missing;
+                point.X = PointPairBase.Missing;
 
             if (y == null)
                 point.Y = (double)i + 1.0;
             else if (i < y.Length)
                 point.Y = y[i];
             else
-                point.Y = PointPair.Missing;
+                point.Y = PointPairBase.Missing;
 
             if (z == null)
                 point.Z = (double)i + 1.0;
             else if (i < z.Length)
                 point.Z = z[i];
             else
-                point.Z = PointPair.Missing;
+                point.Z = PointPairBase.Missing;
 
             Add (point);
         }

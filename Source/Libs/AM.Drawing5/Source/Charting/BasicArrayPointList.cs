@@ -68,13 +68,13 @@ public class BasicArrayPointList : IPointList
             if (index >= 0 && index < x.Length)
                 xVal = x[index];
             else
-                xVal = PointPair.Missing;
+                xVal = PointPairBase.Missing;
 
             if (index >= 0 && index < y.Length)
                 yVal = y[index];
             else
-                yVal = PointPair.Missing;
-            return new PointPair (xVal, yVal, PointPair.Missing, null);
+                yVal = PointPairBase.Missing;
+            return new PointPair (xVal, yVal, PointPairBase.Missing, null);
         }
         set
         {
@@ -125,7 +125,7 @@ public class BasicArrayPointList : IPointList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>

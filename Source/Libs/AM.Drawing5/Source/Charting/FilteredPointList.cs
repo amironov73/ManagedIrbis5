@@ -129,15 +129,15 @@ public class FilteredPointList
             if (index >= 0 && index < _x.Length)
                 xVal = _x[index];
             else
-                xVal = PointPair.Missing;
+                xVal = PointPairBase.Missing;
 
             if (index >= 0 && index < _y.Length)
                 yVal = _y[index];
             else
-                yVal = PointPair.Missing;
+                yVal = PointPairBase.Missing;
 
 
-            return new PointPair (xVal, yVal, PointPair.Missing, null);
+            return new PointPair (xVal, yVal, PointPairBase.Missing, null);
         }
 
         set

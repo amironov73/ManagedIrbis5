@@ -122,8 +122,8 @@ namespace AM.Drawing.Charting
         public PointPair (double x, double y, double z, object tag)
             : base (x, y)
         {
-            this.Z = z;
-            this.Tag = tag;
+            Z = z;
+            Tag = tag;
         }
 
         /// <summary>
@@ -141,12 +141,12 @@ namespace AM.Drawing.Charting
         /// <param name="rhs">The basis for the copy.</param>
         public PointPair (PointPair rhs) : base (rhs)
         {
-            this.Z = rhs.Z;
+            Z = rhs.Z;
 
             if (rhs.Tag is ICloneable)
-                this.Tag = ((ICloneable)rhs.Tag).Clone();
+                Tag = ((ICloneable)rhs.Tag).Clone();
             else
-                this.Tag = rhs.Tag;
+                Tag = rhs.Tag;
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace AM.Drawing.Charting
         /// <returns>A deep copy of this object</returns>
         object ICloneable.Clone()
         {
-            return this.Clone();
+            return Clone();
         }
 
         /// <summary>
@@ -200,8 +200,11 @@ namespace AM.Drawing.Charting
         /// </summary>
         /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
         /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-        [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-        public override void GetObjectData (SerializationInfo info, StreamingContext context)
+        public override void GetObjectData
+            (
+                SerializationInfo info,
+                StreamingContext context
+            )
         {
             base.GetObjectData (info, context);
             info.AddValue ("schema2", schema2);
@@ -224,15 +227,15 @@ namespace AM.Drawing.Charting
         {
             get
             {
-                return this.X == PointPair.Missing ||
-                       this.Y == PointPair.Missing ||
-                       this.Z == PointPair.Missing ||
-                       Double.IsInfinity (this.X) ||
-                       Double.IsInfinity (this.Y) ||
-                       Double.IsInfinity (this.Z) ||
-                       Double.IsNaN (this.X) ||
-                       Double.IsNaN (this.Y) ||
-                       Double.IsNaN (this.Z);
+                return X == Missing ||
+                       Y == Missing ||
+                       Z == Missing ||
+                       double.IsInfinity (X) ||
+                       double.IsInfinity (Y) ||
+                       double.IsInfinity (Z) ||
+                       double.IsNaN (X) ||
+                       double.IsNaN (Y) ||
+                       double.IsNaN (Z);
             }
         }
 
@@ -243,8 +246,8 @@ namespace AM.Drawing.Charting
         /// <value>The lower dependent value for this <see cref="PointPair"/>.</value>
         public double LowValue
         {
-            get { return this.Z; }
-            set { this.Z = value; }
+            get { return Z; }
+            set { Z = value; }
         }
 
         /// <summary>
@@ -407,7 +410,7 @@ namespace AM.Drawing.Charting
                 double lY = l.Y;
                 double rY = r.Y;
 
-                if (System.Math.Abs (lY - rY) < .000000001)
+                if (Math.Abs (lY - rY) < .000000001)
                     return 0;
 
                 return lY < rY ? -1 : 1;
@@ -429,7 +432,7 @@ namespace AM.Drawing.Charting
             /// <param name="type">The axis type on which to sort.</param>
             public PointPairComparer (SortType type)
             {
-                this.sortType = type;
+                sortType = type;
             }
 
             /// <summary>
@@ -460,12 +463,12 @@ namespace AM.Drawing.Charting
                     rVal = r.Y;
                 }
 
-                if (lVal == PointPair.Missing || Double.IsInfinity (lVal) || Double.IsNaN (lVal))
+                if (lVal == Missing || double.IsInfinity (lVal) || double.IsNaN (lVal))
                     l = null;
-                if (rVal == PointPair.Missing || Double.IsInfinity (rVal) || Double.IsNaN (rVal))
+                if (rVal == Missing || double.IsInfinity (rVal) || double.IsNaN (rVal))
                     r = null;
 
-                if ((l == null && r == null) || (System.Math.Abs (lVal - rVal) < 1e-100))
+                if ((l == null && r == null) || (Math.Abs (lVal - rVal) < 1e-100))
                     return 0;
                 else if (l == null && r != null)
                     return -1;
@@ -491,7 +494,7 @@ namespace AM.Drawing.Charting
         public override bool Equals (object obj)
         {
             PointPair rhs = obj as PointPair;
-            return this.X == rhs.X && this.Y == rhs.Y && this.Z == rhs.Z;
+            return X == rhs.X && Y == rhs.Y && Z == rhs.Z;
         }
 
         /// <summary>
@@ -511,7 +514,7 @@ namespace AM.Drawing.Charting
         /// <returns>A string representation of the PointPair</returns>
         virtual public string ToString (bool isShowZ)
         {
-            return this.ToString (PointPair.DefaultFormat, isShowZ);
+            return ToString (DefaultFormat, isShowZ);
         }
 
         /// <summary>
@@ -526,9 +529,9 @@ namespace AM.Drawing.Charting
         /// <param name="isShowZ">true to show the third "Z" or low dependent value coordinate</param>
         virtual public string ToString (string format, bool isShowZ)
         {
-            return "( " + this.X.ToString (format) +
-                   ", " + this.Y.ToString (format) +
-                   (isShowZ ? (", " + this.Z.ToString (format)) : "")
+            return "( " + X.ToString (format) +
+                   ", " + Y.ToString (format) +
+                   (isShowZ ? (", " + Z.ToString (format)) : "")
                    + " )";
         }
 
@@ -545,9 +548,9 @@ namespace AM.Drawing.Charting
         /// <returns>A string representation of the PointPair</returns>
         public string ToString (string formatX, string formatY, string formatZ)
         {
-            return "( " + this.X.ToString (formatX) +
-                   ", " + this.Y.ToString (formatY) +
-                   ", " + this.Z.ToString (formatZ) +
+            return "( " + X.ToString (formatX) +
+                   ", " + Y.ToString (formatY) +
+                   ", " + Z.ToString (formatZ) +
                    " )";
         }
 

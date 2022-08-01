@@ -316,7 +316,7 @@ public class MasterPane
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -460,7 +460,7 @@ public class MasterPane
     /// </remarks>
     public void AxisChange()
     {
-        using (var img = new Bitmap ((int)this.Rect.Width, (int)this.Rect.Height))
+        using (var img = new Bitmap ((int)Rect.Width, (int)Rect.Height))
         using (Graphics g = Graphics.FromImage (img))
             AxisChange (g);
     }
@@ -694,9 +694,9 @@ public class MasterPane
         // See if the point is in a GraphObj
         // If so, just save the object and index so we can see if other overlying objects were
         // intersected as well.
-        if (this.GraphObjList.FindPoint (mousePt, this, g, scaleFactor, out index))
+        if (GraphObjList.FindPoint (mousePt, this, g, scaleFactor, out index))
         {
-            saveGraphItem = this.GraphObjList[index];
+            saveGraphItem = GraphObjList[index];
             saveIndex = index;
 
             // If it's an "In-Front" item, then just return it

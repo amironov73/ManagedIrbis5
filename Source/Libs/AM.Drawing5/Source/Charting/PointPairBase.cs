@@ -38,7 +38,7 @@ public class PointPairBase
     /// <summary>
     /// Missing values are represented internally using <see cref="System.Double.MaxValue"/>.
     /// </summary>
-    public const double Missing = Double.MaxValue;
+    public const double Missing = double.MaxValue;
 
     /// <summary>
     /// The default format to be used for displaying point values via the
@@ -75,8 +75,8 @@ public class PointPairBase
     /// <param name="y">This pair's y coordinate.</param>
     public PointPairBase (double x, double y)
     {
-        this.X = x;
-        this.Y = y;
+        X = x;
+        Y = y;
     }
 
     /// <summary>
@@ -95,8 +95,8 @@ public class PointPairBase
     /// <param name="rhs">The basis for the copy.</param>
     public PointPairBase (PointPairBase rhs)
     {
-        this.X = rhs.X;
-        this.Y = rhs.Y;
+        X = rhs.X;
+        Y = rhs.Y;
     }
 
     #endregion
@@ -149,7 +149,7 @@ public class PointPairBase
     /// <returns>true if either value is missing</returns>
     public bool IsMissing
     {
-        get { return this.X == PointPairBase.Missing || this.Y == PointPairBase.Missing; }
+        get { return X == Missing || Y == Missing; }
     }
 
     /// <summary>
@@ -163,12 +163,12 @@ public class PointPairBase
     {
         get
         {
-            return this.X == PointPairBase.Missing ||
-                   this.Y == PointPairBase.Missing ||
-                   Double.IsInfinity (this.X) ||
-                   Double.IsInfinity (this.Y) ||
-                   Double.IsNaN (this.X) ||
-                   Double.IsNaN (this.Y);
+            return X == Missing ||
+                   Y == Missing ||
+                   double.IsInfinity (X) ||
+                   double.IsInfinity (Y) ||
+                   double.IsNaN (X) ||
+                   double.IsNaN (Y);
         }
     }
 
@@ -182,9 +182,9 @@ public class PointPairBase
     /// <returns>true if the value is invalid, false otherwise</returns>
     public static bool IsValueInvalid (double value)
     {
-        return (value == PointPairBase.Missing ||
-                Double.IsInfinity (value) ||
-                Double.IsNaN (value));
+        return (value == Missing ||
+                double.IsInfinity (value) ||
+                double.IsNaN (value));
     }
 
     #endregion
@@ -216,7 +216,7 @@ public class PointPairBase
     public override bool Equals (object obj)
     {
         PointPairBase rhs = obj as PointPairBase;
-        return this.X == rhs.X && this.Y == rhs.Y;
+        return X == rhs.X && Y == rhs.Y;
     }
 
     /// <summary>
@@ -235,7 +235,7 @@ public class PointPairBase
     /// <returns>A string representation of the PointPair</returns>
     public override string ToString()
     {
-        return this.ToString (PointPairBase.DefaultFormat);
+        return ToString (DefaultFormat);
     }
 
     /// <summary>
@@ -247,8 +247,8 @@ public class PointPairBase
     /// <returns>A string representation of the PointPair</returns>
     public string ToString (string format)
     {
-        return "( " + this.X.ToString (format) +
-               ", " + this.Y.ToString (format) +
+        return "( " + X.ToString (format) +
+               ", " + Y.ToString (format) +
                " )";
     }
 
@@ -264,8 +264,8 @@ public class PointPairBase
     /// <returns>A string representation of the PointPair</returns>
     public string ToString (string formatX, string formatY)
     {
-        return "( " + this.X.ToString (formatX) +
-               ", " + this.Y.ToString (formatY) +
+        return "( " + X.ToString (formatX) +
+               ", " + Y.ToString (formatY) +
                " )";
     }
 

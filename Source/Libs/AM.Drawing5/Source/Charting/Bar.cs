@@ -146,7 +146,7 @@ public class Bar
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -524,11 +524,11 @@ public class Bar
 
             // Draw the bar
             if (pane._barSettings.Base == BarBase.X)
-                this.Draw (g, pane, pixSide, pixSide + barWidth, pixLowVal,
+                Draw (g, pane, pixSide, pixSide + barWidth, pixLowVal,
                     pixHiVal, scaleFactor, true, curve.IsSelected,
                     curve.Points[index]);
             else
-                this.Draw (g, pane, pixLowVal, pixHiVal, pixSide, pixSide + barWidth,
+                Draw (g, pane, pixLowVal, pixHiVal, pixSide, pixSide + barWidth,
                     scaleFactor, true, curve.IsSelected,
                     curve.Points[index]);
         }

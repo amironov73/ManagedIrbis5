@@ -304,7 +304,7 @@ public class BarSettings
         // First, calculate the clusterScaleWidth for BarItem objects
         if (_clusterScaleWidthAuto && !baseAxis.Scale.IsAnyOrdinal)
         {
-            double minStep = Double.MaxValue;
+            double minStep = double.MaxValue;
 
             foreach (CurveItem curve in _ownerPane.CurveList)
             {
@@ -317,7 +317,7 @@ public class BarSettings
                 }
             }
 
-            if (minStep == Double.MaxValue)
+            if (minStep == double.MaxValue)
                 minStep = 1.0;
 
             _clusterScaleWidth = minStep;
@@ -359,7 +359,7 @@ public class BarSettings
     /// <returns>The minimum increment between bars along the base axis</returns>
     internal static double GetMinStepSize (IPointList list, Axis baseAxis)
     {
-        double minStep = Double.MaxValue;
+        double minStep = double.MaxValue;
 
         if (list.Count <= 0 || baseAxis._scale.IsAnyOrdinal)
             return 1.0;

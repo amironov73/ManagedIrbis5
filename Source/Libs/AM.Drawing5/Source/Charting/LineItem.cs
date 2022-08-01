@@ -208,7 +208,7 @@ public class LineItem
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -251,8 +251,11 @@ public class LineItem
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
@@ -345,8 +348,8 @@ public class LineItem
     /// </param>
     override public void MakeUnique (ColorSymbolRotator rotator)
     {
-        this.Color = rotator.NextColor;
-        this.Symbol.Type = rotator.NextSymbol;
+        Color = rotator.NextColor;
+        Symbol.Type = rotator.NextSymbol;
     }
 
     /// <summary>
@@ -384,7 +387,7 @@ public class LineItem
 
         float halfSize = _symbol.Size * pane.CalcScaleFactor();
 
-        coords = String.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
+        coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
             pixPt.X - halfSize, pixPt.Y - halfSize,
             pixPt.X + halfSize, pixPt.Y + halfSize);
 

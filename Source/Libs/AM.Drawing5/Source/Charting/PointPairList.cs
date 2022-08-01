@@ -128,7 +128,7 @@ public class PointPairList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -201,14 +201,14 @@ public class PointPairList
             else if (i < x.Length)
                 point.X = x[i];
             else
-                point.X = PointPair.Missing;
+                point.X = PointPairBase.Missing;
 
             if (y == null)
                 point.Y = (double)i + 1.0;
             else if (i < y.Length)
                 point.Y = y[i];
             else
-                point.Y = PointPair.Missing;
+                point.Y = PointPairBase.Missing;
 
             base.Add (point);
         }
@@ -249,21 +249,21 @@ public class PointPairList
             else if (i < x.Length)
                 point.X = x[i];
             else
-                point.X = PointPair.Missing;
+                point.X = PointPairBase.Missing;
 
             if (y == null)
                 point.Y = (double)i + 1.0;
             else if (i < y.Length)
                 point.Y = y[i];
             else
-                point.Y = PointPair.Missing;
+                point.Y = PointPairBase.Missing;
 
             if (z == null)
                 point.Z = (double)i + 1.0;
             else if (i < z.Length)
                 point.Z = z[i];
             else
-                point.Z = PointPair.Missing;
+                point.Z = PointPairBase.Missing;
 
             base.Add (point);
         }
@@ -420,7 +420,7 @@ public class PointPairList
         int iPt = 0;
         foreach (PointPair p in this)
         {
-            if (p.Tag is string && String.Compare ((string)p.Tag, label, true) == 0)
+            if (p.Tag is string && string.Compare ((string)p.Tag, label, true) == 0)
                 return iPt;
             iPt++;
         }
@@ -439,10 +439,10 @@ public class PointPairList
     public override bool Equals (object obj)
     {
         PointPairList rhs = obj as PointPairList;
-        if (this.Count != rhs.Count)
+        if (Count != rhs.Count)
             return false;
 
-        for (int i = 0; i < this.Count; i++)
+        for (int i = 0; i < Count; i++)
         {
             if (!this[i].Equals (rhs[i]))
                 return false;
@@ -489,7 +489,7 @@ public class PointPairList
         if (_sorted)
             return true;
 
-        this.Sort (new PointPair.PointPairComparer (type));
+        Sort (new PointPair.PointPairComparer (type));
 
         return false;
     }
@@ -513,7 +513,7 @@ public class PointPairList
     {
         for (int i = 0; i < x.Length; i++)
         {
-            if (i < this.Count)
+            if (i < Count)
                 this[i].X = x[i];
         }
 
@@ -539,7 +539,7 @@ public class PointPairList
     {
         for (int i = 0; i < y.Length; i++)
         {
-            if (i < this.Count)
+            if (i < Count)
                 this[i].Y = y[i];
         }
 
@@ -565,7 +565,7 @@ public class PointPairList
     {
         for (int i = 0; i < z.Length; i++)
         {
-            if (i < this.Count)
+            if (i < Count)
                 this[i].Z = z[i];
         }
 
@@ -582,7 +582,7 @@ public class PointPairList
     /// be summed into the this <see cref="PointPairList"/>.</param>
     public void SumY (PointPairList sumList)
     {
-        for (int i = 0; i < this.Count; i++)
+        for (int i = 0; i < Count; i++)
         {
             if (i < sumList.Count)
                 this[i].Y += sumList[i].Y;
@@ -601,7 +601,7 @@ public class PointPairList
     /// be summed into the this <see cref="PointPairList"/>.</param>
     public void SumX (PointPairList sumList)
     {
-        for (int i = 0; i < this.Count; i++)
+        for (int i = 0; i < Count; i++)
         {
             if (i < sumList.Count)
                 this[i].X += sumList[i].X;
@@ -623,7 +623,7 @@ public class PointPairList
     public double InterpolateX (double xTarget)
     {
         int lo, mid, hi;
-        if (this.Count < 2)
+        if (Count < 2)
             throw new Exception ("Error: Not enough points in curve to interpolate");
 
         if (xTarget <= this[0].X)
@@ -631,17 +631,17 @@ public class PointPairList
             lo = 0;
             hi = 1;
         }
-        else if (xTarget >= this[this.Count - 1].X)
+        else if (xTarget >= this[Count - 1].X)
         {
-            lo = this.Count - 2;
-            hi = this.Count - 1;
+            lo = Count - 2;
+            hi = Count - 1;
         }
         else
         {
             // if x is within the bounds of the x table, then do a binary search
             // in the x table to find table entries that bound the x value
             lo = 0;
-            hi = this.Count - 1;
+            hi = Count - 1;
 
             // limit to 1000 loops to avoid an infinite loop problem
             int j;
@@ -688,18 +688,18 @@ public class PointPairList
         tension /= 3.0;
 
         int lo, mid, hi;
-        if (this.Count < 2)
+        if (Count < 2)
             throw new Exception ("Error: Not enough points in curve to interpolate");
 
         // Extrapolation not allowed
-        if (xTarget <= this[0].X || xTarget >= this[this.Count - 1].X)
-            return PointPair.Missing;
+        if (xTarget <= this[0].X || xTarget >= this[Count - 1].X)
+            return PointPairBase.Missing;
         else
         {
             // if x is within the bounds of the x table, then do a binary search
             // in the x table to find table entries that bound the x value
             lo = 0;
-            hi = this.Count - 1;
+            hi = Count - 1;
 
             // limit to 1000 loops to avoid an infinite loop problem
             int j;
@@ -741,7 +741,7 @@ public class PointPairList
             Y0 = this[lo - 1].Y;
         }
 
-        if (hi == this.Count - 1)
+        if (hi == Count - 1)
         {
             X3 = X2 + (X2 - X1) / 3;
             Y3 = Y2 + (Y2 - Y1) / 3;
@@ -801,7 +801,7 @@ public class PointPairList
     public double InterpolateY (double yTarget)
     {
         int lo, mid, hi;
-        if (this.Count < 2)
+        if (Count < 2)
             throw new Exception ("Error: Not enough points in curve to interpolate");
 
         if (yTarget <= this[0].Y)
@@ -809,17 +809,17 @@ public class PointPairList
             lo = 0;
             hi = 1;
         }
-        else if (yTarget >= this[this.Count - 1].Y)
+        else if (yTarget >= this[Count - 1].Y)
         {
-            lo = this.Count - 2;
-            hi = this.Count - 1;
+            lo = Count - 2;
+            hi = Count - 1;
         }
         else
         {
             // if y is within the bounds of the y table, then do a binary search
             // in the y table to find table entries that bound the y value
             lo = 0;
-            hi = this.Count - 1;
+            hi = Count - 1;
 
             // limit to 1000 loops to avoid an infinite loop problem
             int j;

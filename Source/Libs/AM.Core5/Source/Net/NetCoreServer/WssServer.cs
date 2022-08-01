@@ -1,168 +1,222 @@
-﻿using System.Net;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedMember.Global
+
+/* WssServer.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System.Net;
 using System.Text;
 
-namespace NetCoreServer
+#endregion
+
+#nullable enable
+
+namespace NetCoreServer;
+
+/// <summary>
+/// WebSocket secure server
+/// </summary>
+/// <remarks> WebSocket secure server is used to communicate with clients using WebSocket protocol. Thread-safe.</remarks>
+public class WssServer : HttpsServer, IWebSocket
 {
+    internal readonly WebSocket WebSocket;
+
     /// <summary>
-    /// WebSocket secure server
+    /// Initialize WebSocket server with a given IP address and port number
     /// </summary>
-    /// <remarks> WebSocket secure server is used to communicate with clients using WebSocket protocol. Thread-safe.</remarks>
-    public class WssServer : HttpsServer, IWebSocket
+    /// <param name="context">SSL context</param>
+    /// <param name="address">IP address</param>
+    /// <param name="port">Port number</param>
+    public WssServer (SslContext context, IPAddress address, int port) : base (context, address, port)
     {
-        internal readonly WebSocket WebSocket;
+        WebSocket = new WebSocket (this);
+    }
 
-        /// <summary>
-        /// Initialize WebSocket server with a given IP address and port number
-        /// </summary>
-        /// <param name="context">SSL context</param>
-        /// <param name="address">IP address</param>
-        /// <param name="port">Port number</param>
-        public WssServer(SslContext context, IPAddress address, int port) : base(context, address, port) { WebSocket = new WebSocket(this); }
-        /// <summary>
-        /// Initialize WebSocket server with a given IP address and port number
-        /// </summary>
-        /// <param name="context">SSL context</param>
-        /// <param name="address">IP address</param>
-        /// <param name="port">Port number</param>
-        public WssServer(SslContext context, string address, int port) : base(context, address, port) { WebSocket = new WebSocket(this); }
-        /// <summary>
-        /// Initialize WebSocket server with a given DNS endpoint
-        /// </summary>
-        /// <param name="context">SSL context</param>
-        /// <param name="endpoint">DNS endpoint</param>
-        public WssServer(SslContext context, DnsEndPoint endpoint) : base(context, endpoint) { WebSocket = new WebSocket(this); }
-        /// <summary>
-        /// Initialize WebSocket server with a given IP endpoint
-        /// </summary>
-        /// <param name="context">SSL context</param>
-        /// <param name="endpoint">IP endpoint</param>
-        public WssServer(SslContext context, IPEndPoint endpoint) : base(context, endpoint) { WebSocket = new WebSocket(this); }
+    /// <summary>
+    /// Initialize WebSocket server with a given IP address and port number
+    /// </summary>
+    /// <param name="context">SSL context</param>
+    /// <param name="address">IP address</param>
+    /// <param name="port">Port number</param>
+    public WssServer (SslContext context, string address, int port) : base (context, address, port)
+    {
+        WebSocket = new WebSocket (this);
+    }
 
-        public virtual bool CloseAll(int status)
+    /// <summary>
+    /// Initialize WebSocket server with a given DNS endpoint
+    /// </summary>
+    /// <param name="context">SSL context</param>
+    /// <param name="endpoint">DNS endpoint</param>
+    public WssServer (SslContext context, DnsEndPoint endpoint) : base (context, endpoint)
+    {
+        WebSocket = new WebSocket (this);
+    }
+
+    /// <summary>
+    /// Initialize WebSocket server with a given IP endpoint
+    /// </summary>
+    /// <param name="context">SSL context</param>
+    /// <param name="endpoint">IP endpoint</param>
+    public WssServer (SslContext context, IPEndPoint endpoint) : base (context, endpoint)
+    {
+        WebSocket = new WebSocket (this);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public virtual bool CloseAll (int status)
+    {
+        lock (WebSocket.WsSendLock)
         {
-            lock (WebSocket.WsSendLock)
+            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_CLOSE, false, null, 0, 0, status);
+            if (!Multicast (WebSocket.WsSendBuffer.ToArray()))
             {
-                WebSocket.PrepareSendFrame(WebSocket.WS_FIN | WebSocket.WS_CLOSE, false, null, 0, 0, status);
-                if (!Multicast(WebSocket.WsSendBuffer.ToArray()))
-                    return false;
-
-                return base.DisconnectAll();
+                return false;
             }
+
+            return base.DisconnectAll();
+        }
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public override bool Multicast (byte[] buffer, long offset, long size)
+    {
+        if (!IsStarted)
+        {
+            return false;
         }
 
-        public override bool Multicast(byte[] buffer, long offset, long size)
+        if (size == 0)
         {
-            if (!IsStarted)
-                return false;
-
-            if (size == 0)
-                return true;
-
-            // Multicast data to all WebSocket sessions
-            foreach (var session in Sessions.Values)
-            {
-                if (session is WssSession wssSession)
-                {
-                    if (wssSession.WebSocket.WsHandshaked)
-                        wssSession.SendAsync(buffer, offset, size);
-                }
-            }
-
             return true;
         }
 
-        #region WebSocket multicast text methods
-
-        public bool MulticastText(byte[] buffer, long offset, long size)
+        // Multicast data to all WebSocket sessions
+        foreach (var session in Sessions.Values)
         {
-            lock (WebSocket.WsSendLock)
+            if (session is WssSession wssSession)
             {
-                WebSocket.PrepareSendFrame(WebSocket.WS_FIN | WebSocket.WS_TEXT, false, buffer, offset, size);
-                return Multicast(WebSocket.WsSendBuffer.ToArray());
+                if (wssSession.WebSocket.WsHandshaked)
+                {
+                    wssSession.SendAsync (buffer, offset, size);
+                }
             }
         }
 
-        public bool MulticastText(string text)
+        return true;
+    }
+
+    #region WebSocket multicast text methods
+
+    public bool MulticastText (byte[] buffer, long offset, long size)
+    {
+        lock (WebSocket.WsSendLock)
         {
-            lock (WebSocket.WsSendLock)
-            {
-                var data = Encoding.UTF8.GetBytes(text);
-                WebSocket.PrepareSendFrame(WebSocket.WS_FIN | WebSocket.WS_TEXT, false, data, 0, data.Length);
-                return Multicast(WebSocket.WsSendBuffer.ToArray());
-            }
+            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_TEXT, false, buffer, offset, size);
+            return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
+    }
 
-        #endregion
-
-        #region WebSocket multicast binary methods
-
-        public bool MulticastBinary(byte[] buffer, long offset, long size)
+    public bool MulticastText (string text)
+    {
+        lock (WebSocket.WsSendLock)
         {
-            lock (WebSocket.WsSendLock)
-            {
-                WebSocket.PrepareSendFrame(WebSocket.WS_FIN | WebSocket.WS_BINARY, false, buffer, offset, size);
-                return Multicast(WebSocket.WsSendBuffer.ToArray());
-            }
+            var data = Encoding.UTF8.GetBytes (text);
+            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_TEXT, false, data, 0, data.Length);
+            return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
+    }
 
-        public bool MulticastBinary(string text)
+    #endregion
+
+    #region WebSocket multicast binary methods
+
+    public bool MulticastBinary (byte[] buffer, long offset, long size)
+    {
+        lock (WebSocket.WsSendLock)
         {
-            lock (WebSocket.WsSendLock)
-            {
-                var data = Encoding.UTF8.GetBytes(text);
-                WebSocket.PrepareSendFrame(WebSocket.WS_FIN | WebSocket.WS_BINARY, false, data, 0, data.Length);
-                return Multicast(WebSocket.WsSendBuffer.ToArray());
-            }
+            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_BINARY, false, buffer, offset, size);
+            return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
+    }
 
-        #endregion
-
-        #region WebSocket multicast ping methods
-
-        public bool SendPing(byte[] buffer, long offset, long size)
+    public bool MulticastBinary (string text)
+    {
+        lock (WebSocket.WsSendLock)
         {
-            lock (WebSocket.WsSendLock)
-            {
-                WebSocket.PrepareSendFrame(WebSocket.WS_FIN | WebSocket.WS_PING, false, buffer, offset, size);
-                return Multicast(WebSocket.WsSendBuffer.ToArray());
-            }
+            var data = Encoding.UTF8.GetBytes (text);
+            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_BINARY, false, data, 0, data.Length);
+            return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
+    }
 
-        public bool SendPing(string text)
+    #endregion
+
+    #region WebSocket multicast ping methods
+
+    public bool SendPing (byte[] buffer, long offset, long size)
+    {
+        lock (WebSocket.WsSendLock)
         {
-            lock (WebSocket.WsSendLock)
-            {
-                var data = Encoding.UTF8.GetBytes(text);
-                WebSocket.PrepareSendFrame(WebSocket.WS_FIN | WebSocket.WS_PING, false, data, 0, data.Length);
-                return Multicast(WebSocket.WsSendBuffer.ToArray());
-            }
+            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PING, false, buffer, offset, size);
+            return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
+    }
 
-        #endregion
-
-        #region WebSocket multicast pong methods
-
-        public bool SendPong(byte[] buffer, long offset, long size)
+    public bool SendPing (string text)
+    {
+        lock (WebSocket.WsSendLock)
         {
-            lock (WebSocket.WsSendLock)
-            {
-                WebSocket.PrepareSendFrame(WebSocket.WS_FIN | WebSocket.WS_PONG, false, buffer, offset, size);
-                return Multicast(WebSocket.WsSendBuffer.ToArray());
-            }
+            var data = Encoding.UTF8.GetBytes (text);
+            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PING, false, data, 0, data.Length);
+            return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
+    }
 
-        public bool SendPong(string text)
+    #endregion
+
+    #region WebSocket multicast pong methods
+
+    public bool SendPong (byte[] buffer, long offset, long size)
+    {
+        lock (WebSocket.WsSendLock)
         {
-            lock (WebSocket.WsSendLock)
-            {
-                var data = Encoding.UTF8.GetBytes(text);
-                WebSocket.PrepareSendFrame(WebSocket.WS_FIN | WebSocket.WS_PONG, false, data, 0, data.Length);
-                return Multicast(WebSocket.WsSendBuffer.ToArray());
-            }
+            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PONG, false, buffer, offset, size);
+            return Multicast (WebSocket.WsSendBuffer.ToArray());
         }
+    }
 
-        #endregion
+    public bool SendPong (string text)
+    {
+        lock (WebSocket.WsSendLock)
+        {
+            var data = Encoding.UTF8.GetBytes (text);
+            WebSocket.PrepareSendFrame (WebSocket.WS_FIN | WebSocket.WS_PONG, false, data, 0, data.Length);
+            return Multicast (WebSocket.WsSendBuffer.ToArray());
+        }
+    }
 
-        protected override SslSession CreateSession() { return new WssSession(this); }
+    #endregion
+
+    /// <summary>
+    ///
+    /// </summary>
+    protected override SslSession CreateSession()
+    {
+        return new WssSession (this);
     }
 }

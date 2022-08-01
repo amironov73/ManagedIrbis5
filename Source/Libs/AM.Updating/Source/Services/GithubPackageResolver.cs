@@ -117,26 +117,34 @@ public class GithubPackageResolver : IPackageResolver
                 releaseTitle = releaseJson.GetProperty ("tag_name").GetString();
             }
 
+            releaseTitle = releaseTitle.ThrowIfNull();
+
             // Try to parse version
             var versionText = Regex.Match (releaseTitle, "(\\d+\\.\\d+(?:\\.\\d+)?(?:\\.\\d+)?)").Groups[1].Value;
             if (!Version.TryParse (versionText, out var version))
+            {
                 continue;
+            }
 
             // Skip pre-releases
             var isPreRelease = releaseJson.GetProperty ("prerelease").GetBoolean();
             if (isPreRelease)
+            {
                 continue;
+            }
 
             // Find asset
             var assetsJson = releaseJson.GetProperty ("assets");
             foreach (var assetJson in assetsJson.EnumerateArray())
             {
-                var assetName = assetJson.GetProperty ("name").GetString();
-                var assetUrl = assetJson.GetProperty ("url").GetString();
+                var assetName = assetJson.GetProperty ("name").GetString().ThrowIfNull();
+                var assetUrl = assetJson.GetProperty ("url").GetString().ThrowIfNull();
 
                 // See if name matches
                 if (!WildcardPattern.IsMatch (assetName, _assetNamePattern))
+                {
                     continue;
+                }
 
                 // Add to dictionary
                 map[version] = assetUrl;
@@ -155,7 +163,9 @@ public class GithubPackageResolver : IPackageResolver
 
         // Set If-None-Match header if ETag is available
         if (_cachedPackageVersionUrlMapETag != null && _cachedPackageVersionUrlMap != null)
+        {
             request.Headers.IfNoneMatch.Add (_cachedPackageVersionUrlMapETag);
+        }
 
         // Get response
         using var response =
@@ -163,7 +173,9 @@ public class GithubPackageResolver : IPackageResolver
 
         // If not modified - return cached
         if (response.StatusCode == HttpStatusCode.NotModified)
+        {
             return _cachedPackageVersionUrlMap!;
+        }
 
         // Ensure success status code otherwise
         response.EnsureSuccessStatusCode();
@@ -197,17 +209,18 @@ public class GithubPackageResolver : IPackageResolver
         // Try to get package URL
         var packageUrl = map.GetValueOrDefault (version);
         if (string.IsNullOrWhiteSpace (packageUrl))
+        {
             throw new PackageNotFoundException (version);
+        }
 
         // Download
         using var request = new HttpRequestMessage (HttpMethod.Get, packageUrl);
         request.Headers.Add ("Accept", "application/octet-stream"); // required
 
-        using var response =
-            await _httpClient.SendAsync (request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        using var response = await _httpClient.SendAsync (request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        using var output = File.Create (destFilePath);
+        await using var output = File.Create (destFilePath);
         await response.Content.CopyToStreamAsync (output, progress, cancellationToken);
     }
 }

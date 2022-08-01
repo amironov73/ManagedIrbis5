@@ -140,7 +140,7 @@ public class Link
         _title = string.Empty;
         _url = string.Empty;
         _target = string.Empty;
-        this.Tag = null;
+        Tag = null;
         _isEnabled = false;
     }
 
@@ -173,9 +173,9 @@ public class Link
 
         // copy reference types by cloning
         if (rhs.Tag is ICloneable)
-            this.Tag = ((ICloneable)rhs.Tag).Clone();
+            Tag = ((ICloneable)rhs.Tag).Clone();
         else
-            this.Tag = rhs.Tag;
+            Tag = rhs.Tag;
     }
 
     /// <summary>
@@ -185,7 +185,7 @@ public class Link
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>

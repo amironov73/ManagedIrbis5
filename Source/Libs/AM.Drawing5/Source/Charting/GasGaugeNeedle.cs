@@ -133,7 +133,7 @@ public class GasGaugeNeedle
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -486,7 +486,7 @@ public class GasGaugeNeedle
     /// <returns>true if it's a valid point, false otherwise</returns>
     public override bool GetCoords (GraphPane pane, int i, out string coords)
     {
-        coords = String.Empty;
+        coords = string.Empty;
         return false;
     }
 
@@ -573,7 +573,7 @@ public class GasGaugeNeedle
 
         nonExpRect.Inflate (-(float)0.05F * nonExpRect.Height, -(float)0.05 * nonExpRect.Width);
 
-        GasGaugeNeedle.CalculateGasGaugeParameters (pane);
+        CalculateGasGaugeParameters (pane);
 
         foreach (CurveItem curve in pane.CurveList)
         {

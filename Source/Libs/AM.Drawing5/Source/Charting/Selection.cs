@@ -109,7 +109,7 @@ public class Selection
     /// <param name="ci">The <see cref="CurveItem" /> to be added to the list.</param>
     public void AddToSelection (MasterPane master, CurveItem ci)
     {
-        if (this.Contains (ci) == false)
+        if (Contains (ci) == false)
             Add (ci);
 
         UpdateSelection (master);
@@ -125,8 +125,8 @@ public class Selection
     {
         foreach (CurveItem ci in ciList)
         {
-            if (this.Contains (ci) == false)
-                this.Add (ci);
+            if (Contains (ci) == false)
+                Add (ci);
         }
 
         UpdateSelection (master);
@@ -152,8 +152,8 @@ public class Selection
     /// <param name="ci">The <see cref="CurveItem" /> to be removed from the list.</param>
     public void RemoveFromSelection (MasterPane master, CurveItem ci)
     {
-        if (this.Contains (ci))
-            this.Remove (ci);
+        if (Contains (ci))
+            Remove (ci);
 
         UpdateSelection (master);
     }
@@ -175,7 +175,7 @@ public class Selection
     /// false otherwise.</param>
     public void ClearSelection (MasterPane master, bool sendEvent)
     {
-        this.Clear();
+        Clear();
 
         foreach (GraphPane pane in master.PaneList)
         {

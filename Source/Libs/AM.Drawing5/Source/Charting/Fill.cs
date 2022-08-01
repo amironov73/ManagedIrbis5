@@ -243,7 +243,7 @@ public class Fill
         blend.Positions[1] = 1.0f;
         _type = FillType.Brush;
 
-        this.CreateBrushFromBlend (blend, angle);
+        CreateBrushFromBlend (blend, angle);
     }
 
     /// <summary>
@@ -292,7 +292,7 @@ public class Fill
         blend.Positions[2] = 1.0f;
         _type = FillType.Brush;
 
-        this.CreateBrushFromBlend (blend, angle);
+        CreateBrushFromBlend (blend, angle);
     }
 
     /// <summary>
@@ -321,7 +321,7 @@ public class Fill
     {
         Init();
         _type = FillType.Brush;
-        this.CreateBrushFromBlend (blend, angle);
+        CreateBrushFromBlend (blend, angle);
     }
 
     /// <summary>
@@ -363,7 +363,7 @@ public class Fill
             blend.Positions[i] = (float)i / (float)(colors.Length - 1);
         _type = FillType.Brush;
 
-        this.CreateBrushFromBlend (blend, angle);
+        CreateBrushFromBlend (blend, angle);
     }
 
     /// <summary>
@@ -406,7 +406,7 @@ public class Fill
         blend.Positions = positions;
         _type = FillType.Brush;
 
-        this.CreateBrushFromBlend (blend, angle);
+        CreateBrushFromBlend (blend, angle);
     }
 
     /// <summary>
@@ -527,7 +527,7 @@ public class Fill
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -900,7 +900,7 @@ public class Fill
     public Brush MakeBrush (RectangleF rect, PointPair dataValue)
     {
         // get a brush
-        if (this.IsVisible && (!_color.IsEmpty || _brush != null))
+        if (IsVisible && (!_color.IsEmpty || _brush != null))
         {
             if (rect.Height < 1.0F)
                 rect.Height = 1.0F;
@@ -973,7 +973,7 @@ public class Fill
     {
         double valueFraction;
 
-        if (Double.IsInfinity (val) || double.IsNaN (val) || val == PointPair.Missing)
+        if (double.IsInfinity (val) || double.IsNaN (val) || val == PointPairBase.Missing)
             val = _rangeDefault;
 
         if (_rangeMax - _rangeMin < 1e-20 || val == double.MaxValue)
@@ -1149,9 +1149,9 @@ public class Fill
     /// <see cref="FillType.GradientByZ" /> <see cref="FillType" />.</param>
     public void Draw (Graphics g, RectangleF rect, PointPair pt)
     {
-        if (this.IsVisible)
+        if (IsVisible)
         {
-            using (Brush brush = this.MakeBrush (rect, pt))
+            using (Brush brush = MakeBrush (rect, pt))
             {
                 g.FillRectangle (brush, rect);
             }

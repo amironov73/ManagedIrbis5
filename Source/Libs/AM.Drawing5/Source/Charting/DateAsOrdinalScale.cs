@@ -229,12 +229,12 @@ class DateAsOrdinalScale
                     val2 = pt2.Y;
                 }
 
-                if (val1 != PointPair.Missing &&
-                    val2 != PointPair.Missing &&
-                    !Double.IsNaN (val1) &&
-                    !Double.IsNaN (val2) &&
-                    !Double.IsInfinity (val1) &&
-                    !Double.IsInfinity (val2) &&
+                if (val1 != PointPairBase.Missing &&
+                    val2 != PointPairBase.Missing &&
+                    !double.IsNaN (val1) &&
+                    !double.IsNaN (val2) &&
+                    !double.IsInfinity (val1) &&
+                    !double.IsInfinity (val2) &&
                     Math.Abs (val2 - val1) > 1e-10)
                     range = Math.Abs (val2 - val1);
             }
@@ -284,7 +284,7 @@ class DateAsOrdinalScale
     override internal string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
-            _format = Scale.Default.Format;
+            _format = Default.Format;
 
         double val;
 

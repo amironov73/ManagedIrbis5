@@ -42,7 +42,7 @@ public class ScrollRangeList
     public ScrollRangeList (ScrollRangeList rhs)
     {
         foreach (ScrollRange item in rhs)
-            this.Add (new ScrollRange (item));
+            Add (new ScrollRange (item));
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public class ScrollRangeList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ public class ScrollRangeList
     {
         get
         {
-            if (index < 0 || index >= this.Count)
+            if (index < 0 || index >= Count)
                 return new ScrollRange (false);
             else
                 return (ScrollRange)base[index];

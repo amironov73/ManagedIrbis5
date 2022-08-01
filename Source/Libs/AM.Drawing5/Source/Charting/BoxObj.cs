@@ -126,8 +126,8 @@ public class BoxObj
     public BoxObj (double x, double y, double width, double height, Color borderColor, Color fillColor)
         : base (x, y, width, height)
     {
-        this.Border = new Border (borderColor, Default.PenWidth);
-        this.Fill = new Fill (fillColor);
+        Border = new Border (borderColor, Default.PenWidth);
+        Fill = new Fill (fillColor);
     }
 
     /// <summary>
@@ -146,8 +146,8 @@ public class BoxObj
         :
         base (x, y, width, height)
     {
-        this.Border = new Border (Default.BorderColor, Default.PenWidth);
-        this.Fill = new Fill (Default.FillColor);
+        Border = new Border (Default.BorderColor, Default.PenWidth);
+        Fill = new Fill (Default.FillColor);
     }
 
     /// <summary>
@@ -181,8 +181,8 @@ public class BoxObj
         Color fillColor1, Color fillColor2) :
         base (x, y, width, height)
     {
-        this.Border = new Border (borderColor, Default.PenWidth);
-        this.Fill = new Fill (fillColor1, fillColor2);
+        Border = new Border (borderColor, Default.PenWidth);
+        Fill = new Fill (fillColor1, fillColor2);
     }
 
     /// <summary>
@@ -191,8 +191,8 @@ public class BoxObj
     /// <param name="rhs">The <see cref="BoxObj"/> object from which to copy</param>
     public BoxObj (BoxObj rhs) : base (rhs)
     {
-        this.Border = rhs.Border.Clone();
-        this.Fill = rhs.Fill.Clone();
+        Border = rhs.Border.Clone();
+        Fill = rhs.Fill.Clone();
     }
 
     /// <summary>
@@ -202,7 +202,7 @@ public class BoxObj
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -245,8 +245,11 @@ public class BoxObj
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
@@ -283,7 +286,7 @@ public class BoxObj
     {
         // Convert the arrow coordinates from the user coordinate system
         // to the screen coordinate system
-        RectangleF pixRect = this.Location.TransformRect (pane);
+        RectangleF pixRect = Location.TransformRect (pane);
 
         // Clip the rect to just outside the PaneRect so we don't end up with wild coordinates.
         RectangleF tmpRect = pane.Rect;
@@ -346,7 +349,7 @@ public class BoxObj
         RectangleF pixRect = _location.TransformRect (pane);
 
         shape = "rect";
-        coords = String.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
+        coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
             pixRect.Left, pixRect.Top, pixRect.Right, pixRect.Bottom);
     }
 

@@ -45,7 +45,7 @@ public class PointPair4
     /// </summary>
     public PointPair4() : base()
     {
-        this.T = 0;
+        T = 0;
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public class PointPair4
     /// <param name="t">This pair's t coordinate.</param>
     public PointPair4 (double x, double y, double z, double t) : base (x, y, z)
     {
-        this.T = t;
+        T = t;
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public class PointPair4
     public PointPair4 (double x, double y, double z, double t, string label) :
         base (x, y, z, label)
     {
-        this.T = t;
+        T = t;
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ public class PointPair4
     /// <param name="rhs">The basis for the copy.</param>
     public PointPair4 (PointPair4 rhs) : base (rhs)
     {
-        this.T = rhs.T;
+        T = rhs.T;
     }
 
     #endregion
@@ -137,18 +137,18 @@ public class PointPair4
     {
         get
         {
-            return this.X == PointPair.Missing ||
-                   this.Y == PointPair.Missing ||
-                   this.Z == PointPair.Missing ||
-                   this.T == PointPair.Missing ||
-                   Double.IsInfinity (this.X) ||
-                   Double.IsInfinity (this.Y) ||
-                   Double.IsInfinity (this.Z) ||
-                   Double.IsInfinity (this.T) ||
-                   Double.IsNaN (this.X) ||
-                   Double.IsNaN (this.Y) ||
-                   Double.IsNaN (this.Z) ||
-                   Double.IsNaN (this.T);
+            return X == Missing ||
+                   Y == Missing ||
+                   Z == Missing ||
+                   T == Missing ||
+                   double.IsInfinity (X) ||
+                   double.IsInfinity (Y) ||
+                   double.IsInfinity (Z) ||
+                   double.IsInfinity (T) ||
+                   double.IsNaN (X) ||
+                   double.IsNaN (Y) ||
+                   double.IsNaN (Z) ||
+                   double.IsNaN (T);
         }
     }
 
@@ -164,7 +164,7 @@ public class PointPair4
     /// <returns>A string representation of the PointPair4</returns>
     public new string ToString (bool isShowZT)
     {
-        return this.ToString (PointPair.DefaultFormat, isShowZT);
+        return ToString (DefaultFormat, isShowZT);
     }
 
     /// <summary>
@@ -179,11 +179,11 @@ public class PointPair4
     /// <param name="isShowZT">true to show the third "Z" or low dependent value coordinate</param>
     public new string ToString (string format, bool isShowZT)
     {
-        return "( " + this.X.ToString (format) +
-               ", " + this.Y.ToString (format) +
+        return "( " + X.ToString (format) +
+               ", " + Y.ToString (format) +
                (isShowZT
-                   ? (", " + this.Z.ToString (format) +
-                      ", " + this.T.ToString (format))
+                   ? (", " + Z.ToString (format) +
+                      ", " + T.ToString (format))
                    : "") + " )";
     }
 
@@ -202,10 +202,10 @@ public class PointPair4
     /// <returns>A string representation of the PointPair</returns>
     public string ToString (string formatX, string formatY, string formatZ, string formatT)
     {
-        return "( " + this.X.ToString (formatX) +
-               ", " + this.Y.ToString (formatY) +
-               ", " + this.Z.ToString (formatZ) +
-               ", " + this.T.ToString (formatT) +
+        return "( " + X.ToString (formatX) +
+               ", " + Y.ToString (formatY) +
+               ", " + Z.ToString (formatZ) +
+               ", " + T.ToString (formatT) +
                " )";
     }
 

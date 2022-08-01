@@ -164,7 +164,7 @@ class LinearScale
             if (_isPreventLabelOverlap)
             {
                 // Calculate the maximum number of labels
-                double maxLabels = (double)this.CalcMaxLabels (g, pane, scaleFactor);
+                double maxLabels = (double)CalcMaxLabels (g, pane, scaleFactor);
 
                 if (maxLabels < (_max - _min) / _majorStep)
                     _majorStep = CalcBoundedStepSize (_max - _min, maxLabels);

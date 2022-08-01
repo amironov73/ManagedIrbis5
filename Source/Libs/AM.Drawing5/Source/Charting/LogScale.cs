@@ -256,12 +256,12 @@ class LogScale
     /// </returns>
     override internal double CalcBaseTic()
     {
-        if (_baseTic != PointPair.Missing)
+        if (_baseTic != PointPairBase.Missing)
             return _baseTic;
         else
         {
             // go to the nearest even multiple of the step size
-            return Math.Ceiling (Scale.SafeLog (_min) - 0.00000001);
+            return Math.Ceiling (SafeLog (_min) - 0.00000001);
         }
     }
 
@@ -280,7 +280,7 @@ class LogScale
 
         //nTics = (int)( ( Math.Floor( Scale.SafeLog( _max ) + 1.0e-12 ) ) -
         //		( Math.Ceiling( Scale.SafeLog( _min ) - 1.0e-12 ) ) + 1 ) / CyclesPerStep;
-        nTics = (int)((Scale.SafeLog (_max) - Scale.SafeLog (_min)) / CyclesPerStep) + 1;
+        nTics = (int)((SafeLog (_max) - SafeLog (_min)) / CyclesPerStep) + 1;
 
         if (nTics < 1)
             nTics = 1;
@@ -397,7 +397,7 @@ class LogScale
     override internal string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
-            _format = Scale.Default.Format;
+            _format = Default.Format;
 
         if (_isUseTenPower)
             return string.Format ("{0:F0}", dVal);

@@ -45,7 +45,7 @@ public class GraphObjList
     public GraphObjList (GraphObjList rhs)
     {
         foreach (GraphObj item in rhs)
-            this.Add ((GraphObj)((ICloneable)item).Clone());
+            Add ((GraphObj)((ICloneable)item).Clone());
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ public class GraphObjList
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public class GraphObjList
         foreach (GraphObj p in this)
         {
             if (p.Tag is string &&
-                String.Compare ((string)p.Tag, tag, true) == 0)
+                string.Compare ((string)p.Tag, tag, true) == 0)
                 return index;
             index++;
         }
@@ -180,7 +180,7 @@ public class GraphObjList
             return -1;
 
         GraphObj graphObj = this[index];
-        this.RemoveAt (index);
+        RemoveAt (index);
 
         index += relativePos;
         if (index < 0)
@@ -229,7 +229,7 @@ public class GraphObjList
         // Draw the items in reverse order, so the last items in the
         // list appear behind the first items (consistent with
         // CurveList)
-        for (int i = this.Count - 1; i >= 0; i--)
+        for (int i = Count - 1; i >= 0; i--)
         {
             GraphObj item = this[i];
             if (item.ZOrder == zOrder && item.IsVisible)

@@ -43,9 +43,9 @@ public class MajorTic
         _color = Default.Color;
         _penWidth = Default.PenWidth;
 
-        this.IsOutside = Default.IsOutside;
-        this.IsInside = Default.IsInside;
-        this.IsOpposite = Default.IsOpposite;
+        IsOutside = Default.IsOutside;
+        IsInside = Default.IsInside;
+        IsOpposite = Default.IsOpposite;
         _isCrossOutside = Default.IsCrossOutside;
         _isCrossInside = Default.IsCrossInside;
 
@@ -69,7 +69,7 @@ public class MajorTic
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        return this.Clone();
+        return Clone();
     }
 
     /// <summary>
