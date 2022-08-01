@@ -73,9 +73,9 @@ public sealed class TextOutput
             string text
         )
     {
-        if (!string.IsNullOrEmpty(text))
+        if (!string.IsNullOrEmpty (text))
         {
-            _builder.Append(text);
+            _builder.Append (text);
         }
 
         return this;
@@ -91,9 +91,9 @@ public sealed class TextOutput
         )
     {
         HaveError = true;
-        if (!string.IsNullOrEmpty(text))
+        if (!string.IsNullOrEmpty (text))
         {
-            _builder.Append(text);
+            _builder.Append (text);
         }
 
         return this;
@@ -110,5 +110,4 @@ public sealed class TextOutput
     }
 
     #endregion
-
 }

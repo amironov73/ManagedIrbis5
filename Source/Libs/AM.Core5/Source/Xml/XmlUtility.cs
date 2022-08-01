@@ -17,116 +17,113 @@
 #region Using directives
 
 using System.IO;
-using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+
+using AM.Text;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Xml
+namespace AM.Xml;
+
+/// <summary>
+/// Возня с XML.
+/// </summary>
+public static class XmlUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Возня с XML.
+    /// Десериализация объекта из XML-файла.
     /// </summary>
-    public static class XmlUtility
+    public static T DeserializeFile<T>
+        (
+            string fileName
+        )
     {
-        #region Public methods
+        Sure.FileExists (fileName);
 
-        /// <summary>
-        /// Deserialize object from file.
-        /// </summary>
-        public static T DeserializeFile<T>
-            (
-                string fileName
-            )
+        var serializer = new XmlSerializer (typeof (T));
+        using var stream = File.OpenRead (fileName);
+
+        return (T) serializer.Deserialize (stream).ThrowIfNull();
+    }
+
+    /// <summary>
+    /// Десериализация объекта из XML-строки.
+    /// </summary>
+    public static T DeserializeString<T>
+        (
+            string xmlText
+        )
+    {
+        Sure.NotNullNorEmpty (xmlText);
+
+        var reader = new StringReader (xmlText);
+        var serializer = new XmlSerializer (typeof (T));
+
+        return (T) serializer.Deserialize (reader).ThrowIfNull();
+    }
+
+    /// <summary>
+    /// Сериализация обхекта в XML-файл.
+    /// </summary>
+    public static void SerializeToFile<T>
+        (
+            string fileName,
+            T obj
+        )
+        where T: class
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        var settings = new XmlWriterSettings
         {
-            Sure.FileExists (fileName);
+            OmitXmlDeclaration = true,
+            Indent = true
+        };
+        var namespaces = new XmlSerializerNamespaces();
+        namespaces.Add (string.Empty, string.Empty);
+        using var output = new StreamWriter (fileName);
+        using var writer = XmlWriter.Create (output, settings);
+        var objType = obj.GetType();
+        var serializer = new XmlSerializer (objType);
+        serializer.Serialize (writer, obj, namespaces);
+    }
 
-            var serializer = new XmlSerializer (typeof (T));
-            using Stream stream = File.OpenRead (fileName);
+    /// <summary>
+    /// Сериализация объекта в XML-строку без стандартного XML-заголовка
+    /// и пространств имен.
+    /// </summary>
+    public static string SerializeShort
+        (
+            object obj
+        )
+    {
+        Sure.NotNull (obj);
 
-            return (T)serializer.Deserialize (stream).ThrowIfNull();
-
-        } // method DeserializeFile
-
-        /// <summary>
-        /// Deserialize the string.
-        /// </summary>
-        public static T DeserializeString<T>
-            (
-                string xmlText
-            )
+        var settings = new XmlWriterSettings
         {
-            Sure.NotNullNorEmpty (xmlText, nameof (xmlText));
-
-            var reader = new StringReader (xmlText);
-            var serializer = new XmlSerializer (typeof (T));
-
-            return (T)serializer.Deserialize (reader).ThrowIfNull ();
-
-        } // method DeserializeString
-
-        /// <summary>
-        /// Serialize object to file.
-        /// </summary>
-        public static void SerializeToFile<T>
-            (
-                string fileName,
-                T obj
-            )
-            where T : class
+            OmitXmlDeclaration = true,
+            Indent = false,
+            NewLineHandling = NewLineHandling.None
+        };
+        var output = StringBuilderPool.Shared.Get();
+        var namespaces = new XmlSerializerNamespaces();
+        namespaces.Add (string.Empty, string.Empty);
+        using (var writer = XmlWriter.Create (output, settings))
         {
-            Sure.NotNullNorEmpty (fileName);
-
-            var settings = new XmlWriterSettings
-            {
-                OmitXmlDeclaration = true,
-                Indent = true
-            };
-            var namespaces = new XmlSerializerNamespaces();
-            namespaces.Add (string.Empty, string.Empty);
-            using var output = new StreamWriter (fileName);
-            using var writer = XmlWriter.Create (output, settings);
-            var objType = obj.GetType();
-            var serializer = new XmlSerializer (objType);
+            var serializer = new XmlSerializer (obj.GetType());
             serializer.Serialize (writer, obj, namespaces);
+        }
 
-        } // method SerializeToFile
+        var result = output.ToString();
+        StringBuilderPool.Shared.Return (output);
 
-        /// <summary>
-        /// Serialize to string without standard
-        /// XML header and namespaces.
-        /// </summary>
-        public static string SerializeShort
-            (
-                object obj
-            )
-        {
-            Sure.NotNull (obj);
+        return result;
+    }
 
-            var settings = new XmlWriterSettings
-            {
-                OmitXmlDeclaration = true,
-                Indent = false,
-                NewLineHandling = NewLineHandling.None
-            };
-            var output = new StringBuilder();
-            var namespaces = new XmlSerializerNamespaces();
-            namespaces.Add (string.Empty, string.Empty);
-            using (var writer = XmlWriter.Create (output, settings))
-            {
-                var serializer = new XmlSerializer (obj.GetType());
-                serializer.Serialize (writer, obj, namespaces);
-            }
-
-            return output.ToString();
-
-        } // method SerializeShort
-
-        #endregion
-
-    } // class XmlUtility
-
-} // nameof AM.Xml
+    #endregion
+}

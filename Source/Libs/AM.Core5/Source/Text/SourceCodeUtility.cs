@@ -16,7 +16,6 @@
 #region Using directives
 
 using System.Globalization;
-using System.Text;
 
 #endregion
 
@@ -56,20 +55,21 @@ public static class SourceCodeUtility
     {
         Sure.NotNull (array);
 
-        var result = new StringBuilder ("{");
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ('{');
         for (var i = 0; i < array.Length; i++)
         {
             if (i != 0)
             {
-                result.Append (", ");
+                builder.Append (", ");
                 if (i % 10 == 0)
                 {
-                    result.AppendLine();
-                    result.Append ("  ");
+                    builder.AppendLine();
+                    builder.Append ("  ");
                 }
             }
 
-            result.AppendFormat
+            builder.AppendFormat
                 (
                     CultureInfo.InvariantCulture,
                     "0x{0:X2}",
@@ -77,9 +77,12 @@ public static class SourceCodeUtility
                 );
         }
 
-        result.Append ('}');
+        builder.Append ('}');
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -138,28 +141,32 @@ public static class SourceCodeUtility
     {
         Sure.NotNull (array);
 
-        var result = new StringBuilder ("{");
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ('{');
         for (var i = 0; i < array.Length; i++)
         {
             if (i != 0)
             {
-                result.Append (", ");
+                builder.Append (", ");
                 if (i % 10 == 0)
                 {
-                    result.AppendLine();
-                    result.Append ("  ");
+                    builder.AppendLine();
+                    builder.Append ("  ");
                 }
             }
 
-            result.Append
+            builder.Append
                 (
                     "'" + EncodeCharacter (array[i]) + "'"
                 );
         }
 
-        result.Append ('}');
+        builder.Append ('}');
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -172,20 +179,21 @@ public static class SourceCodeUtility
     {
         Sure.NotNull (array);
 
-        var result = new StringBuilder ("{");
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ('{');
         for (var i = 0; i < array.Length; i++)
         {
             if (i != 0)
             {
-                result.Append (", ");
+                builder.Append (", ");
                 if (i % 10 == 0)
                 {
-                    result.AppendLine();
-                    result.Append ("  ");
+                    builder.AppendLine();
+                    builder.Append ("  ");
                 }
             }
 
-            result.Append
+            builder.Append
                 (
                     array[i].ToString
                         (
@@ -194,9 +202,12 @@ public static class SourceCodeUtility
                 );
         }
 
-        result.Append ('}');
+        builder.Append ('}');
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

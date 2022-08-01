@@ -129,13 +129,13 @@ public static class RichText
             return text;
         }
 
-        var length = text.Length;
-        var result = new StringBuilder (length);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (text.Length);
         var navigator = new TextNavigator (text);
         while (!navigator.IsEOF)
         {
             var chunk = navigator.ReadUntil ('\\');
-            result.Append (chunk);
+            builder.Append (chunk);
             var prefix = navigator.ReadChar();
             if (prefix != '\\')
             {
@@ -145,14 +145,14 @@ public static class RichText
             var c = navigator.ReadChar();
             if (c == '\0')
             {
-                result.Append (prefix);
+                builder.Append (prefix);
                 break;
             }
 
             if (c != 'u')
             {
-                result.Append (prefix);
-                result.Append (c);
+                builder.Append (prefix);
+                builder.Append (c);
                 continue;
             }
 
@@ -170,12 +170,15 @@ public static class RichText
 
             if (buffer.Length != 0)
             {
-                c = (char)int.Parse (buffer.ToString());
-                result.Append (c);
+                c = (char) int.Parse (buffer.ToString());
+                builder.Append (c);
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -192,38 +195,38 @@ public static class RichText
             return text;
         }
 
-        var length = text.Length;
-        var result = new StringBuilder (length);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (text.Length);
         foreach (var c in text)
         {
             if (c < 0x20)
             {
-                result.AppendFormat ("\\'{0:x2}", (byte) c);
+                builder.AppendFormat ("\\'{0:x2}", (byte) c);
             }
             else if (c < 0x80)
             {
                 switch (c)
                 {
                     case '{':
-                        result.Append ("\\{");
+                        builder.Append ("\\{");
                         break;
 
                     case '}':
-                        result.Append ("\\}");
+                        builder.Append ("\\}");
                         break;
 
                     case '\\':
-                        result.Append ("\\\\");
+                        builder.Append ("\\\\");
                         break;
 
                     default:
-                        result.Append (c);
+                        builder.Append (c);
                         break;
                 }
             }
             else if (c < 0x100)
             {
-                result.AppendFormat ("\\'{0:x2}", (byte) c);
+                builder.AppendFormat ("\\'{0:x2}", (byte) c);
             }
             else
             {
@@ -238,18 +241,21 @@ public static class RichText
 
                 if (simple)
                 {
-                    result.Append (c);
+                    builder.Append (c);
                 }
                 else
                 {
                     // После \u следующий символ съедается
                     // поэтому подсовываем знак вопроса
-                    result.AppendFormat ("\\u{0}?", (short) c);
+                    builder.AppendFormat ("\\u{0}?", (short) c);
                 }
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -266,22 +272,21 @@ public static class RichText
             return text;
         }
 
-        var length = text.Length;
-
-        var result = new StringBuilder (length);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (text.Length);
         foreach (var c in text)
         {
             if (c < 0x20)
             {
-                result.AppendFormat ("\\'{0:x2}", (byte) c);
+                builder.AppendFormat ("\\'{0:x2}", (byte) c);
             }
             else if (c < 0x80)
             {
-                result.Append (c);
+                builder.Append (c);
             }
             else if (c < 0x100)
             {
-                result.AppendFormat ("\\'{0:x2}", (byte) c);
+                builder.AppendFormat ("\\'{0:x2}", (byte) c);
             }
             else
             {
@@ -296,18 +301,21 @@ public static class RichText
 
                 if (simple)
                 {
-                    result.Append (c);
+                    builder.Append (c);
                 }
                 else
                 {
                     // После \u следующий символ съедается
                     // поэтому подсовываем знак вопроса
-                    result.AppendFormat ("\\u{0}?", (int) c);
+                    builder.AppendFormat ("\\u{0}?", (int) c);
                 }
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -325,24 +333,23 @@ public static class RichText
             return text;
         }
 
-        var length = text.Length;
-
-        var result = new StringBuilder (length);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (text.Length);
         foreach (var c in text)
         {
             if (c < 0x20)
             {
-                result.AppendFormat ("\\'{0:x2}", (byte) c);
+                builder.AppendFormat ("\\'{0:x2}", (byte) c);
             }
             else if (c < 0x80)
             {
-                result.Append (c);
+                builder.Append (c);
             }
             else if (c < 0x100)
             {
-                result.Append ('{');
-                result.AppendFormat ("{0}\\'{1:x2}", modeSwitch, (byte) c);
-                result.Append ('}');
+                builder.Append ('{');
+                builder.AppendFormat ("{0}\\'{1:x2}", modeSwitch, (byte) c);
+                builder.Append ('}');
             }
             else
             {
@@ -357,18 +364,21 @@ public static class RichText
 
                 if (simple)
                 {
-                    result.Append (c);
+                    builder.Append (c);
                 }
                 else
                 {
                     // После \u следующий символ съедается
                     // поэтому подсовываем знак вопроса
-                    result.AppendFormat ("\\u{0}?", (int) c);
+                    builder.AppendFormat ("\\u{0}?", (int) c);
                 }
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion
