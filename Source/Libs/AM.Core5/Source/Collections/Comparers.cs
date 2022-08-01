@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedMember.Global
 
 /* Comparers.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -32,7 +33,8 @@ internal static class Comparers
     /// Only the keys are compared.
     /// </summary>
     [Serializable]
-    class KeyValueEqualityComparer<TKey, TValue> : IEqualityComparer<KeyValuePair<TKey, TValue>>
+    class KeyValueEqualityComparer<TKey, TValue>
+        : IEqualityComparer<KeyValuePair<TKey, TValue>>
     {
         private readonly IEqualityComparer<TKey> keyEqualityComparer;
 
@@ -51,17 +53,10 @@ internal static class Comparers
             return Util.GetHashCode (obj.Key, keyEqualityComparer);
         }
 
-        public override bool Equals (object obj)
+        public override bool Equals (object? obj)
         {
-            if (obj is KeyValueEqualityComparer<TKey, TValue>)
-            {
-                return object.Equals (keyEqualityComparer,
-                    ((KeyValueEqualityComparer<TKey, TValue>)obj).keyEqualityComparer);
-            }
-            else
-            {
-                return false;
-            }
+            return obj is KeyValueEqualityComparer<TKey, TValue> comparer
+                   && Equals (keyEqualityComparer, comparer.keyEqualityComparer);
         }
 
         public override int GetHashCode()
@@ -89,16 +84,15 @@ internal static class Comparers
             return keyComparer.Compare (x.Key, y.Key);
         }
 
-        public override bool Equals (object obj)
+        public override bool Equals
+            (
+                object? obj
+            )
         {
-            if (obj is KeyValueComparer<TKey, TValue>)
-            {
-                return object.Equals (keyComparer, ((KeyValueComparer<TKey, TValue>)obj).keyComparer);
-            }
-            else
-            {
-                return false;
-            }
+            Sure.NotNull (obj);
+
+            return obj is KeyValueComparer<TKey, TValue> comparer
+                   && Equals (keyComparer, comparer.keyComparer);
         }
 
         public override int GetHashCode()
@@ -127,27 +121,18 @@ internal static class Comparers
         {
             var keyCompare = keyComparer.Compare (x.Key, y.Key);
 
-            if (keyCompare == 0)
-            {
-                return valueComparer.Compare (x.Value, y.Value);
-            }
-            else
-            {
-                return keyCompare;
-            }
+            return keyCompare == 0 ? valueComparer.Compare (x.Value, y.Value) : keyCompare;
         }
 
-        public override bool Equals (object obj)
+        public override bool Equals (object? obj)
         {
-            if (obj is PairComparer<TKey, TValue>)
+            if (obj is PairComparer<TKey, TValue> comparer)
             {
-                return object.Equals (keyComparer, ((PairComparer<TKey, TValue>)obj).keyComparer) &&
-                       object.Equals (valueComparer, ((PairComparer<TKey, TValue>)obj).valueComparer);
+                return Equals (keyComparer, comparer.keyComparer) &&
+                       Equals (valueComparer, comparer.valueComparer);
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public override int GetHashCode()
@@ -169,21 +154,14 @@ internal static class Comparers
             this.comparison = comparison;
         }
 
-        public int Compare (T x, T y)
+        public int Compare (T? x, T? y)
         {
-            return comparison (x, y);
+            return comparison (x!, y!);
         }
 
-        public override bool Equals (object obj)
+        public override bool Equals (object? obj)
         {
-            if (obj is ComparisonComparer<T>)
-            {
-                return comparison.Equals (((ComparisonComparer<T>)obj).comparison);
-            }
-            else
-            {
-                return false;
-            }
+            return obj is ComparisonComparer<T> comparer && comparison.Equals (comparer.comparison);
         }
 
         public override int GetHashCode()
@@ -211,16 +189,10 @@ internal static class Comparers
             return comparison (x.Key, y.Key);
         }
 
-        public override bool Equals (object obj)
+        public override bool Equals (object? obj)
         {
-            if (obj is ComparisonKeyValueComparer<TKey, TValue>)
-            {
-                return comparison.Equals (((ComparisonKeyValueComparer<TKey, TValue>)obj).comparison);
-            }
-            else
-            {
-                return false;
-            }
+            return obj is ComparisonKeyValueComparer<TKey, TValue> comparer
+                   && comparison.Equals (comparer.comparison);
         }
 
         public override int GetHashCode()
@@ -236,12 +208,12 @@ internal static class Comparers
     /// <typeparam name="T">T to compare.</typeparam>
     /// <param name="comparison">Comparison delegate on T</param>
     /// <returns>IComparer that uses the comparison.</returns>
-    public static IComparer<T> ComparerFromComparison<T> (Comparison<T> comparison)
+    public static IComparer<T> ComparerFromComparison<T>
+        (
+            Comparison<T> comparison
+        )
     {
-        if (comparison == null)
-        {
-            throw new ArgumentNullException ("comparison");
-        }
+        Sure.NotNull (comparison);
 
         return new ComparisonComparer<T> (comparison);
     }
@@ -254,13 +226,12 @@ internal static class Comparers
     /// <typeparam name="TValue">TValue of the apris</typeparam>
     /// <param name="keyComparer">IComparer on TKey</param>
     /// <returns>IComparer for comparing key-value pairs.</returns>
-    public static IComparer<KeyValuePair<TKey, TValue>> ComparerKeyValueFromComparerKey<TKey, TValue> (
-        IComparer<TKey> keyComparer)
+    public static IComparer<KeyValuePair<TKey, TValue>> ComparerKeyValueFromComparerKey<TKey, TValue>
+        (
+            IComparer<TKey> keyComparer
+        )
     {
-        if (keyComparer == null)
-        {
-            throw new ArgumentNullException ("keyComparer");
-        }
+        Sure.NotNull (keyComparer);
 
         return new KeyValueComparer<TKey, TValue> (keyComparer);
     }
@@ -273,13 +244,12 @@ internal static class Comparers
     /// <typeparam name="TValue">TValue of the apris</typeparam>
     /// <param name="keyEqualityComparer">IComparer on TKey</param>
     /// <returns>IEqualityComparer for comparing key-value pairs.</returns>
-    public static IEqualityComparer<KeyValuePair<TKey, TValue>> EqualityComparerKeyValueFromComparerKey<TKey, TValue> (
-        IEqualityComparer<TKey> keyEqualityComparer)
+    public static IEqualityComparer<KeyValuePair<TKey, TValue>> EqualityComparerKeyValueFromComparerKey<TKey, TValue>
+        (
+            IEqualityComparer<TKey> keyEqualityComparer
+        )
     {
-        if (keyEqualityComparer == null)
-        {
-            throw new ArgumentNullException ("keyEqualityComparer");
-        }
+        Sure.NotNull (keyEqualityComparer);
 
         return new KeyValueEqualityComparer<TKey, TValue> (keyEqualityComparer);
     }
@@ -293,18 +263,14 @@ internal static class Comparers
     /// <param name="keyComparer">IComparer on TKey</param>
     /// <param name="valueComparer">IComparer on TValue</param>
     /// <returns>IComparer for comparing key-value pairs.</returns>
-    public static IComparer<KeyValuePair<TKey, TValue>> ComparerPairFromKeyValueComparers<TKey, TValue> (
-        IComparer<TKey> keyComparer, IComparer<TValue> valueComparer)
+    public static IComparer<KeyValuePair<TKey, TValue>> ComparerPairFromKeyValueComparers<TKey, TValue>
+        (
+            IComparer<TKey> keyComparer,
+            IComparer<TValue> valueComparer
+        )
     {
-        if (keyComparer == null)
-        {
-            throw new ArgumentNullException ("keyComparer");
-        }
-
-        if (valueComparer == null)
-        {
-            throw new ArgumentNullException ("valueComparer");
-        }
+        Sure.NotNull (keyComparer);
+        Sure.NotNull (valueComparer);
 
         return new PairComparer<TKey, TValue> (keyComparer, valueComparer);
     }
@@ -317,13 +283,12 @@ internal static class Comparers
     /// <typeparam name="TValue">TValue of the apris</typeparam>
     /// <param name="keyComparison">Comparison delegate on TKey</param>
     /// <returns>IComparer for comparing key-value pairs.</returns>
-    public static IComparer<KeyValuePair<TKey, TValue>> ComparerKeyValueFromComparisonKey<TKey, TValue> (
-        Comparison<TKey> keyComparison)
+    public static IComparer<KeyValuePair<TKey, TValue>> ComparerKeyValueFromComparisonKey<TKey, TValue>
+        (
+            Comparison<TKey> keyComparison
+        )
     {
-        if (keyComparison == null)
-        {
-            throw new ArgumentNullException ("keyComparison");
-        }
+        Sure.NotNull (keyComparison);
 
         return new ComparisonKeyValueComparer<TKey, TValue> (keyComparison);
     }
@@ -337,14 +302,12 @@ internal static class Comparers
     public static IComparer<T> DefaultComparer<T>()
     {
         if (typeof (IComparable<T>).IsAssignableFrom (typeof (T)) ||
-            typeof (System.IComparable).IsAssignableFrom (typeof (T)))
+            typeof (IComparable).IsAssignableFrom (typeof (T)))
         {
             return Comparer<T>.Default;
         }
-        else
-        {
-            throw new InvalidOperationException ("Type does not implement IComparable<T> or IComparable");
-        }
+
+        throw new InvalidOperationException ("Type does not implement IComparable<T> or IComparable");
     }
 
     /// <summary>
