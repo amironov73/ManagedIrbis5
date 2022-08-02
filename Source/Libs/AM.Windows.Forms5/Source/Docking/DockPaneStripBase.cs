@@ -3,8 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable VirtualMemberCallInConstructor
 
-/* 
+/* DockPaneStripBase.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,7 +18,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Permissions;
 using System.Diagnostics.CodeAnalysis;
 
 #endregion
@@ -25,16 +26,25 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AM.Windows.Forms.Docking;
 
-public abstract class DockPaneStripBase : Control
+/// <summary>
+///
+/// </summary>
+public abstract class DockPaneStripBase
+    : Control
 {
+    /// <summary>
+    ///
+    /// </summary>
     [SuppressMessage ("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
-    protected internal class Tab : IDisposable
+    protected internal class Tab
+        : IDisposable
     {
-        private IDockContent m_content;
-
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
         public Tab (IDockContent content)
         {
-            m_content = content;
+            Content = content;
         }
 
         ~Tab()
@@ -42,28 +52,35 @@ public abstract class DockPaneStripBase : Control
             Dispose (false);
         }
 
-        public IDockContent Content
-        {
-            get { return m_content; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public IDockContent Content { get; }
 
-        public Form ContentForm
-        {
-            get { return m_content as Form; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public Form? ContentForm => Content as Form;
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
             Dispose (true);
             GC.SuppressFinalize (this);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         protected virtual void Dispose (bool disposing)
         {
         }
 
         private Rectangle? _rect;
 
+        /// <summary>
+        ///
+        /// </summary>
         public Rectangle? Rectangle
         {
             get
@@ -80,20 +97,24 @@ public abstract class DockPaneStripBase : Control
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     [SuppressMessage ("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
-    protected sealed class TabCollection : IEnumerable<Tab>
+    protected sealed class TabCollection
+        : IEnumerable<Tab>
     {
         #region IEnumerable Members
 
         IEnumerator<Tab> IEnumerable<Tab>.GetEnumerator()
         {
-            for (int i = 0; i < Count; i++)
+            for (var i = 0; i < Count; i++)
                 yield return this[i];
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            for (int i = 0; i < Count; i++)
+            for (var i = 0; i < Count; i++)
                 yield return this[i];
         }
 
@@ -101,46 +122,57 @@ public abstract class DockPaneStripBase : Control
 
         internal TabCollection (DockPane pane)
         {
-            m_dockPane = pane;
+            DockPane = pane;
         }
 
-        private DockPane m_dockPane;
+        /// <summary>
+        ///
+        /// </summary>
+        public DockPane DockPane { get; }
 
-        public DockPane DockPane
-        {
-            get { return m_dockPane; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public int Count => DockPane.DisplayingContents.Count;
 
-        public int Count
-        {
-            get { return DockPane.DisplayingContents.Count; }
-        }
-
+        /// <summary>
+        ///
+        /// </summary>
         public Tab this [int index]
         {
             get
             {
-                IDockContent content = DockPane.DisplayingContents[index];
+                var content = DockPane.DisplayingContents[index];
                 if (content == null)
                 {
-                    throw (new ArgumentOutOfRangeException (nameof (index)));
+                    throw new ArgumentOutOfRangeException (nameof (index));
                 }
 
                 return content.DockHandler.GetTab (DockPane.TabStripControl);
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         public bool Contains (Tab tab)
         {
-            return (IndexOf (tab) != -1);
+            return IndexOf (tab) >= 0;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="content"></param>
         public bool Contains (IDockContent content)
         {
-            return (IndexOf (content) != -1);
+            return IndexOf (content) != -1;
         }
 
-        public int IndexOf (Tab tab)
+        /// <summary>
+        ///
+        /// </summary>
+        public int IndexOf (Tab? tab)
         {
             if (tab == null)
             {
@@ -150,39 +182,43 @@ public abstract class DockPaneStripBase : Control
             return DockPane.DisplayingContents.IndexOf (tab.Content);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         public int IndexOf (IDockContent content)
         {
             return DockPane.DisplayingContents.IndexOf (content);
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected DockPaneStripBase (DockPane pane)
     {
-        m_dockPane = pane;
+        DockPane = pane;
 
         SetStyle (ControlStyles.OptimizedDoubleBuffer, true);
         SetStyle (ControlStyles.Selectable, false);
         AllowDrop = true;
     }
 
-    private DockPane m_dockPane;
+    /// <summary>
+    ///
+    /// </summary>
+    protected DockPane DockPane { get; }
 
-    protected DockPane DockPane
-    {
-        get { return m_dockPane; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    protected DockPane.AppearanceStyle Appearance => DockPane.Appearance;
 
-    protected DockPane.AppearanceStyle Appearance
-    {
-        get { return DockPane.Appearance; }
-    }
+    private TabCollection? _tabs;
 
-    private TabCollection m_tabs;
-
-    protected TabCollection Tabs
-    {
-        get { return m_tabs ?? (m_tabs = new TabCollection (DockPane)); }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    protected TabCollection Tabs => _tabs ??= new (DockPane);
 
     internal void RefreshChanges()
     {
@@ -194,28 +230,52 @@ public abstract class DockPaneStripBase : Control
         OnRefreshChanges();
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void OnRefreshChanges()
     {
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected internal abstract int MeasureHeight();
 
+    /// <summary>
+    ///
+    /// </summary>
     protected internal abstract void EnsureTabVisible (IDockContent content);
 
+    /// <summary>
+    ///
+    /// </summary>
     protected int HitTest()
     {
         return HitTest (PointToClient (Control.MousePosition));
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected internal abstract int HitTest (Point point);
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual bool MouseDownActivateTest (MouseEventArgs e)
     {
         return true;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public abstract GraphicsPath GetOutline (int index);
 
+    /// <summary>
+    ///
+    /// </summary>
     protected internal virtual Tab CreateTab (IDockContent content)
     {
         return new Tab (content);
@@ -223,10 +283,11 @@ public abstract class DockPaneStripBase : Control
 
     private Rectangle _dragBox = Rectangle.Empty;
 
+    /// <inheritdoc cref="Control.OnMouseDown"/>
     protected override void OnMouseDown (MouseEventArgs e)
     {
         base.OnMouseDown (e);
-        int index = HitTest();
+        var index = HitTest();
         if (index != -1)
         {
             if (e.Button == MouseButtons.Middle)
@@ -236,7 +297,7 @@ public abstract class DockPaneStripBase : Control
             }
             else
             {
-                IDockContent content = Tabs[index].Content;
+                var content = Tabs[index].Content;
                 if (DockPane.ActiveContent != content)
                 {
                     // Test if the content should be active
@@ -251,11 +312,12 @@ public abstract class DockPaneStripBase : Control
         if (e.Button == MouseButtons.Left)
         {
             var dragSize = SystemInformation.DragSize;
-            _dragBox = new Rectangle (new Point (e.X - (dragSize.Width / 2),
-                e.Y - (dragSize.Height / 2)), dragSize);
+            _dragBox = new Rectangle (new Point (e.X - dragSize.Width / 2,
+                e.Y - dragSize.Height / 2), dragSize);
         }
     }
 
+    /// <inheritdoc cref="Control.OnMouseMove"/>
     protected override void OnMouseMove (MouseEventArgs e)
     {
         base.OnMouseMove (e);
@@ -277,22 +339,28 @@ public abstract class DockPaneStripBase : Control
         }
     }
 
-    protected bool HasTabPageContextMenu
-    {
-        get { return DockPane.HasTabPageContextMenu; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    protected bool HasTabPageContextMenu => DockPane.HasTabPageContextMenu;
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void ShowTabPageContextMenu (Point position)
     {
         DockPane.ShowTabPageContextMenu (this, position);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected bool TryCloseTab (int index)
     {
         if (index >= 0 || index < Tabs.Count)
         {
             // Close the specified content.
-            IDockContent content = Tabs[index].Content;
+            var content = Tabs[index].Content;
             DockPane.CloseContent (content);
             if (PatchController.EnableSelectClosestOnClose == true)
             {
@@ -318,6 +386,7 @@ public abstract class DockPaneStripBase : Control
         }
     }
 
+    /// <inheritdoc cref="Control.OnMouseUp"/>
     protected override void OnMouseUp (MouseEventArgs e)
     {
         base.OnMouseUp (e);
@@ -328,17 +397,17 @@ public abstract class DockPaneStripBase : Control
         }
     }
 
-    [SecurityPermission (SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+    /// <inheritdoc cref="Control.WndProc"/>
     protected override void WndProc (ref Message m)
     {
         if (m.Msg == (int)Win32.Msgs.WM_LBUTTONDBLCLK)
         {
             base.WndProc (ref m);
 
-            int index = HitTest();
+            var index = HitTest();
             if (DockPane.DockPanel.AllowEndUserDocking && index != -1)
             {
-                IDockContent content = Tabs[index].Content;
+                var content = Tabs[index].Content;
                 if (content.DockHandler.CheckDockState (!content.DockHandler.IsFloat) != DockState.Unknown)
                 {
                     content.DockHandler.IsFloat = !content.DockHandler.IsFloat;
@@ -349,17 +418,17 @@ public abstract class DockPaneStripBase : Control
         }
 
         base.WndProc (ref m);
-        return;
     }
 
+    /// <inheritdoc cref="Control.OnDragOver"/>
     protected override void OnDragOver (DragEventArgs drgevent)
     {
         base.OnDragOver (drgevent);
 
-        int index = HitTest();
+        var index = HitTest();
         if (index != -1)
         {
-            IDockContent content = Tabs[index].Content;
+            var content = Tabs[index].Content;
             if (DockPane.ActiveContent != content)
             {
                 DockPane.ActiveContent = content;
@@ -367,17 +436,27 @@ public abstract class DockPaneStripBase : Control
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected void ContentClosed()
     {
-        if (m_tabs.Count == 0)
+        if (_tabs.Count == 0)
         {
             DockPane.ClearLastActiveContent();
         }
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected abstract Rectangle GetTabBounds (Tab tab);
 
-    internal static Rectangle ToScreen (Rectangle rectangle, Control parent)
+    internal static Rectangle ToScreen
+        (
+            Rectangle rectangle,
+            Control? parent
+        )
     {
         if (parent == null)
         {
@@ -388,42 +467,51 @@ public abstract class DockPaneStripBase : Control
             new Size (rectangle.Width, rectangle.Height));
     }
 
+    /// <inheritdoc cref="Control.CreateAccessibilityInstance"/>
     protected override AccessibleObject CreateAccessibilityInstance()
     {
         return new DockPaneStripAccessibleObject (this);
     }
 
-    public class DockPaneStripAccessibleObject : Control.ControlAccessibleObject
+    /// <summary>
+    ///
+    /// </summary>
+    public class DockPaneStripAccessibleObject
+        : ControlAccessibleObject
     {
-        private DockPaneStripBase _strip;
+        private readonly DockPaneStripBase _strip;
 
+        /// <summary>
+        ///
+        /// </summary>
         public DockPaneStripAccessibleObject (DockPaneStripBase strip)
             : base (strip)
         {
             _strip = strip;
         }
 
-        public override AccessibleRole Role
-        {
-            get { return AccessibleRole.PageTabList; }
-        }
+        /// <inheritdoc cref="ControlAccessibleObject.Role"/>
+        public override AccessibleRole Role => AccessibleRole.PageTabList;
 
+        /// <inheritdoc cref="AccessibleObject.GetChildCount"/>
         public override int GetChildCount()
         {
             return _strip.Tabs.Count;
         }
 
+        /// <inheritdoc cref="AccessibleObject.GetChild"/>
         public override AccessibleObject GetChild (int index)
         {
             return new DockPaneStripTabAccessibleObject (_strip, _strip.Tabs[index], this);
         }
 
-        public override AccessibleObject HitTest (int x, int y)
+        /// <inheritdoc cref="AccessibleObject.HitTest"/>
+        public override AccessibleObject? HitTest (int x, int y)
         {
-            Point point = new Point (x, y);
-            foreach (Tab tab in _strip.Tabs)
+            var point = new Point (x, y);
+            foreach (var tab in _strip.Tabs)
             {
-                Rectangle rectangle = _strip.GetTabBounds (tab);
+                var rectangle = _strip.GetTabBounds (tab);
                 if (ToScreen (rectangle, _strip).Contains (point))
                 {
                     return new DockPaneStripTabAccessibleObject (_strip, tab, this);
@@ -434,40 +522,42 @@ public abstract class DockPaneStripBase : Control
         }
     }
 
-    protected class DockPaneStripTabAccessibleObject : AccessibleObject
+    /// <summary>
+    ///
+    /// </summary>
+    protected class DockPaneStripTabAccessibleObject
+        : AccessibleObject
     {
         private DockPaneStripBase _strip;
         private Tab _tab;
-
-        private AccessibleObject _parent;
 
         internal DockPaneStripTabAccessibleObject (DockPaneStripBase strip, Tab tab, AccessibleObject parent)
         {
             _strip = strip;
             _tab = tab;
 
-            _parent = parent;
+            Parent = parent;
         }
 
-        public override AccessibleObject Parent
-        {
-            get { return _parent; }
-        }
+        /// <inheritdoc cref="AccessibleObject.Parent"/>
+        public override AccessibleObject Parent { get; }
 
-        public override AccessibleRole Role
-        {
-            get { return AccessibleRole.PageTab; }
-        }
+        /// <inheritdoc cref="AccessibleObject.Role"/>
+        public override AccessibleRole Role => AccessibleRole.PageTab;
 
+        /// <inheritdoc cref="AccessibleObject.Bounds"/>
         public override Rectangle Bounds
         {
             get
             {
-                Rectangle rectangle = _strip.GetTabBounds (_tab);
+                var rectangle = _strip.GetTabBounds (_tab);
                 return ToScreen (rectangle, _strip);
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         public override string Name
         {
             get { return _tab.Content.DockHandler.TabText; }
