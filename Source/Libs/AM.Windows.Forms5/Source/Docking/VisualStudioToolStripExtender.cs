@@ -59,7 +59,9 @@ public partial class VisualStudioToolStripExtender : Component, IExtenderProvide
         private void SaveMenuStripText()
         {
             foreach (ToolStripItem item in strip.Items)
+            {
                 menuText.Add (item, item.Text);
+            }
         }
 
         public void UpdateMenuText (bool caps)

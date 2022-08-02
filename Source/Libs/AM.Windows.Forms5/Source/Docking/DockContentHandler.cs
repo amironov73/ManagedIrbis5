@@ -1146,6 +1146,7 @@ public class DockContentHandler : IDisposable, IDockDragSource
         {
             DockPane paneExisting = null;
             foreach (DockPane pane in DockPanel.Panes)
+            {
                 if (pane.DockState == dockState)
                 {
                     if (paneExisting == null || pane.IsActivated)
@@ -1158,6 +1159,7 @@ public class DockContentHandler : IDisposable, IDockDragSource
                         break;
                     }
                 }
+            }
 
             if (paneExisting == null)
             {

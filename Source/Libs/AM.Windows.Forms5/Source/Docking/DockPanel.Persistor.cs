@@ -932,10 +932,12 @@ partial class DockPanel
             }
 
             foreach (string s in CompatibleConfigFileVersions)
+            {
                 if (s == formatVersion)
                 {
                     return true;
                 }
+            }
 
             return false;
         }

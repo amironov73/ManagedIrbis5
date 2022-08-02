@@ -3,8 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Local
+// ReSharper disable InconsistentNaming
 
-/*
+/* DockPanel.MdiClientController.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,13 +28,13 @@ partial class DockPanel
 {
     //  This class comes from Jacob Slusser's MdiClientController class:
     //  http://www.codeproject.com/cs/miscctrl/mdiclientcontroller.asp
-    private class MdiClientController : NativeWindow, IComponent, IDisposable
+    private class MdiClientController
+        : NativeWindow, IComponent
     {
         private bool m_autoScroll = true;
         private BorderStyle m_borderStyle = BorderStyle.Fixed3D;
-        private MdiClient m_mdiClient = null;
-        private Form m_parentForm = null;
-        private ISite m_site = null;
+        private Form? m_parentForm;
+        private ISite? m_site;
 
         public void Dispose()
         {
@@ -107,9 +109,9 @@ partial class DockPanel
                 if (!Win32Helper.IsRunningOnMono)
                 {
                     // Get styles using Win32 calls
-                    int style = Win32.NativeMethods.GetWindowLong (MdiClient.Handle,
+                    var style = Win32.NativeMethods.GetWindowLong (MdiClient.Handle,
                         (int)Win32.GetWindowLongIndex.GWL_STYLE);
-                    int exStyle = Win32.NativeMethods.GetWindowLong (MdiClient.Handle,
+                    var exStyle = Win32.NativeMethods.GetWindowLong (MdiClient.Handle,
                         (int)Win32.GetWindowLongIndex.GWL_EXSTYLE);
 
                     // Add or remove style flags as necessary.
@@ -143,24 +145,27 @@ partial class DockPanel
             }
         }
 
-        public MdiClient MdiClient
-        {
-            get { return m_mdiClient; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public MdiClient? MdiClient { get; private set; }
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable (false)]
         [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public Form ParentForm
+        public Form? ParentForm
         {
-            get { return m_parentForm; }
+            get => m_parentForm;
             set
             {
                 // If the ParentForm has previously been set,
                 // unwire events connected to the old parent.
                 if (m_parentForm != null)
                 {
-                    m_parentForm.HandleCreated -= new EventHandler (ParentFormHandleCreated);
-                    m_parentForm.MdiChildActivate -= new EventHandler (ParentFormMdiChildActivate);
+                    m_parentForm.HandleCreated -= ParentFormHandleCreated;
+                    m_parentForm.MdiChildActivate -= ParentFormMdiChildActivate;
                 }
 
                 m_parentForm = value;
@@ -179,14 +184,14 @@ partial class DockPanel
                 }
                 else
                 {
-                    m_parentForm.HandleCreated += new EventHandler (ParentFormHandleCreated);
+                    m_parentForm.HandleCreated += ParentFormHandleCreated;
                 }
 
-                m_parentForm.MdiChildActivate += new EventHandler (ParentFormMdiChildActivate);
+                m_parentForm.MdiChildActivate += ParentFormMdiChildActivate;
             }
         }
 
-        public ISite Site
+        public ISite? Site
         {
             get { return m_site; }
             set
@@ -200,11 +205,9 @@ partial class DockPanel
 
                 // If the component is dropped onto a form during design-time,
                 // set the ParentForm property.
-                IDesignerHost host = (value.GetService (typeof (IDesignerHost)) as IDesignerHost);
-                if (host != null)
+                if (value!.GetService (typeof (IDesignerHost)) is IDesignerHost host)
                 {
-                    Form parent = host.RootComponent as Form;
-                    if (parent != null)
+                    if (host.RootComponent is Form parent)
                     {
                         ParentForm = parent;
                     }
@@ -219,13 +222,13 @@ partial class DockPanel
             RefreshProperties();
         }
 
-        public event EventHandler Disposed;
+        public event EventHandler? Disposed;
 
-        public event EventHandler HandleAssigned;
+        public event EventHandler? HandleAssigned;
 
-        public event EventHandler MdiChildActivate;
+        public event EventHandler? MdiChildActivate;
 
-        public event LayoutEventHandler Layout;
+        public event LayoutEventHandler? Layout;
 
         protected virtual void OnHandleAssigned (EventArgs e)
         {
@@ -254,7 +257,10 @@ partial class DockPanel
             }
         }
 
-        public event PaintEventHandler Paint;
+        /// <summary>
+        ///
+        /// </summary>
+        public event PaintEventHandler? Paint;
 
         protected virtual void OnPaint (PaintEventArgs e)
         {
@@ -286,32 +292,32 @@ partial class DockPanel
             base.WndProc (ref m);
         }
 
-        private void ParentFormHandleCreated (object sender, EventArgs e)
+        private void ParentFormHandleCreated (object? sender, EventArgs eventArgs)
         {
             // The form has been created, unwire the event, and initialize the MdiClient.
-            this.m_parentForm.HandleCreated -= new EventHandler (ParentFormHandleCreated);
+            this.m_parentForm.HandleCreated -= ParentFormHandleCreated;
             InitializeMdiClient();
             RefreshProperties();
         }
 
-        private void ParentFormMdiChildActivate (object sender, EventArgs e)
+        private void ParentFormMdiChildActivate (object? sender, EventArgs eventArgs)
         {
-            OnMdiChildActivate (e);
+            OnMdiChildActivate (eventArgs);
         }
 
-        private void MdiClientLayout (object sender, LayoutEventArgs e)
+        private void MdiClientLayout (object? sender, LayoutEventArgs eventArgs)
         {
-            OnLayout (e);
+            OnLayout (eventArgs);
         }
 
         private void MdiClientHandleDestroyed (object sender, EventArgs e)
         {
             // If the MdiClient handle has been released, drop the reference and
             // release the handle.
-            if (m_mdiClient != null)
+            if (MdiClient != null)
             {
-                m_mdiClient.HandleDestroyed -= new EventHandler (MdiClientHandleDestroyed);
-                m_mdiClient = null;
+                MdiClient.HandleDestroyed -= MdiClientHandleDestroyed;
+                MdiClient = null;
             }
 
             ReleaseHandle();
@@ -323,8 +329,8 @@ partial class DockPanel
             // to the old MDI.
             if (MdiClient != null)
             {
-                MdiClient.HandleDestroyed -= new EventHandler (MdiClientHandleDestroyed);
-                MdiClient.Layout -= new LayoutEventHandler (MdiClientLayout);
+                MdiClient.HandleDestroyed -= MdiClientHandleDestroyed;
+                MdiClient.Layout -= MdiClientLayout;
             }
 
             if (ParentForm == null)
@@ -338,8 +344,8 @@ partial class DockPanel
                 // If the form is an MDI container, it will contain an MdiClient control
                 // just as it would any other control.
 
-                m_mdiClient = control as MdiClient;
-                if (m_mdiClient == null)
+                MdiClient = control as MdiClient;
+                if (MdiClient == null)
                 {
                     continue;
                 }
@@ -352,8 +358,8 @@ partial class DockPanel
                 OnHandleAssigned (EventArgs.Empty);
 
                 // Monitor the MdiClient for when its handle is destroyed.
-                MdiClient.HandleDestroyed += new EventHandler (MdiClientHandleDestroyed);
-                MdiClient.Layout += new LayoutEventHandler (MdiClientLayout);
+                MdiClient.HandleDestroyed += MdiClientHandleDestroyed;
+                MdiClient.Layout += MdiClientLayout;
 
                 break;
             }
@@ -391,22 +397,22 @@ partial class DockPanel
         if (m_mdiClientController == null)
         {
             m_mdiClientController = new MdiClientController();
-            m_mdiClientController.HandleAssigned += new EventHandler (MdiClientHandleAssigned);
-            m_mdiClientController.MdiChildActivate += new EventHandler (ParentFormMdiChildActivate);
-            m_mdiClientController.Layout += new LayoutEventHandler (MdiClient_Layout);
+            m_mdiClientController.HandleAssigned += MdiClientHandleAssigned;
+            m_mdiClientController.MdiChildActivate += ParentFormMdiChildActivate;
+            m_mdiClientController.Layout += MdiClient_Layout;
         }
 
         return m_mdiClientController;
     }
 
-    private void ParentFormMdiChildActivate (object sender, EventArgs e)
+    private void ParentFormMdiChildActivate (object? sender, EventArgs e)
     {
         if (GetMdiClientController().ParentForm == null)
         {
             return;
         }
 
-        IDockContent content = GetMdiClientController().ParentForm.ActiveMdiChild as IDockContent;
+        var content = GetMdiClientController().ParentForm.ActiveMdiChild as IDockContent;
         if (content == null)
         {
             return;
@@ -432,14 +438,14 @@ partial class DockPanel
 
     private void SetMdiClientBounds (Rectangle bounds)
     {
-        GetMdiClientController().MdiClient.Bounds = bounds;
+        GetMdiClientController().MdiClient!.Bounds = bounds;
     }
 
     private void SuspendMdiClientLayout()
     {
         if (GetMdiClientController().MdiClient != null)
         {
-            GetMdiClientController().MdiClient.SuspendLayout();
+            GetMdiClientController().MdiClient!.SuspendLayout();
         }
     }
 
@@ -447,7 +453,7 @@ partial class DockPanel
     {
         if (GetMdiClientController().MdiClient != null)
         {
-            GetMdiClientController().MdiClient.ResumeLayout (perform);
+            GetMdiClientController().MdiClient!.ResumeLayout (perform);
         }
     }
 
@@ -465,7 +471,7 @@ partial class DockPanel
     // 3. MdiClientController.Handle assigned
     private void SetMdiClient()
     {
-        MdiClientController controller = GetMdiClientController();
+        var controller = GetMdiClientController();
 
         if (this.DocumentStyle == DocumentStyle.DockingMdi)
         {
@@ -473,7 +479,7 @@ partial class DockPanel
             controller.BorderStyle = BorderStyle.None;
             if (MdiClientExists)
             {
-                controller.MdiClient.Dock = DockStyle.Fill;
+                controller.MdiClient!.Dock = DockStyle.Fill;
             }
         }
         else if (DocumentStyle == DocumentStyle.DockingSdi || DocumentStyle == DocumentStyle.DockingWindow)
@@ -482,7 +488,7 @@ partial class DockPanel
             controller.BorderStyle = BorderStyle.Fixed3D;
             if (MdiClientExists)
             {
-                controller.MdiClient.Dock = DockStyle.Fill;
+                controller.MdiClient!.Dock = DockStyle.Fill;
             }
         }
         else if (this.DocumentStyle == DocumentStyle.SystemMdi)

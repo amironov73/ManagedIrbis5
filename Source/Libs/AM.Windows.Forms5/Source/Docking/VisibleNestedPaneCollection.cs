@@ -62,12 +62,14 @@ public sealed class VisibleNestedPaneCollection : ReadOnlyCollection<DockPane>
         }
 
         foreach (DockPane pane in NestedPanes)
+        {
             if (pane.DockState != DockState || pane.IsHidden)
             {
                 pane.Bounds = Rectangle.Empty;
                 pane.SplitterBounds = Rectangle.Empty;
                 Remove (pane);
             }
+        }
 
         CalculateBounds();
 

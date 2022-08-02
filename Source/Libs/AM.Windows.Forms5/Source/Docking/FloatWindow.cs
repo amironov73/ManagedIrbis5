@@ -3,8 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 
-/*
+/* FloatWindow.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -13,7 +15,6 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Security.Permissions;
 using System.Diagnostics.CodeAnalysis;
 
 #endregion
@@ -22,16 +23,25 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AM.Windows.Forms.Docking;
 
-public class FloatWindow : Form, INestedPanesContainer, IDockDragSource
+/// <summary>
+///
+/// </summary>
+public class FloatWindow
+    : Form, INestedPanesContainer, IDockDragSource
 {
-    private NestedPaneCollection m_nestedPanes;
     internal const int WM_CHECKDISPOSE = (int)(Win32.Msgs.WM_USER + 1);
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     internal protected FloatWindow (DockPanel dockPanel, DockPane pane)
     {
         InternalConstruct (dockPanel, pane, false, Rectangle.Empty);
     }
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     internal protected FloatWindow (DockPanel dockPanel, DockPane pane, Rectangle bounds)
     {
         InternalConstruct (dockPanel, pane, true, bounds);
@@ -44,7 +54,7 @@ public class FloatWindow : Form, INestedPanesContainer, IDockDragSource
             throw (new ArgumentNullException (Strings.FloatWindow_Constructor_NullDockPanel));
         }
 
-        m_nestedPanes = new NestedPaneCollection (this);
+        NestedPanes = new NestedPaneCollection (this);
 
         FormBorderStyle = FormBorderStyle.SizableToolWindow;
         ShowInTaskbar = false;
@@ -70,7 +80,7 @@ public class FloatWindow : Form, INestedPanesContainer, IDockDragSource
             Size = dockPanel.DefaultFloatWindowSize;
         }
 
-        m_dockPanel = dockPanel;
+        DockPanel = dockPanel;
         Owner = DockPanel.FindForm();
         DockPanel.AddFloatWindow (this);
         if (pane != null)
@@ -86,6 +96,7 @@ public class FloatWindow : Form, INestedPanesContainer, IDockDragSource
         ResumeLayout();
     }
 
+    /// <inheritdoc cref="Form.Dispose(bool)"/>
     protected override void Dispose (bool disposing)
     {
         if (disposing)
@@ -95,67 +106,64 @@ public class FloatWindow : Form, INestedPanesContainer, IDockDragSource
                 DockPanel.RemoveFloatWindow (this);
             }
 
-            m_dockPanel = null;
+            DockPanel = null;
         }
 
         base.Dispose (disposing);
     }
 
-    private bool m_allowEndUserDocking = true;
+    /// <summary>
+    ///
+    /// </summary>
+    public bool AllowEndUserDocking { get; set; } = true;
 
-    public bool AllowEndUserDocking
-    {
-        get { return m_allowEndUserDocking; }
-        set { m_allowEndUserDocking = value; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public bool DoubleClickTitleBarToDock { get; set; } = true;
 
-    private bool m_doubleClickTitleBarToDock = true;
+    /// <summary>
+    ///
+    /// </summary>
+    public NestedPaneCollection NestedPanes { get; private set; }
 
-    public bool DoubleClickTitleBarToDock
-    {
-        get { return m_doubleClickTitleBarToDock; }
-        set { m_doubleClickTitleBarToDock = value; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public VisibleNestedPaneCollection VisibleNestedPanes => NestedPanes.VisibleNestedPanes;
 
-    public NestedPaneCollection NestedPanes
-    {
-        get { return m_nestedPanes; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public DockPanel DockPanel { get; private set; }
 
-    public VisibleNestedPaneCollection VisibleNestedPanes
-    {
-        get { return NestedPanes.VisibleNestedPanes; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public DockState DockState => DockState.Float;
 
-    private DockPanel m_dockPanel;
-
-    public DockPanel DockPanel
-    {
-        get { return m_dockPanel; }
-    }
-
-    public DockState DockState
-    {
-        get { return DockState.Float; }
-    }
-
-    public bool IsFloat
-    {
-        get { return DockState == DockState.Float; }
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    public bool IsFloat => DockState == DockState.Float;
 
     internal bool IsDockStateValid (DockState dockState)
     {
         foreach (DockPane pane in NestedPanes)
-        foreach (IDockContent content in pane.Contents)
-            if (!DockHelper.IsDockStateValid (dockState, content.DockHandler.DockAreas))
+        {
+            foreach (IDockContent content in pane.Contents)
             {
-                return false;
+                if (!DockHelper.IsDockStateValid (dockState, content.DockHandler.DockAreas))
+                {
+                    return false;
+                }
             }
+        }
 
         return true;
     }
 
+    /// <inheritdoc cref="Form.OnActivated"/>
     protected override void OnActivated (EventArgs e)
     {
         DockPanel.FloatWindows.BringWindowToFront (this);
@@ -163,20 +171,30 @@ public class FloatWindow : Form, INestedPanesContainer, IDockDragSource
 
         // Propagate the Activated event to the visible panes content objects
         foreach (DockPane pane in VisibleNestedPanes)
-        foreach (IDockContent content in pane.Contents)
-            content.OnActivated (e);
+        {
+            foreach (IDockContent content in pane.Contents)
+            {
+                content.OnActivated (e);
+            }
+        }
     }
 
+    /// <inheritdoc cref="Form.OnDeactivate"/>
     protected override void OnDeactivate (EventArgs e)
     {
         base.OnDeactivate (e);
 
         // Propagate the Deactivate event to the visible panes content objects
         foreach (DockPane pane in VisibleNestedPanes)
-        foreach (IDockContent content in pane.Contents)
-            content.OnDeactivate (e);
+        {
+            foreach (IDockContent content in pane.Contents)
+            {
+                content.OnDeactivate (e);
+            }
+        }
     }
 
+    /// <inheritdoc cref="Form.OnLayout"/>
     protected override void OnLayout (LayoutEventArgs levent)
     {
         VisibleNestedPanes.Refresh();
@@ -192,7 +210,7 @@ public class FloatWindow : Form, INestedPanesContainer, IDockDragSource
         MessageId = "System.Windows.Forms.Control.set_Text(System.String)")]
     internal void SetText()
     {
-        DockPane theOnlyPane = (VisibleNestedPanes.Count == 1) ? VisibleNestedPanes[0] : null;
+        var theOnlyPane = (VisibleNestedPanes.Count == 1) ? VisibleNestedPanes[0] : null;
 
         if (theOnlyPane == null || theOnlyPane.ActiveContent == null)
         {
@@ -223,7 +241,7 @@ public class FloatWindow : Form, INestedPanesContainer, IDockDragSource
         base.SetBoundsCore (x, y, width, height, specified);
     }
 
-    [SecurityPermission (SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+    /// <inheritdoc cref="Form.WndProc"/>
     protected override void WndProc (ref Message m)
     {
         switch (m.Msg)
@@ -242,7 +260,7 @@ public class FloatWindow : Form, INestedPanesContainer, IDockDragSource
                 if (result == 2 && DockPanel.AllowEndUserDocking && this.AllowEndUserDocking) // HITTEST_CAPTION
                 {
                     Activate();
-                    m_dockPanel.BeginDrag (this);
+                    DockPanel.BeginDrag (this);
                 }
                 else
                 {

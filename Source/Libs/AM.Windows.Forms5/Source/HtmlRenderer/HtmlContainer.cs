@@ -5,11 +5,18 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
+/* HtmlContainer.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Windows.Forms;
+
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
 using AM.Drawing.HtmlRenderer.Core;
 using AM.Drawing.HtmlRenderer.Core.Entities;
@@ -18,6 +25,10 @@ using AM.Drawing.HtmlRenderer.Core.Utils;
 using AM.Windows.Forms.HtmlRenderer.Adapters;
 using AM.Windows.Forms.HtmlRenderer.Utilities;
 
+#endregion
+
+#nullable enable
+
 namespace AM.Windows.Forms.HtmlRenderer;
 
 /// <summary>
@@ -25,14 +36,10 @@ namespace AM.Windows.Forms.HtmlRenderer;
 /// <see cref="HtmlLabel"/>, <see cref="HtmlToolTip"/> and <see cref="HtmlRender"/>.<br/>
 /// </summary>
 /// <seealso cref="HtmlContainerInt"/>
-public sealed class HtmlContainer : IDisposable
+public sealed class HtmlContainer
+    : IDisposable
 {
     #region Fields and Consts
-
-    /// <summary>
-    /// The internal core html container
-    /// </summary>
-    private readonly HtmlContainerInt _htmlContainerInt;
 
     /// <summary>
     /// Use GDI+ text rendering to measure/draw text.
@@ -47,9 +54,9 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public HtmlContainer()
     {
-        _htmlContainerInt = new HtmlContainerInt(WinFormsAdapter.Instance);
-        _htmlContainerInt.SetMargins(0);
-        _htmlContainerInt.PageSize = new RSize(99999, 99999);
+        HtmlContainerInt = new HtmlContainerInt (WinFormsAdapter.Instance);
+        HtmlContainerInt.SetMargins (0);
+        HtmlContainerInt.PageSize = new RSize (99999, 99999);
     }
 
     /// <summary>
@@ -58,8 +65,11 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public event EventHandler LoadComplete
     {
-        add { HtmlContainerInt.LoadComplete += value; }
-        remove { HtmlContainerInt.LoadComplete -= value; }
+        add => HtmlContainerInt.LoadComplete += value;
+        remove
+        {
+            if (HtmlContainerInt != null) HtmlContainerInt.LoadComplete -= value;
+        }
     }
 
     /// <summary>
@@ -68,8 +78,8 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public event EventHandler<HtmlLinkClickedEventArgs> LinkClicked
     {
-        add { _htmlContainerInt.LinkClicked += value; }
-        remove { _htmlContainerInt.LinkClicked -= value; }
+        add { HtmlContainerInt.LinkClicked += value; }
+        remove { HtmlContainerInt.LinkClicked -= value; }
     }
 
     /// <summary>
@@ -80,8 +90,8 @@ public sealed class HtmlContainer : IDisposable
     /// </remarks>
     public event EventHandler<HtmlRefreshEventArgs> Refresh
     {
-        add { _htmlContainerInt.Refresh += value; }
-        remove { _htmlContainerInt.Refresh -= value; }
+        add { HtmlContainerInt.Refresh += value; }
+        remove { HtmlContainerInt.Refresh -= value; }
     }
 
     /// <summary>
@@ -90,8 +100,8 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public event EventHandler<HtmlScrollEventArgs> ScrollChange
     {
-        add { _htmlContainerInt.ScrollChange += value; }
-        remove { _htmlContainerInt.ScrollChange -= value; }
+        add { HtmlContainerInt.ScrollChange += value; }
+        remove { HtmlContainerInt.ScrollChange -= value; }
     }
 
     /// <summary>
@@ -102,8 +112,8 @@ public sealed class HtmlContainer : IDisposable
     /// </remarks>
     public event EventHandler<HtmlRenderErrorEventArgs> RenderError
     {
-        add { _htmlContainerInt.RenderError += value; }
-        remove { _htmlContainerInt.RenderError -= value; }
+        add { HtmlContainerInt.RenderError += value; }
+        remove { HtmlContainerInt.RenderError -= value; }
     }
 
     /// <summary>
@@ -113,8 +123,8 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public event EventHandler<HtmlStylesheetLoadEventArgs> StylesheetLoad
     {
-        add { _htmlContainerInt.StylesheetLoad += value; }
-        remove { _htmlContainerInt.StylesheetLoad -= value; }
+        add => HtmlContainerInt.StylesheetLoad += value;
+        remove => HtmlContainerInt.StylesheetLoad -= value;
     }
 
     /// <summary>
@@ -123,17 +133,17 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public event EventHandler<HtmlImageLoadEventArgs> ImageLoad
     {
-        add { _htmlContainerInt.ImageLoad += value; }
-        remove { _htmlContainerInt.ImageLoad -= value; }
+        add => HtmlContainerInt.ImageLoad += value;
+        remove
+        {
+            if (HtmlContainerInt != null) HtmlContainerInt.ImageLoad -= value;
+        }
     }
 
     /// <summary>
     /// The internal core html container
     /// </summary>
-    internal HtmlContainerInt HtmlContainerInt
-    {
-        get { return _htmlContainerInt; }
-    }
+    internal HtmlContainerInt HtmlContainerInt { get; }
 
     /// <summary>
     /// Use GDI+ text rendering to measure/draw text.<br/>
@@ -156,7 +166,7 @@ public sealed class HtmlContainer : IDisposable
             if (_useGdiPlusTextRendering != value)
             {
                 _useGdiPlusTextRendering = value;
-                _htmlContainerInt.RequestRefresh(true);
+                HtmlContainerInt.RequestRefresh (true);
             }
         }
     }
@@ -164,18 +174,15 @@ public sealed class HtmlContainer : IDisposable
     /// <summary>
     /// the parsed stylesheet data used for handling the html
     /// </summary>
-    public CssData CssData
-    {
-        get { return _htmlContainerInt.CssData; }
-    }
+    public CssData CssData => HtmlContainerInt.CssData;
 
     /// <summary>
     /// Gets or sets a value indicating if anti-aliasing should be avoided for geometry like backgrounds and borders (default - false).
     /// </summary>
     public bool AvoidGeometryAntialias
     {
-        get { return _htmlContainerInt.AvoidGeometryAntialias; }
-        set { _htmlContainerInt.AvoidGeometryAntialias = value; }
+        get { return HtmlContainerInt.AvoidGeometryAntialias; }
+        set { HtmlContainerInt.AvoidGeometryAntialias = value; }
     }
 
     /// <summary>
@@ -190,8 +197,8 @@ public sealed class HtmlContainer : IDisposable
     /// </remarks>
     public bool AvoidAsyncImagesLoading
     {
-        get { return _htmlContainerInt.AvoidAsyncImagesLoading; }
-        set { _htmlContainerInt.AvoidAsyncImagesLoading = value; }
+        get { return HtmlContainerInt.AvoidAsyncImagesLoading; }
+        set { HtmlContainerInt.AvoidAsyncImagesLoading = value; }
     }
 
     /// <summary>
@@ -209,8 +216,8 @@ public sealed class HtmlContainer : IDisposable
     /// </remarks>
     public bool AvoidImagesLateLoading
     {
-        get { return _htmlContainerInt.AvoidImagesLateLoading; }
-        set { _htmlContainerInt.AvoidImagesLateLoading = value; }
+        get { return HtmlContainerInt.AvoidImagesLateLoading; }
+        set { HtmlContainerInt.AvoidImagesLateLoading = value; }
     }
 
     /// <summary>
@@ -219,8 +226,8 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public bool IsSelectionEnabled
     {
-        get { return _htmlContainerInt.IsSelectionEnabled; }
-        set { _htmlContainerInt.IsSelectionEnabled = value; }
+        get { return HtmlContainerInt.IsSelectionEnabled; }
+        set { HtmlContainerInt.IsSelectionEnabled = value; }
     }
 
     /// <summary>
@@ -228,8 +235,8 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public bool IsContextMenuEnabled
     {
-        get { return _htmlContainerInt.IsContextMenuEnabled; }
-        set { _htmlContainerInt.IsContextMenuEnabled = value; }
+        get { return HtmlContainerInt.IsContextMenuEnabled; }
+        set { HtmlContainerInt.IsContextMenuEnabled = value; }
     }
 
     /// <summary>
@@ -242,8 +249,8 @@ public sealed class HtmlContainer : IDisposable
     /// </example>
     public Point ScrollOffset
     {
-        get { return Utils.ConvertRound(_htmlContainerInt.ScrollOffset); }
-        set { _htmlContainerInt.ScrollOffset = Utils.Convert(value); }
+        get { return Utils.ConvertRound (HtmlContainerInt.ScrollOffset); }
+        set { HtmlContainerInt.ScrollOffset = Utils.Convert (value); }
     }
 
     /// <summary>
@@ -252,8 +259,8 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public PointF Location
     {
-        get { return Utils.Convert(_htmlContainerInt.Location); }
-        set { _htmlContainerInt.Location = Utils.Convert(value); }
+        get { return Utils.Convert (HtmlContainerInt.Location); }
+        set { HtmlContainerInt.Location = Utils.Convert (value); }
     }
 
     /// <summary>
@@ -265,8 +272,8 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public SizeF MaxSize
     {
-        get { return Utils.Convert(_htmlContainerInt.MaxSize); }
-        set { _htmlContainerInt.MaxSize = Utils.Convert(value); }
+        get { return Utils.Convert (HtmlContainerInt.MaxSize); }
+        set { HtmlContainerInt.MaxSize = Utils.Convert (value); }
     }
 
     /// <summary>
@@ -274,8 +281,8 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public SizeF ActualSize
     {
-        get { return Utils.Convert(_htmlContainerInt.ActualSize); }
-        internal set { _htmlContainerInt.ActualSize = Utils.Convert(value); }
+        get { return Utils.Convert (HtmlContainerInt.ActualSize); }
+        internal set { HtmlContainerInt.ActualSize = Utils.Convert (value); }
     }
 
     /// <summary>
@@ -283,7 +290,7 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public string SelectedText
     {
-        get { return _htmlContainerInt.SelectedText; }
+        get { return HtmlContainerInt.SelectedText; }
     }
 
     /// <summary>
@@ -291,7 +298,7 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     public string SelectedHtml
     {
-        get { return _htmlContainerInt.SelectedHtml; }
+        get { return HtmlContainerInt.SelectedHtml; }
     }
 
     /// <summary>
@@ -307,9 +314,13 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     /// <param name="htmlSource">the html to init with, init empty if not given</param>
     /// <param name="baseCssData">optional: the stylesheet to init with, init default if not given</param>
-    public void SetHtml(string htmlSource, CssData baseCssData = null)
+    public void SetHtml
+        (
+            string htmlSource,
+            CssData? baseCssData = null
+        )
     {
-        _htmlContainerInt.SetHtml(htmlSource, baseCssData);
+        HtmlContainerInt.SetHtml (htmlSource, baseCssData);
     }
 
     /// <summary>
@@ -317,9 +328,12 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     /// <param name="styleGen">Optional: controls the way styles are generated when html is generated (default: <see cref="HtmlGenerationStyle.Inline"/>)</param>
     /// <returns>generated html</returns>
-    public string GetHtml(HtmlGenerationStyle styleGen = HtmlGenerationStyle.Inline)
+    public string GetHtml
+        (
+            HtmlGenerationStyle styleGen = HtmlGenerationStyle.Inline
+        )
     {
-        return _htmlContainerInt.GetHtml(styleGen);
+        return HtmlContainerInt.GetHtml (styleGen);
     }
 
     /// <summary>
@@ -329,9 +343,9 @@ public sealed class HtmlContainer : IDisposable
     /// <param name="location">the location to find the attribute at</param>
     /// <param name="attribute">the attribute key to get value by</param>
     /// <returns>found attribute value or null if not found</returns>
-    public string GetAttributeAt(Point location, string attribute)
+    public string GetAttributeAt (Point location, string attribute)
     {
-        return _htmlContainerInt.GetAttributeAt(Utils.Convert(location), attribute);
+        return HtmlContainerInt.GetAttributeAt (Utils.Convert (location), attribute);
     }
 
     /// <summary>
@@ -343,8 +357,9 @@ public sealed class HtmlContainer : IDisposable
         var linkElements = new List<LinkElementData<RectangleF>>();
         foreach (var link in HtmlContainerInt.GetLinks())
         {
-            linkElements.Add(new LinkElementData<RectangleF>(link.Id, link.Href, Utils.Convert(link.Rectangle)));
+            linkElements.Add (new LinkElementData<RectangleF> (link.Id, link.Href, Utils.Convert (link.Rectangle)));
         }
+
         return linkElements;
     }
 
@@ -353,9 +368,9 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     /// <param name="location">the location to find the link at</param>
     /// <returns>css link href if exists or null</returns>
-    public string GetLinkAt(Point location)
+    public string GetLinkAt (Point location)
     {
-        return _htmlContainerInt.GetLinkAt(Utils.Convert(location));
+        return HtmlContainerInt.GetLinkAt (Utils.Convert (location));
     }
 
     /// <summary>
@@ -365,23 +380,23 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     /// <param name="elementId">the id of the element to get its rectangle</param>
     /// <returns>the rectangle of the element or null if not found</returns>
-    public RectangleF? GetElementRectangle(string elementId)
+    public RectangleF? GetElementRectangle (string elementId)
     {
-        var r = _htmlContainerInt.GetElementRectangle(elementId);
-        return r.HasValue ? Utils.Convert(r.Value) : (RectangleF?)null;
+        var r = HtmlContainerInt.GetElementRectangle (elementId);
+        return r.HasValue ? Utils.Convert (r.Value) : null;
     }
 
     /// <summary>
     /// Measures the bounds of box and children, recursively.
     /// </summary>
     /// <param name="g">Device context to draw</param>
-    public void PerformLayout(Graphics g)
+    public void PerformLayout (Graphics g)
     {
-        ArgChecker.AssertArgNotNull(g, "g");
+        ArgChecker.AssertArgNotNull (g, "g");
 
-        using (var ig = new GraphicsAdapter(g, _useGdiPlusTextRendering))
+        using (var ig = new GraphicsAdapter (g, _useGdiPlusTextRendering))
         {
-            _htmlContainerInt.PerformLayout(ig);
+            HtmlContainerInt.PerformLayout (ig);
         }
     }
 
@@ -389,13 +404,13 @@ public sealed class HtmlContainer : IDisposable
     /// Render the html using the given device.
     /// </summary>
     /// <param name="g">the device to use to render</param>
-    public void PerformPaint(Graphics g)
+    public void PerformPaint (Graphics g)
     {
-        ArgChecker.AssertArgNotNull(g, "g");
+        ArgChecker.AssertArgNotNull (g, "g");
 
-        using (var ig = new GraphicsAdapter(g, _useGdiPlusTextRendering))
+        using (var ig = new GraphicsAdapter (g, _useGdiPlusTextRendering))
         {
-            _htmlContainerInt.PerformPaint(ig);
+            HtmlContainerInt.PerformPaint (ig);
         }
     }
 
@@ -404,12 +419,13 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="e">the mouse event args</param>
-    public void HandleMouseDown(Control parent, MouseEventArgs e)
+    public void HandleMouseDown (Control parent, MouseEventArgs e)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
-        ArgChecker.AssertArgNotNull(e, "e");
+        ArgChecker.AssertArgNotNull (parent, "parent");
+        ArgChecker.AssertArgNotNull (e, "e");
 
-        _htmlContainerInt.HandleMouseDown(new ControlAdapter(parent, _useGdiPlusTextRendering), Utils.Convert(e.Location));
+        HtmlContainerInt.HandleMouseDown (new ControlAdapter (parent, _useGdiPlusTextRendering),
+            Utils.Convert (e.Location));
     }
 
     /// <summary>
@@ -417,12 +433,13 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="e">the mouse event args</param>
-    public void HandleMouseUp(Control parent, MouseEventArgs e)
+    public void HandleMouseUp (Control parent, MouseEventArgs e)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
-        ArgChecker.AssertArgNotNull(e, "e");
+        ArgChecker.AssertArgNotNull (parent, "parent");
+        ArgChecker.AssertArgNotNull (e, "e");
 
-        _htmlContainerInt.HandleMouseUp(new ControlAdapter(parent, _useGdiPlusTextRendering), Utils.Convert(e.Location), CreateMouseEvent(e));
+        HtmlContainerInt.HandleMouseUp (new ControlAdapter (parent, _useGdiPlusTextRendering),
+            Utils.Convert (e.Location), CreateMouseEvent (e));
     }
 
     /// <summary>
@@ -430,12 +447,13 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
     /// <param name="e">mouse event args</param>
-    public void HandleMouseDoubleClick(Control parent, MouseEventArgs e)
+    public void HandleMouseDoubleClick (Control parent, MouseEventArgs e)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
-        ArgChecker.AssertArgNotNull(e, "e");
+        ArgChecker.AssertArgNotNull (parent, "parent");
+        ArgChecker.AssertArgNotNull (e, "e");
 
-        _htmlContainerInt.HandleMouseDoubleClick(new ControlAdapter(parent, _useGdiPlusTextRendering), Utils.Convert(e.Location));
+        HtmlContainerInt.HandleMouseDoubleClick (new ControlAdapter (parent, _useGdiPlusTextRendering),
+            Utils.Convert (e.Location));
     }
 
     /// <summary>
@@ -443,23 +461,24 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
     /// <param name="e">the mouse event args</param>
-    public void HandleMouseMove(Control parent, MouseEventArgs e)
+    public void HandleMouseMove (Control parent, MouseEventArgs e)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
-        ArgChecker.AssertArgNotNull(e, "e");
+        ArgChecker.AssertArgNotNull (parent, "parent");
+        ArgChecker.AssertArgNotNull (e, "e");
 
-        _htmlContainerInt.HandleMouseMove(new ControlAdapter(parent, _useGdiPlusTextRendering), Utils.Convert(e.Location));
+        HtmlContainerInt.HandleMouseMove (new ControlAdapter (parent, _useGdiPlusTextRendering),
+            Utils.Convert (e.Location));
     }
 
     /// <summary>
     /// Handle mouse leave to handle hover cursor.
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
-    public void HandleMouseLeave(Control parent)
+    public void HandleMouseLeave (Control parent)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
+        ArgChecker.AssertArgNotNull (parent, "parent");
 
-        _htmlContainerInt.HandleMouseLeave(new ControlAdapter(parent, _useGdiPlusTextRendering));
+        HtmlContainerInt.HandleMouseLeave (new ControlAdapter (parent, _useGdiPlusTextRendering));
     }
 
     /// <summary>
@@ -467,36 +486,36 @@ public sealed class HtmlContainer : IDisposable
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="e">the pressed key</param>
-    public void HandleKeyDown(Control parent, KeyEventArgs e)
+    public void HandleKeyDown (Control parent, KeyEventArgs e)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
-        ArgChecker.AssertArgNotNull(e, "e");
+        ArgChecker.AssertArgNotNull (parent, "parent");
+        ArgChecker.AssertArgNotNull (e, "e");
 
-        _htmlContainerInt.HandleKeyDown(new ControlAdapter(parent, _useGdiPlusTextRendering), CreateKeyEevent(e));
+        HtmlContainerInt.HandleKeyDown (new ControlAdapter (parent, _useGdiPlusTextRendering), CreateKeyEevent (e));
     }
 
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
-        _htmlContainerInt.Dispose();
+        HtmlContainerInt.Dispose();
     }
-
 
     #region Private methods
 
     /// <summary>
     /// Create HtmlRenderer mouse event from win forms mouse event.
     /// </summary>
-    private static RMouseEvent CreateMouseEvent(MouseEventArgs e)
+    private static RMouseEvent CreateMouseEvent (MouseEventArgs e)
     {
-        return new RMouseEvent((e.Button & MouseButtons.Left) != 0);
+        return new RMouseEvent ((e.Button & MouseButtons.Left) != 0);
     }
 
     /// <summary>
     /// Create HtmlRenderer key event from win forms key event.
     /// </summary>
-    private static RKeyEvent CreateKeyEevent(KeyEventArgs e)
+    private static RKeyEvent CreateKeyEevent (KeyEventArgs e)
     {
-        return new RKeyEvent(e.Control, e.KeyCode == Keys.A, e.KeyCode == Keys.C);
+        return new RKeyEvent (e.Control, e.KeyCode == Keys.A, e.KeyCode == Keys.C);
     }
 
     #endregion
