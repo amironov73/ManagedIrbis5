@@ -13,7 +13,6 @@
 
 using System;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -28,17 +27,6 @@ namespace AM.Drawing.Charting;
 public class Margin
     : ICloneable, ISerializable
 {
-    /// <summary>
-    /// Private fields that store the size of the margin around the edge of the pane which will be
-    /// kept blank.  Use the public properties <see cref="Margin.Left"/>, <see cref="Margin.Right"/>,
-    /// <see cref="Margin.Top"/>, <see cref="Margin.Bottom"/> to access these values.
-    /// </summary>
-    /// <value>Units are points (1/72 inch)</value>
-    [CLSCompliant (false)] protected float _left,
-        _right,
-        _top,
-        _bottom;
-
     #region Constructors
 
     /// <summary>
@@ -46,10 +34,10 @@ public class Margin
     /// </summary>
     public Margin()
     {
-        _left = Default.Left;
-        _right = Default.Right;
-        _top = Default.Top;
-        _bottom = Default.Bottom;
+        Left = Default.Left;
+        Right = Default.Right;
+        Top = Default.Top;
+        Bottom = Default.Bottom;
     }
 
     /// <summary>
@@ -58,10 +46,10 @@ public class Margin
     /// <param name="rhs">the <see cref="Margin" /> instance to be copied.</param>
     public Margin (Margin rhs)
     {
-        _left = rhs._left;
-        _right = rhs._right;
-        _top = rhs._top;
-        _bottom = rhs._bottom;
+        Left = rhs.Left;
+        Right = rhs.Right;
+        Top = rhs.Top;
+        Bottom = rhs.Bottom;
     }
 
     /// <summary>
@@ -98,11 +86,8 @@ public class Margin
     /// <seealso cref="Right"/>
     /// <seealso cref="Top"/>
     /// <seealso cref="Bottom"/>
-    public float Left
-    {
-        get { return _left; }
-        set { _left = value; }
-    }
+    [field: CLSCompliant (false)]
+    public float Left { get; set; }
 
     /// <summary>
     /// Gets or sets a float value that determines the margin area between the right edge of the
@@ -115,11 +100,8 @@ public class Margin
     /// <seealso cref="Left"/>
     /// <seealso cref="Top"/>
     /// <seealso cref="Bottom"/>
-    public float Right
-    {
-        get { return _right; }
-        set { _right = value; }
-    }
+    [field: CLSCompliant (false)]
+    public float Right { get; set; }
 
     /// <summary>
     /// Gets or sets a float value that determines the margin area between the top edge of the
@@ -132,11 +114,8 @@ public class Margin
     /// <seealso cref="Left"/>
     /// <seealso cref="Right"/>
     /// <seealso cref="Bottom"/>
-    public float Top
-    {
-        get { return _top; }
-        set { _top = value; }
-    }
+    [field: CLSCompliant (false)]
+    public float Top { get; set; }
 
     /// <summary>
     /// Gets or sets a float value that determines the margin area between the bottom edge of the
@@ -149,11 +128,8 @@ public class Margin
     /// <seealso cref="Left"/>
     /// <seealso cref="Right"/>
     /// <seealso cref="Top"/>
-    public float Bottom
-    {
-        get { return _bottom; }
-        set { _bottom = value; }
-    }
+    [field: CLSCompliant (false)]
+    public float Bottom { get; set; }
 
     /// <summary>
     /// Concurrently sets all outer margin values to a single value.
@@ -169,10 +145,10 @@ public class Margin
     {
         set
         {
-            _bottom = value;
-            _top = value;
-            _left = value;
-            _right = value;
+            Bottom = value;
+            Top = value;
+            Left = value;
+            Right = value;
         }
     }
 
@@ -196,12 +172,12 @@ public class Margin
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        info.GetInt32 ("schema");
 
-        _left = info.GetSingle ("left");
-        _right = info.GetSingle ("right");
-        _top = info.GetSingle ("top");
-        _bottom = info.GetSingle ("bottom");
+        Left = info.GetSingle ("left");
+        Right = info.GetSingle ("right");
+        Top = info.GetSingle ("top");
+        Bottom = info.GetSingle ("bottom");
     }
 
     /// <summary>
@@ -209,15 +185,18 @@ public class Margin
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
+    public virtual void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         info.AddValue ("schema", schema);
 
-        info.AddValue ("left", _left);
-        info.AddValue ("right", _right);
-        info.AddValue ("top", _top);
-        info.AddValue ("bottom", _bottom);
+        info.AddValue ("left", Left);
+        info.AddValue ("right", Right);
+        info.AddValue ("top", Top);
+        info.AddValue ("bottom", Bottom);
     }
 
     #endregion

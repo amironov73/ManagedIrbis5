@@ -564,15 +564,9 @@ public static class Algorithms
             return wrappedDictionary.ContainsKey (key);
         }
 
-        public ICollection<TKey> Keys
-        {
-            get { return ReadOnly (wrappedDictionary.Keys); }
-        }
+        public ICollection<TKey> Keys => ReadOnly (wrappedDictionary.Keys)!;
 
-        public ICollection<TValue> Values
-        {
-            get { return ReadOnly (wrappedDictionary.Values); }
-        }
+        public ICollection<TValue> Values => ReadOnly (wrappedDictionary.Values)!;
 
         public bool Remove (TKey key)
         {
@@ -1076,7 +1070,7 @@ public static class Algorithms
     /// <param name="typedCollection">A typed collection to wrap.</param>
     /// <returns>A non-generic ICollection wrapper around <paramref name="typedCollection"/>.
     /// If <paramref name="typedCollection"/> is null, then null is returned.</returns>
-    public static ICollection Untyped<T> (ICollection<T> typedCollection)
+    public static ICollection? Untyped<T> (ICollection<T>? typedCollection)
     {
         if (typedCollection == null)
         {
@@ -1128,7 +1122,7 @@ public static class Algorithms
         }
 
 
-        public int Add (object value)
+        public int Add (object? value)
         {
             // We assume that Add always adds to the end. Is this true?
             wrappedList.Add (ConvertToItemType ("value", value));
@@ -1140,7 +1134,7 @@ public static class Algorithms
             wrappedList.Clear();
         }
 
-        public bool Contains (object value)
+        public bool Contains (object? value)
         {
             if (value is T)
             {
@@ -1150,7 +1144,7 @@ public static class Algorithms
             return false;
         }
 
-        public int IndexOf (object value)
+        public int IndexOf (object? value)
         {
             if (value is T)
             {
@@ -1160,7 +1154,7 @@ public static class Algorithms
             return -1;
         }
 
-        public void Insert (int index, object value)
+        public void Insert (int index, object? value)
         {
             wrappedList.Insert (index, ConvertToItemType ("value", value));
         }
@@ -1175,7 +1169,7 @@ public static class Algorithms
             get { return wrappedList.IsReadOnly; }
         }
 
-        public void Remove (object value)
+        public void Remove (object? value)
         {
             if (value is T)
             {

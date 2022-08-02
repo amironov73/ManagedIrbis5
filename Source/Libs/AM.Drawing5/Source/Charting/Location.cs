@@ -14,7 +14,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -30,72 +29,26 @@ namespace AM.Drawing.Charting;
 public class Location
     : ICloneable, ISerializable
 {
-    #region Private Fields
-
-    /// <summary> Private field to store the vertical alignment property for
-    /// this object.  Use the public property <see cref="Location.AlignV"/>
-    /// to access this value.  The value of this field is a <see cref="AlignV"/> enum.
-    /// </summary>
-    private AlignV _alignV;
-
-    /// <summary> Private field to store the horizontal alignment property for
-    /// this object.  Use the public property <see cref="Location.AlignH"/>
-    /// to access this value.  The value of this field is a <see cref="AlignH"/> enum.
-    /// </summary>
-    private AlignH _alignH;
-
-    /// <summary> Private fields to store the X and Y coordinate positions for
-    /// this object.  Use the public properties <see cref="X"/> and
-    /// <see cref="Y"/> to access these values.  The coordinate type stored here is
-    /// dependent upon the setting of <see cref="CoordinateFrame"/>.
-    /// </summary>
-    private double _x,
-        _y,
-        _width,
-        _height;
-
-    /// <summary>
-    /// Private field to store the coordinate system to be used for defining the
-    /// object position.  Use the public property
-    /// <see cref="CoordinateFrame"/> to access this value. The coordinate system
-    /// is defined with the <see cref="CoordType"/> enum.
-    /// </summary>
-    private CoordType _coordinateFrame;
-
-    #endregion
-
     #region Properties
 
     /// <summary>
     /// A horizontal alignment parameter for this object specified
     /// using the <see cref="AlignH"/> enum type.
     /// </summary>
-    public AlignH AlignH
-    {
-        get { return _alignH; }
-        set { _alignH = value; }
-    }
+    public AlignH AlignH { get; set; }
 
     /// <summary>
     /// A vertical alignment parameter for this object specified
     /// using the <see cref="AlignV"/> enum type.
     /// </summary>
-    public AlignV AlignV
-    {
-        get { return _alignV; }
-        set { _alignV = value; }
-    }
+    public AlignV AlignV { get; set; }
 
     /// <summary>
     /// The coordinate system to be used for defining the object position
     /// </summary>
     /// <value> The coordinate system is defined with the <see cref="CoordType"/>
     /// enum</value>
-    public CoordType CoordinateFrame
-    {
-        get { return _coordinateFrame; }
-        set { _coordinateFrame = value; }
-    }
+    public CoordType CoordinateFrame { get; set; }
 
     /// <summary>
     /// The x position of the object.
@@ -106,11 +59,7 @@ public class Location
     /// The object will be aligned to this position based on the
     /// <see cref="AlignH"/> property.
     /// </remarks>
-    public double X
-    {
-        get { return _x; }
-        set { _x = value; }
-    }
+    public double X { get; set; }
 
     /// <summary>
     /// The y position of the object.
@@ -121,11 +70,7 @@ public class Location
     /// The object will be aligned to this position based on the
     /// <see cref="AlignV"/> property.
     /// </remarks>
-    public double Y
-    {
-        get { return _y; }
-        set { _y = value; }
-    }
+    public double Y { get; set; }
 
     /// <summary>
     /// The x1 position of the object (an alias for the x position).
@@ -138,8 +83,8 @@ public class Location
     /// </remarks>
     public double X1
     {
-        get { return _x; }
-        set { _x = value; }
+        get => X;
+        set => X = value;
     }
 
     /// <summary>
@@ -153,8 +98,8 @@ public class Location
     /// </remarks>
     public double Y1
     {
-        get { return _y; }
-        set { _y = value; }
+        get => Y;
+        set => Y = value;
     }
 
     /// <summary>
@@ -164,11 +109,7 @@ public class Location
     /// The units of this position are specified by the
     /// <see cref="CoordinateFrame"/> property.
     /// </remarks>
-    public double Width
-    {
-        get { return _width; }
-        set { _width = value; }
-    }
+    public double Width { get; set; }
 
     /// <summary>
     /// The height of the object.
@@ -177,11 +118,7 @@ public class Location
     /// The units of this position are specified by the
     /// <see cref="CoordinateFrame"/> property.
     /// </remarks>
-    public double Height
-    {
-        get { return _height; }
-        set { _height = value; }
-    }
+    public double Height { get; set; }
 
     /// <summary>
     /// The x2 position of the object.
@@ -195,12 +132,7 @@ public class Location
     /// to have a second coordinate.  Note that the X2 position is stored
     /// internally as a <see cref="Width"/> offset from <see cref="X"/>.
     /// </remarks>
-    public double X2
-    {
-        get { return _x + _width; }
-
-        //set { width = value-x; }
-    }
+    public double X2 => X + Width;
 
     /// <summary>
     /// The y2 position of the object.
@@ -214,12 +146,7 @@ public class Location
     /// to have a second coordinate.  Note that the Y2 position is stored
     /// internally as a <see cref="Height"/> offset from <see cref="Y"/>.
     /// </remarks>
-    public double Y2
-    {
-        get { return _y + _height; }
-
-        //set { height = value-y; }
-    }
+    public double Y2 => Y + Height;
 
     /// <summary>
     /// The <see cref="RectangleF"/> for this object as defined by the
@@ -235,13 +162,13 @@ public class Location
     /// units.</value>
     public RectangleF Rect
     {
-        get { return new RectangleF ((float)_x, (float)_y, (float)_width, (float)_height); }
+        get => new ( (float) X, (float) Y, (float) Width, (float) Height);
         set
         {
-            _x = value.X;
-            _y = value.Y;
-            _width = value.Width;
-            _height = value.Height;
+            X = value.X;
+            Y = value.Y;
+            Width = value.Width;
+            Height = value.Height;
         }
     }
 
@@ -256,11 +183,11 @@ public class Location
     /// <value>A <see cref="PointF"/> in <see cref="CoordinateFrame"/> units.</value>
     public PointF TopLeft
     {
-        get { return new PointF ((float)_x, (float)_y); }
+        get => new ((float) X, (float) Y);
         set
         {
-            _x = value.X;
-            _y = value.Y;
+            X = value.X;
+            Y = value.Y;
         }
     }
 
@@ -273,12 +200,7 @@ public class Location
     /// may affect the resolution of the point location.
     /// </remarks>
     /// <value>A <see cref="PointF"/> in <see cref="CoordinateFrame"/> units.</value>
-    public PointF BottomRight
-    {
-        get { return new PointF ((float)X2, (float)Y2); }
-
-        //set { this.X2 = value.X; this.Y2 = value.Y; }
-    }
+    public PointF BottomRight => new ((float) X2, (float) Y2);
 
     #endregion
 
@@ -328,13 +250,13 @@ public class Location
     /// the vertical alignment of the object with respect to the (x,y) location</param>
     public Location (double x, double y, CoordType coordType, AlignH alignH, AlignV alignV)
     {
-        _x = x;
-        _y = y;
-        _width = 0;
-        _height = 0;
-        _coordinateFrame = coordType;
-        _alignH = alignH;
-        _alignV = alignV;
+        X = x;
+        Y = y;
+        Width = 0;
+        Height = 0;
+        CoordinateFrame = coordType;
+        AlignH = alignH;
+        AlignV = alignV;
     }
 
     /// <summary>
@@ -364,8 +286,8 @@ public class Location
         CoordType coordType, AlignH alignH, AlignV alignV) :
         this (x, y, coordType, alignH, alignV)
     {
-        _width = width;
-        _height = height;
+        Width = width;
+        Height = height;
     }
 
     /// <summary>
@@ -374,13 +296,13 @@ public class Location
     /// <param name="rhs">The <see cref="Location"/> object from which to copy</param>
     public Location (Location rhs)
     {
-        _x = rhs._x;
-        _y = rhs._y;
-        _width = rhs._width;
-        _height = rhs._height;
-        _coordinateFrame = rhs.CoordinateFrame;
-        _alignH = rhs.AlignH;
-        _alignV = rhs.AlignV;
+        X = rhs.X;
+        Y = rhs.Y;
+        Width = rhs.Width;
+        Height = rhs.Height;
+        CoordinateFrame = rhs.CoordinateFrame;
+        AlignH = rhs.AlignH;
+        AlignV = rhs.AlignV;
     }
 
     /// <summary>
@@ -422,15 +344,15 @@ public class Location
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        info.GetInt32 ("schema");
 
-        _alignV = (AlignV)info.GetValue ("alignV", typeof (AlignV));
-        _alignH = (AlignH)info.GetValue ("alignH", typeof (AlignH));
-        _x = info.GetDouble ("x");
-        _y = info.GetDouble ("y");
-        _width = info.GetDouble ("width");
-        _height = info.GetDouble ("height");
-        _coordinateFrame = (CoordType)info.GetValue ("coordinateFrame", typeof (CoordType));
+        AlignV = (AlignV) info.GetValue ("alignV", typeof (AlignV))!;
+        AlignH = (AlignH) info.GetValue ("alignH", typeof (AlignH))!;
+        X = info.GetDouble ("x");
+        Y = info.GetDouble ("y");
+        Width = info.GetDouble ("width");
+        Height = info.GetDouble ("height");
+        CoordinateFrame = (CoordType) info.GetValue ("coordinateFrame", typeof (CoordType))!;
     }
 
     /// <summary>
@@ -438,17 +360,20 @@ public class Location
     /// </summary>
     /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
+    public virtual void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         info.AddValue ("schema", schema);
-        info.AddValue ("alignV", _alignV);
-        info.AddValue ("alignH", _alignH);
-        info.AddValue ("x", _x);
-        info.AddValue ("y", _y);
-        info.AddValue ("width", _width);
-        info.AddValue ("height", _height);
-        info.AddValue ("coordinateFrame", _coordinateFrame);
+        info.AddValue ("alignV", AlignV);
+        info.AddValue ("alignH", AlignH);
+        info.AddValue ("x", X);
+        info.AddValue ("y", Y);
+        info.AddValue ("width", Width);
+        info.AddValue ("height", Height);
+        info.AddValue ("coordinateFrame", CoordinateFrame);
     }
 
     #endregion
@@ -467,8 +392,7 @@ public class Location
     /// specified user point.</returns>
     public PointF Transform (PaneBase pane)
     {
-        return Transform (pane, _x, _y,
-            _coordinateFrame);
+        return Transform (pane, X, Y, CoordinateFrame);
     }
 
     /// <summary>
@@ -519,15 +443,27 @@ public class Location
     {
         PointF pt = Transform (pane);
 
-        if (_alignH == AlignH.Right)
-            pt.X -= width;
-        else if (_alignH == AlignH.Center)
-            pt.X -= width / 2.0F;
+        switch (AlignH)
+        {
+            case AlignH.Right:
+                pt.X -= width;
+                break;
 
-        if (_alignV == AlignV.Bottom)
-            pt.Y -= height;
-        else if (_alignV == AlignV.Center)
-            pt.Y -= height / 2.0F;
+            case AlignH.Center:
+                pt.X -= width / 2.0F;
+                break;
+        }
+
+        switch (AlignV)
+        {
+            case AlignV.Bottom:
+                pt.Y -= height;
+                break;
+
+            case AlignV.Center:
+                pt.Y -= height / 2.0F;
+                break;
+        }
 
         return pt;
     }
@@ -560,7 +496,7 @@ public class Location
     /// <value>A <see cref="PointF"/> in pixel units.</value>
     public PointF TransformBottomRight (PaneBase pane)
     {
-        return Transform (pane, X2, Y2, _coordinateFrame);
+        return Transform (pane, X2, Y2, CoordinateFrame);
     }
 
     /// <summary>
