@@ -1,0 +1,129 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System.Collections.Generic;
+
+using ManagedIrbis.Epub.Schema;
+
+#endregion
+
+#nullable enable
+
+namespace ManagedIrbis.Epub.Internal;
+
+internal static class ContentReader
+{
+    public static EpubContentRef ParseContentMap(EpubBookRef bookRef)
+    {
+        EpubContentRef result = new EpubContentRef
+        {
+            Html = new Dictionary<string, EpubTextContentFileRef>(),
+            Css = new Dictionary<string, EpubTextContentFileRef>(),
+            Images = new Dictionary<string, EpubByteContentFileRef>(System.StringComparer.OrdinalIgnoreCase),
+            Fonts = new Dictionary<string, EpubByteContentFileRef>(),
+            AllFiles = new Dictionary<string, EpubContentFileRef>()
+        };
+        foreach (EpubManifestItem manifestItem in bookRef.Schema.Package.Manifest)
+        {
+            string fileName = manifestItem.Href;
+            string contentMimeType = manifestItem.MediaType;
+            EpubContentType contentType = GetContentTypeByContentMimeType(contentMimeType);
+            switch (contentType)
+            {
+                case EpubContentType.XHTML_1_1:
+                case EpubContentType.CSS:
+                case EpubContentType.OEB1_DOCUMENT:
+                case EpubContentType.OEB1_CSS:
+                case EpubContentType.XML:
+                case EpubContentType.DTBOOK:
+                case EpubContentType.DTBOOK_NCX:
+                    EpubTextContentFileRef epubTextContentFile = new EpubTextContentFileRef(bookRef, fileName, contentType, contentMimeType);
+                    switch (contentType)
+                    {
+                        case EpubContentType.XHTML_1_1:
+                            result.Html[fileName] = epubTextContentFile;
+                            if (result.NavigationHtmlFile == null && manifestItem.Properties != null && manifestItem.Properties.Contains(ManifestProperty.NAV))
+                            {
+                                result.NavigationHtmlFile = epubTextContentFile;
+                            }
+                            break;
+                        case EpubContentType.CSS:
+                            result.Css[fileName] = epubTextContentFile;
+                            break;
+                    }
+                    result.AllFiles[fileName] = epubTextContentFile;
+                    break;
+                default:
+                    EpubByteContentFileRef epubByteContentFile = new EpubByteContentFileRef(bookRef, fileName, contentType, contentMimeType);
+                    switch (contentType)
+                    {
+                        case EpubContentType.IMAGE_GIF:
+                        case EpubContentType.IMAGE_JPEG:
+                        case EpubContentType.IMAGE_PNG:
+                        case EpubContentType.IMAGE_SVG:
+                            result.Images[fileName] = epubByteContentFile;
+                            break;
+                        case EpubContentType.FONT_TRUETYPE:
+                        case EpubContentType.FONT_OPENTYPE:
+                            result.Fonts[fileName] = epubByteContentFile;
+                            break;
+                    }
+                    result.AllFiles[fileName] = epubByteContentFile;
+                    break;
+            }
+        }
+        result.Cover = BookCoverReader.ReadBookCover(bookRef.Schema, result.Images);
+        return result;
+    }
+
+    private static EpubContentType GetContentTypeByContentMimeType(string contentMimeType)
+    {
+        switch (contentMimeType.ToLowerInvariant())
+        {
+            case "application/xhtml+xml":
+                return EpubContentType.XHTML_1_1;
+            case "application/x-dtbook+xml":
+                return EpubContentType.DTBOOK;
+            case "application/x-dtbncx+xml":
+                return EpubContentType.DTBOOK_NCX;
+            case "text/x-oeb1-document":
+                return EpubContentType.OEB1_DOCUMENT;
+            case "application/xml":
+                return EpubContentType.XML;
+            case "text/css":
+                return EpubContentType.CSS;
+            case "text/x-oeb1-css":
+                return EpubContentType.OEB1_CSS;
+            case "image/gif":
+                return EpubContentType.IMAGE_GIF;
+            case "image/jpeg":
+                return EpubContentType.IMAGE_JPEG;
+            case "image/png":
+                return EpubContentType.IMAGE_PNG;
+            case "image/svg+xml":
+                return EpubContentType.IMAGE_SVG;
+            case "font/truetype":
+            case "application/x-font-truetype":
+                return EpubContentType.FONT_TRUETYPE;
+            case "font/opentype":
+            case "application/vnd.ms-opentype":
+                return EpubContentType.FONT_OPENTYPE;
+            default:
+                return EpubContentType.OTHER;
+        }
+    }
+}
