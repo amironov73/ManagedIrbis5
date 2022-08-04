@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* FB2Book.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,8 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
 #endregion
 
@@ -27,26 +25,53 @@ using System.Text;
 
 namespace ManagedIrbis.FictionBook.Entities;
 
-public class FB2Book: IBook
+/// <summary>
+///
+/// </summary>
+public class FB2Book
+    : IBook
 {
     #region IComparable Members
-    public int CompareTo(object obj)
+
+    /// <summary>
+    ///
+    /// </summary>
+    public int CompareTo (object obj)
     {
-        IBook fc = obj as IBook;
-        if (fc == null)
+        if (obj is not IBook fc)
+        {
             throw new InvalidCastException();
-        int result = string.Compare(this.BookAuthorLastName, fc.BookAuthorLastName, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        var result = string.Compare (BookAuthorLastName, fc.BookAuthorLastName,
+            StringComparison.InvariantCultureIgnoreCase);
         if (result == 0)
-            result = string.Compare(this.BookAuthorFirstName, fc.BookAuthorFirstName, StringComparison.InvariantCultureIgnoreCase);
+        {
+            result = string.Compare (BookAuthorFirstName, fc.BookAuthorFirstName,
+                StringComparison.InvariantCultureIgnoreCase);
+        }
+
         if (result == 0)
-            result = string.Compare(this.BookSequenceName, fc.BookSequenceName, StringComparison.InvariantCultureIgnoreCase);
+        {
+            result = string.Compare (BookSequenceName, fc.BookSequenceName,
+                StringComparison.InvariantCultureIgnoreCase);
+        }
+
         if (result == 0)
-            result = Comparer<int?>.Default.Compare(BookSequenceNr, fc.BookSequenceNr);
+        {
+            result = Comparer<int?>.Default.Compare (BookSequenceNr, fc.BookSequenceNr);
+        }
+
         if (result == 0)
-            result = string.Compare(this.BookTitle, fc.BookTitle, StringComparison.InvariantCultureIgnoreCase);
+        {
+            result = string.Compare (BookTitle, fc.BookTitle, StringComparison.InvariantCultureIgnoreCase);
+        }
+
         return result;
     }
+
     #endregion
+
     public string BookAuthorFirstName { get; set; }
     public string BookAuthorLastName { get; set; }
     public string BookAuthorMiddleName { get; set; }
@@ -59,6 +84,7 @@ public class FB2Book: IBook
     public string BookLang { get; set; }
     public string BookSizeText { get; set; }
     public string BookFile { get; set; }
+
     public FB2Book()
     {
         BookFile = string.Empty;

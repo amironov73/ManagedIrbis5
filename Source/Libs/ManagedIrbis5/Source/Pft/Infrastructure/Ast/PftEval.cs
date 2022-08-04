@@ -7,13 +7,14 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftEval.cs --
+/* PftEval.cs -- исполнение динамического PFT-формата
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Text;
+using AM;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Text;
 
@@ -21,115 +22,126 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Исполнение динамического PFT-формата.
+/// </summary>
+public sealed class PftEval
+    : PftNode
 {
+    #region Properties
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax" />
+    public override bool ExtendedSyntax => true;
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Исполнение динамического PFT-формата.
+    /// Конструктор.
     /// </summary>
-    public sealed class PftEval
-        : PftNode
+    public PftEval()
     {
-        #region Properties
-
-        /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax => true;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftEval()
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftEval
-            (
-                PftToken token
-            )
-            : base(token)
-        {
-            token.MustBe(PftTokenKind.Eval);
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftEval
-            (
-                params PftNode[] children
-            )
-        {
-            foreach (var child in children)
-            {
-                Children.Add(child);
-            }
-        }
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            var expression = context.Evaluate(Children);
-            if (!string.IsNullOrEmpty(expression))
-            {
-                var program = PftUtility.CompileProgram(expression);
-                program.Execute(context);
-            }
-
-            OnAfterExecution(context);
-        }
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer
-                .WriteIndentIfNeeded()
-                .Write("eval(")
-                .WriteNodes(Children)
-                .Write(")");
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString()" />
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-            result.Append("eval(");
-            var first = true;
-            foreach (var child in Children)
-            {
-                if (!first)
-                {
-                    result.Append(' ');
-                }
-                result.Append(child);
-                first = false;
-            }
-            result.Append(')');
-
-            return result.ToString();
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftEval
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.Eval);
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftEval
+        (
+            params PftNode[] children
+        )
+    {
+        Sure.NotNull (children);
+
+        foreach (var child in children)
+        {
+            Children.Add (child);
+        }
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        var expression = context.Evaluate (Children);
+        if (!string.IsNullOrEmpty (expression))
+        {
+            var program = PftUtility.CompileProgram (expression);
+            program.Execute (context);
+        }
+
+        OnAfterExecution (context);
+    }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
+
+        printer
+            .WriteIndentIfNeeded()
+            .Write ("eval(")
+            .WriteNodes (Children)
+            .Write (")");
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString()" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ("eval(");
+        var first = true;
+        foreach (var child in Children)
+        {
+            if (!first)
+            {
+                builder.Append (' ');
+            }
+
+            builder.Append (child);
+            first = false;
+        }
+
+        builder.Append (')');
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
+
+    #endregion
 }

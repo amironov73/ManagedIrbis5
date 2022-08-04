@@ -18,9 +18,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 
 using AM;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
@@ -502,33 +502,33 @@ public sealed class PftConditionalStatement
     /// <inheritdoc cref="Object.ToString" />
     public override string ToString()
     {
-        var result = new StringBuilder();
-        result.Append ("if ");
-        if (!ReferenceEquals (Condition, null))
-        {
-            result.Append (Condition);
-        }
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ("if ");
+        builder.Append (Condition);
 
-        result.Append (" then");
+        builder.Append (" then");
         foreach (var node in ThenBranch)
         {
-            result.Append (' ');
-            result.Append (node);
+            builder.Append (' ');
+            builder.Append (node);
         }
 
         if (ElseBranch.Count != 0)
         {
-            result.Append (" else");
+            builder.Append (" else");
             foreach (var node in ElseBranch)
             {
-                result.Append (' ');
-                result.Append (node);
+                builder.Append (' ');
+                builder.Append (node);
             }
         }
 
-        result.Append (" fi");
+        builder.Append (" fi");
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

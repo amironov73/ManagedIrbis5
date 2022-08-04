@@ -17,10 +17,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 
 using AM;
 using AM.IO;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
@@ -409,21 +409,18 @@ public sealed class PftConditionAndOr
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        var result = new StringBuilder();
-        if (!ReferenceEquals (LeftOperand, null))
-        {
-            result.Append (LeftOperand);
-        }
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (LeftOperand);
 
-        result.Append (' ');
-        result.Append (Operation);
-        result.Append (' ');
-        if (!ReferenceEquals (RightOperand, null))
-        {
-            result.Append (RightOperand);
-        }
+        builder.Append (' ');
+        builder.Append (Operation);
+        builder.Append (' ');
+        builder.Append (RightOperand);
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion
