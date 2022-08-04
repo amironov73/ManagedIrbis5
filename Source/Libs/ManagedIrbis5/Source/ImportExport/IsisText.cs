@@ -16,49 +16,46 @@
 
 #region Using directives
 
-using System.Text;
-
 using AM;
+using AM.Text;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.ImportExport
+namespace ManagedIrbis.ImportExport;
+
+/// <summary>
+/// Специфичное для ISIS текстовое представление записей.
+/// </summary>
+public static class IsisText
 {
     /// <summary>
-    /// Специфичное для ISIS текстовое представление записей.
+    /// Формирует текстовое представление записи,
+    /// характерное для ISIS.
     /// </summary>
-    public static class IsisText
+    public static string ToIsisText
+        (
+            this Record record
+        )
     {
-        /// <summary>
-        /// Формирует текстовое представление записи,
-        /// характерное для ISIS.
-        /// </summary>
-        public static string ToIsisText
-            (
-                this Record record
-            )
+        Sure.NotNull (record);
+
+        var builder = StringBuilderPool.Shared.Get();
+        foreach (var field in record.Fields)
         {
-            Sure.NotNull(record, "record");
+            builder.AppendFormat
+                (
+                    "<{0}>{1}</{0}>",
+                    field.Tag,
+                    field.ToText()
+                );
+            builder.AppendLine();
+        }
 
-            var result = new StringBuilder();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-            foreach (var field in record.Fields)
-            {
-                result.AppendFormat
-                    (
-                        "<{0}>{1}</{0}>",
-                        field.Tag,
-                        field.ToText()
-                    );
-                result.AppendLine();
-            }
-
-            return result.ToString();
-
-        } // method ToIsisText
-
-    } // class IsisText
-
-} // namespace ManagedIrbis.ImportExport
+        return result;
+    }
+}

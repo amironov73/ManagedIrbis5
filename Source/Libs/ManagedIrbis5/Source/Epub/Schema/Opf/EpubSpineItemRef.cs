@@ -9,14 +9,15 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/*
+/* EpubSpineItemRef.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.Collections.Generic;
-using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -24,24 +25,56 @@ using System.Text;
 
 namespace ManagedIrbis.Epub.Schema;
 
+/// <summary>
+///
+/// </summary>
 public class EpubSpineItemRef
 {
-    public string Id { get; set; }
-    public string IdRef { get; set; }
-    public bool IsLinear { get; set; }
-    public List<SpineProperty> Properties { get; set; }
+    #region Properties
 
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Id { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? IdRef { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public bool IsLinear { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public List<SpineProperty>? Properties { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        StringBuilder resultBuilder = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         if (Id != null)
         {
-            resultBuilder.Append("Id: ");
-            resultBuilder.Append(Id);
-            resultBuilder.Append("; ");
+            builder.Append ("Id: ");
+            builder.Append (Id);
+            builder.Append ("; ");
         }
-        resultBuilder.Append("IdRef: ");
-        resultBuilder.Append(IdRef ?? "(null)");
-        return resultBuilder.ToString();
+
+        builder.Append ("IdRef: ");
+        builder.Append (IdRef ?? "(null)");
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
+
+    #endregion
 }

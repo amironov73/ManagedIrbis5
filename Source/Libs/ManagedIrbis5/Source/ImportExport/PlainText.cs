@@ -20,6 +20,7 @@ using System.IO;
 using System.Text;
 
 using AM;
+using AM.Text;
 
 using Microsoft.Extensions.Logging;
 
@@ -88,8 +89,9 @@ public static class PlainText
             char delimiter
         )
     {
-        var result = new StringBuilder();
+        Sure.NotNull (reader);
 
+        var builder = StringBuilderPool.Shared.Get();
         while (true)
         {
             var next = reader.Read();
@@ -98,16 +100,19 @@ public static class PlainText
                 break;
             }
 
-            var c = (char)next;
+            var c = (char) next;
             if (c == delimiter)
             {
                 break;
             }
 
-            result.Append (c);
+            builder.Append (c);
         }
 
-        return result.ToString().AsMemory();
+        var result = builder.ToString().AsMemory();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     private static Field _ParseLine
@@ -304,13 +309,16 @@ public static class PlainText
     {
         Sure.NotNull (record);
 
-        var output = new StringBuilder();
-        output.AppendLine ("0");
-        output.AppendLine ($"{record.Mfn}#0");
-        output.AppendLine ($"0#{record.Version}");
-        output.Append (record.ToPlainText());
+        var builder = StringBuilderPool.Shared.Get();
+        builder.AppendLine ("0");
+        builder.AppendLine ($"{record.Mfn}#0");
+        builder.AppendLine ($"0#{record.Version}");
+        builder.Append (record.ToPlainText());
 
-        return output.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -323,25 +331,28 @@ public static class PlainText
     {
         Sure.NotNull (record);
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         foreach (var field in record.Fields)
         {
-            result.AppendFormat ("{0}#", field.Tag);
+            builder.AppendFormat ("{0}#", field.Tag);
             foreach (var subField in field.Subfields)
             {
                 if (subField.Code != SubField.NoCode)
                 {
-                    result.Append ('^');
-                    result.Append (subField.Code);
+                    builder.Append ('^');
+                    builder.Append (subField.Code);
                 }
 
-                result.Append (subField.Value);
+                builder.Append (subField.Value);
             }
 
-            result.AppendLine();
+            builder.AppendLine();
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
