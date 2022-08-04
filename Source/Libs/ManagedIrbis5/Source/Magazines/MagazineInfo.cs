@@ -19,13 +19,13 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 #endregion
 
@@ -119,24 +119,31 @@ public sealed class MagazineInfo
     {
         get
         {
-            var result = new StringBuilder();
-            result.Append (Title);
+            var builder = StringBuilderPool.Shared.Get();
+            builder.Append (Title);
             if (!string.IsNullOrEmpty (SeriesNumber))
             {
-                result.AppendFormat (". {0}", SeriesNumber);
+                builder.Append (' ');
+                builder.Append (SeriesNumber);
             }
 
             if (!string.IsNullOrEmpty (SeriesTitle))
             {
-                result.AppendFormat (". {0}", SeriesTitle);
+                builder.Append (' ');
+                builder.Append (SeriesTitle);
             }
 
             if (!string.IsNullOrEmpty (SubTitle))
             {
-                result.AppendFormat (": {0}", SubTitle);
+                builder.Append (':');
+                builder.Append (' ');
+                builder.Append (SubTitle);
             }
 
-            return result.ToString();
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
         }
     }
 

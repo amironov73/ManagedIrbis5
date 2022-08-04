@@ -26,6 +26,7 @@ using AM;
 using AM.Collections;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 using ManagedIrbis.Infrastructure;
 
@@ -401,17 +402,19 @@ public sealed class MenuFile
     /// </summary>
     public string ToText()
     {
-        var result = new StringBuilder();
-
+        var builder = StringBuilderPool.Shared.Get();
         foreach (var entry in Entries)
         {
-            result.AppendLine (entry.Code);
-            result.AppendLine (entry.Comment);
+            builder.AppendLine (entry.Code);
+            builder.AppendLine (entry.Comment);
         }
 
-        result.AppendLine (StopMarker);
+        builder.AppendLine (StopMarker);
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion

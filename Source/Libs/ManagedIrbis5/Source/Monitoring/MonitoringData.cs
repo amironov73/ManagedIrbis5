@@ -18,14 +18,13 @@
 
 using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 #endregion
 
@@ -129,16 +128,28 @@ public sealed class MonitoringData
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        var result = new StringBuilder();
-        result.Append (Moment.ToLongUniformString());
-        if (!ReferenceEquals (Databases, null)
-            && Databases.Length != 0)
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (Moment.ToLongUniformString());
+        if (Databases is { Length: not 0 })
         {
-            result.Append (':');
-            result.Append (string.Join (",", Databases.Select (d => d.Name)));
+            builder.Append (':');
+            var first = true;
+            foreach (var database in Databases)
+            {
+                if (!first)
+                {
+                    builder.Append (',');
+                }
+
+                builder.Append (database.Name);
+                first = false;
+            }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     #endregion
