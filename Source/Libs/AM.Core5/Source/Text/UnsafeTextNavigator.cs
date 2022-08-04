@@ -17,7 +17,6 @@
 
 using System;
 using System.Diagnostics.Contracts;
-using System.Text;
 
 using Microsoft.Extensions.Logging;
 
@@ -47,7 +46,7 @@ public unsafe ref struct UnsafeTextNavigator
     /// Текст закончился?
     /// </summary>
     [Pure]
-    public bool IsEOF => _position >= _length;
+    public bool IsEOF => Position >= _length;
 
     /// <summary>
     /// Общая длина текста в символах.
@@ -59,7 +58,7 @@ public unsafe ref struct UnsafeTextNavigator
     /// Текущая позиция в тексте.
     /// </summary>
     [Pure]
-    public int Position => _position;
+    public int Position { get; private set; }
 
     /// <summary>
     /// Хранимый текст в виде спана.
@@ -90,7 +89,7 @@ public unsafe ref struct UnsafeTextNavigator
     {
         _text = text;
         _length = length;
-        _position = 0;
+        Position = 0;
     }
 
     /// <summary>
@@ -108,7 +107,7 @@ public unsafe ref struct UnsafeTextNavigator
         }
 
         _length = text.Length;
-        _position = 0;
+        Position = 0;
     }
 
     #endregion
@@ -117,7 +116,6 @@ public unsafe ref struct UnsafeTextNavigator
 
     private readonly char* _text;
     private readonly int _length;
-    private int _position;
 
     #endregion
 
@@ -131,7 +129,7 @@ public unsafe ref struct UnsafeTextNavigator
     {
         var result = new UnsafeTextNavigator (_text, _length)
         {
-            _position = _position
+            Position = Position
         };
 
         return result;
@@ -147,7 +145,7 @@ public unsafe ref struct UnsafeTextNavigator
     {
         return IsEOF
             ? new ReadOnlySpan<char>()
-            : Substring (_position);
+            : Substring (Position);
     }
 
     /// <summary>
@@ -240,7 +238,7 @@ public unsafe ref struct UnsafeTextNavigator
     [Pure]
     public char LookAhead()
     {
-        var newPosition = _position + 1;
+        var newPosition = Position + 1;
         return newPosition >= _length
             ? EOF
             : _text[newPosition];
@@ -257,7 +255,7 @@ public unsafe ref struct UnsafeTextNavigator
     {
         Sure.NonNegative (distance);
 
-        var newPosition = _position + distance;
+        var newPosition = Position + distance;
         return newPosition >= _length
             ? EOF
             : _text[newPosition];
@@ -269,9 +267,9 @@ public unsafe ref struct UnsafeTextNavigator
     [Pure]
     public char LookBehind()
     {
-        return _position == 0
+        return Position == 0
             ? EOF
-            : _text[_position - 1];
+            : _text[Position - 1];
     }
 
     /// <summary>
@@ -285,9 +283,9 @@ public unsafe ref struct UnsafeTextNavigator
     {
         Sure.Positive (distance, nameof (distance));
 
-        return _position < distance
+        return Position < distance
             ? EOF
-            : _text[_position - distance];
+            : _text[Position - distance];
     }
 
     /// <summary>
@@ -298,7 +296,7 @@ public unsafe ref struct UnsafeTextNavigator
             int distance
         )
     {
-        _position = Math.Max (0, Math.Min (_position + distance, _length));
+        Position = Math.Max (0, Math.Min (Position + distance, _length));
     }
 
     /// <summary>
@@ -307,9 +305,9 @@ public unsafe ref struct UnsafeTextNavigator
     [Pure]
     public char PeekChar()
     {
-        return _position >= _length
+        return Position >= _length
             ? EOF
-            : _text[_position];
+            : _text[Position];
     }
 
     /// <summary>
@@ -329,7 +327,7 @@ public unsafe ref struct UnsafeTextNavigator
             return ReadOnlySpan<char>.Empty;
         }
 
-        var start = _position;
+        var start = Position;
         for (var i = 0; i < length; i++)
         {
             var c = ReadChar();
@@ -339,8 +337,8 @@ public unsafe ref struct UnsafeTextNavigator
             }
         }
 
-        var result = Substring (start, _position - start);
-        _position = start;
+        var result = Substring (start, Position - start);
+        Position = start;
 
         return result;
     }
@@ -356,9 +354,9 @@ public unsafe ref struct UnsafeTextNavigator
             char stopChar
         )
     {
-        var postion = _position;
+        var postion = Position;
         var result = ReadTo (stopChar);
-        _position = postion;
+        Position = postion;
 
         return result;
     }
@@ -374,12 +372,12 @@ public unsafe ref struct UnsafeTextNavigator
             char[] stopChars
         )
     {
-        var position = _position;
+        var position = Position;
         var result = ReadTo (stopChars);
-        _position = position;
+        Position = position;
 
         return result;
-    } // method PeekTo
+    }
 
     /// <summary>
     /// Подглядывание вплоть до указанного символа.
@@ -391,12 +389,12 @@ public unsafe ref struct UnsafeTextNavigator
             char stopChar
         )
     {
-        var position = _position;
+        var position = Position;
         var result = ReadUntil (stopChar);
-        _position = position;
+        Position = position;
 
         return result;
-    } // method PeekUntil
+    }
 
     /// <summary>
     /// Подглядывание вплоть до указанных символов.
@@ -408,24 +406,24 @@ public unsafe ref struct UnsafeTextNavigator
             params char[] stopChars
         )
     {
-        var position = _position;
+        var position = Position;
         var result = ReadUntil (stopChars);
-        _position = position;
+        Position = position;
         return result;
-    } // metdho PeekUntil
+    }
 
     /// <summary>
     /// Считывание символа.
     /// </summary>
     public char ReadChar()
     {
-        if (_position >= _length)
+        if (Position >= _length)
         {
             return EOF;
         }
 
-        return _text[_position++];
-    } // method ReadChar
+        return _text[Position++];
+    }
 
     /// <summary>
     /// Считывание экранированной строки вплоть до разделителя
@@ -444,7 +442,7 @@ public unsafe ref struct UnsafeTextNavigator
             return null;
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         while (true)
         {
             var c = ReadChar();
@@ -464,10 +462,11 @@ public unsafe ref struct UnsafeTextNavigator
                             + ": unexpected end of stream"
                         );
 
+                    StringBuilderPool.Shared.Return (builder);
                     throw new FormatException();
                 }
 
-                result.Append (c);
+                builder.Append (c);
             }
             else if (c == stopChar)
             {
@@ -475,12 +474,15 @@ public unsafe ref struct UnsafeTextNavigator
             }
             else
             {
-                result.Append (c);
+                builder.Append (c);
             }
         }
 
-        return result.ToString();
-    } // method ReadEscapedUntil
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
+    }
 
     /// <summary>
     /// Считывание начиная с открывающего символа
@@ -501,7 +503,7 @@ public unsafe ref struct UnsafeTextNavigator
             return ReadOnlySpan<char>.Empty;
         }
 
-        var start = _position;
+        var start = Position;
         var c = PeekChar();
         if (c != openChar)
         {
@@ -515,7 +517,7 @@ public unsafe ref struct UnsafeTextNavigator
             c = ReadChar();
             if (c == EOF)
             {
-                _position = start;
+                Position = start;
                 return ReadOnlySpan<char>.Empty;
             }
 
@@ -528,9 +530,9 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 start,
-                _position - start
+                Position - start
             );
-    } // method ReadFrom
+    }
 
     /// <summary>
     /// Считывание начиная с открывающего символа
@@ -551,7 +553,7 @@ public unsafe ref struct UnsafeTextNavigator
             return ReadOnlySpan<char>.Empty;
         }
 
-        var start = _position;
+        var start = Position;
         var c = PeekChar();
         if (!openChars.Contains (c))
         {
@@ -565,7 +567,7 @@ public unsafe ref struct UnsafeTextNavigator
             c = ReadChar();
             if (c == EOF)
             {
-                _position = start;
+                Position = start;
                 return ReadOnlySpan<char>.Empty;
             }
 
@@ -578,9 +580,9 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 start,
-                _position - start
+                Position - start
             );
-    } // metdhod ReadFrom
+    }
 
     /// <summary>
     /// Чтение беззнакового целого.
@@ -594,7 +596,7 @@ public unsafe ref struct UnsafeTextNavigator
             return ReadOnlySpan<char>.Empty;
         }
 
-        var startPosition = _position;
+        var startPosition = Position;
         while (IsDigit())
         {
             ReadChar();
@@ -603,16 +605,16 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 startPosition,
-                _position - startPosition
+                Position - startPosition
             );
-    } // method ReadInteger
+    }
 
     /// <summary>
     /// Чтение до конца строки.
     /// </summary>
     public ReadOnlySpan<char> ReadLine()
     {
-        var startPosition = _position;
+        var startPosition = Position;
         while (!IsEOF)
         {
             var c = PeekChar();
@@ -624,7 +626,7 @@ public unsafe ref struct UnsafeTextNavigator
             ReadChar();
         }
 
-        var stopPosition = _position;
+        var stopPosition = Position;
 
         if (!IsEOF)
         {
@@ -647,7 +649,7 @@ public unsafe ref struct UnsafeTextNavigator
                 startPosition,
                 stopPosition - startPosition
             );
-    } // method ReadLine
+    }
 
     /// <summary>
     /// Чтение строки вплоть до указанной длины.
@@ -661,7 +663,7 @@ public unsafe ref struct UnsafeTextNavigator
     {
         Sure.Positive (length, nameof (length));
 
-        var startPosition = _position;
+        var startPosition = Position;
         for (var i = 0; i < length; i++)
         {
             var c = ReadChar();
@@ -674,9 +676,9 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 startPosition,
-                _position - startPosition
+                Position - startPosition
             );
-    } // method ReadString
+    }
 
     /// <summary>
     /// Считывание вплоть до указанного символа
@@ -689,7 +691,7 @@ public unsafe ref struct UnsafeTextNavigator
             char stopChar
         )
     {
-        var start = _position;
+        var start = Position;
         while (true)
         {
             var c = ReadChar();
@@ -702,9 +704,9 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 start,
-                length: _position - start
+                length: Position - start
             );
-    } // method ReadTo
+    }
 
     /// <summary>
     /// Считывание вплоть до указанного разделителя
@@ -718,7 +720,7 @@ public unsafe ref struct UnsafeTextNavigator
     {
         // Sure.NotNullNorEmpty(stopString, nameof(stopString));
 
-        var savePosition = _position;
+        var savePosition = Position;
         var length = 0;
         while (true)
         {
@@ -726,14 +728,14 @@ public unsafe ref struct UnsafeTextNavigator
             var c = ReadChar();
             if (c == EOF)
             {
-                _position = savePosition;
+                Position = savePosition;
                 return ReadOnlySpan<char>.Empty;
             }
 
             length++;
             if (length >= stopString.Length)
             {
-                var start = _position - stopString.Length;
+                var start = Position - stopString.Length;
                 for (var i = 0; i < stopString.Length; i++)
                 {
                     if (_text[start + i] != stopString[i])
@@ -749,9 +751,9 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 savePosition,
-                _position - savePosition - stopString.Length
+                Position - savePosition - stopString.Length
             );
-    } // method ReadTo
+    }
 
     /// <summary>
     /// Считывание вплоть до указанного символа
@@ -764,7 +766,7 @@ public unsafe ref struct UnsafeTextNavigator
             params char[] stopChars
         )
     {
-        var start = _position;
+        var start = Position;
         while (true)
         {
             var c = ReadChar();
@@ -778,10 +780,10 @@ public unsafe ref struct UnsafeTextNavigator
         var result = Substring
             (
                 start,
-                length: _position - start
+                length: Position - start
             );
         return result;
-    } // method ReadTo
+    }
 
     /// <summary>
     /// Считывание вплоть до указанного символа
@@ -794,7 +796,7 @@ public unsafe ref struct UnsafeTextNavigator
             char stopChar
         )
     {
-        var startPosition = _position;
+        var startPosition = Position;
         while (true)
         {
             var c = PeekChar();
@@ -809,9 +811,9 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 startPosition,
-                _position - startPosition
+                Position - startPosition
             );
-    } // method ReadUntil
+    }
 
     /// <summary>
     /// Считывание вплоть до указанного разделителя
@@ -825,7 +827,7 @@ public unsafe ref struct UnsafeTextNavigator
     {
         // Sure.NotNullNorEmpty(stopString, nameof(stopString));
 
-        var position = _position;
+        var position = Position;
         var length = 0;
         while (true)
         {
@@ -833,14 +835,14 @@ public unsafe ref struct UnsafeTextNavigator
             var c = ReadChar();
             if (c == EOF)
             {
-                _position = position;
+                Position = position;
                 return ReadOnlySpan<char>.Empty;
             }
 
             length++;
             if (length >= stopString.Length)
             {
-                var start = _position - stopString.Length;
+                var start = Position - stopString.Length;
                 for (var i = 0; i < stopString.Length; i++)
                 {
                     if (_text[start + i] != stopString[i])
@@ -856,11 +858,11 @@ public unsafe ref struct UnsafeTextNavigator
         var result = Substring
             (
                 position,
-                _position - position - stopString.Length
+                Position - position - stopString.Length
             );
-        _position -= stopString.Length;
+        Position -= stopString.Length;
         return result;
-    } // method ReadUntil
+    }
 
     /// <summary>
     /// Считывание вплоть до указанных символов
@@ -873,7 +875,7 @@ public unsafe ref struct UnsafeTextNavigator
             params char[] stopChars
         )
     {
-        var savePosition = _position;
+        var savePosition = Position;
         while (true)
         {
             var c = PeekChar();
@@ -889,9 +891,9 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 savePosition,
-                _position - savePosition
+                Position - savePosition
             );
-    } // method ReadUntil
+    }
 
     /// <summary>
     /// Считывание вплоть до указанных символов
@@ -906,14 +908,14 @@ public unsafe ref struct UnsafeTextNavigator
             ReadOnlySpan<char> stopChars
         )
     {
-        var start = _position;
+        var start = Position;
         var level = 0;
         while (true)
         {
             var c = PeekChar();
             if (c == EOF)
             {
-                _position = start;
+                Position = start;
                 return ReadOnlySpan<char>.Empty;
             }
 
@@ -945,9 +947,9 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 start,
-                _position - start
+                Position - start
             );
-    } // method ReadUntil
+    }
 
     /// <summary>
     /// Считывание, пока встречается указанный символ.
@@ -959,7 +961,7 @@ public unsafe ref struct UnsafeTextNavigator
             char goodChar
         )
     {
-        var startPosition = _position;
+        var startPosition = Position;
         while (true)
         {
             var c = PeekChar();
@@ -974,9 +976,9 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 startPosition,
-                _position - startPosition
+                Position - startPosition
             );
-    } // method ReadWhile
+    }
 
     /// <summary>
     /// Считывание, пока встречается указанные символы.
@@ -988,7 +990,7 @@ public unsafe ref struct UnsafeTextNavigator
             params char[] goodChars
         )
     {
-        var startPosition = _position;
+        var startPosition = Position;
         while (true)
         {
             var c = PeekChar();
@@ -1004,16 +1006,16 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 startPosition,
-                _position - startPosition
+                Position - startPosition
             );
-    } // method ReadWhile
+    }
 
     /// <summary>
     /// Считываем слово под курсором.
     /// </summary>
     public ReadOnlySpan<char> ReadWord()
     {
-        var startPosition = _position;
+        var startPosition = Position;
         while (true)
         {
             var c = PeekChar();
@@ -1029,9 +1031,9 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 startPosition,
-                _position - startPosition
+                Position - startPosition
             );
-    } // metdhod ReadWord
+    }
 
     /// <summary>
     /// Считываем слово под курсором.
@@ -1041,7 +1043,7 @@ public unsafe ref struct UnsafeTextNavigator
             params char[] additionalWordCharacters
         )
     {
-        var savePosition = _position;
+        var savePosition = Position;
         while (true)
         {
             var c = PeekChar();
@@ -1058,9 +1060,9 @@ public unsafe ref struct UnsafeTextNavigator
         return Substring
             (
                 savePosition,
-                _position - savePosition
+                Position - savePosition
             );
-    } // method ReadWord
+    }
 
     /// <summary>
     /// Получаем недавно считанный текст указанной длины.
@@ -1071,7 +1073,7 @@ public unsafe ref struct UnsafeTextNavigator
             int length
         )
     {
-        var start = _position - length;
+        var start = Position - length;
         if (start < 0)
         {
             length += start;
@@ -1090,7 +1092,7 @@ public unsafe ref struct UnsafeTextNavigator
         }
 
         return Substring (start, length);
-    } // method RecentText
+    }
 
     /// <summary>
     /// Пропускает один символ, если он совпадает с указанным.
@@ -1110,7 +1112,7 @@ public unsafe ref struct UnsafeTextNavigator
         }
 
         return false;
-    } // method SkipChar
+    }
 
     /// <summary>
     /// Пропускает указанное число символов.
@@ -1128,7 +1130,7 @@ public unsafe ref struct UnsafeTextNavigator
         }
 
         return !IsEOF;
-    } // method SkipChar
+    }
 
     /// <summary>
     /// Пропускает один символ, если он совпадает с любым
@@ -1148,7 +1150,7 @@ public unsafe ref struct UnsafeTextNavigator
         }
 
         return false;
-    } // method SkipChar
+    }
 
     /// <summary>
     /// Пропускаем управляющие символы.
@@ -1171,7 +1173,7 @@ public unsafe ref struct UnsafeTextNavigator
                 return true;
             }
         }
-    } // method SkipControl
+    }
 
     /// <summary>
     /// Пропускаем пунктуацию.
@@ -1194,7 +1196,7 @@ public unsafe ref struct UnsafeTextNavigator
                 return true;
             }
         }
-    } // method SkipPunctuation
+    }
 
     /// <summary>
     /// Skip non-word characters.
@@ -1218,7 +1220,7 @@ public unsafe ref struct UnsafeTextNavigator
                 return true;
             }
         }
-    } // method SkipNonWord
+    }
 
     /// <summary>
     /// Skip non-word characters.
@@ -1246,7 +1248,7 @@ public unsafe ref struct UnsafeTextNavigator
                 return true;
             }
         }
-    } // method SkipNonWord
+    }
 
     /// <summary>
     /// Пропускаем произвольное количество символов
@@ -1275,7 +1277,7 @@ public unsafe ref struct UnsafeTextNavigator
                 return true;
             }
         }
-    } // method SkipRange
+    }
 
     /// <summary>
     /// Пропустить указанный символ.
@@ -1302,7 +1304,7 @@ public unsafe ref struct UnsafeTextNavigator
                 return true;
             }
         }
-    } // method SkipWhile
+    }
 
     /// <summary>
     /// Пропустить указанные символы.
@@ -1329,7 +1331,7 @@ public unsafe ref struct UnsafeTextNavigator
                 return true;
             }
         }
-    } // method SkipWhile
+    }
 
     /// <summary>
     /// Пропустить, пока не встретится указанный символ.
@@ -1347,7 +1349,7 @@ public unsafe ref struct UnsafeTextNavigator
                 return false;
             }
 
-            char c = PeekChar();
+            var c = PeekChar();
             if (c == stopChar)
             {
                 return true;
@@ -1355,7 +1357,7 @@ public unsafe ref struct UnsafeTextNavigator
 
             ReadChar();
         }
-    } // method SkipTo
+    }
 
     /// <summary>
     /// Пропустить, пока не встретятся указанные символы.

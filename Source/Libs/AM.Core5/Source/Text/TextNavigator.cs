@@ -484,7 +484,7 @@ public sealed class TextNavigator
             return null;
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         while (true)
         {
             var c = ReadChar();
@@ -504,10 +504,11 @@ public sealed class TextNavigator
                             + ": unexpected end of stream"
                         );
 
+                    StringBuilderPool.Shared.Return (builder);
                     throw new FormatException();
                 }
 
-                result.Append (c);
+                builder.Append (c);
             }
             else if (c == stopChar)
             {
@@ -515,11 +516,14 @@ public sealed class TextNavigator
             }
             else
             {
-                result.Append (c);
+                builder.Append (c);
             }
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -870,19 +874,22 @@ public sealed class TextNavigator
             return null;
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         while (true)
         {
-            char c = PeekCharNoCrLf();
+            var c = PeekCharNoCrLf();
             if (c == EOF || c == stopChar)
             {
                 break;
             }
 
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
-        return result.ToString();
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return result;
     }
 
     /// <summary>
@@ -1639,7 +1646,7 @@ public sealed class TextNavigator
     public char PeekCharNoCrLf()
     {
         var position = _position;
-        char result = '\0';
+        var result = '\0';
 
         while (position < _text.Length)
         {

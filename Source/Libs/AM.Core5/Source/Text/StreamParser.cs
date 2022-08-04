@@ -81,44 +81,44 @@ public sealed class StreamParser
 
     private readonly bool _ownReader;
 
-    private StringBuilder _ReadNumber()
+    private string _ReadNumber()
     {
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         var c = PeekChar();
-        if (c == '-' || c == '+')
+        if (c is '-' or '+')
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
         while (IsDigit())
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
         c = PeekChar();
         if (c == '.')
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
             while (IsDigit())
             {
-                result.Append (ReadChar());
+                builder.Append (ReadChar());
             }
 
             c = PeekChar();
         }
 
-        if (c == 'e' || c == 'E')
+        if (c is 'e' or 'E')
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
             c = PeekChar();
-            if (c == '-' || c == '+')
+            if (c is '-' or '+')
             {
-                result.Append (ReadChar());
+                builder.Append (ReadChar());
             }
 
             while (IsDigit())
             {
-                result.Append (ReadChar());
+                builder.Append (ReadChar());
             }
 
             //c = PeekChar();
@@ -129,6 +129,9 @@ public sealed class StreamParser
         //{
         //    result.Append(ReadChar());
         //}
+
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
         return result;
     }
@@ -305,7 +308,7 @@ public sealed class StreamParser
 
         return decimal.Parse
             (
-                result.ToString(),
+                result,
                 provider ?? CultureInfo.InvariantCulture
             );
     }
@@ -323,11 +326,11 @@ public sealed class StreamParser
             return null;
         }
 
-        var result = _ReadNumber();
+        var number = _ReadNumber();
 
         return double.Parse
             (
-                result.ToString(),
+                number,
                 provider ?? CultureInfo.InvariantCulture
             );
     }
@@ -342,18 +345,21 @@ public sealed class StreamParser
             return null;
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         if (PeekChar() == '-')
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
         while (IsDigit())
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
-        return short.Parse (result.ToString());
+        var text = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return text.ParseInt16();
     }
 
     /// <summary>
@@ -366,18 +372,21 @@ public sealed class StreamParser
             return null;
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         if (PeekChar() == '-')
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
         while (IsDigit())
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
-        return int.Parse (result.ToString());
+        var text = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return text.ParseInt32();
     }
 
     /// <summary>
@@ -390,18 +399,21 @@ public sealed class StreamParser
             return null;
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         if (PeekChar() == '-')
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
         while (IsDigit())
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
-        return long.Parse (result.ToString());
+        var text = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return text.ParseInt64();
     }
 
     /// <summary>
@@ -417,11 +429,11 @@ public sealed class StreamParser
             return null;
         }
 
-        var result = _ReadNumber();
+        var number = _ReadNumber();
 
         return float.Parse
             (
-                result.ToString(),
+                number,
                 provider ?? CultureInfo.InvariantCulture
             );
     }
@@ -436,13 +448,16 @@ public sealed class StreamParser
             return null;
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         while (IsDigit())
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
-        return ushort.Parse (result.ToString());
+        var text = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return text.ParseUInt16();
     }
 
     /// <summary>
@@ -455,13 +470,16 @@ public sealed class StreamParser
             return null;
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         while (IsDigit())
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
-        return uint.Parse (result.ToString());
+        var text = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return text.ParseUInt32();
     }
 
     /// <summary>
@@ -474,13 +492,16 @@ public sealed class StreamParser
             return null;
         }
 
-        var result = new StringBuilder();
+        var builder = StringBuilderPool.Shared.Get();
         while (IsDigit())
         {
-            result.Append (ReadChar());
+            builder.Append (ReadChar());
         }
 
-        return ulong.Parse (result.ToString());
+        var text = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
+
+        return text.ParseUInt64();
     }
 
     /// <summary>

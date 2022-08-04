@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Text;
 
 #endregion
 
@@ -156,7 +155,7 @@ public static class RichText
                 continue;
             }
 
-            var buffer = new StringBuilder();
+            var buffer = StringBuilderPool.Shared.Get();
             while (!navigator.IsEOF)
             {
                 c = navigator.ReadChar();
@@ -168,11 +167,10 @@ public static class RichText
                 buffer.Append (c);
             }
 
-            if (buffer.Length != 0)
-            {
-                c = (char) int.Parse (buffer.ToString());
-                builder.Append (c);
-            }
+            var number = buffer.ToString();
+            StringBuilderPool.Shared.Return (buffer);
+            c = (char) number.ParseInt16();
+            builder.Append (c);
         }
 
         var result = builder.ToString();
