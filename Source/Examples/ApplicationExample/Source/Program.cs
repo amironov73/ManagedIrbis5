@@ -22,22 +22,17 @@ namespace ApplicationExample;
 /// </summary>
 internal static class Program
 {
-    private static int ActualRun
-        (
-            MagnaApplication application
-        )
-    {
-        var logger = application.Logger;
-
-        logger.LogInformation ("Привет из приложения!");
-
-        return 0;
-    }
-
     public static int Main (string[] args)
     {
         return new MagnaApplication (args)
             .ConfigureCancelKey()
-            .Run<MagnaApplication> (ActualRun);
+            .Run (application =>
+            {
+                var logger = application.Logger;
+
+                logger.LogInformation ("Привет из приложения!");
+
+                return 0;
+            });
     }
 }

@@ -17,6 +17,7 @@ using System;
 using System.Linq;
 
 using AM;
+using AM.AppServices;
 
 using ManagedIrbis.AppServices;
 using ManagedIrbis.Magazines;
@@ -31,29 +32,38 @@ using Microsoft.Extensions.Logging;
 /// <summary>
 /// Вся логика программы в одном классе.
 /// </summary>
-internal static class Program
+internal sealed class Program
+    : IrbisApplication
 {
-    private static int ActualRun
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    private Program
         (
-            IrbisApplication application
+            string[] args
         )
+        : base (args)
     {
-        var connection = application.Connection;
-        var logger = application.Logger;
-        var manager = new MagazineManager (Magna.Host, connection);
+        // пустое тело конструктора
+    }
+
+    /// <inheritdoc cref="MagnaApplication.DoTheWork"/>
+    protected override int DoTheWork()
+    {
+        var manager = new MagazineManager (Magna.Host, Connection);
         var cumulator = new Cumulator();
         var magazines = manager.GetAllMagazines()
             .OrderBy (m => m.Title)
             .ToArray();
 
         // magazines = magazines.Take (50).ToArray();
-        logger.LogInformation ("Magazines found: {Length}", magazines.Length);
+        Logger.LogInformation ("Magazines found: {Length}", magazines.Length);
 
         foreach (var magazine in magazines)
         {
-            if (application.Stop)
+            if (Stop)
             {
-                logger.LogError ("Cancel key pressed");
+                Logger.LogError ("Cancel key pressed");
                 break;
             }
 
@@ -62,21 +72,21 @@ internal static class Program
             record.RemoveField (909);
 
             var title = magazine.ExtendedTitle;
-            logger.LogInformation ("Magazine: {Title}", title);
+            Logger.LogInformation ("Magazine: {Title}", title);
 
             var issues = manager.GetIssues (magazine);
             var cumulated = cumulator.Cumulate (issues, CumulationMethod.Complect);
             foreach (var cumulation in cumulated)
             {
-                logger.LogInformation ("{Cumulation}", cumulation.ToString());
+                Logger.LogInformation ("{Cumulation}", cumulation.ToString());
                 var field = cumulation.ToField();
                 record.Add (field);
             }
 
-            connection.WriteRecord (record, dontParse: true);
+            Connection.WriteRecord (record, dontParse: true);
         }
 
-        if (!application.Stop)
+        if (!Stop)
         {
             Console.WriteLine ("ALL DONE");
         }
@@ -89,8 +99,8 @@ internal static class Program
             string[] args
         )
     {
-        return new IrbisApplication (args)
+        return new Program (args)
             .ConfigureCancelKey()
-            .Run<IrbisApplication> (ActualRun);
+            .Run();
     }
 }

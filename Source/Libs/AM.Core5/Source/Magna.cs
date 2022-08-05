@@ -21,7 +21,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -38,7 +37,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Splat;
 
 using ILogger = Microsoft.Extensions.Logging.ILogger;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 #endregion
 
@@ -143,148 +141,11 @@ public sealed class Magna
     /// Глобальный объект приложения.
     /// </summary>
     [AllowNull]
-    public static MagnaApplication Application { get; internal set; }
+    public static IMagnaApplication Application { get; internal set; }
 
     #endregion
 
     #region Public methods
-
-    // /// <summary>
-    // /// Критическая ситуация.
-    // /// </summary>
-    // public static void Critical
-    //     (
-    //         string message
-    //     )
-    // {
-    //     Logger.LogCritical (message);
-    // }
-    //
-    // /// <summary>
-    // /// Критическая ситуация.
-    // /// </summary>
-    // public static void Critical
-    //     (
-    //         string message,
-    //         params object[] args
-    //     )
-    // {
-    //     Logger.LogCritical (message, args);
-    // }
-
-    // /// <summary>
-    // /// Отладочное логирование.
-    // /// </summary>
-    // [Conditional ("DEBUG")]
-    // public static void Debug
-    //     (
-    //         string message
-    //     )
-    // {
-    //     Logger.LogDebug (message);
-    // }
-    //
-    // /// <summary>
-    // /// Отладочное логирование.
-    // /// </summary>
-    // [Conditional ("DEBUG")]
-    // public static void Debug
-    //     (
-    //         string message,
-    //         params object[] args
-    //     )
-    // {
-    //     Logger.LogDebug (message, args);
-    // }
-
-    // /// <summary>
-    // /// Отладочное логирование.
-    // /// </summary>
-    // [Conditional ("DEBUG")]
-    // public static void Debug
-    //     (
-    //         Func<string> lazy
-    //     )
-    // {
-    //     if (Logger.IsEnabled (LogLevel.Debug))
-    //     {
-    //         Logger.LogDebug (lazy());
-    //     }
-    // }
-
-    // /// <summary>
-    // /// Логирует сообщение об ошибке.
-    // /// </summary>
-    // public static void Error
-    //     (
-    //         string message
-    //     )
-    // {
-    //     Logger.LogError (message);
-    // }
-    //
-    // /// <summary>
-    // /// Логирует сообщение об ошибке.
-    // /// </summary>
-    // public static void Error
-    //     (
-    //         string message,
-    //         params object[] args
-    //     )
-    // {
-    //     Logger.LogError (message, args);
-    // }
-    //
-    // /// <summary>
-    // /// Логирует сообщение об ошибке.
-    // /// </summary>
-    // public static void Error
-    //     (
-    //         Func<string> lazy
-    //     )
-    // {
-    //     if (Logger.IsEnabled (LogLevel.Error))
-    //     {
-    //         Logger.LogError (lazy());
-    //     }
-    // }
-    //
-    // /// <summary>
-    // /// Логирует информационное сообщение.
-    // /// </summary>
-    // public static void Info
-    //     (
-    //         string message
-    //     )
-    // {
-    //     Logger.LogInformation (message);
-    // }
-    //
-    // /// <summary>
-    // /// Логирует информационное сообщение.
-    // /// </summary>
-    // public static void Info
-    //     (
-    //         string message,
-    //         params object[] args
-    //     )
-    // {
-    //     Logger.LogInformation (message, args);
-    // }
-    //
-    // /// <summary>
-    // /// Логирует информационное сообщение.
-    // /// </summary>
-    // public static void Info
-    //     (
-    //         Func<string> lazy
-    //     )
-    // {
-    //     if (Logger.IsEnabled (LogLevel.Information))
-    //     {
-    //         Logger.LogInformation (lazy());
-    //     }
-    // }
 
     /// <summary>
     /// Инициализация.
@@ -377,95 +238,6 @@ public sealed class Magna
 
         return result;
     }
-
-    // /// <summary>
-    // /// Трассировочное логирование.
-    // /// </summary>
-    // [Conditional ("TRACE")]
-    // public static void Trace
-    //     (
-    //         string message
-    //     )
-    // {
-    //     Logger.LogTrace (message);
-    // }
-    //
-    // /// <summary>
-    // /// Трассировочное логирование.
-    // /// </summary>
-    // [Conditional ("TRACE")]
-    // public static void Trace
-    //     (
-    //         string message,
-    //         params object[] args
-    //     )
-    // {
-    //     Logger.LogTrace (message, args);
-    // }
-    //
-    // /// <summary>
-    // /// Логирует сообщение об ошибке.
-    // /// </summary>
-    // [Conditional ("TRACE")]
-    // public static void Trace
-    //     (
-    //         Func<string> lazy
-    //     )
-    // {
-    //     if (Logger.IsEnabled (LogLevel.Trace))
-    //     {
-    //         Logger.LogTrace (lazy());
-    //     }
-    // }
-    //
-    // /// <summary>
-    // /// Регистрация исключения в логах.
-    // /// </summary>
-    // public static void TraceException
-    //     (
-    //         string text,
-    //         Exception exception
-    //     )
-    // {
-    //     Logger.Log (LogLevel.Trace, exception, text);
-    // }
-    //
-    // /// <summary>
-    // /// Логирование предупреждения.
-    // /// </summary>
-    // public static void Warning
-    //     (
-    //         string message
-    //     )
-    // {
-    //     Logger.LogWarning (message);
-    // }
-    //
-    // /// <summary>
-    // /// Логирование предупреждения.
-    // /// </summary>
-    // public static void Warning
-    //     (
-    //         string message,
-    //         params object[] args
-    //     )
-    // {
-    //     Logger.LogWarning (message, args);
-    // }
-    //
-    // /// <summary>
-    // /// Логирование предупреждения.
-    // /// </summary>
-    // public static void Warning
-    //     (
-    //         Func<string> lazy
-    //     )
-    // {
-    //     if (Logger.IsEnabled (LogLevel.Warning))
-    //     {
-    //         Logger.LogWarning (lazy());
-    //     }
-    // }
 
     #endregion
 }

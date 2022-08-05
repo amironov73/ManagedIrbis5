@@ -114,9 +114,9 @@ public class WinFormsApplication
     /// <summary>
     /// Запуск приложения.
     /// </summary>
-    public override int Run<TApplication>
+    public override int Run
         (
-            Func<TApplication, int> runDelegate,
+            Func<IMagnaApplication, int> runDelegate,
             bool waitForHostShutdown = true,
             bool shutdownHost = true
         )
@@ -139,7 +139,6 @@ public class WinFormsApplication
             };
             timer.Tick += (_, _) =>
             {
-                var self = (TApplication)(object)  this;
                 timer.Enabled = false;
 
                 if (_postConfigure is not null)
@@ -150,7 +149,7 @@ public class WinFormsApplication
                     }
                 }
 
-                result = runDelegate (self);
+                result = runDelegate (this);
             };
             timer.Enabled = true;
 

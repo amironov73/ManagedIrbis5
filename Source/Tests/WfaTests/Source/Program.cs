@@ -179,7 +179,10 @@ internal sealed class Program
     ///  The main entry point for the application.
     /// </summary>
     [STAThread]
-    public static int Main (string[] args)
+    public static int Main
+        (
+            string[] args
+        )
     {
         return new Program (args)
             .SetTitle ("Some WinForms Application")
@@ -199,7 +202,7 @@ internal sealed class Program
                     app.MainForm.WriteLog ($"Now: {DateTime.Now:hh:mm:ss}");
                 };
             })
-            .Run<WinFormsApplication>();
+            .Run();
     }
 
     #endregion

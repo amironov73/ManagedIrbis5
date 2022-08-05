@@ -16,6 +16,7 @@
 
 using System.Linq;
 
+using AM.AppServices;
 using AM.Text;
 
 using ManagedIrbis;
@@ -38,7 +39,14 @@ namespace GetOutLaters;
 internal sealed class Program
     : IrbisApplication
 {
-    public Program (string[] args) : base(args)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Program
+        (
+            string[] args
+        )
+        : base (args)
     {
     }
 
@@ -137,6 +145,7 @@ internal sealed class Program
         }
     }
 
+    /// <inheritdoc cref="MagnaApplication.DoTheWork"/>
     protected override int DoTheWork()
     {
         Logger.LogInformation ("Прогоняем ночующих");
@@ -170,10 +179,13 @@ internal sealed class Program
     /// <summary>
     /// Формальная точка входа в программу
     /// </summary>
-    public static int Main (string[] args)
+    public static int Main
+        (
+            string[] args
+        )
     {
         return new Program (args)
             .ConfigureCancelKey()
-            .Run<IrbisApplication>();
+            .Run();
     }
 }

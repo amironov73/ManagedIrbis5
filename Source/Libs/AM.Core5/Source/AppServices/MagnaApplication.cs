@@ -2,7 +2,6 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
 // ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
@@ -49,6 +48,7 @@ namespace AM.AppServices;
 /// Класс-приложение.
 /// </summary>
 public class MagnaApplication
+    : IMagnaApplication
 {
     #region Events
 
@@ -61,19 +61,13 @@ public class MagnaApplication
 
     #region Properties
 
-    /// <summary>
-    /// Экземпляр инициализирован?
-    /// </summary>
+    /// <inheritdoc cref="IMagnaApplication.IsInitialized"/>
     public bool IsInitialized { get; private set; }
 
-    /// <summary>
-    /// Экземпляр отработал?
-    /// </summary>
+    /// <inheritdoc cref="IMagnaApplication.IsShutdown"/>
     public bool IsShutdown { get; private set; }
 
-    /// <summary>
-    /// Аргументы командной строки.
-    /// </summary>
+    /// <inheritdoc cref="IMagnaApplication.Args"/>
     public string[] Args { get; }
 
     /// <summary>
@@ -81,26 +75,18 @@ public class MagnaApplication
     /// </summary>
     public ParseResult? CommandLineParseResult { get; protected set; }
 
-    /// <summary>
-    /// Конфигурация.
-    /// </summary>
+    /// <inheritdoc cref="IMagnaApplication.Configuration"/>
     [AllowNull]
     public IConfiguration Configuration { get; protected set; }
 
-    /// <summary>
-    /// Логгер.
-    /// </summary>
+    /// <inheritdoc cref="IMagnaApplication.Logger"/>
     [AllowNull]
     public ILogger Logger { get; protected set; }
 
-    /// <summary>
-    /// Пользователь запросил прекращение текущего действия?
-    /// </summary>
+    /// <inheritdoc cref="IMagnaApplication.Stop"/>
     public bool Stop { get; set; }
 
-    /// <summary>
-    /// Хост.
-    /// </summary>
+    /// <inheritdoc cref="IMagnaApplication.ApplicationHost"/>
     [AllowNull]
     public IHost ApplicationHost { get; protected set; }
 
@@ -285,7 +271,7 @@ public class MagnaApplication
     }
 
     /// <summary>
-    /// Вызывается в конце <see cref="Run{TApplication}(bool,bool)"/> и <see cref="RunAsync{T}"/>.
+    /// Вызывается в конце <see cref="Run(Func{IMagnaApplication,int},bool,bool)"/> и <see cref="RunAsync"/>.
     /// </summary>
     protected virtual void Cleanup()
     {
@@ -465,33 +451,28 @@ public class MagnaApplication
     }
 
     /// <summary>
-    /// Запуск приложения с переопределенным методом <see cref="DoTheWork"/>.
+    /// Запуск приложения.
     /// </summary>
-    /// <returns>Код завершения.</returns>
-    public int Run<TApplication>
+    public int Run
         (
             bool waitForHostShutdown = true,
             bool shutdownHost = true
         )
-        where TApplication: MagnaApplication
     {
         // ReSharper disable ConvertToLocalFunction
-        Func<TApplication, int> func = self => DoTheWork();
+        Func<IMagnaApplication, int> func = self => DoTheWork();
         // ReSharper restore ConvertToLocalFunction
 
         return Run (func, waitForHostShutdown, shutdownHost);
     }
 
-    /// <summary>
-    /// Запуск приложения.
-    /// </summary>
-    public virtual int Run<TApplication>
+    /// <inheritdoc cref="IMagnaApplication.Run"/>
+    public virtual int Run
         (
-            Func<TApplication, int> runDelegate,
+            Func<IMagnaApplication, int> runDelegate,
             bool waitForHostShutdown = true,
             bool shutdownHost = true
         )
-        where TApplication: MagnaApplication
     {
         Sure.NotNull (runDelegate);
 
@@ -505,7 +486,7 @@ public class MagnaApplication
         {
             ApplicationHost.Start();
 
-            result = runDelegate ((TApplication) this);
+            result = runDelegate (this);
 
             if (waitForHostShutdown)
             {
@@ -532,13 +513,12 @@ public class MagnaApplication
     /// <summary>
     /// Запуск приложения.
     /// </summary>
-    public virtual async Task<int> RunAsync<TApplication>
+    public virtual async Task<int> RunAsync
         (
-            Func<TApplication, Task<int>> runDelegate,
+            Func<IMagnaApplication, Task<int>> runDelegate,
             bool waitForHostShutdown = true,
             bool shutdownHost = true
         )
-        where TApplication: MagnaApplication
     {
         Sure.NotNull (runDelegate);
 
@@ -552,7 +532,7 @@ public class MagnaApplication
         {
             await ApplicationHost.StartAsync();
 
-            result = await runDelegate ((TApplication) this);
+            result = await runDelegate (this);
 
             if (waitForHostShutdown)
             {

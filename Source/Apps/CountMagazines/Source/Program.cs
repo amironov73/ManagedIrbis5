@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 
 using AM;
+using AM.AppServices;
 
 using ManagedIrbis;
 using ManagedIrbis.AppServices;
@@ -42,12 +43,16 @@ internal sealed class Program
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public Program(string[] args)
-        : base(args)
+    public Program
+        (
+            string[] args
+        )
+        : base (args)
     {
         // пустое тело конструктора
     }
 
+    /// <inheritdoc cref="MagnaApplication.DoTheWork"/>
     protected override int DoTheWork()
     {
         var manager = new MagazineManager (Magna.Host, Connection);
@@ -95,6 +100,6 @@ internal sealed class Program
     {
         return new Program (args)
             .ConfigureCancelKey()
-            .Run<Program>();
+            .Run();
     }
 }

@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 
 using AM;
+using AM.AppServices;
 
 using ManagedIrbis;
 using ManagedIrbis.AppServices;
@@ -113,13 +114,14 @@ internal sealed class Program
     {
         return new Program (args)
             .ConfigureCancelKey()
-            .Run<Program>();
+            .Run();
     }
 
     #endregion
 
     #region IrbisApplication members
 
+    /// <inheritdoc cref="MagnaApplication.DoTheWork"/>
     protected override int DoTheWork()
     {
         Debugger.Break();
@@ -156,5 +158,4 @@ internal sealed class Program
     }
 
     #endregion
-
 }
