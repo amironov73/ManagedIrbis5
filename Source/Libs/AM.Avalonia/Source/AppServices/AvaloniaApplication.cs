@@ -28,6 +28,9 @@ using AM.AppServices;
 using AM.Interactivity;
 
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml.Styling;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,37 +52,25 @@ public class AvaloniaApplication
     : Application,
     IMagnaApplication
 {
+
     #region Construction
 
     /// <summary>
-    /// Конструктор.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public AvaloniaApplication
-        (
-            IHostBuilder builder,
-            string[]? args = null
-        )
+    public AvaloniaApplication()
     {
-        Sure.NotNull (builder);
-
-        _builder = builder;
-        Args = args ?? Array.Empty<string>();
+        _builder = Host.CreateDefaultBuilder();
+        Args = Array.Empty<string>();
         EarlyInitialization();
-    }
+        _windowCreator = _ => new Window();
 
-    /// <summary>
-    /// Конструктор.
-    /// </summary>
-    public AvaloniaApplication
-        (
-            string[] args
-        )
-    {
-        Sure.NotNull (args);
-
-        Args = args;
-        _builder = Host.CreateDefaultBuilder (args);
-        EarlyInitialization();
+        // загрузка стилей Авалонии
+        // TODO: сделать настраиваемой
+        // Current!.Styles.Add (new StyleInclude (new Uri ("avares://ControlCatalog/Styles"))
+        // {
+        //     Source = new Uri ("avares://Avalonia.Themes.Fluent/FluentLight.xaml")
+        // });
     }
 
     #endregion
@@ -88,6 +79,7 @@ public class AvaloniaApplication
 
     private readonly IHostBuilder _builder;
     private ServiceProvider? _preliminaryServices;
+    private Func<AvaloniaApplication, Window> _windowCreator;
 
     /// <summary>
     /// Пометка экземпляра как проинициазированного.
@@ -235,6 +227,96 @@ public class AvaloniaApplication
 
     #endregion
 
+    #region Application members
+
+    /// <inheritdoc cref="Application.OnFrameworkInitializationCompleted"/>
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            var mainWindow = _windowCreator (this);
+            mainWindow.Closed += (_, _) =>
+            {
+                var lifetime = RequireService<IHostApplicationLifetime>();
+                lifetime.StopApplication();
+            };
+
+            desktop.MainWindow = mainWindow;
+        }
+
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <inheritdoc cref="MagnaApplication.HandleException"/>
+    public virtual void HandleException
+        (
+            Exception exception
+        )
+    {
+        exception.NotUsed();
+        // ShowException (exception);
+    }
+
+    /// <summary>
+    /// Запрос сервиса, который обязательно должен быть.
+    /// </summary>
+    public virtual TService RequireService<TService>()
+        where TService: class
+    {
+        CheckForgottenInitialization();
+        CheckForShutdown();
+
+        return ApplicationHost.Services.GetRequiredService<TService>();
+    }
+
+    /// <summary>
+    /// Использовать указанное окно.
+    /// </summary>
+    public virtual AvaloniaApplication UseMainWindow
+        (
+            Func<AvaloniaApplication, Window> windowCreator
+        )
+    {
+        Sure.NotNull (windowCreator);
+
+        _windowCreator = windowCreator;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Использовать указанное окно.
+    /// </summary>
+    public virtual AvaloniaApplication UseMainWindow<TWindow>()
+        where TWindow: Window, new()
+    {
+        _windowCreator = _ => new TWindow();
+
+        return this;
+    }
+
+    /// <summary>
+    /// Визуальная инициализация.
+    /// </summary>
+    public virtual void VisualInitialization()
+    {
+        // перекрыть в потомке
+    }
+
+    /// <summary>
+    /// Визуальная де-инициализация.
+    /// </summary>
+    public virtual void VisualShutdown()
+    {
+        // перекрыть в потомке
+    }
+
+    #endregion
+
     #region IMagnaApplication members
 
     /// <inheritdoc cref="IMagnaApplication.IsInitialized"/>
@@ -269,7 +351,55 @@ public class AvaloniaApplication
             bool shutdownHost = true
         )
     {
-        throw new NotImplementedException();
+        Sure.NotNull (runDelegate);
+
+        if (!FinalInitialization())
+        {
+            return int.MaxValue;
+        }
+
+        var result = int.MaxValue;
+        try
+        {
+            ApplicationHost.Start();
+
+            VisualInitialization();
+
+            var avalonia = AppBuilder.Configure<AvaloniaApplication>()
+                .UsePlatformDetect()
+                .LogToTrace();
+
+            avalonia.StartWithClassicDesktopLifetime (Args);
+
+            // MainForm.FormClosed += (_, _) =>
+            // {
+            //     var lifetime = RequireService<IHostApplicationLifetime>();
+            //     lifetime.StopApplication();
+            // };
+
+            // TODO разобраться, когда вызывать VisualShutdown
+            // VisualShutdown();
+
+            if (waitForHostShutdown)
+            {
+                ApplicationHost.WaitForShutdown();
+                MarkAsShutdown();
+            }
+        }
+        catch (Exception exception)
+        {
+            HandleException (exception);
+        }
+
+        Cleanup();
+
+        if (shutdownHost)
+        {
+            ApplicationHost.Dispose();
+            MarkAsShutdown();
+        }
+
+        return result;
     }
 
     /// <inheritdoc cref="RunAsync"/>
@@ -281,6 +411,19 @@ public class AvaloniaApplication
         )
     {
         throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Использовать указанные аргументы командной строки.
+    /// </summary>
+    public void UseArgs
+        (
+            string[] args
+        )
+    {
+        Sure.NotNull (args);
+
+        Args = args;
     }
 
     #endregion
