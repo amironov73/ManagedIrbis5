@@ -500,10 +500,7 @@ public sealed class AsnTokenList
             first = false;
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -526,10 +523,7 @@ public sealed class AsnTokenList
             builder.Append (token.Text);
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

@@ -229,10 +229,7 @@ public sealed class Table
             builder.AppendLine();
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

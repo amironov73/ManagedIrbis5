@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* AsnNodeCollection.cs --
+/* AsnNodeCollection.cs -- коллекция AST-узлов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,7 +27,7 @@ using AM.Text;
 namespace AM.Asn1;
 
 /// <summary>
-///
+/// Коллекция AST-узлов.
 /// </summary>
 public sealed class AsnNodeCollection
     : NonNullCollection<AsnNode>
@@ -154,10 +154,7 @@ public sealed class AsnNodeCollection
         var builder = StringBuilderPool.Shared.Get();
         AsnHelper.NodesToText (builder, this);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

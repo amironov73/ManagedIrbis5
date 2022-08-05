@@ -218,10 +218,7 @@ namespace FluentAvalonia.UI.Controls
                 AppendEntry (builder, ForwardStack[i]);
             }
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
+            return builder.ReturnShared();
         }
 
         /// <summary>

@@ -53,17 +53,13 @@ public static class TreeStringSerializationExtensions
         Sure.NonNegative (indention);
 
         var builder = StringBuilderPool.Shared.Get();
-
         sequence.ForEach (n =>
         {
             var renderedIndent = string.Empty.PadRight (n.Level * indention);
             builder.AppendLine ($"{renderedIndent}{toTextLine (n)}");
         });
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -94,9 +90,6 @@ public static class TreeStringSerializationExtensions
             appendLine (n, renderedIndent, builder);
         });
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 }

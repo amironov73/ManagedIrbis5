@@ -583,10 +583,7 @@ public class IniFile
                 builder.AppendLine (line.ToString());
             }
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
+            return builder.ReturnShared();
         }
 
         #endregion

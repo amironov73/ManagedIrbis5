@@ -165,10 +165,7 @@ public static class PathUtility
 
         builder.Append (absoluteParts[^1]);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>

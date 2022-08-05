@@ -182,10 +182,7 @@ public class HttpRequest
         builder.AppendLine ($"Request body: {BodyLength}");
         builder.AppendLine (Body);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>

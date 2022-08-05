@@ -138,10 +138,7 @@ public sealed class IPFilter
             first = false;
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

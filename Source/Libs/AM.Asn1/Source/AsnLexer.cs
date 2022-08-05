@@ -103,10 +103,7 @@ public sealed class AsnLexer
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     private string ReadIdentifier
@@ -142,10 +139,7 @@ public sealed class AsnLexer
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     private string? ReadInteger()
@@ -173,10 +167,7 @@ public sealed class AsnLexer
             ReadChar();
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     private string? ReadFloat()
@@ -270,10 +261,7 @@ public sealed class AsnLexer
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     private string ReadTo

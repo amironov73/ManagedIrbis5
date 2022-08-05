@@ -91,10 +91,7 @@ public class Utilities
             builder.Append (" bytes");
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -182,9 +179,6 @@ public class Utilities
             builder.Append (" ns");
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 }

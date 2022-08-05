@@ -283,9 +283,8 @@ namespace FluentAvalonia.UI.Controls
                     rightCorner,
                     height - (4 + rightCorner)
                 );
-            var text = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
 
+            var text = builder.ReturnShared();
             TabViewTemplateSettings.TabGeometry = StreamGeometry.Parse (text);
         }
 

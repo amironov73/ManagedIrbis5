@@ -129,10 +129,7 @@ public abstract class SerialTreeNode<TNode>
                     builder.AppendLine ($"{string.Empty.PadLeft (l * indentation)}{toLineOfText (n)}")
             );
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     private static IEnumerable<TNode> FindRecursive

@@ -244,10 +244,7 @@ namespace NetCoreServer
             builder.AppendLine ($"Body: {BodyLength}");
             builder.AppendLine (Body);
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
+            return builder.ReturnShared();
         }
 
         /// <summary>
