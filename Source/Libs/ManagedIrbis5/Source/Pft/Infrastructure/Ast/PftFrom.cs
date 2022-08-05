@@ -19,9 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 
 using AM;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
@@ -56,29 +56,29 @@ public sealed class PftFrom
     #region Properties
 
     /// <summary>
-    /// Variable reference.
+    /// Переменная, принимающая разнообразные значения по ходу дела.
     /// </summary>
     public PftVariableReference? Variable { get; set; }
 
     /// <summary>
-    /// Source.
+    /// Источник значений для переменной.
     /// </summary>
-    public PftNodeCollection Source { get; private set; }
+    public PftNodeCollection Source { get; private set; } = null!;
 
     /// <summary>
-    /// Where clause.
+    /// Клаузула "where".
     /// </summary>
     public PftCondition? Where { get; set; }
 
     /// <summary>
     /// Select clause.
     /// </summary>
-    public PftNodeCollection Select { get; private set; }
+    public PftNodeCollection Select { get; private set; } = null!;
 
     /// <summary>
     /// Order clause.
     /// </summary>
-    public PftNodeCollection Order { get; private set; }
+    public PftNodeCollection Order { get; private set; } = null!;
 
     /// <inheritdoc cref="PftNode.ExtendedSyntax" />
     public override bool ExtendedSyntax => true;
@@ -91,17 +91,17 @@ public sealed class PftFrom
     {
         get
         {
-            if (ReferenceEquals (_virtualChildren, null))
+            if (_virtualChildren is null)
             {
                 _virtualChildren = new VirtualChildren();
                 var nodes = new List<PftNode>();
-                if (!ReferenceEquals (Variable, null))
+                if (Variable is not null)
                 {
                     nodes.Add (Variable);
                 }
 
                 nodes.AddRange (Source);
-                if (!ReferenceEquals (Where, null))
+                if (Where is not null)
                 {
                     nodes.Add (Where);
                 }
@@ -131,17 +131,15 @@ public sealed class PftFrom
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public PftFrom()
     {
-        Source = new PftNodeCollection (this);
-        Select = new PftNodeCollection (this);
-        Order = new PftNodeCollection (this);
+        _Initialize();
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public PftFrom
         (
@@ -151,9 +149,7 @@ public sealed class PftFrom
     {
         token.MustBe (PftTokenKind.From);
 
-        Source = new PftNodeCollection (this);
-        Select = new PftNodeCollection (this);
-        Order = new PftNodeCollection (this);
+        _Initialize();
     }
 
     #endregion
@@ -162,6 +158,13 @@ public sealed class PftFrom
 
     private VirtualChildren? _virtualChildren;
 
+    private void _Initialize()
+    {
+        Source = new PftNodeCollection (this);
+        Select = new PftNodeCollection (this);
+        Order = new PftNodeCollection (this);
+    }
+
     #endregion
 
     #region ICloneable members
@@ -169,22 +172,12 @@ public sealed class PftFrom
     /// <inheritdoc cref="ICloneable.Clone" />
     public override object Clone()
     {
-        var result = (PftFrom)base.Clone();
+        var result = (PftFrom) base.Clone();
 
         result._virtualChildren = null;
-
-        if (!ReferenceEquals (Variable, null))
-        {
-            result.Variable = (PftVariableReference)Variable.Clone();
-        }
-
+        result.Variable = (PftVariableReference?) Variable?.Clone();
         result.Source = Source.CloneNodes (result).ThrowIfNull();
-
-        if (!ReferenceEquals (Where, null))
-        {
-            result.Where = (PftCondition)Where.Clone();
-        }
-
+        result.Where = (PftCondition?) Where?.Clone();
         result.Select = Select.CloneNodes (result).ThrowIfNull();
         result.Order = Order.CloneNodes (result).ThrowIfNull();
 
@@ -201,35 +194,17 @@ public sealed class PftFrom
             PftNode otherNode
         )
     {
+        Sure.NotNull (otherNode);
+
         base.CompareNode (otherNode);
 
-        var otherFrom = (PftFrom)otherNode;
-        CompareNodes
-            (
-                Variable,
-                otherFrom.Variable
-            );
-        CompareLists
-            (
-                Source,
-                otherFrom.Source
-            );
-        CompareNodes
-            (
-                Where,
-                otherFrom.Where
-            );
-        CompareLists
-            (
-                Select,
-                otherFrom.Select
-            );
-        CompareLists
-            (
-                Order,
-                otherFrom.Order
-            );
-    } // method CompareNode
+        var otherFrom = (PftFrom) otherNode;
+        CompareNodes (Variable, otherFrom.Variable);
+        CompareLists (Source, otherFrom.Source);
+        CompareNodes (Where, otherFrom.Where);
+        CompareLists (Select, otherFrom.Select);
+        CompareLists (Order, otherFrom.Order);
+    }
 
     /// <inheritdoc cref="PftNode.Compile" />
     public override void Compile
@@ -237,7 +212,7 @@ public sealed class PftFrom
             PftCompiler compiler
         )
     {
-        if (ReferenceEquals (Variable, null)
+        if (Variable is null
             || Source.Count == 0
             || Select.Count == 0)
         {
@@ -245,10 +220,7 @@ public sealed class PftFrom
         }
 
         compiler.CompileNodes (Source);
-        if (!ReferenceEquals (Where, null))
-        {
-            Where.Compile (compiler);
-        }
+        Where?.Compile (compiler);
 
         compiler.CompileNodes (Select);
         compiler.CompileNodes (Order);
@@ -267,13 +239,12 @@ public sealed class PftFrom
     {
         base.Deserialize (reader);
 
-        Variable = (PftVariableReference?)PftSerializer
-            .DeserializeNullable (reader);
+        Variable = (PftVariableReference?) PftSerializer.DeserializeNullable (reader);
         PftSerializer.Deserialize (reader, Source);
-        Where = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+        Where = (PftCondition?) PftSerializer.DeserializeNullable (reader);
         PftSerializer.Deserialize (reader, Select);
         PftSerializer.Deserialize (reader, Order);
-    } // method Deserialize
+    }
 
     /// <inheritdoc cref="PftNode.Execute" />
     public override void Execute
@@ -281,13 +252,14 @@ public sealed class PftFrom
             PftContext context
         )
     {
+        Sure.NotNull (context);
+
         OnBeforeExecution (context);
 
         var manager = context.Variables;
-        var variable = Variable;
-        if (variable is not null)
+        if (Variable is not null)
         {
-            var name = variable.Name;
+            var name = Variable.Name;
             if (!string.IsNullOrEmpty (name))
             {
                 var buffer = new List<string>();
@@ -297,7 +269,7 @@ public sealed class PftFrom
                 var lines = sourceText.SplitLines();
 
                 // Where clause
-                if (!ReferenceEquals (Where, null))
+                if (Where is not null)
                 {
                     foreach (var line in lines)
                     {
@@ -354,7 +326,7 @@ public sealed class PftFrom
         }
 
         OnAfterExecution (context);
-    } // method Execute
+    }
 
     /// <inheritdoc cref="PftNode.GetNodeInfo" />
     public override PftNodeInfo GetNodeInfo()
@@ -365,7 +337,7 @@ public sealed class PftFrom
             Name = "From"
         };
 
-        if (!ReferenceEquals (Variable, null))
+        if (Variable is not null)
         {
             var variable = new PftNodeInfo
             {
@@ -385,7 +357,7 @@ public sealed class PftFrom
             sourceClause.Children.Add (node.GetNodeInfo());
         }
 
-        if (!ReferenceEquals (Where, null))
+        if (Where is not null)
         {
             var whereClause = new PftNodeInfo
             {
@@ -419,7 +391,7 @@ public sealed class PftFrom
         }
 
         return result;
-    } // method GetNodeInfo
+    }
 
     /// <inheritdoc cref="PftNode.PrettyPrint" />
     public override void PrettyPrint
@@ -427,6 +399,8 @@ public sealed class PftFrom
             PftPrettyPrinter printer
         )
     {
+        Sure.NotNull (printer);
+
         printer.EatWhitespace();
         printer.EatNewLine();
 
@@ -499,7 +473,7 @@ public sealed class PftFrom
         printer
             .WriteIndent()
             .WriteLine ("end");
-    } // method PrettyPrint
+    }
 
     /// <inheritdoc cref="PftNode.Serialize" />
     protected internal override void Serialize
@@ -514,7 +488,7 @@ public sealed class PftFrom
         PftSerializer.SerializeNullable (writer, Where);
         PftSerializer.Serialize (writer, Select);
         PftSerializer.Serialize (writer, Order);
-    } // method Serialize
+    }
 
     /// <inheritdoc cref="PftNode.ShouldSerializeText" />
     protected internal override bool ShouldSerializeText() => false;
@@ -526,31 +500,29 @@ public sealed class PftFrom
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
     {
-        var result = new StringBuilder();
-        result.Append ("from ");
-        result.Append (Variable);
-        result.Append (" in ");
-        PftUtility.NodesToText (result, Source);
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ("from ");
+        builder.Append (Variable);
+        builder.Append (" in ");
+        PftUtility.NodesToText (builder, Source);
         if (Where is { } whereClause)
         {
-            result.Append (" where ");
-            result.Append (whereClause);
+            builder.Append (" where ");
+            builder.Append (whereClause);
         }
 
-        result.Append (" select ");
-        PftUtility.NodesToText (result, Select);
+        builder.Append (" select ");
+        PftUtility.NodesToText (builder, Select);
         if (Order.Count != 0)
         {
-            result.Append (" order ");
-            PftUtility.NodesToText (result, Order);
+            builder.Append (" order ");
+            PftUtility.NodesToText (builder, Order);
         }
 
-        result.Append (" end");
+        builder.Append (" end");
 
-        return result.ToString();
-    } // method ToString
+        return builder.ReturnShared();
+    }
 
     #endregion
-} // class PftFrom
-
-// namespace ManagedIrbis.Pft.Infrastructure.Ast
+}

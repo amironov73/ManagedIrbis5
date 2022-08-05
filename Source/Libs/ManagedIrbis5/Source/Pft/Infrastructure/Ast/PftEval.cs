@@ -40,7 +40,7 @@ public sealed class PftEval
     #region Construction
 
     /// <summary>
-    /// Конструктор.
+    /// Конструктор по умолчанию.
     /// </summary>
     public PftEval()
     {
@@ -48,7 +48,7 @@ public sealed class PftEval
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public PftEval
         (
@@ -60,7 +60,7 @@ public sealed class PftEval
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public PftEval
         (
@@ -137,10 +137,7 @@ public sealed class PftEval
 
         builder.Append (')');
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

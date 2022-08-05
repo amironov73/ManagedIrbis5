@@ -15,10 +15,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 using AM;
 using AM.IO;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
@@ -42,14 +42,14 @@ public sealed class PftFunctionCall
     #region Properties
 
     /// <summary>
-    /// Function name.
+    /// Имя функции.
     /// </summary>
     public string? Name { get; set; }
 
     /// <summary>
-    /// Array of arguments.
+    /// Массив аргументов.
     /// </summary>
-    public PftNodeCollection Arguments { get; private set; }
+    public PftNodeCollection Arguments { get; private set; } = null!;
 
     /// <inheritdoc cref="PftNode.ExtendedSyntax" />
     public override bool ExtendedSyntax => true;
@@ -59,7 +59,7 @@ public sealed class PftFunctionCall
     {
         get
         {
-            if (ReferenceEquals (_virtualChildren, null))
+            if (_virtualChildren is null)
             {
                 _virtualChildren = new VirtualChildren();
                 var nodes = new List<PftNode>();
@@ -85,29 +85,29 @@ public sealed class PftFunctionCall
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public PftFunctionCall()
     {
-        Arguments = new PftNodeCollection (this);
-    } // constructor
+        _Initialize();
+    }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public PftFunctionCall
         (
             string name
         )
     {
-        Sure.NotNullNorEmpty (name, nameof (name));
+        Sure.NotNullNorEmpty (name);
 
         Name = name;
-        Arguments = new PftNodeCollection (this);
-    } // constructor
+        _Initialize();
+    }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public PftFunctionCall
         (
@@ -118,14 +118,19 @@ public sealed class PftFunctionCall
         token.MustBe (PftTokenKind.Identifier);
 
         Name = token.Text;
-        Arguments = new PftNodeCollection (this);
-    } // constructor
+        _Initialize();
+    }
 
     #endregion
 
     #region Private members
 
     private VirtualChildren? _virtualChildren;
+
+    private void _Initialize()
+    {
+        Arguments = new PftNodeCollection (this);
+    }
 
     #endregion
 
@@ -134,13 +139,12 @@ public sealed class PftFunctionCall
     /// <inheritdoc cref="PftNode.Clone" />
     public override object Clone()
     {
-        var result = (PftFunctionCall)base.Clone();
+        var result = (PftFunctionCall) base.Clone();
         result._virtualChildren = null;
-        result.Arguments = Arguments.CloneNodes (result)
-            .ThrowIfNull();
+        result.Arguments = Arguments.CloneNodes (result).ThrowIfNull();
 
         return result;
-    } // method Clone
+    }
 
     #endregion
 
@@ -173,6 +177,8 @@ public sealed class PftFunctionCall
             PftCompiler compiler
         )
     {
+        Sure.NotNull (compiler);
+
         if (string.IsNullOrEmpty (Name))
         {
             throw new PftCompilerException();
@@ -194,7 +200,7 @@ public sealed class PftFunctionCall
 
         compiler.EndMethod (this);
         compiler.MarkReady (this);
-    } // method Compile
+    }
 
     /// <inheritdoc cref="PftNode.Deserialize" />
     protected internal override void Deserialize
@@ -206,7 +212,7 @@ public sealed class PftFunctionCall
 
         Name = reader.ReadNullableString();
         PftSerializer.Deserialize (reader, Arguments);
-    } // method Deserialize
+    }
 
     /// <inheritdoc cref="PftNode.Execute" />
     public override void Execute
@@ -232,8 +238,7 @@ public sealed class PftFunctionCall
 
         var arguments = Arguments.ToArray();
 
-        var descriptor = context.Functions
-            .FindFunction (name);
+        var descriptor = context.Functions.FindFunction (name);
         if (descriptor is not null)
         {
             descriptor.Function?.Invoke
@@ -245,13 +250,11 @@ public sealed class PftFunctionCall
         }
         else
         {
-            var procedure = context.Procedures
-                .FindProcedure (name);
+            var procedure = context.Procedures.FindProcedure (name);
 
-            if (!ReferenceEquals (procedure, null))
+            if (procedure is not null)
             {
-                var expression
-                    = context.GetStringArgument (arguments, 0);
+                var expression = context.GetStringArgument (arguments, 0);
                 procedure.Execute
                     (
                         context,
@@ -271,7 +274,7 @@ public sealed class PftFunctionCall
         }
 
         OnAfterExecution (context);
-    } // method Execute
+    }
 
     /// <inheritdoc cref="PftNode.GetNodeInfo" />
     public override PftNodeInfo GetNodeInfo()
@@ -300,7 +303,7 @@ public sealed class PftFunctionCall
         result.Children.Add (arguments);
 
         return result;
-    } // method GetNodeInfo
+    }
 
     /// <inheritdoc cref="PftNode.PrettyPrint" />
     public override void PrettyPrint
@@ -308,6 +311,8 @@ public sealed class PftFunctionCall
             PftPrettyPrinter printer
         )
     {
+        Sure.NotNull (printer);
+
         printer.EatWhitespace();
         printer
             .SingleSpace()
@@ -315,7 +320,7 @@ public sealed class PftFunctionCall
             .Write ('(')
             .WriteNodes (", ", Arguments)
             .Write (')');
-    } // method PrettyPrint
+    }
 
     /// <inheritdoc cref="PftNode.Serialize" />
     protected internal override void Serialize
@@ -327,7 +332,7 @@ public sealed class PftFunctionCall
 
         writer.WriteNullable (Name);
         PftSerializer.Serialize (writer, Arguments);
-    } // method Serialize
+    }
 
     /// <inheritdoc cref="PftNode.ShouldSerializeText" />
     protected internal override bool ShouldSerializeText() => false;
@@ -339,16 +344,14 @@ public sealed class PftFunctionCall
     /// <inheritdoc cref="PftNode.ToString" />
     public override string ToString()
     {
-        var result = new StringBuilder();
-        result.Append (Name);
-        result.Append ('(');
-        PftUtility.NodesToText (",", result, Arguments);
-        result.Append (')');
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (Name);
+        builder.Append ('(');
+        PftUtility.NodesToText (",", builder, Arguments);
+        builder.Append (')');
 
-        return result.ToString();
-    } // method ToString
+        return builder.ReturnShared();
+    }
 
     #endregion
-} // class PftFunctionCall
-
-// namespace ManagedIrbis.Pft.Infrastructure.Ast
+}

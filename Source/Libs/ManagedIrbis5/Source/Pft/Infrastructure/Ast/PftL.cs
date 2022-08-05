@@ -7,13 +7,14 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftL.cs --
+/* PftL.cs -- функция L
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Text;
+using AM;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
@@ -23,180 +24,188 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+//
+// Функция L
+// использует текст, полученный в результате вычисления аргумента,
+// в качестве термина доступа для инвертированного файла
+// и возвращает MFN первой ссылки на этот термин, если она есть.
+//
+// Перед поиском в инвертированном файле термин автоматически
+// переводится в прописные буквы. Если термин не найден,
+// то функция принимает значение ноль.
+//
+// Функция L обычно используется вместе с функцией REF .
+//
+// Обратим внимание, что формат, расположенный в аргументе,
+// вычисляется с использованием текущего режима вывода.
+// Это является существенным, так как использование неправильного
+// режима может привести к тому, что термин не будет найден
+// в инвертированном файле. Как правило, следует использовать
+// тот же режим, который применяется в ТВП для инвертированного файла.
+//
+
+/// <summary>
+/// Функция L.
+/// </summary>
+public sealed class PftL
+    : PftNumeric
 {
-    //
-    // Функция L
-    // использует текст, полученный в результате вычисления аргумента,
-    // в качестве термина доступа для инвертированного файла
-    // и возвращает MFN первой ссылки на этот термин, если она есть.
-    //
-    // Перед поиском в инвертированном файле термин автоматически
-    // переводится в прописные буквы. Если термин не найден,
-    // то функция принимает значение ноль.
-    //
-    // Функция L обычно используется вместе с функцией REF .
-    //
-    // Обратим внимание, что формат, расположенный в аргументе,
-    // вычисляется с использованием текущего режима вывода.
-    // Это является существенным, так как использование неправильного
-    // режима может привести к тому, что термин не будет найден
-    // в инвертированном файле. Как правило, следует использовать
-    // тот же режим, который применяется в ТВП для инвертированного файла.
-    //
+    #region Construction
 
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class PftL
-        : PftNumeric
+    public PftL()
     {
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftL()
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftL
-            (
-                PftToken token
-            )
-            : base(token)
-        {
-            token.MustBe(PftTokenKind.L);
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftL
-            (
-                params PftNode[] body
-            )
-        {
-            foreach (var node in body)
-            {
-                Children.Add(node);
-            }
-        }
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
-        {
-            compiler.CompileNodes(Children);
-
-            var actionName = compiler.CompileAction(Children);
-
-            compiler.StartMethod(this);
-
-            compiler
-                .WriteIndent()
-                .WriteLine("double result = 0.0;");
-
-            if (!string.IsNullOrEmpty(actionName))
-            {
-                compiler
-                    .WriteIndent()
-                    .WriteLine("string text = Evaluate({0});", actionName)
-                    .WriteIndent()
-                    .WriteLine("if (!string.IsNullOrEmpty(text))")
-                    .WriteIndent()
-                    .WriteLine("{")
-                    .IncreaseIndent()
-                    .WriteIndent()
-                    .WriteLine("int[] found = Context.Provider.Search(text);")
-                    .WriteIndent()
-                    .WriteLine("if (found.Length != 0)")
-                    .WriteIndent()
-                    .WriteLine("{")
-                    .IncreaseIndent()
-                    .WriteIndent()
-                    .WriteLine("result = found[0];")
-                    .DecreaseIndent()
-                    .WriteIndent()
-                    .WriteLine("}")
-                    .DecreaseIndent()
-                    .WriteIndent()
-                    .WriteLine("}");
-            }
-
-            compiler
-                .WriteIndent()
-                .WriteLine("return result;");
-
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
-        }
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution(context);
-
-            Value = 0;
-            var expression = context.Evaluate(Children);
-            if (!string.IsNullOrEmpty(expression))
-            {
-                // TODO get the first found item only
-
-                var found = context.Provider.Search(expression);
-                if (found.Length != 0)
-                {
-                    Value = found[0];
-                }
-            }
-
-            OnAfterExecution(context);
-        }
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer.EatWhitespace();
-            printer
-                .SingleSpace()
-                .Write("l(");
-            base.PrettyPrint(printer);
-            printer.Write(')');
-        }
-
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        protected internal override bool ShouldSerializeText() => false;
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-            result.Append("l(");
-            PftUtility.NodesToText(result, Children);
-            result.Append(')');
-
-            return result.ToString();
-        }
-
-        #endregion
+        // пустое тело класса
     }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftL
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.L);
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftL
+        (
+            params PftNode[] body
+        )
+    {
+        Sure.NotNull (body);
+
+        foreach (var node in body)
+        {
+            Children.Add (node);
+        }
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        Sure.NotNull (compiler);
+
+        compiler.CompileNodes (Children);
+
+        var actionName = compiler.CompileAction (Children);
+
+        compiler.StartMethod (this);
+
+        compiler
+            .WriteIndent()
+            .WriteLine ("double result = 0.0;");
+
+        if (!string.IsNullOrEmpty (actionName))
+        {
+            compiler
+                .WriteIndent()
+                .WriteLine ("string text = Evaluate({0});", actionName)
+                .WriteIndent()
+                .WriteLine ("if (!string.IsNullOrEmpty(text))")
+                .WriteIndent()
+                .WriteLine ("{")
+                .IncreaseIndent()
+                .WriteIndent()
+                .WriteLine ("int[] found = Context.Provider.Search(text);")
+                .WriteIndent()
+                .WriteLine ("if (found.Length != 0)")
+                .WriteIndent()
+                .WriteLine ("{")
+                .IncreaseIndent()
+                .WriteIndent()
+                .WriteLine ("result = found[0];")
+                .DecreaseIndent()
+                .WriteIndent()
+                .WriteLine ("}")
+                .DecreaseIndent()
+                .WriteIndent()
+                .WriteLine ("}");
+        }
+
+        compiler
+            .WriteIndent()
+            .WriteLine ("return result;");
+
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        Value = 0;
+        var expression = context.Evaluate (Children);
+        if (!string.IsNullOrEmpty (expression))
+        {
+            // TODO get the first found item only
+
+            var found = context.Provider.Search (expression);
+            if (found.Length != 0)
+            {
+                Value = found[0];
+            }
+        }
+
+        OnAfterExecution (context);
+    }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
+
+        printer.EatWhitespace();
+        printer
+            .SingleSpace()
+            .Write ("l(");
+        base.PrettyPrint (printer);
+        printer.Write (')');
+    }
+
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    protected internal override bool ShouldSerializeText() => false;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ("l(");
+        PftUtility.NodesToText (builder, Children);
+        builder.Append (')');
+
+        return builder.ReturnShared();
+    }
+
+    #endregion
 }

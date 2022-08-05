@@ -2,11 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* StringBuilderPool.cs -- пул для StringBuilder
  * Ars Magna project, http://arsmagna.ru
@@ -34,8 +30,7 @@ public static class StringBuilderPool
     /// <summary>
     /// Общий экземпляр пула.
     /// </summary>
-    public static ObjectPool<StringBuilder> Shared { get; }
-        = CreateNew();
+    public static ObjectPool<StringBuilder> Shared { get; } = CreateNew();
 
     #endregion
 
@@ -63,6 +58,22 @@ public static class StringBuilderPool
                 initialCapacity,
                 maximumRetainedCapacity
             );
+    }
+
+    /// <summary>
+    /// Возврат <see cref="StringBuilder"/> в общий пул.
+    /// </summary>
+    public static string ReturnShared
+        (
+            this StringBuilder builder
+        )
+    {
+        Sure.NotNull (builder);
+
+        var result = builder.ToString();
+        Shared.Return (builder);
+
+        return result;
     }
 
     #endregion
