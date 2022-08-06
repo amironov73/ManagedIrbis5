@@ -14,12 +14,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System.Text;
-
-#endregion
-
 #nullable enable
 
 namespace AM.Text;
@@ -147,10 +141,7 @@ public static class NewLine
         builder.Replace (CarriageReturn, string.Empty);
         builder.Replace (LineFeed, string.Empty);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>

@@ -81,10 +81,7 @@ public static class KernelUtility
                 0
             );
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>

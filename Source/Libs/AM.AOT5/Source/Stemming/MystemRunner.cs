@@ -124,8 +124,7 @@ public sealed class MystemRunner
         builder.Append (MystemOptions);
         builder.Append (" -e " + TransferEncoding.HeaderName);
         builder.Append (" --format json");
-        var commandLine = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
+        var commandLine = builder.ReturnShared();
 
         var startInfo = new ProcessStartInfo
             (
