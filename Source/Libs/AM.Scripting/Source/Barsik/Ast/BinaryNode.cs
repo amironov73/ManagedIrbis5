@@ -215,10 +215,7 @@ internal sealed class BinaryNode
                     builder.Append (str);
                 }
 
-                var result = builder.ToString();
-                StringBuilderPool.Shared.Return (builder);
-
-                return result;
+                return builder.ReturnShared();
             }
         }
 

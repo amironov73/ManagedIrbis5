@@ -202,7 +202,6 @@ public static class BarsikUtility
         }
 
         return 0;
-
     }
 
     /// <summary>
@@ -238,7 +237,7 @@ public static class BarsikUtility
             return;
         }
 
-        var dictionary = (IDictionary<string, object?>) expando;
+        var dictionary = (IDictionary<string, object?>)expando;
         output.Write ("{");
 
         var keys = dictionary.Keys;
@@ -552,12 +551,12 @@ public static class BarsikUtility
             short i16 => i16,
             ushort u16 => u16,
             int i32 => i32,
-            uint u32 => unchecked ((int) u32),
-            long i64 => unchecked ((int) i64),
-            ulong u64 => unchecked ((int) u64),
-            float f32 => unchecked ((int) f32),
-            double d64 => unchecked ((int) d64),
-            decimal d => (int) d,
+            uint u32 => unchecked ((int)u32),
+            long i64 => unchecked ((int)i64),
+            ulong u64 => unchecked ((int)u64),
+            float f32 => unchecked ((int)f32),
+            double d64 => unchecked ((int)d64),
+            decimal d => (int)d,
             _ => 0
         };
     }
@@ -571,13 +570,10 @@ public static class BarsikUtility
         )
     {
         var builder = StringBuilderPool.Shared.Get();
-        var output = new StringWriter(builder);
+        var output = new StringWriter (builder);
         PrintObject (output, value);
 
-        var result = output.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>

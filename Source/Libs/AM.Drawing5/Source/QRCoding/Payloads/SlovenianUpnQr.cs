@@ -129,9 +129,6 @@ public class SlovenianUpnQr : Payload
         builder.Append (_recipientPlace).Append ('\n');
         builder.AppendFormat ("{0:000}", CalculateChecksum()).Append ('\n');
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 }

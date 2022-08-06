@@ -90,10 +90,7 @@ internal sealed class WhileNode : StatementNode
             builder.AppendLine (statement.ToString());
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

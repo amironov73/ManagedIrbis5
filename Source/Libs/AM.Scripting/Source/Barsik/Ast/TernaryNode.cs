@@ -84,10 +84,7 @@ sealed class TernaryNode
         builder.AppendLine ($"true: {_trueValue}");
         builder.AppendLine ($"false: {_falseValue}");
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion
