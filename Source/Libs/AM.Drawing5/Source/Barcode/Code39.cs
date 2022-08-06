@@ -276,10 +276,7 @@ public sealed class Code39
 
         builder.Remove (builder.Length - 1, 1);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     // private static char ComputeChecksum (string text)

@@ -69,10 +69,7 @@ public sealed class Standard2of5
 
         builder.Append ("1101011");
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <inheritdoc cref="LinearBarcodeBase.Verify"/>

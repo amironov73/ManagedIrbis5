@@ -120,10 +120,7 @@ public sealed class Codabar
         // убираем последний межсимвольный разделитель
         builder.Remove (builder.Length - 1, 1);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <inheritdoc cref="LinearBarcodeBase.Verify"/>

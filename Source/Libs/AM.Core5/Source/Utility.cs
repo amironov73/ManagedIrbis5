@@ -749,10 +749,7 @@ public static class Utility
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -1707,10 +1704,7 @@ public static class Utility
             .AppendWithDelimiter (second, separator)
             .AppendWithDelimiter (third, separator);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -1733,10 +1727,7 @@ public static class Utility
             .AppendWithDelimiter (third, separator)
             .AppendWithDelimiter (fourth, separator);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -1755,10 +1746,7 @@ public static class Utility
             builder.AppendWithDelimiter (t, separator);
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -1777,10 +1765,7 @@ public static class Utility
             builder.AppendWithDelimiter (t, separator);
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -5141,10 +5126,7 @@ public static class Utility
                 );
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -5192,10 +5174,7 @@ public static class Utility
             builder.Append (c);
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -5810,10 +5789,7 @@ public static class Utility
             builder.Append (RandomSymbols[_random.Next (RandomSymbols.Length)]);
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -6488,10 +6464,7 @@ public static class Utility
             builder.Append (format.Substring (startIndex));
         }
 
-        var finalResult = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return finalResult;
+        return builder.ReturnShared();
     }
 
     /// <summary>

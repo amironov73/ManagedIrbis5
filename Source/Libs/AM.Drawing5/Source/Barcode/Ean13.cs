@@ -160,10 +160,7 @@ public sealed class Ean13
 
         builder.Append ("101"); // закрывающая последовательность
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <inheritdoc cref="LinearBarcodeBase.Verify"/>

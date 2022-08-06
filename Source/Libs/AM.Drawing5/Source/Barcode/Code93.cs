@@ -101,10 +101,7 @@ public sealed class Code93
 
         var builder = StringBuilderPool.Shared.Get();
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <inheritdoc cref="LinearBarcodeBase.Verify"/>

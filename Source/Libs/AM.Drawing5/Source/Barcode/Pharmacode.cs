@@ -69,10 +69,7 @@ public class Pharmacode
             }
         } while (number != 0);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <inheritdoc cref="LinearBarcodeBase.Verify"/>

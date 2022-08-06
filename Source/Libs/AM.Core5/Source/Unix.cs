@@ -117,10 +117,7 @@ namespace AM
                 builder.Append(Path.DirectorySeparatorChar);
             }
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return(builder);
-
-            return result;
+            return builder.ReturnShared();
         }
 
         #endregion

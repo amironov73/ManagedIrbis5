@@ -130,7 +130,7 @@ public sealed class Code11
         builder.Append (_patterns[11]); // start/stop
         builder.Append ('0'); // space
 
-        foreach (var c in withChecksums.ToString())
+        foreach (var c in withChecksums.ReturnShared())
         {
             var d = c == '-' ? 10 : c - '0';
             builder.Append (_patterns[d]);
@@ -139,11 +139,7 @@ public sealed class Code11
 
         builder.Append (_patterns[11]); // start/stop
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (withChecksums);
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
