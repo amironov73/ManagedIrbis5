@@ -110,19 +110,16 @@ public static class XmlUtility
             Indent = false,
             NewLineHandling = NewLineHandling.None
         };
-        var output = StringBuilderPool.Shared.Get();
+        var builder = StringBuilderPool.Shared.Get();
         var namespaces = new XmlSerializerNamespaces();
         namespaces.Add (string.Empty, string.Empty);
-        using (var writer = XmlWriter.Create (output, settings))
+        using (var writer = XmlWriter.Create (builder, settings))
         {
             var serializer = new XmlSerializer (obj.GetType());
             serializer.Serialize (writer, obj, namespaces);
         }
 
-        var result = output.ToString();
-        StringBuilderPool.Shared.Return (output);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

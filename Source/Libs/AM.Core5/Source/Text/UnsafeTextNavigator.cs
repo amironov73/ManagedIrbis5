@@ -478,10 +478,7 @@ public unsafe ref struct UnsafeTextNavigator
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>

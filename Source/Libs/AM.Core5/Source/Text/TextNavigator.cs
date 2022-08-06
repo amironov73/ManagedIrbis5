@@ -886,10 +886,7 @@ public sealed class TextNavigator
             builder.Append (ReadChar());
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>

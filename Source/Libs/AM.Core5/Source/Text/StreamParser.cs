@@ -130,10 +130,7 @@ public sealed class StreamParser
         //    result.Append(ReadChar());
         //}
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion
@@ -356,10 +353,7 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        var text = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return text.ParseInt16();
+        return builder.ReturnShared().ParseInt16();
     }
 
     /// <summary>
@@ -383,10 +377,7 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        var text = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return text.ParseInt32();
+        return builder.ReturnShared().ParseInt32();
     }
 
     /// <summary>
@@ -410,10 +401,7 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        var text = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return text.ParseInt64();
+        return builder.ReturnShared().ParseInt64();
     }
 
     /// <summary>
@@ -454,10 +442,7 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        var text = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return text.ParseUInt16();
+        return builder.ReturnShared().ParseUInt16();
     }
 
     /// <summary>
@@ -476,10 +461,7 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        var text = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return text.ParseUInt32();
+        return builder.ReturnShared().ParseUInt32();
     }
 
     /// <summary>
@@ -498,10 +480,7 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        var text = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return text.ParseUInt64();
+        return builder.ReturnShared().ParseUInt64();
     }
 
     /// <summary>

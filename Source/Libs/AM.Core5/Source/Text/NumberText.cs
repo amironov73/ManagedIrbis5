@@ -215,10 +215,7 @@ public sealed class NumberText
                 }
             }
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
+            return builder.ReturnShared();
         }
 
         #endregion
@@ -1422,10 +1419,7 @@ public sealed class NumberText
             builder.Append (chunk);
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

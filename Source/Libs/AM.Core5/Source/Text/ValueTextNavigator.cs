@@ -511,10 +511,7 @@ public ref struct ValueTextNavigator
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>

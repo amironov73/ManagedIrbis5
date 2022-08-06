@@ -167,16 +167,12 @@ public static class RichText
                 buffer.Append (c);
             }
 
-            var number = buffer.ToString();
-            StringBuilderPool.Shared.Return (buffer);
+            var number = buffer.ReturnShared();
             c = (char) number.ParseInt16();
             builder.Append (c);
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -250,10 +246,7 @@ public static class RichText
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -310,10 +303,7 @@ public static class RichText
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -373,10 +363,7 @@ public static class RichText
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion
