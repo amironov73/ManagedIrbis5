@@ -202,7 +202,7 @@ public class TextSeparator
                 );
         }
 
-        StringBuilderPool.Shared.Return (buffer);
+        buffer.DismissShared();
 
         return inner;
     }

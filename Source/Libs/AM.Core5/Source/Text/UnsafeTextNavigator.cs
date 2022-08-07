@@ -462,7 +462,8 @@ public unsafe ref struct UnsafeTextNavigator
                             + ": unexpected end of stream"
                         );
 
-                    StringBuilderPool.Shared.Return (builder);
+                    builder.DismissShared();
+
                     throw new FormatException();
                 }
 

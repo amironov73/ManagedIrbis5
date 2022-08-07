@@ -495,7 +495,8 @@ public ref struct ValueTextNavigator
                             + ": unexpected end of stream"
                         );
 
-                    StringBuilderPool.Shared.Return (builder);
+                    builder.DismissShared();
+
                     throw new FormatException();
                 }
 

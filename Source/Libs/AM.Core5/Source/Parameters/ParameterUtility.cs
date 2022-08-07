@@ -89,10 +89,7 @@ public static class ParameterUtility
             builder.Append (ValueSeparator);
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>

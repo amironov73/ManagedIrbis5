@@ -76,5 +76,19 @@ public static class StringBuilderPool
         return result;
     }
 
+    /// <summary>
+    /// Возврат <see cref="StringBuilder"/> в общий пул
+    /// без получения из него строки.
+    /// </summary>
+    public static void DismissShared
+        (
+            this StringBuilder builder
+        )
+    {
+        Sure.NotNull (builder);
+
+        Shared.Return (builder);
+    }
+
     #endregion
 }

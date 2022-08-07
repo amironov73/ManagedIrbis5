@@ -648,8 +648,8 @@ public sealed class NumberText
                             text
                         );
 
-                    StringBuilderPool.Shared.Return (firstBuffer);
-                    StringBuilderPool.Shared.Return (secondBuffer);
+                    firstBuffer.DismissShared();
+                    secondBuffer.DismissShared();
 
                     throw new ArsMagnaException();
                 }
@@ -719,8 +719,8 @@ public sealed class NumberText
                         text
                     );
 
-                StringBuilderPool.Shared.Return (firstBuffer);
-                StringBuilderPool.Shared.Return (secondBuffer);
+                firstBuffer.DismissShared();
+                secondBuffer.DismissShared();
 
                 throw new Exception();
             }
@@ -739,8 +739,8 @@ public sealed class NumberText
                         secondNumber.GetPrefix (0)
                     );
 
-                StringBuilderPool.Shared.Return (firstBuffer);
-                StringBuilderPool.Shared.Return (secondBuffer);
+                firstBuffer.DismissShared();
+                secondBuffer.DismissShared();
 
                 throw new Exception();
             }
@@ -760,8 +760,8 @@ public sealed class NumberText
             goto BEGIN;
         }
 
-        StringBuilderPool.Shared.Return (firstBuffer);
-        StringBuilderPool.Shared.Return (secondBuffer);
+        firstBuffer.DismissShared();
+        secondBuffer.DismissShared();
     }
 
     /// <summary>

@@ -504,7 +504,7 @@ public sealed class TextNavigator
                             + ": unexpected end of stream"
                         );
 
-                    StringBuilderPool.Shared.Return (builder);
+                    builder.DismissShared();
                     throw new FormatException();
                 }
 
@@ -520,10 +520,7 @@ public sealed class TextNavigator
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
