@@ -218,8 +218,7 @@ public class ChapterWithRecords
             }
 
             builder.Append ('}');
-            var text = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
+            var text = builder.ReturnShared();
 
             report.Body.Add (new ParagraphBand());
             report.Body.Add (new ParagraphBand (text));

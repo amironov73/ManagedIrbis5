@@ -367,8 +367,7 @@ public class ChapterWithDictionary
 
             builder.Append ('}');
 
-            var description = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
+            var description = builder.ReturnShared();
             if (!string.IsNullOrEmpty (description))
             {
                 // TODO implement properly!!!

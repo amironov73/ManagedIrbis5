@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* DictionaryEntry.cs --
+/* DictionaryEntry.cs -- запись в словаре
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,75 +22,51 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Запись в словаре: термин и список ссылок на него.
+/// </summary>
+public sealed class DictionaryEntry
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Термин.
     /// </summary>
-    public sealed class DictionaryEntry
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// Список ссылок.
+    /// </summary>
+    public List<int> References { get; set; } = new ();
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
     {
-        #region Properties
-
-        /// <summary>
-        /// Title.
-        /// </summary>
-        public string? Title { get; set; }
-
-        /// <summary>
-        /// List of references.
-        /// </summary>
-        public List<int> References { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public DictionaryEntry()
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (Title);
+        builder.Append (' ');
+        var refs = References.ToArray();
+        Array.Sort (refs);
+        var first = true;
+        foreach (var reference in refs)
         {
-            References = new List<int>();
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var builder = StringBuilderPool.Shared.Get();
-            builder.Append (Title);
-            builder.Append (' ');
-            var refs = References.ToArray();
-            Array.Sort (refs);
-            var first = true;
-            foreach (var reference in refs)
+            if (!first)
             {
-                if (!first)
-                {
-                    builder.Append (", ");
-                }
-
-                builder.Append (reference);
-                first = false;
+                builder.Append (", ");
             }
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
+            builder.Append (reference);
+            first = false;
         }
 
-        #endregion
+        return builder.ReturnShared();
     }
+
+    #endregion
 }

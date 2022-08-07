@@ -317,10 +317,7 @@ public class SimpleChapter
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion
