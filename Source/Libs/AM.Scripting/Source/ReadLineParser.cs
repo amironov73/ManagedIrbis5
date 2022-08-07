@@ -91,8 +91,7 @@ internal sealed class ReadLineParser
         }
 
         // state.DumpChar();
-        result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
+        result = builder.ReturnShared();
 
         return true;
     }

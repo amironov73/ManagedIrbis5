@@ -94,8 +94,7 @@ internal sealed class IdentifierParser
             state.Advance();
         }
 
-        result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
+        result = builder.ReturnShared();
 
         return Array.IndexOf (BarsikUtility.Keywords, result) < 0
             || Array.IndexOf (BarsikUtility.ShortTypeNames, result) >= 0;

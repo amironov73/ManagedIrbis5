@@ -77,7 +77,7 @@ internal sealed class DoubleParser
 
         if (!state.HasCurrent)
         {
-            StringBuilderPool.Shared.Return (builder);
+            builder.DismissShared();
             return false;
         }
 
@@ -113,7 +113,7 @@ internal sealed class DoubleParser
 
             if (!state.HasCurrent)
             {
-                StringBuilderPool.Shared.Return (builder);
+                builder.DismissShared();
                 return false;
             }
 
@@ -126,7 +126,7 @@ internal sealed class DoubleParser
 
             if (!state.HasCurrent)
             {
-                StringBuilderPool.Shared.Return (builder);
+                 builder.DismissShared();
                 return false;
             }
 
@@ -145,15 +145,13 @@ internal sealed class DoubleParser
 
         if (!haveDigits || !haveDotOrExponent)
         {
-            StringBuilderPool.Shared.Return (builder);
+            builder.DismissShared();
             return false;
         }
 
-        var text = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
         return double.TryParse
             (
-                text,
+                builder.ReturnShared(),
                 NumberStyles.Float,
                 CultureInfo.InvariantCulture,
                 out result

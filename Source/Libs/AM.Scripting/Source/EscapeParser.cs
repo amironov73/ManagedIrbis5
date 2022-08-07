@@ -94,8 +94,7 @@ sealed class EscapeParser
                 if (!escape)
                 {
                     state.Advance();
-                    result = builder.ToString();
-                    StringBuilderPool.Shared.Return (builder);
+                    result = builder.ReturnShared();
 
                     return true;
                 }
@@ -116,7 +115,7 @@ sealed class EscapeParser
             state.Advance();
         }
 
-        StringBuilderPool.Shared.Return (builder);
+        builder.DismissShared();
         state.SetError (Maybe.Just (_limiter), true, state.Location, null);
 
         return false;
