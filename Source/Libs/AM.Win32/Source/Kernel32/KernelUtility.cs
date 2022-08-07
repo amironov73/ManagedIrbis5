@@ -147,8 +147,7 @@ public static class KernelUtility
         var builder = StringBuilderPool.Shared.Get();
         builder.EnsureCapacity (300);
         var code = Kernel32.GetShortPathName (longName, builder, builder.Capacity);
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
+        var result = builder.ReturnShared();
 
         return code > 0
             ? result

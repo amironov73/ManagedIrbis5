@@ -44,8 +44,7 @@ internal sealed class RemainderParser
             builder.Append (state.ReadChar());
         }
 
-        result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
+        result = builder.ReturnShared();
 
         return true;
     }

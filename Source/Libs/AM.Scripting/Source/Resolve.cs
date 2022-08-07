@@ -206,10 +206,7 @@ public static class Resolve
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
@@ -260,10 +257,7 @@ public static class Resolve
             }
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
 
         char ParseUnicode()
         {

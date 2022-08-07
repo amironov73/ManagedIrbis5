@@ -44,8 +44,7 @@ class Win32Resources : IDisposable
         var builder = StringBuilderPool.Shared.Get();
         builder.EnsureCapacity (_bufferSize);
         var code = NativeMethods.LoadString (_moduleHandle, id, builder, builder.Capacity + 1);
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
+        var result = builder.ReturnShared();
 
         return code == 0
             ? throw new Win32Exception (Marshal.GetLastWin32Error())
@@ -60,9 +59,10 @@ class Win32Resources : IDisposable
         var source = LoadString (id);
 
         // For some reason FORMAT_MESSAGE_FROM_HMODULE doesn't work so we use this way.
-        var flags = NativeMethods.FormatMessageFlags.FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                    NativeMethods.FormatMessageFlags.FORMAT_MESSAGE_ARGUMENT_ARRAY |
-                    NativeMethods.FormatMessageFlags.FORMAT_MESSAGE_FROM_STRING;
+        const NativeMethods.FormatMessageFlags flags =
+            NativeMethods.FormatMessageFlags.FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            NativeMethods.FormatMessageFlags.FORMAT_MESSAGE_ARGUMENT_ARRAY |
+            NativeMethods.FormatMessageFlags.FORMAT_MESSAGE_FROM_STRING;
 
         var sourcePtr = Marshal.StringToHGlobalAuto (source);
         try

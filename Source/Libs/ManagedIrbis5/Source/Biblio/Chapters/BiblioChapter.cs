@@ -123,10 +123,7 @@ public class BiblioChapter
         builder.Replace ("»", string.Empty);
         builder.Replace ("...", string.Empty);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     /// <summary>
