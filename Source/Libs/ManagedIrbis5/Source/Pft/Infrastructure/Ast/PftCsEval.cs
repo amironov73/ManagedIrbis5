@@ -5,8 +5,6 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* PftCsEval.cs -- исполнение динамического формата на языке C#
  * Ars Magna project, http://arsmagna.ru
@@ -200,10 +198,11 @@ namespace ManagedIrbis.UserSpace
     #region Construction
 
     /// <summary>
-    /// Конструктор.
+    /// Конструктор по умолчанию.
     /// </summary>
     public PftCsEval()
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -227,6 +226,7 @@ namespace ManagedIrbis.UserSpace
         )
         : base (children)
     {
+        // пустое тело конструктора
     }
 
     #endregion
@@ -246,6 +246,8 @@ namespace ManagedIrbis.UserSpace
             PftContext context
         )
     {
+        Sure.NotNull (context);
+
         OnBeforeExecution (context);
 
         var expression = context.Evaluate (Children);
@@ -259,10 +261,7 @@ namespace ManagedIrbis.UserSpace
                 _method = compiler.CompileSnippet (expression);
             }
 
-            if (!ReferenceEquals (_method, null))
-            {
-                _method.Invoke (null, null);
-            }
+            _method?.Invoke (null, null);
         }
 
         OnAfterExecution (context);
@@ -274,6 +273,8 @@ namespace ManagedIrbis.UserSpace
             PftPrettyPrinter printer
         )
     {
+        Sure.NotNull (printer);
+
         printer
             .WriteIndentIfNeeded()
             .Write ("cseval(")
@@ -304,10 +305,7 @@ namespace ManagedIrbis.UserSpace
 
         builder.Append (')');
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

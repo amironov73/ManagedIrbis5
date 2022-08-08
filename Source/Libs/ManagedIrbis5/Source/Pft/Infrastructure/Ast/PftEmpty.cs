@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* PftEmpty.cs -- проверка на пустую строку
  * Ars Magna project, http://arsmagna.ru
@@ -13,6 +11,7 @@
 
 #region Using directives
 
+using AM;
 using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
@@ -22,167 +21,161 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Проверка, не пустая ли строка.
+/// </summary>
+/// <example>
+/// <code>
+/// if empty('Hello') then 'Empty' else 'Not empty' fi/
+/// if empty(v500) then 'Empty' else 'Not empty' fi/
+/// </code>
+/// </example>
+public sealed class PftEmpty
+    : PftCondition
 {
+    #region Properties
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax" />
+    public override bool ExtendedSyntax => true;
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Проверка, не пустая ли строка.
+    /// Конструктор по умолчанию.
     /// </summary>
-    /// <example>
-    /// <code>
-    /// if empty('Hello') then 'Empty' else 'Not empty' fi/
-    /// if empty(v500) then 'Empty' else 'Not empty' fi/
-    /// </code>
-    /// </example>
-    public sealed class PftEmpty
-        : PftCondition
+    public PftEmpty()
     {
-        #region Properties
+        // пустое тело конструктора
+    }
 
-        /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax => true;
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftEmpty
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.Empty);
+    }
 
-        #endregion
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftEmpty
+        (
+            params PftNode[] children
+        )
+        : base (children)
+    {
+        // пустое тело конструктора
+    }
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftEmpty()
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        Sure.NotNull (compiler);
+
+        compiler.CompileNodes (Children);
+
+        var actionName = compiler.CompileAction (Children);
+        compiler.StartMethod (this);
+        if (string.IsNullOrEmpty (actionName))
         {
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftEmpty
-            (
-                PftToken token
-            )
-            : base (token)
+            compiler
+                .WriteIndent()
+                .WriteLine ("bool result = true;");
+        }
+        else
         {
-            token.MustBe (PftTokenKind.Empty);
-
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftEmpty
-            (
-                params PftNode[] children
-            )
-            : base (children)
-        {
-        } // constructor
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
-        {
-            compiler.CompileNodes (Children);
-
-            var actionName = compiler.CompileAction (Children);
-
-            compiler.StartMethod (this);
-
-            if (string.IsNullOrEmpty (actionName))
-            {
-                compiler
-                    .WriteIndent()
-                    .WriteLine ("bool result = true;");
-            }
-            else
-            {
-                compiler
-                    .WriteIndent()
-                    .WriteLine ("string text = Evaluate({0});", actionName);
-
-                compiler
-                    .WriteIndent()
-                    .WriteLine ("bool result = string.IsNullOrEmpty (text);");
-            }
+            compiler
+                .WriteIndent()
+                .WriteLine ("string text = Evaluate({0});", actionName);
 
             compiler
                 .WriteIndent()
-                .WriteLine ("return result;");
+                .WriteLine ("bool result = string.IsNullOrEmpty (text);");
+        }
 
-            compiler.EndMethod (this);
-            compiler.MarkReady (this);
+        compiler
+            .WriteIndent()
+            .WriteLine ("return result;");
 
-        } // method COmpile
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
 
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        var text = context.Evaluate (Children);
+        Value = string.IsNullOrEmpty (text);
+
+        OnAfterExecution (context);
+    }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
+
+        printer
+            .SingleSpace()
+            .Write ("empty(");
+        base.PrettyPrint (printer);
+        printer.Write (')');
+    }
+
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    protected internal override bool ShouldSerializeText() => false;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ("empty(");
+        var first = true;
+        foreach (var child in Children)
         {
-            OnBeforeExecution (context);
-
-            var text = context.Evaluate (Children);
-
-            Value = string.IsNullOrEmpty (text);
-
-            OnAfterExecution (context);
-
-        } // method Execute
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer
-                .SingleSpace()
-                .Write ("empty(");
-            base.PrettyPrint (printer);
-            printer.Write (')');
-
-        } // method PrettyPrint
-
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        protected internal override bool ShouldSerializeText() => false;
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var builder = StringBuilderPool.Shared.Get();
-            builder.Append ("empty(");
-            var first = true;
-            foreach (var child in Children)
+            if (!first)
             {
-                if (!first)
-                {
-                    builder.Append (' ');
-                }
-
-                builder.Append (child);
-                first = false;
+                builder.Append (' ');
             }
 
-            builder.Append (')');
+            builder.Append (child);
+            first = false;
+        }
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
+        builder.Append (')');
 
-            return result;
+        return builder.ReturnShared();
+    }
 
-        } // method ToString
-
-        #endregion
-
-    } // class PftEmpty
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #endregion
+}

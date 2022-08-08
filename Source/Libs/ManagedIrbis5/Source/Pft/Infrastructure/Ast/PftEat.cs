@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* PftEat.cs -- съедает результат выполнения операторов
  * Ars Magna project, http://arsmagna.ru
@@ -13,6 +11,7 @@
 
 #region Using directives
 
+using AM;
 using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Text;
@@ -21,113 +20,110 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Съедает результат выполнения операторов.
+/// </summary>
+/// <example>
+/// <code>
+/// 'Hello,', [[['again,']]] 'World'
+/// </code>
+/// </example>
+public sealed class PftEat
+    : PftNode
 {
+    #region Properties
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax" />
+    public override bool ExtendedSyntax => true;
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Съедает результат выполнения операторов.
+    /// Конструктор по умолчанию.
     /// </summary>
-    /// <example>
-    /// <code>
-    /// 'Hello,', [[['again,']]] 'World'
-    /// </code>
-    /// </example>
-    public sealed class PftEat
-        : PftNode
+    public PftEat()
     {
-        #region Properties
+        // пустое тело конструктора
+    }
 
-        /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax => true;
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftEat
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.EatOpen);
+    }
 
-        #endregion
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftEat
+        (
+            params PftNode[] children
+        )
+        : base (children)
+    {
+        // пустое тело конструктора
+    }
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftEat()
-        {
-        } // constructor
+    #region PftNode members
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftEat
-            (
-                PftToken token
-            )
-            : base (token)
-        {
-            token.MustBe (PftTokenKind.EatOpen);
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
 
-        } // constructor
+        OnBeforeExecution (context);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftEat
-            (
-                params PftNode[] children
-            )
-            : base (children)
-        {
-        } // constructor
+        // съедаем результат вычисления
+        var _ = context.Evaluate (Children);
 
-        #endregion
+        OnAfterExecution (context);
+    }
 
-        #region PftNode members
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
 
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution (context);
+        printer.Write ("[[[");
+        base.PrettyPrint (printer);
+        printer.Write ("]]] ");
+    }
 
-            // Eat the output
-            context.Evaluate (Children);
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    protected internal override bool ShouldSerializeText() => false;
 
-            OnAfterExecution (context);
+    #endregion
 
-        } // method Execute
+    #region Object members
 
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer.Write ("[[[");
-            base.PrettyPrint (printer);
-            printer.Write ("]]] ");
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ("[[[");
+        PftUtility.NodesToText (builder, Children);
+        builder.Append ("]]]");
 
-        } // method PrettyPrint
+        return builder.ReturnShared();
+    }
 
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        protected internal override bool ShouldSerializeText() => false;
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var builder = StringBuilderPool.Shared.Get();
-            builder.Append ("[[[");
-            PftUtility.NodesToText (builder, Children);
-            builder.Append ("]]]");
-
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
-        } // method ToString
-
-        #endregion
-
-    } // class PftEat
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #endregion
+}

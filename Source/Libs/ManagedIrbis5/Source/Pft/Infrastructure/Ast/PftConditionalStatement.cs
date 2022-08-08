@@ -44,7 +44,7 @@ public sealed class PftConditionalStatement
     #region Properties
 
     /// <summary>
-    /// Собственно условие
+    /// Собственно условие.
     /// </summary>
     public PftCondition? Condition { get; set; }
 
@@ -63,7 +63,7 @@ public sealed class PftConditionalStatement
     {
         get
         {
-            if (ReferenceEquals (_virtualChildren, null))
+            if (_virtualChildren is null)
             {
                 _virtualChildren = new VirtualChildren();
                 var nodes = new List<PftNode>();
@@ -79,6 +79,7 @@ public sealed class PftConditionalStatement
 
             return _virtualChildren;
         }
+
         [ExcludeFromCodeCoverage]
         protected set
         {
@@ -154,15 +155,10 @@ public sealed class PftConditionalStatement
     /// <inheritdoc cref="ICloneable.Clone" />
     public override object Clone()
     {
-        var result = (PftConditionalStatement)base.Clone();
+        var result = (PftConditionalStatement) base.Clone();
 
         result._virtualChildren = null;
-
-        if (!ReferenceEquals (Condition, null))
-        {
-            result.Condition = (PftCondition)Condition.Clone();
-        }
-
+        result.Condition = (PftCondition?) Condition?.Clone();
         result.ElseBranch = ElseBranch.CloneNodes (result).ThrowIfNull();
         result.ThenBranch = ThenBranch.CloneNodes (result).ThrowIfNull();
 
@@ -183,8 +179,7 @@ public sealed class PftConditionalStatement
 
         base.CompareNode (otherNode);
 
-        var otherStatement
-            = (PftConditionalStatement)otherNode;
+        var otherStatement = (PftConditionalStatement) otherNode;
         PftSerializationUtility.CompareNodes
             (
                 Condition,
@@ -261,7 +256,7 @@ public sealed class PftConditionalStatement
         Sure.NotNull (reader);
 
         base.Deserialize (reader);
-        Condition = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+        Condition = (PftCondition?) PftSerializer.DeserializeNullable (reader);
         PftSerializer.Deserialize (reader, ThenBranch);
         PftSerializer.Deserialize (reader, ElseBranch);
     }
@@ -326,7 +321,7 @@ public sealed class PftConditionalStatement
             Name = SimplifyTypeName (GetType().Name)
         };
 
-        if (!ReferenceEquals (Condition, null))
+        if (Condition is not null)
         {
             var conditionNode = new PftNodeInfo
             {
@@ -368,10 +363,7 @@ public sealed class PftConditionalStatement
     /// <inheritdoc cref="PftNode.Optimize"/>
     public override PftNode? Optimize()
     {
-        if (!ReferenceEquals (Condition, null))
-        {
-            Condition = (PftCondition?)Condition.Optimize();
-        }
+        Condition = (PftCondition?) Condition?.Optimize();
 
         ThenBranch.Optimize();
         ElseBranch.Optimize();
@@ -400,10 +392,8 @@ public sealed class PftConditionalStatement
             .WriteLine()
             .WriteIndent()
             .Write ("if ");
-        if (!ReferenceEquals (Condition, null))
-        {
-            Condition.PrettyPrint (printer);
-        }
+
+        Condition?.PrettyPrint (printer);
 
         printer
             .WriteLine()
@@ -525,14 +515,8 @@ public sealed class PftConditionalStatement
 
         builder.Append (" fi");
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion
-
-} // class PftConditionalStatement
-
-// namespace ManagedIrbis.Pft.Infrastructure.Ast
+}
