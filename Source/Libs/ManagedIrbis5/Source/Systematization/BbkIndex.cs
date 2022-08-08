@@ -633,7 +633,7 @@ public sealed class BbkIndex
         }
         finally
         {
-            StringBuilderPool.Shared.Return (accumulator);
+            accumulator.DismissShared();
         }
 
         return result;
@@ -694,10 +694,7 @@ public sealed class BbkIndex
 
         builder.Append (SocialIndex);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

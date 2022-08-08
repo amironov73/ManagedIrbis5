@@ -5,19 +5,17 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* SearchTerm.cs --
+/* SearchTerm.cs -- операнд поискового выражения, лист AST-дерева
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Text;
 
 using AM;
 using AM.Text;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Direct;
 using ManagedIrbis.Providers;
 
@@ -61,7 +59,7 @@ namespace ManagedIrbis.Infrastructure;
 //
 
 /// <summary>
-/// Leaf node of AST.
+/// Операнд поискового выражения, лист AST-дерева.
 /// </summary>
 public sealed class SearchTerm
     : ISearchTree
@@ -98,6 +96,8 @@ public sealed class SearchTerm
             int limit
         )
     {
+        limit.NotUsed();
+
         if (provider is DirectProvider direct)
         {
             var accessor = direct.GetAccessor (database);
@@ -117,6 +117,11 @@ public sealed class SearchTerm
             int limit
         )
     {
+        Sure.NotNull (provider);
+        Sure.NotNullNorEmpty (database);
+        Sure.NotNullNorEmpty (term);
+        limit.NotUsed();
+
         throw new NotImplementedException (nameof (_TrimSearch));
     }
 
@@ -128,6 +133,11 @@ public sealed class SearchTerm
             int limit
         )
     {
+        Sure.NotNull (provider);
+        Sure.NotNullNorEmpty (database);
+        Sure.NotNullNorEmpty (term);
+        limit.NotUsed();
+
         throw new NotImplementedException (nameof (_MorphoSearch));
     }
 
@@ -232,10 +242,7 @@ public sealed class SearchTerm
             builder.Append (')');
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

@@ -104,10 +104,7 @@ public sealed class ReadRecordCommand
             builder.Append ("\r\n");
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion
