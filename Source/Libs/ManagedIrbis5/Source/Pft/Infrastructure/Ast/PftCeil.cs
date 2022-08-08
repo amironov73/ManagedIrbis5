@@ -17,6 +17,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
+using AM;
 using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
@@ -26,153 +27,149 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Округление вверх.
+/// </summary>
+public sealed class PftCeil
+    : PftNumeric
 {
+    #region Properties
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax" />
+    public override bool ExtendedSyntax => true;
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Округление вверх.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class PftCeil
-        : PftNumeric
+    public PftCeil()
     {
-        #region Properties
+        // пустое тело конструктора
+    }
 
-        /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax => true;
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftCeil
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        token.MustBe (PftTokenKind.Ceil);
+    }
 
-        #endregion
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftCeil
+        (
+            PftNumeric value
+        )
+    {
+        Sure.NotNull (value);
 
-        #region Construction
+        Children.Add (value);
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftCeil()
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        Sure.NotNull (compiler);
+
+        var child = Children.FirstOrDefault() as PftNumeric
+                    ?? throw new PftCompilerException();
+
+        child.Compile (compiler);
+
+        compiler.StartMethod (this);
+
+        compiler
+            .WriteIndent()
+            .WriteLine ("double value = ")
+            .CallNodeMethod (child);
+
+        compiler
+            .WriteIndent()
+            .WriteLine ("double result = Math.Ceiling (value);"); //-V3010
+
+        compiler
+            .WriteIndent()
+            .WriteLine ("return result;");
+
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        if (Children.FirstOrDefault() is PftNumeric child)
         {
-        } // constructor
+            child.Execute (context);
+            Value = Math.Ceiling (child.Value);
+        }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftCeil
-            (
-                PftToken token
-            )
-            : base (token)
+        OnAfterExecution (context);
+    }
+
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
+
+        printer
+            .SingleSpace()
+            .Write ("ceil(");
+        base.PrettyPrint (printer);
+        printer.Write (')');
+    } // method PrettyPrint
+
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    [ExcludeFromCodeCoverage]
+    protected internal override bool ShouldSerializeText() => false;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="PftNode.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append ("ceil(");
+        var child = Children.FirstOrDefault();
+        if (!ReferenceEquals (child, null))
         {
-            token.MustBe (PftTokenKind.Ceil);
+            builder.Append (child);
+        }
 
-        } // constructor
+        builder.Append (')');
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftCeil
-            (
-                PftNumeric value
-            )
-        {
-            Children.Add (value);
+        return builder.ReturnShared();
+    }
 
-        } // constructor
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
-        {
-            var child = Children.FirstOrDefault() as PftNumeric
-                        ?? throw new PftCompilerException();
-
-            child.Compile (compiler);
-
-            compiler.StartMethod (this);
-
-            compiler
-                .WriteIndent()
-                .WriteLine ("double value = ")
-                .CallNodeMethod (child);
-
-            compiler
-                .WriteIndent()
-                .WriteLine ("double result = Math.Ceiling (value);"); //-V3010
-
-            compiler
-                .WriteIndent()
-                .WriteLine ("return result;");
-
-            compiler.EndMethod (this);
-            compiler.MarkReady (this);
-
-        } // method Compile
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
-        {
-            OnBeforeExecution (context);
-
-            if (Children.FirstOrDefault() is PftNumeric child)
-            {
-                child.Execute (context);
-                Value = Math.Ceiling (child.Value);
-            }
-
-            OnAfterExecution (context);
-
-        } // method Execute
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
-            printer
-                .SingleSpace()
-                .Write ("ceil(");
-            base.PrettyPrint (printer);
-            printer.Write (')');
-
-        } // method PrettyPrint
-
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [ExcludeFromCodeCoverage]
-        protected internal override bool ShouldSerializeText() => false;
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="PftNode.ToString" />
-        public override string ToString()
-        {
-            var builder = StringBuilderPool.Shared.Get();
-            builder.Append ("ceil(");
-            var child = Children.FirstOrDefault();
-            if (!ReferenceEquals (child, null))
-            {
-                builder.Append (child);
-            }
-
-            builder.Append (')');
-
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
-
-        } // method ToString
-
-        #endregion
-
-    } // class PftCeil
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
-
+    #endregion
+}

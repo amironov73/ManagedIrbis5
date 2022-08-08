@@ -63,7 +63,7 @@ public sealed class PftConditionAndOr
     {
         get
         {
-            if (ReferenceEquals (_virtualChildren, null))
+            if (_virtualChildren is null)
             {
                 _virtualChildren = new VirtualChildren();
                 var nodes = new List<PftNode>();
@@ -417,10 +417,7 @@ public sealed class PftConditionAndOr
         builder.Append (' ');
         builder.Append (RightOperand);
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

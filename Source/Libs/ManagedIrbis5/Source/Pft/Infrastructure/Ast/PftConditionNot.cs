@@ -50,11 +50,11 @@ public sealed class PftConditionNot
     {
         get
         {
-            if (ReferenceEquals (_virtualChildren, null))
+            if (_virtualChildren is null)
             {
                 _virtualChildren = new VirtualChildren();
                 var nodes = new List<PftNode>();
-                if (!ReferenceEquals (InnerCondition, null))
+                if (InnerCondition is not null)
                 {
                     nodes.Add (InnerCondition);
                 }
@@ -111,15 +111,10 @@ public sealed class PftConditionNot
     /// <inheritdoc cref="PftNode.Clone" />
     public override object Clone()
     {
-        var result = (PftConditionNot)base.Clone();
+        var result = (PftConditionNot) base.Clone();
 
         result._virtualChildren = null;
-
-        if (!ReferenceEquals (InnerCondition, null))
-        {
-            result.InnerCondition
-                = (PftCondition)InnerCondition.Clone();
-        }
+        result.InnerCondition = (PftCondition?) InnerCondition?.Clone();
 
         return result;
     }
@@ -141,7 +136,7 @@ public sealed class PftConditionNot
         PftSerializationUtility.CompareNodes
             (
                 InnerCondition,
-                ((PftConditionNot)otherNode).InnerCondition
+                ((PftConditionNot) otherNode).InnerCondition
             );
     }
 
@@ -184,8 +179,7 @@ public sealed class PftConditionNot
 
         base.Deserialize (reader);
 
-        InnerCondition
-            = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+        InnerCondition = (PftCondition?) PftSerializer.DeserializeNullable (reader);
     }
 
     /// <inheritdoc cref="PftNode.Execute" />
@@ -198,7 +192,7 @@ public sealed class PftConditionNot
 
         OnBeforeExecution (context);
 
-        if (ReferenceEquals (InnerCondition, null))
+        if (InnerCondition is null)
         {
             Magna.Logger.LogError
                 (
@@ -268,10 +262,7 @@ public sealed class PftConditionNot
             builder.Append (InnerCondition);
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

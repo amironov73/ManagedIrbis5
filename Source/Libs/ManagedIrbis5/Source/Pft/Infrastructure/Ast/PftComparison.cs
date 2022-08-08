@@ -45,17 +45,17 @@ public sealed class PftComparison
     #region Properties
 
     /// <summary>
-    /// Left operand.
+    /// Левый операнд.
     /// </summary>
     public PftNode? LeftOperand { get; set; }
 
     /// <summary>
-    /// Operation.
+    /// Операция.
     /// </summary>
     public string? Operation { get; set; }
 
     /// <summary>
-    /// Right operand.
+    /// Правый операнд.
     /// </summary>
     public PftNode? RightOperand { get; set; }
 
@@ -64,20 +64,11 @@ public sealed class PftComparison
     {
         get
         {
-            switch (Operation)
+            return Operation switch
             {
-                case "::":
-                case "~":
-                case "~~":
-                case "!~":
-                case "!~~":
-                case "==":
-                case "!==":
-
-                    return true;
-            }
-
-            return base.ExtendedSyntax;
+                "::" or "~" or "~~" or "!~" or "!~~" or "==" or "===" => true,
+                _ => base.ExtendedSyntax
+            };
         }
     }
 
@@ -86,7 +77,7 @@ public sealed class PftComparison
     {
         get
         {
-            if (ReferenceEquals (_virtualChildren, null))
+            if (_virtualChildren is null)
             {
                 _virtualChildren = new VirtualChildren();
                 var operationNode = new PftNode
@@ -121,7 +112,7 @@ public sealed class PftComparison
     /// </summary>
     public PftComparison()
     {
-        // пустое тело метода
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -758,10 +749,7 @@ public sealed class PftComparison
             builder.Append (RightOperand);
         }
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

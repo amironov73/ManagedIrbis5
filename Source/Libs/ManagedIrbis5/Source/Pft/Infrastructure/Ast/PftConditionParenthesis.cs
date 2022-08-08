@@ -52,11 +52,11 @@ public sealed class PftConditionParenthesis
     {
         get
         {
-            if (ReferenceEquals (_virtualChildren, null))
+            if (_virtualChildren is null)
             {
                 _virtualChildren = new VirtualChildren();
                 var nodes = new List<PftNode>();
-                if (!ReferenceEquals (InnerCondition, null))
+                if (InnerCondition is not null)
                 {
                     nodes.Add (InnerCondition);
                 }
@@ -116,11 +116,7 @@ public sealed class PftConditionParenthesis
         var result = (PftConditionParenthesis)base.Clone();
 
         result._virtualChildren = null;
-
-        if (InnerCondition is not null)
-        {
-            result.InnerCondition = (PftCondition)InnerCondition.Clone();
-        }
+        result.InnerCondition = (PftCondition?) InnerCondition?.Clone();
 
         return result;
     }
@@ -185,7 +181,7 @@ public sealed class PftConditionParenthesis
 
         base.Deserialize (reader);
 
-        InnerCondition = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+        InnerCondition = (PftCondition?) PftSerializer.DeserializeNullable (reader);
     }
 
     /// <inheritdoc cref="PftNode.Execute" />
@@ -224,7 +220,7 @@ public sealed class PftConditionParenthesis
             Name = SimplifyTypeName (GetType().Name)
         };
 
-        if (!ReferenceEquals (InnerCondition, null))
+        if (InnerCondition is not null)
         {
             result.Children.Add (InnerCondition.GetNodeInfo());
         }
@@ -268,17 +264,14 @@ public sealed class PftConditionParenthesis
     {
         var builder = StringBuilderPool.Shared.Get();
         builder.Append ('(');
-        if (!ReferenceEquals (InnerCondition, null))
+        if (InnerCondition is not null)
         {
             builder.Append (InnerCondition);
         }
 
         builder.Append (')');
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion
