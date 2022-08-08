@@ -31,209 +31,294 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Ast
+namespace ManagedIrbis.Pft.Infrastructure.Ast;
+
+/// <summary>
+/// Операция присваивания переменной вычисленного значения выражения.
+/// </summary>
+public sealed class PftAssignment
+    : PftNode
 {
+    #region Properties
+
     /// <summary>
-    /// Операция присваивания переменной вычисленного значения выражения.
+    /// Флаг: мы имеем численное, а не текстовое присваивание.
     /// </summary>
-    public sealed class PftAssignment
-        : PftNode
+    public bool IsNumeric { get; set; }
+
+    /// <summary>
+    /// Имя переменной, которой будет присвоено вычисленное значение.
+    /// </summary>
+    public string? VaruableName { get; set; }
+
+    /// <summary>
+    /// Спецификация индекса.
+    /// </summary>
+    public IndexSpecification Index { get; set; }
+
+    /// <inheritdoc cref="PftNode.ComplexExpression" />
+    public override bool ComplexExpression => true;
+
+    /// <inheritdoc cref="PftNode.ExtendedSyntax" />
+    public override bool ExtendedSyntax => true;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftAssignment()
     {
-        #region Properties
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Whether is numeric or text assignment.
-        /// </summary>
-        public bool IsNumeric { get; set; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftAssignment
+        (
+            string varuableName
+        )
+    {
+        Sure.NotNullNorEmpty (varuableName);
 
-        /// <summary>
-        /// Variable name.
-        /// </summary>
-        public string? Name { get; set; }
+        VaruableName = varuableName;
+    }
 
-        /// <summary>
-        /// Index.
-        /// </summary>
-        public IndexSpecification Index { get; set; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftAssignment
+        (
+            bool isNumeric,
+            string varuableName,
+            params PftNode[] body
+        )
+    {
+        Sure.NotNullNorEmpty (varuableName);
+        Sure.NotNull (body);
 
-        /// <inheritdoc cref="PftNode.ComplexExpression" />
-        public override bool ComplexExpression => true;
-
-        /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax => true;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftAssignment()
+        IsNumeric = isNumeric;
+        VaruableName = varuableName;
+        foreach (var node in body)
         {
-        } // constructor
+            Children.Add (node);
+        }
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftAssignment
-            (
-                string name
-            )
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PftAssignment
+        (
+            PftToken token
+        )
+        : base (token)
+    {
+        VaruableName = token.Text;
+    }
+
+    #endregion
+
+    #region Private members
+
+    // Handle direct variable-to-variable assignment
+    // Ignore IsNumeric setting
+    private bool HandleDirectAssignment
+        (
+            PftContext context
+        )
+    {
+        //
+        // TODO handle indexing
+        //
+
+        var name = VaruableName.ThrowIfNull (nameof (VaruableName));
+
+        if (Children.Count == 1)
         {
-            Name = name;
-
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftAssignment
-            (
-                bool isNumeric,
-                string name,
-                params PftNode[] body
-            )
-        {
-            IsNumeric = isNumeric;
-            Name = name;
-            foreach (var node in body)
+            var reference = Children.First() as PftVariableReference;
+            if (!ReferenceEquals (reference, null))
             {
-                Children.Add (node);
-            }
-
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PftAssignment
-            (
-                PftToken token
-            )
-            : base (token)
-        {
-            Name = token.Text;
-
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        // Handle direct variable-to-variable assignment
-        // Ignore IsNumeric setting
-        private bool HandleDirectAssignment
-            (
-                PftContext context
-            )
-        {
-            //
-            // TODO handle indexing
-            //
-
-            var name = Name.ThrowIfNull (nameof (Name));
-
-            if (Children.Count == 1)
-            {
-                var reference = Children.First() as PftVariableReference;
-                if (!ReferenceEquals (reference, null))
-                {
-                    var donorName = reference.Name.ThrowIfNull ("reference.Name");
-                    if (context.Variables.Registry.TryGetValue
+                var donorName = reference.Name.ThrowIfNull();
+                if (context.Variables.Registry.TryGetValue
                         (
                             donorName,
                             out var donor
                         ))
+                {
+                    if (donor.IsNumeric)
                     {
-                        if (donor.IsNumeric)
-                        {
-                            context.Variables.SetVariable
-                                (
-                                    name,
-                                    donor.NumericValue
-                                );
-                        }
-                        else
-                        {
-                            context.Variables.SetVariable
-                                (
-                                    name,
-                                    donor.StringValue
-                                );
-                        }
+                        context.Variables.SetVariable
+                            (
+                                name,
+                                donor.NumericValue
+                            );
+                    }
+                    else
+                    {
+                        context.Variables.SetVariable
+                            (
+                                name,
+                                donor.StringValue
+                            );
+                    }
 
-                        return true;
-
-                    } // if
-
-                } // if
-
-            } // if
-
-            return false;
-
-        } // method HandleDirectAssignment
-
-        #endregion
-
-        #region ICloneable members
-
-        /// <inheritdoc cref="ICloneable.Clone" />
-        public override object Clone()
-        {
-            var result = (PftAssignment) base.Clone();
-            result.IsNumeric = IsNumeric;
-            result.Index = (IndexSpecification) Index.Clone();
-
-            return result;
-
-        } // method Clone
-
-        #endregion
-
-        #region PftNode members
-
-        /// <inheritdoc cref="PftNode.CompareNode"/>
-        internal override void CompareNode
-            (
-                PftNode otherNode
-            )
-        {
-            base.CompareNode (otherNode);
-
-            var otherAssignment = (PftAssignment)otherNode;
-            if (Name != otherAssignment.Name
-                || !IndexSpecification.Compare (Index, otherAssignment.Index)
-                || IsNumeric != otherAssignment.IsNumeric)
-            {
-                throw new PftSerializationException();
+                    return true;
+                }
             }
+        }
 
-        } // method CompareNode
+        return false;
+    }
 
-        /// <inheritdoc cref="PftNode.Compile" />
-        public override void Compile
-            (
-                PftCompiler compiler
-            )
+    #endregion
+
+    #region ICloneable members
+
+    /// <inheritdoc cref="ICloneable.Clone" />
+    public override object Clone()
+    {
+        var result = (PftAssignment) base.Clone();
+        result.IsNumeric = IsNumeric;
+        result.Index = (IndexSpecification) Index.Clone();
+
+        return result;
+    }
+
+    #endregion
+
+    #region PftNode members
+
+    /// <inheritdoc cref="PftNode.CompareNode"/>
+    internal override void CompareNode
+        (
+            PftNode otherNode
+        )
+    {
+        Sure.NotNull (otherNode);
+
+        base.CompareNode (otherNode);
+
+        var otherAssignment = (PftAssignment)otherNode;
+        if (VaruableName != otherAssignment.VaruableName
+            || !IndexSpecification.Compare (Index, otherAssignment.Index)
+            || IsNumeric != otherAssignment.IsNumeric)
         {
-            if (string.IsNullOrEmpty (Name))
+            throw new PftSerializationException();
+        }
+    }
+
+    /// <inheritdoc cref="PftNode.Compile" />
+    public override void Compile
+        (
+            PftCompiler compiler
+        )
+    {
+        Sure.NotNull (compiler);
+
+        if (string.IsNullOrEmpty (VaruableName))
+        {
+            throw new PftCompilerException();
+        }
+
+        string? actionName = null;
+        IndexInfo? index = null;
+
+        compiler.CompileNodes (Children);
+        if (!IsNumeric)
+        {
+            actionName = compiler.CompileAction (Children);
+            index = compiler.CompileIndex (Index);
+        }
+
+        compiler.StartMethod (this);
+
+        if (IsNumeric)
+        {
+            var numeric =
+                (
+                    Children.FirstOrDefault() as PftNumeric
+                )
+                .ThrowIfNull ("numeric");
+
+            compiler
+                .WriteIndent()
+                .Write ("double value = ")
+                .CallNodeMethod (numeric);
+
+            compiler
+                .WriteIndent()
+                .WriteLine
+                    (
+                        "Context.Variables.SetVariable("
+                        + "\"{0}\", value);",
+                        CompilerUtility.Escape (VaruableName)!
+                    );
+        }
+        else
+        {
+            compiler
+                .WriteIndent()
+                .Write ("string value = "); //-V3010
+            if (ReferenceEquals (actionName, null))
             {
-                throw new PftCompilerException();
+                compiler.WriteLine ("string.Empty;");
             }
-
-            string? actionName = null;
-            IndexInfo? index = null;
-
-            compiler.CompileNodes (Children);
-            if (!IsNumeric)
+            else
             {
-                actionName = compiler.CompileAction (Children);
-                index = compiler.CompileIndex (Index);
-            }
+                compiler
+                    .WriteLine ("Evaluate({0});", actionName); //-V3010
 
-            compiler.StartMethod (this);
+                compiler
+                    .WriteIndent()
+                    .WriteLine
+                        (
+                            "Context.Variables.SetVariable("
+                            + "Context, \"{0}\", "
+                            + "{1}, "
+                            + "value);",
+                            CompilerUtility.Escape (VaruableName)!,
+                            index?.Reference
+                        );
+            }
+        }
+
+        compiler.EndMethod (this);
+        compiler.MarkReady (this);
+    }
+
+    /// <inheritdoc cref="PftNode.Deserialize" />
+    protected internal override void Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        base.Deserialize (reader);
+
+        IsNumeric = reader.ReadBoolean();
+        VaruableName = reader.ReadNullableString();
+        Index.Deserialize (reader);
+    }
+
+    /// <inheritdoc cref="PftNode.Execute" />
+    public override void Execute
+        (
+            PftContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        OnBeforeExecution (context);
+
+        if (!HandleDirectAssignment (context))
+        {
+            var name = VaruableName.ThrowIfNull();
+            var stringValue = context.Evaluate (Children);
 
             if (IsNumeric)
             {
@@ -241,206 +326,116 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     (
                         Children.FirstOrDefault() as PftNumeric
                     )
-                    .ThrowIfNull ("numeric");
-
-                compiler
-                    .WriteIndent()
-                    .Write ("double value = ")
-                    .CallNodeMethod (numeric);
-
-                compiler
-                    .WriteIndent()
-                    .WriteLine
-                        (
-                            "Context.Variables.SetVariable("
-                            + "\"{0}\", value);",
-                            CompilerUtility.Escape (Name)!
-                        );
+                    .ThrowIfNull();
+                var numericValue = numeric.Value;
+                context.Variables.SetVariable
+                    (
+                        name,
+                        numericValue
+                    );
             }
             else
             {
-                compiler
-                    .WriteIndent()
-                    .Write ("string value = "); //-V3010
-                if (ReferenceEquals (actionName, null))
-                {
-                    compiler.WriteLine ("string.Empty;");
-                }
-                else
-                {
-                    compiler
-                        .WriteLine ("Evaluate({0});", actionName); //-V3010
-
-                    compiler
-                        .WriteIndent()
-                        .WriteLine
-                            (
-                                "Context.Variables.SetVariable("
-                                + "Context, \"{0}\", "
-                                + "{1}, "
-                                + "value);",
-                                CompilerUtility.Escape (Name)!,
-                                index?.Reference
-                            );
-                }
+                context.Variables.SetVariable
+                    (
+                        context,
+                        name,
+                        Index,
+                        stringValue
+                    );
             }
+        }
 
-            compiler.EndMethod (this);
-            compiler.MarkReady (this);
+        OnAfterExecution (context);
+    }
 
-        } // method Compile
-
-        /// <inheritdoc cref="PftNode.Deserialize" />
-        protected internal override void Deserialize
-            (
-                BinaryReader reader
-            )
+    /// <inheritdoc cref="PftNode.GetNodeInfo" />
+    public override PftNodeInfo GetNodeInfo()
+    {
+        var result = new PftNodeInfo
         {
-            base.Deserialize (reader);
+            Node = this,
+            Name = SimplifyTypeName (GetType().Name)
+        };
 
-            IsNumeric = reader.ReadBoolean();
-            Name = reader.ReadNullableString();
-            Index.Deserialize (reader);
-
-        } // method Deserialize
-
-        /// <inheritdoc cref="PftNode.Execute" />
-        public override void Execute
-            (
-                PftContext context
-            )
+        var name = new PftNodeInfo
         {
-            OnBeforeExecution (context);
+            Name = "Name",
+            Value = VaruableName
+        };
+        result.Children.Add (name);
 
-            if (!HandleDirectAssignment (context))
-            {
-                var name = Name.ThrowIfNull ("name");
-                var stringValue = context.Evaluate (Children);
-
-                if (IsNumeric)
-                {
-                    var numeric =
-                        (
-                            Children.FirstOrDefault() as PftNumeric
-                        )
-                        .ThrowIfNull ("numeric");
-                    var numericValue = numeric.Value;
-                    context.Variables.SetVariable
-                        (
-                            name,
-                            numericValue
-                        );
-                }
-                else
-                {
-                    context.Variables.SetVariable
-                        (
-                            context,
-                            name,
-                            Index,
-                            stringValue
-                        );
-                }
-
-            } // if
-
-            OnAfterExecution (context);
-
-        } // method Execute
-
-        /// <inheritdoc cref="PftNode.GetNodeInfo" />
-        public override PftNodeInfo GetNodeInfo()
+        if (Index.Kind != IndexKind.None)
         {
-            var result = new PftNodeInfo
-            {
-                Node = this,
-                Name = SimplifyTypeName (GetType().Name)
-            };
+            result.Children.Add (Index.GetNodeInfo());
+        }
 
-            var name = new PftNodeInfo
-            {
-                Name = "Name",
-                Value = Name
-            };
-            result.Children.Add (name);
-
-            if (Index.Kind != IndexKind.None)
-            {
-                result.Children.Add (Index.GetNodeInfo());
-            }
-
-            var numeric = new PftNodeInfo
-            {
-                Name = "IsNumeric",
-                Value = IsNumeric.ToString()
-            };
-            result.Children.Add (numeric);
-
-            foreach (var node in Children)
-            {
-                result.Children.Add (node.GetNodeInfo());
-            }
-
-            return result;
-
-        } // method GetNodeInfo
-
-        /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
+        var numeric = new PftNodeInfo
         {
-            printer
-                .SingleSpace()
-                .Write ('$')
-                .Write (Name)
-                .Write (Index.ToText())
-                .Write ('=');
-            base.PrettyPrint (printer);
-            printer.Write (';');
+            Name = "IsNumeric",
+            Value = IsNumeric.ToString()
+        };
+        result.Children.Add (numeric);
 
-        } // method PrettyPrint
-
-        /// <inheritdoc cref="PftNode.Serialize" />
-        protected internal override void Serialize
-            (
-                BinaryWriter writer
-            )
+        foreach (var node in Children)
         {
-            base.Serialize (writer);
+            result.Children.Add (node.GetNodeInfo());
+        }
 
-            writer.Write (IsNumeric);
-            writer.WriteNullable (Name);
-            Index.Serialize (writer);
+        return result;
+    }
 
-        } // method Serialize
+    /// <inheritdoc cref="PftNode.PrettyPrint" />
+    public override void PrettyPrint
+        (
+            PftPrettyPrinter printer
+        )
+    {
+        Sure.NotNull (printer);
 
-        /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText() => false;
+        printer
+            .SingleSpace()
+            .Write ('$')
+            .Write (VaruableName)
+            .Write (Index.ToText())
+            .Write ('=');
+        base.PrettyPrint (printer);
+        printer.Write (';');
+    } // method PrettyPrint
 
-        #endregion
+    /// <inheritdoc cref="PftNode.Serialize" />
+    protected internal override void Serialize
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        #region Object members
+        base.Serialize (writer);
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var builder = StringBuilderPool.Shared.Get();
-            builder.AppendFormat ("${0}{1}=", Name, Index.ToText());
-            PftUtility.NodesToText (builder, Children);
-            builder.Append (';');
+        writer.Write (IsNumeric);
+        writer.WriteNullable (VaruableName);
+        Index.Serialize (writer);
+    }
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
+    /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+    [DebuggerStepThrough]
+    protected internal override bool ShouldSerializeText() => false;
 
-            return result;
+    #endregion
 
-        } // method ToString
+    #region Object members
 
-        #endregion
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.AppendFormat ("${0}{1}=", VaruableName, Index.ToText());
+        PftUtility.NodesToText (builder, Children);
+        builder.Append (';');
 
-    } // class PftAssingnment
+        return builder.ReturnShared();
+    }
 
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    #endregion
+}

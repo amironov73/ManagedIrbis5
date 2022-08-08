@@ -45,7 +45,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
                 {
                     new PftAssignment
                     {
-                        Name = "x",
+                        VaruableName = "x",
                         Children =
                         {
                             new PftUnconditionalLiteral("NewX")
@@ -53,7 +53,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
                     },
                     new PftAssignment
                     {
-                        Name = "y",
+                        VaruableName = "y",
                         Children =
                         {
                             new PftUnconditionalLiteral("NewY")

@@ -204,7 +204,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure
                     new PftAssignment
                     {
                         IsNumeric = true,
-                        Name = "x",
+                        VaruableName = "x",
                         Children =
                         {
                             new PftNumericExpression
@@ -633,7 +633,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure
                             new PftAssignment
                             {
                                 IsNumeric = true,
-                                Name = "x",
+                                VaruableName = "x",
                                 Children = { new PftNumericLiteral(1) }
                             }
                         },
@@ -648,7 +648,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure
                             new PftAssignment
                             {
                                 IsNumeric = true,
-                                Name = "x",
+                                VaruableName = "x",
                                 Children =
                                 {
                                     new PftNumericExpression

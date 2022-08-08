@@ -33,7 +33,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             context.Variables.SetVariable("y1", 3.14);
             context.Variables.SetVariable("y2", "hello");
             node.Execute(context);
-            var variable = context.Variables.GetExistingVariable(node.Name!);
+            var variable = context.Variables.GetExistingVariable(node.VaruableName!);
             Assert.IsNotNull(variable);
             var actual = variable!.StringValue.DosToUnix();
             Assert.AreEqual(expected, actual);
@@ -49,7 +49,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             context.Variables.SetVariable("y1", 3.14);
             context.Variables.SetVariable("y2", "hello");
             node.Execute(context);
-            var variable = context.Variables.GetExistingVariable(node.Name!);
+            var variable = context.Variables.GetExistingVariable(node.VaruableName!);
             Assert.IsNotNull(variable);
             var actual = variable!.NumericValue;
             Assert.AreEqual(expected, actual);
@@ -60,7 +60,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             return new ()
             {
                 IsNumeric = true,
-                Name = "x",
+                VaruableName = "x",
                 Children =
                 {
                     new PftNumericExpression
@@ -83,7 +83,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             return new ()
             {
                 IsNumeric = true,
-                Name = "x",
+                VaruableName = "x",
                 Children =
                 {
                     new PftVariableReference("y1")
@@ -96,7 +96,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             return new ()
             {
                 IsNumeric = false,
-                Name = "x",
+                VaruableName = "x",
                 Children =
                 {
                     new PftVariableReference("y2")
@@ -109,7 +109,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             return new ()
             {
                 IsNumeric = false,
-                Name = "x",
+                VaruableName = "x",
                 Children =
                 {
                     new PftUnconditionalLiteral("Hello,"),
@@ -127,7 +127,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             Assert.IsTrue(node.RequiresConnection);
             Assert.IsTrue(node.ExtendedSyntax);
             Assert.IsTrue(node.ComplexExpression);
-            Assert.IsNull(node.Name);
+            Assert.IsNull(node.VaruableName);
             Assert.AreEqual(0, node.Children.Count);
         }
 
@@ -141,7 +141,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             Assert.IsTrue(node.RequiresConnection);
             Assert.IsTrue(node.ExtendedSyntax);
             Assert.IsTrue(node.ComplexExpression);
-            Assert.AreSame(name, node.Name);
+            Assert.AreSame(name, node.VaruableName);
             Assert.AreEqual(0, node.Children.Count);
             Assert.AreEqual(token.Column, node.Column);
             Assert.AreEqual(token.Line, node.LineNumber);
@@ -157,7 +157,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             Assert.IsTrue(node.RequiresConnection);
             Assert.IsTrue(node.ExtendedSyntax);
             Assert.IsTrue(node.ComplexExpression);
-            Assert.AreSame(name, node.Name);
+            Assert.AreSame(name, node.VaruableName);
             Assert.AreEqual(0, node.Children.Count);
         }
 
@@ -176,7 +176,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             Assert.IsTrue(node.RequiresConnection);
             Assert.IsTrue(node.ExtendedSyntax);
             Assert.IsTrue(node.ComplexExpression);
-            Assert.AreSame(name, node.Name);
+            Assert.AreSame(name, node.VaruableName);
             Assert.AreEqual(body.Length, node.Children.Count);
         }
 

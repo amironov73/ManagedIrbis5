@@ -84,7 +84,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
                     new PftAssignment
                     {
                         IsNumeric = true,
-                        Name = name,
+                        VaruableName = name,
                         Children =
                         {
                             new PftNumericLiteral(1)
@@ -102,7 +102,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
                     new PftAssignment
                     {
                         IsNumeric = true,
-                        Name = name,
+                        VaruableName = name,
                         Children =
                         {
                             new PftNumericExpression
@@ -218,7 +218,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
                     new PftAssignment
                     {
                         IsNumeric = true,
-                        Name = outer,
+                        VaruableName = outer,
                         Children =
                         {
                             new PftNumericLiteral(1)
@@ -236,7 +236,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
                     new PftAssignment
                     {
                         IsNumeric = true,
-                        Name = outer,
+                        VaruableName = outer,
                         Children =
                         {
                             new PftNumericExpression
@@ -257,7 +257,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
                             new PftAssignment
                             {
                                 IsNumeric = true,
-                                Name = inner,
+                                VaruableName = inner,
                                 Children =
                                 {
                                     new PftNumericLiteral(1)
@@ -275,7 +275,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
                             new PftAssignment
                             {
                                 IsNumeric = true,
-                                Name = inner,
+                                VaruableName = inner,
                                 Children =
                                 {
                                     new PftNumericExpression
