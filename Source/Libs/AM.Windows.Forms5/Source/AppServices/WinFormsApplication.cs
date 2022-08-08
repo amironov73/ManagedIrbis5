@@ -116,9 +116,7 @@ public class WinFormsApplication
     /// </summary>
     public override int Run
         (
-            Func<IMagnaApplication, int> runDelegate,
-            bool waitForHostShutdown = true,
-            bool shutdownHost = true
+            Func<IMagnaApplication, int> runDelegate
         )
     {
         Sure.NotNull (runDelegate);
@@ -133,14 +131,11 @@ public class WinFormsApplication
         {
             ApplicationHost.Start();
 
-            var timer = new System.Windows.Forms.Timer
-            {
-                Interval = 10
-            };
+            // настраиваем таймер, запускаюшмй пользовательский код
+            var timer = new System.Windows.Forms.Timer { Interval = 10 };
             timer.Tick += (_, _) =>
             {
                 timer.Enabled = false;
-
                 if (_postConfigure is not null)
                 {
                     foreach (var action in _postConfigure)
@@ -157,18 +152,15 @@ public class WinFormsApplication
 
             MainForm.FormClosed += (_, _) =>
             {
-                var lifetime = RequireService<IHostApplicationLifetime>();
-                lifetime.StopApplication();
+                Shutdown();
             };
 
             Application.Run (MainForm);
             VisualShutdown();
 
-            if (waitForHostShutdown)
-            {
-                ApplicationHost.WaitForShutdown();
-                MarkAsShutdown();
-            }
+            // ожидаем остановки хоста
+            ApplicationHost.WaitForShutdown();
+            MarkAsShutdown();
         }
         catch (Exception exception)
         {
@@ -177,11 +169,9 @@ public class WinFormsApplication
 
         Cleanup();
 
-        if (shutdownHost)
-        {
-            ApplicationHost.Dispose();
-            MarkAsShutdown();
-        }
+        // глушим хост
+        ApplicationHost.Dispose();
+        MarkAsShutdown();
 
         return result;
     }

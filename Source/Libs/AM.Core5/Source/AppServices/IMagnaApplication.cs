@@ -86,9 +86,7 @@ public interface IMagnaApplication
     /// </summary>
     int Run
         (
-            Func<IMagnaApplication, int> runDelegate,
-            bool waitForHostShutdown = true,
-            bool shutdownHost = true
+            Func<IMagnaApplication, int> runDelegate
         );
 
     /// <summary>
@@ -96,9 +94,7 @@ public interface IMagnaApplication
     /// </summary>
     Task<int> RunAsync
         (
-            Func<IMagnaApplication, Task<int>> runDelegate,
-            bool waitForHostShutdown = true,
-            bool shutdownHost = true
+            Func<IMagnaApplication, Task<int>> runDelegate
         );
 
     #endregion

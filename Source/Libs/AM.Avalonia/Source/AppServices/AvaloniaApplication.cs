@@ -62,14 +62,14 @@ public class AvaloniaApplication
     {
         _builder = Host.CreateDefaultBuilder();
         Args = Array.Empty<string>();
-        EarlyInitialization();
+        // EarlyInitialization();
         _windowCreator = _ => new Window();
 
         // загрузка стилей Авалонии
         // TODO: сделать настраиваемой
-        // Current!.Styles.Add (new StyleInclude (new Uri ("avares://ControlCatalog/Styles"))
+        // Current!.Styles.Add (new StyleInclude (new Uri ("avares://AvaloniaExample/Styles"))
         // {
-        //     Source = new Uri ("avares://Avalonia.Themes.Fluent/FluentLight.xaml")
+        //      Source = new Uri ("avares://Avalonia.Themes.Fluent/FluentLight.xaml")
         // });
     }
 
@@ -79,7 +79,7 @@ public class AvaloniaApplication
 
     private readonly IHostBuilder _builder;
     private ServiceProvider? _preliminaryServices;
-    private Func<AvaloniaApplication, Window> _windowCreator;
+    internal Func<AvaloniaApplication, Window> _windowCreator;
 
     /// <summary>
     /// Пометка экземпляра как проинициазированного.
@@ -218,7 +218,7 @@ public class AvaloniaApplication
     }
 
     /// <summary>
-    /// Вызывается в конце <see cref="Run(Func{IMagnaApplication,int},bool,bool)"/> и <see cref="RunAsync"/>.
+    /// Вызывается в конце <see cref="Run(Func{IMagnaApplication,int})"/> и <see cref="RunAsync"/>.
     /// </summary>
     protected virtual void Cleanup()
     {
@@ -274,32 +274,6 @@ public class AvaloniaApplication
     }
 
     /// <summary>
-    /// Использовать указанное окно.
-    /// </summary>
-    public virtual AvaloniaApplication UseMainWindow
-        (
-            Func<AvaloniaApplication, Window> windowCreator
-        )
-    {
-        Sure.NotNull (windowCreator);
-
-        _windowCreator = windowCreator;
-
-        return this;
-    }
-
-    /// <summary>
-    /// Использовать указанное окно.
-    /// </summary>
-    public virtual AvaloniaApplication UseMainWindow<TWindow>()
-        where TWindow: Window, new()
-    {
-        _windowCreator = _ => new TWindow();
-
-        return this;
-    }
-
-    /// <summary>
     /// Визуальная инициализация.
     /// </summary>
     public virtual void VisualInitialization()
@@ -346,9 +320,7 @@ public class AvaloniaApplication
     /// <inheritdoc cref="IMagnaApplication.Run"/>
     public int Run
         (
-            Func<IMagnaApplication, int> runDelegate,
-            bool waitForHostShutdown = true,
-            bool shutdownHost = true
+            Func<IMagnaApplication, int> runDelegate
         )
     {
         Sure.NotNull (runDelegate);
@@ -365,12 +337,6 @@ public class AvaloniaApplication
 
             VisualInitialization();
 
-            var avalonia = AppBuilder.Configure<AvaloniaApplication>()
-                .UsePlatformDetect()
-                .LogToTrace();
-
-            avalonia.StartWithClassicDesktopLifetime (Args);
-
             // MainForm.FormClosed += (_, _) =>
             // {
             //     var lifetime = RequireService<IHostApplicationLifetime>();
@@ -380,11 +346,8 @@ public class AvaloniaApplication
             // TODO разобраться, когда вызывать VisualShutdown
             // VisualShutdown();
 
-            if (waitForHostShutdown)
-            {
-                ApplicationHost.WaitForShutdown();
-                MarkAsShutdown();
-            }
+            ApplicationHost.WaitForShutdown();
+            MarkAsShutdown();
         }
         catch (Exception exception)
         {
@@ -393,11 +356,8 @@ public class AvaloniaApplication
 
         Cleanup();
 
-        if (shutdownHost)
-        {
-            ApplicationHost.Dispose();
-            MarkAsShutdown();
-        }
+        ApplicationHost.Dispose();
+        MarkAsShutdown();
 
         return result;
     }
@@ -405,9 +365,7 @@ public class AvaloniaApplication
     /// <inheritdoc cref="RunAsync"/>
     public Task<int> RunAsync
         (
-            Func<IMagnaApplication, Task<int>> runDelegate,
-            bool waitForHostShutdown = true,
-            bool shutdownHost = true
+            Func<IMagnaApplication, Task<int>> runDelegate
         )
     {
         throw new NotImplementedException();

@@ -7,30 +7,16 @@ using AvaloniaExample;
 
 using Microsoft.Extensions.Logging;
 
-internal sealed class Program
-    : AvaloniaApplication
+internal static class Program
 {
-    public Program
-        (
-            string[] args
-        )
-    {
-        UseArgs (args);
-    }
-
     [STAThread]
-    public static void Main
+    public static int Main
         (
             string[] args
         )
     {
-        new Program (args)
+        return DesktopApplication.BuildAvaloniaApp (args)
             .UseMainWindow<MainWindow>()
-            .Run (app =>
-            {
-                app.Logger.LogInformation ("Это Авалония");
-
-                return 0;
-            });
+            .Run();
     }
 }

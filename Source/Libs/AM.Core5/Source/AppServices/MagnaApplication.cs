@@ -77,7 +77,7 @@ public class MagnaApplication
 
     /// <inheritdoc cref="IMagnaApplication.Configuration"/>
     [AllowNull]
-    public IConfiguration Configuration { get; protected set; }
+    public IConfiguration Configuration { get; protected internal set; }
 
     /// <inheritdoc cref="IMagnaApplication.Logger"/>
     [AllowNull]
@@ -88,7 +88,7 @@ public class MagnaApplication
 
     /// <inheritdoc cref="IMagnaApplication.ApplicationHost"/>
     [AllowNull]
-    public IHost ApplicationHost { get; protected set; }
+    public IHost ApplicationHost { get; protected internal set; }
 
     #endregion
 
@@ -271,7 +271,7 @@ public class MagnaApplication
     }
 
     /// <summary>
-    /// Вызывается в конце <see cref="Run(Func{IMagnaApplication,int},bool,bool)"/> и <see cref="RunAsync"/>.
+    /// Вызывается в конце <see cref="Run(Func{IMagnaApplication,int})"/> и <see cref="RunAsync"/>.
     /// </summary>
     protected virtual void Cleanup()
     {
@@ -453,25 +453,19 @@ public class MagnaApplication
     /// <summary>
     /// Запуск приложения.
     /// </summary>
-    public int Run
-        (
-            bool waitForHostShutdown = true,
-            bool shutdownHost = true
-        )
+    public int Run()
     {
         // ReSharper disable ConvertToLocalFunction
         Func<IMagnaApplication, int> func = self => DoTheWork();
         // ReSharper restore ConvertToLocalFunction
 
-        return Run (func, waitForHostShutdown, shutdownHost);
+        return Run (func);
     }
 
     /// <inheritdoc cref="IMagnaApplication.Run"/>
     public virtual int Run
         (
-            Func<IMagnaApplication, int> runDelegate,
-            bool waitForHostShutdown = true,
-            bool shutdownHost = true
+            Func<IMagnaApplication, int> runDelegate
         )
     {
         Sure.NotNull (runDelegate);
@@ -488,11 +482,9 @@ public class MagnaApplication
 
             result = runDelegate (this);
 
-            if (waitForHostShutdown)
-            {
-                ApplicationHost.WaitForShutdown();
-                MarkAsShutdown();
-            }
+            // ожидаем остановки хоста
+            ApplicationHost.WaitForShutdown();
+            MarkAsShutdown();
         }
         catch (Exception exception)
         {
@@ -501,11 +493,9 @@ public class MagnaApplication
 
         Cleanup();
 
-        if (shutdownHost)
-        {
-            ApplicationHost.Dispose();
-            MarkAsShutdown();
-        }
+        // глушим хост
+        ApplicationHost.Dispose();
+        MarkAsShutdown(); // повторяем для надежности
 
         return result;
     }
@@ -515,9 +505,7 @@ public class MagnaApplication
     /// </summary>
     public virtual async Task<int> RunAsync
         (
-            Func<IMagnaApplication, Task<int>> runDelegate,
-            bool waitForHostShutdown = true,
-            bool shutdownHost = true
+            Func<IMagnaApplication, Task<int>> runDelegate
         )
     {
         Sure.NotNull (runDelegate);
@@ -534,22 +522,20 @@ public class MagnaApplication
 
             result = await runDelegate (this);
 
-            if (waitForHostShutdown)
-            {
-                await ApplicationHost.WaitForShutdownAsync();
-                MarkAsShutdown();
-            }
+            // ожидаем остановки хоста
+            await ApplicationHost.WaitForShutdownAsync();
+            MarkAsShutdown();
         }
         catch (Exception exception)
         {
             HandleException (exception);
         }
 
-        if (shutdownHost)
-        {
-            ApplicationHost.Dispose();
-            MarkAsShutdown();
-        }
+        Cleanup();
+
+        // глушим хост
+        ApplicationHost.Dispose();
+        MarkAsShutdown(); // повторяем для надежности
 
         return result;
     }
@@ -559,12 +545,10 @@ public class MagnaApplication
     /// </summary>
     public void Shutdown()
     {
-        if (IsShutdown)
+        if (IsShutdown || !IsInitialized)
         {
             return;
         }
-
-        CheckForgottenInitialization();
 
         var application = ApplicationHost.Services
             .GetRequiredService<IHostApplicationLifetime>()
