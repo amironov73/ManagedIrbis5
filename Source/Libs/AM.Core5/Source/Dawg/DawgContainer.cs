@@ -1,0 +1,210 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
+// ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Global
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
+// ReSharper disable UnusedParameter.Local
+// ReSharper disable VirtualMemberCallInConstructor
+
+/* DawgContainer.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Dawg;
+
+/// <summary>
+///
+/// </summary>
+public sealed class DawgContainer<TPayload>
+    : IEnumerable<KeyValuePair<string, TPayload>>
+{
+    readonly IDawg<TPayload> dawg;
+
+    internal DawgContainer (IDawg<TPayload> dawg)
+    {
+        this.dawg = dawg;
+    }
+
+    public TPayload this [IEnumerable<char> word] => dawg[word];
+
+    public int GetLongestCommonPrefixLength (IEnumerable<char> word)
+    {
+        return dawg.GetLongestCommonPrefixLength (word);
+    }
+
+    /// <summary>
+    /// Returns all items with a given word.
+    /// </summary>
+    public IEnumerable<KeyValuePair<string, TPayload>> MatchPrefix (IEnumerable<char> prefix)
+    {
+        return dawg.MatchPrefix (prefix);
+    }
+
+    /// <summary>
+    /// Returns all items that are substrings of a given word.
+    /// </summary>
+    public IEnumerable<KeyValuePair<string, TPayload>> GetPrefixes (IEnumerable<char> word)
+    {
+        return dawg.GetPrefixes (word);
+    }
+
+    public int GetNodeCount()
+    {
+        return dawg.GetNodeCount();
+    }
+
+    public IEnumerator<KeyValuePair<string, TPayload>> GetEnumerator()
+    {
+        return MatchPrefix ("").GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    /// <summary>
+    /// Save the DAWG to a file / stream.
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <param name="writePayload">Optional, can be null for basic types (int, string, etc).</param>
+    public void SaveTo (Stream stream, Action<BinaryWriter, TPayload> writePayload = null)
+    {
+#pragma warning disable 618
+        SaveAsYaleDawg (stream, writePayload ?? GetStandardWriter());
+#pragma warning restore 618
+    }
+
+    /// <summary>
+    /// This method is only used for testing.
+    /// </summary>
+    [Obsolete ("This method is only used for testing.")]
+    public void SaveAsYaleDawg (Stream stream, Action<BinaryWriter, TPayload> writePayload = null)
+    {
+        Save (stream, (d, w) => d.root.SaveAsYaleDawg (w, writePayload ?? GetStandardWriter()));
+    }
+
+    /// <summary>
+    /// This method is only used for testing.
+    /// </summary>
+    [Obsolete ("This method is only used for testing.")]
+    public void SaveAsMatrixDawg (Stream stream, Action<BinaryWriter, TPayload> writePayload = null)
+    {
+        Save (stream, (d, w) => d.root.SaveAsMatrixDawg (w, writePayload ?? GetStandardWriter()));
+    }
+
+    private void Save (Stream stream, Action<OldDawg<TPayload>, BinaryWriter> save)
+    {
+        // Do not close the BinaryWriter. Users might want to append more data to the stream.
+        var writer = new BinaryWriter (stream);
+
+        writer.Write (GetSignature());
+
+        save ((OldDawg<TPayload>)dawg, writer);
+    }
+
+    static Action<BinaryWriter, TPayload> GetStandardWriter()
+    {
+        return BuiltinTypeIO.GetWriter<TPayload>();
+    }
+
+    public static DawgContainer<TPayload> Load (Stream stream, Func<BinaryReader, TPayload> readPayload = null)
+    {
+        return new (LoadIDawg (stream, readPayload ?? BuiltinTypeIO.GetReader<TPayload>()));
+    }
+
+    static IDawg<TPayload> LoadIDawg (Stream stream, Func<BinaryReader, TPayload> readPayload)
+    {
+        using (var reader = new BinaryReader (stream))
+        {
+            var signature = GetSignature();
+
+            var firstInt = reader.ReadInt32();
+
+            if (firstInt == signature)
+            {
+                var version = reader.ReadInt32();
+
+                switch (version)
+                {
+                    case 1: return new MatrixDawg<TPayload> (reader, readPayload);
+                    case 2: return new YaleDawg<TPayload> (reader, readPayload);
+                }
+
+                throw new Exception ("This file was produced by a more recent version of DawgSharp.");
+            }
+
+            // The old, unversioned, file format had the number of nodes as the first 4 bytes of the stream.
+            // It is extremely unlikely that they happen to be exactly the same as the signature "DAWG".
+            // return LoadOldDawg (reader, firstInt, readPayload);
+            throw new Exception();
+        }
+    }
+
+    private static int GetSignature()
+    {
+        var bytes = Encoding.UTF8.GetBytes ("DAWG");
+
+        return bytes[0]
+            + bytes[1] << 8
+            + bytes[2] << 16
+            + bytes[3] << 24;
+    }
+
+    private static OldDawg<TPayload> LoadOldDawg (BinaryReader reader, int nodeCount,
+        Func<BinaryReader, TPayload> readPayload)
+    {
+        var nodes = new Node<TPayload>[nodeCount];
+
+        var rootIndex = reader.ReadInt32();
+
+        var chars = reader.ReadChars (nodeCount);
+
+        for (var i = 0; i < nodeCount; ++i)
+        {
+            var node = new Node<TPayload>();
+
+            int childCount = reader.ReadInt16();
+
+            while (childCount-- > 0)
+            {
+                var childIndex = reader.ReadInt32();
+
+                node.Children.Add (chars[childIndex], nodes[childIndex]);
+            }
+
+            node.Payload = readPayload (reader);
+
+            nodes[i] = node;
+        }
+
+        return new OldDawg<TPayload> (nodes[rootIndex]);
+    }
+
+    public KeyValuePair<string, TPayload> GetRandomItem (Random random)
+    {
+        return dawg.GetRandomItem (random);
+    }
+}
