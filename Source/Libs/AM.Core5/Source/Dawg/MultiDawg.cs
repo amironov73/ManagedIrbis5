@@ -37,14 +37,28 @@ namespace AM.Dawg;
 /// </summary>
 public sealed class MultiDawg<TPayload>
 {
-    private readonly TPayload[][] payloads;
-    private readonly YaleGraph yaleGraph;
+    #region Construction
 
-    internal MultiDawg (YaleGraph yaleGraph, TPayload[][] payloads)
+    internal MultiDawg
+        (
+            YaleGraph yaleGraph,
+            TPayload[][] payloads
+        )
     {
-        this.yaleGraph = yaleGraph;
-        this.payloads = payloads;
+        _yaleGraph = yaleGraph;
+        _payloads = payloads;
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly TPayload[][] _payloads;
+    private readonly YaleGraph _yaleGraph;
+
+    #endregion
+
+    #region Public methods
 
     /// <summary>
     /// Tries to find as many space-separated words as it can.
@@ -81,7 +95,7 @@ public sealed class MultiDawg<TPayload>
                     last_word_count = wordCount;
                 }
 
-                if (yaleGraph.IsLeaf (node_i))
+                if (_yaleGraph.IsLeaf (node_i))
                 {
                     break;
                 }
@@ -92,7 +106,7 @@ public sealed class MultiDawg<TPayload>
 
         // ReSharper restore AccessToModifiedClosure
 
-        foreach (var i in yaleGraph.GetPath (GetChars()))
+        foreach (var i in _yaleGraph.GetPath (GetChars()))
         {
             node_i = i;
         }
@@ -102,8 +116,12 @@ public sealed class MultiDawg<TPayload>
         return GetPayloads (last_word_end_node_i);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="key"></param>
     public IEnumerable<TPayload> this [IEnumerable<char> key] =>
-        GetPayloads (yaleGraph.GetPath (key).Last());
+        GetPayloads (_yaleGraph.GetPath (key).Last());
 
     private IEnumerable<TPayload> GetPayloads (int i)
     {
@@ -112,7 +130,7 @@ public sealed class MultiDawg<TPayload>
             yield break;
         }
 
-        foreach (var arr in payloads)
+        foreach (var arr in _payloads)
         {
             if (arr.Length <= i)
             {
@@ -123,13 +141,21 @@ public sealed class MultiDawg<TPayload>
         }
     }
 
-    public IEnumerable<KeyValuePair<string, IEnumerable<TPayload>>> MatchPrefix (IEnumerable<char> prefix)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="prefix"></param>
+    /// <returns></returns>
+    public IEnumerable<KeyValuePair<string, IEnumerable<TPayload>>> MatchPrefix
+        (
+            IEnumerable<char> prefix
+        )
     {
         var prefixStr = prefix.AsString();
 
         var sb = new StringBuilder (prefixStr);
 
-        foreach (var node_i in yaleGraph.MatchPrefix (sb, yaleGraph.GetPath (prefixStr).Last()))
+        foreach (var node_i in _yaleGraph.MatchPrefix (sb, _yaleGraph.GetPath (prefixStr).Last()))
         {
             if (HasPayload (node_i))
             {
@@ -138,15 +164,20 @@ public sealed class MultiDawg<TPayload>
         }
     }
 
-    private bool HasPayload (int node_i) => payloads.Length > 0 && node_i < payloads[0].Length;
+    private bool HasPayload (int node_i) => _payloads.Length > 0 && node_i < _payloads[0].Length;
 
-    public int GetNodeCount() => yaleGraph.NodeCount;
+    public int GetNodeCount() => _yaleGraph.NodeCount;
 
-    public int MaxPayloads => payloads.Length;
+    public int MaxPayloads => _payloads.Length;
 
-    public IEnumerable<KeyValuePair<string, IEnumerable<TPayload>>> MatchTree (IEnumerable<IEnumerable<char>> tree)
+    public IEnumerable<KeyValuePair<string, IEnumerable<TPayload>>> MatchTree
+        (
+            IEnumerable<IEnumerable<char>> tree
+        )
     {
-        return yaleGraph.MatchTree (tree)
+        return _yaleGraph.MatchTree (tree)
             .Select (pair => new KeyValuePair<string, IEnumerable<TPayload>> (pair.Key, GetPayloads (pair.Value)));
     }
+
+    #endregion
 }

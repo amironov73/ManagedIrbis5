@@ -31,32 +31,59 @@ using System.Text;
 
 namespace AM.Dawg;
 
-class PrefixMatcher<TPayload>
+/// <summary>
+///
+/// </summary>
+internal sealed class PrefixMatcher<TPayload>
 {
-    readonly StringBuilder sb;
+    #region Construction
 
-    public PrefixMatcher (StringBuilder sb)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PrefixMatcher
+        (
+            StringBuilder builder
+        )
     {
-        this.sb = sb;
+        _builder = builder;
     }
 
-    public IEnumerable<KeyValuePair<string, TPayload>> MatchPrefix (Node<TPayload> node)
+    #endregion
+
+    #region Private members
+
+    private readonly StringBuilder _builder;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    public IEnumerable<KeyValuePair<string, TPayload>> MatchPrefix
+        (
+            Node<TPayload> node
+        )
     {
         if (!EqualityComparer<TPayload>.Default.Equals (node.Payload, default))
         {
-            yield return new KeyValuePair<string, TPayload> (sb.ToString(), node.Payload);
+            yield return new KeyValuePair<string, TPayload> (_builder.ToString(), node.Payload);
         }
 
         foreach (var child in node.Children)
         {
-            sb.Append (child.Key);
+            _builder.Append (child.Key);
 
             foreach (var kvp in MatchPrefix (child.Value))
             {
                 yield return kvp;
             }
 
-            --sb.Length;
+            --_builder.Length;
         }
     }
+
+    #endregion
 }

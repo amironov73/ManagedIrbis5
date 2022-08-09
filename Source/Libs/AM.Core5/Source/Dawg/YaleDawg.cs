@@ -34,31 +34,44 @@ using System.Text;
 
 namespace AM.Dawg;
 
-class YaleDawg<TPayload> : IDawg<TPayload>
+internal sealed class YaleDawg<TPayload>
+    : IDawg<TPayload>
 {
-    private readonly TPayload[] payloads;
-    private readonly char[] indexToChar;
-    private readonly int nodeCount, rootNodeIndex;
-    private readonly int[] firstChildForNode;
-    private readonly YaleChild[] children;
-    private readonly YaleGraph yaleGraph;
+    #region Construction
 
-    public YaleDawg (BinaryReader reader, Func<BinaryReader, TPayload> readPayload)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public YaleDawg
+        (
+            BinaryReader reader,
+            Func<BinaryReader, TPayload> readPayload
+        )
     {
-        nodeCount = reader.ReadInt32();
+        Sure.NotNull (reader);
+        Sure.NotNull (readPayload);
 
-        rootNodeIndex = reader.ReadInt32();
+        _nodeCount = reader.ReadInt32();
+        _rootNodeIndex = reader.ReadInt32();
+        _payloads = reader.ReadArray (readPayload);
+        _indexToChar = reader.ReadArray (r => r.ReadChar());
 
-        payloads = reader.ReadArray (readPayload);
+        var charToIndexPlusOne = CharToIndexPlusOneMap.Get (_indexToChar);
+        YaleReader.ReadChildren (_indexToChar, _nodeCount, reader, out _firstChildForNode, out _children);
 
-        indexToChar = reader.ReadArray (r => r.ReadChar());
-
-        var charToIndexPlusOne = CharToIndexPlusOneMap.Get (indexToChar);
-
-        YaleReader.ReadChildren (indexToChar, nodeCount, reader, out firstChildForNode, out children);
-
-        yaleGraph = new YaleGraph (children, firstChildForNode, charToIndexPlusOne, rootNodeIndex, indexToChar);
+        _yaleGraph = new YaleGraph (_children, _firstChildForNode, charToIndexPlusOne, _rootNodeIndex, _indexToChar);
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly TPayload[] _payloads;
+    private readonly char[] _indexToChar;
+    private readonly int _nodeCount, _rootNodeIndex;
+    private readonly int[] _firstChildForNode;
+    private readonly YaleChild[] _children;
+    private readonly YaleGraph _yaleGraph;
 
     TPayload IDawg<TPayload>.this [IEnumerable<char> word]
     {
@@ -77,12 +90,12 @@ class YaleDawg<TPayload> : IDawg<TPayload>
 
     private TPayload GetPayload (int node_i)
     {
-        return node_i < payloads.Length ? payloads[node_i] : default;
+        return node_i < _payloads.Length ? _payloads[node_i] : default;
     }
 
     IEnumerable<int> GetPath (IEnumerable<char> word)
     {
-        return yaleGraph.GetPath (word);
+        return _yaleGraph.GetPath (word);
     }
 
     int IDawg<TPayload>.GetLongestCommonPrefixLength (IEnumerable<char> word)
@@ -101,7 +114,7 @@ class YaleDawg<TPayload> : IDawg<TPayload>
 
         var sb = new StringBuilder (prefixStr);
 
-        foreach (var node_i in yaleGraph.MatchPrefix (sb, GetPath (prefixStr).Last()))
+        foreach (var node_i in _yaleGraph.MatchPrefix (sb, GetPath (prefixStr).Last()))
         {
             var payload = GetPayload (node_i);
 
@@ -112,12 +125,20 @@ class YaleDawg<TPayload> : IDawg<TPayload>
         }
     }
 
-    public IEnumerable<KeyValuePair<string, TPayload>> GetPrefixes (IEnumerable<char> key)
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    public IEnumerable<KeyValuePair<string, TPayload>> GetPrefixes
+        (
+            IEnumerable<char> key
+        )
     {
         var sb = new StringBuilder();
-
         var keyStr = key.AsString();
-
         var strIndex = -1;
 
         foreach (var node_i in GetPath (keyStr))
@@ -148,29 +169,32 @@ class YaleDawg<TPayload> : IDawg<TPayload>
 
     int IDawg<TPayload>.GetNodeCount()
     {
-        return nodeCount;
+        return _nodeCount;
     }
 
-    public KeyValuePair<string, TPayload> GetRandomItem (Random random)
+    public KeyValuePair<string, TPayload> GetRandomItem
+        (
+            Random random
+        )
     {
-        var nodeIndex = random.Next (0, payloads.Length);
+        Sure.NotNull (random);
 
-        var payload = payloads[nodeIndex];
-
+        var nodeIndex = random.Next (0, _payloads.Length);
+        var payload = _payloads[nodeIndex];
         var sb = new StringBuilder();
 
         for (;;)
         {
-            var childIndexes = children.Select ((c, i) => new { c, i })
+            var childIndexes = _children.Select ((c, i) => new { c, i })
                 .Where (t => t.c.Index == nodeIndex)
                 .Select (t => t.i)
                 .ToList();
 
             var childIndex = childIndexes[random.Next (0, childIndexes.Count)];
 
-            sb.Insert (0, indexToChar[children[childIndex].CharIndex]);
+            sb.Insert (0, _indexToChar[_children[childIndex].CharIndex]);
 
-            var parentIndex = Array.BinarySearch (firstChildForNode, childIndex);
+            var parentIndex = Array.BinarySearch (_firstChildForNode, childIndex);
 
             if (parentIndex < 0)
             {
@@ -178,11 +202,11 @@ class YaleDawg<TPayload> : IDawg<TPayload>
             }
             else
             {
-                while (parentIndex < firstChildForNode.Length - 1 && firstChildForNode[parentIndex + 1] == childIndex)
+                while (parentIndex < _firstChildForNode.Length - 1 && _firstChildForNode[parentIndex + 1] == childIndex)
                     ++parentIndex;
             }
 
-            if (parentIndex == rootNodeIndex)
+            if (parentIndex == _rootNodeIndex)
             {
                 return new KeyValuePair<string, TPayload> (sb.ToString(), payload);
             }
@@ -190,4 +214,6 @@ class YaleDawg<TPayload> : IDawg<TPayload>
             nodeIndex = parentIndex;
         }
     }
+
+    #endregion
 }

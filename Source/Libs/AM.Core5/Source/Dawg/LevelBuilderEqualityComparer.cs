@@ -36,17 +36,34 @@ namespace AM.Dawg;
 internal sealed class LevelBuilderEqualityComparer<TPayload>
     : IEqualityComparer<Node<TPayload>>
 {
-    private readonly IEqualityComparer<TPayload> payloadComparer;
+    private readonly IEqualityComparer<TPayload> _payloadComparer;
 
-    public LevelBuilderEqualityComparer (IEqualityComparer<TPayload> payloadComparer)
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public LevelBuilderEqualityComparer
+        (
+            IEqualityComparer<TPayload> payloadComparer
+        )
     {
-        this.payloadComparer = payloadComparer;
+        Sure.NotNull ((object?) payloadComparer);
+
+        _payloadComparer = payloadComparer;
     }
 
-    public bool Equals (Node<TPayload> x, Node<TPayload> y)
+    #endregion
+
+    /// <inheritdoc cref="IEqualityComparer{T}.Equals(T?,T?)"/>
+    public bool Equals
+        (
+            Node<TPayload>? x,
+            Node<TPayload>? y
+        )
     {
         // ReSharper disable PossibleNullReferenceException
-        var equals = AreEqual (x, y);
+        var equals = AreEqual (x!, y!);
 
         // ReSharper restore PossibleNullReferenceException
 
@@ -55,14 +72,16 @@ internal sealed class LevelBuilderEqualityComparer<TPayload>
 
     private bool AreEqual (Node<TPayload> xNode, Node<TPayload> yNode)
     {
-        var equals = payloadComparer.Equals (xNode.Payload, yNode.Payload)
+        var equals = _payloadComparer.Equals (xNode.Payload, yNode.Payload)
                      && SequenceEqual (xNode.SortedChildren, yNode.SortedChildren);
         return equals;
     }
 
-    private bool SequenceEqual (
+    private bool SequenceEqual
+        (
         IEnumerable<KeyValuePair<char, Node<TPayload>>> x,
-        IEnumerable<KeyValuePair<char, Node<TPayload>>> y)
+        IEnumerable<KeyValuePair<char, Node<TPayload>>> y
+        )
     {
         // Do not bother disposing of these enumerators.
 
@@ -100,7 +119,7 @@ internal sealed class LevelBuilderEqualityComparer<TPayload>
 
     private int ComputeHashCode (Node<TPayload> node)
     {
-        var hashCode = payloadComparer.GetHashCode (node.Payload);
+        var hashCode = _payloadComparer.GetHashCode (node.Payload);
 
         foreach (var pair in node.Children)
         {

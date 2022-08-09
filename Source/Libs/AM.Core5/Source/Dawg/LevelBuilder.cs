@@ -36,14 +36,72 @@ namespace AM.Dawg;
 /// </summary>
 internal sealed class LevelBuilder<TPayload>
 {
-    public LevelBuilder (IEqualityComparer<TPayload> comparer = null)
+    #region Nested classes
+
+    class StackFrame
     {
-        this.comparer = new LevelBuilderEqualityComparer<TPayload> (
-            comparer ?? EqualityComparer<TPayload>.Default);
+        /// <summary>
+        ///
+        /// </summary>
+        public Node<TPayload> Node;
+
+        /// <summary>
+        ///
+        /// </summary>
+        public IEnumerator<KeyValuePair<char, Node<TPayload>>> ChildIterator;
+
+        /// <summary>
+        ///
+        /// </summary>
+        public int Level;
     }
 
-    public void MergeEnds (Node<TPayload> root)
+    #endregion
+
+    #region Contstruction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public LevelBuilder
+        (
+            IEqualityComparer<TPayload>? comparer = null
+        )
     {
+        _comparer = new LevelBuilderEqualityComparer<TPayload>
+            (
+                comparer ?? EqualityComparer<TPayload>.Default
+            );
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly LevelBuilderEqualityComparer<TPayload> _comparer;
+
+    private Dictionary<Node<TPayload>, Node<TPayload>> NewLevel() => new (_comparer);
+
+    private static void Push
+        (
+            Stack<StackFrame> stack, Node<TPayload> node
+        )
+    {
+        stack.Push (new StackFrame { Node = node, ChildIterator = node.Children.ToList().GetEnumerator() });
+    }
+
+    #endregion
+
+    /// <summary>
+    ///
+    /// </summary>
+    public void MergeEnds
+        (
+            Node<TPayload> root
+        )
+    {
+        Sure.NotNull (root);
+
         var levels = new[] { NewLevel() }.ToList();
         var stack = new Stack<StackFrame>();
         Push (stack, root);
@@ -90,20 +148,5 @@ internal sealed class LevelBuilder<TPayload>
                 parent.Level = parentLevel;
             }
         }
-    }
-
-    private Dictionary<Node<TPayload>, Node<TPayload>> NewLevel() => new (comparer);
-    private readonly LevelBuilderEqualityComparer<TPayload> comparer;
-
-    private static void Push (Stack<StackFrame> stack, Node<TPayload> node)
-    {
-        stack.Push (new StackFrame { Node = node, ChildIterator = node.Children.ToList().GetEnumerator() });
-    }
-
-    class StackFrame
-    {
-        public Node<TPayload> Node;
-        public IEnumerator<KeyValuePair<char, Node<TPayload>>> ChildIterator;
-        public int Level;
     }
 }

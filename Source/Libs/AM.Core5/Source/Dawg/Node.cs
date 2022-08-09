@@ -62,7 +62,7 @@ internal sealed class Node<TPayload>
         return newNode;
     }
 
-    public Node<TPayload> GetChild (char c)
+    public Node<TPayload>? GetChild (char c)
     {
         _children.TryGetValue (c, out var node);
 

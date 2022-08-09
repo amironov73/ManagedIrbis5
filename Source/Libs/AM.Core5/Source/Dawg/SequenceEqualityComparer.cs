@@ -37,19 +37,27 @@ namespace AM.Dawg;
 public class SequenceEqualityComparer<T>
     : IEqualityComparer<IList<T>>
 {
-    private readonly IEqualityComparer<T> elementComparer;
+    private readonly IEqualityComparer<T> _elementComparer;
 
-    public SequenceEqualityComparer (IEqualityComparer<T> elementComparer = null)
+    /// <summary>
+    ///
+    /// </summary>
+    public SequenceEqualityComparer
+        (
+            IEqualityComparer<T>? elementComparer = null
+        )
     {
-        this.elementComparer = elementComparer ?? EqualityComparer<T>.Default;
+        _elementComparer = elementComparer ?? EqualityComparer<T>.Default;
     }
 
-    public bool Equals (IList<T> x, IList<T> y)
+    /// <inheritdoc cref="IEqualityComparer{T}.Equals(T?,T?)"/>
+    public bool Equals (IList<T>? x, IList<T>? y)
     {
-        return ReferenceEquals (x, y) || (x != null && y != null && x.SequenceEqual (y, elementComparer));
+        return ReferenceEquals (x, y) || (x != null && y != null && x.SequenceEqual (y, _elementComparer));
     }
 
-    public int GetHashCode (IList<T> obj)
+    /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
+    public int GetHashCode (IList<T>? obj)
     {
         if (obj == null)
         {
@@ -59,7 +67,7 @@ public class SequenceEqualityComparer<T>
         // Will not throw an OverflowException
         unchecked
         {
-            return obj.Where (e => e != null).Select (elementComparer.GetHashCode).Aggregate (17, (a, b) => 23 * a + b);
+            return obj.Where (e => e != null).Select (_elementComparer.GetHashCode).Aggregate (17, (a, b) => 23 * a + b);
         }
     }
 }

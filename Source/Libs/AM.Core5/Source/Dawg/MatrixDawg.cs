@@ -89,7 +89,7 @@ internal sealed class MatrixDawg<TPayload>
         }
     }
 
-    int GetChildIndexPlusOne (int node_i, char c)
+    private int GetChildIndexPlusOne (int node_i, char c)
     {
         var children = node_i < payloads.Length ? children1 : children0;
 

@@ -33,9 +33,20 @@ using System.Text;
 
 namespace AM.Dawg;
 
-class OldDawg <TPayload> : IDawg<TPayload>
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="TPayload"></typeparam>
+internal sealed class OldDawg<TPayload>
+    : IDawg<TPayload>
 {
+    #region Private members
+
     internal readonly Node<TPayload> root;
+
+    #endregion
+
+    #region Public methods
 
     public TPayload this [IEnumerable<char> word]
     {
@@ -47,15 +58,20 @@ class OldDawg <TPayload> : IDawg<TPayload>
         }
     }
 
-    private Node<TPayload> FindNode (IEnumerable<char> word)
+    private Node<TPayload>? FindNode
+        (
+            IEnumerable<char> word
+        )
     {
         var node = root;
-
-        foreach (char c in word)
+        foreach (var c in word)
         {
             node = node.GetChild (c);
 
-            if (node == null) return null;
+            if (node == null)
+            {
+                return null;
+            }
         }
 
         return node;
@@ -64,13 +80,16 @@ class OldDawg <TPayload> : IDawg<TPayload>
     public int GetLongestCommonPrefixLength (IEnumerable<char> word)
     {
         var node = root;
-        int len = 0;
+        var len = 0;
 
-        foreach (char c in word)
+        foreach (var c in word)
         {
             node = node.GetChild (c);
 
-            if (node == null) break;
+            if (node == null)
+            {
+                break;
+            }
 
             ++len;
         }
@@ -83,20 +102,23 @@ class OldDawg <TPayload> : IDawg<TPayload>
     /// </summary>
     public IEnumerable<KeyValuePair<string, TPayload>> MatchPrefix (IEnumerable<char> prefix)
     {
-        string prefixStr = prefix.AsString();
+        var prefixStr = prefix.AsString();
 
         var node = FindNode (prefixStr);
 
-        if (node == null) return Enumerable.Empty <KeyValuePair<string, TPayload>> ();
+        if (node == null)
+        {
+            return Enumerable.Empty<KeyValuePair<string, TPayload>>();
+        }
 
-        var sb = new StringBuilder ();
+        var sb = new StringBuilder();
 
         sb.Append (prefixStr);
 
-        return new PrefixMatcher<TPayload>(sb).MatchPrefix (node);
+        return new PrefixMatcher<TPayload> (sb).MatchPrefix (node);
     }
 
-    IEnumerable<KeyValuePair<string, TPayload>> IDawg<TPayload>.GetPrefixes(IEnumerable<char> key)
+    IEnumerable<KeyValuePair<string, TPayload>> IDawg<TPayload>.GetPrefixes (IEnumerable<char> key)
     {
         throw new NotImplementedException();
     }
@@ -106,23 +128,37 @@ class OldDawg <TPayload> : IDawg<TPayload>
         this.root = root;
     }
 
-    public int GetNodeCount ()
+    public int GetNodeCount()
     {
-        return root.GetRecursiveChildNodeCount ();
+        return root.GetRecursiveChildNodeCount();
     }
 
-    public KeyValuePair<string, TPayload> GetRandomItem(Random random)
+    public KeyValuePair<string, TPayload> GetRandomItem (Random random)
     {
         throw new NotImplementedException();
     }
+
+    #endregion
 }
 
-class NodeByPayloadComparer<TPayload> : IComparer<Node<TPayload>>
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="TPayload"></typeparam>
+internal sealed class NodeByPayloadComparer<TPayload>
+    : IComparer<Node<TPayload>>
 {
-    public int Compare(Node<TPayload> x, Node<TPayload> y)
+    #region IComparer<T> members
+
+    /// <inheritdoc cref="IComparer{T}.Compare"/>
+    public int Compare
+        (
+            Node<TPayload>? x,
+            Node<TPayload>? y
+        )
     {
-        // ReSharper disable PossibleNullReferenceException
-        return - x.HasPayload.CompareTo(y.HasPayload);
-        // ReSharper restore PossibleNullReferenceException
+        return -x!.HasPayload.CompareTo (y!.HasPayload);
     }
+
+    #endregion
 }

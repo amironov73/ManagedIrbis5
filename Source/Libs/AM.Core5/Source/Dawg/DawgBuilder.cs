@@ -16,7 +16,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable VirtualMemberCallInConstructor
 
-/* DawgBuilder.cs --
+/* DawgBuilder.cs -- строит DAWG
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -32,48 +32,68 @@ using System.IO;
 namespace AM.Dawg;
 
 /// <summary>
-///
+/// Строит DAWG.
 /// </summary>
-/// <typeparam name="TPayload"></typeparam>
-public sealed class DawgBuilder<TPayload>
+public class DawgBuilder<TPayload>
 {
-    internal readonly Node<TPayload> _root;
+    #region Construction
 
-    readonly List<Node<TPayload>> lastPath = new ();
-    string lastKey = "";
-
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
     public DawgBuilder()
     {
         _root = new Node<TPayload>();
     }
 
-    internal DawgBuilder (Node<TPayload> root)
-    {
-        this._root = root;
-    }
-
     /// <summary>
-    /// Inserts a new key/value pair or updates the value for an existing key.
+    /// Конструктор.
     /// </summary>
-    public void Insert (IEnumerable<char> key, TPayload value)
+    internal DawgBuilder
+        (
+            Node<TPayload> root
+        )
     {
-        if (key is string strKey)
-        {
-            InsertLastPath (strKey, value);
-        }
-        else
-        {
-            DoInsert (_root, key, value);
-        }
+        Sure.NotNull (root);
+
+        _root = root;
     }
 
-    private void InsertLastPath (string strKey, TPayload value)
+    #endregion
+
+    #region Private members
+
+    internal readonly Node<TPayload> _root;
+
+    private readonly List<Node<TPayload>> lastPath = new ();
+    private string _lastKey = string.Empty;
+
+    private static void DoInsert
+        (
+            Node<TPayload> node,
+            IEnumerable<char> key,
+            TPayload value
+        )
+    {
+        foreach (var c in key)
+        {
+            node = node.GetOrAddEdge (c);
+        }
+
+        node.Payload = value;
+    }
+
+    private void InsertLastPath
+        (
+            string strKey,
+            TPayload value
+        )
     {
         var i = 0;
 
-        while (i < strKey.Length && i < lastKey.Length)
+        while (i < strKey.Length && i < _lastKey.Length)
         {
-            if (strKey[i] != lastKey[i])
+            if (strKey[i] != _lastKey[i])
             {
                 break;
             }
@@ -83,7 +103,7 @@ public sealed class DawgBuilder<TPayload>
 
         lastPath.RemoveRange (i, lastPath.Count - i);
 
-        lastKey = strKey;
+        _lastKey = strKey;
 
         var node = i == 0 ? _root : lastPath[i - 1];
 
@@ -97,49 +117,45 @@ public sealed class DawgBuilder<TPayload>
         node.Payload = value;
     }
 
-    private static void DoInsert (Node<TPayload> node, IEnumerable<char> key, TPayload value)
+    internal static DawgBuilder<TPayload> Merge
+        (
+            Dictionary<char, Node<TPayload>> children
+        )
     {
-        foreach (var c in key)
-        {
-            node = node.GetOrAddEdge (c);
-        }
-
-        node.Payload = value;
+        var root = new Node<TPayload> (children);
+        return new DawgBuilder<TPayload> (root);
     }
 
-    public bool TryGetValue (IEnumerable<char> key, out TPayload value)
-    {
-        value = default;
+    #endregion
 
-        var node = _root;
+    #region Public methods
 
-        foreach (var c in key)
-        {
-            node = node.GetChild (c);
-
-            if (node == null)
-            {
-                return false;
-            }
-        }
-
-        value = node.Payload;
-
-        return node.HasPayload;
-    }
-
+    /// <summary>
+    ///
+    /// </summary>
     public DawgContainer<TPayload> BuildDawg()
     {
         return BuildDawg (EqualityComparer<TPayload>.Default);
     }
 
-    public DawgContainer<TPayload> BuildDawg (IEqualityComparer<TPayload> payloadComparer)
+    /// <summary>
+    ///
+    /// </summary>
+    public DawgContainer<TPayload> BuildDawg
+        (
+            IEqualityComparer<TPayload> payloadComparer
+        )
     {
+        Sure.NotNull (payloadComparer);
+
         new LevelBuilder<TPayload> (payloadComparer).MergeEnds (_root);
 
         return new DawgContainer<TPayload> (new OldDawg<TPayload> (_root));
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     public DawgContainer<TPayload> BuildYaleDawg()
     {
         var dawg = BuildDawg();
@@ -159,9 +175,54 @@ public sealed class DawgBuilder<TPayload>
         return rehydrated;
     }
 
-    internal static DawgBuilder<TPayload> Merge (Dictionary<char, Node<TPayload>> children)
+    /// <summary>
+    /// Inserts a new key/value pair or updates the value for an existing key.
+    /// </summary>
+    public void Insert
+        (
+            IEnumerable<char> key,
+            TPayload value
+        )
     {
-        var root = new Node<TPayload> (children);
-        return new DawgBuilder<TPayload> (root);
+        Sure.NotNull ((object?) key);
+
+        if (key is string strKey)
+        {
+            InsertLastPath (strKey, value);
+        }
+        else
+        {
+            DoInsert (_root, key, value);
+        }
     }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public bool TryGetValue
+        (
+            IEnumerable<char> key,
+            out TPayload value
+        )
+    {
+        Sure.NotNull ((object?) key);
+
+        value = default!;
+
+        var node = _root;
+        foreach (var c in key)
+        {
+            node = node.GetChild (c);
+            if (node == null)
+            {
+                return false;
+            }
+        }
+
+        value = node.Payload;
+
+        return node.HasPayload;
+    }
+
+    #endregion
 }

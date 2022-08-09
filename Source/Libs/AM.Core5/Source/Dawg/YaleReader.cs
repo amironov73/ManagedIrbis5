@@ -30,16 +30,23 @@ using System.IO;
 
 namespace AM.Dawg;
 
-static class YaleReader
+/// <summary>
+///
+/// </summary>
+internal static class YaleReader
 {
-    public static void ReadChildren (char[] indexToChar, int nodeCount, BinaryReader reader,
-        out int[] firstChildForNode,
-        out YaleChild[] children)
+    public static void ReadChildren
+        (
+            char[] indexToChar,
+            int nodeCount,
+            BinaryReader reader,
+            out int[] firstChildForNode,
+            out YaleChild[] children
+        )
     {
         firstChildForNode = new int[nodeCount + 1];
 
         var firstChildForNode_i = 0;
-
         var totalChildCount = reader.ReadInt32();
 
         children = new YaleChild [totalChildCount];
@@ -64,8 +71,14 @@ static class YaleReader
         }
     }
 
-    public static ushort ReadInt (BinaryReader reader, int countOfPossibleValues)
+    public static ushort ReadInt
+        (
+            BinaryReader reader,
+            int countOfPossibleValues
+        )
     {
-        return countOfPossibleValues > 256 ? reader.ReadUInt16() : reader.ReadByte();
+        return countOfPossibleValues > 256
+            ? reader.ReadUInt16()
+            : reader.ReadByte();
     }
 }

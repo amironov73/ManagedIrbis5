@@ -33,36 +33,132 @@ using System.Text;
 
 namespace AM.Dawg;
 
-class YaleGraph
+/// <summary>
+///
+/// </summary>
+internal sealed class YaleGraph
 {
-    private readonly int rootNodeIndex;
-    private readonly char firstChar;
-    private readonly char lastChar;
-    private readonly ushort[] charToIndexPlusOne;
-    private readonly int[] firstChildForNode;
-    private readonly YaleChild[] children;
-    private readonly char[] indexToChar;
+    #region Nested classes
 
-    public YaleGraph (YaleChild[] children,
-        int[] firstChildForNode,
-        ushort[] charToIndexPlusOne,
-        int rootNodeIndex,
-        char[] indexToChar)
+    class ChildComparer : IComparer<YaleChild>
     {
-        this.children = children;
-        this.firstChildForNode = firstChildForNode;
-        this.charToIndexPlusOne = charToIndexPlusOne;
-        this.indexToChar = indexToChar;
-        lastChar = this.indexToChar.LastOrDefault();
-        firstChar = this.indexToChar.FirstOrDefault();
-        this.rootNodeIndex = rootNodeIndex;
+        public int Compare (YaleChild x, YaleChild y)
+        {
+            return x.CharIndex.CompareTo (y.CharIndex);
+        }
     }
 
-    public int NodeCount => firstChildForNode.Length - 1;
-
-    public IEnumerable<int> GetPath (IEnumerable<char> word)
+    class Frame
     {
-        var node_i = rootNodeIndex;
+        public int NodeIndex { get; }
+        public IEnumerator<char> Enumerator { get; }
+
+        public Frame
+            (
+                int nodeIndex,
+                IEnumerator<char> enumerator
+            )
+        {
+            NodeIndex = nodeIndex;
+            Enumerator = enumerator;
+        }
+
+        public void Deconstruct
+            (
+                out int nodeIndex,
+                out IEnumerator<char> enumerator
+            )
+        {
+            nodeIndex = NodeIndex;
+            enumerator = Enumerator;
+        }
+    }
+
+    #endregion
+
+    #region Construction
+
+    public YaleGraph
+        (
+            YaleChild[] children,
+            int[] firstChildForNode,
+            ushort[] charToIndexPlusOne,
+            int rootNodeIndex,
+            char[] indexToChar
+        )
+    {
+        _children = children;
+        _firstChildForNode = firstChildForNode;
+        _charToIndexPlusOne = charToIndexPlusOne;
+        _indexToChar = indexToChar;
+        _lastChar = _indexToChar.LastOrDefault();
+        _firstChar = _indexToChar.FirstOrDefault();
+        _rootNodeIndex = rootNodeIndex;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly int _rootNodeIndex;
+    private readonly char _firstChar;
+    private readonly char _lastChar;
+    private readonly ushort[] _charToIndexPlusOne;
+    private readonly int[] _firstChildForNode;
+    private readonly YaleChild[] _children;
+    private readonly char[] _indexToChar;
+
+    private static readonly ChildComparer childComparer = new ();
+
+    private int GetChildIndex (int node_i, char c)
+    {
+        if (c >= _firstChar && c <= _lastChar)
+        {
+            var charIndexPlusOne = _charToIndexPlusOne[c - _firstChar];
+
+            if (charIndexPlusOne != 0)
+            {
+                var firstChild_i = _firstChildForNode[node_i];
+                var lastChild_i = _firstChildForNode[node_i + 1];
+                var nChildren = lastChild_i - firstChild_i;
+                var charIndex = (ushort)(charIndexPlusOne - 1);
+                int child_i;
+
+                if (nChildren == 1)
+                {
+                    child_i = _children[firstChild_i].CharIndex == charIndex ? firstChild_i : -1;
+                }
+                else
+                {
+                    var searchValue = new YaleChild (-1, charIndex);
+
+                    child_i = Array.BinarySearch (_children, firstChild_i, nChildren, searchValue, childComparer);
+                }
+
+                return child_i;
+            }
+        }
+
+        return -1;
+    }
+
+    #endregion
+
+    #region Public methods
+
+    public int NodeCount => _firstChildForNode.Length - 1;
+
+    /// <summary>
+    ///
+    /// </summary>
+    public IEnumerable<int> GetPath
+        (
+            IEnumerable<char> word
+        )
+    {
+        Sure.NotNull ((object?) word);
+
+        var node_i = _rootNodeIndex;
 
         yield return node_i;
 
@@ -77,7 +173,7 @@ class YaleGraph
 
             if (child_i >= 0)
             {
-                node_i = children[child_i].Index;
+                node_i = _children[child_i].Index;
 
                 yield return node_i;
                 continue;
@@ -88,53 +184,18 @@ class YaleGraph
         }
     }
 
-    private int GetChildIndex (int node_i, char c)
+    public IEnumerable<KeyValuePair<string, int>> MatchTree
+        (
+            IEnumerable<IEnumerable<char>> tree
+        )
     {
-        if (c >= firstChar && c <= lastChar)
-        {
-            var charIndexPlusOne = charToIndexPlusOne[c - firstChar];
+        Sure.NotNull ((object?) tree);
 
-            if (charIndexPlusOne != 0)
-            {
-                var firstChild_i = firstChildForNode[node_i];
-
-                var lastChild_i = firstChildForNode[node_i + 1];
-
-                var nChildren = lastChild_i - firstChild_i;
-
-                var charIndex = (ushort)(charIndexPlusOne - 1);
-
-                int child_i;
-
-                if (nChildren == 1)
-                {
-                    child_i = children[firstChild_i].CharIndex == charIndex ? firstChild_i : -1;
-                }
-                else
-                {
-                    var searchValue = new YaleChild (-1, charIndex);
-
-                    child_i = Array.BinarySearch (children, firstChild_i, nChildren, searchValue, childComparer);
-                }
-
-                return child_i;
-            }
-        }
-
-        return -1;
-    }
-
-    public IEnumerable<KeyValuePair<string, int>> MatchTree (IEnumerable<IEnumerable<char>> tree)
-    {
-        var node_i = rootNodeIndex;
-
+        var node_i = _rootNodeIndex;
         var stack = new Stack<Frame>();
-
         var enums = tree.ToList();
-
         var sb = new StringBuilder (enums.Count);
-
-        IEnumerator<char> enumerator = null;
+        IEnumerator<char>? enumerator = null;
 
         for (;;)
         {
@@ -155,7 +216,7 @@ class YaleGraph
                 {
                     sb.Append (enumerator.Current);
                     stack.Push (new Frame (node_i, enumerator));
-                    node_i = children[childIndex].Index;
+                    node_i = _children[childIndex].Index;
                     enumerator = null;
                 }
                 else
@@ -190,37 +251,9 @@ class YaleGraph
         }
     }
 
-    class Frame
-    {
-        public Frame (int nodeIndex, IEnumerator<char> enumerator)
-        {
-            NodeIndex = nodeIndex;
-            Enumerator = enumerator;
-        }
-
-        public int NodeIndex { get; }
-        public IEnumerator<char> Enumerator { get; }
-
-        public void Deconstruct (out int nodeIndex, out IEnumerator<char> enumerator)
-        {
-            nodeIndex = NodeIndex;
-            enumerator = Enumerator;
-        }
-    }
-
-    private static readonly ChildComparer childComparer = new ();
-
-    class ChildComparer : IComparer<YaleChild>
-    {
-        public int Compare (YaleChild x, YaleChild y)
-        {
-            return x.CharIndex.CompareTo (y.CharIndex);
-        }
-    }
-
     public bool IsLeaf (int node_i)
     {
-        return firstChildForNode[node_i] == firstChildForNode[node_i + 1];
+        return _firstChildForNode[node_i] == _firstChildForNode[node_i + 1];
     }
 
     public IEnumerable<int> MatchPrefix (StringBuilder sb, int node_i)
@@ -229,15 +262,15 @@ class YaleGraph
         {
             yield return node_i;
 
-            var firstChild_i = firstChildForNode[node_i];
+            var firstChild_i = _firstChildForNode[node_i];
 
-            var lastChild_i = firstChildForNode[node_i + 1];
+            var lastChild_i = _firstChildForNode[node_i + 1];
 
             for (var i = firstChild_i; i < lastChild_i; ++i)
             {
-                var child = children[i];
+                var child = _children[i];
 
-                sb.Append (indexToChar[child.CharIndex]);
+                sb.Append (_indexToChar[child.CharIndex]);
 
                 foreach (var child_node_i in MatchPrefix (sb, child.Index))
                 {
@@ -248,4 +281,6 @@ class YaleGraph
             }
         }
     }
+
+    #endregion
 }

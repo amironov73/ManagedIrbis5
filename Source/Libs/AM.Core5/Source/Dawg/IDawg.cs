@@ -16,7 +16,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable VirtualMemberCallInConstructor
 
-/* IDawg.cs --
+/* IDawg.cs -- интерфейс DAWG-контейнера
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -32,7 +32,7 @@ using System.Collections.Generic;
 namespace AM.Dawg;
 
 /// <summary>
-///
+/// Интерфейс DAWG-контейнера.
 /// </summary>
 internal interface IDawg<TPayload>
 {
