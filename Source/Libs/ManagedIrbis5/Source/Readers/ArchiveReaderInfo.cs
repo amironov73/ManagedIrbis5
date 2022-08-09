@@ -13,6 +13,7 @@
 #region Using directives
 
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -28,208 +29,222 @@ using ManagedIrbis.Mapping;
 
 #nullable enable
 
-namespace ManagedIrbis.Readers
+namespace ManagedIrbis.Readers;
+
+/// <summary>
+/// Архивная информация о читателе.
+/// </summary>
+[XmlRoot ("reader")]
+public sealed class ArchiveReaderInfo
+    : IHandmadeSerializable
 {
+    #region Properties
+
     /// <summary>
-    /// Информация о читателе.
+    /// Identifier for LiteDB.
     /// </summary>
-    [XmlRoot ("reader")]
-    public sealed class ArchiveReaderInfo
-        : IHandmadeSerializable
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public int Id { get; set; }
+
+    /// <summary>
+    /// Номер читательского. Поле 30.
+    /// </summary>
+    [Field (30)]
+    [XmlAttribute ("ticket")]
+    [JsonPropertyName ("ticket")]
+    [DisplayName ("Читательский билет")]
+    [Description ("Номер читательского билета")]
+    public string? Ticket { get; set; }
+
+    /// <summary>
+    /// Информация о посещениях.
+    /// </summary>
+    [XmlArray ("visits")]
+    [JsonPropertyName ("visits")]
+    [DisplayName ("Посещения/выдачи")]
+    [Description ("Массив посещений/выдач литературы")]
+    public VisitInfo[]? Visits { get; set; }
+
+    /// <summary>
+    /// Произвольные данные, ассоциированные с читателем.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public object? UserData { get; set; }
+
+    /// <summary>
+    /// Дата первого посещения
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public DateTime FirstVisitDate
+        => Visits?.FirstOrDefault()?.DateGiven ?? DateTime.MinValue;
+
+    /// <summary>
+    /// Дата последнего посещения.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public DateTime LastVisitDate => Visits?.LastOrDefault()?.DateGiven ?? DateTime.MinValue;
+
+    /// <summary>
+    /// Кафедра последнего посещения.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public string? LastVisitPlace => Visits?.LastOrDefault()?.Department;
+
+    /// <summary>
+    /// Последний обслуживавший библиотекарь.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public string? LastVisitResponsible => Visits?.LastOrDefault()?.Responsible;
+
+    /// <summary>
+    /// MFN записи.
+    /// </summary>
+    [XmlAttribute ("mfn")]
+    [JsonPropertyName ("mfn")]
+    [Browsable (false)]
+    public int Mfn { get; set; }
+
+    /// <summary>
+    /// Flag for the reader info.
+    /// </summary>
+    [XmlAttribute ("marked")]
+    [JsonPropertyName ("marked")]
+    [DisplayName ("Помечен")]
+    [Description ("По")]
+    public bool Marked { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Parse the specified record.
+    /// </summary>
+    public static ArchiveReaderInfo Parse
+        (
+            Record record
+        )
     {
-        #region Properties
+        // TODO Support for unknown fields
 
-        /// <summary>
-        /// Identifier for LiteDB.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Номер читательского. Поле 30.
-        /// </summary>
-        [Field (30)]
-        [XmlAttribute ("ticket")]
-        [JsonPropertyName ("ticket")]
-        public string? Ticket { get; set; }
-
-        /// <summary>
-        /// Информация о посещениях.
-        /// </summary>
-        [XmlArray ("visits")]
-        [JsonPropertyName ("visits")]
-        public VisitInfo[]? Visits { get; set; }
-
-        /// <summary>
-        /// Произвольные данные, ассоциированные с читателем.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public object? UserData { get; set; }
-
-        /// <summary>
-        /// Дата первого посещения
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public DateTime FirstVisitDate
-            => Visits?.FirstOrDefault()?.DateGiven ?? DateTime.MinValue;
-
-        /// <summary>
-        /// Дата последнего посещения.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public DateTime LastVisitDate
-            => Visits?.LastOrDefault()?.DateGiven ?? DateTime.MinValue;
-
-        /// <summary>
-        /// Кафедра последнего посещения.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public string? LastVisitPlace => Visits?.LastOrDefault()?.Department;
-
-        /// <summary>
-        /// Последний обслуживавший библиотекарь.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public string? LastVisitResponsible => Visits?.LastOrDefault()?.Responsible;
-
-        /// <summary>
-        /// MFN записи.
-        /// </summary>
-        [XmlAttribute ("mfn")]
-        [JsonPropertyName ("mfn")]
-        public int Mfn { get; set; }
-
-        /// <summary>
-        /// Flag for the reader info.
-        /// </summary>
-        [XmlAttribute ("marked")]
-        [JsonPropertyName ("marked")]
-        public bool Marked { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Parse the specified record.
-        /// </summary>
-        public static ArchiveReaderInfo Parse
-            (
-                Record record
-            )
+        var result = new ArchiveReaderInfo
         {
-            // TODO Support for unknown fields
+            Ticket = record.FM (30),
+            Visits = record.Fields
+                .GetField (40)
+                .Select (VisitInfo.Parse)
+                .ToArray(),
+            Mfn = record.Mfn,
+        };
 
-            var result = new ArchiveReaderInfo
+        return result;
+    }
+
+    /// <summary>
+    /// Считывание из файла.
+    /// </summary>
+    public static ArchiveReaderInfo[] ReadFromFile
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
+
+        var result = SerializationUtility
+            .RestoreArrayFromFile<ArchiveReaderInfo> (fileName);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Сохранение в файле.
+    /// </summary>
+    public static void SaveToFile
+        (
+            string fileName,
+            ArchiveReaderInfo[] readers
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        readers.SaveToFile (fileName);
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WritePackedInt32 (Id);
+        writer.WriteNullable (Ticket);
+        writer.WriteNullableArray (Visits);
+        writer.WritePackedInt32 (Mfn);
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        Id = reader.ReadPackedInt32();
+        Ticket = reader.ReadNullableString();
+        Visits = reader.ReadNullableArray<VisitInfo>();
+        Mfn = reader.ReadPackedInt32();
+    }
+
+    /// <summary>
+    /// Формирование записи по данным о читателе.
+    /// </summary>
+    public Record ToRecord()
+    {
+        var result = new Record
+        {
+            Mfn = Mfn
+        };
+
+        result.AddNonEmptyField (30, Ticket);
+        if (Visits is not null)
+        {
+            foreach (var visit in Visits)
             {
-                Ticket = record.FM (30),
-                Visits = record.Fields
-                    .GetField (40)
-                    .Select (VisitInfo.Parse)
-                    .ToArray(),
-                Mfn = record.Mfn,
-            };
-
-            return result;
-
-        } // method Parse
-
-        /// <summary>
-        /// Считывание из файла.
-        /// </summary>
-        public static ArchiveReaderInfo[] ReadFromFile
-            (
-                string fileName
-            )
-        {
-            var result = SerializationUtility
-                .RestoreArrayFromFile<ArchiveReaderInfo> (fileName);
-
-            return result;
-
-        } // method ReadFromFile
-
-        /// <summary>
-        /// Сохранение в файле.
-        /// </summary>
-        public static void SaveToFile
-            (
-                string fileName,
-                ArchiveReaderInfo[] readers
-            )
-        {
-            readers.SaveToFile (fileName);
-
-        } // method SaveToFile
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WritePackedInt32 (Id);
-            writer.WriteNullable (Ticket);
-            writer.WriteNullableArray (Visits);
-            writer.WritePackedInt32 (Mfn);
-
-        } // method SaveToStream
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Id = reader.ReadPackedInt32();
-            Ticket = reader.ReadNullableString();
-            Visits = reader.ReadNullableArray<VisitInfo>();
-            Mfn = reader.ReadPackedInt32();
-
-        } // method RestoreFromStream
-
-        /// <summary>
-        /// Формирование записи по данным о читателе.
-        /// </summary>
-        public Record ToRecord()
-        {
-            var result = new Record
-            {
-                Mfn = Mfn
-            };
-
-            result.AddNonEmptyField (30, Ticket);
-            if (Visits is not null)
-            {
-                foreach (var visit in Visits)
-                {
-                    result.Fields.Add (visit.ToField());
-                }
+                result.Fields.Add (visit.ToField());
             }
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method ToRecord
+    #endregion
 
-        #endregion
+    #region Object members
 
-        #region Object members
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Ticket.ToVisibleString();
+    }
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Ticket.ToVisibleString();
-
-        #endregion
-
-    } // class ArchiveReaderInfo
-
-} // namespace ManagedIrbis.Readers
+    #endregion
+}

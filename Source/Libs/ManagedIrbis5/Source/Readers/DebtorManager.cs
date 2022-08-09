@@ -5,6 +5,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
+// ReSharper disable UnusedMethodReturnValue.Local
 
 /* DebtorManager.cs -- работа с задолжниками
  * Ars Magna project, http://arsmagna.ru
@@ -14,347 +17,350 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 using AM;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Readers
+namespace ManagedIrbis.Readers;
+
+/// <summary>
+/// Работа с задолжниками.
+/// </summary>
+public sealed class DebtorManager
 {
+    #region Events
+
     /// <summary>
-    /// Работа с задолжниками.
+    /// Fired on batch read.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(Department) + "}")]
-    public sealed class DebtorManager
+    public event EventHandler? BatchRead;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Connection.
+    /// </summary>
+    public ISyncProvider Connection { get; private set; }
+
+    /// <summary>
+    /// Database name.
+    /// </summary>
+    public string? Database { get; set; }
+
+    /// <summary>
+    /// Кафедра обслуживания.
+    /// </summary>
+    public string? Department { get; set; }
+
+    /// <summary>
+    /// С какой даты задолженность?
+    /// </summary>
+    public DateTime? FromDate { get; set; }
+
+    /// <summary>
+    /// По какую дату задолженность.
+    /// </summary>
+    public DateTime? ToDate { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DebtorManager
+        (
+            ISyncProvider connection
+        )
     {
-        #region Events
+        Sure.NotNull (connection);
 
-        /// <summary>
-        /// Fired on batch read.
-        /// </summary>
-        public event EventHandler? BatchRead;
+        Database = "RDR";
+        Connection = connection;
+    }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Private members
 
-        /// <summary>
-        /// Connection.
-        /// </summary>
-        public ISyncProvider Connection { get; private set; }
+    private string? _fromDate, _toDate;
 
-        /// <summary>
-        /// Database name.
-        /// </summary>
-        public string? Database { get; set; }
+    private void HandleBatchRead
+        (
+            object? sender,
+            EventArgs eventArgs
+        )
+    {
+        BatchRead?.Invoke (sender, eventArgs);
+    }
 
-        /// <summary>
-        /// Кафедра обслуживания.
-        /// </summary>
-        public string? Department { get; set; }
-
-        /// <summary>
-        /// С какой даты задолженность?
-        /// </summary>
-        public DateTime? FromDate { get; set; }
-
-        /// <summary>
-        /// По какую дату задолженность.
-        /// </summary>
-        public DateTime? ToDate { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public DebtorManager
-            (
-                ISyncProvider connection
-            )
+    /// <summary>
+    /// Setup <see cref="FromDate"/> and
+    /// <see cref="ToDate"/>.
+    /// </summary>
+    /// <returns><c>true</c> on success,
+    /// <c>false</c> otherwise.</returns>
+    private bool SetupDates()
+    {
+        if (!FromDate.HasValue
+            || !ToDate.HasValue)
         {
-            Database = "RDR";
-            Connection = connection;
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private string? _fromDate, _toDate;
-
-        private void HandleBatchRead(object sender, EventArgs eventArgs) =>
-            BatchRead?.Invoke(sender, eventArgs);
-
-        /// <summary>
-        /// Setup <see cref="FromDate"/> and
-        /// <see cref="ToDate"/>.
-        /// </summary>
-        /// <returns><c>true</c> on success,
-        /// <c>false</c> otherwise.</returns>
-        private bool SetupDates()
-        {
-            if (!FromDate.HasValue
-                || !ToDate.HasValue)
-            {
-                return false;
-            }
-
-            _fromDate = IrbisDate.ConvertDateToString(FromDate.Value);
-            _toDate = IrbisDate.ConvertDateToString(ToDate.Value);
-
-            return true;
-        } // method SetupDates
-
-        #endregion
-
-        #region Public methods
-
-        /*
-
-        /// <summary>
-        /// Fill additional fields.
-        /// </summary>
-        public VisitInfo FillInfo
-            (
-                VisitInfo debt,
-                string? format
-            )
-        {
-            var database = debt.Database.ThrowIfNull
-                (
-                    "Database not specified"
-                );
-            var index = debt.Index.ThrowIfNull
-                (
-                    "Index not specified"
-                );
-
-            Connection.PushDatabase(database);
-            Record bookRecord = Connection.SearchReadOneRecord
-                (
-                    "\"I={0}\"",
-                    index
-                );
-            Connection.PopDatabase();
-
-            if (!ReferenceEquals(bookRecord, null))
-            {
-                if (!string.IsNullOrEmpty(format))
-                {
-                    var description = Connection.FormatRecord
-                        (
-                            database,
-                            format,
-                            bookRecord.Mfn
-                        );
-                    if (!string.IsNullOrEmpty(description))
-                    {
-                        debt.Description = description;
-                    }
-                }
-
-                debt.Price = debt.GetBookPrice(bookRecord);
-                debt.Year = VisitInfo.GetBookYear(bookRecord);
-            }
-
-            return debt;
+            return false;
         }
 
-        /// <summary>
-        /// Get debt from the reader
-        /// </summary>
-        public VisitInfo[] GetDebt
-            (
-                ReaderInfo reader
-            )
-        {
-            VisitInfo[] result = reader.Visits.GetDebt
-                (
-                    _fromDate,
-                    _toDate
-                );
+        _fromDate = IrbisDate.ConvertDateToString (FromDate.Value);
+        _toDate = IrbisDate.ConvertDateToString (ToDate.Value);
 
-            if (!string.IsNullOrEmpty(Department))
+        return true;
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Fill additional fields.
+    /// </summary>
+    public VisitInfo FillInfo
+        (
+            VisitInfo debt,
+            string? format
+        )
+    {
+        var database = Connection.EnsureDatabase (debt.Database);
+        var index = debt.Index.ThrowIfNull ("Index not specified");
+
+        var previousDatabase = Connection.Database;
+        Connection.Database = database;
+        var bookRecord = Connection.ByIndex (index);
+        Connection.Database = previousDatabase;
+
+        if (bookRecord is not null)
+        {
+            if (!string.IsNullOrEmpty (format))
             {
-                result = result.Where
+                var parameters = new FormatRecordParameters
+                {
+                    Database = database,
+                    Format = format,
+                    Mfn = bookRecord.Mfn
+                };
+                if (Connection.FormatRecords (parameters))
+                {
+                    debt.Description = parameters.Result.AsSingle();
+                }
+            }
+
+            debt.Price = debt.GetBookPrice (bookRecord);
+            debt.Year = VisitInfo.GetBookYear (bookRecord);
+        }
+
+        return debt;
+    }
+
+    /// <summary>
+    /// Get debt from the reader
+    /// </summary>
+    public VisitInfo[] GetDebt
+        (
+            ReaderInfo reader
+        )
+    {
+        var result = reader.Visits!.GetDebt
+            (
+                _fromDate!,
+                _toDate!
+            );
+
+        if (!string.IsNullOrEmpty (Department))
+        {
+            result = result.Where
                     (
                         item => item.Department.SameString
                             (
                                 Department
                             )
                     )
+                .ToArray();
+        }
+
+        return result.ToArray();
+    }
+
+
+    /// <summary>
+    /// Get debtor from the reader.
+    /// </summary>
+    /// <returns><c>null</c> if reader is not debtor.
+    /// </returns>
+    public DebtorInfo? GetDebtor
+        (
+            ReaderInfo reader
+        )
+    {
+        var debt = GetDebt (reader);
+
+        if (debt.Length == 0)
+        {
+            return null;
+        }
+
+        var result = DebtorInfo.FromReader
+            (
+                reader,
+                debt
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Получение списка задолжников.
+    /// </summary>
+    public DebtorInfo[] GetDebtors()
+    {
+        SetupDates();
+
+        var manager = new ReaderManager (Connection);
+        manager.BatchRead += HandleBatchRead;
+
+        var database = Connection.EnsureDatabase (Database);
+        var readers = manager.GetAllReaders (database);
+        var result = new List<DebtorInfo> (readers.Length);
+        string? fromDate = null;
+        if (FromDate.HasValue)
+        {
+            fromDate = IrbisDate.ConvertDateToString (FromDate.Value);
+        }
+
+        foreach (var reader in readers)
+        {
+            var visits = reader.Visits.ThrowIfNull();
+            var debt = ToDate.HasValue
+                ? visits.GetDebt (ToDate.Value)
+                : visits.GetDebt();
+
+            if (!string.IsNullOrEmpty (fromDate))
+            {
+                debt = debt.Where
+                        (
+                            loan => string.CompareOrdinal
+                                (
+                                    loan.DateExpectedString,
+                                    fromDate
+                                )
+                                 >= 0
+                        )
                     .ToArray();
             }
 
-            return result.ToArray();
-        }
-
-        /// <summary>
-        /// Get debtor from the reader.
-        /// </summary>
-        /// <returns><c>null</c> if reader is not debtor.
-        /// </returns>
-        public DebtorInfo? GetDebtor
-            (
-                ReaderInfo reader
-            )
-        {
-            var debt = GetDebt(reader);
-
-            if (debt.Length == 0)
+            if (!string.IsNullOrEmpty (Department))
             {
-                return null;
-            }
-
-            var result = DebtorInfo.FromReader
-                (
-                    reader,
-                    debt
-                );
-
-            return result;
-        }
-
-        /// <summary>
-        /// Получение списка задолжников.
-        /// </summary>
-        public DebtorInfo[] GetDebtors()
-        {
-            SetupDates();
-
-            ReaderManager manager = new ReaderManager(Connection);
-            manager.BatchRead += HandleBatchRead;
-
-            var database = Database.ThrowIfNull("Database");
-            ReaderInfo[] readers = manager.GetAllReaders(database);
-            var result = new List<DebtorInfo>(readers.Length);
-            string fromDate = null;
-            if (FromDate.HasValue)
-            {
-                fromDate = IrbisDate.ConvertDateToString(FromDate.Value);
-            }
-            foreach (var reader in readers)
-            {
-                VisitInfo[] debt = ToDate.HasValue
-                    ? reader.Visits.GetDebt(ToDate.Value)
-                    : reader.Visits.GetDebt();
-
-                if (!string.IsNullOrEmpty(fromDate))
-                {
-                    debt = debt.Where
-                        (
-                            loan => loan.DateExpectedString
-                                .SafeCompare(fromDate) >= 0
-                        )
-                        .ToArray();
-                }
-
-                if (!string.IsNullOrEmpty(Department))
-                {
-                    debt = debt.Where
+                debt = debt.Where
                         (
                             loan => loan.Department.SameString
                                 (
                                     Department
                                 )
                         )
-                        .ToArray();
-                }
-
-                if (debt.Length != 0)
-                {
-                    var debtor = DebtorInfo.FromReader
-                        (
-                            reader,
-                            debt
-                        );
-                    result.Add(debtor);
-                }
+                    .ToArray();
             }
 
-            manager.BatchRead -= HandleBatchRead;
-
-            return result.ToArray();
+            if (debt.Length != 0)
+            {
+                var debtor = DebtorInfo.FromReader
+                    (
+                        reader,
+                        debt
+                    );
+                result.Add (debtor);
+            }
         }
 
-        /// <summary>
-        /// Получение списка задолжников.
-        /// </summary>
-        public DebtorInfo[] GetDebtors
-            (
-                IEnumerable<int> mfns
-            )
+        manager.BatchRead -= HandleBatchRead;
+
+        return result.ToArray();
+    }
+
+    /// <summary>
+    /// Получение списка задолжников.
+    /// </summary>
+    public DebtorInfo[] GetDebtors
+        (
+            IEnumerable<int> mfns
+        )
+    {
+        SetupDates();
+
+        var manager = new ReaderManager (Connection);
+        manager.BatchRead += HandleBatchRead;
+
+        var database = Connection.EnsureDatabase (Database);
+        var readers = manager.GetReaders (database, mfns);
+        var result = new List<DebtorInfo> (readers.Length);
+        string? fromDate = null;
+        if (FromDate.HasValue)
         {
-            SetupDates();
+            fromDate = IrbisDate.ConvertDateToString (FromDate.Value);
+        }
 
-            ReaderManager manager = new ReaderManager(Connection);
-            manager.BatchRead += HandleBatchRead;
+        foreach (var reader in readers)
+        {
+            var visits = reader.Visits.ThrowIfNull();
+            var debt = ToDate.HasValue
+                ? visits.GetDebt (ToDate.Value)
+                : visits.GetDebt();
 
-            var database = Database.ThrowIfNull("Database");
-            ReaderInfo[] readers = manager.GetReaders(database, mfns);
-            var result = new List<DebtorInfo>(readers.Length);
-            string fromDate = null;
-            if (FromDate.HasValue)
+            if (!string.IsNullOrEmpty (fromDate))
             {
-                fromDate = IrbisDate.ConvertDateToString(FromDate.Value);
-            }
-            foreach (var reader in readers)
-            {
-                VisitInfo[] debt = ToDate.HasValue
-                    ? reader.Visits.GetDebt(ToDate.Value)
-                    : reader.Visits.GetDebt();
-
-                if (!string.IsNullOrEmpty(fromDate))
-                {
-                    debt = debt.Where
+                debt = debt.Where
                         (
-                            loan => loan.DateExpectedString
-                                .SafeCompare(fromDate) >= 0
+                            loan => string.CompareOrdinal
+                                (
+                                    loan.DateExpectedString,
+                                    fromDate
+                                ) >= 0
                         )
-                        .ToArray();
-                }
+                    .ToArray();
+            }
 
-                if (!string.IsNullOrEmpty(Department))
-                {
-                    debt = debt.Where
+            if (!string.IsNullOrEmpty (Department))
+            {
+                debt = debt.Where
                         (
                             loan => loan.Department.SameString
                                 (
                                     Department
                                 )
                         )
-                        .ToArray();
-                }
-
-                if (debt.Length != 0)
-                {
-                    var debtor = DebtorInfo.FromReader
-                        (
-                            reader,
-                            debt
-                        );
-                    result.Add(debtor);
-                }
+                    .ToArray();
             }
 
-            manager.BatchRead -= HandleBatchRead;
+            if (debt.Length != 0)
+            {
+                var debtor = DebtorInfo.FromReader
+                    (
+                        reader,
+                        debt
+                    );
+                result.Add (debtor);
+            }
+        }
 
-            return result.ToArray();
-        } // method GetDebtors
+        manager.BatchRead -= HandleBatchRead;
 
-        */
+        return result.ToArray();
+    }
 
-        #endregion
-
-    } // class DebtorManager
-
-} // namespace ManagedIrbis.Readers
+    #endregion
+}

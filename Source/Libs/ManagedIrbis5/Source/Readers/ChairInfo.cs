@@ -13,6 +13,7 @@
 #region Using directives
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -40,7 +41,8 @@ namespace ManagedIrbis.Readers;
 [XmlRoot ("chair")]
 [DebuggerDisplay ("{Code} {Title}")]
 public sealed class ChairInfo
-    : IHandmadeSerializable
+    : IHandmadeSerializable,
+    IVerifiable
 {
     #region Constants
 
@@ -63,6 +65,8 @@ public sealed class ChairInfo
     /// </summary>
     [XmlAttribute ("code")]
     [JsonPropertyName ("code")]
+    [DisplayName ("Код")]
+    [Description ("Условное обозначение, например, АБ")]
     public string? Code { get; set; }
 
     /// <summary>
@@ -70,6 +74,8 @@ public sealed class ChairInfo
     /// </summary>
     [XmlAttribute ("title")]
     [JsonPropertyName ("title")]
+    [DisplayName ("Название")]
+    [Description ("Название кафедры, например \"Абонемент\"")]
     public string? Title { get; set; }
 
     #endregion
@@ -77,35 +83,41 @@ public sealed class ChairInfo
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public ChairInfo()
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
-    /// <param name="code">Chair code.</param>
+    /// <param name="code">Код кафедры.</param>
     public ChairInfo
         (
             string code
         )
     {
+        Sure.NotNullNorEmpty (code);
+
         Code = code;
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
-    /// <param name="code">Chair code.</param>
-    /// <param name="title">Chair title.</param>
+    /// <param name="code">Код кафедры.</param>
+    /// <param name="title">Название.</param>
     public ChairInfo
         (
             string code,
             string title
         )
     {
+        Sure.NotNull (code);
+        Sure.NotNull (title);
+
         Code = code;
         Title = title;
     }
@@ -229,6 +241,25 @@ public sealed class ChairInfo
 
         Code = reader.ReadNullableString();
         Title = reader.ReadNullableString();
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<ChairInfo> (this, throwOnError);
+
+        verifier
+            .NotNullNorEmpty (Code)
+            .NotNullNorEmpty (Title);
+
+        return verifier.Result;
     }
 
     #endregion

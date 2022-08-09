@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -22,6 +23,7 @@ using System.Xml.Serialization;
 using AM;
 using AM.IO;
 using AM.Runtime;
+
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Mapping;
 
@@ -29,248 +31,268 @@ using ManagedIrbis.Mapping;
 
 #nullable enable
 
-namespace ManagedIrbis.Readers
+namespace ManagedIrbis.Readers;
+
+/// <summary>
+/// Обезличенная информация о читателе.
+/// </summary>
+[XmlRoot ("reader")]
+public sealed class DepersonalizedReader
+    : IHandmadeSerializable
 {
+    #region Properties
+
     /// <summary>
-    /// Обезличенная информация о читателе.
+    /// Дата рождения. Поле 21.
     /// </summary>
-    [XmlRoot("reader")]
-    public sealed class DepersonalizedReader
-        : IHandmadeSerializable
+    [Field (21)]
+    [XmlAttribute ("dateOfBirth")]
+    [JsonPropertyName ("dateOfBirth")]
+    [DisplayName ("Дата рождения")]
+    public string? DateOfBirth { get; set; }
+
+    /// <summary>
+    /// Номер читательского. Поле 30.
+    /// </summary>
+    [Field (30)]
+    [XmlAttribute ("ticket")]
+    [JsonPropertyName ("ticket")]
+    [DisplayName ("Читательский билет")]
+    public string? Ticket { get; set; }
+
+    /// <summary>
+    /// Пол. Поле 23.
+    /// </summary>
+    [Field (23)]
+    [XmlAttribute ("gender")]
+    [JsonPropertyName ("gender")]
+    [DisplayName ("Пол")]
+    public string? Gender { get; set; }
+
+    /// <summary>
+    /// Категория. Поле 50.
+    /// </summary>
+    [Field (50)]
+    [XmlAttribute ("category")]
+    [JsonPropertyName ("category")]
+    [DisplayName ("Категория")]
+    public string? Category { get; set; }
+
+    /// <summary>
+    /// Дата записи. Поле 51.
+    /// </summary>
+    [Field (51)]
+    [XmlAttribute ("registrationDate")]
+    [JsonPropertyName ("registrationDate")]
+    [DisplayName ("Дата записи")]
+    public string? RegistrationDateString { get; set; }
+
+    /// <summary>
+    /// Дата регистрации
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public DateTime RegistrationDate =>
+        IrbisDate.ConvertStringToDate (RegistrationDateString);
+
+    /// <summary>
+    /// Возраст, годы.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public int Age
     {
-        #region Properties
-
-        /// <summary>
-        /// Дата рождения. Поле 21.
-        /// </summary>
-        [Field(21)]
-        [XmlAttribute("dateOfBirth")]
-        [JsonPropertyName("dateOfBirth")]
-        public string? DateOfBirth { get; set; }
-
-        /// <summary>
-        /// Номер читательского. Поле 30.
-        /// </summary>
-        [Field(30)]
-        [XmlAttribute("ticket")]
-        [JsonPropertyName("ticket")]
-        public string? Ticket { get; set; }
-
-        /// <summary>
-        /// Пол. Поле 23.
-        /// </summary>
-        [Field(23)]
-        [XmlAttribute("gender")]
-        [JsonPropertyName("gender")]
-        public string? Gender { get; set; }
-
-        /// <summary>
-        /// Категория. Поле 50.
-        /// </summary>
-        [Field(50)]
-        [XmlAttribute("category")]
-        [JsonPropertyName("category")]
-        public string? Category { get; set; }
-
-        /// <summary>
-        /// Дата записи. Поле 51.
-        /// </summary>
-        [Field(51)]
-        [XmlAttribute("registrationDate")]
-        [JsonPropertyName("registrationDate")]
-        public string? RegistrationDateString { get; set; }
-
-        /// <summary>
-        /// Дата регистрации
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public DateTime RegistrationDate =>
-            IrbisDate.ConvertStringToDate(RegistrationDateString);
-
-        /// <summary>
-        /// Возраст, годы
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public int Age
+        get
         {
-            get
+            var yearText = DateOfBirth;
+
+            if (string.IsNullOrEmpty (yearText))
             {
-                var yearText = DateOfBirth;
-
-                if (string.IsNullOrEmpty(yearText))
-                {
-                    return 0;
-                }
-
-                if (yearText.Length > 4)
-                {
-                    yearText = yearText.Substring(1, 4);
-                }
-
-                if (!int.TryParse(yearText, out var year))
-                {
-                    return 0;
-                }
-
-                return DateTime.Today.Year - year;
-            }
-        }
-
-        /// <summary>
-        /// Visits.
-        /// </summary>
-        public List<VisitInfo> Visits { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public DepersonalizedReader()
-        {
-            Visits = new List<VisitInfo>();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private static void _DegreaseVisitInfo
-            (
-                VisitInfo visit
-            )
-        {
-            visit.Description = null;
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Add the visits if not yet.
-        /// </summary>
-        public void AddVisits
-            (
-                IEnumerable<VisitInfo> visits
-            )
-        {
-            foreach (var visit in visits)
-            {
-                var found = false;
-                foreach (var other in Visits)
-                {
-                    if (visit.SameVisit(other))
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found)
-                {
-                    _DegreaseVisitInfo(visit);
-                    Visits.Add(visit);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Create <see cref="DepersonalizedReader"/>
-        /// from the <see cref="ReaderInfo"/>.
-        /// </summary>
-        public static DepersonalizedReader FromReaderInfo
-            (
-                ReaderInfo readerInfo
-            )
-        {
-            var result = new DepersonalizedReader
-            {
-                Ticket = readerInfo.Ticket,
-                Category = readerInfo.Category,
-                DateOfBirth = readerInfo.DateOfBirth,
-                Gender = readerInfo.Gender,
-                RegistrationDateString = readerInfo.RegistrationDateString
-            };
-
-            if (readerInfo.Visits is not null)
-            {
-                result.Visits.AddRange(readerInfo.Visits);
-                foreach (var visit in result.Visits)
-                {
-                    _DegreaseVisitInfo(visit);
-                }
+                return 0;
             }
 
-            return result;
-        }
-
-        /// <summary>
-        /// Convert back to the record.
-        /// </summary>
-        public Record ToMarcRecord()
-        {
-            var result = new Record();
-
-            result
-                .AddNonEmptyField(21, DateOfBirth)
-                .AddNonEmptyField(30, Ticket)
-                .AddNonEmptyField(23, Gender)
-                .AddNonEmptyField(50, Category)
-                .AddNonEmptyField(51, RegistrationDateString);
-
-            foreach (var visit in Visits)
+            if (yearText.Length > 4)
             {
-                result.Fields.Add(visit.ToField());
+                yearText = yearText.Substring (1, 4);
             }
 
-            return result;
+            if (!int.TryParse (yearText, out var year))
+            {
+                return 0;
+            }
+
+            return DateTime.Today.Year - year;
         }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            DateOfBirth = reader.ReadNullableString();
-            Ticket = reader.ReadNullableString();
-            Gender = reader.ReadNullableString();
-            Category = reader.ReadNullableString();
-            RegistrationDateString = reader.ReadNullableString();
-            Visits = reader.ReadList<VisitInfo>();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WriteNullable(DateOfBirth)
-                .WriteNullable(Ticket)
-                .WriteNullable(Gender)
-                .WriteNullable(Category)
-                .WriteNullable(RegistrationDateString)
-                .WriteList(Visits);
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => Ticket.ToVisibleString();
-
-        #endregion
     }
+
+    /// <summary>
+    /// Посещения/выдачи.
+    /// </summary>
+    [XmlArrayItem ("visit")]
+    [JsonPropertyName ("visits")]
+    [DisplayName ("Посещения/выдачи")]
+    public List<VisitInfo> Visits { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DepersonalizedReader()
+    {
+        Visits = new List<VisitInfo>();
+    }
+
+    #endregion
+
+    #region Private members
+
+    private static void _DegreaseVisitInfo
+        (
+            VisitInfo visit
+        )
+    {
+        visit.Description = null;
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Add the visits if not yet.
+    /// </summary>
+    public void AddVisits
+        (
+            IEnumerable<VisitInfo> visits
+        )
+    {
+        Sure.NotNull ((object?) visits);
+
+        foreach (var visit in visits)
+        {
+            var found = false;
+            foreach (var other in Visits)
+            {
+                if (visit.SameVisit (other))
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                _DegreaseVisitInfo (visit);
+                Visits.Add (visit);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Create <see cref="DepersonalizedReader"/>
+    /// from the <see cref="ReaderInfo"/>.
+    /// </summary>
+    public static DepersonalizedReader FromReaderInfo
+        (
+            ReaderInfo readerInfo
+        )
+    {
+        Sure.NotNull (readerInfo);
+
+        var result = new DepersonalizedReader
+        {
+            Ticket = readerInfo.Ticket,
+            Category = readerInfo.Category,
+            DateOfBirth = readerInfo.DateOfBirth,
+            Gender = readerInfo.Gender,
+            RegistrationDateString = readerInfo.RegistrationDateString
+        };
+
+        if (readerInfo.Visits is not null)
+        {
+            result.Visits.AddRange (readerInfo.Visits);
+            foreach (var visit in result.Visits)
+            {
+                _DegreaseVisitInfo (visit);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Convert back to the record.
+    /// </summary>
+    public Record ToMarcRecord()
+    {
+        var result = new Record();
+
+        result
+            .AddNonEmptyField (21, DateOfBirth)
+            .AddNonEmptyField (30, Ticket)
+            .AddNonEmptyField (23, Gender)
+            .AddNonEmptyField (50, Category)
+            .AddNonEmptyField (51, RegistrationDateString);
+
+        foreach (var visit in Visits)
+        {
+            result.Fields.Add (visit.ToField());
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        DateOfBirth = reader.ReadNullableString();
+        Ticket = reader.ReadNullableString();
+        Gender = reader.ReadNullableString();
+        Category = reader.ReadNullableString();
+        RegistrationDateString = reader.ReadNullableString();
+        Visits = reader.ReadList<VisitInfo>();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer
+            .WriteNullable (DateOfBirth)
+            .WriteNullable (Ticket)
+            .WriteNullable (Gender)
+            .WriteNullable (Category)
+            .WriteNullable (RegistrationDateString)
+            .WriteList (Visits);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return Ticket.ToVisibleString();
+    }
+
+    #endregion
 }
