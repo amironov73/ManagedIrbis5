@@ -621,8 +621,18 @@ public sealed class VisitInfo
     {
         var verifier = new Verifier<VisitInfo> (this, throwOnError);
 
-        verifier
-            .NotNullNorEmpty (InventoryNumber);
+        if (IsVisit)
+        {
+            verifier
+                .NotNullNorEmpty (Description);
+        }
+        else
+        {
+            verifier
+                .NotNullNorEmpty (Index)
+                .NotNullNorEmpty (InventoryNumber)
+                .NotNullNorEmpty (DateGivenString);
+        }
 
         return verifier.Result;
     }

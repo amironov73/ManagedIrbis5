@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -28,6 +29,7 @@ using AM.IO;
 using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -42,7 +44,7 @@ namespace ManagedIrbis.Workspace;
 [DebuggerDisplay ("{" + nameof (Name) + "}")]
 public sealed class WssFile
     : IHandmadeSerializable,
-        IVerifiable
+    IVerifiable
 {
     #region Properties
 
@@ -59,36 +61,24 @@ public sealed class WssFile
     [XmlArray ("items")]
     [XmlArrayItem ("item")]
     [JsonPropertyName ("items")]
-    public NonNullCollection<WorksheetItem> Items { get; private set; }
-
-    #endregion
-
-    #region Construction
-
-    /// <summary>
-    /// Конструктор
-    /// </summary>
-    public WssFile()
-    {
-        Items = new NonNullCollection<WorksheetItem>();
-    }
+    public NonNullCollection<WorksheetItem> Items { get; private set; } = new ();
 
     #endregion
 
     #region Public methods
 
     /// <summary>
-    /// Разбор потока.
+    /// Разбор текстового потока.
     /// </summary>
     public static WssFile ParseStream
         (
             TextReader reader
         )
     {
+        Sure.NotNull (reader);
+
         var result = new WssFile();
-
         var count = int.Parse (reader.RequireLine());
-
         for (var i = 0; i < count; i++)
         {
             var item = WorksheetItem.ParseStream (reader);
@@ -99,7 +89,7 @@ public sealed class WssFile
     }
 
     /// <summary>
-    /// Read from server.
+    /// Чтение рабочего листа с сервера.
     /// </summary>
     public static WssFile? ReadFromServer
         (
@@ -107,6 +97,10 @@ public sealed class WssFile
             FileSpecification specification
         )
     {
+        Sure.NotNull (provider);
+        Sure.VerifyNotNull (specification);
+        provider.EnsureConnected();
+
         var content = provider.ReadTextFile (specification);
         if (string.IsNullOrEmpty (content))
         {
@@ -123,40 +117,25 @@ public sealed class WssFile
     public static WssFile ReadLocalFile
         (
             string fileName,
-            Encoding encoding
+            Encoding? encoding = null
         )
     {
-        using var reader = TextReaderUtility.OpenRead
-            (
-                fileName,
-                encoding
-            );
-        var result = ParseStream (reader);
+        Sure.FileExists (fileName);
 
+        encoding ??= IrbisEncoding.Ansi;
+
+        using var reader = TextReaderUtility.OpenRead (fileName, encoding);
+        var result = ParseStream (reader);
         result.Name = Path.GetFileName (fileName);
 
         return result;
     }
 
     /// <summary>
-    /// Считывание из локального файла.
-    /// </summary>
-    public static WssFile ReadLocalFile
-        (
-            string fileName
-        )
-    {
-        return ReadLocalFile
-            (
-                fileName,
-                IrbisEncoding.Ansi
-            );
-    }
-
-    /// <summary>
     /// Should serialize the <see cref="Items"/> collection?
     /// </summary>
     [ExcludeFromCodeCoverage]
+    [EditorBrowsable (EditorBrowsableState.Never)]
     public bool ShouldSerializeItems()
     {
         return Items.Count != 0;
@@ -172,6 +151,8 @@ public sealed class WssFile
             BinaryReader reader
         )
     {
+        Sure.NotNull (reader);
+
         Name = reader.ReadNullableString();
         Items = reader.ReadNonNullCollection<WorksheetItem>();
     }
@@ -182,6 +163,8 @@ public sealed class WssFile
             BinaryWriter writer
         )
     {
+        Sure.NotNull (writer);
+
         writer.WriteNullable (Name);
         writer.WriteCollection (Items);
     }

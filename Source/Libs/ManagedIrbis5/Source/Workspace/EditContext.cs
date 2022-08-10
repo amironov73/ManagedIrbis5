@@ -24,84 +24,84 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis.Workspace
+namespace ManagedIrbis.Workspace;
+
+/// <summary>
+/// Контекст редактирования для поля/подполя.
+/// </summary>
+public sealed class EditContext
 {
+    #region Properties
+
     /// <summary>
-    /// Контекст редактирования для поля/подполя.
+    /// Родительский (или корневой) контекст.
     /// </summary>
-    public sealed class EditContext
-    {
-        #region Properties
+    public EditContext? ParentContext { get; set; }
 
-        /// <summary>
-        /// Родительский (или корневой) контекст.
-        /// </summary>
-        public EditContext? ParentContext { get; set; }
+    /// <summary>
+    /// Провайдер.
+    /// </summary>
+    public ISyncProvider? Provider { get; set; }
 
-        /// <summary>
-        /// Провайдер.
-        /// </summary>
-        public ISyncProvider? Provider { get; set; }
+    /// <summary>
+    /// Код режима редактирования.
+    /// </summary>
+    public EditMode Mode { get; set; }
 
-        /// <summary>
-        /// Код режима редактирования.
-        /// </summary>
-        public EditMode Mode { get; set; }
+    /// <summary>
+    /// Редактируемая запись.
+    /// </summary>
+    public Record? Record { get; set; }
 
-        /// <summary>
-        /// Редактируемая запись.
-        /// </summary>
-        public Record? Record { get; set; }
+    /// <summary>
+    /// Редактируемые поля (как минимум, одно).
+    /// </summary>
+    public Field[]? Fields { get; set; }
 
-        /// <summary>
-        /// Редактируемые поля (как минимум, одно).
-        /// </summary>
-        public Field[]? Fields { get; set; }
+    /// <summary>
+    /// (Текущее) редактируемое поле.
+    /// </summary>
+    public Field? CurrentField { get; set; }
 
-        /// <summary>
-        /// (Текущее) редактируемое поле.
-        /// </summary>
-        public Field? Field { get; set; }
+    /// <summary>
+    /// Редактируемое подполе.
+    /// </summary>
+    public SubField? CurrentSubfield { get; set; }
 
-        /// <summary>
-        /// Редактируемое подполе.
-        /// </summary>
-        public SubField? Subfield { get; set; }
+    /// <summary>
+    /// Метка поля.
+    /// </summary>
+    public int Tag => CurrentField?.Tag ?? 0;
 
-        /// <summary>
-        /// Метка поля.
-        /// </summary>
-        public int Tag => Field?.Tag ?? 0;
+    /// <summary>
+    /// Код подполя (если есть).
+    /// </summary>
+    public char Code => CurrentSubfield?.Code ?? SubField.NoCode;
 
-        /// <summary>
-        /// Код подполя (если есть).
-        /// </summary>
-        public char Code => Subfield?.Code ?? SubField.NoCode;
+    /// <summary>
+    /// Индекс повторения.
+    /// -1 = все.
+    /// -2 = неизвестен.
+    /// </summary>
+    public int Repeat { get; set; }
 
-        /// <summary>
-        /// Индекс повторения.
-        /// -1 = все.
-        /// -2 = неизвестен.
-        /// </summary>
-        public int Repeat { get; set; }
+    /// <summary>
+    /// Ссылка на элемент рабочего листа.
+    /// </summary>
+    public WorksheetItem? Item { get; set; }
 
-        /// <summary>
-        /// Ссылка на элемент рабочего листа.
-        /// </summary>
-        public WorksheetItem? Item { get; set; }
+    /// <summary>
+    /// Пользователь подтвердил результат редактирования.
+    /// </summary>
+    public bool Accept { get; set; }
 
-        /// <summary>
-        /// Пользователь подтвердил результат редактирования.
-        /// </summary>
-        public bool Accept { get; set; }
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    public object? UserData { get; set; }
 
-        /// <summary>
-        /// Произвольные пользовательские данные.
-        /// </summary>
-        public object? UserData { get; set; }
+    #endregion
 
-        #endregion
+} // class EditContext
 
-    } // class EditContext
-
-} // namespace ManagedIrbis.Workspace
+// namespace ManagedIrbis.Workspace
