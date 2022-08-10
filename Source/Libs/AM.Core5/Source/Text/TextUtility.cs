@@ -8,12 +8,15 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-
-
-#nullable enable
+#region Using directives
 
 using System;
 using System.Text;
+
+#endregion
+
+#nullable enable
+
 namespace AM.Text;
 
 /// <summary>
@@ -31,6 +34,30 @@ public static class TextUtility
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Добавление заданного количества повторений указанного символа.
+    /// </summary>
+    public static StringBuilder AppendRepeat
+        (
+            this StringBuilder builder,
+            char c,
+            int count
+        )
+    {
+        Sure.NotNull (builder);
+
+        if (count > 0)
+        {
+            builder.EnsureCapacity (builder.Length + count);
+            for (var i = 0; i < count; i++)
+            {
+                builder.Append (c);
+            }
+        }
+
+        return builder;
+    }
 
     /// <summary>
     /// Определяем, что за текст.

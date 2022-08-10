@@ -249,8 +249,8 @@ namespace ManagedIrbis.Readers
             )
         {
             var result = string.CompareOrdinal(first.Database, second.Database) == 0
-                          && string.CompareOrdinal(first.Index, second.Inventory) == 0
-                          && string.CompareOrdinal(first.Inventory, second.Inventory) == 0
+                          && string.CompareOrdinal(first.Index, second.InventoryNumber) == 0
+                          && string.CompareOrdinal(first.InventoryNumber, second.InventoryNumber) == 0
                           && string.CompareOrdinal(first.Barcode, second.Barcode) == 0
                           && string.CompareOrdinal(first.DateGivenString, second.DateGivenString) == 0;
 

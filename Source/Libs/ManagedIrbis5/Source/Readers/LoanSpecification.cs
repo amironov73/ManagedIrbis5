@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Text.Json.Serialization;
@@ -31,6 +32,8 @@ namespace ManagedIrbis.Readers;
 /// <summary>
 /// Спецификация выдачи документа.
 /// </summary>
+[Serializable]
+[XmlRoot ("loan")]
 public sealed class LoanSpecification
     : IHandmadeSerializable,
     IVerifiable
@@ -45,6 +48,15 @@ public sealed class LoanSpecification
     [DisplayName ("База данных")]
     [Description ("Имя базы данных (опционально)")]
     public string? Database { get; set; }
+
+    /// <summary>
+    /// Шифр документа в базе.
+    /// </summary>
+    [XmlAttribute ("index")]
+    [JsonPropertyName ("index")]
+    [DisplayName ("Шифр")]
+    [Description ("Шифр документа в базе")]
+    public string? Index { get; set; }
 
     /// <summary>
     /// Инвентарный номер выдаваемого экземпляра.
@@ -86,6 +98,7 @@ public sealed class LoanSpecification
         Sure.NotNull (reader);
 
         Database = reader.ReadNullableString();
+        Index = reader.ReadNullableString();
         InventoryNumber = reader.ReadNullableString();
         Barcode = reader.ReadNullableString();
         EstimatedReturnDate = reader.ReadNullableString();
@@ -101,6 +114,7 @@ public sealed class LoanSpecification
 
         writer
             .WriteNullable (Database)
+            .WriteNullable (Index)
             .WriteNullable (InventoryNumber)
             .WriteNullable (Barcode)
             .WriteNullable (EstimatedReturnDate);
@@ -118,11 +132,18 @@ public sealed class LoanSpecification
     {
         var verifier = new Verifier<LoanSpecification> (this, throwOnError);
 
-        verifier.AnyNotNullNorEmpty
-            (
-                InventoryNumber,
-                Barcode
-            );
+        if (string.IsNullOrEmpty (Database) && string.IsNullOrEmpty (Index))
+        {
+            verifier.AnyNotNullNorEmpty
+                (
+                    InventoryNumber,
+                    Barcode
+                );
+        }
+        else
+        {
+            verifier.NotNullNorEmpty (Index);
+        }
 
         return verifier.Result;
     }

@@ -29,7 +29,7 @@ namespace UnitTests.ManagedIrbis.Readers
             Assert.AreEqual(0, visit.Id);
             Assert.IsNull(visit.Database);
             Assert.IsNull(visit.Index);
-            Assert.IsNull(visit.Inventory);
+            Assert.IsNull(visit.InventoryNumber);
             Assert.IsNull(visit.Barcode);
             Assert.IsNull(visit.Sigla);
             Assert.IsNull(visit.DateGivenString);
@@ -154,7 +154,7 @@ namespace UnitTests.ManagedIrbis.Readers
             var visit = VisitInfo.Parse(field);
             Assert.AreSame(field, visit.Field);
             Assert.AreEqual("84(2=Рус)5/Ц 27-422726", visit.Index);
-            Assert.AreEqual("1539325", visit.Inventory);
+            Assert.AreEqual("1539325", visit.InventoryNumber);
             Assert.AreEqual("Ф302", visit.Sigla);
             Assert.AreEqual("Цветаева М. И. Стихотворения", visit.Description);
             Assert.AreEqual("*", visit.Department);
@@ -181,7 +181,7 @@ namespace UnitTests.ManagedIrbis.Readers
             var result = new VisitInfo
             {
                 Index = "84(2=Рус)5/Ц 27-422726",
-                Inventory = "1539325",
+                InventoryNumber = "1539325",
                 Sigla = "Ф302",
                 Description = "Цветаева М. И. Стихотворения",
                 Department = "*",
@@ -203,7 +203,7 @@ namespace UnitTests.ManagedIrbis.Readers
             var visit = _GetVisit();
             var field = visit.ToField();
             Assert.AreEqual(visit.Index, field.GetFirstSubFieldValue('a'));
-            Assert.AreEqual(visit.Inventory, field.GetFirstSubFieldValue('b'));
+            Assert.AreEqual(visit.InventoryNumber, field.GetFirstSubFieldValue('b'));
             Assert.AreEqual(visit.Sigla, field.GetFirstSubFieldValue('k'));
             Assert.AreEqual(visit.Description, field.GetFirstSubFieldValue('c'));
             Assert.AreEqual(visit.Department, field.GetFirstSubFieldValue('v'));
@@ -225,7 +225,7 @@ namespace UnitTests.ManagedIrbis.Readers
             Assert.AreEqual(first.Id, second.Id);
             Assert.AreEqual(first.Database, second.Database);
             Assert.AreEqual(first.Index, second.Index);
-            Assert.AreEqual(first.Inventory, second.Inventory);
+            Assert.AreEqual(first.InventoryNumber, second.InventoryNumber);
             Assert.AreEqual(first.Barcode, second.Barcode);
             Assert.AreEqual(first.Sigla, second.Sigla);
             Assert.AreEqual(first.DateGivenString, second.DateGivenString);
