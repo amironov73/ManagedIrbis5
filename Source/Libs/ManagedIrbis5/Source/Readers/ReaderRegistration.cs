@@ -14,6 +14,7 @@
 #region Using directives
 
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -30,176 +31,214 @@ using ManagedIrbis.Mapping;
 
 #nullable enable
 
-namespace ManagedIrbis.Readers
+namespace ManagedIrbis.Readers;
+
+/// <summary>
+/// Информация о регистрации/перерегистрации читателя.
+/// </summary>
+[Serializable]
+[XmlRoot ("registration")]
+public sealed class ReaderRegistration
+    : IHandmadeSerializable
 {
+    #region Constants
+
     /// <summary>
-    /// Информация о регистрации/перерегистрации читателя.
+    /// Поле регистрация.
     /// </summary>
-    [XmlRoot("registration")]
-    public sealed class ReaderRegistration
-        : IHandmadeSerializable
+    public const int RegistrationTag = 51;
+
+    /// <summary>
+    /// Поле "перерегистрация".
+    /// </summary>
+    public const int ReregistrationTag = 52;
+
+    /// <summary>
+    /// Коды известных подполей.
+    /// </summary>
+    public const string KnownCodes = "abc";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Дата. Подполе *.
+    /// </summary>
+    [XmlAttribute ("date")]
+    [JsonPropertyName ("date")]
+    [DisplayName ("Дата")]
+    [Description ("Дата в формате ГГГГММДД")]
+    public string? DateString { get; set; }
+
+    /// <summary>
+    /// Дата.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public DateTime Date
     {
-        #region Constants
+        get => IrbisDate.ConvertStringToDate (DateString);
+        set => DateString = IrbisDate.ConvertDateToString (value);
+    }
 
-        /// <summary>
-        /// Поле регистрация.
-        /// </summary>
-        public const int RegistrationTag = 51;
+    /// <summary>
+    /// Место (кафедра обслуживания).
+    /// Подполе c.
+    /// </summary>
+    [SubField ('c')]
+    [XmlAttribute ("chair")]
+    [JsonPropertyName ("chair")]
+    [DisplayName ("Место")]
+    [Description ("Место (кафедра обслуживания)")]
+    public string? Chair { get; set; }
 
-        /// <summary>
-        /// Поле "перерегистрация".
-        /// </summary>
-        public const int ReregistrationTag = 52;
+    /// <summary>
+    /// Номер приказа. Подполе a.
+    /// </summary>
+    [SubField ('a')]
+    [XmlAttribute ("order-number")]
+    [JsonPropertyName ("order-number")]
+    [DisplayName ("Приказ")]
+    [Description ("Номер приказа")]
+    public string? OrderNumber { get; set; }
 
-        #endregion
+    /// <summary>
+    /// Причина. Подполе b.
+    /// </summary>
+    [SubField ('b')]
+    [XmlAttribute ("reason")]
+    [JsonPropertyName ("reason")]
+    [DisplayName ("Причина")]
+    [Description ("Причина")]
+    public string? Reason { get; set; }
 
-        #region Properties
+    /// <summary>
+    /// Ссылка на зарегистрированного читателя.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public ReaderInfo? Reader { get; set; }
 
-        /// <summary>
-        /// Дата. Подполе *.
-        /// </summary>
-        [XmlAttribute("date")]
-        [JsonPropertyName("date")]
-        public string? DateString { get; set; }
+    /// <summary>
+    /// Неизвестные подполя.
+    /// </summary>
+    [XmlElement ("unknown")]
+    [JsonPropertyName ("unknown")]
+    [Browsable (false)]
+    public SubField[]? UnknownSubFields { get; set; }
 
-        /// <summary>
-        /// Дата.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public DateTime Date
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Разбор поля библиографической записи,
+    /// получение информации о регистрации.
+    /// </summary>
+    public static ReaderRegistration Parse
+        (
+            Field field
+        )
+    {
+        Sure.NotNull (field);
+
+        var result = new ReaderRegistration
         {
-            get => IrbisDate.ConvertStringToDate(DateString);
-            set => DateString = IrbisDate.ConvertDateToString(value);
-        }
+            DateString = field.Value,
+            Chair = field.GetFirstSubFieldValue ('c'),
+            OrderNumber = field.GetFirstSubFieldValue ('a'),
+            Reason = field.GetFirstSubFieldValue ('b'),
+            UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes)
+        };
 
-        /// <summary>
-        /// Место (кафедра обслуживания).
-        /// Подполе c.
-        /// </summary>
-        [SubField('c')]
-        [XmlAttribute("chair")]
-        [JsonPropertyName("chair")]
-        public string? Chair { get; set; }
+        return result;
+    }
 
-        /// <summary>
-        /// Номер приказа. Подполе a.
-        /// </summary>
-        [SubField('a')]
-        [XmlAttribute("order-number")]
-        [JsonPropertyName("order-number")]
-        public string? OrderNumber { get; set; }
+    /// <summary>
+    /// Разбор полей библиографической записи с указанной меткой.
+    /// </summary>
+    public static ReaderRegistration[] Parse
+        (
+            Record record,
+            int tag
+        )
+    {
+        Sure.NotNull (record);
+        Sure.Positive (tag);
 
-        /// <summary>
-        /// Причина. Подполе b.
-        /// </summary>
-        [SubField('b')]
-        [XmlAttribute("reason")]
-        [JsonPropertyName("reason")]
-        public string? Reason { get; set; }
+        var result = record.Fields
+            .GetField (tag)
+            .Select (field => Parse (field))
+            .ToArray();
 
-        /// <summary>
-        /// Ссылка на зарегистрированного читателя.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public ReaderInfo? Reader { get; set; }
+        return result;
+    }
 
-        #endregion
+    /// <summary>
+    /// Преобразование регистрации в поле библиографической записи.
+    /// </summary>
+    public Field ToField()
+    {
+        var result = new Field (RegistrationTag, DateString)
+            .AddNonEmpty ('c', Chair)
+            .AddNonEmpty ('a', OrderNumber)
+            .AddNonEmpty ('b', Reason)
+            .AddRange (UnknownSubFields);
 
-        #region Public methods
+        return result;
+    }
 
-        /// <summary>
-        /// Разбор поля.
-        /// </summary>
-        public static ReaderRegistration Parse
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        DateString = reader.ReadNullableString();
+        Chair = reader.ReadNullableString();
+        OrderNumber = reader.ReadNullableString();
+        Reason = reader.ReadNullableString();
+        UnknownSubFields = reader.ReadNullableArray<SubField>();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WriteNullable (DateString);
+        writer.WriteNullable (Chair);
+        writer.WriteNullable (OrderNumber);
+        writer.WriteNullable (Reason);
+        writer.WriteNullableArray (UnknownSubFields);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Utility.JoinNonEmpty
             (
-                Field field
-            )
-        {
-            // TODO Support for unknown subfields
+                " - ",
+                DateString,
+                Chair
+            );
+    }
 
-            var result = new ReaderRegistration
-            {
-                DateString = field.Value,
-                Chair = field.GetFirstSubFieldValue('c'),
-                OrderNumber = field.GetFirstSubFieldValue('a'),
-                Reason = field.GetFirstSubFieldValue('b')
-            };
-
-            return result;
-        } // method Parse
-
-        /// <summary>
-        /// Разбор записи.
-        /// </summary>
-        public static ReaderRegistration[] Parse
-            (
-                Record record,
-                int tag
-            )
-        {
-            var result = record.Fields
-                .GetField(tag)
-                .Select(field => Parse(field))
-                .ToArray();
-
-            return result;
-        } // method Parse
-
-        /// <summary>
-        /// Преобразование в поле.
-        /// </summary>
-        public Field ToField()
-        {
-            var result = new Field (RegistrationTag, DateString)
-                .AddNonEmpty ('c', Chair)
-                .AddNonEmpty ('a', OrderNumber)
-                .AddNonEmpty ('b', Reason);
-
-            return result;
-
-        } // method ToField
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            DateString = reader.ReadNullableString();
-            Chair = reader.ReadNullableString();
-            OrderNumber = reader.ReadNullableString();
-            Reason = reader.ReadNullableString();
-
-        } // method RestoreFromStream
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WriteNullable(DateString);
-            writer.WriteNullable(Chair);
-            writer.WriteNullable(OrderNumber);
-            writer.WriteNullable(Reason);
-
-        } // method SaveToStream
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => $"{DateString.ToVisibleString()} - {Chair.ToVisibleString()}";
-
-        #endregion
-
-    } // class ReaderRegistration
-
-} // namespace ManagedIrbis.Readers
+    #endregion
+}

@@ -50,7 +50,7 @@ namespace ManagedIrbis.Readers
         public const int Tag = 40;
 
         /// <summary>
-        /// Known codes.
+        /// Коды известных подполей.
         /// </summary>
         public const string KnownCodes = "1249abcdefghikluv";
 
