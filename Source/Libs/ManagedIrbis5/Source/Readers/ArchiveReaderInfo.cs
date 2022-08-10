@@ -34,6 +34,7 @@ namespace ManagedIrbis.Readers;
 /// <summary>
 /// Архивная информация о читателе.
 /// </summary>
+[Serializable]
 [XmlRoot ("reader")]
 public sealed class ArchiveReaderInfo
     : IHandmadeSerializable
@@ -41,7 +42,7 @@ public sealed class ArchiveReaderInfo
     #region Properties
 
     /// <summary>
-    /// Identifier for LiteDB.
+    /// Идентификатор LiteDB.
     /// </summary>
     [XmlIgnore]
     [JsonIgnore]

@@ -14,8 +14,8 @@
 
 #region Using directives
 
+using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -33,7 +33,8 @@ namespace ManagedIrbis.Readers;
 /// <summary>
 /// Информация о читателе-задолжнике.
 /// </summary>
-[DebuggerDisplay ("Name")]
+[Serializable]
+[XmlRoot ("debtor")]
 public sealed class DebtorInfo
     : IHandmadeSerializable
 {

@@ -12,9 +12,9 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -38,8 +38,8 @@ namespace ManagedIrbis.Readers;
 /// <summary>
 /// Информация о кафедре обслуживания.
 /// </summary>
+[Serializable]
 [XmlRoot ("chair")]
-[DebuggerDisplay ("{Code} {Title}")]
 public sealed class ChairInfo
     : IHandmadeSerializable,
     IVerifiable

@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable ConvertClosureToMethodGroup
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 
 /* IriProfile.cs -- профиль ИРИ
@@ -16,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -31,256 +31,306 @@ using ManagedIrbis.Mapping;
 
 #nullable enable
 
-namespace ManagedIrbis.Readers
+namespace ManagedIrbis.Readers;
+
+/// <summary>
+/// Профиль ИРИ.
+/// </summary>
+[Serializable]
+[XmlRoot ("iri-profile")]
+public sealed class IriProfile
+    : IHandmadeSerializable,
+    IVerifiable
 {
+    #region Constants
+
     /// <summary>
-    /// Профиль ИРИ
+    /// Тег поля ИРИ.
     /// </summary>
-    [XmlRoot("iri-profile")]
-    [DebuggerDisplay("{Title} {Query}")]
-    public sealed class IriProfile
-        : IHandmadeSerializable
+    public const int Tag = 140;
+
+    /// <summary>
+    /// Известные коды подполей.
+    /// </summary>
+    public const string KnownCodes = "abcdefi";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Статус профиля (активен или нет). Подполе A.
+    /// </summary>
+    [SubField ('a')]
+    [XmlAttribute ("active")]
+    [JsonPropertyName ("active")]
+    [DisplayName ("Статус")]
+    [Description ("Статус профиля (активен или нет)")]
+    public bool Active { get; set; }
+
+    /// <summary>
+    /// Код (порядковый номер). Подполе B.
+    /// </summary>
+    [SubField ('b')]
+    [XmlAttribute ("id")]
+    [JsonPropertyName ("id")]
+    [DisplayName ("Код")]
+    [Description ("Код (порядковый номер) профиля")]
+    public string? ID { get; set; }
+
+    /// <summary>
+    /// Описание профиля на естественном языке. Подполе C.
+    /// </summary>
+    [SubField ('c')]
+    [XmlAttribute ("title")]
+    [JsonPropertyName ("title")]
+    [DisplayName ("Описание")]
+    [Description ("Описание профиля на естественном языке")]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// Запрос на языке ИРБИС. Подполе D.
+    /// </summary>
+    [SubField ('d')]
+    [XmlAttribute ("query")]
+    [JsonPropertyName ("query")]
+    [DisplayName ("Запрос")]
+    [Description ("Запрос на языке ИРБИС")]
+    public string? Query { get; set; }
+
+    /// <summary>
+    /// Периодичность в днях, целое число. Подполе E.
+    /// </summary>
+    [SubField ('e')]
+    [XmlAttribute ("periodicity")]
+    [JsonPropertyName ("periodicity")]
+    [DisplayName ("Периодичность")]
+    [Description ("Периодичность в днях, целое число")]
+    public int Periodicity { get; set; }
+
+    /// <summary>
+    /// Дата последнего обслуживания. Подполе F.
+    /// </summary>
+    [SubField ('f')]
+    [XmlAttribute ("lastServed")]
+    [JsonPropertyName ("lastServed")]
+    [DisplayName ("Дата последнего обслуживания")]
+    [Description ("Дата последнего обслуживания")]
+    public string? LastServed { get; set; }
+
+    /// <summary>
+    /// Список баз данных. Подполе I.
+    /// </summary>
+    [SubField ('i')]
+    [XmlAttribute ("database")]
+    [JsonPropertyName ("database")]
+    [DisplayName ("Базы данных")]
+    [Description ("Список баз данных")]
+    public string? Database { get; set; }
+
+    /// <summary>
+    /// Поле, в котором хранится данный профиль.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public Field? Field { get; set; }
+
+    /// <summary>
+    /// Массив неизвестных подполей.
+    /// </summary>
+    [XmlElement ("unknown")]
+    [JsonPropertyName ("unknown")]
+    [Browsable (false)]
+    public SubField[]? UnknownSubFields { get; set; }
+
+    /// <summary>
+    /// Ссылка на читателя, для которого заведен данный профиль.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public ReaderInfo? Reader { get; set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные,
+    /// ассоциированные с данным профилем.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Разбор поля библиографической записи, получение профиля ИРИ.
+    /// </summary>
+    public static IriProfile ParseField
+        (
+            Field field
+        )
     {
-        #region Constants
+        Sure.NotNull (field);
 
-        /// <summary>
-        /// Тег поля ИРИ.
-        /// </summary>
-        public const int Tag = 140;
-
-        /// <summary>
-        /// Известные коды.
-        /// </summary>
-        public const string KnownCodes = "abcdefi";
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Статус профиля (активен или нет). Подполе A.
-        /// </summary>
-        [SubField('a')]
-        [XmlAttribute("active")]
-        [JsonPropertyName("active")]
-        public bool Active { get; set; }
-
-        /// <summary>
-        /// Код (порядковый номер). Подполе B.
-        /// </summary>
-        [SubField('b')]
-        [XmlAttribute("id")]
-        [JsonPropertyName("id")]
-        // ReSharper disable once InconsistentNaming
-        public string? ID { get; set; }
-
-        /// <summary>
-        /// Описание профиля на естественном языке. Подполе C.
-        /// </summary>
-        [SubField('c')]
-        [XmlAttribute("title")]
-        [JsonPropertyName("title")]
-        public string? Title { get; set; }
-
-        /// <summary>
-        /// Запрос на языке ИРБИС. Подполе D.
-        /// </summary>
-        [SubField('d')]
-        [XmlAttribute("query")]
-        [JsonPropertyName("query")]
-        public string? Query { get; set; }
-
-        /// <summary>
-        /// Периодичность в днях, целое число. Подполе E.
-        /// </summary>
-        [SubField('e')]
-        [XmlAttribute("periodicity")]
-        [JsonPropertyName("periodicity")]
-        public int Periodicity { get; set; }
-
-        /// <summary>
-        /// Дата последнего обслуживания. Подполе F.
-        /// </summary>
-        [SubField('f')]
-        [XmlAttribute("lastServed")]
-        [JsonPropertyName("lastServed")]
-        public string? LastServed { get; set; }
-
-        /// <summary>
-        /// Список баз данных. Подполе I.
-        /// </summary>
-        [SubField('i')]
-        [XmlAttribute("database")]
-        [JsonPropertyName("database")]
-        public string? Database { get; set; }
-
-        /// <summary>
-        /// Поле, в котором хранится профиль.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable(false)]
-        public Field? Field { get; set; }
-
-        /// <summary>
-        /// Unknown subfields.
-        /// </summary>
-        [XmlElement("unknown")]
-        [JsonPropertyName("unknown")]
-        [Browsable(false)]
-        public SubField[]? UnknownSubFields { get; set; }
-
-        /// <summary>
-        /// Ссылка на читателя.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable(false)]
-        public ReaderInfo? Reader { get; set; }
-
-        /// <summary>
-        /// Arbitrary user data.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable(false)]
-        public object? UserData { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Разбор поля.
-        /// </summary>
-        public static IriProfile ParseField
-            (
-                Field field
-            )
+        var active = field.GetFirstSubFieldValue ('a') ?? string.Empty;
+        var result = new IriProfile
         {
-            var result = new IriProfile
-            {
-                Active = field.GetFirstSubFieldValue('a') == "1",
-                ID = field.GetFirstSubFieldValue('b'),
-                Title = field.GetFirstSubFieldValue('c'),
-                Query = field.GetFirstSubFieldValue('d'),
-                Periodicity = field.GetFirstSubFieldValue('e').SafeToInt32(),
-                LastServed = field.GetFirstSubFieldValue('f'),
-                Database = field.GetFirstSubFieldValue('i'),
-                UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
-                Field = field
-            };
+            Active = Utility.ToBoolean (active),
+            ID = field.GetFirstSubFieldValue ('b'),
+            Title = field.GetFirstSubFieldValue ('c'),
+            Query = field.GetFirstSubFieldValue ('d'),
+            Periodicity = field.GetFirstSubFieldValue ('e').SafeToInt32(),
+            LastServed = field.GetFirstSubFieldValue ('f'),
+            Database = field.GetFirstSubFieldValue ('i'),
+            UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
+            Field = field
+        };
 
-            return result;
+        return result;
+    }
+
+    /// <summary>
+    /// Преобразование профиля ИРИ в поле библиографической записи.
+    /// </summary>
+    public Field ToField()
+    {
+        var result = new Field (Tag)
+            .Add ('a', Active)
+            .AddNonEmpty ('b', ID)
+            .AddNonEmpty ('c', Title)
+            .AddNonEmpty ('d', Query)
+            .AddNonEmpty ('e', Periodicity.ToInvariantString())
+            .AddNonEmpty ('f', LastServed)
+            .AddNonEmpty ('i', Database)
+            .AddRange (UnknownSubFields);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Разбор библиографической записи, получение массива профилей ИРИ.
+    /// </summary>
+    public static IriProfile[] ParseRecord
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var result = new List<IriProfile>();
+        foreach (var field in record.Fields.GetField (Tag))
+        {
+            var profile = ParseField (field);
+            result.Add (profile);
         }
 
-        /// <summary>
-        /// Конверсия обратно в поле.
-        /// </summary>
-        public Field ToField()
-        {
-            var result = new Field (Tag)
-                .Add ('a', Active)
-                .AddNonEmpty ('b', ID)
-                .AddNonEmpty ('c', Title)
-                .AddNonEmpty ('d', Query)
-                .AddNonEmpty ('e', Periodicity.ToInvariantString())
-                .AddNonEmpty ('f', LastServed)
-                .AddNonEmpty ('i', Database)
-                .AddRange (UnknownSubFields);
+        return result.ToArray();
+    }
 
-            return result;
+    /// <summary>
+    /// Считывание массива профилей ИРИ из указанного файла.
+    /// </summary>
+    public static IriProfile[] LoadFromFile
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
 
-        } // method ToField
+        var result = SerializationUtility
+            .RestoreArrayFromFile<IriProfile> (fileName)
+            .ThrowIfNull();
 
-        /// <summary>
-        /// Разбор записи.
-        /// </summary>
-        public static IriProfile[] ParseRecord
-            (
-                Record record
-            )
-        {
-            var result = new List<IriProfile>();
-            foreach (var field in record.Fields.GetField(Tag))
-            {
-                var profile = ParseField(field);
-                result.Add(profile);
-            }
+        return result;
+    }
 
-            return result.ToArray();
-        }
+    /// <summary>
+    /// Сохранение массива профилей ИРИ в файл.
+    /// </summary>
+    public static void SaveToFile
+        (
+            string fileName,
+            IriProfile[] profiles
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+        Sure.NotNull (profiles);
 
+        profiles.SaveToFile (fileName);
+    }
 
-        /// <summary>
-        /// Считывание из файла.
-        /// </summary>
-        public static IriProfile[] LoadFromFile
-            (
-                string fileName
-            )
-        {
-            var result = SerializationUtility
-                .RestoreArrayFromFile<IriProfile>
-                    (
-                        fileName
-                    )
-                .ThrowIfNull("RestoreArrayFromFile");
+    #endregion
 
-            return result;
-        }
+    #region IHandmadeSerializable
 
-        /// <summary>
-        /// Сохранение в файл.
-        /// </summary>
-        public static void SaveToFile
-            (
-                string fileName,
-                IriProfile[] profiles
-            )
-        {
-            profiles.SaveToFile(fileName);
-        } // method SaveToFile
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
 
-        #endregion
+        Active = reader.ReadBoolean();
+        ID = reader.ReadNullableString();
+        Title = reader.ReadNullableString();
+        Query = reader.ReadNullableString();
+        Periodicity = reader.ReadPackedInt32();
+        LastServed = reader.ReadNullableString();
+        Database = reader.ReadNullableString();
+        UnknownSubFields = reader.ReadNullableArray<SubField>();
+    }
 
-        #region IHandmadeSerializable
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Active = reader.ReadBoolean();
-            ID = reader.ReadNullableString();
-            Title = reader.ReadNullableString();
-            Query = reader.ReadNullableString();
-            Periodicity = reader.ReadPackedInt32();
-            LastServed = reader.ReadNullableString();
-            Database = reader.ReadNullableString();
-            UnknownSubFields = reader.ReadNullableArray<SubField>();
-        } // method RestoreFromStream
+        writer.Write (Active);
+        writer.WriteNullable (ID);
+        writer.WriteNullable (Title);
+        writer.WriteNullable (Query);
+        writer.WritePackedInt32 (Periodicity);
+        writer.WriteNullable (LastServed);
+        writer.WriteNullable (Database);
+        writer.WriteNullableArray (UnknownSubFields);
+    }
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.Write(Active);
-            writer.WriteNullable(ID);
-            writer.WriteNullable(Title);
-            writer.WriteNullable(Query);
-            writer.WritePackedInt32(Periodicity);
-            writer.WriteNullable(LastServed);
-            writer.WriteNullable(Database);
-            writer.WriteNullableArray(UnknownSubFields);
-        } // method SaveToStream
+    #endregion
 
-        #endregion
+    #region IVerifiable members
 
-    } // class IriProfile
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<IriProfile> (this, throwOnError);
 
-} // namespace ManagedIrbis.Readers
+        verifier
+            .NotNullNorEmpty (Query);
 
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return string.IsNullOrEmpty (Title)
+            ? Query.ToVisibleString()
+            : $"{Title}: {Query}";
+    }
+
+    #endregion
+}

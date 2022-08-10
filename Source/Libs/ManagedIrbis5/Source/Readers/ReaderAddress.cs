@@ -12,15 +12,14 @@
 
 #region Using directives
 
+using System;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
-using AM.Linq;
 using AM.Runtime;
 
 using ManagedIrbis.Mapping;
@@ -29,128 +28,152 @@ using ManagedIrbis.Mapping;
 
 #nullable enable
 
-namespace ManagedIrbis.Readers
+namespace ManagedIrbis.Readers;
+
+/// <summary>
+/// Адрес читателя: поле 13 в базе RDR.
+/// </summary>
+[Serializable]
+[XmlRoot ("address")]
+public sealed class ReaderAddress
+    : IHandmadeSerializable,
+    IVerifiable
 {
+    #region Constants
+
     /// <summary>
-    /// Адрес читателя: поле 13 в базе RDR.
+    /// Метка поля.
     /// </summary>
-    [XmlRoot("address")]
-    public sealed class ReaderAddress
-        : IHandmadeSerializable,
-        IVerifiable
+    public const int Tag = 13;
+
+    /// <summary>
+    /// Известные коды подполей.
+    /// </summary>
+    public const string KnownCodes = "abcdefgh";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Почтовый индекс. Подполе A.
+    /// </summary>
+    [SubField ('a')]
+    [XmlAttribute ("postcode")]
+    [JsonPropertyName ("postcode")]
+    [DisplayName ("Индекс")]
+    [Description ("Почтовый индекс")]
+    public string? Postcode { get; set; }
+
+    /// <summary>
+    /// Страна/республика. Подполе B.
+    /// </summary>
+    [SubField ('b')]
+    [XmlAttribute ("country")]
+    [JsonPropertyName ("country")]
+    [DisplayName ("Страна")]
+    [Description ("Страна или республика")]
+    public string? Country { get; set; }
+
+    /// <summary>
+    /// Город. Подполе C.
+    /// </summary>
+    [SubField ('c')]
+    [XmlAttribute ("city")]
+    [JsonPropertyName ("city")]
+    [DisplayName ("Город")]
+    [Description ("Город")]
+    public string? City { get; set; }
+
+    /// <summary>
+    /// Улица. Подполе D.
+    /// </summary>
+    [SubField ('d')]
+    [XmlAttribute ("street")]
+    [JsonPropertyName ("street")]
+    [DisplayName ("Улица")]
+    [Description ("Улица")]
+    public string? Street { get; set; }
+
+    /// <summary>
+    /// Номер дома. Подполе E.
+    /// </summary>
+    [SubField ('e')]
+    [XmlAttribute ("building")]
+    [JsonPropertyName ("building")]
+    [DisplayName ("Дом")]
+    [Description ("Номер дома")]
+    public string? Building { get; set; }
+
+    /// <summary>
+    /// Номер подъезда. Подполе G.
+    /// </summary>
+    [SubField ('g')]
+    [XmlAttribute ("entrance")]
+    [JsonPropertyName ("entrance")]
+    [DisplayName ("Подъезд")]
+    [Description ("Номер подъезда")]
+    public string? Entrance { get; set; }
+
+    /// <summary>
+    /// Номер квартиры. Подполе H.
+    /// </summary>
+    [SubField ('h')]
+    [XmlAttribute ("apartment")]
+    [JsonPropertyName ("apartment")]
+    [DisplayName ("Квартира")]
+    [Description ("Номер квартиры")]
+    public string? Apartment { get; set; }
+
+    /// <summary>
+    /// Дополнительные данные. Подполе F.
+    /// </summary>
+    [SubField ('f')]
+    [XmlAttribute ("additionalData")]
+    [JsonPropertyName ("additionalData")]
+    [DisplayName ("Дополнительно")]
+    [Description ("Дополнительные данные")]
+    public string? AdditionalData { get; set; }
+
+    /// <summary>
+    /// Поле, в котором хранится адрес.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public Field? Field { get; set; }
+
+    /// <summary>
+    /// Массив неизвестных подполей.
+    /// </summary>
+    [XmlElement ("unknown")]
+    [JsonPropertyName ("unknown")]
+    [Browsable (false)]
+    public SubField[]? UnknownSubFields { get; set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Применение адреса к указанному полю библиографической записи.
+    /// </summary>
+    public Field ApplyToField
+        (
+            Field field
+        )
     {
-        #region Constants
+        Sure.NotNull (field);
 
-        /// <summary>
-        /// Тег поля.
-        /// </summary>
-        public const int Tag = 13;
-
-        /// <summary>
-        /// Known subfield codes.
-        /// </summary>
-        public const string KnownCodes = "abcdefgh";
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Почтовый индекс. Подполе A.
-        /// </summary>
-        [SubField('a')]
-        [XmlAttribute("postcode")]
-        [JsonPropertyName("postcode")]
-        public string? Postcode { get; set; }
-
-        /// <summary>
-        /// Страна/республика. Подполе B.
-        /// </summary>
-        [SubField('b')]
-        [XmlAttribute("country")]
-        [JsonPropertyName("country")]
-        public string? Country { get; set; }
-
-        /// <summary>
-        /// Город. Подполе C.
-        /// </summary>
-        [SubField('c')]
-        [XmlAttribute("city")]
-        [JsonPropertyName("city")]
-        public string? City { get; set; }
-
-        /// <summary>
-        /// Улица. Подполе D.
-        /// </summary>
-        [SubField('d')]
-        [XmlAttribute("street")]
-        [JsonPropertyName("street")]
-        public string? Street { get; set; }
-
-        /// <summary>
-        /// Номер дома. Подполе E.
-        /// </summary>
-        [SubField('e')]
-        [XmlAttribute("building")]
-        [JsonPropertyName("building")]
-        public string? Building { get; set; }
-
-        /// <summary>
-        /// Номер подъезда. Подполе G.
-        /// </summary>
-        [SubField('g')]
-        [XmlAttribute("entrance")]
-        [JsonPropertyName("entrance")]
-        public string? Entrance { get; set; }
-
-        /// <summary>
-        /// Номер квартиры. Подполе H.
-        /// </summary>
-        [SubField('h')]
-        [XmlAttribute("apartment")]
-        [JsonPropertyName("apartment")]
-        public string? Apartment { get; set; }
-
-        /// <summary>
-        /// Дополнительные данные. Подполе F.
-        /// </summary>
-        [SubField('f')]
-        [XmlAttribute("additionalData")]
-        [JsonPropertyName("additionalData")]
-        public string? AdditionalData { get; set; }
-
-        /// <summary>
-        /// Поле, в котором хранится адрес.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable(false)]
-        public Field? Field { get; set; }
-
-        /// <summary>
-        /// Unknown subfields.
-        /// </summary>
-        [XmlElement("unknown")]
-        [JsonPropertyName("unknown")]
-        [Browsable(false)]
-        public SubField[]? UnknownSubFields { get; set; }
-
-        /// <summary>
-        /// Arbitrary user data.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable(false)]
-        public object? UserData { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Apply to the field.
-        /// </summary>
-        public Field ApplyToField (Field field) => field
+        return field
             .SetSubFieldValue ('a', Postcode)
             .SetSubFieldValue ('b', Country)
             .SetSubFieldValue ('c', City)
@@ -159,165 +182,159 @@ namespace ManagedIrbis.Readers
             .SetSubFieldValue ('g', Entrance)
             .SetSubFieldValue ('h', Apartment)
             .SetSubFieldValue ('f', AdditionalData);
+    }
 
-        /// <summary>
-        /// Разбор поля 13.
-        /// </summary>
-        public static ReaderAddress? Parse
-            (
-                Field? field
-            )
+    /// <summary>
+    /// Разбор указанного поля библиографической записи.
+    /// </summary>
+    public static ReaderAddress? Parse
+        (
+            Field? field
+        )
+    {
+        if (field is null)
         {
-            if (field is null)
-            {
-                return null;
-            }
-
-            return new ReaderAddress
-            {
-                Postcode = field.GetFirstSubFieldValue('A'),
-                Country = field.GetFirstSubFieldValue('B'),
-                City = field.GetFirstSubFieldValue('C'),
-                Street = field.GetFirstSubFieldValue('D'),
-                Building = field.GetFirstSubFieldValue('E'),
-                Entrance = field.GetFirstSubFieldValue('G'),
-                Apartment = field.GetFirstSubFieldValue('H'),
-                AdditionalData = field.GetFirstSubFieldValue('F'),
-                UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
-                Field = field
-            };
-        } // method Parse
-
-        /// <summary>
-        /// Разбор поля 13.
-        /// </summary>
-        public static ReaderAddress? Parse
-            (
-                Record record,
-                int tag = Tag
-            )
-        {
-            var field = record.Fields.GetFirstField(tag);
-
-            return field is null
-                ? null
-                : Parse(field);
-        } // method Parse
-
-        /// <summary>
-        /// Преобразование обратно в поле.
-        /// </summary>
-        public Field ToField()
-        {
-            var result = new Field (Tag)
-                .AddNonEmpty ('a', Postcode)
-                .AddNonEmpty ('b', Country)
-                .AddNonEmpty ('c', City)
-                .AddNonEmpty ('d', Street)
-                .AddNonEmpty ('e', Building)
-                .AddNonEmpty ('g', Entrance)
-                .AddNonEmpty ('h', Apartment)
-                .AddNonEmpty ('f', AdditionalData)
-                .AddRange (UnknownSubFields);
-
-            return result;
-
-        } // method ToField
-
-        #endregion
-
-        #region IHandmadeSerializable
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Postcode = reader.ReadNullableString();
-            Country = reader.ReadNullableString();
-            City = reader.ReadNullableString();
-            Street = reader.ReadNullableString();
-            Building = reader.ReadNullableString();
-            Entrance = reader.ReadNullableString();
-            Apartment = reader.ReadNullableString();
-            AdditionalData = reader.ReadNullableString();
-        } // method RestoreFromStream
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WriteNullable(Postcode);
-            writer.WriteNullable(Country);
-            writer.WriteNullable(City);
-            writer.WriteNullable(Street);
-            writer.WriteNullable(Building);
-            writer.WriteNullable(Entrance);
-            writer.WriteNullable(Apartment);
-            writer.WriteNullable(AdditionalData);
-        } // method SaveToStream
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify(bool throwOnError)
-        {
-            var verifier
-                = new Verifier<ReaderAddress>(this, throwOnError);
-
-            var haveAnyNonNull = new []
-                {
-                    Postcode,
-                    Country,
-                    City,
-                    Street,
-                    Building,
-                    Entrance,
-                    Apartment,
-                    AdditionalData
-                }
-                .NonNullItems()
-                .Count() != 0;
-
-            verifier.Assert(haveAnyNonNull, "address is empty");
-
-            return verifier.Result;
-        } // method Verify
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var list = new[]
-                {
-                    Postcode,
-                    Country,
-                    City,
-                    Street,
-                    Building,
-                    Entrance,
-                    Apartment,
-                    AdditionalData
-                }
-                .NonNullItems();
-
-            return string.Join
-                (
-                    ", ",
-                    list
-                );
+            return null;
         }
 
-        #endregion
+        return new ReaderAddress
+        {
+            Postcode = field.GetFirstSubFieldValue ('A'),
+            Country = field.GetFirstSubFieldValue ('B'),
+            City = field.GetFirstSubFieldValue ('C'),
+            Street = field.GetFirstSubFieldValue ('D'),
+            Building = field.GetFirstSubFieldValue ('E'),
+            Entrance = field.GetFirstSubFieldValue ('G'),
+            Apartment = field.GetFirstSubFieldValue ('H'),
+            AdditionalData = field.GetFirstSubFieldValue ('F'),
+            UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
+            Field = field
+        };
+    }
 
-    } // class ReaderAddress
+    /// <summary>
+    /// Разбор поля с указанной меткой (как правило, 13)
+    /// из библиографической записи.
+    /// </summary>
+    public static ReaderAddress? Parse
+        (
+            Record record,
+            int tag = Tag
+        )
+    {
+        Sure.NotNull (record);
+        Sure.Positive (tag);
 
-} // namespace ManagedIrbis.Readers
+        var field = record.Fields.GetFirstField (tag);
+
+        return field is null
+            ? null
+            : Parse (field);
+    }
+
+    /// <summary>
+    /// Преобразование адреса в поле библиографической записи.
+    /// </summary>
+    public Field ToField()
+    {
+        var result = new Field (Tag)
+            .AddNonEmpty ('a', Postcode)
+            .AddNonEmpty ('b', Country)
+            .AddNonEmpty ('c', City)
+            .AddNonEmpty ('d', Street)
+            .AddNonEmpty ('e', Building)
+            .AddNonEmpty ('g', Entrance)
+            .AddNonEmpty ('h', Apartment)
+            .AddNonEmpty ('f', AdditionalData)
+            .AddRange (UnknownSubFields);
+
+        return result;
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        Postcode = reader.ReadNullableString();
+        Country = reader.ReadNullableString();
+        City = reader.ReadNullableString();
+        Street = reader.ReadNullableString();
+        Building = reader.ReadNullableString();
+        Entrance = reader.ReadNullableString();
+        Apartment = reader.ReadNullableString();
+        AdditionalData = reader.ReadNullableString();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WriteNullable (Postcode);
+        writer.WriteNullable (Country);
+        writer.WriteNullable (City);
+        writer.WriteNullable (Street);
+        writer.WriteNullable (Building);
+        writer.WriteNullable (Entrance);
+        writer.WriteNullable (Apartment);
+        writer.WriteNullable (AdditionalData);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify (bool throwOnError)
+    {
+        var verifier = new Verifier<ReaderAddress> (this, throwOnError);
+
+        verifier.AnyNotNullNorEmpty
+            (
+                Postcode,
+                Country,
+                City,
+                Street,
+                Building,
+                Entrance,
+                Apartment,
+                AdditionalData
+            );
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Utility.JoinNonEmpty
+            (
+                ", ",
+                Postcode,
+                Country,
+                City,
+                Street,
+                Building,
+                Entrance,
+                Apartment,
+                AdditionalData
+            );
+    }
+
+    #endregion
+}

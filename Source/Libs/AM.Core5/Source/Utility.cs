@@ -4811,36 +4811,17 @@ public static class Utility
 
             text = text.ToLowerInvariant();
 
-            if (text == "false"
-                || text == "0"
-                || text == "no"
-                || text == "n"
-                || text == "off"
-                || text == "negative"
-                || text == "neg"
-                || text == "disabled"
-                || text == "incorrect"
-                || text == "wrong"
-                || text == "нет"
-               )
+            switch (text)
             {
-                return false;
-            }
+                case "false" or "0" or "no" or "n" or "off"
+                    or "negative" or "neg" or "disabled" or "incorrect"
+                    or "wrong" or "нет":
+                    return false;
 
-            if (text == "true"
-                || text == "1"
-                || text == "yes"
-                || text == "y"
-                || text == "on"
-                || text == "positiva"
-                || text == "pos"
-                || text == "enabled"
-                || text == "correct"
-                || text == "right"
-                || text == "да"
-               )
-            {
-                return true;
+                case "true" or "1" or "yes" or "y" or "on"
+                    or "positiva" or "pos" or "enabled" or "correct"
+                    or "right" or "да":
+                    return true;
             }
         }
 
