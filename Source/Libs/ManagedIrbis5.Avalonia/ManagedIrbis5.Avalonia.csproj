@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RootNamespace>ManagedIrbis.Avalonia</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>Avalonia UI support for ManagedIrbis</Description>
+    <Title>Avalonia support for ManagedIrbis</Title>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\ManagedIrbis5.Avalonia.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\ManagedIrbis5.Avalonia.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+    <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
+    <ProjectReference Include="..\AM.Avalonia\AM.Avalonia.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.10.15" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.15" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.15" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.15" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.13" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.13.3" />
+    <PackageReference Include="Avalonia.Xaml.Interactions" Version="0.10.13.3" />
+    <PackageReference Include="Avalonia.Xaml.Interactivity" Version="0.10.13.3" />
+    <PackageReference Include="ReactiveUI" Version="18.0.10" />
+    <PackageReference Include="DynamicData" Version="7.6.7" />
+    <PackageReference Include="DynamicData.ReactiveUI" Version="6.11.0.2613" />
+    <PackageReference Include="GridExtra.Avalonia" Version="0.9.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="ReactiveHistory" Version="0.10.7" />
+    <PackageReference Include="SkiaSharp" Version="2.88.1-preview.1" />
+    <PackageReference Include="XamlColorSchemeGenerator" Version="3.0.0.31" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Source\FieldEditorWindow.axaml.cs">
+      <DependentUpon>FieldEditorWindow.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

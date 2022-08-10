@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="400" Height="300"
+        x:Class="ManagedIrbis.Avalonia.FieldEditorWindow"
+        Title="Field editor">
+  <Grid
+      RowDefinitions="*, Auto"
+      >
+
+      <DataGrid Name="FieldGrid"
+                Grid.Column="0"
+                Grid.Row="0"
+                CanUserReorderColumns="False"
+                CanUserSortColumns="False"
+                AutoGenerateColumns="False">
+
+          <DataGrid.Columns>
+              <DataGridTextColumn
+                  Header="Поле"
+                  Binding="{Binding Title}"
+                  Width="*"
+                  IsReadOnly="True">
+              </DataGridTextColumn>
+
+              <DataGridTextColumn
+                  Header="Значение"
+                  Binding="{Binding Data}"
+                  Width="*"
+              />
+          </DataGrid.Columns>
+      </DataGrid>
+
+      <StackPanel
+          Grid.Column="0"
+          Grid.Row="1"
+          Orientation="Horizontal"
+          HorizontalAlignment="Stretch"
+          Spacing="5"
+          Margin="5"
+          >
+
+          <Label
+              Name="HintBox"
+              HorizontalAlignment="Stretch"
+              >
+
+          </Label>
+
+      </StackPanel>
+
+  </Grid>
+</Window>
