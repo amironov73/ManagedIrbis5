@@ -20,7 +20,7 @@ using AM.Reflection;
 
 #nullable enable
 
-namespace ManagedIrbis.Workspace;
+namespace ManagedIrbis.Client;
 
 /// <summary>
 /// Коды операций для оперативных режимов.
@@ -90,7 +90,7 @@ public static class OperativeCommandCode
     /// Эмуляция режима "Номера".
     /// </summary>
     [Description ("Список номеров")]
-    public const string ShowRegisteredMagazines = "101";
+    public const string ListIssues = "101";
 
     /// <summary>
     /// Эмуляция режима "Формирование подшивки".
@@ -114,7 +114,7 @@ public static class OperativeCommandCode
     /// Эмуляция режима "Другие номера".
     /// </summary>
     [Description ("Список других номеров")]
-    public const string ShowOtherIssues = "105";
+    public const string ListOtherIssues = "105";
 
     /// <summary>
     /// Эмуляция режима "Новая статья".
@@ -132,13 +132,13 @@ public static class OperativeCommandCode
     /// Эмуляция режима "Источник"
     /// </summary>
     [Description ("Переход к источнику")]
-    public const string GotoSourceIssue = "108";
+    public const string GotoSource = "108";
 
     /// <summary>
     /// Эмуляция режима "Другие статьи".
     /// </summary>
     [Description ("Другие статьи")]
-    public const string ShowOtherArticles = "109";
+    public const string ListOtherArticles = "109";
 
     #endregion
 

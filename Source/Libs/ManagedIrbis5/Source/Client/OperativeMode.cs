@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Text.Json.Serialization;
@@ -29,7 +30,21 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.Workspace;
+namespace ManagedIrbis.Client;
+
+//
+// При работе с определенными видами документов предлагаются специальные
+// оперативные (ситуативные) режимы, которые упрощают переходы между
+// связанными документами. Такие режимы реализуются с помощью кнопок,
+// которые автоматически появляются на «всплывающих» формах.
+//
+// Оперативные режимы предлагаются для следующих видов документов:
+//
+// * Сводные описания периодических изданий;
+// * Описания отдельных номеров периодических изданий;
+// * Аналитические описания статей;
+// * Описания сборников с расписанным содержанием.
+//
 
 /// <summary>
 /// <para>Оперативный режим.</para>
@@ -151,6 +166,64 @@ public sealed class OperativeMode
 
     #endregion
 
+    #region Public methods
+
+    /// <summary>
+    /// Чтение одного оперативного режима из потока.
+    /// </summary>
+    public static OperativeMode? Parse
+        (
+            TextReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        var result = new OperativeMode
+        {
+            Kind = reader.ReadLine(),
+            Title = reader.ReadLine(),
+            Hint = reader.ReadLine(),
+            Icon = reader.ReadLine(),
+            CommandCode = reader.ReadLine(),
+            CommandParameters = reader.ReadLine(),
+            SuccessMessage = reader.ReadLine(),
+            Reserved = reader.ReadLine()
+        };
+
+        return result.Verify (false) ? null : result;
+    }
+
+    /// <summary>
+    /// Разбор текстового представления оперативного режима.
+    /// </summary>
+    public static OperativeMode[]? Parse
+        (
+            string text
+        )
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return null;
+        }
+
+        var result = new List<OperativeMode>();
+        var reader = new StringReader (text);
+        while (true)
+        {
+            var mode = Parse (reader);
+            if (mode is null)
+            {
+                break;
+            }
+
+            result.Add (mode);
+        }
+
+        return result.ToArray();
+    }
+
+    #endregion
+
     #region IHandmadeSerializable members
 
     /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
@@ -203,11 +276,8 @@ public sealed class OperativeMode
         var verifier = new Verifier<OperativeMode> (this, throwOnError);
 
         verifier
-            .AnyNotNullNorEmpty
-                (
-                    Title,
-                    CommandCode
-                );
+            .NotNull (Kind)
+            .NotNull (CommandCode);
 
         return verifier.Result;
     }
@@ -219,7 +289,7 @@ public sealed class OperativeMode
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return (Title ?? CommandCode).ToVisibleString();
+        return Utility.JoinNonEmpty (" | ", Kind, Title, CommandCode);
     }
 
     #endregion

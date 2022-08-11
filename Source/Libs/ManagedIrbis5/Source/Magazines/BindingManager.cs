@@ -85,7 +85,7 @@ public sealed class BindingManager
         Sure.NotNull (host);
         Sure.NotNull (provider);
 
-        _logger = LoggingUtility.GetLogger (host, typeof (BindingManager));
+        _logger = LoggingUtility.GetLogger (host.Services, typeof (BindingManager));
         Provider = provider;
         BindingConfiguration = bindingConfiguration ?? BindingConfiguration.GetDefault();
         RecordConfiguration = recordConfiguration ?? RecordConfiguration.GetDefault();

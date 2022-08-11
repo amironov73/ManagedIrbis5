@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable TemplateIsNotCompileTimeConstantProblem
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -17,7 +18,6 @@ using System;
 using System.Diagnostics;
 
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -76,15 +76,15 @@ public static class LoggingUtility
     /// </summary>
     public static ILogger GetLogger
         (
-            IHost host,
+            IServiceProvider serviceProvider,
             Type type
         )
     {
-        Sure.NotNull (host);
+        Sure.NotNull (serviceProvider);
         Sure.NotNull (type);
 
         ILogger result = NullLogger.Instance;
-        var factory = host.Services.GetService<ILoggerFactory>();
+        var factory = serviceProvider.GetService<ILoggerFactory>();
         if (factory is not null)
         {
             result = factory.CreateLogger (type);

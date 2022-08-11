@@ -67,7 +67,7 @@ public sealed class PazkSpecFixer
         Sure.NotNull (host);
 
         Host = host;
-        Logger = LoggingUtility.GetLogger (host, typeof (PazkSpecFixer));
+        Logger = LoggingUtility.GetLogger (host.Services, typeof (PazkSpecFixer));
         Configuration = configuration ?? RecordConfiguration.GetDefault();
     }
 

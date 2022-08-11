@@ -87,7 +87,7 @@ public sealed class MagazineManager
         Sure.NotNull (host);
         Sure.NotNull (connection);
 
-        _logger = LoggingUtility.GetLogger (host, typeof (BindingManager));
+        _logger = LoggingUtility.GetLogger (host.Services, typeof (BindingManager));
         var options = new MemoryCacheOptions();
         _cache = new MemoryCache (options);
         Connection = connection;

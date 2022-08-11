@@ -87,7 +87,7 @@ public sealed class HardFormat
         Sure.NotNull (provider);
 
         AreaSeparator = string.Empty;
-        _logger = LoggingUtility.GetLogger (host, typeof (HardFormat));
+        _logger = LoggingUtility.GetLogger (host.Services, typeof (HardFormat));
 
         var services = host.Services;
         _configuration = configuration
