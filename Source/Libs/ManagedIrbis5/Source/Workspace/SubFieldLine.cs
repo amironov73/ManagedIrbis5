@@ -9,7 +9,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* SubFieldLine.cs -- одна строчка в редакторе подполей (только данные).
+/* SubFieldLine.cs -- одна строчка в редакторе подполей (только данные)
  * Ars Magna project, http://arsmagna.ru
  */
 
