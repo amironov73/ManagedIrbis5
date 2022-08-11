@@ -125,7 +125,7 @@ public sealed class CompactRecord
     {
         get => null;
         set { }
-    } // property Database
+    }
 
     /// <inheritdoc cref="IRecord.Mfn"/>
     public int Mfn
@@ -161,8 +161,11 @@ public sealed class CompactRecord
     /// <inheritdoc cref="IRecord.Encode(ManagedIrbis.Direct.MstRecord64)"/>
     public void Encode (MstRecord64 record) => throw new NotImplementedException();
 
-    /// <inheritdoc cref="IRecord.FM"/>
+    /// <inheritdoc cref="IRecord.FM(int)"/>
     public string FM (int tag) => throw new NotImplementedException();
+
+    /// <inheritdoc cref="IRecord.FM(int,char)" />
+    public string? FM (int tag, char code) => throw new NotImplementedException();
 
     #endregion
 

@@ -74,4 +74,10 @@ public interface IRecord
     /// <param name="tag">Метка поля.</param>
     /// <returns>Значение поля или <c>null</c>.</returns>
     string? FM (int tag);
+
+    /// <summary>
+    /// Текст первого подполя с указанными меткой и кодом.
+    /// </summary>
+    string? FM (int tag, char code);
+
 }

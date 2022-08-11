@@ -226,6 +226,32 @@ public sealed class RawRecord
         return null;
     }
 
+    /// <inheritdoc cref="IRecord.FM(int,char)"/>
+    public string? FM
+        (
+            int tag,
+            char code
+        )
+    {
+        Sure.Positive (tag);
+
+        Span<char> tagText = stackalloc char[10];
+        tagText = tagText[..FastNumber.Int32ToChars (tag, tagText)];
+        foreach (var field in Fields)
+        {
+            var navigator = new ValueTextNavigator (field);
+            var opening = navigator.ReadUntil ('#');
+            if (Utility.CompareSpans (tagText, opening) == 0)
+            {
+                return field;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        return null;
+    }
+
     /// <summary>
     /// Parse MFN, status and version of the record
     /// </summary>

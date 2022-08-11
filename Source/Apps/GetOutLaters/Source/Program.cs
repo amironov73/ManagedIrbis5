@@ -135,7 +135,7 @@ internal sealed class Program
         }
         finally
         {
-            StringBuilderPool.Shared.Return (builder);
+            builder.DismissShared();
         }
 
         if (modified)

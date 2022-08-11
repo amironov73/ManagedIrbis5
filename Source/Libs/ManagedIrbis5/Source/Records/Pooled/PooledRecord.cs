@@ -192,6 +192,37 @@ public sealed class PooledRecord
         return null;
     }
 
+    /// <inheritdoc cref="IRecord.FM(int,char)"/>
+    public string? FM
+        (
+            int tag,
+            char code
+        )
+    {
+        Sure.Positive (tag);
+
+        foreach (var field in Fields)
+        {
+            if (field.Tag == tag)
+            {
+                if (code == SubField.NoCode)
+                {
+                    return field.Subfields.FirstOrDefault()?.Value;
+                }
+
+                foreach (var subfield in field.Subfields)
+                {
+                    if (subfield.Code.SameChar (code))
+                    {
+                        return subfield.Value;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     #endregion
 
     #region Public methods

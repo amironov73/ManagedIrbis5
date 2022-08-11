@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* BiblioUtility.cs --
+/* BiblioUtility.cs -- полезные методы, применяемые при построении библиографического указателя
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,99 +23,95 @@ using AM.Text;
 
 #nullable enable
 
-namespace ManagedIrbis.Biblio
+namespace ManagedIrbis.Biblio;
+
+/// <summary>
+/// Полезные методы, применяемые при построении библиографического указателя.
+/// </summary>
+public static class BiblioUtility
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public static class BiblioUtility
+    #region Private members
+
+    private static readonly char[] _delimiters = { '.', '!', '?', ')', ':', '}' };
+
+    private static readonly Regex _commandRegex = new (@"\\[a-z]\d+$");
+
+    private static void _AddDot
+        (
+            StringBuilder builder,
+            string? line
+        )
     {
-        #region Private members
-
-        private static readonly char[] _delimiters = { '.', '!', '?', ')', ':', '}' };
-
-        private static readonly Regex _commandRegex = new (@"\\[a-z]\d+$");
-
-        private static void _AddDot
-            (
-                StringBuilder builder,
-                string? line
-            )
+        if (!string.IsNullOrEmpty (line))
         {
+            line = line.TrimEnd();
+            builder.Append (line);
             if (!string.IsNullOrEmpty (line))
             {
-                line = line.TrimEnd();
-                builder.Append (line);
-                if (!string.IsNullOrEmpty (line))
+                var lastChar = line.LastChar();
+                if (!lastChar.IsOneOf (_delimiters)
+                    && !_commandRegex.IsMatch (line))
                 {
-                    var lastChar = line.LastChar();
-                    if (!lastChar.IsOneOf (_delimiters)
-                        && !_commandRegex.IsMatch (line))
-                    {
-                        builder.Append ('.');
-                    }
+                    builder.Append ('.');
                 }
             }
         }
+    }
 
-        #endregion
+    #endregion
 
-        #region Public methods
+    #region Public methods
 
-        /// <summary>
-        /// Add trailing dot to every line in the text.
-        /// </summary>
-        public static string AddTrailingDot
-            (
-                string text
-            )
+    /// <summary>
+    /// Add trailing dot to every line in the text.
+    /// </summary>
+    public static string AddTrailingDot
+        (
+            string text
+        )
+    {
+        Sure.NotNull (text);
+
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (text.Length + 10);
+        var navigator = new TextNavigator (text);
+        string? line;
+        while (!navigator.IsEOF)
         {
-            Sure.NotNull (text);
-
-            var builder = StringBuilderPool.Shared.Get();
-            builder.EnsureCapacity (text.Length + 10);
-            var navigator = new TextNavigator (text);
-            string? line;
-            while (!navigator.IsEOF)
+            line = navigator.ReadTo ("\\par").ToString();
+            if (string.IsNullOrEmpty (line))
             {
-                line = navigator.ReadTo ("\\par").ToString();
-                if (string.IsNullOrEmpty (line))
-                {
-                    break;
-                }
-
-                var recent = navigator.RecentText (4).ToString();
-                var par = false;
-                if (recent == "\\par")
-                {
-                    if (navigator.PeekChar() == 'd')
-                    {
-                        builder.Append (line);
-                        builder.Append ("\\par");
-                        builder.Append (navigator.ReadChar());
-                        continue;
-                    }
-
-                    par = true;
-                }
-
-                _AddDot (builder, line);
-
-                if (par)
-                {
-                    builder.Append ("\\par");
-                }
+                break;
             }
 
-            line = navigator.GetRemainingText().ToString();
+            var recent = navigator.RecentText (4).ToString();
+            var par = false;
+            if (recent == "\\par")
+            {
+                if (navigator.PeekChar() == 'd')
+                {
+                    builder.Append (line);
+                    builder.Append ("\\par");
+                    builder.Append (navigator.ReadChar());
+                    continue;
+                }
+
+                par = true;
+            }
+
             _AddDot (builder, line);
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-
-            return result;
+            if (par)
+            {
+                builder.Append ("\\par");
+            }
         }
 
-        #endregion
+        line = navigator.GetRemainingText().ToString();
+        _AddDot (builder, line);
+
+        return builder.ReturnShared();
     }
+
+    #endregion
 }
