@@ -7,13 +7,15 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* MemoryEx.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+
+using AM.Text;
 
 #endregion
 
@@ -28,7 +30,10 @@ internal static class MemoryEx
     public static int IndexOf (this ReadOnlySpan<char> @this, char value, int startIndex)
     {
         var result = @this.Slice (startIndex).IndexOf (value);
-        if (result >= 0) result += startIndex;
+        if (result >= 0)
+        {
+            result += startIndex;
+        }
 
         return result;
     }
@@ -36,7 +41,10 @@ internal static class MemoryEx
     public static int IndexOfAny (this ReadOnlySpan<char> @this, char value0, char value1, int startIndex)
     {
         var result = @this.Slice (startIndex).IndexOfAny (value0, value1);
-        if (result >= 0) result += startIndex;
+        if (result >= 0)
+        {
+            result += startIndex;
+        }
 
         return result;
     }
@@ -45,7 +53,9 @@ internal static class MemoryEx
     {
         for (var searchLocation = 0; searchLocation < @this.Length; searchLocation++)
             if (chars.Contains (@this[searchLocation]))
+            {
                 return searchLocation;
+            }
 
         return -1;
     }
@@ -83,7 +93,10 @@ internal static class MemoryEx
     public static bool StartsWith (this ReadOnlySpan<char> @this, string value, StringComparison comparison)
     {
 #if DEBUG
-        if (value == null) throw new ArgumentNullException (nameof (value));
+        if (value == null)
+        {
+            throw new ArgumentNullException (nameof (value));
+        }
 #endif
         return @this.StartsWith (value.AsSpan(), comparison);
     }
@@ -109,7 +122,10 @@ internal static class MemoryEx
             partLength = commaIndex - startIndex;
             if (partLength > 0)
             {
-                if (!partHandler (@this.Slice (startIndex, partLength), partIndex)) return false;
+                if (!partHandler (@this.Slice (startIndex, partLength), partIndex))
+                {
+                    return false;
+                }
 
                 partIndex++;
             }
@@ -132,8 +148,12 @@ internal static class MemoryEx
         {
             partLength = commaIndex - startIndex;
             if (partLength > 0)
+            {
                 if (!partHandler (@this.Slice (startIndex, partLength), partIndex++))
+                {
                     return false;
+                }
+            }
 
             startIndex = commaIndex + 1;
         }
@@ -151,28 +171,42 @@ internal static class MemoryEx
     public static string Without (this ReadOnlySpan<char> @this, char value)
     {
         var removeIndex = @this.IndexOf (value);
-        if (removeIndex < 0) return @this.ToString();
+        if (removeIndex < 0)
+        {
+            return @this.ToString();
+        }
 
-        if (removeIndex == @this.Length - 1) return @this.Slice (0, removeIndex).ToString();
+        if (removeIndex == @this.Length - 1)
+        {
+            return @this.Slice (0, removeIndex).ToString();
+        }
 
-        var builder = StringBuilderPool.Get (@this.Length - 1);
+        var builder = AM.Text.StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (@this.Length - 1);
         builder.Append (@this.Slice (0, removeIndex));
 
         for (var i = removeIndex; i < @this.Length; i++)
         {
             ref readonly var c = ref @this[i];
-            if (value != c) builder.Append (c);
+            if (value != c)
+            {
+                builder.Append (c);
+            }
         }
 
-        return StringBuilderPool.GetStringAndReturn (builder);
+        return builder.ReturnShared();
     }
 
     public static ReadOnlySpan<char> Replace (this ReadOnlySpan<char> @this, char oldChar, char newChar)
     {
         var replaceIndex = @this.IndexOf (oldChar);
-        if (replaceIndex < 0) return @this;
+        if (replaceIndex < 0)
+        {
+            return @this;
+        }
 
-        var builder = StringBuilderPool.Get (@this.Length);
+        var builder = AM.Text.StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (@this.Length);
         builder.Append (@this.Slice (0, replaceIndex));
         builder.Append (newChar);
         for (var i = replaceIndex + 1; i < @this.Length; i++)
@@ -181,13 +215,16 @@ internal static class MemoryEx
             builder.Append (c == oldChar ? newChar : c);
         }
 
-        return StringBuilderPool.GetStringAndReturn (builder).AsSpan();
+        return builder.ReturnShared().AsSpan();
     }
 
     public static ReadOnlySpan<char> Replace (this ReadOnlySpan<char> @this, string oldText, string newText)
     {
         var replaceIndex = @this.IndexOf (oldText.AsSpan());
-        if (replaceIndex < 0) return @this;
+        if (replaceIndex < 0)
+        {
+            return @this;
+        }
 
         // TODO: use replaceIndex to optimize
 
@@ -196,7 +233,10 @@ internal static class MemoryEx
 
     public static ReadOnlySpan<char> Reversed (this ReadOnlySpan<char> @this)
     {
-        if (@this.Length <= 1) return @this;
+        if (@this.Length <= 1)
+        {
+            return @this;
+        }
 
         var chars = new char[@this.Length];
         var lastIndex = @this.Length - 1;
@@ -208,7 +248,10 @@ internal static class MemoryEx
     public static ReadOnlySpan<char> Limit (this ReadOnlySpan<char> @this, int maxLength)
     {
 #if DEBUG
-        if (maxLength < 0) throw new ArgumentOutOfRangeException (nameof (maxLength));
+        if (maxLength < 0)
+        {
+            throw new ArgumentOutOfRangeException (nameof (maxLength));
+        }
 #endif
         return @this.Length > maxLength ? @this.Slice (0, maxLength) : @this;
     }
@@ -216,15 +259,26 @@ internal static class MemoryEx
     public static string ConcatString (this ReadOnlySpan<char> @this, string value)
     {
 #if DEBUG
-        if (value == null) throw new ArgumentNullException (nameof (value));
+        if (value == null)
+        {
+            throw new ArgumentNullException (nameof (value));
+        }
 #endif
-        if (@this.IsEmpty) return value;
-        if (value.Length == 0) return @this.ToString();
+        if (@this.IsEmpty)
+        {
+            return value;
+        }
 
-        var builder = StringBuilderPool.Get (@this.Length + value.Length);
+        if (value.Length == 0)
+        {
+            return @this.ToString();
+        }
+
+        var builder = AM.Text.StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (@this.Length + value.Length);
         builder.Append (@this);
         builder.Append (value);
-        return StringBuilderPool.GetStringAndReturn (builder);
+        return builder.ReturnShared();
     }
 
     public static string ConcatString (this ReadOnlySpan<char> @this, char value)

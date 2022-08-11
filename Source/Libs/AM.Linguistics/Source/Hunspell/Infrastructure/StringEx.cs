@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* StringEx.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,6 +15,8 @@
 
 using System;
 using System.Buffers;
+
+using AM.Text;
 
 #if !NO_INLINE
 using System.Runtime.CompilerServices;
@@ -36,7 +38,10 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         public static bool StartsWith (this string @this, char character)
         {
 #if DEBUG
-            if (@this == null) throw new ArgumentNullException (nameof (@this));
+            if (@this == null)
+            {
+                throw new ArgumentNullException (nameof (@this));
+            }
 #endif
             return @this.Length != 0 && @this[0] == character;
         }
@@ -47,7 +52,10 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         public static bool EndsWith (this string @this, char character)
         {
 #if DEBUG
-            if (@this == null) throw new ArgumentNullException (nameof (@this));
+            if (@this == null)
+            {
+                throw new ArgumentNullException (nameof (@this));
+            }
 #endif
             return @this.Length != 0 && @this[@this.Length - 1] == character;
         }
@@ -58,7 +66,10 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         public static string[] SplitOnTabOrSpace (this string @this)
         {
 #if DEBUG
-            if (@this == null) throw new ArgumentNullException (nameof (@this));
+            if (@this == null)
+            {
+                throw new ArgumentNullException (nameof (@this));
+            }
 #endif
             return @this.Split (SpaceOrTab, StringSplitOptions.RemoveEmptyEntries);
         }
@@ -70,7 +81,10 @@ namespace AM.Linguistics.Hunspell.Infrastructure
 
         public static string GetReversed (this string @this)
         {
-            if (@this == null || @this.Length <= 1) return @this;
+            if (@this == null || @this.Length <= 1)
+            {
+                return @this;
+            }
 
             using (var mo = MemoryPool<char>.Shared.Rent (@this.Length))
             {
@@ -89,10 +103,11 @@ namespace AM.Linguistics.Hunspell.Infrastructure
 
         public static string Replace (this string @this, int index, int removeCount, string replacement)
         {
-            var builder = StringBuilderPool.Get (@this,
-                Math.Max (@this.Length, @this.Length + replacement.Length - removeCount));
+            var capacity = Math.Max (@this.Length, @this.Length + replacement.Length - removeCount);
+            var builder = AM.Text.StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (capacity);
             builder.Replace (index, removeCount, replacement);
-            return StringBuilderPool.GetStringAndReturn (builder);
+            return builder.ReturnShared();
         }
 
 #if !NO_INLINE
@@ -101,7 +116,10 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         public static char GetCharOrTerminator (this string @this, int index)
         {
 #if DEBUG
-            if (index < 0) throw new ArgumentOutOfRangeException (nameof (index));
+            if (index < 0)
+            {
+                throw new ArgumentOutOfRangeException (nameof (index));
+            }
 #endif
             return index < @this.Length ? @this[index] : '\0';
         }
@@ -120,23 +138,27 @@ namespace AM.Linguistics.Hunspell.Infrastructure
             string str3, int startIndex3)
         {
             var count3 = str3.Length - startIndex3;
-            var builder = StringBuilderPool.Get (count0 + str1.Length + 1 + count3);
+            var capacity = count0 + str1.Length + 1 + count3;
+            var builder = AM.Text.StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (capacity);
             builder.Append (str0, startIndex0, count0);
             builder.Append (str1);
             builder.Append (char2);
             builder.Append (str3, startIndex3, count3);
-            return StringBuilderPool.GetStringAndReturn (builder);
+            return builder.ReturnShared();
         }
 
         public static string ConcatString (string str0, int startIndex0, int count0, string str1, string str2,
             int startIndex2)
         {
             var count2 = str2.Length - startIndex2;
-            var builder = StringBuilderPool.Get (count0 + str1.Length + count2);
+            var capacity = count0 + str1.Length + count2;
+            var builder = AM.Text.StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (capacity);
             builder.Append (str0, startIndex0, count0);
             builder.Append (str1);
             builder.Append (str2, startIndex2, count2);
-            return StringBuilderPool.GetStringAndReturn (builder);
+            return builder.ReturnShared();
         }
 
         public static string ConcatString (string str0, int startIndex0, int count0, char char1, string str2,
@@ -148,15 +170,27 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         public static string ConcatString (this string @this, ReadOnlySpan<char> value)
         {
 #if DEBUG
-            if (@this == null) throw new ArgumentNullException (nameof (@this));
+            if (@this == null)
+            {
+                throw new ArgumentNullException (nameof (@this));
+            }
 #endif
-            if (@this.Length == 0) return value.ToString();
-            if (value.IsEmpty) return @this;
+            if (@this.Length == 0)
+            {
+                return value.ToString();
+            }
 
-            var builder = StringBuilderPool.Get (@this.Length + value.Length);
+            if (value.IsEmpty)
+            {
+                return @this;
+            }
+
+            var capacity = @this.Length + value.Length;
+            var builder = AM.Text.StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (capacity);
             builder.Append (@this);
             builder.Append (value);
-            return StringBuilderPool.GetStringAndReturn (builder);
+            return builder.ReturnShared();
         }
 
 #if !NO_INLINE
@@ -167,19 +201,38 @@ namespace AM.Linguistics.Hunspell.Infrastructure
         public static string WithoutIndex (this string @this, int index)
         {
 #if DEBUG
-            if (@this == null) throw new ArgumentNullException (nameof (@this));
-            if (index < 0) throw new ArgumentOutOfRangeException (nameof (index));
-            if (index >= @this.Length) throw new ArgumentOutOfRangeException (nameof (index));
+            if (@this == null)
+            {
+                throw new ArgumentNullException (nameof (@this));
+            }
+
+            if (index < 0)
+            {
+                throw new ArgumentOutOfRangeException (nameof (index));
+            }
+
+            if (index >= @this.Length)
+            {
+                throw new ArgumentOutOfRangeException (nameof (index));
+            }
 #endif
 
-            if (index == 0) return @this.Substring (1);
-            var lastIndex = @this.Length - 1;
-            if (index == lastIndex) return @this.Substring (0, lastIndex);
+            if (index == 0)
+            {
+                return @this.Substring (1);
+            }
 
-            var builder = StringBuilderPool.Get (lastIndex);
+            var lastIndex = @this.Length - 1;
+            if (index == lastIndex)
+            {
+                return @this.Substring (0, lastIndex);
+            }
+
+            var builder = AM.Text.StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (lastIndex);
             builder.Append (@this, 0, index);
             builder.Append (@this, index + 1, lastIndex - index);
-            return StringBuilderPool.GetStringAndReturn (builder);
+            return builder.ReturnShared();
         }
     }
 }

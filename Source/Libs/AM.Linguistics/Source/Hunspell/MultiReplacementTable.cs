@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using AM.Linguistics.Hunspell.Infrastructure;
+using AM.Text;
 
 #if !NO_INLINE
 using System.Runtime.CompilerServices;
@@ -81,7 +82,10 @@ namespace AM.Linguistics.Hunspell
         internal bool TryConvert (string text, out string converted)
         {
 #if DEBUG
-            if (text == null) throw new ArgumentNullException (nameof (text));
+            if (text == null)
+            {
+                throw new ArgumentNullException (nameof (text));
+            }
 #endif
 
             var appliedConversion = false;
@@ -92,7 +96,8 @@ namespace AM.Linguistics.Hunspell
             }
             else
             {
-                var convertedBuilder = StringBuilderPool.Get (text.Length);
+                var convertedBuilder = AM.Text.StringBuilderPool.Shared.Get();
+                convertedBuilder.EnsureCapacity (text.Length);
 
                 for (var i = 0; i < text.Length; i++)
                 {
@@ -112,7 +117,7 @@ namespace AM.Linguistics.Hunspell
                     convertedBuilder.Append (text[i]);
                 }
 
-                converted = StringBuilderPool.GetStringAndReturn (convertedBuilder);
+                converted = convertedBuilder.ReturnShared();
             }
 
             return appliedConversion;
@@ -124,11 +129,15 @@ namespace AM.Linguistics.Hunspell
         /// <param name="text">The text to find a matching input conversion for.</param>
         /// <returns>The best matching input conversion.</returns>
         /// <seealso cref="MultiReplacementEntry"/>
-        internal MultiReplacementEntry FindLargestMatchingConversion (ReadOnlySpan<char> text)
+        internal MultiReplacementEntry? FindLargestMatchingConversion (ReadOnlySpan<char> text)
         {
             for (var searchLength = text.Length; searchLength > 0; searchLength--)
+            {
                 if (replacements.TryGetValue (text.Slice (0, searchLength).ToString(), out var entry))
+                {
                     return entry;
+                }
+            }
 
             return null;
         }

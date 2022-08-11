@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* WordList.QuerySuggest.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -532,7 +532,8 @@ public partial class WordList
             if (word.Length < 5) return wlst.Count;
 
             var state = 0;
-            var builder = StringBuilderPool.Get (word.Length);
+            var builder = AM.Text.StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (word.Length);
             for (var i = 2; i < word.Length; i++)
                 if (word[i] == word[i - 2])
                 {
@@ -551,7 +552,7 @@ public partial class WordList
                     state = 0;
                 }
 
-            StringBuilderPool.Return (builder);
+            AM.Text.StringBuilderPool.DismissShared (builder);
 
             return wlst.Count;
         }
@@ -564,7 +565,8 @@ public partial class WordList
             var tryString = Affix.TryString;
             if (string.IsNullOrEmpty (tryString)) return wlst.Count;
 
-            var candidate = StringBuilderPool.Get (word);
+            var candidate = AM.Text.StringBuilderPool.Shared.Get();
+            candidate.Append (word);
 
             var timer = OperationTimeLimiter.Create (TimeLimitMs, MinTimer);
 
@@ -583,7 +585,7 @@ public partial class WordList
                 if (timer.QueryCounter == 0) return wlst.Count;
             }
 
-            StringBuilderPool.Return (candidate);
+            AM.Text.StringBuilderPool.DismissShared (candidate);
 
             return wlst.Count;
         }
@@ -1132,7 +1134,8 @@ public partial class WordList
             // mangle original word three differnt ways
             // and score them to generate a minimum acceptable score
             var thresh = 0;
-            var mw = StringBuilderPool.Get (word.Length);
+            var mw = AM.Text.StringBuilderPool.Shared.Get();
+            mw.EnsureCapacity (word.Length);
             for (var sp = 1; sp < 4; sp++)
             {
                 mw.Clear();
@@ -1143,7 +1146,7 @@ public partial class WordList
                 thresh += NGram (word.Length, word, mw.ToString(), NGramOptions.AnyMismatch | NGramOptions.Lowering);
             }
 
-            StringBuilderPool.Return (mw);
+            AM.Text.StringBuilderPool.DismissShared (mw);
 
             thresh = thresh / 3 - 1;
 

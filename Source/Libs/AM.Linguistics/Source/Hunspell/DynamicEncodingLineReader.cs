@@ -46,9 +46,15 @@ namespace AM.Linguistics.Hunspell
 
 #if DEBUG
             var max = 0;
-            foreach (var e in PreambleEncodings) max = Math.Max (max, e.GetPreamble().Length);
+            foreach (var e in PreambleEncodings)
+            {
+                max = Math.Max (max, e.GetPreamble().Length);
+            }
 
-            if (max != MaxPreambleLengthInBytes) throw new InvalidOperationException();
+            if (max != MaxPreambleLengthInBytes)
+            {
+                throw new InvalidOperationException();
+            }
 #endif
         }
 
@@ -67,59 +73,82 @@ namespace AM.Linguistics.Hunspell
         private int maxSingleCharResultsCount;
 
         private readonly int bufferMaxSize = 4096;
-        private char[] charBuffer = null;
-        private int charBufferUsedSize = 0;
-        private byte[] buffer = null;
-        private int byteBufferUsedSize = 0;
+        private char[]? charBuffer;
+        private int charBufferUsedSize;
+        private byte[]? buffer;
+        private int byteBufferUsedSize;
         private int bufferIndex = -1;
-        private bool hasCheckedForPreamble = false;
+        private bool hasCheckedForPreamble;
 
         public Encoding CurrentEncoding { get; private set; }
 
-        public static List<string> ReadLines (string filePath, Encoding defaultEncoding)
+        public static List<string> ReadLines
+            (
+                string filePath,
+                Encoding? defaultEncoding
+            )
         {
-            if (filePath == null) throw new ArgumentNullException (nameof (filePath));
+            Sure.NotNull (filePath);
 
-            using (var stream = FileStreamEx.OpenReadFileStream (filePath))
-            using (var reader = new DynamicEncodingLineReader (stream, defaultEncoding ?? Encoding.UTF8))
-            {
-                return reader.ReadLines().ToList();
-            }
+            using var stream = FileStreamEx.OpenReadFileStream (filePath);
+            using var reader = new DynamicEncodingLineReader (stream, defaultEncoding ?? Encoding.UTF8);
+
+            return reader.ReadLines().ToList();
         }
 
-        public static async Task<IEnumerable<string>> ReadLinesAsync (string filePath, Encoding defaultEncoding)
+        public static async Task<IEnumerable<string>> ReadLinesAsync
+            (
+                string filePath,
+                Encoding? defaultEncoding
+            )
         {
-            if (filePath == null) throw new ArgumentNullException (nameof (filePath));
+            Sure.NotNull (filePath);
 
-            using (var stream = FileStreamEx.OpenAsyncReadFileStream (filePath))
-            using (var reader = new DynamicEncodingLineReader (stream, defaultEncoding ?? Encoding.UTF8))
-            {
-                return await reader.ReadLinesAsync().ConfigureAwait (false);
-            }
+            using var stream = FileStreamEx.OpenAsyncReadFileStream (filePath);
+            using var reader = new DynamicEncodingLineReader (stream, defaultEncoding ?? Encoding.UTF8);
+
+            return await reader.ReadLinesAsync().ConfigureAwait (false);
         }
 
-        public string ReadLine()
+        public string? ReadLine()
         {
-            if (!hasCheckedForPreamble) ReadPreamble();
+            if (!hasCheckedForPreamble)
+            {
+                ReadPreamble();
+            }
 
             var builder = StringBuilderPool.Get();
             while (ReadNextChars())
+            {
                 if (ProcessCharsForLine (builder))
+                {
                     break;
+                }
+            }
 
-            if (charBuffer == null && builder.Length == 0) return null;
+            if (charBuffer == null && builder.Length == 0)
+            {
+                return null;
+            }
 
             return ProcessLine (StringBuilderPool.GetStringAndReturn (builder));
         }
 
         public async Task<string> ReadLineAsync()
         {
-            if (!hasCheckedForPreamble) await ReadPreambleAsync().ConfigureAwait (false);
+            if (!hasCheckedForPreamble)
+            {
+                await ReadPreambleAsync().ConfigureAwait (false);
+            }
 
             var builder = StringBuilderPool.Get();
             while (await ReadNextCharsAsync().ConfigureAwait (false))
+            {
                 if (ProcessCharsForLine (builder))
+                {
                     break;
+                }
+            }
 
             if (charBuffer == null && builder.Length == 0)
             {
@@ -170,13 +199,18 @@ namespace AM.Linguistics.Hunspell
         private bool ReadNextChars()
         {
             if (charBuffer == null || charBuffer.Length < maxSingleCharResultsCount)
+            {
                 charBuffer = new char[maxSingleCharResultsCount];
+            }
 
             var bytesConsumed = 0;
             while (bytesConsumed < maxSingleCharBytes)
             {
                 var nextByte = ReadByte();
-                if (nextByte < 0) break;
+                if (nextByte < 0)
+                {
+                    break;
+                }
 
                 bytesConsumed++;
 
@@ -196,13 +230,18 @@ namespace AM.Linguistics.Hunspell
         private async Task<bool> ReadNextCharsAsync()
         {
             if (charBuffer == null || charBuffer.Length < maxSingleCharResultsCount)
+            {
                 charBuffer = new char[maxSingleCharResultsCount];
+            }
 
             var bytesConsumed = 0;
             while (bytesConsumed < maxSingleCharBytes)
             {
                 var nextByte = await ReadByteAsync().ConfigureAwait (false);
-                if (nextByte < 0) break;
+                if (nextByte < 0)
+                {
+                    break;
+                }
 
                 bytesConsumed++;
 
@@ -249,15 +288,21 @@ namespace AM.Linguistics.Hunspell
             return HandlePreambleBytes (await ReadBytesAsync (MaxPreambleLengthInBytes).ConfigureAwait (false));
         }
 
-        private bool HandlePreambleBytes (byte[] possiblePreambleBytes)
+        private bool HandlePreambleBytes (byte[]? possiblePreambleBytes)
         {
-            if (possiblePreambleBytes == null || possiblePreambleBytes.Length == 0) return false;
+            if (possiblePreambleBytes == null || possiblePreambleBytes.Length == 0)
+            {
+                return false;
+            }
 
             int? bytesToRestore = null;
             foreach (var candidateEncoding in PreambleEncodings)
             {
                 var encodingPreamble = candidateEncoding.GetPreamble();
-                if (encodingPreamble == null || encodingPreamble.Length == 0) continue;
+                if (encodingPreamble == null || encodingPreamble.Length == 0)
+                {
+                    continue;
+                }
 
                 if (
                         possiblePreambleBytes.Length >= encodingPreamble.Length
@@ -280,12 +325,15 @@ namespace AM.Linguistics.Hunspell
 
         private int ReadByte()
         {
-            if (!PrepareBuffer()) return -1;
+            if (!PrepareBuffer())
+            {
+                return -1;
+            }
 
             return HandleReadByteIncrement();
         }
 
-        private byte[] ReadBytes (int count)
+        private byte[]? ReadBytes (int count)
         {
             var result = new byte[count];
             var resultOffset = 0;
@@ -293,7 +341,10 @@ namespace AM.Linguistics.Hunspell
 
             while (bytesNeeded > 0)
             {
-                if (!PrepareBuffer()) return null;
+                if (!PrepareBuffer())
+                {
+                    return null;
+                }
 
                 HandleReadBytesIncrement (result, ref bytesNeeded, ref resultOffset);
             }
@@ -304,12 +355,15 @@ namespace AM.Linguistics.Hunspell
 
         private async Task<int> ReadByteAsync()
         {
-            if (!await PrepareBufferAsync().ConfigureAwait (false)) return -1;
+            if (!await PrepareBufferAsync().ConfigureAwait (false))
+            {
+                return -1;
+            }
 
             return HandleReadByteIncrement();
         }
 
-        private async Task<byte[]> ReadBytesAsync (int count)
+        private async Task<byte[]?> ReadBytesAsync (int count)
         {
             var result = new byte[count];
             var resultOffset = 0;
@@ -317,7 +371,10 @@ namespace AM.Linguistics.Hunspell
 
             while (bytesNeeded > 0)
             {
-                if (!await PrepareBufferAsync().ConfigureAwait (false)) return null;
+                if (!await PrepareBufferAsync().ConfigureAwait (false))
+                {
+                    return null;
+                }
 
                 HandleReadBytesIncrement (result, ref bytesNeeded, ref resultOffset);
             }
@@ -329,9 +386,13 @@ namespace AM.Linguistics.Hunspell
         {
             var result = buffer[bufferIndex];
             if (1 >= byteBufferUsedSize - bufferIndex)
+            {
                 bufferIndex = byteBufferUsedSize;
+            }
             else
+            {
                 bufferIndex++;
+            }
 
             return result;
         }
@@ -358,8 +419,13 @@ namespace AM.Linguistics.Hunspell
         private bool PrepareBuffer()
         {
             if (buffer == null)
+            {
                 buffer = new byte[bufferMaxSize];
-            else if (bufferIndex < byteBufferUsedSize) return true;
+            }
+            else if (bufferIndex < byteBufferUsedSize)
+            {
+                return true;
+            }
 
             bufferIndex = 0;
             byteBufferUsedSize = stream.Read (buffer, 0, buffer.Length);
@@ -369,8 +435,13 @@ namespace AM.Linguistics.Hunspell
         private async Task<bool> PrepareBufferAsync()
         {
             if (buffer == null)
+            {
                 buffer = new byte[bufferMaxSize];
-            else if (bufferIndex < byteBufferUsedSize) return true;
+            }
+            else if (bufferIndex < byteBufferUsedSize)
+            {
+                return true;
+            }
 
             bufferIndex = 0;
             byteBufferUsedSize = await stream.ReadAsync (buffer, 0, buffer.Length).ConfigureAwait (false);
@@ -379,12 +450,21 @@ namespace AM.Linguistics.Hunspell
 
         private void RevertReadBytes (int count)
         {
-            if (count == 0) return;
+            if (count == 0)
+            {
+                return;
+            }
 
-            if (buffer == null) throw new InvalidOperationException();
+            if (buffer == null)
+            {
+                throw new InvalidOperationException();
+            }
 
             var revertedIndex = bufferIndex - count;
-            if (revertedIndex < 0 || revertedIndex >= byteBufferUsedSize) throw new InvalidOperationException();
+            if (revertedIndex < 0 || revertedIndex >= byteBufferUsedSize)
+            {
+                throw new InvalidOperationException();
+            }
 
             bufferIndex = revertedIndex;
         }
@@ -404,13 +484,18 @@ namespace AM.Linguistics.Hunspell
             var startIndex = 0;
             for (; startIndex < line.Length && line[startIndex].IsTabOrSpace(); startIndex++) ;
 
-            if (startIndex == line.Length) return; // empty or whitespace
+            if (startIndex == line.Length)
+            {
+                return; // empty or whitespace
+            }
 
             if (line.Length - startIndex < 5
                 || line[startIndex] != 'S'
                 || line[++startIndex] != 'E'
                 || line[++startIndex] != 'T')
+            {
                 return; // not a set command
+            }
 
             startIndex++;
 
@@ -433,7 +518,10 @@ namespace AM.Linguistics.Hunspell
         private void ChangeEncoding (Encoding newEncoding)
         {
             if (CurrentEncoding != null && (newEncoding == null || ReferenceEquals (newEncoding, CurrentEncoding) ||
-                                            CurrentEncoding.Equals (newEncoding))) return;
+                                            CurrentEncoding.Equals (newEncoding)))
+            {
+                return;
+            }
 
             decoder = newEncoding.GetDecoder();
             CurrentEncoding = newEncoding;

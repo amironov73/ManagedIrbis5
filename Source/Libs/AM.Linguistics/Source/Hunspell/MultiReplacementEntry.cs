@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* .cs --
+/* MultiReplacementEntry.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,11 @@ using AM.Linguistics.Hunspell.Infrastructure;
 
 namespace AM.Linguistics.Hunspell;
 
-public sealed class MultiReplacementEntry : ReplacementEntry
+/// <summary>
+///
+/// </summary>
+public sealed class MultiReplacementEntry
+    : ReplacementEntry
 {
     public MultiReplacementEntry (string pattern)
         : base (pattern)
@@ -106,10 +110,17 @@ public sealed class MultiReplacementEntry : ReplacementEntry
 
 internal static class MultiReplacementEntryExtensions
 {
-    public static bool AddReplacementEntry (this Dictionary<string, MultiReplacementEntry> list, string pattern1,
-        string pattern2)
+    public static bool AddReplacementEntry
+        (
+            this Dictionary<string, MultiReplacementEntry> list,
+            string pattern1,
+            string? pattern2
+        )
     {
-        if (string.IsNullOrEmpty (pattern1) || pattern2 == null) return false;
+        if (string.IsNullOrEmpty (pattern1) || pattern2 == null)
+        {
+            return false;
+        }
 
         var pattern1Builder = StringBuilderPool.Get (pattern1);
         ReplacementValueType type;
@@ -148,11 +159,15 @@ internal static class MultiReplacementEntryExtensions
 
         // find existing entry
         if (list.TryGetValue (pattern1, out var entry))
+        {
             entry.Set (type, pattern2);
+        }
         else
 
             // make a new entry if none exists
+        {
             entry = new MultiReplacementEntry (pattern1, type, pattern2);
+        }
 
         list[pattern1] = entry;
 
