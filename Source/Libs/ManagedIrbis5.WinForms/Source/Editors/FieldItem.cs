@@ -6,33 +6,31 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 
-/* FieldItem.cs -- содержимое редактируемого поля.
+/* FieldItem.cs -- содержимое редактируемого поля
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Editors
+namespace ManagedIrbis.WinForms.Editors;
+
+/// <summary>
+/// Содержимое редактируемого поля библиографической записи
+/// для <see cref="SimplestMarcEditor"/>.
+/// </summary>
+internal sealed class FieldItem
 {
+    #region Properties
+
     /// <summary>
-    /// Содержимое редактируемого поля для <see cref="SimplestMarcEditor"/>.
+    /// Метка поля.
     /// </summary>
-    sealed class FieldItem
-    {
-        #region Properties
+    public int Tag { get; set; }
 
-        /// <summary>
-        /// Метка поля.
-        /// </summary>
-        public int Tag { get; set; }
+    /// <summary>
+    /// Значение поля.
+    /// </summary>
+    public string? Text { get; set; }
 
-        /// <summary>
-        /// Значение поля.
-        /// </summary>
-        public string? Text { get; set; }
-
-        #endregion
-
-    } // class FieldItem
-
-} // namespace ManagedIrbis.WinForms.Editors
+    #endregion
+}

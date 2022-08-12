@@ -23,107 +23,106 @@ using ManagedIrbis.Menus;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Editors
+namespace ManagedIrbis.WinForms.Editors;
+
+/// <summary>
+/// Форма для отображения меню (MNU-файла).
+/// </summary>
+public sealed partial class MenuForm
+    : Form
 {
+    #region Properties
+
     /// <summary>
-    /// Форма для отображения меню (MNU-файла).
+    /// Текущий элемент меню.
     /// </summary>
-    public partial class MenuForm
-        : Form
+    public MenuEntry? CurrentEntry => (MenuEntry?)_grid.CurrentRow?.Data;
+
+    /// <summary>
+    /// Элементы меню.
+    /// </summary>
+    public MenuEntry[] Entries { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public MenuForm()
     {
-        #region Properties
+        InitializeComponent();
 
-        /// <summary>
-        /// Current menu entry.
-        /// </summary>
-        public MenuEntry? CurrentEntry => (MenuEntry?) _grid.CurrentRow?.Data;
+        Entries = Array.Empty<MenuEntry>();
+        _grid.Focus();
+        _grid.DoubleClick += _grid_DoubleClick;
+        _grid.PreviewKeyDown += _grid_PreviewKeyDown;
+    }
 
-        /// <summary>
-        /// Entries
-        /// </summary>
-        public MenuEntry[] Entries { get; private set; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Construction
+    /// <summary>
+    /// Заполнение грида меню.
+    /// </summary>
+    public void SetEntries
+        (
+            MenuEntry[] entries
+        )
+    {
+        Entries = entries;
+        _grid.Load (entries);
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public MenuForm()
+    /// <summary>
+    /// Выбор значения.
+    /// </summary>
+    public static MenuEntry? SelectEntry
+        (
+            MenuEntry[] entries,
+            MenuEntry? current = default,
+            IWin32Window? owner = default
+        )
+    {
+        // TODO: установить первоначальную выбранную строку
+
+        using var form = new MenuForm();
+        form.SetEntries (entries);
+        if (form.ShowDialog (owner) == DialogResult.OK)
         {
-            InitializeComponent();
-
-            Entries = Array.Empty<MenuEntry>();
-            _grid.Focus();
-            _grid.DoubleClick += _grid_DoubleClick;
-            _grid.PreviewKeyDown += _grid_PreviewKeyDown;
+            return form.CurrentEntry;
         }
 
-        #endregion
+        return default;
+    }
 
-        #region Public methods
+    #endregion
 
-        /// <summary>
-        /// Заполнение грида меню.
-        /// </summary>
-        public void SetEntries
-            (
-                MenuEntry[] entries
-            )
+    #region Private members
+
+    private void _grid_DoubleClick
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        DialogResult = DialogResult.OK;
+    }
+
+    private void _grid_PreviewKeyDown
+        (
+            object? sender,
+            PreviewKeyDownEventArgs e
+        )
+    {
+        if (e.KeyCode == Keys.Enter)
         {
-            Entries = entries;
-            _grid.Load(entries);
-        }
-
-        /// <summary>
-        /// Выбор значения.
-        /// </summary>
-        public static MenuEntry? SelectEntry
-            (
-                MenuEntry[] entries,
-                MenuEntry? current = default,
-                IWin32Window? owner = default
-            )
-        {
-            // TODO: установить первоначальную выбранную строку
-
-            using var form = new MenuForm();
-            form.SetEntries(entries);
-            if (form.ShowDialog(owner) == DialogResult.OK)
-            {
-                return form.CurrentEntry;
-            }
-
-            return default;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private void _grid_DoubleClick
-            (
-                object? sender,
-                EventArgs e
-            )
-        {
+            e.IsInputKey = false;
             DialogResult = DialogResult.OK;
         }
-
-        private void _grid_PreviewKeyDown
-            (
-                object? sender,
-                PreviewKeyDownEventArgs e
-            )
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                e.IsInputKey = false;
-                DialogResult = DialogResult.OK;
-            }
-        }
-
-        #endregion
     }
+
+    #endregion
 }

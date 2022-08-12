@@ -20,126 +20,121 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Editors
+namespace ManagedIrbis.WinForms.Editors;
+
+/// <summary>
+/// Простейший редактор MARC-записей.
+/// </summary>
+public sealed partial class SimplestMarcEditor
+    : UserControl
 {
+    #region Properties
+
     /// <summary>
-    /// Простейший редактор MARC-записей.
+    /// Whether the editor is read-only.
     /// </summary>
-    public partial class SimplestMarcEditor
-        : UserControl
+    public bool ReadOnly
     {
-        #region Properties
-
-        /// <summary>
-        /// Whether the editor is read-only.
-        /// </summary>
-        public bool ReadOnly
+        get => _gridView.ReadOnly;
+        set
         {
-            get => _gridView.ReadOnly;
-            set
-            {
-                _bindingNavigator.Enabled = !value;
-                _gridView.ReadOnly = value;
-            }
+            _bindingNavigator.Enabled = !value;
+            _gridView.ReadOnly = value;
         }
+    }
 
-        #endregion
+    #endregion
 
-        #region Constructions
+    #region Constructions
 
-        /// <summary>
-        ///
-        /// </summary>
-        public SimplestMarcEditor()
+    /// <summary>
+    ///
+    /// </summary>
+    public SimplestMarcEditor()
+    {
+        InitializeComponent();
+    }
+
+    #endregion
+
+    #region Private members
+
+    private List<Field>? _originalFields;
+
+    private List<FieldItem>? _items;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Очистка.
+    /// </summary>
+    public void Clear()
+    {
+        _originalFields = new List<Field>();
+        _items = new List<FieldItem>();
+        _bindingSource.DataSource = _items;
+    }
+
+    /// <summary>
+    /// Get the fields.
+    /// </summary>
+    public void GetFields
+        (
+            IEnumerable<Field> collection
+        )
+    {
+        /*
+
+        //collection.BeginUpdate();
+        collection.Clear();
+        //collection.EnsureCapacity(_items.Count);
+
+        if (_items is not null)
         {
-            InitializeComponent();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private List<Field>? _originalFields;
-
-        private List<FieldItem>? _items;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Очистка.
-        /// </summary>
-        public void Clear()
-        {
-            _originalFields = new List<Field>();
-            _items = new List<FieldItem>();
-            _bindingSource.DataSource = _items;
-
-        } // method Clear
-
-        /// <summary>
-        /// Get the fields.
-        /// </summary>
-        public void GetFields
-            (
-                IEnumerable<Field> collection
-            )
-        {
-            /*
-
-            //collection.BeginUpdate();
-            collection.Clear();
-            //collection.EnsureCapacity(_items.Count);
-
-            if (_items is not null)
+            foreach (var item in _items)
             {
-                foreach (var item in _items)
+                var tag = item.Tag;
+                var text = item.Text;
+
+                var field = new Field(tag);
+                field.DecodeBody(text);
+                if (field.Verify(false))
                 {
-                    var tag = item.Tag;
-                    var text = item.Text;
-
-                    var field = new Field(tag);
-                    field.DecodeBody(text);
-                    if (field.Verify(false))
-                    {
-                        collection.Add(field);
-                    }
+                    collection.Add(field);
                 }
             }
+        }
 
-            */
+        */
 
-            //collection.EndUpdate();
+        //collection.EndUpdate();
+    }
 
-        } // method GetFields
-
-        /// <summary>
-        /// Set the fields.
-        /// </summary>
-        public void SetFields
-            (
-                IEnumerable<Field> collection
-            )
+    /// <summary>
+    /// Set the fields.
+    /// </summary>
+    public void SetFields
+        (
+            IEnumerable<Field> collection
+        )
+    {
+        // _originalFields = collection;
+        var list = new List<FieldItem>();
+        foreach (var field in collection)
         {
-            // _originalFields = collection;
-            var list = new List<FieldItem>();
-            foreach (var field in collection)
+            var item = new FieldItem
             {
-                var item = new FieldItem
-                {
-                    Tag = field.Tag,
-                    Text = field.ToText()
-                };
-                list.Add(item);
-            }
-            _items = list;
-            _bindingSource.DataSource = _items;
+                Tag = field.Tag,
+                Text = field.ToText()
+            };
+            list.Add (item);
+        }
 
-        } // method SetFields
+        _items = list;
+        _bindingSource.DataSource = _items;
+    }
 
-        #endregion
-
-    } // class SimplestMarcEditor
-
-} // namespace ManagedIrbis.WinForms.Editors
+    #endregion
+}

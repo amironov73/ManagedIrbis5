@@ -25,63 +25,62 @@ using ManagedIrbis.WinForms.Editors;
 
 #nullable enable
 
-namespace IrbisFormsTests
+namespace IrbisFormsTests;
+
+public sealed class SimplestMarcEditorTest
+    : IIrbisFormsTest
 {
-    public sealed class SimplestMarcEditorTest
-        : IIrbisFormsTest
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var record = new Record();
-            var field = new Field(700)
-            {
-                {'a', "Иванов"},
-                {'b', "И. И."}
-            };
-            record.Fields.Add(field);
+        var record = new Record();
+        var field = new Field (700)
+        {
+            { 'a', "Иванов" },
+            { 'b', "И. И." }
+        };
+        record.Fields.Add (field);
 
-            field = new Field(701)
-            {
-                {'a', "Петров"},
-                {'b', "П. П."}
-            };
-            record.Fields.Add(field);
+        field = new Field (701)
+        {
+            { 'a', "Петров" },
+            { 'b', "П. П." }
+        };
+        record.Fields.Add (field);
 
-            field = new Field(200)
-            {
-                {'a', "Заглавие"},
-                {'e', "подзаголовочное"},
-                {'f', "И. И. Иванов, П. П. Петров"}
-            };
-            record.Fields.Add(field);
+        field = new Field (200)
+        {
+            { 'a', "Заглавие" },
+            { 'e', "подзаголовочное" },
+            { 'f', "И. И. Иванов, П. П. Петров" }
+        };
+        record.Fields.Add (field);
 
-            field = new Field(300, "Первое примечание");
-            record.Fields.Add(field);
-            field = new Field(300, "Второе примечание");
-            record.Fields.Add(field);
-            field = new Field(300, "Третье примечание");
-            record.Fields.Add(field);
+        field = new Field (300, "Первое примечание");
+        record.Fields.Add (field);
+        field = new Field (300, "Второе примечание");
+        record.Fields.Add (field);
+        field = new Field (300, "Третье примечание");
+        record.Fields.Add (field);
 
-            var editor = new SimplestMarcEditor
-            {
-                Dock = DockStyle.Fill
-            };
-            form.Controls.Add(editor);
-            editor.SetFields(record.Fields);
+        var editor = new SimplestMarcEditor
+        {
+            Dock = DockStyle.Fill
+        };
+        form.Controls.Add (editor);
+        editor.SetFields (record.Fields);
 
-            form.ShowDialog(ownerWindow);
+        form.ShowDialog (ownerWindow);
 
-            editor.GetFields(record.Fields);
-            string text = record.ToPlainText();
-            PlainTextForm.ShowDialog(form, text);
-        }
+        editor.GetFields (record.Fields);
+        string text = record.ToPlainText();
+        PlainTextForm.ShowDialog (form, text);
     }
 }
