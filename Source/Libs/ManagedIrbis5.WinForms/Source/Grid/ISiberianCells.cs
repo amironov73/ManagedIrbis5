@@ -18,15 +18,13 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Список ячеек, принадлежащих строке грида.
+/// </summary>
+public interface ISiberianCells
+    : IList<SiberianCell>
 {
-    /// <summary>
-    /// Список ячеек, принадлежащих строке грида.
-    /// </summary>
-    public interface ISiberianCells
-        : IList<SiberianCell>
-    {
-
-    } // interface ISiberianCells
-
-} // namespace ManagedIrbis.WinForms.Grid
+    // пустое тело интерфейса
+}

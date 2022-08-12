@@ -17,14 +17,13 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
-{
-    /// <summary>
-    /// Интерфейс коллекции колонок грида.
-    /// </summary>
-    public interface ISiberianColumnCollection
-        : IList<SiberianColumn>
-    {
-    } // interface ISiberianColumnCollection
+namespace ManagedIrbis.WinForms.Grid;
 
-} // namespace ManagedIrbis.WinForms.Grid
+/// <summary>
+/// Интерфейс коллекции колонок грида.
+/// </summary>
+public interface ISiberianColumnCollection
+    : IList<SiberianColumn>
+{
+    // пустое тело интерфейса
+}

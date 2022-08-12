@@ -12,36 +12,33 @@
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Интерфейс адаптера для виртуального режима грида.
+/// </summary>
+public interface IVirtualAdapter<T>
 {
+    #region Properties
+
     /// <summary>
-    /// Интерфейс адаптера для виртуального режима грида.
+    /// Предпочитаемая порция данных.
     /// </summary>
-    public interface IVirtualAdapter<T>
-    {
-        #region Properties
+    int PreferredPortion => 256;
 
-        /// <summary>
-        /// Предпочитаемая порция данных.
-        /// </summary>
-        int PreferredPortion => 256;
+    /// <summary>
+    /// Общая длина данных в строках.
+    /// </summary>
+    int TotalLength { get; }
 
-        /// <summary>
-        /// Общая длина данных в строках.
-        /// </summary>
-        int TotalLength { get; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Public methods
+    /// <summary>
+    /// Чтение данных.
+    /// </summary>
+    VirtualData<T>? ReadData (int firstLine, int lineCount);
 
-        /// <summary>
-        /// Чтение данных.
-        /// </summary>
-        VirtualData<T>? ReadData(int firstLine, int lineCount);
-
-        #endregion
-
-    } // interface IVirtialAdapter
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}
