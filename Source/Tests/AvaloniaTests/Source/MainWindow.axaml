@@ -1,19 +1,32 @@
+<!-- ReSharper disable MarkupAttributeTypo -->
+
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Width="400"
         Height="300"
         x:Class="AvaloniaTests.MainWindow"
         Title="Avalonia Tests">
+
     <StackPanel
         Orientation="Vertical"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
         Spacing="10"
         >
+
         <Button
             Name="FieldEditorButton"
             HorizontalAlignment="Stretch"
-            Click="FieldEditorButton_OnClick"
-                >Field Editor</Button>
+            Click="FieldEditorButton_OnClick">
+            Field Editor
+        </Button>
+
+        <Button
+            Name="LoginWindowButton"
+            HorizontalAlignment="Stretch"
+            Click="LoginWindowButton_OnClick">
+            Login Window
+        </Button>
+
     </StackPanel>
 </Window>

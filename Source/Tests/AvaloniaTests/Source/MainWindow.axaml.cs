@@ -17,6 +17,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -58,5 +60,12 @@ public partial class MainWindow : Window
         window.SetLines (lines);
         window.SetHint ("Тут какая-то подсказка");
         window.ShowDialog (this);
+    }
+
+    private async void LoginWindowButton_OnClick (object? sender, RoutedEventArgs e)
+    {
+        var window = new LoginWindow();
+        var result = await window.ShowDialog<bool> (this);
+        Debug.WriteLine ($"Dialog result is {result}");
     }
 }

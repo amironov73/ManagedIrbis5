@@ -34,9 +34,8 @@ namespace ManagedIrbis.Avalonia;
 /// <summary>
 /// Окно редактора полей.
 /// </summary>
-public class FieldEditorWindow
+public partial class FieldEditorWindow
     : Window
-
 {
     #region Construction
 
@@ -46,8 +45,6 @@ public class FieldEditorWindow
     public FieldEditorWindow()
     {
         AvaloniaXamlLoader.Load (this);
-        _fieldGrid = this.FindControl<DataGrid> ("FieldGrid");
-        _hintBox = this.FindControl<Label> ("HintBox");
     }
 
     #endregion
@@ -55,9 +52,6 @@ public class FieldEditorWindow
     #region Private members
 
     private IEnumerable<FieldLine>? _lines;
-
-    private readonly DataGrid _fieldGrid;
-    private readonly Label _hintBox;
 
     #endregion
 
@@ -73,7 +67,7 @@ public class FieldEditorWindow
     {
         Sure.NotNull ((object?) lines);
 
-        _fieldGrid.Items = _lines = lines;
+        FieldGrid.Items = _lines = lines;
     }
 
     /// <summary>
@@ -92,7 +86,7 @@ public class FieldEditorWindow
             string? hint
         )
     {
-        _hintBox.Content = hint;
+        HintBox.Content = hint;
     }
 
     #endregion
