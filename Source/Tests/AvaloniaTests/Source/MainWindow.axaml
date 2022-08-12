@@ -7,26 +7,29 @@
         x:Class="AvaloniaTests.MainWindow"
         Title="Avalonia Tests">
 
-    <StackPanel
-        Orientation="Vertical"
+    <WrapPanel
+        Orientation="Horizontal"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
-        Spacing="10"
         >
 
         <Button
             Name="FieldEditorButton"
-            HorizontalAlignment="Stretch"
             Click="FieldEditorButton_OnClick">
             Field Editor
         </Button>
 
         <Button
             Name="LoginWindowButton"
-            HorizontalAlignment="Stretch"
             Click="LoginWindowButton_OnClick">
             Login Window
         </Button>
 
-    </StackPanel>
+        <Button
+            Name="AboutWindowButton"
+            Click="AboutWindowButton_OnClick">
+            About Window
+        </Button>
+
+    </WrapPanel>
 </Window>

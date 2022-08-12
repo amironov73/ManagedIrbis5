@@ -11,15 +11,21 @@
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
 
-/* LoginWindow.cs -- окно для ввода логина и пароля
+/* AboutWindow.cs -- окно "О продукте"
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
+using System.Globalization;
+
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+
+using ReactiveUI.Fody.Helpers;
 
 #endregion
 
@@ -28,33 +34,53 @@ using Avalonia.Markup.Xaml;
 namespace ManagedIrbis.Avalonia;
 
 /// <summary>
-/// Окно для ввода логина и пароля.
+/// Окно "О продукте".
 /// </summary>
-public partial class LoginWindow
+public partial class AboutWindow
     : Window
 {
     #region Properties
 
     /// <summary>
-    /// Введенный логин.
+    /// Наименование продукта
     /// </summary>
-    public string? Login { get; set; }
+    [Reactive]
+    public string? ProductTitle { get; set; }
 
     /// <summary>
-    /// Введенный пароль.
+    /// Версия продукта.
     /// </summary>
-    public string? Password { get; set; }
+    [Reactive]
+    public string? ProductVersion { get; set; }
+
+    /// <summary>
+    /// Коммит Git.
+    /// </summary>
+    [Reactive]
+    public string? GitCommit { get; set; }
+
+    /// <summary>
+    /// Дата коммита.
+    /// </summary>
+    [Reactive]
+    public string? ProductDate { get; set; }
 
     #endregion
 
     #region Construction
 
     /// <summary>
-    /// Конструктор по умолчанию.
+    /// Конструктор по умолчанию
     /// </summary>
-    public LoginWindow()
+    public AboutWindow()
     {
         AvaloniaXamlLoader.Load (this);
+
+        ProductTitle = "Проект ARS MAGNA";
+        ProductVersion = ThisAssembly.AssemblyFileVersion;
+        GitCommit = ThisAssembly.GitCommitId;
+        ProductDate = ThisAssembly.GitCommitDate.ToString (CultureInfo.CurrentUICulture);
+
         DataContext = this;
 
 #if DEBUG
@@ -66,17 +92,11 @@ public partial class LoginWindow
 
     #region Private members
 
-    private void LoginButtonClicked()
+    private void OkButton_OnClick (object? sender, RoutedEventArgs e)
     {
-        // TODO: implement
-        Close (true);
-    }
-
-    private void CancelButtonClicked()
-    {
-        // TODO: implement
-        Close (false);
+        Close();
     }
 
     #endregion
 }
+

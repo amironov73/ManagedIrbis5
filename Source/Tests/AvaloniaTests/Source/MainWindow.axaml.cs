@@ -68,4 +68,10 @@ public partial class MainWindow : Window
         var result = await window.ShowDialog<bool> (this);
         Debug.WriteLine ($"Dialog result is {result}");
     }
+
+    private async void AboutWindowButton_OnClick (object? sender, RoutedEventArgs e)
+    {
+        var window = new AboutWindow();
+        await window.ShowDialog<bool> (this);
+    }
 }
