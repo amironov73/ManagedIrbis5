@@ -14,37 +14,34 @@
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Порция данных для виртуального грида.
+/// </summary>
+public class VirtualData
 {
+    #region Properties
+
     /// <summary>
-    /// Порция данных для виртуального грида.
+    /// Номер первой строчки.
     /// </summary>
-    public class VirtualData
-    {
-        #region Properties
+    public int FirstLine { get; set; }
 
-        /// <summary>
-        /// Номер первой строчки.
-        /// </summary>
-        public int FirstLine { get; set; }
+    /// <summary>
+    /// Количество строк.
+    /// </summary>
+    public int LineCount { get; set; }
 
-        /// <summary>
-        /// Количество строк.
-        /// </summary>
-        public int LineCount { get; set; }
+    /// <summary>
+    /// Общее количество строк.
+    /// </summary>
+    public int TotalCount { get; set; }
 
-        /// <summary>
-        /// Общее количество строк.
-        /// </summary>
-        public int TotalCount { get; set; }
+    /// <summary>
+    /// Строки с данными.
+    /// </summary>
+    public object?[]? Lines { get; set; }
 
-        /// <summary>
-        /// Строки с данными.
-        /// </summary>
-        public object?[]? Lines { get; set; }
-
-        #endregion
-
-    } // class VirtualData
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

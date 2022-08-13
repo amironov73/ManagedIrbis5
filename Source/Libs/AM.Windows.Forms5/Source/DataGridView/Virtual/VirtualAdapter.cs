@@ -19,56 +19,53 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Адаптер, подкачивающий данные в грид.
+/// </summary>
+public class VirtualAdapter
 {
+    #region Properties
+
     /// <summary>
-    /// Адаптер, подкачивающий данные в грид.
+    /// Предпочитаемый размер страницы.
     /// </summary>
-    public class VirtualAdapter
+    public virtual int PageSize => 500;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение данных для колонки из объекта.
+    /// </summary>
+    public virtual object? ByIndex
+        (
+            object? value,
+            int index
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Предпочитаемый размер страницы.
-        /// </summary>
-        public virtual int PageSize => 500;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Получение данных для колонки из объекта.
-        /// </summary>
-        public virtual object? ByIndex
-            (
-                object? value,
-                int index
-            )
+        if (value is Array array)
         {
-            if (value is Array array)
-            {
-                return index < array.Length ? array.GetValue(index) : default;
-            }
+            return index < array.Length ? array.GetValue (index) : default;
+        }
 
-            return default;
+        return default;
+    }
 
-        } // method ByIndex
+    /// <summary>
+    /// Очистка.
+    /// </summary>
+    public virtual void Clear()
+    {
+        // пустое тело метода
+    }
 
-        /// <summary>
-        /// Очистка.
-        /// </summary>
-        public virtual void Clear()
-        {
-        } // method Clear
+    /// <summary>
+    /// Подгрузка данных в кеш виртуального грида.
+    /// </summary>
+    public virtual VirtualData? PullData (int firstLine, int lineCount) => default;
 
-        /// <summary>
-        /// Подгрузка данных в кеш виртуального грида.
-        /// </summary>
-        public virtual VirtualData? PullData(int firstLine, int lineCount) => default;
-
-        #endregion
-
-    } // class VirtualAdapter
-
-} // namespace AM.Windows.Forms
+    #endregion
+}
