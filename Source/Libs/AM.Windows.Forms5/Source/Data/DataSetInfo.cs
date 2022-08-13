@@ -12,6 +12,7 @@
 
 #region Using directives
 
+using System;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
@@ -27,167 +28,175 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace AM.Data
+namespace AM.Data;
+
+/// <summary>
+/// Информация о датасете <see cref="DataSet"/>.
+/// </summary>
+[Serializable]
+[XmlRoot ("dataset")]
+public sealed class DataSetInfo
+    : IHandmadeSerializable,
+    IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    /// Информация о датасете <see cref="DataSet"/>.
+    /// Строка подключения.
     /// </summary>
-    [XmlRoot ("dataset")]
-    public sealed class DataSetInfo
-        : IHandmadeSerializable,
-        IVerifiable
+    [XmlElement ("connectionString")]
+    [JsonPropertyName ("connectionString")]
+    [DisplayName ("Строка подключения")]
+    [Description ("Строка подключения")]
+    public string? ConnectionString { get; set; }
+
+    /// <summary>
+    /// Датасет только для чтения?
+    /// </summary>
+    [XmlAttribute ("readOnly")]
+    [JsonPropertyName ("readOnly")]
+    [DisplayName ("Только для чтения")]
+    [Description ("Датасет только для чтения?")]
+    public bool ReadOnly { get; set; }
+
+    /// <summary>
+    /// Команда выборки данных.
+    /// </summary>
+    [XmlElement ("selectCommand")]
+    [JsonPropertyName ("selectCommand")]
+    [DisplayName ("Выборка")]
+    [Description ("Команда выборки данных")]
+    public string? SelectCommandText { get; set; }
+
+    /// <summary>
+    /// Таблицы, входящие в датасет.
+    /// </summary>
+    [XmlElement ("table")]
+    [JsonPropertyName ("tables")]
+    [DisplayName ("Таблицы")]
+    [Description ("Таблицы, входящие в датасет")]
+    public NonNullCollection<DataTableInfo> Tables { get; private set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public object? UserData { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public DataSetInfo()
     {
-        #region Properties
+        Tables = new NonNullCollection<DataTableInfo>();
+    }
 
-        /// <summary>
-        /// Строка подключения.
-        /// </summary>
-        [XmlElement ("connectionString")]
-        [JsonPropertyName ("connectionString")]
-        public string? ConnectionString { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Датасет только для чтения?
-        /// </summary>
-        [XmlAttribute ("readOnly")]
-        [JsonPropertyName ("readOnly")]
-        public bool ReadOnly { get; set; }
+    #region Public methods
 
-        /// <summary>
-        /// Команда выборки данных.
-        /// </summary>
-        [XmlElement ("selectCommand")]
-        [JsonPropertyName ("selectCommand")]
-        public string? SelectCommandText { get; set; }
+    /// <summary>
+    /// Чтение информации <see cref="DataSetInfo"/> из указанного файла.
+    /// </summary>
+    public static DataSetInfo Load
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
 
-        /// <summary>
-        /// Список таблиц, входящих в датасет.
-        /// </summary>
-        [XmlElement ("table")]
-        [JsonPropertyName ("tables")]
-        public NonNullCollection<DataTableInfo> Tables { get; private set; }
+        var serializer = new XmlSerializer (typeof (DataSetInfo));
+        using var stream = File.OpenRead (fileName);
 
-        /// <summary>
-        /// Произвольные пользовательские данные.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable (false)]
-        public object? UserData { get; set; }
+        return (DataSetInfo)serializer.Deserialize (stream).ThrowIfNull();
+    }
 
-        #endregion
+    /// <summary>
+    /// Сохранение информации о датасете в файл.
+    /// </summary>
+    public void Save
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
 
-        #region Construction
+        var serializer = new XmlSerializer (typeof (DataSetInfo));
+        using var stream = File.Create (fileName);
+        serializer.Serialize (stream, this);
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public DataSetInfo()
+    /// <summary>
+    /// Should serialize the <see cref="ReadOnly"/> field?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    [EditorBrowsable (EditorBrowsableState.Never)]
+    public bool ShouldSerializeReadOnly() => ReadOnly;
+
+    /// <summary>
+    /// Should serialize the <see cref="Tables"/> collection?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    [EditorBrowsable (EditorBrowsableState.Never)]
+    public bool ShouldSerializeTables() => Tables.Count != 0;
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        ConnectionString = reader.ReadNullableString();
+        ReadOnly = reader.ReadBoolean();
+        SelectCommandText = reader.ReadNullableString();
+        Tables = reader.ReadNonNullCollection<DataTableInfo>();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WriteNullable (ConnectionString);
+        writer.Write (ReadOnly);
+        writer.WriteNullable (SelectCommandText);
+        writer.WriteCollection (Tables);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<DataSetInfo> (this, throwOnError);
+
+        foreach (var table in Tables)
         {
-            Tables = new NonNullCollection<DataTableInfo>();
+            verifier.VerifySubObject (table, "Table");
+        }
 
-        } // constructor
+        return verifier.Result;
+    }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Чтение информации <see cref="DataSetInfo"/> из указанного файла.
-        /// </summary>
-        public static DataSetInfo Load
-            (
-                string fileName
-            )
-        {
-            var serializer = new XmlSerializer (typeof (DataSetInfo));
-            using var stream = File.OpenRead (fileName);
-
-            return (DataSetInfo) serializer.Deserialize (stream).ThrowIfNull();
-
-        } // method Load
-
-        /// <summary>
-        /// Сохранение датасета в файл.
-        /// </summary>
-        public void Save
-            (
-                string fileName
-            )
-        {
-            var serializer = new XmlSerializer (typeof (DataSetInfo));
-            using var stream = File.Create (fileName);
-            serializer.Serialize(stream, this);
-
-        } // method Save
-
-        /// <summary>
-        /// Should serialize the <see cref="ReadOnly"/> field?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeReadOnly() => ReadOnly;
-
-        /// <summary>
-        /// Should serialize the <see cref="Tables"/> collection?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeTables() => Tables.Count != 0;
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            ConnectionString = reader.ReadNullableString();
-            ReadOnly = reader.ReadBoolean();
-            SelectCommandText = reader.ReadNullableString();
-            Tables = reader.ReadNonNullCollection<DataTableInfo>();
-
-        } // method RestoreFromStream
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WriteNullable (ConnectionString);
-            writer.Write (ReadOnly);
-            writer.WriteNullable (SelectCommandText);
-            writer.WriteCollection (Tables);
-
-        } // method SaveToStream
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<DataSetInfo>(this, throwOnError);
-
-            foreach (var table in Tables)
-            {
-                verifier.VerifySubObject (table);
-            }
-
-            return verifier.Result;
-
-        } // method Verify
-
-        #endregion
-
-    } // class DataSetInfo
-
-} // namespace AM.Data
+    #endregion
+}
