@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* FixedColumnAttribute.cs -- помечает колонку в гриде как фиксированную
@@ -20,47 +21,46 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Помечает колонку в гриде как фиксированную.
+/// </summary>
+[Serializable]
+[AttributeUsage (AttributeTargets.Property)]
+public sealed class FixedColumnAttribute
+    : Attribute
 {
+    #region Properties
+
     /// <summary>
-    /// Помечает колонку в гриде как фиксированную.
+    /// Признак фиксированной колонки.
     /// </summary>
-    [AttributeUsage (AttributeTargets.Property)]
-    public sealed class FixedColumnAttribute
-        : Attribute
+    public bool Fixed { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public FixedColumnAttribute()
+        : this (true)
     {
-        #region Properties
+        //.пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Признак фиксированной колонки.
-        /// </summary>
-        public bool Fixed { get; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public FixedColumnAttribute
+        (
+            bool isFixed
+        )
+    {
+        Fixed = isFixed;
+    }
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public FixedColumnAttribute()
-            : this(true)
-        {
-        } // constructor
-
-        /// <summary>
-        /// Конструктор
-        /// </summary>
-        public FixedColumnAttribute
-            (
-                bool isFixed
-            )
-        {
-            Fixed = isFixed;
-        } // constructor
-
-        #endregion
-
-    } // class FixedColumnAttribute
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

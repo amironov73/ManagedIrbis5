@@ -20,40 +20,37 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Задает индекс для сортировки.
+/// </summary>
+[Serializable]
+[AttributeUsage (AttributeTargets.Property | AttributeTargets.Field)]
+public sealed class SortIndexAttribute
+    : Attribute
 {
+    #region Properties
+
     /// <summary>
-    /// Задает индекс для сортировки
+    /// Индекс для сортировки.
     /// </summary>
-    [Serializable]
-    [AttributeUsage ( AttributeTargets.Property | AttributeTargets.Field )]
-    public class SortIndexAttribute
-        : Attribute
+    public int SortIndex { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SortIndexAttribute
+        (
+            int index
+        )
     {
-        #region Properties
+        SortIndex = index;
+    }
 
-        /// <summary>
-        /// Индекс для сортировки
-        /// </summary>
-        public int SortIndex { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SortIndexAttribute
-            (
-                int index
-            )
-        {
-            SortIndex = index;
-        } // constructor
-
-        #endregion
-
-    } // class SortIndexAttribute
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

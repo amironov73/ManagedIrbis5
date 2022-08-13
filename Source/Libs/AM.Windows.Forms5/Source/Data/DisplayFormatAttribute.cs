@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* DisplayFormatAttribute.cs -- задает формат отображения значений
@@ -20,39 +21,37 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Задает формат отображения значений.
+/// </summary>
+[Serializable]
+[AttributeUsage (AttributeTargets.Property | AttributeTargets.Field)]
+public sealed class DisplayFormatAttribute
+    : Attribute
 {
+    #region Properties
+
     /// <summary>
-    /// Задает формат отображения значений.
+    /// Формат отображения значений.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-    public class DisplayFormatAttribute
-        : Attribute
+    public string DisplayFormat { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DisplayFormatAttribute
+        (
+            string displayFormat
+        )
     {
-        #region Properties
+        DisplayFormat = displayFormat;
+    }
 
-        /// <summary>
-        /// Формат отображения значений.
-        /// </summary>
-        public string DisplayFormat { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public DisplayFormatAttribute
-            (
-                string displayFormat
-            )
-        {
-            DisplayFormat = displayFormat;
-        } // constructor
-
-        #endregion
-
-    } // class DisplayFormatAttribute
-
-} // namespace AM.Windows.Forms
+    #endregion
+}
