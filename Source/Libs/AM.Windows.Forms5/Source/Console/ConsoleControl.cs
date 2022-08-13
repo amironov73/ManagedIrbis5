@@ -166,8 +166,8 @@ public sealed class ConsoleControl
             }
 
             _cursorHeight = value;
-        } // set
-    } // property CursorHeight
+        }
+    }
 
     /// <summary>
     /// Номер колонки, в которой находится курсор (нумерация с 0).
@@ -193,7 +193,7 @@ public sealed class ConsoleControl
             _cursorVisible = value;
             _CursorHandler (this, EventArgs.Empty);
         }
-    } // property CursorVisible
+    }
 
     /// <summary>
     /// Текущая высота окна (символы).
@@ -212,7 +212,7 @@ public sealed class ConsoleControl
             _windowHeight = value;
             _SetupWindow();
         }
-    } // property WindowHeight
+    }
 
     /// <summary>
     /// Текущая ширина окна (символы).
@@ -228,7 +228,7 @@ public sealed class ConsoleControl
             _windowWidth = value;
             _SetupWindow();
         } // set
-    } // property WindowWidth
+    }
 
     #endregion
 
@@ -396,7 +396,7 @@ public sealed class ConsoleControl
             graphics.FillRectangle (cursorBrush, rectangle);
             SystemSounds.Asterisk.Play();
         }
-    } // method _CursorHandler
+    }
 
     private void _HandleEnter()
     {
@@ -415,7 +415,7 @@ public sealed class ConsoleControl
 
         AddHistoryEntry (text);
         _inputBuffer.Length = 0;
-    } // method _HandleEnter
+    }
 
     private void _HandleTab()
     {
@@ -428,13 +428,13 @@ public sealed class ConsoleControl
             };
             tabPressed.Invoke (this, eventArgs);
         }
-    } // method _HandleTab
+    }
 
     private void _HideCursorTemporary()
     {
         _cursorVisibleNow = true;
         _CursorHandler (this, EventArgs.Empty);
-    } // method _HideCursorTemporary
+    }
 
     private int _InputPosition() => (CursorTop - _inputRow) * WindowWidth + CursorLeft - _inputColumn;
 
@@ -455,7 +455,7 @@ public sealed class ConsoleControl
 
         var newDelta = newPosition - currentPosition;
         MoveCursor (newDelta, 0);
-    } // method _MoveInput
+    }
 
     private void _SetupCells()
     {
@@ -480,14 +480,14 @@ public sealed class ConsoleControl
         var clientSize = ClientSize;
         _cellHeight = clientSize.Height / WindowHeight;
         _cellWidth = clientSize.Width / WindowWidth;
-    } // method _SetupCells
+    }
 
     private void _SetupFont()
     {
         _italicFont = new Font (_font!, FontStyle.Italic);
 
         _SetupCells();
-    } // method _SetupFont
+    }
 
     private void _SetupWindow()
     {
@@ -538,7 +538,7 @@ public sealed class ConsoleControl
         MoveCursor (-1, 0);
 
         return true;
-    } // method Backspace
+    }
 
     /// <summary>
     /// Очистка консоли.
@@ -566,7 +566,7 @@ public sealed class ConsoleControl
         _inputRow = 0;
 
         Invalidate();
-    } // method Clear
+    }
 
     /// <summary>
     /// Clear from given position to end of the console.
@@ -589,7 +589,7 @@ public sealed class ConsoleControl
                 Write (y, x, ' ', ForeColor, BackColor, false);
             }
         }
-    } // method ClearFrom
+    }
 
     /// <summary>
     /// Clear history list.

@@ -19,7 +19,7 @@ using System;
 namespace AM.Windows.Forms;
 
 /// <summary>
-/// Аргументы события для консольного контрола <see cref="ConsoleControl"/>
+/// Аргументы события для консольного контрола <see cref="ConsoleControl"/>.
 /// </summary>
 public sealed class ConsoleInputEventArgs
     : EventArgs

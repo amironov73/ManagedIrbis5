@@ -41,8 +41,8 @@ public sealed class ConsoleForm
     public ConsoleForm()
     {
         Console = new ConsoleControl();
-        int consoleWidth = Console.Width;
-        int consoleHeight = Console.Height;
+        var consoleWidth = Console.Width;
+        var consoleHeight = Console.Height;
 
         Controls.Add (Console);
         ClientSize = new Size (consoleWidth, consoleHeight);
