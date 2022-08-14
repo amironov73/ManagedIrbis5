@@ -24,198 +24,192 @@ using AM.Xml;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Полезные методы для <see cref="DataGridView"/>
+/// </summary>
+public static class DataGridViewUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Полезные методы для <see cref="DataGridView"/>
+    /// Apply specified columns to the <see cref="DataGridView"/>.
     /// </summary>
-    public static class DataGridViewUtility
+    public static void ApplyColumns
+        (
+            DataGridView grid,
+            IEnumerable<DataColumnInfo> columns
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Apply specified columns to the <see cref="DataGridView"/>.
-        /// </summary>
-        public static void ApplyColumns
-            (
-                DataGridView grid,
-                IEnumerable<DataColumnInfo> columns
-            )
+        try
         {
-            try
+            grid.SuspendLayout();
+
+            grid.AutoGenerateColumns = false;
+            grid.Columns.Clear();
+
+            foreach (var info in columns)
             {
-                grid.SuspendLayout();
-
-                grid.AutoGenerateColumns = false;
-                grid.Columns.Clear();
-
-                foreach (var info in columns)
-                {
-                    var column = info.ToGridColumn();
-                    grid.Columns.Add(column);
-                }
+                var column = info.ToGridColumn();
+                grid.Columns.Add (column);
             }
-            finally
-            {
-                grid.ResumeLayout();
-            }
-
-        } // method ApplyColumns
-
-        /// <summary>
-        /// Converts the column description into
-        /// <see cref="DataGridViewColumn"/>
-        /// </summary>
-        public static DataGridViewColumn ToGridColumn
-            (
-                this DataColumnInfo column
-            )
+        }
+        finally
         {
-            var columnTypeName = column.Type;
-            Type? columnType = null;
-            if (!string.IsNullOrEmpty (columnTypeName))
-            {
-                columnType = Type.GetType (columnTypeName, true);
-            }
+            grid.ResumeLayout();
+        }
+    }
 
-            var result = columnType is null
-                ? new DataGridViewTextBoxColumn()
-                : (DataGridViewColumn) Activator.CreateInstance (columnType).ThrowIfNull();
-
-            result.DataPropertyName = column.Name;
-            result.HeaderText = column.Title;
-            result.DataPropertyName = column.Name;
-            result.ReadOnly = column.ReadOnly;
-            result.Frozen = column.Frozen;
-            result.Visible = !column.Invisible;
-            if (column.Width != 0)
-            {
-                if (column.Width > 0)
-                {
-                    result.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-                    result.Width = column.Width;
-                }
-                else
-                {
-                    result.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    result.FillWeight = Math.Abs(column.Width);
-                }
-            }
-
-            result.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
-            return result;
-
-        } // method ToGridColumn
-
-        /// <summary>
-        /// Gets the columns.
-        /// </summary>
-        public static List<DataGridViewColumn> GetColumns
-            (
-                string xmlText
-            )
+    /// <summary>
+    /// Converts the column description into
+    /// <see cref="DataGridViewColumn"/>
+    /// </summary>
+    public static DataGridViewColumn ToGridColumn
+        (
+            this DataColumnInfo column
+        )
+    {
+        var columnTypeName = column.Type;
+        Type? columnType = null;
+        if (!string.IsNullOrEmpty (columnTypeName))
         {
-            var info = XmlUtility.DeserializeString<DataSetInfo> (xmlText);
+            columnType = Type.GetType (columnTypeName, true);
+        }
 
-            var result = new List<DataGridViewColumn>();
-            foreach (var column in info.Tables[0].Columns)
+        var result = columnType is null
+            ? new DataGridViewTextBoxColumn()
+            : (DataGridViewColumn)Activator.CreateInstance (columnType).ThrowIfNull();
+
+        result.DataPropertyName = column.Name;
+        result.HeaderText = column.Title;
+        result.DataPropertyName = column.Name;
+        result.ReadOnly = column.ReadOnly;
+        result.Frozen = column.Frozen;
+        result.Visible = !column.Invisible;
+        if (column.Width != 0)
+        {
+            if (column.Width > 0)
             {
-                result.Add(column.ToGridColumn());
+                result.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                result.Width = column.Width;
             }
+            else
+            {
+                result.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                result.FillWeight = Math.Abs (column.Width);
+            }
+        }
 
-            return result;
+        result.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-        } // method GetColumns
+        return result;
+    }
 
-        ///// <summary>
-        ///// Generates the table HTML.
-        ///// </summary>
-        ///// <param name="grid">The grid.</param>
-        ///// <param name="title">The title.</param>
-        ///// <returns></returns>
-        //public static string GenerateTableHtml
-        //    (
-        //        DataGridView grid,
-        //        string title
-        //    )
-        //{
-        //    ArgumentUtility.NotNull(grid, "grid");
-        //    ArgumentUtility.NotNull(title, "title");
+    /// <summary>
+    /// Gets the columns.
+    /// </summary>
+    public static List<DataGridViewColumn> GetColumns
+        (
+            string xmlText
+        )
+    {
+        var info = XmlUtility.DeserializeString<DataSetInfo> (xmlText);
 
-        //    StringWriter writer = new StringWriter();
-        //    Html32TextWriter html = new Html32TextWriter(writer);
+        var result = new List<DataGridViewColumn>();
+        foreach (var column in info.Tables[0].Columns)
+        {
+            result.Add (column.ToGridColumn());
+        }
 
-        //    html.RenderBeginTag(HtmlTextWriterTag.Html);
-        //    html.RenderBeginTag(HtmlTextWriterTag.Head);
-        //    html.RenderBeginTag(HtmlTextWriterTag.Title);
-        //    html.WriteEncodedText(title);
-        //    html.RenderEndTag(); // title
-        //    html.RenderEndTag(); // head
-        //    html.RenderBeginTag(HtmlTextWriterTag.Body);
-        //    html.AddAttribute(HtmlTextWriterAttribute.Width, "90%");
-        //    html.AddAttribute(HtmlTextWriterAttribute.Border, "1");
-        //    html.AddAttribute(HtmlTextWriterAttribute.Cellspacing, "0");
-        //    html.AddAttribute(HtmlTextWriterAttribute.Cellpadding, "3");
-        //    html.AddAttribute(HtmlTextWriterAttribute.Bordercolor, "black");
-        //    html.AddAttribute(HtmlTextWriterAttribute.Align, "center");
-        //    html.RenderBeginTag(HtmlTextWriterTag.Table);
+        return result;
+    }
 
-        //    html.RenderBeginTag(HtmlTextWriterTag.Tr);
-        //    foreach (DataGridViewColumn column in grid.Columns)
-        //    {
-        //        if (column.Visible)
-        //        {
-        //            html.RenderBeginTag(HtmlTextWriterTag.Td);
-        //            html.RenderBeginTag(HtmlTextWriterTag.B);
-        //            html.WriteEncodedText(column.HeaderText);
-        //            html.RenderEndTag();
-        //            html.RenderEndTag(); // td
-        //        }
-        //    }
-        //    html.RenderEndTag(); // tr
+    ///// <summary>
+    ///// Generates the table HTML.
+    ///// </summary>
+    ///// <param name="grid">The grid.</param>
+    ///// <param name="title">The title.</param>
+    ///// <returns></returns>
+    //public static string GenerateTableHtml
+    //    (
+    //        DataGridView grid,
+    //        string title
+    //    )
+    //{
+    //    ArgumentUtility.NotNull(grid, "grid");
+    //    ArgumentUtility.NotNull(title, "title");
 
-        //    foreach (DataGridViewRow row in grid.Rows)
-        //    {
-        //        html.RenderBeginTag(HtmlTextWriterTag.Tr);
-        //        foreach (DataGridViewCell cell in row.Cells)
-        //        {
-        //            if (cell.OwningColumn.Visible)
-        //            {
-        //                html.RenderBeginTag(HtmlTextWriterTag.Td);
-        //                object formattedValue = cell.FormattedValue;
-        //                bool written = false;
-        //                if (formattedValue != null)
-        //                {
-        //                    string text = formattedValue.ToString();
-        //                    if (!string.IsNullOrEmpty(text))
-        //                    {
-        //                        html.WriteEncodedText(formattedValue.ToString());
-        //                        written = true;
-        //                    }
-        //                }
-        //                if (!written)
-        //                {
-        //                    html.Write("&nbsp;");
-        //                }
-        //                html.RenderEndTag(); // td
-        //            }
-        //        }
-        //        html.RenderEndTag(); // tr
-        //    }
+    //    StringWriter writer = new StringWriter();
+    //    Html32TextWriter html = new Html32TextWriter(writer);
 
-        //    html.RenderEndTag(); // table
+    //    html.RenderBeginTag(HtmlTextWriterTag.Html);
+    //    html.RenderBeginTag(HtmlTextWriterTag.Head);
+    //    html.RenderBeginTag(HtmlTextWriterTag.Title);
+    //    html.WriteEncodedText(title);
+    //    html.RenderEndTag(); // title
+    //    html.RenderEndTag(); // head
+    //    html.RenderBeginTag(HtmlTextWriterTag.Body);
+    //    html.AddAttribute(HtmlTextWriterAttribute.Width, "90%");
+    //    html.AddAttribute(HtmlTextWriterAttribute.Border, "1");
+    //    html.AddAttribute(HtmlTextWriterAttribute.Cellspacing, "0");
+    //    html.AddAttribute(HtmlTextWriterAttribute.Cellpadding, "3");
+    //    html.AddAttribute(HtmlTextWriterAttribute.Bordercolor, "black");
+    //    html.AddAttribute(HtmlTextWriterAttribute.Align, "center");
+    //    html.RenderBeginTag(HtmlTextWriterTag.Table);
 
-        //    html.RenderEndTag(); // body
-        //    html.RenderEndTag(); // html
+    //    html.RenderBeginTag(HtmlTextWriterTag.Tr);
+    //    foreach (DataGridViewColumn column in grid.Columns)
+    //    {
+    //        if (column.Visible)
+    //        {
+    //            html.RenderBeginTag(HtmlTextWriterTag.Td);
+    //            html.RenderBeginTag(HtmlTextWriterTag.B);
+    //            html.WriteEncodedText(column.HeaderText);
+    //            html.RenderEndTag();
+    //            html.RenderEndTag(); // td
+    //        }
+    //    }
+    //    html.RenderEndTag(); // tr
 
-        //    html.Flush();
+    //    foreach (DataGridViewRow row in grid.Rows)
+    //    {
+    //        html.RenderBeginTag(HtmlTextWriterTag.Tr);
+    //        foreach (DataGridViewCell cell in row.Cells)
+    //        {
+    //            if (cell.OwningColumn.Visible)
+    //            {
+    //                html.RenderBeginTag(HtmlTextWriterTag.Td);
+    //                object formattedValue = cell.FormattedValue;
+    //                bool written = false;
+    //                if (formattedValue != null)
+    //                {
+    //                    string text = formattedValue.ToString();
+    //                    if (!string.IsNullOrEmpty(text))
+    //                    {
+    //                        html.WriteEncodedText(formattedValue.ToString());
+    //                        written = true;
+    //                    }
+    //                }
+    //                if (!written)
+    //                {
+    //                    html.Write("&nbsp;");
+    //                }
+    //                html.RenderEndTag(); // td
+    //            }
+    //        }
+    //        html.RenderEndTag(); // tr
+    //    }
 
-        //    return writer.ToString();
-        //}
+    //    html.RenderEndTag(); // table
 
-        #endregion
+    //    html.RenderEndTag(); // body
+    //    html.RenderEndTag(); // html
 
-    } // class DataGridViewUtility
+    //    html.Flush();
 
-} // namespace AM.Windows.Forms
+    //    return writer.ToString();
+    //}
+
+    #endregion
+}

@@ -19,71 +19,50 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+///
+/// </summary>
+public class DataGridViewProgressColumn
+    : DataGridViewColumn
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Gets or sets the maximum.
     /// </summary>
-    public class DataGridViewProgressColumn
-        : DataGridViewColumn
+    /// <value>The maximum.</value>
+    [DefaultValue (100)]
+    public int Maximum
     {
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets the maximum.
-        /// </summary>
-        /// <value>The maximum.</value>
-        [DefaultValue(100)]
-        public int Maximum
-        {
-            get
-            {
-                return ((DataGridViewProgressCell)CellTemplate).Maximum;
-            }
-            set
-            {
-                ((DataGridViewProgressCell)CellTemplate).Maximum = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the minimum.
-        /// </summary>
-        /// <value>The minimum.</value>
-        [DefaultValue(0)]
-        public int Minimum
-        {
-            get
-            {
-                return ((DataGridViewProgressCell)CellTemplate).Minimum;
-            }
-            set
-            {
-                ((DataGridViewProgressCell)CellTemplate).Minimum = value;
-            }
-        }
-
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        public DataGridViewProgressColumn()
-            : base(new DataGridViewProgressCell())
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
+        get => ((DataGridViewProgressCell) CellTemplate).Maximum;
+        set => ((DataGridViewProgressCell) CellTemplate).Maximum = value;
     }
+
+    /// <summary>
+    /// Gets or sets the minimum.
+    /// </summary>
+    /// <value>The minimum.</value>
+    [DefaultValue (0)]
+    public int Minimum
+    {
+        get => ((DataGridViewProgressCell) CellTemplate).Minimum;
+        set => ((DataGridViewProgressCell) CellTemplate).Minimum = value;
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public DataGridViewProgressColumn()
+        : base (new DataGridViewProgressCell())
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
 }
