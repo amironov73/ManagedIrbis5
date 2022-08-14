@@ -17,45 +17,44 @@ using System.Windows.Forms;
 
 #endregion
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+///
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+public class HabitualDataGridView
+    : DataGridView
 {
+    #region Properties
+
+    //
+    // TODO: объединить с  HandyGrid
+    //
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    ///
+    /// Constructor.
     /// </summary>
-    [System.ComponentModel.DesignerCategory("Code")]
-    public class HabitualDataGridView
-        : DataGridView
+    public HabitualDataGridView()
     {
-        #region Properties
+        AutoGenerateColumns = false;
+        RowHeadersVisible = false;
+        SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        AllowUserToResizeRows = false;
 
-        //
-        // TODO: объединить с  HandyGrid
-        //
+        var mainStyle = new DataGridViewCellStyle();
+        DefaultCellStyle = mainStyle;
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public HabitualDataGridView()
+        var alternateStyle = new DataGridViewCellStyle (mainStyle)
         {
-            AutoGenerateColumns = false;
-            RowHeadersVisible = false;
-            SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            AllowUserToResizeRows = false;
-
-            var mainStyle = new DataGridViewCellStyle();
-            DefaultCellStyle = mainStyle;
-
-            var alternateStyle = new DataGridViewCellStyle(mainStyle)
-                {
-                    BackColor = Color.LightGray
-                };
-            AlternatingRowsDefaultCellStyle = alternateStyle;
-        }
-
-        #endregion
+            BackColor = Color.LightGray
+        };
+        AlternatingRowsDefaultCellStyle = alternateStyle;
     }
+
+    #endregion
 }

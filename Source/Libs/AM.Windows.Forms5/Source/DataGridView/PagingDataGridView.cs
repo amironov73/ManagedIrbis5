@@ -22,180 +22,172 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+///
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+public class PagingDataGridView
+    : DataGridView
 {
+    #region Events
+
     /// <summary>
-    ///
+    /// Raised on paging.
     /// </summary>
-    [System.ComponentModel.DesignerCategory("Code")]
-    public class PagingDataGridView
-        : DataGridView
+    public event EventHandler<PagingDataGridViewEventArgs>? Paging;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PagingDataGridView()
     {
-        #region Events
+        ReadOnly = true;
+        AutoGenerateColumns = false;
+        RowHeadersVisible = false;
+        SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        AllowUserToAddRows = false;
+        AllowUserToResizeRows = false;
+        AllowUserToDeleteRows = false;
+        EnableHeadersVisualStyles = false;
+        ColumnHeadersDefaultCellStyle.SelectionBackColor = ColumnHeadersDefaultCellStyle.BackColor;
+        ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+        ScrollBars = ScrollBars.None;
 
-        /// <summary>
-        /// Raised on paging.
-        /// </summary>
-        public event EventHandler<PagingDataGridViewEventArgs>? Paging;
+        var mainStyle = new DataGridViewCellStyle();
+        DefaultCellStyle = mainStyle;
 
-        #endregion
-
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public PagingDataGridView()
+        var alternateStyle = new DataGridViewCellStyle (mainStyle)
         {
-            ReadOnly = true;
-            AutoGenerateColumns = false;
-            RowHeadersVisible = false;
-            SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            AllowUserToAddRows = false;
-            AllowUserToResizeRows = false;
-            AllowUserToDeleteRows = false;
-            EnableHeadersVisualStyles = false;
-            ColumnHeadersDefaultCellStyle.SelectionBackColor = ColumnHeadersDefaultCellStyle.BackColor;
-            ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            ScrollBars = ScrollBars.None;
+            BackColor = Color.LightGray
+        };
+        AlternatingRowsDefaultCellStyle = alternateStyle;
+    }
 
-            var mainStyle = new DataGridViewCellStyle();
-            DefaultCellStyle = mainStyle;
+    #endregion
 
-            var alternateStyle = new DataGridViewCellStyle(mainStyle)
-                {
-                    BackColor = Color.LightGray
-                };
-            AlternatingRowsDefaultCellStyle = alternateStyle;
+    #region Private members
 
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private void _HandleScrolling(bool down)
+    private void _HandleScrolling (bool down)
+    {
+        var row = CurrentRow;
+        if (row == null)
         {
-            var row = CurrentRow;
-            if (row == null)
+            return;
+        }
+
+        var rowIndex = row.Index;
+        var rowCount = RowCount;
+
+        if (down)
+        {
+            if (rowIndex >= rowCount - 1)
             {
+                PerformPaging (true, false);
+            }
+        }
+        else
+        {
+            if (rowIndex == 0)
+            {
+                PerformPaging (false, false);
+            }
+        }
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Fill the grid.
+    /// </summary>
+    public void FillGrid
+        (
+            IEnumerable<object> objects
+        )
+    {
+        DataSource = objects.ToArray();
+    }
+
+    /// <summary>
+    /// Perform paging.
+    /// </summary>
+    public void PerformPaging
+        (
+            bool scrollDown,
+            bool initialCall
+        )
+    {
+        var eventArgs = new PagingDataGridViewEventArgs
+        {
+            InitialCall = initialCall,
+            ScrollDown = scrollDown,
+            CurrentRow = CurrentRow
+        };
+
+        Paging.Raise (this, eventArgs);
+
+        if (!eventArgs.Success)
+        {
+            return;
+        }
+
+        if (!scrollDown && RowCount > 0)
+        {
+            CurrentCell = Rows[RowCount - 1].Cells[0];
+        }
+    }
+
+    #endregion
+
+    #region DataGridView members
+
+    /// <inheritdoc cref="DataGridView.OnKeyDown" />
+    protected override void OnKeyDown
+        (
+            KeyEventArgs e
+        )
+    {
+        base.OnKeyDown (e);
+
+        var down = false;
+
+        switch (e.KeyCode)
+        {
+            case Keys.Down:
+            case Keys.PageDown:
+                down = true;
+                break;
+
+            case Keys.Up:
+            case Keys.PageUp:
+                break;
+
+            default:
                 return;
-            }
-
-            var rowIndex = row.Index;
-            var rowCount = RowCount;
-
-            if (down)
-            {
-                if (rowIndex >= rowCount - 1)
-                {
-                    PerformPaging(true, false);
-                }
-            }
-            else
-            {
-                if (rowIndex == 0)
-                {
-                    PerformPaging(false, false);
-                }
-            }
         }
 
-        #endregion
+        e.Handled = true;
 
-        #region Public methods
+        _HandleScrolling (down);
+    }
 
-        /// <summary>
-        /// Fill the grid.
-        /// </summary>
-        public void FillGrid
-            (
-                IEnumerable<object> objects
-            )
-        {
-            DataSource = objects.ToArray();
-        }
+    /// <inheritdoc cref="DataGridView.OnMouseWheel" />
+    protected override void OnMouseWheel
+        (
+            MouseEventArgs e
+        )
+    {
+        base.OnMouseWheel (e);
 
-        /// <summary>
-        /// Perform paging.
-        /// </summary>
-        public void PerformPaging
-            (
-                bool scrollDown,
-                bool initialCall
-            )
-        {
-            var eventArgs = new PagingDataGridViewEventArgs
-            {
-                InitialCall = initialCall,
-                ScrollDown = scrollDown,
-                CurrentRow = CurrentRow
-            };
+        _HandleScrolling (e.Delta < 0);
+    }
 
-            Paging.Raise(this, eventArgs);
-
-            if (!eventArgs.Success)
-            {
-                return;
-            }
-
-            if (!scrollDown && RowCount > 0)
-            {
-                CurrentCell = Rows[RowCount - 1].Cells[0];
-            }
-        }
-
-        #endregion
-
-        #region DataGridView members
-
-        /// <inheritdoc />
-        protected override void OnKeyDown
-            (
-                KeyEventArgs e
-            )
-        {
-            base.OnKeyDown(e);
-
-            var down = false;
-
-            switch (e.KeyCode)
-            {
-                case Keys.Down:
-                case Keys.PageDown:
-                    down = true;
-                    break;
-
-                case Keys.Up:
-                case Keys.PageUp:
-                    break;
-
-                default:
-                    return;
-            }
-
-            e.Handled = true;
-
-            _HandleScrolling(down);
-        }
-
-        /// <inheritdoc />
-        protected override void OnMouseWheel
-            (
-                MouseEventArgs e
-            )
-        {
-            base.OnMouseWheel(e);
-
-            _HandleScrolling(e.Delta < 0);
-        }
-
-        #endregion
-
-    } // class PagingDataGridView
-
-} // namespace AM.Windows.Forms
+    #endregion
+}
