@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftDebuggerForm.cs --
+/* PftDebuggerForm.cs -- форма для PFT-отладчика
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,24 +27,23 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Pft
+namespace ManagedIrbis.WinForms.Pft;
+
+/// <summary>
+/// Форма для PFT-отладчика.
+/// </summary>
+public partial class PftDebuggerForm
+    : Form
 {
+    #region Construction
+
     /// <summary>
-    /// Form for PFT debugger.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public partial class PftDebuggerForm
-        : Form
+    public PftDebuggerForm()
     {
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftDebuggerForm()
-        {
-            InitializeComponent();
-        }
-
-        #endregion
+        InitializeComponent();
     }
+
+    #endregion
 }

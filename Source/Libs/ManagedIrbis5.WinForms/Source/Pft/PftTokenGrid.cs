@@ -16,89 +16,90 @@
 using System;
 using System.Windows.Forms;
 
+using AM;
+
 using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Pft
+namespace ManagedIrbis.WinForms.Pft;
+
+/// <summary>
+/// Таблица, отображающая токены PFT-скрипта.
+/// </summary>
+public partial class PftTokenGrid
+    : UserControl
 {
+    #region Events
+
     /// <summary>
-    /// Таблица, отображающая токены PFT-скрипта.
+    /// Cell double click.
     /// </summary>
-    public partial class PftTokenGrid
-        : UserControl
+    public event EventHandler? CellDoubleClick;
+
+    #endregion
+
+    #region Properites
+
+    /// <summary>
+    /// Selected token.
+    /// </summary>
+    public PftToken? SelectedToken => _grid.CurrentRow?.DataBoundItem as PftToken;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftTokenGrid()
     {
-        #region Events
+        InitializeComponent();
 
-        /// <summary>
-        /// Cell double click.
-        /// </summary>
-        public event EventHandler? CellDoubleClick;
+        _grid.CellDoubleClick += _Grid_CellDoubleClick;
+    }
 
-        #endregion
+    #endregion
 
-        #region Properites
+    #region Private members
 
-        /// <summary>
-        /// Selected token.
-        /// </summary>
-        public PftToken? SelectedToken => _grid.CurrentRow?.DataBoundItem as PftToken;
+    void _Grid_CellDoubleClick
+        (
+            object? sender,
+            DataGridViewCellEventArgs e
+        )
+    {
+        CellDoubleClick?.Invoke (this, EventArgs.Empty);
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Public methods
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftTokenGrid()
-        {
-            InitializeComponent();
+    /// <summary>
+    /// Clear.
+    /// </summary>
+    public void Clear()
+    {
+        _grid.DataSource = null;
+    }
 
-            _grid.CellDoubleClick += _grid_CellDoubleClick;
-        }
+    /// <summary>
+    /// Set tokens.
+    /// </summary>
+    public void SetTokens
+        (
+            PftTokenList tokens
+        )
+    {
+        Sure.NotNull (tokens);
 
-        #endregion
+        _grid.AutoGenerateColumns = false;
+        _grid.DataSource = tokens.ToArray();
+    }
 
-        #region Private members
-
-        void _grid_CellDoubleClick
-            (
-                object? sender,
-                DataGridViewCellEventArgs e
-            )
-        {
-            CellDoubleClick?.Invoke(this, EventArgs.Empty);
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Clear.
-        /// </summary>
-        public void Clear()
-        {
-            _grid.DataSource = null;
-        }
-
-        /// <summary>
-        /// Set tokens.
-        /// </summary>
-        public void SetTokens
-            (
-                PftTokenList tokens
-            )
-        {
-            _grid.AutoGenerateColumns = false;
-            _grid.DataSource = tokens.ToArray();
-        }
-
-        #endregion
-
-    } // class PftTokenGrid
-
-} // namespace ManagedIrbis.WinForms.Pft
+    #endregion
+}
