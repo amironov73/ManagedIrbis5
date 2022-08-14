@@ -19,106 +19,74 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Column of <see cref="DataGridViewCalendarCell"/>'s.
+/// </summary>
+/// <remarks>Stolen from MSDN article
+/// "How to: Host Controls in Windows Forms DataGridView Cells"
+/// </remarks>
+public class DataGridViewCalendarColumn
+    : DataGridViewColumn
 {
+    #region Properties
+
     /// <summary>
-    /// Column of <see cref="DataGridViewCalendarCell"/>'s.
+    /// Gets or sets the format of date.
     /// </summary>
-    /// <remarks>Stolen from MSDN article
-    /// "How to: Host Controls in Windows Forms DataGridView Cells"
-    /// </remarks>
-    public class DataGridViewCalendarColumn
-        : DataGridViewColumn
+    /// <value>Format of date.</value>
+    public string Format
     {
-        #region Properties
+        [DebuggerStepThrough] get => ((DataGridViewCalendarCell)CellTemplate).Format;
 
-        /// <summary>
-        /// Gets or sets the format of date.
-        /// </summary>
-        /// <value>Format of date.</value>
-        public string Format
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return ((DataGridViewCalendarCell)CellTemplate).Format;
-            }
-            [DebuggerStepThrough]
-            set
-            {
-                ((DataGridViewCalendarCell)CellTemplate).Format = value;
-            }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="DataGridViewCalendarColumn"/> class.
-        /// </summary>
-        public DataGridViewCalendarColumn()
-            : base(new DataGridViewCalendarCell())
-        {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region DataGridViewColumn members
-
-        /// <summary>
-        /// Gets or sets the template used to create new cells.
-        /// </summary>
-        /// <value></value>
-        /// <returns>A
-        /// <see cref="T:System.Windows.Forms.DataGridViewCell"/>
-        /// that all other cells in the column are modeled after.
-        /// The default is null.</returns>
-        public override DataGridViewCell CellTemplate
-        {
-            get
-            {
-                return base.CellTemplate;
-            }
-            set
-            {
-                // Ensure that the cell used for the template is a CalendarCell.
-                if (!(value is DataGridViewCalendarCell))
-                {
-                    throw new InvalidCastException("Must be a CalendarCell");
-                }
-                base.CellTemplate = value;
-            }
-        }
-
-        /// <summary>
-        /// Creates an exact copy of this column.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="T:System.Object"/> that represents the cloned
-        /// <see cref="DataGridViewTextBoxColumn"></see>.
-        /// </returns>
-        public override object Clone()
-        {
-            var result = base.Clone();
-            var clone
-                = result as DataGridViewCalendarColumn;
-            if (clone != null)
-            {
-                clone.Format = Format;
-            }
-            return result;
-        }
-
-        #endregion
+        [DebuggerStepThrough] set => ((DataGridViewCalendarCell)CellTemplate).Format = value;
     }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию
+    /// </summary>
+    public DataGridViewCalendarColumn()
+        : base (new DataGridViewCalendarCell())
+    {
+        // пустое тело конструктора
+    }
+
+    #endregion
+
+    #region DataGridViewColumn members
+
+    /// <inheritdoc cref="DataGridViewColumn.CellTemplate"/>
+    public override DataGridViewCell CellTemplate
+    {
+        get => base.CellTemplate;
+        set
+        {
+            // Ensure that the cell used for the template is a CalendarCell.
+            if (!(value is DataGridViewCalendarCell))
+            {
+                throw new InvalidCastException ("Must be a CalendarCell");
+            }
+
+            base.CellTemplate = value;
+        }
+    }
+
+    /// <inheritdoc cref="DataGridViewColumn.Clone"/>
+    public override object Clone()
+    {
+        var result = base.Clone();
+        if (result is DataGridViewCalendarColumn clone)
+        {
+            clone.Format = Format;
+        }
+
+        return result;
+    }
+
+    #endregion
 }
