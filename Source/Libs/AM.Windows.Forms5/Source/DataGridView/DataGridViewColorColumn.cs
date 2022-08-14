@@ -18,32 +18,24 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+///
+/// </summary>
+public class DataGridViewColorColumn
+    : DataGridViewColumn
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public class DataGridViewColorColumn
-        : DataGridViewColumn
+    public DataGridViewColorColumn()
+        : base (new DataGridViewColorCell())
     {
-        #region Construction
-
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        public DataGridViewColorColumn()
-            : base(new DataGridViewColorCell())
-        {
-        }
-
-        #endregion
-
-        #region Private members
-        #endregion
-
-        #region Public methods
-        #endregion
-
-
+        // пустое тело конструктора
     }
+
+    #endregion
 }
