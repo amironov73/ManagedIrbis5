@@ -110,12 +110,15 @@ public class DataGridViewNumericCell
             return value.ToString();
         }
 
-        return base.GetFormattedValue (value,
-            rowIndex,
-            ref cellStyle,
-            valueTypeConverter,
-            formattedValueTypeConverter,
-            context);
+        return base.GetFormattedValue
+            (
+                value,
+                rowIndex,
+                ref cellStyle,
+                valueTypeConverter,
+                formattedValueTypeConverter,
+                context
+            );
     }
 
     /// <inheritdoc cref="DataGridViewCell.ParseFormattedValue"/>
