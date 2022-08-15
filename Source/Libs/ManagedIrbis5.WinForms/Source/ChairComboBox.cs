@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -13,93 +14,93 @@
 
 #region Using directives
 
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using AM;
+
+using ManagedIrbis.Providers;
 using ManagedIrbis.Readers;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms
+namespace ManagedIrbis.WinForms;
+
+/// <summary>
+/// Выпадающий список кафедр обслуживания.
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+public sealed class ChairComboBox
+    : ComboBox
 {
+    #region Properties
+
     /// <summary>
-    /// Выпадающий список кафедр обслуживания.
+    /// Выбранная кафедра.
     /// </summary>
-    [System.ComponentModel.DesignerCategory("Code")]
-    public class ChairComboBox
-        : ComboBox
+    public ChairInfo? SelectedChair => SelectedItem as ChairInfo;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public ChairComboBox()
     {
-        #region Properties
+        DropDownStyle = ComboBoxStyle.DropDownList;
+    }
 
-        /// <summary>
-        /// Selected chair.
-        /// </summary>
-        public ChairInfo? SelectedChair => SelectedItem as ChairInfo;
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Construction
+    /// <summary>
+    /// Заполнение комбобокса списком кафедр.
+    /// </summary>
+    public void FillWithChairs
+        (
+            ISyncProvider connection,
+            bool addAllItem = false
+        )
+    {
+        Sure.NotNull (connection);
+        connection.EnsureConnected();
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ChairComboBox()
-        {
-            DropDownStyle = ComboBoxStyle.DropDownList;
-        } // constructor
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Fill the combo box with chair list.
-        /// </summary>
-        public void FillWithChairs
+        var chairs = ChairInfo.Read
             (
-                ISyncProvider connection,
-                bool addAllItem = false
-            )
-        {
-            var chairs = ChairInfo.Read
-                (
-                    connection,
-                    ChairInfo.ChairMenu,
-                    addAllItem
-                );
-            Items.Clear();
+                connection,
+                ChairInfo.ChairMenu,
+                addAllItem
+            );
+        Items.Clear();
+        Items.AddRange (chairs);
+    }
 
-            // ReSharper disable CoVariantArrayConversion
-            Items.AddRange(chairs);
-            // ReSharper restore CoVariantArrayConversion
-        } // method FillWithChairs
+    /// <summary>
+    /// Заполнение комбобокса списокм мест обслуживания.
+    /// Fill the combo box with places list.
+    /// </summary>
+    public void FillWithPlaces
+        (
+            SyncConnection connection,
+            bool addAllItem = false
+        )
+    {
+        Sure.NotNull (connection);
+        connection.EnsureConnected();
 
-        /// <summary>
-        /// Fill the combo box with places list.
-        /// </summary>
-        public void FillWithPlaces
+        var chairs = ChairInfo.Read
             (
-                SyncConnection connection,
-                bool addAllItem = false
-            )
-        {
-            var chairs = ChairInfo.Read
-                (
-                    connection,
-                    ChairInfo.PlacesMenu,
-                    addAllItem
-                );
-            Items.Clear();
+                connection,
+                ChairInfo.PlacesMenu,
+                addAllItem
+            );
+        Items.Clear();
+        Items.AddRange (chairs);
+    }
 
-            // ReSharper disable CoVariantArrayConversion
-            Items.AddRange(chairs);
-            // ReSharper restore CoVariantArrayConversion
-        } // method FillWithPlaces
-
-        #endregion
-
-    } // class ChairComboBox
-
-} // namespace ManagedIrbis.WinForms
+    #endregion
+}

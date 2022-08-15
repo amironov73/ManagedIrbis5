@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
@@ -14,62 +15,63 @@
 
 using System.Windows.Forms;
 
+using AM;
+
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms
+namespace ManagedIrbis.WinForms;
+
+/// <summary>
+/// Выпадающий список баз данных.
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+public sealed class DatabaseComboBox
+    : ComboBox
 {
+    #region Properties
+
     /// <summary>
-    /// Выпадающий список баз данных.
+    /// Выбранная пользователем база данных.
     /// </summary>
-    [System.ComponentModel.DesignerCategory("Code")]
-    public class DatabaseComboBox
-        : ComboBox
+    public DatabaseInfo? SelectedDatabase => SelectedItem as DatabaseInfo;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public DatabaseComboBox()
     {
-        #region Properties
+        DropDownStyle = ComboBoxStyle.DropDownList;
+    }
 
-        /// <summary>
-        /// Выбранная пользователем база данных.
-        /// </summary>
-        public DatabaseInfo? SelectedDatabase => SelectedItem as DatabaseInfo;
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Construction
+    /// <summary>
+    /// Заполнение комбобокса списком баз данных.
+    /// </summary>
+    public void FillWithDatabases
+        (
+            ISyncProvider connection,
+            string listFile
+        )
+    {
+        Sure.NotNull (connection);
+        Sure.NotNullNorEmpty (listFile);
+        connection.EnsureConnected();
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public DatabaseComboBox()
-        {
-            DropDownStyle = ComboBoxStyle.DropDownList;
-        } // constructor
+        var databases = connection.ListDatabases (listFile);
+        Items.Clear();
+        Items.AddRange (databases);
+    }
 
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Fill the combo box with databases list.
-        /// </summary>
-        public void FillWithDatabases
-            (
-                ISyncProvider connection,
-                string listFile
-            )
-        {
-            // DatabaseInfo[] databases = connection.ListDatabases(listFile);
-            //
-            // Items.AddRange(databases);
-        } // method FillWithDatabases
-
-        #endregion
-
-    } // class DatabaseComboBox
-
-} // namespace ManagedIrbis.WinForms
+    #endregion
+}
