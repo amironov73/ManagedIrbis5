@@ -106,7 +106,7 @@ public sealed class ColorComboBox
         return summa > 300 ? Brushes.Black : Brushes.White;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IStyleable.StyleKey"/>
     Type IStyleable.StyleKey => typeof (ComboBox);
 
     #endregion

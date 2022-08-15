@@ -4,20 +4,14 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
 
-/* AbstractControl.cs --
+/* AbstractControl.cs -- некий абстрактный контрол, хранящий значение
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 using Avalonia.Threading;
@@ -32,77 +26,114 @@ using AM.Avalonia.Interfaces;
 
 namespace AM.Avalonia.Controls;
 
+/// <summary>
+/// Некий абстрактный контрол, хранящий значение определенного типа.
+/// </summary>
 public abstract class AbstractControl<T>
     : ReactiveObject, IDialogControl<T>
 {
-    private string name;
-    private bool isVisible;
-    private bool isEnabled;
-    private bool isRequired;
-    private T value;
+    #region Properties
 
-    public string Name
+    /// <inheritdoc cref="IDialogControl.Name"/>
+    public string? Name
     {
-        get { return name; }
+        get => _name;
         set
         {
-            name = value;
+            _name = value;
             OnPropertyChanged();
         }
     }
 
+    /// <inheritdoc cref="IDialogControl.IsRequired"/>
     public bool IsRequired
     {
-        get { return isRequired; }
+        get => _isRequired;
         set
         {
-            isRequired = value;
+            _isRequired = value;
             OnPropertyChanged();
         }
     }
 
+    /// <inheritdoc cref="IDialogControl.IsVisible"/>
     public bool IsVisible
     {
-        get { return isVisible; }
+        get => _isVisible;
         set
         {
-            isVisible = value;
+            _isVisible = value;
             OnPropertyChanged();
         }
     }
 
+    /// <inheritdoc cref="IDialogControl.IsEnabled"/>
     public bool IsEnabled
     {
-        get { return isEnabled; }
+        get => _isEnabled;
         set
         {
-            isEnabled = value;
+            _isEnabled = value;
             OnPropertyChanged();
         }
     }
 
+    /// <inheritdoc cref="IDialogControl{T}.Value"/>
     public T Value
     {
-        get { return value; }
+        get => _value;
         set
         {
-            this.value = value;
+            _value = value;
             OnPropertyChanged();
         }
     }
 
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        if (Dispatcher.UIThread.CheckAccess())
-            this.RaisePropertyChanged(propertyName);
-        else
-            Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(propertyName));
-    }
+    #endregion
 
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
     protected AbstractControl()
     {
         IsEnabled = true;
         IsVisible = true;
         IsRequired = false;
+        _value = default!;
     }
+
+    #endregion
+
+    #region Private members
+
+    private string? _name;
+    private bool _isVisible;
+    private bool _isEnabled;
+    private bool _isRequired;
+    private T _value;
+
+    /// <summary>
+    /// Вызов оповещения об изменении свойства объекта.
+    /// </summary>
+    protected virtual void OnPropertyChanged
+        (
+            [CallerMemberName] string? propertyName = null
+        )
+    {
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            this.RaisePropertyChanged (propertyName);
+        }
+        else
+        {
+            Dispatcher.UIThread.InvokeAsync
+                (
+                    () => this.RaisePropertyChanged (propertyName)
+                );
+        }
+    }
+
+    #endregion
 }
