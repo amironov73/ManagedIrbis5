@@ -16,6 +16,8 @@
 using System;
 using System.Windows.Forms;
 
+using AM;
+
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 
@@ -23,139 +25,139 @@ using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Pft
+namespace ManagedIrbis.WinForms.Pft;
+
+/// <summary>
+/// TreeView over <see cref="PftNode"/>'s
+/// </summary>
+public partial class PftTreeView
+    : UserControl
 {
+    #region Events
+
     /// <summary>
-    /// TreeView over <see cref="PftNode"/>'s
+    /// Fired when current node changed.
     /// </summary>
-    public partial class PftTreeView
-        : UserControl
+    public event EventHandler<TreeViewEventArgs>? CurrentNodeChanged;
+
+    /// <summary>
+    /// Fired when node check state changed.
+    /// </summary>
+    public event EventHandler<TreeViewEventArgs>? NodeChecked;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Current node.
+    /// </summary>
+    public PftNodeInfo? CurrentNode => _tree.SelectedNode?.Tag as PftNodeInfo;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Construction.
+    /// </summary>
+    public PftTreeView()
     {
-        #region Events
+        InitializeComponent();
 
-        /// <summary>
-        /// Fired when current node changed.
-        /// </summary>
-        public event EventHandler<TreeViewEventArgs>? CurrentNodeChanged;
+        _tree.AfterSelect += _tree_AfterSelect;
+        _tree.AfterCheck += _tree_AfterCheck;
+    }
 
-        /// <summary>
-        /// Fired when node check state changed.
-        /// </summary>
-        public event EventHandler<TreeViewEventArgs>? NodeChecked;
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Properties
+    private static TreeNode _ConvertNode
+        (
+            PftNodeInfo info
+        )
+    {
+        var text = info.ToString();
 
-        /// <summary>
-        /// Current node.
-        /// </summary>
-        public PftNodeInfo? CurrentNode => _tree.SelectedNode?.Tag as PftNodeInfo;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Construction.
-        /// </summary>
-        public PftTreeView()
+        var result = new TreeNode
         {
-            InitializeComponent();
+            Tag = info,
+            Text = text,
+            ToolTipText = text
+        };
 
-            _tree.AfterSelect += _tree_AfterSelect;
-            _tree.AfterCheck += _tree_AfterCheck;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private static TreeNode _ConvertNode
-            (
-                PftNodeInfo info
-            )
+        foreach (var child in info.Children)
         {
-            var text = info.ToString();
-
-            var result = new TreeNode
+            if (!ReferenceEquals (child, null))
             {
-                Tag = info,
-                Text = text,
-                ToolTipText = text
-            };
-
-            foreach (var child in info.Children)
-            {
-                if (!ReferenceEquals (child, null))
+                var node = _ConvertNode (child);
+                if (!ReferenceEquals (node, null))
                 {
-                    var node = _ConvertNode(child);
-                    if (!ReferenceEquals (node, null))
-                    {
-                        result.Nodes.Add(node);
-                    }
+                    result.Nodes.Add (node);
                 }
             }
-
-            return result;
         }
 
-        private void _tree_AfterCheck
-            (
-                object? sender,
-                TreeViewEventArgs e
-            )
-        {
-            NodeChecked?.Invoke (sender, e);
-        }
-
-        void _tree_AfterSelect
-            (
-                object? sender,
-                TreeViewEventArgs e
-            )
-        {
-            CurrentNodeChanged?.Invoke (sender, e);
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Clear.
-        /// </summary>
-        public void Clear()
-        {
-            _tree.Nodes.Clear();
-        }
-
-        /// <summary>
-        /// Set nodes.
-        /// </summary>
-        public void SetNodes
-            (
-                PftNode rootNode
-            )
-        {
-            try
-            {
-                _tree.BeginUpdate();
-                _tree.Nodes.Clear();
-                var rootInfo = rootNode.GetNodeInfo();
-                var treeNode = _ConvertNode(rootInfo);
-                _tree.Nodes.Add(treeNode);
-                _tree.ExpandAll();
-                _tree.SelectedNode = treeNode;
-                treeNode.EnsureVisible();
-            }
-            finally
-            {
-                _tree.EndUpdate();
-            }
-        }
-
-        #endregion
+        return result;
     }
-}
 
+    private void _tree_AfterCheck
+        (
+            object? sender,
+            TreeViewEventArgs e
+        )
+    {
+        NodeChecked?.Invoke (sender, e);
+    }
+
+    void _tree_AfterSelect
+        (
+            object? sender,
+            TreeViewEventArgs e
+        )
+    {
+        CurrentNodeChanged?.Invoke (sender, e);
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Clear.
+    /// </summary>
+    public void Clear()
+    {
+        _tree.Nodes.Clear();
+    }
+
+    /// <summary>
+    /// Set nodes.
+    /// </summary>
+    public void SetNodes
+        (
+            PftNode rootNode
+        )
+    {
+        Sure.NotNull (rootNode);
+
+        try
+        {
+            _tree.BeginUpdate();
+            _tree.Nodes.Clear();
+            var rootInfo = rootNode.GetNodeInfo();
+            var treeNode = _ConvertNode (rootInfo);
+            _tree.Nodes.Add (treeNode);
+            _tree.ExpandAll();
+            _tree.SelectedNode = treeNode;
+            treeNode.EnsureVisible();
+        }
+        finally
+        {
+            _tree.EndUpdate();
+        }
+    }
+
+    #endregion
+}

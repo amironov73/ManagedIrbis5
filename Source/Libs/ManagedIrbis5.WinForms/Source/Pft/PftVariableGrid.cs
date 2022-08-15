@@ -28,94 +28,98 @@ using ManagedIrbis.Pft.Infrastructure;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Pft
+namespace ManagedIrbis.WinForms.Pft;
+
+/// <summary>
+///
+/// </summary>
+public partial class PftVariableGrid
+    : UserControl
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public partial class PftVariableGrid
-        : UserControl
+    #region Nested classes
+
+    class VariableInfo
     {
-        #region Nested classes
+        #region Properties
 
-        class VariableInfo
-        {
-            #region Properties
+        public string? Name { get; set; }
 
-            public string? Name { get; set; }
-
-            public object? Value { get; set; }
-
-            #endregion
-
-            #region Public methods
-
-            public static VariableInfo FromVariable
-                (
-                    PftVariable variable
-                )
-            {
-                object? value = variable.StringValue;
-                if (variable.IsNumeric)
-                {
-                    value = variable.NumericValue;
-                }
-
-                var result = new VariableInfo
-                {
-                    Name = variable.Name.ThrowIfNull("variable.Name"),
-                    Value = value
-                };
-
-                return result;
-            }
-
-            #endregion
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftVariableGrid()
-        {
-            InitializeComponent();
-        }
+        public object? Value { get; set; }
 
         #endregion
 
         #region Public methods
 
-        /// <summary>
-        /// Clear.
-        /// </summary>
-        public void Clear()
-        {
-            _grid.DataSource = null;
-        }
-
-        /// <summary>
-        /// Set variables.
-        /// </summary>
-        public void SetVariables
+        public static VariableInfo FromVariable
             (
-                PftVariableManager manager
+                PftVariable variable
             )
         {
-            var all = manager.GetAllVariables();
-            var list = new List<VariableInfo>();
-            foreach (var variable in all)
+            object? value = variable.StringValue;
+            if (variable.IsNumeric)
             {
-                var info = VariableInfo.FromVariable(variable);
-                list.Add(info);
+                value = variable.NumericValue;
             }
-            _grid.AutoGenerateColumns = false;
-            _grid.DataSource = list.OrderBy(v => v.Name).ToArray();
+
+            var result = new VariableInfo
+            {
+                Name = variable.Name.ThrowIfNull(),
+                Value = value
+            };
+
+            return result;
         }
 
         #endregion
     }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PftVariableGrid()
+    {
+        InitializeComponent();
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Clear.
+    /// </summary>
+    public void Clear()
+    {
+        _grid.DataSource = null;
+    }
+
+    /// <summary>
+    /// Set variables.
+    /// </summary>
+    public void SetVariables
+        (
+            PftVariableManager manager
+        )
+    {
+        Sure.NotNull (manager);
+
+        var all = manager.GetAllVariables();
+        var list = new List<VariableInfo>();
+        foreach (var variable in all)
+        {
+            Sure.NotNull (variable);
+
+            var info = VariableInfo.FromVariable (variable);
+            list.Add (info);
+        }
+
+        _grid.AutoGenerateColumns = false;
+        _grid.DataSource = list.OrderBy (v => v.Name).ToArray();
+    }
+
+    #endregion
 }

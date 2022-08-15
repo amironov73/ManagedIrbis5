@@ -13,6 +13,8 @@
 
 #region Using directives
 
+using AM;
+
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 
@@ -20,56 +22,55 @@ using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Pft
+namespace ManagedIrbis.WinForms.Pft;
+
+/// <summary>
+/// PFT debugger for WinForms.
+/// </summary>
+public sealed class PftUiDebugger
+    : PftDebugger
 {
+    #region Properties
+
     /// <summary>
-    /// PFT debugger for WinForms.
+    /// Form.
     /// </summary>
-    public sealed class PftUiDebugger
-        : PftDebugger
+    public PftDebuggerForm Form { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public PftUiDebugger
+        (
+            PftContext context
+        )
+        : base(context)
     {
-        #region Properties
-
-        /// <summary>
-        /// Form.
-        /// </summary>
-        public PftDebuggerForm Form { get { return _form; } }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftUiDebugger
-            (
-                PftContext context
-            )
-            : base(context)
-        {
-            _form = new PftDebuggerForm();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly PftDebuggerForm _form;
-
-        #endregion
-
-        #region PftDebugger members
-
-        /// <inheritdoc/>
-        public override void Activate
-            (
-                PftDebugEventArgs eventArgs
-            )
-        {
-            _form.ShowDialog();
-        }
-
-        #endregion
+        Form = new PftDebuggerForm();
     }
+
+    #endregion
+
+    #region Private members
+
+    #endregion
+
+    #region PftDebugger members
+
+    /// <inheritdoc/>
+    public override void Activate
+        (
+            PftDebugEventArgs eventArgs
+        )
+    {
+        Sure.NotNull (eventArgs);
+
+        Form.ShowDialog();
+    }
+
+    #endregion
 }
