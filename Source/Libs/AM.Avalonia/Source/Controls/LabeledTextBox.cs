@@ -34,13 +34,7 @@ public sealed class LabeledTextBox
     public string? Label
     {
         get => (string?) _innerLabel?.Content;
-        set
-        {
-            if (_innerLabel is not null)
-            {
-                _innerLabel.Content = value;
-            }
-        }
+        set => _innerLabel?.SetValue (ContentProperty, value);
     }
 
     /// <summary>
@@ -49,13 +43,7 @@ public sealed class LabeledTextBox
     public string? Text
     {
         get => _innerTextBox?.Text;
-        set
-        {
-            if (_innerTextBox is not null)
-            {
-                _innerTextBox.Text = value;
-            }
-        }
+        set => _innerTextBox?.SetValue (TextBox.TextProperty, value);
     }
 
     #endregion

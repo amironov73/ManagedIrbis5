@@ -38,5 +38,11 @@
             LabeledTextBox
         </Button>
 
+        <Button
+            Name="ColorComboBoxButton"
+            Click="ColorComboBoxButton_OnClick">
+            ColorComboBox
+        </Button>
+
     </WrapPanel>
 </Window>

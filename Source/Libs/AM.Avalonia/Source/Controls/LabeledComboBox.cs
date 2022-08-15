@@ -14,6 +14,7 @@
 using System.Collections;
 
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 
 #endregion
@@ -36,13 +37,7 @@ public sealed class LabeledComboBox
     public IEnumerable? Items
     {
         get => _innerComboBox?.Items;
-        set
-        {
-            if (_innerComboBox is not null)
-            {
-                _innerComboBox.Items = value;
-            }
-        }
+        set => _innerComboBox?.SetValue (ItemsControl.ItemsProperty, value);
     }
 
     /// <summary>
@@ -51,13 +46,7 @@ public sealed class LabeledComboBox
     public string? Label
     {
         get => (string?) _innerLabel?.Content;
-        set
-        {
-            if (_innerLabel is not null)
-            {
-                _innerLabel.Content = value;
-            }
-        }
+        set => _innerLabel?.SetValue (ContentProperty, value);
     }
 
     /// <summary>
@@ -66,13 +55,7 @@ public sealed class LabeledComboBox
     public int SelectedIndex
     {
         get => _innerComboBox?.SelectedIndex ?? -1;
-        set
-        {
-            if (_innerComboBox is not null)
-            {
-                _innerComboBox.SelectedIndex = value;
-            }
-        }
+        set => _innerComboBox?.SetValue (SelectingItemsControl.SelectedIndexProperty, value);
     }
 
     /// <summary>
@@ -81,13 +64,7 @@ public sealed class LabeledComboBox
     public object? SelectedItem
     {
         get => _innerComboBox?.SelectedItem;
-        set
-        {
-            if (_innerComboBox is not null)
-            {
-                _innerComboBox.SelectedItem = value;
-            }
-        }
+        set => _innerComboBox?.SetValue (SelectingItemsControl.SelectedItemProperty, value);
     }
 
     #endregion

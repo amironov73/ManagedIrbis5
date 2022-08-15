@@ -15,10 +15,8 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 using AM.Avalonia.Controls;
 
@@ -139,5 +137,23 @@ public partial class MainWindow : Window
         };
 
         await window.ShowDialog (this);
+    }
+
+    private async void ColorComboBoxButton_OnClick (object? sender, RoutedEventArgs e)
+    {
+        var window = new Window
+        {
+            Title = "ColorComboBox control demo",
+            Width = 300,
+            Height = 100,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            Content = new ColorComboBox
+            {
+                Margin = new Thickness (10),
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            }
+        };
+
+        await window.ShowDialog<bool> (this);
     }
 }
