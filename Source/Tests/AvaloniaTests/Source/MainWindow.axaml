@@ -8,6 +8,7 @@
         Title="Avalonia Tests">
 
     <WrapPanel
+        Margin="20"
         Orientation="Horizontal"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
@@ -29,6 +30,12 @@
             Name="AboutWindowButton"
             Click="AboutWindowButton_OnClick">
             About Window
+        </Button>
+
+        <Button
+            Name="LabeledTextBoxButton"
+            Click="LabeledTextBoxButton_OnClick">
+            LabeledTextBox
         </Button>
 
     </WrapPanel>

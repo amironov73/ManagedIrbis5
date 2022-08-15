@@ -20,8 +20,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
+using AM.Avalonia.Controls;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 
 using ManagedIrbis;
 using ManagedIrbis.Avalonia;
@@ -73,5 +77,67 @@ public partial class MainWindow : Window
     {
         var window = new AboutWindow();
         await window.ShowDialog<bool> (this);
+    }
+
+    private async void LabeledTextBoxButton_OnClick (object? sender, RoutedEventArgs e)
+    {
+        var labeledTextBox = new LabeledTextBox
+        {
+            Label = "Это метка",
+            Text = "А это текст"
+        };
+
+        var labeledComboBox = new LabeledComboBox
+        {
+            Label = "Это другая метка",
+            Items = new []
+            {
+                "Первый элемент",
+                "Второй элемент",
+                "Третий элемент",
+                "Четвертый элемент",
+                "Пятый элемент"
+            },
+            SelectedIndex = 1
+        };
+
+        var resultLabel1 = new Label();
+        var resultLabel2 = new Label();
+
+        var button = new Button
+        {
+            Content = "Нажми меня",
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+
+        button.Click += (_, _) =>
+        {
+            resultLabel1.Content = labeledTextBox.Text;
+            resultLabel2.Content = labeledComboBox.SelectedItem;
+        };
+
+        var window = new Window
+        {
+            Title = "LabeledTextBox control demo",
+            Content = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Margin = new Thickness (20),
+                Spacing = 10,
+                Children =
+                {
+                    new Label { Content = "Это сверху" },
+                    labeledTextBox,
+                    labeledComboBox,
+                    new Label { Content = "Это снизу" },
+                    button,
+                    resultLabel1,
+                    resultLabel2
+                }
+            }
+        };
+
+        await window.ShowDialog (this);
     }
 }
