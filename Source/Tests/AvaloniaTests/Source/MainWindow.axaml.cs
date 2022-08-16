@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -88,7 +89,7 @@ public partial class MainWindow : Window
         var labeledComboBox = new LabeledComboBox
         {
             Label = "Это другая метка",
-            Items = new []
+            Items = new[]
             {
                 "Первый элемент",
                 "Второй элемент",
@@ -151,6 +152,62 @@ public partial class MainWindow : Window
             {
                 Margin = new Thickness (10),
                 HorizontalAlignment = HorizontalAlignment.Stretch
+            }
+        };
+
+        await window.ShowDialog<bool> (this);
+    }
+
+    private async void BusyStripeButton_OnClick (object? sender, RoutedEventArgs e)
+    {
+        var stripe = new BusyStripe
+        {
+            Text = "Приложение занято чем-то важным",
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            IsVisible = false,
+            Height = 17
+        };
+
+        var button = new Button
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Content = "Активность"
+        };
+        button.Click += (_, _) => stripe.Active = !stripe.Active;
+
+        var window = new Window
+        {
+            Title = "BusyStripe control demo",
+            Width = 300,
+            Height = 150,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            Content = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Children =
+                {
+                    stripe,
+                    new StackPanel
+                    {
+                        Orientation = Orientation.Vertical,
+                        Margin = new Thickness (10),
+                        Spacing = 10,
+                        Children =
+                        {
+                            new Label
+                            {
+                                Content = "У попа была собака, он ее любил",
+                                HorizontalAlignment = HorizontalAlignment.Center
+                            },
+                            new Label
+                            {
+                                Content = "Она съела кусок мяса, он ее убил",
+                                HorizontalAlignment = HorizontalAlignment.Center
+                            },
+                            button
+                        }
+                    }
+                }
             }
         };
 

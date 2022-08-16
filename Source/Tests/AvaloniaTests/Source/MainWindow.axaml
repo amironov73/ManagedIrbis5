@@ -44,5 +44,11 @@
             ColorComboBox
         </Button>
 
+        <Button
+            Name="BusyStripeButton"
+            Click="BusyStripeButton_OnClick">
+            BusyStripe
+        </Button>
+
     </WrapPanel>
 </Window>
