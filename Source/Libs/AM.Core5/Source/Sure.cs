@@ -186,6 +186,27 @@ public static class Sure
     }
 
     /// <summary>
+    /// Проверка, попадают ли <paramref name="index"/>
+    /// и <param name="count"></param> в допустимые диапазоны
+    /// для данного списка.
+    /// </summary>
+    public static void InRange<T>
+        (
+            int index,
+            int count,
+            IReadOnlyList<T> list
+        )
+    {
+        NotNull (list);
+
+        if (index < 0 || index >= list.Count || count < 0 || count >= list.Count
+            || (list.Count - index < count))
+        {
+            throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    /// <summary>
     /// Проверка, попадает ли <paramref name="argument"/> в указанный
     /// диапазон от <paramref name="fromValue"/>
     /// до <paramref name="toValue"/> (включительно).
