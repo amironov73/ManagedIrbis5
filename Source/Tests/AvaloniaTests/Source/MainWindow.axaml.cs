@@ -213,4 +213,29 @@ public partial class MainWindow : Window
 
         await window.ShowDialog<bool> (this);
     }
+
+    private async void DriveComboBoxButton_OnClick (object? sender, RoutedEventArgs e)
+    {
+        var window = new Window
+        {
+            Title = "DriveComboBox control demo",
+            Width = 300,
+            Height = 150,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            Content = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Margin = new Thickness (10),
+                Children =
+                {
+                    new DriveComboBox
+                    {
+                        HorizontalAlignment = HorizontalAlignment.Stretch
+                    }
+                }
+            }
+        };
+
+        await window.ShowDialog<bool> (this);
+    }
 }

@@ -50,5 +50,12 @@
             BusyStripe
         </Button>
 
+        <Button
+            Name="DriveComboBoxButton"
+            Click="DriveComboBoxButton_OnClick">
+            DriveComboBox
+        </Button>
+
     </WrapPanel>
+
 </Window>
