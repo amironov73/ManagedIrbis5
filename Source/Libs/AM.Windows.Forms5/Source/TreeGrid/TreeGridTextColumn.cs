@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridTextColumn.cs
+/* TreeGridTextColumn.cs -- колонка в гриде, содержащая простой текст
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,23 +21,18 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Колонка в гриде <see cref="TreeGrid"/>, содержащая простой текст.
+/// </summary>
+public class TreeGridTextColumn
+    : TreeGridColumn
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public class TreeGridTextColumn
-        : TreeGridColumn
-    {
-        #region TreeGridColumn members
+    #region TreeGridColumn members
 
-        /// <summary>
-        ///
-        /// </summary>
-        public override bool Editable => true;
+    /// <inheritdoc cref="TreeGridColumn.Editable"/>
+    public override bool Editable => true;
 
-        #endregion
-
-    } // class TreeGridTextColumn
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

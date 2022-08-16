@@ -3,7 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
 /* TreeGridButtonColumn.cs -- колонка, содержащая кнопки

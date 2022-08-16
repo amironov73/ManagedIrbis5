@@ -3,21 +3,18 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
-/* TreeGridNullColumn.cs
+/* TreeGridNullColumn.cs -- совершенно пустая колонка для грида
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Windows.Forms
-{
-    /// <summary>
-    ///
-    /// </summary>
-    public class TreeGridNullColumn
-        : TreeGridColumn
-    {
-    } // class TreeGridNullColumn
+namespace AM.Windows.Forms;
 
-} // namespace AM.Windows.Forms
+/// <summary>
+/// Совершенно пустая колонка для грида <see cref="TreeGrid"/>.
+/// </summary>
+public sealed class TreeGridNullColumn
+    : TreeGridColumn
+{
+    // пустое тело класса
+}

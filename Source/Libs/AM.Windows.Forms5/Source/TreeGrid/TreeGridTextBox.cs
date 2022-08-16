@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridTextBox.cs
+/* TreeGridTextBox.cs -- редактор для простого текста в ячейке грида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,88 +18,61 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Редактор для простого текста в ячейке грида <see cref="TreeGrid"/>.
+/// </summary>
+public class TreeGridTextBox
+    : TreeGridEditor
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public class TreeGridTextBox
-        : TreeGridEditor
+    public TreeGridTextBox()
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public TreeGridTextBox()
-        {
-            _textBox = new TextBox();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly TextBox _textBox;
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets the control.
-        /// </summary>
-        /// <value>The control.</value>
-        public override Control Control
-        {
-            get { return _textBox; }
-        }
-
-        /// <summary>
-        /// Gets the text box.
-        /// </summary>
-        /// <value>The text box.</value>
-        public TextBox TextBox
-        {
-            get { return _textBox; }
-        }
-
-        #endregion
-
-        #region TreeGridEditor members
-
-        /// <summary>
-        /// Sets the value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        public override void SetValue
-            (
-                string? value
-            )
-        {
-            _textBox.Text = value;
-        }
-
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        /// <returns></returns>
-        public override string GetValue()
-        {
-            return _textBox.Text;
-        }
-
-        /// <summary>
-        /// Selects the text.
-        /// </summary>
-        /// <param name="start">The start.</param>
-        /// <param name="length">The length.</param>
-        public override void SelectText(int start, int length)
-        {
-            _textBox.SelectionStart = start;
-            _textBox.SelectionLength = length;
-        }
-
-        #endregion
+        TextBox = new TextBox();
     }
+
+    #endregion
+
+    #region Properties
+
+    /// <inheritdoc cref="TreeGridEditor.Control"/>
+    public override Control Control => TextBox;
+
+    /// <summary>
+    /// Собственно текстбокс, осуществляющий редактирование.
+    /// </summary>
+    public TextBox TextBox { get; }
+
+    #endregion
+
+    #region TreeGridEditor members
+
+    /// <inheritdoc cref="TreeGridEditor.SetValue"/>
+    public override void SetValue
+        (
+            string? value
+        )
+    {
+        TextBox.Text = value;
+    }
+
+    /// <inheritdoc cref="TreeGridEditor.GetValue"/>
+    public override string GetValue()
+    {
+        return TextBox.Text;
+    }
+
+    /// <inheritdoc cref="TreeGridEditor.SelectText"/>
+    public override void SelectText (int start, int length)
+    {
+        TextBox.SelectionStart = start;
+        TextBox.SelectionLength = length;
+    }
+
+    #endregion
 }
