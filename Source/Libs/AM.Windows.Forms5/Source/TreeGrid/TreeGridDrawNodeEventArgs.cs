@@ -3,11 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridDrawRowEventArgs.cs -- аргументы события для перерисовки узла грида
  * Ars Magna project, http://arsmagna.ru

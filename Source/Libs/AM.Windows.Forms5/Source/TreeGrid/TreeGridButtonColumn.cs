@@ -3,7 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridButtonColumn.cs -- колонка, содержащая кнопки
  * Ars Magna project, http://arsmagna.ru

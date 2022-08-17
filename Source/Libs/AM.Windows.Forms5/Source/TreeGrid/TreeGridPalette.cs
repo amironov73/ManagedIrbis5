@@ -3,8 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridPalette.cs -- палитра цветов для TreeGrid
  * Ars Magna project, http://arsmagna.ru
@@ -50,7 +48,7 @@ public sealed class TreeGridPalette
     /// Цвет фона.
     /// </summary>
     [PaletteColor ("White")]
-    public Tube Backrground => GetTubeFromProperty();
+    public Tube Background => GetTubeFromProperty();
 
     /// <summary>
     /// Цвет текста в выбранном узле.

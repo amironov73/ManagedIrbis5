@@ -2,16 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
-// ReSharper disable EventNeverSubscribedTo.Global
-// ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable RedundantNameQualifier
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridNode.cs -- узел иерархического грида
  * Ars Magna project, http://arsmagna.ru
@@ -415,7 +407,7 @@ public class TreeGridNode
                 bounds.X = column.Left;
                 bounds.Width = column.Width;
 
-                var tgdcea = new TreeGridDrawCellEventArgs
+                var cellEventArgs = new TreeGridDrawCellEventArgs
                 {
                     Graphics = eventArgs.Graphics,
                     Grid = grid,
@@ -425,7 +417,7 @@ public class TreeGridNode
                     State = eventArgs.State
                 };
 
-                column.OnDrawCell (tgdcea);
+                column.OnDrawCell (cellEventArgs);
             }
         }
     }
@@ -707,10 +699,10 @@ public class TreeGridNode
     /// <summary>
     /// Список всех подчиненных узлов.
     /// </summary>
-    public List<TreeGridNode> GetAllSubnodes()
+    public List<TreeGridNode> GetAllSubNodes()
     {
         var result = new List<TreeGridNode> (Nodes);
-        result.AddRange (Nodes.SelectMany (_ => _.GetAllSubnodes()));
+        result.AddRange (Nodes.SelectMany (_ => _.GetAllSubNodes()));
 
         return result;
     }

@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridDataCollection.cs -- коллекция данных, хранящихся в строке грида
  * Ars Magna project, http://arsmagna.ru

@@ -3,10 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable RedundantNameQualifier
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridColumn.cs -- колонка грида
  * Ars Magna project, http://arsmagna.ru

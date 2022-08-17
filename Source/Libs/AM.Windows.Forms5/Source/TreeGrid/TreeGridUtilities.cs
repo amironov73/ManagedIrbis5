@@ -108,7 +108,7 @@ public static class TreeGridUtilities
         Sure.Defined (state);
 
         var result = (node.BackgroundColor == Color.Empty)
-            ? grid.Palette.Backrground.Brush
+            ? grid.Palette.Background.Brush
             : new SolidBrush (node.BackgroundColor);
 
         if ((state & TreeGridNodeState.Selected) != 0)

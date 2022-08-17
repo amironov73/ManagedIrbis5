@@ -89,8 +89,8 @@ public class TreeGrid
     /// </PermissionSet>
     public override Color BackColor
     {
-        get => Palette.Backrground;
-        set => Palette.Backrground.Color = value;
+        get => Palette.Background;
+        set => Palette.Background.Color = value;
     }
 
     /// <summary>
@@ -807,7 +807,7 @@ public class TreeGrid
     {
         var result = new List<TreeGridNode> (Nodes);
 
-        result.AddRange (Nodes.SelectMany (_ => _.GetAllSubnodes()));
+        result.AddRange (Nodes.SelectMany (_ => _.GetAllSubNodes()));
 
         return result;
     }

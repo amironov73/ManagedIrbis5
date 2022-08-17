@@ -3,10 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
-/* TreeGridNodeState.cs
+/* TreeGridNodeState.cs -- состояние узла грида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,37 +16,36 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Состояние узла грида.
+/// </summary>
+[Flags]
+public enum TreeGridNodeState
 {
     /// <summary>
-    ///
+    /// Нормальное (по умолчанию).
     /// </summary>
-    [Flags]
-    public enum TreeGridNodeState
-    {
-        /// <summary>
-        ///
-        /// </summary>
-        Normal = 0,
+    Normal = 0,
 
-        /// <summary>
-        ///
-        /// </summary>
-        Selected = 1,
+    /// <summary>
+    /// Узел выбран.
+    /// </summary>
+    Selected = 1,
 
-        /// <summary>
-        ///
-        /// </summary>
-        Disabled = 2,
+    /// <summary>
+    /// Узел запрещен.
+    /// </summary>
+    Disabled = 2,
 
-        /// <summary>
-        ///
-        /// </summary>
-        Checked = 4,
+    /// <summary>
+    /// Узел отмечен.
+    /// </summary>
+    Checked = 4,
 
-        /// <summary>
-        ///
-        /// </summary>
-        ReadOnly = 8
-    }
+    /// <summary>
+    /// Узел только для чтения.
+    /// </summary>
+    ReadOnly = 8
 }

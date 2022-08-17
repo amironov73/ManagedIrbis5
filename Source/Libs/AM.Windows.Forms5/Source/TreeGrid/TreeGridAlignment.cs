@@ -3,7 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridAlignment.cs -- выравнивание элементов в гриде
  * Ars Magna project, http://arsmagna.ru

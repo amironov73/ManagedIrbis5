@@ -3,8 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridTextBox.cs -- редактор для простого текста в ячейке грида
  * Ars Magna project, http://arsmagna.ru
@@ -68,7 +66,11 @@ public class TreeGridTextBox
     }
 
     /// <inheritdoc cref="TreeGridEditor.SelectText"/>
-    public override void SelectText (int start, int length)
+    public override void SelectText
+        (
+            int start,
+            int length
+        )
     {
         TextBox.SelectionStart = start;
         TextBox.SelectionLength = length;

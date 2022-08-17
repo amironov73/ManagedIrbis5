@@ -3,108 +3,79 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridRichTextBox.cs
+/* TreeGridRichTextBox.cs -- RTF-редактор для ячейки грида
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// RTF-редактор для ячейки грида.
+/// </summary>
+public class TreeGridRichTextBox
+    : TreeGridEditor
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Собственно RTF-редактор.
     /// </summary>
-    public class TreeGridRichTextBox
-        : TreeGridEditor
+    public RichTextBox RichTextBox { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public TreeGridRichTextBox()
     {
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TreeGridRichTextBox"/> class.
-        /// </summary>
-        public TreeGridRichTextBox()
-        {
-            _control = new RichTextBox();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly RichTextBox _control;
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets the rich text box.
-        /// </summary>
-        /// <value>The rich text box.</value>
-        public RichTextBox RichTextBox
-        {
-            get { return _control; }
-        }
-
-        #endregion
-
-        #region TreeGridEditor members
-
-        /// <summary>
-        /// Gets the control.
-        /// </summary>
-        /// <value>The control.</value>
-        public override Control Control
-        {
-            get { return _control; }
-        }
-
-        /// <summary>
-        /// Sets the value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        public override void SetValue
-            (
-                string? value
-            )
-        {
-            //ComboBox.Text = value;
-            Control.Text = value;
-        }
-
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        /// <returns></returns>
-        public override string GetValue()
-        {
-            return Control.Text;
-        }
-
-        /// <summary>
-        /// Selects the text.
-        /// </summary>
-        /// <param name="start">The start.</param>
-        /// <param name="length">The length.</param>
-        public override void SelectText(int start, int length)
-        {
-            RichTextBox.SelectionStart = start;
-            RichTextBox.SelectionLength = length;
-        }
-
-        #endregion
+        RichTextBox = new RichTextBox();
     }
+
+    #endregion
+
+    #region TreeGridEditor members
+
+    /// <inheritdoc cref="TreeGridEditor.Control"/>
+    public override Control Control => RichTextBox;
+
+    /// <inheritdoc cref="TreeGridEditor.SetValue"/>
+    public override void SetValue
+        (
+            string? value
+        )
+    {
+        Control.Text = value;
+    }
+
+    /// <inheritdoc cref="TreeGridEditor.GetValue"/>
+    public override string GetValue()
+    {
+        return Control.Text;
+    }
+
+    /// <inheritdoc cref="TreeGridEditor.SelectText"/>
+    public override void SelectText
+        (
+            int start,
+            int length
+        )
+    {
+        RichTextBox.SelectionStart = start;
+        RichTextBox.SelectionLength = length;
+    }
+
+    #endregion
 }

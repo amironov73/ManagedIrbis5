@@ -3,21 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridTextColumn.cs -- колонка в гриде, содержащая простой текст
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using drectives
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-#endregion
 
 #nullable enable
 

@@ -3,8 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* DataCollection.cs -- набор данных, хранящихся в строке грида
  * Ars Magna project, http://arsmagna.ru

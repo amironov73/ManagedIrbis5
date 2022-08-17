@@ -3,9 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridMouseEventArgs.cs -- событие мыши в TreeGrid
  * Ars Magna project, http://arsmagna.ru
@@ -28,22 +25,6 @@ public class TreeGridMouseEventArgs
     : MouseEventArgs
 {
     #region Construction
-
-    /// <summary>
-    /// Конструктор.
-    /// </summary>
-    public TreeGridMouseEventArgs
-        (
-            MouseButtons button,
-            int clicks,
-            int x,
-            int y,
-            int delta
-        )
-        : base (button, clicks, x, y, delta)
-    {
-        // пустое тело конструктора
-    }
 
     /// <summary>
     /// Конструктор.
