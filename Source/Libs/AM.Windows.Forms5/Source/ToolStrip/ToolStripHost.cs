@@ -2,11 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 // ReSharper disable VirtualMemberCallInConstructor
 
 /* ToolStripHost.cs -- обертка над произвольным контролом, позволяющая изобразить тулстрип

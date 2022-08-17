@@ -3,17 +3,15 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
+// ReSharper disable RedundantNameQualifier
 
-/* ToolStripColorComboBox.cs -- ComboBox that appears in ToolStrip
+/* ToolStripColorComboBox.cs -- ComboBox, хостящийся в ToolStrip
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
@@ -21,47 +19,38 @@ using System.Windows.Forms.Design;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// <see cref="T:System.Windows.Forms.ComboBox"/>, хостящийся в
+/// <see cref="T:System.Windows.Forms.ToolStrip"/>.
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+[ToolStripItemDesignerAvailability
+    (ToolStripItemDesignerAvailability.ToolStrip | ToolStripItemDesignerAvailability.StatusStrip)]
+public class ToolStripColorComboBox
+    : ToolStripControlHost
 {
+    #region Properties
+
     /// <summary>
-    /// <see cref="T:System.Windows.Forms.ComboBox"/> that
-    /// appears in <see cref="T:System.Windows.Forms.ToolStrip"/>.
+    /// Собственно <see cref="ColorComboBox"/>.
     /// </summary>
-    [System.ComponentModel.DesignerCategory("Code")]
-    [ToolStripItemDesignerAvailability
-        (ToolStripItemDesignerAvailability.ToolStrip
-          | ToolStripItemDesignerAvailability.StatusStrip)]
-    public class ToolStripColorComboBox
-        : ToolStripControlHost
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
+    public ColorComboBox ColorComboBox => (ColorComboBox) Control;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public ToolStripColorComboBox()
+        : base (new ColorComboBox())
     {
-        #region Properties
-
-        /// <summary>
-        /// Gets the ColorComboBox.
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ColorComboBox ColorComboBox
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return (ColorComboBox) Control;
-            }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="ToolStripColorComboBox"/> class.
-        /// </summary>
-        public ToolStripColorComboBox()
-            : base(new ColorComboBox())
-        {
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
 }

@@ -3,17 +3,15 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
+// ReSharper disable RedundantNameQualifier
 
-/* ToolStripTrackBar.cs -- TrackBar that appears in ToolStrip
+/* ToolStripTrackBar.cs -- TrackBar, хостящийся в ToolStrip
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
@@ -22,66 +20,57 @@ using System.Windows.Forms.Design;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// <see cref="T:System.Windows.Forms.TrackBar"/>, хостящийся в
+/// <see cref="T:System.Windows.Forms.ToolStrip"/>.
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+[ToolStripItemDesignerAvailability
+    (ToolStripItemDesignerAvailability.ToolStrip | ToolStripItemDesignerAvailability.StatusStrip)]
+public class ToolStripTrackBar
+    : ToolStripControlHost
 {
+    #region Nested classes
+
     /// <summary>
-    /// <see cref="T:System.Windows.Forms.TrackBar"/> that
-    /// appears in <see cref="T:System.Windows.Forms.ToolStrip"/>.
+    /// Версия <see cref="TrackBar"/>, поддерживающая прозрачный фон.
     /// </summary>
-    // ReSharper disable once RedundantNameQualifier
-    [System.ComponentModel.DesignerCategory("Code")]
-    [ToolStripItemDesignerAvailability
-        (ToolStripItemDesignerAvailability.ToolStrip
-          | ToolStripItemDesignerAvailability.StatusStrip)]
-    public class ToolStripTrackBar
-        : ToolStripControlHost
+    internal sealed class TrackBarWithTransparentBackground
+        : TrackBar
     {
-        #region Nested classes
-
-        class TrackBarWithTransparentBackground
-            : TrackBar
+        public TrackBarWithTransparentBackground()
         {
-            public TrackBarWithTransparentBackground()
-            {
-                SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-            }
+            SetStyle (ControlStyles.SupportsTransparentBackColor, true);
         }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets the TrackBar.
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public TrackBar TrackBar
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return (TrackBar) Control;
-            }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="ToolStripTrackBar"/> class.
-        /// </summary>
-        public ToolStripTrackBar()
-            : base(new TrackBarWithTransparentBackground())
-        {
-            // TODO support transparent background
-            TrackBar.BackColor = Color.Transparent;
-            TrackBar.BackColor = SystemColors.InactiveCaption;
-            TrackBar.AutoSize = false;
-            AutoSize = false;
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Собственно <see cref="TrackBar"/>.
+    /// </summary>
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
+    public TrackBar TrackBar => (TrackBar) Control;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public ToolStripTrackBar()
+        : base (new TrackBarWithTransparentBackground())
+    {
+        TrackBar.BackColor = Color.Transparent;
+        TrackBar.BackColor = SystemColors.InactiveCaption;
+        TrackBar.AutoSize = false;
+        AutoSize = false;
+    }
+
+    #endregion
 }
