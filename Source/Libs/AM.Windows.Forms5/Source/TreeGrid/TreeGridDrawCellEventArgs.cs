@@ -3,11 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridDrawColumnEventArgs.cs -- аргументы для события, возникающего при перерисовке грида
  * Ars Magna project, http://arsmagna.ru
@@ -87,24 +82,30 @@ public sealed class TreeGridDrawCellEventArgs
     /// <summary>
     /// Получение кисти для текста.
     /// </summary>
-    public Brush GetForegroundBrush() => ForegroundOverride
-        ?? TreeGridUtilities.GetForegroundBrush
-            (
-                Grid.ThrowIfNull(),
-                Node.ThrowIfNull(),
-                State
-            );
+    public Brush GetForegroundBrush()
+    {
+        return ForegroundOverride
+               ?? TreeGridUtilities.GetForegroundBrush
+                   (
+                       Grid.ThrowIfNull(),
+                       Node.ThrowIfNull(),
+                       State
+                   );
+    }
 
     /// <summary>
     /// Получение кисти для фона.
     /// </summary>
-    public Brush GetBackgroundBrush() => BackgroundOverride
-        ?? TreeGridUtilities.GetBackgroundBrush
-            (
-                Grid.ThrowIfNull(),
-                Node.ThrowIfNull(),
-                State
-            );
+    public Brush GetBackgroundBrush()
+    {
+        return BackgroundOverride
+               ?? TreeGridUtilities.GetBackgroundBrush
+                   (
+                       Grid.ThrowIfNull(),
+                       Node.ThrowIfNull(),
+                       State
+                   );
+    }
 
     /// <summary>
     /// Получение иконки, отражающей текущее состояние ноды.
@@ -128,11 +129,7 @@ public sealed class TreeGridDrawCellEventArgs
     public void DrawBackground()
     {
         var brush = GetBackgroundBrush();
-        Graphics.ThrowIfNull().FillRectangle
-            (
-                brush,
-                Bounds
-            );
+        Graphics?.FillRectangle (brush, Bounds);
     }
 
     /// <summary>
@@ -191,7 +188,7 @@ public sealed class TreeGridDrawCellEventArgs
             }
         }
 
-        var r = new Rectangle
+        var rectangle = new Rectangle
             (
                 left,
                 Bounds.Top,
@@ -212,14 +209,14 @@ public sealed class TreeGridDrawCellEventArgs
                     text,
                     grid.Font,
                     brush,
-                    r,
+                    rectangle,
                     format
                 );
         }
     }
 
     /// <summary>
-    /// Draws the frame.
+    /// Отрисовка рамки вокруг выделенной ячейки.
     /// </summary>
     public void DrawSelection()
     {

@@ -3,11 +3,11 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridDataCollection.cs
+/* TreeGridDataCollection.cs -- коллекция данных, хранящихся в строке грида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,273 +25,299 @@ using System.Xml.Serialization;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Коллекция данных, хранящихся в строке грида.
+/// </summary>
+[Serializable]
+[XmlRoot ("data")]
+public sealed class TreeGridDataCollection
+    : Collection<object?>,
+    IXmlSerializable
 {
+    #region Events
+
     /// <summary>
-    /// Generic collection of some data with events.
+    /// Событие "данные изменились".
     /// </summary>
-    [Serializable]
-    [XmlRoot("data")]
-    public sealed class TreeGridDataCollection
-        : Collection<object?>,
-        IXmlSerializable
+    public event EventHandler? DataChanged;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public TreeGridDataCollection()
     {
-        #region Events
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Occurs when [data changed].
-        /// </summary>
-        public event EventHandler? DataChanged;
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public TreeGridDataCollection
+        (
+            TreeGridNode node
+        )
+    {
+        Sure.NotNull (node);
 
-        #endregion
+        Node = node;
+    }
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Конструктор
-        /// </summary>
-        public TreeGridDataCollection()
+    #region Public methods
+
+    /// <summary>
+    /// Добавление произвольного числа элементов в коллекцию.
+    /// </summary>
+    public void AddRange
+        (
+            params object?[] range
+        )
+    {
+        Sure.NotNull (range);
+
+        foreach (var item in range)
         {
+            Add (item);
+        }
+    }
+
+    /// <summary>
+    /// Добавление произвольного числа элементов в коллекцию.
+    /// </summary>
+    public void AddRange
+        (
+            IEnumerable range
+        )
+    {
+        Sure.NotNull ((object?) range);
+
+        foreach (var item in range)
+        {
+            Add (item);
+        }
+    }
+
+    /// <summary>
+    /// Отладочный вывод в консоль.
+    /// </summary>
+    public void Dump()
+    {
+        foreach (var item in Items)
+        {
+            Console.WriteLine
+                (
+                    item is null
+                        ? "(null)"
+                        : $"{item.GetType()} {item}"
+                );
         }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="node"></param>
-        public TreeGridDataCollection
-            (
-                TreeGridNode node
-            )
+        Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Чтение данных из указанного файла.
+    /// </summary>
+    public static TreeGridDataCollection Read
+        (
+            string fileName,
+            TreeGridNode node
+        )
+    {
+        Sure.FileExists (fileName);
+        Sure.NotNull (node);
+
+        var serializer = new XmlSerializer (typeof (TreeGridDataCollection));
+        using var stream = File.OpenRead (fileName);
+        var result = (TreeGridDataCollection) serializer.Deserialize (stream)
+            .ThrowIfNull();
+        result.Node = node;
+        return result;
+    }
+
+    /// <summary>
+    /// Сохранение данных в указанный файл.
+    /// </summary>
+    public void Save
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        var serializer = new XmlSerializer (typeof (TreeGridDataCollection));
+        using var stream = File.OpenWrite (fileName);
+        serializer.Serialize (stream, this);
+    }
+
+    /// <summary>
+    /// Безопасное получение элемента по его индексу.
+    /// </summary>
+    public object? SafeGet
+        (
+            int index
+        )
+    {
+        return index >= 0 && index < Count ? this[index] : null;
+    }
+
+    /// <summary>
+    /// Безопасное задание данных по указанному индексу.
+    /// </summary>
+    public void SafeSet
+        (
+            int index,
+            object? data
+        )
+    {
+        if (index >= 0)
         {
-            Node = node;
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Adds the range.
-        /// </summary>
-        /// <param name="range">The range.</param>
-        public void AddRange(params object?[] range)
-        {
-            foreach (var item in range)
+            while (Count <= index)
             {
-                Add(item);
+                Add (null);
             }
-        }
 
-        /// <summary>
-        /// Adds the range.
-        /// </summary>
-        /// <param name="range">The range.</param>
-        public void AddRange(IEnumerable range)
+            this[index] = data;
+        }
+    }
+
+    #endregion
+
+    #region Private members
+
+    internal TreeGridNode? Node;
+
+    /// <inheritdoc cref="Collection{T}.ClearItems"/>
+    protected override void ClearItems()
+    {
+        base.ClearItems();
+        Update();
+    }
+
+    /// <inheritdoc cref="Collection{T}.InsertItem"/>
+    protected override void InsertItem
+        (
+            int index,
+            object? item
+        )
+    {
+        Sure.NonNegative (index);
+
+        base.InsertItem (index, item);
+        Update();
+    }
+
+    /// <inheritdoc cref="Collection{T}.RemoveItem"/>
+    protected override void RemoveItem
+        (
+            int index
+        )
+    {
+        Sure.InRange (index, this);
+
+        base.RemoveItem (index);
+        Update();
+    }
+
+    /// <inheritdoc cref="Collection{T}.SetItem"/>
+    protected override void SetItem
+        (
+            int index,
+            object? item
+        )
+    {
+        base.SetItem (index, item);
+        Update();
+    }
+
+    /// <summary>
+    /// Инвалидация для отображения произошедших изменений.
+    /// </summary>
+    internal void Update()
+    {
+        OnDataChanged();
+    }
+
+    /// <summary>
+    /// Вызов события "данные изменились".
+    /// </summary>
+    internal void OnDataChanged()
+    {
+        DataChanged?.Invoke (this, EventArgs.Empty);
+    }
+
+    #endregion
+
+    #region Implementation of IXmlSerializable
+
+    /// <inheritdoc cref="IXmlSerializable.GetSchema"/>
+    XmlSchema? IXmlSerializable.GetSchema() => null;
+
+    /// <inheritdoc cref="IXmlSerializable.ReadXml"/>
+    void IXmlSerializable.ReadXml
+        (
+            XmlReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        reader.Read();
+        while (reader.LocalName == "item")
         {
-            foreach (var item in range)
+            var attribute = reader.GetAttribute ("isnull");
+            if (!string.IsNullOrEmpty (attribute))
             {
-                Add(item);
+                Add (null!);
             }
-        }
-
-        /// <summary>
-        /// Dumps this instance to the console.
-        /// </summary>
-        public void Dump ()
-        {
-            foreach (var item in Items)
+            else
             {
-                if (item is null)
-                {
-                    Console.WriteLine("(null)");
-                }
-                else
-                {
-                    Console.WriteLine
-                        (
-                            "{0} {1}",
-                            item.GetType(),
-                            item
-                        );
-                }
+                var typeName = reader.GetAttribute ("type").ThrowIfNull();
+                var type = Type.GetType (typeName).ThrowIfNull();
+                var value = reader.ReadString();
+                var result = Convert.ChangeType (value, type);
+                Add (result);
             }
-            Console.WriteLine();
-        }
 
-        /// <summary>
-        /// Reads from XML.
-        /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <param name="node">The node.</param>
-        /// <returns></returns>
-        public static TreeGridDataCollection Read
-            (
-                string fileName,
-                TreeGridNode node
-            )
-        {
-            var serializer = new XmlSerializer (typeof (TreeGridDataCollection));
-            using var stream = File.OpenRead (fileName);
-            var result = (TreeGridDataCollection) serializer
-                    .Deserialize (stream).ThrowIfNull();
-            result.Node = node;
-            return result;
-        }
-
-        /// <summary>
-        /// Saves to XML.
-        /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        public void Save ( string fileName )
-        {
-            var serializer = new XmlSerializer (typeof (TreeGridDataCollection));
-            using var stream = File.OpenWrite (fileName);
-            serializer.Serialize (stream,this);
-        }
-
-        /// <summary>
-        /// Безопасное получение элемента по его индексу.
-        /// </summary>
-        public object? SafeGet(int index) => index >= 0 && index < Count ? this[index] : null;
-
-        /// <summary>
-        /// Безопасное задание данных по указанному индексу.
-        /// </summary>
-        public void SafeSet
-            (
-                int index,
-                object? data
-            )
-        {
-            if (index >= 0)
-            {
-                while (Count <= index)
-                {
-                    Add(null);
-                }
-
-                this[index] = data;
-            }
-        }
-
-        #endregion
-
-        #region Private members
-
-        internal TreeGridNode? Node;
-
-        /// <inheritdoc cref="Collection{T}.ClearItems"/>
-        protected override void ClearItems()
-        {
-            base.ClearItems();
-            Update();
-        }
-
-        /// <inheritdoc cref="Collection{T}.InsertItem"/>
-        protected override void InsertItem
-            (
-                int index,
-                object? item
-            )
-        {
-            base.InsertItem(index,item);
-            Update();
-        }
-
-        /// <inheritdoc cref="Collection{T}.RemoveItem"/>
-        protected override void RemoveItem(int index)
-        {
-            base.RemoveItem(index);
-            Update();
-        }
-
-        /// <inheritdoc cref="Collection{T}.SetItem"/>
-        protected override void SetItem
-            (
-                int index,
-                object? item
-            )
-        {
-            base.SetItem(index,item);
-            Update();
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        internal void Update ()
-        {
-            OnDataChanged();
-        }
-
-        internal void OnDataChanged () => DataChanged?.Invoke(this, EventArgs.Empty);
-
-        #endregion
-
-        #region Implementation of IXmlSerializable
-
-        /// <inheritdoc cref="IXmlSerializable.GetSchema"/>
-        XmlSchema? IXmlSerializable.GetSchema() => null;
-
-        /// <inheritdoc cref="IXmlSerializable.ReadXml"/>
-        void IXmlSerializable.ReadXml
-            (
-                XmlReader reader
-            )
-        {
             reader.Read();
-            while (reader.LocalName == "item")
-            {
-                var attribute = reader.GetAttribute ("isnull");
-                if (!string.IsNullOrEmpty (attribute))
-                {
-                    Add (null!);
-                }
-                else
-                {
-                    var typeName = reader.GetAttribute ("type").ThrowIfNull();
-                    var type = Type.GetType (typeName).ThrowIfNull();
-                    var value = reader.ReadString();
-                    var result = Convert.ChangeType (value, type);
-                    Add (result);
-                }
-                reader.Read();
-            }
+        }
+    }
 
-        } // method ReadXml
+    /// <inheritdoc cref="IXmlSerializable.WriteXml"/>
+    void IXmlSerializable.WriteXml
+        (
+            XmlWriter writer
+        )
+    {
+        Sure.NotNull (writer);
 
-        /// <inheritdoc cref="IXmlSerializable.WriteXml"/>
-        void IXmlSerializable.WriteXml
-            (
-                XmlWriter writer
-            )
+        foreach (var item in Items)
         {
-            foreach (var item in Items)
+            if (item is null)
             {
-                if (item is null)
-                {
-                    writer.WriteStartElement ("item");
-                    writer.WriteAttributeString ("isnull","true");
-                    writer.WriteEndElement();
-                }
-                else
-                {
-                    writer.WriteStartElement ("item");
-                    writer.WriteAttributeString
-                        (
-                            "type",
-                            item.GetType().ToString()
-                        );
-                    writer.WriteString (item.ToString());
-                    writer.WriteEndElement();
-                }
+                writer.WriteStartElement ("item");
+                writer.WriteAttributeString ("isnull", "true");
+                writer.WriteEndElement();
+            }
+            else
+            {
+                writer.WriteStartElement ("item");
+                writer.WriteAttributeString
+                    (
+                        "type",
+                        item.GetType().ToString()
+                    );
+                writer.WriteString (item.ToString());
+                writer.WriteEndElement();
+            }
+        }
+    }
 
-            } // method foreach
-
-        } // method WriteXml
-
-        #endregion
-
-    } // class TreeGridDataCollection
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

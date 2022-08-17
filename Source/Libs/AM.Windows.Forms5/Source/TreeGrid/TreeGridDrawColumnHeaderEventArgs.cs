@@ -3,9 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedMember.Global
 
 /* TreeGridDrawColumnHeaderEventArgs.cs -- аргументы события для перерисовки заголовка колонки грида
  * Ars Magna project, http://arsmagna.ru

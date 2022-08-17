@@ -75,7 +75,7 @@ public sealed class TreeGridDrawNodeEventArgs
     #region Public methods
 
     /// <summary>
-    /// Draws the background.
+    /// Отрисовка фона.
     /// </summary>
     public void DrawBackground()
     {
@@ -101,12 +101,12 @@ public sealed class TreeGridDrawNodeEventArgs
         }
 
         var brush = ForegroundOverride
-                    ?? TreeGridUtilities.GetBackgroundBrush
-                        (
-                            grid,
-                            node,
-                            State
-                        );
+            ?? TreeGridUtilities.GetBackgroundBrush
+                (
+                    grid,
+                    node,
+                    State
+                );
 
         graphics.FillRectangle (brush, Bounds);
     }
@@ -138,12 +138,12 @@ public sealed class TreeGridDrawNodeEventArgs
         }
 
         var brush = ForegroundOverride
-                    ?? TreeGridUtilities.GetForegroundBrush
-                        (
-                            grid,
-                            node,
-                            State
-                        );
+            ?? TreeGridUtilities.GetForegroundBrush
+                (
+                    grid,
+                    node,
+                    State
+                );
 
         var text = node.Title;
         if (!string.IsNullOrEmpty (text))

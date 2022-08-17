@@ -3,108 +3,75 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridComboBox.cs
+/* TreeGridComboBox.cs -- редактор для грида в виде комбобокса
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Редактор для грида в виде комбобокса.
+/// </summary>
+public class TreeGridComboBox
+    : TreeGridEditor
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Собственно комбобокс.
     /// </summary>
-    public class TreeGridComboBox
-        : TreeGridEditor
+    public ComboBox ComboBox { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public TreeGridComboBox()
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public TreeGridComboBox()
-        {
-            _control = new ComboBox();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly ComboBox _control;
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets the combo box.
-        /// </summary>
-        /// <value>The combo box.</value>
-        public ComboBox ComboBox
-        {
-            get { return _control; }
-        }
-
-        #endregion
-
-        #region TreeGridEditor members
-
-        /// <summary>
-        /// Gets the control.
-        /// </summary>
-        /// <value>The control.</value>
-        public override Control Control
-        {
-            get { return _control; }
-        }
-
-        /// <summary>
-        /// Sets the value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        public override void SetValue
-            (
-                string? value
-            )
-        {
-            //ComboBox.Text = value;
-            Control.Text = value;
-        }
-
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        /// <returns></returns>
-        public override string GetValue()
-        {
-            return Control.Text;
-        }
-
-        /// <summary>
-        /// Selects the text.
-        /// </summary>
-        /// <param name="start">The start.</param>
-        /// <param name="length">The length.</param>
-        public override void SelectText(int start, int length)
-        {
-            ComboBox.SelectionStart = start;
-            ComboBox.SelectionLength = length;
-        }
-
-        #endregion
+        ComboBox = new ComboBox();
     }
+
+    #endregion
+
+    #region TreeGridEditor members
+
+    /// <inheritdoc cref="TreeGridEditor.Control"/>
+    public override Control Control => ComboBox;
+
+    /// <inheritdoc cref="TreeGridEditor.SetValue"/>
+    public override void SetValue
+        (
+            string? value
+        )
+    {
+        Control.Text = value;
+    }
+
+    /// <inheritdoc cref="TreeGridEditor.GetValue"/>
+    public override string GetValue()
+    {
+        return Control.Text;
+    }
+
+    /// <inheritdoc cref="TreeGridEditor.SelectText"/>
+    public override void SelectText (int start, int length)
+    {
+        ComboBox.SelectionStart = start;
+        ComboBox.SelectionLength = length;
+    }
+
+    #endregion
 }
