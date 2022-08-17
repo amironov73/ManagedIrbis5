@@ -116,12 +116,12 @@ public class TreeGridButtonColumn
     /// <inheritdoc cref="TreeGridColumn.OnMouseDoubleClick"/>
     protected internal override void OnMouseDoubleClick
         (
-            TreeGridMouseEventArgs args
+            TreeGridMouseEventArgs eventArgs
         )
     {
-        Sure.NotNull (args);
+        Sure.NotNull (eventArgs);
 
-        MouseDoubleClick?.Invoke (this, args);
+        MouseDoubleClick?.Invoke (this, eventArgs);
     }
 
     /// <inheritdoc cref="TreeGridColumn.Editable"/>

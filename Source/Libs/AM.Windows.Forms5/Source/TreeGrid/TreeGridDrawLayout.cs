@@ -3,11 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
 
-/* TreeGridDrawLayout.cs
+/* TreeGridDrawLayout.cs -- описание взаимного расположения элементов в гриде
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,88 +16,89 @@ using System.Drawing;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Описание взаимного расположения элементов в гриде.
+/// </summary>
+public sealed class TreeGridDrawLayout
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class TreeGridDrawLayout
+    public TreeGridDrawLayout()
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public TreeGridDrawLayout()
-        {
-            Expand = Rectangle.Empty;
-            Check = Rectangle.Empty;
-            Icon = Rectangle.Empty;
-            Text = Rectangle.Empty;
-        }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        ///
-        /// </summary>
-        public Rectangle Expand { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public Rectangle Check { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public Rectangle Icon { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public Rectangle Text { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public string? TextOverride { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        public TreeGridClickKind DetermineClickKind ( Point point )
-        {
-            TreeGridClickKind result = TreeGridClickKind.Unknown;
-
-            if (Expand.Contains(point))
-            {
-                result = TreeGridClickKind.Expand;
-            }
-            else if (Check.Contains(point))
-            {
-                result = TreeGridClickKind.Check;
-            }
-            else if (Icon.Contains(point))
-            {
-                result = TreeGridClickKind.Icon;
-            }
-            else if (Text.Contains(point))
-            {
-                result = TreeGridClickKind.Text;
-            }
-
-            return result;
-        }
-
-        #endregion
+        Expand = Rectangle.Empty;
+        Check = Rectangle.Empty;
+        Icon = Rectangle.Empty;
+        Text = Rectangle.Empty;
     }
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Зона, где ожидается клик мышью для развертывания региона.
+    /// </summary>
+    public Rectangle Expand { get; set; }
+
+    /// <summary>
+    /// Зона, где ожидается клик мышью для отметки элемента.
+    /// </summary>
+    public Rectangle Check { get; set; }
+
+    /// <summary>
+    /// Зона с иконкой.
+    /// </summary>
+    public Rectangle Icon { get; set; }
+
+    /// <summary>
+    /// Зона с текстом.
+    /// </summary>
+    public Rectangle Text { get; set; }
+
+    /// <summary>
+    /// Переопределение текста.
+    /// </summary>
+    public string? TextOverride { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Определение вида клика мышью по гриду
+    /// </summary>
+    public TreeGridClickKind DetermineClickKind
+        (
+            Point point
+        )
+    {
+        if (Expand.Contains (point))
+        {
+            return TreeGridClickKind.Expand;
+        }
+
+        if (Check.Contains (point))
+        {
+            return TreeGridClickKind.Check;
+        }
+
+        if (Icon.Contains (point))
+        {
+            return TreeGridClickKind.Icon;
+        }
+
+        if (Text.Contains (point))
+        {
+            return TreeGridClickKind.Text;
+        }
+
+        return TreeGridClickKind.Unknown;
+    }
+
+    #endregion
 }

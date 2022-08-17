@@ -3,45 +3,40 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
-/* TreeGridClickKind.cs
+/* TreeGridClickKind.cs -- перечисление: вид клика мышью по элементу грида
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Перечисление: вид клика мышью по элементу грида.
+/// </summary>
+public enum TreeGridClickKind
 {
     /// <summary>
-    ///
+    /// Неизвестно.
     /// </summary>
-    public enum TreeGridClickKind
-    {
-        /// <summary>
-        ///
-        /// </summary>
-        Unknown,
+    Unknown,
 
-        /// <summary>
-        ///
-        /// </summary>
-        Text,
+    /// <summary>
+    /// Клик по тексту.
+    /// </summary>
+    Text,
 
-        /// <summary>
-        ///
-        /// </summary>
-        Expand,
+    /// <summary>
+    /// Разворачивание региона.
+    /// </summary>
+    Expand,
 
-        /// <summary>
-        ///
-        /// </summary>
-        Check,
+    /// <summary>
+    /// Чекбокс или другой элемент для проставления отметки.
+    /// </summary>
+    Check,
 
-        /// <summary>
-        ///
-        /// </summary>
-        Icon
-
-    } // enum TreeGridClickKind
-
-} // namespace AM.Windows.Forms
+    /// <summary>
+    /// Иконка.
+    /// </summary>
+    Icon
+}
