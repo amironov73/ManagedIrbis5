@@ -3,156 +3,133 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
+// ReSharper disable InconsistentNaming
 
-/* TreeGridNodeCollection.cs
+/* TreeGridNodeCollection.cs -- коллекция узлов грида
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Collections.ObjectModel;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Коллекция узлов грида.
+/// </summary>
+public sealed class TreeGridNodeCollection
+    : Collection<TreeGridNode>
 {
+    #region Construction
+
     /// <summary>
-    ///
+    /// Конструктор.
     /// </summary>
-    public sealed class TreeGridNodeCollection
-        : Collection<TreeGridNode>
+    public TreeGridNodeCollection
+        (
+            TreeGrid? grid,
+            TreeGridNode? parent
+        )
     {
-        #region Private members
+        _grid = grid;
+        _parent = parent;
+    }
 
-        internal TreeGrid? _grid;
-        internal TreeGridNode? _parent;
+    #endregion
 
-        #endregion
+    #region Private members
 
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="TreeGridNodeCollection"/> class.
-        /// </summary>
-        /// <param name="grid">The grid.</param>
-        /// <param name="parent">The parent.</param>
-        public TreeGridNodeCollection
-            (
-                TreeGrid? grid,
-                TreeGridNode? parent
-            )
+    internal TreeGrid? _grid;
+    internal TreeGridNode? _parent;
+
+
+    internal void _UpdateGrid()
+    {
+        if (_grid != null)
         {
-            _grid = grid;
-            _parent = parent;
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public TreeGridNode Add
-            (
-                string text,
-                params object [] data
-            )
-        {
-            var result = new TreeGridNode
-                                      {
-                                          Title = text,
-                                      };
-            result.Data.AddRange(data);
-            Add(result);
-            return result;
-        }
-
-        internal void _UpdateGrid ()
-        {
-            if (_grid != null)
-            {
-                _grid.UpdateState();
-            }
-        }
-
-        /// <summary>
-        /// Removes all elements from the
-        /// <see cref="T:System.Collections.ObjectModel.Collection`1"/>.
-        /// </summary>
-        protected override void ClearItems()
-        {
-            base.ClearItems();
-            _UpdateGrid();
-        }
-
-        /// <summary>
-        /// Inserts an element into the
-        /// <see cref="T:System.Collections.ObjectModel.Collection`1"/> at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
-        /// <param name="item">The object to insert. The value can be null for reference types.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is greater than
-        /// <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
-        protected override void InsertItem
-            (
-            int index,
-            TreeGridNode item
-            )
-        {
-            if (item == null)
-            {
-                throw new ArgumentNullException("item");
-            }
-            item.Parent = _parent;
-            item._SetTreeGrid ( _grid );
-            base.InsertItem(index,item);
-            _UpdateGrid();
-        }
-
-        /// <summary>
-        /// Removes the element at the specified index of the
-        /// <see cref="T:System.Collections.ObjectModel.Collection`1"/>.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to remove.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is equal to or greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
-        protected override void RemoveItem(int index)
-        {
-            base.RemoveItem(index);
-            _UpdateGrid();
-        }
-
-        /// <summary>
-        /// Replaces the element at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to replace.</param>
-        /// <param name="item">The new value for the element at the specified index. The value can be null for reference types.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
-        protected override void SetItem(int index, TreeGridNode item)
-        {
-            if (item == null)
-            {
-                throw new ArgumentNullException("item");
-            }
-            item.Parent = _parent;
-            item._SetTreeGrid ( _grid );
-            base.SetItem(index,item);
-            _UpdateGrid();
+            _grid.UpdateState();
         }
     }
+
+    /// <inheritdoc cref="Collection{T}.ClearItems"/>
+    protected override void ClearItems()
+    {
+        base.ClearItems();
+        _UpdateGrid();
+    }
+
+    /// <inheritdoc cref="Collection{T}.InsertItem"/>
+    protected override void InsertItem
+        (
+            int index,
+            TreeGridNode item
+        )
+    {
+        Sure.NonNegative (index);
+        Sure.NotNull (item);
+
+        item.Parent = _parent;
+        item._SetTreeGrid (_grid);
+        base.InsertItem (index, item);
+        _UpdateGrid();
+    }
+
+    /// <inheritdoc cref="Collection{T}.RemoveItem"/>
+    protected override void RemoveItem
+        (
+            int index
+        )
+    {
+        Sure.InRange (index, this);
+
+        base.RemoveItem (index);
+        _UpdateGrid();
+    }
+
+    /// <inheritdoc cref="Collection{T}.SetItem"/>
+    protected override void SetItem
+        (
+            int index,
+            TreeGridNode item
+        )
+    {
+        Sure.InRange (index, this);
+        Sure.NotNull (item);
+
+        item.Parent = _parent;
+        item._SetTreeGrid (_grid);
+        base.SetItem (index, item);
+        _UpdateGrid();
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Добавление дочернего узла.
+    /// </summary>
+    public TreeGridNode Add
+        (
+            string? text,
+            params object[]? data
+        )
+    {
+        var result = new TreeGridNode { Title = text };
+        if (data is not null)
+        {
+            result.Data.AddRange (data);
+        }
+
+        Add (result);
+
+        return result;
+    }
+
+    #endregion
 }

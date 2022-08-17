@@ -19,40 +19,40 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Событие мыши в <see cref="TreeGrid"/>.
+/// </summary>
+public class TreeGridMouseEventArgs
+    : MouseEventArgs
 {
+    #region Construction
+
     /// <summary>
-    /// Событие мыши в <see cref="TreeGrid"/>.
+    /// Конструктор.
     /// </summary>
-    public class TreeGridMouseEventArgs
-        : MouseEventArgs
+    public TreeGridMouseEventArgs
+        (
+            MouseButtons button,
+            int clicks,
+            int x,
+            int y,
+            int delta
+        )
+        : base (button, clicks, x, y, delta)
     {
+        // пустое тело конструктора
+    }
 
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public TreeGridMouseEventArgs
-            (
-                MouseButtons button,
-                int clicks,
-                int x,
-                int y,
-                int delta
-            )
-            : base(button, clicks, x, y, delta)
-        {
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public TreeGridMouseEventArgs
-            (
-                MouseEventArgs args
-            )
-            : base
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public TreeGridMouseEventArgs
+        (
+            MouseEventArgs args
+        )
+        : base
             (
                 args.Button,
                 args.Clicks,
@@ -60,30 +60,28 @@ namespace AM.Windows.Forms
                 args.Y,
                 args.Delta
             )
-        {
-        }
+    {
+        // пустое тело конструктора
+    }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Properties
 
-        /// <summary>
-        /// Грид, в котором произошло событие.
-        /// </summary>
-        public TreeGrid? TreeGrid { get; set; }
+    /// <summary>
+    /// Грид, в котором произошло событие.
+    /// </summary>
+    public TreeGrid? TreeGrid { get; set; }
 
-        /// <summary>
-        /// Нода, в которой произошло событие (возможно, <c>null</c>).
-        /// </summary>
-        public TreeGridNode? Node { get; set; }
+    /// <summary>
+    /// Узел, в котором произошло событие (возможно, <c>null</c>).
+    /// </summary>
+    public TreeGridNode? Node { get; set; }
 
-        /// <summary>
-        /// Колонка, в которой произошло событие (возможно, <c>null</c>).
-        /// </summary>
-        public TreeGridColumn? Column { get; set; }
+    /// <summary>
+    /// Колонка, в которой произошло событие (возможно, <c>null</c>).
+    /// </summary>
+    public TreeGridColumn? Column { get; set; }
 
-        #endregion
-
-    } // class TreeGridMouseEventArgs
-
-} // namespace AM.Windows.Forms
+    #endregion
+}
