@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* ToolStripCustomizationForm.cs --
+/* ToolStripCustomizationForm.cs -- форма настройки ToolStrip
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,76 +19,76 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Форма настройки ToolStrip.
+/// </summary>
+partial class ToolStripCustomizationForm
+    : Form
 {
+    #region Properties
+
     /// <summary>
-    /// Customization form for ToolStrip.
+    /// Подлежащий настройке ToolStrip.
     /// </summary>
-    partial class ToolStripCustomizationForm
-        : Form
+    public ToolStrip ToolStrip { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ToolStripCustomizationForm
+        (
+            ToolStrip toolStrip
+        )
     {
-        #region Properties
+        Sure.NotNull (toolStrip);
 
-        /// <summary>
-        /// ToolStrip.
-        /// </summary>
-        public ToolStrip ToolStrip { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ToolStripCustomizationForm
-            (
-                ToolStrip toolStrip
-            )
-        {
-            ToolStrip = toolStrip;
-
-            InitializeComponent();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private void ToolStripCustomizationForm_Load
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            try
-            {
-                _listBox.BeginUpdate();
-                _listBox.Items.Clear();
-                foreach (ToolStripItem item in ToolStrip.Items)
-                {
-                    _listBox.Items.Add(item, item.Available);
-                }
-            }
-            finally
-            {
-                _listBox.EndUpdate();
-            }
-        }
-
-        private void _applyButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            foreach (ToolStripItem item in _listBox.Items)
-            {
-                int index = _listBox.Items.IndexOf(item);
-                item.Available = _listBox.GetItemChecked(index);
-            }
-        }
-
-        #endregion
+        ToolStrip = toolStrip;
+        InitializeComponent();
     }
+
+    #endregion
+
+    #region Private members
+
+    private void ToolStripCustomizationForm_Load
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        try
+        {
+            _listBox.BeginUpdate();
+            _listBox.Items.Clear();
+            foreach (ToolStripItem item in ToolStrip.Items)
+            {
+                _listBox.Items.Add (item, item.Available);
+            }
+        }
+        finally
+        {
+            _listBox.EndUpdate();
+        }
+    }
+
+    private void _applyButton_Click
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        foreach (ToolStripItem item in _listBox.Items)
+        {
+            var index = _listBox.Items.IndexOf (item);
+            item.Available = _listBox.GetItemChecked (index);
+        }
+    }
+
+    #endregion
 }

@@ -3,10 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* ToolStripCustomizer.cs --
+/* ToolStripCustomizer.cs -- вызов диалога настройки ToolStrip
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,26 +17,25 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Настройщик ToolStrip.
+/// </summary>
+public static class ToolStripCustomizer
 {
     /// <summary>
-    ///
+    /// Вызов диалога настройки для указанной ToolStrip.
     /// </summary>
-    public static class ToolStripCustomizer
+    public static bool Customize
+        (
+            ToolStrip toolStrip
+        )
     {
-        /// <summary>
-        /// Customizes the specified tool strip.
-        /// </summary>
-        public static bool Customize
-            (
-                ToolStrip toolStrip
-            )
-        {
-            using (var form = new ToolStripCustomizationForm(toolStrip))
-            {
-                return form.ShowDialog(toolStrip.FindForm())
-                    == DialogResult.OK;
-            }
-        }
+        Sure.NotNull (toolStrip);
+
+        using var form = new ToolStripCustomizationForm (toolStrip);
+
+        return form.ShowDialog (toolStrip.FindForm()) == DialogResult.OK;
     }
 }

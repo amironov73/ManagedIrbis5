@@ -3,17 +3,16 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
+// ReSharper disable RedundantNameQualifier
 // ReSharper disable UnusedMember.Global
 
-/* ToolStripDateTimePicker.cs -- DateTimePicker that appears in ToolStrip.
+/* ToolStripDateTimePicker.cs -- DateTimePicker, хостящийся в ToolStrip.
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
@@ -21,47 +20,52 @@ using System.Windows.Forms.Design;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// <see cref="T:System.Windows.Forms.DateTimePicker"/>, хостящийся в
+/// <see cref="T:System.Windows.Forms.ToolStrip"/>.
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+[ToolStripItemDesignerAvailability
+    (ToolStripItemDesignerAvailability.ToolStrip | ToolStripItemDesignerAvailability.StatusStrip)]
+public class ToolStripDateTimePicker
+    : ToolStripControlHost
 {
+    #region Properties
+
     /// <summary>
-    /// <see cref="T:System.Windows.Forms.DateTimePicker"/> that
-    /// appears in <see cref="T:System.Windows.Forms.ToolStrip"/>.
+    /// Собственно <see cref="DateTimePicker"/>.
     /// </summary>
-    [System.ComponentModel.DesignerCategory("Code")]
-    [ToolStripItemDesignerAvailability
-        (ToolStripItemDesignerAvailability.ToolStrip
-          | ToolStripItemDesignerAvailability.StatusStrip)]
-    public class ToolStripDateTimePicker
-        : ToolStripControlHost
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
+    public DateTimePicker DateTimePicker => (DateTimePicker) Control;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ToolStripDateTimePicker()
+        : base (new DateTimePicker())
     {
-        #region Properties
-
-        /// <summary>
-        /// Gets the DateTimePicker.
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public DateTimePicker DateTimePicker
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return (DateTimePicker) Control;
-            }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="ToolStripDateTimePicker"/> class.
-        /// </summary>
-        public ToolStripDateTimePicker()
-            : base(new DateTimePicker())
-        {
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region ToolStripControlHost members
+
+    /// <inheritdoc cref="ToolStripControlHost.Text"/>
+    [Bindable (true)]
+    [DefaultValue (null)]
+    [Localizable (true)]
+    public override string Text
+    {
+        get => DateTimePicker.Text;
+        set => DateTimePicker.Text = value;
+    }
+
+    #endregion
 }

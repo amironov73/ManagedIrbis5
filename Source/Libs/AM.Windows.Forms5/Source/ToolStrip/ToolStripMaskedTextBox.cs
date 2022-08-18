@@ -4,16 +4,16 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable RedundantNameQualifier
 // ReSharper disable UnusedMember.Global
 
-/* ToolStripMaskedTextBox.cs -- MaskedTextBox that appears in ToolStrip.
+/* ToolStripMaskedTextBox.cs -- MaskedTextBox, хостящийся в ToolStrip.
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
@@ -21,47 +21,52 @@ using System.Windows.Forms.Design;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// <see cref="T:System.Windows.Forms.MaskedTextBox"/>, хостящийся в
+/// <see cref="T:System.Windows.Forms.ToolStrip"/>.
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+[ToolStripItemDesignerAvailability
+    (ToolStripItemDesignerAvailability.ToolStrip | ToolStripItemDesignerAvailability.StatusStrip)]
+public class ToolStripMaskedTextBox
+    : ToolStripControlHost
 {
+    #region Properties
+
     /// <summary>
-    /// <see cref="T:System.Windows.Forms.MaskedTextBox"/> that
-    /// appears in <see cref="T:System.Windows.Forms.ToolStrip"/>.
+    /// Собственно <see cref="MaskedTextBox"/>.
     /// </summary>
-    // ReSharper disable once RedundantNameQualifier
-    [System.ComponentModel.DesignerCategory("Code")]
-    [ToolStripItemDesignerAvailability
-        (ToolStripItemDesignerAvailability.ToolStrip
-          | ToolStripItemDesignerAvailability.StatusStrip)]
-    public class ToolStripMaskedTextBox
-        : ToolStripControlHost
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
+    public MaskedTextBox MaskedTextBox => (MaskedTextBox) Control;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ToolStripMaskedTextBox()
+        : base (new MaskedTextBox())
     {
-        #region Properties
-
-        /// <summary>
-        /// Gets the MaskedTextBox.
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public MaskedTextBox MaskedTextBox
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return (MaskedTextBox) Control;
-            }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ToolStripMaskedTextBox()
-            : base(new MaskedTextBox())
-        {
-        }
-
-        #endregion
+        // пустое тело конструктора
     }
+
+    #endregion
+
+    #region ToolStripControlHost members
+
+    /// <inheritdoc cref="ToolStripControlHost.Text"/>
+    [Bindable (true)]
+    [DefaultValue (null)]
+    [Localizable (true)]
+    public override string Text
+    {
+        get => MaskedTextBox.Text;
+        set => MaskedTextBox.Text = value;
+    }
+
+    #endregion
 }
