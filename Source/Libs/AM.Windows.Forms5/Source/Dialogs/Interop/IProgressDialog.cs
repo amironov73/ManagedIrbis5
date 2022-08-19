@@ -3,8 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
 
-/*
+/* IProgressDialog.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,77 +21,154 @@ using System.Runtime.InteropServices;
 
 namespace AM.Windows.Forms.Dialogs.Interop;
 
+/// <summary>
+///
+/// </summary>
 [ComImport]
 [Guid (CLSIDGuid.ProgressDialog)]
 internal class ProgressDialogRCW
 {
+    // пустое тело
 }
 
-[ComImport,
- Guid (IIDGuid.IProgressDialog),
- CoClass (typeof (ProgressDialogRCW))]
-internal interface ProgressDialog : IProgressDialog
+/// <summary>
+///
+/// </summary>
+[ComImport]
+[Guid (IIDGuid.IProgressDialog)]
+[CoClass (typeof (ProgressDialogRCW))]
+internal interface ProgressDialog
+    : IProgressDialog
 {
+    // пустое тело
 }
 
+/// <summary>
+///
+/// </summary>
 [Flags]
-internal enum ProgressDialogFlags : uint
+internal enum ProgressDialogFlags
+    : uint
 {
+    /// <summary>
+    ///
+    /// </summary>
     Normal = 0x00000000,
+
+    /// <summary>
+    ///
+    /// </summary>
     Modal = 0x00000001,
+
+    /// <summary>
+    ///
+    /// </summary>
     AutoTime = 0x00000002,
+
+    /// <summary>
+    ///
+    /// </summary>
     NoTime = 0x00000004,
+
+    /// <summary>
+    ///
+    /// </summary>
     NoMinimize = 0x00000008,
+
+    /// <summary>
+    ///
+    /// </summary>
     NoProgressBar = 0x00000010,
+
+    /// <summary>
+    ///
+    /// </summary>
     MarqueeProgress = 0x00000020,
+
+    /// <summary>
+    ///
+    /// </summary>
     NoCancel = 0x00000040
 }
 
+/// <summary>
+///
+/// </summary>
 [ComImport]
 [Guid (IIDGuid.IProgressDialog)]
 [InterfaceType (ComInterfaceType.InterfaceIsIUnknown)]
 internal interface IProgressDialog
 {
+    /// <summary>
+    ///
+    /// </summary>
     [PreserveSig]
-    void StartProgressDialog (
+    void StartProgressDialog
+        (
             IntPtr hwndParent,
             [MarshalAs (UnmanagedType.IUnknown)] object punkEnableModless,
             ProgressDialogFlags dwFlags,
             IntPtr pvResevered
         );
 
+    /// <summary>
+    ///
+    /// </summary>
     [PreserveSig]
     void StopProgressDialog();
 
+    /// <summary>
+    ///
+    /// </summary>
     [PreserveSig]
-    void SetTitle (
+    void SetTitle
+        (
             [MarshalAs (UnmanagedType.LPWStr)] string pwzTitle
         );
 
+    /// <summary>
+    ///
+    /// </summary>
     [PreserveSig]
-    void SetAnimation (
+    void SetAnimation
+        (
             SafeModuleHandle hInstAnimation,
             ushort idAnimation
         );
 
+    /// <summary>
+    ///
+    /// </summary>
     [PreserveSig]
     [return: MarshalAs (UnmanagedType.Bool)]
     bool HasUserCancelled();
 
+    /// <summary>
+    ///
+    /// </summary>
     [PreserveSig]
-    void SetProgress (
+    void SetProgress
+        (
             uint dwCompleted,
             uint dwTotal
         );
 
+    /// <summary>
+    ///
+    /// </summary>
     [PreserveSig]
-    void SetProgress64 (
+    void SetProgress64
+        (
             ulong ullCompleted,
             ulong ullTotal
         );
 
+    /// <summary>
+    ///
+    /// </summary>
     [PreserveSig]
-    void SetLine (
+    void SetLine
+        (
             uint dwLineNum,
             [MarshalAs (UnmanagedType.LPWStr)] string pwzString,
             [MarshalAs (UnmanagedType.VariantBool)]
@@ -97,14 +176,22 @@ internal interface IProgressDialog
             IntPtr pvResevered
         );
 
+    /// <summary>
+    ///
+    /// </summary>
     [PreserveSig]
-    void SetCancelMsg (
+    void SetCancelMsg
+        (
             [MarshalAs (UnmanagedType.LPWStr)] string pwzCancelMsg,
             object pvResevered
         );
 
+    /// <summary>
+    ///
+    /// </summary>
     [PreserveSig]
-    void Timer (
+    void Timer
+        (
             uint dwTimerAction,
             object pvResevered
         );

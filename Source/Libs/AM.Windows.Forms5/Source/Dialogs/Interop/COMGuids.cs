@@ -3,8 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable InconsistentNaming
 
-/*
+/* COMGuids.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 

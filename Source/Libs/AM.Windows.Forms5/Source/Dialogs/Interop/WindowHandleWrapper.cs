@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* WindowHandleWrapper.cs -- оебртка над дескриптором Win32-окна
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,21 +19,27 @@ using System.Windows.Forms;
 
 namespace AM.Windows.Forms.Dialogs.Interop;
 
-class WindowHandleWrapper : IWin32Window
+/// <summary>
+/// Обертка над дескриптором Win32-окна.
+/// </summary>
+internal sealed class WindowHandleWrapper
+    : IWin32Window
 {
-    private IntPtr _handle;
+    #region Construction
 
-    public WindowHandleWrapper (IntPtr handle)
+    public WindowHandleWrapper
+        (
+            IntPtr handle
+        )
     {
-        _handle = handle;
+        Handle = handle;
     }
+
+    #endregion
 
     #region IWin32Window Members
 
-    public IntPtr Handle
-    {
-        get { return _handle; }
-    }
+    public IntPtr Handle { get; }
 
     #endregion
 }

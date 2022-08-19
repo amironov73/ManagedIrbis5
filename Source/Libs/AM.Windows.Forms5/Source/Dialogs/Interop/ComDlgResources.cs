@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* ComDlgResources.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -12,7 +12,10 @@ namespace AM.Windows.Forms.Dialogs.Interop;
 
 #nullable enable
 
-static class ComDlgResources
+/// <summary>
+///
+/// </summary>
+internal static class ComDlgResources
 {
     public enum ComDlgResourceId
     {

@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* Win32Resources.cs -- работа с Win32-ресурсами
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,27 +22,61 @@ using AM.Text;
 
 namespace AM.Windows.Forms.Dialogs.Interop;
 
-class Win32Resources : IDisposable
+/// <summary>
+/// Работа с Win32-ресурсами.
+/// </summary>
+internal sealed class Win32Resources
+    : IDisposable
 {
-    private SafeModuleHandle _moduleHandle;
-    private const int _bufferSize = 500;
+    #region Constants
 
-    public Win32Resources (string module)
+    private const int BufferSize = 500;
+
+    #endregion
+
+    #region Construction
+
+    public Win32Resources
+        (
+            string module
+        )
     {
-        _moduleHandle = NativeMethods.LoadLibraryEx (module, IntPtr.Zero,
-            NativeMethods.LoadLibraryExFlags.LoadLibraryAsDatafile);
+        _moduleHandle = NativeMethods.LoadLibraryEx
+            (
+                module,
+                IntPtr.Zero,
+                NativeMethods.LoadLibraryExFlags.LoadLibraryAsDatafile
+            );
         if (_moduleHandle.IsInvalid)
         {
             throw new Win32Exception (Marshal.GetLastWin32Error());
         }
     }
 
+    #endregion
+
+    #region Private members
+
+    private readonly SafeModuleHandle _moduleHandle;
+
+    private void CheckDisposed()
+    {
+        if (_moduleHandle.IsClosed)
+        {
+            throw new ObjectDisposedException ("Win32Resources");
+        }
+    }
+
+    #endregion
+
+    #region Public methods
+
     public string LoadString (uint id)
     {
         CheckDisposed();
 
         var builder = StringBuilderPool.Shared.Get();
-        builder.EnsureCapacity (_bufferSize);
+        builder.EnsureCapacity (BufferSize);
         var code = NativeMethods.LoadString (_moduleHandle, id, builder, builder.Capacity + 1);
         var result = builder.ReturnShared();
 
@@ -51,7 +85,11 @@ class Win32Resources : IDisposable
             : result;
     }
 
-    public string FormatString (uint id, params string[] args)
+    public string? FormatString
+        (
+            uint id,
+            params string[] args
+        )
     {
         CheckDisposed();
 
@@ -85,28 +123,14 @@ class Win32Resources : IDisposable
         return result;
     }
 
-    protected virtual void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            _moduleHandle.Dispose();
-        }
-    }
+    #endregion
 
-    private void CheckDisposed()
-    {
-        if (_moduleHandle.IsClosed)
-        {
-            throw new ObjectDisposedException ("Win32Resources");
-        }
-    }
+    #region IDisposable members
 
-    #region IDisposable Members
-
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
-        Dispose (true);
-        GC.SuppressFinalize (this);
+        _moduleHandle.Dispose();
     }
 
     #endregion
