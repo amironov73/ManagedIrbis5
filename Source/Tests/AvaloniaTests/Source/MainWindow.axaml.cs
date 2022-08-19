@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using AM.Avalonia.Controls;
+using AM.Avalonia.Dialogs;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -237,5 +238,18 @@ public partial class MainWindow : Window
         };
 
         await window.ShowDialog<bool> (this);
+    }
+
+    private async void InputDialogButton_OnClick (object? sender, RoutedEventArgs e)
+    {
+        var data = new InputData()
+        {
+            Title = "Заголовок окна",
+            Prompt = "Это просто тест",
+            Value = "Начальное значение"
+        };
+        var result = await InputDialog.Query (this, data);
+        Debug.WriteLine ("Result is: " + result);
+        Debug.WriteLine ("Value is: " + data.Value);
     }
 }

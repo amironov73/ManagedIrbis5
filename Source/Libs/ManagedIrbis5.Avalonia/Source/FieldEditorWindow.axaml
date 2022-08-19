@@ -4,7 +4,7 @@
         x:Class="ManagedIrbis.Avalonia.FieldEditorWindow"
         Title="Field editor">
   <Grid
-      RowDefinitions="*, Auto"
+      RowDefinitions="*, Auto, Auto"
       >
 
       <DataGrid Name="FieldGrid"
@@ -30,23 +30,36 @@
           </DataGrid.Columns>
       </DataGrid>
 
-      <StackPanel
+      <Label
           Grid.Column="0"
           Grid.Row="1"
+          Name="HintBox"
+          Margin="5"
+          HorizontalAlignment="Stretch" />
+
+      <StackPanel
+          Grid.Column="0"
+          Grid.Row="2"
           Orientation="Horizontal"
-          HorizontalAlignment="Stretch"
+          HorizontalAlignment="Right"
           Spacing="5"
           Margin="5"
           >
 
-          <Label
-              Name="HintBox"
-              HorizontalAlignment="Stretch"
-              >
+          <Button
+              Name="OkButton"
+              Click="OkButton_OnClick">
+              OK
+          </Button>
 
-          </Label>
+          <Button
+              Name="CancelButton"
+              Click="CancelButton_OnClick">
+              Cancel
+          </Button>
 
       </StackPanel>
 
   </Grid>
+
 </Window>

@@ -56,6 +56,12 @@
             DriveComboBox
         </Button>
 
+        <Button
+            Name="InputDialogButton"
+            Click="InputDialogButton_OnClick">
+            InputDialog
+        </Button>
+
     </WrapPanel>
 
 </Window>

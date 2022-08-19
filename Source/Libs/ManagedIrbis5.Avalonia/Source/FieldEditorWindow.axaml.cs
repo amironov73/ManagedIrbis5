@@ -19,15 +19,16 @@
 using System.Collections.Generic;
 
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using AM;
 
+using ManagedIrbis.Workspace;
+
 #endregion
 
 #nullable enable
-
-using ManagedIrbis.Workspace;
 
 namespace ManagedIrbis.Avalonia;
 
@@ -45,6 +46,10 @@ public partial class FieldEditorWindow
     public FieldEditorWindow()
     {
         AvaloniaXamlLoader.Load (this);
+
+        // TODO разобраться, почему не срабатывает автоматика
+        FieldGrid = this.FindControl<DataGrid> ("FieldGrid");
+        HintBox = this.FindControl<Label> ("HintBox");
     }
 
     #endregion
@@ -52,6 +57,30 @@ public partial class FieldEditorWindow
     #region Private members
 
     private IEnumerable<FieldLine>? _lines;
+
+    private void OkButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        sender.NotUsed();
+        eventArgs.NotUsed();
+
+        Close (true);
+    }
+
+    private void CancelButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        sender.NotUsed();
+        eventArgs.NotUsed();
+
+        Close (false);
+    }
 
     #endregion
 
