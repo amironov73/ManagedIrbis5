@@ -1,0 +1,60 @@
+﻿<!-- ReSharper disable MarkupAttributeTypo -->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:AM.Avalonia.Dialogs"
+        Width="400" Height="250"
+        CanResize="False"
+        x:Class="AM.Avalonia.Dialogs.ExceptionDialog"
+        Title="Произошло исключение">
+
+    <Design.DataContext>
+        <local:ExceptionDialog />
+    </Design.DataContext>
+
+    <StackPanel
+        Margin="10"
+        Spacing="10"
+        Orientation="Vertical"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Center">
+
+        <TextBox
+            Height="180"
+            IsReadOnly="True"
+            TextWrapping="Wrap"
+            Text="{Binding Message}"
+            />
+
+        <StackPanel
+            Orientation="Horizontal"
+            HorizontalAlignment="Right"
+            Spacing="10">
+
+            <Button
+                Name="ExitButton">
+                Завершить
+            </Button>
+
+            <Button
+                Name="PrintButton">
+                Распечатать
+            </Button>
+
+            <Button
+                Name="SaveButton">
+                Сохранить
+            </Button>
+
+            <Button
+                Name="OkButton"
+                Click="OkButton_OnClick">
+                OK
+            </Button>
+
+        </StackPanel>
+
+    </StackPanel>
+
+</Window>
+

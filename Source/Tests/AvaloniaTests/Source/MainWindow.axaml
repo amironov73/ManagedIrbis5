@@ -62,6 +62,12 @@
             InputDialog
         </Button>
 
+        <Button
+            Name="ExceptionDialogButton"
+            Click="ExceptionDialogButton_OnClick">
+            ExceptionDialog
+        </Button>
+
     </WrapPanel>
 
 </Window>

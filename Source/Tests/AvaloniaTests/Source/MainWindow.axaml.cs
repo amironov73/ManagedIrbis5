@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+using AM;
 using AM.Avalonia.Controls;
 using AM.Avalonia.Dialogs;
 
@@ -242,7 +243,7 @@ public partial class MainWindow : Window
 
     private async void InputDialogButton_OnClick (object? sender, RoutedEventArgs e)
     {
-        var data = new InputData()
+        var data = new InputData
         {
             Title = "Заголовок окна",
             Prompt = "Это просто тест",
@@ -251,5 +252,22 @@ public partial class MainWindow : Window
         var result = await InputDialog.Query (this, data);
         Debug.WriteLine ("Result is: " + result);
         Debug.WriteLine ("Value is: " + data.Value);
+    }
+
+    private async void ExceptionDialogButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        try
+        {
+            throw new ArsMagnaException ("Учебная тревога");
+        }
+        catch (Exception exception)
+        {
+            await ExceptionDialog.Show (this, exception);
+        }
+
     }
 }
