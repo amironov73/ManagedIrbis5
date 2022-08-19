@@ -20,147 +20,121 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// <see cref="TraceListener"/> that uses <see cref="TextBox"/>
+/// to write trace messages.
+/// </summary>
+public class TextBoxTraceListener
+    : TraceListener
 {
+    #region Properties
+
     /// <summary>
-    /// <see cref="TraceListener"/> that uses <see cref="TextBox"/>
-    /// to write trace messages.
+    /// Gets the text box used to write trace messages.
     /// </summary>
-    public class TextBoxTraceListener
-        : TraceListener
+    /// <value>The text box used.</value>
+    public TextBox TextBox { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public TextBoxTraceListener
+        (
+            TextBox textBox
+        )
     {
-        #region Properties
+        Sure.NotNull (textBox);
 
-        private TextBox _textBox;
+        TextBox = textBox;
+        TextBox.Disposed += _textBox_Disposed;
+    }
 
-        /// <summary>
-        /// Gets the text box used to write trace messages.
-        /// </summary>
-        /// <value>The text box used.</value>
-        public TextBox TextBox
+    #endregion
+
+    #region Private members
+
+    private bool _disposed;
+
+    /// <summary>
+    /// Отрабатываем ситуацию, когда текстбокс, в который мы писали,
+    /// неожиданно для нас был удален.
+    /// </summary>
+    private void _textBox_Disposed
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        _disposed = true;
+        Trace.Listeners.Remove (this);
+    }
+
+    #endregion
+
+    #region TraceListener members
+
+    /// <inheritdoc cref="TraceListener.Write(string?)"/>
+    public override void Write
+        (
+            string? message
+        )
+    {
+        if (!_disposed)
         {
-            [DebuggerStepThrough]
-            get
+            if (TextBox.InvokeRequired)
             {
-                return _textBox;
+                TextBox.Invoke ((MethodInvoker) delegate { Write (message); });
             }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="TextBoxTraceListener"/> class.
-        /// </summary>
-        public TextBoxTraceListener
-            (
-                TextBox textBox
-            )
-        {
-            _textBox = textBox;
-            _textBox.Disposed += _textBox_Disposed;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private bool _disposed;
-
-        /// <summary>
-        /// Handles the Disposed event of the _textBox control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="T:System.EventArgs"/>
-        /// instance containing the event data.</param>
-        private void _textBox_Disposed
-            (
-                object? sender,
-                EventArgs e
-            )
-        {
-            _disposed = true;
-            Trace.Listeners.Remove(this);
-        }
-
-        #endregion
-
-        #region TraceListener members
-
-        /// <summary>
-        /// When overridden in a derived class, writes the specified
-        /// message to the listener you create in the derived class.
-        /// </summary>
-        /// <param name="message">A message to write.
-        /// </param>
-        public override void Write
-            (
-                string? message
-            )
-        {
-            if (!_disposed)
+            else
             {
-                if (TextBox.InvokeRequired)
+                if (!string.IsNullOrEmpty (message))
                 {
-                    TextBox.Invoke((MethodInvoker)delegate { Write(message); });
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(message))
-                    {
-                        TextBox.AppendText(message);
-                        TextBox.SelectionStart = TextBox.TextLength;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// When overridden in a derived class, writes a message to
-        /// the listener you create in the derived class, followed by
-        /// a line terminator.
-        /// </summary>
-        /// <param name="message">A message to write.
-        /// </param>
-        public override void WriteLine
-            (
-                string? message
-            )
-        {
-            if (!_disposed)
-            {
-                if (TextBox.InvokeRequired)
-                {
-                    TextBox.Invoke((MethodInvoker)delegate { WriteLine(message); });
-                }
-                else
-                {
-                    TextBox.AppendText(message + Environment.NewLine);
+                    TextBox.AppendText (message);
                     TextBox.SelectionStart = TextBox.TextLength;
                 }
             }
         }
+    }
 
-        /// <summary>
-        /// Releases the unmanaged resources used by the
-        /// <see cref="TraceListener"/> and optionally releases
-        /// the managed resources.
-        /// </summary>
-        /// <param name="disposing">true to release both
-        /// managed and unmanaged resources; false to release
-        /// only unmanaged resources.</param>
-        protected override void Dispose(bool disposing)
+    /// <inheritdoc cref="TraceListener.WriteLine(string?)"/>
+    public override void WriteLine
+        (
+            string? message
+        )
+    {
+        if (!_disposed)
         {
-            base.Dispose(disposing);
-            if (disposing && !_disposed)
+            if (TextBox.InvokeRequired)
             {
-                _disposed = true;
-                TextBox.Dispose();
+                TextBox.Invoke ((MethodInvoker) delegate { WriteLine (message); });
+            }
+            else
+            {
+                TextBox.AppendText (message + Environment.NewLine);
+                TextBox.SelectionStart = TextBox.TextLength;
             }
         }
-
-        #endregion
     }
+
+    /// <inheritdoc cref="TraceListener.Dispose(bool)"/>
+    protected override void Dispose
+        (
+            bool disposing
+        )
+    {
+        base.Dispose (disposing);
+        if (disposing && !_disposed)
+        {
+            _disposed = true;
+            TextBox.Dispose();
+        }
+    }
+
+    #endregion
 }

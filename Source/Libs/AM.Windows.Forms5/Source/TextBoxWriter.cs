@@ -131,9 +131,7 @@ public class TextBoxWriter
     /// <inheritdoc cref="TextWriter.Encoding"/>
     public override Encoding Encoding => Encoding.Unicode;
 
-    /// <summary>
-    /// Writes a character to the text stream.
-    /// </summary>
+    /// <inheritdoc cref="TextWriter.Write(char)"/>
     public override void Write
         (
             char value
@@ -144,10 +142,7 @@ public class TextBoxWriter
         OnScroll();
     }
 
-    /// <summary>
-    /// Writes a string to the text stream.
-    /// </summary>
-    /// <param name="value">The string to write.</param>
+    /// <inheritdoc cref="TextWriter.Write(string?)"/>
     public override void Write
         (
             string? value
@@ -161,9 +156,7 @@ public class TextBoxWriter
         }
     }
 
-    /// <summary>
-    /// Writes a line terminator to the text stream.
-    /// </summary>
+    /// <inheritdoc cref="TextWriter.WriteLine()"/>
     public override void WriteLine()
     {
         _CheckDisposed();
@@ -171,9 +164,7 @@ public class TextBoxWriter
         OnScroll();
     }
 
-    /// <summary>
-    /// Writes a string followed by a line terminator to the text stream.
-    /// </summary>
+    /// <inheritdoc cref="TextWriter.WriteLine(string?)"/>
     public override void WriteLine
         (
             string? value
