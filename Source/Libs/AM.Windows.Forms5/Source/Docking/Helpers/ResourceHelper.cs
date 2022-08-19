@@ -3,8 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable StringLiteralTypo
 
-/* 
+/* ResourceHelper.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,26 +19,39 @@ using System.Resources;
 
 namespace AM.Windows.Forms.Docking;
 
+/// <summary>
+///
+/// </summary>
 internal static class ResourceHelper
 {
-    private static ResourceManager _resourceManager = null;
+    #region Private members
 
-    private static ResourceManager ResourceManager
+    private static ResourceManager? _resourceManager;
+
+    // TODO исправить путь к ресурсам
+    private static ResourceManager ResourceManager =>
+        _resourceManager ??= new ResourceManager
+            (
+                "WeifenLuo.WinFormsUI.Docking.Strings",
+                typeof (ResourceHelper).Assembly
+            );
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    public static string? GetString
+        (
+            string name
+        )
     {
-        get
-        {
-            if (_resourceManager == null)
-            {
-                _resourceManager = new ResourceManager ("WeifenLuo.WinFormsUI.Docking.Strings",
-                    typeof (ResourceHelper).Assembly);
-            }
+        Sure.NotNullNorEmpty (name);
 
-            return _resourceManager;
-        }
-    }
-
-    public static string GetString (string name)
-    {
         return ResourceManager.GetString (name);
     }
+
+    #endregion
 }

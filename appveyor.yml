@@ -12,14 +12,14 @@ init:
 before_build:
 - systeminfo
 - '"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"'
-- python -m pip install --upgrade pip
-- pip install --upgrade pygount sphinx sphinx_rtd_theme
-- pygount -f summary Source/Libs                       -s cs -N "*.Designer.cs" -F "obj"
-- pygount -f summary Source/Libs/AM.Core5/Source       -s cs -N "*.Designer.cs" -F "obj"
-- pygount -f summary Source/Libs/ManagedIrbis5/Source  -s cs -N "*.Designer.cs" -F "obj"
-- pygount -f summary Source/Libs/AM.Scripting/Source   -s cs -N "*.Designer.cs" -F "obj"
-- pygount -f summary Source/Tests                      -s cs -N "*.Designer.cs" -F "obj"
-- pygount -f summary Source/Apps                       -s cs -N "*.Designer.cs" -F "obj"
+- rem python -m pip install --upgrade pip
+- rem pip install --upgrade pygount sphinx sphinx_rtd_theme
+- rem pygount -f summary Source/Libs                       -s cs -N "*.Designer.cs" -F "obj"
+- rem pygount -f summary Source/Libs/AM.Core5/Source       -s cs -N "*.Designer.cs" -F "obj"
+- rem pygount -f summary Source/Libs/ManagedIrbis5/Source  -s cs -N "*.Designer.cs" -F "obj"
+- rem pygount -f summary Source/Libs/AM.Scripting/Source   -s cs -N "*.Designer.cs" -F "obj"
+- rem pygount -f summary Source/Tests                      -s cs -N "*.Designer.cs" -F "obj"
+- rem pygount -f summary Source/Apps                       -s cs -N "*.Designer.cs" -F "obj"
 - dotnet --info
 - dotnet tool install --tool-path . nbgv
 - dotnet tool install --tool-path . coverlet.console

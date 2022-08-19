@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/*
+/* Win32Helper.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,18 +20,16 @@ using System.Windows.Forms;
 
 namespace AM.Windows.Forms.Docking;
 
+/// <summary>
+///
+/// </summary>
 public static class Win32Helper
 {
-    private static readonly bool _isRunningOnMono = Type.GetType ("Mono.Runtime") != null;
+    #region Private members
 
-    public static bool IsRunningOnMono
+    internal static Control? ControlAtPoint (Point pt)
     {
-        get { return _isRunningOnMono; }
-    }
-
-    internal static Control ControlAtPoint (Point pt)
-    {
-        return Control.FromChildHandle (AM.Windows.Forms.Docking.Win32.NativeMethods.WindowFromPoint (pt));
+        return Control.FromChildHandle (Win32.NativeMethods.WindowFromPoint (pt));
     }
 
     internal static uint MakeLong (int low, int high)
@@ -41,8 +39,25 @@ public static class Win32Helper
 
     internal static uint HitTestCaption (Control control)
     {
-        var captionRectangle = new Rectangle (0, 0, control.Width,
-            control.ClientRectangle.Top - control.PointToClient (control.Location).X);
+        var captionRectangle = new Rectangle
+            (
+                0,
+                0,
+                control.Width,
+                control.ClientRectangle.Top - control.PointToClient (control.Location).X
+            );
+
         return captionRectangle.Contains (Control.MousePosition) ? (uint)2 : 0;
     }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    public static bool IsRunningOnMono { get; } = Type.GetType ("Mono.Runtime") != null;
+
+    #endregion
 }

@@ -3,8 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 
-/* 
+/* DrawHelper.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,42 +15,63 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
+using static System.Math;
+
 #endregion
 
 #nullable enable
 
 namespace AM.Windows.Forms.Docking;
 
+/// <summary>
+///
+/// </summary>
 public static class DrawHelper
 {
-    public static Point RtlTransform (Control control, Point point)
+    #region Public methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    public static Point RtlTransform
+        (
+            Control control,
+            Point point
+        )
     {
-        if (control.RightToLeft != RightToLeft.Yes)
-        {
-            return point;
-        }
-        else
-        {
-            return new Point (control.Right - point.X, point.Y);
-        }
+        return control.RightToLeft != RightToLeft.Yes
+            ? point
+            : point with { X = control.Right - point.X };
     }
 
-    public static Rectangle RtlTransform (Control control, Rectangle rectangle)
+    /// <summary>
+    ///
+    /// </summary>
+    public static Rectangle RtlTransform
+        (
+            Control control,
+            Rectangle rectangle
+        )
     {
         if (control.RightToLeft != RightToLeft.Yes)
         {
             return rectangle;
         }
-        else
-        {
-            return new Rectangle (control.ClientRectangle.Right - rectangle.Right, rectangle.Y, rectangle.Width,
-                rectangle.Height);
-        }
+
+        return rectangle with { X = control.ClientRectangle.Right - rectangle.Right };
     }
 
-    public static GraphicsPath GetRoundedCornerTab (GraphicsPath graphicsPath, Rectangle rect, bool upCorner)
+    /// <summary>
+    ///
+    /// </summary>
+    public static GraphicsPath GetRoundedCornerTab
+        (
+            GraphicsPath? graphicsPath,
+            Rectangle rect,
+            bool upCorner
+        )
     {
-        if (graphicsPath == null)
+        if (graphicsPath is null)
         {
             graphicsPath = new GraphicsPath();
         }
@@ -58,7 +80,7 @@ public static class DrawHelper
             graphicsPath.Reset();
         }
 
-        int curveSize = 6;
+        var curveSize = 6;
         if (upCorner)
         {
             graphicsPath.AddLine (rect.Left, rect.Bottom, rect.Left, rect.Top + curveSize / 2);
@@ -70,8 +92,7 @@ public static class DrawHelper
         else
         {
             graphicsPath.AddLine (rect.Right, rect.Top, rect.Right, rect.Bottom - curveSize / 2);
-            graphicsPath.AddArc (
-                new Rectangle (rect.Right - curveSize, rect.Bottom - curveSize, curveSize, curveSize), 0, 90);
+            graphicsPath.AddArc (new Rectangle (rect.Right - curveSize, rect.Bottom - curveSize, curveSize, curveSize), 0, 90);
             graphicsPath.AddLine (rect.Right - curveSize / 2, rect.Bottom, rect.Left + curveSize / 2, rect.Bottom);
             graphicsPath.AddArc (new Rectangle (rect.Left, rect.Bottom - curveSize, curveSize, curveSize), 90, 90);
             graphicsPath.AddLine (rect.Left, rect.Bottom - curveSize / 2, rect.Left, rect.Top);
@@ -80,29 +101,41 @@ public static class DrawHelper
         return graphicsPath;
     }
 
-    public static GraphicsPath CalculateGraphicsPathFromBitmap (Bitmap bitmap)
+    /// <summary>
+    ///
+    /// </summary>
+    public static GraphicsPath CalculateGraphicsPathFromBitmap
+        (
+            Bitmap bitmap
+        )
     {
         return CalculateGraphicsPathFromBitmap (bitmap, Color.Empty);
     }
 
     // From http://edu.cnzz.cn/show_3281.html
-    public static GraphicsPath CalculateGraphicsPathFromBitmap (Bitmap bitmap, Color colorTransparent)
+    /// <summary>
+    ///
+    /// </summary>
+    public static GraphicsPath CalculateGraphicsPathFromBitmap
+        (
+            Bitmap bitmap,
+            Color colorTransparent
+        )
     {
-        GraphicsPath graphicsPath = new GraphicsPath();
+        var graphicsPath = new GraphicsPath();
         if (colorTransparent == Color.Empty)
         {
             colorTransparent = bitmap.GetPixel (0, 0);
         }
 
-        for (int row = 0; row < bitmap.Height; row++)
+        for (var row = 0; row < bitmap.Height; row++)
         {
-            int colOpaquePixel = 0;
-            for (int col = 0; col < bitmap.Width; col++)
+            for (var col = 0; col < bitmap.Width; col++)
             {
                 if (bitmap.GetPixel (col, row) != colorTransparent)
                 {
-                    colOpaquePixel = col;
-                    int colNext = col;
+                    var colOpaquePixel = col;
+                    var colNext = col;
                     for (colNext = colOpaquePixel; colNext < bitmap.Width; colNext++)
                         if (bitmap.GetPixel (colNext, row) == colorTransparent)
                         {
@@ -118,18 +151,20 @@ public static class DrawHelper
         return graphicsPath;
     }
 
-    public static int Balance (int length, int margin, int input, int lower, int upper)
+    /// <summary>
+    ///
+    /// </summary>
+    public static int Balance
+        (
+            int length,
+            int margin,
+            int input,
+            int lower,
+            int upper
+        )
     {
         return Max (Min (input, upper - length - margin), lower + margin);
     }
 
-    private static int Min (int one, int other)
-    {
-        return one > other ? other : one;
-    }
-
-    private static int Max (int one, int other)
-    {
-        return one < other ? other : one;
-    }
+    #endregion
 }
