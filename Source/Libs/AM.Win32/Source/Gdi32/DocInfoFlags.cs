@@ -2,17 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* DocInfoFlags.cs -- specifies additional information about the print job
+/* DocInfoFlags.cs -- содержит дополнительную информацию о задании на печать
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -24,20 +18,20 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Specifies additional information about the print job.
+/// Содержит дополнительную информацию о задании на печать.
 /// </summary>
 [Flags]
 public enum DocInfoFlags
 {
     /// <summary>
-    /// Applications that use banding should set this flag for optimal
-    /// performance during printing.
+    /// Приложения, использующие печать по полосам, должны установить
+    /// этот флаг для оптимальной производительности во время печати.
     /// </summary>
     DI_APPBANDING = 0x00000001,
 
     /// <summary>
-    /// The application will use raster operations that involve reading
-    /// from the destination surface.
+    /// Приложение будет использовать растровые операции, включающие
+    /// чтение с целевой поверхности.
     /// </summary>
     DI_ROPS_READ_DESTINATION = 0x00000002
 }
