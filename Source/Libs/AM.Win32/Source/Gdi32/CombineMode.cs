@@ -2,48 +2,45 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* CombineMode.cs -- specifies a mode indicating how the two regions will be combined
+/* CombineMode.cs -- определяет режим, указывающий, как будут объединены две области.
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32;
 
 /// <summary>
-/// Specifies a mode indicating how the two regions will be combined.
+/// Определяет режим, указывающий, как будут объединены две области.
 /// </summary>
 public enum CombineMode
     : uint
 {
     /// <summary>
-    /// Creates the intersection of the two combined regions.
+    /// Создает пересечение двух объединяемых регионов.
     /// </summary>
     RGN_AND = 1,
 
     /// <summary>
-    /// Creates the union of two combined regions.
+    /// Создает объединение двух объединяемых регионов.
     /// </summary>
     RGN_OR = 2,
 
     /// <summary>
-    /// Creates the union of two combined regions except for any
-    /// overlapping areas.
+    /// Создает объединение двух объединяемых областей,
+    /// за исключением любых перекрывающихся областей.
     /// </summary>
     RGN_XOR = 3,
 
     /// <summary>
-    /// Combines the parts of hrgnSrc1 that are not part of hrgnSrc2.
+    /// Объединяет части hrgnSrc1, которые не являются частью hrgnSrc2.
     /// </summary>
     RGN_DIFF = 4,
 
     /// <summary>
-    /// Creates a copy of the region identified by hrgnSrc1.
+    /// Создает копию региона, указанного hrgnSrc1.
     /// </summary>
     RGN_COPY = 5
 }

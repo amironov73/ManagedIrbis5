@@ -2,83 +2,82 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* BrushStyle.cs -- specifies the brush style
+/* BrushStyle.cs -- задает стиль кисти
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32;
 
 /// <summary>
-/// Specifies the brush style.
+/// Задает стиль кисти.
 /// </summary>
 public enum BrushStyle
 {
     /// <summary>
-    /// Solid brush.
+    /// Сплошная (одноцветная кисть).
     /// </summary>
     BS_SOLID = 0,
 
     /// <summary>
-    /// Same as BS_HOLLOW.
+    /// То же, что и BS_HOLLOW.
     /// </summary>
     BS_NULL = 1,
 
     /// <summary>
-    /// Hollow brush.
+    /// Пустая кисть.
     /// </summary>
     BS_HOLLOW = 0,
 
     /// <summary>
-    /// Hatched brush.
+    /// Штриховка.
     /// </summary>
     BS_HATCHED = 2,
 
     /// <summary>
-    /// Pattern brush defined by a memory bitmap.
+    /// Узорчатая кисть, определяемая растровым изображением в памяти.
     /// </summary>
     BS_PATTERN = 3,
 
     /// <summary>
-    /// ???
+    /// Не поддерживается.
     /// </summary>
     BS_INDEXED = 4,
 
     /// <summary>
-    /// <para>A pattern brush defined by a device-independent bitmap
-    /// (DIB) specification. If lbStyle is BS_DIBPATTERN, the lbHatch
-    /// member contains a handle to a packed DIB.</para>
-    /// <para>Windows 95: Creating brushes from bitmaps or DIBs larger
-    /// than 8 by 8 pixels is not supported. If a larger bitmap is specified,
-    /// only a portion of the bitmap is used.</para>
+    /// <para>Узорчатая кисть, определяемая спецификацией
+    /// аппаратно-независимого растрового изображения (DIB).
+    /// Если lbStyle имеет значение BS_DIBPATTERN, элемент lbHatch
+    /// содержит дескриптор упакованного DIB.</para>
+    /// <para>Windows 95: создание кистей из растровых изображений
+    /// или файлов DIB размером более 8 на 8 пикселей не поддерживается.
+    /// Если указано большее растровое изображение, используется
+    /// только часть растрового изображения.</para>
     /// </summary>
     BS_DIBPATTERN = 5,
 
     /// <summary>
-    /// A pattern brush defined by a device-independent bitmap (DIB)
-    /// specification. If lbStyle is BS_DIBPATTERNPT, the lbHatch member
-    /// contains a pointer to a packed DIB.
+    /// Узорчатая кисть, определяемая спецификацией аппаратно-независимого
+    /// растрового изображения (DIB). Если lbStyle имеет значение
+    /// BS_DIBPATTERNPT, элемент lbHatch содержит указатель
+    /// на упакованный DIB.
     /// </summary>
     BS_DIBPATTERNPT = 6,
 
     /// <summary>
-    /// Same as BS_PATTERN.
+    /// То же, что и BS_PATTERN.
     /// </summary>
     BS_PATTERN8X8 = 7,
 
     /// <summary>
-    /// Same as BS_DIBPATTERN.
+    /// То же, что и BS_DIBPATTERN.
     /// </summary>
     BS_DIBPATTERN8X8 = 8,
 
     /// <summary>
-    /// ???
+    /// Не поддерживается.
     /// </summary>
     BS_MONOPATTERN = 9
 }
