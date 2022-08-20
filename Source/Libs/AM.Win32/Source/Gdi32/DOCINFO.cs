@@ -12,7 +12,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* DOCINFO.cs -- contains the input and output file names and other information used by the StartDoc function
+/* DOCINFO.cs -- содержит имена входных и выходных файлов и другую информацию, используемую функцией StartDoc
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -27,49 +27,56 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// Contains the input and output file names and other information used
-/// by the StartDoc function.
+/// Содержит имена входных и выходных файлов и другую информацию,
+/// используемую функцией StartDoc.
 /// </summary>
 [Serializable]
-[StructLayout (LayoutKind.Sequential, Size = Size)]
+[StructLayout (LayoutKind.Sequential)]
 public struct DOCINFO
 {
     /// <summary>
-    /// Structure size.
+    /// Размер структуры в 32-битной среде (используется в <see cref="cbSize"/>).
     /// </summary>
-    public const int Size = 20;
+    public const int Size32 = 20;
 
     /// <summary>
-    /// Specifies the size, in bytes, of the structure.
+    /// Размер структуры в 64-битной среде (используется в <see cref="cbSize"/>).
+    /// </summary>
+    public const int Size64 = 32;
+
+    /// <summary>
+    /// Указывает размер структуры в байтах.
     /// </summary>
     public int cbSize;
 
     /// <summary>
-    /// Pointer to a null-terminated string that specifies the name
-    /// of the document.
+    /// Указатель на строку с завершающим нулем, которая определяет
+    /// имя документа.
     /// </summary>
     [MarshalAs (UnmanagedType.LPTStr)]
     public string? lpszDocName;
 
     /// <summary>
-    /// Pointer to a null-terminated string that specifies the name of
-    /// an output file. If this pointer is NULL, the output will be sent
-    /// to the device identified by the device context handle that was
-    /// passed to the StartDoc function.
+    /// Указатель на строку с завершающим нулем, которая определяет
+    /// имя выходного файла. Если этот указатель имеет значение NULL,
+    /// выходные данные будут отправлены на устройство,
+    /// идентифицированное дескриптором контекста устройства,
+    /// который был передан функции StartDoc.
     /// </summary>
     [MarshalAs (UnmanagedType.LPTStr)]
     public string? lpszOutput;
 
     /// <summary>
-    /// Pointer to a null-terminated string that specifies the type of data,
-    /// such as "raw" or "emf", used to record the print job. This member can
-    /// be NULL. Note that the requested data type might be ignored.
+    /// Указатель на заканчивающуюся нулем строку, указывающую тип данных,
+    /// например "raw" или "emf", используемый для записи задания на печать.
+    /// Этот элемент может быть NULL. Обратите внимание, что запрошенный
+    /// тип данных может быть проигнорирован.
     /// </summary>
     [MarshalAs (UnmanagedType.LPTStr)]
     public string? lpszDatatype;
 
     /// <summary>
-    /// Specifies additional information about the print job.
+    /// Указывает дополнительную информацию о задании на печать.
     /// </summary>
     public DocInfoFlags fwType;
 }

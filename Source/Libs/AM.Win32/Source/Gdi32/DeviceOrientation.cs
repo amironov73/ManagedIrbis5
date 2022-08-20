@@ -2,58 +2,52 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* DeviceOrientation.cs -- the orientation at which images should be presented
+/* DeviceOrientation.cs -- ориентация изображений или бумаге при выводе
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32;
 
 /// <summary>
-/// The orientation at which images should be presented
-/// or orientation of the paper.
+/// Ориентация изображений или бумаги при выводе изображений.
 /// </summary>
 public enum DeviceOrientation
 {
     /// <summary>
-    /// Portrait orientation.
+    /// Портретная ориентация.
     /// </summary>
     DMORIENT_PORTRAIT = 1,
 
     /// <summary>
-    /// Landscape orientation.
+    /// Альбомная ориентация.
     /// </summary>
     DMORIENT_LANDSCAPE = 2,
 
     /// <summary>
-    /// The display orientation is the natural orientation
-    /// of the display device; it should be used as the default.
+    /// Ориентация дисплея — это естественная ориентация устройства
+    /// отображения; режим следует использовать по умолчанию.
     /// </summary>
     DMDO_DEFAULT = 0,
 
     /// <summary>
-    /// The display orientation is rotated 90 degrees
-    /// (measured clockwise) from DMDO_DEFAULT.
+    /// Ориентация дисплея -- повернутый на 90 градусов (по часовой
+    /// стрелке) от DMDO_DEFAULT.
     /// </summary>
     DMDO_90 = 1,
 
     /// <summary>
-    /// The display orientation is rotated 180 degrees
-    /// (measured clockwise) from DMDO_DEFAULT.
+    /// Ориентация дисплея -- повернутый на 180 градусов (по часовой
+    /// стрелке) от DMDO_DEFAULT.
     /// </summary>
     DMDO_180 = 2,
 
     /// <summary>
-    /// The display orientation is rotated 270 degrees
-    /// (measured clockwise) from DMDO_DEFAULT.
+    /// Ориентация дисплея -- повернутый на 270 градусов (по часовой
+    /// стрелке) от DMDO_DEFAULT.
     /// </summary>
     DMDO_270 = 3
 }

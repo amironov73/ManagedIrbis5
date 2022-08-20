@@ -2,17 +2,12 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* DeviceStateFlags.cs -- display device state flags
+/* DeviceStateFlags.cs -- флаги состояния устройства отображения
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -24,61 +19,62 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Display device state flags.
+/// Флаги состояни устройства отображения.
 /// </summary>
 [Flags]
 public enum DeviceStateFlags
 {
     /// <summary>
-    /// The device is part of the desktop.
+    /// Устройство является частью рабочего стола.
     /// </summary>
     DISPLAY_DEVICE_ATTACHED_TO_DESKTOP = 0x00000001,
 
     /// <summary>
-    ///
+    /// Назначение флага неизвестно.
     /// </summary>
     DISPLAY_DEVICE_MULTI_DRIVER = 0x00000002,
 
     /// <summary>
-    /// The primary desktop is on the device.
-    /// For a system with a single display card,
-    /// this is always set. For a system with multiple
-    /// display cards, only one device can have this set.
+    /// Основной рабочий стол находится на устройстве. Для системы
+    /// с одной видеокартой этот флаг всегда установлен. В системе
+    /// с несколькими видеокартами этот флаг может быть только
+    /// у одного устройства.
     /// </summary>
     DISPLAY_DEVICE_PRIMARY_DEVICE = 0x00000004,
 
     /// <summary>
-    /// Represents a pseudo device used to mirror application
-    /// drawing for remoting or other purposes. An invisible pseudo
-    /// monitor is associated with this device. For example,
-    /// NetMeeting uses it. Note that GetSystemMetrics(SM_MONITORS)
-    /// only accounts for visible display monitors.
+    /// Представляет псевдоустройство, используемое для зеркального
+    /// отображения вывода приложения для удаленного взаимодействия
+    /// или других целей. С этим устройством связан невидимый
+    /// псевдомонитор. Например, NetMeeting использует его.
+    /// Обратите внимание, что GetSystemMetrics(SM_MONITORS)
+    /// учитывает только видимые мониторы.
     /// </summary>
     DISPLAY_DEVICE_MIRRORING_DRIVER = 0x00000008,
 
     /// <summary>
-    /// The device is VGA compatible.
+    /// Устройство совместимо с VGA.
     /// </summary>
     DISPLAY_DEVICE_VGA_COMPATIBLE = 0x00000010,
 
     /// <summary>
-    /// The device is removable; it cannot be the primary display.
+    /// Устройство съемное; он не может быть основным дисплеем.
     /// </summary>
     DISPLAY_DEVICE_REMOVABLE = 0x00000020,
 
     /// <summary>
-    /// The device has more display modes than its output
-    /// devices support.
+    /// Устройство имеет больше режимов отображения, чем поддерживают
+    /// его устройства вывода.
     /// </summary>
     DISPLAY_DEVICE_MODESPRUNED = 0x08000000,
 
     /// <summary>
-    /// ???
+    /// Назначение флага неизвестно.
     /// </summary>
     DISPLAY_DEVICE_REMOTE = 0x04000000,
 
     /// <summary>
-    /// ???
+    /// Назначение флага неизвестно.
     /// </summary>
     DISPLAY_DEVICE_DISCONNECT = 0x02000000
 }
