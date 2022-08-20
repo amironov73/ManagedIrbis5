@@ -2,14 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
 
-/* BITMAPINFO.cs -- defines the dimensions and color information for a DIB.
+/* BITMAPINFO.cs -- определяет размеры и информацию о цвете для DIB
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -22,41 +19,39 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// The BITMAPINFO structure defines the dimensions and color
-/// information for a DIB.
+/// Структура BITMAINFO определяет размеры и информацию о цвете для DIB.
 /// </summary>
 [Serializable]
 [StructLayout (LayoutKind.Sequential, Pack = 1)]
 public struct BITMAPINFO
 {
     /// <summary>
-    /// Specifies a <see cref="BITMAPINFOHEADER">BITMAPINFOHEADER</see>
-    /// structure that contains information
-    /// about the dimensions of color format.
+    /// Задает структуру <see cref="BITMAPINFOHEADER" />,
+    /// которая содержит информацию о размерах цветового формата.
     /// </summary>
     public BITMAPINFOHEADER bmiHeader;
 
     // Fixed-length Array "bmiColors[1]". Members can be
     // accessed with (&my_BITMAPINFO.bmiColors_1)[index]
     /// <summary>
-    /// <para>The bmiColors member contains one of the following:</para>
+    /// <para>Член bmiColors содержит одно из следующего:</para>
     ///
-    /// <para> * An array of RGBQUAD. The elements of the array that
-    /// make up the color table.</para>
+    /// <para> * Массив RGBQUAD. Элементы массива, составляющие
+    /// таблицу цветов.</para>
     ///
-    /// <para> * An array of 16-bit unsigned integers that specifies
-    /// indexes into the currently realized logical palette. This use
-    /// of bmiColors is allowed for functions that use DIBs. When bmiColors
-    /// elements contain indexes to a realized logical palette, they must
-    /// also call the following bitmap functions: CreateDIBitmap,
-    /// CreateDIBPatternBrush, CreateDIBSection</para>
+    /// <para> * Массив 16-битных целых чисел без знака,
+    /// указывающий индексы в текущей реализованной логической палитре.
+    /// Такое использование bmiColors разрешено для функций,
+    /// использующих DIB. Когда элементы bmiColors содержат
+    /// индексы реализованной логической палитры, они также должны
+    /// вызывать следующие функции растрового изображения:
+    /// CreateDIBitmap, CreateDIBPatternBrush, CreateDIBSection</para>
     ///
-    /// <para>The iUsage parameter of CreateDIBSection must be set
-    /// to DIB_PAL_COLORS.</para>
+    /// <para>Параметр iUsage CreateDIBSection должен иметь значение
+    /// DIB_PAL_COLORS.</para>
     ///
-    /// <para>The number of entries in the array depends on the values
-    /// of the biBitCount and biClrUsed members of the BITMAPINFOHEADER
-    /// structure.</para>
+    /// <para>Количество записей в массиве зависит от значений элементов
+    /// biBitCount и biClrUsed структуры BITMAPINFOHEADER.</para>
     /// </summary>
     public RGBQUAD bmiColors_1;
 }

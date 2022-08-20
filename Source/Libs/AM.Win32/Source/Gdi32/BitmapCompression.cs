@@ -2,61 +2,60 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* BitmapCompression.cs -- specifies the type of compression for a compressed bottom-up bitmap.
+/* BitmapCompression.cs -- указывает тип сжатия для сжатого растрового изображения
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32;
 
 /// <summary>
-/// Specifies the type of compression for a compressed
-/// bottom-up bitmap.
+/// Указывает тип сжатия для сжатого растрового изображения снизу вверх.
 /// </summary>
 public enum BitmapCompression
 {
     /// <summary>
-    /// An uncompressed format.
+    /// Изображение не сжато.
     /// </summary>
     BI_RGB = 0,
 
     /// <summary>
-    /// A run-length encoded (RLE) format for bitmaps with 8 bpp.
-    /// The compression format is a 2-byte format consisting of
-    /// a count byte followed by a byte containing a color index.
+    /// Формат кодирования длин серий (RLE) для растровых изображений
+    /// с 8 битами на пиксель. Формат сжатия представляет собой
+    /// 2-байтовый формат, состоящий из байта счетчика,
+    /// за которым следует байт, содержащий индекс цвета.
     /// </summary>
     BI_RLE8 = 1,
 
     /// <summary>
-    /// An RLE format for bitmaps with 4 bpp. The compression format
-    /// is a 2-byte format consisting of a count byte followed by two
-    /// word-length color indexes.
+    /// Формат RLE для растровых изображений с 4 битами на пиксель.
+    /// Формат сжатия представляет собой 2-байтовый формат,
+    /// состоящий из байта счетчика, за которым следуют два
+    /// индекса цвета длиной в слово.
     /// </summary>
     BI_RLE4 = 2,
 
     /// <summary>
-    /// Specifies that the bitmap is not compressed and that the color
-    /// table consists of three DWORD color masks that specify the
-    /// red, green, and blue components, respectively, of each pixel.
-    /// This is valid when used with 16- and 32-bpp bitmaps.
+    /// Указывает, что растровое изображение не сжато и что таблица
+    /// цветов состоит из трех цветовых масок типа DWORD,
+    /// определяющих красный, зеленый и синий компоненты каждого
+    /// пикселя соответственно. Этот формат можно применять
+    /// при использовании растровых изображений с разрешением
+    /// 16 и 32 бита на пиксель.
     /// </summary>
     BI_BITFIELDS = 3,
 
     /// <summary>
-    /// Windows 98/Me, Windows 2000/XP: Indicates that the image is
-    /// a JPEG image.
+    /// Windows 98/Me, Windows 2000/XP: указывает, что изображение
+    /// является изображением в формате JPEG.
     /// </summary>
     BI_JPEG = 4,
 
     /// <summary>
-    /// Windows 98/Me, Windows 2000/XP: Indicates that the image is
-    /// a PNG image.
+    /// Windows 98/Me, Windows 2000/XP: указывает, что изображение
+    /// представляет собой изображение в формате PNG.
     /// </summary>
     BI_PNG = 5
 }
