@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* BackgroundMode.cs -- background mix mode for text, hatch brush drawing on device context
+/* BackgroundMode.cs -- режим смешивания фона для текста, рисования штриховки кистью в контексте устройства
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -19,7 +19,8 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Background mix mode for text, hatch brush drawing on device context.
+/// Режим смешивания фона для текста, рисования штриховки кистью
+/// в контексте устройства.
 /// </summary>
 [Flags]
 public enum BackgroundMode

@@ -5,9 +5,8 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
 
-/* BITMAP.cs -- defines the type, width, height, color format, and bit values of a bitmap
+/* BITMAP.cs -- определяет тип, ширину, высоту, цветовой формат и битовые значения растрового изображения
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -20,53 +19,54 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// The BITMAP structure defines the type, width, height,
-/// color format, and bit values of a bitmap.
+///Структура BITMAP определяет тип, ширину, высоту, цветовой формат
+/// и битовые значения растрового изображения.
 /// </summary>
 [Serializable]
 [StructLayout (LayoutKind.Sequential, Pack = 1)]
 public struct BITMAP
 {
     /// <summary>
-    /// Specifies the bitmap type. This member must be zero.
+    /// Указывает тип растрового изображения.
+    /// Этот элемент должен быть равен нулю.
     /// </summary>
     public int bmType;
 
     /// <summary>
-    /// Specifies the width, in pixels, of the bitmap.
-    /// The width must be greater than zero.
+    /// Задает ширину растрового изображения в пикселях.
+    /// Ширина должна быть больше нуля.
     /// </summary>
     public int bmWidth;
 
     /// <summary>
-    /// Specifies the height, in pixels, of the bitmap.
-    /// The height must be greater than zero.
+    /// Задает высоту растрового изображения в пикселях.
+    /// Высота должна быть больше нуля.
     /// </summary>
     public int bmHeight;
 
     /// <summary>
-    /// Specifies the number of bytes in each scan line.
-    /// This value must be divisible by 2, because the system
-    /// assumes that the bit values of a bitmap form an array
-    /// that is word aligned.
+    /// Определяет количество байтов в каждой строке сканирования.
+    /// Это значение должно делиться на 2, поскольку система
+    /// предполагает, что битовые значения растрового изображения
+    /// образуют массив, выровненный по словам.
     /// </summary>
     public int bmWidthBytes;
 
     /// <summary>
-    /// Specifies the count of color planes.
+    /// Указывает количество цветовых плоскостей.
     /// </summary>
     public ushort bmPlanes;
 
     /// <summary>
-    /// Specifies the number of bits required to indicate
-    /// the color of a pixel.
+    /// Указывает количество битов, необходимых для указания
+    /// цвета пикселя.
     /// </summary>
     public ushort bmBitsPixel;
 
     /// <summary>
-    /// Pointer to the location of the bit values for the bitmap.
-    /// The bmBits member must be a long pointer to an array of
-    /// character (1-byte) values.
+    /// Указатель на расположение битовых значений растрового изображения.
+    /// Элемент bmBits должен быть длинным указателем на массив
+    /// символов (однобайтовых значений).
     /// </summary>
     public IntPtr bmBits;
 }

@@ -3,11 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* AbortProc.cs -- callback function for SetAbortProc
+/* AbortProc.cs -- вызвается, когда задание печати должно быть отменено
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -19,11 +17,10 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// The AbortProc function is an application-defined callback function
-/// used with the SetAbortProc function. It is called when a print job
-/// is to be canceled during spooling. The ABORTPROC type defines a pointer
-/// to this callback function. AbortProc is a placeholder for the
-/// application-defined function name.
+/// Функция AbortProc — это определяемая приложением функция
+/// обратного вызова, используемая с функцией SetAbortProc.
+/// Она вызывается, когда задание печати должно быть отменено
+/// во время буферизации.
 /// </summary>
 public delegate bool AbortProc
     (
