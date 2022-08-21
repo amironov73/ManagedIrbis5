@@ -26,59 +26,48 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Структура PAINTSTRUCT содержит информацию для приложения.
+/// Эта информация может использоваться для рисования клиентской
+/// области окна, принадлежащего этому приложению.
+/// </summary>
+[StructLayout (LayoutKind.Sequential)]
+public struct PAINTSTRUCT
 {
     /// <summary>
-    /// The PAINTSTRUCT structure contains information for an application.
-    /// This information can be used to paint the client area of a window
-    /// owned by that application.
+    /// Дескриптор DC устройства, который будет использоваться для рисования.
     /// </summary>
-    [Serializable]
-    [StructLayout(LayoutKind.Explicit, Size = 64)]
-    public struct PAINTSTRUCT
-    {
-        /// <summary>
-        /// Handle to the display DC to be used for painting.
-        /// </summary>
-        [FieldOffset(0)]
-        public IntPtr hdc;
+    public IntPtr hdc;
 
-        /// <summary>
-        /// Specifies whether the background must be erased. This value is
-        /// nonzero if the application should erase the background. The
-        /// application is responsible for erasing the background if a window
-        /// class is created without a background brush.
-        /// </summary>
-        [FieldOffset(4)]
-        public int fErase;
+    /// <summary>
+    /// Указывает, нужно ли стирать фон. Это значение не равно нулю,
+    /// если приложение должно стереть фон. Приложение отвечает
+    /// за стирание фона, если класс окна создается без фоновой кисти.
+    /// </summary>
+    public int fErase;
 
-        /// <summary>
-        /// Specifies a RECT structure that specifies the upper left and lower
-        /// right corners of the rectangle in which the painting is requested,
-        /// in device units relative to the upper-left corner of the client area.
-        /// </summary>
-        [FieldOffset(8)]
-        public Rectangle rcPaint;
+    /// <summary>
+    /// Структура RECT, указывающая верхний левый и нижний правый углы
+    /// прямоугольника, в котором запрашивается рисование, в единицах
+    /// устройства относительно левого верхнего угла клиентской области.
+    /// </summary>
+    public Rectangle rcPaint;
 
-        /// <summary>
-        /// Reserved; used internally by the system.
-        /// </summary>
-        [FieldOffset(24)]
-        public int fRestore;
+    /// <summary>
+    /// Зарезервировано для системных нужд.
+    /// </summary>
+    public int fRestore;
 
-        /// <summary>
-        /// Reserved; used internally by the system.
-        /// </summary>
-        [FieldOffset(28)]
-        public int fIncUpdate;
+    /// <summary>
+    /// Зарезервировано для системных нужд.
+    /// </summary>
+    public int fIncUpdate;
 
-        /// <summary>
-        /// Reserved; used internally by the system.
-        /// </summary>
-        [FieldOffset(32)]
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        public byte[] rgbReserved;
-
-    } // struct PAINTSTRUCT
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Зарезервировано для системных нужд.
+    /// </summary>
+    [MarshalAs (UnmanagedType.ByValArray, SizeConst = 32)]
+    public byte[] rgbReserved;
+}

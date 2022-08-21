@@ -2,13 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 
-/* POINTL.cs -- координаты точки
+/* POINTL.cs -- координаты точки на растровом устройстве вывода
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,25 +19,36 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Координаты точки на растровом устройстве вывода.
+/// </summary>
+[Serializable]
+[StructLayout (LayoutKind.Sequential)]
+public struct POINTL
 {
+    #region Properties
+
     /// <summary>
-    /// Координаты точки.
+    /// Горизонтальная (x) координата точки.
     /// </summary>
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public struct POINTL
+    public int X;
+
+    /// <summary>
+    /// Вертикальная (y) координата точки.
+    /// </summary>
+    public int Y;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="ValueType.ToString"/>
+    public override string ToString()
     {
-        /// <summary>
-        /// The horizontal (x) coordinate of the point.
-        /// </summary>
-        public int x;
+        return $"{X}, {Y}";
+    }
 
-        /// <summary>
-        /// The vertical (y) coordinate of the point.
-        /// </summary>
-        public int y;
-
-    } // struct POINTL
-
-} // namespace AM.Win32
+    #endregion
+}

@@ -2,17 +2,13 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* MapKeyType.cs -- translation type for MapVirtualKey function
+/* MapKeyType.cs -- тип трансляции для функции MapVirtualKey.
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -21,44 +17,42 @@ using System;
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Указывает тип трансляции для функции MapVirtualKey.
+/// </summary>
+[Serializable]
+public enum MapKeyType
 {
     /// <summary>
-    /// Specifies the translation type for MapVirtualKey function.
+    /// uCode - это код виртуального ключа, который транслируется
+    /// в скан-код. Если это код виртуальной клавиши, который
+    /// не различает клавиши для левой и правой руки, возвращается
+    /// скан-код для левой руки. Если перевода нет, функция возвращает 0.
     /// </summary>
-    [Serializable]
-    public enum MapKeyType
-    {
-        /// <summary>
-        /// uCode is a virtual-key code and is translated into a scan code.
-        /// If it is a virtual-key code that does not distinguish between left-
-        /// and right-hand keys, the left-hand scan code is returned. If there
-        /// is no translation, the function returns 0.
-        /// </summary>
-        VirtualKeyToScanCode = 0,
+    VirtualKeyToScanCode = 0,
 
-        /// <summary>
-        /// uCode is a scan code and is translated into a virtual-key code that
-        /// does not distinguish between left- and right-hand keys. If there is
-        /// no translation, the function returns 0.
-        /// </summary>
-        ScanCodeToVirtualKey = 1,
+    /// <summary>
+    /// uCode - это скан-код, который транслируется в код виртуальной
+    /// клавиши, не делающей различий между левой и правой клавишами.
+    /// Если перевода нет, функция возвращает 0.
+    /// </summary>
+    ScanCodeToVirtualKey = 1,
 
-        /// <summary>
-        /// uCode is a virtual-key code and is translated into an unshifted
-        /// character value in the low-order word of the return value. Dead
-        /// keys (diacritics) are indicated by setting the top bit of the
-        /// return value. If there is no translation, the function returns 0.
-        /// </summary>
-        VirtualKeyToUnshiftedKey = 2,
+    /// <summary>
+    /// uCode - это код виртуального ключа, который преобразуется
+    /// в несдвинутое символьное значение в младшем слове возвращаемого
+    /// значения. Мертвые клавиши (диакритические знаки) обозначаются
+    /// установкой верхнего бита возвращаемого значения.
+    /// Если перевода нет, функция возвращает 0.
+    /// </summary>
+    VirtualKeyToUnshiftedKey = 2,
 
-        /// <summary>
-        /// Windows NT/2000/XP: uCode is a scan code and is translated into
-        /// a virtual-key code that distinguishes between left- and right-hand
-        /// keys. If there is no translation, the function returns 0.
-        /// </summary>
-        VirtualKeyToScanCodeRL = 3
-
-    } // enum MapKeyType
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Windows NT/2000/XP: uCode - это скан-код, транслируемый
+    /// в код виртуальной клавиши, который различает клавиши
+    /// для левой и правой руки. Если перевода нет, функция возвращает 0.
+    /// </summary>
+    VirtualKeyToScanCodeRL = 3
+}
