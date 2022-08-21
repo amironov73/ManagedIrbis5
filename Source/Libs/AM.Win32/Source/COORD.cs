@@ -7,7 +7,6 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-
 /* COORD.cs -- координаты ячейки с символом
  * Ars Magna project, http://arsmagna.ru
  */

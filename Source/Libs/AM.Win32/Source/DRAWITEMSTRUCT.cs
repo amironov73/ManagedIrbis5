@@ -7,7 +7,6 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-
 /* DRAWITEMSTRUCT.cs -- инфорация о контроле или элементе меню, которые необходимо отрисовать
  * Ars Magna project, http://arsmagna.ru
  */
@@ -25,83 +24,83 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// Provides information that the owner window uses
-/// to determine how to paint an owner-drawn control
-/// or menu item. The owner window of the owner-drawn control
-/// or menu item receives a pointer to this structure
-/// as the lParam parameter of the WM_DRAWITEM message.
+/// Предоставляет информацию, которую использует окно владельца,
+/// чтобы определить, как рисовать нарисованный владельцем элемент
+/// управления или элемент меню. Окно владельца нарисованного
+/// владельцем элемента управления или пункта меню получает
+/// указатель на эту структуру в качестве параметра lParam
+/// сообщения WM_DRAWITEM.
 /// </summary>
 [StructLayout (LayoutKind.Sequential)]
 public struct DRAWITEMSTRUCT
 {
     /// <summary>
-    /// The control type.
+    /// Тип контрола.
     /// </summary>
     public int CtlType;
 
     /// <summary>
-    /// The identifier of the combo box, list box, button,
-    /// or static control. This member is not used for a menu item.
+    /// Идентификатор поля со списком, списка, кнопки или
+    /// статического элемента управления. Этот элемент
+    /// не используется для пункта меню.
     /// </summary>
     public int CtlID;
 
     /// <summary>
-    /// The menu item identifier for a menu item or the index
-    /// of the item in a list box or combo box. For an empty
-    /// list box or combo box, this member can be -1.
-    /// This allows the application to draw only the focus
-    /// rectangle at the coordinates specified by the rcItem
-    /// member even though there are no items in the control.
-    /// This indicates to the user whether the list box
-    /// or combo box has the focus. How the bits are set
-    /// in the itemAction member determines whether
-    /// the rectangle is to be drawn as though the list box
-    /// or combo box has the focus.
+    /// Идентификатор пункта меню для пункта меню или индекс пункта
+    /// в списке или поле со списком. Для пустого списка или поля
+    /// со списком этот член может быть равен -1. Это позволяет
+    /// приложению рисовать только прямоугольник фокуса с координатами,
+    /// указанными в члене rcItem, даже если в элементе управления
+    /// нет элементов. Это указывает пользователю, имеет ли
+    /// фокус поле со списком или поле со списком. То, как биты
+    /// установлены в члене itemAction, определяет, должен ли
+    /// прямоугольник быть нарисован так, как если бы поле списка
+    /// или поле со списком имело фокус.
     /// </summary>
     public int itemID;
 
     /// <summary>
-    /// The required drawing action.
+    /// Требуемое действие рисования.
     /// </summary>
     public int itemAction;
 
     /// <summary>
-    /// The visual state of the item after the current
-    /// drawing action takes place.
+    /// Визуальное состояние элемента после выполнения текущего
+    /// действия рисования.
     /// </summary>
     public int itemState;
 
     /// <summary>
-    /// A handle to the control for combo boxes, list boxes,
-    /// buttons, and static controls. For menus, this member
-    /// is a handle to the menu that contains the item.
+    /// Дескриптор элемента управления для полей со списком, списков,
+    /// кнопок и статических элементов управления. Для меню этот член
+    /// является дескриптором меню, которое содержит элемент.
     /// </summary>
     public IntPtr hwndItem;
 
     /// <summary>
-    /// A handle to a device context; this device context
-    /// must be used when performing drawing operations
-    /// on the control.
+    /// Дескриптор контекста устройства; этот контекст устройства
+    /// должен использоваться при выполнении операций рисования
+    /// на элементе управления.
     /// </summary>
     public IntPtr hDC;
 
     /// <summary>
-    /// A rectangle that defines the boundaries of the control
-    /// to be drawn. This rectangle is in the device context
-    /// specified by the hDC member. The system automatically
-    /// clips anything that the owner window draws in the device
-    /// context for combo boxes, list boxes, and buttons,
-    /// but does not clip menu items. When drawing menu items,
-    /// the owner window must not draw outside the boundaries
-    /// of the rectangle defined by the rcItem member.
+    /// Прямоугольник, определяющий границы рисуемого элемента
+    /// управления. Этот прямоугольник находится в контексте устройства,
+    /// указанном элементом hDC. Система автоматически обрезает все,
+    /// что окно владельца рисует в контексте устройства для полей
+    /// со списком, списков и кнопок, но не обрезает элементы меню.
+    /// При рисовании пунктов меню окно владельца не должно выходить
+    /// за границы прямоугольника, определенного элементом rcItem.
     /// </summary>
     public Rectangle rcItem;
 
     /// <summary>
-    /// The application-defined value associated with the menu item.
-    /// For a control, this parameter specifies the value last
-    /// assigned to the list box or combo box by
-    /// the LB_SETITEMDATA or CB_SETITEMDATA message.
+    /// Определяемое приложением значение, связанное с пунктом меню.
+    /// Для элемента управления этот параметр указывает значение,
+    /// присвоенное последним списку или комбинированному полю
+    /// сообщением LB_SETITEMDATA или CB_SETITEMDATA.\
     /// </summary>
     public IntPtr itemData;
 }

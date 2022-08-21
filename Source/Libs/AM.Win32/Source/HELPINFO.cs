@@ -2,11 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
 /* HELPINFO.cs -- информация об элементе, для которого затребована подсказка
  * Ars Magna project, http://arsmagna.ru
@@ -22,60 +21,65 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Информация об элементе, для которого была затребована контекстно-
+/// чувствительная подсказка.
+/// </summary>
+[StructLayout (LayoutKind.Sequential)]
+public struct HELPINFO
 {
     /// <summary>
-    /// Информация об элементе, для которого была затребована контекстно-
-    /// чувствительная подсказка.
+    /// Размер структуры в байтах. Зависит от разрядности платформы.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct HELPINFO
-    {
-        /// <summary>
-        /// The structure size, in bytes.
-        /// </summary>
-        public int cbSize;
+    public int cbSize;
 
-        /// <summary>
-        /// The type of context for which Help is requested.
-        /// This member can be one of the following values.
-        ///
-        /// HELPINFO_MENUITEM
-        /// Help requested for a menu item.
-        ///
-        /// HELPINFO_WINDOW
-        /// Help requested for a control or window.
-        /// </summary>
-        public int iContextType;
+    /// <summary>
+    ///Тип контекста, для которого запрашивается справка.
+    /// Этот элемент может быть одним из следующих значений.
+    /// <list type="table">
+    /// <listheader>
+    ///     <term>Значение</term>
+    ///     <description>Описание</description>
+    /// </listheader>
+    /// <item>
+    ///     <term>HELPINFO_MENUITEM</term>
+    ///     <description>Запрошена помощь по пункту меню.</description>
+    /// </item>
+    /// <item>
+    ///     <term>HELPINFO_WINDOW</term>
+    ///     <description>Запрошена помощь для элемента управления
+    ///     или окна.</description>
+    /// </item>
+    /// </list>
+    /// </summary>
+    public int iContextType;
 
-        /// <summary>
-        /// The identifier of the window or control
-        /// if iContextType is HELPINFO_WINDOW,
-        /// or identifier of the menu item
-        /// if iContextType is HELPINFO_MENUITEM.
-        /// </summary>
-        public int iCtrlId;
+    /// <summary>
+    /// Идентификатор окна или элемента управления,
+    /// если iContextType равен HELPINFO_WINDOW,
+    /// или идентификатор пункта меню, если iContextType
+    /// равен HELPINFO_MENUITEM.
+    /// </summary>
+    public int iCtrlId;
 
-        /// <summary>
-        /// The identifier of the child window or control
-        /// if iContextType is HELPINFO_WINDOW,
-        /// or identifier of the associated menu
-        /// if iContextType is HELPINFO_MENUITEM.
-        /// </summary>
-        public IntPtr hItemHandle;
+    /// <summary>
+    /// Идентификатор дочернего окна или элемента управления,
+    /// если iContextType равен HELPINFО_WINDOW, или идентификатор
+    /// связанного меню, если iContextType равен HELPINFO_MENUITEM.
+    /// </summary>
+    public IntPtr hItemHandle;
 
-        /// <summary>
-        /// The help context identifier of the window or control.
-        /// </summary>
-        public int dwContextId;
+    /// <summary>
+    /// Идентификатор контекста справки окна или элемента управления.
+    /// </summary>
+    public int dwContextId;
 
-        /// <summary>
-        /// The POINT structure that contains the screen coordinates
-        /// of the mouse cursor. This is useful for providing Help
-        /// based on the position of the mouse cursor.
-        /// </summary>
-        public Point MousePos;
-
-    } // struct HELPINFO
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Структура POINT, содержащая экранные координаты курсора мыши.
+    /// Это полезно для предоставления справки в зависимости
+    /// от положения курсора мыши.
+    /// </summary>
+    public Point MousePos;
+}

@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
-
+// ReSharper disable UnusedMember.Local
 
 /* DLLVERSIONINFO.cs -- используется в DllGetVesion
  * Ars Magna project, http://arsmagna.ru
@@ -27,38 +27,42 @@ namespace AM.Win32;
 /// Содержит информацию о версии конкретной DLL.
 /// Используется в функции DllGetVersion.
 /// </summary>
+[Serializable]
 [StructLayout (LayoutKind.Sequential)]
-public class DLLVERSIONINFO
+public struct DLLVERSIONINFO
 {
     /// <summary>
-    /// The size of the structure, in bytes.
-    /// This member must be filled in before calling the function.
+    /// Заранее подсчитанный размер структуры в байтах.
+    /// </summary>
+    private const int Size = 20;
+
+    /// <summary>
+    /// Размер структуры в байтах. Этот член должен быть заполнен
+    /// до вызова функции.
     /// </summary>
     public uint cbSize;
 
     /// <summary>
-    /// The major version of the DLL.
-    /// For instance, if the DLL's version is 4.0.950,
-    /// this value will be 4.
+    /// Основная версия DLL. Например, если версия DLL - 4.0.950,
+    /// это поле будет равно 4.
     /// </summary>
     public uint dwMajorVersion;
 
     /// <summary>
-    /// The minor version of the DLL.
-    /// For instance, if the DLL's version is 4.0.950,
-    /// this value will be 0.
+    /// Минорная версия DLL. Например, если версия DLL - 4.0.950,
+    /// это поле будет равно 0.
     /// </summary>
     public uint dwMinorVersion;
 
     /// <summary>
-    /// The build number of the DLL.
-    /// For instance, if the DLL's version is 4.0.950,
-    /// this value will be 950.
+    /// Номер сборки DLL. Например, если версия DLL - 4.0.950,
+    /// это поле будет равно 950.
     /// </summary>
     public uint dwBuildNumber;
 
     /// <summary>
-    /// Identifies the platform for which the DLL was built.
+    /// Идентифицирует платформу, для которой была создана
+    /// библиотека DLL.
     /// </summary>
     public uint dwPlatformID;
 }
