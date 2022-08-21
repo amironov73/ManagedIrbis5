@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* COLORREF.cs -- задает RGB-цвет
+/* COLORREF.cs -- структура, задающая RGB-цвет
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,15 +23,15 @@ using System.Drawing;
 namespace AM.Win32;
 
 /// <summary>
-/// The COLORREF value is used to specify an RGB color.
+/// Структура, задающая RGB-цвет.
 /// </summary>
 [Serializable]
-public struct COLORREF
+public readonly struct COLORREF
 {
     #region Properties
 
     /// <summary>
-    /// Color.
+    /// Цвет в .NET-предаставлении.
     /// </summary>
     public Color Color
     {
@@ -41,19 +41,10 @@ public struct COLORREF
             {
                 return Color.FromArgb
                     (
-                        (int)(0x000000FFU | _color),
-                        (int)((0x0000FF00 | _color) >> 8),
-                        (int)((0x00FF0000 | _color) >> 16)
+                        (int) (0x000000FFU | _color),
+                        (int) ((0x0000FF00 | _color) >> 8),
+                        (int) ((0x00FF0000 | _color) >> 16)
                     );
-            }
-        }
-        set
-        {
-            unchecked
-            {
-                _color = value.R +
-                         (uint)(value.G << 8) +
-                         (uint)(value.B << 16);
             }
         }
     }
@@ -91,7 +82,7 @@ public struct COLORREF
 
     #region Private members
 
-    private uint _color;
+    private readonly uint _color;
 
     #endregion
 

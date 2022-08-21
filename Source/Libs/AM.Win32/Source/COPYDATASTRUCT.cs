@@ -7,7 +7,6 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-
 /* COPYDATASTRUCT.cs -- содержит данные для сообщения WM_COPYDATA
  * Ars Magna project, http://arsmagna.ru
  */
@@ -31,19 +30,20 @@ namespace AM.Win32;
 public struct COPYDATASTRUCT
 {
     /// <summary>
-    /// The data to be passed to the receiving application.
+    /// Данные, которые необходимо передать принимающему приложению.
+    /// Вообще говоря, это могут быть любые данные по выбору
+    /// отправляющей стороны, например, дескриптор главного окна.
     /// </summary>
-    public int dwData;
+    public IntPtr dwData;
 
     /// <summary>
-    /// The size, in bytes, of the data pointed
-    /// to by the lpData member.
+    /// Размер в байтах данных, на которые указывает элемент lpData.
     /// </summary>
     public int cbData;
 
     /// <summary>
-    /// The data to be passed to the receiving application.
-    /// This member can be NULL.
+    /// Данные, которые необходимо передать принимающему приложению.
+    /// Этот элемент может быть NULL.
     /// </summary>
     public IntPtr lpData;
 }

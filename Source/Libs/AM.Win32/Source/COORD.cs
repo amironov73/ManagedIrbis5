@@ -24,23 +24,37 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// The COORD structure defines the coordinates of a character cell
-/// in a console screen buffer. The origin of the coordinate system
-/// (0,0) is at the top, left cell of the buffer.
+/// Структура COORD определяет координаты символьной ячейки
+/// в экранном буфере консоли. Начало системы координат
+/// (0,0) находится в верхней левой ячейке буфера.
 /// </summary>
 [Serializable]
 [StructLayout (LayoutKind.Explicit, Size = 4)]
 public struct COORD
 {
+    #region Properties
+
     /// <summary>
-    /// Horizontal coordinate or column value.
+    /// Горизонтальная координата (номер столбца, нумерация с 0).
     /// </summary>
     [FieldOffset (0)]
     public short X;
 
     /// <summary>
-    /// Vertical coordinate or row value.
+    /// Вертикальная координата (номер строки, нумерация с 0).
     /// </summary>
     [FieldOffset (2)]
     public short Y;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="ValueType.ToString"/>
+    public override string ToString()
+    {
+        return $"{X}, {Y}";
+    }
+
+    #endregion
 }
