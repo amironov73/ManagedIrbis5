@@ -28,62 +28,62 @@ namespace AM.Win32;
 public enum BorderFlags3D
 {
     /// <summary>
-    /// Raised outer edge.
+    /// Приподнятый внешний край.
     /// </summary>
     BDR_RAISEDOUTER = 0x0001,
 
     /// <summary>
-    /// Sunken outer edge.
+    /// Утопленный внешний край.
     /// </summary>
     BDR_SUNKENOUTER = 0x0002,
 
     /// <summary>
-    /// Raised inner edge.
+    /// Приподнятый внутренний край.
     /// </summary>
     BDR_RAISEDINNER = 0x0004,
 
     /// <summary>
-    /// Sunken inner edge.
+    /// Утопленный внутренний край.
     /// </summary>
     BDR_SUNKENINNER = 0x0008,
 
     /// <summary>
-    /// ???
+    /// Приподнятый внешний и утопленный внутренний края.
     /// </summary>
     BDR_OUTER = BDR_RAISEDOUTER | BDR_SUNKENOUTER,
 
     /// <summary>
-    /// ???
+    /// Приподнятый внутренний и утопленный внешний края.
     /// </summary>
     BDR_INNER = BDR_RAISEDINNER | BDR_SUNKENINNER,
 
     /// <summary>
-    /// ???
+    /// Приподнятые внутренний и внешний края.
     /// </summary>
     BDR_RAISED = BDR_RAISEDOUTER | BDR_RAISEDINNER,
 
     /// <summary>
-    /// ???
+    /// Утопленные внутренний и внешний края.
     /// </summary>
     BDR_SUNKEN = BDR_SUNKENOUTER | BDR_SUNKENINNER,
 
     /// <summary>
-    /// Combination of BDR_RAISEDOUTER and BDR_RAISEDINNER.
+    /// Комбинация BDR_RAISEDOUTER и BDR_RAISEDINNER.
     /// </summary>
     EDGE_RAISED = BDR_RAISEDOUTER | BDR_RAISEDINNER,
 
     /// <summary>
-    /// Combination of BDR_SUNKENOUTER and BDR_SUNKENINNER.
+    /// Комбинация BDR_SUNKENOUTER и BDR_SUNKENINNER.
     /// </summary>
     EDGE_SUNKEN = BDR_SUNKENOUTER | BDR_SUNKENINNER,
 
     /// <summary>
-    /// Combination of BDR_SUNKENOUTER and BDR_RAISEDINNER.
+    /// Комбинация BDR_SUNKENOUTER и BDR_RAISEDINNER.
     /// </summary>
     EDGE_ETCHED = BDR_SUNKENOUTER | BDR_RAISEDINNER,
 
     /// <summary>
-    /// Combination of BDR_RAISEDOUTER and BDR_SUNKENINNER.
+    /// Комбинация BDR_RAISEDOUTER и BDR_SUNKENINNER.
     /// </summary>
     EDGE_BUMP = BDR_RAISEDOUTER | BDR_SUNKENINNER
 }

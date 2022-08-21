@@ -28,103 +28,103 @@ namespace AM.Win32;
 public enum BorderFlags
 {
     /// <summary>
-    /// Left side of border rectangle.
+    /// Левая сторона граничного прямоугольника..
     /// </summary>
     BF_LEFT = 0x0001,
 
     /// <summary>
-    /// Top of border rectangle.
+    /// Верхняя сторона граничного прямоугольника.
     /// </summary>
     BF_TOP = 0x0002,
 
     /// <summary>
-    /// Right side of border rectangle.
+    /// Правая сторона граничного прямоугольника.
     /// </summary>
     BF_RIGHT = 0x0004,
 
     /// <summary>
-    /// Bottom of border rectangle.
+    /// Нижняя сторона граничного прямоугольника.
     /// </summary>
     BF_BOTTOM = 0x0008,
 
     /// <summary>
-    /// Top and left side of border rectangle.
+    /// Верхняя и левая стороны граничного прямоугольника.
     /// </summary>
     BF_TOPLEFT = BF_TOP | BF_LEFT,
 
     /// <summary>
-    /// Top and right side of border rectangle.
+    /// Верхняя и правая стороны граничного прямоугольника.
     /// </summary>
     BF_TOPRIGHT = BF_TOP | BF_RIGHT,
 
     /// <summary>
-    /// Bottom and left side of border rectangle.
+    /// Нижняя и левая стороны граничного прямоугольника.
     /// </summary>
     BF_BOTTOMLEFT = BF_BOTTOM | BF_LEFT,
 
     /// <summary>
-    /// Bottom and right side of border rectangle.
+    /// Нижняя и правая стороны граничного прямоугольника.
     /// </summary>
     BF_BOTTOMRIGHT = BF_BOTTOM | BF_RIGHT,
 
     /// <summary>
-    /// Entire border rectangle.
+    /// Все стороны граничного прямоугольника.
     /// </summary>
     BF_RECT = BF_LEFT | BF_TOP | BF_RIGHT | BF_BOTTOM,
 
     /// <summary>
-    /// Diagonal border.
+    /// Диагональная граница.
     /// </summary>
     BF_DIAGONAL = 0x0010,
 
     /// <summary>
-    /// Diagonal border. The end point is the upper-right corner of the
-    /// rectangle; the origin is the lower-left corner.
+    /// Диагональная граница. Конечная точка — правый верхний угол
+    /// прямоугольника; исходной точкой является нижний левый угол.
     /// </summary>
     BF_DIAGONAL_ENDTOPRIGHT = BF_DIAGONAL | BF_TOP | BF_RIGHT,
 
     /// <summary>
-    /// Diagonal border. The end point is the upper-left corner of the
-    /// rectangle; the origin is the lower-right corner.
+    /// Диагональная граница. Конечная точка — левый верхний угол
+    /// прямоугольника; исходной точкой является нижний правый угол.
     /// </summary>
     BF_DIAGONAL_ENDTOPLEFT = BF_DIAGONAL | BF_TOP | BF_LEFT,
 
     /// <summary>
-    /// Diagonal border. The end point is the lower-left corner of the
-    /// rectangle; the origin is the upper-right corner.
+    /// Диагональная граница. Конечная точка — левый нижний угол
+    /// прямоугольника; исходной точкой является верхний правый угол.
     /// </summary>
     BF_DIAGONAL_ENDBOTTOMLEFT = BF_DIAGONAL | BF_BOTTOM | BF_LEFT,
 
     /// <summary>
-    /// Diagonal border. The end point is the lower-right corner of the
-    /// rectangle; the origin is the upper-left corner.
+    /// Диагональная граница. Конечная точка — правый нижний угол
+    /// прямоугольника; исходной точкой является верхний левый угол.
     /// </summary>
     BF_DIAGONAL_ENDBOTTOMRIGHT = BF_DIAGONAL | BF_BOTTOM | BF_RIGHT,
 
     /// <summary>
-    /// Interior of the rectangle is to be filled.
+    /// Внутреннее пространство прямоугольника должно быть заполнено.
     /// </summary>
     BF_MIDDLE = 0x0800,
 
     /// <summary>
-    /// Soft buttons instead of tiles.
+    /// Софтовые кнопки вместо черепицы.
     /// </summary>
     BF_SOFT = 0x1000,
 
     /// <summary>
-    /// The rectangle pointed to by the pDestRect parameter is shrunk to
-    /// exclude the edges that were drawn; otherwise the rectangle does
-    /// not change.
+    /// Прямоугольник, на который указывает параметр pDestRect,
+    /// сжимается, чтобы исключить нарисованные края; в противном
+    /// случае прямоугольник не меняется.
     /// </summary>
     BF_ADJUST = 0x2000,
 
     /// <summary>
-    /// Flat border.
+    /// Плоская граница.
     /// </summary>
     BF_FLAT = 0x4000,
 
     /// <summary>
-    /// One-dimensional border.
+    /// Одномерная граница.
     /// </summary>
     BF_MONO = 0x8000
 }

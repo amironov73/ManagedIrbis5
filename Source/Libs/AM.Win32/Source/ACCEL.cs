@@ -28,17 +28,18 @@ namespace AM.Win32;
 public struct ACCEL
 {
     /// <summary>
-    /// The accelerator behavior.
+    /// Поведение акселератора - сочетание факторов (в частности,
+    /// клавиш-модификаторов), опроеделяющих работу акселератора.
     /// </summary>
     public byte fVirt;
 
     /// <summary>
-    /// The accelerator key.
+    /// Активирующая клавиша.
     /// </summary>
     public short key;
 
     /// <summary>
-    /// The accelerator identifier.
+    /// Идентификатор акселератора (номер команды).
     /// </summary>
     public short cmd;
 }
