@@ -33,6 +33,8 @@ namespace AM.Win32;
 [StructLayout (LayoutKind.Sequential, Pack = 2, Size = 8)]
 public struct SMALL_RECT
 {
+    #region Properties
+
     /// <summary>
     /// Координата X верхнего левого угла прямоугольника.
     /// </summary>
@@ -52,4 +54,16 @@ public struct SMALL_RECT
     /// Координата Y нижнего правого угла прямоугольника.
     /// </summary>
     public short Bottom;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="ValueType.ToString"/>
+    public override string ToString()
+    {
+        return $"({Left}, {Top}) - ({Right}, {Bottom})";
+    }
+
+    #endregion
 }

@@ -2,11 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 
 /* SIZEL.cs -- ширина и высота прямоугольника
  * Ars Magna project, http://arsmagna.ru
@@ -21,25 +19,37 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Высота и ширина прямоугольника.
+/// Единицы измерения зависят от используемой функции.
+/// </summary>
+[Serializable]
+[StructLayout (LayoutKind.Sequential)]
+public struct SIZEL
 {
+    #region Properties
+
     /// <summary>
-    /// Высота и ширина прямоугольника.
+    /// Ширина прямоугольника. Единица измерения зависит от используемой функции.
     /// </summary>
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential)]
-    public struct SIZEL
+    public int cx;
+
+    /// <summary>
+    /// Высота прямоугольника. Единица измерения зависит от используемой функции.
+    /// </summary>
+    public int cy;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="ValueType.ToString"/>
+    public override string ToString()
     {
-        /// <summary>
-        /// Specifies the rectangle's width. The units depend on which function uses this.
-        /// </summary>
-        public int cx;
+        return $"{cx} x {cy}";
+    }
 
-        /// <summary>
-        /// Specifies the rectangle's height. The units depend on which function uses this.
-        /// </summary>
-        public int cy;
-
-    } // struct SIZEL
-
-} // namespace AM.Win32
+    #endregion
+}

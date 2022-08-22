@@ -6,7 +6,6 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* MapKeyType.cs -- тип трансляции для функции MapVirtualKey.
    Ars Magna project, http://arsmagna.ru */
