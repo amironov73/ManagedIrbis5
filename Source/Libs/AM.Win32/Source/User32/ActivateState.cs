@@ -7,30 +7,30 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* ActivateState.cs -- flags for WM_ACTIVATE message
+/* ActivateState.cs -- флаги для оконного сообщения WM_ACTIVATE
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32;
 
 /// <summary>
-/// Flags for WM_ACTIVATE message (low word of wparam).
+/// Флаги для оконного сообщения WM_ACTIVATE (младшее слово wparam).
 /// </summary>
 public enum ActivateState
     : ushort
 {
     /// <summary>
-    /// Window has been deactivated.
+    /// Окно было деактивировано.
     /// </summary>
     WA_INACTIVE = 0,
 
     /// <summary>
-    /// Window activated by other than a mouse click,
-    /// like call to SetActiveWindow.
+    /// Окно было активировано не щелчком мыши, а другим способом,
+    /// например, вызовом функции <c>SetActiveWindow</c>.
     /// </summary>
     WA_ACTIVE = 1,
 
     /// <summary>
-    /// Window activated by a mouse click.
+    /// Окно было активировано щелчком мыши.
     /// </summary>
     WA_CLICKACTIVE = 2
 }

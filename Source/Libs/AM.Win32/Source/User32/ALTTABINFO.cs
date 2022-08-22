@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* ALTTABINFO.cs -- status information for the application-switching (ALT+TAB) window
+/* ALTTABINFO.cs -- информация о статусе переключения приложений с помощью ALT+TAB
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -23,63 +23,67 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// Contains status information for the application-switching
-/// (ALT+TAB) window.
+/// Информация о статусе переключения приложений с помощью ALT+TAB.
 /// </summary>
 [Serializable]
 [StructLayout (LayoutKind.Sequential)]
 public struct ALTTABINFO
 {
     /// <summary>
-    /// Size of the structure in bytes.
+    /// Размер структуры в байтах. Это значение должно быть передано
+    /// в <see cref="cbSize" />.
     /// </summary>
     public const int SIZE = 40;
 
     /// <summary>
-    /// Specifies the size, in bytes, of the structure.
-    /// The caller must set this to sizeof(ALTTABINFO).
+    /// Размер структуры в байтах. Вызывающая сторона должна заполнить
+    /// это поле перед вызовом API.
     /// </summary>
     public int cbSize;
 
     /// <summary>
-    /// Specifies the number of items in the window.
+    /// Количество элементов в окне выбора приложения
+    /// для переключения по ALT+TAB.
     /// </summary>
     public int cItems;
 
     /// <summary>
-    /// Specifies the number of columns in the window.
+    /// Количество столбцов в окне выбора приложения
+    /// для переключения по ALT+TAB.
     /// </summary>
     public int cColumns;
 
     /// <summary>
-    /// Specifies the number of rows in the window.
+    /// Количество строк в окне выбора приложения
+    /// для переключения по ALT+TAB.
     /// </summary>
     public int cRows;
 
     /// <summary>
-    /// Specifies the column of the item that has the focus.
+    /// Номер активного столбца в окне выбора приложения
+    /// (нумерация с 0).
     /// </summary>
     public int iColFocus;
 
     /// <summary>
-    /// Specifies the row of the item that has the focus.
+    /// Номер активной строки в окне выбора приложения
+    /// (нумерация с 0).
     /// </summary>
     public int iRowFocus;
 
     /// <summary>
-    /// Specifies the width of each icon in the
-    /// application-switching window.
+    /// Ширина иконки в окне выбора приложения.
     /// </summary>
     public int cxItem;
 
     /// <summary>
-    /// Specifies the height of each icon in the
-    /// application-switching window.
+    /// Высота иконки в окне выбора приложения.
     /// </summary>
     public int cyItem;
 
     /// <summary>
-    /// Specifies the top-left corner of the first icon.
+    /// Координаы левого верхнего угла первой иконки
+    /// в окне выбора приложения.
     /// </summary>
     public Point ptStart;
 }
