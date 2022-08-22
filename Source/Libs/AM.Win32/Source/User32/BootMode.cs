@@ -3,8 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
 /* BootMode.cs -- режим загрузки операционной системы

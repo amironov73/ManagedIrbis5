@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* BroadcastSystemMessageFlags.cs -- specifies the broadcast option
+/* BroadcastSystemMessageFlags.cs -- опции для рассылки широковещательных системных сообщений
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -19,70 +19,73 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Specifies the broadcast option.
+/// Опции для рассылки широковещательных системных сообщений.
 /// </summary>
 [Flags]
 public enum BroadcastSystemMessageFlags
 {
     /// <summary>
-    /// Sends the message to one recipient at a time, sending to a
-    /// subsequent recipient only if the current recipient returns TRUE.
+    /// Отправляет сообщение одному получателю за раз, отправляя
+    /// следующему получателю, только если текущий получатель
+    /// возвращает TRUE.
     /// </summary>
     BSF_QUERY = 0x00000001,
 
     /// <summary>
-    /// Does not send the message to windows that belong to the current
-    /// task. This prevents an application from receiving its own message.
+    /// Не отправляет сообщение окнам, принадлежащим текущей задаче.
+    /// Это предотвращает получение приложением собственного сообщения.
     /// </summary>
     BSF_IGNORECURRENTTASK = 0x00000002,
 
     /// <summary>
-    /// Flushes the disk after each recipient processes the message.
+    /// Сбрасывает дисковый кеш после обработки сообщения каждым получателем.
     /// </summary>
     BSF_FLUSHDISK = 0x00000004,
 
     /// <summary>
-    /// Forces a hung application to time out. If one of the recipients
-    /// times out, do not continue broadcasting the message.
+    /// Форсирует истечение времени ожидания на зависшем приложении.
+    /// Если время ожидания одного из получателей истекло,
+    /// не продолжает трансляцию сообщения.
     /// </summary>
     BSF_NOHANG = 0x00000008,
 
     /// <summary>
-    /// Posts the message. Do not use in combination with BSF_QUERY.
+    /// Размещает сообщение (не дожидается начала актуальной отправки
+    /// сообщения). Не используйте в сочетании с BSF_QUERY.
     /// </summary>
     BSF_POSTMESSAGE = 0x00000010,
 
     /// <summary>
-    /// Continues to broadcast the message, even if the time-out period
-    /// elapses or one of the recipients is hung.
+    /// Продолжает транслировать сообщение, даже если время ожидания
+    /// истекло или один из получателей завис.
     /// </summary>
     BSF_FORCEIFHUNG = 0x00000020,
 
     /// <summary>
-    /// Waits for a response to the message, as long as the recipient is
-    /// not hung. Does not time out.
+    /// Ожидает ответа на сообщение, пока получатель не завис.
+    /// Время ожидания никогда не истекает.
     /// </summary>
     BSF_NOTIMEOUTIFNOTHUNG = 0x00000040,
 
     /// <summary>
-    /// Windows 2000/XP: Enables the recipient to set the
-    /// foreground window while processing the message.
+    /// Windows 2000/XP: позволяет получателю установить окно переднего
+    /// плана при обработке сообщения.
     /// </summary>
     BSF_ALLOWSFW = 0x00000080,
 
     /// <summary>
-    /// Windows 2000/XP: Sends the message using SendNotifyMessage
-    /// function. Do not use in combination with BSF_QUERY.
+    /// Windows 2000/XP: Отправляет сообщение с помощью функции
+    /// SendNotifyMessage. Не используйте в сочетании с BSF_QUERY.
     /// </summary>
     BSF_SENDNOTIFYMESSAGE = 0x00000100,
 
     /// <summary>
-    /// ???
+    /// Назначение опции неизвестно.
     /// </summary>
     BSF_RETURNHDESK = 0x00000200,
 
     /// <summary>
-    /// ???
+    /// Назначение опции неизвестно.
     /// </summary>
     BSF_LUID = 0x00000400
 }

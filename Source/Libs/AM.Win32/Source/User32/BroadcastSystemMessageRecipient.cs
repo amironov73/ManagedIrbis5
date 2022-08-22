@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* BroadcastSystemMessageRecipient.cs -- information about the recipients of the system message
+/* BroadcastSystemMessageRecipient.cs -- задает получателей системных широковещательных сообщений
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -19,40 +19,39 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Contains information about the recipients of the
-/// system message.
+/// Задает получателей системных широковещательных сообщений.
 /// </summary>
 [Flags]
 public enum BroadcastSystemMessageRecipient
 {
     /// <summary>
-    /// Broadcast to all system components.
+    /// Вещание на все системные компоненты.
     /// </summary>
     BSM_ALLCOMPONENTS = 0x00000000,
 
     /// <summary>
-    /// Windows 95/98/Me: Broadcast to all system-level device drivers.
+    /// Windows 95/98/Me: Вещание на все системные драйверы.
     /// </summary>
     BSM_VXDS = 0x00000001,
 
     /// <summary>
-    /// Windows 95/98/Me: Broadcast to network drivers.
+    /// Windows 95/98/Me: Вещание в сетевые драйверы.
     /// </summary>
     BSM_NETDRIVER = 0x00000002,
 
     /// <summary>
-    /// Windows 95/98/Me: Broadcast to installable drivers.
+    /// Windows 95/98/Me: Вещание в устанавливаемые драйверы.
     /// </summary>
     BSM_INSTALLABLEDRIVERS = 0x00000004,
 
     /// <summary>
-    /// Broadcast to applications.
+    /// Вещание приложениям.
     /// </summary>
     BSM_APPLICATIONS = 0x00000008,
 
     /// <summary>
-    /// Windows NT/2000/XP: Broadcast to all desktops.
-    /// Requires the SE_TCB_NAME privilege.
+    /// Windows NT/2000/XP: Трансляция на все рабочие столы.
+    /// Требуется привилегия SE_TCB_NAME.
     /// </summary>
     BSM_ALLDESKTOPS = 0x00000010
 }

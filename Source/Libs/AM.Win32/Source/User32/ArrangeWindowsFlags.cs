@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* ArrangeWindowsFlags.cs -- specifies how the system arranges minimized windows
+/* ArrangeWindowsFlags.cs -- управляет расположением минимизированных окон
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -19,75 +19,76 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Specifies how the system arranges minimized windows.
+/// Управляет тем, как система располагает минимизированные окна.
 /// </summary>
 [Flags]
 public enum ArrangeWindowsFlags
 {
     /// <summary>
-    /// Start at the lower-left corner of the screen
-    /// (default position).
+    /// Окна располагаются, начиная с нижнего левого угла экрана
+    /// (положение по умолчанию).
     /// </summary>
     ARW_BOTTOMLEFT = 0x0000,
 
     /// <summary>
-    /// Start at the lower-right corner of the screen.
-    /// Equivalent to ARW_STARTRIGHT.
+    /// Окна располагаются, начиная с правого нижнего угла экрана.
+    /// Эквивалентно ARW_STARTRIGHT.
     /// </summary>
     ARW_BOTTOMRIGHT = 0x0001,
 
     /// <summary>
-    /// Start at the upper-left corner of the screen.
-    /// Equivalent to ARV_STARTTOP.
+    /// Окна располагаются, начиная с верхнего левого угла экрана.
+    /// Эквивалентно ARV_STARTTOP.
     /// </summary>
     ARW_TOPLEFT = 0x0002,
 
     /// <summary>
-    /// Start at the upper-right corner of the screen.
-    /// Equivalent to ARW_STARTTOP | SRW_STARTRIGHT.
+    /// Окна располагаются, начиная с правого верхнего угла экрана.
+    /// Эквивалентно ARW_STARTTOP | SRW_STARTRIGHT.
     /// </summary>
     ARW_TOPRIGHT = 0x0003,
 
     /// <summary>
-    /// ???
+    /// Окна располагаются, начиная с правого верхнего угла экрана.
+    /// Эквивалентно ARW_STARTTOP | SRW_STARTRIGHT.
     /// </summary>
     ARW_STARTMASK = 0x0003,
 
     /// <summary>
-    /// Start at the lower-right corner of the screen.
-    /// Equivalent to ARW_BOTTOMRIGHT.
+    /// Окна располагаются, начиная с правого нижнего угла экрана.
+    /// Эквивалентно ARW_BOTTOMRIGHT.
     /// </summary>
     ARW_STARTRIGHT = 0x0001,
 
     /// <summary>
-    /// Start at the upper-left corner of the screen.
-    /// Equivalent to ARV_TOPLEFT.
+    /// Окна располагаются, начиная с верхнего левого угла экрана.
+    /// Эквивалентно ARV_TOPLEFT.
     /// </summary>
     ARW_STARTTOP = 0x0002,
 
     /// <summary>
-    /// Arrange horizontally, left to right.
+    /// Окна располагаются горизонтально, слева направо.
     /// </summary>
     ARW_LEFT = 0x0000,
 
     /// <summary>
-    /// Arrange horizontally, right to left.
+    /// Окна располагаются горизонтально, справа налево.
     /// </summary>
     ARW_RIGHT = 0x0000,
 
     /// <summary>
-    /// Arrange vertically, bottom to top.
+    /// Окна располагаются вертикально, снизу вверх.
     /// </summary>
     ARW_UP = 0x0004,
 
     /// <summary>
-    /// Arrange vertically, top to bottom.
+    /// Окна располагаются вертикально, сверху вниз.
     /// </summary>
     ARW_DOWN = 0x0004,
 
     /// <summary>
-    /// Hide minimized windows by moving them off
-    /// the visible area of the screen.
+    /// Свернутые окна скрываются за счет перемещения их за пределы
+    /// видимой области экрана.
     /// </summary>
     ARW_HIDE = 0x0008,
 }
