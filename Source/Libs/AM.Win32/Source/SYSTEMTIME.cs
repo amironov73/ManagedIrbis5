@@ -21,60 +21,57 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Структура SYSTEMTIME представляет дату и время, используя
+/// отдельные элементы для месяца, дня, года, дня недели, часа,
+/// минуты, секунды и миллисекунды.
+/// </summary>
+[Serializable]
+[StructLayout (LayoutKind.Sequential, Pack = 2)]
+public struct SYSTEMTIME
 {
     /// <summary>
-    /// The SYSTEMTIME structure represents a date and time using
-    /// individual members for the month, day, year, weekday, hour,
-    /// minute, second, and millisecond.
+    /// <para>Текущий год. Должен быть больше 1601.
+    /// </para>
+    /// <para>Windows Server 2003, Windows XP:
+    /// год не должен быть больше 30827.</para>
     /// </summary>
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    public struct SYSTEMTIME
-    {
-        /// <summary>
-        /// <para>Current year. The year must be greater than 1601.
-        /// </para>
-        /// <para>Windows Server 2003, Windows XP: The year cannot
-        /// be greater than 30827.</para>
-        /// </summary>
-        public ushort wYear;
+    public ushort wYear;
 
-        /// <summary>
-        /// Current month; January = 1, February = 2, and so on.
-        /// </summary>
-        public ushort wMonth;
+    /// <summary>
+    /// Текущий месяц; Январь = 1, Февраль = 2 и т. д.
+    /// </summary>
+    public ushort wMonth;
 
-        /// <summary>
-        /// Current day of the week; Sunday = 0, Monday = 1, and so on.
-        /// </summary>
-        public ushort wDayOfWeek;
+    /// <summary>
+    /// Текущий день недели; воскресенье = 0, понедельник = 1 и т. д.
+    /// </summary>
+    public ushort wDayOfWeek;
 
-        /// <summary>
-        /// Current day of the month.
-        /// </summary>
-        public ushort wDay;
+    /// <summary>
+    /// Текущий день месяца, нумерация с 1.
+    /// </summary>
+    public ushort wDay;
 
-        /// <summary>
-        /// Current hour.
-        /// </summary>
-        public ushort wHour;
+    /// <summary>
+    /// Часы.
+    /// </summary>
+    public ushort wHour;
 
-        /// <summary>
-        /// Current minute.
-        /// </summary>
-        public ushort wMinute;
+    /// <summary>
+    /// Минуты.
+    /// </summary>
+    public ushort wMinute;
 
-        /// <summary>
-        /// Current second.
-        /// </summary>
-        public ushort wSecond;
+    /// <summary>
+    /// Секунды.
+    /// </summary>
+    public ushort wSecond;
 
-        /// <summary>
-        /// Current millisecond.
-        /// </summary>
-        public ushort wMilliseconds;
-
-    } // struct SYSTEMTIME
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Миллисекунды.
+    /// </summary>
+    public ushort wMilliseconds;
+}

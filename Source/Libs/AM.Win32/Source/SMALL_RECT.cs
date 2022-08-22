@@ -2,11 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 
 /* SMALL_RECT.cs -- координаты верхнего левого и нижнего правого углов прямоугольника
  * Ars Magna project, http://arsmagna.ru
@@ -21,40 +19,37 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Координаты верхнего левого и нижнего правого углов прямоугольника.
+/// </summary>
+/// <remarks>
+/// Эта структура используется консольными функциями для указания
+/// прямоугольных областей экранных буферов консоли, где координаты
+/// определяют строки и столбцы символьных ячеек экранного буфера.
+/// </remarks>
+[Serializable]
+[StructLayout (LayoutKind.Sequential, Pack = 2, Size = 8)]
+public struct SMALL_RECT
 {
     /// <summary>
-    /// Defines the coordinates of the upper left and lower
-    /// right corners of a rectangle.
+    /// Координата X верхнего левого угла прямоугольника.
     /// </summary>
-    /// <remarks>This structure is used by console functions
-    /// to specify rectangular areas of console screen buffers,
-    /// where the coordinates specify the rows and columns of
-    /// screen-buffer character cells.</remarks>
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential, Size = 8)]
-    public struct SMALL_RECT
-    {
-        /// <summary>
-        /// X-coordinate of the upper left corner of the rectangle.
-        /// </summary>
-        public short Left;
+    public short Left;
 
-        /// <summary>
-        /// Y-coordinate of the upper left corner of the rectangle.
-        /// </summary>
-        public short Top;
+    /// <summary>
+    /// Координата Y верхнего левого угла прямоугольника.
+    /// </summary>
+    public short Top;
 
-        /// <summary>
-        /// X-coordinate of the lower right corner of the rectangle.
-        /// </summary>
-        public short Right;
+    /// <summary>
+    /// Координата X нижнего правого угла прямоугольника.
+    /// </summary>
+    public short Right;
 
-        /// <summary>
-        /// Y-coordinate of the lower right corner of the rectangle.
-        /// </summary>
-        public short Bottom;
-
-    } // struct SMALL_RECT
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Координата Y нижнего правого угла прямоугольника.
+    /// </summary>
+    public short Bottom;
+}
