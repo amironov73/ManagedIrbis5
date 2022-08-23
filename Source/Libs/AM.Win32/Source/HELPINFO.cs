@@ -33,7 +33,7 @@ public struct HELPINFO
     /// <summary>
     /// Размер структуры в байтах. Зависит от разрядности платформы.
     /// </summary>
-    public int cbSize;
+    public int Size;
 
     /// <summary>
     ///Тип контекста, для которого запрашивается справка.
@@ -54,7 +54,7 @@ public struct HELPINFO
     /// </item>
     /// </list>
     /// </summary>
-    public int iContextType;
+    public int ContextType;
 
     /// <summary>
     /// Идентификатор окна или элемента управления,
@@ -62,19 +62,19 @@ public struct HELPINFO
     /// или идентификатор пункта меню, если iContextType
     /// равен HELPINFO_MENUITEM.
     /// </summary>
-    public int iCtrlId;
+    public int ControlID;
 
     /// <summary>
     /// Идентификатор дочернего окна или элемента управления,
     /// если iContextType равен HELPINFО_WINDOW, или идентификатор
     /// связанного меню, если iContextType равен HELPINFO_MENUITEM.
     /// </summary>
-    public IntPtr hItemHandle;
+    public IntPtr ItemHandle;
 
     /// <summary>
     /// Идентификатор контекста справки окна или элемента управления.
     /// </summary>
-    public int dwContextId;
+    public int ContextId;
 
     /// <summary>
     /// Структура POINT, содержащая экранные координаты курсора мыши.

@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.Runtime.InteropServices;
 
 #endregion
@@ -27,19 +28,33 @@ namespace AM.Win32;
 [StructLayout (LayoutKind.Sequential)]
 public struct ACCEL
 {
+    #region Properties
+
     /// <summary>
     /// Поведение акселератора - сочетание факторов (в частности,
     /// клавиш-модификаторов), опроеделяющих работу акселератора.
     /// </summary>
-    public byte fVirt;
+    public byte Virtual;
 
     /// <summary>
     /// Активирующая клавиша.
     /// </summary>
-    public short key;
+    public short Key;
 
     /// <summary>
     /// Идентификатор акселератора (номер команды).
     /// </summary>
-    public short cmd;
+    public short Command;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="ValueType.ToString"/>
+    public override string ToString()
+    {
+        return $"{Virtual} {Key} {Command}";
+    }
+
+    #endregion
 }

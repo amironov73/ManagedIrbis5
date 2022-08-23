@@ -5,7 +5,6 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 
 /* DLLVERSIONINFO.cs -- используется в DllGetVesion
@@ -31,6 +30,8 @@ namespace AM.Win32;
 [StructLayout (LayoutKind.Sequential)]
 public struct DLLVERSIONINFO
 {
+    #region Properties
+
     /// <summary>
     /// Заранее подсчитанный размер структуры в байтах.
     /// </summary>
@@ -40,29 +41,41 @@ public struct DLLVERSIONINFO
     /// Размер структуры в байтах. Этот член должен быть заполнен
     /// до вызова функции.
     /// </summary>
-    public uint cbSize;
+    public uint StructureSize;
 
     /// <summary>
     /// Основная версия DLL. Например, если версия DLL - 4.0.950,
     /// это поле будет равно 4.
     /// </summary>
-    public uint dwMajorVersion;
+    public uint MajorVersion;
 
     /// <summary>
     /// Минорная версия DLL. Например, если версия DLL - 4.0.950,
     /// это поле будет равно 0.
     /// </summary>
-    public uint dwMinorVersion;
+    public uint MinorVersion;
 
     /// <summary>
     /// Номер сборки DLL. Например, если версия DLL - 4.0.950,
     /// это поле будет равно 950.
     /// </summary>
-    public uint dwBuildNumber;
+    public uint BuildNumber;
 
     /// <summary>
     /// Идентифицирует платформу, для которой была создана
     /// библиотека DLL.
     /// </summary>
-    public uint dwPlatformID;
+    public uint PlatformID;
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="ValueType.ToString"/>
+    public override string ToString()
+    {
+        return $"{MajorVersion}.{MinorVersion}.{BuildNumber} ({PlatformID})";
+    }
+
+    #endregion
 }
