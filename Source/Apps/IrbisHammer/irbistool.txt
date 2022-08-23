@@ -1,0 +1,37 @@
+Usage:
+irbistool.exe tool name, parameters
+available tools: 
+actualif - actualize database dictionary
+dict - create database dictionary
+terms - record terms only
+sort - sort terms only
+loaddict - load database dictionary only
+newdb - create new database
+dropdb - drop database
+lockdb - lock database
+unlockdb - unlock database
+unlockmfn - unlock records by mfn range or list
+emptydb - empty database fully
+emptyftdb - empty fulltext database only
+import - import records to database
+export - export records from database
+global - global correction
+batch - batch command execution
+diagrec - diagnose records
+diagrecft - diagnose full text records
+diagmfn - diagnose mst and xrf
+diaglnk - diagnose dictionary
+reorgif - reorganize inverted file
+reorgmf - reorganize master file
+reorgexmf - reorganize master file excluding deleted records (export / import)
+format - compile and run formats for error checking
+ftcache - build fulltext cache
+ftinput - input full texts
+delcells - clear facet cache
+cells - build facet cache
+exportif - export inverted file
+pdfclean - clean pdf files
+fmtprint - convert format file to minimized single line or pretty look with indentation
+fst2ifs - fst file convertion from old fst format to new ifs
+diagmstxrf - diagnose mst and xrf coincidence
+mergedb - merge multiple databases into one without indexing

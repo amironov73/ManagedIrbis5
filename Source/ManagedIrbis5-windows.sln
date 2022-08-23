@@ -181,45 +181,47 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Scripting.WinForms", "Li
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarsorRunner", "Apps\BarsorRunner\BarsorRunner.csproj", "{AFA777E1-B561-47F6-8297-B7F5E6C5A1EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarsikIDE", "Apps\BarsikIDE\BarsikIDE.csproj", "{273864CF-4228-4C68-B07A-C7866C3CB479}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarsikIDE", "Apps\BarsikIDE\BarsikIDE.csproj", "{273864CF-4228-4C68-B07A-C7866C3CB479}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Linguistics", "Libs\AM.Linguistics\AM.Linguistics.csproj", "{8E5FA6B5-3218-4C3D-9C6F-B7FCC29F1163}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Linguistics", "Libs\AM.Linguistics\AM.Linguistics.csproj", "{8E5FA6B5-3218-4C3D-9C6F-B7FCC29F1163}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountKpio", "Apps\CountKpio\CountKpio.csproj", "{44653947-E3A1-4ECF-990E-385122CCA270}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CountKpio", "Apps\CountKpio\CountKpio.csproj", "{44653947-E3A1-4ECF-990E-385122CCA270}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chimera", "Apps\Chimera\Chimera.csproj", "{7D88423E-D396-49B6-8F40-6625FF2D70C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chimera", "Apps\Chimera\Chimera.csproj", "{7D88423E-D396-49B6-8F40-6625FF2D70C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagnaVersion", "Apps\MagnaVersion\MagnaVersion.csproj", "{0006E749-269F-466A-9E61-9CB1AAE4B538}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagnaVersion", "Apps\MagnaVersion\MagnaVersion.csproj", "{0006E749-269F-466A-9E61-9CB1AAE4B538}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recumulator", "Apps\Recumulator\Recumulator.csproj", "{C726DBE9-2207-4045-BF26-A8B6F2644F1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recumulator", "Apps\Recumulator\Recumulator.csproj", "{C726DBE9-2207-4045-BF26-A8B6F2644F1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoundlessStat", "Apps\BoundlessStat\BoundlessStat.csproj", "{53B72A07-B1F4-4BED-A551-BCEC6431C413}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoundlessStat", "Apps\BoundlessStat\BoundlessStat.csproj", "{53B72A07-B1F4-4BED-A551-BCEC6431C413}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Web.Razor", "Libs\AM.Web.Razor\AM.Web.Razor.csproj", "{65EFC82B-3327-45F1-998C-B04E0DB1CE9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Web.Razor", "Libs\AM.Web.Razor\AM.Web.Razor.csproj", "{65EFC82B-3327-45F1-998C-B04E0DB1CE9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.BuildSystem", "Libs\AM.BuildSystem\AM.BuildSystem.csproj", "{5C2B1C36-1542-4F51-AE24-9DA5F2DC131E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.BuildSystem", "Libs\AM.BuildSystem\AM.BuildSystem.csproj", "{5C2B1C36-1542-4F51-AE24-9DA5F2DC131E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NugetDown", "Apps\NugetDown\NugetDown.csproj", "{46039128-9447-4A42-B6DF-0F4AD8BB0115}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NugetDown", "Apps\NugetDown\NugetDown.csproj", "{46039128-9447-4A42-B6DF-0F4AD8BB0115}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NugetReserve", "Apps\NugetReserve\NugetReserve.csproj", "{AC829936-9392-422D-8AF0-978F51CBC5F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NugetReserve", "Apps\NugetReserve\NugetReserve.csproj", "{AC829936-9392-422D-8AF0-978F51CBC5F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rcfa", "Apps\Rcfa\Rcfa.csproj", "{B6644E60-3434-4A2E-A160-42DCFAC3FC7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rcfa", "Apps\Rcfa\Rcfa.csproj", "{B6644E60-3434-4A2E-A160-42DCFAC3FC7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minigun", "Apps\Minigun\Minigun.csproj", "{A507F3D6-1C9E-45D0-A8BC-2A6413AECD7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minigun", "Apps\Minigun\Minigun.csproj", "{A507F3D6-1C9E-45D0-A8BC-2A6413AECD7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Linux", "Libs\AM.Linux\AM.Linux.csproj", "{8C835F73-632E-45BF-A130-D21A5F6B2F9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Linux", "Libs\AM.Linux\AM.Linux.csproj", "{8C835F73-632E-45BF-A130-D21A5F6B2F9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WfaTests", "Tests\WfaTests\WfaTests.csproj", "{B012F2F6-7A58-446C-B449-1C8BC0E6B578}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WfaTests", "Tests\WfaTests\WfaTests.csproj", "{B012F2F6-7A58-446C-B449-1C8BC0E6B578}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardTests", "Tests\HardTests\HardTests.csproj", "{44754C33-236F-484E-9D8C-D1E5779A1194}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HardTests", "Tests\HardTests\HardTests.csproj", "{44754C33-236F-484E-9D8C-D1E5779A1194}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Updating", "Libs\AM.Updating\AM.Updating.csproj", "{F5056AA1-180A-4A5D-80D2-625F36F89E35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Updating", "Libs\AM.Updating\AM.Updating.csproj", "{F5056AA1-180A-4A5D-80D2-625F36F89E35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaExample", "Examples\AvaloniaExample\AvaloniaExample.csproj", "{0080F58C-F561-4043-B573-947623B3F553}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaExample", "Examples\AvaloniaExample\AvaloniaExample.csproj", "{0080F58C-F561-4043-B573-947623B3F553}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis5.Avalonia", "Libs\ManagedIrbis5.Avalonia\ManagedIrbis5.Avalonia.csproj", "{0C565135-A1D1-4734-AB40-70717D6E8019}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagedIrbis5.Avalonia", "Libs\ManagedIrbis5.Avalonia\ManagedIrbis5.Avalonia.csproj", "{0C565135-A1D1-4734-AB40-70717D6E8019}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaTests", "Tests\AvaloniaTests\AvaloniaTests.csproj", "{B76A065D-9ED1-4413-BA08-2EED4BFF67E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaTests", "Tests\AvaloniaTests\AvaloniaTests.csproj", "{B76A065D-9ED1-4413-BA08-2EED4BFF67E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IrbisHammer", "Apps\IrbisHammer\IrbisHammer.csproj", "{4AB89921-A62B-43F1-A69D-C140C1D3925E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1455,6 +1457,18 @@ Global
 		{B76A065D-9ED1-4413-BA08-2EED4BFF67E4}.Release|x64.Build.0 = Release|Any CPU
 		{B76A065D-9ED1-4413-BA08-2EED4BFF67E4}.Release|x86.ActiveCfg = Release|Any CPU
 		{B76A065D-9ED1-4413-BA08-2EED4BFF67E4}.Release|x86.Build.0 = Release|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Debug|x64.Build.0 = Debug|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Debug|x86.Build.0 = Debug|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Release|x64.ActiveCfg = Release|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Release|x64.Build.0 = Release|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Release|x86.ActiveCfg = Release|Any CPU
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1562,6 +1576,7 @@ Global
 		{0080F58C-F561-4043-B573-947623B3F553} = {788F67EC-79CA-4941-B29F-7970FA721205}
 		{0C565135-A1D1-4734-AB40-70717D6E8019} = {F7FE7B9E-2592-439F-A9CF-DA7D8D3DBC91}
 		{B76A065D-9ED1-4413-BA08-2EED4BFF67E4} = {F56FBD0E-5530-4F55-ABE1-9E106B93417F}
+		{4AB89921-A62B-43F1-A69D-C140C1D3925E} = {1E5940AA-0540-4947-8216-45E381E76C72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E077767-1AE0-47E0-AEFB-59E4D7464AD4}
