@@ -31,7 +31,7 @@ public struct ALTTABINFO
 {
     /// <summary>
     /// Размер структуры в байтах. Это значение должно быть передано
-    /// в <see cref="cbSize" />.
+    /// в <see cref="Size" />.
     /// </summary>
     public const int SIZE = 40;
 
@@ -39,51 +39,51 @@ public struct ALTTABINFO
     /// Размер структуры в байтах. Вызывающая сторона должна заполнить
     /// это поле перед вызовом API.
     /// </summary>
-    public int cbSize;
+    public int Size;
 
     /// <summary>
     /// Количество элементов в окне выбора приложения
     /// для переключения по ALT+TAB.
     /// </summary>
-    public int cItems;
+    public int Items;
 
     /// <summary>
     /// Количество столбцов в окне выбора приложения
     /// для переключения по ALT+TAB.
     /// </summary>
-    public int cColumns;
+    public int Columns;
 
     /// <summary>
     /// Количество строк в окне выбора приложения
     /// для переключения по ALT+TAB.
     /// </summary>
-    public int cRows;
+    public int Rows;
 
     /// <summary>
     /// Номер активного столбца в окне выбора приложения
     /// (нумерация с 0).
     /// </summary>
-    public int iColFocus;
+    public int ColumnFocus;
 
     /// <summary>
     /// Номер активной строки в окне выбора приложения
     /// (нумерация с 0).
     /// </summary>
-    public int iRowFocus;
+    public int RowFocus;
 
     /// <summary>
     /// Ширина иконки в окне выбора приложения.
     /// </summary>
-    public int cxItem;
+    public int XItem;
 
     /// <summary>
     /// Высота иконки в окне выбора приложения.
     /// </summary>
-    public int cyItem;
+    public int YItem;
 
     /// <summary>
     /// Координаы левого верхнего угла первой иконки
     /// в окне выбора приложения.
     /// </summary>
-    public Point ptStart;
+    public Point Start;
 }
