@@ -2,31 +2,21 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* HookProcedure.cs -- callback function used with the SetWindowsHookEx
+/* HookProcedure.cs -- функция обратного вызова, используемая с функцией SetWindowsHookEx
    Ars Magna project, http://arsmagna.ru */
 
-namespace AM.Win32
-{
-    /// <summary>
-    /// The HookProcedure hook procedure is an application-defined
-    /// or library-defined callback function used with the
-    /// SetWindowsHookEx function.
-    /// </summary>
-    public delegate int HookProcedure
-        (
-            int code,
-            int wParam,
-            int lParam
-        );
+namespace AM.Win32;
 
-} // namespace AM.Win32
+/// <summary>
+/// Процедура подключения HookProcedure — это определяемая
+/// приложением или библиотекой функция обратного вызова,
+/// используемая с функцией SetWindowsHookEx.
+/// </summary>
+public delegate int HookProcedure
+    (
+        int code,
+        int wParam,
+        int lParam
+    );
