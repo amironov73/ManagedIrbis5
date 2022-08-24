@@ -2,36 +2,28 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* GuiResourcesFlags.cs -- GUI object type
+/* GuiResourcesFlags.cs -- тип GUI-объекта
    Ars Magna project, http://arsmagna.ru */
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Тип GUI-объекта.
+/// </summary>
+public enum GuiResourcesFlags
 {
     /// <summary>
-    /// GUI object type.
+    /// Количество GDI-объектов.
     /// </summary>
-    public enum GuiResourcesFlags
-    {
-        /// <summary>
-        /// Count of GDI objects.
-        /// </summary>
-        GR_GDIOBJECTS = 0,
+    GR_GDIOBJECTS = 0,
 
-        /// <summary>
-        /// Count of USER objects.
-        /// </summary>
-        GR_USEROBJECTS = 1
-
-    } // enum GuiResourcesFlags
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Количество USER-объектов.
+    /// </summary>
+    GR_USEROBJECTS = 1
+}
