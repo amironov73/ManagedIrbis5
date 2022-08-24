@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 
 
-/* EnumChildProc.cs -- callback function used with EnumChildWindows function
+/* EnumChildProc.cs -- функция обратного вызова, используемая с функцией EnumChildWindows
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -20,19 +20,20 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// The EnumChildProc function is an application-defined callback
-/// function used with the EnumChildWindows function. It receives
-/// the child window handles.
+/// Функция EnumChildProc — это определяемая приложением функция
+/// обратного вызова, используемая с функцией EnumChildWindows.
+/// Он получает дескрипторы дочернего окна.
 /// </summary>
 ///
-/// <param name="hwnd">Handle to a child window of the parent window
-/// specified in EnumChildWindows.</param>
+/// <param name="hwnd">Дескриптор дочернего окна родительского окна,
+/// указанного в EnumChildWindows.</param>
 ///
-/// <param name="lParam">Specifies the application-defined value
-/// given in EnumChildWindows.</param>
+/// <param name="lParam">Указывает определяемое приложением значение,
+/// заданное в EnumChildWindows.</param>
 ///
-/// <returns>To continue enumeration, the callback function must
-/// return TRUE; to stop enumeration, it must return FALSE.</returns>
+/// <returns>Чтобы продолжить перечисление, функция обратного вызова
+/// должна вернуть TRUE; чтобы остановить перечисление,
+/// он должен вернуть FALSE.</returns>
 public delegate bool EnumChildProc
     (
         IntPtr hwnd,

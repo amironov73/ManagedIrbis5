@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 
 
-/* EditMargins.cs -- specifies what margin of edit control to set
+/* EditMargins.cs -- задание полей контрола текстового редактора
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -20,27 +20,26 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Specifies what margin of edit control to set.
+/// Задание полей (отступов) контрола текстового редактора.
 /// </summary>
 [Flags]
 public enum EditMargins
 {
     /// <summary>
-    /// Sets the left margin.
+    /// Установка левого отступа.
     /// </summary>
     EC_LEFTMARGIN = 1,
 
     /// <summary>
-    /// Sets the right margin.
+    /// Установка правого отступа.
     /// </summary>
     EC_RIGHTMARGIN = 2,
 
     /// <summary>
-    /// Sets the left and right margins to a narrow
-    /// width calculated using the text metrics of the
-    /// control's current font. If no font has been
-    /// set for the control, the margins are set to
-    /// zero.
+    /// Устанавливает для левого и правого полей узкую ширину,
+    /// рассчитанную с использованием текстовых показателей текущего
+    /// шрифта элемента управления. Если для элемента управления
+    /// не установлен шрифт, поля устанавливаются равными нулю.
     /// </summary>
     EC_USEFONTINFO = 0xFFFF
 }

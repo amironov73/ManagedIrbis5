@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 
 
-/* EnableScrollBarFlags.cs -- options for EnableScrollBar method
+/* EnableScrollBarFlags.cs -- параметры для метода EnableScrollBar
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -20,50 +20,50 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Options for EnableScrollBar method.
+/// Параметры для метода EnableScrollBar.
 /// </summary>
 [Flags]
 public enum EnableScrollBarFlags
 {
     /// <summary>
-    /// Enables both arrows on a scroll bar.
+    /// Включает обе стрелки на полосе прокрутки.
     /// </summary>
     ESB_ENABLE_BOTH = 0x0000,
 
     /// <summary>
-    /// Disables both arrows on a scroll bar.
+    /// Отключает обе стрелки на полосе прокрутки.
     /// </summary>
     ESB_DISABLE_BOTH = 0x0003,
 
     /// <summary>
-    /// Disables the left arrow on a horizontal scroll bar.
+    /// Отключает стрелку влево на горизонтальной полосе прокрутки.
     /// </summary>
     ESB_DISABLE_LEFT = 0x0001,
 
     /// <summary>
-    /// Disables the right arrow on a horizontal scroll bar.
+    /// Отключает стрелку вправо на горизонтальной полосе прокрутки.
     /// </summary>
     ESB_DISABLE_RIGHT = 0x0002,
 
     /// <summary>
-    /// Disables the up arrow on a vertical scroll bar.
+    /// Отключает стрелку вверх на вертикальной полосе прокрутки.
     /// </summary>
     ESB_DISABLE_UP = 0x0001,
 
     /// <summary>
-    /// Disables the down arrow on a vertical scroll bar.
+    /// Отключает стрелку вниз на вертикальной полосе прокрутки.
     /// </summary>
     ESB_DISABLE_DOWN = 0x0002,
 
     /// <summary>
-    /// Disables the left arrow on a horizontal scroll bar
-    /// or the up arrow of a vertical scroll bar.
+    /// Отключает стрелку влево на горизонтальной полосе прокрутки
+    /// или стрелку вверх на вертикальной полосе прокрутки.
     /// </summary>
     ESB_DISABLE_LTUP = ESB_DISABLE_LEFT,
 
     /// <summary>
-    /// Disables the right arrow on a horizontal scroll bar
-    /// or the down arrow of a vertical scroll bar.
+    /// Отключает стрелку вправо на горизонтальной полосе прокрутки
+    /// или стрелку вниз на вертикальной полосе прокрутки.
     /// </summary>
     ESB_DISABLE_RTDN = ESB_DISABLE_RIGHT
 }
