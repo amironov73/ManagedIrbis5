@@ -2,46 +2,38 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* LoadImageFlags.cs -- flags for LoadImage function
+/* LoadImageFlags.cs -- флаги для функции LoadImage
    Ars Magna project, http://arsmagna.ru */
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Флаги для функции LoadImage.
+/// </summary>
+public enum LoadImageFlags
 {
     /// <summary>
-    /// Flags for LoadImage function.
+    /// Загрузка битового изображения.
     /// </summary>
-    public enum LoadImageFlags
-    {
-        /// <summary>
-        /// Loads a bitmap.
-        /// </summary>
-        IMAGE_BITMAP = 0,
+    IMAGE_BITMAP = 0,
 
-        /// <summary>
-        /// Loads an icon.
-        /// </summary>
-        IMAGE_ICON = 1,
+    /// <summary>
+    /// Загрузка иконки.
+    /// </summary>
+    IMAGE_ICON = 1,
 
-        /// <summary>
-        /// Loads a cursor.
-        /// </summary>
-        IMAGE_CURSOR = 2,
+    /// <summary>
+    /// Загрузка курсора.
+    /// </summary>
+    IMAGE_CURSOR = 2,
 
-        /// <summary>
-        /// Loads an enhanced metafile.
-        /// </summary>
-        IMAGE_ENHMETAFILE = 3
-
-    } // enum LoadImageFlags
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Загрузка улучшенного метафайла.
+    /// </summary>
+    IMAGE_ENHMETAFILE = 3
+}
