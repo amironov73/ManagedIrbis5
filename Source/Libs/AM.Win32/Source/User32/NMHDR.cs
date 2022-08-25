@@ -2,15 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* NMHDR.cs -- notification message
    Ars Magna project, http://arsmagna.ru */
@@ -22,31 +17,28 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Contains information about a notification message.
+/// </summary>
+[StructLayout (LayoutKind.Sequential)]
+public struct NMHDR
 {
     /// <summary>
-    /// Contains information about a notification message.
+    /// Window handle to the control sending a message.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct NMHDR
-    {
-        /// <summary>
-        /// Window handle to the control sending a message.
-        /// </summary>
-        public IntPtr hwndFrom;
+    public IntPtr hwndFrom;
 
-        /// <summary>
-        /// Identifier of the control sending a message.
-        /// </summary>
-        public uint idFrom;
+    /// <summary>
+    /// Identifier of the control sending a message.
+    /// </summary>
+    public uint idFrom;
 
-        /// <summary>
-        /// Notification code. This member can be a control-specific
-        /// notification code or it can be one of the common notification
-        /// codes.
-        /// </summary>
-        public int code;
-
-    } // struct NMHDR
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Notification code. This member can be a control-specific
+    /// notification code or it can be one of the common notification
+    /// codes.
+    /// </summary>
+    public int code;
+}
