@@ -2,15 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* MSLLHOOKSTRUCT.cs -- low-level keyboard input event
    Ars Magna project, http://arsmagna.ru */
@@ -23,40 +18,37 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Contains information about a low-level keyboard input event.
+/// </summary>
+[StructLayout (LayoutKind.Sequential)]
+public struct MSLLHOOKSTRUCT
 {
     /// <summary>
-    /// Contains information about a low-level keyboard input event.
+    /// Specifies a POINT structure that contains the x- and
+    /// y-coordinates of the cursor, in screen coordinates.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct MSLLHOOKSTRUCT
-    {
-        /// <summary>
-        /// Specifies a POINT structure that contains the x- and
-        /// y-coordinates of the cursor, in screen coordinates.
-        /// </summary>
-        public Point pt;
+    public Point pt;
 
-        /// <summary>
-        /// Data.
-        /// </summary>
-        public int mouseData;
+    /// <summary>
+    /// Data.
+    /// </summary>
+    public int mouseData;
 
-        /// <summary>
-        /// Specifies the event-injected flag.
-        /// </summary>
-        public LowLevelMouseHookFlags flags;
+    /// <summary>
+    /// Specifies the event-injected flag.
+    /// </summary>
+    public LowLevelMouseHookFlags flags;
 
-        /// <summary>
-        /// Specifies the time stamp for this message.
-        /// </summary>
-        public int time;
+    /// <summary>
+    /// Specifies the time stamp for this message.
+    /// </summary>
+    public int time;
 
-        /// <summary>
-        /// Specifies extra information associated with the message.
-        /// </summary>
-        public IntPtr dwExtraInfo;
-
-    } // MSLLHOOKSTRUCT
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Specifies extra information associated with the message.
+    /// </summary>
+    public IntPtr dwExtraInfo;
+}
