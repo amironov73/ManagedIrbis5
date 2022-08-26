@@ -26,15 +26,14 @@ namespace AM.Win32;
 public struct CONSOLE_FONT_INFO
 {
     /// <summary>
-    /// Index of the font in the system's console font table.
+    /// Индекс шрифта в таблице шрифтов системной консоли.
     /// </summary>
     [FieldOffset (0)]
     public int nFont;
 
     /// <summary>
-    /// A COORD structure that contains the width and height
-    /// of each character in the font. The X member contains
-    /// the width, while the Y member contains the height.
+    /// Структура COORD, содержащая ширину и высоту каждого символа
+    /// шрифта. Член X содержит ширину, а элемент Y содержит высоту.
     /// </summary>
     [FieldOffset (4)]
     public COORD dwFontSize;

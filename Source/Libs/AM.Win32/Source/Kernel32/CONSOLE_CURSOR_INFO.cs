@@ -26,18 +26,17 @@ namespace AM.Win32;
 public struct CONSOLE_CURSOR_INFO
 {
     /// <summary>
-    /// Percentage of the character cell that is filled
-    /// by the cursor. This value is between 1 and 100.
-    /// The cursor appearance varies, ranging from completely
-    /// filling the cell to showing up as a horizontal line
-    /// at the bottom of the cell.
+    /// Процент символьной ячейки, заполненной курсором. Это значение
+    /// должно находиться в диапазоне от 1 до 100. Внешний вид курсора
+    /// может быть разным: от полного заполнения ячейки до отображения
+    /// в виде горизонтальной линии в нижней части ячейки.
     /// </summary>
     [FieldOffset (0)]
     public int dwSize;
 
     /// <summary>
-    /// Visibility of the cursor. If the cursor is visible,
-    /// this member is TRUE.
+    /// Видимость курсора. Если курсор виден, этот член имеет
+    /// значение TRUE.
     /// </summary>
     [FieldOffset (4)]
     public bool bVisible;
