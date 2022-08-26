@@ -2,43 +2,40 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* CopyProgressCode.cs -- the CopyProgressRoutine function should return one of the following values
+/* CopyProgressCode.cs -- значения, возвращаемые функцией CopyProgressRoutine
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32;
 
 /// <summary>
-/// The CopyProgressRoutine function should return
-/// one of the following values.
+/// Функция CopyProgressRoutine должна возвращать
+/// одно из следующих значений.
 /// </summary>
 public enum CopyProgressCode
 {
     /// <summary>
-    /// Continue the copy operation.
+    /// Продолжать копирование файла.
     /// </summary>
     PROGRESS_CONTINUE = 0,
 
     /// <summary>
-    /// Cancel the copy operation and delete the destination file.
+    /// Прекратить копирование и удалить целевой файл.
     /// </summary>
     PROGRESS_CANCEL = 1,
 
     /// <summary>
-    /// Stop the copy operation. It can be restarted at a later time.
+    /// Остановить копирование. Оно может быть перезапущено позже.
     /// </summary>
     PROGRESS_STOP = 2,
 
     /// <summary>
-    /// Continue the copy operation, but stop invoking
-    /// CopyProgressRoutine to report progress.
+    /// Продолжать операцию копирования. но прекратить вызывать
+    /// CopyProgressRoutine для отслеживания прогресса.
     /// </summary>
     PROGRESS_QUIET = 3
 }
