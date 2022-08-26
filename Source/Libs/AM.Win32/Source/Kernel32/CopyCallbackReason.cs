@@ -2,33 +2,30 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* CopyCallbackReason.cs -- reason that CopyProgressRoutine was called
+/* CopyCallbackReason.cs -- причина вызова CopyProgressRoutine
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32;
 
 /// <summary>
-/// Reason that CopyProgressRoutine was called.
+/// Причина вызова CopyProgressRoutine.
 /// </summary>
 public enum CopyCallbackReason
 {
     /// <summary>
-    /// Another part of the data file was copied.
+    /// Была скопирована другая часть файла данных.
     /// </summary>
     CALLBACK_CHUNK_FINISHED = 0x00000000,
 
     /// <summary>
-    /// Another stream was created and is about to be copied.
-    /// This is the callback reason given when the callback
-    /// routine is first invoked.
+    /// Был создан другой поток, который будет скопирован.
+    /// Это причина обратного вызова, указанная при первом
+    /// вызове процедуры обратного вызова.
     /// </summary>
     CALLBACK_STREAM_SWITCH = 0x00000001
 }
