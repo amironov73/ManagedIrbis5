@@ -7,43 +7,43 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* ProcessorFeatures.cs -- processor features
+/* ProcessorFeatures.cs -- возможности процессора
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32;
 
 /// <summary>
-/// Processor features.
+/// Возможности процессора.
 /// </summary>
 public enum ProcessorFeatures
 {
     /// <summary>
-    /// Pentium:  In rare circumstances, a floating-point
-    /// precision error can occur.
+    /// Pentium: в редких случаях может возникнуть ошибка точности
+    /// с плавающей запятой.
     /// </summary>
     PF_FLOATING_POINT_PRECISION_ERRATA,
 
     /// <summary>
-    /// <para>Floating-point operations are emulated using a
-    /// software emulator.</para>
-    /// <para>This function returns a nonzero value if
-    /// floating-point operations are emulated; otherwise,
-    /// it returns zero.</para>
-    /// <para>Windows NT 4.0: This function returns zero if
-    /// floating-point operations are emulated; otherwise,
-    /// it returns a nonzero value. This behavior is a bug that
-    /// is fixed in later versions.</para>
+    /// <para>Операции с плавающей запятой эмулируются с помощью
+    /// программного эмулятора.</para>
+    /// <para>Эта функция возвращает ненулевое значение, если
+    /// эмулируются операции с плавающей запятой; в противном случае
+    /// возвращается ноль.</para>
+    /// <para>Windows NT 4.0: эта функция возвращает ноль, если
+    /// эмулируются операции с плавающей запятой; в противном случае
+    /// возвращается ненулевое значение. Такое поведение является
+    /// ошибкой, исправленной в более поздних версиях.</para>
     /// </summary>
     PF_FLOATING_POINT_EMULATED,
 
     /// <summary>
-    /// The compare and exchange double operation is available
-    /// (Pentium, MIPS, and Alpha).
+    /// Доступна двойная операция сравнения и обмена (Pentium,
+    /// MIPS и Alpha).
     /// </summary>
     PF_COMPARE_EXCHANGE_DOUBLE,
 
     /// <summary>
-    /// The MMX instruction set is available.
+    /// Доступен набор инструкций MMX.
     /// </summary>
     PF_MMX_INSTRUCTIONS_AVAILABLE,
 
@@ -58,27 +58,27 @@ public enum ProcessorFeatures
     PF_ALPHA_BYTE_INSTRUCTIONS,
 
     /// <summary>
-    /// The SSE instruction set is available.
+    /// Доступен набор инструкций SSE.
     /// </summary>
     PF_XMMI_INSTRUCTIONS_AVAILABLE,
 
     /// <summary>
-    /// The 3D-Now instruction set is available.
+    /// Доступен набор инструкций 3D-Now.
     /// </summary>
     PF_3DNOW_INSTRUCTIONS_AVAILABLE,
 
     /// <summary>
-    /// The RDTSC instruction is available.
+    /// Доступна инструкция RDTSC.
     /// </summary>
     PF_RDTSC_INSTRUCTION_AVAILABLE,
 
     /// <summary>
-    /// The processor is PAE-enabled.
+    /// Процессор поддерживает PAE.
     /// </summary>
     PF_PAE_ENABLED,
 
     /// <summary>
-    /// The SSE2 instruction set is available.
+    /// Доступен набор инструкций SSE2.
     /// </summary>
     PF_XMMI64_INSTRUCTIONS_AVAILABLE
 }
