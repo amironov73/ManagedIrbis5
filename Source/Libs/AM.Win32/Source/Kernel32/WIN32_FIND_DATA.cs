@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* WIN32_FIND_DATA.cs -- describes a file found by the FindFirstFile and similar functions
+/* WIN32_FIND_DATA.cs -- описывает файл, найденный функциями FindFirstFile, FindFirstFileEx или FindNextFile
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -21,86 +21,87 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// Describes a file found by the FindFirstFile,
-/// FindFirstFileEx, or FindNextFile function.
+/// Структура описывает файл, найденный функциями
+/// <c>FindFirstFile</c>, <c>FindFirstFileEx</c>
+/// или <c>FindNextFile</c>.
 /// </summary>
 [StructLayout (LayoutKind.Sequential)]
 public struct WIN32_FIND_DATA
 {
     /// <summary>
-    /// Maximal path length.
+    /// Максимальная длина пути в Win32.
     /// </summary>
     public const int MAX_PATH = 260;
 
     /// <summary>
-    /// File attributes of the file found.
+    /// Атрибуты найденного файла.
     /// </summary>
     public FileAttributes dwFileAttributes;
 
     /// <summary>
-    /// A FILETIME structure that specifies when the file
-    /// or directory was created. If the underlying file
-    /// system does not support creation time, this member
-    /// is zero.
+    /// Структура <see cref="FILETIME" />, указывающая, когда
+    /// был создан файл или каталог. Если базовая файловая система
+    /// не поддерживает  время создания, этот элемент равен нулю.
     /// </summary>
     public FILETIME ftCreationTime;
 
     /// <summary>
-    /// A FILETIME structure. For a file, the structure specifies
-    /// when the file was last read from or written to. For a
-    /// directory, the structure specifies when the directory
-    /// was created. For both files and directories, the specified
-    /// date will be correct, but the time of day will always be set
-    /// to midnight. If the underlying file system does not support
-    /// last access time, this member is zero.
+    /// Структура <see cref="FILETIME" />. Для файла структура
+    /// указывает, когда в последний раз файл считывался
+    /// или записывался. Для каталога структура указывает,
+    /// когда каталог был создан. И для файлов, и для каталогов
+    /// указанная дата будет правильной, но время суток всегда
+    /// будет установлено на полночь. Если базовая файловая
+    /// система не поддерживает время последнего доступа,
+    /// этот элемент равен нулю.
     /// </summary>
     public FILETIME ftLastAccessTime;
 
     /// <summary>
-    /// A FILETIME structure. For a file, the structure specifies
-    /// when the file was last written to. For a directory, the
-    /// structure specifies when the directory was created. If the
-    /// underlying file system does not support last write time,
-    /// this member is zero.
+    /// Структура <see cref="FILETIME" />. Для файла структура
+    /// указывает, когда файл был в последний раз записан.
+    /// Для каталога структура указывает, когда каталог был создан.
+    /// Если базовая файловая система не поддерживает время
+    /// последней записи, этот элемент равен нулю.
     /// </summary>
     public FILETIME ftLastWriteTime;
 
     /// <summary>
-    /// High-order DWORD value of the file size, in bytes.
-    /// This value is zero unless the file size is greater than
-    /// MAXDWORD. The size of the file is equal to
-    /// (nFileSizeHigh * (MAXDWORD+1)) + nFileSizeLow.
+    /// Старшее значение <c>DWORD</c> размера файла в байтах.
+    /// Это значение равно нулю, если размер файла не превышает
+    /// <c>MAXDWORD</c>. Размер файла равен
+    /// <c>(nFileSizeHigh * (MAXDWORD+1)) + nFileSizeLow</c>.
     /// </summary>
     public int nFileSizeHigh;
 
     /// <summary>
-    /// Low-order DWORD value of the file size, in bytes.
+    /// Младшее значение <c>DWORD</c> размера файла в байтах.
     /// </summary>
     public uint nFileSizeLow;
 
     /// <summary>
-    /// If the dwFileAttributes member includes the
-    /// FILE_ATTRIBUTE_REPARSE_POINT attribute, this member
-    /// specifies the reparse tag. Otherwise, this value is
-    /// undefined and should not be used.
+    /// Если элемент dwFileAttributes включает в себя атрибут
+    /// <c>FILE_ATTRIBUTE_REPARSE_POINT</c>, этот элемент определяет
+    /// тег повторной обработки. В противном случае это значение
+    /// не определено и не должно использоваться.
     /// </summary>
     public int dwReserved0;
 
     /// <summary>
-    /// Reserved for future use.
+    /// Зарезервировано для будущего использования.
     /// </summary>
     public int dwReserved1;
 
     /// <summary>
-    /// A null-terminated string that specifies the name of the file.
+    /// Строка с завершающим нулем, содержащая имя файла.
     /// </summary>
     [MarshalAs (UnmanagedType.ByValTStr, SizeConst = MAX_PATH)]
     public string? cFileName;
 
     /// <summary>
-    /// A null-terminated string that specifies an alternative name
-    /// for the file. This name is in the classic 8.3 (filename.ext)
-    /// file name format.
+    /// Строка с завершающим нулем, содержащая альтернативное
+    /// имя файла. Это имя имеет классический формат имени
+    /// файла 8.3 (<c>filename.ext</c>).
     /// </summary>
     [MarshalAs (UnmanagedType.ByValTStr, SizeConst = 14)]
     public string? cAlternateFileName;
