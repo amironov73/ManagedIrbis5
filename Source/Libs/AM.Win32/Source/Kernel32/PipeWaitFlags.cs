@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* PipeWaitFlags.cs -- wait intervals for named pipes
+/* PipeWaitFlags.cs -- интервалы ожидания для именованных каналов
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -19,25 +19,25 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Wait intervals for named pipes.
+/// Интервалы ожидания для именованных каналов.
 /// </summary>
 [Flags]
 public enum PipeWaitFlags
 {
     /// <summary>
-    /// Waits indefinitely.
+    /// Бесконечное ожидание.
     /// </summary>
-    NMPWAIT_WAIT_FOREVER = unchecked ((int)0xffffffff),
+    NMPWAIT_WAIT_FOREVER = unchecked ((int) 0xffffffff),
 
     /// <summary>
-    /// Does not wait for the named pipe. If the named pipe
-    /// is not available, the function returns an error.
+    /// Не ждет именованный канал. Если именованный канал недоступен,
+    /// функция возвращает ошибку.
     /// </summary>
     NMPWAIT_NOWAIT = 0x00000001,
 
     /// <summary>
-    /// Uses the default time-out specified in a call to the
-    /// CreateNamedPipe function.
+    /// Использует время ожидания по умолчанию, указанное при вызове
+    /// функции <c>CreateNamedPipe</c>.
     /// </summary>
     NMPWAIT_USE_DEFAULT_WAIT = 0x00000000
 }
