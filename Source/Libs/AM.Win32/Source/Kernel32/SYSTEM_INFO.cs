@@ -19,22 +19,24 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// The SYSTEM_INFO structure contains information about the
-/// current computer system. This includes the architecture
-/// and type of the processor, the number of processors in
-/// the system, the page size, and other such information.
+/// Структура <c>SYSTEM_INFO</c> содержит информацию о текущей
+/// компьютерной системе. Это включает в себя архитектуру
+/// и тип процессора, количество процессоров в системе,
+/// размер страницы и другую подобную информацию.
 /// </summary>
 [Serializable]
 [StructLayout (LayoutKind.Explicit, Size = 36)]
 public struct SYSTEM_INFO
 {
     /// <summary>
-    /// <para>An obsolete member that is retained for compatibility
-    /// with Windows NT 3.5 and earlier. New applications should use
-    /// the wProcessorArchitecture branch of the union.</para>
-    /// <para>Windows Me/98/95: The system always sets this member
-    /// to zero, the value defined for PROCESSOR_ARCHITECTURE_INTEL.
-    /// </para></summary>
+    /// <para>Устаревший элемент, оставленный для совместимости
+    /// с Windows NT 3.5 и более ранними версиями. Новые приложения
+    /// должны использовать ветвь объединения
+    /// <c>wProcessorArchitecture.</c></para>
+    /// <para>Windows Me/98/95: система всегда устанавливает для этого
+    /// члена нулевое значение, определенное для
+    /// <c>PROCESSOR_ARCHITECTURE_INTEL</c>.</para>
+    /// </summary>
     [FieldOffset (0)]
     public uint dwOemId;
 
@@ -51,70 +53,73 @@ public struct SYSTEM_INFO
     public ushort wReserved;
 
     /// <summary>
-    /// Page size and the granularity of page protection and
-    /// commitment. This is the page size used by the VirtualAlloc
-    /// function.
+    /// Размер страницы и степень детализации защиты страницы
+    /// и обязательства. Это размер страницы, используемый функцией
+    /// <c>VirtualAlloc</c>.
     /// </summary>
     [FieldOffset (4)]
     public uint dwPageSize;
 
     /// <summary>
-    /// Pointer to the lowest memory address accessible to
-    /// applications and dynamic-link libraries (DLLs).
+    /// Указатель на наименьший адрес памяти, доступный приложениям
+    /// и библиотекам динамической компоновки (DLL).
     /// </summary>
     [FieldOffset (8)]
     public uint lpMinimumApplicationAddress;
 
     /// <summary>
-    /// Pointer to the highest memory address accessible to
-    /// applications and DLLs.
+    /// Указатель на самый высокий адрес памяти, доступный
+    /// для приложений и библиотек DLL.
     /// </summary>
     [FieldOffset (12)]
     public uint lpMaximumApplicationAddress;
 
     /// <summary>
-    /// Mask representing the set of processors configured into
-    /// the system. Bit 0 is processor 0; bit 31 is processor 31.
+    /// Маска, представляющая набор процессоров, настроенных
+    /// в системе. Бит 0 - процессор 0; бит 31 - процессор 31.
     /// </summary>
     [FieldOffset (16)]
     public uint dwActiveProcessorMask;
 
     /// <summary>
-    /// Number of processors in the system.
+    /// Количество процессоров в системе.
     /// </summary>
     [FieldOffset (20)]
     public uint dwNumberOfProcessors;
 
     /// <summary>
-    /// An obsolete member that is retained for compatibility with
-    /// Windows NT 3.5 and earlier. Use the wProcessorArchitecture,
-    /// wProcessorLevel, and wProcessorRevision members to determine
-    /// the type of processor.
+    /// Устаревшее поле, оставленное для совместимости
+    /// с Windows NT 3.5 и более ранними версиями. Используйте поля
+    /// <see cref="wProcessorArchitecture" />,
+    /// <see cref="wProcessorLevel" /> и
+    /// <see cref="wProcessorRevision" />,
+    /// чтобы определить тип процессора.
     /// </summary>
     [FieldOffset (24)]
     public uint dwProcessorType;
 
     /// <summary>
-    /// Granularity with which virtual memory is allocated. For
-    /// example, a VirtualAlloc request to allocate 1 byte will
-    /// reserve an address space of dwAllocationGranularity bytes.
-    /// This value was hard coded as 64K in the past, but other
-    /// hardware architectures may require different values.
+    /// Детализация, с которой выделяется виртуальная память.
+    /// Например, запрос <c>VirtualAlloc</c> на выделение 1 байта
+    /// зарезервирует адресное пространство в байтах
+    /// <c>dwAllocationGranularity</c>. Раньше это значение было
+    /// жестко закодировано как 64 КБ, но для других аппаратных
+    /// архитектур могут потребоваться другие значения.
     /// </summary>
     [FieldOffset (28)]
     public uint dwAllocationGranularity;
 
     /// <summary>
-    /// System's architecture-dependent processor level. It should
-    /// be used only for display purposes. To determine the feature
-    /// set of a processor, use the IsProcessorFeaturePresent
-    /// function.
+    /// Уровень процессора, зависящий от архитектуры системы.
+    /// Его следует использовать только для демонстрации.
+    /// Чтобы определить набор функций процессора,
+    /// используйте функцию <c>IsProcessorFeaturePresent</c>.
     /// </summary>
     [FieldOffset (32)]
     public ushort wProcessorLevel;
 
     /// <summary>
-    /// Architecture-dependent processor revision.
+    /// Ревизия процессора, зависящая от архитектуры.
     /// </summary>
     [FieldOffset (34)]
     public ushort wProcessorRevision;
