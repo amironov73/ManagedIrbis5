@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* ProcessAccessFlags.cs -- process access flags
+/* ProcessAccessFlags.cs -- флаги доступа к процессу
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -19,18 +19,19 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Process access flags.
+/// Флаги доступа к процессу.
 /// </summary>
 [Flags]
 public enum ProcessAccessFlags
 {
     /// <summary>
-    /// Required to terminate a process using TerminateProcess.
+    /// Требуется для завершения процесса с помощью
+    /// <c>TerminateProcess</c>.
     /// </summary>
     PROCESS_TERMINATE = 0x0001,
 
     /// <summary>
-    /// Required to create a thread.
+    /// Требуется для создания потока (thread).
     /// </summary>
     PROCESS_CREATE_THREAD = 0x0002,
 
@@ -40,46 +41,51 @@ public enum ProcessAccessFlags
     PROCESS_SET_SESSIONID = 0x0004,
 
     /// <summary>
-    /// Required to perform an operation on the address space of
-    /// a process (see VirtualProtectEx and WriteProcessMemory).
+    /// Требуется для выполнения операции над адресным пространством
+    /// процесса (см. <c>VirtualProtectEx</c>
+    /// и <c>WriteProcessMemory</c>).
     /// </summary>
     PROCESS_VM_OPERATION = 0x0008,
 
     /// <summary>
-    /// Required to read memory in a process using ReadProcessMemory.
+    /// Требуется для чтения памяти в процессе, использующем
+    /// <c>ReadProcessMemory</c>.
     /// </summary>
     PROCESS_VM_READ = 0x0010,
 
     /// <summary>
-    /// Required to write to memory in a process using WriteProcessMemory.
+    /// Требуется для записи в память в процессе, использующем
+    /// <c>WriteProcessMemory</c>.
     /// </summary>
     PROCESS_VM_WRITE = 0x0020,
 
     /// <summary>
-    /// Required to duplicate a handle using DuplicateHandle.
+    /// Требуется для дублирования дескриптора с помощью
+    /// <c>DuplicateHandle</c>.
     /// </summary>
     PROCESS_DUP_HANDLE = 0x0040,
 
     /// <summary>
-    /// Required to create a process.
+    /// Требуется для создания процесса.
     /// </summary>
     PROCESS_CREATE_PROCESS = 0x0080,
 
     /// <summary>
-    /// Required to set memory limits using SetProcessWorkingSetSize.
+    /// Требуется для установки пределов памяти с помощью
+    /// <c>SetProcessWorkingSetSize</c>.
     /// </summary>
     PROCESS_SET_QUOTA = 0x0100,
 
     /// <summary>
-    /// Required to set certain information about a process, such as
-    /// its priority class (see SetPriorityClass).
+    /// Требуется для установки определенной информации о процессе,
+    /// например его класса приоритета (см. <c>SetPriorityClass</c>).
     /// </summary>
     PROCESS_SET_INFORMATION = 0x0200,
 
     /// <summary>
-    /// Required to retrieve certain information about a process,
-    /// such as its exit code and priority class (see
-    /// GetExitCodeProcess and GetPriorityClass).
+    /// Требуется для получения определенной информации о процессе,
+    /// такой как его код выхода и класс приоритета
+    /// (см. <c>GetExitCodeProcess</c> и <c>GetPriorityClass</c>).
     /// </summary>
     PROCESS_QUERY_INFORMATION = 0x0400,
 
@@ -109,8 +115,8 @@ public enum ProcessAccessFlags
     WRITE_OWNER = 0x00080000,
 
     /// <summary>
-    /// Required to wait for the process to terminate using the
-    /// wait functions.
+    /// Требуется дождаться завершения процесса с помощью
+    /// функций ожидания.
     /// </summary>
     SYNCHRONIZE = 0x00100000,
 
@@ -120,7 +126,7 @@ public enum ProcessAccessFlags
     STANDARD_RIGHTS_REQUIRED = 0x000F0000,
 
     /// <summary>
-    /// All possible access rights for a process object.
+    /// Все возможные права доступа для объекта процесса.
     /// </summary>
     PROCESS_ALL_ACCESS = STANDARD_RIGHTS_REQUIRED | SYNCHRONIZE | 0xFFF
 }
