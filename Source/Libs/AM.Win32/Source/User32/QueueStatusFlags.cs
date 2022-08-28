@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* QueueStatusFlags.cs -- specifies the types of messages for which to check the queue
+/* QueueStatusFlags.cs -- типы сообщений, для которых необходимо проверить очередь
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -19,81 +19,83 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Specifies the types of messages for which to check the queue.
+/// Указывает типы сообщений, для которых необходимо проверить очередь.
 /// </summary>
 [Flags]
 public enum QueueStatusFlags
 {
     /// <summary>
-    /// A WM_KEYUP, WM_KEYDOWN, WM_SYSKEYUP, or WM_SYSKEYDOWN message
-    /// is in the queue.
+    /// Сообщения <c>WM_KEYUP</c>, <c>WM_KEYDOWN</c>, <c>WM_SYSKEYUP</c>
+    /// или <c>WM_SYSKEYDOWN</c>.
     /// </summary>
     QS_KEY = 0x0001,
 
     /// <summary>
-    /// A WM_MOUSEMOVE message is in the queue.
+    /// Сообщение <c>WM_MOUSEMOVE</c>.
     /// </summary>
     QS_MOUSEMOVE = 0x0002,
 
     /// <summary>
-    /// A mouse-button message (WM_LBUTTONUP, WM_RBUTTONDOWN, and so on).
+    /// Сообщения, относящиеся к кнопкам мыши (<c>WM_LBUTTONUP</c>,
+    /// <c>WM_RBUTTONDOWN</c> и т. д.).
     /// </summary>
     QS_MOUSEBUTTON = 0x0004,
 
     /// <summary>
-    /// A posted message (other than those listed here) is in the queue.
+    /// Опубликованное сообщение (кроме перечисленных выше).
     /// </summary>
     QS_POSTMESSAGE = 0x0008,
 
     /// <summary>
-    /// A WM_TIMER message is in the queue.
+    /// Сообщение  <c>WM_TIMER</c>.
     /// </summary>
     QS_TIMER = 0x0010,
 
     /// <summary>
-    /// A WM_PAINT message is in the queue.
+    /// Сообщение <c>WM_PAINT</c>.
     /// </summary>
     QS_PAINT = 0x0020,
 
     /// <summary>
-    /// A message sent by another thread or application is in the queue.
+    /// Сообщение, отправленное другим потоком или приложением.
     /// </summary>
     QS_SENDMESSAGE = 0x0040,
 
     /// <summary>
-    /// A WM_HOTKEY message is in the queue.
+    /// Сообщение <c>WM_HOTKEY</c>.
     /// </summary>
     QS_HOTKEY = 0x0080,
 
     /// <summary>
-    /// A posted message (other than those listed here) is in the queue.
+    /// Опубликованное сообщение (кроме перечисленных выше).
     /// </summary>
     QS_ALLPOSTMESSAGE = 0x0100,
 
     /// <summary>
-    /// Windows XP: A raw input message is in the queue.
+    /// Windows XP: Необработанное сообщение, относящиееся
+    /// к пользовательскому вводу.
     /// </summary>
     QS_RAWINPUT = 0x0400,
 
     /// <summary>
-    /// A WM_MOUSEMOVE message or mouse-button message (WM_LBUTTONUP,
-    /// WM_RBUTTONDOWN, and so on).
+    /// Сообщение, относящееся к мыши: <c>WM_MOUSEMOVE</c>,
+    /// <c>WM_LBUTTONUP</c>, <c>WM_RBUTTONDOWN</c> и т. д.
     /// </summary>
     QS_MOUSE = QS_MOUSEMOVE
                | QS_MOUSEBUTTON,
 
     /// <summary>
-    /// <para>An input message is in the queue. This is composed
-    /// of QS_KEY and QS_MOUSE.</para>
-    /// <para>Windows XP: This also includes QS_RAWINPUT.</para>
+    /// <para>Сообщение, относящееся к пользовательскому вводу,
+    /// т. е. комбинация <c>QS_KEY</c> и <c>QS_MOUSE</c>.</para>
+    /// <para>Windows XP: Также включает <c>QS_RAWINPUT</c>.</para>
     /// </summary>
     QS_INPUT = QS_MOUSE
                | QS_KEY
                | QS_RAWINPUT,
 
     /// <summary>
-    /// An input, WM_TIMER, WM_PAINT, WM_HOTKEY, or posted message
-    /// is in the queue.
+    /// Пользовательский ввод,<c> WM_TIMER</c>, <c>WM_PAINT</c>,
+    /// <c>WM_HOTKEY</c> или опубликованное сообщение.
     /// </summary>
     QS_ALLEVENTS = QS_INPUT
                    | QS_POSTMESSAGE
@@ -102,7 +104,7 @@ public enum QueueStatusFlags
                    | QS_HOTKEY,
 
     /// <summary>
-    /// Any message is in the queue.
+    /// Любое сообщение.
     /// </summary>
     QS_ALLINPUT = QS_INPUT
                   | QS_POSTMESSAGE
