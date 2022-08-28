@@ -2,17 +2,12 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* SCROLLINFO.cs -- scroll bar parameters
+/* SCROLLINFO.cs -- параметры полосы прокрутки
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -21,61 +16,63 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Структура <c>SCROLLINFO</c> содержит параметры полосы прокрутки,
+/// которые должны быть установлены функцией <c>SetScrollInfo</c>
+/// (или сообщением <c>SBM_SETSCROLLINFO</c>) или извлечены функцией
+/// <c>GetScrollInfo</c> (или сообщением <c>SBM_GETSCROLLINFO</c>).
+/// </summary>
+[StructLayout (LayoutKind.Sequential, Size = StructureSize)]
+public struct SCROLLINFO
 {
     /// <summary>
-    /// The SCROLLINFO structure contains scroll bar parameters to be set by
-    /// the SetScrollInfo function (or SBM_SETSCROLLINFO message), or retrieved
-    /// by the GetScrollInfo function (or SBM_GETSCROLLINFO message).
+    /// Константа: размер структуры в байтах.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Size = Size)]
-    public struct SCROLLINFO
-    {
-        /// <summary>
-        /// Size of structure, in bytes.
-        /// </summary>
-        public const int Size = 28;
+    public const int StructureSize = 28;
 
-        /// <summary>
-        /// Specifies the size, in bytes, of this structure.
-        /// </summary>
-        public int cbSize;
+    /// <summary>
+    /// Размер структуры в байтах, должен быть установлен
+    /// вызывающей функцией.
+    /// </summary>
+    public int Size;
 
-        /// <summary>
-        /// Specifies the scroll bar parameters to set or retrieve.
-        /// </summary>
-        public int fMask;
+    /// <summary>
+    /// Указывает параметры полосы прокрутки для установки
+    /// или извлечения.
+    /// </summary>
+    public int Mask;
 
-        /// <summary>
-        /// Specifies the minimum scrolling position.
-        /// </summary>
-        public int nMin;
+    /// <summary>
+    /// Задает минимальную позицию прокрутки.
+    /// </summary>
+    public int Min;
 
-        /// <summary>
-        /// Specifies the maximum scrolling position.
-        /// </summary>
-        public int nMax;
+    /// <summary>
+    /// Задает максимальную позицию прокрутки.
+    /// </summary>
+    public int Max;
 
-        /// <summary>
-        /// Specifies the page size. A scroll bar uses this value to
-        /// determine the appropriate size of the proportional scroll box.
-        /// </summary>
-        public int nPage;
+    /// <summary>
+    /// Задает размер страницы. Полоса прокрутки использует
+    /// это значение для определения соответствующего размера
+    /// пропорционального поля прокрутки.
+    /// </summary>
+    public int Page;
 
-        /// <summary>
-        /// Specifies the position of the scroll box.
-        /// </summary>
-        public int nPos;
+    /// <summary>
+    /// Определяет положение полосы прокрутки.
+    /// </summary>
+    public int Pos;
 
-        /// <summary>
-        /// Specifies the immediate position of a scroll box that the user
-        /// is dragging. An application can retrieve this value while processing
-        /// the SB_THUMBTRACK request code. An application cannot set the
-        /// immediate scroll position; the SetScrollInfo function ignores
-        /// this member.
-        /// </summary>
-        public int nTrackPos;
-
-    } // struct SCROLLINFO
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Указывает непосредственное положение полосы прокрутки,
+    /// которую перетаскивает пользователь. Приложение может
+    /// получить это значение при обработке кода запроса
+    /// <c>SB_THUMBTRACK</c>. Приложение не может установить
+    /// позицию непосредственной прокрутки; функция <c>SetScrollInfo</c>
+    /// игнорирует этот элемент.
+    /// </summary>
+    public int TrackPos;
+}
