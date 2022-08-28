@@ -2,53 +2,47 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* ScrollBarFlags.cs -- Flags for GetScrollPos and SetScrollPos functions
+/* ScrollBarFlags.cs -- флаги для функций GetScrollPos и SetScrollPos
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// Флаги для функций <c>GetScrollPos</c> и <c>SetScrollPos</c>.
+/// </summary>
+public enum ScrollBarFlags
 {
     /// <summary>
-    /// Flags for GetScrollPos and SetScrollPos functions.
+    /// Получает положение полосы прокрутки на стандартной
+    /// горизонтальной полосе прокрутки окна.
     /// </summary>
-    public enum ScrollBarFlags
-    {
-        /// <summary>
-        /// Retrieves the position of the scroll box in a window's
-        /// standard horizontal scroll bar.
-        /// </summary>
-        SB_HORZ = 0,
+    SB_HORZ = 0,
 
-        /// <summary>
-        /// Retrieves the position of the scroll box in a window's
-        /// standard vertical scroll bar.
-        /// </summary>
-        SB_VERT = 1,
+    /// <summary>
+    /// Получает положение полосы прокрутки на стандартной
+    /// вертикальной полосе прокрутки окна.
+    /// </summary>
+    SB_VERT = 1,
 
-        /// <summary>
-        /// Retrieves the position of the scroll box in a scroll bar control.
-        /// The hWnd parameter must be the handle to the scroll bar control.
-        /// </summary>
-        SB_CTL = 2,
+    /// <summary>
+    /// Извлекает положение полосы прокрутки в элементе управления
+    /// полосы прокрутки. Параметр <c>hWnd</c> должен быть
+    /// дескриптором элемента управления полосы прокрутки.
+    /// </summary>
+    SB_CTL = 2,
 
-        /// <summary>
-        /// ???
-        /// </summary>
-        SB_BOTH = 3
-
-    } // enum ScrollBarFlags
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Получает положение полосы прокрутки на стандартных
+    /// полосах прокрутки окна (вертикальной и горизонтальной).
+    /// </summary>
+    SB_BOTH = 3
+}

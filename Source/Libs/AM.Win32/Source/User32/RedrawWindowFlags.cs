@@ -19,7 +19,7 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Флаги для функции RedrawWindow.
+/// Флаги для функции <c>RedrawWindow</c>.
 /// </summary>
 [Flags]
 public enum RedrawWindowFlags
