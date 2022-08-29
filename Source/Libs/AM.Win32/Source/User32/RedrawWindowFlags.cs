@@ -25,82 +25,94 @@ namespace AM.Win32;
 public enum RedrawWindowFlags
 {
     /// <summary>
-    /// Invalidates lprcUpdate or hrgnUpdate (only one may be non-NULL).
-    /// If both are NULL, the entire window is invalidated.
+    /// Делает недействительными <c>lprcUpdate</c>
+    /// или <c>hrgnUpdate</c> (только одно из них может быть
+    /// не <c>NULL</c>). Если оба имеют значение <c>NULL</c>,
+    /// все окно становится недействительным.
     /// </summary>
     RDW_INVALIDATE = 0x0001,
 
     /// <summary>
-    /// Causes a WM_PAINT message to be posted to the window regardless
-    /// of whether any portion of the window is invalid.
+    /// Вызывает отправку сообщения <c>WM_PAINT</c> в окно
+    /// независимо от того, недействительна ли какая-либо часть окна.
     /// </summary>
     RDW_INTERNALPAINT = 0x0002,
 
     /// <summary>
-    /// Causes the window to receive a WM_ERASEBKGND message when
-    /// the window is repainted. The RDW_INVALIDATE flag must also
-    /// be specified; otherwise, RDW_ERASE has no effect.
+    /// Заставляет окно получать сообщение <c>WM_ERASEBKGND</c>
+    /// при перерисовке окна. Также должен быть указан флаг
+    /// <c>RDW_INVALIDATE</c>; в противном случае
+    /// <c>RDW_ERASE</c> не действует.
     /// </summary>
     RDW_ERASE = 0x0004,
 
     /// <summary>
-    /// Validates lprcUpdate or hrgnUpdate (only one may be non-NULL).
-    /// If both are NULL, the entire window is validated. This flag does
-    /// not affect internal WM_PAINT messages.
+    /// Валидирует <c>lprcUpdate</c> или <c>hrgnUpdate</c>
+    /// (только один из них может быть не <c>NULL</c>).
+    /// Если оба равны <c>NULL</c>, валидируется все окно.
+    /// Этот флаг не влияет на внутренние сообщения <c>WM_PAINT</c>.
     /// </summary>
     RDW_VALIDATE = 0x0008,
 
     /// <summary>
-    /// Suppresses any pending internal WM_PAINT messages. This flag does
-    /// not affect WM_PAINT messages resulting from a non-NULL update area.
+    /// Подавляет любые ожидающие внутренние сообщения <c>WM_PAINT</c>.
+    /// Этот флаг не влияет на сообщения WM_PAINT, полученные
+    /// из области обновления, отличной от <c>NULL</c>.
     /// </summary>
     RDW_NOINTERNALPAINT = 0x0010,
 
     /// <summary>
-    /// Suppresses any pending WM_ERASEBKGND messages.
+    /// Подавляет любые ожидающие сообщения WM_ERASEBKGND.
     /// </summary>
     RDW_NOERASE = 0x0020,
 
     /// <summary>
-    /// Excludes child windows, if any, from the repainting operation.
+    /// Исключает дочерние окна, если таковые имеются, из операции
+    /// перерисовки.
     /// </summary>
     RDW_NOCHILDREN = 0x0040,
 
     /// <summary>
-    /// Includes child windows, if any, in the repainting operation.
+    /// Включает дочерние окна, если они есть, в операцию перерисовки.
     /// </summary>
     RDW_ALLCHILDREN = 0x0080,
 
     /// <summary>
-    /// Causes the affected windows (as specified by the RDW_ALLCHILDREN
-    /// and RDW_NOCHILDREN flags) to receive WM_NCPAINT, WM_ERASEBKGND,
-    /// and WM_PAINT messages, if necessary, before the function returns.
+    /// Заставляет затронутые окна (как указано флагами
+    /// <c>RDW_ALLCHILDREN</c> и <c>RDW_NOCHILDREN</c>) получать
+    /// сообщения <c>WM_NCPAINT</c>, <c>WM_ERASEBKGND</c>
+    /// и <c>WM_PAINT</c>, если это необходимо, до возврата функции.
     /// </summary>
     RDW_UPDATENOW = 0x0100,
 
     /// <summary>
-    /// Causes the affected windows (as specified by the RDW_ALLCHILDREN
-    /// and RDW_NOCHILDREN flags) to receive WM_NCPAINT and WM_ERASEBKGND
-    /// messages, if necessary, before the function returns. WM_PAINT
-    /// messages are received at the ordinary time.
+    /// Заставляет затронутые окна (как указано флагами
+    /// <c>RDW_ALLCHILDREN</c> и <c>RDW_NOCHILDREN</c>) получать
+    /// сообщения <c>WM_NCPAINT</c> и <c>WM_ERASEBKGND</c>,
+    /// если это необходимо, до возврата функции.
+    /// Сообщения <c>WM_PAINT</c> принимаются в обычное время.
     /// </summary>
     RDW_ERASENOW = 0x0200,
 
     /// <summary>
-    /// Causes any part of the nonclient area of the window that
-    /// intersects the update region to receive a WM_NCPAINT message.
-    /// The RDW_INVALIDATE flag must also be specified; otherwise,
-    /// RDW_FRAME has no effect. The WM_NCPAINT message is typically
-    /// not sent during the execution of RedrawWindow unless either
-    /// RDW_UPDATENOW or RDW_ERASENOW is specified.
+    /// Заставляет любую часть неклиентской области окна,
+    /// пересекающую область обновления, получать сообщение
+    /// <c>WM_NCPAINT</c>. Также должен быть указан флаг
+    /// <c>RDW_INVALIDATE</c>; в противном случае <c>RDW_FRAME</c>
+    /// не действует. Сообщение WM_NCPAINT обычно не отправляется
+    /// во время выполнения <c>RedrawWindow</c>,
+    /// если не указано либо <c>RDW_UPDATENOW</c>,
+    /// либо <c>RDW_ERASENOW</c>.
     /// </summary>
     RDW_FRAME = 0x0400,
 
     /// <summary>
-    /// Suppresses any pending WM_NCPAINT messages. This flag must be
-    /// used with RDW_VALIDATE and is typically used with RDW_NOCHILDREN.
-    /// RDW_NOFRAME should be used with care, as it could cause parts of
-    /// a window to be painted improperly.
+    /// Подавляет любые ожидающие сообщения <c>WM_NCPAINT</c>.
+    /// Этот флаг должен использоваться с <c>RDW_VALIDATE</c>
+    /// и обычно используется с <c>RDW_NOCHILDREN</c>.
+    /// <c>RDW_NOFRAME</c> следует использовать с осторожностью,
+    /// так как это может привести к тому, что части окна будут
+    /// прорисованы неправильно.
     /// </summary>
     RDW_NOFRAME = 0x0800
 }
