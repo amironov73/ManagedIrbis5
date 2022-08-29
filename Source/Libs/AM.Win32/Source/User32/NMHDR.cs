@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* NMHDR.cs -- notification message
+/* NMHDR.cs -- содержит информацию об уведомлении
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -20,25 +20,26 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// Contains information about a notification message.
+/// Содержит информацию об уведомлении.
 /// </summary>
 [StructLayout (LayoutKind.Sequential)]
 public struct NMHDR
 {
     /// <summary>
-    /// Window handle to the control sending a message.
+    /// Дескриптор окна (<c>HWND</c>) для элемента управления,
+    /// отправляющего сообщение.
     /// </summary>
-    public IntPtr hwndFrom;
+    public IntPtr ControlHandle;
 
     /// <summary>
-    /// Identifier of the control sending a message.
+    /// Идентификатор элемента управления, отправляющего сообщение.
     /// </summary>
-    public uint idFrom;
+    public uint ControlId;
 
     /// <summary>
-    /// Notification code. This member can be a control-specific
-    /// notification code or it can be one of the common notification
-    /// codes.
+    /// Код уведомления. Этот элемент может быть кодом уведомления
+    /// для конкретного элемента управления или одним из общих
+    /// кодов уведомления.
     /// </summary>
-    public int code;
+    public int Code;
 }
