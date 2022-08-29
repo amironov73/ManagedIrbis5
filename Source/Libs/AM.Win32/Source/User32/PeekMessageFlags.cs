@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* PeekMessageFlags.cs -- specifies how messages are handled by PeekMessage function
+/* PeekMessageFlags.cs -- указывает, как сообщения обрабатываются функцией PeekMessage
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -19,48 +19,53 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// Specifies how messages are handled by PeekMessage function.
+/// Указывает, как сообщения обрабатываются функцией <c>PeekMessage</c>.
 /// </summary>
 [Flags]
 public enum PeekMessageFlags
 {
     /// <summary>
-    ///Messages are not removed from the queue after processing
-    /// by PeekMessage.
+    /// Сообщения не удаляются из очереди после обработки
+    /// <c>PeekMessage</c>.
     /// </summary>
     PM_NOREMOVE = 0x0000,
 
     /// <summary>
-    /// Messages are removed from the queue after processing
-    /// by PeekMessage.
+    /// Сообщения удаляются из очереди после обработки
+    /// <c>PeekMessage</c>.
     /// </summary>
     PM_REMOVE = 0x0001,
 
     /// <summary>
-    /// ???
+    /// Предотвращает освобождение системой любого потока,
+    /// ожидающего бездействия вызывающего объекта
+    /// (см. <c>WaitForInputIdle</c>). Объедините это значение либо
+    /// с <c>PM_NOREMOVE</c>, либо с <c>PM_REMOVE</c>.
     /// </summary>
     PM_NOYIELD = 0x0002,
 
     /// <summary>
-    /// Windows 98/Me, Windows 2000/XP: Process mouse and keyboard messages.
+    /// Windows 98/Me, Windows 2000/XP: обработка сообщений мыши
+    /// и клавиатуры.
     /// </summary>
     PM_QS_INPUT = QueueStatusFlags.QS_INPUT << 16,
 
     /// <summary>
-    /// Windows 98/Me, Windows 2000/XP: Process all posted messages, including
-    /// timers and hotkeys.
+    /// Windows 98/Me, Windows 2000/XP: Обработка всех размещенных
+    /// сообщений, включая таймеры и горячие клавиши.
     /// </summary>
     PM_QS_POSTMESSAGE = (QueueStatusFlags.QS_POSTMESSAGE
                          | QueueStatusFlags.QS_HOTKEY
                          | QueueStatusFlags.QS_TIMER) << 16,
 
     /// <summary>
-    /// Windows 98/Me, Windows 2000/XP: Process paint messages.
+    /// Windows 98/Me, Windows 2000/XP: обработка сообщений рисования.
     /// </summary>
     PM_QS_PAINT = QueueStatusFlags.QS_PAINT << 16,
 
     /// <summary>
-    /// Windows 98/Me, Windows 2000/XP: Process all sent messages.
+    /// Windows 98/Me, Windows 2000/XP: обрабатывать
+    /// все отправленные сообщения.
     /// </summary>
     PM_QS_SENDMESSAGE = QueueStatusFlags.QS_SENDMESSAGE << 16,
 }
