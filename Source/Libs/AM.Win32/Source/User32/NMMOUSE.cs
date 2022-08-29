@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* NMMOUSE.cs -- mouse notification message
+/* NMMOUSE.cs -- уведомление о событиях, связанных с мышью
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -21,36 +21,37 @@ using System.Runtime.InteropServices;
 namespace AM.Win32;
 
 /// <summary>
-/// Contains information used with mouse notification messages.
+/// Содержит информацию, используемую с сообщениями уведомлений
+/// о событиях, связанных с мышью.
 /// </summary>
 [StructLayout (LayoutKind.Sequential)]
 public struct NMMOUSE
 {
     /// <summary>
-    /// <see cref="NMHDR" /> structure that contains additional
-    /// information about this notification.
+    /// Структура <see cref="NMHDR" />, содержащая дополнительную
+    /// информацию об этом уведомлении.
     /// </summary>
     public NMHDR hdr;
 
     /// <summary>
-    /// Control-specific item identifier.
+    /// Идентификатор элемента управления.
     /// </summary>
     public IntPtr dwItemSpec;
 
     /// <summary>
-    /// Control-specific item data.
+    /// Данные элемента управления.
     /// </summary>
     public IntPtr dwItemData;
 
     /// <summary>
-    /// <see cref="Point" /> structure that contains the screen
-    /// coordinates of the mouse when the click occurred.
+    /// Структура <see cref="Point" />, содержащая экранные координаты
+    /// мыши в момент щелчка.
     /// </summary>
     public Point pt;
 
     /// <summary>
-    /// Carries information about where on the item or control the
-    /// cursor is pointing.
+    /// Содержит информацию о том, куда на элементе или элементе
+    /// управления указывает курсор.
     /// </summary>
     public IntPtr dwHitInfo;
 }
