@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* OutputProc.cs -- application-defined callback function used with the GrayString function
+/* OutputProc.cs -- определяемая приложением функция обратного вызова, используемая с функцией GrayString
    Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
@@ -16,19 +16,25 @@ using System;
 namespace AM.Win32;
 
 /// <summary>
-/// The OutputProc function is an application-defined callback
-/// function used with the GrayString function. It is used to
-/// draw a string. The GRAYSTRINGPROC type defines a pointer
-/// to this callback function. OutputProc is a placeholder for
-/// the application-defined or library-defined function name.
+/// Функция <c>OutputProc</c> - это определяемая приложением функция
+/// обратного вызова, используемая с функцией <c>GrayString</c>.
+/// Она используется для рисования строки.
+/// Тип <c>GRAYSTRINGPROC</c> определяет указатель на эту функцию
+/// обратного вызова.
 /// </summary>
-/// <param name="hdc">Handle to a device context with a bitmap
-/// of at least the width and height specified by the nWidth and
-/// nHeight parameters passed to GrayString.</param>
-/// <param name="lpData">Pointer to the string to be drawn.</param>
-/// <param name="cchData">Specifies the length, in characters,
-/// of the string.</param>
-/// <returns>If it succeeds, the callback function should return TRUE.
+/// <param name="hdc">
+///Дескриптор контекста устройства с растровым изображением
+/// по крайней мере шириной и высотой, указанными параметрами
+/// <c>nWidth</c> и <c>nHeight</c>, переданными в <c>GrayString</c>.
+/// </param>
+/// <param name="lpData">
+/// Указатель на строку, которую нужно нарисовать.
+/// </param>
+/// <param name="cchData">
+/// Задает длину строки в символах.
+/// </param>
+/// <returns>
+/// В случае успеха функция обратного вызова должна вернуть TRUE.
 /// </returns>
 public delegate bool OutputProc
     (
@@ -36,4 +42,3 @@ public delegate bool OutputProc
         IntPtr lpData,
         int cchData
     );
-
