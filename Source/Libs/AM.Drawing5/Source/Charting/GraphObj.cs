@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* GraphObj.cs --
+/* GraphObj.cs -- абстрактный базовый класс, представляющий объект на графике
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,9 +23,9 @@ using System.Security.Permissions;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// An abstract base class that represents a text object on the graph.  A list of
-/// <see cref="GraphObj"/> objects is maintained by the
-/// <see cref="GraphObjList"/> collection class.
+/// Абстрактный базовый класс, представляющий объект на графике.
+/// Список объектов <see cref="GraphObj"/> поддерживается классом коллекции
+/// <see cref="GraphObjList"/>.
 /// </summary>
 [Serializable]
 public abstract class GraphObj

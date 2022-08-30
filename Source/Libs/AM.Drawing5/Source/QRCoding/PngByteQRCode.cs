@@ -59,7 +59,7 @@ public sealed class PngByteQRCode
     #endregion
 
     /// <summary>
-    /// Creates a black & white PNG of the QR code, using 1-bit grayscale.
+    /// Creates a black &amp; white PNG of the QR code, using 1-bit grayscale.
     /// </summary>
     public byte[] GetGraphic(int pixelsPerModule, bool drawQuietZones = true)
     {
