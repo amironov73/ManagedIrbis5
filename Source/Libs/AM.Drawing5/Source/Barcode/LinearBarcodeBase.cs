@@ -3,11 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 
-/* LinearBarcodeBase.cs --
+/* LinearBarcodeBase.cs -- базовый класс для обычных одномерных штрихкодов
  * Ars Magna project, http://arsmagna.ru
  */
 
