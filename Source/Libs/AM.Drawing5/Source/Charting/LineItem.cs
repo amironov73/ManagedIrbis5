@@ -277,7 +277,7 @@ public class LineItem
     /// called by the Draw method of the parent <see cref="CurveList"/>
     /// collection object.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -293,20 +293,20 @@ public class LineItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor)
+    public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
     {
         if (_isVisible)
         {
-            Line.Draw (g, pane, this, scaleFactor);
+            Line.Draw (graphics, pane, this, scaleFactor);
 
-            Symbol.Draw (g, pane, this, scaleFactor, IsSelected);
+            Symbol.Draw (graphics, pane, this, scaleFactor, IsSelected);
         }
     }
 
     /// <summary>
     /// Draw a legend key entry for this <see cref="LineItem"/> at the specified location
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -322,7 +322,7 @@ public class LineItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
+    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor)
     {
         // Draw a sample curve to the left of the label text
         int xMid = (int)(rect.Left + rect.Width / 2.0F);
@@ -332,12 +332,12 @@ public class LineItem
         //rect2.Y = yMid;
         //rect2.Height = rect.Height / 2.0f;
 
-        _line.Fill.Draw (g, rect);
+        _line.Fill.Draw (graphics, rect);
 
-        _line.DrawSegment (g, pane, rect.Left, yMid, rect.Right, yMid, scaleFactor);
+        _line.DrawSegment (graphics, pane, rect.Left, yMid, rect.Right, yMid, scaleFactor);
 
         // Draw a sample symbol to the left of the label text
-        _symbol.DrawSymbol (g, pane, xMid, yMid, scaleFactor, false, null);
+        _symbol.DrawSymbol (graphics, pane, xMid, yMid, scaleFactor, false, null);
     }
 
     /// <summary>

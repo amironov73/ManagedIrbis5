@@ -384,7 +384,7 @@ public class GasGaugeRegion
     /// called by the Draw method of the parent <see cref="CurveList"/>
     /// collection object.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into. This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -399,7 +399,7 @@ public class GasGaugeRegion
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor)
+    public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
     {
         if (pane.Chart._rect.Width <= 0 && pane.Chart._rect.Height <= 0)
         {
@@ -407,7 +407,7 @@ public class GasGaugeRegion
         }
         else
         {
-            CalcRectangle (g, pane, scaleFactor, pane.Chart._rect);
+            CalcRectangle (graphics, pane, scaleFactor, pane.Chart._rect);
 
             _slicePath = new GraphicsPath();
 
@@ -420,24 +420,24 @@ public class GasGaugeRegion
 
             if (tRect.Width >= 1 && tRect.Height >= 1)
             {
-                SmoothingMode sMode = g.SmoothingMode;
-                g.SmoothingMode = SmoothingMode.AntiAlias;
+                SmoothingMode sMode = graphics.SmoothingMode;
+                graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
                 _slicePath.AddPie (tRect.X, tRect.Y, tRect.Width, tRect.Height,
                     -0.0f, -180.0f);
 
-                g.FillPie (Fill.MakeBrush (_boundingRectangle), tRect.X, tRect.Y, tRect.Width, tRect.Height,
+                graphics.FillPie (Fill.MakeBrush (_boundingRectangle), tRect.X, tRect.Y, tRect.Width, tRect.Height,
                     -StartAngle, -SweepAngle);
 
                 if (Border.IsVisible)
                 {
                     Pen borderPen = _border.GetPen (pane, scaleFactor);
-                    g.DrawPie (borderPen, tRect.X, tRect.Y, tRect.Width, tRect.Height,
+                    graphics.DrawPie (borderPen, tRect.X, tRect.Y, tRect.Width, tRect.Height,
                         -0.0f, -180.0f);
                     borderPen.Dispose();
                 }
 
-                g.SmoothingMode = sMode;
+                graphics.SmoothingMode = sMode;
             }
         }
     }
@@ -445,7 +445,7 @@ public class GasGaugeRegion
     /// <summary>
     /// Render the label for this <see cref="GasGaugeRegion"/>.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into. This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -460,7 +460,7 @@ public class GasGaugeRegion
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
+    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor)
     {
         if (!_isVisible)
         {
@@ -473,7 +473,7 @@ public class GasGaugeRegion
             // just avoid height/width being less than 0.1 so GDI+ doesn't cry
             using (Brush brush = _fill.MakeBrush (rect))
             {
-                g.FillRectangle (brush, rect);
+                graphics.FillRectangle (brush, rect);
 
                 //brush.Dispose();
             }
@@ -482,7 +482,7 @@ public class GasGaugeRegion
         // Border the bar
         if (!_border.Color.IsEmpty)
         {
-            _border.Draw (g, pane, scaleFactor, rect);
+            _border.Draw (graphics, pane, scaleFactor, rect);
         }
     }
 

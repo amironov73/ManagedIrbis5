@@ -885,7 +885,7 @@ public abstract class Scale
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        var sch = info.GetInt32 ("schema");
 
         _min = info.GetDouble ("min");
         _max = info.GetDouble ("max");
@@ -935,17 +935,12 @@ public abstract class Scale
         _labelGap = info.GetSingle ("labelGap");
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to
-    /// serialize the target object
-    /// </summary>
-    /// <remarks>
-    /// You MUST set the _ownerAxis property after deserializing a BarSettings object.
-    /// </remarks>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
+    public virtual void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         info.AddValue ("schema", schema);
         info.AddValue ("min", _min);
@@ -1053,7 +1048,7 @@ public abstract class Scale
     {
         get
         {
-            AxisType type = Type;
+            var type = Type;
 
             return type == AxisType.Ordinal ||
                    type == AxisType.Text ||
@@ -1886,7 +1881,7 @@ public abstract class Scale
         // linear or ordinal is the default behavior
         // this method is overridden for other Scale types
 
-        double scaleMult = Math.Pow ((double)10.0, _mag);
+        var scaleMult = Math.Pow ((double)10.0, _mag);
 
         return (dVal / scaleMult).ToString (_format);
     }
@@ -1925,17 +1920,17 @@ public abstract class Scale
                 scaleMult = Math.Pow ((double)10.0, _mag);
             int i;
 
-            float saveAngle = _fontSpec.Angle;
+            var saveAngle = _fontSpec.Angle;
             if (!applyAngle)
             {
                 _fontSpec.Angle = 0;
             }
 
-            int nTics = CalcNumTics();
+            var nTics = CalcNumTics();
 
-            double startVal = CalcBaseTic();
+            var startVal = CalcBaseTic();
 
-            SizeF maxSpace = new SizeF (0, 0);
+            var maxSpace = new SizeF (0, 0);
 
             // Repeat for each tic
             for (i = 0; i < nTics; i++)
@@ -1944,7 +1939,7 @@ public abstract class Scale
 
                 // draw the label
                 //string tmpStr = MakeLabel( pane, i, dVal );
-                string tmpStr = _ownerAxis.MakeLabelEventWorks (pane, i, dVal);
+                var tmpStr = _ownerAxis.MakeLabelEventWorks (pane, i, dVal);
 
                 SizeF sizeF;
                 if (IsLog && _isUseTenPower)
@@ -2108,30 +2103,30 @@ public abstract class Scale
     internal void DrawLabels (Graphics g, GraphPane pane, double baseVal, int nTics,
         float topPix, float shift, float scaleFactor)
     {
-        MajorTic tic = _ownerAxis._majorTic;
+        var tic = _ownerAxis._majorTic;
 
 //			MajorGrid grid = _ownerAxis._majorGrid;
 
         double dVal, dVal2;
         float pixVal, pixVal2;
-        float scaledTic = tic.ScaledTic (scaleFactor);
+        var scaledTic = tic.ScaledTic (scaleFactor);
 
-        double scaleMult = Math.Pow ((double)10.0, _mag);
+        var scaleMult = Math.Pow ((double)10.0, _mag);
 
-        using (Pen ticPen = tic.GetPen (pane, scaleFactor))
+        using (var ticPen = tic.GetPen (pane, scaleFactor))
 
 //			using ( Pen gridPen = grid.GetPen( pane, scaleFactor ) )
         {
             // get the Y position of the center of the axis labels
             // (the axis itself is referenced at zero)
-            SizeF maxLabelSize = GetScaleMaxSpace (g, pane, scaleFactor, true);
-            float charHeight = _fontSpec.GetHeight (scaleFactor);
-            float maxSpace = maxLabelSize.Height;
+            var maxLabelSize = GetScaleMaxSpace (g, pane, scaleFactor, true);
+            var charHeight = _fontSpec.GetHeight (scaleFactor);
+            var maxSpace = maxLabelSize.Height;
 
-            float edgeTolerance = Default.EdgeTolerance * scaleFactor;
-            double rangeTol = (_maxLinTemp - _minLinTemp) * 0.001;
+            var edgeTolerance = Default.EdgeTolerance * scaleFactor;
+            var rangeTol = (_maxLinTemp - _minLinTemp) * 0.001;
 
-            int firstTic = (int)((_minLinTemp - baseVal) / _majorStep + 0.99);
+            var firstTic = (int)((_minLinTemp - baseVal) / _majorStep + 0.99);
             if (firstTic < 0)
             {
                 firstTic = 0;
@@ -2141,7 +2136,7 @@ public abstract class Scale
             float lastPixVal = -10000;
 
             // loop for each major tic
-            for (int i = firstTic; i < nTics + firstTic; i++)
+            for (var i = firstTic; i < nTics + firstTic; i++)
             {
                 dVal = CalcMajorTicValue (baseVal, i);
 
@@ -2196,19 +2191,19 @@ public abstract class Scale
                 // draw the grid
 //					grid.Draw( g, gridPen, pixVal2, topPix );
 
-                bool isMaxValueAtMaxPix = ((_ownerAxis is XAxis || _ownerAxis is Y2Axis) &&
-                                           !IsReverse) ||
-                                          (_ownerAxis is Y2Axis && IsReverse);
+                var isMaxValueAtMaxPix = ((_ownerAxis is XAxis || _ownerAxis is Y2Axis) &&
+                                          !IsReverse) ||
+                                         (_ownerAxis is Y2Axis && IsReverse);
 
-                bool isSkipZone = (((_isSkipFirstLabel && isMaxValueAtMaxPix) ||
-                                    (_isSkipLastLabel && !isMaxValueAtMaxPix)) &&
-                                   pixVal < edgeTolerance) ||
-                                  (((_isSkipLastLabel && isMaxValueAtMaxPix) ||
-                                    (_isSkipFirstLabel && !isMaxValueAtMaxPix)) &&
-                                   pixVal > _maxPix - _minPix - edgeTolerance);
+                var isSkipZone = (((_isSkipFirstLabel && isMaxValueAtMaxPix) ||
+                                   (_isSkipLastLabel && !isMaxValueAtMaxPix)) &&
+                                  pixVal < edgeTolerance) ||
+                                 (((_isSkipLastLabel && isMaxValueAtMaxPix) ||
+                                   (_isSkipFirstLabel && !isMaxValueAtMaxPix)) &&
+                                  pixVal > _maxPix - _minPix - edgeTolerance);
 
-                bool isSkipCross = _isSkipCrossLabel && !_ownerAxis._crossAuto &&
-                                   Math.Abs (_ownerAxis._cross - dVal) < rangeTol * 10.0;
+                var isSkipCross = _isSkipCrossLabel && !_ownerAxis._crossAuto &&
+                                  Math.Abs (_ownerAxis._cross - dVal) < rangeTol * 10.0;
 
                 isSkipZone = isSkipZone || isSkipCross;
 
@@ -2232,15 +2227,15 @@ public abstract class Scale
 
     internal void DrawGrid (Graphics g, GraphPane pane, double baseVal, float topPix, float scaleFactor)
     {
-        MajorTic tic = _ownerAxis._majorTic;
-        MajorGrid grid = _ownerAxis._majorGrid;
+        var tic = _ownerAxis._majorTic;
+        var grid = _ownerAxis._majorGrid;
 
-        int nTics = CalcNumTics();
+        var nTics = CalcNumTics();
 
         double dVal, dVal2;
         float pixVal, pixVal2;
 
-        using (Pen gridPen = grid.GetPen (pane, scaleFactor))
+        using (var gridPen = grid.GetPen (pane, scaleFactor))
         {
             // get the Y position of the center of the axis labels
             // (the axis itself is referenced at zero)
@@ -2249,9 +2244,9 @@ public abstract class Scale
 //				float maxSpace = maxLabelSize.Height;
 
 //				float edgeTolerance = Default.EdgeTolerance * scaleFactor;
-            double rangeTol = (_maxLinTemp - _minLinTemp) * 0.001;
+            var rangeTol = (_maxLinTemp - _minLinTemp) * 0.001;
 
-            int firstTic = (int)((_minLinTemp - baseVal) / _majorStep + 0.99);
+            var firstTic = (int)((_minLinTemp - baseVal) / _majorStep + 0.99);
             if (firstTic < 0)
             {
                 firstTic = 0;
@@ -2261,7 +2256,7 @@ public abstract class Scale
 //				float lastPixVal = -10000;
 
             // loop for each major tic
-            for (int i = firstTic; i < nTics + firstTic; i++)
+            for (var i = firstTic; i < nTics + firstTic; i++)
             {
                 dVal = CalcMajorTicValue (baseVal, i);
 
@@ -2330,7 +2325,7 @@ public abstract class Scale
 
         // draw the label
         //string tmpStr = MakeLabel( pane, i, dVal );
-        string tmpStr = _ownerAxis.MakeLabelEventWorks (pane, i, dVal);
+        var tmpStr = _ownerAxis.MakeLabelEventWorks (pane, i, dVal);
 
         float height;
         if (IsLog && _isUseTenPower)
@@ -2364,8 +2359,8 @@ public abstract class Scale
             textCenter = shift + textCenter;
         }
 
-        AlignV av = AlignV.Center;
-        AlignH ah = AlignH.Center;
+        var av = AlignV.Center;
+        var ah = AlignH.Center;
 
         if (_ownerAxis is XAxis || _ownerAxis is X2Axis)
         {
@@ -2416,9 +2411,9 @@ public abstract class Scale
     /// </param>
     internal void Draw (Graphics g, GraphPane pane, float scaleFactor, float shiftPos)
     {
-        MajorGrid majorGrid = _ownerAxis._majorGrid;
-        MajorTic majorTic = _ownerAxis._majorTic;
-        MinorTic minorTic = _ownerAxis._minorTic;
+        var majorGrid = _ownerAxis._majorGrid;
+        var majorTic = _ownerAxis._majorTic;
+        var minorTic = _ownerAxis._minorTic;
 
         float rightPix,
             topPix;
@@ -2426,12 +2421,12 @@ public abstract class Scale
         GetTopRightPix (pane, out topPix, out rightPix);
 
         // calculate the total number of major tics required
-        int nTics = CalcNumTics();
+        var nTics = CalcNumTics();
 
         // get the first major tic value
-        double baseVal = CalcBaseTic();
+        var baseVal = CalcBaseTic();
 
-        using (Pen pen = new Pen (_ownerAxis.Color,
+        using (var pen = new Pen (_ownerAxis.Color,
                    pane.ScaledPenWidth (majorTic._penWidth, scaleFactor)))
         {
             // redraw the axis border
@@ -2443,7 +2438,7 @@ public abstract class Scale
             // Draw a zero-value line if needed
             if (majorGrid._isZeroLine && _min < 0.0 && _max > 0.0)
             {
-                float zeroPix = LocalTransform (0.0);
+                var zeroPix = LocalTransform (0.0);
                 g.DrawLine (pen, zeroPix, 0.0F, zeroPix, topPix);
             }
         }
@@ -2484,10 +2479,10 @@ public abstract class Scale
                 return;
             }
 
-            double tMajor = (_max - _min) / (_majorStep * MajorUnitMultiplier);
-            double tMinor = (_max - _min) / (_minorStep * MinorUnitMultiplier);
+            var tMajor = (_max - _min) / (_majorStep * MajorUnitMultiplier);
+            var tMinor = (_max - _min) / (_minorStep * MinorUnitMultiplier);
 
-            MinorTic minorTic = _ownerAxis._minorTic;
+            var minorTic = _ownerAxis._minorTic;
 
             if (tMajor > 1000 ||
                 ((minorTic.IsOutside || minorTic.IsInside || minorTic.IsOpposite)
@@ -2511,7 +2506,7 @@ public abstract class Scale
     /// <returns>The width of each bar cluster, in pixel units</returns>
     public float GetClusterWidth (GraphPane pane)
     {
-        double basisVal = _min;
+        var basisVal = _min;
         return Math.Abs (Transform (basisVal +
                                     (IsAnyOrdinal ? 1.0 : pane._barSettings._clusterScaleWidth)) -
                          Transform (basisVal));
@@ -2526,7 +2521,7 @@ public abstract class Scale
     /// <returns>The equivalent pixel size of the bar cluster</returns>
     public float GetClusterWidth (double clusterScaleWidth)
     {
-        double basisVal = _min;
+        var basisVal = _min;
         return Math.Abs (Transform (basisVal + clusterScaleWidth) -
                          Transform (basisVal));
     }
@@ -2573,8 +2568,8 @@ public abstract class Scale
     /// </param>
     public virtual void PickScale (GraphPane pane, Graphics g, float scaleFactor)
     {
-        double minVal = _rangeMin;
-        double maxVal = _rangeMax;
+        var minVal = _rangeMin;
+        var maxVal = _rangeMax;
 
         // Make sure that minVal and maxVal are legitimate values
         if (double.IsInfinity (minVal) || double.IsNaN (minVal) || minVal == double.MaxValue)
@@ -2588,10 +2583,10 @@ public abstract class Scale
         }
 
         // if the scales are autoranged, use the actual data values for the range
-        double range = maxVal - minVal;
+        var range = maxVal - minVal;
 
         // "Grace" is applied to the numeric axis types only
-        bool numType = !IsAnyOrdinal;
+        var numType = !IsAnyOrdinal;
 
         // For autoranged values, assign the value.  If appropriate, adjust the value by the
         // "Grace" value.
@@ -2668,7 +2663,7 @@ public abstract class Scale
     /// </param>
     public int CalcMaxLabels (Graphics g, GraphPane pane, float scaleFactor)
     {
-        SizeF size = GetScaleMaxSpace (g, pane, scaleFactor, false);
+        var size = GetScaleMaxSpace (g, pane, scaleFactor, false);
 
         // The font angles are already set such that the Width is parallel to the appropriate (X or Y)
         // axis.  Therefore, we always use size.Width.
@@ -2680,8 +2675,8 @@ public abstract class Scale
 
         float maxWidth = 1000;
         float temp = 1000;
-        float costh = (float)Math.Abs (Math.Cos (_fontSpec.Angle * Math.PI / 180.0));
-        float sinth = (float)Math.Abs (Math.Sin (_fontSpec.Angle * Math.PI / 180.0));
+        var costh = (float)Math.Abs (Math.Cos (_fontSpec.Angle * Math.PI / 180.0));
+        var sinth = (float)Math.Abs (Math.Sin (_fontSpec.Angle * Math.PI / 180.0));
 
         if (costh > 0.001)
         {
@@ -2716,7 +2711,7 @@ public abstract class Scale
 
         // Calculate the maximum number of labels
         double width;
-        RectangleF chartRect = pane.Chart._rect;
+        var chartRect = pane.Chart._rect;
         if (_ownerAxis is XAxis || _ownerAxis is X2Axis)
         {
             width = (chartRect.Width == 0) ? pane.Rect.Width * 0.75 : chartRect.Width;
@@ -2726,7 +2721,7 @@ public abstract class Scale
             width = (chartRect.Height == 0) ? pane.Rect.Height * 0.75 : chartRect.Height;
         }
 
-        int maxLabels = (int)(width / maxWidth);
+        var maxLabels = (int)(width / maxWidth);
         if (maxLabels <= 0)
         {
             maxLabels = 1;
@@ -2751,10 +2746,10 @@ public abstract class Scale
         if (_magAuto)
         {
             // Find the optimal scale display multiple
-            double minMag = Math.Floor (Math.Log10 (Math.Abs (_min)));
-            double maxMag = Math.Floor (Math.Log10 (Math.Abs (_max)));
+            var minMag = Math.Floor (Math.Log10 (Math.Abs (_min)));
+            var maxMag = Math.Floor (Math.Log10 (Math.Abs (_max)));
 
-            double mag = Math.Max (maxMag, minMag);
+            var mag = Math.Max (maxMag, minMag);
 
             // Do not use scale multiples for magnitudes below 4
             if (Math.Abs (mag) <= 3)
@@ -2769,7 +2764,7 @@ public abstract class Scale
         // Calculate the appropriate number of dec places to display if required
         if (_formatAuto)
         {
-            int numDec = 0 - (int)(Math.Floor (Math.Log10 (_majorStep)) - _mag);
+            var numDec = 0 - (int)(Math.Floor (Math.Log10 (_majorStep)) - _mag);
             if (numDec < 0)
             {
                 numDec = 0;
@@ -2798,11 +2793,11 @@ public abstract class Scale
     protected static double CalcStepSize (double range, double targetSteps)
     {
         // Calculate an initial guess at step size
-        double tempStep = range / targetSteps;
+        var tempStep = range / targetSteps;
 
         // Get the magnitude of the step size
-        double mag = Math.Floor (Math.Log10 (tempStep));
-        double magPow = Math.Pow ((double)10.0, mag);
+        var mag = Math.Floor (Math.Log10 (tempStep));
+        var magPow = Math.Pow ((double)10.0, mag);
 
         // Calculate most significant digit of the new step size
         double magMsd = ((int)(tempStep / magPow + .5));
@@ -2842,14 +2837,14 @@ public abstract class Scale
     protected double CalcBoundedStepSize (double range, double maxSteps)
     {
         // Calculate an initial guess at step size
-        double tempStep = range / maxSteps;
+        var tempStep = range / maxSteps;
 
         // Get the magnitude of the step size
-        double mag = Math.Floor (Math.Log10 (tempStep));
-        double magPow = Math.Pow ((double)10.0, mag);
+        var mag = Math.Floor (Math.Log10 (tempStep));
+        var magPow = Math.Pow ((double)10.0, mag);
 
         // Calculate most significant digit of the new step size
-        double magMsd = Math.Ceiling (tempStep / magPow);
+        var magMsd = Math.Ceiling (tempStep / magPow);
 
         // promote the MSD to either 1, 2, or 5
         if (magMsd > 5.0)
@@ -2876,7 +2871,7 @@ public abstract class Scale
     /// </returns>
     internal virtual int CalcNumTics()
     {
-        int nTics = 1;
+        var nTics = 1;
 
         // default behavior is for a linear or ordinal scale
         nTics = (int)((_max - _min) / _majorStep + 0.01) + 1;
@@ -3004,7 +2999,7 @@ public abstract class Scale
     public float Transform (double x)
     {
         // Must take into account Log, and Reverse Axes
-        double denom = (_maxLinTemp - _minLinTemp);
+        var denom = (_maxLinTemp - _minLinTemp);
         double ratio;
         if (denom > 1e-100)
         {
@@ -3206,8 +3201,8 @@ public abstract class Scale
     {
         if (zoomFraction > 0.0001 && zoomFraction < 1000.0)
         {
-            double minLin = _minLinearized;
-            double maxLin = _maxLinearized;
+            var minLin = _minLinearized;
+            var maxLin = _maxLinearized;
 
             if (!isZoomOnCenter)
             {

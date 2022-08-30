@@ -203,7 +203,7 @@ public class BarItem
     /// called by the Draw method of the parent <see cref="CurveList"/>
     /// collection object.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -219,13 +219,13 @@ public class BarItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void Draw (Graphics g, GraphPane pane, int pos,
+    public override void Draw (Graphics graphics, GraphPane pane, int pos,
         float scaleFactor)
     {
         // Pass the drawing onto the bar class
         if (_isVisible)
         {
-            _bar.DrawBars (g, pane, this, BaseAxis (pane), ValueAxis (pane),
+            _bar.DrawBars (graphics, pane, this, BaseAxis (pane), ValueAxis (pane),
                 GetBarWidth (pane), pos, scaleFactor);
         }
     }
@@ -233,7 +233,7 @@ public class BarItem
     /// <summary>
     /// Draw a legend key entry for this <see cref="BarItem"/> at the specified location
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -249,9 +249,9 @@ public class BarItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
+    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor)
     {
-        _bar.Draw (g, pane, rect, scaleFactor, true, false, null);
+        _bar.Draw (graphics, pane, rect, scaleFactor, true, false, null);
     }
 
     /// <summary>

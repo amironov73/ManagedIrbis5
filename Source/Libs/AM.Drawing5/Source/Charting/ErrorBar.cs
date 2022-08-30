@@ -248,13 +248,12 @@ public class ErrorBar
         _symbol = (Symbol)info.GetValue ("symbol", typeof (Symbol));
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
+    public virtual void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         info.AddValue ("schema", schema);
         info.AddValue ("isVisible", _isVisible);
@@ -271,7 +270,7 @@ public class ErrorBar
     /// Draw the <see cref="ErrorBar"/> to the specified <see cref="Graphics"/>
     /// device at the specified location.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -300,25 +299,34 @@ public class ErrorBar
     /// <param name="isSelected">Indicates that the <see cref="ErrorBar" /> should be drawn
     /// with attributes from the <see cref="Selection" /> class.
     /// </param>
-    public void Draw (Graphics g, GraphPane pane, bool isXBase,
-        float pixBase, float pixValue,
-        float pixLowValue, float scaleFactor, Pen pen, bool isSelected,
-        PointPair dataValue)
+    public void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            bool isXBase,
+            float pixBase,
+            float pixValue,
+            float pixLowValue,
+            float scaleFactor,
+            Pen pen,
+            bool isSelected,
+            PointPair dataValue
+        )
     {
         if (isXBase)
         {
-            g.DrawLine (pen, pixBase, pixValue, pixBase, pixLowValue);
-            _symbol.DrawSymbol (g, pane, (int)pixBase, (int)pixValue,
+            graphics.DrawLine (pen, pixBase, pixValue, pixBase, pixLowValue);
+            _symbol.DrawSymbol (graphics, pane, (int)pixBase, (int)pixValue,
                 scaleFactor, isSelected, dataValue);
-            _symbol.DrawSymbol (g, pane, (int)pixBase, (int)pixLowValue,
+            _symbol.DrawSymbol (graphics, pane, (int)pixBase, (int)pixLowValue,
                 scaleFactor, isSelected, dataValue);
         }
         else
         {
-            g.DrawLine (pen, pixValue, pixBase, pixLowValue, pixBase);
-            _symbol.DrawSymbol (g, pane, (int)pixValue, (int)pixBase,
+            graphics.DrawLine (pen, pixValue, pixBase, pixLowValue, pixBase);
+            _symbol.DrawSymbol (graphics, pane, (int)pixValue, (int)pixBase,
                 scaleFactor, isSelected, dataValue);
-            _symbol.DrawSymbol (g, pane, (int)pixLowValue, (int)pixBase,
+            _symbol.DrawSymbol (graphics, pane, (int)pixLowValue, (int)pixBase,
                 scaleFactor, isSelected, dataValue);
         }
     }
@@ -328,7 +336,7 @@ public class ErrorBar
     /// Draw all the <see cref="ErrorBar"/>'s to the specified <see cref="Graphics"/>
     /// device as a an error bar at each defined point.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -348,7 +356,7 @@ public class ErrorBar
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public void Draw (Graphics g, GraphPane pane, ErrorBarItem curve,
+    public void Draw (Graphics graphics, GraphPane pane, ErrorBarItem curve,
         Axis baseAxis, Axis valueAxis, float scaleFactor)
     {
         ValueHandler valueHandler = new ValueHandler (pane, false);
@@ -384,7 +392,7 @@ public class ErrorBar
                         //if ( this.fill.IsGradientValueType )
                         //	brush = fill.MakeBrush( _rect, _points[i] );
 
-                        Draw (g, pane, baseAxis is XAxis || baseAxis is X2Axis, pixBase, pixValue,
+                        Draw (graphics, pane, baseAxis is XAxis || baseAxis is X2Axis, pixBase, pixValue,
                             pixLowValue, scaleFactor, pen, curve.IsSelected,
                             curve.Points[i]);
                     }

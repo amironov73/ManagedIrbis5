@@ -204,7 +204,7 @@ public class OHLCBarItem
     /// called by the Draw method of the parent <see cref="CurveList"/>
     /// collection object.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -220,11 +220,11 @@ public class OHLCBarItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor)
+    public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
     {
         if (_isVisible)
         {
-            _bar.Draw (g, pane, this, BaseAxis (pane),
+            _bar.Draw (graphics, pane, this, BaseAxis (pane),
                 ValueAxis (pane), scaleFactor);
         }
     }
@@ -232,7 +232,7 @@ public class OHLCBarItem
     /// <summary>
     /// Draw a legend key entry for this <see cref="OHLCBarItem"/> at the specified location
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -248,7 +248,7 @@ public class OHLCBarItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect,
+    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect,
         float scaleFactor)
     {
         float pixBase, pixHigh, pixLow, pixOpen, pixClose;
@@ -274,7 +274,7 @@ public class OHLCBarItem
 
         using (Pen pen = new Pen (_bar.Color, _bar._width))
         {
-            _bar.Draw (g, pane, pane._barSettings.Base == BarBase.X, pixBase, pixHigh,
+            _bar.Draw (graphics, pane, pane._barSettings.Base == BarBase.X, pixBase, pixHigh,
                 pixLow, pixOpen, pixClose, halfSize, pen);
         }
     }

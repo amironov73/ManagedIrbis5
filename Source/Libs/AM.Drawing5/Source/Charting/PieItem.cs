@@ -572,7 +572,7 @@ public class PieItem
     /// called by the Draw method of the parent <see cref="CurveList"/>
     /// collection object.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -587,7 +587,7 @@ public class PieItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor)
+    public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
     {
         if (pane.Chart._rect.Width <= 0 && pane.Chart._rect.Height <= 0)
         {
@@ -597,7 +597,7 @@ public class PieItem
         else
         {
             //pane.PieRect = CalcPieRect( g, pane, scaleFactor, pane.ChartRect );
-            CalcPieRect (g, pane, scaleFactor, pane.Chart._rect);
+            CalcPieRect (graphics, pane, scaleFactor, pane.Chart._rect);
 
             _slicePath = new GraphicsPath();
 
@@ -610,8 +610,8 @@ public class PieItem
 
             if (tRect.Width >= 1 && tRect.Height >= 1)
             {
-                SmoothingMode sMode = g.SmoothingMode;
-                g.SmoothingMode = SmoothingMode.AntiAlias;
+                SmoothingMode sMode = graphics.SmoothingMode;
+                graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
                 Fill tFill = _fill;
                 Border tBorder = _border;
@@ -623,7 +623,7 @@ public class PieItem
 
                 using (Brush brush = tFill.MakeBrush (_boundingRectangle))
                 {
-                    g.FillPie (brush, tRect.X, tRect.Y, tRect.Width, tRect.Height, StartAngle,
+                    graphics.FillPie (brush, tRect.X, tRect.Y, tRect.Width, tRect.Height, StartAngle,
                         SweepAngle);
 
                     //add GraphicsPath for hit testing
@@ -634,20 +634,20 @@ public class PieItem
                     {
                         using (Pen borderPen = tBorder.GetPen (pane, scaleFactor))
                         {
-                            g.DrawPie (borderPen, tRect.X, tRect.Y, tRect.Width, tRect.Height,
+                            graphics.DrawPie (borderPen, tRect.X, tRect.Y, tRect.Width, tRect.Height,
                                 StartAngle, SweepAngle);
                         }
                     }
 
                     if (_labelType != PieLabelType.None)
                     {
-                        DrawLabel (g, pane, tRect, scaleFactor);
+                        DrawLabel (graphics, pane, tRect, scaleFactor);
                     }
 
                     //brush.Dispose();
                 }
 
-                g.SmoothingMode = sMode;
+                graphics.SmoothingMode = sMode;
             }
         }
     }
@@ -1055,7 +1055,7 @@ public class PieItem
     /// <summary>
     /// Draw a legend key entry for this <see cref="PieItem"/> at the specified location
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -1071,7 +1071,7 @@ public class PieItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
+    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor)
     {
         if (!_isVisible)
         {
@@ -1084,7 +1084,7 @@ public class PieItem
             // just avoid height/width being less than 0.1 so GDI+ doesn't cry
             using (Brush brush = _fill.MakeBrush (rect))
             {
-                g.FillRectangle (brush, rect);
+                graphics.FillRectangle (brush, rect);
 
                 //brush.Dispose();
             }
@@ -1093,7 +1093,7 @@ public class PieItem
         // Border the bar
         if (!_border.Color.IsEmpty)
         {
-            _border.Draw (g, pane, scaleFactor, rect);
+            _border.Draw (graphics, pane, scaleFactor, rect);
         }
     }
 

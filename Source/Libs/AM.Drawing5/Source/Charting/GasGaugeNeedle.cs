@@ -386,7 +386,7 @@ public class GasGaugeNeedle
     /// called by the Draw method of the parent <see cref="CurveList"/>
     /// collection object.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into. This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -396,7 +396,7 @@ public class GasGaugeNeedle
     /// </param>
     /// <param name="pos">Not used for rendering GasGaugeNeedle</param>
     /// <param name="scaleFactor">Not used for rendering GasGaugeNeedle</param>
-    public override void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor)
+    public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
     {
         if (pane.Chart._rect.Width <= 0 && pane.Chart._rect.Height <= 0)
         {
@@ -404,7 +404,7 @@ public class GasGaugeNeedle
         }
         else
         {
-            CalcRectangle (g, pane, scaleFactor, pane.Chart._rect);
+            CalcRectangle (graphics, pane, scaleFactor, pane.Chart._rect);
 
             _slicePath = new GraphicsPath();
 
@@ -417,8 +417,8 @@ public class GasGaugeNeedle
 
             if (tRect.Width >= 1 && tRect.Height >= 1)
             {
-                SmoothingMode sMode = g.SmoothingMode;
-                g.SmoothingMode = SmoothingMode.AntiAlias;
+                SmoothingMode sMode = graphics.SmoothingMode;
+                graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
                 Matrix matrix = new Matrix();
 
@@ -435,7 +435,7 @@ public class GasGaugeNeedle
 
                 Pen p = new Pen (NeedleColor, ((tRect.Height * .10f) / 2.0f));
                 p.EndCap = LineCap.ArrowAnchor;
-                g.DrawLine (p, pts[0].X, pts[0].Y, pts[1].X, pts[1].Y);
+                graphics.DrawLine (p, pts[0].X, pts[0].Y, pts[1].X, pts[1].Y);
 
                 //Fill center 10% with Black dot;
                 Fill f = new Fill (Color.Black);
@@ -443,12 +443,12 @@ public class GasGaugeNeedle
                     (tRect.Y + (tRect.Height / 2)) - 1.0f, 1.0f, 1.0f);
                 r.Inflate ((tRect.Height * .10f), (tRect.Height * .10f));
                 Brush b = f.MakeBrush (r);
-                g.FillPie (b, r.X, r.Y, r.Width, r.Height, 0.0f, -180.0f);
+                graphics.FillPie (b, r.X, r.Y, r.Width, r.Height, 0.0f, -180.0f);
 
                 Pen borderPen = new Pen (Color.White, 2.0f);
-                g.DrawPie (borderPen, r.X, r.Y, r.Width, r.Height, 0.0f, -180.0f);
+                graphics.DrawPie (borderPen, r.X, r.Y, r.Width, r.Height, 0.0f, -180.0f);
 
-                g.SmoothingMode = sMode;
+                graphics.SmoothingMode = sMode;
             }
         }
     }
@@ -456,7 +456,7 @@ public class GasGaugeNeedle
     /// <summary>
     /// Render the label for this <see cref="GasGaugeNeedle"/>.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into. This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -471,7 +471,7 @@ public class GasGaugeNeedle
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
+    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor)
     {
         if (!_isVisible)
         {
@@ -484,7 +484,7 @@ public class GasGaugeNeedle
         pen.StartCap = LineCap.Round;
         pen.EndCap = LineCap.ArrowAnchor;
         pen.DashStyle = DashStyle.Solid;
-        g.DrawLine (pen, rect.Left, yMid, rect.Right, yMid);
+        graphics.DrawLine (pen, rect.Left, yMid, rect.Right, yMid);
     }
 
     /// <summary>

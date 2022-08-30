@@ -669,7 +669,7 @@ namespace AM.Drawing.Charting
         /// called by the Draw method of the parent <see cref="CurveList"/>
         /// collection object.
         /// </summary>
-        /// <param name="g">
+        /// <param name="graphics">
         /// A graphic device object to be drawn into.  This is normally e.Graphics from the
         /// PaintEventArgs argument to the Paint() method.
         /// </param>
@@ -685,14 +685,14 @@ namespace AM.Drawing.Charting
         /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
         /// font sizes, etc. according to the actual size of the graph.
         /// </param>
-        public abstract void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor);
+        public abstract void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor);
 
         /// <summary>
         /// Draw a legend key entry for this <see cref="CurveItem"/> at the specified location.
         /// This abstract base method passes through to <see cref="BarItem.DrawLegendKey"/> or
         /// <see cref="LineItem.DrawLegendKey"/> to do the rendering.
         /// </summary>
-        /// <param name="g">
+        /// <param name="graphics">
         /// A graphic device object to be drawn into.  This is normally e.Graphics from the
         /// PaintEventArgs argument to the Paint() method.
         /// </param>
@@ -708,7 +708,7 @@ namespace AM.Drawing.Charting
         /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
         /// font sizes, etc. according to the actual size of the graph.
         /// </param>
-        public abstract void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor);
+        public abstract void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor);
 
         #endregion
 
