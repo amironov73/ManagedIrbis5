@@ -66,22 +66,36 @@ public class BasicArrayPointList : IPointList
         {
             double xVal, yVal;
             if (index >= 0 && index < x.Length)
+            {
                 xVal = x[index];
+            }
             else
+            {
                 xVal = PointPairBase.Missing;
+            }
 
             if (index >= 0 && index < y.Length)
+            {
                 yVal = y[index];
+            }
             else
+            {
                 yVal = PointPairBase.Missing;
+            }
+
             return new PointPair (xVal, yVal, PointPairBase.Missing, null);
         }
         set
         {
             if (index >= 0 && index < x.Length)
+            {
                 x[index] = value.X;
+            }
+
             if (index >= 0 && index < y.Length)
+            {
                 y[index] = value.Y;
+            }
         }
     }
 

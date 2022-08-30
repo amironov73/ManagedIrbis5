@@ -138,7 +138,7 @@ class DateScale
     /// <returns>
     /// The specified major tic value (floating point double).
     /// </returns>
-    override internal double CalcMajorTicValue (double baseVal, double tic)
+    internal override double CalcMajorTicValue (double baseVal, double tic)
     {
         XDate xDate = new XDate (baseVal);
 
@@ -188,7 +188,7 @@ class DateScale
     /// <returns>
     /// The specified minor tic value (floating point double).
     /// </returns>
-    override internal double CalcMinorTicValue (double baseVal, int iTic)
+    internal override double CalcMinorTicValue (double baseVal, int iTic)
     {
         XDate xDate = new XDate (baseVal);
 
@@ -229,7 +229,7 @@ class DateScale
     /// This value can be negative (e.g., -3 means the first minor tic is 3 minor step
     /// increments before the first major tic.
     /// </returns>
-    override internal int CalcMinorStart (double baseVal)
+    internal override int CalcMinorStart (double baseVal)
     {
         switch (_minorUnit)
         {
@@ -261,10 +261,12 @@ class DateScale
     /// <returns>
     /// First major tic value (floating point double).
     /// </returns>
-    override internal double CalcBaseTic()
+    internal override double CalcBaseTic()
     {
         if (_baseTic != PointPairBase.Missing)
+        {
             return _baseTic;
+        }
         else
         {
             int year, month, day, hour, minute, second, millisecond;
@@ -352,7 +354,7 @@ class DateScale
     /// <returns>
     /// This is the total number of major tics for this axis.
     /// </returns>
-    override internal int CalcNumTics()
+    internal override int CalcNumTics()
     {
         int nTics = 1;
 
@@ -391,9 +393,13 @@ class DateScale
         }
 
         if (nTics < 1)
+        {
             nTics = 1;
+        }
         else if (nTics > 1000)
+        {
             nTics = 1000;
+        }
 
         return nTics;
     }
@@ -443,7 +449,7 @@ class DateScale
     /// <seealso cref="AxisType.Date"/>
     /// <seealso cref="Scale.MajorUnit"/>
     /// <seealso cref="Scale.MinorUnit"/>
-    override public void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
     {
         // call the base class first
         base.PickScale (pane, g, scaleFactor);
@@ -452,9 +458,14 @@ class DateScale
         if (_max - _min < 1.0e-20)
         {
             if (_maxAuto)
+            {
                 _max = _max + 0.2 * (_max == 0 ? 1.0 : Math.Abs (_max));
+            }
+
             if (_minAuto)
+            {
                 _min = _min - 0.2 * (_min == 0 ? 1.0 : Math.Abs (_min));
+            }
         }
 
         double targetSteps = (_ownerAxis is XAxis || _ownerAxis is X2Axis)
@@ -475,17 +486,23 @@ class DateScale
                 double maxLabels = (double)CalcMaxLabels (g, pane, scaleFactor);
 
                 if (maxLabels < CalcNumTics())
+                {
                     _majorStep = CalcDateStepSize (_max - _min, maxLabels);
+                }
             }
         }
 
         // Calculate the scale minimum
         if (_minAuto)
+        {
             _min = CalcEvenStepDate (_min, -1);
+        }
 
         // Calculate the scale maximum
         if (_maxAuto)
+        {
             _max = CalcEvenStepDate (_max, 1);
+        }
 
         _mag = 0; // Never use a magnitude shift for date scales
 
@@ -530,7 +547,9 @@ class DateScale
         {
             scale._majorUnit = DateUnit.Year;
             if (scale._formatAuto)
+            {
                 scale._format = Default.FormatYearYear;
+            }
 
             tempStep = Math.Ceiling (tempStep / 365.0);
 
@@ -538,16 +557,23 @@ class DateScale
             {
                 scale._minorUnit = DateUnit.Year;
                 if (tempStep == 1.0)
+                {
                     scale._minorStep = 0.25;
+                }
                 else
+                {
                     scale._minorStep = CalcStepSize (tempStep, targetSteps);
+                }
             }
         }
         else if (range > Default.RangeYearMonth)
         {
             scale._majorUnit = DateUnit.Year;
             if (scale._formatAuto)
+            {
                 scale._format = Default.FormatYearMonth;
+            }
+
             tempStep = Math.Ceiling (tempStep / 365.0);
 
             if (scale._minorStepAuto)
@@ -560,16 +586,23 @@ class DateScale
 
                 // make sure the minorStep is 1, 2, 3, 6, or 12 months
                 if (scale._minorStep > 6)
+                {
                     scale._minorStep = 12;
+                }
                 else if (scale._minorStep > 3)
+                {
                     scale._minorStep = 6;
+                }
             }
         }
         else if (range > Default.RangeMonthMonth)
         {
             scale._majorUnit = DateUnit.Month;
             if (scale._formatAuto)
+            {
                 scale._format = Default.FormatMonthMonth;
+            }
+
             tempStep = Math.Ceiling (tempStep / 30.0);
 
             if (scale._minorStepAuto)
@@ -582,7 +615,10 @@ class DateScale
         {
             scale._majorUnit = DateUnit.Day;
             if (scale._formatAuto)
+            {
                 scale._format = Default.FormatDayDay;
+            }
+
             tempStep = Math.Ceiling (tempStep);
 
             if (scale._minorStepAuto)
@@ -597,7 +633,10 @@ class DateScale
         {
             scale._majorUnit = DateUnit.Day;
             if (scale._formatAuto)
+            {
                 scale._format = Default.FormatDayHour;
+            }
+
             tempStep = Math.Ceiling (tempStep);
 
             if (scale._minorStepAuto)
@@ -610,11 +649,17 @@ class DateScale
 
                 // make sure the minorStep is 1, 2, 3, 6, or 12 hours
                 if (scale._minorStep > 6)
+                {
                     scale._minorStep = 12;
+                }
                 else if (scale._minorStep > 3)
+                {
                     scale._minorStep = 6;
+                }
                 else
+                {
                     scale._minorStep = 1;
+                }
             }
         }
         else if (range > Default.RangeHourHour)
@@ -622,30 +667,50 @@ class DateScale
             scale._majorUnit = DateUnit.Hour;
             tempStep = Math.Ceiling (tempStep * XDate.HoursPerDay);
             if (scale._formatAuto)
+            {
                 scale._format = Default.FormatHourHour;
+            }
 
             if (tempStep > 12.0)
+            {
                 tempStep = 24.0;
+            }
             else if (tempStep > 6.0)
+            {
                 tempStep = 12.0;
+            }
             else if (tempStep > 2.0)
+            {
                 tempStep = 6.0;
+            }
             else if (tempStep > 1.0)
+            {
                 tempStep = 2.0;
+            }
             else
+            {
                 tempStep = 1.0;
+            }
 
             if (scale._minorStepAuto)
             {
                 scale._minorUnit = DateUnit.Hour;
                 if (tempStep <= 1.0)
+                {
                     scale._minorStep = 0.25;
+                }
                 else if (tempStep <= 6.0)
+                {
                     scale._minorStep = 1.0;
+                }
                 else if (tempStep <= 12.0)
+                {
                     scale._minorStep = 2.0;
+                }
                 else
+                {
                     scale._minorStep = 4.0;
+                }
             }
         }
         else if (range > Default.RangeHourMinute)
@@ -654,7 +719,9 @@ class DateScale
             tempStep = Math.Ceiling (tempStep * XDate.HoursPerDay);
 
             if (scale._formatAuto)
+            {
                 scale._format = Default.FormatHourMinute;
+            }
 
             if (scale._minorStepAuto)
             {
@@ -666,42 +733,66 @@ class DateScale
 
                 // make sure the minorStep is 1, 5, 15, or 30 minutes
                 if (scale._minorStep > 15.0)
+                {
                     scale._minorStep = 30.0;
+                }
                 else if (scale._minorStep > 5.0)
+                {
                     scale._minorStep = 15.0;
+                }
                 else if (scale._minorStep > 1.0)
+                {
                     scale._minorStep = 5.0;
+                }
                 else
+                {
                     scale._minorStep = 1.0;
+                }
             }
         }
         else if (range > Default.RangeMinuteMinute)
         {
             scale._majorUnit = DateUnit.Minute;
             if (scale._formatAuto)
+            {
                 scale._format = Default.FormatMinuteMinute;
+            }
 
             tempStep = Math.Ceiling (tempStep * XDate.MinutesPerDay);
 
             // make sure the minute step size is 1, 5, 15, or 30 minutes
             if (tempStep > 15.0)
+            {
                 tempStep = 30.0;
+            }
             else if (tempStep > 5.0)
+            {
                 tempStep = 15.0;
+            }
             else if (tempStep > 1.0)
+            {
                 tempStep = 5.0;
+            }
             else
+            {
                 tempStep = 1.0;
+            }
 
             if (scale._minorStepAuto)
             {
                 scale._minorUnit = DateUnit.Minute;
                 if (tempStep <= 1.0)
+                {
                     scale._minorStep = 0.25;
+                }
                 else if (tempStep <= 5.0)
+                {
                     scale._minorStep = 1.0;
+                }
                 else
+                {
                     scale._minorStep = 5.0;
+                }
             }
         }
         else if (range > Default.RangeMinuteSecond)
@@ -710,7 +801,9 @@ class DateScale
             tempStep = Math.Ceiling (tempStep * XDate.MinutesPerDay);
 
             if (scale._formatAuto)
+            {
                 scale._format = Default.FormatMinuteSecond;
+            }
 
             if (scale._minorStepAuto)
             {
@@ -722,49 +815,75 @@ class DateScale
 
                 // make sure the minorStep is 1, 5, 15, or 30 seconds
                 if (scale._minorStep > 15.0)
+                {
                     scale._minorStep = 30.0;
+                }
                 else if (scale._minorStep > 5.0)
+                {
                     scale._minorStep = 15.0;
+                }
                 else if (scale._minorStep > 1.0)
+                {
                     scale._minorStep = 5.0;
+                }
                 else
+                {
                     scale._minorStep = 1.0;
+                }
             }
         }
         else if (range > Default.RangeSecondSecond) // SecondSecond
         {
             scale._majorUnit = DateUnit.Second;
             if (scale._formatAuto)
+            {
                 scale._format = Default.FormatSecondSecond;
+            }
 
             tempStep = Math.Ceiling (tempStep * XDate.SecondsPerDay);
 
             // make sure the second step size is 1, 5, 15, or 30 seconds
             if (tempStep > 15.0)
+            {
                 tempStep = 30.0;
+            }
             else if (tempStep > 5.0)
+            {
                 tempStep = 15.0;
+            }
             else if (tempStep > 1.0)
+            {
                 tempStep = 5.0;
+            }
             else
+            {
                 tempStep = 1.0;
+            }
 
             if (scale._minorStepAuto)
             {
                 scale._minorUnit = DateUnit.Second;
                 if (tempStep <= 1.0)
+                {
                     scale._minorStep = 0.25;
+                }
                 else if (tempStep <= 5.0)
+                {
                     scale._minorStep = 1.0;
+                }
                 else
+                {
                     scale._minorStep = 5.0;
+                }
             }
         }
         else // MilliSecond
         {
             scale._majorUnit = DateUnit.Millisecond;
             if (scale._formatAuto)
+            {
                 scale._format = Default.FormatMillisecond;
+            }
 
             tempStep = CalcStepSize (range * XDate.MillisecondsPerDay, Default.TargetXSteps);
 
@@ -803,7 +922,9 @@ class DateScale
         // the current time period, .e.g., for 15-May-95, and monthly steps, we
         // can just back up to 1-May-95
         if (direction < 0)
+        {
             direction = 0;
+        }
 
         switch (_majorUnit)
         {
@@ -812,39 +933,59 @@ class DateScale
                 // If the date is already an exact year, then don't step to the next year
                 if (direction == 1 && month == 1 && day == 1 && hour == 0
                     && minute == 0 && second == 0)
+                {
                     return date;
+                }
                 else
+                {
                     return XDate.CalendarDateToXLDate (year + direction, 1, 1,
                         0, 0, 0);
+                }
             case DateUnit.Month:
                 // If the date is already an exact month, then don't step to the next month
                 if (direction == 1 && day == 1 && hour == 0
                     && minute == 0 && second == 0)
+                {
                     return date;
+                }
                 else
+                {
                     return XDate.CalendarDateToXLDate (year, month + direction, 1,
                         0, 0, 0);
+                }
             case DateUnit.Day:
                 // If the date is already an exact Day, then don't step to the next day
                 if (direction == 1 && hour == 0 && minute == 0 && second == 0)
+                {
                     return date;
+                }
                 else
+                {
                     return XDate.CalendarDateToXLDate (year, month,
                         day + direction, 0, 0, 0);
+                }
             case DateUnit.Hour:
                 // If the date is already an exact hour, then don't step to the next hour
                 if (direction == 1 && minute == 0 && second == 0)
+                {
                     return date;
+                }
                 else
+                {
                     return XDate.CalendarDateToXLDate (year, month, day,
                         hour + direction, 0, 0);
+                }
             case DateUnit.Minute:
                 // If the date is already an exact minute, then don't step to the next minute
                 if (direction == 1 && second == 0)
+                {
                     return date;
+                }
                 else
+                {
                     return XDate.CalendarDateToXLDate (year, month, day, hour,
                         minute + direction, 0);
+                }
             case DateUnit.Second:
                 return XDate.CalendarDateToXLDate (year, month, day, hour,
                     minute, second + direction);
@@ -871,10 +1012,12 @@ class DateScale
     /// and text (<see cref="Scale.IsText"/>) type axes.
     /// </param>
     /// <returns>The resulting value label as a <see cref="string" /></returns>
-    override internal string MakeLabel (GraphPane pane, int index, double dVal)
+    internal override string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
+        {
             _format = Default.Format;
+        }
 
         return XDate.ToString (dVal, _format);
     }
@@ -887,7 +1030,7 @@ class DateScale
     /// and <see cref="Scale.Max" />.  This reflects the setting of
     /// <see cref="Scale.MajorUnit" />.
     /// </remarks>
-    override internal double MajorUnitMultiplier
+    internal override double MajorUnitMultiplier
     {
         get { return GetUnitMultiple (_majorUnit); }
     }
@@ -900,7 +1043,7 @@ class DateScale
     /// and <see cref="Scale.Max" />.  This reflects the setting of
     /// <see cref="Scale.MinorUnit" />.
     /// </remarks>
-    override internal double MinorUnitMultiplier
+    internal override double MinorUnitMultiplier
     {
         get { return GetUnitMultiple (_minorUnit); }
     }

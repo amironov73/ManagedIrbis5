@@ -359,9 +359,15 @@ public struct XDate
     public static double MakeValidDate (double xlDate)
     {
         if (xlDate < XLDayMin)
+        {
             xlDate = XLDayMin;
+        }
+
         if (xlDate > XLDayMax)
+        {
             xlDate = XLDayMax;
+        }
+
         return xlDate;
     }
 
@@ -1438,7 +1444,9 @@ public struct XDate
             return ((double)obj) == _xlDate;
         }
         else
+        {
             return false;
+        }
     }
 
     /// <summary>
@@ -1465,7 +1473,9 @@ public struct XDate
     public int CompareTo (object target)
     {
         if (!(target is XDate))
+        {
             throw new ArgumentException();
+        }
 
         return (XLDate).CompareTo (((XDate)target).XLDate);
     }
@@ -1580,7 +1590,9 @@ public struct XDate
         int year, month, day, hour, minute, second, millisecond;
 
         if (!CheckValidDate (xlDate))
+        {
             return "Date Error";
+        }
 
         XLDateToCalendarDate (xlDate, out year, out month, out day, out hour, out minute,
             out second, out millisecond);
@@ -1618,19 +1630,36 @@ public struct XDate
         }
 
         if (fmtStr.IndexOf ("[f]") >= 0)
+        {
             fmtStr = fmtStr.Replace ("[f]", ((int)(xlDate * 864000)).ToString ("d"));
+        }
+
         if (fmtStr.IndexOf ("[ff]") >= 0)
+        {
             fmtStr = fmtStr.Replace ("[ff]", ((int)(xlDate * 8640000)).ToString ("d"));
+        }
+
         if (fmtStr.IndexOf ("[fff]") >= 0)
+        {
             fmtStr = fmtStr.Replace ("[fff]", ((int)(xlDate * 86400000)).ToString ("d"));
+        }
+
         if (fmtStr.IndexOf ("[ffff]") >= 0)
+        {
             fmtStr = fmtStr.Replace ("[ffff]", ((int)(xlDate * 864000000)).ToString ("d"));
+        }
+
         if (fmtStr.IndexOf ("[fffff]") >= 0)
+        {
             fmtStr = fmtStr.Replace ("[fffff]", ((int)(xlDate * 8640000000)).ToString ("d"));
+        }
 
         //DateTime dt = XLDateToDateTime( xlDate );
         if (year > 9999)
+        {
             year = 9999;
+        }
+
         DateTime dt = new DateTime (year, month, day, hour, minute, second, millisecond);
         return dt.ToString (fmtStr);
     }

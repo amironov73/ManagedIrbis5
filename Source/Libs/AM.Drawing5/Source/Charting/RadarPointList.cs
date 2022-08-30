@@ -65,10 +65,14 @@ public class RadarPointList
 
             // The last point is a repeat of the first point
             if (index == count - 1)
+            {
                 index = 0;
+            }
 
             if (index < 0 || index >= count)
+            {
                 return null;
+            }
 
             PointPair pt = (PointPair)base[index];
 
@@ -86,10 +90,14 @@ public class RadarPointList
 
             // The last point is a repeat of the first point
             if (index == count - 1)
+            {
                 index = 0;
+            }
 
             if (index < 0 || index >= count)
+            {
                 return;
+            }
 
             PointPair pt = (PointPair)base[index];
             pt.Y = Math.Sqrt (value.X * value.X + value.Y * value.Y);

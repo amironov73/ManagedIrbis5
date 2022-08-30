@@ -500,9 +500,13 @@ public class GraphPane
 
         _xAxis = (XAxis)info.GetValue ("xAxis", typeof (XAxis));
         if (sch >= 11)
+        {
             _x2Axis = (X2Axis)info.GetValue ("x2Axis", typeof (X2Axis));
+        }
         else
+        {
             _x2Axis = new X2Axis ("");
+        }
 
         _yAxisList = (YAxisList)info.GetValue ("yAxisList", typeof (YAxisList));
         _y2AxisList = (Y2AxisList)info.GetValue ("y2AxisList", typeof (Y2AxisList));
@@ -628,7 +632,9 @@ public class GraphPane
         // Set the ClusterScaleWidth, if needed
         //_barSettings.CalcClusterScaleWidth();
         if (_barSettings._clusterScaleWidthAuto)
+        {
             _barSettings._clusterScaleWidth = 1.0;
+        }
 
         // if the ChartRect is not yet determined, then pick a scale based on a default ChartRect
         // size (using 75% of Rect -- code is in Axis.CalcMaxLabels() )
@@ -651,7 +657,9 @@ public class GraphPane
 
         // Trigger the AxisChangeEvent
         if (AxisChangeEvent != null)
+        {
             AxisChangeEvent (this);
+        }
     }
 
     private void PickScale (Graphics g, float scaleFactor)
@@ -697,7 +705,9 @@ public class GraphPane
         {
             int nTics = axis._scale.CalcNumTics();
             if (nTics < numTics)
+            {
                 axis._scale._maxLinearized += axis._scale._majorStep * (numTics - nTics);
+            }
         }
     }
 
@@ -724,7 +734,9 @@ public class GraphPane
         base.Draw (g);
 
         if (_rect.Width <= 1 || _rect.Height <= 1)
+        {
             return;
+        }
 
         // Clip everything to the rect
         g.SetClip (_rect);
@@ -743,11 +755,15 @@ public class GraphPane
             //this.pieRect = PieItem.CalcPieRect( g, this, scaleFactor, this.chartRect );
         }
         else
+        {
             CalcChartRect (g, scaleFactor);
+        }
 
         // do a sanity check on the ChartRect
         if (_chart._rect.Width < 1 || _chart._rect.Height < 1)
+        {
             return;
+        }
 
         // Draw the graph features only if there is at least one curve with data
         // if ( _curveList.HasData() &&
@@ -768,7 +784,9 @@ public class GraphPane
 
         // Draw the GraphItems that are behind the Axis objects
         if (showGraf)
+        {
             _graphObjList.Draw (g, this, scaleFactor, ZOrder.G_BehindChartFill);
+        }
 
         // Fill the axis background
         _chart.Fill.Draw (g, _chart._rect);
@@ -872,10 +890,15 @@ public class GraphPane
                         _x2Axis._scale._min < _x2Axis._scale._max;
         foreach (Axis axis in _yAxisList)
             if (axis._scale._min >= axis._scale._max)
+            {
                 showGraf = false;
+            }
+
         foreach (Axis axis in _y2AxisList)
             if (axis._scale._min >= axis._scale._max)
+            {
                 showGraf = false;
+            }
 
         return showGraf;
     }
@@ -955,7 +978,9 @@ public class GraphPane
 
             //if ( !axis.CrossAuto || axis.Cross < _xAxis.Min )
             if (axis.IsCrossShifted (this))
+            {
                 totSpaceY += tmp;
+            }
 
             minSpaceL += fixedSpace;
         }
@@ -967,7 +992,9 @@ public class GraphPane
 
             //if ( !axis.CrossAuto || axis.Cross < _xAxis.Min )
             if (axis.IsCrossShifted (this))
+            {
                 totSpaceY += tmp;
+            }
 
             minSpaceR += fixedSpace;
         }
@@ -1026,17 +1053,27 @@ public class GraphPane
         float crossPix = crossFrac * (1 + crossFrac) * (1 + crossFrac * crossFrac) * clientSize;
 
         if (!axis.IsPrimary (this) && axis.IsCrossShifted (this))
+        {
             axis._tmpSpace = 0;
+        }
 
         if (axis._tmpSpace < crossPix)
+        {
             axis._tmpSpace = 0;
+        }
         else if (crossPix > 0)
+        {
             axis._tmpSpace -= crossPix;
+        }
 
         if (axis._scale._isLabelsInside && (axis.IsPrimary (this) || (crossFrac != 0.0 && crossFrac != 1.0)))
+        {
             spaceAlt = axis._tmpSpace;
+        }
         else
+        {
             spaceNorm = axis._tmpSpace;
+        }
     }
 
     /// <summary>
@@ -1658,16 +1695,22 @@ public class GraphPane
         // Setup the scaling data based on the chart rect
         Axis xAxis = _xAxis;
         if (isX2Axis)
+        {
             xAxis = _x2Axis;
+        }
 
         xAxis.Scale.SetupScaleData (this, xAxis);
         x = xAxis.Scale.ReverseTransform (ptF.X);
 
         Axis yAxis = null;
         if (isY2Axis && Y2AxisList.Count > yAxisIndex)
+        {
             yAxis = Y2AxisList[yAxisIndex];
+        }
         else if (!isY2Axis && YAxisList.Count > yAxisIndex)
+        {
             yAxis = YAxisList[yAxisIndex];
+        }
 
         if (yAxis != null)
         {
@@ -1675,7 +1718,9 @@ public class GraphPane
             y = yAxis.Scale.ReverseTransform (ptF.Y);
         }
         else
+        {
             y = PointPairBase.Missing;
+        }
     }
 
     /// <summary>
@@ -2044,7 +2089,9 @@ public class GraphPane
 
         // If the point is outside the ChartRect, always return false
         if (!_chart._rect.Contains (mousePt))
+        {
             return false;
+        }
 
         double x, x2;
         double[] y;
@@ -2054,7 +2101,9 @@ public class GraphPane
         ReverseTransform (mousePt, out x, out x2, out y, out y2);
 
         if (!AxisRangesValid())
+        {
             return false;
+        }
 
         ValueHandler valueHandler = new ValueHandler (this, false);
 
@@ -2112,9 +2161,13 @@ public class GraphPane
                 Axis baseAxis = curve.BaseAxis (this);
                 bool isXBaseAxis = (baseAxis is XAxis || baseAxis is X2Axis);
                 if (isXBaseAxis)
+                {
                     barWidthUserHalf = barWidth / xPixPerUnit / 2.0;
+                }
                 else
+                {
                     barWidthUserHalf = barWidth / yPixPerUnitAct / 2.0;
+                }
 
                 if (points != null)
                 {
@@ -2122,15 +2175,23 @@ public class GraphPane
                     {
                         // xVal is the user scale X value of the current point
                         if (xAxis._scale.IsAnyOrdinal && !curve.IsOverrideOrdinal)
+                        {
                             xVal = (double)iPt + 1.0;
+                        }
                         else
+                        {
                             xVal = points[iPt].X;
+                        }
 
                         // yVal is the user scale Y value of the current point
                         if (yAxis._scale.IsAnyOrdinal && !curve.IsOverrideOrdinal)
+                        {
                             yVal = (double)iPt + 1.0;
+                        }
                         else
+                        {
                             yVal = points[iPt].Y;
+                        }
 
                         if (xVal != PointPairBase.Missing &&
                             yVal != PointPairBase.Missing)
@@ -2158,7 +2219,9 @@ public class GraphPane
                                     if (xAct < centerVal - barWidthUserHalf ||
                                         xAct > centerVal + barWidthUserHalf ||
                                         yAct < lowVal || yAct > hiVal)
+                                    {
                                         continue;
+                                    }
                                 }
                                 else
                                 {
@@ -2168,7 +2231,9 @@ public class GraphPane
                                     if (yAct < centerVal - barWidthUserHalf ||
                                         yAct > centerVal + barWidthUserHalf ||
                                         xAct < lowVal || xAct > hiVal)
+                                    {
                                         continue;
+                                    }
                                 }
 
                                 if (nearestBar == null)
@@ -2191,7 +2256,9 @@ public class GraphPane
                                 dist = distX * distX + distY * distY;
 
                                 if (dist >= minDist)
+                                {
                                     continue;
+                                }
 
                                 minDist = dist;
                                 iNearest = iPt;
@@ -2201,7 +2268,9 @@ public class GraphPane
                     }
 
                     if (curve.IsBar)
+                    {
                         iBar++;
+                    }
                 }
             }
         }
@@ -2212,7 +2281,9 @@ public class GraphPane
                 CalcScaleFactor() / 2);
             minDist -= halfSymbol * halfSymbol;
             if (minDist < 0)
+            {
                 minDist = 0;
+            }
         }
 
         if (minDist >= tolSquared && nearestBar != null)
@@ -2229,7 +2300,9 @@ public class GraphPane
             return true;
         }
         else // otherwise, no valid point found
+        {
             return false;
+        }
     }
 
     /// <summary>

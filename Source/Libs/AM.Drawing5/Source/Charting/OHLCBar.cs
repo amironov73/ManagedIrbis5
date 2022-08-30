@@ -67,7 +67,7 @@ public class OHLCBar
     /// A simple struct that defines the
     /// default property values for the <see cref="OHLCBar"/> class.
     /// </summary>
-    new public struct Default
+    public new struct Default
     {
         // Default Symbol properties
         /// <summary>
@@ -285,20 +285,36 @@ public class OHLCBar
             if (isXBase)
             {
                 if (Math.Abs (pixLow) < 1000000 && Math.Abs (pixHigh) < 1000000)
+                {
                     g.DrawLine (pen, pixBase, pixHigh, pixBase, pixLow);
+                }
+
                 if (_isOpenCloseVisible && Math.Abs (pixOpen) < 1000000)
+                {
                     g.DrawLine (pen, pixBase - halfSize, pixOpen, pixBase, pixOpen);
+                }
+
                 if (_isOpenCloseVisible && Math.Abs (pixClose) < 1000000)
+                {
                     g.DrawLine (pen, pixBase, pixClose, pixBase + halfSize, pixClose);
+                }
             }
             else
             {
                 if (Math.Abs (pixLow) < 1000000 && Math.Abs (pixHigh) < 1000000)
+                {
                     g.DrawLine (pen, pixHigh, pixBase, pixLow, pixBase);
+                }
+
                 if (_isOpenCloseVisible && Math.Abs (pixOpen) < 1000000)
+                {
                     g.DrawLine (pen, pixOpen, pixBase - halfSize, pixOpen, pixBase);
+                }
+
                 if (_isOpenCloseVisible && Math.Abs (pixClose) < 1000000)
+                {
                     g.DrawLine (pen, pixClose, pixBase, pixClose, pixBase + halfSize);
+                }
             }
         }
     }
@@ -376,14 +392,22 @@ public class OHLCBar
                         pixHigh = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, high);
                         pixLow = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, low);
                         if (PointPairBase.IsValueInvalid (open))
+                        {
                             pixOpen = float.MaxValue;
+                        }
                         else
+                        {
                             pixOpen = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, open);
+                        }
 
                         if (PointPairBase.IsValueInvalid (close))
+                        {
                             pixClose = float.MaxValue;
+                        }
                         else
+                        {
                             pixClose = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, close);
+                        }
 
                         if (!curve.IsSelected && _gradientFill.IsGradientValueType)
                         {
@@ -393,9 +417,11 @@ public class OHLCBar
                                     pixClose, halfSize, tPen);
                         }
                         else
+                        {
                             Draw (g, pane, baseAxis is XAxis || baseAxis is X2Axis,
                                 pixBase, pixHigh, pixLow, pixOpen,
                                 pixClose, halfSize, pen);
+                        }
                     }
                 }
             }
@@ -420,10 +446,14 @@ public class OHLCBar
     {
         float width;
         if (_isAutoSize)
+        {
             width = baseAxis._scale.GetClusterWidth (_userScaleSize) /
                     (1.0F + pane._barSettings.MinClusterGap) / 2.0f;
+        }
         else
+        {
             width = (float)(_size * scaleFactor) / 2.0f;
+        }
 
         // use integral size
         return (int)(width + 0.5f);

@@ -155,7 +155,7 @@ class DateAsOrdinalScale
     /// </param>
     /// <seealso cref="PickScale"/>
     /// <seealso cref="AxisType.Ordinal"/>
-    override public void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
     {
         // call the base class first
         base.PickScale (pane, g, scaleFactor);
@@ -236,31 +236,55 @@ class DateAsOrdinalScale
                     !double.IsInfinity (val1) &&
                     !double.IsInfinity (val2) &&
                     Math.Abs (val2 - val1) > 1e-10)
+                {
                     range = Math.Abs (val2 - val1);
+                }
             }
 
             if (range > Default.RangeYearYear)
+            {
                 _format = Default.FormatYearYear;
+            }
             else if (range > Default.RangeYearMonth)
+            {
                 _format = Default.FormatYearMonth;
+            }
             else if (range > Default.RangeMonthMonth)
+            {
                 _format = Default.FormatMonthMonth;
+            }
             else if (range > Default.RangeDayDay)
+            {
                 _format = Default.FormatDayDay;
+            }
             else if (range > Default.RangeDayHour)
+            {
                 _format = Default.FormatDayHour;
+            }
             else if (range > Default.RangeHourHour)
+            {
                 _format = Default.FormatHourHour;
+            }
             else if (range > Default.RangeHourMinute)
+            {
                 _format = Default.FormatHourMinute;
+            }
             else if (range > Default.RangeMinuteMinute)
+            {
                 _format = Default.FormatMinuteMinute;
+            }
             else if (range > Default.RangeMinuteSecond)
+            {
                 _format = Default.FormatMinuteSecond;
+            }
             else if (range > Default.RangeSecondSecond)
+            {
                 _format = Default.FormatSecondSecond;
+            }
             else // MilliSecond
+            {
                 _format = Default.FormatMillisecond;
+            }
         }
     }
 
@@ -281,10 +305,12 @@ class DateAsOrdinalScale
     /// and text (<see cref="Scale.IsText"/>) type axes.
     /// </param>
     /// <returns>The resulting value label as a <see cref="string" /></returns>
-    override internal string MakeLabel (GraphPane pane, int index, double dVal)
+    internal override string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
+        {
             _format = Default.Format;
+        }
 
         double val;
 
@@ -293,13 +319,20 @@ class DateAsOrdinalScale
         if (pane.CurveList.Count > 0 && pane.CurveList[0].Points.Count > tmpIndex)
         {
             if (_ownerAxis is XAxis || _ownerAxis is X2Axis)
+            {
                 val = pane.CurveList[0].Points[tmpIndex].X;
+            }
             else
+            {
                 val = pane.CurveList[0].Points[tmpIndex].Y;
+            }
+
             return XDate.ToString (val, _format);
         }
         else
+        {
             return string.Empty;
+        }
     }
 
     #endregion

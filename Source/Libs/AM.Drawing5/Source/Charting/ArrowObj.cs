@@ -54,7 +54,7 @@ public class ArrowObj
     /// A simple struct that defines the
     /// default property values for the <see cref="ArrowObj"/> class.
     /// </summary>
-    new public struct Default
+    public new struct Default
     {
         /// <summary>
         /// The default size for the <see cref="ArrowObj"/> item arrowhead
@@ -84,8 +84,8 @@ public class ArrowObj
     /// <seealso cref="Default.Size"/>
     public float Size
     {
-        get { return _size; }
-        set { _size = value; }
+        get => _size;
+        set => _size = value;
     }
 
     /// <summary>
@@ -96,8 +96,8 @@ public class ArrowObj
     /// <seealso cref="Default.IsArrowHead"/>
     public bool IsArrowHead
     {
-        get { return _isArrowHead; }
-        set { _isArrowHead = value; }
+        get => _isArrowHead;
+        set => _isArrowHead = value;
     }
 
     #endregion
@@ -210,7 +210,11 @@ public class ArrowObj
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected ArrowObj (SerializationInfo info, StreamingContext context)
+    protected ArrowObj
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
         : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
@@ -221,11 +225,7 @@ public class ArrowObj
         _isArrowHead = info.GetBoolean ("isArrowHead");
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="LineObj.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -240,30 +240,15 @@ public class ArrowObj
 
     #endregion
 
-    #region Rendering Methods
+    #region Rendering methods
 
-    /// <summary>
-    /// Render this object to the specified <see cref="Graphics"/> device.
-    /// </summary>
-    /// <remarks>
-    /// This method is normally only called by the Draw method
-    /// of the parent <see cref="GraphObjList"/> collection object.
-    /// </remarks>
-    /// <param name="g">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="PaneBase"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    override public void Draw (Graphics g, PaneBase pane, float scaleFactor)
+    /// <inheritdoc cref="LineObj.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics,
+            PaneBase pane,
+            float scaleFactor
+        )
     {
         // Convert the arrow coordinates from the user coordinate system
         // to the screen coordinate system
@@ -283,15 +268,15 @@ public class ArrowObj
             var length = (float)Math.Sqrt (dx * dx + dy * dy);
 
             // Save the old transform matrix
-            var transform = g.Transform;
+            var transform = graphics.Transform;
 
             // Move the coordinate system so it is located at the starting point
             // of this arrow
-            g.TranslateTransform (pix1.X, pix1.Y);
+            graphics.TranslateTransform (pix1.X, pix1.Y);
 
             // Rotate the coordinate system according to the angle of this arrow
             // about the starting point
-            g.RotateTransform (angle);
+            graphics.RotateTransform (angle);
 
             // get a pen according to this arrow properties
             using (var pen = _line.GetPen (pane, scaleFactor))
@@ -304,7 +289,7 @@ public class ArrowObj
                 if (_isArrowHead)
                 {
                     // Draw the line segment for this arrow
-                    g.DrawLine (pen, 0, 0, length - scaledSize + 1, 0);
+                    graphics.DrawLine (pen, 0, 0, length - scaledSize + 1, 0);
 
                     // Create a polygon representing the arrowhead based on the scaled
                     // size
@@ -321,14 +306,16 @@ public class ArrowObj
                     using (var brush = new SolidBrush (_line._color))
 
                         // render the arrowhead
-                        g.FillPolygon (brush, polyPt);
+                        graphics.FillPolygon (brush, polyPt);
                 }
                 else
-                    g.DrawLine (pen, 0, 0, length, 0);
+                {
+                    graphics.DrawLine (pen, 0, 0, length, 0);
+                }
             }
 
             // Restore the transform matrix back to its original state
-            g.Transform = transform;
+            graphics.Transform = transform;
         }
     }
 

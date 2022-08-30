@@ -99,7 +99,9 @@ public class ScaleStateList
         int count = Math.Min (list.Count, Count);
         for (int i = 0; i < count; i++)
             if (this[i].IsChanged (list[i]))
+            {
                 return true;
+            }
 
         return false;
     }
@@ -118,7 +120,9 @@ public class ScaleStateList
         int count = Math.Min (list.Count, Count);
         for (int i = 0; i < count; i++)
             if (this[i].IsChanged (list[i]))
+            {
                 return true;
+            }
 
         return false;
     }

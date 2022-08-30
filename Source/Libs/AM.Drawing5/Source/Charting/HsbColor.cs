@@ -228,15 +228,23 @@ public struct HsbColor
 
         double h;
         if (r == max)
+        {
             h = (g - b) / delta; // between yellow & magenta
+        }
         else if (g == max)
+        {
             h = 2 + (b - r) / delta; // between cyan & yellow
+        }
         else
+        {
             h = 4 + (r - g) / delta; // between magenta & cyan
+        }
 
         hsbColor.H = (byte)(h * 42.5);
         if (hsbColor.H < 0)
+        {
             hsbColor.H += 255;
+        }
 
         return hsbColor;
     }

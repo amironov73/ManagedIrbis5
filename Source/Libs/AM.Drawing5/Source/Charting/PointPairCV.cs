@@ -106,7 +106,7 @@ namespace AM.Drawing.Charting
         /// The ColorValue property.  This is used with the
         /// <see cref="FillType.GradientByColorValue" /> option.
         /// </summary>
-        override public double ColorValue
+        public override double ColorValue
         {
             get { return _colorValue; }
             set { _colorValue = value; }

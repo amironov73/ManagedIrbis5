@@ -291,9 +291,13 @@ public class Symbol
         _border = rhs.Border.Clone();
 
         if (rhs.UserSymbol != null)
+        {
             _userSymbol = rhs.UserSymbol.Clone() as GraphicsPath;
+        }
         else
+        {
             _userSymbol = null;
+        }
     }
 
     /// <summary>
@@ -345,9 +349,13 @@ public class Symbol
         _border = (Border)info.GetValue ("border", typeof (Border));
 
         if (sch >= 11)
+        {
             _userSymbol = (GraphicsPath)info.GetValue ("userSymbol", typeof (GraphicsPath));
+        }
         else
+        {
             _userSymbol = null;
+        }
     }
 
     /// <summary>
@@ -404,12 +412,16 @@ public class Symbol
 
             // Fill or draw the symbol as required
             if (_fill.IsVisible)
+            {
                 g.FillPath (brush, path);
+            }
 
             //FillPoint( g, x, y, scaleFactor, pen, brush );
 
             if (_border.IsVisible)
+            {
                 g.DrawPath (pen, path);
+            }
 
             //DrawPoint( g, x, y, scaleFactor, pen );
 
@@ -449,7 +461,9 @@ public class Symbol
     {
         Symbol source = this;
         if (isSelected)
+        {
             source = Selection.Symbol;
+        }
 
         // Only draw if the symbol is visible
         if (_isVisible &&
@@ -459,7 +473,9 @@ public class Symbol
         {
             SmoothingMode sModeSave = g.SmoothingMode;
             if (_isAntiAlias)
+            {
                 g.SmoothingMode = SmoothingMode.HighQuality;
+            }
 
             using (Pen pen = _border.GetPen (pane, scaleFactor, dataValue))
             using (GraphicsPath path = MakePath (g, scaleFactor))
@@ -589,7 +605,9 @@ public class Symbol
     {
         Symbol source = this;
         if (isSelected)
+        {
             source = Selection.Symbol;
+        }
 
         int tmpX, tmpY;
 
@@ -608,7 +626,9 @@ public class Symbol
         {
             SmoothingMode sModeSave = g.SmoothingMode;
             if (_isAntiAlias)
+            {
                 g.SmoothingMode = SmoothingMode.HighQuality;
+            }
 
             // For the sake of speed, go ahead and create a solid brush and a pen
             // If it's a gradient fill, it will be created on the fly for each symbol
@@ -649,9 +669,13 @@ public class Symbol
                         {
                             curX = points[i].X;
                             if (curve is StickItem)
+                            {
                                 curY = points[i].Z;
+                            }
                             else
+                            {
                                 curY = points[i].Y;
+                            }
                         }
 
                         // Any value set to double max is invalid and should be skipped
@@ -678,7 +702,10 @@ public class Symbol
                                 tmpY <= maxY) // guard against the zoom-in case
                             {
                                 if (isPixelDrawn[tmpX, tmpY])
+                                {
                                     continue;
+                                }
+
                                 isPixelDrawn[tmpX, tmpY] = true;
                             }
 

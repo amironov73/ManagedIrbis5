@@ -270,7 +270,9 @@ public class MinorGrid
     {
         // draw the minor grid
         if (_isVisible)
+        {
             g.DrawLine (pen, pixVal, 0.0F, pixVal, topPix);
+        }
     }
 
     internal Pen GetPen (GraphPane pane, float scaleFactor)

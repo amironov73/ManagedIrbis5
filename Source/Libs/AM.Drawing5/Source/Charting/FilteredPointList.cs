@@ -127,14 +127,22 @@ public class FilteredPointList
 
             double xVal, yVal;
             if (index >= 0 && index < _x.Length)
+            {
                 xVal = _x[index];
+            }
             else
+            {
                 xVal = PointPairBase.Missing;
+            }
 
             if (index >= 0 && index < _y.Length)
+            {
                 yVal = _y[index];
+            }
             else
+            {
                 yVal = PointPairBase.Missing;
+            }
 
 
             return new PointPair (xVal, yVal, PointPairBase.Missing, null);
@@ -161,10 +169,14 @@ public class FilteredPointList
             }
 
             if (index >= 0 && index < _x.Length)
+            {
                 _x[index] = value.X;
+            }
 
             if (index >= 0 && index < _y.Length)
+            {
                 _y[index] = value.Y;
+            }
         }
     }
 
@@ -185,11 +197,15 @@ public class FilteredPointList
 
                 // limit the point count to the filter bounds
                 if (boundSize < arraySize)
+                {
                     arraySize = boundSize;
+                }
 
                 // limit the point count to the declared max points
                 if (arraySize > _maxPts)
+                {
                     arraySize = _maxPts;
+                }
             }
 
             return arraySize;
@@ -236,7 +252,7 @@ public class FilteredPointList
     /// Deep-copy clone routine
     /// </summary>
     /// <returns>A new, independent copy of the FilteredPointList</returns>
-    virtual public object Clone()
+    public virtual object Clone()
     {
         return new FilteredPointList (this);
     }
@@ -271,13 +287,19 @@ public class FilteredPointList
         if (first < 0)
         {
             if (first == -1)
+            {
                 first = 0;
+            }
             else
+            {
                 first = ~(first + 1);
+            }
         }
 
         if (last < 0)
+        {
             last = ~last;
+        }
 
         _minBoundIndex = first;
         _maxBoundIndex = last;

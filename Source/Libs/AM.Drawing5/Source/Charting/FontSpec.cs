@@ -854,9 +854,13 @@ public class FontSpec
 
         SizeF sizeF;
         if (layoutArea.IsEmpty)
+        {
             sizeF = MeasureString (g, text, scaleFactor);
+        }
         else
+        {
             sizeF = MeasureString (g, text, scaleFactor, layoutArea);
+        }
 
         // Save the old transform matrix for later restoration
         var saveMatrix = g.Transform;
@@ -1045,7 +1049,10 @@ public class FontSpec
         Remake (scaleFactor, Size, ref _scaledSize, ref _font);
         float height = _font.Height;
         if (_isDropShadow)
+        {
             height += (float)(Math.Sin (_dropShadowAngle) * _dropShadowOffset * _font.Height);
+        }
+
         return height;
     }
 
@@ -1091,7 +1098,10 @@ public class FontSpec
         Remake (scaleFactor, Size, ref _scaledSize, ref _font);
         var width = g.MeasureString (text, _font).Width;
         if (_isDropShadow)
+        {
             width += (float)(Math.Cos (_dropShadowAngle) * _dropShadowOffset * _font.Height);
+        }
+
         return width;
     }
 
@@ -1228,9 +1238,13 @@ public class FontSpec
         //Remake( scaleFactor, this.Size, ref this.scaledSize, ref this.font );
         SizeF s;
         if (layoutArea.IsEmpty)
+        {
             s = MeasureString (g, text, scaleFactor);
+        }
         else
+        {
             s = MeasureString (g, text, scaleFactor, layoutArea);
+        }
 
         var cs = (float)Math.Abs (Math.Cos (_angle * Math.PI / 180.0));
         var sn = (float)Math.Abs (Math.Sin (_angle * Math.PI / 180.0));
@@ -1378,9 +1392,13 @@ public class FontSpec
         // Get the width and height of the text
         SizeF sizeF;
         if (layoutArea.IsEmpty)
+        {
             sizeF = g.MeasureString (text, _font);
+        }
         else
+        {
             sizeF = g.MeasureString (text, _font, layoutArea);
+        }
 
         // Create a bounding box rectangle for the text
         var rect = new RectangleF (new PointF (-sizeF.Width / 2.0F, 0.0F), sizeF);
@@ -1409,7 +1427,9 @@ public class FontSpec
         // Rotate the coordinate system according to the
         // specified angle of the FontSpec
         if (_angle != 0.0F)
+        {
             matrix.Rotate (-angle, MatrixOrder.Prepend);
+        }
 
         // Since the text will be drawn by g.DrawString()
         // assuming the location is the TopCenter
@@ -1419,18 +1439,30 @@ public class FontSpec
         // actually aligned per the caller specified position
         float xa, ya;
         if (alignH == AlignH.Left)
+        {
             xa = sizeF.Width / 2.0F;
+        }
         else if (alignH == AlignH.Right)
+        {
             xa = -sizeF.Width / 2.0F;
+        }
         else
+        {
             xa = 0.0F;
+        }
 
         if (alignV == AlignV.Center)
+        {
             ya = -sizeF.Height / 2.0F;
+        }
         else if (alignV == AlignV.Bottom)
+        {
             ya = -sizeF.Height;
+        }
         else
+        {
             ya = 0.0F;
+        }
 
         // Shift the coordinates to accomodate the alignment
         // parameters
@@ -1453,18 +1485,30 @@ public class FontSpec
         // as needed.
         float xa, ya;
         if (alignH == AlignH.Left)
+        {
             xa = sizeF.Width / 2.0F;
+        }
         else if (alignH == AlignH.Right)
+        {
             xa = -sizeF.Width / 2.0F;
+        }
         else
+        {
             xa = 0.0F;
+        }
 
         if (alignV == AlignV.Center)
+        {
             ya = -sizeF.Height / 2.0F;
+        }
         else if (alignV == AlignV.Bottom)
+        {
             ya = -sizeF.Height;
+        }
         else
+        {
             ya = 0.0F;
+        }
 
         // Shift the coordinates to accomodate the alignment
         // parameters
@@ -1473,7 +1517,9 @@ public class FontSpec
         // Rotate the coordinate system according to the
         // specified angle of the FontSpec
         if (angle != 0.0F)
+        {
             matrix.Rotate (angle, MatrixOrder.Prepend);
+        }
 
         // Move the coordinate system to local coordinates
         // of this text object (that is, at the specified
@@ -1524,9 +1570,13 @@ public class FontSpec
         // Get the width and height of the text
         SizeF sizeF;
         if (layoutArea.IsEmpty)
+        {
             sizeF = g.MeasureString (text, _font);
+        }
         else
+        {
             sizeF = g.MeasureString (text, _font, layoutArea);
+        }
 
         // Create a bounding box rectangle for the text
         var rect = new RectangleF (new PointF (-sizeF.Width / 2.0F, 0.0F), sizeF);

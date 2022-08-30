@@ -203,7 +203,7 @@ public class LineObj
     /// This method is normally only called by the Draw method
     /// of the parent <see cref="GraphObjList"/> collection object.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -217,7 +217,12 @@ public class LineObj
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    override public void Draw (Graphics g, PaneBase pane, float scaleFactor)
+    public override void Draw
+        (
+            Graphics graphics,
+            PaneBase pane,
+            float scaleFactor
+        )
     {
         // Convert the arrow coordinates from the user coordinate system
         // to the screen coordinate system
@@ -234,15 +239,15 @@ public class LineObj
             float length = (float)Math.Sqrt (dx * dx + dy * dy);
 
             // Save the old transform matrix
-            Matrix transform = g.Transform;
+            Matrix transform = graphics.Transform;
 
             // Move the coordinate system so it is located at the starting point
             // of this arrow
-            g.TranslateTransform (pix1.X, pix1.Y);
+            graphics.TranslateTransform (pix1.X, pix1.Y);
 
             // Rotate the coordinate system according to the angle of this arrow
             // about the starting point
-            g.RotateTransform (angle);
+            graphics.RotateTransform (angle);
 
             // get a pen according to this arrow properties
             using (Pen pen = _line.GetPen (pane, scaleFactor))
@@ -251,11 +256,11 @@ public class LineObj
             {
                 //pen.DashStyle = _style;
 
-                g.DrawLine (pen, 0, 0, length, 0);
+                graphics.DrawLine (pen, 0, 0, length, 0);
             }
 
             // Restore the transform matrix back to its original state
-            g.Transform = transform;
+            graphics.Transform = transform;
         }
     }
 
@@ -266,12 +271,12 @@ public class LineObj
     /// <remarks>The bounding box is calculated assuming a distance
     /// of <see cref="GraphPane.Default.NearestTol"/> pixels around the arrow segment.
     /// </remarks>
-    /// <param name="pt">The screen point, in pixels</param>
+    /// <param name="point">The screen point, in pixels</param>
     /// <param name="pane">
     /// A reference to the <see cref="PaneBase"/> object that is the parent or
     /// owner of this object.
     /// </param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -282,10 +287,18 @@ public class LineObj
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
     /// <returns>true if the point lies in the bounding box, false otherwise</returns>
-    override public bool PointInBox (PointF pt, PaneBase pane, Graphics g, float scaleFactor)
+    public override bool PointInBox
+        (
+            PointF point,
+            PaneBase pane,
+            Graphics graphics,
+            float scaleFactor
+        )
     {
-        if (!base.PointInBox (pt, pane, g, scaleFactor))
+        if (!base.PointInBox (point, pane, graphics, scaleFactor))
+        {
             return false;
+        }
 
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
@@ -297,7 +310,7 @@ public class LineObj
             using (GraphicsPath path = new GraphicsPath())
             {
                 path.AddLine (pix, pix2);
-                return path.IsOutlineVisible (pt, pen);
+                return path.IsOutlineVisible (point, pen);
             }
         }
     }
@@ -305,7 +318,7 @@ public class LineObj
     /// <summary>
     /// Determines the shape type and Coords values for this GraphObj
     /// </summary>
-    override public void GetCoords (PaneBase pane, Graphics g, float scaleFactor,
+    public override void GetCoords (PaneBase pane, Graphics graphics, float scaleFactor,
         out string shape, out string coords)
     {
         // transform the x,y location from the user-defined
@@ -314,7 +327,10 @@ public class LineObj
 
         Matrix matrix = new Matrix();
         if (pixRect.Right == 0)
+        {
             pixRect.Width = 1;
+        }
+
         float angle = (float)Math.Atan ((pixRect.Top - pixRect.Bottom) /
                                         (pixRect.Left - pixRect.Right));
         matrix.Rotate (angle, MatrixOrder.Prepend);

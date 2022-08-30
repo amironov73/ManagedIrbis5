@@ -71,7 +71,7 @@ public class TextObj
     /// A simple struct that defines the
     /// default property values for the <see cref="TextObj"/> class.
     /// </summary>
-    new public struct Default
+    public new struct Default
     {
         /*
         /// <summary>
@@ -176,7 +176,10 @@ public class TextObj
         set
         {
             if (value == null)
+            {
                 throw new ArgumentNullException ("Uninitialized FontSpec in TextObj");
+            }
+
             _fontSpec = value;
         }
     }
@@ -209,9 +212,13 @@ public class TextObj
     private void Init (string text)
     {
         if (text != null)
+        {
             _text = text;
+        }
         else
+        {
             text = "Text";
+        }
 
         _fontSpec = new FontSpec (
             Default.FontFamily, Default.FontSize,
@@ -361,26 +368,13 @@ public class TextObj
 
     #region Rendering Methods
 
-    /// <summary>
-    /// Render this <see cref="TextObj"/> object to the specified <see cref="Graphics"/> device
-    /// This method is normally only called by the Draw method
-    /// of the parent <see cref="GraphObjList"/> collection object.
-    /// </summary>
-    /// <param name="g">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="PaneBase"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    override public void Draw (Graphics g, PaneBase pane, float scaleFactor)
+    /// <inheritdoc cref="GraphObj.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics,
+            PaneBase pane,
+            float scaleFactor
+        )
     {
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
@@ -394,7 +388,7 @@ public class TextObj
             //	this.FontSpec.Draw( g, pane.IsPenWidthScaled, this.text, pix.X, pix.Y,
             //		this.location.AlignH, this.location.AlignV, scaleFactor );
             //else
-            FontSpec.Draw (g, pane, _text, pix.X, pix.Y,
+            FontSpec.Draw (graphics, pane, _text, pix.X, pix.Y,
                 _location.AlignH, _location.AlignV, scaleFactor, _layoutArea);
         }
     }
@@ -404,12 +398,12 @@ public class TextObj
     /// <see cref="TextObj"/>.  This method takes into account rotation and alignment
     /// parameters of the text, as specified in the <see cref="FontSpec"/>.
     /// </summary>
-    /// <param name="pt">The screen point, in pixels</param>
+    /// <param name="point">The screen point, in pixels</param>
     /// <param name="pane">
     /// A reference to the <see cref="PaneBase"/> object that is the parent or
     /// owner of this object.
     /// </param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -420,30 +414,38 @@ public class TextObj
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
     /// <returns>true if the point lies in the bounding box, false otherwise</returns>
-    override public bool PointInBox (PointF pt, PaneBase pane, Graphics g, float scaleFactor)
+    public override bool PointInBox
+        (
+            PointF point,
+            PaneBase pane,
+            Graphics graphics,
+            float scaleFactor
+        )
     {
-        if (!base.PointInBox (pt, pane, g, scaleFactor))
+        if (!base.PointInBox (point, pane, graphics, scaleFactor))
+        {
             return false;
+        }
 
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
         PointF pix = _location.Transform (pane);
 
-        return _fontSpec.PointInBox (pt, g, _text, pix.X, pix.Y,
+        return _fontSpec.PointInBox (point, graphics, _text, pix.X, pix.Y,
             _location.AlignH, _location.AlignV, scaleFactor, LayoutArea);
     }
 
     /// <summary>
     /// Determines the shape type and Coords values for this GraphObj
     /// </summary>
-    override public void GetCoords (PaneBase pane, Graphics g, float scaleFactor,
+    public override void GetCoords (PaneBase pane, Graphics graphics, float scaleFactor,
         out string shape, out string coords)
     {
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
         PointF pix = _location.Transform (pane);
 
-        PointF[] pts = _fontSpec.GetBox (g, _text, pix.X, pix.Y, _location.AlignH,
+        PointF[] pts = _fontSpec.GetBox (graphics, _text, pix.X, pix.Y, _location.AlignH,
             _location.AlignV, scaleFactor, new SizeF());
 
         shape = "poly";

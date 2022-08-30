@@ -96,9 +96,13 @@ public class YAxisList
         {
             int index = IndexOf (title);
             if (index >= 0)
+            {
                 return this[index];
+            }
             else
+            {
                 return null;
+            }
         }
     }
 
@@ -120,7 +124,10 @@ public class YAxisList
         foreach (YAxis axis in this)
         {
             if (string.Compare (axis.Title._text, title, true) == 0)
+            {
                 return index;
+            }
+
             index++;
         }
 
@@ -146,7 +153,10 @@ public class YAxisList
         {
             if (axis.Tag is string &&
                 string.Compare ((string)axis.Tag, tagStr, true) == 0)
+            {
                 return index;
+            }
+
             index++;
         }
 

@@ -94,7 +94,10 @@ class LogScale
         get { return _min; }
         set
         {
-            if (value > 0) _min = value;
+            if (value > 0)
+            {
+                _min = value;
+            }
         }
     }
 
@@ -111,7 +114,10 @@ class LogScale
         get { return _max; }
         set
         {
-            if (value > 0) _max = value;
+            if (value > 0)
+            {
+                _max = value;
+            }
         }
     }
 
@@ -136,7 +142,7 @@ class LogScale
     /// <param name="axis">
     /// The parent <see cref="Axis" /> for this <see cref="Scale" />
     /// </param>
-    override public void SetupScaleData (GraphPane pane, Axis axis)
+    public override void SetupScaleData (GraphPane pane, Axis axis)
     {
         base.SetupScaleData (pane, axis);
 
@@ -153,7 +159,7 @@ class LogScale
     /// it returns the log or power equivalent.
     /// </remarks>
     /// <param name="val">The value to be converted</param>
-    override public double Linearize (double val)
+    public override double Linearize (double val)
     {
         return SafeLog (val);
     }
@@ -168,7 +174,7 @@ class LogScale
     /// it returns the anti-log or inverse-power equivalent.
     /// </remarks>
     /// <param name="val">The value to be converted</param>
-    override public double DeLinearize (double val)
+    public override double DeLinearize (double val)
     {
         return Math.Pow (10.0, val);
     }
@@ -189,7 +195,7 @@ class LogScale
     /// <returns>
     /// The specified major tic value (floating point double).
     /// </returns>
-    override internal double CalcMajorTicValue (double baseVal, double tic)
+    internal override double CalcMajorTicValue (double baseVal, double tic)
     {
         return baseVal + (double)tic * CyclesPerStep;
 
@@ -214,7 +220,7 @@ class LogScale
     /// <returns>
     /// The specified minor tic value (floating point double).
     /// </returns>
-    override internal double CalcMinorTicValue (double baseVal, int iTic)
+    internal override double CalcMinorTicValue (double baseVal, int iTic)
     {
         double[] dLogVal =
         {
@@ -237,7 +243,7 @@ class LogScale
     /// This value can be negative (e.g., -3 means the first minor tic is 3 minor step
     /// increments before the first major tic.
     /// </returns>
-    override internal int CalcMinorStart (double baseVal)
+    internal override int CalcMinorStart (double baseVal)
     {
         return -9;
     }
@@ -254,10 +260,12 @@ class LogScale
     /// <returns>
     /// First major tic value (floating point double).
     /// </returns>
-    override internal double CalcBaseTic()
+    internal override double CalcBaseTic()
     {
         if (_baseTic != PointPairBase.Missing)
+        {
             return _baseTic;
+        }
         else
         {
             // go to the nearest even multiple of the step size
@@ -271,7 +279,7 @@ class LogScale
     /// <returns>
     /// This is the total number of major tics for this axis.
     /// </returns>
-    override internal int CalcNumTics()
+    internal override int CalcNumTics()
     {
         int nTics = 1;
 
@@ -283,9 +291,13 @@ class LogScale
         nTics = (int)((SafeLog (_max) - SafeLog (_min)) / CyclesPerStep) + 1;
 
         if (nTics < 1)
+        {
             nTics = 1;
+        }
         else if (nTics > 1000)
+        {
             nTics = 1000;
+        }
 
         return nTics;
     }
@@ -332,14 +344,16 @@ class LogScale
     /// </param>
     /// <seealso cref="PickScale"/>
     /// <seealso cref="AxisType.Log"/>
-    override public void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
     {
         // call the base class first
         base.PickScale (pane, g, scaleFactor);
 
         // Majorstep is always 1 for log scales
         if (_majorStepAuto)
+        {
             _majorStep = 1.0;
+        }
 
         _mag = 0; // Never use a magnitude shift for log scales
 
@@ -364,18 +378,28 @@ class LogScale
         if (_max - _min < 1.0e-20)
         {
             if (_maxAuto)
+            {
                 _max = _max * 2.0;
+            }
+
             if (_minAuto)
+            {
                 _min = _min / 2.0;
+            }
         }
 
         // Get the nearest power of 10 (no partial log cycles allowed)
         if (_minAuto)
+        {
             _min = Math.Pow ((double)10.0,
                 Math.Floor (Math.Log10 (_min)));
+        }
+
         if (_maxAuto)
+        {
             _max = Math.Pow ((double)10.0,
                 Math.Ceiling (Math.Log10 (_max)));
+        }
     }
 
     /// <summary>
@@ -394,15 +418,21 @@ class LogScale
     /// and text (<see cref="Scale.IsText"/>) type axes.
     /// </param>
     /// <returns>The resulting value label as a <see cref="string" /></returns>
-    override internal string MakeLabel (GraphPane pane, int index, double dVal)
+    internal override string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
+        {
             _format = Default.Format;
+        }
 
         if (_isUseTenPower)
+        {
             return string.Format ("{0:F0}", dVal);
+        }
         else
+        {
             return Math.Pow (10.0, dVal).ToString (_format);
+        }
     }
 
     #endregion

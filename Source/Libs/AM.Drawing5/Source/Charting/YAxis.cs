@@ -170,7 +170,7 @@ public class YAxis
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    override public void SetTransformMatrix (Graphics g, GraphPane pane, float scaleFactor)
+    public override void SetTransformMatrix (Graphics g, GraphPane pane, float scaleFactor)
     {
         // Move the origin to the TopLeft of the ChartRect, which is the left
         // side of the axis (facing from the label side)
@@ -197,7 +197,7 @@ public class YAxis
     /// owner of this object.
     /// </param>
     /// <returns>true for a primary <see cref="Axis" />, false otherwise</returns>
-    override internal bool IsPrimary (GraphPane pane)
+    internal override bool IsPrimary (GraphPane pane)
     {
         return this == pane.YAxis;
     }
@@ -216,9 +216,13 @@ public class YAxis
         double effCross = EffectiveCrossValue (pane);
 
         if (!_crossAuto)
+        {
             return pane.XAxis.Scale._minPix - pane.XAxis.Scale.Transform (effCross);
+        }
         else
+        {
             return 0;
+        }
     }
 
     /*
@@ -242,7 +246,7 @@ public class YAxis
     /// A reference to the <see cref="GraphPane"/> object that is the parent or
     /// owner of this object.
     /// </param>
-    override public Axis GetCrossAxis (GraphPane pane)
+    public override Axis GetCrossAxis (GraphPane pane)
     {
         return pane.XAxis;
     }

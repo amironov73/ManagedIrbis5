@@ -197,7 +197,9 @@ public class PolyObj
         _points = (PointD[])info.GetValue ("points", typeof (PointD[]));
 
         if (schema3 >= 11)
+        {
             _isClosedFigure = info.GetBoolean ("isClosedFigure");
+        }
     }
 
     /// <summary>
@@ -219,28 +221,13 @@ public class PolyObj
 
     #region Rendering Methods
 
-    /// <summary>
-    /// Render this object to the specified <see cref="Graphics"/> device.
-    /// </summary>
-    /// <remarks>
-    /// This method is normally only called by the Draw method
-    /// of the parent <see cref="GraphObjList"/> collection object.
-    /// </remarks>
-    /// <param name="g">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="PaneBase"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    override public void Draw (Graphics g, PaneBase pane, float scaleFactor)
+    /// <inheritdoc cref="BoxObj.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics,
+            PaneBase pane,
+            float scaleFactor
+        )
     {
         if (_points != null && _points.Length > 1)
         {
@@ -250,13 +237,13 @@ public class PolyObj
                 if (_fill.IsVisible)
                 {
                     using (Brush brush = Fill.MakeBrush (path.GetBounds()))
-                        g.FillPath (brush, path);
+                        graphics.FillPath (brush, path);
                 }
 
                 if (_border.IsVisible)
                 {
                     using (Pen pen = _border.GetPen (pane, scaleFactor))
-                        g.DrawPath (pen, path);
+                        graphics.DrawPath (pen, path);
                 }
             }
         }
@@ -280,16 +267,22 @@ public class PolyObj
                 Math.Abs (pixPt.Y) < 100000)
             {
                 if (first)
+                {
                     first = false;
+                }
                 else
+                {
                     path.AddLine (lastPt, pixPt);
+                }
 
                 lastPt = pixPt;
             }
         }
 
         if (_isClosedFigure)
+        {
             path.CloseFigure();
+        }
 
         return path;
     }
@@ -298,12 +291,12 @@ public class PolyObj
     /// Determine if the specified screen point lies inside the bounding box of this
     /// <see cref="PolyObj"/>.
     /// </summary>
-    /// <param name="pt">The screen point, in pixels</param>
+    /// <param name="point">The screen point, in pixels</param>
     /// <param name="pane">
     /// A reference to the <see cref="PaneBase"/> object that is the parent or
     /// owner of this object.
     /// </param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -314,18 +307,28 @@ public class PolyObj
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
     /// <returns>true if the point lies in the bounding box, false otherwise</returns>
-    override public bool PointInBox (PointF pt, PaneBase pane, Graphics g, float scaleFactor)
+    public override bool PointInBox
+        (
+            PointF point,
+            PaneBase pane,
+            Graphics graphics,
+            float scaleFactor
+        )
     {
         if (_points != null && _points.Length > 1)
         {
-            if (!base.PointInBox (pt, pane, g, scaleFactor))
+            if (!base.PointInBox (point, pane, graphics, scaleFactor))
+            {
                 return false;
+            }
 
             using (GraphicsPath path = MakePath (pane))
-                return path.IsVisible (pt);
+                return path.IsVisible (point);
         }
         else
+        {
             return false;
+        }
     }
 
     #endregion

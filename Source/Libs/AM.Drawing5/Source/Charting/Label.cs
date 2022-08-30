@@ -94,15 +94,23 @@ public class Label
     public Label (Label rhs)
     {
         if (rhs._text != null)
+        {
             _text = (string)rhs._text.Clone();
+        }
         else
+        {
             _text = string.Empty;
+        }
 
         _isVisible = rhs._isVisible;
         if (rhs._fontSpec != null)
+        {
             _fontSpec = rhs._fontSpec.Clone();
+        }
         else
+        {
             _fontSpec = null;
+        }
     }
 
     /// <summary>

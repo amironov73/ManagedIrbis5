@@ -89,7 +89,7 @@ public class TextScale
     /// This value can be negative (e.g., -3 means the first minor tic is 3 minor step
     /// increments before the first major tic.
     /// </returns>
-    override internal int CalcMinorStart (double baseVal)
+    internal override int CalcMinorStart (double baseVal)
     {
         // This should never happen (no minor tics for text labels)
         return 0;
@@ -107,12 +107,16 @@ public class TextScale
     /// <returns>
     /// First major tic value (floating point double).
     /// </returns>
-    override internal double CalcBaseTic()
+    internal override double CalcBaseTic()
     {
         if (_baseTic != PointPairBase.Missing)
+        {
             return _baseTic;
+        }
         else
+        {
             return 1.0;
+        }
     }
 
     /// <summary>
@@ -121,20 +125,28 @@ public class TextScale
     /// <returns>
     /// This is the total number of major tics for this axis.
     /// </returns>
-    override internal int CalcNumTics()
+    internal override int CalcNumTics()
     {
         int nTics = 1;
 
         // If no array of labels is available, just assume 10 labels so we don't blow up.
         if (_textLabels == null)
+        {
             nTics = 10;
+        }
         else
+        {
             nTics = _textLabels.Length;
+        }
 
         if (nTics < 1)
+        {
             nTics = 1;
+        }
         else if (nTics > 1000)
+        {
             nTics = 1000;
+        }
 
         return nTics;
     }
@@ -182,7 +194,7 @@ public class TextScale
     /// </param>
     /// <seealso cref="PickScale"/>
     /// <seealso cref="AxisType.Text"/>
-    override public void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
     {
         // call the base class first
         base.PickScale (pane, g, scaleFactor);
@@ -191,25 +203,39 @@ public class TextScale
         if (_textLabels != null)
         {
             if (_minAuto)
+            {
                 _min = 0.5;
+            }
+
             if (_maxAuto)
+            {
                 _max = _textLabels.Length + 0.5;
+            }
         }
         else
         {
             if (_minAuto)
+            {
                 _min -= 0.5;
+            }
+
             if (_maxAuto)
+            {
                 _max += 0.5;
+            }
         }
 
         // Test for trivial condition of range = 0 and pick a suitable default
         if (_max - _min < .1)
         {
             if (_maxAuto)
+            {
                 _max = _min + 10.0;
+            }
             else
+            {
                 _min = _max - 10.0;
+            }
         }
 
         if (_majorStepAuto)
@@ -231,13 +257,17 @@ public class TextScale
                 _majorStep = tmpStep;
             }
             else
+            {
                 _majorStep = (int)((_max - _min - 1.0) / Default.MaxTextLabels) + 1.0;
+            }
         }
         else
         {
             _majorStep = (int)_majorStep;
             if (_majorStep <= 0)
+            {
                 _majorStep = 1.0;
+            }
         }
 
         if (_minorStepAuto)
@@ -246,7 +276,9 @@ public class TextScale
 
             //_minorStep = CalcStepSize( _majorStep, 10 );
             if (_minorStep < 1)
+            {
                 _minorStep = 1;
+            }
         }
 
         _mag = 0;
@@ -268,16 +300,22 @@ public class TextScale
     /// and text (<see cref="Scale.IsText"/>) type axes.
     /// </param>
     /// <returns>The resulting value label as a <see cref="string" /></returns>
-    override internal string MakeLabel (GraphPane pane, int index, double dVal)
+    internal override string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
+        {
             _format = Default.Format;
+        }
 
         index *= (int)_majorStep;
         if (_textLabels == null || index < 0 || index >= _textLabels.Length)
+        {
             return string.Empty;
+        }
         else
+        {
             return _textLabels[index];
+        }
     }
 
     #endregion

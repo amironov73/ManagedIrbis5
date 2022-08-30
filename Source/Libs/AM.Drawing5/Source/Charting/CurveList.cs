@@ -58,7 +58,9 @@ public class CurveList
             foreach (CurveItem curve in this)
             {
                 if (curve.IsBar)
+                {
                     count++;
+                }
             }
 
             return count;
@@ -81,7 +83,9 @@ public class CurveList
             foreach (CurveItem curve in this)
             {
                 if (curve.IsBar || curve is HiLowBarItem)
+                {
                     count++;
+                }
             }
 
             return count;
@@ -101,7 +105,9 @@ public class CurveList
             foreach (CurveItem curve in this)
             {
                 if (curve.IsPie)
+                {
                     count++;
+                }
             }
 
             return count;
@@ -120,9 +126,13 @@ public class CurveList
             foreach (CurveItem curve in this)
             {
                 if (!curve.IsPie)
+                {
                     return false;
+                }
                 else
+                {
                     hasPie = true;
+                }
             }
 
             return hasPie;
@@ -140,7 +150,9 @@ public class CurveList
         foreach (CurveItem curve in this)
         {
             if (curve.Points.Count > 0)
+            {
                 return true;
+            }
         }
 
         return false;
@@ -251,9 +263,13 @@ public class CurveList
         {
             int index = IndexOf (label);
             if (index >= 0)
+            {
                 return (this[index]);
+            }
             else
+            {
                 return null;
+            }
         }
     }
 /*
@@ -311,7 +327,10 @@ public class CurveList
         foreach (CurveItem p in this)
         {
             if (string.Compare (p._label._text, label, true) == 0)
+            {
                 return index;
+            }
+
             index++;
         }
 
@@ -336,7 +355,10 @@ public class CurveList
         {
             if (p.Tag is string &&
                 string.Compare ((string)p.Tag, tag, true) == 0)
+            {
                 return index;
+            }
+
             index++;
         }
 
@@ -372,16 +394,23 @@ public class CurveList
     public int Move (int index, int relativePos)
     {
         if (index < 0 || index >= Count)
+        {
             return -1;
+        }
 
         CurveItem curve = this[index];
         RemoveAt (index);
 
         index += relativePos;
         if (index < 0)
+        {
             index = 0;
+        }
+
         if (index > Count)
+        {
             index = Count;
+        }
 
         Insert (index, curve);
         return index;
@@ -493,9 +522,13 @@ public class CurveList
                         if (!(curve is HiLowBarItem))
                         {
                             if (tYMinVal > 0)
+                            {
                                 tYMinVal = 0;
+                            }
                             else if (tYMaxVal < 0)
+                            {
                                 tYMaxVal = 0;
+                            }
                         }
 
                         // for non-ordinal axes, expand the data range slightly for bar charts to
@@ -512,9 +545,13 @@ public class CurveList
                         if (!(curve is HiLowBarItem))
                         {
                             if (tXMinVal > 0)
+                            {
                                 tXMinVal = 0;
+                            }
                             else if (tXMaxVal < 0)
+                            {
                                 tXMaxVal = 0;
+                            }
                         }
 
                         // for non-ordinal axes, expand the data range slightly for bar charts to
@@ -529,22 +566,34 @@ public class CurveList
 
                 // determine which curve has the maximum number of points
                 if (curve.NPts > maxPts)
+                {
                     maxPts = curve.NPts;
+                }
 
                 // If the min and/or max values from the current curve
                 // are the absolute min and/or max, then save the values
                 // Also, differentiate between Y and Y2 values
 
                 if (tYMinVal < yScale._rangeMin)
+                {
                     yScale._rangeMin = tYMinVal;
+                }
+
                 if (tYMaxVal > yScale._rangeMax)
+                {
                     yScale._rangeMax = tYMaxVal;
+                }
 
 
                 if (tXMinVal < xScale._rangeMin)
+                {
                     xScale._rangeMin = tXMinVal;
+                }
+
                 if (tXMaxVal > xScale._rangeMax)
+                {
                     xScale._rangeMax = tXMaxVal;
+                }
             }
         }
 
@@ -605,27 +654,48 @@ public class CurveList
             if (x != PointPairBase.Missing && y != PointPairBase.Missing && lowVal != PointPairBase.Missing)
             {
                 if (x < tXMinVal)
+                {
                     tXMinVal = x;
+                }
+
                 if (x > tXMaxVal)
+                {
                     tXMaxVal = x;
+                }
+
                 if (y < tYMinVal)
+                {
                     tYMinVal = y;
+                }
+
                 if (y > tYMaxVal)
+                {
                     tYMaxVal = y;
+                }
 
                 if (!isXBase)
                 {
                     if (lowVal < tXMinVal)
+                    {
                         tXMinVal = lowVal;
+                    }
+
                     if (lowVal > tXMaxVal)
+                    {
                         tXMaxVal = lowVal;
+                    }
                 }
                 else
                 {
                     if (lowVal < tYMinVal)
+                    {
                         tYMinVal = lowVal;
+                    }
+
                     if (lowVal > tYMaxVal)
+                    {
                         tYMaxVal = lowVal;
+                    }
                 }
             }
         }
@@ -667,7 +737,9 @@ public class CurveList
             CurveList tempList = new CurveList();
             foreach (CurveItem curve in this)
                 if (curve.IsBar)
+                {
                     tempList.Add ((CurveItem)curve);
+                }
 
             // Loop through the bars, graphing each ordinal position separately
             for (int i = 0; i < maxPts; i++)
@@ -693,7 +765,9 @@ public class CurveList
             CurveItem curve = this[i];
 
             if (curve.IsBar)
+            {
                 pos--;
+            }
 
             // Render the curve
 
@@ -720,15 +794,21 @@ public class CurveList
         if (pane._barSettings.Type == BarType.Overlay ||
             pane._barSettings.Type == BarType.Stack ||
             pane._barSettings.Type == BarType.PercentStack)
+        {
             return 0;
+        }
 
         int i = 0;
         foreach (CurveItem curve in this)
         {
             if (curve == barItem)
+            {
                 return i;
+            }
             else if (curve is BarItem)
+            {
                 i++;
+            }
         }
 
         return -1;

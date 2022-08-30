@@ -121,7 +121,7 @@ class LinearAsOrdinalScale
     /// </param>
     /// <seealso cref="PickScale"/>
     /// <seealso cref="AxisType.Ordinal"/>
-    override public void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
     {
         // call the base class first
         base.PickScale (pane, g, scaleFactor);
@@ -180,10 +180,12 @@ class LinearAsOrdinalScale
     /// and text (<see cref="Scale.IsText"/>) type axes.
     /// </param>
     /// <returns>The resulting value label as a <see cref="string" /></returns>
-    override internal string MakeLabel (GraphPane pane, int index, double dVal)
+    internal override string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
+        {
             _format = Default.Format;
+        }
 
         double val;
 
@@ -196,7 +198,9 @@ class LinearAsOrdinalScale
             return (val / scaleMult).ToString (_format);
         }
         else
+        {
             return string.Empty;
+        }
     }
 
     #endregion

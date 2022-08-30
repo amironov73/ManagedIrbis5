@@ -50,7 +50,7 @@ public class Border
     /// A simple struct that defines the
     /// default property values for the <see cref="Fill"/> class.
     /// </summary>
-    new public struct Default
+    public new struct Default
     {
         /// <summary>
         /// The default value for <see cref="Border.InflateFactor"/>, in units of points (1/72 inch).

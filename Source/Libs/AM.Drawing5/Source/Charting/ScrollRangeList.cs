@@ -80,9 +80,13 @@ public class ScrollRangeList
         get
         {
             if (index < 0 || index >= Count)
+            {
                 return new ScrollRange (false);
+            }
             else
+            {
                 return (ScrollRange)base[index];
+            }
         }
         set { base[index] = value; }
     }

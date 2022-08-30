@@ -106,7 +106,9 @@ public class ColorSymbolRotator
         get
         {
             if (colorIndex >= COLORS.Length)
+            {
                 colorIndex = 0;
+            }
 
             return colorIndex++;
         }
@@ -133,7 +135,9 @@ public class ColorSymbolRotator
         get
         {
             if (symbolIndex >= SYMBOLS.Length)
+            {
                 symbolIndex = 0;
+            }
 
             return symbolIndex++;
         }
@@ -151,7 +155,9 @@ public class ColorSymbolRotator
         get
         {
             if (_staticInstance == null)
+            {
                 _staticInstance = new ColorSymbolRotator();
+            }
 
             return _staticInstance;
         }

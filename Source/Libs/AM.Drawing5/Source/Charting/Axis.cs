@@ -851,7 +851,9 @@ public abstract class Axis
 
         // isGrowOnly indicates the minSpace can grow but not shrink
         if (isGrowOnly)
+        {
             space = Math.Max (oldSpace, space);
+        }
 
         // Set the minSpace
         MinSpace = space;
@@ -874,7 +876,7 @@ public abstract class Axis
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    abstract public void SetTransformMatrix (Graphics g, GraphPane pane, float scaleFactor);
+    public abstract void SetTransformMatrix (Graphics g, GraphPane pane, float scaleFactor);
 
 
     /// <summary>
@@ -886,7 +888,7 @@ public abstract class Axis
     /// owner of this object.
     /// </param>
     /// <returns>The shift amount measured in pixels</returns>
-    abstract internal float CalcCrossShift (GraphPane pane);
+    internal abstract float CalcCrossShift (GraphPane pane);
 
     /// <summary>
     /// Gets the "Cross" axis that corresponds to this axis.
@@ -903,7 +905,7 @@ public abstract class Axis
     /// A reference to the <see cref="GraphPane"/> object that is the parent or
     /// owner of this object.
     /// </param>
-    abstract public Axis GetCrossAxis (GraphPane pane);
+    public abstract Axis GetCrossAxis (GraphPane pane);
 
 //		abstract internal float GetMinPix( GraphPane pane );
 
@@ -929,16 +931,26 @@ public abstract class Axis
         if (_crossAuto)
         {
             if (crossAxis._scale.IsReverse == (this is Y2Axis || this is X2Axis))
+            {
                 return max;
+            }
             else
+            {
                 return min;
+            }
         }
         else if (_cross < min)
+        {
             return min;
+        }
         else if (_cross > max)
+        {
             return max;
+        }
         else
+        {
             return _scale.Linearize (_cross);
+        }
     }
 
     /// <summary>
@@ -949,7 +961,9 @@ public abstract class Axis
     internal bool IsCrossShifted (GraphPane pane)
     {
         if (_crossAuto)
+        {
             return false;
+        }
         else
         {
             Axis crossAxis = GetCrossAxis (pane);
@@ -957,12 +971,16 @@ public abstract class Axis
                 ((this is X2Axis || this is Y2Axis) && crossAxis._scale.IsReverse))
             {
                 if (_cross <= crossAxis._scale._min)
+                {
                     return false;
+                }
             }
             else
             {
                 if (_cross >= crossAxis._scale._max)
+                {
                     return false;
+                }
             }
         }
 
@@ -983,11 +1001,15 @@ public abstract class Axis
             // if it's the primary axis and the scale labels are on the inside, then we
             // don't need to save any room for the axis labels (they will be inside the chart rect)
             if (IsPrimary (pane) && _scale._isLabelsInside)
+            {
                 return 1.0f;
+            }
 
             // otherwise, it's a secondary (outboard) axis and we always save room for the axis and labels.
             else
+            {
                 return 0.0f;
+            }
         }
 
         double effCross = EffectiveCrossValue (pane);
@@ -1003,14 +1025,23 @@ public abstract class Axis
 
         if (((this is XAxis || this is YAxis) && _scale._isLabelsInside == crossAxis._scale.IsReverse) ||
             ((this is X2Axis || this is Y2Axis) && _scale._isLabelsInside != crossAxis._scale.IsReverse))
+        {
             frac = (float)((effCross - min) / (max - min));
+        }
         else
+        {
             frac = (float)((max - effCross) / (max - min));
+        }
 
         if (frac < 0.0f)
+        {
             frac = 0.0f;
+        }
+
         if (frac > 1.0f)
+        {
             frac = 1.0f;
+        }
 
         return frac;
     }
@@ -1038,7 +1069,9 @@ public abstract class Axis
                     // shift the axis to leave room for the outside tics
                     if (_majorTic.IsOutside || _majorTic._isCrossOutside ||
                         _minorTic.IsOutside || _minorTic._isCrossOutside)
+                    {
                         shiftPos -= ticSize;
+                    }
                 }
                 else
                 {
@@ -1048,7 +1081,9 @@ public abstract class Axis
                     // if it has inside tics, leave another tic space
                     if (_majorTic.IsInside || _majorTic._isCrossInside ||
                         _minorTic.IsInside || _minorTic._isCrossInside)
+                    {
                         shiftPos += ticSize;
+                    }
                 }
             }
         }
@@ -1123,7 +1158,9 @@ public abstract class Axis
 
             // account for the tic space.  Leave the tic space for any type of outside tic (Outside Tic Space)
             if (hasTic)
+            {
                 _tmpSpace += ticSize;
+            }
 
             // if this is not the primary axis
             if (!IsPrimary (pane))
@@ -1134,7 +1171,9 @@ public abstract class Axis
                 // if it has inside tics, leave another tic space (Inside Tic Space)
                 if (MajorTic._isInside || MajorTic._isCrossInside ||
                     MinorTic._isInside || MinorTic._isCrossInside)
+                {
                     _tmpSpace += ticSize;
+                }
             }
 
             // tic takes up 1x tic
@@ -1162,7 +1201,9 @@ public abstract class Axis
             }
 
             if (hasTic)
+            {
                 fixedSpace += ticSize;
+            }
         }
 
         // for the Y axes, make sure that enough space is left to fit the first
@@ -1216,7 +1257,7 @@ public abstract class Axis
     /// </param>
     /// <returns>true for a primary <see cref="Axis" /> (for the <see cref="XAxis" />,
     /// this is always true), false otherwise</returns>
-    abstract internal bool IsPrimary (GraphPane pane);
+    internal abstract bool IsPrimary (GraphPane pane);
 
     internal void FixZeroLine (Graphics g, GraphPane pane, float scaleFactor,
         float left, float right)
@@ -1306,7 +1347,9 @@ public abstract class Axis
 
                         // Maintain a value for the current major tic
                         if (dVal > majorVal)
+                        {
                             majorVal = _scale.CalcMajorTicValue (baseVal, ++MajorTic);
+                        }
 
                         // Make sure that the current value does not match up with a major tic
                         if (((Math.Abs (dVal) < 1e-20 && Math.Abs (dVal - majorVal) > 1e-20) ||
@@ -1387,12 +1430,18 @@ public abstract class Axis
                 : 0);
 
             if (_scale._isLabelsInside)
+            {
                 y = shiftPos - y - gap;
+            }
             else
+            {
                 y = shiftPos + y + gap;
+            }
 
             if (!_crossAuto && !_title._isTitleAtCross)
+            {
                 y = Math.Max (y, gap);
+            }
 
             AlignV alignV = AlignV.Center;
 
@@ -1408,7 +1457,9 @@ public abstract class Axis
     private string MakeTitle()
     {
         if (_title._text == null)
+        {
             _title._text = "";
+        }
 
         // Revision: JCarpenter 10/06
         // Allow customization of the modified title when the scale is very large
@@ -1418,15 +1469,21 @@ public abstract class Axis
         {
             string label = ScaleTitleEvent (this);
             if (label != null)
+            {
                 return label;
+            }
         }
 
         // If the Mag is non-zero and IsOmitMag == false, and IsLog == false,
         // then add the mag indicator to the title.
         if (_scale._mag != 0 && !_title._isOmitMag && !_scale.IsLog)
+        {
             return _title._text + string.Format (" (10^{0})", _scale._mag);
+        }
         else
+        {
             return _title._text;
+        }
     }
 
     /// <summary>
@@ -1462,15 +1519,21 @@ public abstract class Axis
 
             label = ScaleFormatEvent (pane, this, dVal, index);
             if (label != null)
+            {
                 return label;
+            }
         }
 
         // second try.  If there's no custom ScaleFormatEvent, then just call
         // _scale.MakeLabel according to the type of scale
         if (Scale != null)
+        {
             return _scale.MakeLabel (pane, index, dVal);
+        }
         else
+        {
             return "?";
+        }
     }
 
     #endregion

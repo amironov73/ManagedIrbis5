@@ -135,9 +135,13 @@ public class PaneList
         {
             int index = IndexOf (title);
             if (index >= 0)
+            {
                 return ((GraphPane)this[index]);
+            }
             else
+            {
                 return null;
+            }
         }
     }
 
@@ -195,7 +199,10 @@ public class PaneList
         foreach (GraphPane pane in this)
         {
             if (string.Compare (pane.Title.Text, title, true) == 0)
+            {
                 return index;
+            }
+
             index++;
         }
 
@@ -220,7 +227,10 @@ public class PaneList
         {
             if (pane.Tag is string &&
                 string.Compare ((string)pane.Tag, tagStr, true) == 0)
+            {
                 return index;
+            }
+
             index++;
         }
 

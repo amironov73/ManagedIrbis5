@@ -102,15 +102,21 @@ public class ValueHandler
         baseVal = PointPairBase.Missing;
 
         if (curve == null || curve.Points.Count <= iPt || !curve.IsVisible)
+        {
             return false;
+        }
 
         Axis baseAxis = curve.BaseAxis (pane);
         Axis valueAxis = curve.ValueAxis (pane);
 
         if (baseAxis is XAxis || baseAxis is X2Axis)
+        {
             baseVal = curve.Points[iPt].X;
+        }
         else
+        {
             baseVal = curve.Points[iPt].Y;
+        }
 
         // is it a stacked bar type?
         if (curve is BarItem && (pane._barSettings.Type == BarType.Stack ||
@@ -154,9 +160,13 @@ public class ValueHandler
                     {
                         // Get the value for the appropriate value axis
                         if (baseAxis is XAxis || baseAxis is X2Axis)
+                        {
                             curVal = tmpCurve.Points[iPt].Y;
+                        }
                         else
+                        {
                             curVal = tmpCurve.Points[iPt].X;
+                        }
                     }
 
                     // If it's a missing value, skip it
@@ -191,13 +201,17 @@ public class ValueHandler
                     // Add all positive values to the positive stack, and negative values to the
                     // negative stack
                     if (curVal >= 0)
+                    {
                         positiveStack = (curVal == PointPairBase.Missing || positiveStack == PointPairBase.Missing)
                             ? PointPairBase.Missing
                             : positiveStack + curVal;
+                    }
                     else
+                    {
                         negativeStack = (curVal == PointPairBase.Missing || negativeStack == PointPairBase.Missing)
                             ? PointPairBase.Missing
                             : negativeStack + curVal;
+                    }
                 }
             }
 
@@ -226,9 +240,13 @@ public class ValueHandler
 
             if (baseVal == PointPairBase.Missing || lowVal == PointPairBase.Missing ||
                 hiVal == PointPairBase.Missing)
+            {
                 return false;
+            }
             else
+            {
                 return true;
+            }
         }
 
         // If the curve is a stacked line type, then sum up the values similar to the stacked bar type
@@ -270,7 +288,9 @@ public class ValueHandler
 
                     // if the current value is missing, then the rest of the stack is missing
                     if (curVal == PointPairBase.Missing)
+                    {
                         stack = PointPairBase.Missing;
+                    }
 
                     // if the current curve is the target curve, save the values
                     if (tmpCurve == curve)
@@ -299,36 +319,54 @@ public class ValueHandler
 
             if (baseVal == PointPairBase.Missing || lowVal == PointPairBase.Missing ||
                 hiVal == PointPairBase.Missing)
+            {
                 return false;
+            }
             else
+            {
                 return true;
+            }
         }
 
         // otherwise, the curve is not a stacked type (not a stacked bar or stacked line)
         else
         {
             if ((!(curve is HiLowBarItem)) && (!(curve is ErrorBarItem)))
+            {
                 lowVal = 0;
+            }
             else
+            {
                 lowVal = curve.Points[iPt].LowValue;
+            }
 
             if (baseAxis is XAxis || baseAxis is X2Axis)
+            {
                 hiVal = curve.Points[iPt].Y;
+            }
             else
+            {
                 hiVal = curve.Points[iPt].X;
+            }
         }
 
         // Special Exception: Bars on log scales should always plot from the Min value upwards,
         // since they can never be zero
         if (curve is BarItem && valueAxis._scale.IsLog && lowVal == 0)
+        {
             lowVal = valueAxis._scale._min;
+        }
 
         if (baseVal == PointPairBase.Missing || hiVal == PointPairBase.Missing ||
             (lowVal == PointPairBase.Missing && (curve is ErrorBarItem ||
-                                             curve is HiLowBarItem)))
+                                                 curve is HiLowBarItem)))
+        {
             return false;
+        }
         else
+        {
             return true;
+        }
     }
 
     /// <summary>
@@ -358,9 +396,13 @@ public class ValueHandler
             curve is OHLCBarItem || curve is JapaneseCandleStickItem)
         {
             if (baseAxis._scale.IsAnyOrdinal && iCluster >= 0 && !curve.IsOverrideOrdinal)
+            {
                 return (double)iCluster + 1.0;
+            }
             else
+            {
                 return val;
+            }
         }
         else
         {
@@ -369,7 +411,9 @@ public class ValueHandler
             float barGap = barWidth * _pane._barSettings.MinBarGap;
 
             if (curve.IsBar && _pane._barSettings.Type != BarType.Cluster)
+            {
                 iOrdinal = 0;
+            }
 
             float centerPix = baseAxis.Scale.Transform (curve.IsOverrideOrdinal, iCluster, val)
                               - clusterWidth / 2.0F + clusterGap / 2.0F +

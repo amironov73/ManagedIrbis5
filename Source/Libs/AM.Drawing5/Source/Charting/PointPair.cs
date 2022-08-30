@@ -144,9 +144,13 @@ namespace AM.Drawing.Charting
             Z = rhs.Z;
 
             if (rhs.Tag is ICloneable)
+            {
                 Tag = ((ICloneable)rhs.Tag).Clone();
+            }
             else
+            {
                 Tag = rhs.Tag;
+            }
         }
 
         /// <summary>
@@ -259,7 +263,7 @@ namespace AM.Drawing.Charting
         /// can be mapped to a unique value.  This is used with the
         /// <see cref="FillType.GradientByColorValue" /> option.
         /// </remarks>
-        virtual public double ColorValue
+        public virtual double ColorValue
         {
             get { return Z; }
             set { Z = value; }
@@ -411,7 +415,9 @@ namespace AM.Drawing.Charting
                 double rY = r.Y;
 
                 if (Math.Abs (lY - rY) < .000000001)
+                {
                     return 0;
+                }
 
                 return lY < rY ? -1 : 1;
             }
@@ -444,11 +450,17 @@ namespace AM.Drawing.Charting
             public int Compare (PointPair l, PointPair r)
             {
                 if (l == null && r == null)
+                {
                     return 0;
+                }
                 else if (l == null && r != null)
+                {
                     return -1;
+                }
                 else if (l != null && r == null)
+                {
                     return 1;
+                }
 
                 double lVal, rVal;
 
@@ -464,18 +476,31 @@ namespace AM.Drawing.Charting
                 }
 
                 if (lVal == Missing || double.IsInfinity (lVal) || double.IsNaN (lVal))
+                {
                     l = null;
+                }
+
                 if (rVal == Missing || double.IsInfinity (rVal) || double.IsNaN (rVal))
+                {
                     r = null;
+                }
 
                 if ((l == null && r == null) || (Math.Abs (lVal - rVal) < 1e-100))
+                {
                     return 0;
+                }
                 else if (l == null && r != null)
+                {
                     return -1;
+                }
                 else if (l != null && r == null)
+                {
                     return 1;
+                }
                 else
+                {
                     return lVal < rVal ? -1 : 1;
+                }
             }
         }
 
@@ -512,7 +537,7 @@ namespace AM.Drawing.Charting
         /// </summary>
         /// <param name="isShowZ">true to show the third "Z" or low dependent value coordinate</param>
         /// <returns>A string representation of the PointPair</returns>
-        virtual public string ToString (bool isShowZ)
+        public virtual string ToString (bool isShowZ)
         {
             return ToString (DefaultFormat, isShowZ);
         }
@@ -527,7 +552,7 @@ namespace AM.Drawing.Charting
         /// the two double type values (see <see cref="System.Double.ToString()"/>).</param>
         /// <returns>A string representation of the PointPair</returns>
         /// <param name="isShowZ">true to show the third "Z" or low dependent value coordinate</param>
-        virtual public string ToString (string format, bool isShowZ)
+        public virtual string ToString (string format, bool isShowZ)
         {
             return "( " + X.ToString (format) +
                    ", " + Y.ToString (format) +

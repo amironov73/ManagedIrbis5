@@ -251,7 +251,9 @@ public class JapaneseCandleStick
         _fallingBorder = (Border)info.GetValue ("fallingBorder", typeof (Border));
 
         if (schema2 >= 11)
+        {
             _fallingColor = (Color)info.GetValue ("fallingColor", typeof (Color));
+        }
     }
 
     /// <summary>
@@ -348,9 +350,14 @@ public class JapaneseCandleStick
                 Math.Abs (pixClose) < 1000000)
             {
                 if (rect.Width == 0)
+                {
                     rect.Width = 1;
+                }
+
                 if (rect.Height == 0)
+                {
                     rect.Height = 1;
+                }
 
                 fill.Draw (g, rect, pt);
                 border.Draw (g, pane, scaleFactor, rect);
@@ -446,14 +453,22 @@ public class JapaneseCandleStick
                         pixHigh = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, high);
                         pixLow = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, low);
                         if (PointPairBase.IsValueInvalid (open))
+                        {
                             pixOpen = float.MaxValue;
+                        }
                         else
+                        {
                             pixOpen = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, open);
+                        }
 
                         if (PointPairBase.IsValueInvalid (close))
+                        {
                             pixClose = float.MaxValue;
+                        }
                         else
+                        {
                             pixClose = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, close);
+                        }
 
                         if (!curve.IsSelected && _gradientFill.IsGradientValueType)
                         {
@@ -466,12 +481,14 @@ public class JapaneseCandleStick
                                     (close > open ? tRisingBorder : tFallingBorder), pt);
                         }
                         else
+                        {
                             Draw (g, pane, baseAxis is XAxis || baseAxis is X2Axis,
                                 pixBase, pixHigh, pixLow, pixOpen,
                                 pixClose, halfSize, scaleFactor,
                                 (close > open ? risingPen : fallingPen),
                                 (close > open ? tRisingFill : tFallingFill),
                                 (close > open ? tRisingBorder : tFallingBorder), pt);
+                        }
                     }
                 }
             }

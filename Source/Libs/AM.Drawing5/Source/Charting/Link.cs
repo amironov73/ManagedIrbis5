@@ -173,9 +173,13 @@ public class Link
 
         // copy reference types by cloning
         if (rhs.Tag is ICloneable)
+        {
             Tag = ((ICloneable)rhs.Tag).Clone();
+        }
         else
+        {
             Tag = rhs.Tag;
+        }
     }
 
     /// <summary>
@@ -225,21 +229,29 @@ public class Link
         string url = _url;
 
         if (url.IndexOf ('?') >= 0)
+        {
             url += "&index=" + index.ToString();
+        }
         else
+        {
             url += "?index=" + index.ToString();
+        }
 
         Axis xAxis = curve.GetXAxis (pane);
         if (xAxis.Type == AxisType.Text && index >= 0 &&
             xAxis.Scale.TextLabels != null &&
             index <= xAxis.Scale.TextLabels.Length)
+        {
             url += "&xtext=" + xAxis.Scale.TextLabels[index];
+        }
 
         Axis yAxis = curve.GetYAxis (pane);
         if (yAxis != null && yAxis.Type == AxisType.Text && index >= 0 &&
             yAxis.Scale.TextLabels != null &&
             index <= yAxis.Scale.TextLabels.Length)
+        {
             url += "&ytext=" + yAxis.Scale.TextLabels[index];
+        }
 
         return url;
     }

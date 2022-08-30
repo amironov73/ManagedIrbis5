@@ -474,9 +474,13 @@ public abstract class PaneBase
         _graphObjList = rhs._graphObjList.Clone();
 
         if (rhs._tag is ICloneable)
+        {
             _tag = ((ICloneable)rhs._tag).Clone();
+        }
         else
+        {
             _tag = rhs._tag;
+        }
     }
 
 
@@ -607,7 +611,9 @@ public abstract class PaneBase
     public virtual void Draw (Graphics g)
     {
         if (_rect.Width <= 1 || _rect.Height <= 1)
+        {
             return;
+        }
 
         // calculate scaleFactor on "normal" pane size (BaseDimension)
         float scaleFactor = CalcScaleFactor();
@@ -773,7 +779,9 @@ public abstract class PaneBase
 
         // if font scaling is turned off, then always return a 1.0 scale factor
         if (!_isFontsScaled)
+        {
             return 1.0f;
+        }
 
         // Assume the standard width (BaseDimension) is 8.0 inches
         // Therefore, if the rect is 8.0 inches wide, then the fonts will be scaled at 1.0
@@ -782,19 +790,29 @@ public abstract class PaneBase
 
         // Scale the size depending on the client area width in linear fashion
         if (_rect.Height <= 0)
+        {
             return 1.0F;
+        }
+
         float length = _rect.Width;
         float aspect = _rect.Width / _rect.Height;
         if (aspect > ASPECTLIMIT)
+        {
             length = _rect.Height * ASPECTLIMIT;
+        }
+
         if (aspect < 1.0F / ASPECTLIMIT)
+        {
             length = _rect.Width * ASPECTLIMIT;
+        }
 
         scaleFactor = length / (_baseDimension * 72F);
 
         // Don't let the scaleFactor get ridiculous
         if (scaleFactor < 0.1F)
+        {
             scaleFactor = 0.1F;
+        }
 
         return scaleFactor;
     }
@@ -813,9 +831,13 @@ public abstract class PaneBase
     public float ScaledPenWidth (float penWidth, float scaleFactor)
     {
         if (_isPenWidthScaled)
+        {
             return (float)(penWidth * scaleFactor);
+        }
         else
+        {
             return penWidth;
+        }
     }
 
     /// <summary>

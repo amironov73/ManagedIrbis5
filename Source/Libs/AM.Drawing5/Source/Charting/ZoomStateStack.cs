@@ -124,7 +124,9 @@ public class ZoomStateStack
             return state;
         }
         else
+        {
             return null;
+        }
     }
 
     /// <summary>
@@ -148,7 +150,9 @@ public class ZoomStateStack
             return state;
         }
         else
+        {
             return null;
+        }
     }
 
     /// <summary>
@@ -161,9 +165,13 @@ public class ZoomStateStack
         get
         {
             if (!IsEmpty)
+            {
                 return (ZoomState)this[Count - 1];
+            }
             else
+            {
                 return null;
+            }
         }
     }
 }

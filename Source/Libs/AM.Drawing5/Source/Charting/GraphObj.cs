@@ -361,9 +361,13 @@ public abstract class GraphObj
 
         // copy reference types by cloning
         if (rhs.Tag is ICloneable)
+        {
             Tag = ((ICloneable)rhs.Tag).Clone();
+        }
         else
+        {
             Tag = rhs.Tag;
+        }
 
         _location = rhs.Location.Clone();
         _link = rhs._link.Clone();
@@ -412,13 +416,17 @@ public abstract class GraphObj
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected GraphObj (SerializationInfo info, StreamingContext context)
+    protected GraphObj
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        var sch = info.GetInt32 ("schema");
 
-        _location = (Location)info.GetValue ("location", typeof (Location));
+        _location = (Location) info.GetValue ("location", typeof (Location));
         _isVisible = info.GetBoolean ("isVisible");
         Tag = info.GetValue ("Tag", typeof (object));
         _zOrder = (ZOrder)info.GetValue ("zOrder", typeof (ZOrder));
@@ -459,7 +467,7 @@ public abstract class GraphObj
     /// This method is normally only called by the Draw method
     /// of the parent <see cref="GraphObjList"/> collection object.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -473,18 +481,23 @@ public abstract class GraphObj
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    abstract public void Draw (Graphics g, PaneBase pane, float scaleFactor);
+    public abstract void Draw
+        (
+            Graphics graphics,
+            PaneBase pane,
+            float scaleFactor
+        );
 
     /// <summary>
     /// Determine if the specified screen point lies inside the bounding box of this
     /// <see cref="GraphObj"/>.
     /// </summary>
-    /// <param name="pt">The screen point, in pixels</param>
+    /// <param name="point">The screen point, in pixels</param>
     /// <param name="pane">
     /// A reference to the <see cref="PaneBase"/> object that is the parent or
     /// owner of this object.
     /// </param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -495,21 +508,30 @@ public abstract class GraphObj
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
     /// <returns>true if the point lies in the bounding box, false otherwise</returns>
-    virtual public bool PointInBox (PointF pt, PaneBase pane, Graphics g, float scaleFactor)
+    public virtual bool PointInBox
+        (
+            PointF point,
+            PaneBase pane,
+            Graphics graphics,
+            float scaleFactor
+        )
     {
-        GraphPane gPane = pane as GraphPane;
+        var gPane = pane as GraphPane;
 
-        if (gPane != null && _isClippedToChartRect && !gPane.Chart.Rect.Contains (pt))
-            return false;
-
-        return true;
+        return gPane == null || !_isClippedToChartRect || gPane.Chart.Rect.Contains (point);
     }
 
     /// <summary>
     /// Determines the shape type and Coords values for this GraphObj
     /// </summary>
-    abstract public void GetCoords (PaneBase pane, Graphics g, float scaleFactor,
-        out string shape, out string coords);
+    public abstract void GetCoords
+        (
+            PaneBase pane,
+            Graphics graphics,
+            float scaleFactor,
+            out string shape,
+            out string coords
+        );
 
     #endregion
 }

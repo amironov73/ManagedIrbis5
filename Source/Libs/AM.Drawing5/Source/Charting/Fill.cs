@@ -221,7 +221,9 @@ public class Fill
         Init();
         _color = color;
         if (color != Color.Empty)
+        {
             _type = FillType.Solid;
+        }
     }
 
     /// <summary>
@@ -487,9 +489,14 @@ public class Fill
         _secondaryValueGradientColor = rhs._color;
 
         if (rhs._brush != null)
+        {
             _brush = (Brush)rhs._brush.Clone();
+        }
         else
+        {
             _brush = null;
+        }
+
         _type = rhs._type;
         _alignH = rhs.AlignH;
         _alignV = rhs.AlignV;
@@ -500,21 +507,31 @@ public class Fill
         _gradientBM = null;
 
         if (rhs._colorList != null)
+        {
             _colorList = (Color[])rhs._colorList.Clone();
+        }
         else
+        {
             _colorList = null;
+        }
 
         if (rhs._positionList != null)
         {
             _positionList = (float[])rhs._positionList.Clone();
         }
         else
+        {
             _positionList = null;
+        }
 
         if (rhs._image != null)
+        {
             _image = (Image)rhs._image.Clone();
+        }
         else
+        {
             _image = null;
+        }
 
         _angle = rhs._angle;
         _wrapMode = rhs._wrapMode;
@@ -903,9 +920,14 @@ public class Fill
         if (IsVisible && (!_color.IsEmpty || _brush != null))
         {
             if (rect.Height < 1.0F)
+            {
                 rect.Height = 1.0F;
+            }
+
             if (rect.Width < 1.0F)
+            {
                 rect.Width = 1.0F;
+            }
 
             //Brush	brush;
             if (_type == FillType.Brush)
@@ -925,7 +947,9 @@ public class Fill
                         return tmpFill.MakeBrush (rect);
                     }
                     else
+                    {
                         return new SolidBrush (GetGradientColor (dataValue));
+                    }
                 }
                 else if (_rangeDefault != double.MaxValue)
                 {
@@ -938,13 +962,19 @@ public class Fill
                         return tmpFill.MakeBrush (rect);
                     }
                     else
+                    {
                         return new SolidBrush (GetGradientColor (_rangeDefault));
+                    }
                 }
                 else
+                {
                     return ScaleBrush (rect, _brush, true);
+                }
             }
             else
+            {
                 return new SolidBrush (_color);
+            }
         }
 
         // Always return a suitable default
@@ -956,15 +986,25 @@ public class Fill
         double val;
 
         if (dataValue == null)
+        {
             val = _rangeDefault;
+        }
         else if (_type == FillType.GradientByColorValue)
+        {
             val = dataValue.ColorValue;
+        }
         else if (_type == FillType.GradientByZ)
+        {
             val = dataValue.Z;
+        }
         else if (_type == FillType.GradientByY)
+        {
             val = dataValue.Y;
+        }
         else
+        {
             val = dataValue.X;
+        }
 
         return GetGradientColor (val);
     }
@@ -974,17 +1014,27 @@ public class Fill
         double valueFraction;
 
         if (double.IsInfinity (val) || double.IsNaN (val) || val == PointPairBase.Missing)
+        {
             val = _rangeDefault;
+        }
 
         if (_rangeMax - _rangeMin < 1e-20 || val == double.MaxValue)
+        {
             valueFraction = 0.5;
+        }
         else
+        {
             valueFraction = (val - _rangeMin) / (_rangeMax - _rangeMin);
+        }
 
         if (valueFraction < 0.0)
+        {
             valueFraction = 0.0;
+        }
         else if (valueFraction > 1.0)
+        {
             valueFraction = 1.0;
+        }
 
         if (_gradientBM == null)
         {
@@ -1106,7 +1156,9 @@ public class Fill
         else
 
             // If they didn't provide a brush, make one using the fillcolor gradient to white
+        {
             return new LinearGradientBrush (rect, Color.White, _color, 0F);
+        }
     }
 
     /// <summary>

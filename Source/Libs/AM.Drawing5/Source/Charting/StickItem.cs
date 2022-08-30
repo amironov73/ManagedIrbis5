@@ -51,7 +51,7 @@ public class StickItem
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the Z data are included, false otherwise</value>
-    override internal bool IsZIncluded (GraphPane pane)
+    internal override bool IsZIncluded (GraphPane pane)
     {
         return _symbol.IsVisible;
     }
@@ -62,7 +62,7 @@ public class StickItem
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the X axis is independent, false otherwise</value>
-    override internal bool IsXIndependent (GraphPane pane)
+    internal override bool IsXIndependent (GraphPane pane)
     {
         return true;
     }

@@ -76,7 +76,7 @@ public class LineItem
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the Z data are included, false otherwise</value>
-    override internal bool IsZIncluded (GraphPane pane)
+    internal override bool IsZIncluded (GraphPane pane)
     {
         return false;
     }
@@ -87,7 +87,7 @@ public class LineItem
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the X axis is independent, false otherwise</value>
-    override internal bool IsXIndependent (GraphPane pane)
+    internal override bool IsXIndependent (GraphPane pane)
     {
         return true;
     }
@@ -167,9 +167,13 @@ public class LineItem
     {
         _line = new Line (color);
         if (lineWidth == 0)
+        {
             _line.IsVisible = false;
+        }
         else
+        {
             _line.Width = lineWidth;
+        }
 
         _symbol = new Symbol (symbolType, color);
     }
@@ -289,7 +293,7 @@ public class LineItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    override public void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor)
+    public override void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor)
     {
         if (_isVisible)
         {
@@ -318,7 +322,7 @@ public class LineItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    override public void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
+    public override void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
     {
         // Draw a sample curve to the left of the label text
         int xMid = (int)(rect.Left + rect.Width / 2.0F);
@@ -346,7 +350,7 @@ public class LineItem
     /// The <see cref="ColorSymbolRotator"/> that is used to pick the color
     ///  and symbol for this method call.
     /// </param>
-    override public void MakeUnique (ColorSymbolRotator rotator)
+    public override void MakeUnique (ColorSymbolRotator rotator)
     {
         Color = rotator.NextColor;
         Symbol.Type = rotator.NextSymbol;
@@ -361,16 +365,20 @@ public class LineItem
     /// <param name="coords">A list of coordinates that represents the "rect" for
     /// this point (used in an html AREA tag)</param>
     /// <returns>true if it's a valid point, false otherwise</returns>
-    override public bool GetCoords (GraphPane pane, int i, out string coords)
+    public override bool GetCoords (GraphPane pane, int i, out string coords)
     {
         coords = string.Empty;
 
         if (i < 0 || i >= _points.Count)
+        {
             return false;
+        }
 
         PointPair pt = _points[i];
         if (pt.IsInvalid)
+        {
             return false;
+        }
 
         double x, y, z;
         ValueHandler valueHandler = new ValueHandler (pane, false);
@@ -383,7 +391,9 @@ public class LineItem
             yAxis.Scale.Transform (_isOverrideOrdinal, i, y));
 
         if (!pane.Chart.Rect.Contains (pixPt))
+        {
             return false;
+        }
 
         float halfSize = _symbol.Size * pane.CalcScaleFactor();
 

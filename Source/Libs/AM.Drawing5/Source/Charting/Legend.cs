@@ -319,7 +319,10 @@ public class Legend
         set
         {
             if (value == null)
+            {
                 throw new ArgumentNullException ("Uninitialized FontSpec in Legend");
+            }
+
             _fontSpec = value;
         }
     }
@@ -539,10 +542,14 @@ public class Legend
         _gap = info.GetSingle ("gap");
 
         if (schema >= 11)
+        {
             _isReverse = info.GetBoolean ("isReverse");
+        }
 
         if (schema >= 12)
+        {
             _isShowLegendSymbols = info.GetBoolean ("isShowLegendSymbols");
+        }
     }
 
     /// <summary>
@@ -596,7 +603,9 @@ public class Legend
     {
         // if the legend is not visible, do nothing
         if (!_isVisible)
+        {
             return;
+        }
 
         // Fill the background with the specified color if required
         _fill.Draw (g, _rect);
@@ -607,11 +616,19 @@ public class Legend
 
         // Check for bad data values
         if (_hStack <= 0)
+        {
             _hStack = 1;
+        }
+
         if (_legendItemWidth <= 0)
+        {
             _legendItemWidth = 100;
+        }
+
         if (_legendItemHeight <= 0)
+        {
             _legendItemHeight = _tmpSize;
+        }
 
         //float gap = pane.ScaledGap( scaleFactor );
 
@@ -665,7 +682,9 @@ public class Legend
                         else
                         {
                             if (curve._label._fontSpec == null)
+                            {
                                 tmpFont.FontColor = curve.Color;
+                            }
 
                             tmpFont.Draw (g, pane, curve._label._text,
                                 x + 0.0F * _tmpSize, y + _legendItemHeight / 2.0F,
@@ -678,12 +697,16 @@ public class Legend
                 }
 
                 if (pane is MasterPane && ((MasterPane)pane).IsUniformLegendEntries)
+                {
                     break;
+                }
             }
 
             // Draw a border around the legend if required
             if (iEntry > 0)
+            {
                 Border.Draw (g, pane, scaleFactor, _rect);
+            }
         }
     }
 
@@ -702,13 +725,17 @@ public class Legend
                 {
                     float tmpHeight = defaultCharHeight;
                     if (curve._label._fontSpec != null)
+                    {
                         tmpHeight = curve._label._fontSpec.GetHeight (scaleFactor);
+                    }
 
                     // Account for multiline legend entries
                     tmpHeight *= curve._label._text.Split ('\n').Length;
 
                     if (tmpHeight > maxCharHeight)
+                    {
                         maxCharHeight = tmpHeight;
+                    }
                 }
             }
         }
@@ -747,9 +774,14 @@ public class Legend
             int j = (int)((mousePt.Y - _rect.Top) / _legendItemHeight);
             int i = (int)((mousePt.X - _rect.Left - _tmpSize / 2.0f) / _legendItemWidth);
             if (i < 0)
+            {
                 i = 0;
+            }
+
             if (i >= _hStack)
+            {
                 i = _hStack - 1;
+            }
 
             int pos = i + j * _hStack;
             index = 0;
@@ -763,7 +795,10 @@ public class Legend
                     if (curve._label._isVisible && curve._label._text != string.Empty)
                     {
                         if (pos == 0)
+                        {
                             return true;
+                        }
+
                         pos--;
                     }
 
@@ -774,7 +809,9 @@ public class Legend
             return true;
         }
         else
+        {
             return false;
+        }
     }
 
     private PaneList GetPaneList (PaneBase pane)
@@ -789,7 +826,9 @@ public class Legend
             paneList.Add ((GraphPane)pane);
         }
         else
+        {
             paneList = ((MasterPane)pane).PaneList;
+        }
 
         return paneList;
     }
@@ -834,7 +873,9 @@ public class Legend
 
         // If the legend is invisible, don't do anything
         if (!_isVisible)
+        {
             return;
+        }
 
         int nCurve = 0;
 
@@ -864,18 +905,24 @@ public class Legend
                     tmpWidth = tmpFont.GetWidth (g, curve._label._text, scaleFactor);
 
                     if (tmpWidth > maxWidth)
+                    {
                         maxWidth = tmpWidth;
+                    }
 
                     // Save the maximum symbol height for line-type curves
                     if (curve is LineItem && ((LineItem)curve).Symbol.Size > _legendItemHeight)
+                    {
                         _legendItemHeight = ((LineItem)curve).Symbol.Size;
+                    }
 
                     nCurve++;
                 }
             }
 
             if (pane is MasterPane && ((MasterPane)pane).IsUniformLegendEntries)
+            {
                 break;
+            }
         }
 
         float widthAvail;
@@ -924,30 +971,44 @@ public class Legend
 
             // width of one legend entry
             if (_isShowLegendSymbols)
+            {
                 _legendItemWidth = 3.0f * _tmpSize + maxWidth;
+            }
             else
+            {
                 _legendItemWidth = 0.5f * _tmpSize + maxWidth;
+            }
 
             // Calculate the number of columns in the legend
             // Normally, the legend is:
             //     available width / ( max width of any entry + space for line&symbol )
             if (maxWidth > 0)
+            {
                 _hStack = (int)((widthAvail - halfGap) / _legendItemWidth);
+            }
 
             // You can never have more columns than legend entries
             if (_hStack > nCurve)
+            {
                 _hStack = nCurve;
+            }
 
             // a saftey check
             if (_hStack == 0)
+            {
                 _hStack = 1;
+            }
         }
         else
         {
             if (_isShowLegendSymbols)
+            {
                 _legendItemWidth = 3.0F * _tmpSize + maxWidth;
+            }
             else
+            {
                 _legendItemWidth = 0.5F * _tmpSize + maxWidth;
+            }
         }
 
         // legend is:
@@ -966,7 +1027,10 @@ public class Legend
         // The total legend height
         _legendItemHeight = _legendItemHeight * (float)scaleFactor + halfGap;
         if (_tmpSize > _legendItemHeight)
+        {
             _legendItemHeight = _tmpSize;
+        }
+
         float totLegHeight = (float)Math.Ceiling ((double)nCurve / (double)_hStack)
                              * _legendItemHeight;
 

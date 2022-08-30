@@ -67,7 +67,9 @@ public class CollectionPlus
     public void Remove (int index)
     {
         if (index >= 0 && index < List.Count)
+        {
             List.RemoveAt (index);
+        }
     }
 
     /// <summary>
@@ -101,14 +103,23 @@ public class CollectionPlus
     public int Move (int index, int relativePos)
     {
         if (index < 0 || index >= List.Count)
+        {
             return -1;
+        }
+
         object obj = List[index];
         List.RemoveAt (index);
         index += relativePos;
         if (index < 0)
+        {
             index = 0;
+        }
+
         if (index > List.Count)
+        {
             index = List.Count;
+        }
+
         List.Insert (index, obj);
         return index;
     }

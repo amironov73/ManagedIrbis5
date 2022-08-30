@@ -95,7 +95,7 @@ public class StockPointList
     /// </summary>
     /// <param name="point">The <see cref="StockPoint"/> object to
     /// be added</param>
-    new public void Add (StockPoint point)
+    public new void Add (StockPoint point)
     {
         base.Add (new StockPoint (point));
     }

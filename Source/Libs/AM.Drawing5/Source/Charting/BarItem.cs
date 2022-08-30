@@ -63,7 +63,7 @@ public class BarItem
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the Z data are included, false otherwise</value>
-    override internal bool IsZIncluded (GraphPane pane)
+    internal override bool IsZIncluded (GraphPane pane)
     {
         return this is HiLowBarItem;
     }
@@ -74,7 +74,7 @@ public class BarItem
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the X axis is independent, false otherwise</value>
-    override internal bool IsXIndependent (GraphPane pane)
+    internal override bool IsXIndependent (GraphPane pane)
     {
         return pane._barSettings.Base == BarBase.X || pane._barSettings.Base == BarBase.X2;
     }
@@ -219,13 +219,15 @@ public class BarItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    override public void Draw (Graphics g, GraphPane pane, int pos,
+    public override void Draw (Graphics g, GraphPane pane, int pos,
         float scaleFactor)
     {
         // Pass the drawing onto the bar class
         if (_isVisible)
+        {
             _bar.DrawBars (g, pane, this, BaseAxis (pane), ValueAxis (pane),
                 GetBarWidth (pane), pos, scaleFactor);
+        }
     }
 
     /// <summary>
@@ -357,18 +359,28 @@ public class BarItem
                     // depending on whether they are horizontal or vertical bars, respectively
                     float position;
                     if (isBarCenter)
+                    {
                         position = (float)(hiVal + lowVal) / 2.0f;
+                    }
                     else if (hiVal >= 0)
+                    {
                         position = (float)hiVal + labelOffset;
+                    }
                     else
+                    {
                         position = (float)hiVal - labelOffset;
+                    }
 
                     // Create the new TextObj
                     TextObj label;
                     if (isVertical)
+                    {
                         label = new TextObj (barLabelText, centerVal, position);
+                    }
                     else
+                    {
                         label = new TextObj (barLabelText, position, centerVal);
+                    }
 
                     label.FontSpec.Family = fontFamily;
 
@@ -409,12 +421,14 @@ public class BarItem
     /// <param name="coords">A list of coordinates that represents the "rect" for
     /// this point (used in an html AREA tag)</param>
     /// <returns>true if it's a valid point, false otherwise</returns>
-    override public bool GetCoords (GraphPane pane, int i, out string coords)
+    public override bool GetCoords (GraphPane pane, int i, out string coords)
     {
         coords = string.Empty;
 
         if (i < 0 || i >= _points.Count)
+        {
             return false;
+        }
 
         var valueAxis = ValueAxis (pane);
         var baseAxis = BaseAxis (pane);
@@ -456,13 +470,17 @@ public class BarItem
 
             // Draw the bar
             if (baseAxis is XAxis || baseAxis is X2Axis)
+            {
                 coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
                     pixSide, pixLowVal,
                     pixSide + barWidth, pixHiVal);
+            }
             else
+            {
                 coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
                     pixLowVal, pixSide,
                     pixHiVal, pixSide + barWidth);
+            }
 
             return true;
         }

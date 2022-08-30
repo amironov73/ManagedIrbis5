@@ -236,7 +236,7 @@ public class GasGaugeNeedle
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the Z data are included, false otherwise</value>
-    override internal bool IsZIncluded (GraphPane pane)
+    internal override bool IsZIncluded (GraphPane pane)
     {
         return false;
     }
@@ -247,7 +247,7 @@ public class GasGaugeNeedle
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the X axis is independent, false otherwise</value>
-    override internal bool IsXIndependent (GraphPane pane)
+    internal override bool IsXIndependent (GraphPane pane)
     {
         return true;
     }
@@ -409,7 +409,9 @@ public class GasGaugeNeedle
             _slicePath = new GraphicsPath();
 
             if (!_isVisible)
+            {
                 return;
+            }
 
             RectangleF tRect = _boundingRectangle;
 
@@ -472,7 +474,9 @@ public class GasGaugeNeedle
     public override void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
     {
         if (!_isVisible)
+        {
             return;
+        }
 
         float yMid = rect.Top + rect.Height / 2.0F;
 
@@ -515,10 +519,14 @@ public class GasGaugeNeedle
             {
                 GasGaugeRegion ggr = (GasGaugeRegion)curve;
                 if (maxVal < ggr.MaxValue)
+                {
                     maxVal = ggr.MaxValue;
+                }
 
                 if (minVal > ggr.MinValue)
+                {
                     minVal = ggr.MinValue;
+                }
             }
 
         //Set Needle Sweep angle values here based on the min and max values of the GasGuage

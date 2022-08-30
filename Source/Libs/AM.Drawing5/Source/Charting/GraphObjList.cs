@@ -99,9 +99,13 @@ public class GraphObjList
         {
             int index = IndexOfTag (tag);
             if (index >= 0)
+            {
                 return (this[index]);
+            }
             else
+            {
                 return null;
+            }
         }
     }
 /*
@@ -150,7 +154,10 @@ public class GraphObjList
         {
             if (p.Tag is string &&
                 string.Compare ((string)p.Tag, tag, true) == 0)
+            {
                 return index;
+            }
+
             index++;
         }
 
@@ -177,16 +184,23 @@ public class GraphObjList
     public int Move (int index, int relativePos)
     {
         if (index < 0 || index >= Count)
+        {
             return -1;
+        }
 
         GraphObj graphObj = this[index];
         RemoveAt (index);
 
         index += relativePos;
         if (index < 0)
+        {
             index = 0;
+        }
+
         if (index > Count)
+        {
             index = Count;
+        }
 
         Insert (index, graphObj);
         return index;
@@ -244,7 +258,9 @@ public class GraphObjList
                 item.Draw (g, pane, scaleFactor);
 
                 if (item.IsClippedToChartRect && pane is GraphPane)
+                {
                     g.Clip = region;
+                }
             }
         }
     }
@@ -285,14 +301,20 @@ public class GraphObjList
             if (this[i].PointInBox (mousePt, pane, g, scaleFactor))
             {
                 if ((index >= 0 && this[i].ZOrder > this[index].ZOrder) || index < 0)
+                {
                     index = i;
+                }
             }
         }
 
         if (index >= 0)
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
     #endregion

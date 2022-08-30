@@ -172,11 +172,15 @@ namespace AM.Drawing.Charting
             Init (label);
 
             if (points == null)
+            {
                 _points = new PointPairList();
+            }
             else
 
                 //this.points = (IPointList) _points.Clone();
+            {
                 _points = points;
+            }
         }
 
         /// <summary>
@@ -227,9 +231,13 @@ namespace AM.Drawing.Charting
             _yAxisIndex = rhs._yAxisIndex;
 
             if (rhs.Tag is ICloneable)
+            {
                 Tag = ((ICloneable)rhs.Tag).Clone();
+            }
             else
+            {
                 Tag = rhs.Tag;
+            }
 
             _points = (IPointList)rhs.Points.Clone();
 
@@ -285,9 +293,13 @@ namespace AM.Drawing.Charting
             _label = (Label)info.GetValue ("label", typeof (Label));
             _isY2Axis = info.GetBoolean ("isY2Axis");
             if (sch >= 11)
+            {
                 _isX2Axis = info.GetBoolean ("isX2Axis");
+            }
             else
+            {
                 _isX2Axis = false;
+            }
 
             _isVisible = info.GetBoolean ("isVisible");
 
@@ -326,9 +338,13 @@ namespace AM.Drawing.Charting
             // otherwise, create a new PointPairList so it can be serialized
             PointPairList list;
             if (_points is PointPairList)
+            {
                 list = _points as PointPairList;
+            }
             else
+            {
                 list = new PointPairList (_points);
+            }
 
             info.AddValue ("points", list);
             info.AddValue ("Tag", Tag);
@@ -363,17 +379,29 @@ namespace AM.Drawing.Charting
             get
             {
                 if (this is BarItem)
+                {
                     return ((BarItem)this).Bar.Fill.Color;
+                }
                 else if (this is LineItem && ((LineItem)this).Line.IsVisible)
+                {
                     return ((LineItem)this).Line.Color;
+                }
                 else if (this is LineItem)
+                {
                     return ((LineItem)this).Symbol.Border.Color;
+                }
                 else if (this is ErrorBarItem)
+                {
                     return ((ErrorBarItem)this).Bar.Color;
+                }
                 else if (this is HiLowBarItem)
+                {
                     return ((HiLowBarItem)this).Bar.Fill.Color;
+                }
                 else
+                {
                     return Color.Empty;
+                }
             }
             set
             {
@@ -388,9 +416,13 @@ namespace AM.Drawing.Charting
                     ((LineItem)this).Symbol.Fill.Color = value;
                 }
                 else if (this is ErrorBarItem)
+                {
                     ((ErrorBarItem)this).Bar.Color = value;
+                }
                 else if (this is HiLowBarItem)
+                {
                     ((HiLowBarItem)this).Bar.Fill.Color = value;
+                }
             }
         }
 
@@ -557,7 +589,7 @@ namespace AM.Drawing.Charting
         /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
         /// </param>
         /// <value>true if the Z data are included, false otherwise</value>
-        abstract internal bool IsZIncluded (GraphPane pane);
+        internal abstract bool IsZIncluded (GraphPane pane);
 
         /// <summary>
         /// Gets a flag indicating if the X axis is the independent axis for this <see cref="CurveItem" />
@@ -565,7 +597,7 @@ namespace AM.Drawing.Charting
         /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
         /// </param>
         /// <value>true if the X axis is independent, false otherwise</value>
-        abstract internal bool IsXIndependent (GraphPane pane);
+        internal abstract bool IsXIndependent (GraphPane pane);
 
         /// <summary>
         /// Readonly property that gives the number of points that define this
@@ -577,9 +609,13 @@ namespace AM.Drawing.Charting
             get
             {
                 if (_points == null)
+                {
                     return 0;
+                }
                 else
+                {
                     return _points.Count;
+                }
             }
         }
 
@@ -602,9 +638,13 @@ namespace AM.Drawing.Charting
             get
             {
                 if (_points == null)
+                {
                     return new PointPair (PointPairBase.Missing, PointPairBase.Missing);
+                }
                 else
+                {
                     return (_points)[index];
+                }
             }
         }
 
@@ -645,7 +685,7 @@ namespace AM.Drawing.Charting
         /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
         /// font sizes, etc. according to the actual size of the graph.
         /// </param>
-        abstract public void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor);
+        public abstract void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor);
 
         /// <summary>
         /// Draw a legend key entry for this <see cref="CurveItem"/> at the specified location.
@@ -668,7 +708,7 @@ namespace AM.Drawing.Charting
         /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
         /// font sizes, etc. according to the actual size of the graph.
         /// </param>
-        abstract public void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor);
+        public abstract void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor);
 
         #endregion
 
@@ -697,12 +737,18 @@ namespace AM.Drawing.Charting
         public void AddPoint (PointPair point)
         {
             if (_points == null)
+            {
                 Points = new PointPairList();
+            }
 
             if (_points is IPointListEdit)
+            {
                 (_points as IPointListEdit).Add (point);
+            }
             else
+            {
                 throw new NotImplementedException();
+            }
         }
 
         /// <summary>
@@ -717,9 +763,13 @@ namespace AM.Drawing.Charting
         public void Clear()
         {
             if (_points is IPointListEdit)
+            {
                 (_points as IPointListEdit).Clear();
+            }
             else
+            {
                 throw new NotImplementedException();
+            }
         }
 
         /// <summary>
@@ -734,9 +784,13 @@ namespace AM.Drawing.Charting
         public void RemovePoint (int index)
         {
             if (_points is IPointListEdit)
+            {
                 (_points as IPointListEdit).RemoveAt (index);
+            }
             else
+            {
                 throw new NotImplementedException();
+            }
         }
 
         /// <summary>
@@ -750,9 +804,13 @@ namespace AM.Drawing.Charting
         public Axis GetXAxis (GraphPane pane)
         {
             if (_isX2Axis)
+            {
                 return pane.X2Axis;
+            }
             else
+            {
                 return pane.XAxis;
+            }
         }
 
         /// <summary>
@@ -774,16 +832,24 @@ namespace AM.Drawing.Charting
             if (_isY2Axis)
             {
                 if (_yAxisIndex < pane.Y2AxisList.Count)
+                {
                     return pane.Y2AxisList[_yAxisIndex];
+                }
                 else
+                {
                     return pane.Y2AxisList[0];
+                }
             }
             else
             {
                 if (_yAxisIndex < pane.YAxisList.Count)
+                {
                     return pane.YAxisList[_yAxisIndex];
+                }
                 else
+                {
                     return pane.YAxisList[0];
+                }
             }
         }
 
@@ -805,9 +871,13 @@ namespace AM.Drawing.Charting
         {
             if (_yAxisIndex >= 0 &&
                 _yAxisIndex < (_isY2Axis ? pane.Y2AxisList.Count : pane.YAxisList.Count))
+            {
                 return _yAxisIndex;
+            }
             else
+            {
                 return 0;
+            }
         }
 
         /// <summary>
@@ -832,7 +902,7 @@ namespace AM.Drawing.Charting
         /// The <see cref="ColorSymbolRotator"/> that is used to pick the color
         ///  and symbol for this method call.
         /// </param>
-        virtual public void MakeUnique (ColorSymbolRotator rotator)
+        public virtual void MakeUnique (ColorSymbolRotator rotator)
         {
             Color = rotator.NextColor;
         }
@@ -862,7 +932,7 @@ namespace AM.Drawing.Charting
         /// owner of this object.
         /// </param>
         /// <seealso cref="GraphPane.IsBoundedRanges"/>
-        virtual public void GetRange (out double xMin, out double xMax,
+        public virtual void GetRange (out double xMin, out double xMax,
             out double yMin, out double yMax,
             bool ignoreInitial,
             bool isBoundedRanges,
@@ -884,7 +954,9 @@ namespace AM.Drawing.Charting
             Axis yAxis = GetYAxis (pane);
             Axis xAxis = GetXAxis (pane);
             if (yAxis == null || xAxis == null)
+            {
                 return;
+            }
 
             if (isBoundedRanges)
             {
@@ -923,7 +995,9 @@ namespace AM.Drawing.Charting
                 // Y value
                 if (ignoreInitial && curY != 0 &&
                     curY != PointPairBase.Missing)
+                {
                     ignoreInitial = false;
+                }
 
                 if (!ignoreInitial &&
                     !outOfBounds &&
@@ -931,27 +1005,48 @@ namespace AM.Drawing.Charting
                     curY != PointPairBase.Missing)
                 {
                     if (curX < xMin)
+                    {
                         xMin = curX;
+                    }
+
                     if (curX > xMax)
+                    {
                         xMax = curX;
+                    }
+
                     if (curY < yMin)
+                    {
                         yMin = curY;
+                    }
+
                     if (curY > yMax)
+                    {
                         yMax = curY;
+                    }
 
                     if (isZIncluded && isXIndependent && curZ != PointPairBase.Missing)
                     {
                         if (curZ < yMin)
+                        {
                             yMin = curZ;
+                        }
+
                         if (curZ > yMax)
+                        {
                             yMax = curZ;
+                        }
                     }
                     else if (isZIncluded && curZ != PointPairBase.Missing)
                     {
                         if (curZ < xMin)
+                        {
                             xMin = curZ;
+                        }
+
                         if (curZ > xMax)
+                        {
                             xMax = curZ;
+                        }
                     }
                 }
             }
@@ -975,18 +1070,30 @@ namespace AM.Drawing.Charting
             BarBase barBase;
 
             if (this is BarItem || this is ErrorBarItem || this is HiLowBarItem)
+            {
                 barBase = pane._barSettings.Base;
+            }
             else
+            {
                 barBase = _isX2Axis ? BarBase.X2 : BarBase.X;
+            }
 
             if (barBase == BarBase.X)
+            {
                 return pane.XAxis;
+            }
             else if (barBase == BarBase.X2)
+            {
                 return pane.X2Axis;
+            }
             else if (barBase == BarBase.Y)
+            {
                 return pane.YAxis;
+            }
             else
+            {
                 return pane.Y2Axis;
+            }
         }
 
         /// <summary>Returns a reference to the <see cref="Axis"/> object that is the "value"
@@ -1003,16 +1110,22 @@ namespace AM.Drawing.Charting
             BarBase barBase;
 
             if (this is BarItem || this is ErrorBarItem || this is HiLowBarItem)
+            {
                 barBase = pane._barSettings.Base;
+            }
             else
+            {
                 barBase = BarBase.X;
+            }
 
             if (barBase == BarBase.X || barBase == BarBase.X2)
             {
                 return GetYAxis (pane);
             }
             else
+            {
                 return GetXAxis (pane);
+            }
         }
 
         /// <summary>
@@ -1036,10 +1149,12 @@ namespace AM.Drawing.Charting
             float barWidth;
 
             if (this is ErrorBarItem)
+            {
                 barWidth = (float)(((ErrorBarItem)this).Bar.Symbol.Size *
                                    pane.CalcScaleFactor());
+            }
 
-//			else if ( this is HiLowBarItem && pane._barSettings.Type != BarType.ClusterHiLow )
+            //			else if ( this is HiLowBarItem && pane._barSettings.Type != BarType.ClusterHiLow )
 //				barWidth = (float) ( ((HiLowBarItem)this).Bar.GetBarWidth( pane,
 //						((HiLowBarItem)this).BaseAxis(pane), pane.CalcScaleFactor() ) );
 //				barWidth = (float) ( ((HiLowBarItem)this).Bar.Size *
@@ -1049,17 +1164,24 @@ namespace AM.Drawing.Charting
                 // For stacked bar types, the bar width will be based on a single bar
                 float numBars = 1.0F;
                 if (pane._barSettings.Type == BarType.Cluster)
+                {
                     numBars = pane.CurveList.NumClusterableBars;
+                }
 
                 float denom = numBars * (1.0F + pane._barSettings.MinBarGap) -
                     pane._barSettings.MinBarGap + pane._barSettings.MinClusterGap;
                 if (denom <= 0)
+                {
                     denom = 1;
+                }
+
                 barWidth = pane.BarSettings.GetClusterWidth() / denom;
             }
 
             if (barWidth <= 0)
+            {
                 return 1;
+            }
 
             return barWidth;
         }
@@ -1073,7 +1195,7 @@ namespace AM.Drawing.Charting
         /// <param name="coords">A list of coordinates that represents the "rect" for
         /// this point (used in an html AREA tag)</param>
         /// <returns>true if it's a valid point, false otherwise</returns>
-        abstract public bool GetCoords (GraphPane pane, int i, out string coords);
+        public abstract bool GetCoords (GraphPane pane, int i, out string coords);
 
         #endregion
 
@@ -1187,16 +1309,27 @@ namespace AM.Drawing.Charting
             public int Compare (CurveItem l, CurveItem r)
             {
                 if (l == null && r == null)
+                {
                     return 0;
+                }
                 else if (l == null && r != null)
+                {
                     return -1;
+                }
                 else if (l != null && r == null)
+                {
                     return 1;
+                }
 
                 if (r != null && r.NPts <= index)
+                {
                     r = null;
+                }
+
                 if (l != null && l.NPts <= index)
+                {
                     l = null;
+                }
 
                 double lVal, rVal;
 
@@ -1212,18 +1345,31 @@ namespace AM.Drawing.Charting
                 }
 
                 if (lVal == PointPairBase.Missing || double.IsInfinity (lVal) || double.IsNaN (lVal))
+                {
                     l = null;
+                }
+
                 if (rVal == PointPairBase.Missing || double.IsInfinity (rVal) || double.IsNaN (rVal))
+                {
                     r = null;
+                }
 
                 if ((l == null && r == null) || (Math.Abs (lVal - rVal) < 1e-10))
+                {
                     return 0;
+                }
                 else if (l == null && r != null)
+                {
                     return -1;
+                }
                 else if (l != null && r == null)
+                {
                     return 1;
+                }
                 else
+                {
                     return rVal < lVal ? -1 : 1;
+                }
             }
         }
 

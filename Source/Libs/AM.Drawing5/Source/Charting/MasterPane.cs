@@ -368,7 +368,9 @@ public class MasterPane
         _prop = (float[])info.GetValue ("prop", typeof (float[]));
 
         if (sch >= 11)
+        {
             _isAntiAlias = info.GetBoolean ("isAntiAlias");
+        }
     }
 
     /// <summary>
@@ -592,7 +594,9 @@ public class MasterPane
 
 
         if (_rect.Width <= 1 || _rect.Height <= 1)
+        {
             return;
+        }
 
         float scaleFactor = CalcScaleFactor();
 
@@ -740,7 +744,9 @@ public class MasterPane
         foreach (GraphPane pane in _paneList)
         {
             if (pane.Rect.Contains (mousePt))
+            {
                 return pane;
+            }
         }
 
         return null;
@@ -758,7 +764,9 @@ public class MasterPane
         foreach (GraphPane pane in _paneList)
         {
             if (pane.Chart._rect.Contains (mousePt))
+            {
                 return pane;
+            }
         }
 
         return null;
@@ -828,9 +836,14 @@ public class MasterPane
         InitLayout();
 
         if (rows < 1)
+        {
             rows = 1;
+        }
+
         if (columns < 1)
+        {
             columns = 1;
+        }
 
         int[] countList = new int[rows];
 
@@ -946,12 +959,16 @@ public class MasterPane
     public void DoLayout (Graphics g)
     {
         if (_countList != null)
+        {
             DoLayout (g, _isColumnSpecified, _countList, _prop);
+        }
         else
         {
             int count = _paneList.Count;
             if (count == 0)
+            {
                 return;
+            }
 
             int rows,
                 cols,
@@ -981,14 +998,20 @@ public class MasterPane
                     rows = root;
                     cols = root;
                     if (count <= root * (root - 1))
+                    {
                         rows--;
+                    }
+
                     DoLayout (g, rows, cols);
                     break;
                 case PaneLayout.SquareRowPreferred:
                     rows = root;
                     cols = root;
                     if (count <= root * (root - 1))
+                    {
                         cols--;
+                    }
+
                     DoLayout (g, rows, cols);
                     break;
                 case PaneLayout.ExplicitCol12:
@@ -1027,9 +1050,14 @@ public class MasterPane
     internal void DoLayout (Graphics g, int rows, int columns)
     {
         if (rows < 1)
+        {
             rows = 1;
+        }
+
         if (columns < 1)
+        {
             columns = 1;
+        }
 
         int[] countList = new int[rows];
 
@@ -1074,14 +1102,19 @@ public class MasterPane
 
                 int columns = countList[rowNum];
                 if (columns <= 0)
+                {
                     columns = 1;
+                }
+
                 float width = (innerRect.Width - (float)(columns - 1) * scaledInnerGap) /
                               (float)columns;
 
                 for (int colNum = 0; colNum < columns; colNum++)
                 {
                     if (iPane >= _paneList.Count)
+                    {
                         return;
+                    }
 
                     this[iPane].Rect = new RectangleF (
                         innerRect.X + colNum * (width + scaledInnerGap),
@@ -1109,13 +1142,18 @@ public class MasterPane
 
                 int rows = countList[colNum];
                 if (rows <= 0)
+                {
                     rows = 1;
+                }
+
                 float height = (innerRect.Height - (float)(rows - 1) * scaledInnerGap) / (float)rows;
 
                 for (int rowNum = 0; rowNum < rows; rowNum++)
                 {
                     if (iPane >= _paneList.Count)
+                    {
                         return;
+                    }
 
                     this[iPane].Rect = new RectangleF (
                         innerRect.X + x,

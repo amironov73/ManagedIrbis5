@@ -110,7 +110,9 @@ public class Selection
     public void AddToSelection (MasterPane master, CurveItem ci)
     {
         if (Contains (ci) == false)
+        {
             Add (ci);
+        }
 
         UpdateSelection (master);
     }
@@ -126,7 +128,9 @@ public class Selection
         foreach (CurveItem ci in ciList)
         {
             if (Contains (ci) == false)
+            {
                 Add (ci);
+            }
         }
 
         UpdateSelection (master);
@@ -153,7 +157,9 @@ public class Selection
     public void RemoveFromSelection (MasterPane master, CurveItem ci)
     {
         if (Contains (ci))
+        {
             Remove (ci);
+        }
 
         UpdateSelection (master);
     }
@@ -188,7 +194,9 @@ public class Selection
         if (sendEvent)
         {
             if (SelectionChangedEvent != null)
+            {
                 SelectionChangedEvent (this, new EventArgs());
+            }
         }
     }
 
@@ -242,7 +250,9 @@ public class Selection
 
         //Send Selection Changed Event
         if (SelectionChangedEvent != null)
+        {
             SelectionChangedEvent (this, new EventArgs());
+        }
     }
 
     #endregion

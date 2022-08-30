@@ -306,7 +306,7 @@ public class GasGaugeRegion
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the Z data are included, false otherwise</value>
-    override internal bool IsZIncluded (GraphPane pane)
+    internal override bool IsZIncluded (GraphPane pane)
     {
         return false;
     }
@@ -317,7 +317,7 @@ public class GasGaugeRegion
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the X axis is independent, false otherwise</value>
-    override internal bool IsXIndependent (GraphPane pane)
+    internal override bool IsXIndependent (GraphPane pane)
     {
         return true;
     }
@@ -412,7 +412,9 @@ public class GasGaugeRegion
             _slicePath = new GraphicsPath();
 
             if (!_isVisible)
+            {
                 return;
+            }
 
             RectangleF tRect = _boundingRectangle;
 
@@ -461,7 +463,9 @@ public class GasGaugeRegion
     public override void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
     {
         if (!_isVisible)
+        {
             return;
+        }
 
         // Fill the slice
         if (_fill.IsVisible)
@@ -477,7 +481,9 @@ public class GasGaugeRegion
 
         // Border the bar
         if (!_border.Color.IsEmpty)
+        {
             _border.Draw (g, pane, scaleFactor, rect);
+        }
     }
 
     /// <summary>
@@ -512,10 +518,14 @@ public class GasGaugeRegion
             {
                 GasGaugeRegion ggr = (GasGaugeRegion)curve;
                 if (maxVal < ggr.MaxValue)
+                {
                     maxVal = ggr.MaxValue;
+                }
 
                 if (minVal > ggr.MinValue)
+                {
                     minVal = ggr.MinValue;
+                }
             }
 
         //Calculate start and sweep angles for each of the GasGaugeRegion based on teh min and max value

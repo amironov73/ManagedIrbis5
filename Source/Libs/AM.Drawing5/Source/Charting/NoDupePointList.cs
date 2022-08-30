@@ -130,7 +130,9 @@ public class NoDupePointList
         {
             int j = index;
             if (_isFiltered)
+            {
                 j = _visibleIndicies[index];
+            }
 
             DataPoint dp = base[j];
             PointPair pt = new PointPair (dp.X, dp.Y);
@@ -140,7 +142,9 @@ public class NoDupePointList
         {
             int j = index;
             if (_isFiltered)
+            {
                 j = _visibleIndicies[index];
+            }
 
             DataPoint dp;
             dp.X = value.X;
@@ -159,9 +163,13 @@ public class NoDupePointList
         get
         {
             if (!_isFiltered)
+            {
                 return base.Count;
+            }
             else
+            {
                 return _filteredCount;
+            }
         }
     }
 
@@ -245,9 +253,13 @@ public class NoDupePointList
         _filterMode = rhs._filterMode;
 
         if (rhs._visibleIndicies != null)
+        {
             _visibleIndicies = (int[])rhs._visibleIndicies.Clone();
+        }
         else
+        {
             _visibleIndicies = null;
+        }
     }
 
     /// <summary>
@@ -302,7 +314,9 @@ public class NoDupePointList
     public void FilterData (GraphPane pane, Axis xAxis, Axis yAxis)
     {
         if (_visibleIndicies == null || _visibleIndicies.Length < base.Count)
+        {
             _visibleIndicies = new int[base.Count];
+        }
 
         _filteredCount = 0;
         _isFiltered = true;
@@ -310,7 +324,9 @@ public class NoDupePointList
         int width = (int)pane.Chart.Rect.Width;
         int height = (int)pane.Chart.Rect.Height;
         if (width <= 0 || height <= 0)
+        {
             throw new IndexOutOfRangeException ("Error in FilterData: Chart rect not valid");
+        }
 
         bool[,] usedArray = new bool[width, height];
         for (int i = 0; i < width; i++)
@@ -334,7 +350,9 @@ public class NoDupePointList
             {
                 bool used = false;
                 if (n <= 0)
+                {
                     used = usedArray[x, y];
+                }
                 else
                 {
                     for (int ix = x - n; ix <= x + n; ix++)

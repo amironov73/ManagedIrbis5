@@ -476,23 +476,34 @@ public class MinorTic
         SmoothingMode smode = g.SmoothingMode;
         g.SmoothingMode = SmoothingMode.None;
         if (IsOutside)
+        {
             g.DrawLine (pen, pixVal, shift, pixVal, shift + scaledTic);
+        }
 
         // draw the cross tic
         if (_isCrossOutside)
+        {
             g.DrawLine (pen, pixVal, 0.0f, pixVal, scaledTic);
+        }
 
         // draw the inside tic
         if (IsInside)
+        {
             g.DrawLine (pen, pixVal, shift, pixVal, shift - scaledTic);
+        }
 
         // draw the inside cross tic
         if (_isCrossInside)
+        {
             g.DrawLine (pen, pixVal, 0.0f, pixVal, -scaledTic);
+        }
 
         // draw the opposite tic
         if (IsOpposite)
+        {
             g.DrawLine (pen, pixVal, topPix, pixVal, topPix + scaledTic);
+        }
+
         g.SmoothingMode = smode;
     }
 

@@ -131,7 +131,7 @@ class OrdinalScale
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
     /// <seealso cref="AxisType.Ordinal"/>
-    override public void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
     {
         // call the base class first
         base.PickScale (pane, g, scaleFactor);
@@ -145,9 +145,13 @@ class OrdinalScale
         if (scale._max - scale._min < 1.0)
         {
             if (scale._maxAuto)
+            {
                 scale._max = scale._min + 0.5;
+            }
             else
+            {
                 scale._min = scale._max - 0.5;
+            }
         }
         else
         {
@@ -170,25 +174,36 @@ class OrdinalScale
 
                     // Use the greater of the two step sizes
                     if (tmpStep > scale._majorStep)
+                    {
                         scale._majorStep = tmpStep;
+                    }
                 }
             }
 
             scale._majorStep = (int)scale._majorStep;
             if (scale._majorStep < 1.0)
+            {
                 scale._majorStep = 1.0;
+            }
 
             // Calculate the new minor step size
             if (scale._minorStepAuto)
+            {
                 scale._minorStep = CalcStepSize (scale._majorStep,
                     (scale._ownerAxis is XAxis || scale._ownerAxis is X2Axis)
                         ? Default.TargetMinorXSteps
                         : Default.TargetMinorYSteps);
+            }
 
             if (scale._minAuto)
+            {
                 scale._min -= 0.5;
+            }
+
             if (scale._maxAuto)
+            {
                 scale._max += 0.5;
+            }
         }
     }
 

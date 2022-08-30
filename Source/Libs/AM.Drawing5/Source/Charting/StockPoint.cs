@@ -125,9 +125,13 @@ public class StockPoint
         ColorValue = rhs.ColorValue;
 
         if (rhs.Tag is ICloneable)
+        {
             Tag = ((ICloneable)rhs.Tag).Clone();
+        }
         else
+        {
             Tag = rhs.Tag;
+        }
     }
 
     /// <summary>
@@ -234,7 +238,7 @@ public class StockPoint
     /// The ColorValue property.  This is used with the
     /// <see cref="FillType.GradientByColorValue" /> option.
     /// </summary>
-    override public double ColorValue
+    public override double ColorValue
     {
         get { return _colorValue; }
         set { _colorValue = value; }
@@ -279,7 +283,7 @@ public class StockPoint
     /// </summary>
     /// <param name="isShowAll">true to show all the value coordinates</param>
     /// <returns>A string representation of the <see cref="StockPoint" />.</returns>
-    override public string ToString (bool isShowAll)
+    public override string ToString (bool isShowAll)
     {
         return ToString (DefaultFormat, isShowAll);
     }
@@ -294,7 +298,7 @@ public class StockPoint
     /// the two double type values (see <see cref="System.Double.ToString()"/>).</param>
     /// <returns>A string representation of the PointPair</returns>
     /// <param name="isShowAll">true to show all the value coordinates</param>
-    override public string ToString (string format, bool isShowAll)
+    public override string ToString (string format, bool isShowAll)
     {
         return "( " + XDate.ToString (Date, "g") +
                ", " + Close.ToString (format) +

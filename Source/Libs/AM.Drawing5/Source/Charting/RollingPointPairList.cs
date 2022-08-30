@@ -91,8 +91,10 @@ public class RollingPointPairList
         _headIdx = _tailIdx = -1;
 
         if (preLoad)
+        {
             for (int i = 0; i < capacity; i++)
                 _mBuffer[i] = new PointPair();
+        }
     }
 
     /// <summary>
@@ -135,13 +137,19 @@ public class RollingPointPairList
         get
         {
             if (_headIdx == -1)
+            {
                 return 0;
+            }
 
             if (_headIdx > _tailIdx)
+            {
                 return (_headIdx - _tailIdx) + 1;
+            }
 
             if (_tailIdx > _headIdx)
+            {
                 return (_mBuffer.Length - _tailIdx) + _headIdx + 1;
+            }
 
             return 1;
         }
@@ -168,22 +176,30 @@ public class RollingPointPairList
         get
         {
             if (index >= Count || index < 0)
+            {
                 throw new ArgumentOutOfRangeException();
+            }
 
             index += _tailIdx;
             if (index >= _mBuffer.Length)
+            {
                 index -= _mBuffer.Length;
+            }
 
             return _mBuffer[index];
         }
         set
         {
             if (index >= Count || index < 0)
+            {
                 throw new ArgumentOutOfRangeException();
+            }
 
             index += _tailIdx;
             if (index >= _mBuffer.Length)
+            {
                 index -= _mBuffer.Length;
+            }
 
             _mBuffer[index] = value;
         }
@@ -329,7 +345,9 @@ public class RollingPointPairList
         int count = Count;
 
         if (index >= count || index < 0)
+        {
             throw new ArgumentOutOfRangeException();
+        }
 
         // shift all the items that lie after index back by 1
         for (int i = index + _tailIdx; i < _tailIdx + count - 1; i++)
@@ -363,7 +381,9 @@ public class RollingPointPairList
         int totalCount = Count;
 
         if (index >= totalCount || index < 0 || count < 0 || count > totalCount)
+        {
             throw new ArgumentOutOfRangeException();
+        }
 
         for (int i = 0; i < count; i++)
             RemoveAt (index);
@@ -445,7 +465,9 @@ public class RollingPointPairList
         GetNextIndex();
 
         if (_mBuffer[_headIdx] == null)
+        {
             _mBuffer[_headIdx] = new PointPair (x, y, z, tag);
+        }
         else
         {
             _mBuffer[_headIdx].X = x;
@@ -536,26 +558,43 @@ public class RollingPointPairList
         int len = 0;
 
         if (x != null)
+        {
             len = x.Length;
+        }
+
         if (y != null && y.Length > len)
+        {
             len = y.Length;
+        }
 
         for (int i = 0; i < len; i++)
         {
             PointPair point = new PointPair (0, 0, 0);
             if (x == null)
+            {
                 point.X = (double)i + 1.0;
+            }
             else if (i < x.Length)
+            {
                 point.X = x[i];
+            }
             else
+            {
                 point.X = PointPairBase.Missing;
+            }
 
             if (y == null)
+            {
                 point.Y = (double)i + 1.0;
+            }
             else if (i < y.Length)
+            {
                 point.Y = y[i];
+            }
             else
+            {
                 point.Y = PointPairBase.Missing;
+            }
 
             Add (point);
         }
@@ -579,36 +618,62 @@ public class RollingPointPairList
         int len = 0;
 
         if (x != null)
+        {
             len = x.Length;
+        }
+
         if (y != null && y.Length > len)
+        {
             len = y.Length;
+        }
+
         if (z != null && z.Length > len)
+        {
             len = z.Length;
+        }
 
         for (int i = 0; i < len; i++)
         {
             PointPair point = new PointPair();
 
             if (x == null)
+            {
                 point.X = (double)i + 1.0;
+            }
             else if (i < x.Length)
+            {
                 point.X = x[i];
+            }
             else
+            {
                 point.X = PointPairBase.Missing;
+            }
 
             if (y == null)
+            {
                 point.Y = (double)i + 1.0;
+            }
             else if (i < y.Length)
+            {
                 point.Y = y[i];
+            }
             else
+            {
                 point.Y = PointPairBase.Missing;
+            }
 
             if (z == null)
+            {
                 point.Z = (double)i + 1.0;
+            }
             else if (i < z.Length)
+            {
                 point.Z = z[i];
+            }
             else
+            {
                 point.Z = PointPairBase.Missing;
+            }
 
             Add (point);
         }

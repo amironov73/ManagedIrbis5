@@ -35,7 +35,7 @@ using System.Globalization;
 /// classes to define specific characteristics for those types.
 /// </remarks>
 [Serializable]
-abstract public class Scale
+public abstract class Scale
     : ISerializable
 {
     #region Fields
@@ -782,9 +782,13 @@ abstract public class Scale
         _labelGap = rhs._labelGap;
 
         if (rhs._textLabels != null)
+        {
             _textLabels = (string[])rhs._textLabels.Clone();
+        }
         else
+        {
             _textLabels = null;
+        }
     }
 
     /// <summary>
@@ -793,7 +797,7 @@ abstract public class Scale
     /// <param name="owner">The new <see cref="Axis" /> instance that will be
     /// the owner of the new Scale</param>
     /// <returns>A new <see cref="Scale" /> clone.</returns>
-    abstract public Scale Clone (Axis owner);
+    public abstract Scale Clone (Axis owner);
 /*
 		/// <summary>
 		/// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
@@ -923,7 +927,9 @@ abstract public class Scale
         _isLabelsInside = info.GetBoolean ("isLabelsInside");
         _align = (AlignP)info.GetValue ("align", typeof (AlignP));
         if (schema >= 11)
+        {
             _alignH = (AlignH)info.GetValue ("alignH", typeof (AlignH));
+        }
 
         _fontSpec = (FontSpec)info.GetValue ("fontSpec", typeof (FontSpec));
         _labelGap = info.GetSingle ("labelGap");
@@ -989,7 +995,7 @@ abstract public class Scale
     /// <summary>
     /// Get an <see cref="AxisType" /> enumeration that indicates the type of this scale.
     /// </summary>
-    abstract public AxisType Type { get; }
+    public abstract AxisType Type { get; }
 
     /// <summary>
     /// True if this scale is <see cref="AxisType.Log" />, false otherwise.
@@ -1296,7 +1302,7 @@ abstract public class Scale
     /// and <see cref="Max" />.  This reflects the setting of
     /// <see cref="MajorUnit" />.
     /// </remarks>
-    virtual internal double MajorUnitMultiplier
+    internal virtual double MajorUnitMultiplier
     {
         get { return 1.0; }
     }
@@ -1309,7 +1315,7 @@ abstract public class Scale
     /// and <see cref="Max" />.  This reflects the setting of
     /// <see cref="MinorUnit" />.
     /// </remarks>
-    virtual internal double MinorUnitMultiplier
+    internal virtual double MinorUnitMultiplier
     {
         get { return 1.0; }
     }
@@ -1551,7 +1557,10 @@ abstract public class Scale
         set
         {
             if (value == null)
+            {
                 throw new ArgumentNullException ("Uninitialized FontSpec in Scale");
+            }
+
             _fontSpec = value;
         }
     }
@@ -1749,7 +1758,7 @@ abstract public class Scale
     /// <param name="axis">
     /// The parent <see cref="Axis" /> for this <see cref="Scale" />
     /// </param>
-    virtual public void SetupScaleData (GraphPane pane, Axis axis)
+    public virtual void SetupScaleData (GraphPane pane, Axis axis)
     {
         // save the ChartRect data for transforming scale values to pixels
         if (axis is XAxis || axis is X2Axis)
@@ -1784,7 +1793,7 @@ abstract public class Scale
     /// it returns the log or power equivalent.
     /// </remarks>
     /// <param name="val">The value to be converted</param>
-    virtual public double Linearize (double val)
+    public virtual double Linearize (double val)
     {
         return val;
     }
@@ -1799,7 +1808,7 @@ abstract public class Scale
     /// it returns the anti-log or inverse-power equivalent.
     /// </remarks>
     /// <param name="val">The value to be converted</param>
-    virtual public double DeLinearize (double val)
+    public virtual double DeLinearize (double val)
     {
         return val;
     }
@@ -1867,10 +1876,12 @@ abstract public class Scale
     /// and text (<see cref="IsText"/>) type axes.
     /// </param>
     /// <returns>The resulting value label as a <see cref="string" /></returns>
-    virtual internal string MakeLabel (GraphPane pane, int index, double dVal)
+    internal virtual string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
+        {
             _format = Default.Format;
+        }
 
         // linear or ordinal is the default behavior
         // this method is overridden for other Scale types
@@ -1916,7 +1927,9 @@ abstract public class Scale
 
             float saveAngle = _fontSpec.Angle;
             if (!applyAngle)
+            {
                 _fontSpec.Angle = 0;
+            }
 
             int nTics = CalcNumTics();
 
@@ -1935,16 +1948,25 @@ abstract public class Scale
 
                 SizeF sizeF;
                 if (IsLog && _isUseTenPower)
+                {
                     sizeF = _fontSpec.BoundingBoxTenPower (g, tmpStr,
                         scaleFactor);
+                }
                 else
+                {
                     sizeF = _fontSpec.BoundingBox (g, tmpStr,
                         scaleFactor);
+                }
 
                 if (sizeF.Height > maxSpace.Height)
+                {
                     maxSpace.Height = sizeF.Height;
+                }
+
                 if (sizeF.Width > maxSpace.Width)
+                {
                     maxSpace.Width = sizeF.Width;
+                }
             }
 
             _fontSpec.Angle = saveAngle;
@@ -1952,7 +1974,9 @@ abstract public class Scale
             return maxSpace;
         }
         else
+        {
             return new SizeF (0, 0);
+        }
     }
 
     /// <summary>
@@ -1971,7 +1995,7 @@ abstract public class Scale
     /// <returns>
     /// The specified major tic value (floating point double).
     /// </returns>
-    virtual internal double CalcMajorTicValue (double baseVal, double tic)
+    internal virtual double CalcMajorTicValue (double baseVal, double tic)
     {
         // Default behavior is a normal linear scale (also works for ordinal types)
         return baseVal + (double)_majorStep * tic;
@@ -1994,7 +2018,7 @@ abstract public class Scale
     /// <returns>
     /// The specified minor tic value (floating point double).
     /// </returns>
-    virtual internal double CalcMinorTicValue (double baseVal, int iTic)
+    internal virtual double CalcMinorTicValue (double baseVal, int iTic)
     {
         // default behavior is a linear axis (works for ordinal types too
         return baseVal + (double)_minorStep * (double)iTic;
@@ -2011,7 +2035,7 @@ abstract public class Scale
     /// This value can be negative (e.g., -3 means the first minor tic is 3 minor step
     /// increments before the first major tic.
     /// </returns>
-    virtual internal int CalcMinorStart (double baseVal)
+    internal virtual int CalcMinorStart (double baseVal)
     {
         // Default behavior is for a linear scale (works for ordinal as well
         return (int)((_min - baseVal) / _minorStep);
@@ -2029,10 +2053,12 @@ abstract public class Scale
     /// <returns>
     /// First major tic value (floating point double).
     /// </returns>
-    virtual internal double CalcBaseTic()
+    internal virtual double CalcBaseTic()
     {
         if (_baseTic != PointPairBase.Missing)
+        {
             return _baseTic;
+        }
         else if (IsAnyOrdinal)
         {
             // basetic is always 1 for ordinal types
@@ -2107,7 +2133,9 @@ abstract public class Scale
 
             int firstTic = (int)((_minLinTemp - baseVal) / _majorStep + 0.99);
             if (firstTic < 0)
+            {
                 firstTic = 0;
+            }
 
             // save the position of the previous tic
             float lastPixVal = -10000;
@@ -2119,11 +2147,15 @@ abstract public class Scale
 
                 // If we're before the start of the scale, just go to the next tic
                 if (dVal < _minLinTemp)
+                {
                     continue;
+                }
 
                 // if we've already past the end of the scale, then we're done
                 if (dVal > _maxLinTemp + rangeTol)
+                {
                     break;
+                }
 
                 // convert the value to a pixel position
                 pixVal = LocalTransform (dVal);
@@ -2148,11 +2180,16 @@ abstract public class Scale
 
                     dVal2 = CalcMajorTicValue (baseVal, (double)i + 0.5);
                     if (dVal2 > _maxLinTemp)
+                    {
                         break;
+                    }
+
                     pixVal2 = LocalTransform (dVal2);
                 }
                 else
+                {
                     pixVal2 = pixVal;
+                }
 
                 tic.Draw (g, pane, ticPen, pixVal2, topPix, shift, scaledTic);
 
@@ -2181,7 +2218,9 @@ abstract public class Scale
                     // This is because exponential scales have varying label spacing
                     if (IsPreventLabelOverlap &&
                         Math.Abs (pixVal - lastPixVal) < maxLabelSize.Width)
+                    {
                         continue;
+                    }
 
                     DrawLabel (g, pane, i, dVal, pixVal, shift, maxSpace, scaledTic, charHeight, scaleFactor);
 
@@ -2214,7 +2253,9 @@ abstract public class Scale
 
             int firstTic = (int)((_minLinTemp - baseVal) / _majorStep + 0.99);
             if (firstTic < 0)
+            {
                 firstTic = 0;
+            }
 
             // save the position of the previous tic
 //				float lastPixVal = -10000;
@@ -2226,11 +2267,15 @@ abstract public class Scale
 
                 // If we're before the start of the scale, just go to the next tic
                 if (dVal < _minLinTemp)
+                {
                     continue;
+                }
 
                 // if we've already past the end of the scale, then we're done
                 if (dVal > _maxLinTemp + rangeTol)
+                {
                     break;
+                }
 
                 // convert the value to a pixel position
                 pixVal = LocalTransform (dVal);
@@ -2253,11 +2298,16 @@ abstract public class Scale
 
                     dVal2 = CalcMajorTicValue (baseVal, (double)i + 0.5);
                     if (dVal2 > _maxLinTemp)
+                    {
                         break;
+                    }
+
                     pixVal2 = LocalTransform (dVal2);
                 }
                 else
+                {
                     pixVal2 = pixVal;
+                }
 
                 // draw the grid
                 grid.Draw (g, gridPen, pixVal2, topPix);
@@ -2270,9 +2320,13 @@ abstract public class Scale
     {
         float textTop, textCenter;
         if (_ownerAxis.MajorTic.IsOutside)
+        {
             textTop = scaledTic + charHeight * _labelGap;
+        }
         else
+        {
             textTop = charHeight * _labelGap;
+        }
 
         // draw the label
         //string tmpStr = MakeLabel( pane, i, dVal );
@@ -2280,40 +2334,62 @@ abstract public class Scale
 
         float height;
         if (IsLog && _isUseTenPower)
+        {
             height = _fontSpec.BoundingBoxTenPower (g, tmpStr, scaleFactor).Height;
+        }
         else
+        {
             height = _fontSpec.BoundingBox (g, tmpStr, scaleFactor).Height;
+        }
 
         if (_align == AlignP.Center)
+        {
             textCenter = textTop + maxSpace / 2.0F;
+        }
         else if (_align == AlignP.Outside)
+        {
             textCenter = textTop + maxSpace - height / 2.0F;
+        }
         else // inside
+        {
             textCenter = textTop + height / 2.0F;
+        }
 
         if (_isLabelsInside)
+        {
             textCenter = shift - textCenter;
+        }
         else
+        {
             textCenter = shift + textCenter;
+        }
 
         AlignV av = AlignV.Center;
         AlignH ah = AlignH.Center;
 
         if (_ownerAxis is XAxis || _ownerAxis is X2Axis)
+        {
             ah = _alignH;
+        }
         else
+        {
             av = _alignH == AlignH.Left ? AlignV.Top : (_alignH == AlignH.Right ? AlignV.Bottom : AlignV.Center);
+        }
 
         if (IsLog && _isUseTenPower)
+        {
             _fontSpec.DrawTenPower (g, pane, tmpStr,
                 pixVal, textCenter,
                 ah, av,
                 scaleFactor);
+        }
         else
+        {
             _fontSpec.Draw (g, pane, tmpStr,
                 pixVal, textCenter,
                 ah, av,
                 scaleFactor);
+        }
     }
 
     /// <summary>
@@ -2360,7 +2436,9 @@ abstract public class Scale
         {
             // redraw the axis border
             if (_ownerAxis.IsAxisSegmentVisible)
+            {
                 g.DrawLine (pen, 0.0F, shiftPos, rightPix, shiftPos);
+            }
 
             // Draw a zero-value line if needed
             if (majorGrid._isZeroLine && _min < 0.0 && _max > 0.0)
@@ -2393,14 +2471,18 @@ abstract public class Scale
 
         // sanity check
         if (_min >= _max)
+        {
             return;
+        }
 
         // if the step size is outrageous, then quit
         // (step size not used for log scales)
         if (!IsLog)
         {
             if (_majorStep <= 0 || _minorStep <= 0)
+            {
                 return;
+            }
 
             double tMajor = (_max - _min) / (_majorStep * MajorUnitMultiplier);
             double tMinor = (_max - _min) / (_minorStep * MinorUnitMultiplier);
@@ -2410,7 +2492,9 @@ abstract public class Scale
             if (tMajor > 1000 ||
                 ((minorTic.IsOutside || minorTic.IsInside || minorTic.IsOpposite)
                  && tMinor > 5000))
+            {
                 return;
+            }
         }
     }
 
@@ -2487,16 +2571,21 @@ abstract public class Scale
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    virtual public void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public virtual void PickScale (GraphPane pane, Graphics g, float scaleFactor)
     {
         double minVal = _rangeMin;
         double maxVal = _rangeMax;
 
         // Make sure that minVal and maxVal are legitimate values
         if (double.IsInfinity (minVal) || double.IsNaN (minVal) || minVal == double.MaxValue)
+        {
             minVal = 0.0;
+        }
+
         if (double.IsInfinity (maxVal) || double.IsNaN (maxVal) || maxVal == double.MaxValue)
+        {
             maxVal = 0.0;
+        }
 
         // if the scales are autoranged, use the actual data values for the range
         double range = maxVal - minVal;
@@ -2512,7 +2601,9 @@ abstract public class Scale
 
             // Do not let the grace value extend the axis below zero when all the values were positive
             if (numType && (_min < 0 || minVal - _minGrace * range >= 0.0))
+            {
                 _min = minVal - _minGrace * range;
+            }
         }
 
         if (_maxAuto)
@@ -2521,7 +2612,9 @@ abstract public class Scale
 
             // Do not let the grace value extend the axis above zero when all the values were negative
             if (numType && (_max > 0 || maxVal + _maxGrace * range <= 0.0))
+            {
                 _max = maxVal + _maxGrace * range;
+            }
         }
 
         if (_max == _min && _maxAuto && _minAuto)
@@ -2541,9 +2634,13 @@ abstract public class Scale
         if (_max <= _min)
         {
             if (_maxAuto)
+            {
                 _max = _min + 1.0;
+            }
             else if (_minAuto)
+            {
                 _min = _max - 1.0;
+            }
         }
     }
 
@@ -2587,11 +2684,19 @@ abstract public class Scale
         float sinth = (float)Math.Abs (Math.Sin (_fontSpec.Angle * Math.PI / 180.0));
 
         if (costh > 0.001)
+        {
             maxWidth = size.Width / costh;
+        }
+
         if (sinth > 0.001)
+        {
             temp = size.Height / sinth;
+        }
+
         if (temp < maxWidth)
+        {
             maxWidth = temp;
+        }
 
 
         //maxWidth = size.Width;
@@ -2604,20 +2709,28 @@ abstract public class Scale
                         maxWidth = size.Width + this.Scale.FontSpec.GetWidth( g, scaleFactor ) / 2.0;
         */
         if (maxWidth <= 0)
+        {
             maxWidth = 1;
+        }
 
 
         // Calculate the maximum number of labels
         double width;
         RectangleF chartRect = pane.Chart._rect;
         if (_ownerAxis is XAxis || _ownerAxis is X2Axis)
+        {
             width = (chartRect.Width == 0) ? pane.Rect.Width * 0.75 : chartRect.Width;
+        }
         else
+        {
             width = (chartRect.Height == 0) ? pane.Rect.Height * 0.75 : chartRect.Height;
+        }
 
         int maxLabels = (int)(width / maxWidth);
         if (maxLabels <= 0)
+        {
             maxLabels = 1;
+        }
 
         return maxLabels;
     }
@@ -2696,11 +2809,17 @@ abstract public class Scale
 
         // promote the MSD to either 1, 2, or 5
         if (magMsd > 5.0)
+        {
             magMsd = 10.0;
+        }
         else if (magMsd > 2.0)
+        {
             magMsd = 5.0;
+        }
         else if (magMsd > 1.0)
+        {
             magMsd = 2.0;
+        }
 
         return magMsd * magPow;
     }
@@ -2734,11 +2853,17 @@ abstract public class Scale
 
         // promote the MSD to either 1, 2, or 5
         if (magMsd > 5.0)
+        {
             magMsd = 10.0;
+        }
         else if (magMsd > 2.0)
+        {
             magMsd = 5.0;
+        }
         else if (magMsd > 1.0)
+        {
             magMsd = 2.0;
+        }
 
         return magMsd * magPow;
     }
@@ -2749,7 +2874,7 @@ abstract public class Scale
     /// <returns>
     /// This is the total number of major tics for this axis.
     /// </returns>
-    virtual internal int CalcNumTics()
+    internal virtual int CalcNumTics()
     {
         int nTics = 1;
 
@@ -2757,9 +2882,13 @@ abstract public class Scale
         nTics = (int)((_max - _min) / _majorStep + 0.01) + 1;
 
         if (nTics < 1)
+        {
             nTics = 1;
+        }
         else if (nTics > 1000)
+        {
             nTics = 1000;
+        }
 
         return nTics;
     }
@@ -2777,7 +2906,9 @@ abstract public class Scale
         double temp;
 
         if (y == 0)
+        {
             return 0;
+        }
 
         temp = x / y;
         return y * (temp - Math.Floor (temp));
@@ -2876,9 +3007,13 @@ abstract public class Scale
         double denom = (_maxLinTemp - _minLinTemp);
         double ratio;
         if (denom > 1e-100)
+        {
             ratio = (Linearize (x) - _minLinTemp) / denom;
+        }
         else
+        {
             ratio = 0;
+        }
 
         // _isReverse   axisType    Eqn
         //     T          XAxis     _maxPix - ...
@@ -2890,9 +3025,13 @@ abstract public class Scale
         //     F          XAxis     _minPix + ...
 
         if (_isReverse == (_ownerAxis is XAxis || _ownerAxis is X2Axis))
+        {
             return (float)(_maxPix - (_maxPix - _minPix) * ratio);
+        }
         else
+        {
             return (float)(_minPix + (_maxPix - _minPix) * ratio);
+        }
     }
 
     /// <summary>
@@ -2922,7 +3061,10 @@ abstract public class Scale
     {
         // ordinal types ignore the X value, and just use the ordinal position
         if (IsAnyOrdinal && i >= 0 && !isOverrideOrdinal)
+        {
             x = (double)i + 1.0;
+        }
+
         return Transform (x);
     }
 
@@ -2950,13 +3092,17 @@ abstract public class Scale
 
         // see if the sign of the equation needs to be reversed
         if ((_isReverse) == (_ownerAxis is XAxis || _ownerAxis is X2Axis))
+        {
             val = (double)(pixVal - _maxPix)
                 / (double)(_minPix - _maxPix)
                 * (_maxLinTemp - _minLinTemp) + _minLinTemp;
+        }
         else
+        {
             val = (double)(pixVal - _minPix)
                 / (double)(_maxPix - _minPix)
                 * (_maxLinTemp - _minLinTemp) + _minLinTemp;
+        }
 
         return DeLinearize (val);
     }
@@ -2995,9 +3141,13 @@ abstract public class Scale
                 (_maxLinTemp - _minLinTemp);
 
         if (_isReverse == (_ownerAxis is YAxis || _ownerAxis is X2Axis))
+        {
             rv = (float)((_maxPix - _minPix) * ratio);
+        }
         else
+        {
             rv = (float)((_maxPix - _minPix) * (1.0F - ratio));
+        }
 
         return rv;
     }
@@ -3011,9 +3161,13 @@ abstract public class Scale
     public static double SafeLog (double x)
     {
         if (x > 1.0e-20)
+        {
             return Math.Log10 (x);
+        }
         else
+        {
             return 0.0;
+        }
     }
 
     ///<summary>
@@ -3024,9 +3178,13 @@ abstract public class Scale
     public static double SafeExp (double x, double exponent)
     {
         if (x > 1.0e-20)
+        {
             return Math.Pow (x, exponent);
+        }
         else
+        {
             return 0.0;
+        }
     }
 
     #endregion

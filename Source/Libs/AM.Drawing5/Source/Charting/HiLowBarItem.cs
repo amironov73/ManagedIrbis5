@@ -100,7 +100,7 @@ public class HiLowBarItem
     /// Typesafe, deep-copy clone method.
     /// </summary>
     /// <returns>A new, independent copy of this class</returns>
-    new public HiLowBarItem Clone()
+    public new HiLowBarItem Clone()
     {
         return new HiLowBarItem (this);
     }

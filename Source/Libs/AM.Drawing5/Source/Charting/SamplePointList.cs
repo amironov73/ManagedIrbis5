@@ -154,9 +154,13 @@ public class SamplePointList
             case SampleType.VelocityAvg:
                 double timeDiff = sample.Time.ToOADate() - ((Sample)list[0]).Time.ToOADate();
                 if (timeDiff <= 0)
+                {
                     return PointPairBase.Missing;
+                }
                 else
+                {
                     return (sample.Position - ((Sample)list[0]).Position) / timeDiff;
+                }
             case SampleType.VelocityInst:
                 return sample.Velocity;
             default:

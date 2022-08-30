@@ -330,9 +330,13 @@ public class PieItem
         {
             _labelType = value;
             if (value == PieLabelType.None)
+            {
                 LabelDetail.IsVisible = false;
+            }
             else
+            {
                 LabelDetail.IsVisible = true;
+            }
         }
     }
 
@@ -372,7 +376,7 @@ public class PieItem
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the Z data are included, false otherwise</value>
-    override internal bool IsZIncluded (GraphPane pane)
+    internal override bool IsZIncluded (GraphPane pane)
     {
         return false;
     }
@@ -383,7 +387,7 @@ public class PieItem
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the X axis is independent, false otherwise</value>
-    override internal bool IsXIndependent (GraphPane pane)
+    internal override bool IsXIndependent (GraphPane pane)
     {
         return true;
     }
@@ -410,7 +414,9 @@ public class PieItem
         this (pieValue, color1, displacement, label)
     {
         if (!color1.IsEmpty && !color2.IsEmpty)
+        {
             _fill = new Fill (color1, color2, fillAngle);
+        }
     }
 
     /// <summary>
@@ -581,7 +587,7 @@ public class PieItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    override public void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor)
+    public override void Draw (Graphics g, GraphPane pane, int pos, float scaleFactor)
     {
         if (pane.Chart._rect.Width <= 0 && pane.Chart._rect.Height <= 0)
         {
@@ -596,7 +602,9 @@ public class PieItem
             _slicePath = new GraphicsPath();
 
             if (!_isVisible)
+            {
                 return;
+            }
 
             RectangleF tRect = _boundingRectangle;
 
@@ -632,7 +640,9 @@ public class PieItem
                     }
 
                     if (_labelType != PieLabelType.None)
+                    {
                         DrawLabel (g, pane, tRect, scaleFactor);
+                    }
 
                     //brush.Dispose();
                 }
@@ -707,8 +717,10 @@ public class PieItem
 
             //make an adjustment in rect size,as aspect ratio varies
             if (aspectRatio < 1.5)
+            {
                 nonExplRect.Inflate (-(float)(.1 * (1.5 / aspectRatio) * nonExplRect.Width),
                     -(float)(.1 * (1.5 / aspectRatio) * nonExplRect.Width));
+            }
 
             //modify the rect to determine if any of the labels need to be wrapped....
             //first see if there's any exploded slices and if so, what's the max displacement...
@@ -716,7 +728,9 @@ public class PieItem
             CalculatePieChartParams (pane, ref maxDisplacement);
 
             if (maxDisplacement != 0) //need new rectangle if any slice exploded
+            {
                 CalcNewBaseRect (maxDisplacement, ref nonExplRect);
+            }
 
             foreach (PieItem slice in pane.CurveList)
             {
@@ -769,7 +783,9 @@ public class PieItem
             {
                 pieTotalValue += curve._pieValue;
                 if (curve.Displacement > maxDisplacement)
+                {
                     maxDisplacement = curve.Displacement;
+                }
             }
 
         double nextStartAngle = 0;
@@ -807,7 +823,9 @@ public class PieItem
     public void DrawLabel (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
     {
         if (!_labelDetail.IsVisible)
+        {
             return;
+        }
 
         using (Pen labelPen = Border.GetPen (pane, scaleFactor))
         {
@@ -844,7 +862,9 @@ public class PieItem
     public void DesignLabel (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
     {
         if (!_labelDetail.IsVisible)
+        {
             return;
+        }
 
         _labelDetail.LayoutArea = new SizeF();
 
@@ -886,9 +906,13 @@ public class PieItem
             {
                 //no, so got to move explosion radius
                 if (_midAngle > 90) //move _label clockwise one-third of way to the end of the arc
+                {
                     CalculateLinePoints (rect, _midAngle + (_sweepAngle + _startAngle - _midAngle) / 3);
+                }
                 else //move _label counter-clockwise one-third of way to the start of the arc
+                {
                     CalculateLinePoints (rect, _midAngle - (_midAngle - (_midAngle - _startAngle) / 3));
+                }
             }
         }
 
@@ -914,9 +938,13 @@ public class PieItem
             {
                 //no, so got to move explosion radius
                 if (_midAngle < 270) //move _label counter-clockwise one-third of way to the start of the arc
+                {
                     CalculateLinePoints (rect, _midAngle - (_sweepAngle + _startAngle - _midAngle) / 3);
+                }
                 else //move _label clockwise one-third of way to the end of the arc
+                {
                     CalculateLinePoints (rect, _midAngle + (_midAngle - _startAngle) / 3);
+                }
             }
         }
 
@@ -1043,10 +1071,12 @@ public class PieItem
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    override public void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
+    public override void DrawLegendKey (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor)
     {
         if (!_isVisible)
+        {
             return;
+        }
 
         // Fill the slice
         if (_fill.IsVisible)
@@ -1062,7 +1092,9 @@ public class PieItem
 
         // Border the bar
         if (!_border.Color.IsEmpty)
+        {
             _border.Draw (g, pane, scaleFactor, rect);
+        }
     }
 
     /// <summary>
@@ -1074,7 +1106,7 @@ public class PieItem
     /// <param name="coords">A list of coordinates that represents the "rect" for
     /// this point (used in an html AREA tag)</param>
     /// <returns>true if it's a valid point, false otherwise</returns>
-    override public bool GetCoords (GraphPane pane, int i, out string coords)
+    public override bool GetCoords (GraphPane pane, int i, out string coords)
     {
         coords = string.Empty;
 
