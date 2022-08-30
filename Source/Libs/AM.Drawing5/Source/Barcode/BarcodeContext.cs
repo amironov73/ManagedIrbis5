@@ -43,7 +43,7 @@ public class BarcodeContext
     public BarcodeData? Data { get; set; }
 
     /// <summary>
-    ///
+    /// Провайдер сервисов.
     /// </summary>
     public IServiceProvider? ServiceProvider { get; set; }
 

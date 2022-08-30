@@ -3,8 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 
 /* Code93.cs -- штрихкод, поддерживающий A-Z, 0-9 и некоторые спецсимволы
  * Ars Magna project, http://arsmagna.ru

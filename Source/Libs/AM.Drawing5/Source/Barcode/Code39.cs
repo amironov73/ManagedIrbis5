@@ -3,9 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
 /* Code39.cs -- штрихкод, поддерживающий A-Z, 0-9 и некоторые спецсимволы

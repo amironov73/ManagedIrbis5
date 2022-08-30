@@ -3,12 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
-/* Ean13.cs --
+/* Ean13.cs -- позволяет закодировать 13 цифр, последняя цифра является контрольной
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +20,8 @@ using AM.Text;
 namespace AM.Drawing.Barcodes;
 
 /// <summary>
-/// EAN 13.
+/// Штрих-код EAN-13 позволяет закодировать 13 цифр.
+/// Последняя символ является контрольным и может быть буквой.
 /// </summary>
 public sealed class Ean13
     : LinearBarcodeBase

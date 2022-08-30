@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
 /* Codabar.cs -- штриховой код, позволяющий кодировать числа от 0 до 9, символы -, $, :, /, ., + и четыре буквы (A, B, C, D)
@@ -62,7 +60,6 @@ namespace AM.Drawing.Barcodes;
 /// Штриховой код, позволяющий кодировать числа от 0 до 9,
 /// символы -, $, :, /, ., + и четыре буквы (A, B, C, D).
 /// </summary>
-
 public sealed class Codabar
     : LinearBarcodeBase
 {

@@ -4,10 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 
-/* Ean8.cs --
+/* Ean8.cs -- позволяет закодировать 8 цифр, последняя  цифра является контрольной
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +20,8 @@ using AM.Text;
 namespace AM.Drawing.Barcodes;
 
 /// <summary>
-/// EAN 8
+/// Штрих-код EAN-8 позволяет закодировать 8 цифр.
+/// Последняя цифра является контрольным символом.
 /// </summary>
 public sealed class Ean8
     : LinearBarcodeBase
