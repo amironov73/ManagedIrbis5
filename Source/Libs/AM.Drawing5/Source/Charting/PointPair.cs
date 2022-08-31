@@ -12,266 +12,264 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
-#if ( !DOTNET1 ) // Is this a .Net 2 compilation?
-using System.Collections.Generic;
-#endif
 
 #endregion
 
 #nullable enable
 
-namespace AM.Drawing.Charting
+namespace AM.Drawing.Charting;
+
+/// <summary>
+/// A simple point represented by an (X,Y,Z) group of double values.
+/// </summary>
+[Serializable]
+public class PointPair
+    : PointPairBase, ISerializable, ICloneable
 {
+    #region Member variables
+
     /// <summary>
-    /// A simple point represented by an (X,Y,Z) group of double values.
+    /// This PointPair's Z coordinate.  Also used for the lower value (dependent axis)
+    /// for <see cref="HiLowBarItem"/> and <see cref="ErrorBarItem" /> charts.
     /// </summary>
-    [Serializable]
-    public class PointPair : PointPairBase, ISerializable, ICloneable
+    public double Z;
+
+    /// <summary>
+    /// A tag object for use by the user.  This can be used to store additional
+    /// information associated with the <see cref="PointPair"/>.  ZedGraph never
+    /// modifies this value, but if it is a <see cref="String"/> type, it
+    /// may be displayed in a <see cref="System.Windows.Forms.ToolTip"/>
+    /// within the <see cref="ZedGraphControl"/> object.
+    /// </summary>
+    /// <remarks>
+    /// Note that, if you are going to Serialize ZedGraph data, then any type
+    /// that you store in <see cref="Tag"/> must be a serializable type (or
+    /// it will cause an exception).
+    /// </remarks>
+    public object Tag;
+
+    #endregion
+
+    #region Constructors
+
+    /// <summary>
+    /// Default Constructor
+    /// </summary>
+    public PointPair() : this (0, 0, 0, null)
     {
-        #region Member variables
+    }
 
-        /// <summary>
-        /// This PointPair's Z coordinate.  Also used for the lower value (dependent axis)
-        /// for <see cref="HiLowBarItem"/> and <see cref="ErrorBarItem" /> charts.
-        /// </summary>
-        public double Z;
+    /// <summary>
+    /// Creates a point pair with the specified X and Y.
+    /// </summary>
+    /// <param name="x">This pair's x coordinate.</param>
+    /// <param name="y">This pair's y coordinate.</param>
+    public PointPair (double x, double y)
+        : this (x, y, 0, null)
+    {
+    }
 
-        /// <summary>
-        /// A tag object for use by the user.  This can be used to store additional
-        /// information associated with the <see cref="PointPair"/>.  ZedGraph never
-        /// modifies this value, but if it is a <see cref="String"/> type, it
-        /// may be displayed in a <see cref="System.Windows.Forms.ToolTip"/>
-        /// within the <see cref="ZedGraphControl"/> object.
-        /// </summary>
-        /// <remarks>
-        /// Note that, if you are going to Serialize ZedGraph data, then any type
-        /// that you store in <see cref="Tag"/> must be a serializable type (or
-        /// it will cause an exception).
-        /// </remarks>
-        public object Tag;
+    /// <summary>
+    /// Creates a point pair with the specified X, Y, and
+    /// label (<see cref="Tag"/>).
+    /// </summary>
+    /// <param name="x">This pair's x coordinate.</param>
+    /// <param name="y">This pair's y coordinate.</param>
+    /// <param name="label">This pair's string label (<see cref="Tag"/>)</param>
+    public PointPair (double x, double y, string label)
+        : this (x, y, 0, label as object)
+    {
+    }
 
-        #endregion
+    /// <summary>
+    /// Creates a point pair with the specified X, Y, and base value.
+    /// </summary>
+    /// <param name="x">This pair's x coordinate.</param>
+    /// <param name="y">This pair's y coordinate.</param>
+    /// <param name="z">This pair's z or lower dependent coordinate.</param>
+    public PointPair (double x, double y, double z)
+        : this (x, y, z, null)
+    {
+    }
 
-        #region Constructors
+    /// <summary>
+    /// Creates a point pair with the specified X, Y, base value, and
+    /// string label (<see cref="Tag"/>).
+    /// </summary>
+    /// <param name="x">This pair's x coordinate.</param>
+    /// <param name="y">This pair's y coordinate.</param>
+    /// <param name="z">This pair's z or lower dependent coordinate.</param>
+    /// <param name="label">This pair's string label (<see cref="Tag"/>)</param>
+    public PointPair (double x, double y, double z, string? label)
+        : this (x, y, z, label as object)
+    {
+    }
 
-        /// <summary>
-        /// Default Constructor
-        /// </summary>
-        public PointPair() : this (0, 0, 0, null)
+    /// <summary>
+    /// Creates a point pair with the specified X, Y, base value, and
+    /// (<see cref="Tag"/>).
+    /// </summary>
+    /// <param name="x">This pair's x coordinate.</param>
+    /// <param name="y">This pair's y coordinate.</param>
+    /// <param name="z">This pair's z or lower dependent coordinate.</param>
+    /// <param name="tag">This pair's <see cref="Tag"/> property</param>
+    public PointPair (double x, double y, double z, object tag)
+        : base (x, y)
+    {
+        Z = z;
+        Tag = tag;
+    }
+
+    /// <summary>
+    /// Creates a point pair from the specified <see cref="PointF"/> struct.
+    /// </summary>
+    /// <param name="pt">The <see cref="PointF"/> struct from which to get the
+    /// new <see cref="PointPair"/> values.</param>
+    public PointPair (PointF pt) : this (pt.X, pt.Y, 0, null)
+    {
+    }
+
+    /// <summary>
+    /// The PointPair copy constructor.
+    /// </summary>
+    /// <param name="rhs">The basis for the copy.</param>
+    public PointPair (PointPair rhs) : base (rhs)
+    {
+        Z = rhs.Z;
+
+        if (rhs.Tag is ICloneable)
         {
+            Tag = ((ICloneable)rhs.Tag).Clone();
         }
-
-        /// <summary>
-        /// Creates a point pair with the specified X and Y.
-        /// </summary>
-        /// <param name="x">This pair's x coordinate.</param>
-        /// <param name="y">This pair's y coordinate.</param>
-        public PointPair (double x, double y)
-            : this (x, y, 0, null)
+        else
         {
+            Tag = rhs.Tag;
         }
+    }
 
-        /// <summary>
-        /// Creates a point pair with the specified X, Y, and
-        /// label (<see cref="Tag"/>).
-        /// </summary>
-        /// <param name="x">This pair's x coordinate.</param>
-        /// <param name="y">This pair's y coordinate.</param>
-        /// <param name="label">This pair's string label (<see cref="Tag"/>)</param>
-        public PointPair (double x, double y, string label)
-            : this (x, y, 0, label as object)
+    /// <summary>
+    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
+    /// calling the typed version of <see cref="Clone" />
+    /// </summary>
+    /// <returns>A deep copy of this object</returns>
+    object ICloneable.Clone()
+    {
+        return Clone();
+    }
+
+    /// <summary>
+    /// Typesafe, deep-copy clone method.
+    /// </summary>
+    /// <returns>A new, independent copy of this class</returns>
+    public PointPair Clone()
+    {
+        return new PointPair (this);
+    }
+
+    #endregion
+
+    #region Serialization
+
+    /// <summary>
+    /// Current schema value that defines the version of the serialized file
+    /// </summary>
+    public const int schema2 = 11;
+
+    /// <summary>
+    /// Constructor for deserializing objects
+    /// </summary>
+    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data
+    /// </param>
+    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
+    /// </param>
+    protected PointPair (SerializationInfo info, StreamingContext context)
+        : base (info, context)
+    {
+        // The schema value is just a file version parameter.  You can use it to make future versions
+        // backwards compatible as new member variables are added to classes
+        var sch = info.GetInt32 ("schema2");
+
+        Z = info.GetDouble ("Z");
+        Tag = info.GetValue ("Tag", typeof (object));
+    }
+
+    /// <summary>
+    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
+    /// </summary>
+    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
+    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+    {
+        base.GetObjectData (info, context);
+        info.AddValue ("schema2", schema2);
+        info.AddValue ("Z", Z);
+        info.AddValue ("Tag", Tag);
+    }
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Readonly value that determines if either the X, Y, or Z
+    /// coordinate in this PointPair is an invalid (not plotable) value.
+    /// It is considered invalid if it is missing (equal to System.Double.Max),
+    /// Infinity, or NaN.
+    /// </summary>
+    /// <returns>true if any value is invalid</returns>
+    public bool IsInvalid3D
+    {
+        get
         {
+            return X == Missing ||
+                   Y == Missing ||
+                   Z == Missing ||
+                   double.IsInfinity (X) ||
+                   double.IsInfinity (Y) ||
+                   double.IsInfinity (Z) ||
+                   double.IsNaN (X) ||
+                   double.IsNaN (Y) ||
+                   double.IsNaN (Z);
         }
+    }
 
-        /// <summary>
-        /// Creates a point pair with the specified X, Y, and base value.
-        /// </summary>
-        /// <param name="x">This pair's x coordinate.</param>
-        /// <param name="y">This pair's y coordinate.</param>
-        /// <param name="z">This pair's z or lower dependent coordinate.</param>
-        public PointPair (double x, double y, double z)
-            : this (x, y, z, null)
-        {
-        }
+    /// <summary>
+    /// The "low" value for this point (lower dependent-axis value).
+    /// This is really just an alias for <see cref="PointPair.Z"/>.
+    /// </summary>
+    /// <value>The lower dependent value for this <see cref="PointPair"/>.</value>
+    public double LowValue
+    {
+        get { return Z; }
+        set { Z = value; }
+    }
 
-        /// <summary>
-        /// Creates a point pair with the specified X, Y, base value, and
-        /// string label (<see cref="Tag"/>).
-        /// </summary>
-        /// <param name="x">This pair's x coordinate.</param>
-        /// <param name="y">This pair's y coordinate.</param>
-        /// <param name="z">This pair's z or lower dependent coordinate.</param>
-        /// <param name="label">This pair's string label (<see cref="Tag"/>)</param>
-        public PointPair (double x, double y, double z, string label)
-            : this (x, y, z, label as object)
-        {
-        }
+    /// <summary>
+    /// The ColorValue property is just an alias for the <see cref="PointPair.Z" />
+    /// property.
+    /// </summary>
+    /// <remarks>
+    /// For other types, such as the <see cref="StockPoint"/>, the <see cref="StockPoint" />
+    /// can be mapped to a unique value.  This is used with the
+    /// <see cref="FillType.GradientByColorValue" /> option.
+    /// </remarks>
+    public virtual double ColorValue
+    {
+        get { return Z; }
+        set { Z = value; }
+    }
 
-        /// <summary>
-        /// Creates a point pair with the specified X, Y, base value, and
-        /// (<see cref="Tag"/>).
-        /// </summary>
-        /// <param name="x">This pair's x coordinate.</param>
-        /// <param name="y">This pair's y coordinate.</param>
-        /// <param name="z">This pair's z or lower dependent coordinate.</param>
-        /// <param name="tag">This pair's <see cref="Tag"/> property</param>
-        public PointPair (double x, double y, double z, object tag)
-            : base (x, y)
-        {
-            Z = z;
-            Tag = tag;
-        }
+    #endregion
 
-        /// <summary>
-        /// Creates a point pair from the specified <see cref="PointF"/> struct.
-        /// </summary>
-        /// <param name="pt">The <see cref="PointF"/> struct from which to get the
-        /// new <see cref="PointPair"/> values.</param>
-        public PointPair (PointF pt) : this (pt.X, pt.Y, 0, null)
-        {
-        }
-
-        /// <summary>
-        /// The PointPair copy constructor.
-        /// </summary>
-        /// <param name="rhs">The basis for the copy.</param>
-        public PointPair (PointPair rhs) : base (rhs)
-        {
-            Z = rhs.Z;
-
-            if (rhs.Tag is ICloneable)
-            {
-                Tag = ((ICloneable)rhs.Tag).Clone();
-            }
-            else
-            {
-                Tag = rhs.Tag;
-            }
-        }
-
-        /// <summary>
-        /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-        /// calling the typed version of <see cref="Clone" />
-        /// </summary>
-        /// <returns>A deep copy of this object</returns>
-        object ICloneable.Clone()
-        {
-            return Clone();
-        }
-
-        /// <summary>
-        /// Typesafe, deep-copy clone method.
-        /// </summary>
-        /// <returns>A new, independent copy of this class</returns>
-        public PointPair Clone()
-        {
-            return new PointPair (this);
-        }
-
-        #endregion
-
-        #region Serialization
-
-        /// <summary>
-        /// Current schema value that defines the version of the serialized file
-        /// </summary>
-        public const int schema2 = 11;
-
-        /// <summary>
-        /// Constructor for deserializing objects
-        /// </summary>
-        /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data
-        /// </param>
-        /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
-        /// </param>
-        protected PointPair (SerializationInfo info, StreamingContext context)
-            : base (info, context)
-        {
-            // The schema value is just a file version parameter.  You can use it to make future versions
-            // backwards compatible as new member variables are added to classes
-            int sch = info.GetInt32 ("schema2");
-
-            Z = info.GetDouble ("Z");
-            Tag = info.GetValue ("Tag", typeof (object));
-        }
-
-        /// <summary>
-        /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-        /// </summary>
-        /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-        /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-        public override void GetObjectData
-            (
-                SerializationInfo info,
-                StreamingContext context
-            )
-        {
-            base.GetObjectData (info, context);
-            info.AddValue ("schema2", schema2);
-            info.AddValue ("Z", Z);
-            info.AddValue ("Tag", Tag);
-        }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Readonly value that determines if either the X, Y, or Z
-        /// coordinate in this PointPair is an invalid (not plotable) value.
-        /// It is considered invalid if it is missing (equal to System.Double.Max),
-        /// Infinity, or NaN.
-        /// </summary>
-        /// <returns>true if any value is invalid</returns>
-        public bool IsInvalid3D
-        {
-            get
-            {
-                return X == Missing ||
-                       Y == Missing ||
-                       Z == Missing ||
-                       double.IsInfinity (X) ||
-                       double.IsInfinity (Y) ||
-                       double.IsInfinity (Z) ||
-                       double.IsNaN (X) ||
-                       double.IsNaN (Y) ||
-                       double.IsNaN (Z);
-            }
-        }
-
-        /// <summary>
-        /// The "low" value for this point (lower dependent-axis value).
-        /// This is really just an alias for <see cref="PointPair.Z"/>.
-        /// </summary>
-        /// <value>The lower dependent value for this <see cref="PointPair"/>.</value>
-        public double LowValue
-        {
-            get { return Z; }
-            set { Z = value; }
-        }
-
-        /// <summary>
-        /// The ColorValue property is just an alias for the <see cref="PointPair.Z" />
-        /// property.
-        /// </summary>
-        /// <remarks>
-        /// For other types, such as the <see cref="StockPoint"/>, the <see cref="StockPoint" />
-        /// can be mapped to a unique value.  This is used with the
-        /// <see cref="FillType.GradientByColorValue" /> option.
-        /// </remarks>
-        public virtual double ColorValue
-        {
-            get { return Z; }
-            set { Z = value; }
-        }
-
-        #endregion
-
-        #region Inner classes
+    #region Inner classes
 
 #if ( DOTNET1 ) // Is this a .Net 1.1 compilation?
 		/// <summary>
@@ -383,202 +381,193 @@ namespace AM.Drawing.Charting
 
 #else // Otherwise, it's .Net 2.0, so use generics
 
+    /// <summary>
+    /// Compares points based on their y values.  Is setup to be used in an
+    /// ascending order sort.
+    /// <seealso cref="System.Collections.ArrayList.Sort()"/>
+    /// </summary>
+    public class PointPairComparerY : IComparer<PointPair>
+    {
         /// <summary>
-        /// Compares points based on their y values.  Is setup to be used in an
-        /// ascending order sort.
-        /// <seealso cref="System.Collections.ArrayList.Sort()"/>
+        /// Compares two <see cref="PointPair"/>s.
         /// </summary>
-        public class PointPairComparerY : IComparer<PointPair>
+        /// <param name="l">Point to the left.</param>
+        /// <param name="r">Point to the right.</param>
+        /// <returns>-1, 0, or 1 depending on l.Y's relation to r.Y</returns>
+        public int Compare (PointPair l, PointPair r)
         {
-            /// <summary>
-            /// Compares two <see cref="PointPair"/>s.
-            /// </summary>
-            /// <param name="l">Point to the left.</param>
-            /// <param name="r">Point to the right.</param>
-            /// <returns>-1, 0, or 1 depending on l.Y's relation to r.Y</returns>
-            public int Compare (PointPair l, PointPair r)
+            if (l == null && r == null)
             {
-                if (l == null && r == null)
-                {
-                    return 0;
-                }
-                else if (l == null && r != null)
-                {
-                    return -1;
-                }
-                else if (l != null && r == null)
-                {
-                    return 1;
-                }
-
-                double lY = l.Y;
-                double rY = r.Y;
-
-                if (Math.Abs (lY - rY) < .000000001)
-                {
-                    return 0;
-                }
-
-                return lY < rY ? -1 : 1;
+                return 0;
             }
+            else if (l == null && r != null)
+            {
+                return -1;
+            }
+            else if (l != null && r == null)
+            {
+                return 1;
+            }
+
+            var lY = l.Y;
+            var rY = r.Y;
+
+            if (Math.Abs (lY - rY) < .000000001)
+            {
+                return 0;
+            }
+
+            return lY < rY ? -1 : 1;
+        }
+    }
+
+    /// <summary>
+    /// Compares points based on their x values.  Is setup to be used in an
+    /// ascending order sort.
+    /// <seealso cref="System.Collections.ArrayList.Sort()"/>
+    /// </summary>
+    public class PointPairComparer : IComparer<PointPair>
+    {
+        private SortType sortType;
+
+        /// <summary>
+        /// Constructor for PointPairComparer.
+        /// </summary>
+        /// <param name="type">The axis type on which to sort.</param>
+        public PointPairComparer (SortType type)
+        {
+            sortType = type;
         }
 
         /// <summary>
-        /// Compares points based on their x values.  Is setup to be used in an
-        /// ascending order sort.
-        /// <seealso cref="System.Collections.ArrayList.Sort()"/>
+        /// Compares two <see cref="PointPair"/>s.
         /// </summary>
-        public class PointPairComparer : IComparer<PointPair>
+        /// <param name="l">Point to the left.</param>
+        /// <param name="r">Point to the right.</param>
+        /// <returns>-1, 0, or 1 depending on l.X's relation to r.X</returns>
+        public int Compare (PointPair l, PointPair r)
         {
-            private SortType sortType;
-
-            /// <summary>
-            /// Constructor for PointPairComparer.
-            /// </summary>
-            /// <param name="type">The axis type on which to sort.</param>
-            public PointPairComparer (SortType type)
+            if (l == null && r == null)
             {
-                sortType = type;
+                return 0;
+            }
+            else if (l == null && r != null)
+            {
+                return -1;
+            }
+            else if (l != null && r == null)
+            {
+                return 1;
             }
 
-            /// <summary>
-            /// Compares two <see cref="PointPair"/>s.
-            /// </summary>
-            /// <param name="l">Point to the left.</param>
-            /// <param name="r">Point to the right.</param>
-            /// <returns>-1, 0, or 1 depending on l.X's relation to r.X</returns>
-            public int Compare (PointPair l, PointPair r)
+            double lVal, rVal;
+
+            if (sortType == SortType.XValues)
             {
-                if (l == null && r == null)
-                {
-                    return 0;
-                }
-                else if (l == null && r != null)
-                {
-                    return -1;
-                }
-                else if (l != null && r == null)
-                {
-                    return 1;
-                }
+                lVal = l.X;
+                rVal = r.X;
+            }
+            else
+            {
+                lVal = l.Y;
+                rVal = r.Y;
+            }
 
-                double lVal, rVal;
+            if (lVal == Missing || double.IsInfinity (lVal) || double.IsNaN (lVal))
+            {
+                l = null;
+            }
 
-                if (sortType == SortType.XValues)
-                {
-                    lVal = l.X;
-                    rVal = r.X;
-                }
-                else
-                {
-                    lVal = l.Y;
-                    rVal = r.Y;
-                }
+            if (rVal == Missing || double.IsInfinity (rVal) || double.IsNaN (rVal))
+            {
+                r = null;
+            }
 
-                if (lVal == Missing || double.IsInfinity (lVal) || double.IsNaN (lVal))
-                {
-                    l = null;
-                }
-
-                if (rVal == Missing || double.IsInfinity (rVal) || double.IsNaN (rVal))
-                {
-                    r = null;
-                }
-
-                if ((l == null && r == null) || (Math.Abs (lVal - rVal) < 1e-100))
-                {
-                    return 0;
-                }
-                else if (l == null && r != null)
-                {
-                    return -1;
-                }
-                else if (l != null && r == null)
-                {
-                    return 1;
-                }
-                else
-                {
-                    return lVal < rVal ? -1 : 1;
-                }
+            if ((l == null && r == null) || (Math.Abs (lVal - rVal) < 1e-100))
+            {
+                return 0;
+            }
+            else if (l == null && r != null)
+            {
+                return -1;
+            }
+            else if (l != null && r == null)
+            {
+                return 1;
+            }
+            else
+            {
+                return lVal < rVal ? -1 : 1;
             }
         }
+    }
 
 #endif
 
-        #endregion
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        /// <summary>
-        /// Compare two <see cref="PointPair"/> objects for equality.  To be equal, X, Y, and Z
-        /// must be exactly the same between the two objects.
-        /// </summary>
-        /// <param name="obj">The <see cref="PointPair"/> object to be compared with.</param>
-        /// <returns>true if the <see cref="PointPair"/> objects are equal, false otherwise</returns>
-        public override bool Equals (object obj)
-        {
-            PointPair rhs = obj as PointPair;
-            return X == rhs.X && Y == rhs.Y && Z == rhs.Z;
-        }
-
-        /// <summary>
-        /// Return the HashCode from the base class.
-        /// </summary>
-        /// <returns></returns>
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
-        /// <summary>
-        /// Format this PointPair value using the default format.  Example:  "( 12.345, -16.876 )".
-        /// The two double values are formatted with the "g" format type.
-        /// </summary>
-        /// <param name="isShowZ">true to show the third "Z" or low dependent value coordinate</param>
-        /// <returns>A string representation of the PointPair</returns>
-        public virtual string ToString (bool isShowZ)
-        {
-            return ToString (DefaultFormat, isShowZ);
-        }
-
-        /// <summary>
-        /// Format this PointPair value using a general format string.
-        /// Example:  a format string of "e2" would give "( 1.23e+001, -1.69e+001 )".
-        /// If <see paramref="isShowZ"/>
-        /// is true, then the third "Z" coordinate is also shown.
-        /// </summary>
-        /// <param name="format">A format string that will be used to format each of
-        /// the two double type values (see <see cref="System.Double.ToString()"/>).</param>
-        /// <returns>A string representation of the PointPair</returns>
-        /// <param name="isShowZ">true to show the third "Z" or low dependent value coordinate</param>
-        public virtual string ToString (string format, bool isShowZ)
-        {
-            return "( " + X.ToString (format) +
-                   ", " + Y.ToString (format) +
-                   (isShowZ ? (", " + Z.ToString (format)) : "")
-                   + " )";
-        }
-
-        /// <summary>
-        /// Format this PointPair value using different general format strings for the X, Y, and Z values.
-        /// Example:  a format string of "e2" would give "( 1.23e+001, -1.69e+001 )".
-        /// </summary>
-        /// <param name="formatX">A format string that will be used to format the X
-        /// double type value (see <see cref="System.Double.ToString()"/>).</param>
-        /// <param name="formatY">A format string that will be used to format the Y
-        /// double type value (see <see cref="System.Double.ToString()"/>).</param>
-        /// <param name="formatZ">A format string that will be used to format the Z
-        /// double type value (see <see cref="System.Double.ToString()"/>).</param>
-        /// <returns>A string representation of the PointPair</returns>
-        public string ToString (string formatX, string formatY, string formatZ)
-        {
-            return "( " + X.ToString (formatX) +
-                   ", " + Y.ToString (formatY) +
-                   ", " + Z.ToString (formatZ) +
-                   " )";
-        }
-
-        #endregion
+    /// <inheritdoc cref="Object.Equals(object)"/>
+    public override bool Equals (object obj)
+    {
+        var rhs = obj as PointPair;
+        return X == rhs.X && Y == rhs.Y && Z == rhs.Z;
     }
+
+    /// <inheritdoc cref="Object.GetHashCode"/>
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    /// <summary>
+    /// Format this PointPair value using the default format.  Example:  "( 12.345, -16.876 )".
+    /// The two double values are formatted with the "g" format type.
+    /// </summary>
+    /// <param name="isShowZ">true to show the third "Z" or low dependent value coordinate</param>
+    /// <returns>A string representation of the PointPair</returns>
+    public virtual string ToString (bool isShowZ)
+    {
+        return ToString (DefaultFormat, isShowZ);
+    }
+
+    /// <summary>
+    /// Format this PointPair value using a general format string.
+    /// Example:  a format string of "e2" would give "( 1.23e+001, -1.69e+001 )".
+    /// If <see paramref="isShowZ"/>
+    /// is true, then the third "Z" coordinate is also shown.
+    /// </summary>
+    /// <param name="format">A format string that will be used to format each of
+    /// the two double type values (see <see cref="System.Double.ToString()"/>).</param>
+    /// <returns>A string representation of the PointPair</returns>
+    /// <param name="isShowZ">true to show the third "Z" or low dependent value coordinate</param>
+    public virtual string ToString (string format, bool isShowZ)
+    {
+        return "( " + X.ToString (format) +
+               ", " + Y.ToString (format) +
+               (isShowZ ? (", " + Z.ToString (format)) : "")
+               + " )";
+    }
+
+    /// <summary>
+    /// Format this PointPair value using different general format strings for the X, Y, and Z values.
+    /// Example:  a format string of "e2" would give "( 1.23e+001, -1.69e+001 )".
+    /// </summary>
+    /// <param name="formatX">A format string that will be used to format the X
+    /// double type value (see <see cref="System.Double.ToString()"/>).</param>
+    /// <param name="formatY">A format string that will be used to format the Y
+    /// double type value (see <see cref="System.Double.ToString()"/>).</param>
+    /// <param name="formatZ">A format string that will be used to format the Z
+    /// double type value (see <see cref="System.Double.ToString()"/>).</param>
+    /// <returns>A string representation of the PointPair</returns>
+    public string ToString (string formatX, string formatY, string formatZ)
+    {
+        return "( " + X.ToString (formatX) +
+               ", " + Y.ToString (formatY) +
+               ", " + Z.ToString (formatZ) +
+               " )";
+    }
+
+    #endregion
 }

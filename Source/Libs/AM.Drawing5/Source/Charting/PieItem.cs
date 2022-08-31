@@ -16,7 +16,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -505,12 +504,16 @@ public class PieItem
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected PieItem (SerializationInfo info, StreamingContext context)
+    protected PieItem
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
         : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        info.GetInt32 ("schema2").NotUsed();
 
         _displacement = info.GetDouble ("displacement");
         _labelDetail = (TextObj)info.GetValue ("labelDetail", typeof (TextObj));
@@ -532,13 +535,12 @@ public class PieItem
         _percentDecimalDigits = info.GetInt32 ("percentDecimalDigits");
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
@@ -566,28 +568,14 @@ public class PieItem
 
     #region Methods
 
-    /// <summary>
-    /// Do all rendering associated with this <see cref="PieItem"/> item to the specified
-    /// <see cref="Graphics"/> device.  This method is normally only
-    /// called by the Draw method of the parent <see cref="CurveList"/>
-    /// collection object.
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="pos">Not used for rendering Pies</param>param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
+    /// <inheritdoc cref="CurveItem.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            int pos,
+            float scaleFactor
+        )
     {
         if (pane.Chart._rect.Width <= 0 && pane.Chart._rect.Height <= 0)
         {
@@ -1010,22 +998,28 @@ public class PieItem
             case PieLabelType.Value:
                 curve._labelStr = curve._pieValue.ToString ("F", labelFormat);
                 break;
+
             case PieLabelType.Percent:
                 curve._labelStr = (curve._sweepAngle / 360).ToString ("P", labelFormat);
                 break;
+
             case PieLabelType.Name_Value:
                 curve._labelStr = curve._label._text + ": " + curve._pieValue.ToString ("F", labelFormat);
                 break;
+
             case PieLabelType.Name_Percent:
                 curve._labelStr = curve._label._text + ": " + (curve._sweepAngle / 360).ToString ("P", labelFormat);
                 break;
+
             case PieLabelType.Name_Value_Percent:
                 curve._labelStr = curve._label._text + ": " + curve._pieValue.ToString ("F", labelFormat) +
                                   " (" + (curve._sweepAngle / 360).ToString ("P", labelFormat) + ")";
                 break;
+
             case PieLabelType.Name:
                 curve._labelStr = curve._label._text;
                 break;
+
             case PieLabelType.None:
             default:
                 break;
