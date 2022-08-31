@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* PointD.cs --
+/* PointD.cs -- структура, хранящая координаты X и Y как числа с плавающей точкой
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,29 +20,42 @@ using System;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// Simple struct that stores X and Y coordinates as doubles.
+/// Простая структура, хранящая координаты X и Y
+/// как числа с плавающей точкой.
 /// </summary>
 [Serializable]
 public struct PointD
 {
+    #region Fields
+
     /// <summary>
-    /// The X coordinate
+    /// Координата X.
     /// </summary>
     public double X;
 
     /// <summary>
-    /// The Y coordinate
+    /// Координата Y,
     /// </summary>
     public double Y;
 
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Construct a <see cref="PointD" /> object from two double values.
+    /// Создает объект <see cref="PointD" /> из двух двойных значений.
     /// </summary>
-    /// <param name="x">The X coordinate</param>
-    /// <param name="y">The Y coordinate</param>
-    public PointD (double x, double y)
+    /// <param name="x">Координата X.</param>
+    /// <param name="y">Координата Y.</param>
+    public PointD
+        (
+            double x,
+            double y
+        )
     {
         X = x;
         Y = y;
     }
+
+    #endregion
 }

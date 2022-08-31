@@ -45,17 +45,17 @@ public class RollingPointPairList
     /// <summary>
     /// An array of PointPair objects that acts as the underlying buffer.
     /// </summary>
-    [CLSCompliant (false)] protected PointPair[] _mBuffer;
+    protected PointPair[]? _mBuffer;
 
     /// <summary>
     /// The index of the previously enqueued item. -1 if buffer is empty.
     /// </summary>
-    [CLSCompliant (false)] protected int _headIdx;
+    protected int _headIdx;
 
     /// <summary>
     /// The index of the next item to be dequeued. -1 if buffer is empty.
     /// </summary>
-    [CLSCompliant (false)] protected int _tailIdx;
+    protected int _tailIdx;
 
     #endregion
 
@@ -92,7 +92,7 @@ public class RollingPointPairList
 
         if (preLoad)
         {
-            for (int i = 0; i < capacity; i++)
+            for (var i = 0; i < capacity; i++)
                 _mBuffer[i] = new PointPair();
         }
     }
@@ -107,7 +107,7 @@ public class RollingPointPairList
     {
         _mBuffer = new PointPair[rhs.Count];
 
-        for (int i = 0; i < rhs.Count; i++)
+        for (var i = 0; i < rhs.Count; i++)
         {
             _mBuffer[i] = new PointPair (rhs[i]);
         }
@@ -292,7 +292,7 @@ public class RollingPointPairList
     {
         // A slightly more efficient approach would be to determine where the new points should placed within
         // the buffer and to then copy them in directly - updating the head and tail indexes appropriately.
-        for (int i = 0; i < pointList.Count; i++)
+        for (var i = 0; i < pointList.Count; i++)
             Add (pointList[i]);
     }
 
@@ -311,7 +311,7 @@ public class RollingPointPairList
             throw new InvalidOperationException ("buffer is empty.");
         }
 
-        PointPair o = _mBuffer[_tailIdx];
+        var o = _mBuffer[_tailIdx];
 
         if (_tailIdx == _headIdx)
         {
@@ -342,7 +342,7 @@ public class RollingPointPairList
     /// </param>
     public void RemoveAt (int index)
     {
-        int count = Count;
+        var count = Count;
 
         if (index >= count || index < 0)
         {
@@ -350,10 +350,10 @@ public class RollingPointPairList
         }
 
         // shift all the items that lie after index back by 1
-        for (int i = index + _tailIdx; i < _tailIdx + count - 1; i++)
+        for (var i = index + _tailIdx; i < _tailIdx + count - 1; i++)
         {
             i = (i >= _mBuffer.Length) ? 0 : i;
-            int j = i + 1;
+            var j = i + 1;
             j = (j >= _mBuffer.Length) ? 0 : j;
             _mBuffer[i] = _mBuffer[j];
         }
@@ -378,14 +378,14 @@ public class RollingPointPairList
     /// or greater than the total available items in the queue</param>
     public void RemoveRange (int index, int count)
     {
-        int totalCount = Count;
+        var totalCount = Count;
 
         if (index >= totalCount || index < 0 || count < 0 || count > totalCount)
         {
             throw new ArgumentOutOfRangeException();
         }
 
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
             RemoveAt (index);
     }
 
@@ -401,7 +401,7 @@ public class RollingPointPairList
             throw new InvalidOperationException ("buffer is empty.");
         }
 
-        PointPair o = _mBuffer[_headIdx];
+        var o = _mBuffer[_headIdx];
 
         if (_tailIdx == _headIdx)
         {
@@ -555,7 +555,7 @@ public class RollingPointPairList
     /// <param name="y">A double[] array of Y values</param>
     public void Add (double[] x, double[] y)
     {
-        int len = 0;
+        var len = 0;
 
         if (x != null)
         {
@@ -567,9 +567,9 @@ public class RollingPointPairList
             len = y.Length;
         }
 
-        for (int i = 0; i < len; i++)
+        for (var i = 0; i < len; i++)
         {
-            PointPair point = new PointPair (0, 0, 0);
+            var point = new PointPair (0, 0, 0);
             if (x == null)
             {
                 point.X = (double)i + 1.0;
@@ -613,9 +613,14 @@ public class RollingPointPairList
     /// <param name="x">A double[] array of X values</param>
     /// <param name="y">A double[] array of Y values</param>
     /// <param name="z">A double[] array of Z values</param>
-    public void Add (double[] x, double[] y, double[] z)
+    public void Add
+        (
+            double[]? x,
+            double[]? y,
+            double[]? z
+        )
     {
-        int len = 0;
+        var len = 0;
 
         if (x != null)
         {
@@ -632,13 +637,13 @@ public class RollingPointPairList
             len = z.Length;
         }
 
-        for (int i = 0; i < len; i++)
+        for (var i = 0; i < len; i++)
         {
-            PointPair point = new PointPair();
+            var point = new PointPair();
 
             if (x == null)
             {
-                point.X = (double)i + 1.0;
+                point.X = i + 1.0;
             }
             else if (i < x.Length)
             {
@@ -695,24 +700,27 @@ public class RollingPointPairList
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected RollingPointPairList (SerializationInfo info, StreamingContext context)
+    protected RollingPointPairList
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        info.GetInt32 ("schema").NotUsed();
 
         _headIdx = info.GetInt32 ("headIdx");
         _tailIdx = info.GetInt32 ("tailIdx");
-        _mBuffer = (PointPair[])info.GetValue ("mBuffer", typeof (PointPair[]));
+        _mBuffer = (PointPair[]?) info.GetValue ("mBuffer", typeof (PointPair[]));
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
+    public virtual void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         info.AddValue ("schema", schema);
         info.AddValue ("headIdx", _headIdx);

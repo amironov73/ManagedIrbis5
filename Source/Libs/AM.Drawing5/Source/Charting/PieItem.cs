@@ -53,7 +53,7 @@ public class PieItem
     /// A <see cref="TextObj"/> which will customize the label display of this
     /// <see cref="PieItem"/>
     /// </summary>
-    private TextObj _labelDetail;
+    private TextObj? _labelDetail;
 
     /// <summary>
     /// Private	field	that stores the	<see cref="Charting.Fill"/> data for this
@@ -516,7 +516,7 @@ public class PieItem
         info.GetInt32 ("schema2").NotUsed();
 
         _displacement = info.GetDouble ("displacement");
-        _labelDetail = (TextObj)info.GetValue ("labelDetail", typeof (TextObj));
+        _labelDetail = (TextObj) info.GetValue ("labelDetail", typeof (TextObj));
         _fill = (Fill)info.GetValue ("fill", typeof (Fill));
         _border = (Border)info.GetValue ("border", typeof (Border));
         _pieValue = info.GetDouble ("pieValue");
@@ -594,22 +594,22 @@ public class PieItem
                 return;
             }
 
-            RectangleF tRect = _boundingRectangle;
+            var tRect = _boundingRectangle;
 
             if (tRect.Width >= 1 && tRect.Height >= 1)
             {
-                SmoothingMode sMode = graphics.SmoothingMode;
+                var sMode = graphics.SmoothingMode;
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-                Fill tFill = _fill;
-                Border tBorder = _border;
+                var tFill = _fill;
+                var tBorder = _border;
                 if (IsSelected)
                 {
                     tFill = Selection.Fill;
                     tBorder = Selection.Border;
                 }
 
-                using (Brush brush = tFill.MakeBrush (_boundingRectangle))
+                using (var brush = tFill.MakeBrush (_boundingRectangle))
                 {
                     graphics.FillPie (brush, tRect.X, tRect.Y, tRect.Width, tRect.Height, StartAngle,
                         SweepAngle);
@@ -620,7 +620,7 @@ public class PieItem
 
                     if (Border.IsVisible)
                     {
-                        using (Pen borderPen = tBorder.GetPen (pane, scaleFactor))
+                        using (var borderPen = tBorder.GetPen (pane, scaleFactor))
                         {
                             graphics.DrawPie (borderPen, tRect.X, tRect.Y, tRect.Width, tRect.Height,
                                 StartAngle, SweepAngle);
@@ -674,7 +674,7 @@ public class PieItem
         double maxDisplacement = 0;
         RectangleF tempRect; //= new RectangleF(0,0,0,0);
 
-        RectangleF nonExplRect = chartRect;
+        var nonExplRect = chartRect;
 
         if (pane.CurveList.IsPieOnly)
         {
@@ -684,7 +684,7 @@ public class PieItem
                 nonExplRect.Inflate (-(float)0.05F * nonExplRect.Height, -(float)0.05F * nonExplRect.Width);
 
                 //get the difference between dimensions
-                float delta = (nonExplRect.Height - nonExplRect.Width) / 2;
+                var delta = (nonExplRect.Height - nonExplRect.Width) / 2;
 
                 //make a square	so we end up with circular pie
                 nonExplRect.Height = nonExplRect.Width;
@@ -695,7 +695,7 @@ public class PieItem
             else
             {
                 nonExplRect.Inflate (-(float)0.05F * nonExplRect.Height, -(float)0.05F * nonExplRect.Width);
-                float delta = (nonExplRect.Width - nonExplRect.Height) / 2;
+                var delta = (nonExplRect.Width - nonExplRect.Height) / 2;
                 nonExplRect.Width = nonExplRect.Height;
                 nonExplRect.X += delta;
             }
@@ -762,7 +762,7 @@ public class PieItem
     /// <param name="maxDisplacement">maximum slice displacement</param>
     private static void CalculatePieChartParams (GraphPane pane, ref double maxDisplacement)
     {
-        string lblStr = " ";
+        var lblStr = " ";
 
         //loop thru slices and get total value and maxDisplacement
         double pieTotalValue = 0;
@@ -815,7 +815,7 @@ public class PieItem
             return;
         }
 
-        using (Pen labelPen = Border.GetPen (pane, scaleFactor))
+        using (var labelPen = Border.GetPen (pane, scaleFactor))
         {
             //draw line from intersection point to pivot point -
             g.DrawLine (labelPen, _intersectionPoint, _pivotPoint);
@@ -864,14 +864,14 @@ public class PieItem
         CalculateLinePoints (rect, _midAngle);
 
         //now get size of bounding rect for label
-        SizeF size = _labelDetail.FontSpec.BoundingBox (g, _labelStr, scaleFactor);
+        var size = _labelDetail.FontSpec.BoundingBox (g, _labelStr, scaleFactor);
 
         //how much room left for the label - most likely midangles for wrapping
         //Right - 315 -> 45 degrees
         //Bottom - 45 -> 135
         //Left - 135 -> 225
         //Top - 225 -> 315
-        RectangleF chartRect = pane.Chart._rect;
+        var chartRect = pane.Chart._rect;
         float fill = 0;
         if (_midAngle > 315 || _midAngle <= 45)
         {
@@ -952,7 +952,7 @@ public class PieItem
     private void CalculateLinePoints (RectangleF rect, double midAngle)
     {
         //get the point where the explosion radius intersects the this arc
-        PointF rectCenter = new PointF ((rect.X + rect.Width / 2), (rect.Y + rect.Height / 2));
+        var rectCenter = new PointF ((rect.X + rect.Width / 2), (rect.Y + rect.Height / 2));
 
         _intersectionPoint = new PointF (
             (float)(rectCenter.X + (rect.Width / 2 * Math.Cos ((midAngle) * Math.PI / 180))),
@@ -987,7 +987,7 @@ public class PieItem
     private static void BuildLabelString (PieItem curve)
     {
         //set up label string formatting
-        NumberFormatInfo labelFormat = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
+        var labelFormat = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
 
         labelFormat.NumberDecimalDigits = curve._valueDecimalDigits;
         labelFormat.PercentPositivePattern = 1; //no space between number and % sign
@@ -1040,8 +1040,8 @@ public class PieItem
         //go beyond nonExplRect, but want to maintain the same center point...therefore, got to
         //reduce the diameter of the nonexploded pie by the alue of the displacement
 
-        float xDispl = (float)((maxDisplacement * baseRect.Width));
-        float yDispl = (float)((maxDisplacement * baseRect.Height));
+        var xDispl = (float)((maxDisplacement * baseRect.Width));
+        var yDispl = (float)((maxDisplacement * baseRect.Height));
 
         baseRect.Inflate (-(float)((xDispl / 10)), -(float)((xDispl / 10)));
     }
@@ -1076,7 +1076,7 @@ public class PieItem
         if (_fill.IsVisible)
         {
             // just avoid height/width being less than 0.1 so GDI+ doesn't cry
-            using (Brush brush = _fill.MakeBrush (rect))
+            using (var brush = _fill.MakeBrush (rect))
             {
                 graphics.FillRectangle (brush, rect);
 
@@ -1100,16 +1100,21 @@ public class PieItem
     /// <param name="coords">A list of coordinates that represents the "rect" for
     /// this point (used in an html AREA tag)</param>
     /// <returns>true if it's a valid point, false otherwise</returns>
-    public override bool GetCoords (GraphPane pane, int i, out string coords)
+    public override bool GetCoords
+        (
+            GraphPane pane,
+            int i,
+            out string coords
+        )
     {
         coords = string.Empty;
 
-        PointF pt = _boundingRectangle.Location;
+        var pt = _boundingRectangle.Location;
         pt.X += _boundingRectangle.Width / 2.0f;
         pt.Y += _boundingRectangle.Height / 2.0f;
 
-        float radius = _boundingRectangle.Width / 2.0f;
-        Matrix matrix = new Matrix();
+        var radius = _boundingRectangle.Width / 2.0f;
+        var matrix = new Matrix();
 
         // Move the coordinate system to local coordinates
         // of this text object (that is, at the specified
@@ -1119,25 +1124,29 @@ public class PieItem
         matrix.Rotate (StartAngle);
 
         //One mark every 5'ish degrees
-        int count = (int)Math.Floor (SweepAngle / 5) + 1;
-        PointF[] pts = new PointF[2 + count];
+        var count = (int) Math.Floor (SweepAngle / 5) + 1;
+        var pts = new PointF[2 + count];
         pts[0] = new PointF (0, 0);
         pts[1] = new PointF (radius, 0);
-        double angle = 0.0;
-        for (int j = 2; j < count + 2; j++)
+        var angle = 0.0;
+        for (var j = 2; j < count + 2; j++)
         {
             angle += SweepAngle / count;
 
-            pts[j] = new PointF (radius * (float)Math.Cos (angle * Math.PI / 180.0),
-                radius * (float)Math.Sin (angle * Math.PI / 180.0));
+            pts[j] = new PointF
+                (
+                    radius * (float) Math.Cos (angle * Math.PI / 180.0),
+                    radius * (float) Math.Sin (angle * Math.PI / 180.0)
+                );
         }
 
         matrix.TransformPoints (pts);
 
-        coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0},",
-            pts[0].X, pts[0].Y, pts[1].X, pts[1].Y);
-        for (int j = 2; j < count + 2; j++)
+        coords = $"{pts[0].X:f0},{pts[0].Y:f0},{pts[1].X:f0},{pts[1].Y:f0},";
+        for (var j = 2; j < count + 2; j++)
+        {
             coords += string.Format (j > count ? "{0:f0},{1:f0}" : "{0:f0},{1:f0},", pts[j].X, pts[j].Y);
+        }
 
         return true;
     }

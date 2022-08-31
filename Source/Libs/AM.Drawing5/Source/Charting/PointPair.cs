@@ -50,7 +50,7 @@ public class PointPair
     /// that you store in <see cref="Tag"/> must be a serializable type (or
     /// it will cause an exception).
     /// </remarks>
-    public object Tag;
+    public object? Tag;
 
     #endregion
 

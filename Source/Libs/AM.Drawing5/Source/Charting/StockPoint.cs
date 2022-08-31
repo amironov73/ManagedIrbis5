@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* StockPoint.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -13,7 +14,6 @@
 
 using System;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -99,8 +99,16 @@ public class StockPoint
     /// <param name="low">The daily low stock price</param>
     /// <param name="vol">The daily trading volume</param>
     /// <param name="tag">The user-defined <see cref="PointPair.Tag" /> property.</param>
-    public StockPoint (double date, double high, double low, double open, double close, double vol,
-        string tag)
+    public StockPoint
+        (
+            double date,
+            double high,
+            double low,
+            double open,
+            double close,
+            double vol,
+            string? tag
+        )
         : base (date, high)
     {
         Low = low;
@@ -174,12 +182,16 @@ public class StockPoint
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected StockPoint (SerializationInfo info, StreamingContext context)
+    protected StockPoint
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
         : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema3");
+        info.GetInt32 ("schema3").NotUsed();
 
         Open = info.GetDouble ("Open");
         Close = info.GetDouble ("Close");
@@ -187,13 +199,12 @@ public class StockPoint
         ColorValue = info.GetDouble ("ColorValue");
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema3", schema2);

@@ -14,7 +14,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -39,31 +38,27 @@ namespace AM.Drawing.Charting;
 public class StickItem
     : LineItem, ICloneable
 {
-    #region Fields
-
-    #endregion
-
     #region Properties
 
-    /// <summary>
-    /// Gets a flag indicating if the Z data range should be included in the axis scaling calculations.
-    /// </summary>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the Z data are included, false otherwise</value>
-    internal override bool IsZIncluded (GraphPane pane)
+    /// <inheritdoc cref="LineItem.IsZIncluded"/>
+    internal override bool IsZIncluded
+        (
+            GraphPane pane
+        )
     {
+        pane.NotUsed();
+
         return _symbol.IsVisible;
     }
 
-    /// <summary>
-    /// Gets a flag indicating if the X axis is the independent axis for this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the X axis is independent, false otherwise</value>
-    internal override bool IsXIndependent (GraphPane pane)
+    /// <inheritdoc cref="LineItem.IsXIndependent"/>
+    internal override bool IsXIndependent
+        (
+            GraphPane pane
+        )
     {
+        pane.NotUsed();
+
         return true;
     }
 
@@ -190,28 +185,28 @@ public class StickItem
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected StickItem (SerializationInfo info, StreamingContext context) : base (info, context)
+    protected StickItem
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema3");
+        info.GetInt32 ("schema3").NotUsed();
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema3", schema3);
     }
-
-    #endregion
-
-    #region Methods
 
     #endregion
 }
