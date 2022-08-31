@@ -124,8 +124,15 @@ public class ArrowObj
     /// <param name="y2">The y position of the ending point that defines the
     /// arrow.  The units of this position are specified by the
     /// <see cref="Location.CoordinateFrame"/> property.</param>
-    public ArrowObj (Color color, float size, double x1, double y1,
-        double x2, double y2)
+    public ArrowObj
+        (
+            Color color,
+            float size,
+            double x1,
+            double y1,
+            double x2,
+            double y2
+        )
         : base (color, x1, y1, x2, y2)
     {
         _isArrowHead = Default.IsArrowHead;
@@ -149,7 +156,13 @@ public class ArrowObj
     /// <param name="y2">The y position of the ending point that defines the
     /// <see cref="ArrowObj"/>.  The units of this position are specified by the
     /// <see cref="Location.CoordinateFrame"/> property.</param>
-    public ArrowObj (double x1, double y1, double x2, double y2)
+    public ArrowObj
+        (
+            double x1,
+            double y1,
+            double x2,
+            double y2
+        )
         : this (LineBase.Default.Color, Default.Size, x1, y1, x2, y2)
     {
     }
@@ -159,8 +172,7 @@ public class ArrowObj
     /// (0,0) to (1,1).  All other values are defaulted.
     /// </summary>
     public ArrowObj()
-        :
-        this (LineBase.Default.Color, Default.Size, 0, 0, 1, 1)
+        : this (LineBase.Default.Color, Default.Size, 0, 0, 1, 1)
     {
     }
 
@@ -219,7 +231,7 @@ public class ArrowObj
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        var sch = info.GetInt32 ("schema3");
+        info.GetInt32 ("schema3").NotUsed();
 
         _size = info.GetSingle ("size");
         _isArrowHead = info.GetBoolean ("isArrowHead");
@@ -303,10 +315,8 @@ public class ArrowObj
                     polyPt[2].Y = -hsize;
                     polyPt[3] = polyPt[0];
 
-                    using (var brush = new SolidBrush (_line._color))
-
-                        // render the arrowhead
-                        graphics.FillPolygon (brush, polyPt);
+                    using var brush = new SolidBrush (_line._color);
+                    graphics.FillPolygon (brush, polyPt);
                 }
                 else
                 {

@@ -79,9 +79,9 @@ public class Y2Axis
     public Y2Axis (string title)
         : base (title)
     {
-        _isVisible = Default.IsVisible;
+        IsVisible = Default.IsVisible;
         _majorGrid._isZeroLine = Default.IsZeroLine;
-        _scale._fontSpec.Angle = -90.0F;
+        Scale._fontSpec.Angle = -90.0F;
     }
 
     /// <summary>
@@ -214,7 +214,7 @@ public class Y2Axis
     {
         double effCross = EffectiveCrossValue (pane);
 
-        if (!_crossAuto)
+        if (!CrossAuto)
         {
             return pane.XAxis.Scale.Transform (effCross) - pane.XAxis.Scale._maxPix;
         }

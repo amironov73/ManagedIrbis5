@@ -307,8 +307,8 @@ public class JapaneseCandleStickItem
         double low = pt.Z;
 
         if (!pt.IsInvalid3D &&
-            (date > 0 || !baseAxis._scale.IsLog) &&
-            ((high > 0 && low > 0) || !valueAxis._scale.IsLog))
+            (date > 0 || !baseAxis.Scale.IsLog) &&
+            ((high > 0 && low > 0) || !valueAxis.Scale.IsLog))
         {
             float pixBase, pixHigh, pixLow;
             pixBase = baseAxis.Scale.Transform (_isOverrideOrdinal, i, date);

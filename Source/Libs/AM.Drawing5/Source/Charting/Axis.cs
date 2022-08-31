@@ -15,7 +15,6 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -36,13 +35,6 @@ public abstract class Axis
     : ISerializable, ICloneable
 {
     #region Class Fields
-
-    /// <summary>
-    /// private field that stores the <see cref="Charting.Scale" /> class, which implements all the
-    /// calculations and methods associated with the numeric scale for this
-    /// <see cref="Axis" />.  See the public property <see cref="Scale" /> to access this class.
-    /// </summary>
-    internal Scale _scale;
 
     /// <summary>
     /// Private field that stores the <see cref="Charting.MinorTic" /> class, which handles all
@@ -74,23 +66,6 @@ public abstract class Axis
     /// </summary>
     internal double _cross;
 
-    /// <summary> Private field for the <see cref="Axis"/> automatic cross position mode.
-    /// Use the public property <see cref="CrossAuto"/> for access to this value.
-    /// </summary>
-    internal bool _crossAuto;
-
-    /// <summary> Private fields for the <see cref="Axis"/> attributes.
-    /// Use the public properties <see cref="IsVisible"/>, <see cref="IsAxisSegmentVisible"/>
-    /// for access to these values.
-    /// </summary>
-    [CLSCompliant (false)] protected bool _isVisible,
-        _isAxisSegmentVisible;
-
-    /// <summary> Private field for the <see cref="Axis"/> title string.
-    /// Use the public property <see cref="Title"/> for access to this value.
-    /// </summary>
-    [CLSCompliant (false)] protected AxisLabel _title;
-
     /// <summary>
     /// A tag object for use by the user.  This can be used to store additional
     /// information associated with the <see cref="Axis"/>.  ZedGraph does
@@ -101,7 +76,7 @@ public abstract class Axis
     /// that you store in <see cref="Tag"/> must be a serializable type (or
     /// it will cause an exception).
     /// </remarks>
-    public object Tag;
+    public object? Tag;
 
     /// <summary> Private field for the <see cref="Axis"/> drawing dimensions.
     /// Use the public property <see cref="AxisGap"/>
@@ -146,7 +121,7 @@ public abstract class Axis
     /// <summary>
     /// Subscribe to this event to handle custom formatting of the scale labels.
     /// </summary>
-    public event ScaleFormatHandler ScaleFormatEvent;
+    public event ScaleFormatHandler? ScaleFormatEvent;
 
     // Revision: JCarpenter 10/06
     /// <summary>
@@ -244,7 +219,7 @@ public abstract class Axis
         /// The default custom brush for filling in the <see cref="Title" /> text background
         /// (see <see cref="Fill.Brush"/> property).
         /// </summary>
-        public static Brush TitleFillBrush = null;
+        public static Brush? TitleFillBrush = null;
 
         /// <summary>
         /// The default fill mode for filling in the <see cref="Title" /> text background
@@ -298,11 +273,11 @@ public abstract class Axis
     /// </summary>
     public Axis()
     {
-        _scale = new LinearScale (this);
+        Scale = new LinearScale (this);
 
         _cross = 0.0;
 
-        _crossAuto = true;
+        CrossAuto = true;
 
         _majorTic = new MajorTic();
         _minorTic = new MinorTic();
@@ -313,17 +288,28 @@ public abstract class Axis
         _axisGap = Default.AxisGap;
 
         _minSpace = Default.MinSpace;
-        _isVisible = true;
+        IsVisible = true;
 
-        _isAxisSegmentVisible = Default.IsAxisSegmentVisible;
+        IsAxisSegmentVisible = Default.IsAxisSegmentVisible;
 
-        _title = new AxisLabel ("", Default.TitleFontFamily, Default.TitleFontSize,
-            Default.TitleFontColor, Default.TitleFontBold,
-            Default.TitleFontUnderline, Default.TitleFontItalic);
-        _title.FontSpec.Fill = new Fill (Default.TitleFillColor, Default.TitleFillBrush,
-            Default.TitleFillType);
+        Title = new AxisLabel
+            (
+                string.Empty,
+                Default.TitleFontFamily,
+                Default.TitleFontSize,
+                Default.TitleFontColor,
+                Default.TitleFontBold,
+                Default.TitleFontUnderline,
+                Default.TitleFontItalic
+            );
+        Title.FontSpec.Fill = new Fill
+            (
+                Default.TitleFillColor,
+                Default.TitleFillBrush,
+                Default.TitleFillType
+            );
 
-        _title.FontSpec.Border.IsVisible = false;
+        Title.FontSpec.Border.IsVisible = false;
 
 
         _color = Default.Color;
@@ -338,7 +324,7 @@ public abstract class Axis
     public Axis (string title)
         : this()
     {
-        _title._text = title;
+        Title._text = title;
     }
 
     /// <summary>
@@ -347,11 +333,11 @@ public abstract class Axis
     /// <param name="rhs">The Axis object from which to copy</param>
     public Axis (Axis rhs)
     {
-        _scale = rhs._scale.Clone (this);
+        Scale = rhs.Scale.Clone (this);
 
         _cross = rhs._cross;
 
-        _crossAuto = rhs._crossAuto;
+        CrossAuto = rhs.CrossAuto;
 
         _majorTic = rhs.MajorTic.Clone();
         _minorTic = rhs.MinorTic.Clone();
@@ -359,11 +345,11 @@ public abstract class Axis
         _majorGrid = rhs._majorGrid.Clone();
         _minorGrid = rhs._minorGrid.Clone();
 
-        _isVisible = rhs.IsVisible;
+        IsVisible = rhs.IsVisible;
 
-        _isAxisSegmentVisible = rhs._isAxisSegmentVisible;
+        IsAxisSegmentVisible = rhs.IsAxisSegmentVisible;
 
-        _title = (AxisLabel)rhs.Title.Clone();
+        Title = (AxisLabel)rhs.Title.Clone();
 
         _axisGap = rhs._axisGap;
 
@@ -372,26 +358,10 @@ public abstract class Axis
         _color = rhs.Color;
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of Clone.
-    /// </summary>
-    /// <remarks>
-    /// Note that this method must be called with an explicit cast to ICloneable, and
-    /// that it is inherently virtual.  For example:
-    /// <code>
-    /// ParentClass foo = new ChildClass();
-    /// ChildClass bar = (ChildClass) ((ICloneable)foo).Clone();
-    /// </code>
-    /// Assume that ChildClass is inherited from ParentClass.  Even though foo is declared with
-    /// ParentClass, it is actually an instance of ChildClass.  Calling the ICloneable implementation
-    /// of Clone() on foo actually calls ChildClass.Clone() as if it were a virtual function.
-    /// </remarks>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
-        throw new NotImplementedException (
-            "Can't clone an abstract base type -- child types must implement ICloneable");
+        throw new NotImplementedException ("Can't clone an abstract base type -- child types must implement ICloneable");
 
         //return new PaneBase( this );
     }
@@ -412,35 +382,39 @@ public abstract class Axis
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected Axis (SerializationInfo info, StreamingContext context)
+    protected Axis
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        info.GetInt32 ("schema").NotUsed();
 
         _cross = info.GetDouble ("cross");
-        _crossAuto = info.GetBoolean ("crossAuto");
+        CrossAuto = info.GetBoolean ("crossAuto");
 
         _majorTic = (MajorTic)info.GetValue ("MajorTic", typeof (MajorTic));
         _minorTic = (MinorTic)info.GetValue ("MinorTic", typeof (MinorTic));
         _majorGrid = (MajorGrid)info.GetValue ("majorGrid", typeof (MajorGrid));
         _minorGrid = (MinorGrid)info.GetValue ("minorGrid", typeof (MinorGrid));
 
-        _isVisible = info.GetBoolean ("isVisible");
+        IsVisible = info.GetBoolean ("isVisible");
 
-        _title = (AxisLabel)info.GetValue ("title", typeof (AxisLabel));
+        Title = (AxisLabel)info.GetValue ("title", typeof (AxisLabel));
 
         _minSpace = info.GetSingle ("minSpace");
 
         _color = (Color)info.GetValue ("color", typeof (Color));
 
-        _isAxisSegmentVisible = info.GetBoolean ("isAxisSegmentVisible");
+        IsAxisSegmentVisible = info.GetBoolean ("isAxisSegmentVisible");
 
 
         _axisGap = info.GetSingle ("axisGap");
 
-        _scale = (Scale)info.GetValue ("scale", typeof (Scale));
-        _scale._ownerAxis = this;
+        Scale = (Scale) info.GetValue ("scale", typeof (Scale));
+        Scale._ownerAxis = this;
     }
 
     /// <summary>
@@ -457,26 +431,26 @@ public abstract class Axis
         info.AddValue ("schema", schema);
 
         info.AddValue ("cross", _cross);
-        info.AddValue ("crossAuto", _crossAuto);
+        info.AddValue ("crossAuto", CrossAuto);
 
         info.AddValue ("MajorTic", MajorTic);
         info.AddValue ("MinorTic", MinorTic);
         info.AddValue ("majorGrid", _majorGrid);
         info.AddValue ("minorGrid", _minorGrid);
 
-        info.AddValue ("isVisible", _isVisible);
+        info.AddValue ("isVisible", IsVisible);
 
-        info.AddValue ("title", _title);
+        info.AddValue ("title", Title);
 
         info.AddValue ("minSpace", _minSpace);
 
         info.AddValue ("color", _color);
 
-        info.AddValue ("isAxisSegmentVisible", _isAxisSegmentVisible);
+        info.AddValue ("isAxisSegmentVisible", IsAxisSegmentVisible);
 
         info.AddValue ("axisGap", _axisGap);
 
-        info.AddValue ("scale", _scale);
+        info.AddValue ("scale", Scale);
     }
 
     #endregion
@@ -486,10 +460,7 @@ public abstract class Axis
     /// <summary>
     /// Gets the <see cref="Scale" /> instance associated with this <see cref="Axis" />.
     /// </summary>
-    public Scale Scale
-    {
-        get { return _scale; }
-    }
+    public Scale Scale { get; internal set; }
 
     /// <summary>
     /// Gets or sets the scale value at which this axis should cross the "other" axis.
@@ -510,11 +481,11 @@ public abstract class Axis
     /// <seealso cref="CrossAuto"/>
     public double Cross
     {
-        get { return _cross; }
+        get => _cross;
         set
         {
             _cross = value;
-            _crossAuto = false;
+            CrossAuto = false;
         }
     }
 
@@ -528,11 +499,7 @@ public abstract class Axis
     /// <seealso cref="Charting.Scale.Max"/>
     /// <seealso cref="Charting.Scale.MajorStep"/>
     /// <seealso cref="Cross"/>
-    public bool CrossAuto
-    {
-        get { return _crossAuto; }
-        set { _crossAuto = value; }
-    }
+    public bool CrossAuto { get; set; }
 
     /// <summary>
     /// Gets or sets the minimum axis space allocation.
@@ -547,8 +514,8 @@ public abstract class Axis
     /// </remarks>
     public float MinSpace
     {
-        get { return _minSpace; }
-        set { _minSpace = value; }
+        get => _minSpace;
+        set => _minSpace = value;
     }
 
     #endregion
@@ -571,27 +538,21 @@ public abstract class Axis
     /// <seealso cref="IsVisible"/>
     public Color Color
     {
-        get { return _color; }
-        set { _color = value; }
+        get => _color;
+        set => _color = value;
     }
 
     /// <summary>
     /// Gets a reference to the <see cref="Charting.MajorTic" /> class instance
     /// for this <see cref="Axis" />.  This class stores all the major tic settings.
     /// </summary>
-    public MajorTic MajorTic
-    {
-        get { return _majorTic; }
-    }
+    public MajorTic MajorTic => _majorTic;
 
     /// <summary>
     /// Gets a reference to the <see cref="Charting.MinorTic" /> class instance
     /// for this <see cref="Axis" />.  This class stores all the minor tic settings.
     /// </summary>
-    public MinorTic MinorTic
-    {
-        get { return _minorTic; }
-    }
+    public MinorTic MinorTic => _minorTic;
 
     #endregion
 
@@ -601,19 +562,13 @@ public abstract class Axis
     /// Gets a reference to the <see cref="MajorGrid" /> class that contains the properties
     /// of the major grid.
     /// </summary>
-    public MajorGrid MajorGrid
-    {
-        get { return _majorGrid; }
-    }
+    public MajorGrid MajorGrid => _majorGrid;
 
     /// <summary>
     /// Gets a reference to the <see cref="MinorGrid" /> class that contains the properties
     /// of the minor grid.
     /// </summary>
-    public MinorGrid MinorGrid
-    {
-        get { return _minorGrid; }
-    }
+    public MinorGrid MinorGrid => _minorGrid;
 
     #endregion
 
@@ -632,11 +587,8 @@ public abstract class Axis
     /// <seealso cref="XAxis.Default.IsVisible"/>.
     /// <seealso cref="YAxis.Default.IsVisible"/>.
     /// <seealso cref="Y2Axis.Default.IsVisible"/>.
-    public bool IsVisible
-    {
-        get { return _isVisible; }
-        set { _isVisible = value; }
-    }
+    [field: CLSCompliant (false)]
+    public bool IsVisible { get; set; }
 
     /// <summary>
     /// Gets or sets a property that determines whether or not the axis segment (the line that
@@ -648,11 +600,8 @@ public abstract class Axis
     /// However, when the border is not visible, or when <see cref="Axis.CrossAuto"/> is set to
     /// false, this value will make a difference.
     /// </remarks>
-    public bool IsAxisSegmentVisible
-    {
-        get { return _isAxisSegmentVisible; }
-        set { _isAxisSegmentVisible = value; }
-    }
+    [field: CLSCompliant (false)]
+    public bool IsAxisSegmentVisible { get; set; }
 
     /// <summary>
     /// Gets or sets the <see cref="AxisType"/> for this <see cref="Axis"/>.
@@ -669,8 +618,8 @@ public abstract class Axis
     /// <seealso cref="Charting.Scale.IsReverse"/>
     public AxisType Type
     {
-        get { return _scale.Type; }
-        set { _scale = Scale.MakeNewScale (_scale, value); }
+        get => Scale.Type;
+        set => Scale = Scale.MakeNewScale (Scale, value);
     }
 
     #endregion
@@ -688,11 +637,7 @@ public abstract class Axis
     /// </remarks>
     /// <value>the title is a string value</value>
     /// <seealso cref="AxisLabel.IsOmitMag"/>
-    public AxisLabel Title
-    {
-        get { return _title; }
-        set { _title = value; }
-    }
+    public AxisLabel Title { get; set; }
 
     /// <summary>
     /// The size of the gap between multiple axes (see <see cref="GraphPane.YAxisList" /> and
@@ -707,8 +652,8 @@ public abstract class Axis
     /// <seealso cref="Default.AxisGap"/>.
     public float AxisGap
     {
-        get { return _axisGap; }
-        set { _axisGap = value; }
+        get => _axisGap;
+        set => _axisGap = value;
     }
 
     #endregion
@@ -734,15 +679,15 @@ public abstract class Axis
     /// <seealso cref="Charting.Scale.FormatAuto"/>
     public void ResetAutoScale (GraphPane pane, Graphics g)
     {
-        _scale._minAuto = true;
-        _scale._maxAuto = true;
-        _scale._majorStepAuto = true;
-        _scale._minorStepAuto = true;
-        _crossAuto = true;
-        _scale._magAuto = true;
+        Scale._minAuto = true;
+        Scale._maxAuto = true;
+        Scale._majorStepAuto = true;
+        Scale._minorStepAuto = true;
+        CrossAuto = true;
+        Scale._magAuto = true;
 
         //this.numDecAuto = true;
-        _scale._formatAuto = true;
+        Scale._formatAuto = true;
         pane.AxisChange (g);
     }
 
@@ -776,9 +721,9 @@ public abstract class Axis
     {
         Matrix saveMatrix = g.Transform;
 
-        _scale.SetupScaleData (pane, this);
+        Scale.SetupScaleData (pane, this);
 
-        if (_isVisible)
+        if (IsVisible)
         {
             var smode = g.SmoothingMode;
             g.SmoothingMode = SmoothingMode.None;
@@ -787,7 +732,7 @@ public abstract class Axis
 
             shiftPos = CalcTotalShift (pane, scaleFactor, shiftPos);
 
-            _scale.Draw (g, pane, scaleFactor, shiftPos);
+            Scale.Draw (g, pane, scaleFactor, shiftPos);
 
             //DrawTitle( g, pane, scaleFactor );
 
@@ -798,18 +743,18 @@ public abstract class Axis
 
     internal void DrawGrid (Graphics g, GraphPane pane, float scaleFactor, float shiftPos)
     {
-        if (_isVisible)
+        if (IsVisible)
         {
             Matrix saveMatrix = g.Transform;
             SetTransformMatrix (g, pane, scaleFactor);
 
-            double baseVal = _scale.CalcBaseTic();
+            double baseVal = Scale.CalcBaseTic();
             float topPix, rightPix;
-            _scale.GetTopRightPix (pane, out topPix, out rightPix);
+            Scale.GetTopRightPix (pane, out topPix, out rightPix);
 
             shiftPos = CalcTotalShift (pane, scaleFactor, shiftPos);
 
-            _scale.DrawGrid (g, pane, baseVal, topPix, scaleFactor);
+            Scale.DrawGrid (g, pane, baseVal, topPix, scaleFactor);
 
             DrawMinorTics (g, pane, baseVal, shiftPos, scaleFactor, topPix);
 
@@ -925,12 +870,12 @@ public abstract class Axis
 
         // Use Linearize here instead of _minLinTemp because this method is called
         // as part of CalcRect() before scale is fully setup
-        double min = crossAxis._scale.Linearize (crossAxis._scale._min);
-        double max = crossAxis._scale.Linearize (crossAxis._scale._max);
+        double min = crossAxis.Scale.Linearize (crossAxis.Scale._min);
+        double max = crossAxis.Scale.Linearize (crossAxis.Scale._max);
 
-        if (_crossAuto)
+        if (CrossAuto)
         {
-            if (crossAxis._scale.IsReverse == (this is Y2Axis || this is X2Axis))
+            if (crossAxis.Scale.IsReverse == (this is Y2Axis || this is X2Axis))
             {
                 return max;
             }
@@ -949,7 +894,7 @@ public abstract class Axis
         }
         else
         {
-            return _scale.Linearize (_cross);
+            return Scale.Linearize (_cross);
         }
     }
 
@@ -960,24 +905,24 @@ public abstract class Axis
     /// </summary>
     internal bool IsCrossShifted (GraphPane pane)
     {
-        if (_crossAuto)
+        if (CrossAuto)
         {
             return false;
         }
         else
         {
             Axis crossAxis = GetCrossAxis (pane);
-            if (((this is XAxis || this is YAxis) && !crossAxis._scale.IsReverse) ||
-                ((this is X2Axis || this is Y2Axis) && crossAxis._scale.IsReverse))
+            if (((this is XAxis || this is YAxis) && !crossAxis.Scale.IsReverse) ||
+                ((this is X2Axis || this is Y2Axis) && crossAxis.Scale.IsReverse))
             {
-                if (_cross <= crossAxis._scale._min)
+                if (_cross <= crossAxis.Scale._min)
                 {
                     return false;
                 }
             }
             else
             {
-                if (_cross >= crossAxis._scale._max)
+                if (_cross >= crossAxis.Scale._max)
                 {
                     return false;
                 }
@@ -1000,7 +945,7 @@ public abstract class Axis
         {
             // if it's the primary axis and the scale labels are on the inside, then we
             // don't need to save any room for the axis labels (they will be inside the chart rect)
-            if (IsPrimary (pane) && _scale._isLabelsInside)
+            if (IsPrimary (pane) && Scale._isLabelsInside)
             {
                 return 1.0f;
             }
@@ -1019,12 +964,12 @@ public abstract class Axis
         // as part of CalcRect() before scale is fully setup
         //			double max = crossAxis._scale._maxLinTemp;
         //			double min = crossAxis._scale._minLinTemp;
-        double max = crossAxis._scale.Linearize (crossAxis._scale._min);
-        double min = crossAxis._scale.Linearize (crossAxis._scale._max);
+        double max = crossAxis.Scale.Linearize (crossAxis.Scale._min);
+        double min = crossAxis.Scale.Linearize (crossAxis.Scale._max);
         float frac;
 
-        if (((this is XAxis || this is YAxis) && _scale._isLabelsInside == crossAxis._scale.IsReverse) ||
-            ((this is X2Axis || this is Y2Axis) && _scale._isLabelsInside != crossAxis._scale.IsReverse))
+        if (((this is XAxis || this is YAxis) && Scale._isLabelsInside == crossAxis.Scale.IsReverse) ||
+            ((this is X2Axis || this is Y2Axis) && Scale._isLabelsInside != crossAxis.Scale.IsReverse))
         {
             frac = (float)((effCross - min) / (max - min));
         }
@@ -1062,7 +1007,7 @@ public abstract class Axis
 
                 // if the scalelabels are on the inside, shift everything so the axis is drawn,
                 // for example, to the left side of the available space for a YAxis type
-                if (_scale._isLabelsInside)
+                if (Scale._isLabelsInside)
                 {
                     shiftPos += _tmpSpace;
 
@@ -1131,15 +1076,15 @@ public abstract class Axis
         //fixedSpace = 0;
 
         //Typical character height for the scale font
-        float charHeight = _scale._fontSpec.GetHeight (scaleFactor);
+        float charHeight = Scale._fontSpec.GetHeight (scaleFactor);
 
         // Scaled size (pixels) of a tic
         float ticSize = _majorTic.ScaledTic (scaleFactor);
 
         // Scaled size (pixels) of the axis gap
         float axisGap = _axisGap * scaleFactor;
-        float scaledLabelGap = _scale._labelGap * charHeight;
-        float scaledTitleGap = _title.GetScaledGap (scaleFactor);
+        float scaledLabelGap = Scale._labelGap * charHeight;
+        float scaledTitleGap = Title.GetScaledGap (scaleFactor);
 
         // The minimum amount of space to reserve for the NORMAL position of the axis.  This would
         // be the left side of the chart rect for the Y axis, the right side for the Y2 axis, etc.
@@ -1151,7 +1096,7 @@ public abstract class Axis
         _tmpSpace = 0;
 
         // Account for the Axis
-        if (_isVisible)
+        if (IsVisible)
         {
             bool hasTic = MajorTic.IsOutside || MajorTic._isCrossOutside ||
                           MinorTic.IsOutside || MinorTic._isCrossOutside;
@@ -1182,7 +1127,7 @@ public abstract class Axis
             // space between scale label and axis label is 0.5 tic
 
             // account for the tic labels + 'LabelGap' tic gap between the tic and the label
-            _tmpSpace += _scale.GetScaleMaxSpace (g, pane, scaleFactor, true).Height +
+            _tmpSpace += Scale.GetScaleMaxSpace (g, pane, scaleFactor, true).Height +
                          scaledLabelGap;
 
             string str = MakeTitle();
@@ -1190,7 +1135,7 @@ public abstract class Axis
             // Only add space for the title if there is one
             // Axis Title gets actual height
             // if ( str.Length > 0 && _title._isVisible )
-            if (!string.IsNullOrEmpty (str) && _title._isVisible)
+            if (!string.IsNullOrEmpty (str) && Title._isVisible)
             {
                 //tmpSpace += this.TitleFontSpec.BoundingBox( g, str, scaleFactor ).Height;
                 fixedSpace = Title.FontSpec.BoundingBox (g, str, scaleFactor).Height +
@@ -1210,19 +1155,19 @@ public abstract class Axis
         // and last X axis scale label
         if (IsPrimary (pane) && ((
                                           (this is YAxis && (
-                                              (!pane.XAxis._scale._isSkipFirstLabel &&
-                                               !pane.XAxis._scale._isReverse) ||
-                                              (!pane.XAxis._scale._isSkipLastLabel &&
-                                               pane.XAxis._scale._isReverse))) ||
+                                              (!pane.XAxis.Scale._isSkipFirstLabel &&
+                                               !pane.XAxis.Scale._isReverse) ||
+                                              (!pane.XAxis.Scale._isSkipLastLabel &&
+                                               pane.XAxis.Scale._isReverse))) ||
                                           (this is Y2Axis && (
-                                              (!pane.XAxis._scale._isSkipFirstLabel &&
-                                               pane.XAxis._scale._isReverse) ||
-                                              (!pane.XAxis._scale._isSkipLastLabel &&
-                                               !pane.XAxis._scale._isReverse)))) &&
-                                      pane.XAxis.IsVisible && pane.XAxis._scale._isVisible))
+                                              (!pane.XAxis.Scale._isSkipFirstLabel &&
+                                               pane.XAxis.Scale._isReverse) ||
+                                              (!pane.XAxis.Scale._isSkipLastLabel &&
+                                               !pane.XAxis.Scale._isReverse)))) &&
+                                      pane.XAxis.IsVisible && pane.XAxis.Scale._isVisible))
         {
             // half the width of the widest item, plus a gap of 1/2 the charheight
-            float tmp = pane.XAxis._scale.GetScaleMaxSpace (g, pane, scaleFactor, true).Width / 2.0F;
+            float tmp = pane.XAxis.Scale.GetScaleMaxSpace (g, pane, scaleFactor, true).Width / 2.0F;
 
             //+ charHeight / 2.0F;
             //if ( tmp > tmpSpace )
@@ -1263,10 +1208,10 @@ public abstract class Axis
         float left, float right)
     {
         // restore the zero line if needed (since the fill tends to cover it up)
-        if (_isVisible && _majorGrid._isZeroLine &&
-            _scale._min < 0.0 && _scale._max > 0.0)
+        if (IsVisible && _majorGrid._isZeroLine &&
+            Scale._min < 0.0 && Scale._max > 0.0)
         {
-            float zeroPix = _scale.Transform (0.0);
+            float zeroPix = Scale.Transform (0.0);
 
             using (Pen zeroPen = new Pen (_color,
                        pane.ScaledPenWidth (_majorGrid._penWidth, scaleFactor)))
@@ -1312,12 +1257,12 @@ public abstract class Axis
     {
         if ((MinorTic.IsOutside || MinorTic.IsOpposite || MinorTic.IsInside ||
              MinorTic._isCrossOutside || MinorTic._isCrossInside || _minorGrid._isVisible)
-            && _isVisible)
+            && IsVisible)
         {
-            double tMajor = _scale._majorStep * _scale.MajorUnitMultiplier,
-                tMinor = _scale._minorStep * _scale.MinorUnitMultiplier;
+            double tMajor = Scale._majorStep * Scale.MajorUnitMultiplier,
+                tMinor = Scale._minorStep * Scale.MinorUnitMultiplier;
 
-            if (_scale.IsLog || tMinor < tMajor)
+            if (Scale.IsLog || tMinor < tMajor)
             {
                 float minorScaledTic = MinorTic.ScaledTic (scaleFactor);
 
@@ -1325,15 +1270,15 @@ public abstract class Axis
                 // the full scale.  This means that if the minor step size is not
                 // an even division of the major step size, the minor tics won't
                 // line up with all of the scale labels and major tics.
-                double first = _scale._minLinTemp,
-                    last = _scale._maxLinTemp;
+                double first = Scale._minLinTemp,
+                    last = Scale._maxLinTemp;
 
                 double dVal = first;
                 float pixVal;
 
-                int iTic = _scale.CalcMinorStart (baseVal);
+                int iTic = Scale.CalcMinorStart (baseVal);
                 int MajorTic = 0;
-                double majorVal = _scale.CalcMajorTicValue (baseVal, MajorTic);
+                double majorVal = Scale.CalcMajorTicValue (baseVal, MajorTic);
 
                 using (Pen pen = new Pen (_minorTic._color,
                            pane.ScaledPenWidth (MinorTic._penWidth, scaleFactor)))
@@ -1343,12 +1288,12 @@ public abstract class Axis
                     while (dVal < last && iTic < 5000)
                     {
                         // Calculate the scale value for the current tic
-                        dVal = _scale.CalcMinorTicValue (baseVal, iTic);
+                        dVal = Scale.CalcMinorTicValue (baseVal, iTic);
 
                         // Maintain a value for the current major tic
                         if (dVal > majorVal)
                         {
-                            majorVal = _scale.CalcMajorTicValue (baseVal, ++MajorTic);
+                            majorVal = Scale.CalcMajorTicValue (baseVal, ++MajorTic);
                         }
 
                         // Make sure that the current value does not match up with a major tic
@@ -1356,7 +1301,7 @@ public abstract class Axis
                              (Math.Abs (dVal) > 1e-20 && Math.Abs ((dVal - majorVal) / dVal) > 1e-10)) &&
                             (dVal >= first && dVal <= last))
                         {
-                            pixVal = _scale.LocalTransform (dVal);
+                            pixVal = Scale.LocalTransform (dVal);
 
                             _minorGrid.Draw (g, minorGridPen, pixVal, topPix);
 
@@ -1400,20 +1345,20 @@ public abstract class Axis
 
         // If the Axis is visible, draw the title
         //if ( _isVisible && _title._isVisible && str.Length > 0 )
-        if (_isVisible && _title._isVisible && !string.IsNullOrEmpty (str))
+        if (IsVisible && Title._isVisible && !string.IsNullOrEmpty (str))
         {
-            bool hasTic = (_scale._isLabelsInside
+            bool hasTic = (Scale._isLabelsInside
                 ? (MajorTic.IsInside || MajorTic._isCrossInside ||
                    MinorTic.IsInside || MinorTic._isCrossInside)
                 : (MajorTic.IsOutside || MajorTic._isCrossOutside || MinorTic.IsOutside ||
                    MinorTic._isCrossOutside));
 
             // Calculate the title position in screen coordinates
-            float x = (_scale._maxPix - _scale._minPix) / 2;
+            float x = (Scale._maxPix - Scale._minPix) / 2;
 
             float scaledTic = MajorTic.ScaledTic (scaleFactor);
-            float scaledLabelGap = _scale._fontSpec.GetHeight (scaleFactor) * _scale._labelGap;
-            float scaledTitleGap = _title.GetScaledGap (scaleFactor);
+            float scaledLabelGap = Scale._fontSpec.GetHeight (scaleFactor) * Scale._labelGap;
+            float scaledTitleGap = Title.GetScaledGap (scaleFactor);
 
             // The space for the scale labels is only reserved if the axis is not shifted due to the
             // cross value.  Note that this could be a problem if the axis is only shifted slightly,
@@ -1424,12 +1369,12 @@ public abstract class Axis
 
             float gap = scaledTic * (hasTic ? 1.0f : 0.0f) +
                         Title.FontSpec.BoundingBox (g, str, scaleFactor).Height / 2.0F;
-            float y = (_scale._isVisible
-                ? _scale.GetScaleMaxSpace (g, pane, scaleFactor, true).Height
+            float y = (Scale._isVisible
+                ? Scale.GetScaleMaxSpace (g, pane, scaleFactor, true).Height
                   + scaledLabelGap
                 : 0);
 
-            if (_scale._isLabelsInside)
+            if (Scale._isLabelsInside)
             {
                 y = shiftPos - y - gap;
             }
@@ -1438,7 +1383,7 @@ public abstract class Axis
                 y = shiftPos + y + gap;
             }
 
-            if (!_crossAuto && !_title._isTitleAtCross)
+            if (!CrossAuto && !Title.IsTitleAtCross)
             {
                 y = Math.Max (y, gap);
             }
@@ -1456,9 +1401,9 @@ public abstract class Axis
 
     private string MakeTitle()
     {
-        if (_title._text == null)
+        if (Title._text == null)
         {
-            _title._text = "";
+            Title._text = "";
         }
 
         // Revision: JCarpenter 10/06
@@ -1476,13 +1421,13 @@ public abstract class Axis
 
         // If the Mag is non-zero and IsOmitMag == false, and IsLog == false,
         // then add the mag indicator to the title.
-        if (_scale._mag != 0 && !_title._isOmitMag && !_scale.IsLog)
+        if (Scale._mag != 0 && !Title.IsOmitMag && !Scale.IsLog)
         {
-            return _title._text + string.Format (" (10^{0})", _scale._mag);
+            return Title._text + string.Format (" (10^{0})", Scale._mag);
         }
         else
         {
-            return _title._text;
+            return Title._text;
         }
     }
 
@@ -1528,7 +1473,7 @@ public abstract class Axis
         // _scale.MakeLabel according to the type of scale
         if (Scale != null)
         {
-            return _scale.MakeLabel (pane, index, dVal);
+            return Scale.MakeLabel (pane, index, dVal);
         }
         else
         {

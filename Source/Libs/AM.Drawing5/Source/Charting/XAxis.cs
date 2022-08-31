@@ -79,9 +79,9 @@ public class XAxis
     public XAxis (string title)
         : base (title)
     {
-        _isVisible = Default.IsVisible;
+        IsVisible = Default.IsVisible;
         _majorGrid._isZeroLine = Default.IsZeroLine;
-        _scale._fontSpec.Angle = 0F;
+        Scale._fontSpec.Angle = 0F;
     }
 
     /// <summary>
@@ -212,7 +212,7 @@ public class XAxis
     {
         double effCross = EffectiveCrossValue (pane);
 
-        if (!_crossAuto)
+        if (!CrossAuto)
         {
             return pane.YAxis.Scale.Transform (effCross) - pane.YAxis.Scale._maxPix;
         }

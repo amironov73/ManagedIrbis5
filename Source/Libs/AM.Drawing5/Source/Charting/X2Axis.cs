@@ -79,10 +79,10 @@ public class X2Axis
     public X2Axis (string title)
         : base (title)
     {
-        _isVisible = Default.IsVisible;
+        IsVisible = Default.IsVisible;
         _majorGrid._isZeroLine = Default.IsZeroLine;
-        _scale._fontSpec.Angle = 180F;
-        _title._fontSpec.Angle = 180F;
+        Scale._fontSpec.Angle = 180F;
+        Title._fontSpec.Angle = 180F;
     }
 
     /// <summary>
@@ -218,7 +218,7 @@ public class X2Axis
     {
         double effCross = EffectiveCrossValue (pane);
 
-        if (!_crossAuto)
+        if (!CrossAuto)
         {
             return pane.YAxis.Scale.Transform (effCross) - pane.YAxis.Scale._maxPix;
         }

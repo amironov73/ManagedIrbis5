@@ -13,10 +13,7 @@
 
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Collections;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -92,7 +89,7 @@ public class Bar
         /// The default custom brush for filling in the bars
         /// (<see cref="Fill.Brush"/> property).
         /// </summary>
-        public static Brush FillBrush = null; //new LinearGradientBrush( new Rectangle(0,0,100,100),
+        public static Brush? FillBrush = null; //new LinearGradientBrush( new Rectangle(0,0,100,100),
 
         // Color.White, Color.Red, 0F );
     }
@@ -122,11 +119,23 @@ public class Bar
     /// the <see cref="Charting.Fill.Color"/>
     /// of the Bar.
     /// </param>
-    public Bar (Color color)
+    public Bar
+        (
+            Color color
+        )
     {
-        _border = new Border (Default.IsBorderVisible, Default.BorderColor, Default.BorderWidth);
-        _fill = new Fill (color.IsEmpty ? Default.FillColor : color,
-            Default.FillBrush, Default.FillType);
+        _border = new Border
+            (
+                Default.IsBorderVisible,
+                Default.BorderColor,
+                Default.BorderWidth
+            );
+        _fill = new Fill
+            (
+                color.IsEmpty ? Default.FillColor : color,
+                Default.FillBrush,
+                Default.FillType
+            );
     }
 
     /// <summary>
@@ -234,7 +243,7 @@ public class Bar
     /// Draw the <see cref="Bar"/> to the specified <see cref="Graphics"/> device
     /// at the specified location.  This routine draws a single bar.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -263,7 +272,7 @@ public class Bar
     /// <param name="isSelected">Indicates that the <see cref="Bar" /> should be drawn
     /// with attributes from the <see cref="Selection" /> class.
     /// </param>
-    public void Draw (Graphics g, GraphPane pane, float left, float right, float top,
+    public void Draw (Graphics graphics, GraphPane pane, float left, float right, float top,
         float bottom, float scaleFactor, bool fullFrame, bool isSelected,
         PointPair dataValue)
     {
@@ -322,14 +331,14 @@ public class Bar
         // Make a rectangle for the bar and draw it
         RectangleF rect = new RectangleF (left, top, right - left, bottom - top);
 
-        Draw (g, pane, rect, scaleFactor, fullFrame, isSelected, dataValue);
+        Draw (graphics, pane, rect, scaleFactor, fullFrame, isSelected, dataValue);
     }
 
     /// <summary>
     /// Draw the <see cref="Bar"/> to the specified <see cref="Graphics"/> device
     /// at the specified location.  This routine draws a single bar.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -351,18 +360,26 @@ public class Bar
     /// <param name="isSelected">Indicates that the <see cref="Bar" /> should be drawn
     /// with attributes from the <see cref="Selection" /> class.
     /// </param>
-    public void Draw (Graphics g, GraphPane pane, RectangleF rect, float scaleFactor,
-        bool fullFrame, bool isSelected, PointPair dataValue)
+    public void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            RectangleF rect,
+            float scaleFactor,
+            bool fullFrame,
+            bool isSelected,
+            PointPair? dataValue
+        )
     {
         if (isSelected)
         {
-            Selection.Fill.Draw (g, rect, dataValue);
-            Selection.Border.Draw (g, pane, scaleFactor, rect);
+            Selection.Fill.Draw (graphics, rect, dataValue);
+            Selection.Border.Draw (graphics, pane, scaleFactor, rect);
         }
         else
         {
-            _fill.Draw (g, rect, dataValue);
-            _border.Draw (g, pane, scaleFactor, rect);
+            _fill.Draw (graphics, rect, dataValue);
+            _border.Draw (graphics, pane, scaleFactor, rect);
         }
     }
 

@@ -33,9 +33,6 @@ namespace AM.Drawing.Charting;
 public class AxisLabel
     : GapLabel, ICloneable, ISerializable
 {
-    internal bool _isOmitMag,
-        _isTitleAtCross;
-
     #region Constructors
 
     /// <summary>
@@ -52,30 +49,37 @@ public class AxisLabel
     /// <param name="isBold">true for a bold font face</param>
     /// <param name="isItalic">true for an italic font face</param>
     /// <param name="isUnderline">true for an underline font face</param>
-    public AxisLabel (string text, string fontFamily, float fontSize, Color color, bool isBold,
-        bool isItalic, bool isUnderline) :
-        base (text, fontFamily, fontSize, color, isBold, isItalic, isUnderline)
+    public AxisLabel
+        (
+            string text,
+            string fontFamily,
+            float fontSize,
+            Color color,
+            bool isBold,
+            bool isItalic,
+            bool isUnderline
+        )
+        : base (text, fontFamily, fontSize, color, isBold, isItalic, isUnderline)
     {
-        _isOmitMag = false;
-        _isTitleAtCross = true;
+        IsOmitMag = false;
+        IsTitleAtCross = true;
     }
 
     /// <summary>
     /// Copy constructor
     /// </summary>
     /// <param name="rhs">the <see cref="AxisLabel" /> instance to be copied.</param>
-    public AxisLabel (AxisLabel rhs)
+    public AxisLabel
+        (
+            AxisLabel rhs
+        )
         : base (rhs)
     {
-        _isOmitMag = rhs._isOmitMag;
-        _isTitleAtCross = rhs._isTitleAtCross;
+        IsOmitMag = rhs.IsOmitMag;
+        IsTitleAtCross = rhs.IsTitleAtCross;
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -110,11 +114,7 @@ public class AxisLabel
     /// <seealso cref="Axis.Title"/>
     /// <seealso cref="Scale.Mag"/>
     /// <seealso cref="Scale.Format"/>
-    public bool IsOmitMag
-    {
-        get { return _isOmitMag; }
-        set { _isOmitMag = value; }
-    }
+    public bool IsOmitMag { get; set; }
 
     /// <summary>
     /// Gets or sets a value that determines whether the Axis title is located at the
@@ -124,11 +124,7 @@ public class AxisLabel
     /// <remarks>
     /// This value only applies if <see cref="Axis.CrossAuto" /> is false.
     /// </remarks>
-    public bool IsTitleAtCross
-    {
-        get { return _isTitleAtCross; }
-        set { _isTitleAtCross = value; }
-    }
+    public bool IsTitleAtCross { get; set; }
 
     #endregion
 
@@ -146,14 +142,19 @@ public class AxisLabel
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected AxisLabel (SerializationInfo info, StreamingContext context) : base (info, context)
+    protected AxisLabel
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch2 = info.GetInt32 ("schema3");
+        info.GetInt32 ("schema3").NotUsed();
 
-        _isOmitMag = info.GetBoolean ("isOmitMag");
-        _isTitleAtCross = info.GetBoolean ("isTitleAtCross");
+        IsOmitMag = info.GetBoolean ("isOmitMag");
+        IsTitleAtCross = info.GetBoolean ("isTitleAtCross");
     }
 
     /// <summary>
@@ -171,7 +172,7 @@ public class AxisLabel
 
         info.AddValue ("schema3", schema2);
         info.AddValue ("isOmitMag", _isVisible);
-        info.AddValue ("isTitleAtCross", _isTitleAtCross);
+        info.AddValue ("isTitleAtCross", IsTitleAtCross);
     }
 
     #endregion

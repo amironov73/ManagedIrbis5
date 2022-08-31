@@ -668,25 +668,25 @@ public class GraphPane
     {
         int maxTics = 0;
 
-        _xAxis._scale.PickScale (this, g, scaleFactor);
-        _x2Axis._scale.PickScale (this, g, scaleFactor);
+        _xAxis.Scale.PickScale (this, g, scaleFactor);
+        _x2Axis.Scale.PickScale (this, g, scaleFactor);
 
         foreach (Axis axis in _yAxisList)
         {
-            axis._scale.PickScale (this, g, scaleFactor);
-            if (axis._scale.MaxAuto)
+            axis.Scale.PickScale (this, g, scaleFactor);
+            if (axis.Scale.MaxAuto)
             {
-                int nTics = axis._scale.CalcNumTics();
+                int nTics = axis.Scale.CalcNumTics();
                 maxTics = nTics > maxTics ? nTics : maxTics;
             }
         }
 
         foreach (Axis axis in _y2AxisList)
         {
-            axis._scale.PickScale (this, g, scaleFactor);
-            if (axis._scale.MaxAuto)
+            axis.Scale.PickScale (this, g, scaleFactor);
+            if (axis.Scale.MaxAuto)
             {
-                int nTics = axis._scale.CalcNumTics();
+                int nTics = axis.Scale.CalcNumTics();
                 maxTics = nTics > maxTics ? nTics : maxTics;
             }
         }
@@ -703,12 +703,12 @@ public class GraphPane
 
     private void ForceNumTics (Axis axis, int numTics)
     {
-        if (axis._scale.MaxAuto)
+        if (axis.Scale.MaxAuto)
         {
-            int nTics = axis._scale.CalcNumTics();
+            int nTics = axis.Scale.CalcNumTics();
             if (nTics < numTics)
             {
-                axis._scale._maxLinearized += axis._scale._majorStep * (numTics - nTics);
+                axis.Scale._maxLinearized += axis.Scale._majorStep * (numTics - nTics);
             }
         }
     }
@@ -888,16 +888,16 @@ public class GraphPane
 
     private bool AxisRangesValid()
     {
-        bool showGraf = _xAxis._scale._min < _xAxis._scale._max &&
-                        _x2Axis._scale._min < _x2Axis._scale._max;
+        bool showGraf = _xAxis.Scale._min < _xAxis.Scale._max &&
+                        _x2Axis.Scale._min < _x2Axis.Scale._max;
         foreach (Axis axis in _yAxisList)
-            if (axis._scale._min >= axis._scale._max)
+            if (axis.Scale._min >= axis.Scale._max)
             {
                 showGraf = false;
             }
 
         foreach (Axis axis in _y2AxisList)
-            if (axis._scale._min >= axis._scale._max)
+            if (axis.Scale._min >= axis.Scale._max)
             {
                 showGraf = false;
             }
@@ -1068,7 +1068,7 @@ public class GraphPane
             axis._tmpSpace -= crossPix;
         }
 
-        if (axis._scale._isLabelsInside && (axis.IsPrimary (this) || (crossFrac != 0.0 && crossFrac != 1.0)))
+        if (axis.Scale._isLabelsInside && (axis.IsPrimary (this) || (crossFrac != 0.0 && crossFrac != 1.0)))
         {
             spaceAlt = axis._tmpSpace;
         }
@@ -2142,19 +2142,19 @@ public class GraphPane
                 if (curve.IsY2Axis)
                 {
                     yAct = y2[yIndex];
-                    yMinAct = _y2AxisList[yIndex]._scale._min;
-                    yMaxAct = _y2AxisList[yIndex]._scale._max;
+                    yMinAct = _y2AxisList[yIndex].Scale._min;
+                    yMaxAct = _y2AxisList[yIndex].Scale._max;
                 }
                 else
                 {
                     yAct = y[yIndex];
-                    yMinAct = _yAxisList[yIndex]._scale._min;
-                    yMaxAct = _yAxisList[yIndex]._scale._max;
+                    yMinAct = _yAxisList[yIndex].Scale._min;
+                    yMaxAct = _yAxisList[yIndex].Scale._max;
                 }
 
                 yPixPerUnitAct = _chart._rect.Height / (yMaxAct - yMinAct);
 
-                double xPixPerUnit = _chart._rect.Width / (xAxis._scale._max - xAxis._scale._min);
+                double xPixPerUnit = _chart._rect.Width / (xAxis.Scale._max - xAxis.Scale._min);
                 xAct = xAxis is XAxis ? x : x2;
 
                 IPointList points = curve.Points;
@@ -2176,7 +2176,7 @@ public class GraphPane
                     for (int iPt = 0; iPt < curve.NPts; iPt++)
                     {
                         // xVal is the user scale X value of the current point
-                        if (xAxis._scale.IsAnyOrdinal && !curve.IsOverrideOrdinal)
+                        if (xAxis.Scale.IsAnyOrdinal && !curve.IsOverrideOrdinal)
                         {
                             xVal = (double)iPt + 1.0;
                         }
@@ -2186,7 +2186,7 @@ public class GraphPane
                         }
 
                         // yVal is the user scale Y value of the current point
-                        if (yAxis._scale.IsAnyOrdinal && !curve.IsOverrideOrdinal)
+                        if (yAxis.Scale.IsAnyOrdinal && !curve.IsOverrideOrdinal)
                         {
                             yVal = (double)iPt + 1.0;
                         }
@@ -2244,7 +2244,7 @@ public class GraphPane
                                     nearestBar = curve;
                                 }
                             }
-                            else if (xVal >= xAxis._scale._min && xVal <= xAxis._scale._max &&
+                            else if (xVal >= xAxis.Scale._min && xVal <= xAxis.Scale._max &&
                                      yVal >= yMinAct && yVal <= yMaxAct)
                             {
                                 if (curve is LineItem && _lineType == LineType.Stack)

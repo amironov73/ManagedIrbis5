@@ -82,7 +82,7 @@ public class HiLowBarItem
     /// <param name="rhs">The <see cref="HiLowBarItem"/> object from which to copy</param>
     public HiLowBarItem (HiLowBarItem rhs) : base (rhs)
     {
-        _bar = rhs._bar.Clone(); // new HiLowBar( rhs.Bar );
+        Bar = rhs.Bar.Clone(); // new HiLowBar( rhs.Bar );
     }
 
     /// <summary>

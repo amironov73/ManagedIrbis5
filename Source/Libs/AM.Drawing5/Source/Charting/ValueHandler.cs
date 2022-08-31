@@ -136,7 +136,7 @@ public class ValueHandler
                     curVal = PointPairBase.Missing;
 
                     // For non-ordinal curves, find a matching base value (must match exactly)
-                    if (curve.IsOverrideOrdinal || !baseAxis._scale.IsAnyOrdinal)
+                    if (curve.IsOverrideOrdinal || !baseAxis.Scale.IsAnyOrdinal)
                     {
                         IPointList points = tmpCurve.Points;
 
@@ -265,7 +265,7 @@ public class ValueHandler
                     curVal = PointPairBase.Missing;
 
                     // For non-ordinal curves, find a matching base value (must match exactly)
-                    if (curve.IsOverrideOrdinal || !baseAxis._scale.IsAnyOrdinal)
+                    if (curve.IsOverrideOrdinal || !baseAxis.Scale.IsAnyOrdinal)
                     {
                         IPointList points = tmpCurve.Points;
 
@@ -352,9 +352,9 @@ public class ValueHandler
 
         // Special Exception: Bars on log scales should always plot from the Min value upwards,
         // since they can never be zero
-        if (curve is BarItem && valueAxis._scale.IsLog && lowVal == 0)
+        if (curve is BarItem && valueAxis.Scale.IsLog && lowVal == 0)
         {
-            lowVal = valueAxis._scale._min;
+            lowVal = valueAxis.Scale._min;
         }
 
         if (baseVal == PointPairBase.Missing || hiVal == PointPairBase.Missing ||
@@ -395,7 +395,7 @@ public class ValueHandler
         if (curve is ErrorBarItem || curve is HiLowBarItem ||
             curve is OHLCBarItem || curve is JapaneseCandleStickItem)
         {
-            if (baseAxis._scale.IsAnyOrdinal && iCluster >= 0 && !curve.IsOverrideOrdinal)
+            if (baseAxis.Scale.IsAnyOrdinal && iCluster >= 0 && !curve.IsOverrideOrdinal)
             {
                 return (double)iCluster + 1.0;
             }

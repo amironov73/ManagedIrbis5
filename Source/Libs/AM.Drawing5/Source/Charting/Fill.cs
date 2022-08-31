@@ -54,7 +54,7 @@ public class Fill
     /// only applicable if the
     /// <see cref="Type"/> property is set to <see cref="FillType.Brush"/>.
     /// </summary>
-    [CLSCompliant (false)] protected Brush _brush;
+    protected Brush? _brush;
 
     /// <summary>
     /// Private field that determines the type of color fill.  Use the public
@@ -114,7 +114,7 @@ public class Fill
     /// <see cref="LinearGradientBrush"/> in the constructor.  This is used strictly
     /// for serialization.
     /// </summary>
-    private Color[] _colorList;
+    private Color[]? _colorList;
 
     /// <summary>
     /// Private field that saves the list of positions used to create the
@@ -201,7 +201,12 @@ public class Fill
     /// <param name="brush">A custom brush for fills.  Can be a <see cref="SolidBrush"/>,
     /// <see cref="LinearGradientBrush"/>, or <see cref="TextureBrush"/>.</param>
     /// <param name="type">The <see cref="FillType"/> for this fill.</param>
-    public Fill (Color color, Brush brush, FillType type)
+    public Fill
+        (
+            Color color,
+            Brush? brush,
+            FillType type
+        )
     {
         Init();
         _color = color;
@@ -237,7 +242,7 @@ public class Fill
         Init();
         _color = color2;
 
-        ColorBlend blend = new ColorBlend (2);
+        var blend = new ColorBlend (2);
         blend.Colors[0] = color1;
         blend.Colors[1] = color2;
         blend.Positions[0] = 0.0f;
@@ -284,7 +289,7 @@ public class Fill
         Init();
         _color = color3;
 
-        ColorBlend blend = new ColorBlend (3);
+        var blend = new ColorBlend (3);
         blend.Colors[0] = color1;
         blend.Colors[1] = color2;
         blend.Colors[2] = color3;
@@ -356,11 +361,11 @@ public class Fill
         Init();
         _color = colors[colors.Length - 1];
 
-        ColorBlend blend = new ColorBlend();
+        var blend = new ColorBlend();
         blend.Colors = colors;
         blend.Positions = new float[colors.Length];
         blend.Positions[0] = 0.0F;
-        for (int i = 1; i < colors.Length; i++)
+        for (var i = 1; i < colors.Length; i++)
             blend.Positions[i] = (float)i / (float)(colors.Length - 1);
         _type = FillType.Brush;
 
@@ -402,7 +407,7 @@ public class Fill
         Init();
         _color = colors[colors.Length - 1];
 
-        ColorBlend blend = new ColorBlend();
+        var blend = new ColorBlend();
         blend.Colors = colors;
         blend.Positions = positions;
         _type = FillType.Brush;
@@ -621,7 +626,7 @@ public class Fill
 
         if (_colorList != null && _positionList != null)
         {
-            ColorBlend blend = new ColorBlend();
+            var blend = new ColorBlend();
             blend.Colors = _colorList;
             blend.Positions = _positionList;
             CreateBrushFromBlend (blend, _angle);
@@ -916,7 +921,11 @@ public class Fill
     /// color gradient.  This is only applicable for <see cref="FillType.GradientByX"/>,
     /// <see cref="FillType.GradientByY"/> or <see cref="FillType.GradientByZ"/>.</param>
     /// <returns>A <see cref="System.Drawing.Brush"/> class representing the fill brush</returns>
-    public Brush MakeBrush (RectangleF rect, PointPair dataValue)
+    public Brush MakeBrush
+        (
+            RectangleF rect,
+            PointPair? dataValue
+        )
     {
         // get a brush
         if (IsVisible && (!_color.IsEmpty || _brush != null))
@@ -944,7 +953,7 @@ public class Fill
                     {
                         // Go ahead and create a new Fill so we can do all the scaling, etc.,
                         // that is associated with a gradient
-                        Fill tmpFill = new Fill (_secondaryValueGradientColor,
+                        var tmpFill = new Fill (_secondaryValueGradientColor,
                             GetGradientColor (dataValue), _angle);
                         return tmpFill.MakeBrush (rect);
                     }
@@ -959,7 +968,7 @@ public class Fill
                     {
                         // Go ahead and create a new Fill so we can do all the scaling, etc.,
                         // that is associated with a gradient
-                        Fill tmpFill = new Fill (_secondaryValueGradientColor,
+                        var tmpFill = new Fill (_secondaryValueGradientColor,
                             GetGradientColor (_rangeDefault), _angle);
                         return tmpFill.MakeBrush (rect);
                     }
@@ -1040,11 +1049,11 @@ public class Fill
 
         if (_gradientBM == null)
         {
-            RectangleF rect = new RectangleF (0, 0, 100, 1);
+            var rect = new RectangleF (0, 0, 100, 1);
             _gradientBM = new Bitmap (100, 1);
-            Graphics gBM = Graphics.FromImage (_gradientBM);
+            var gBM = Graphics.FromImage (_gradientBM);
 
-            Brush tmpBrush = ScaleBrush (rect, _brush, true);
+            var tmpBrush = ScaleBrush (rect, _brush, true);
             gBM.FillRectangle (tmpBrush, rect);
         }
 
@@ -1061,7 +1070,7 @@ public class Fill
             }
             else if (brush is LinearGradientBrush)
             {
-                LinearGradientBrush linBrush = (LinearGradientBrush)brush.Clone();
+                var linBrush = (LinearGradientBrush)brush.Clone();
 
                 if (isScaled)
                 {
@@ -1107,7 +1116,7 @@ public class Fill
             } // LinearGradientBrush
             else if (brush is TextureBrush)
             {
-                TextureBrush texBrush = (TextureBrush)brush.Clone();
+                var texBrush = (TextureBrush)brush.Clone();
 
                 if (isScaled)
                 {
@@ -1124,9 +1133,11 @@ public class Fill
                         case AlignH.Left:
                             dx = rect.Left;
                             break;
+
                         case AlignH.Center:
                             dx = (rect.Left + rect.Width / 2.0F);
                             break;
+
                         case AlignH.Right:
                             dx = (rect.Left + rect.Width);
                             break;
@@ -1137,9 +1148,11 @@ public class Fill
                         case AlignV.Top:
                             dy = rect.Top;
                             break;
+
                         case AlignV.Center:
                             dy = (rect.Top + rect.Height / 2.0F);
                             break;
+
                         case AlignV.Bottom:
                             dy = (rect.Top + rect.Height);
                             break;
@@ -1167,15 +1180,19 @@ public class Fill
     /// Fill the background of the <see cref="RectangleF"/> area, using the
     /// fill type from this <see cref="Fill"/>.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
     /// <param name="rect">The <see cref="RectangleF"/> struct specifying the area
     /// to be filled</param>
-    public void Draw (Graphics g, RectangleF rect)
+    public void Draw
+        (
+            Graphics graphics,
+            RectangleF rect
+        )
     {
-        Draw (g, rect, null);
+        Draw (graphics, rect, null);
         /*
         if ( this.IsVisible )
         {
@@ -1192,7 +1209,7 @@ public class Fill
     /// Fill the background of the <see cref="RectangleF"/> area, using the
     /// fill type from this <see cref="Fill"/>.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -1201,14 +1218,17 @@ public class Fill
     /// <param name="pt">The data value to be used in case it's a
     /// <see cref="FillType.GradientByX" />, <see cref="FillType.GradientByY" />, or
     /// <see cref="FillType.GradientByZ" /> <see cref="FillType" />.</param>
-    public void Draw (Graphics g, RectangleF rect, PointPair pt)
+    public void Draw
+        (
+            Graphics graphics,
+            RectangleF rect,
+            PointPair? pt
+        )
     {
         if (IsVisible)
         {
-            using (Brush brush = MakeBrush (rect, pt))
-            {
-                g.FillRectangle (brush, rect);
-            }
+            using var brush = MakeBrush (rect, pt);
+            graphics.FillRectangle (brush, rect);
         }
     }
 

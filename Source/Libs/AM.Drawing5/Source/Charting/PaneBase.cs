@@ -618,7 +618,7 @@ public abstract class PaneBase
         }
 
         // calculate scaleFactor on "normal" pane size (BaseDimension)
-        float scaleFactor = CalcScaleFactor();
+        var scaleFactor = CalcScaleFactor();
 
         // Fill the pane background and draw a border around it
         DrawPaneFrame (g, scaleFactor);
@@ -661,11 +661,11 @@ public abstract class PaneBase
     {
         // get scaled values for the paneGap and character height
         //float scaledOuterGap = (float) ( Default.OuterPaneGap * scaleFactor );
-        float charHeight = _title._fontSpec.GetHeight (scaleFactor);
+        var charHeight = _title._fontSpec.GetHeight (scaleFactor);
 
         // chart rect starts out at the full pane rect.  It gets reduced to make room for the legend,
         // scales, titles, etc.
-        RectangleF innerRect = new RectangleF (
+        var innerRect = new RectangleF (
             _rect.Left + _margin.Left * scaleFactor,
             _rect.Top + _margin.Top * scaleFactor,
             _rect.Width - scaleFactor * (_margin.Left + _margin.Right),
@@ -674,7 +674,7 @@ public abstract class PaneBase
         // Leave room for the title
         if (_title._isVisible && _title._text != string.Empty)
         {
-            SizeF titleSize = _title._fontSpec.BoundingBox (g, _title._text, scaleFactor);
+            var titleSize = _title._fontSpec.BoundingBox (g, _title._text, scaleFactor);
 
             // Leave room for the title height, plus a line spacing of charHeight * _titleGap
             innerRect.Y += titleSize.Height + charHeight * _titleGap;
@@ -708,7 +708,7 @@ public abstract class PaneBase
         // new RectangleF( 0, 0, 100, 100 ), which should be 100 pixels wide, we cover
         // from 0 through 99.  The draw routines normally cover from 0 through 100, which is
         // actually 101 pixels wide.
-        RectangleF rect = new RectangleF (_rect.X, _rect.Y, _rect.Width - 1, _rect.Height - 1);
+        var rect = new RectangleF (_rect.X, _rect.Y, _rect.Width - 1, _rect.Height - 1);
 
         _border.Draw (g, this, scaleFactor, rect);
     }
@@ -730,7 +730,7 @@ public abstract class PaneBase
         // only draw the title if it's required
         if (_title._isVisible)
         {
-            SizeF size = _title._fontSpec.BoundingBox (g, _title._text, scaleFactor);
+            var size = _title._fontSpec.BoundingBox (g, _title._text, scaleFactor);
 
             // use the internal fontSpec class to draw the text using user-specified and/or
             // default attributes.
@@ -796,8 +796,8 @@ public abstract class PaneBase
             return 1.0F;
         }
 
-        float length = _rect.Width;
-        float aspect = _rect.Width / _rect.Height;
+        var length = _rect.Width;
+        var aspect = _rect.Width / _rect.Height;
         if (aspect > ASPECTLIMIT)
         {
             length = _rect.Height * ASPECTLIMIT;
@@ -865,8 +865,8 @@ public abstract class PaneBase
     /// <seealso cref="GetMetafile(int,int)"/>
     public Bitmap GetImage (bool isAntiAlias)
     {
-        Bitmap bitmap = new Bitmap ((int)_rect.Width, (int)_rect.Height);
-        using (Graphics bitmapGraphics = Graphics.FromImage (bitmap))
+        var bitmap = new Bitmap ((int)_rect.Width, (int)_rect.Height);
+        using (var bitmapGraphics = Graphics.FromImage (bitmap))
         {
             bitmapGraphics.TranslateTransform (-_rect.Left, -_rect.Top);
             Draw (bitmapGraphics);
@@ -888,9 +888,9 @@ public abstract class PaneBase
     /// <seealso cref="Bitmap"/>
     public Bitmap GetImage (int width, int height, float dpi, bool isAntiAlias)
     {
-        Bitmap bitmap = new Bitmap (width, height);
+        var bitmap = new Bitmap (width, height);
         bitmap.SetResolution (dpi, dpi);
-        using (Graphics bitmapGraphics = Graphics.FromImage (bitmap))
+        using (var bitmapGraphics = Graphics.FromImage (bitmap))
         {
             MakeImage (bitmapGraphics, width, height, isAntiAlias);
         }
@@ -941,7 +941,7 @@ public abstract class PaneBase
         SetAntiAliasMode (g, antiAlias);
 
         // This is actually a shallow clone, so we don't duplicate all the data, curveLists, etc.
-        PaneBase tempPane = ShallowClone();
+        var tempPane = ShallowClone();
 
         // Clone the Chart object for GraphPanes so we don't mess up the minPix and maxPix values or
         // the rect/ChartRect calculations of the original
@@ -969,8 +969,8 @@ public abstract class PaneBase
         // since we're only mimicing the draw.  If you use the 'bitmapGraphics' already created,
         // then you will be drawing back into the bitmap that will be returned.
 
-        Bitmap bm = new Bitmap (1, 1);
-        using (Graphics bmg = Graphics.FromImage (bm))
+        var bm = new Bitmap (1, 1);
+        using (var bmg = Graphics.FromImage (bm))
         {
             ReSize (bmg, Rect);
             SetAntiAliasMode (bmg, antiAlias);
@@ -994,21 +994,21 @@ public abstract class PaneBase
     /// <seealso cref="GetMetafile()"/>
     public Metafile GetMetafile (int width, int height, bool isAntiAlias)
     {
-        Bitmap bm = new Bitmap (1, 1);
-        using (Graphics g = Graphics.FromImage (bm))
+        var bm = new Bitmap (1, 1);
+        using (var g = Graphics.FromImage (bm))
         {
-            IntPtr hdc = g.GetHdc();
+            var hdc = g.GetHdc();
             Stream stream = new MemoryStream();
-            Metafile metafile = new Metafile (stream, hdc, _rect,
+            var metafile = new Metafile (stream, hdc, _rect,
                 MetafileFrameUnit.Pixel, EmfType.EmfPlusDual);
             g.ReleaseHdc (hdc);
 
-            using (Graphics metafileGraphics = Graphics.FromImage (metafile))
+            using (var metafileGraphics = Graphics.FromImage (metafile))
             {
                 //metafileGraphics.TranslateTransform( -_rect.Left, -_rect.Top );
                 metafileGraphics.PageUnit = GraphicsUnit.Pixel;
-                PointF P = new PointF (width, height);
-                PointF[] PA = new PointF[] { P };
+                var P = new PointF (width, height);
+                var PA = new PointF[] { P };
                 metafileGraphics.TransformPoints (CoordinateSpace.Page, CoordinateSpace.Device, PA);
 
                 //metafileGraphics.PageScale = 1f;
@@ -1049,20 +1049,20 @@ public abstract class PaneBase
     /// <seealso cref="GetMetafile(int,int)"/>
     public Metafile GetMetafile()
     {
-        Bitmap bm = new Bitmap (1, 1);
-        using (Graphics g = Graphics.FromImage (bm))
+        var bm = new Bitmap (1, 1);
+        using (var g = Graphics.FromImage (bm))
         {
-            IntPtr hdc = g.GetHdc();
+            var hdc = g.GetHdc();
             Stream stream = new MemoryStream();
-            Metafile metafile = new Metafile (stream, hdc, _rect,
+            var metafile = new Metafile (stream, hdc, _rect,
                 MetafileFrameUnit.Pixel, EmfType.EmfOnly);
 
-            using (Graphics metafileGraphics = Graphics.FromImage (metafile))
+            using (var metafileGraphics = Graphics.FromImage (metafile))
             {
                 metafileGraphics.TranslateTransform (-_rect.Left, -_rect.Top);
                 metafileGraphics.PageUnit = GraphicsUnit.Pixel;
-                PointF P = new PointF (_rect.Width, _rect.Height);
-                PointF[] PA = new PointF[] { P };
+                var P = new PointF (_rect.Width, _rect.Height);
+                var PA = new PointF[] { P };
                 metafileGraphics.TransformPoints (CoordinateSpace.Page, CoordinateSpace.Device, PA);
 
                 //metafileGraphics.PageScale = 1f;
@@ -1196,15 +1196,15 @@ public abstract class PaneBase
         }
 
         // Just to save some casts
-        GraphPane gPane = null;
-        RectangleF chartRect = new RectangleF (0, 0, 1, 1);
+        GraphPane? gPane = null;
+        var chartRect = new RectangleF (0, 0, 1, 1);
         if (this is GraphPane)
         {
             gPane = this as GraphPane;
             chartRect = gPane.Chart._rect;
         }
 
-        PointF ptPix = new PointF();
+        var ptPix = new PointF();
 
         if (coord == CoordType.ChartFraction)
         {

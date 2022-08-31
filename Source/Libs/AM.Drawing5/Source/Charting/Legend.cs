@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* Legend.cs --
+/* Legend.cs -- легенда диаграммы
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,9 +22,8 @@ using System.Runtime.Serialization;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// This class encapsulates the chart <see cref="Legend"/>
-/// that is displayed
-/// in the <see cref="GraphPane"/>
+/// Этот класс инкапсулирует легенду диаграммы
+/// которая отображается в <see cref="GraphPane"/>
 /// </summary>
 [Serializable]
 public class Legend
@@ -167,7 +166,7 @@ public class Legend
         /// <summary>
         /// The default custom brush for filling in this <see cref="Legend"/>.
         /// </summary>
-        public static Brush FillBrush = null;
+        public static Brush? FillBrush = null;
 
         /// <summary>
         /// The default fill mode for the <see cref="Legend"/> background.
@@ -263,7 +262,7 @@ public class Legend
         /// The default custom brush for filling in the scale text background
         /// (see <see cref="Fill.Brush"/> property).
         /// </summary>
-        public static Brush FontFillBrush = null;
+        public static Brush? FontFillBrush = null;
 
         /// <summary>
         /// The default fill mode for filling in the scale text background
@@ -296,10 +295,7 @@ public class Legend
     /// Get the bounding rectangle for the <see cref="Legend"/> in screen coordinates
     /// </summary>
     /// <value>A screen rectangle in pixel units</value>
-    public RectangleF Rect
-    {
-        get { return _rect; }
-    }
+    public RectangleF Rect => _rect;
 
     /// <summary>
     /// Access to the <see cref="Charting.FontSpec"/> class used to render
@@ -314,7 +310,7 @@ public class Legend
     /// <seealso cref="Default.FontSize"/>
     public FontSpec FontSpec
     {
-        get { return _fontSpec; }
+        get => _fontSpec;
         set
         {
             if (value == null)
@@ -333,8 +329,8 @@ public class Legend
     /// <seealso cref="Default.IsVisible"/>
     public bool IsVisible
     {
-        get { return _isVisible; }
-        set { _isVisible = value; }
+        get => _isVisible;
+        set => _isVisible = value;
     }
 
     /// <summary>
@@ -342,8 +338,8 @@ public class Legend
     /// </summary>
     public Border Border
     {
-        get { return _border; }
-        set { _border = value; }
+        get => _border;
+        set => _border = value;
     }
 
     /// <summary>
@@ -352,8 +348,8 @@ public class Legend
     /// </summary>
     public Fill Fill
     {
-        get { return _fill; }
-        set { _fill = value; }
+        get => _fill;
+        set => _fill = value;
     }
 
     /// <summary>
@@ -365,8 +361,8 @@ public class Legend
     /// <seealso cref="Default.IsHStack"/>
     public bool IsHStack
     {
-        get { return _isHStack; }
-        set { _isHStack = value; }
+        get => _isHStack;
+        set => _isHStack = value;
     }
 
     /// <summary>
@@ -376,8 +372,8 @@ public class Legend
     /// <seealso cref="Default.Position"/>
     public LegendPos Position
     {
-        get { return _position; }
-        set { _position = value; }
+        get => _position;
+        set => _position = value;
     }
 
     /// <summary>
@@ -387,8 +383,8 @@ public class Legend
     /// </summary>
     public Location Location
     {
-        get { return _location; }
-        set { _location = value; }
+        get => _location;
+        set => _location = value;
     }
 
     /// <summary>
@@ -401,8 +397,8 @@ public class Legend
     /// </remarks>
     public float Gap
     {
-        get { return _gap; }
-        set { _gap = value; }
+        get => _gap;
+        set => _gap = value;
     }
 
     /// <summary>
@@ -411,8 +407,8 @@ public class Legend
     /// </summary>
     public bool IsReverse
     {
-        get { return _isReverse; }
-        set { _isReverse = value; }
+        get => _isReverse;
+        set => _isReverse = value;
     }
 
     /// <summary>
@@ -429,8 +425,8 @@ public class Legend
     /// </remarks>
     public bool IsShowLegendSymbols
     {
-        get { return _isShowLegendSymbols; }
-        set { _isShowLegendSymbols = value; }
+        get => _isShowLegendSymbols;
+        set => _isShowLegendSymbols = value;
     }
 
     #endregion

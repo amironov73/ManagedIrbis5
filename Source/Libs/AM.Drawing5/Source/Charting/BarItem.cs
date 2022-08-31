@@ -13,9 +13,7 @@
 
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -37,13 +35,6 @@ public class BarItem
 {
     #region Fields
 
-    /// <summary>
-    /// Private field that stores a reference to the <see cref="Charting.Bar"/>
-    /// class defined for this <see cref="BarItem"/>.  Use the public
-    /// property <see cref="Bar"/> to access this value.
-    /// </summary>
-    [CLSCompliant (false)] protected Bar _bar;
-
     #endregion
 
     #region Properties
@@ -52,10 +43,7 @@ public class BarItem
     /// Gets a reference to the <see cref="Charting.Bar"/> class defined
     /// for this <see cref="BarItem"/>.
     /// </summary>
-    public Bar Bar
-    {
-        get { return _bar; }
-    }
+    public Bar? Bar { get; protected set; }
 
     /// <summary>
     /// Gets a flag indicating if the Z data range should be included in the axis scaling calculations.
@@ -63,7 +51,10 @@ public class BarItem
     /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
     /// </param>
     /// <value>true if the Z data are included, false otherwise</value>
-    internal override bool IsZIncluded (GraphPane pane)
+    internal override bool IsZIncluded
+        (
+            GraphPane pane
+        )
     {
         return this is HiLowBarItem;
     }
@@ -89,7 +80,7 @@ public class BarItem
     /// <param name="label">The label that will appear in the legend.</param>
     public BarItem (string label) : base (label)
     {
-        _bar = new Bar();
+        Bar = new Bar();
     }
 
     /// <summary>
@@ -120,7 +111,7 @@ public class BarItem
     public BarItem (string label, IPointList points, Color color)
         : base (label, points)
     {
-        _bar = new Bar (color);
+        Bar = new Bar (color);
     }
 
     /// <summary>
@@ -130,7 +121,7 @@ public class BarItem
     public BarItem (BarItem rhs) : base (rhs)
     {
         //bar = new Bar( rhs.Bar );
-        _bar = rhs._bar.Clone();
+        Bar = rhs.Bar.Clone();
     }
 
     /// <summary>
@@ -168,20 +159,21 @@ public class BarItem
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected BarItem (SerializationInfo info, StreamingContext context) : base (info, context)
+    protected BarItem
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        var sch = info.GetInt32 ("schema2");
+        info.GetInt32 ("schema2").NotUsed();
 
-        _bar = (Bar)info.GetValue ("bar", typeof (Bar));
+        Bar = (Bar?) info.GetValue ("bar", typeof (Bar));
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -190,68 +182,49 @@ public class BarItem
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
-        info.AddValue ("bar", _bar);
+        info.AddValue ("bar", Bar);
     }
 
     #endregion
 
     #region Methods
 
-    /// <summary>
-    /// Do all rendering associated with this <see cref="BarItem"/> to the specified
-    /// <see cref="Graphics"/> device.  This method is normally only
-    /// called by the Draw method of the parent <see cref="CurveList"/>
-    /// collection object.
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="pos">The ordinal position of the current <see cref="Bar"/>
-    /// curve.</param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    public override void Draw (Graphics graphics, GraphPane pane, int pos,
-        float scaleFactor)
+    /// <inheritdoc cref="CurveItem.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            int pos,
+            float scaleFactor
+        )
     {
         // Pass the drawing onto the bar class
         if (_isVisible)
         {
-            _bar.DrawBars (graphics, pane, this, BaseAxis (pane), ValueAxis (pane),
-                GetBarWidth (pane), pos, scaleFactor);
+            Bar?.DrawBars
+                (
+                    graphics,
+                    pane,
+                    this,
+                    BaseAxis (pane),
+                    ValueAxis (pane),
+                    GetBarWidth (pane),
+                    pos,
+                    scaleFactor
+                );
         }
     }
 
-    /// <summary>
-    /// Draw a legend key entry for this <see cref="BarItem"/> at the specified location
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="rect">The <see cref="RectangleF"/> struct that specifies the
-    /// location for the legend key</param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor)
+    /// <inheritdoc cref="CurveItem.DrawLegendKey"/>
+    public override void DrawLegendKey
+        (
+            Graphics graphics,
+            GraphPane pane,
+            RectangleF rect,
+            float scaleFactor
+        )
     {
-        _bar.Draw (graphics, pane, rect, scaleFactor, true, false, null);
+        Bar?.Draw (graphics, pane, rect, scaleFactor, true, false, null);
     }
 
     /// <summary>
@@ -270,11 +243,25 @@ public class BarItem
     /// <param name="valueFormat">The double.ToString string format to use for creating
     /// the labels.
     /// </param>
-    public static void CreateBarLabels (GraphPane pane, bool isBarCenter, string valueFormat)
+    public static void CreateBarLabels
+        (
+            GraphPane pane,
+            bool isBarCenter,
+            string valueFormat
+        )
     {
-        CreateBarLabels (pane, isBarCenter, valueFormat, TextObj.Default.FontFamily,
-            TextObj.Default.FontSize, TextObj.Default.FontColor, TextObj.Default.FontBold,
-            TextObj.Default.FontItalic, TextObj.Default.FontUnderline);
+        CreateBarLabels
+            (
+                pane,
+                isBarCenter,
+                valueFormat,
+                TextObj.Default.FontFamily,
+                TextObj.Default.FontSize,
+                TextObj.Default.FontColor,
+                TextObj.Default.FontBold,
+                TextObj.Default.FontItalic,
+                TextObj.Default.FontUnderline
+            );
     }
 
     /// <summary>
@@ -332,10 +319,9 @@ public class BarItem
                 // The labelOffset should depend on whether the curve is YAxis or Y2Axis.
                 // JHC - Generalize to any value axis
                 // Make the gap between the bars and the labels = 1.5% of the axis range
-                float labelOffset;
 
                 var scale = curve.ValueAxis (pane).Scale;
-                labelOffset = (float)(scale._max - scale._min) * 0.015f;
+                var labelOffset = (float)(scale._max - scale._min) * 0.015f;
 
                 // Loop through each point in the BarItem
                 for (var i = 0; i < points.Count; i++)
@@ -343,8 +329,7 @@ public class BarItem
                     // Get the high, low and base values for the current bar
                     // note that this method will automatically calculate the "effective"
                     // values if the bar is stacked
-                    double baseVal, lowVal, hiVal;
-                    valueHandler.GetValues (curve, i, out baseVal, out lowVal, out hiVal);
+                    valueHandler.GetValues (curve, i, out var baseVal, out var lowVal, out var hiVal);
 
                     // Get the value that corresponds to the center of the bar base
                     // This method figures out how the bars are positioned within a cluster
@@ -373,14 +358,9 @@ public class BarItem
 
                     // Create the new TextObj
                     TextObj label;
-                    if (isVertical)
-                    {
-                        label = new TextObj (barLabelText, centerVal, position);
-                    }
-                    else
-                    {
-                        label = new TextObj (barLabelText, position, centerVal);
-                    }
+                    label = isVertical
+                        ? new TextObj (barLabelText, centerVal, position)
+                        : new TextObj (barLabelText, position, centerVal);
 
                     label.FontSpec.Family = fontFamily;
 
@@ -412,16 +392,13 @@ public class BarItem
         }
     }
 
-    /// <summary>
-    /// Determine the coords for the rectangle associated with a specified point for
-    /// this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The <see cref="GraphPane" /> to which this curve belongs</param>
-    /// <param name="i">The index of the point of interest</param>
-    /// <param name="coords">A list of coordinates that represents the "rect" for
-    /// this point (used in an html AREA tag)</param>
-    /// <returns>true if it's a valid point, false otherwise</returns>
-    public override bool GetCoords (GraphPane pane, int i, out string coords)
+    /// <inheritdoc cref="CurveItem.GetCoords"/>
+    public override bool GetCoords
+        (
+            GraphPane pane,
+            int i,
+            out string coords
+        )
     {
         coords = string.Empty;
 
@@ -469,17 +446,13 @@ public class BarItem
                           pane.CurveList.GetBarItemPos (pane, this) * (barWidth + barGap);
 
             // Draw the bar
-            if (baseAxis is XAxis || baseAxis is X2Axis)
+            if (baseAxis is XAxis or X2Axis)
             {
-                coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
-                    pixSide, pixLowVal,
-                    pixSide + barWidth, pixHiVal);
+                coords = $"{pixSide:f0},{pixLowVal:f0},{pixSide + barWidth:f0},{pixHiVal:f0}";
             }
             else
             {
-                coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
-                    pixLowVal, pixSide,
-                    pixHiVal, pixSide + barWidth);
+                coords = $"{pixLowVal:f0},{pixSide:f0},{pixHiVal:f0},{pixSide + barWidth:f0}";
             }
 
             return true;

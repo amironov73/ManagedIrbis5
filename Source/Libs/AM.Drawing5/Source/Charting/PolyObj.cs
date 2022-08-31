@@ -33,7 +33,7 @@ public class PolyObj
 {
     #region Fields
 
-    private PointD[] _points;
+    private PointD[]? _points;
 
     /// <summary>
     /// private value that determines if the polygon will be automatically closed.
@@ -51,10 +51,10 @@ public class PolyObj
     /// the polygon.  This will be in units determined by
     /// <see cref="Location.CoordinateFrame"/>.
     /// </summary>
-    public PointD[] Points
+    public PointD[]? Points
     {
-        get { return _points; }
-        set { _points = value; }
+        get => _points;
+        set => _points = value;
     }
 
     /// <summary>
@@ -72,8 +72,8 @@ public class PolyObj
     /// </remarks>
     public bool IsClosedFigure
     {
-        get { return _isClosedFigure; }
-        set { _isClosedFigure = value; }
+        get => _isClosedFigure;
+        set => _isClosedFigure = value;
     }
 
     #endregion
@@ -145,9 +145,14 @@ public class PolyObj
     /// the polygon.  This will be in units determined by
     /// <see cref="Location.CoordinateFrame"/>.
     /// </param>
-    public PolyObj (PointD[] points, Color borderColor,
-        Color fillColor1, Color fillColor2) :
-        base (0, 0, 1, 1, borderColor, fillColor1, fillColor2)
+    public PolyObj
+        (
+            PointD[] points,
+            Color borderColor,
+            Color fillColor1,
+            Color fillColor2
+        )
+        : base (0, 0, 1, 1, borderColor, fillColor1, fillColor2)
     {
         _points = points;
     }
@@ -156,9 +161,13 @@ public class PolyObj
     /// The Copy Constructor
     /// </summary>
     /// <param name="rhs">The <see cref="PolyObj"/> object from which to copy</param>
-    public PolyObj (PolyObj rhs) : base (rhs)
+    public PolyObj
+        (
+            PolyObj rhs
+        )
+        : base (rhs)
     {
-        rhs._points = (PointD[])_points.Clone();
+        rhs._points = (PointD[]?) _points?.Clone();
         rhs._isClosedFigure = _isClosedFigure;
     }
 
@@ -208,7 +217,7 @@ public class PolyObj
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema3").NotUsed();
 
-        _points = (PointD[])info.GetValue ("points", typeof (PointD[]));
+        _points = (PointD[]?) info.GetValue ("points", typeof (PointD[]));
 
         if (schema3 >= 11)
         {
@@ -242,53 +251,55 @@ public class PolyObj
             float scaleFactor
         )
     {
-        if (_points != null && _points.Length > 1)
+        if (_points is { Length: > 1 })
         {
-            using (GraphicsPath path = MakePath (pane))
-            {
-                // Fill or draw the symbol as required
-                if (_fill.IsVisible)
-                {
-                    using (Brush brush = Fill.MakeBrush (path.GetBounds()))
-                        graphics.FillPath (brush, path);
-                }
+            using var path = MakePath (pane);
 
-                if (_border.IsVisible)
-                {
-                    using (Pen pen = _border.GetPen (pane, scaleFactor))
-                        graphics.DrawPath (pen, path);
-                }
+            // Fill or draw the symbol as required
+            if (_fill.IsVisible)
+            {
+                using var brush = Fill.MakeBrush (path.GetBounds());
+                graphics.FillPath (brush, path);
+            }
+
+            if (_border.IsVisible)
+            {
+                using var pen = _border.GetPen (pane, scaleFactor);
+                graphics.DrawPath (pen, path);
             }
         }
     }
 
     internal GraphicsPath MakePath (PaneBase pane)
     {
-        GraphicsPath path = new GraphicsPath();
-        bool first = true;
-        PointF lastPt = new PointF();
+        var path = new GraphicsPath();
+        var first = true;
+        var lastPt = new PointF();
 
-        foreach (PointD pt in _points)
+        if (_points is not null)
         {
-            // Convert the coordinates from the user coordinate system
-            // to the screen coordinate system
-            // Offset the points by the location value
-            PointF pixPt = Location.Transform (pane, pt.X + _location.X, pt.Y + _location.Y,
-                _location.CoordinateFrame);
-
-            if (Math.Abs (pixPt.X) < 100000 &&
-                Math.Abs (pixPt.Y) < 100000)
+            foreach (var pt in _points)
             {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    path.AddLine (lastPt, pixPt);
-                }
+                // Convert the coordinates from the user coordinate system
+                // to the screen coordinate system
+                // Offset the points by the location value
+                var pixPt = Location.Transform (pane, pt.X + _location.X, pt.Y + _location.Y,
+                    _location.CoordinateFrame);
 
-                lastPt = pixPt;
+                if (Math.Abs (pixPt.X) < 100_000 &&
+                    Math.Abs (pixPt.Y) < 100_000)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        path.AddLine (lastPt, pixPt);
+                    }
+
+                    lastPt = pixPt;
+                }
             }
         }
 
@@ -328,15 +339,15 @@ public class PolyObj
             float scaleFactor
         )
     {
-        if (_points != null && _points.Length > 1)
+        if (_points is { Length: > 1 })
         {
             if (!base.PointInBox (point, pane, graphics, scaleFactor))
             {
                 return false;
             }
 
-            using (GraphicsPath path = MakePath (pane))
-                return path.IsVisible (point);
+            using var path = MakePath (pane);
+            return path.IsVisible (point);
         }
         else
         {

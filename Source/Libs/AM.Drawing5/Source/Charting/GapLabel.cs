@@ -14,7 +14,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -31,8 +30,6 @@ namespace AM.Drawing.Charting;
 public class GapLabel
     : Label, ICloneable
 {
-    internal float _gap;
-
     #region Constructors
 
     /// <summary>
@@ -49,11 +46,19 @@ public class GapLabel
     /// <param name="isBold">true for a bold font face</param>
     /// <param name="isItalic">true for an italic font face</param>
     /// <param name="isUnderline">true for an underline font face</param>
-    public GapLabel (string text, string fontFamily, float fontSize, Color color, bool isBold,
-        bool isItalic, bool isUnderline)
+    public GapLabel
+        (
+            string text,
+            string fontFamily,
+            float fontSize,
+            Color color,
+            bool isBold,
+            bool isItalic,
+            bool isUnderline
+        )
         : base (text, fontFamily, fontSize, color, isBold, isItalic, isUnderline)
     {
-        _gap = Default.Gap;
+        Gap = Default.Gap;
     }
 
     /// <summary>
@@ -63,7 +68,7 @@ public class GapLabel
     public GapLabel (GapLabel rhs)
         : base (rhs)
     {
-        _gap = rhs._gap;
+        Gap = rhs.Gap;
     }
 
     /// <summary>
@@ -96,20 +101,19 @@ public class GapLabel
     /// <remarks>
     /// This value is expressed as a fraction of the character height for the <see cref="GapLabel" />.
     /// </remarks>
-    public float Gap
-    {
-        get { return _gap; }
-        set { _gap = value; }
-    }
+    public float Gap { get; set; }
 
     /// <summary>
     /// Calculate the size of the <see cref="Gap" /> based on the <see cref="Label.FontSpec" />
     /// height, in pixel units and scaled according to <see paramref="scalefactor" />.
     /// </summary>
     /// <param name="scaleFactor">The scaling factor to be applied</param>
-    public float GetScaledGap (float scaleFactor)
+    public float GetScaledGap
+        (
+            float scaleFactor
+        )
     {
-        return _fontSpec.GetHeight (scaleFactor) * _gap;
+        return _fontSpec.GetHeight (scaleFactor) * Gap;
     }
 
     #endregion
@@ -128,21 +132,21 @@ public class GapLabel
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected GapLabel (SerializationInfo info, StreamingContext context)
+    protected GapLabel
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
         : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch2 = info.GetInt32 ("schema2");
+        info.GetInt32 ("schema2").NotUsed();
 
-        _gap = info.GetSingle ("gap");
+        Gap = info.GetSingle ("gap");
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -152,7 +156,7 @@ public class GapLabel
         base.GetObjectData (info, context);
 
         info.AddValue ("schema2", schema2);
-        info.AddValue ("gap", _gap);
+        info.AddValue ("gap", Gap);
     }
 
     #endregion

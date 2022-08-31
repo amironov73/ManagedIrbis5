@@ -507,8 +507,8 @@ public class Line
                     !double.IsNaN (pt.Y) &&
                     !double.IsInfinity (pt.X) &&
                     !double.IsInfinity (pt.Y) &&
-                    (!xAxis._scale.IsLog || pt.X > 0.0) &&
-                    (!yAxis._scale.IsLog || pt.Y > 0.0))
+                    (!xAxis.Scale.IsLog || pt.X > 0.0) &&
+                    (!yAxis.Scale.IsLog || pt.Y > 0.0))
                 {
                     var pixY = yAxis.Scale.Transform (curve.IsOverrideOrdinal, i, pt.Y);
                     var pixX = xAxis.Scale.Transform (curve.IsOverrideOrdinal, i, pt.X);
@@ -593,7 +593,7 @@ public class Line
                 {
                     path.AddCurve (arrPoints, 0, count - 2, tension);
 
-                    var yMin = yAxis._scale._min < 0 ? 0.0 : yAxis._scale._min;
+                    var yMin = yAxis.Scale._min < 0 ? 0.0 : yAxis.Scale._min;
                     CloseCurve (pane, curve, arrPoints, count, yMin, path);
 
                     var rect = path.GetBounds();
@@ -712,8 +712,8 @@ public class Line
         var yAxis = curve.GetYAxis (pane);
         var xAxis = curve.GetXAxis (pane);
 
-        var xIsLog = xAxis._scale.IsLog;
-        var yIsLog = yAxis._scale.IsLog;
+        var xIsLog = xAxis.Scale.IsLog;
+        var yIsLog = yAxis.Scale.IsLog;
 
         // switch to int to optimize drawing speed (per Dale-a-b)
         var minX = (int)pane.Chart.Rect.Left;
@@ -934,8 +934,8 @@ public class Line
         var yAxis = curve.GetYAxis (pane);
         var xAxis = curve.GetXAxis (pane);
 
-        var xIsLog = xAxis._scale.IsLog;
-        var yIsLog = yAxis._scale.IsLog;
+        var xIsLog = xAxis.Scale.IsLog;
+        var yIsLog = yAxis.Scale.IsLog;
 
         var minX = pane.Chart.Rect.Left;
         var maxX = pane.Chart.Rect.Right;

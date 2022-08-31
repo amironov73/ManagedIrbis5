@@ -366,7 +366,7 @@ public class BarSettings
     {
         var minStep = double.MaxValue;
 
-        if (list.Count <= 0 || baseAxis._scale.IsAnyOrdinal)
+        if (list.Count <= 0 || baseAxis.Scale.IsAnyOrdinal)
         {
             return 1.0;
         }
@@ -427,7 +427,7 @@ public class BarSettings
     /// <returns>The width of each bar cluster, in pixel units</returns>
     public float GetClusterWidth()
     {
-        return BarBaseAxis()._scale.GetClusterWidth (_ownerPane);
+        return BarBaseAxis().Scale.GetClusterWidth (_ownerPane);
     }
 
     /// <summary>

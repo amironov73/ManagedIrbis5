@@ -79,10 +79,10 @@ public class YAxis
     public YAxis (string title)
         : base (title)
     {
-        _isVisible = Default.IsVisible;
+        IsVisible = Default.IsVisible;
         _majorGrid._isZeroLine = Default.IsZeroLine;
-        _scale._fontSpec.Angle = 90.0F;
-        _title._fontSpec.Angle = -180F;
+        Scale._fontSpec.Angle = 90.0F;
+        Title._fontSpec.Angle = -180F;
     }
 
     /// <summary>
@@ -215,7 +215,7 @@ public class YAxis
     {
         double effCross = EffectiveCrossValue (pane);
 
-        if (!_crossAuto)
+        if (!CrossAuto)
         {
             return pane.XAxis.Scale._minPix - pane.XAxis.Scale.Transform (effCross);
         }

@@ -539,17 +539,35 @@ public class FontSpec
     /// <param name="fillBrush">The <see cref="Brush"/> to use for filling in the text background</param>
     /// <param name="fillType">The <see cref="FillType"/> to use for the
     /// text background</param>
-    public FontSpec (string family, float size, Color color, bool isBold,
-        bool isItalic, bool isUnderline, Color fillColor, Brush fillBrush,
-        FillType fillType)
+    public FontSpec
+        (
+            string family,
+            float size,
+            Color color,
+            bool isBold,
+            bool isItalic,
+            bool isUnderline,
+            Color fillColor,
+            Brush fillBrush,
+            FillType fillType
+        )
     {
         Init (family, size, color, isBold, isItalic, isUnderline,
             fillColor, fillBrush, fillType);
     }
 
-    private void Init (string family, float size, Color color, bool isBold,
-        bool isItalic, bool isUnderline, Color fillColor, Brush fillBrush,
-        FillType fillType)
+    private void Init
+        (
+            string family,
+            float size,
+            Color color,
+            bool isBold,
+            bool isItalic,
+            bool isUnderline,
+            Color fillColor,
+            Brush fillBrush,
+            FillType fillType
+        )
     {
         _fontColor = color;
         _family = family;
@@ -639,13 +657,17 @@ public class FontSpec
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected FontSpec (SerializationInfo info, StreamingContext context)
+    protected FontSpec
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
         var sch = info.GetInt32 ("schema");
 
-        _fontColor = (Color)info.GetValue ("fontColor", typeof (Color));
+        _fontColor = (Color) info.GetValue ("fontColor", typeof (Color));
         _family = info.GetString ("family");
         _isBold = info.GetBoolean ("isBold");
         _isItalic = info.GetBoolean ("isItalic");

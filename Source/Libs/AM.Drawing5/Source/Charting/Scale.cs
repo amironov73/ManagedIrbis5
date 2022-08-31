@@ -2202,7 +2202,7 @@ public abstract class Scale
                                    (_isSkipFirstLabel && !isMaxValueAtMaxPix)) &&
                                   pixVal > _maxPix - _minPix - edgeTolerance);
 
-                var isSkipCross = _isSkipCrossLabel && !_ownerAxis._crossAuto &&
+                var isSkipCross = _isSkipCrossLabel && !_ownerAxis.CrossAuto &&
                                   Math.Abs (_ownerAxis._cross - dVal) < rangeTol * 10.0;
 
                 isSkipZone = isSkipZone || isSkipCross;

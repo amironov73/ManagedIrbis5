@@ -31,24 +31,9 @@ public class Link
     #region Fields
 
     /// <summary>
-    /// Internal field that stores the title string for this link.
-    /// </summary>
-    internal string _title;
-
-    /// <summary>
-    /// Internal field that stores the url string for this link
-    /// </summary>
-    internal string _url;
-
-    /// <summary>
     /// Internal field that stores the target string for this link
     /// </summary>
-    internal string _target;
-
-    /// <summary>
-    /// Internal field that determines if this link is "live".
-    /// </summary>
-    internal bool _isEnabled;
+    internal string? _target;
 
     #endregion
 
@@ -62,11 +47,7 @@ public class Link
     /// hovers over the area of the object that owns this link.  Set the value to
     /// <see cref="String.Empty" /> to have no title.
     /// </remarks>
-    public string Title
-    {
-        get { return _title; }
-        set { _title = value; }
-    }
+    public string Title { get; set; }
 
     /// <summary>
     /// Gets or sets the url string for this link.
@@ -75,11 +56,7 @@ public class Link
     /// Set this value to <see cref="String.Empty" /> if you don't want to have
     /// a hyperlink associated with the object to which this link belongs.
     /// </remarks>
-    public string Url
-    {
-        get { return _url; }
-        set { _url = value; }
-    }
+    public string Url { get; set; }
 
     /// <summary>
     /// Gets or sets the target string for this link.
@@ -91,8 +68,8 @@ public class Link
     /// </remarks>
     public string Target
     {
-        get { return _target != string.Empty ? _target : "_self"; }
-        set { _target = value; }
+        get => _target != string.Empty ? _target : "_self";
+        set => _target = value;
     }
 
     /// <summary>
@@ -105,27 +82,20 @@ public class Link
     /// that you store in <see cref="Tag"/> must be a serializable type (or
     /// it will cause an exception).
     /// </remarks>
-    public object Tag;
+    public object? Tag;
 
     /// <summary>
     /// Gets or sets a property that determines if this link is active.  True to have
     /// a clickable link, false to ignore the link.
     /// </summary>
-    public bool IsEnabled
-    {
-        get { return _isEnabled; }
-        set { _isEnabled = value; }
-    }
+    public bool IsEnabled { get; set; }
 
     /// <summary>
     /// Gets a value that indicates if this <see cref="Link" /> is enabled
     /// (see <see cref="IsEnabled" />), and that either the
     /// <see cref="Url" /> or the <see cref="Title" /> is non-null.
     /// </summary>
-    public bool IsActive
-    {
-        get { return _isEnabled && (_url != null || _title != null); }
-    }
+    public bool IsActive => IsEnabled && (Url != null || Title != null);
 
     #endregion
 
@@ -136,11 +106,11 @@ public class Link
     /// </summary>
     public Link()
     {
-        _title = string.Empty;
-        _url = string.Empty;
+        Title = string.Empty;
+        Url = string.Empty;
         _target = string.Empty;
         Tag = null;
-        _isEnabled = false;
+        IsEnabled = false;
     }
 
     /// <summary>
@@ -151,11 +121,11 @@ public class Link
     /// <param name="target">The target for the link (typically "_blank" or "_self").</param>
     public Link (string title, string url, string target)
     {
-        _title = title;
-        _url = url;
+        Title = title;
+        Url = url;
         _target = target;
         Tag = null;
-        _isEnabled = true;
+        IsEnabled = true;
     }
 
     /// <summary>
@@ -165,10 +135,10 @@ public class Link
     public Link (Link rhs)
     {
         // Copy value types
-        _title = rhs._title;
-        _url = rhs._url;
+        Title = rhs.Title;
+        Url = rhs.Url;
         _target = rhs._target;
-        _isEnabled = false;
+        IsEnabled = false;
 
         // copy reference types by cloning
         if (rhs.Tag is ICloneable)
@@ -225,18 +195,18 @@ public class Link
     /// <returns>A string containing the url with an index parameter added.</returns>
     public virtual string MakeCurveItemUrl (GraphPane pane, CurveItem curve, int index)
     {
-        string url = _url;
+        var url = Url;
 
         if (url.IndexOf ('?') >= 0)
         {
-            url += "&index=" + index.ToString();
+            url += "&index=" + index;
         }
         else
         {
-            url += "?index=" + index.ToString();
+            url += "?index=" + index;
         }
 
-        Axis xAxis = curve.GetXAxis (pane);
+        var xAxis = curve.GetXAxis (pane);
         if (xAxis.Type == AxisType.Text && index >= 0 &&
             xAxis.Scale.TextLabels != null &&
             index <= xAxis.Scale.TextLabels.Length)
@@ -244,7 +214,7 @@ public class Link
             url += "&xtext=" + xAxis.Scale.TextLabels[index];
         }
 
-        Axis yAxis = curve.GetYAxis (pane);
+        var yAxis = curve.GetYAxis (pane);
         if (yAxis != null && yAxis.Type == AxisType.Text && index >= 0 &&
             yAxis.Scale.TextLabels != null &&
             index <= yAxis.Scale.TextLabels.Length)
@@ -284,10 +254,10 @@ public class Link
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema").NotUsed();
 
-        _title = info.GetString ("title");
-        _url = info.GetString ("url");
+        Title = info.GetString ("title");
+        Url = info.GetString ("url");
         _target = info.GetString ("target");
-        _isEnabled = info.GetBoolean ("isEnabled");
+        IsEnabled = info.GetBoolean ("isEnabled");
         Tag = info.GetValue ("Tag", typeof (object));
     }
 
@@ -299,10 +269,10 @@ public class Link
         )
     {
         info.AddValue ("schema", schema);
-        info.AddValue ("title", _title);
-        info.AddValue ("url", _url);
+        info.AddValue ("title", Title);
+        info.AddValue ("url", Url);
         info.AddValue ("target", _target);
-        info.AddValue ("isEnabled", _isEnabled);
+        info.AddValue ("isEnabled", IsEnabled);
         info.AddValue ("Tag", Tag);
     }
 
