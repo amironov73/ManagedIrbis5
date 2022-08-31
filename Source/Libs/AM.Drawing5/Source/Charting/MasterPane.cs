@@ -13,11 +13,8 @@
 
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.Collections;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -347,11 +344,16 @@ public class MasterPane
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected MasterPane (SerializationInfo info, StreamingContext context) : base (info, context)
+    protected MasterPane
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        var sch = info.GetInt32 ("schema2");
 
         _paneList = (PaneList)info.GetValue ("paneList", typeof (PaneList));
 
@@ -373,13 +375,12 @@ public class MasterPane
         }
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
@@ -406,8 +407,8 @@ public class MasterPane
     /// <param name="sender"></param>
     public void OnDeserialization (object sender)
     {
-        Bitmap bitmap = new Bitmap (10, 10);
-        Graphics g = Graphics.FromImage (bitmap);
+        var bitmap = new Bitmap (10, 10);
+        var g = Graphics.FromImage (bitmap);
         ReSize (g, _rect);
     }
 
@@ -463,7 +464,7 @@ public class MasterPane
     public void AxisChange()
     {
         using (var img = new Bitmap ((int)Rect.Width, (int)Rect.Height))
-        using (Graphics g = Graphics.FromImage (img))
+        using (var g = Graphics.FromImage (img))
             AxisChange (g);
     }
 
@@ -477,7 +478,7 @@ public class MasterPane
     /// </param>
     public void AxisChange (Graphics g)
     {
-        foreach (GraphPane pane in _paneList)
+        foreach (var pane in _paneList)
             pane.AxisChange (g);
     }
 
@@ -548,17 +549,17 @@ public class MasterPane
         {
             // Find the maximum scaleFactor of all the GraphPanes
             float maxFactor = 0;
-            foreach (GraphPane pane in PaneList)
+            foreach (var pane in PaneList)
             {
                 pane.BaseDimension = PaneBase.Default.BaseDimension;
-                float scaleFactor = pane.CalcScaleFactor();
+                var scaleFactor = pane.CalcScaleFactor();
                 maxFactor = scaleFactor > maxFactor ? scaleFactor : maxFactor;
             }
 
             // Now, calculate the base dimension
-            foreach (GraphPane pane in PaneList)
+            foreach (var pane in PaneList)
             {
-                float scaleFactor = pane.CalcScaleFactor();
+                var scaleFactor = pane.CalcScaleFactor();
                 pane.BaseDimension *= scaleFactor / maxFactor;
             }
         }
@@ -581,10 +582,10 @@ public class MasterPane
     public override void Draw (Graphics g)
     {
         // Save current AntiAlias mode
-        SmoothingMode sModeSave = g.SmoothingMode;
-        TextRenderingHint sHintSave = g.TextRenderingHint;
-        CompositingQuality sCompQual = g.CompositingQuality;
-        InterpolationMode sInterpMode = g.InterpolationMode;
+        var sModeSave = g.SmoothingMode;
+        var sHintSave = g.TextRenderingHint;
+        var sCompQual = g.CompositingQuality;
+        var sInterpMode = g.InterpolationMode;
 
         SetAntiAliasMode (g, _isAntiAlias);
 
@@ -598,7 +599,7 @@ public class MasterPane
             return;
         }
 
-        float scaleFactor = CalcScaleFactor();
+        var scaleFactor = CalcScaleFactor();
 
         // Clip everything to the rect
         g.SetClip (_rect);
@@ -613,7 +614,7 @@ public class MasterPane
         // Reset the clipping
         g.ResetClip();
 
-        foreach (GraphPane pane in _paneList)
+        foreach (var pane in _paneList)
             pane.Draw (g);
 
         // Clip everything to the rect
@@ -623,7 +624,7 @@ public class MasterPane
 
         // Recalculate the legend rect, just in case it has not yet been done
         // innerRect is the area for the GraphPane's
-        RectangleF innerRect = CalcClientRect (g, scaleFactor);
+        var innerRect = CalcClientRect (g, scaleFactor);
         _legend.CalcRect (g, this, scaleFactor, ref innerRect);
 
         //this.legend.SetLocation( this,
@@ -692,8 +693,8 @@ public class MasterPane
         index = -1;
 
         GraphObj saveGraphItem = null;
-        int saveIndex = -1;
-        float scaleFactor = CalcScaleFactor();
+        var saveIndex = -1;
+        var scaleFactor = CalcScaleFactor();
 
         // See if the point is in a GraphObj
         // If so, just save the object and index so we can see if other overlying objects were
@@ -712,7 +713,7 @@ public class MasterPane
             }
         }
 
-        foreach (GraphPane tPane in _paneList)
+        foreach (var tPane in _paneList)
         {
             if (tPane.Rect.Contains (mousePt))
             {
@@ -741,7 +742,7 @@ public class MasterPane
     /// null if no <see cref="GraphPane"/> was found.</returns>
     public GraphPane FindPane (PointF mousePt)
     {
-        foreach (GraphPane pane in _paneList)
+        foreach (var pane in _paneList)
         {
             if (pane.Rect.Contains (mousePt))
             {
@@ -761,7 +762,7 @@ public class MasterPane
     /// null if no <see cref="GraphPane"/> was found.</returns>
     public GraphPane FindChartRect (PointF mousePt)
     {
-        foreach (GraphPane pane in _paneList)
+        foreach (var pane in _paneList)
         {
             if (pane.Chart._rect.Contains (mousePt))
             {
@@ -845,9 +846,9 @@ public class MasterPane
             columns = 1;
         }
 
-        int[] countList = new int[rows];
+        var countList = new int[rows];
 
-        for (int i = 0; i < rows; i++)
+        for (var i = 0; i < rows; i++)
             countList[i] = columns;
 
         SetLayout (g, true, countList, null);
@@ -925,8 +926,8 @@ public class MasterPane
             _prop = new float[countList.Length];
 
             // Sum up the total proportional factors
-            float sumProp = 0.0f;
-            for (int i = 0; i < countList.Length; i++)
+            var sumProp = 0.0f;
+            for (var i = 0; i < countList.Length; i++)
             {
                 _prop[i] = (proportion == null || proportion.Length <= i || proportion[i] < 1e-10)
                     ? 1.0f
@@ -935,7 +936,7 @@ public class MasterPane
             }
 
             // Make prop sum to 1.0
-            for (int i = 0; i < countList.Length; i++)
+            for (var i = 0; i < countList.Length; i++)
                 _prop[i] /= sumProp;
 
             _isColumnSpecified = isColumnSpecified;
@@ -964,7 +965,7 @@ public class MasterPane
         }
         else
         {
-            int count = _paneList.Count;
+            var count = _paneList.Count;
             if (count == 0)
             {
                 return;
@@ -1059,9 +1060,9 @@ public class MasterPane
             columns = 1;
         }
 
-        int[] countList = new int[rows];
+        var countList = new int[rows];
 
-        for (int i = 0; i < rows; i++)
+        for (var i = 0; i < rows; i++)
             countList[i] = columns;
 
         DoLayout (g, true, countList, null);
@@ -1076,40 +1077,40 @@ public class MasterPane
         float[] proportion)
     {
         // calculate scaleFactor on "normal" pane size (BaseDimension)
-        float scaleFactor = CalcScaleFactor();
+        var scaleFactor = CalcScaleFactor();
 
         // innerRect is the area for the GraphPane's
-        RectangleF innerRect = CalcClientRect (g, scaleFactor);
+        var innerRect = CalcClientRect (g, scaleFactor);
         _legend.CalcRect (g, this, scaleFactor, ref innerRect);
 
         // scaled InnerGap is the area between the GraphPane.Rect's
-        float scaledInnerGap = (float)(_innerPaneGap * scaleFactor);
+        var scaledInnerGap = (float)(_innerPaneGap * scaleFactor);
 
-        int iPane = 0;
+        var iPane = 0;
 
         if (isColumnSpecified)
         {
-            int rows = countList.Length;
+            var rows = countList.Length;
 
-            float y = 0.0f;
+            var y = 0.0f;
 
-            for (int rowNum = 0; rowNum < rows; rowNum++)
+            for (var rowNum = 0; rowNum < rows; rowNum++)
             {
-                float propFactor = _prop == null ? 1.0f / rows : _prop[rowNum];
+                var propFactor = _prop == null ? 1.0f / rows : _prop[rowNum];
 
-                float height = (innerRect.Height - (float)(rows - 1) * scaledInnerGap) *
-                               propFactor;
+                var height = (innerRect.Height - (float)(rows - 1) * scaledInnerGap) *
+                             propFactor;
 
-                int columns = countList[rowNum];
+                var columns = countList[rowNum];
                 if (columns <= 0)
                 {
                     columns = 1;
                 }
 
-                float width = (innerRect.Width - (float)(columns - 1) * scaledInnerGap) /
-                              (float)columns;
+                var width = (innerRect.Width - (float)(columns - 1) * scaledInnerGap) /
+                            (float)columns;
 
-                for (int colNum = 0; colNum < columns; colNum++)
+                for (var colNum = 0; colNum < columns; colNum++)
                 {
                     if (iPane >= _paneList.Count)
                     {
@@ -1129,26 +1130,26 @@ public class MasterPane
         }
         else
         {
-            int columns = countList.Length;
+            var columns = countList.Length;
 
-            float x = 0.0f;
+            var x = 0.0f;
 
-            for (int colNum = 0; colNum < columns; colNum++)
+            for (var colNum = 0; colNum < columns; colNum++)
             {
-                float propFactor = _prop == null ? 1.0f / columns : _prop[colNum];
+                var propFactor = _prop == null ? 1.0f / columns : _prop[colNum];
 
-                float width = (innerRect.Width - (float)(columns - 1) * scaledInnerGap) *
-                              propFactor;
+                var width = (innerRect.Width - (float)(columns - 1) * scaledInnerGap) *
+                            propFactor;
 
-                int rows = countList[colNum];
+                var rows = countList[colNum];
                 if (rows <= 0)
                 {
                     rows = 1;
                 }
 
-                float height = (innerRect.Height - (float)(rows - 1) * scaledInnerGap) / (float)rows;
+                var height = (innerRect.Height - (float)(rows - 1) * scaledInnerGap) / (float)rows;
 
-                for (int rowNum = 0; rowNum < rows; rowNum++)
+                for (var rowNum = 0; rowNum < rows; rowNum++)
                 {
                     if (iPane >= _paneList.Count)
                     {
