@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* BoxObj.cs --
+/* BoxObj.cs -- объект прямоугольника с рамкой и/или заливкой
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -13,8 +13,8 @@
 
 using System;
 using System.Drawing;
+using System.Globalization;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -23,11 +23,10 @@ using System.Security.Permissions;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// A class that represents a bordered and/or filled box (rectangle) object on
-/// the graph.  A list of
-/// BoxObj objects is maintained by the <see cref="GraphObjList"/> collection class.
+/// Класс, представляющий объект прямоугольника с рамкой и/или заливкой
+/// на графике. Список объектов <code>BoxObj</code> поддерживается классом
+/// коллекции <see cref="GraphObjList"/>.
 /// </summary>
-/// <version> $Revision: 3.3 $ $Date: 2007-01-25 07:56:08 $ </version>
 [Serializable]
 public class BoxObj
     : GraphObj, ICloneable, ISerializable
@@ -230,21 +229,22 @@ public class BoxObj
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected BoxObj (SerializationInfo info, StreamingContext context) : base (info, context)
+    protected BoxObj
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        info.GetInt32 ("schema2").NotUsed();
 
-        _fill = (Fill)info.GetValue ("fill", typeof (Fill));
-        _border = (Border)info.GetValue ("border", typeof (Border));
+        _fill = (Fill) info.GetValue ("fill", typeof (Fill)).ThrowIfNull ();
+        _border = (Border) info.GetValue ("border", typeof (Border)).ThrowIfNull ();
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -271,10 +271,10 @@ public class BoxObj
     {
         // Convert the arrow coordinates from the user coordinate system
         // to the screen coordinate system
-        RectangleF pixRect = Location.TransformRect (pane);
+        var pixRect = Location.TransformRect (pane);
 
         // Clip the rect to just outside the PaneRect so we don't end up with wild coordinates.
-        RectangleF tmpRect = pane.Rect;
+        var tmpRect = pane.Rect;
         tmpRect.Inflate (20, 20);
         pixRect.Intersect (tmpRect);
 
@@ -307,7 +307,7 @@ public class BoxObj
 
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
-        RectangleF pixRect = _location.TransformRect (pane);
+        var pixRect = _location.TransformRect (pane);
 
         return pixRect.Contains (point);
     }
@@ -315,16 +315,25 @@ public class BoxObj
     /// <summary>
     /// Determines the shape type and Coords values for this GraphObj
     /// </summary>
-    public override void GetCoords (PaneBase pane, Graphics graphics, float scaleFactor,
-        out string shape, out string coords)
+    public override void GetCoords
+        (
+            PaneBase pane,
+            Graphics graphics,
+            float scaleFactor,
+            out string shape,
+            out string coords
+        )
     {
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
-        RectangleF pixRect = _location.TransformRect (pane);
+        var pixRect = _location.TransformRect (pane);
 
         shape = "rect";
-        coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
-            pixRect.Left, pixRect.Top, pixRect.Right, pixRect.Bottom);
+        coords = string.Create
+            (
+                CultureInfo.InvariantCulture,
+                $"{pixRect.Left:f0},{pixRect.Top:f0},{pixRect.Right:f0},{pixRect.Bottom:f0}"
+            );
     }
 
     #endregion

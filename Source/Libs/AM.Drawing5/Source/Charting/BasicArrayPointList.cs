@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* BasicArrayPointList
+/* BasicArrayPointList.cs -- класс-коллекция точек
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,7 +20,8 @@ using System;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// A data collection class for ZedGraph, provided as an alternative to <see cref="PointPairList" />.
+/// Класс-коллекция для ZedGraph, предоставляемый
+/// в качестве альтернативы <see cref="PointPairList" />.
 /// </summary>
 /// <remarks>
 /// The data storage class for ZedGraph can be any type, so long as it uses the <see cref="IPointList" />
@@ -31,7 +32,8 @@ namespace AM.Drawing.Charting;
 /// <seealso cref="PointPairList" />
 /// <seealso cref="IPointList" />
 [Serializable]
-public class BasicArrayPointList : IPointList
+public class BasicArrayPointList
+    : IPointList
 {
     #region Fields
 
@@ -103,10 +105,7 @@ public class BasicArrayPointList : IPointList
     /// Returns the number of points available in the arrays.  Count will be the greater
     /// of the lengths of the X and Y arrays.
     /// </summary>
-    public int Count
-    {
-        get { return x.Length > y.Length ? x.Length : y.Length; }
-    }
+    public int Count => x.Length > y.Length ? x.Length : y.Length;
 
     #endregion
 

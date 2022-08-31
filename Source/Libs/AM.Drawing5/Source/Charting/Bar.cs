@@ -22,8 +22,8 @@ using System.Runtime.Serialization;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// A class representing all the characteristics of the bar
-/// segments that make up a curve on the graph.
+/// Класс, представляющий все характеристики сегментов столбцов,
+/// составляющих кривую на графике.
 /// </summary>
 [Serializable]
 public class Bar
@@ -89,9 +89,7 @@ public class Bar
         /// The default custom brush for filling in the bars
         /// (<see cref="Fill.Brush"/> property).
         /// </summary>
-        public static Brush? FillBrush = null; //new LinearGradientBrush( new Rectangle(0,0,100,100),
-
-        // Color.White, Color.Red, 0F );
+        public static Brush? FillBrush = null;
     }
 
     #endregion
@@ -102,8 +100,10 @@ public class Bar
     /// Default constructor that sets all <see cref="Bar"/> properties to default
     /// values as defined in the <see cref="Default"/> class.
     /// </summary>
-    public Bar() : this (Color.Empty)
+    public Bar()
+        : this (Color.Empty)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -142,17 +142,16 @@ public class Bar
     /// The Copy Constructor
     /// </summary>
     /// <param name="rhs">The Bar object from which to copy</param>
-    public Bar (Bar rhs)
+    public Bar
+        (
+            Bar rhs
+        )
     {
-        _border = (Border)rhs.Border.Clone();
-        _fill = (Fill)rhs.Fill.Clone();
+        _border = rhs.Border.Clone();
+        _fill = rhs.Fill.Clone();
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -187,17 +186,13 @@ public class Bar
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        info.GetInt32 ("schema").NotUsed();
 
-        _fill = (Fill)info.GetValue ("fill", typeof (Fill));
-        _border = (Border)info.GetValue ("border", typeof (Border));
+        _fill = (Fill) info.GetValue ("fill", typeof (Fill)).ThrowIfNull();
+        _border = (Border) info.GetValue ("border", typeof (Border)).ThrowIfNull();
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public virtual void GetObjectData
         (
             SerializationInfo info,
@@ -221,8 +216,8 @@ public class Bar
     /// <seealso cref="Default.BorderColor"/>
     public Border Border
     {
-        get { return _border; }
-        set { _border = value; }
+        get => _border;
+        set => _border = value;
     }
 
     /// <summary>
@@ -231,8 +226,8 @@ public class Bar
     /// </summary>
     public Fill Fill
     {
-        get { return _fill; }
-        set { _fill = value; }
+        get => _fill;
+        set => _fill = value;
     }
 
     #endregion
@@ -272,14 +267,24 @@ public class Bar
     /// <param name="isSelected">Indicates that the <see cref="Bar" /> should be drawn
     /// with attributes from the <see cref="Selection" /> class.
     /// </param>
-    public void Draw (Graphics graphics, GraphPane pane, float left, float right, float top,
-        float bottom, float scaleFactor, bool fullFrame, bool isSelected,
-        PointPair dataValue)
+    public void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            float left,
+            float right,
+            float top,
+            float bottom,
+            float scaleFactor,
+            bool fullFrame,
+            bool isSelected,
+            PointPair dataValue
+        )
     {
         // Do a sanity check to make sure the top < bottom.  If not, reverse them
         if (top > bottom)
         {
-            float junk = top;
+            var junk = top;
             top = bottom;
             bottom = junk;
         }
@@ -287,7 +292,7 @@ public class Bar
         // Do a sanity check to make sure the left < right.  If not, reverse them
         if (left > right)
         {
-            float junk = right;
+            var junk = right;
             right = left;
             left = junk;
         }
@@ -329,7 +334,7 @@ public class Bar
         }
 
         // Make a rectangle for the bar and draw it
-        RectangleF rect = new RectangleF (left, top, right - left, bottom - top);
+        var rect = new RectangleF (left, top, right - left, bottom - top);
 
         Draw (graphics, pane, rect, scaleFactor, fullFrame, isSelected, dataValue);
     }
@@ -389,7 +394,7 @@ public class Bar
     /// is normally only called by the <see cref="BarItem.Draw"/> method of the
     /// <see cref="BarItem"/> object
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -416,22 +421,31 @@ public class Bar
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public void DrawBars (Graphics g, GraphPane pane, CurveItem curve,
-        Axis baseAxis, Axis valueAxis,
-        float barWidth, int pos, float scaleFactor)
+    public void DrawBars
+        (
+            Graphics graphics,
+            GraphPane pane,
+            CurveItem curve,
+            Axis baseAxis,
+            Axis valueAxis,
+            float barWidth,
+            int pos,
+            float scaleFactor
+        )
     {
         // For non-cluster bar types, the position is always zero since the bars are on top
         // of eachother
-        BarType barType = pane._barSettings.Type;
-        if (barType == BarType.Overlay || barType == BarType.Stack || barType == BarType.PercentStack ||
-            barType == BarType.SortedOverlay)
+        var barType = pane._barSettings.Type;
+        if (barType is BarType.Overlay or BarType.Stack or BarType.PercentStack or BarType.SortedOverlay)
         {
             pos = 0;
         }
 
         // Loop over each defined point and draw the corresponding bar
-        for (int i = 0; i < curve.Points.Count; i++)
-            DrawSingleBar (g, pane, curve, i, pos, baseAxis, valueAxis, barWidth, scaleFactor);
+        for (var i = 0; i < curve.Points.Count; i++)
+        {
+            DrawSingleBar (graphics, pane, curve, i, pos, baseAxis, valueAxis, barWidth, scaleFactor);
+        }
     }
 
     /// <summary>
@@ -440,7 +454,7 @@ public class Bar
     /// <see cref="DrawBars"/>, which draws the bars for all points.  It is intended to be used
     /// only for <see cref="BarType.SortedOverlay"/>, which requires special handling of each bar.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -470,9 +484,18 @@ public class Bar
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public void DrawSingleBar (Graphics g, GraphPane pane, CurveItem curve,
-        Axis baseAxis, Axis valueAxis,
-        int pos, int index, float barWidth, float scaleFactor)
+    public void DrawSingleBar
+        (
+            Graphics graphics,
+            GraphPane pane,
+            CurveItem curve,
+            Axis baseAxis,
+            Axis valueAxis,
+            int pos,
+            int index,
+            float barWidth,
+            float scaleFactor
+        )
     {
         // Make sure that a bar value exists for the current curve and current ordinal position
         if (index >= curve.Points.Count)
@@ -482,21 +505,20 @@ public class Bar
 
         // For Overlay and Stack bars, the position is always zero since the bars are on top
         // of eachother
-        if (pane._barSettings.Type == BarType.Overlay || pane._barSettings.Type == BarType.Stack ||
-            pane._barSettings.Type == BarType.PercentStack)
+        if (pane._barSettings.Type is BarType.Overlay or BarType.Stack or BarType.PercentStack)
         {
             pos = 0;
         }
 
         // Draw the specified bar
-        DrawSingleBar (g, pane, curve, index, pos, baseAxis, valueAxis, barWidth, scaleFactor);
+        DrawSingleBar (graphics, pane, curve, index, pos, baseAxis, valueAxis, barWidth, scaleFactor);
     }
 
     /// <summary>
     /// Protected internal routine that draws the specified single bar (an individual "point")
     /// of this series to the specified <see cref="Graphics"/> device.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -526,27 +548,35 @@ public class Bar
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    protected virtual void DrawSingleBar (Graphics g, GraphPane pane,
-        CurveItem curve,
-        int index, int pos, Axis baseAxis, Axis valueAxis,
-        float barWidth, float scaleFactor)
+    protected virtual void DrawSingleBar
+        (
+            Graphics graphics,
+            GraphPane pane,
+            CurveItem curve,
+            int index,
+            int pos,
+            Axis baseAxis,
+            Axis valueAxis,
+            float barWidth,
+            float scaleFactor
+        )
     {
         // pixBase = pixel value for the bar center on the base axis
         // pixHiVal = pixel value for the bar top on the value axis
         // pixLowVal = pixel value for the bar bottom on the value axis
         float pixBase, pixHiVal, pixLowVal;
 
-        float clusterWidth = pane.BarSettings.GetClusterWidth();
+        var clusterWidth = pane.BarSettings.GetClusterWidth();
 
         //float barWidth = curve.GetBarWidth( pane );
-        float clusterGap = pane._barSettings.MinClusterGap * barWidth;
-        float barGap = barWidth * pane._barSettings.MinBarGap;
+        var clusterGap = pane._barSettings.MinClusterGap * barWidth;
+        var barGap = barWidth * pane._barSettings.MinBarGap;
 
         // curBase = the scale value on the base axis of the current bar
         // curHiVal = the scale value on the value axis of the current bar
         // curLowVal = the scale value of the bottom of the bar
         double curBase, curLowVal, curHiVal;
-        ValueHandler valueHandler = new ValueHandler (pane, false);
+        var valueHandler = new ValueHandler (pane, false);
         valueHandler.GetValues (curve, index, out curBase, out curLowVal, out curHiVal);
 
         // Any value set to double max is invalid and should be skipped
@@ -564,19 +594,19 @@ public class Bar
             pixBase = baseAxis.Scale.Transform (curve.IsOverrideOrdinal, index, curBase);
 
             // Calculate the pixel location for the side of the bar (on the base axis)
-            float pixSide = pixBase - clusterWidth / 2.0F + clusterGap / 2.0F +
-                            pos * (barWidth + barGap);
+            var pixSide = pixBase - clusterWidth / 2.0F + clusterGap / 2.0F +
+                          pos * (barWidth + barGap);
 
             // Draw the bar
             if (pane._barSettings.Base == BarBase.X)
             {
-                Draw (g, pane, pixSide, pixSide + barWidth, pixLowVal,
+                Draw (graphics, pane, pixSide, pixSide + barWidth, pixLowVal,
                     pixHiVal, scaleFactor, true, curve.IsSelected,
                     curve.Points[index]);
             }
             else
             {
-                Draw (g, pane, pixLowVal, pixHiVal, pixSide, pixSide + barWidth,
+                Draw (graphics, pane, pixLowVal, pixHiVal, pixSide, pixSide + barWidth,
                     scaleFactor, true, curve.IsSelected,
                     curve.Points[index]);
             }

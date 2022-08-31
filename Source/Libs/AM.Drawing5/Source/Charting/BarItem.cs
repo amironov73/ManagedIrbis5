@@ -78,7 +78,11 @@ public class BarItem
     /// Create a new <see cref="BarItem"/>, specifying only the legend label for the bar.
     /// </summary>
     /// <param name="label">The label that will appear in the legend.</param>
-    public BarItem (string label) : base (label)
+    public BarItem
+        (
+            string label
+        )
+        : base (label)
     {
         Bar = new Bar();
     }
@@ -94,7 +98,13 @@ public class BarItem
     /// <param name="color">A <see cref="Color"/> value that will be applied to
     /// the <see cref="Charting.Bar.Fill"/> and <see cref="Charting.Bar.Border"/> properties.
     /// </param>
-    public BarItem (string label, double[] x, double[] y, Color color)
+    public BarItem
+        (
+            string label,
+            double[] x,
+            double[] y,
+            Color color
+        )
         : this (label, new PointPairList (x, y), color)
     {
     }
@@ -108,7 +118,12 @@ public class BarItem
     /// <param name="color">A <see cref="Color"/> value that will be applied to
     /// the <see cref="Charting.Bar.Fill"/> and <see cref="Charting.Bar.Border"/> properties.
     /// </param>
-    public BarItem (string label, IPointList points, Color color)
+    public BarItem
+        (
+            string label,
+            IPointList points,
+            Color color
+        )
         : base (label, points)
     {
         Bar = new Bar (color);
@@ -118,7 +133,11 @@ public class BarItem
     /// The Copy Constructor
     /// </summary>
     /// <param name="rhs">The <see cref="BarItem"/> object from which to copy</param>
-    public BarItem (BarItem rhs) : base (rhs)
+    public BarItem
+        (
+            BarItem rhs
+        )
+        : base (rhs)
     {
         //bar = new Bar( rhs.Bar );
         Bar = rhs.Bar.Clone();

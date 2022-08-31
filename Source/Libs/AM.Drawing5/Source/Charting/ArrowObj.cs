@@ -4,8 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable RedundantExtendsListEntry
 
-/* ArrowObj.cs --
+/* ArrowObj.cs -- стрелка или линейный объект на графике
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -13,9 +14,7 @@
 
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -24,8 +23,9 @@ using System.Security.Permissions;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// A class that represents a graphic arrow or line object on the graph.  A list of
-/// ArrowObj objects is maintained by the <see cref="GraphObjList"/> collection class.
+/// Класс, представляющий графическую стрелку или линейный объект
+/// на графике. Список объектов <see cref="ArrowObj"/>
+/// поддерживается классом коллекции <see cref="GraphObjList"/>.
 /// </summary>
 [Serializable]
 public class ArrowObj
@@ -187,11 +187,7 @@ public class ArrowObj
         _isArrowHead = rhs.IsArrowHead;
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -237,7 +233,7 @@ public class ArrowObj
         _isArrowHead = info.GetBoolean ("isArrowHead");
     }
 
-    /// <inheritdoc cref="LineObj.GetObjectData"/>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -267,11 +263,11 @@ public class ArrowObj
         var pix1 = Location.TransformTopLeft (pane);
         var pix2 = Location.TransformBottomRight (pane);
 
-        if (pix1.X > -10000 && pix1.X < 100000 && pix1.Y > -100000 && pix1.Y < 100000 &&
-            pix2.X > -10000 && pix2.X < 100000 && pix2.Y > -100000 && pix2.Y < 100000)
+        if (pix1.X is > -10000 and < 100000 && pix1.Y is > -100000 and < 100000 &&
+            pix2.X is > -10000 and < 100000 && pix2.Y is > -100000 and < 100000)
         {
             // get a scaled size for the arrowhead
-            var scaledSize = (float)(_size * scaleFactor);
+            var scaledSize = _size * scaleFactor;
 
             // calculate the length and the angle of the arrow "vector"
             double dy = pix2.Y - pix1.Y;
@@ -292,8 +288,6 @@ public class ArrowObj
 
             // get a pen according to this arrow properties
             using (var pen = _line.GetPen (pane, scaleFactor))
-
-                //new Pen( _color, pane.ScaledPenWidth( _penWidth, scaleFactor ) ) )
             {
                 //pen.DashStyle = _style;
 
@@ -306,13 +300,13 @@ public class ArrowObj
                     // Create a polygon representing the arrowhead based on the scaled
                     // size
                     var polyPt = new PointF[4];
-                    var hsize = scaledSize / 3.0F;
+                    var horizontalSize = scaledSize / 3.0F;
                     polyPt[0].X = length;
                     polyPt[0].Y = 0;
                     polyPt[1].X = length - scaledSize;
-                    polyPt[1].Y = hsize;
+                    polyPt[1].Y = horizontalSize;
                     polyPt[2].X = length - scaledSize;
-                    polyPt[2].Y = -hsize;
+                    polyPt[2].Y = -horizontalSize;
                     polyPt[3] = polyPt[0];
 
                     using var brush = new SolidBrush (_line._color);

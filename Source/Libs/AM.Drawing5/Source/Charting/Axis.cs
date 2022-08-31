@@ -123,7 +123,6 @@ public abstract class Axis
     /// </summary>
     public event ScaleFormatHandler? ScaleFormatEvent;
 
-    // Revision: JCarpenter 10/06
     /// <summary>
     /// Allow customization of title based on user preferences.
     /// </summary>
@@ -135,7 +134,6 @@ public abstract class Axis
     /// <seealso cref="ScaleFormatEvent" />
     public delegate string ScaleTitleEventHandler (Axis axis);
 
-    //Revision: JCarpenter 10/06
     /// <summary>
     /// Allow customization of the title when the scale is very large
     /// Subscribe to this event to handle custom formatting of the scale axis label.
@@ -439,17 +437,11 @@ public abstract class Axis
         info.AddValue ("minorGrid", _minorGrid);
 
         info.AddValue ("isVisible", IsVisible);
-
         info.AddValue ("title", Title);
-
         info.AddValue ("minSpace", _minSpace);
-
         info.AddValue ("color", _color);
-
         info.AddValue ("isAxisSegmentVisible", IsAxisSegmentVisible);
-
         info.AddValue ("axisGap", _axisGap);
-
         info.AddValue ("scale", Scale);
     }
 
@@ -460,7 +452,7 @@ public abstract class Axis
     /// <summary>
     /// Gets the <see cref="Scale" /> instance associated with this <see cref="Axis" />.
     /// </summary>
-    public Scale Scale { get; internal set; }
+    public Scale? Scale { get; internal set; }
 
     /// <summary>
     /// Gets or sets the scale value at which this axis should cross the "other" axis.
@@ -1458,15 +1450,10 @@ public abstract class Axis
     {
         // if there is a valid ScaleFormatEvent, then try to use it to create the label
         // the label will be non-null if it's to be used
-        if (ScaleFormatEvent != null)
+        var label = ScaleFormatEvent?.Invoke (pane, this, dVal, index);
+        if (label is not null)
         {
-            string label;
-
-            label = ScaleFormatEvent (pane, this, dVal, index);
-            if (label != null)
-            {
-                return label;
-            }
+            return label;
         }
 
         // second try.  If there's no custom ScaleFormatEvent, then just call

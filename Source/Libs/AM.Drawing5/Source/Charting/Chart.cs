@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* Chart.cs --
+/* Chart.cs -- класс, обрабатывающий свойства области диаграммы
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,7 +14,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -23,9 +22,9 @@ using System.Security.Permissions;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// Class that handles the properties of the charting area (where the curves are
-/// actually drawn), which is bounded by the <see cref="XAxis" />, <see cref="YAxis"/>,
-/// and <see cref="Y2Axis" />.
+/// Класс, который обрабатывает свойства области диаграммы
+/// (где фактически рисуются кривые), которая ограничена
+/// <see cref="XAxis" />, <see cref="YAxis"/> и <see cref="Y2Axis " />.
 /// </summary>
 [Serializable]
 public class Chart
@@ -71,7 +70,10 @@ public class Chart
     /// Copy constructor
     /// </summary>
     /// <param name="rhs">The source <see cref="Chart" /> to be copied.</param>
-    public Chart (Chart rhs)
+    public Chart
+        (
+            Chart rhs
+        )
     {
         _border = rhs._border.Clone();
         _fill = rhs._fill.Clone();
@@ -111,7 +113,7 @@ public class Chart
     /// <value>The rectangle units are in screen pixels</value>
     public RectangleF Rect
     {
-        get { return _rect; }
+        get => _rect;
         set
         {
             _rect = value;
@@ -125,8 +127,8 @@ public class Chart
     /// </summary>
     public Fill Fill
     {
-        get { return _fill; }
-        set { _fill = value; }
+        get => _fill;
+        set => _fill = value;
     }
 
     /// <summary>
@@ -137,8 +139,8 @@ public class Chart
     /// <seealso cref="Default.BorderPenWidth"/>
     public Border Border
     {
-        get { return _border; }
-        set { _border = value; }
+        get => _border;
+        set => _border = value;
     }
 
     /// <summary>
@@ -157,8 +159,8 @@ public class Chart
     /// <value>true to have ZedGraph calculate the ChartRect, false to do it yourself</value>
     public bool IsRectAuto
     {
-        get { return _isRectAuto; }
-        set { _isRectAuto = value; }
+        get => _isRectAuto;
+        set => _isRectAuto = value;
     }
 
     #endregion
@@ -185,11 +187,11 @@ public class Chart
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        var sch = info.GetInt32 ("schema");
+        info.GetInt32 ("schema").NotUsed();
 
-        _rect = (RectangleF)info.GetValue ("rect", typeof (RectangleF));
-        _fill = (Fill)info.GetValue ("fill", typeof (Fill));
-        _border = (Border)info.GetValue ("border", typeof (Border));
+        _rect = (RectangleF) info.GetValue ("rect", typeof (RectangleF)).ThrowIfNull();
+        _fill = (Fill) info.GetValue ("fill", typeof (Fill)).ThrowIfNull();
+        _border = (Border) info.GetValue ("border", typeof (Border)).ThrowIfNull();
         _isRectAuto = info.GetBoolean ("isRectAuto");
     }
 
@@ -237,7 +239,7 @@ public class Chart
         /// The default brush for the <see cref="GraphPane.Chart"/> background.
         /// (<see cref="Fill.Brush"/> property of <see cref="Chart.Fill"/>).
         /// </summary>
-        public static Brush FillBrush = null;
+        public static Brush? FillBrush = null;
 
         /// <summary>
         /// The default <see cref="FillType"/> for the <see cref="GraphPane.Chart"/> background.

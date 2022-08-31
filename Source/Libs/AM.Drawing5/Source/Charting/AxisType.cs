@@ -4,8 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
-/* AxisType.cs --
+/* AxisType.cs -- доступные типы осей
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +22,7 @@ using System.Drawing.Drawing2D;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// Enumeration type for the various axis types that are available
+/// Тип перечисления для различных доступных типов осей.
 /// </summary>
 /// <seealso cref="Axis.Type"/>
 public enum AxisType

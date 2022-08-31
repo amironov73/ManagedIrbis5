@@ -5,17 +5,14 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* BarSettings.cs --
+/* BarSettings.cs -- обрабатывает глобальные настройки гистограмм
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Drawing;
-using System.Text;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -24,7 +21,7 @@ using System.Security.Permissions;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// Class that handles the global settings for bar charts
+/// Класс, который обрабатывает глобальные настройки гистограмм.
 /// </summary>
 [Serializable]
 public class BarSettings
@@ -88,7 +85,10 @@ public class BarSettings
     /// <summary>
     /// Constructor to build a <see cref="BarSettings" /> instance from the defaults.
     /// </summary>
-    public BarSettings (GraphPane parentPane)
+    public BarSettings
+        (
+            GraphPane parentPane
+        )
     {
         _minClusterGap = Default.MinClusterGap;
         _minBarGap = Default.MinBarGap;
@@ -106,7 +106,11 @@ public class BarSettings
     /// <param name="rhs">the <see cref="BarSettings" /> instance to be copied.</param>
     /// <param name="parentPane">The <see cref="GraphPane" /> that will be the
     /// parent of this new BarSettings object.</param>
-    public BarSettings (BarSettings rhs, GraphPane parentPane)
+    public BarSettings
+        (
+            BarSettings rhs,
+            GraphPane parentPane
+        )
     {
         _minClusterGap = rhs._minClusterGap;
         _minBarGap = rhs._minBarGap;
@@ -131,8 +135,8 @@ public class BarSettings
     /// <seealso cref="ClusterScaleWidth"/>
     public float MinClusterGap
     {
-        get { return _minClusterGap; }
-        set { _minClusterGap = value; }
+        get => _minClusterGap;
+        set => _minClusterGap = value;
     }
 
     /// <summary>
@@ -145,8 +149,8 @@ public class BarSettings
     /// <seealso cref="ClusterScaleWidth"/>
     public float MinBarGap
     {
-        get { return _minBarGap; }
-        set { _minBarGap = value; }
+        get => _minBarGap;
+        set => _minBarGap = value;
     }
 
     /// <summary>Determines the base axis from which <see cref="Bar"/>
@@ -158,8 +162,8 @@ public class BarSettings
     /// <seealso cref="Default.Base"/>
     public BarBase Base
     {
-        get { return _base; }
-        set { _base = value; }
+        get => _base;
+        set => _base = value;
     }
 
     /// <summary>Determines how the <see cref="BarItem"/>
@@ -169,8 +173,8 @@ public class BarSettings
     /// <seealso cref="Default.Type"/>
     public BarType Type
     {
-        get { return _type; }
-        set { _type = value; }
+        get => _type;
+        set => _type = value;
     }
 
     /// <summary>
@@ -196,7 +200,7 @@ public class BarSettings
     /// <seealso cref="MinClusterGap"/>
     public double ClusterScaleWidth
     {
-        get { return _clusterScaleWidth; }
+        get => _clusterScaleWidth;
         set
         {
             _clusterScaleWidth = value;
@@ -217,8 +221,8 @@ public class BarSettings
     /// <seealso cref="ClusterScaleWidth"/>
     public bool ClusterScaleWidthAuto
     {
-        get { return _clusterScaleWidthAuto; }
-        set { _clusterScaleWidthAuto = value; }
+        get => _clusterScaleWidthAuto;
+        set => _clusterScaleWidthAuto = value;
     }
 
     #endregion
@@ -242,7 +246,11 @@ public class BarSettings
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains
     /// the serialized data
     /// </param>
-    internal BarSettings (SerializationInfo info, StreamingContext context)
+    internal BarSettings
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
@@ -252,15 +260,11 @@ public class BarSettings
         _minBarGap = info.GetSingle ("minBarGap");
         _clusterScaleWidth = info.GetDouble ("clusterScaleWidth");
         _clusterScaleWidthAuto = info.GetBoolean ("clusterScaleWidthAuto");
-        _base = (BarBase)info.GetValue ("base", typeof (BarBase));
-        _type = (BarType)info.GetValue ("type", typeof (BarType));
+        _base = (BarBase) info.GetValue ("base", typeof (BarBase)).ThrowIfNull();
+        _type = (BarType) info.GetValue ("type", typeof (BarType)).ThrowIfNull();
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public virtual void GetObjectData
         (
             SerializationInfo info,
@@ -362,7 +366,10 @@ public class BarSettings
     /// of interest</param>
     /// <param name="baseAxis">The base axis for the bar</param>
     /// <returns>The minimum increment between bars along the base axis</returns>
-    internal static double GetMinStepSize (IPointList list, Axis baseAxis)
+    internal static double GetMinStepSize
+        (
+            IPointList list, Axis baseAxis
+        )
     {
         var minStep = double.MaxValue;
 

@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* Border.cs --
+/* Border.cs -- свойства границы (фрейма) для объекта
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,9 +14,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -25,8 +23,9 @@ using System.Security.Permissions;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// A class that encapsulates Border (frame) properties for an object.  The <see cref="Border"/> class
-/// is used in a variety of ZedGraph objects to handle the drawing of the Border around the object.
+/// Класс, который инкапсулирует свойства границы (фрейма) для объекта.
+/// Класс <see cref="Border"/> используется в различных объектах ZedGraph
+/// для обработки рисования границы вокруг объекта.
 /// </summary>
 [Serializable]
 public class Border
@@ -66,7 +65,7 @@ public class Border
     /// <summary>
     /// The default constructor.  Initialized to default values.
     /// </summary>
-    public Border() : base()
+    public Border()
     {
         _inflateFactor = Default.InflateFactor;
     }
@@ -77,8 +76,13 @@ public class Border
     /// <param name="isVisible">Determines whether or not the Border will be drawn.</param>
     /// <param name="color">The color of the Border</param>
     /// <param name="width">The width, in points (1/72 inch), for the Border.</param>
-    public Border (bool isVisible, Color color, float width) :
-        base (color)
+    public Border
+        (
+            bool isVisible,
+            Color color,
+            float width
+        )
+        : base (color)
     {
         _width = width;
         _isVisible = isVisible;
@@ -89,8 +93,12 @@ public class Border
     /// </summary>
     /// <param name="color">The color of the Border</param>
     /// <param name="width">The width, in points (1/72 inch), for the Border.</param>
-    public Border (Color color, float width) :
-        this (!color.IsEmpty, color, width)
+    public Border
+        (
+            Color color,
+            float width
+        )
+        : this (!color.IsEmpty, color, width)
     {
     }
 
@@ -138,21 +146,21 @@ public class Border
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected Border (SerializationInfo info, StreamingContext context) :
-        base (info, context)
+    protected Border
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        info.GetInt32 ("schema").NotUsed();
 
         _inflateFactor = info.GetSingle ("inflateFactor");
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -215,7 +223,7 @@ public class Border
     /// Draw the specified Border (<see cref="RectangleF"/>) using the properties of
     /// this <see cref="Border"/> object.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -229,14 +237,20 @@ public class Border
     /// represents a linear multiple to be applied to font sizes, symbol sizes, etc.
     /// </param>
     /// <param name="rect">A <see cref="RectangleF"/> struct to be drawn.</param>
-    public void Draw (Graphics g, PaneBase pane, float scaleFactor, RectangleF rect)
+    public void Draw
+        (
+            Graphics graphics,
+            PaneBase pane,
+            float scaleFactor,
+            RectangleF rect
+        )
     {
         // Need to use the RectangleF props since rounding it can cause the axisFrame to
         // not line up properly with the last tic mark
         if (_isVisible)
         {
-            var smode = g.SmoothingMode;
-            g.SmoothingMode = SmoothingMode.None;
+            var smode = graphics.SmoothingMode;
+            graphics.SmoothingMode = SmoothingMode.None;
 
             RectangleF tRect = rect;
 
@@ -244,9 +258,9 @@ public class Border
             tRect.Inflate (scaledInflate, scaledInflate);
 
             using (Pen pen = GetPen (pane, scaleFactor))
-                g.DrawRectangle (pen, tRect.X, tRect.Y, tRect.Width, tRect.Height);
+                graphics.DrawRectangle (pen, tRect.X, tRect.Y, tRect.Width, tRect.Height);
 
-            g.SmoothingMode = smode;
+            graphics.SmoothingMode = smode;
         }
     }
 

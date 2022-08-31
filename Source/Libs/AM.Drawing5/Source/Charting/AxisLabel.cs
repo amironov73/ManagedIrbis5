@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* AxisLabel.cs --
+/* AxisLabel.cs -- обрабатывает данные, связанные с текстовым заголовком
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -13,9 +13,7 @@
 
 using System;
 using System.Drawing;
-using System.Text;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -24,10 +22,12 @@ using System.Security.Permissions;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// Class that handles the data associated with text title and its associated font
-/// properties.  Inherits from <see cref="Label" />, and adds <see cref="IsOmitMag" />
-/// and <see cref="IsTitleAtCross" /> properties, which are specifically associated with
-/// the <see cref="Axis" /> <see cref="Axis.Title" />.
+/// Класс, который обрабатывает данные, связанные с текстовым
+/// заголовком и связанными с ним свойствами шрифта. Наследуется
+/// от <see cref="Label" /> и добавляет свойства
+/// <see cref="IsOmitMag" /> и <see cref="IsTitleAtCross" />,
+/// которые специально связаны с <see cref="Axis" />.
+/// <see cref="Axis.Title" />.
 /// </summary>
 [Serializable]
 public class AxisLabel
@@ -157,11 +157,7 @@ public class AxisLabel
         IsTitleAtCross = info.GetBoolean ("isTitleAtCross");
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
