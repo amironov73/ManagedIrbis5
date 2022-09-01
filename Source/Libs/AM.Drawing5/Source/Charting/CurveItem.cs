@@ -51,21 +51,21 @@ namespace AM.Drawing.Charting
         /// <see cref="CurveItem"/> is on the bottom X axis or the top X axis (X2).
         /// Use the public property <see cref="IsX2Axis"/> to access this value.
         /// </summary>
-        [CLSCompliant (false)] protected bool _isX2Axis;
+        protected bool _isX2Axis;
 
         /// <summary>
         /// protected field that stores the boolean value that determines whether this
         /// <see cref="CurveItem"/> is on the left Y axis or the right Y axis (Y2).
         /// Use the public property <see cref="IsY2Axis"/> to access this value.
         /// </summary>
-        [CLSCompliant (false)] protected bool _isY2Axis;
+        protected bool _isY2Axis;
 
         /// <summary>
         /// protected field that stores the index number of the Y Axis to which this
         /// <see cref="CurveItem" /> belongs.  Use the public property <see cref="YAxisIndex" />
         /// to access this value.
         /// </summary>
-        [CLSCompliant (false)] protected int _yAxisIndex;
+        protected int _yAxisIndex;
 
         /// <summary>
         /// protected field that stores the boolean value that determines whether this
@@ -75,7 +75,7 @@ namespace AM.Drawing.Charting
         /// affect the display of the legend entry.  To hide the legend entry, you
         /// have to set <see cref="Charting.Label.IsVisible"/> to false.
         /// </summary>
-        [CLSCompliant (false)] protected bool _isVisible;
+        protected bool _isVisible;
 
         // Revision: JCarpenter 10/06
         /// <summary>
@@ -86,21 +86,21 @@ namespace AM.Drawing.Charting
         /// affect the display of the legend entry.  To hide the legend entry, you
         /// have to set <see cref="Charting.Label.IsVisible"/> to false.
         /// </summary>
-        [CLSCompliant (false)] protected bool _isSelected;
+        protected bool _isSelected;
 
         // Revision: JCarpenter 10/06
         /// <summary>
         /// Protected field that stores the boolean value that determines whether this
         /// <see cref="CurveItem"/> can be selected in the graph.
         /// </summary>
-        [CLSCompliant (false)] protected bool _isSelectable;
+        protected bool _isSelectable;
 
         /// <summary>
         /// protected field that stores a boolean value which allows you to override the normal
         /// ordinal axis behavior.  Use the public property <see cref="IsOverrideOrdinal"/> to
         /// access this value.
         /// </summary>
-        [CLSCompliant (false)] protected bool _isOverrideOrdinal;
+        protected bool _isOverrideOrdinal;
 
         /// <summary>
         /// The <see cref="IPointList"/> of value sets that
@@ -112,7 +112,7 @@ namespace AM.Drawing.Charting
         /// and are not plotted.  The curve will have a break at these points
         /// to indicate the values are missing.
         /// </summary>
-        [CLSCompliant (false)] protected IPointList _points;
+        protected IPointList _points;
 
         /// <summary>
         /// A tag object for use by the user.  This can be used to store additional

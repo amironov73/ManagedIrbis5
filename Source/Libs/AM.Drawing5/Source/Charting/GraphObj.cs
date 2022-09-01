@@ -37,21 +37,21 @@ public abstract class GraphObj
     /// Protected field that stores the location of this <see cref="GraphObj"/>.
     /// Use the public property <see cref="Location"/> to access this value.
     /// </summary>
-    [CLSCompliant (false)] protected Location _location;
+    protected Location _location;
 
     /// <summary>
     /// Protected field that determines whether or not this <see cref="GraphObj"/>
     /// is visible in the graph.  Use the public property <see cref="IsVisible"/> to
     /// access this value.
     /// </summary>
-    [CLSCompliant (false)] protected bool _isVisible;
+    protected bool _isVisible;
 
     /// <summary>
     /// Protected field that determines whether or not the rendering of this <see cref="GraphObj"/>
     /// will be clipped to the ChartRect.  Use the public property <see cref="IsClippedToChartRect"/> to
     /// access this value.
     /// </summary>
-    [CLSCompliant (false)] protected bool _isClippedToChartRect;
+    protected bool _isClippedToChartRect;
 
     /// <summary>
     /// A tag object for use by the user.  This can be used to store additional

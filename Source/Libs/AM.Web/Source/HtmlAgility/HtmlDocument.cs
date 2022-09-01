@@ -3,7 +3,7 @@
 // Forum & Issues: https://github.com/zzzprojects/html-agility-pack
 // License: https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE
 // More projects: http://www.zzzprojects.com/
-// Copyright © ZZZ Projects Inc. 2014 - 2017. All rights reserved.
+// Copyright ï¿½ ZZZ Projects Inc. 2014 - 2017. All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -208,8 +208,8 @@ namespace HtmlAgilityPack
         public bool OptionWriteEmptyNodes;
 
 	    /// <summary>
-	    /// The max number of nested child nodes. 
-	    /// Added to prevent stackoverflow problem when a page has tens of thousands of opening html tags with no closing tags 
+	    /// The max number of nested child nodes.
+	    /// Added to prevent stackoverflow problem when a page has tens of thousands of opening html tags with no closing tags
 	    /// </summary>
 	    public int OptionMaxNestedChildNodes = 0;
 
@@ -636,7 +636,7 @@ namespace HtmlAgilityPack
             return _streamencoding;
         }
 
-     
+
         /// <summary>
         /// Detects the encoding of an HTML text.
         /// </summary>
@@ -1019,7 +1019,7 @@ namespace HtmlAgilityPack
                                 futureChild.Push(node);
                             }
                         }
-                        
+
 
                         if (foundNode != null)
                         {
@@ -1658,8 +1658,8 @@ namespace HtmlAgilityPack
                         {
                             if (_fullcomment)
                             {
-	                            if (((Text[_index - 2] != '-') || (Text[_index - 3] != '-')) 
-                                    &&  
+	                            if (((Text[_index - 2] != '-') || (Text[_index - 3] != '-'))
+                                    &&
                                     ((Text[_index - 2] != '!') || (Text[_index - 3] != '-') ||
                                      (Text[_index - 4] != '-')))
                                 {
@@ -1775,7 +1775,7 @@ namespace HtmlAgilityPack
             Lastnodes.Clear();
         }
 
-        // In this moment, we don't have value. 
+        // In this moment, we don't have value.
         // Potential: "\"", "'", "[", "]", "<", ">", "-", "|", "/", "\\"
         private static List<string> BlockAttributes = new List<string>() { "\"", "'" };
 
@@ -1838,7 +1838,7 @@ namespace HtmlAgilityPack
                     CloseParentExplicitEnd();
                     hasNodeToClose = true;
                 }
-            }           
+            }
         }
         private bool IsParentImplicitEnd()
         {
@@ -1898,7 +1898,7 @@ namespace HtmlAgilityPack
                     {
                         isImplicitEnd = nodeName == "p";
                     }
-                    
+
                     break;
                 case "option":
                     isImplicitEnd = nodeName == "option";
@@ -2015,7 +2015,7 @@ namespace HtmlAgilityPack
             }
 
             _currentattribute.InternalQuoteType = _currentattribute.QuoteType;
-            
+
             if (quote == 0)
             {
                 _currentattribute.InternalQuoteType = AttributeValueQuote.None;
@@ -2123,7 +2123,7 @@ namespace HtmlAgilityPack
         {
             if (!OptionReadEncoding)
                 return;
-            // format is 
+            // format is
             // <meta http-equiv="content-type" content="text/html;charset=iso-8859-1" />
 
             // when we append a child, we are in node end, so attributes are already populated

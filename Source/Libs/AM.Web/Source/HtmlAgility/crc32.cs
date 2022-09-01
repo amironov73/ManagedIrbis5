@@ -3,7 +3,7 @@
 // Forum & Issues: https://github.com/zzzprojects/html-agility-pack
 // License: https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE
 // More projects: http://www.zzzprojects.com/
-// Copyright © ZZZ Projects Inc. 2014 - 2017. All rights reserved.
+// Copyright ï¿½ ZZZ Projects Inc. 2014 - 2017. All rights reserved.
 
 using System;
 
@@ -13,9 +13,6 @@ namespace HtmlAgilityPack
     /// A utility class to compute CRC32.
     /// </summary>
     [System.Obsolete("This type should not be used; it is intended for internal use in HTML Agility Pack.")]
-#if !(NETSTANDARD1_3 || NETSTANDARD1_6) || WINDOWS_UWP
-    [CLSCompliant(false)]
-#endif
     public class Crc32
     {
         #region Fields
@@ -26,7 +23,7 @@ namespace HtmlAgilityPack
 
         #region Static Members
 
-        private static uint[] crc_32_tab = // CRC polynomial 0xedb88320 
+        private static uint[] crc_32_tab = // CRC polynomial 0xedb88320
         {
             0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
             0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,

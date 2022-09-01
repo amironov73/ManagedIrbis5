@@ -38,7 +38,6 @@ namespace RestfulIrbis
     /// NancyFX module for IRBIS REST server.
     /// </summary>
 
-    [CLSCompliant(false)]
     public class IrbisModule
         : NancyModule
     {

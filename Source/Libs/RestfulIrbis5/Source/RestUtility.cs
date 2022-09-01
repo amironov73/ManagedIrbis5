@@ -41,7 +41,6 @@ namespace RestfulIrbis
         /// <summary>
         /// Convert the request body to object of given type.
         /// </summary>
-        [CLSCompliant(false)]
         public static T ConvertRequestBody<T>
             (
                 this Request request

@@ -579,7 +579,6 @@ public abstract class Axis
     /// <seealso cref="XAxis.Default.IsVisible"/>.
     /// <seealso cref="YAxis.Default.IsVisible"/>.
     /// <seealso cref="Y2Axis.Default.IsVisible"/>.
-    [field: CLSCompliant (false)]
     public bool IsVisible { get; set; }
 
     /// <summary>
@@ -592,7 +591,6 @@ public abstract class Axis
     /// However, when the border is not visible, or when <see cref="Axis.CrossAuto"/> is set to
     /// false, this value will make a difference.
     /// </remarks>
-    [field: CLSCompliant (false)]
     public bool IsAxisSegmentVisible { get; set; }
 
     /// <summary>
