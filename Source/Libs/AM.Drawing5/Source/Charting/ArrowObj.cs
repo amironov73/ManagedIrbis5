@@ -287,7 +287,7 @@ public class ArrowObj
             graphics.RotateTransform (angle);
 
             // get a pen according to this arrow properties
-            using (var pen = _line.GetPen (pane, scaleFactor))
+            using (var pen = Line.GetPen (pane, scaleFactor))
             {
                 //pen.DashStyle = _style;
 
@@ -309,7 +309,7 @@ public class ArrowObj
                     polyPt[2].Y = -horizontalSize;
                     polyPt[3] = polyPt[0];
 
-                    using var brush = new SolidBrush (_line._color);
+                    using var brush = new SolidBrush (Line._color);
                     graphics.FillPolygon (brush, polyPt);
                 }
                 else

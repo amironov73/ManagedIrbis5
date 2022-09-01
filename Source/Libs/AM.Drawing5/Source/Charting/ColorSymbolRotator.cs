@@ -5,13 +5,11 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* ColorSymbolRotator.cs --
+/* ColorSymbolRotator.cs -- получение следующего цвета/символа
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
-
-using System;
 
 using Color = System.Drawing.Color;
 
@@ -22,7 +20,8 @@ using Color = System.Drawing.Color;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// Class used to get the next color/symbol for GraphPane.AddCurve methods.
+///  Класс, используемый для получения следующего цвета/символа
+/// для методов GraphPane.AddCurve.
 /// </summary>
 public class ColorSymbolRotator
 {
@@ -64,7 +63,7 @@ public class ColorSymbolRotator
         SymbolType.VDash
     };
 
-    private static ColorSymbolRotator _staticInstance;
+    private static ColorSymbolRotator? _staticInstance;
 
     #endregion
 
@@ -74,13 +73,13 @@ public class ColorSymbolRotator
     /// The index of the next color to be used. Note: may be
     /// > COLORS.Length, it is reset to 0 on the next call if it is.
     /// </summary>
-    protected int colorIndex = 0;
+    protected int colorIndex;
 
     /// <summary>
     /// The index of the next symbol to be used. Note: may be
     /// > SYMBOLS.Length, it is reset to 0 on the next call if it is.
     /// </summary>
-    protected int symbolIndex = 0;
+    protected int symbolIndex;
 
     #endregion
 
@@ -92,10 +91,7 @@ public class ColorSymbolRotator
     /// <seealso cref="NextSymbol"/>
     /// <seealso cref="NextColorIndex"/>
     /// </summary>
-    public Color NextColor
-    {
-        get { return COLORS[NextColorIndex]; }
-    }
+    public Color NextColor => COLORS[NextColorIndex];
 
     /// <summary>
     /// Retrieves the index of the next color to be used.  Calling this
@@ -112,7 +108,7 @@ public class ColorSymbolRotator
 
             return colorIndex++;
         }
-        set { colorIndex = value; }
+        set => colorIndex = value;
     }
 
     /// <summary>
@@ -121,10 +117,7 @@ public class ColorSymbolRotator
     /// <seealso cref="NextColor"/>
     /// <seealso cref="NextSymbolIndex"/>
     /// </summary>
-    public SymbolType NextSymbol
-    {
-        get { return SYMBOLS[NextSymbolIndex]; }
-    }
+    public SymbolType NextSymbol => SYMBOLS[NextSymbolIndex];
 
     /// <summary>
     /// Retrieves the index of the next symbol to be used.  Calling this
@@ -141,7 +134,7 @@ public class ColorSymbolRotator
 
             return symbolIndex++;
         }
-        set { symbolIndex = value; }
+        set => symbolIndex = value;
     }
 
     /// <summary>
@@ -150,18 +143,8 @@ public class ColorSymbolRotator
     /// <seealso cref="StaticNextColor"/>
     /// <seealso cref="StaticNextSymbol"/>
     /// </summary>
-    public static ColorSymbolRotator StaticInstance
-    {
-        get
-        {
-            if (_staticInstance == null)
-            {
-                _staticInstance = new ColorSymbolRotator();
-            }
-
-            return _staticInstance;
-        }
-    }
+    public static ColorSymbolRotator StaticInstance =>
+        _staticInstance ??= new ColorSymbolRotator();
 
     /// <summary>
     /// Retrieves the next color from this class's static
@@ -169,10 +152,7 @@ public class ColorSymbolRotator
     /// <seealso cref="StaticInstance"/>
     /// <seealso cref="StaticNextSymbol"/>
     /// </summary>
-    public static Color StaticNextColor
-    {
-        get { return StaticInstance.NextColor; }
-    }
+    public static Color StaticNextColor => StaticInstance.NextColor;
 
     /// <summary>
     /// Retrieves the next symbol type from this class's static
@@ -180,10 +160,7 @@ public class ColorSymbolRotator
     /// <seealso cref="StaticInstance"/>
     /// <seealso cref="StaticNextColor"/>
     /// </summary>
-    public static SymbolType StaticNextSymbol
-    {
-        get { return StaticInstance.NextSymbol; }
-    }
+    public static SymbolType StaticNextSymbol => StaticInstance.NextSymbol;
 
     #endregion
 }

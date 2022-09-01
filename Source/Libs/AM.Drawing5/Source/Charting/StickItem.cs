@@ -48,7 +48,7 @@ public class StickItem
     {
         pane.NotUsed();
 
-        return _symbol.IsVisible;
+        return Symbol.IsVisible;
     }
 
     /// <inheritdoc cref="LineItem.IsXIndependent"/>
@@ -72,7 +72,7 @@ public class StickItem
     /// <param name="label">The label that will appear in the legend.</param>
     public StickItem (string label) : base (label)
     {
-        _symbol.IsVisible = false;
+        Symbol.IsVisible = false;
     }
 
     /// <summary>
@@ -139,7 +139,7 @@ public class StickItem
     public StickItem (string label, IPointList points, Color color, float lineWidth)
         : base (label, points, color, Symbol.Default.Type, lineWidth)
     {
-        _symbol.IsVisible = false;
+        Symbol.IsVisible = false;
     }
 
     /// <summary>

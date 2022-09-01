@@ -38,8 +38,9 @@ public class CollectionPlus
     /// <summary>
     /// Default Constructor
     /// </summary>
-    public CollectionPlus() : base()
+    public CollectionPlus()
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -107,7 +108,7 @@ public class CollectionPlus
             return -1;
         }
 
-        object obj = List[index];
+        var obj = List[index];
         List.RemoveAt (index);
         index += relativePos;
         if (index < 0)

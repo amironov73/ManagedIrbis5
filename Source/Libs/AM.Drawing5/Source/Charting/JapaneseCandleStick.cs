@@ -68,7 +68,7 @@ public class JapaneseCandleStick
     /// value is less than the <see cref="StockPoint.Open" /> value.  Use the public
     /// property <see cref="FallingColor"/> to access this value.
     /// </summary>
-    [CLSCompliant (false)] protected Color _fallingColor;
+    protected Color _fallingColor;
 
     #endregion
 
@@ -116,8 +116,8 @@ public class JapaneseCandleStick
     /// </summary>
     public Fill RisingFill
     {
-        get { return _risingFill; }
-        set { _risingFill = value; }
+        get => _risingFill;
+        set => _risingFill = value;
     }
 
     /// <summary>
@@ -127,8 +127,8 @@ public class JapaneseCandleStick
     /// </summary>
     public Fill FallingFill
     {
-        get { return _fallingFill; }
-        set { _fallingFill = value; }
+        get => _fallingFill;
+        set => _fallingFill = value;
     }
 
     /// <summary>
@@ -138,8 +138,8 @@ public class JapaneseCandleStick
     /// </summary>
     public Border RisingBorder
     {
-        get { return _risingBorder; }
-        set { _risingBorder = value; }
+        get => _risingBorder;
+        set => _risingBorder = value;
     }
 
     /// <summary>
@@ -149,8 +149,8 @@ public class JapaneseCandleStick
     /// </summary>
     public Border FallingBorder
     {
-        get { return _fallingBorder; }
-        set { _fallingBorder = value; }
+        get => _fallingBorder;
+        set => _fallingBorder = value;
     }
 
     /// <summary>
@@ -164,8 +164,8 @@ public class JapaneseCandleStick
     /// </remarks>
     public Color FallingColor
     {
-        get { return _fallingColor; }
-        set { _fallingColor = value; }
+        get => _fallingColor;
+        set => _fallingColor = value;
     }
 
     #endregion

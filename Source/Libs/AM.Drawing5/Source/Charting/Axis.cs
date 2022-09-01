@@ -393,25 +393,25 @@ public abstract class Axis
         _cross = info.GetDouble ("cross");
         CrossAuto = info.GetBoolean ("crossAuto");
 
-        _majorTic = (MajorTic)info.GetValue ("MajorTic", typeof (MajorTic));
-        _minorTic = (MinorTic)info.GetValue ("MinorTic", typeof (MinorTic));
-        _majorGrid = (MajorGrid)info.GetValue ("majorGrid", typeof (MajorGrid));
-        _minorGrid = (MinorGrid)info.GetValue ("minorGrid", typeof (MinorGrid));
+        _majorTic = (MajorTic) info.GetValue ("MajorTic", typeof (MajorTic)).ThrowIfNull();
+        _minorTic = (MinorTic) info.GetValue ("MinorTic", typeof (MinorTic)).ThrowIfNull();
+        _majorGrid = (MajorGrid) info.GetValue ("majorGrid", typeof (MajorGrid)).ThrowIfNull();
+        _minorGrid = (MinorGrid) info.GetValue ("minorGrid", typeof (MinorGrid)).ThrowIfNull();
 
         IsVisible = info.GetBoolean ("isVisible");
 
-        Title = (AxisLabel)info.GetValue ("title", typeof (AxisLabel));
+        Title = (AxisLabel) info.GetValue ("title", typeof (AxisLabel)).ThrowIfNull();
 
         _minSpace = info.GetSingle ("minSpace");
 
-        _color = (Color)info.GetValue ("color", typeof (Color));
+        _color = (Color) info.GetValue ("color", typeof (Color)).ThrowIfNull();
 
         IsAxisSegmentVisible = info.GetBoolean ("isAxisSegmentVisible");
 
 
         _axisGap = info.GetSingle ("axisGap");
 
-        Scale = (Scale) info.GetValue ("scale", typeof (Scale));
+        Scale = (Scale) info.GetValue ("scale", typeof (Scale)).ThrowIfNull();
         Scale._ownerAxis = this;
     }
 

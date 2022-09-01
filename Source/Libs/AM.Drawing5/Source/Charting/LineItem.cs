@@ -33,18 +33,11 @@ public class LineItem
     #region Fields
 
     /// <summary>
-    /// Private field that stores a reference to the <see cref="Charting.Symbol"/>
-    /// class defined for this <see cref="LineItem"/>.  Use the public
-    /// property <see cref="Symbol"/> to access this value.
-    /// </summary>
-    [CLSCompliant (false)] protected Symbol _symbol;
-
-    /// <summary>
     /// Private field that stores a reference to the <see cref="Charting.Line"/>
     /// class defined for this <see cref="LineItem"/>.  Use the public
     /// property <see cref="Line"/> to access this value.
     /// </summary>
-    [CLSCompliant (false)] protected Line _line;
+    protected Line _line;
 
     #endregion
 
@@ -54,11 +47,7 @@ public class LineItem
     /// Gets or sets the <see cref="Charting.Symbol"/> class instance defined
     /// for this <see cref="LineItem"/>.
     /// </summary>
-    public Symbol Symbol
-    {
-        get { return _symbol; }
-        set { _symbol = value; }
-    }
+    public Symbol Symbol { get; set; }
 
     /// <summary>
     /// Gets or sets the <see cref="Charting.Line"/> class instance defined
@@ -102,7 +91,7 @@ public class LineItem
     /// <param name="label">The _label that will appear in the legend.</param>
     public LineItem (string label) : base (label)
     {
-        _symbol = new Symbol();
+        Symbol = new Symbol();
         _line = new Line();
     }
 
@@ -175,7 +164,7 @@ public class LineItem
             _line.Width = lineWidth;
         }
 
-        _symbol = new Symbol (symbolType, color);
+        Symbol = new Symbol (symbolType, color);
     }
 
     /// <summary>
@@ -201,7 +190,7 @@ public class LineItem
     /// <param name="rhs">The <see cref="LineItem"/> object from which to copy</param>
     public LineItem (LineItem rhs) : base (rhs)
     {
-        _symbol = new Symbol (rhs.Symbol);
+        Symbol = new Symbol (rhs.Symbol);
         _line = new Line (rhs.Line);
     }
 
@@ -246,7 +235,7 @@ public class LineItem
         // backwards compatible as new member variables are added to classes
         int sch = info.GetInt32 ("schema2");
 
-        _symbol = (Symbol)info.GetValue ("symbol", typeof (Symbol));
+        Symbol = (Symbol)info.GetValue ("symbol", typeof (Symbol));
         _line = (Line)info.GetValue ("line", typeof (Line));
     }
 
@@ -263,7 +252,7 @@ public class LineItem
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
-        info.AddValue ("symbol", _symbol);
+        info.AddValue ("symbol", Symbol);
         info.AddValue ("line", _line);
     }
 
@@ -337,7 +326,7 @@ public class LineItem
         _line.DrawSegment (graphics, pane, rect.Left, yMid, rect.Right, yMid, scaleFactor);
 
         // Draw a sample symbol to the left of the label text
-        _symbol.DrawSymbol (graphics, pane, xMid, yMid, scaleFactor, false, null);
+        Symbol.DrawSymbol (graphics, pane, xMid, yMid, scaleFactor, false, null);
     }
 
     /// <summary>
@@ -395,7 +384,7 @@ public class LineItem
             return false;
         }
 
-        float halfSize = _symbol.Size * pane.CalcScaleFactor();
+        float halfSize = Symbol.Size * pane.CalcScaleFactor();
 
         coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
             pixPt.X - halfSize, pixPt.Y - halfSize,

@@ -37,12 +37,6 @@ public class LineObj
 {
     #region Fields
 
-    /// <summary>
-    /// protected field that maintains the attributes of the line using an
-    /// instance of the <see cref="LineBase" /> class.
-    /// </summary>
-    [CLSCompliant (false)] protected LineBase _line;
-
     #endregion
 
     #region Properties
@@ -51,11 +45,7 @@ public class LineObj
     /// A <see cref="LineBase" /> class that contains the attributes for drawing this
     /// <see cref="LineObj" />.
     /// </summary>
-    public LineBase Line
-    {
-        get { return _line; }
-        set { _line = value; }
-    }
+    public LineBase Line { get; set; }
 
     #endregion
 
@@ -84,7 +74,7 @@ public class LineObj
     public LineObj (Color color, double x1, double y1, double x2, double y2)
         : base (x1, y1, x2 - x1, y2 - y1)
     {
-        _line = new LineBase (color);
+        Line = new LineBase (color);
         Location.AlignH = AlignH.Left;
         Location.AlignV = AlignV.Top;
     }
@@ -125,7 +115,7 @@ public class LineObj
     /// <param name="rhs">The <see cref="LineObj"/> object from which to copy</param>
     public LineObj (LineObj rhs) : base (rhs)
     {
-        _line = new LineBase (rhs._line);
+        Line = new LineBase (rhs.Line);
     }
 
     /// <summary>
@@ -171,7 +161,7 @@ public class LineObj
         // backwards compatible as new member variables are added to classes
         int sch = info.GetInt32 ("schema2");
 
-        _line = (LineBase)info.GetValue ("line", typeof (LineBase));
+        Line = (LineBase)info.GetValue ("line", typeof (LineBase));
     }
 
     /// <summary>
@@ -189,7 +179,7 @@ public class LineObj
 
         info.AddValue ("schema2", schema2);
 
-        info.AddValue ("line", _line);
+        info.AddValue ("line", Line);
     }
 
     #endregion
@@ -250,7 +240,7 @@ public class LineObj
             graphics.RotateTransform (angle);
 
             // get a pen according to this arrow properties
-            using (Pen pen = _line.GetPen (pane, scaleFactor))
+            using (Pen pen = Line.GetPen (pane, scaleFactor))
 
                 //new Pen( _line._color, pane.ScaledPenWidth( _line._width, scaleFactor ) ) )
             {
