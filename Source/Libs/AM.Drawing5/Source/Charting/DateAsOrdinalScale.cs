@@ -43,9 +43,13 @@ class DateAsOrdinalScale
     /// (containing object) for this new object.
     /// </summary>
     /// <param name="owner">The owner, or containing object, of this instance</param>
-    public DateAsOrdinalScale (Axis owner)
+    public DateAsOrdinalScale
+        (
+            Axis owner
+        )
         : base (owner)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -54,17 +58,17 @@ class DateAsOrdinalScale
     /// <param name="rhs">The <see cref="DateAsOrdinalScale" /> object from which to copy</param>
     /// <param name="owner">The <see cref="Axis" /> object that will own the
     /// new instance of <see cref="DateAsOrdinalScale" /></param>
-    public DateAsOrdinalScale (Scale rhs, Axis owner)
+    public DateAsOrdinalScale
+        (
+            Scale rhs,
+            Axis owner
+        )
         : base (rhs, owner)
     {
+        // пустое тело конструктора
     }
 
-    /// <summary>
-    /// Create a new clone of the current item, with a new owner assignment
-    /// </summary>
-    /// <param name="owner">The new <see cref="Axis" /> instance that will be
-    /// the owner of the new Scale</param>
-    /// <returns>A new <see cref="Scale" /> clone.</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     public override Scale Clone (Axis owner)
     {
         return new DateAsOrdinalScale (this, owner);
@@ -74,23 +78,10 @@ class DateAsOrdinalScale
 
     #region properties
 
-    /// <summary>
-    /// Return the <see cref="AxisType" /> for this <see cref="Scale" />, which is
-    /// <see cref="AxisType.DateAsOrdinal" />.
-    /// </summary>
-    public override AxisType Type
-    {
-        get { return AxisType.DateAsOrdinal; }
-    }
+    /// <inheritdoc cref="Scale.Type"/>
+    public override AxisType Type => AxisType.DateAsOrdinal;
 
-    /// <summary>
-    /// Gets or sets the minimum value for this scale.
-    /// </summary>
-    /// <remarks>
-    /// The set property is specifically adapted for <see cref="AxisType.DateAsOrdinal" /> scales,
-    /// in that it automatically limits the value to the range of valid dates for the
-    /// <see cref="XDate" /> struct.
-    /// </remarks>
+    /// <inheritdoc cref="Scale.Min"/>
     public override double Min
     {
         get { return _min; }
@@ -101,14 +92,7 @@ class DateAsOrdinalScale
         }
     }
 
-    /// <summary>
-    /// Gets or sets the maximum value for this scale.
-    /// </summary>
-    /// <remarks>
-    /// The set property is specifically adapted for <see cref="AxisType.DateAsOrdinal" /> scales,
-    /// in that it automatically limits the value to the range of valid dates for the
-    /// <see cref="XDate" /> struct.
-    /// </remarks>
+    /// <inheritdoc cref="Scale.Max"/>
     public override double Max
     {
         get { return _max; }
@@ -123,41 +107,18 @@ class DateAsOrdinalScale
 
     #region methods
 
-    /// <summary>
-    /// Select a reasonable ordinal axis scale given a range of data values, with the expectation that
-    /// dates will be displayed.
-    /// </summary>
-    /// <remarks>
-    /// This method only applies to <see cref="AxisType.DateAsOrdinal"/> type axes, and it
-    /// is called by the general <see cref="PickScale"/> method.  For this type,
-    /// the first curve is the "master", which contains the dates to be applied.
-    /// <para>On Exit:</para>
-    /// <para><see cref="Scale.Min"/> is set to scale minimum (if <see cref="Scale.MinAuto"/> = true)</para>
-    /// <para><see cref="Scale.Max"/> is set to scale maximum (if <see cref="Scale.MaxAuto"/> = true)</para>
-    /// <para><see cref="Scale.MajorStep"/> is set to scale step size (if <see cref="Scale.MajorStepAuto"/> = true)</para>
-    /// <para><see cref="Scale.MinorStep"/> is set to scale minor step size (if <see cref="Scale.MinorStepAuto"/> = true)</para>
-    /// <para><see cref="Scale.Mag"/> is set to a magnitude multiplier according to the data</para>
-    /// <para><see cref="Scale.Format"/> is set to the display format for the values (this controls the
-    /// number of decimal places, whether there are thousands separators, currency types, etc.)</para>
-    /// </remarks>
-    /// <param name="pane">A reference to the <see cref="GraphPane"/> object
-    /// associated with this <see cref="Axis"/></param>
-    /// <param name="g">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
+    /// <inheritdoc cref="Scale.PickScale"/>
     /// <seealso cref="PickScale"/>
     /// <seealso cref="AxisType.Ordinal"/>
-    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale
+        (
+            GraphPane pane,
+            Graphics graphics,
+            float scaleFactor
+        )
     {
         // call the base class first
-        base.PickScale (pane, g, scaleFactor);
+        base.PickScale (pane, graphics, scaleFactor);
 
 /*			// First, get the date ranges from the first curve in the list
 			double xMin; // = Double.MaxValue;
@@ -186,11 +147,14 @@ class DateAsOrdinalScale
         SetDateFormat (pane);
 
         // Now, set the axis range based on a ordinal scale
-        base.PickScale (pane, g, scaleFactor);
-        OrdinalScale.PickScale (pane, g, scaleFactor, this);
+        base.PickScale (pane, graphics, scaleFactor);
+        OrdinalScale.PickScale (pane, graphics, scaleFactor, this);
     }
 
-    internal void SetDateFormat (GraphPane pane)
+    internal void SetDateFormat
+        (
+            GraphPane pane
+        )
     {
         if (_formatAuto)
         {
@@ -287,24 +251,13 @@ class DateAsOrdinalScale
         }
     }
 
-    /// <summary>
-    /// Make a value label for an <see cref="AxisType.DateAsOrdinal" /> <see cref="Axis" />.
-    /// </summary>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="index">
-    /// The zero-based, ordinal index of the label to be generated.  For example, a value of 2 would
-    /// cause the third value label on the axis to be generated.
-    /// </param>
-    /// <param name="dVal">
-    /// The numeric value associated with the label.  This value is ignored for log
-    /// (<see cref="Scale.IsLog"/>)
-    /// and text (<see cref="Scale.IsText"/>) type axes.
-    /// </param>
-    /// <returns>The resulting value label as a <see cref="string" /></returns>
-    internal override string MakeLabel (GraphPane pane, int index, double dVal)
+    /// <inheritdoc cref="Scale.MakeLabel"/>
+    internal override string MakeLabel
+        (
+            GraphPane pane,
+            int index,
+            double dVal
+        )
     {
         if (_format == null)
         {

@@ -54,8 +54,8 @@ public class CurveList
     {
         get
         {
-            int count = 0;
-            foreach (CurveItem curve in this)
+            var count = 0;
+            foreach (var curve in this)
             {
                 if (curve.IsBar)
                 {
@@ -79,8 +79,8 @@ public class CurveList
     {
         get
         {
-            int count = 0;
-            foreach (CurveItem curve in this)
+            var count = 0;
+            foreach (var curve in this)
             {
                 if (curve.IsBar || curve is HiLowBarItem)
                 {
@@ -101,8 +101,8 @@ public class CurveList
     {
         get
         {
-            int count = 0;
-            foreach (CurveItem curve in this)
+            var count = 0;
+            foreach (var curve in this)
             {
                 if (curve.IsPie)
                 {
@@ -122,8 +122,8 @@ public class CurveList
     {
         get
         {
-            bool hasPie = false;
-            foreach (CurveItem curve in this)
+            var hasPie = false;
+            foreach (var curve in this)
             {
                 if (!curve.IsPie)
                 {
@@ -147,7 +147,7 @@ public class CurveList
     /// <returns>true if there is any data, false otherwise</returns>
     public bool HasData()
     {
-        foreach (CurveItem curve in this)
+        foreach (var curve in this)
         {
             if (curve.Points.Count > 0)
             {
@@ -178,7 +178,7 @@ public class CurveList
     {
         maxPts = rhs.maxPts;
 
-        foreach (CurveItem item in rhs)
+        foreach (var item in rhs)
         {
             Add ((CurveItem)((ICloneable)item).Clone());
         }
@@ -215,7 +215,7 @@ public class CurveList
     {
         get
         {
-            for (int i = Count - 1; i >= 0; i--)
+            for (var i = Count - 1; i >= 0; i--)
                 yield return this[i];
         }
     }
@@ -227,7 +227,7 @@ public class CurveList
     {
         get
         {
-            for (int i = 0; i < Count; i++)
+            for (var i = 0; i < Count; i++)
                 yield return this[i];
         }
     }
@@ -261,7 +261,7 @@ public class CurveList
     {
         get
         {
-            int index = IndexOf (label);
+            var index = IndexOf (label);
             if (index >= 0)
             {
                 return (this[index]);
@@ -323,8 +323,8 @@ public class CurveList
     /// <seealso cref="IndexOfTag"/>
     public int IndexOf (string label)
     {
-        int index = 0;
-        foreach (CurveItem p in this)
+        var index = 0;
+        foreach (var p in this)
         {
             if (string.Compare (p._label._text, label, true) == 0)
             {
@@ -350,8 +350,8 @@ public class CurveList
     /// or -1 if the <see cref="CurveItem"/> is not in the list</returns>
     public int IndexOfTag (string tag)
     {
-        int index = 0;
-        foreach (CurveItem p in this)
+        var index = 0;
+        foreach (var p in this)
         {
             if (p.Tag is string &&
                 string.Compare ((string)p.Tag, tag, true) == 0)
@@ -398,7 +398,7 @@ public class CurveList
             return -1;
         }
 
-        CurveItem curve = this[index];
+        var curve = this[index];
         RemoveAt (index);
 
         index += relativePos;
@@ -460,16 +460,16 @@ public class CurveList
         InitScale (pane.XAxis.Scale, isBoundedRanges);
         InitScale (pane.X2Axis.Scale, isBoundedRanges);
 
-        foreach (YAxis axis in pane.YAxisList)
+        foreach (var axis in pane.YAxisList)
             InitScale (axis.Scale, isBoundedRanges);
 
-        foreach (Y2Axis axis in pane.Y2AxisList)
+        foreach (var axis in pane.Y2AxisList)
             InitScale (axis.Scale, isBoundedRanges);
 
         maxPts = 1;
 
         // Loop over each curve in the collection and examine the data ranges
-        foreach (CurveItem curve in this)
+        foreach (var curve in this)
         {
             if (curve.IsVisible)
             {
@@ -491,13 +491,13 @@ public class CurveList
                 }
 
                 // isYOrd is true if the Y axis is an ordinal type
-                Scale yScale = curve.GetYAxis (pane).Scale;
+                var yScale = curve.GetYAxis (pane).Scale;
 
-                Scale xScale = curve.GetXAxis (pane).Scale;
-                bool isYOrd = yScale.IsAnyOrdinal;
+                var xScale = curve.GetXAxis (pane).Scale;
+                var isYOrd = yScale.IsAnyOrdinal;
 
                 // isXOrd is true if the X axis is an ordinal type
-                bool isXOrd = xScale.IsAnyOrdinal;
+                var isXOrd = xScale.IsAnyOrdinal;
 
                 // For ordinal Axes, the data range is just 1 to Npts
                 if (isYOrd && !curve.IsOverrideOrdinal)
@@ -600,9 +600,9 @@ public class CurveList
         pane.XAxis.Scale.SetRange (pane, pane.XAxis);
         pane.X2Axis.Scale.SetRange (pane, pane.X2Axis);
 
-        foreach (YAxis axis in pane.YAxisList)
+        foreach (var axis in pane.YAxisList)
             axis.Scale.SetRange (pane, axis);
-        foreach (Y2Axis axis in pane.Y2AxisList)
+        foreach (var axis in pane.Y2AxisList)
             axis.Scale.SetRange (pane, axis);
     }
 
@@ -639,17 +639,17 @@ public class CurveList
         tXMinVal = tYMinVal = double.MaxValue;
         tXMaxVal = tYMaxVal = double.MinValue;
 
-        ValueHandler valueHandler = new ValueHandler (pane, false);
-        Axis baseAxis = curve.BaseAxis (pane);
-        bool isXBase = baseAxis is XAxis || baseAxis is X2Axis;
+        var valueHandler = new ValueHandler (pane, false);
+        var baseAxis = curve.BaseAxis (pane);
+        var isXBase = baseAxis is XAxis || baseAxis is X2Axis;
 
         double lowVal, baseVal, hiVal;
 
-        for (int i = 0; i < curve.Points.Count; i++)
+        for (var i = 0; i < curve.Points.Count; i++)
         {
             valueHandler.GetValues (curve, i, out baseVal, out lowVal, out hiVal);
-            double x = isXBase ? baseVal : hiVal;
-            double y = isXBase ? hiVal : baseVal;
+            var x = isXBase ? baseVal : hiVal;
+            var y = isXBase ? hiVal : baseVal;
 
             if (x != PointPairBase.Missing && y != PointPairBase.Missing && lowVal != PointPairBase.Missing)
             {
@@ -727,22 +727,22 @@ public class CurveList
         //Bar.ResetBarStack();
 
         // Count the number of BarItems in the curvelist
-        int pos = NumBars;
+        var pos = NumBars;
 
         // sorted overlay bars are a special case, since they are sorted independently at each
         // ordinal position.
         if (pane._barSettings.Type == BarType.SortedOverlay)
         {
             // First, create a new curveList with references (not clones) of the curves
-            CurveList tempList = new CurveList();
-            foreach (CurveItem curve in this)
+            var tempList = new CurveList();
+            foreach (var curve in this)
                 if (curve.IsBar)
                 {
                     tempList.Add ((CurveItem)curve);
                 }
 
             // Loop through the bars, graphing each ordinal position separately
-            for (int i = 0; i < maxPts; i++)
+            for (var i = 0; i < maxPts; i++)
             {
                 // At each ordinal position, sort the curves according to the value axis value
                 tempList.Sort (pane._barSettings.Base == BarBase.X ? SortType.YValues : SortType.XValues, i);
@@ -760,9 +760,9 @@ public class CurveList
         // The reverse order is done so that curves that are later in the list are plotted behind
         // curves that are earlier in the list
 
-        for (int i = Count - 1; i >= 0; i--)
+        for (var i = Count - 1; i >= 0; i--)
         {
-            CurveItem curve = this[i];
+            var curve = this[i];
 
             if (curve.IsBar)
             {
@@ -798,8 +798,8 @@ public class CurveList
             return 0;
         }
 
-        int i = 0;
-        foreach (CurveItem curve in this)
+        var i = 0;
+        foreach (var curve in this)
         {
             if (curve == barItem)
             {

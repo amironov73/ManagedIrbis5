@@ -237,10 +237,10 @@ class ExponentScale
     /// </remarks>
     /// <seealso cref="Scale.PickScale"/>
     /// <seealso cref="AxisType.Exponent"/>
-    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale (GraphPane pane, Graphics graphics, float scaleFactor)
     {
         // call the base class first
-        base.PickScale (pane, g, scaleFactor);
+        base.PickScale (pane, graphics, scaleFactor);
 
         // Test for trivial condition of range = 0 and pick a suitable default
         if (_max - _min < 1.0e-20)
@@ -286,7 +286,7 @@ class ExponentScale
             if (_isPreventLabelOverlap)
             {
                 // Calculate the maximum number of labels
-                double maxLabels = (double)CalcMaxLabels (g, pane, scaleFactor);
+                double maxLabels = (double)CalcMaxLabels (graphics, pane, scaleFactor);
 
                 if (maxLabels < (_max - _min) / _majorStep)
                 {

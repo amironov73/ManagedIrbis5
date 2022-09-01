@@ -331,7 +331,7 @@ class LogScale
     /// </remarks>
     /// <param name="pane">A reference to the <see cref="GraphPane"/> object
     /// associated with this <see cref="Axis"/></param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -343,10 +343,10 @@ class LogScale
     /// </param>
     /// <seealso cref="PickScale"/>
     /// <seealso cref="AxisType.Log"/>
-    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale (GraphPane pane, Graphics graphics, float scaleFactor)
     {
         // call the base class first
-        base.PickScale (pane, g, scaleFactor);
+        base.PickScale (pane, graphics, scaleFactor);
 
         // Majorstep is always 1 for log scales
         if (_majorStepAuto)

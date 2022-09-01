@@ -119,7 +119,7 @@ class OrdinalScale
     /// </remarks>
     /// <param name="pane">A reference to the <see cref="GraphPane"/> object
     /// associated with this <see cref="Axis"/></param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -130,15 +130,15 @@ class OrdinalScale
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
     /// <seealso cref="AxisType.Ordinal"/>
-    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale (GraphPane pane, Graphics graphics, float scaleFactor)
     {
         // call the base class first
-        base.PickScale (pane, g, scaleFactor);
+        base.PickScale (pane, graphics, scaleFactor);
 
-        PickScale (pane, g, scaleFactor, this);
+        PickScale (pane, graphics, scaleFactor, this);
     }
 
-    internal static void PickScale (GraphPane pane, Graphics g, float scaleFactor, Scale scale)
+    internal static void PickScale (GraphPane pane, Graphics graphics, float scaleFactor, Scale scale)
     {
         // Test for trivial condition of range = 0 and pick a suitable default
         if (scale._max - scale._min < 1.0)
@@ -166,7 +166,7 @@ class OrdinalScale
                 if (scale.IsPreventLabelOverlap)
                 {
                     // Calculate the maximum number of labels
-                    double maxLabels = (double)scale.CalcMaxLabels (g, pane, scaleFactor);
+                    double maxLabels = (double)scale.CalcMaxLabels (graphics, pane, scaleFactor);
 
                     // Calculate a step size based on the width of the labels
                     double tmpStep = Math.Ceiling ((scale._max - scale._min) / maxLabels);

@@ -2556,7 +2556,7 @@ public abstract class Scale
     /// </remarks>
     /// <param name="pane">A reference to the <see cref="GraphPane"/> object
     /// associated with this <see cref="Axis"/></param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -2566,7 +2566,7 @@ public abstract class Scale
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public virtual void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public virtual void PickScale (GraphPane pane, Graphics graphics, float scaleFactor)
     {
         var minVal = _rangeMin;
         var maxVal = _rangeMax;

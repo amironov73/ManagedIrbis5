@@ -182,7 +182,7 @@ public class TextScale
     /// </remarks>
     /// <param name="pane">A reference to the <see cref="GraphPane"/> object
     /// associated with this <see cref="Axis"/></param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -194,10 +194,10 @@ public class TextScale
     /// </param>
     /// <seealso cref="PickScale"/>
     /// <seealso cref="AxisType.Text"/>
-    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale (GraphPane pane, Graphics graphics, float scaleFactor)
     {
         // call the base class first
-        base.PickScale (pane, g, scaleFactor);
+        base.PickScale (pane, graphics, scaleFactor);
 
         // if text labels are provided, then autorange to the number of labels
         if (_textLabels != null)
@@ -247,7 +247,7 @@ public class TextScale
             else if (_textLabels != null)
             {
                 // Calculate the maximum number of labels
-                double maxLabels = (double)CalcMaxLabels (g, pane, scaleFactor);
+                double maxLabels = (double)CalcMaxLabels (graphics, pane, scaleFactor);
 
                 // Calculate a step size based on the width of the labels
                 double tmpStep = Math.Ceiling ((_max - _min) / maxLabels);

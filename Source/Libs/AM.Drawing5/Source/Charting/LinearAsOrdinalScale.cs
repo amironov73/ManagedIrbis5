@@ -108,7 +108,7 @@ class LinearAsOrdinalScale
     /// </remarks>
     /// <param name="pane">A reference to the <see cref="GraphPane"/> object
     /// associated with this <see cref="Axis"/></param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -120,10 +120,10 @@ class LinearAsOrdinalScale
     /// </param>
     /// <seealso cref="PickScale"/>
     /// <seealso cref="AxisType.Ordinal"/>
-    public override void PickScale (GraphPane pane, Graphics g, float scaleFactor)
+    public override void PickScale (GraphPane pane, Graphics graphics, float scaleFactor)
     {
         // call the base class first
-        base.PickScale (pane, g, scaleFactor);
+        base.PickScale (pane, graphics, scaleFactor);
 
         // First, get the date ranges from the first curve in the list
         double xMin; // = Double.MaxValue;
@@ -157,8 +157,8 @@ class LinearAsOrdinalScale
         double range = Math.Abs (tMax - tMin);
 
         // Now, set the axis range based on a ordinal scale
-        base.PickScale (pane, g, scaleFactor);
-        OrdinalScale.PickScale (pane, g, scaleFactor, this);
+        base.PickScale (pane, graphics, scaleFactor);
+        OrdinalScale.PickScale (pane, graphics, scaleFactor, this);
 
         SetScaleMag (tMin, tMax, range / Default.TargetXSteps);
     }
