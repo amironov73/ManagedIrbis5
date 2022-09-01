@@ -1004,20 +1004,20 @@ public class PieItem
                 break;
 
             case PieLabelType.Name_Value:
-                curve._labelStr = curve._label._text + ": " + curve._pieValue.ToString ("F", labelFormat);
+                curve._labelStr = curve._label.Text + ": " + curve._pieValue.ToString ("F", labelFormat);
                 break;
 
             case PieLabelType.Name_Percent:
-                curve._labelStr = curve._label._text + ": " + (curve._sweepAngle / 360).ToString ("P", labelFormat);
+                curve._labelStr = curve._label.Text + ": " + (curve._sweepAngle / 360).ToString ("P", labelFormat);
                 break;
 
             case PieLabelType.Name_Value_Percent:
-                curve._labelStr = curve._label._text + ": " + curve._pieValue.ToString ("F", labelFormat) +
+                curve._labelStr = curve._label.Text + ": " + curve._pieValue.ToString ("F", labelFormat) +
                                   " (" + (curve._sweepAngle / 360).ToString ("P", labelFormat) + ")";
                 break;
 
             case PieLabelType.Name:
-                curve._labelStr = curve._label._text;
+                curve._labelStr = curve._label.Text;
                 break;
 
             case PieLabelType.None:

@@ -322,7 +322,7 @@ public abstract class Axis
     public Axis (string title)
         : this()
     {
-        Title._text = title;
+        Title.Text = title;
     }
 
     /// <summary>
@@ -1125,7 +1125,7 @@ public abstract class Axis
             // Only add space for the title if there is one
             // Axis Title gets actual height
             // if ( str.Length > 0 && _title._isVisible )
-            if (!string.IsNullOrEmpty (str) && Title._isVisible)
+            if (!string.IsNullOrEmpty (str) && Title.IsVisible)
             {
                 //tmpSpace += this.TitleFontSpec.BoundingBox( g, str, scaleFactor ).Height;
                 fixedSpace = Title.FontSpec.BoundingBox (g, str, scaleFactor).Height +
@@ -1335,7 +1335,7 @@ public abstract class Axis
 
         // If the Axis is visible, draw the title
         //if ( _isVisible && _title._isVisible && str.Length > 0 )
-        if (IsVisible && Title._isVisible && !string.IsNullOrEmpty (str))
+        if (IsVisible && Title.IsVisible && !string.IsNullOrEmpty (str))
         {
             bool hasTic = (Scale._isLabelsInside
                 ? (MajorTic.IsInside || MajorTic._isCrossInside ||
@@ -1391,9 +1391,9 @@ public abstract class Axis
 
     private string MakeTitle()
     {
-        if (Title._text == null)
+        if (Title.Text == null)
         {
-            Title._text = "";
+            Title.Text = "";
         }
 
         // Revision: JCarpenter 10/06
@@ -1413,11 +1413,11 @@ public abstract class Axis
         // then add the mag indicator to the title.
         if (Scale._mag != 0 && !Title.IsOmitMag && !Scale.IsLog)
         {
-            return Title._text + string.Format (" (10^{0})", Scale._mag);
+            return Title.Text + string.Format (" (10^{0})", Scale._mag);
         }
         else
         {
-            return Title._text;
+            return Title.Text;
         }
     }
 

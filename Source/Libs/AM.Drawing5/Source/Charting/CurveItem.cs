@@ -69,7 +69,7 @@ namespace AM.Drawing.Charting
         /// and are not plotted.  The curve will have a break at these points
         /// to indicate the values are missing.
         /// </summary>
-        protected IPointList _points;
+        protected IPointList? _points;
 
         /// <summary>
         /// A tag object for use by the user.  This can be used to store additional
@@ -104,8 +104,13 @@ namespace AM.Drawing.Charting
         /// the independent (X axis) values for this curve</param>
         /// <param name="y">An array of double precision values that define
         /// the dependent (Y axis) values for this curve</param>
-        public CurveItem (string label, double[] x, double[] y) :
-            this (label, new PointPairList (x, y))
+        public CurveItem
+            (
+                string label,
+                double[] x,
+                double[] y
+            )
+            : this (label, new PointPairList (x, y))
         {
         }
 
@@ -124,7 +129,11 @@ namespace AM.Drawing.Charting
         /// <param name="label">A string label (legend entry) for this curve</param>
         /// <param name="points">A <see cref="IPointList"/> of double precision value pairs that define
         /// the X and Y values for this curve</param>
-        public CurveItem (string label, IPointList points)
+        public CurveItem
+            (
+                string label,
+                IPointList? points
+            )
         {
             Init (label);
 
@@ -537,7 +546,7 @@ namespace AM.Drawing.Charting
         /// The <see cref="IPointList"/> of X,Y point sets that represent this
         /// <see cref="CurveItem"/>.
         /// </summary>
-        public IPointList Points
+        public IPointList? Points
         {
             get { return _points; }
             set { _points = value; }

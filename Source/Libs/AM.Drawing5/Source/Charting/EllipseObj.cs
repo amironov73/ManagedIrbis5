@@ -155,7 +155,7 @@ public class EllipseObj
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema3");
+        info.GetInt32 ("schema3").NotUsed();
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -183,7 +183,7 @@ public class EllipseObj
     {
         // Convert the arrow coordinates from the user coordinate system
         // to the screen coordinate system
-        RectangleF pixRect = Location.TransformRect (pane);
+        var pixRect = Location.TransformRect (pane);
 
         if (Math.Abs (pixRect.Left) < 100000 &&
             Math.Abs (pixRect.Top) < 100000 &&
@@ -192,14 +192,14 @@ public class EllipseObj
         {
             if (_fill.IsVisible)
             {
-                using (Brush brush = _fill.MakeBrush (pixRect))
-                    graphics.FillEllipse (brush, pixRect);
+                using var brush = _fill.MakeBrush (pixRect);
+                graphics.FillEllipse (brush, pixRect);
             }
 
             if (_border.IsVisible)
             {
-                using (Pen pen = _border.GetPen (pane, scaleFactor))
-                    graphics.DrawEllipse (pen, pixRect);
+                using var pen = _border.GetPen (pane, scaleFactor);
+                graphics.DrawEllipse (pen, pixRect);
             }
         }
     }
@@ -239,13 +239,11 @@ public class EllipseObj
 
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
-        RectangleF pixRect = _location.TransformRect (pane);
+        var pixRect = _location.TransformRect (pane);
 
-        using (GraphicsPath path = new GraphicsPath())
-        {
-            path.AddEllipse (pixRect);
-            return path.IsVisible (point);
-        }
+        using var path = new GraphicsPath();
+        path.AddEllipse (pixRect);
+        return path.IsVisible (point);
     }
 
     #endregion

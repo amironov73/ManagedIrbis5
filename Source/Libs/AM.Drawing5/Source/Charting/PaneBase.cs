@@ -440,8 +440,8 @@ public abstract class PaneBase
         _title = new GapLabel (title, Default.FontFamily,
             Default.FontSize, Default.FontColor, Default.FontBold,
             Default.FontItalic, Default.FontUnderline);
-        _title._fontSpec.Fill.IsVisible = false;
-        _title._fontSpec.Border.IsVisible = false;
+        _title.FontSpec.Fill.IsVisible = false;
+        _title.FontSpec.Border.IsVisible = false;
 
         _graphObjList = new GraphObjList();
 
@@ -661,7 +661,7 @@ public abstract class PaneBase
     {
         // get scaled values for the paneGap and character height
         //float scaledOuterGap = (float) ( Default.OuterPaneGap * scaleFactor );
-        var charHeight = _title._fontSpec.GetHeight (scaleFactor);
+        var charHeight = _title.FontSpec.GetHeight (scaleFactor);
 
         // chart rect starts out at the full pane rect.  It gets reduced to make room for the legend,
         // scales, titles, etc.
@@ -672,9 +672,9 @@ public abstract class PaneBase
             _rect.Height - scaleFactor * (_margin.Top + _margin.Bottom));
 
         // Leave room for the title
-        if (_title._isVisible && _title._text != string.Empty)
+        if (_title.IsVisible && _title.Text != string.Empty)
         {
-            var titleSize = _title._fontSpec.BoundingBox (g, _title._text, scaleFactor);
+            var titleSize = _title.FontSpec.BoundingBox (g, _title.Text, scaleFactor);
 
             // Leave room for the title height, plus a line spacing of charHeight * _titleGap
             innerRect.Y += titleSize.Height + charHeight * _titleGap;
@@ -728,13 +728,13 @@ public abstract class PaneBase
     public void DrawTitle (Graphics g, float scaleFactor)
     {
         // only draw the title if it's required
-        if (_title._isVisible)
+        if (_title.IsVisible)
         {
-            var size = _title._fontSpec.BoundingBox (g, _title._text, scaleFactor);
+            var size = _title.FontSpec.BoundingBox (g, _title.Text, scaleFactor);
 
             // use the internal fontSpec class to draw the text using user-specified and/or
             // default attributes.
-            _title._fontSpec.Draw (g, this, _title._text,
+            _title.FontSpec.Draw (g, this, _title.Text,
                 (_rect.Left + _rect.Right) / 2,
                 _rect.Top + _margin.Top * (float)scaleFactor + size.Height / 2.0F,
                 AlignH.Center, AlignV.Center, scaleFactor);

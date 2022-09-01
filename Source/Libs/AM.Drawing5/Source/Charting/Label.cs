@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* Label.cs --
+/* Label.cs -- текстовый заголовок
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,7 +14,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -23,31 +22,13 @@ using System.Security.Permissions;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// Class that handles the data associated with text title
-/// and its associated font
-/// properties
+/// Класс, содержащий данные, связанные с текстовым заголовком
+/// и связанными с ним свойствами шрифта.
 /// </summary>
 [Serializable]
 public class Label
     : ICloneable, ISerializable
 {
-    /// <summary>
-    /// private field that stores the <see cref="string" />
-    /// text for this label
-    /// </summary>
-    internal string _text;
-
-    /// <summary>
-    /// private field that stores the <see cref="FontSpec" />
-    /// font properties for this label
-    /// </summary>
-    internal FontSpec _fontSpec;
-
-    /// <summary>
-    /// private field that determines if this label will be displayed.
-    /// </summary>
-    internal bool _isVisible;
-
     #region Constructors
 
     /// <summary>
@@ -64,13 +45,21 @@ public class Label
     /// <param name="isBold">true for a bold font face</param>
     /// <param name="isItalic">true for an italic font face</param>
     /// <param name="isUnderline">true for an underline font face</param>
-    public Label (string text, string fontFamily, float fontSize, Color color, bool isBold,
-        bool isItalic, bool isUnderline)
+    public Label
+        (
+            string? text,
+            string fontFamily,
+            float fontSize,
+            Color color,
+            bool isBold,
+            bool isItalic,
+            bool isUnderline
+        )
     {
-        _text = (text == null) ? string.Empty : text;
+        Text = text ?? string.Empty;
 
-        _fontSpec = new FontSpec (fontFamily, fontSize, color, isBold, isItalic, isUnderline);
-        _isVisible = true;
+        FontSpec = new FontSpec (fontFamily, fontSize, color, isBold, isItalic, isUnderline);
+        IsVisible = true;
     }
 
     /// <summary>
@@ -79,12 +68,16 @@ public class Label
     /// </summary>
     /// <param name="text"></param>
     /// <param name="fontSpec"></param>
-    public Label (string text, FontSpec fontSpec)
+    public Label
+        (
+            string? text,
+            FontSpec fontSpec
+        )
     {
-        _text = (text == null) ? string.Empty : text;
+        Text = text ?? string.Empty;
 
-        _fontSpec = fontSpec;
-        _isVisible = true;
+        FontSpec = fontSpec;
+        IsVisible = true;
     }
 
     /// <summary>
@@ -93,31 +86,20 @@ public class Label
     /// <param name="rhs">the <see cref="Label" /> instance to be copied.</param>
     public Label (Label rhs)
     {
-        if (rhs._text != null)
+        if (rhs.Text != null)
         {
-            _text = (string)rhs._text.Clone();
+            Text = (string)rhs.Text.Clone();
         }
         else
         {
-            _text = string.Empty;
+            Text = string.Empty;
         }
 
-        _isVisible = rhs._isVisible;
-        if (rhs._fontSpec != null)
-        {
-            _fontSpec = rhs._fontSpec.Clone();
-        }
-        else
-        {
-            _fontSpec = null;
-        }
+        IsVisible = rhs.IsVisible;
+        FontSpec = rhs.FontSpec?.Clone();
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -139,30 +121,18 @@ public class Label
     /// <summary>
     /// The <see cref="String" /> text to be displayed
     /// </summary>
-    public string Text
-    {
-        get { return _text; }
-        set { _text = value; }
-    }
+    public string? Text { get; set; }
 
     /// <summary>
     /// A <see cref="Charting.FontSpec" /> instance representing the font properties
     /// for the displayed text.
     /// </summary>
-    public FontSpec FontSpec
-    {
-        get { return _fontSpec; }
-        set { _fontSpec = value; }
-    }
+    public FontSpec? FontSpec { get; set; }
 
     /// <summary>
     /// Gets or sets a boolean value that determines whether or not this label will be displayed.
     /// </summary>
-    public bool IsVisible
-    {
-        get { return _isVisible; }
-        set { _isVisible = value; }
-    }
+    public bool IsVisible { get; set; }
 
     #endregion
 
@@ -180,22 +150,22 @@ public class Label
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected Label (SerializationInfo info, StreamingContext context)
+    protected Label
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        info.GetInt32 ("schema").NotUsed();
 
-        _text = info.GetString ("text");
-        _isVisible = info.GetBoolean ("isVisible");
-        _fontSpec = (FontSpec)info.GetValue ("fontSpec", typeof (FontSpec));
+        Text = info.GetString ("text");
+        IsVisible = info.GetBoolean ("isVisible");
+        FontSpec = (FontSpec?) info.GetValue ("fontSpec", typeof (FontSpec));
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public virtual void GetObjectData
         (
             SerializationInfo info,
@@ -203,9 +173,9 @@ public class Label
         )
     {
         info.AddValue ("schema", schema);
-        info.AddValue ("text", _text);
-        info.AddValue ("isVisible", _isVisible);
-        info.AddValue ("fontSpec", _fontSpec);
+        info.AddValue ("text", Text);
+        info.AddValue ("isVisible", IsVisible);
+        info.AddValue ("fontSpec", FontSpec);
     }
 
     #endregion

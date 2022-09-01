@@ -123,7 +123,7 @@ public class YAxisList
         int index = 0;
         foreach (YAxis axis in this)
         {
-            if (string.Compare (axis.Title._text, title, true) == 0)
+            if (string.Compare (axis.Title.Text, title, true) == 0)
             {
                 return index;
             }

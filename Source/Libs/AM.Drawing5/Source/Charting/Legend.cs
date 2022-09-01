@@ -645,7 +645,7 @@ public class Legend
                 {
                     CurveItem curve = tmpPane.CurveList[_isReverse ? count - i - 1 : i];
 
-                    if (curve._label._text != "" && curve._label._isVisible)
+                    if (curve._label.Text != "" && curve._label.IsVisible)
                     {
                         // Calculate the x,y (TopLeft) location of the current
                         // curve legend label
@@ -659,8 +659,8 @@ public class Legend
                         y = _rect.Top + (int)(iEntry / _hStack) * _legendItemHeight;
 
                         // Draw the legend label for the current curve
-                        FontSpec tmpFont = (curve._label._fontSpec != null)
-                            ? curve._label._fontSpec
+                        FontSpec tmpFont = (curve._label.FontSpec != null)
+                            ? curve._label.FontSpec
                             : FontSpec;
 
                         // This is required because, for long labels, the centering can affect the
@@ -669,7 +669,7 @@ public class Legend
 
                         if (_isShowLegendSymbols)
                         {
-                            tmpFont.Draw (g, pane, curve._label._text,
+                            tmpFont.Draw (g, pane, curve._label.Text,
                                 x + 2.5F * _tmpSize, y + _legendItemHeight / 2.0F,
                                 AlignH.Left, AlignV.Center, scaleFactor);
 
@@ -679,12 +679,12 @@ public class Legend
                         }
                         else
                         {
-                            if (curve._label._fontSpec == null)
+                            if (curve._label.FontSpec == null)
                             {
                                 tmpFont.FontColor = curve.Color;
                             }
 
-                            tmpFont.Draw (g, pane, curve._label._text,
+                            tmpFont.Draw (g, pane, curve._label.Text,
                                 x + 0.0F * _tmpSize, y + _legendItemHeight / 2.0F,
                                 AlignH.Left, AlignV.Center, scaleFactor);
                         }
@@ -719,16 +719,16 @@ public class Legend
         {
             foreach (CurveItem curve in tmpPane.CurveList)
             {
-                if (curve._label._text != string.Empty && curve._label._isVisible)
+                if (curve._label.Text != string.Empty && curve._label.IsVisible)
                 {
                     float tmpHeight = defaultCharHeight;
-                    if (curve._label._fontSpec != null)
+                    if (curve._label.FontSpec != null)
                     {
-                        tmpHeight = curve._label._fontSpec.GetHeight (scaleFactor);
+                        tmpHeight = curve._label.FontSpec.GetHeight (scaleFactor);
                     }
 
                     // Account for multiline legend entries
-                    tmpHeight *= curve._label._text.Split ('\n').Length;
+                    tmpHeight *= curve._label.Text.Split ('\n').Length;
 
                     if (tmpHeight > maxCharHeight)
                     {
@@ -790,7 +790,7 @@ public class Legend
             {
                 foreach (CurveItem curve in tmpPane.CurveList)
                 {
-                    if (curve._label._isVisible && curve._label._text != string.Empty)
+                    if (curve._label.IsVisible && curve._label.Text != string.Empty)
                     {
                         if (pos == 0)
                         {
@@ -895,12 +895,12 @@ public class Legend
             for (int i = 0; i < count; i++)
             {
                 CurveItem curve = tmpPane.CurveList[_isReverse ? count - i - 1 : i];
-                if (curve._label._text != string.Empty && curve._label._isVisible)
+                if (curve._label.Text != string.Empty && curve._label.IsVisible)
                 {
                     // Calculate the width of the label save the max width
-                    FontSpec tmpFont = (curve._label._fontSpec != null) ? curve._label._fontSpec : FontSpec;
+                    FontSpec tmpFont = (curve._label.FontSpec != null) ? curve._label.FontSpec : FontSpec;
 
-                    tmpWidth = tmpFont.GetWidth (g, curve._label._text, scaleFactor);
+                    tmpWidth = tmpFont.GetWidth (g, curve._label.Text, scaleFactor);
 
                     if (tmpWidth > maxWidth)
                     {

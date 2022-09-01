@@ -82,7 +82,7 @@ public class YAxis
         IsVisible = Default.IsVisible;
         _majorGrid._isZeroLine = Default.IsZeroLine;
         Scale._fontSpec.Angle = 90.0F;
-        Title._fontSpec.Angle = -180F;
+        Title.FontSpec.Angle = -180F;
     }
 
     /// <summary>

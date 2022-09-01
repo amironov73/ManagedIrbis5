@@ -14,7 +14,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -32,7 +31,7 @@ namespace AM.Drawing.Charting;
 /// <see cref="System.Double" /> type for storage in the point value arrays.
 /// </remarks>
 [Serializable]
-class DateScale
+internal class DateScale
     : Scale
 {
     #region constructors
@@ -42,9 +41,13 @@ class DateScale
     /// (containing object) for this new object.
     /// </summary>
     /// <param name="owner">The owner, or containing object, of this instance</param>
-    public DateScale (Axis owner)
+    public DateScale
+        (
+            Axis owner
+        )
         : base (owner)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -53,18 +56,21 @@ class DateScale
     /// <param name="rhs">The <see cref="DateScale" /> object from which to copy</param>
     /// <param name="owner">The <see cref="Axis" /> object that will own the
     /// new instance of <see cref="DateScale" /></param>
-    public DateScale (Scale rhs, Axis owner)
+    public DateScale
+        (
+            Scale rhs,
+            Axis owner
+        )
         : base (rhs, owner)
     {
+        // пустое тело конструктора
     }
 
-    /// <summary>
-    /// Create a new clone of the current item, with a new owner assignment
-    /// </summary>
-    /// <param name="owner">The new <see cref="Axis" /> instance that will be
-    /// the owner of the new Scale</param>
-    /// <returns>A new <see cref="Scale" /> clone.</returns>
-    public override Scale Clone (Axis owner)
+    /// <inheritdoc cref="Scale.Clone"/>
+    public override Scale Clone
+        (
+            Axis owner
+        )
     {
         return new DateScale (this, owner);
     }
@@ -73,26 +79,13 @@ class DateScale
 
     #region properties
 
-    /// <summary>
-    /// Return the <see cref="AxisType" /> for this <see cref="Scale" />, which is
-    /// <see cref="AxisType.Date" />.
-    /// </summary>
-    public override AxisType Type
-    {
-        get { return AxisType.Date; }
-    }
+    /// <inheritdoc cref="Scale.Type"/>
+    public override AxisType Type => AxisType.Date;
 
-    /// <summary>
-    /// Gets or sets the minimum value for this scale.
-    /// </summary>
-    /// <remarks>
-    /// The set property is specifically adapted for <see cref="AxisType.Date" /> scales,
-    /// in that it automatically limits the value to the range of valid dates for the
-    /// <see cref="XDate" /> struct.
-    /// </remarks>
+    /// <inheritdoc cref="Scale.Min"/>
     public override double Min
     {
-        get { return _min; }
+        get => _min;
         set
         {
             _min = XDate.MakeValidDate (value);
@@ -100,17 +93,10 @@ class DateScale
         }
     }
 
-    /// <summary>
-    /// Gets or sets the maximum value for this scale.
-    /// </summary>
-    /// <remarks>
-    /// The set property is specifically adapted for <see cref="AxisType.Date" /> scales,
-    /// in that it automatically limits the value to the range of valid dates for the
-    /// <see cref="XDate" /> struct.
-    /// </remarks>
+    /// <inheritdoc cref="Scale.Max"/>
     public override double Max
     {
-        get { return _max; }
+        get => _max;
         set
         {
             _max = XDate.MakeValidDate (value);
@@ -122,25 +108,14 @@ class DateScale
 
     #region methods
 
-    /// <summary>
-    /// Determine the value for any major tic.
-    /// </summary>
-    /// <remarks>
-    /// This method properly accounts for <see cref="Scale.IsLog"/>, <see cref="Scale.IsText"/>,
-    /// and other axis format settings.
-    /// </remarks>
-    /// <param name="baseVal">
-    /// The value of the first major tic (floating point double)
-    /// </param>
-    /// <param name="tic">
-    /// The major tic number (0 = first major tic).  For log scales, this is the actual power of 10.
-    /// </param>
-    /// <returns>
-    /// The specified major tic value (floating point double).
-    /// </returns>
-    internal override double CalcMajorTicValue (double baseVal, double tic)
+    /// <inheritdoc cref="Scale.CalcMajorTicValue"/>
+    internal override double CalcMajorTicValue
+        (
+            double baseVal,
+            double tic
+        )
     {
-        XDate xDate = new XDate (baseVal);
+        var xDate = new XDate (baseVal);
 
         switch (_majorUnit)
         {
@@ -148,21 +123,27 @@ class DateScale
             default:
                 xDate.AddYears (tic * _majorStep);
                 break;
+
             case DateUnit.Month:
                 xDate.AddMonths (tic * _majorStep);
                 break;
+
             case DateUnit.Day:
                 xDate.AddDays (tic * _majorStep);
                 break;
+
             case DateUnit.Hour:
                 xDate.AddHours (tic * _majorStep);
                 break;
+
             case DateUnit.Minute:
                 xDate.AddMinutes (tic * _majorStep);
                 break;
+
             case DateUnit.Second:
                 xDate.AddSeconds (tic * _majorStep);
                 break;
+
             case DateUnit.Millisecond:
                 xDate.AddMilliseconds (tic * _majorStep);
                 break;
@@ -171,96 +152,76 @@ class DateScale
         return xDate.XLDate;
     }
 
-    /// <summary>
-    /// Determine the value for any minor tic.
-    /// </summary>
-    /// <remarks>
-    /// This method properly accounts for <see cref="Scale.IsLog"/>, <see cref="Scale.IsText"/>,
-    /// and other axis format settings.
-    /// </remarks>
-    /// <param name="baseVal">
-    /// The value of the first major tic (floating point double).  This tic value is the base
-    /// reference for all tics (including minor ones).
-    /// </param>
-    /// <param name="iTic">
-    /// The major tic number (0 = first major tic).  For log scales, this is the actual power of 10.
-    /// </param>
-    /// <returns>
-    /// The specified minor tic value (floating point double).
-    /// </returns>
-    internal override double CalcMinorTicValue (double baseVal, int iTic)
+    /// <inheritdoc cref="Scale.CalcMinorTicValue"/>
+    internal override double CalcMinorTicValue
+        (
+            double baseVal,
+            int iTic
+        )
     {
-        XDate xDate = new XDate (baseVal);
+        var xDate = new XDate (baseVal);
 
         switch (_minorUnit)
         {
             case DateUnit.Year:
             default:
-                xDate.AddYears ((double)iTic * _minorStep);
+                xDate.AddYears (iTic * _minorStep);
                 break;
+
             case DateUnit.Month:
-                xDate.AddMonths ((double)iTic * _minorStep);
+                xDate.AddMonths (iTic * _minorStep);
                 break;
+
             case DateUnit.Day:
-                xDate.AddDays ((double)iTic * _minorStep);
+                xDate.AddDays (iTic * _minorStep);
                 break;
+
             case DateUnit.Hour:
-                xDate.AddHours ((double)iTic * _minorStep);
+                xDate.AddHours (iTic * _minorStep);
                 break;
+
             case DateUnit.Minute:
-                xDate.AddMinutes ((double)iTic * _minorStep);
+                xDate.AddMinutes (iTic * _minorStep);
                 break;
+
             case DateUnit.Second:
-                xDate.AddSeconds ((double)iTic * _minorStep);
+                xDate.AddSeconds (iTic * _minorStep);
                 break;
         }
 
         return xDate.XLDate;
     }
 
-    /// <summary>
-    /// Internal routine to determine the ordinals of the first minor tic mark
-    /// </summary>
-    /// <param name="baseVal">
-    /// The value of the first major tic for the axis.
-    /// </param>
-    /// <returns>
-    /// The ordinal position of the first minor tic, relative to the first major tic.
-    /// This value can be negative (e.g., -3 means the first minor tic is 3 minor step
-    /// increments before the first major tic.
-    /// </returns>
-    internal override int CalcMinorStart (double baseVal)
+    /// <inheritdoc cref="Scale.CalcMinorStart"/>
+    internal override int CalcMinorStart
+        (
+            double baseVal
+        )
     {
         switch (_minorUnit)
         {
             case DateUnit.Year:
             default:
                 return (int)((_min - baseVal) / (365.0 * _minorStep));
+
             case DateUnit.Month:
                 return (int)((_min - baseVal) / (28.0 * _minorStep));
+
             case DateUnit.Day:
                 return (int)((_min - baseVal) / _minorStep);
+
             case DateUnit.Hour:
                 return (int)((_min - baseVal) * XDate.HoursPerDay / _minorStep);
+
             case DateUnit.Minute:
                 return (int)((_min - baseVal) * XDate.MinutesPerDay / _minorStep);
+
             case DateUnit.Second:
                 return (int)((_min - baseVal) * XDate.SecondsPerDay / _minorStep);
         }
     }
 
-    /// <summary>
-    /// Determine the value for the first major tic.
-    /// </summary>
-    /// <remarks>
-    /// This is done by finding the first possible value that is an integral multiple of
-    /// the step size, taking into account the date/time units if appropriate.
-    /// This method properly accounts for <see cref="Scale.IsLog"/>, <see cref="Scale.IsText"/>,
-    /// and other axis format settings.
-    /// </remarks>
-    /// <returns>
-    /// First major tic value (floating point double).
-    /// </returns>
+    /// <inheritdoc cref="Scale.CalcBaseTic"/>
     internal override double CalcBaseTic()
     {
         if (_baseTic != PointPairBase.Missing)
@@ -283,6 +244,7 @@ class DateScale
                     second = 0;
                     millisecond = 0;
                     break;
+
                 case DateUnit.Month:
                     day = 1;
                     hour = 0;
@@ -290,29 +252,34 @@ class DateScale
                     second = 0;
                     millisecond = 0;
                     break;
+
                 case DateUnit.Day:
                     hour = 0;
                     minute = 0;
                     second = 0;
                     millisecond = 0;
                     break;
+
                 case DateUnit.Hour:
                     minute = 0;
                     second = 0;
                     millisecond = 0;
                     break;
+
                 case DateUnit.Minute:
                     second = 0;
                     millisecond = 0;
                     break;
+
                 case DateUnit.Second:
                     millisecond = 0;
                     break;
+
                 case DateUnit.Millisecond:
                     break;
             }
 
-            double xlDate = XDate.CalendarDateToXLDate (year, month, day, hour, minute, second, millisecond);
+            var xlDate = XDate.CalendarDateToXLDate (year, month, day, hour, minute, second, millisecond);
             if (xlDate < _min)
             {
                 switch (_majorUnit)
@@ -321,21 +288,27 @@ class DateScale
                     default:
                         year++;
                         break;
+
                     case DateUnit.Month:
                         month++;
                         break;
+
                     case DateUnit.Day:
                         day++;
                         break;
+
                     case DateUnit.Hour:
                         hour++;
                         break;
+
                     case DateUnit.Minute:
                         minute++;
                         break;
+
                     case DateUnit.Second:
                         second++;
                         break;
+
                     case DateUnit.Millisecond:
                         millisecond++;
                         break;
@@ -348,15 +321,10 @@ class DateScale
         }
     }
 
-    /// <summary>
-    /// Internal routine to determine the ordinals of the first and last major axis label.
-    /// </summary>
-    /// <returns>
-    /// This is the total number of major tics for this axis.
-    /// </returns>
+    /// <inheritdoc cref="Scale.CalcNumTics"/>
     internal override int CalcNumTics()
     {
-        int nTics = 1;
+        var nTics = 1;
 
         int year1, year2, month1, month2, day1, day2, hour1, hour2, minute1, minute2;
         int second1, second2, millisecond1, millisecond2;
@@ -404,52 +372,17 @@ class DateScale
         return nTics;
     }
 
-    /// <summary>
-    /// Select a reasonable date-time axis scale given a range of data values.
-    /// </summary>
-    /// <remarks>
-    /// This method only applies to <see cref="AxisType.Date"/> type axes, and it
-    /// is called by the general <see cref="PickScale"/> method.  The scale range is chosen
-    /// based on increments of 1, 2, or 5 (because they are even divisors of 10).
-    /// Note that the <see cref="Scale.MajorStep"/> property setting can have multiple unit
-    /// types (<see cref="Scale.MajorUnit"/> and <see cref="Scale.MinorUnit" />),
-    /// but the <see cref="Scale.Min"/> and
-    /// <see cref="Scale.Max"/> units are always days (<see cref="XDate"/>).  This
-    /// method honors the <see cref="Scale.MinAuto"/>, <see cref="Scale.MaxAuto"/>,
-    /// and <see cref="Scale.MajorStepAuto"/> autorange settings.
-    /// In the event that any of the autorange settings are false, the
-    /// corresponding <see cref="Scale.Min"/>, <see cref="Scale.Max"/>, or <see cref="Scale.MajorStep"/>
-    /// setting is explicitly honored, and the remaining autorange settings (if any) will
-    /// be calculated to accomodate the non-autoranged values.  The basic default for
-    /// scale selection is defined with
-    /// <see cref="Scale.Default.TargetXSteps"/> and <see cref="Scale.Default.TargetYSteps"/>
-    /// from the <see cref="Scale.Default"/> default class.
-    /// <para>On Exit:</para>
-    /// <para><see cref="Scale.Min"/> is set to scale minimum (if <see cref="Scale.MinAuto"/> = true)</para>
-    /// <para><see cref="Scale.Max"/> is set to scale maximum (if <see cref="Scale.MaxAuto"/> = true)</para>
-    /// <para><see cref="Scale.MajorStep"/> is set to scale step size (if <see cref="Scale.MajorStepAuto"/> = true)</para>
-    /// <para><see cref="Scale.MinorStep"/> is set to scale minor step size (if <see cref="Scale.MinorStepAuto"/> = true)</para>
-    /// <para><see cref="Scale.Mag"/> is set to a magnitude multiplier according to the data</para>
-    /// <para><see cref="Scale.Format"/> is set to the display format for the values (this controls the
-    /// number of decimal places, whether there are thousands separators, currency types, etc.)</para>
-    /// </remarks>
-    /// <param name="pane">A reference to the <see cref="GraphPane"/> object
-    /// associated with this <see cref="Axis"/></param>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
+    /// <inheritdoc cref="Scale.PickScale"/>
     /// <seealso cref="Scale.PickScale"/>
     /// <seealso cref="AxisType.Date"/>
     /// <seealso cref="Scale.MajorUnit"/>
     /// <seealso cref="Scale.MinorUnit"/>
-    public override void PickScale (GraphPane pane, Graphics graphics, float scaleFactor)
+    public override void PickScale
+        (
+            GraphPane pane,
+            Graphics graphics,
+            float scaleFactor
+        )
     {
         // call the base class first
         base.PickScale (pane, graphics, scaleFactor);
@@ -468,12 +401,12 @@ class DateScale
             }
         }
 
-        double targetSteps = (_ownerAxis is XAxis || _ownerAxis is X2Axis)
+        var targetSteps = (_ownerAxis is XAxis || _ownerAxis is X2Axis)
             ? Default.TargetXSteps
             : Default.TargetYSteps;
 
         // Calculate the step size based on target steps
-        double tempStep = CalcDateStepSize (_max - _min, targetSteps);
+        var tempStep = CalcDateStepSize (_max - _min, targetSteps);
 
         // Calculate the new step size
         if (_majorStepAuto)
@@ -483,7 +416,7 @@ class DateScale
             if (_isPreventLabelOverlap)
             {
                 // Calculate the maximum number of labels
-                double maxLabels = (double)CalcMaxLabels (graphics, pane, scaleFactor);
+                var maxLabels = (double)CalcMaxLabels (graphics, pane, scaleFactor);
 
                 if (maxLabels < CalcNumTics())
                 {
@@ -520,7 +453,11 @@ class DateScale
     /// calculates and sets the values for <see cref="Scale.MajorUnit"/>,
     /// <see cref="Scale.MinorUnit"/>, <see cref="Scale.MinorStep"/>, and
     /// <see cref="Scale.Format"/></returns>
-    protected double CalcDateStepSize (double range, double targetSteps)
+    protected double CalcDateStepSize
+        (
+            double range,
+            double targetSteps
+        )
     {
         return CalcDateStepSize (range, targetSteps, this);
     }
@@ -538,10 +475,15 @@ class DateScale
     /// calculates and sets the values for <see cref="Scale.MajorUnit"/>,
     /// <see cref="Scale.MinorUnit"/>, <see cref="Scale.MinorStep"/>, and
     /// <see cref="Scale.Format"/></returns>
-    internal static double CalcDateStepSize (double range, double targetSteps, Scale scale)
+    internal static double CalcDateStepSize
+        (
+            double range,
+            double targetSteps,
+            Scale scale
+        )
     {
         // Calculate an initial guess at step size
-        double tempStep = range / targetSteps;
+        var tempStep = range / targetSteps;
 
         if (range > Default.RangeYearYear)
         {
@@ -1030,10 +972,7 @@ class DateScale
     /// and <see cref="Scale.Max" />.  This reflects the setting of
     /// <see cref="Scale.MajorUnit" />.
     /// </remarks>
-    internal override double MajorUnitMultiplier
-    {
-        get { return GetUnitMultiple (_majorUnit); }
-    }
+    internal override double MajorUnitMultiplier => GetUnitMultiple (_majorUnit);
 
     /// <summary>
     /// Gets the minor unit multiplier for this scale type, if any.
@@ -1043,10 +982,7 @@ class DateScale
     /// and <see cref="Scale.Max" />.  This reflects the setting of
     /// <see cref="Scale.MinorUnit" />.
     /// </remarks>
-    internal override double MinorUnitMultiplier
-    {
-        get { return GetUnitMultiple (_minorUnit); }
-    }
+    internal override double MinorUnitMultiplier => GetUnitMultiple (_minorUnit);
 
     /// <summary>
     /// Internal routine to calculate a multiplier to the selected unit back to days.
@@ -1094,11 +1030,16 @@ class DateScale
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected DateScale (SerializationInfo info, StreamingContext context) : base (info, context)
+    protected DateScale
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        info.GetInt32 ("schema2").NotUsed();
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>

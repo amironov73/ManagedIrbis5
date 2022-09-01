@@ -384,7 +384,7 @@ public class Symbol
     /// Draw the <see cref="Symbol"/> to the specified <see cref="Graphics"/> device
     /// at the specified location.  This routine draws a single symbol.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -398,7 +398,7 @@ public class Symbol
     /// <param name="brush">A <see cref="Brush"/> class representing a default solid brush for this symbol
     /// If this symbol uses a <see cref="LinearGradientBrush"/>, it will be created on the fly for
     /// each point, since it has to be scaled to the individual point coordinates.</param>
-    private void DrawSymbol (Graphics g, int x, int y, GraphicsPath path,
+    private void DrawSymbol (Graphics graphics, int x, int y, GraphicsPath path,
         Pen pen, Brush brush)
     {
         // Only draw if the symbol is visible
@@ -407,25 +407,25 @@ public class Symbol
             x < 100000 && x > -100000 &&
             y < 100000 && y > -100000)
         {
-            Matrix saveMatrix = g.Transform;
-            g.TranslateTransform (x, y);
+            Matrix saveMatrix = graphics.Transform;
+            graphics.TranslateTransform (x, y);
 
             // Fill or draw the symbol as required
             if (_fill.IsVisible)
             {
-                g.FillPath (brush, path);
+                graphics.FillPath (brush, path);
             }
 
             //FillPoint( g, x, y, scaleFactor, pen, brush );
 
             if (_border.IsVisible)
             {
-                g.DrawPath (pen, path);
+                graphics.DrawPath (pen, path);
             }
 
             //DrawPoint( g, x, y, scaleFactor, pen );
 
-            g.Transform = saveMatrix;
+            graphics.Transform = saveMatrix;
         }
     }
 
@@ -433,7 +433,7 @@ public class Symbol
     /// Draw the <see cref="Symbol"/> to the specified <see cref="Graphics"/> device
     /// at the specified location.  This routine draws a single symbol.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -456,8 +456,16 @@ public class Symbol
     /// <param name="isSelected">Indicates that the <see cref="Symbol" /> should be drawn
     /// with attributes from the <see cref="Selection" /> class.
     /// </param>
-    public void DrawSymbol (Graphics g, GraphPane pane, int x, int y,
-        float scaleFactor, bool isSelected, PointPair dataValue)
+    public void DrawSymbol
+        (
+            Graphics graphics,
+            GraphPane pane,
+            int x,
+            int y,
+            float scaleFactor,
+            bool isSelected,
+            PointPair? dataValue
+        )
     {
         Symbol source = this;
         if (isSelected)
@@ -471,20 +479,20 @@ public class Symbol
             x < 100000 && x > -100000 &&
             y < 100000 && y > -100000)
         {
-            SmoothingMode sModeSave = g.SmoothingMode;
+            SmoothingMode sModeSave = graphics.SmoothingMode;
             if (_isAntiAlias)
             {
-                g.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
             }
 
             using (Pen pen = _border.GetPen (pane, scaleFactor, dataValue))
-            using (GraphicsPath path = MakePath (g, scaleFactor))
+            using (GraphicsPath path = MakePath (graphics, scaleFactor))
             using (Brush brush = Fill.MakeBrush (path.GetBounds(), dataValue))
             {
-                DrawSymbol (g, x, y, path, pen, brush);
+                DrawSymbol (graphics, x, y, path, pen, brush);
             }
 
-            g.SmoothingMode = sModeSave;
+            graphics.SmoothingMode = sModeSave;
         }
     }
 

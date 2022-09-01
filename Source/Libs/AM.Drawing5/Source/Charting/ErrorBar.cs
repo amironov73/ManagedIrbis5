@@ -14,7 +14,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -117,8 +116,8 @@ public class ErrorBar
     /// <seealso cref="Default.IsVisible"/>
     public bool IsVisible
     {
-        get { return _isVisible; }
-        set { _isVisible = value; }
+        get => _isVisible;
+        set => _isVisible = value;
     }
 
     /// <summary>
@@ -131,8 +130,8 @@ public class ErrorBar
     /// </remarks>
     public Color Color
     {
-        get { return _color; }
-        set { _color = value; }
+        get => _color;
+        set => _color = value;
     }
 
     /// <summary>
@@ -145,8 +144,8 @@ public class ErrorBar
     /// </remarks>
     public float PenWidth
     {
-        get { return _penWidth; }
-        set { _penWidth = value; }
+        get => _penWidth;
+        set => _penWidth = value;
     }
 
     /// <summary>
@@ -155,8 +154,8 @@ public class ErrorBar
     /// </summary>
     public Symbol Symbol
     {
-        get { return _symbol; }
-        set { _symbol = value; }
+        get => _symbol;
+        set => _symbol = value;
     }
 
     #endregion
@@ -167,8 +166,10 @@ public class ErrorBar
     /// Default constructor that sets all <see cref="ErrorBar"/> properties to
     /// default values as defined in the <see cref="Default"/> class.
     /// </summary>
-    public ErrorBar() : this (Default.Color)
+    public ErrorBar()
+        : this (Default.Color)
     {
+        // пустое тело метода
     }
 
     /// <summary>
@@ -201,11 +202,7 @@ public class ErrorBar
         _symbol = rhs.Symbol.Clone();
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -240,7 +237,7 @@ public class ErrorBar
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        info.GetInt32 ("schema").NotUsed();
 
         _isVisible = info.GetBoolean ("isVisible");
         _color = (Color)info.GetValue ("color", typeof (Color));
@@ -310,24 +307,63 @@ public class ErrorBar
             float scaleFactor,
             Pen pen,
             bool isSelected,
-            PointPair dataValue
+            PointPair? dataValue
         )
     {
         if (isXBase)
         {
             graphics.DrawLine (pen, pixBase, pixValue, pixBase, pixLowValue);
-            _symbol.DrawSymbol (graphics, pane, (int)pixBase, (int)pixValue,
-                scaleFactor, isSelected, dataValue);
-            _symbol.DrawSymbol (graphics, pane, (int)pixBase, (int)pixLowValue,
-                scaleFactor, isSelected, dataValue);
+            _symbol.DrawSymbol
+                (
+                    graphics,
+                    pane,
+                    (int) pixBase,
+                    (int) pixValue,
+                    scaleFactor,
+                    isSelected,
+                    dataValue
+                );
+            _symbol.DrawSymbol
+                (
+                    graphics,
+                    pane,
+                    (int) pixBase,
+                    (int) pixLowValue,
+                    scaleFactor,
+                    isSelected,
+                    dataValue
+                );
         }
         else
         {
-            graphics.DrawLine (pen, pixValue, pixBase, pixLowValue, pixBase);
-            _symbol.DrawSymbol (graphics, pane, (int)pixValue, (int)pixBase,
-                scaleFactor, isSelected, dataValue);
-            _symbol.DrawSymbol (graphics, pane, (int)pixLowValue, (int)pixBase,
-                scaleFactor, isSelected, dataValue);
+            graphics.DrawLine
+                (
+                    pen,
+                    pixValue,
+                    pixBase,
+                    pixLowValue,
+                    pixBase
+                );
+            _symbol.DrawSymbol
+                (
+                    graphics,
+                    pane,
+                    (int) pixValue,
+                    (int) pixBase,
+                    scaleFactor,
+                    isSelected,
+                    dataValue
+                );
+            _symbol.DrawSymbol
+                (
+                    graphics,
+                    pane,
+                    (int) pixLowValue,
+                    (int) pixBase,
+                    scaleFactor,
+                    isSelected,
+                    dataValue
+                );
         }
     }
 
@@ -356,22 +392,29 @@ public class ErrorBar
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public void Draw (Graphics graphics, GraphPane pane, ErrorBarItem curve,
-        Axis baseAxis, Axis valueAxis, float scaleFactor)
+    public void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            ErrorBarItem curve,
+            Axis baseAxis,
+            Axis valueAxis,
+            float scaleFactor
+        )
     {
-        ValueHandler valueHandler = new ValueHandler (pane, false);
+        var valueHandler = new ValueHandler (pane, false);
 
         float pixBase, pixValue, pixLowValue;
         double scaleBase, scaleValue, scaleLowValue;
 
         if (curve.Points != null && IsVisible)
         {
-            using (Pen pen = !curve.IsSelected
+            using (var pen = !curve.IsSelected
                        ? new Pen (_color, _penWidth)
                        : new Pen (Selection.Border.Color, Selection.Border.Width))
             {
                 // Loop over each defined point
-                for (int i = 0; i < curve.Points.Count; i++)
+                for (var i = 0; i < curve.Points.Count; i++)
                 {
                     valueHandler.GetValues (curve, i, out scaleBase,
                         out scaleLowValue, out scaleValue);

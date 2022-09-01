@@ -113,7 +113,7 @@ public class GapLabel
             float scaleFactor
         )
     {
-        return _fontSpec.GetHeight (scaleFactor) * Gap;
+        return FontSpec.GetHeight (scaleFactor) * Gap;
     }
 
     #endregion

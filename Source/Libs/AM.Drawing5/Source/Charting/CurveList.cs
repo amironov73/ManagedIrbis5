@@ -326,7 +326,7 @@ public class CurveList
         var index = 0;
         foreach (var p in this)
         {
-            if (string.Compare (p._label._text, label, true) == 0)
+            if (string.Compare (p._label.Text, label, true) == 0)
             {
                 return index;
             }

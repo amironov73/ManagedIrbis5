@@ -1895,8 +1895,8 @@ public class GraphPane
             }
 
             // See if the point is in the Pane Title
-            SizeF paneTitleBox = _title._fontSpec.BoundingBox (g, _title._text, scaleFactor);
-            if (saveZOrder <= ZOrder.H_BehindAll && _title._isVisible)
+            SizeF paneTitleBox = _title.FontSpec.BoundingBox (g, _title.Text, scaleFactor);
+            if (saveZOrder <= ZOrder.H_BehindAll && _title.IsVisible)
             {
                 tmpRect = new RectangleF ((_rect.Left + _rect.Right - paneTitleBox.Width) / 2,
                     _rect.Top + _margin.Top * scaleFactor,
