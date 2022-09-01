@@ -284,7 +284,7 @@ public class LineItem
     /// </param>
     public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
     {
-        if (_isVisible)
+        if (IsVisible)
         {
             Line.Draw (graphics, pane, this, scaleFactor);
 
@@ -376,8 +376,8 @@ public class LineItem
         Axis yAxis = GetYAxis (pane);
         Axis xAxis = GetXAxis (pane);
 
-        PointF pixPt = new PointF (xAxis.Scale.Transform (_isOverrideOrdinal, i, x),
-            yAxis.Scale.Transform (_isOverrideOrdinal, i, y));
+        PointF pixPt = new PointF (xAxis.Scale.Transform (IsOverrideOrdinal, i, x),
+            yAxis.Scale.Transform (IsOverrideOrdinal, i, y));
 
         if (!pane.Chart.Rect.Contains (pixPt))
         {

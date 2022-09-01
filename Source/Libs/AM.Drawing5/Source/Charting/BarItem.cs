@@ -218,7 +218,7 @@ public class BarItem
         )
     {
         // Pass the drawing onto the bar class
-        if (_isVisible)
+        if (IsVisible)
         {
             Bar?.DrawBars
                 (
@@ -454,11 +454,11 @@ public class BarItem
         if (!_points[i].IsInvalid3D)
         {
             // calculate a pixel value for the top of the bar on value axis
-            pixLowVal = valueAxis.Scale.Transform (_isOverrideOrdinal, i, curLowVal);
-            pixHiVal = valueAxis.Scale.Transform (_isOverrideOrdinal, i, curHiVal);
+            pixLowVal = valueAxis.Scale.Transform (IsOverrideOrdinal, i, curLowVal);
+            pixHiVal = valueAxis.Scale.Transform (IsOverrideOrdinal, i, curHiVal);
 
             // calculate a pixel value for the center of the bar on the base axis
-            pixBase = baseAxis.Scale.Transform (_isOverrideOrdinal, i, curBase);
+            pixBase = baseAxis.Scale.Transform (IsOverrideOrdinal, i, curBase);
 
             // Calculate the pixel location for the side of the bar (on the base axis)
             var pixSide = pixBase - clusterWidth / 2.0F + clusterGap / 2.0F +

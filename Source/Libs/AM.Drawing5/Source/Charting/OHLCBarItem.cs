@@ -225,7 +225,7 @@ public class OHLCBarItem
     /// </param>
     public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
     {
-        if (_isVisible)
+        if (IsVisible)
         {
             _bar.Draw (graphics, pane, this, BaseAxis (pane),
                 ValueAxis (pane), scaleFactor);
@@ -315,9 +315,9 @@ public class OHLCBarItem
             ((high > 0 && low > 0) || !valueAxis.Scale.IsLog))
         {
             float pixBase, pixHigh, pixLow;
-            pixBase = baseAxis.Scale.Transform (_isOverrideOrdinal, i, date);
-            pixHigh = valueAxis.Scale.Transform (_isOverrideOrdinal, i, high);
-            pixLow = valueAxis.Scale.Transform (_isOverrideOrdinal, i, low);
+            pixBase = baseAxis.Scale.Transform (IsOverrideOrdinal, i, date);
+            pixHigh = valueAxis.Scale.Transform (IsOverrideOrdinal, i, high);
+            pixLow = valueAxis.Scale.Transform (IsOverrideOrdinal, i, low);
 
             // Calculate the pixel location for the side of the bar (on the base axis)
             float pixSide = pixBase - halfSize;

@@ -46,37 +46,6 @@ namespace AM.Drawing.Charting
         /// </summary>
         internal Label _label;
 
-        /// <summary>
-        /// protected field that stores the boolean value that determines whether this
-        /// <see cref="CurveItem"/> is on the bottom X axis or the top X axis (X2).
-        /// Use the public property <see cref="IsX2Axis"/> to access this value.
-        /// </summary>
-        protected bool _isX2Axis;
-
-        /// <summary>
-        /// protected field that stores the boolean value that determines whether this
-        /// <see cref="CurveItem"/> is on the left Y axis or the right Y axis (Y2).
-        /// Use the public property <see cref="IsY2Axis"/> to access this value.
-        /// </summary>
-        protected bool _isY2Axis;
-
-        /// <summary>
-        /// protected field that stores the index number of the Y Axis to which this
-        /// <see cref="CurveItem" /> belongs.  Use the public property <see cref="YAxisIndex" />
-        /// to access this value.
-        /// </summary>
-        protected int _yAxisIndex;
-
-        /// <summary>
-        /// protected field that stores the boolean value that determines whether this
-        /// <see cref="CurveItem"/> is visible on the graph.
-        /// Use the public property <see cref="IsVisible"/> to access this value.
-        /// Note that this value turns the curve display on or off, but it does not
-        /// affect the display of the legend entry.  To hide the legend entry, you
-        /// have to set <see cref="Charting.Label.IsVisible"/> to false.
-        /// </summary>
-        protected bool _isVisible;
-
         // Revision: JCarpenter 10/06
         /// <summary>
         /// Protected field that stores the boolean value that determines whether this
@@ -89,18 +58,6 @@ namespace AM.Drawing.Charting
         protected bool _isSelected;
 
         // Revision: JCarpenter 10/06
-        /// <summary>
-        /// Protected field that stores the boolean value that determines whether this
-        /// <see cref="CurveItem"/> can be selected in the graph.
-        /// </summary>
-        protected bool _isSelectable;
-
-        /// <summary>
-        /// protected field that stores a boolean value which allows you to override the normal
-        /// ordinal axis behavior.  Use the public property <see cref="IsOverrideOrdinal"/> to
-        /// access this value.
-        /// </summary>
-        protected bool _isOverrideOrdinal;
 
         /// <summary>
         /// The <see cref="IPointList"/> of value sets that
@@ -190,12 +147,12 @@ namespace AM.Drawing.Charting
         private void Init (string label)
         {
             _label = new Label (label, null);
-            _isY2Axis = false;
-            _isX2Axis = false;
-            _isVisible = true;
-            _isOverrideOrdinal = false;
+            IsY2Axis = false;
+            IsX2Axis = false;
+            IsVisible = true;
+            IsOverrideOrdinal = false;
             Tag = null;
-            _yAxisIndex = 0;
+            YAxisIndex = 0;
             _link = new Link();
         }
 
@@ -224,11 +181,11 @@ namespace AM.Drawing.Charting
         public CurveItem (CurveItem rhs)
         {
             _label = rhs._label.Clone();
-            _isY2Axis = rhs.IsY2Axis;
-            _isX2Axis = rhs.IsX2Axis;
-            _isVisible = rhs.IsVisible;
-            _isOverrideOrdinal = rhs._isOverrideOrdinal;
-            _yAxisIndex = rhs._yAxisIndex;
+            IsY2Axis = rhs.IsY2Axis;
+            IsX2Axis = rhs.IsX2Axis;
+            IsVisible = rhs.IsVisible;
+            IsOverrideOrdinal = rhs.IsOverrideOrdinal;
+            YAxisIndex = rhs.YAxisIndex;
 
             if (rhs.Tag is ICloneable)
             {
@@ -288,22 +245,22 @@ namespace AM.Drawing.Charting
         {
             // The schema value is just a file version parameter.  You can use it to make future versions
             // backwards compatible as new member variables are added to classes
-            int sch = info.GetInt32 ("schema");
+            var sch = info.GetInt32 ("schema");
 
             _label = (Label)info.GetValue ("label", typeof (Label));
-            _isY2Axis = info.GetBoolean ("isY2Axis");
+            IsY2Axis = info.GetBoolean ("isY2Axis");
             if (sch >= 11)
             {
-                _isX2Axis = info.GetBoolean ("isX2Axis");
+                IsX2Axis = info.GetBoolean ("isX2Axis");
             }
             else
             {
-                _isX2Axis = false;
+                IsX2Axis = false;
             }
 
-            _isVisible = info.GetBoolean ("isVisible");
+            IsVisible = info.GetBoolean ("isVisible");
 
-            _isOverrideOrdinal = info.GetBoolean ("isOverrideOrdinal");
+            IsOverrideOrdinal = info.GetBoolean ("isOverrideOrdinal");
 
             // Data Points are always stored as a PointPairList, regardless of the
             // actual original type (which could be anything that supports IPointList).
@@ -311,7 +268,7 @@ namespace AM.Drawing.Charting
 
             Tag = info.GetValue ("Tag", typeof (object));
 
-            _yAxisIndex = info.GetInt32 ("yAxisIndex");
+            YAxisIndex = info.GetInt32 ("yAxisIndex");
 
             _link = (Link)info.GetValue ("link", typeof (Link));
         }
@@ -329,10 +286,10 @@ namespace AM.Drawing.Charting
         {
             info.AddValue ("schema", schema);
             info.AddValue ("label", _label);
-            info.AddValue ("isY2Axis", _isY2Axis);
-            info.AddValue ("isX2Axis", _isX2Axis);
-            info.AddValue ("isVisible", _isVisible);
-            info.AddValue ("isOverrideOrdinal", _isOverrideOrdinal);
+            info.AddValue ("isY2Axis", IsY2Axis);
+            info.AddValue ("isX2Axis", IsX2Axis);
+            info.AddValue ("isVisible", IsVisible);
+            info.AddValue ("isOverrideOrdinal", IsOverrideOrdinal);
 
             // if points is already a PointPairList, use it
             // otherwise, create a new PointPairList so it can be serialized
@@ -348,7 +305,7 @@ namespace AM.Drawing.Charting
 
             info.AddValue ("points", list);
             info.AddValue ("Tag", Tag);
-            info.AddValue ("yAxisIndex", _yAxisIndex);
+            info.AddValue ("yAxisIndex", YAxisIndex);
 
             info.AddValue ("link", _link);
         }
@@ -378,30 +335,20 @@ namespace AM.Drawing.Charting
         {
             get
             {
-                if (this is BarItem)
+                return this switch
                 {
-                    return ((BarItem)this).Bar.Fill.Color;
-                }
-                else if (this is LineItem && ((LineItem)this).Line.IsVisible)
-                {
-                    return ((LineItem)this).Line.Color;
-                }
-                else if (this is LineItem)
-                {
-                    return ((LineItem)this).Symbol.Border.Color;
-                }
-                else if (this is ErrorBarItem)
-                {
-                    return ((ErrorBarItem)this).Bar.Color;
-                }
-                else if (this is HiLowBarItem)
-                {
-                    return ((HiLowBarItem)this).Bar.Fill.Color;
-                }
-                else
-                {
-                    return Color.Empty;
-                }
+                    HiLowBarItem hiLowBarItem => hiLowBarItem.Bar.ThrowIfNull().Fill.Color,
+
+                    BarItem barItem => barItem.Bar.ThrowIfNull().Fill.Color,
+
+                    LineItem visibleLine when visibleLine.Line.IsVisible => visibleLine.Line.Color,
+
+                    LineItem lineItem => lineItem.Symbol.Border.Color,
+
+                    ErrorBarItem errorBarItem => errorBarItem.Bar.Color,
+
+                    _ => Color.Empty
+                };
             }
             set
             {
@@ -432,11 +379,7 @@ namespace AM.Drawing.Charting
         /// affect the display of the legend entry.  To hide the legend entry, you
         /// have to set <see cref="Charting.Label.IsVisible"/> to false.
         /// </summary>
-        public bool IsVisible
-        {
-            get { return _isVisible; }
-            set { _isVisible = value; }
-        }
+        public bool IsVisible { get; set; }
 
         // Revision: JCarpenter 10/06
         /// <summary>
@@ -475,11 +418,7 @@ namespace AM.Drawing.Charting
         /// <summary>
         /// Determines whether this <see cref="CurveItem"/> can be selected in the graph.
         /// </summary>
-        public bool IsSelectable
-        {
-            get { return _isSelectable; }
-            set { _isSelectable = value; }
-        }
+        public bool IsSelectable { get; set; }
 
         /// <summary>
         /// Gets or sets a value which allows you to override the normal
@@ -494,11 +433,7 @@ namespace AM.Drawing.Charting
         /// </remarks>
         /// <seealso cref="AxisType.Ordinal"/>
         /// <seealso cref="AxisType.Text"/>
-        public bool IsOverrideOrdinal
-        {
-            get { return _isOverrideOrdinal; }
-            set { _isOverrideOrdinal = value; }
-        }
+        public bool IsOverrideOrdinal { get; set; }
 
         /// <summary>
         /// Gets or sets a value that determines which X axis this <see cref="CurveItem"/>
@@ -512,11 +447,7 @@ namespace AM.Drawing.Charting
         /// </remarks>
         /// <value>true to assign the curve to the <see cref="X2Axis"/>,
         /// false to assign the curve to the <see cref="XAxis"/></value>
-        public bool IsX2Axis
-        {
-            get { return _isX2Axis; }
-            set { _isX2Axis = value; }
-        }
+        public bool IsX2Axis { get; set; }
 
         /// <summary>
         /// Gets or sets a value that determines which Y axis this <see cref="CurveItem"/>
@@ -532,11 +463,7 @@ namespace AM.Drawing.Charting
         /// </remarks>
         /// <value>true to assign the curve to the <see cref="Y2Axis"/>,
         /// false to assign the curve to the <see cref="YAxis"/></value>
-        public bool IsY2Axis
-        {
-            get { return _isY2Axis; }
-            set { _isY2Axis = value; }
-        }
+        public bool IsY2Axis { get; set; }
 
         /// <summary>
         /// Gets or sets the index number of the Y Axis to which this
@@ -547,41 +474,28 @@ namespace AM.Drawing.Charting
         /// or <see cref="GraphPane.Y2AxisList" />, depending on the setting of
         /// <see cref="IsY2Axis" />.
         /// </remarks>
-        public int YAxisIndex
-        {
-            get { return _yAxisIndex; }
-            set { _yAxisIndex = value; }
-        }
+        public int YAxisIndex { get; set; }
 
         /// <summary>
         /// Determines whether this <see cref="CurveItem"/>
         /// is a <see cref="BarItem"/>.
         /// </summary>
         /// <value>true for a bar chart, or false for a line or pie graph</value>
-        public bool IsBar
-        {
-            get { return this is BarItem || this is HiLowBarItem || this is ErrorBarItem; }
-        }
+        public bool IsBar => this is BarItem || this is HiLowBarItem || this is ErrorBarItem;
 
         /// <summary>
         /// Determines whether this <see cref="CurveItem"/>
         /// is a <see cref="PieItem"/>.
         /// </summary>
         /// <value>true for a pie chart, or false for a line or bar graph</value>
-        public bool IsPie
-        {
-            get { return this is PieItem; }
-        }
+        public bool IsPie => this is PieItem;
 
         /// <summary>
         /// Determines whether this <see cref="CurveItem"/>
         /// is a <see cref="LineItem"/>.
         /// </summary>
         /// <value>true for a line chart, or false for a bar type</value>
-        public bool IsLine
-        {
-            get { return this is LineItem; }
-        }
+        public bool IsLine => this is LineItem;
 
         /// <summary>
         /// Gets a flag indicating if the Z data range should be included in the axis scaling calculations.
@@ -741,9 +655,9 @@ namespace AM.Drawing.Charting
                 Points = new PointPairList();
             }
 
-            if (_points is IPointListEdit)
+            if (_points is IPointListEdit pointListEdit)
             {
-                (_points as IPointListEdit).Add (point);
+                pointListEdit.Add (point);
             }
             else
             {
@@ -762,9 +676,9 @@ namespace AM.Drawing.Charting
         /// </remarks>
         public void Clear()
         {
-            if (_points is IPointListEdit)
+            if (_points is IPointListEdit pointListEdit)
             {
-                (_points as IPointListEdit).Clear();
+                pointListEdit.Clear();
             }
             else
             {
@@ -783,9 +697,9 @@ namespace AM.Drawing.Charting
         /// <param name="index">The ordinal position of the point to be removed.</param>
         public void RemovePoint (int index)
         {
-            if (_points is IPointListEdit)
+            if (_points is IPointListEdit pointListEdit)
             {
-                (_points as IPointListEdit).RemoveAt (index);
+                pointListEdit.RemoveAt (index);
             }
             else
             {
@@ -803,7 +717,7 @@ namespace AM.Drawing.Charting
         /// </returns>
         public Axis GetXAxis (GraphPane pane)
         {
-            if (_isX2Axis)
+            if (IsX2Axis)
             {
                 return pane.X2Axis;
             }
@@ -829,11 +743,11 @@ namespace AM.Drawing.Charting
         /// </returns>
         public Axis GetYAxis (GraphPane pane)
         {
-            if (_isY2Axis)
+            if (IsY2Axis)
             {
-                if (_yAxisIndex < pane.Y2AxisList.Count)
+                if (YAxisIndex < pane.Y2AxisList.Count)
                 {
-                    return pane.Y2AxisList[_yAxisIndex];
+                    return pane.Y2AxisList[YAxisIndex];
                 }
                 else
                 {
@@ -842,9 +756,9 @@ namespace AM.Drawing.Charting
             }
             else
             {
-                if (_yAxisIndex < pane.YAxisList.Count)
+                if (YAxisIndex < pane.YAxisList.Count)
                 {
-                    return pane.YAxisList[_yAxisIndex];
+                    return pane.YAxisList[YAxisIndex];
                 }
                 else
                 {
@@ -869,10 +783,10 @@ namespace AM.Drawing.Charting
         /// </returns>
         public int GetYAxisIndex (GraphPane pane)
         {
-            if (_yAxisIndex >= 0 &&
-                _yAxisIndex < (_isY2Axis ? pane.Y2AxisList.Count : pane.YAxisList.Count))
+            if (YAxisIndex >= 0 &&
+                YAxisIndex < (IsY2Axis ? pane.Y2AxisList.Count : pane.YAxisList.Count))
             {
-                return _yAxisIndex;
+                return YAxisIndex;
             }
             else
             {
@@ -932,27 +846,32 @@ namespace AM.Drawing.Charting
         /// owner of this object.
         /// </param>
         /// <seealso cref="GraphPane.IsBoundedRanges"/>
-        public virtual void GetRange (out double xMin, out double xMax,
-            out double yMin, out double yMax,
-            bool ignoreInitial,
-            bool isBoundedRanges,
-            GraphPane pane)
+        public virtual void GetRange
+            (
+                out double xMin,
+                out double xMax,
+                out double yMin,
+                out double yMax,
+                bool ignoreInitial,
+                bool isBoundedRanges,
+                GraphPane pane
+            )
         {
             // The lower and upper bounds of allowable data for the X values.  These
             // values allow you to subset the data values.  If the X range is bounded, then
             // the resulting range for Y will reflect the Y values for the points within the X
             // bounds.
-            double xLBound = double.MinValue;
-            double xUBound = double.MaxValue;
-            double yLBound = double.MinValue;
-            double yUBound = double.MaxValue;
+            var xLBound = double.MinValue;
+            var xUBound = double.MaxValue;
+            var yLBound = double.MinValue;
+            var yUBound = double.MaxValue;
 
             // initialize the values to outrageous ones to start
             xMin = yMin = double.MaxValue;
             xMax = yMax = double.MinValue;
 
-            Axis yAxis = GetYAxis (pane);
-            Axis xAxis = GetXAxis (pane);
+            var yAxis = GetYAxis (pane);
+            var xAxis = GetXAxis (pane);
             if (yAxis == null || xAxis == null)
             {
                 return;
@@ -967,29 +886,29 @@ namespace AM.Drawing.Charting
             }
 
 
-            bool isZIncluded = IsZIncluded (pane);
-            bool isXIndependent = IsXIndependent (pane);
-            bool isXLog = xAxis.Scale.IsLog;
-            bool isYLog = yAxis.Scale.IsLog;
-            bool isXOrdinal = xAxis.Scale.IsAnyOrdinal;
-            bool isYOrdinal = yAxis.Scale.IsAnyOrdinal;
-            bool isZOrdinal = (isXIndependent ? yAxis : xAxis).Scale.IsAnyOrdinal;
+            var isZIncluded = IsZIncluded (pane);
+            var isXIndependent = IsXIndependent (pane);
+            var isXLog = xAxis.Scale.IsLog;
+            var isYLog = yAxis.Scale.IsLog;
+            var isXOrdinal = xAxis.Scale.IsAnyOrdinal;
+            var isYOrdinal = yAxis.Scale.IsAnyOrdinal;
+            var isZOrdinal = (isXIndependent ? yAxis : xAxis).Scale.IsAnyOrdinal;
 
             // Loop over each point in the arrays
             //foreach ( PointPair point in this.Points )
-            for (int i = 0; i < Points.Count; i++)
+            for (var i = 0; i < Points.Count; i++)
             {
-                PointPair point = Points[i];
+                var point = Points[i];
 
-                double curX = isXOrdinal ? i + 1 : point.X;
-                double curY = isYOrdinal ? i + 1 : point.Y;
-                double curZ = isZOrdinal ? i + 1 : point.Z;
+                var curX = isXOrdinal ? i + 1 : point.X;
+                var curY = isYOrdinal ? i + 1 : point.Y;
+                var curZ = isZOrdinal ? i + 1 : point.Z;
 
-                bool outOfBounds = curX < xLBound || curX > xUBound ||
-                                   curY < yLBound || curY > yUBound ||
-                                   (isZIncluded && isXIndependent && (curZ < yLBound || curZ > yUBound)) ||
-                                   (isZIncluded && !isXIndependent && (curZ < xLBound || curZ > xUBound)) ||
-                                   (curX <= 0 && isXLog) || (curY <= 0 && isYLog);
+                var outOfBounds = curX < xLBound || curX > xUBound ||
+                                  curY < yLBound || curY > yUBound ||
+                                  (isZIncluded && isXIndependent && (curZ < yLBound || curZ > yUBound)) ||
+                                  (isZIncluded && !isXIndependent && (curZ < xLBound || curZ > xUBound)) ||
+                                  (curX <= 0 && isXLog) || (curY <= 0 && isYLog);
 
                 // ignoreInitial becomes false at the first non-zero
                 // Y value
@@ -1065,7 +984,10 @@ namespace AM.Drawing.Charting
         /// </remarks>
         /// <seealso cref="BarBase"/>
         /// <seealso cref="ValueAxis"/>
-        public virtual Axis BaseAxis (GraphPane pane)
+        public virtual Axis BaseAxis
+            (
+                GraphPane pane
+            )
         {
             BarBase barBase;
 
@@ -1075,7 +997,7 @@ namespace AM.Drawing.Charting
             }
             else
             {
-                barBase = _isX2Axis ? BarBase.X2 : BarBase.X;
+                barBase = IsX2Axis ? BarBase.X2 : BarBase.X;
             }
 
             if (barBase == BarBase.X)
@@ -1105,7 +1027,10 @@ namespace AM.Drawing.Charting
         /// </remarks>
         /// <seealso cref="BarBase"/>
         /// <seealso cref="BaseAxis"/>
-        public virtual Axis ValueAxis (GraphPane pane)
+        public virtual Axis ValueAxis
+            (
+                GraphPane pane
+            )
         {
             BarBase barBase;
 
@@ -1162,13 +1087,13 @@ namespace AM.Drawing.Charting
             else // BarItem or LineItem
             {
                 // For stacked bar types, the bar width will be based on a single bar
-                float numBars = 1.0F;
+                var numBars = 1.0F;
                 if (pane._barSettings.Type == BarType.Cluster)
                 {
                     numBars = pane.CurveList.NumClusterableBars;
                 }
 
-                float denom = numBars * (1.0F + pane._barSettings.MinBarGap) -
+                var denom = numBars * (1.0F + pane._barSettings.MinBarGap) -
                     pane._barSettings.MinBarGap + pane._barSettings.MinClusterGap;
                 if (denom <= 0)
                 {
@@ -1200,83 +1125,6 @@ namespace AM.Drawing.Charting
         #endregion
 
         #region Inner classes
-
-#if ( DOTNET1 ) // Is this a .Net 1.1 compilation?
-		/// <summary>
-		/// Compares <see cref="CurveItem"/>'s based on the point value at the specified
-		/// index and for the specified axis.
-		/// <seealso cref="System.Collections.ArrayList.Sort()"/>
-		/// </summary>
-		public class Comparer : IComparer
-		{
-			private int index;
-			private SortType sortType;
-
-			/// <summary>
-			/// Constructor for Comparer.
-			/// </summary>
-			/// <param name="type">The axis type on which to sort.</param>
-			/// <param name="index">The index number of the point on which to sort</param>
-			public Comparer( SortType type, int index )
-			{
-				this.sortType = type;
-				this.index = index;
-			}
-
-			/// <summary>
-			/// Compares two <see cref="CurveItem"/>s using the previously specified index value
-			/// and axis.  Sorts in descending order.
-			/// </summary>
-			/// <param name="l">Curve to the left.</param>
-			/// <param name="r">Curve to the right.</param>
-			/// <returns>-1, 0, or 1 depending on l.X's relation to r.X</returns>
-			public int Compare( object l, object r )
-			{
-				CurveItem cl = (CurveItem) l;
-				CurveItem cr = (CurveItem) r;
-
-				if (cl == null && cr == null )
-					return 0;
-				else if (cl == null && cr != null )
-					return -1;
-				else if (cl != null && cr == null)
-					return 1;
-
-				if ( cr != null && cr.NPts <= index )
-					cr = null;
-				if ( cl != null && cl.NPts <= index )
-					cl = null;
-
-				double lVal, rVal;
-
-				if ( sortType == SortType.XValues )
-				{
-					lVal = ( l != null ) ? System.Math.Abs( cl[index].X ) : PointPair.Missing;
-					rVal = ( r != null ) ? System.Math.Abs( cr[index].X ) : PointPair.Missing;
-				}
-				else
-				{
-					lVal = ( l != null ) ? System.Math.Abs( cl[index].Y ) : PointPair.Missing;
-					rVal = ( r != null ) ? System.Math.Abs( cr[index].Y ) : PointPair.Missing;
-				}
-
-				if ( lVal == PointPair.Missing || Double.IsInfinity( lVal ) || Double.IsNaN( lVal ) )
-					cl = null;
-				if ( rVal == PointPair.Missing || Double.IsInfinity( rVal ) || Double.IsNaN( rVal ) )
-					cr = null;
-
-				if ( ( cl == null && cr == null) || ( System.Math.Abs( lVal - rVal ) < 1e-10 ) )
-					return 0;
-				else if ( cl == null && cr != null )
-					return -1;
-				else if ( cl != null && r == null )
-					return 1;
-				else
-					return rVal < lVal ? -1 : 1;
-			}
-		}
-
-#else // Otherwise, it's .Net 2.0 so use generics
 
         /// <summary>
         /// Compares <see cref="CurveItem"/>'s based on the point value at the specified
@@ -1372,8 +1220,6 @@ namespace AM.Drawing.Charting
                 }
             }
         }
-
-#endif
 
         #endregion
     }

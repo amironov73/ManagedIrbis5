@@ -411,7 +411,7 @@ public class GasGaugeRegion
 
             _slicePath = new GraphicsPath();
 
-            if (!_isVisible)
+            if (!IsVisible)
             {
                 return;
             }
@@ -462,7 +462,7 @@ public class GasGaugeRegion
     /// </param>
     public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor)
     {
-        if (!_isVisible)
+        if (!IsVisible)
         {
             return;
         }
