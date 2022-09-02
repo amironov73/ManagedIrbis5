@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* Margin.cs --
+/* Margin.cs -- поля для GraphPane
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +21,8 @@ using System.Runtime.Serialization;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// Class that handles that stores the margin properties for the GraphPane
+/// Класс, который обрабатывает, хранит свойства полей для
+/// <see cref="GraphPane"/>.
 /// </summary>
 [Serializable]
 public class Margin
@@ -44,7 +45,10 @@ public class Margin
     /// Copy constructor
     /// </summary>
     /// <param name="rhs">the <see cref="Margin" /> instance to be copied.</param>
-    public Margin (Margin rhs)
+    public Margin
+        (
+            Margin rhs
+        )
     {
         Left = rhs.Left;
         Right = rhs.Right;
@@ -52,11 +56,7 @@ public class Margin
         Bottom = rhs.Bottom;
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -86,7 +86,6 @@ public class Margin
     /// <seealso cref="Right"/>
     /// <seealso cref="Top"/>
     /// <seealso cref="Bottom"/>
-    [field: CLSCompliant (false)]
     public float Left { get; set; }
 
     /// <summary>
@@ -100,7 +99,6 @@ public class Margin
     /// <seealso cref="Left"/>
     /// <seealso cref="Top"/>
     /// <seealso cref="Bottom"/>
-    [field: CLSCompliant (false)]
     public float Right { get; set; }
 
     /// <summary>
@@ -114,7 +112,6 @@ public class Margin
     /// <seealso cref="Left"/>
     /// <seealso cref="Right"/>
     /// <seealso cref="Bottom"/>
-    [field: CLSCompliant (false)]
     public float Top { get; set; }
 
     /// <summary>
@@ -128,7 +125,6 @@ public class Margin
     /// <seealso cref="Left"/>
     /// <seealso cref="Right"/>
     /// <seealso cref="Top"/>
-    [field: CLSCompliant (false)]
     public float Bottom { get; set; }
 
     /// <summary>
@@ -168,11 +164,15 @@ public class Margin
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected Margin (SerializationInfo info, StreamingContext context)
+    protected Margin
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        info.GetInt32 ("schema");
+        info.GetInt32 ("schema").NotUsed();
 
         Left = info.GetSingle ("left");
         Right = info.GetSingle ("right");

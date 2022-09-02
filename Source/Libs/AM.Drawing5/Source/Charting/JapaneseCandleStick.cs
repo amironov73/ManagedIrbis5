@@ -348,7 +348,7 @@ public class JapaneseCandleStick
                 g.DrawLine (pen, pixHigh, pixBase, pixLow, pixBase);
             }
 
-            if (_isOpenCloseVisible && Math.Abs (pixOpen) < 1000000 &&
+            if (IsOpenCloseVisible && Math.Abs (pixOpen) < 1000000 &&
                 Math.Abs (pixClose) < 1000000)
             {
                 if (rect.Width == 0)

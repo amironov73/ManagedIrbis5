@@ -3,9 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 
-/* OHLCBar.cs --
+/* OHLCBar.cs -- рисование объектов-кривых
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,8 +23,7 @@ using System.Runtime.Serialization;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// This class handles the drawing of the curve
-/// <see cref="OHLCBar"/> objects.
+/// Этот класс управляет рисованием объектов-кривых <see cref="OHLCBar"/>.
 /// </summary>
 [Serializable]
 public class OHLCBar
@@ -32,25 +32,10 @@ public class OHLCBar
     #region Fields
 
     /// <summary>
-    /// Private field that stores the visibility of the <see cref="OHLCBar"/> open and
-    /// close line segments ("wings").  Use the public
-    /// property <see cref="IsOpenCloseVisible"/> to access this value.  If this value is
-    /// false, the wings will not be shown.
-    /// </summary>
-    [CLSCompliant (false)] protected bool _isOpenCloseVisible;
-
-    /// <summary>
     /// Private field that stores the total width for the Opening/Closing line
     /// segments.  Use the public property <see cref="Size"/> to access this value.
     /// </summary>
-    [CLSCompliant (false)] protected float _size;
-
-    /// <summary>
-    /// Private field that determines if the <see cref="Size" /> property will be
-    /// calculated automatically based on the minimum axis scale step size between
-    /// bars.  Use the public property <see cref="IsAutoSize" /> to access this value.
-    /// </summary>
-    [CLSCompliant (false)] protected bool _isAutoSize;
+    protected float _size;
 
     /// <summary>
     /// The result of the autosize calculation, which is the size of the bars in
@@ -96,11 +81,7 @@ public class OHLCBar
     /// </summary>
     /// <value>true to show the CandleStick wings, false to hide them</value>
     /// <seealso cref="Default.IsOpenCloseVisible"/>
-    public bool IsOpenCloseVisible
-    {
-        get { return _isOpenCloseVisible; }
-        set { _isOpenCloseVisible = value; }
-    }
+    public bool IsOpenCloseVisible { get; set; }
 
     /// <summary>
     /// Gets or sets the total width to be used for drawing the opening/closing line
@@ -121,11 +102,11 @@ public class OHLCBar
     /// <seealso cref="Default.Size"/>
     public float Size
     {
-        get { return _size; }
+        get => _size;
         set
         {
             _size = value;
-            _isAutoSize = false;
+            IsAutoSize = false;
         }
     }
 
@@ -134,11 +115,7 @@ public class OHLCBar
     /// calculated automatically based on the minimum axis scale step size between
     /// bars.
     /// </summary>
-    public bool IsAutoSize
-    {
-        get { return _isAutoSize; }
-        set { _isAutoSize = value; }
-    }
+    public bool IsAutoSize { get; set; }
 
     #endregion
 
@@ -148,8 +125,10 @@ public class OHLCBar
     /// Default constructor that sets all <see cref="OHLCBar"/> properties to
     /// default values as defined in the <see cref="Default"/> class.
     /// </summary>
-    public OHLCBar() : this (LineBase.Default.Color)
+    public OHLCBar()
+        : this (LineBase.Default.Color)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -164,8 +143,8 @@ public class OHLCBar
     public OHLCBar (Color color) : base (color)
     {
         _size = Default.Size;
-        _isAutoSize = Default.IsAutoSize;
-        _isOpenCloseVisible = Default.IsOpenCloseVisible;
+        IsAutoSize = Default.IsAutoSize;
+        IsOpenCloseVisible = Default.IsOpenCloseVisible;
     }
 
     /// <summary>
@@ -174,9 +153,9 @@ public class OHLCBar
     /// <param name="rhs">The <see cref="OHLCBar"/> object from which to copy</param>
     public OHLCBar (OHLCBar rhs) : base (rhs)
     {
-        _isOpenCloseVisible = rhs._isOpenCloseVisible;
+        IsOpenCloseVisible = rhs.IsOpenCloseVisible;
         _size = rhs._size;
-        _isAutoSize = rhs._isAutoSize;
+        IsAutoSize = rhs.IsAutoSize;
     }
 
     /// <summary>
@@ -214,16 +193,20 @@ public class OHLCBar
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected OHLCBar (SerializationInfo info, StreamingContext context) :
-        base (info, context)
+    protected OHLCBar
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        info.GetInt32 ("schema").NotUsed();
 
-        _isOpenCloseVisible = info.GetBoolean ("isOpenCloseVisible");
+        IsOpenCloseVisible = info.GetBoolean ("isOpenCloseVisible");
         _size = info.GetSingle ("size");
-        _isAutoSize = info.GetBoolean ("isAutoSize");
+        IsAutoSize = info.GetBoolean ("isAutoSize");
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -235,9 +218,9 @@ public class OHLCBar
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema", schema);
-        info.AddValue ("isOpenCloseVisible", _isOpenCloseVisible);
+        info.AddValue ("isOpenCloseVisible", IsOpenCloseVisible);
         info.AddValue ("size", _size);
-        info.AddValue ("isAutoSize", _isAutoSize);
+        info.AddValue ("isAutoSize", IsAutoSize);
     }
 
     #endregion
@@ -248,7 +231,7 @@ public class OHLCBar
     /// Draw the <see cref="OHLCBar"/> to the specified <see cref="Graphics"/>
     /// device at the specified location.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -273,7 +256,7 @@ public class OHLCBar
     /// The scaled width of the candlesticks, pixels</param>
     /// <param name="pen">A pen with attributes of <see cref="Color"/> and
     /// <see cref="LineBase.Width"/> for this <see cref="OHLCBar"/></param>
-    public void Draw (Graphics g, GraphPane pane, bool isXBase,
+    public void Draw (Graphics graphics, GraphPane pane, bool isXBase,
         float pixBase, float pixHigh, float pixLow,
         float pixOpen, float pixClose,
         float halfSize, Pen pen)
@@ -282,36 +265,36 @@ public class OHLCBar
         {
             if (isXBase)
             {
-                if (Math.Abs (pixLow) < 1000000 && Math.Abs (pixHigh) < 1000000)
+                if (Math.Abs (pixLow) < 1_000_000 && Math.Abs (pixHigh) < 1_000_000)
                 {
-                    g.DrawLine (pen, pixBase, pixHigh, pixBase, pixLow);
+                    graphics.DrawLine (pen, pixBase, pixHigh, pixBase, pixLow);
                 }
 
-                if (_isOpenCloseVisible && Math.Abs (pixOpen) < 1000000)
+                if (IsOpenCloseVisible && Math.Abs (pixOpen) < 1_000_000)
                 {
-                    g.DrawLine (pen, pixBase - halfSize, pixOpen, pixBase, pixOpen);
+                    graphics.DrawLine (pen, pixBase - halfSize, pixOpen, pixBase, pixOpen);
                 }
 
-                if (_isOpenCloseVisible && Math.Abs (pixClose) < 1000000)
+                if (IsOpenCloseVisible && Math.Abs (pixClose) < 1_000_000)
                 {
-                    g.DrawLine (pen, pixBase, pixClose, pixBase + halfSize, pixClose);
+                    graphics.DrawLine (pen, pixBase, pixClose, pixBase + halfSize, pixClose);
                 }
             }
             else
             {
-                if (Math.Abs (pixLow) < 1000000 && Math.Abs (pixHigh) < 1000000)
+                if (Math.Abs (pixLow) < 1_000_000 && Math.Abs (pixHigh) < 1_000_000)
                 {
-                    g.DrawLine (pen, pixHigh, pixBase, pixLow, pixBase);
+                    graphics.DrawLine (pen, pixHigh, pixBase, pixLow, pixBase);
                 }
 
-                if (_isOpenCloseVisible && Math.Abs (pixOpen) < 1000000)
+                if (IsOpenCloseVisible && Math.Abs (pixOpen) < 1_000_000)
                 {
-                    g.DrawLine (pen, pixOpen, pixBase - halfSize, pixOpen, pixBase);
+                    graphics.DrawLine (pen, pixOpen, pixBase - halfSize, pixOpen, pixBase);
                 }
 
-                if (_isOpenCloseVisible && Math.Abs (pixClose) < 1000000)
+                if (IsOpenCloseVisible && Math.Abs (pixClose) < 1_000_000)
                 {
-                    g.DrawLine (pen, pixClose, pixBase, pixClose, pixBase + halfSize);
+                    graphics.DrawLine (pen, pixClose, pixBase, pixClose, pixBase + halfSize);
                 }
             }
         }
@@ -322,7 +305,7 @@ public class OHLCBar
     /// Draw all the <see cref="OHLCBar"/>'s to the specified <see cref="Graphics"/>
     /// device as a candlestick at each defined point.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -342,84 +325,106 @@ public class OHLCBar
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public void Draw (Graphics g, GraphPane pane, OHLCBarItem curve,
-        Axis baseAxis, Axis valueAxis, float scaleFactor)
+    public void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            OHLCBarItem curve,
+            Axis baseAxis,
+            Axis valueAxis,
+            float scaleFactor
+        )
     {
         //ValueHandler valueHandler = new ValueHandler( pane, false );
 
-        float pixBase, pixHigh, pixLow, pixOpen, pixClose;
+        float pixHigh, pixLow, pixOpen, pixClose;
 
         if (curve.Points != null)
         {
             //float halfSize = _size * scaleFactor;
-            float halfSize = GetBarWidth (pane, baseAxis, scaleFactor);
+            var halfSize = GetBarWidth (pane, baseAxis, scaleFactor);
 
-            using (Pen pen = !curve.IsSelected
-                       ? new Pen (_color, _width)
-                       : new Pen (Selection.Border.Color, Selection.Border.Width))
+            using var pen = !curve.IsSelected
+                ? new Pen (_color, _width)
+                : new Pen (Selection.Border.Color, Selection.Border.Width);
 
-//				using ( Pen pen = new Pen( _color, _penWidth ) )
+            // Loop over each defined point
+            for (var i = 0; i < curve.Points.Count; i++)
             {
-                // Loop over each defined point
-                for (int i = 0; i < curve.Points.Count; i++)
+                var pt = curve.Points[i];
+                var date = pt.X;
+                var high = pt.Y;
+                var low = pt.Z;
+                var open = PointPairBase.Missing;
+                var close = PointPairBase.Missing;
+                if (pt is StockPoint)
                 {
-                    PointPair pt = curve.Points[i];
-                    double date = pt.X;
-                    double high = pt.Y;
-                    double low = pt.Z;
-                    double open = PointPairBase.Missing;
-                    double close = PointPairBase.Missing;
-                    if (pt is StockPoint)
+                    open = (pt as StockPoint).Open;
+                    close = (pt as StockPoint).Close;
+                }
+
+                // Any value set to double max is invalid and should be skipped
+                // This is used for calculated values that are out of range, divide
+                //   by zero, etc.
+                // Also, any value <= zero on a log scale is invalid
+
+                if (!curve.Points[i].IsInvalid3D &&
+                    (date > 0 || !baseAxis.Scale.IsLog) &&
+                    (high > 0 && low > 0 || !valueAxis.Scale.IsLog))
+                {
+                    float pixBase = (int)(baseAxis.Scale.Transform (curve.IsOverrideOrdinal, i, date) + 0.5);
+
+                    //pixBase = baseAxis.Scale.Transform( curve.IsOverrideOrdinal, i, date );
+                    pixHigh = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, high);
+                    pixLow = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, low);
+                    if (PointPairBase.IsValueInvalid (open))
                     {
-                        open = (pt as StockPoint).Open;
-                        close = (pt as StockPoint).Close;
+                        pixOpen = float.MaxValue;
+                    }
+                    else
+                    {
+                        pixOpen = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, open);
                     }
 
-                    // Any value set to double max is invalid and should be skipped
-                    // This is used for calculated values that are out of range, divide
-                    //   by zero, etc.
-                    // Also, any value <= zero on a log scale is invalid
-
-                    if (!curve.Points[i].IsInvalid3D &&
-                        (date > 0 || !baseAxis.Scale.IsLog) &&
-                        ((high > 0 && low > 0) || !valueAxis.Scale.IsLog))
+                    if (PointPairBase.IsValueInvalid (close))
                     {
-                        pixBase = (int)(baseAxis.Scale.Transform (curve.IsOverrideOrdinal, i, date) + 0.5);
+                        pixClose = float.MaxValue;
+                    }
+                    else
+                    {
+                        pixClose = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, close);
+                    }
 
-                        //pixBase = baseAxis.Scale.Transform( curve.IsOverrideOrdinal, i, date );
-                        pixHigh = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, high);
-                        pixLow = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, low);
-                        if (PointPairBase.IsValueInvalid (open))
-                        {
-                            pixOpen = float.MaxValue;
-                        }
-                        else
-                        {
-                            pixOpen = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, open);
-                        }
-
-                        if (PointPairBase.IsValueInvalid (close))
-                        {
-                            pixClose = float.MaxValue;
-                        }
-                        else
-                        {
-                            pixClose = valueAxis.Scale.Transform (curve.IsOverrideOrdinal, i, close);
-                        }
-
-                        if (!curve.IsSelected && _gradientFill.IsGradientValueType)
-                        {
-                            using (Pen tPen = GetPen (pane, scaleFactor, pt))
-                                Draw (g, pane, baseAxis is XAxis || baseAxis is X2Axis,
-                                    pixBase, pixHigh, pixLow, pixOpen,
-                                    pixClose, halfSize, tPen);
-                        }
-                        else
-                        {
-                            Draw (g, pane, baseAxis is XAxis || baseAxis is X2Axis,
-                                pixBase, pixHigh, pixLow, pixOpen,
-                                pixClose, halfSize, pen);
-                        }
+                    if (!curve.IsSelected && _gradientFill.IsGradientValueType)
+                    {
+                        using var tPen = GetPen (pane, scaleFactor, pt);
+                        Draw
+                            (
+                                graphics,
+                                pane,
+                                baseAxis is XAxis or X2Axis,
+                                pixBase,
+                                pixHigh, pixLow, pixOpen,
+                                pixClose,
+                                halfSize,
+                                tPen
+                            );
+                    }
+                    else
+                    {
+                        Draw
+                            (
+                                graphics,
+                                pane,
+                                baseAxis is XAxis or X2Axis,
+                                pixBase,
+                                pixHigh,
+                                pixLow,
+                                pixOpen,
+                                pixClose,
+                                halfSize,
+                                pen
+                            );
                     }
                 }
             }
@@ -440,17 +445,22 @@ public class OHLCBar
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
     /// <returns>The width of each bar, in pixel units</returns>
-    public float GetBarWidth (GraphPane pane, Axis baseAxis, float scaleFactor)
+    public float GetBarWidth
+        (
+            GraphPane pane,
+            Axis baseAxis,
+            float scaleFactor
+        )
     {
         float width;
-        if (_isAutoSize)
+        if (IsAutoSize)
         {
             width = baseAxis.Scale.GetClusterWidth (_userScaleSize) /
                     (1.0F + pane._barSettings.MinClusterGap) / 2.0f;
         }
         else
         {
-            width = (float)(_size * scaleFactor) / 2.0f;
+            width = _size * scaleFactor / 2.0f;
         }
 
         // use integral size

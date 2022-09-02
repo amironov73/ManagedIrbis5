@@ -52,34 +52,18 @@ public class NoDupePointList
     : List<DataPoint>, IPointListEdit
 {
     /// <summary>
-    /// Protected field that stores a value indicating whether or not the data have been filtered.
-    /// If the data have not been filtered, then <see cref="Count" /> will be equal to
-    /// <see cref="TotalCount" />.  Use the public property <see cref="IsFiltered" /> to
-    /// access this value.
-    /// </summary>
-    [CLSCompliant (false)] protected bool _isFiltered;
-
-    /// <summary>
     /// Protected field that stores the number of data points after filtering (e.g.,
     /// <see cref="FilterData" /> has been called).  The <see cref="Count" /> property
     /// returns the total count for an unfiltered dataset, or <see cref="_filteredCount" />
     /// for a dataset that has been filtered.
     /// </summary>
-    [CLSCompliant (false)] protected int _filteredCount;
+    protected int _filteredCount;
 
     /// <summary>
     /// Protected array of indices for all the points that are currently visible.  This only
     /// applies if <see cref="IsFiltered" /> is true.
     /// </summary>
-    [CLSCompliant (false)] protected int[] _visibleIndicies;
-
-
-    /// <summary>
-    /// Protected field that stores a value that determines how close a point must be to a prior
-    /// neighbor in order to be filtered out.  Use the public property <see cref="FilterMode" />
-    /// to access this value.
-    /// </summary>
-    [CLSCompliant (false)] protected int _filterMode;
+    protected int[]? _visibleIndices;
 
 
     /// <summary>
@@ -94,21 +78,14 @@ public class NoDupePointList
     /// a particular pixel location is taken, any subsequent point that lies within 2
     /// pixels of that location will be filtered out.
     /// </remarks>
-    public int FilterMode
-    {
-        get { return _filterMode; }
-        set { _filterMode = value; }
-    }
+    public int FilterMode { get; set; }
 
     /// <summary>
     /// Gets a value indicating whether or not the data have been filtered.  If the data
     /// have not been filtered, then <see cref="Count" /> will be equal to
     /// <see cref="TotalCount" />.
     /// </summary>
-    public bool IsFiltered
-    {
-        get { return _isFiltered; }
-    }
+    public bool IsFiltered { get; protected set; }
 
     /// <summary>
     /// Indexer: get the DataPoint instance at the specified ordinal position in the list
@@ -128,28 +105,27 @@ public class NoDupePointList
     {
         get
         {
-            int j = index;
-            if (_isFiltered)
+            var indices = _visibleIndices.ThrowIfNull();
+            var j = index;
+            if (IsFiltered)
             {
-                j = _visibleIndicies[index];
+                j = indices[index];
             }
 
-            DataPoint dp = base[j];
-            PointPair pt = new PointPair (dp.X, dp.Y);
+            var dp = base[j];
+            var pt = new PointPair (dp.X, dp.Y);
             return pt;
         }
         set
         {
-            int j = index;
-            if (_isFiltered)
+            var indices = _visibleIndices.ThrowIfNull();
+            var j = index;
+            if (IsFiltered)
             {
-                j = _visibleIndicies[index];
+                j = indices[index];
             }
 
-            DataPoint dp;
-            dp.X = value.X;
-            dp.Y = value.Y;
-            base[j] = dp;
+            base[j] = new DataPoint { X = value.X, Y = value.Y };
         }
     }
 
@@ -158,29 +134,13 @@ public class NoDupePointList
     /// samples that are non-duplicates.  See the <see cref="TotalCount" /> property
     /// to get the total number of samples in the list.
     /// </summary>
-    public new int Count
-    {
-        get
-        {
-            if (!_isFiltered)
-            {
-                return base.Count;
-            }
-            else
-            {
-                return _filteredCount;
-            }
-        }
-    }
+    public new int Count => !IsFiltered ? base.Count : _filteredCount;
 
     /// <summary>
     /// Gets the total number of samples in the collection.  See the <see cref="Count" />
     /// property to get the number of active (non-duplicate) samples in the list.
     /// </summary>
-    public int TotalCount
-    {
-        get { return base.Count; }
-    }
+    public int TotalCount => base.Count;
 
     /// <summary>
     /// Append a data point to the collection
@@ -188,9 +148,11 @@ public class NoDupePointList
     /// <param name="pt">The <see cref="PointPair" /> value to append</param>
     public void Add (PointPair pt)
     {
-        DataPoint dp = new DataPoint();
-        dp.X = pt.X;
-        dp.Y = pt.Y;
+        var dp = new DataPoint
+        {
+            X = pt.X,
+            Y = pt.Y
+        };
         Add (dp);
     }
 
@@ -202,14 +164,16 @@ public class NoDupePointList
     /// <param name="y">The y value of the point to append</param>
     public void Add (double x, double y)
     {
-        DataPoint dp = new DataPoint();
-        dp.X = x;
-        dp.Y = y;
+        var dp = new DataPoint
+        {
+            X = x,
+            Y = y
+        };
         Add (dp);
     }
 
 
-    // generic Clone: just call the typesafe version
+   /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -231,10 +195,10 @@ public class NoDupePointList
     /// </summary>
     public NoDupePointList()
     {
-        _isFiltered = false;
+        IsFiltered = false;
         _filteredCount = 0;
-        _visibleIndicies = null;
-        _filterMode = 0;
+        _visibleIndices = null;
+        FilterMode = 0;
     }
 
     /// <summary>
@@ -244,21 +208,21 @@ public class NoDupePointList
     /// <param name="rhs">The NoDupePointList to be copied</param>
     public NoDupePointList (NoDupePointList rhs)
     {
-        int count = rhs.TotalCount;
-        for (int i = 0; i < count; i++)
+        var count = rhs.TotalCount;
+        for (var i = 0; i < count; i++)
             Add (rhs.GetDataPointAt (i));
 
         _filteredCount = rhs._filteredCount;
-        _isFiltered = rhs._isFiltered;
-        _filterMode = rhs._filterMode;
+        IsFiltered = rhs.IsFiltered;
+        FilterMode = rhs.FilterMode;
 
-        if (rhs._visibleIndicies != null)
+        if (rhs._visibleIndices != null)
         {
-            _visibleIndicies = (int[])rhs._visibleIndicies.Clone();
+            _visibleIndices = (int[])rhs._visibleIndices.Clone();
         }
         else
         {
-            _visibleIndicies = null;
+            _visibleIndices = null;
         }
     }
 
@@ -279,7 +243,7 @@ public class NoDupePointList
     /// </summary>
     public void ClearFilter()
     {
-        _isFiltered = false;
+        IsFiltered = false;
         _filteredCount = 0;
     }
 
@@ -313,57 +277,59 @@ public class NoDupePointList
     /// </param>
     public void FilterData (GraphPane pane, Axis xAxis, Axis yAxis)
     {
-        if (_visibleIndicies == null || _visibleIndicies.Length < base.Count)
+        if (_visibleIndices == null || _visibleIndices.Length < base.Count)
         {
-            _visibleIndicies = new int[base.Count];
+            _visibleIndices = new int[base.Count];
         }
 
         _filteredCount = 0;
-        _isFiltered = true;
+        IsFiltered = true;
 
-        int width = (int)pane.Chart.Rect.Width;
-        int height = (int)pane.Chart.Rect.Height;
+        var width = (int)pane.Chart.Rect.Width;
+        var height = (int)pane.Chart.Rect.Height;
         if (width <= 0 || height <= 0)
         {
             throw new IndexOutOfRangeException ("Error in FilterData: Chart rect not valid");
         }
 
-        bool[,] usedArray = new bool[width, height];
-        for (int i = 0; i < width; i++)
-        for (int j = 0; j < height; j++)
+        var usedArray = new bool[width, height];
+        for (var i = 0; i < width; i++)
+        for (var j = 0; j < height; j++)
             usedArray[i, j] = false;
 
-        xAxis.Scale.SetupScaleData (pane, xAxis);
-        yAxis.Scale.SetupScaleData (pane, yAxis);
+        var xScale = xAxis.Scale.ThrowIfNull();
+        var yScale = yAxis.Scale.ThrowIfNull();
+        xScale.SetupScaleData (pane, xAxis);
+        yScale.SetupScaleData (pane, yAxis);
 
-        int n = _filterMode < 0 ? 0 : _filterMode;
-        int left = (int)pane.Chart.Rect.Left;
-        int top = (int)pane.Chart.Rect.Top;
+        var n = FilterMode < 0 ? 0 : FilterMode;
+        var left = (int)pane.Chart.Rect.Left;
+        var top = (int)pane.Chart.Rect.Top;
 
-        for (int i = 0; i < base.Count; i++)
+        for (var i = 0; i < base.Count; i++)
         {
-            DataPoint dp = base[i];
-            int x = (int)(xAxis.Scale.Transform (dp.X) + 0.5) - left;
-            int y = (int)(yAxis.Scale.Transform (dp.Y) + 0.5) - top;
+            var dp = base[i];
+            var x = (int)(xScale.Transform (dp.X) + 0.5) - left;
+            var y = (int)(yScale.Transform (dp.Y) + 0.5) - top;
 
             if (x >= 0 && x < width && y >= 0 && y < height)
             {
-                bool used = false;
+                var used = false;
                 if (n <= 0)
                 {
                     used = usedArray[x, y];
                 }
                 else
                 {
-                    for (int ix = x - n; ix <= x + n; ix++)
-                    for (int iy = y - n; iy <= y + n; iy++)
+                    for (var ix = x - n; ix <= x + n; ix++)
+                    for (var iy = y - n; iy <= y + n; iy++)
                         used |= (ix >= 0 && ix < width && iy >= 0 && iy < height && usedArray[ix, iy]);
                 }
 
                 if (!used)
                 {
                     usedArray[x, y] = true;
-                    _visibleIndicies[_filteredCount] = i;
+                    _visibleIndices[_filteredCount] = i;
                     _filteredCount++;
                 }
             }
