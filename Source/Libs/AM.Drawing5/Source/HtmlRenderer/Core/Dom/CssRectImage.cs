@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* CssRectImage.cs --
+/* CssRectImage.cs -- представляет картинку внутри inline-блока
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,66 +21,54 @@ using AM.Drawing.HtmlRenderer.Adapters.Entities;
 namespace AM.Drawing.HtmlRenderer.Core.Dom;
 
 /// <summary>
-/// Represents a word inside an inline box
+/// Представляет картинку внутри inline-блока
 /// </summary>
-internal sealed class CssRectImage 
+internal sealed class CssRectImage
     : CssRect
 {
-    #region Fields and Consts
+    #region Properties
 
     /// <summary>
-    /// the image object if it is image word (can be null if not loaded)
+    /// Gets the image this words represents (if one exists)
     /// </summary>
-    private RImage _image;
+    public override RImage? Image { get; set; }
 
     /// <summary>
-    /// the image rectangle restriction as returned from image load event
+    /// Gets if the word represents an image.
     /// </summary>
-    private RRect _imageRectangle;
+    public override bool IsImage => true;
+
+    /// <summary>
+    /// the image rectange restriction as returned from image load event
+    /// </summary>
+    public RRect ImageRectangle { get; set; }
 
     #endregion
 
+    #region Construction
 
     /// <summary>
     /// Creates a new BoxWord which represents an image
     /// </summary>
     /// <param name="owner">the CSS box owner of the word</param>
-    public CssRectImage(CssBox owner)
-        : base(owner)
-    { }
-
-    /// <summary>
-    /// Gets the image this words represents (if one exists)
-    /// </summary>
-    public override RImage Image
+    public CssRectImage
+        (
+            CssBox owner
+        )
+        : base (owner)
     {
-        get { return _image; }
-        set { _image = value; }
+        // пустое тело конструктора
     }
 
-    /// <summary>
-    /// Gets if the word represents an image.
-    /// </summary>
-    public override bool IsImage
-    {
-        get { return true; }
-    }
+    #endregion
 
-    /// <summary>
-    /// the image rectange restriction as returned from image load event
-    /// </summary>
-    public RRect ImageRectangle
-    {
-        get { return _imageRectangle; }
-        set { _imageRectangle = value; }
-    }
+    #region Object members
 
-    /// <summary>
-    /// Represents this word for debugging purposes
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
         return "Image";
     }
+
+    #endregion
 }

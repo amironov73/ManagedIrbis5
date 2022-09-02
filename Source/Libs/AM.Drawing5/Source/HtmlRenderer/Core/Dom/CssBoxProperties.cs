@@ -13,7 +13,6 @@
 
 using System;
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 using AM.Drawing.HtmlRenderer.Adapters;
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
@@ -37,12 +36,6 @@ internal abstract class CssBoxProperties
 {
     #region CSS Fields
 
-    private string _backgroundColor = "transparent";
-    private string _backgroundGradient = "none";
-    private string _backgroundGradientAngle = "90";
-    private string _backgroundImage = "none";
-    private string _backgroundPosition = "0% 0%";
-    private string _backgroundRepeat = "repeat";
     private string _borderTopWidth = "medium";
     private string _borderRightWidth = "medium";
     private string _borderBottomWidth = "medium";
@@ -51,59 +44,20 @@ internal abstract class CssBoxProperties
     private string _borderRightColor = "black";
     private string _borderBottomColor = "black";
     private string _borderLeftColor = "black";
-    private string _borderTopStyle = "none";
-    private string _borderRightStyle = "none";
-    private string _borderBottomStyle = "none";
-    private string _borderLeftStyle = "none";
-    private string _borderSpacing = "0";
-    private string _borderCollapse = "separate";
-    private string _bottom;
+    private string? _bottom;
     private string _color = "black";
-    private string _content = "normal";
-    private string _cornerNwRadius = "0";
-    private string _cornerNeRadius = "0";
-    private string _cornerSeRadius = "0";
-    private string _cornerSwRadius = "0";
     private string _cornerRadius = "0";
-    private string _emptyCells = "show";
-    private string _direction = "ltr";
-    private string _display = "inline";
-    private string _fontFamily;
     private string _fontSize = "medium";
-    private string _fontStyle = "normal";
-    private string _fontVariant = "normal";
-    private string _fontWeight = "normal";
-    private string _float = "none";
-    private string _height = "auto";
-    private string _marginBottom = "0";
-    private string _marginLeft = "0";
-    private string _marginRight = "0";
-    private string _marginTop = "0";
     private string _left = "auto";
     private string _lineHeight = "normal";
-    private string _listStyleType = "disc";
-    private string _listStyleImage = string.Empty;
-    private string _listStylePosition = "outside";
-    private string _listStyle = string.Empty;
-    private string _overflow = "visible";
     private string _paddingLeft = "0";
     private string _paddingBottom = "0";
     private string _paddingRight = "0";
     private string _paddingTop = "0";
-    private string _pageBreakInside = CssConstants.Auto;
-    private string _right;
-    private string _textAlign = string.Empty;
-    private string _textDecoration = string.Empty;
+    private string? _right;
     private string _textIndent = "0";
     private string _top = "auto";
-    private string _position = "static";
-    private string _verticalAlign = "baseline";
-    private string _width = "auto";
-    private string _maxWidth = "none";
     private string _wordSpacing = "normal";
-    private string _wordBreak = "normal";
-    private string _whiteSpace = "normal";
-    private string _visibility = "visible";
 
     #endregion
 
@@ -147,7 +101,6 @@ internal abstract class CssBoxProperties
     /// </summary>
     private double _actualLineHeight = double.NaN;
 
-    private double _actualWordSpacing = double.NaN;
     private double _actualTextIndent = double.NaN;
     private double _actualBorderSpacingHorizontal = double.NaN;
     private double _actualBorderSpacingVertical = double.NaN;
@@ -157,7 +110,7 @@ internal abstract class CssBoxProperties
     private RColor _actualBorderBottomColor = RColor.Empty;
     private RColor _actualBorderRightColor = RColor.Empty;
     private RColor _actualBackgroundColor = RColor.Empty;
-    private RFont _actualFont;
+    private RFont? _actualFont;
 
     #endregion
 
@@ -166,7 +119,7 @@ internal abstract class CssBoxProperties
 
     public string BorderBottomWidth
     {
-        get { return _borderBottomWidth; }
+        get => _borderBottomWidth;
         set
         {
             _borderBottomWidth = value;
@@ -176,7 +129,7 @@ internal abstract class CssBoxProperties
 
     public string BorderLeftWidth
     {
-        get { return _borderLeftWidth; }
+        get => _borderLeftWidth;
         set
         {
             _borderLeftWidth = value;
@@ -186,7 +139,7 @@ internal abstract class CssBoxProperties
 
     public string BorderRightWidth
     {
-        get { return _borderRightWidth; }
+        get => _borderRightWidth;
         set
         {
             _borderRightWidth = value;
@@ -196,7 +149,7 @@ internal abstract class CssBoxProperties
 
     public string BorderTopWidth
     {
-        get { return _borderTopWidth; }
+        get => _borderTopWidth;
         set
         {
             _borderTopWidth = value;
@@ -204,33 +157,17 @@ internal abstract class CssBoxProperties
         }
     }
 
-    public string BorderBottomStyle
-    {
-        get { return _borderBottomStyle; }
-        set { _borderBottomStyle = value; }
-    }
+    public string BorderBottomStyle { get; set; } = "none";
 
-    public string BorderLeftStyle
-    {
-        get { return _borderLeftStyle; }
-        set { _borderLeftStyle = value; }
-    }
+    public string BorderLeftStyle { get; set; } = "none";
 
-    public string BorderRightStyle
-    {
-        get { return _borderRightStyle; }
-        set { _borderRightStyle = value; }
-    }
+    public string BorderRightStyle { get; set; } = "none";
 
-    public string BorderTopStyle
-    {
-        get { return _borderTopStyle; }
-        set { _borderTopStyle = value; }
-    }
+    public string BorderTopStyle { get; set; } = "none";
 
     public string BorderBottomColor
     {
-        get { return _borderBottomColor; }
+        get => _borderBottomColor;
         set
         {
             _borderBottomColor = value;
@@ -240,7 +177,7 @@ internal abstract class CssBoxProperties
 
     public string BorderLeftColor
     {
-        get { return _borderLeftColor; }
+        get => _borderLeftColor;
         set
         {
             _borderLeftColor = value;
@@ -250,7 +187,7 @@ internal abstract class CssBoxProperties
 
     public string BorderRightColor
     {
-        get { return _borderRightColor; }
+        get => _borderRightColor;
         set
         {
             _borderRightColor = value;
@@ -260,7 +197,7 @@ internal abstract class CssBoxProperties
 
     public string BorderTopColor
     {
-        get { return _borderTopColor; }
+        get => _borderTopColor;
         set
         {
             _borderTopColor = value;
@@ -268,24 +205,16 @@ internal abstract class CssBoxProperties
         }
     }
 
-    public string BorderSpacing
-    {
-        get { return _borderSpacing; }
-        set { _borderSpacing = value; }
-    }
+    public string BorderSpacing { get; set; } = "0";
 
-    public string BorderCollapse
-    {
-        get { return _borderCollapse; }
-        set { _borderCollapse = value; }
-    }
+    public string BorderCollapse { get; set; } = "separate";
 
     public string CornerRadius
     {
-        get { return _cornerRadius; }
+        get => _cornerRadius;
         set
         {
-            MatchCollection r = RegexParserUtils.Match(RegexParserUtils.CssLength, value);
+            var r = RegexParserUtils.Match (RegexParserUtils.CssLength, value);
 
             switch (r.Count)
             {
@@ -318,57 +247,25 @@ internal abstract class CssBoxProperties
         }
     }
 
-    public string CornerNwRadius
-    {
-        get { return _cornerNwRadius; }
-        set { _cornerNwRadius = value; }
-    }
+    public string CornerNwRadius { get; set; } = "0";
 
-    public string CornerNeRadius
-    {
-        get { return _cornerNeRadius; }
-        set { _cornerNeRadius = value; }
-    }
+    public string CornerNeRadius { get; set; } = "0";
 
-    public string CornerSeRadius
-    {
-        get { return _cornerSeRadius; }
-        set { _cornerSeRadius = value; }
-    }
+    public string CornerSeRadius { get; set; } = "0";
 
-    public string CornerSwRadius
-    {
-        get { return _cornerSwRadius; }
-        set { _cornerSwRadius = value; }
-    }
+    public string CornerSwRadius { get; set; } = "0";
 
-    public string MarginBottom
-    {
-        get { return _marginBottom; }
-        set { _marginBottom = value; }
-    }
+    public string MarginBottom { get; set; } = "0";
 
-    public string MarginLeft
-    {
-        get { return _marginLeft; }
-        set { _marginLeft = value; }
-    }
+    public string MarginLeft { get; set; } = "0";
 
-    public string MarginRight
-    {
-        get { return _marginRight; }
-        set { _marginRight = value; }
-    }
+    public string MarginRight { get; set; } = "0";
 
-    public string MarginTop
-    {
-        get { return _marginTop; }
-        set { _marginTop = value; }
-    }
+    public string MarginTop { get; set; } = "0";
 
     public string PaddingBottom
     {
-        get { return _paddingBottom; }
+        get => _paddingBottom;
         set
         {
             _paddingBottom = value;
@@ -378,7 +275,7 @@ internal abstract class CssBoxProperties
 
     public string PaddingLeft
     {
-        get { return _paddingLeft; }
+        get => _paddingLeft;
         set
         {
             _paddingLeft = value;
@@ -388,7 +285,7 @@ internal abstract class CssBoxProperties
 
     public string PaddingRight
     {
-        get { return _paddingRight; }
+        get => _paddingRight;
         set
         {
             _paddingRight = value;
@@ -398,7 +295,7 @@ internal abstract class CssBoxProperties
 
     public string PaddingTop
     {
-        get { return _paddingTop; }
+        get => _paddingTop;
         set
         {
             _paddingTop = value;
@@ -406,100 +303,57 @@ internal abstract class CssBoxProperties
         }
     }
 
-    public string PageBreakInside
-    {
-        get { return _pageBreakInside; }
-        set
-        {
-            _pageBreakInside = value;
-        }
-    }
+    public string PageBreakInside { get; set; } = CssConstants.Auto;
 
     public string Left
     {
-        get { return _left; }
+        get => _left;
         set
         {
             _left = value;
 
             if (Position == CssConstants.Fixed)
             {
-                _location = GetActualLocation(Left, Top);
+                _location = GetActualLocation (Left, Top);
             }
         }
     }
 
     public string Top
     {
-        get { return _top; }
-        set {
+        get => _top;
+        set
+        {
             _top = value;
 
             if (Position == CssConstants.Fixed)
             {
-                _location = GetActualLocation(Left, Top);
+                _location = GetActualLocation (Left, Top);
             }
-
         }
     }
 
-    public string Width
-    {
-        get { return _width; }
-        set { _width = value; }
-    }
+    public string Width { get; set; } = "auto";
 
-    public string MaxWidth
-    {
-        get { return _maxWidth; }
-        set { _maxWidth = value; }
-    }
+    public string MaxWidth { get; set; } = "none";
 
-    public string Height
-    {
-        get { return _height; }
-        set { _height = value; }
-    }
+    public string Height { get; set; } = "auto";
 
-    public string BackgroundColor
-    {
-        get { return _backgroundColor; }
-        set { _backgroundColor = value; }
-    }
+    public string BackgroundColor { get; set; } = "transparent";
 
-    public string BackgroundImage
-    {
-        get { return _backgroundImage; }
-        set { _backgroundImage = value; }
-    }
+    public string BackgroundImage { get; set; } = "none";
 
-    public string BackgroundPosition
-    {
-        get { return _backgroundPosition; }
-        set { _backgroundPosition = value; }
-    }
+    public string BackgroundPosition { get; set; } = "0% 0%";
 
-    public string BackgroundRepeat
-    {
-        get { return _backgroundRepeat; }
-        set { _backgroundRepeat = value; }
-    }
+    public string BackgroundRepeat { get; set; } = "repeat";
 
-    public string BackgroundGradient
-    {
-        get { return _backgroundGradient; }
-        set { _backgroundGradient = value; }
-    }
+    public string BackgroundGradient { get; set; } = "none";
 
-    public string BackgroundGradientAngle
-    {
-        get { return _backgroundGradientAngle; }
-        set { _backgroundGradientAngle = value; }
-    }
+    public string BackgroundGradientAngle { get; set; } = "90";
 
     public string Color
     {
-        get { return _color; }
+        get => _color;
         set
         {
             _color = value;
@@ -507,113 +361,63 @@ internal abstract class CssBoxProperties
         }
     }
 
-    public string Content
-    {
-        get { return _content; }
-        set { _content = value; }
-    }
+    public string Content { get; set; } = "normal";
 
-    public string Display
-    {
-        get { return _display; }
-        set { _display = value; }
-    }
+    public string Display { get; set; } = "inline";
 
-    public string Direction
-    {
-        get { return _direction; }
-        set { _direction = value; }
-    }
+    public string Direction { get; set; } = "ltr";
 
-    public string EmptyCells
-    {
-        get { return _emptyCells; }
-        set { _emptyCells = value; }
-    }
+    public string EmptyCells { get; set; } = "show";
 
-    public string Float
-    {
-        get { return _float; }
-        set { _float = value; }
-    }
+    public string Float { get; set; } = "none";
 
-    public string Position
-    {
-        get { return _position; }
-        set { _position = value; }
-    }
+    public string Position { get; set; } = "static";
 
     public string LineHeight
     {
-        get { return _lineHeight; }
-        set { _lineHeight = string.Format(NumberFormatInfo.InvariantInfo, "{0}px", CssValueParser.ParseLength(value, Size.Height, this, CssConstants.Em)); }
+        get => _lineHeight;
+        set =>
+            _lineHeight = string.Format (NumberFormatInfo.InvariantInfo, "{0}px",
+                CssValueParser.ParseLength (value, Size.Height, this, CssConstants.Em));
     }
 
-    public string VerticalAlign
-    {
-        get { return _verticalAlign; }
-        set { _verticalAlign = value; }
-    }
+    public string VerticalAlign { get; set; } = "baseline";
 
     public string TextIndent
     {
-        get { return _textIndent; }
-        set { _textIndent = NoEms(value); }
+        get => _textIndent;
+        set => _textIndent = NoEms (value);
     }
 
-    public string TextAlign
-    {
-        get { return _textAlign; }
-        set { _textAlign = value; }
-    }
+    public string TextAlign { get; set; } = string.Empty;
 
-    public string TextDecoration
-    {
-        get { return _textDecoration; }
-        set { _textDecoration = value; }
-    }
+    public string TextDecoration { get; set; } = string.Empty;
 
-    public string WhiteSpace
-    {
-        get { return _whiteSpace; }
-        set { _whiteSpace = value; }
-    }
+    public string WhiteSpace { get; set; } = "normal";
 
-    public string Visibility
-    {
-        get { return _visibility; }
-        set { _visibility = value; }
-    }
+    public string Visibility { get; set; } = "visible";
 
     public string WordSpacing
     {
-        get { return _wordSpacing; }
-        set { _wordSpacing = NoEms(value); }
+        get => _wordSpacing;
+        set => _wordSpacing = NoEms (value);
     }
 
-    public string WordBreak
-    {
-        get { return _wordBreak; }
-        set { _wordBreak = value; }
-    }
+    public string WordBreak { get; set; } = "normal";
 
-    public string FontFamily
-    {
-        get { return _fontFamily; }
-        set { _fontFamily = value; }
-    }
+    public string FontFamily { get; set; }
 
     public string FontSize
     {
-        get { return _fontSize; }
+        get => _fontSize;
         set
         {
-            string length = RegexParserUtils.Search(RegexParserUtils.CssLength, value);
+            var length = RegexParserUtils.Search (RegexParserUtils.CssLength, value);
 
             if (length != null)
             {
                 string computedValue;
-                CssLength len = new CssLength(length);
+                var len = new CssLength (length);
 
                 if (len.HasError)
                 {
@@ -621,7 +425,7 @@ internal abstract class CssBoxProperties
                 }
                 else if (len.Unit == CssUnit.Ems && GetParent() != null)
                 {
-                    computedValue = len.ConvertEmToPoints(GetParent().ActualFont.Size).ToString();
+                    computedValue = len.ConvertEmToPoints (GetParent().ActualFont.Size).ToString();
                 }
                 else
                 {
@@ -637,53 +441,21 @@ internal abstract class CssBoxProperties
         }
     }
 
-    public string FontStyle
-    {
-        get { return _fontStyle; }
-        set { _fontStyle = value; }
-    }
+    public string FontStyle { get; set; } = "normal";
 
-    public string FontVariant
-    {
-        get { return _fontVariant; }
-        set { _fontVariant = value; }
-    }
+    public string FontVariant { get; set; } = "normal";
 
-    public string FontWeight
-    {
-        get { return _fontWeight; }
-        set { _fontWeight = value; }
-    }
+    public string FontWeight { get; set; } = "normal";
 
-    public string ListStyle
-    {
-        get { return _listStyle; }
-        set { _listStyle = value; }
-    }
+    public string ListStyle { get; set; } = string.Empty;
 
-    public string Overflow
-    {
-        get { return _overflow; }
-        set { _overflow = value; }
-    }
+    public string Overflow { get; set; } = "visible";
 
-    public string ListStylePosition
-    {
-        get { return _listStylePosition; }
-        set { _listStylePosition = value; }
-    }
+    public string ListStylePosition { get; set; } = "outside";
 
-    public string ListStyleImage
-    {
-        get { return _listStyleImage; }
-        set { _listStyleImage = value; }
-    }
+    public string ListStyleImage { get; set; } = string.Empty;
 
-    public string ListStyleType
-    {
-        get { return _listStyleType; }
-        set { _listStyleType = value; }
-    }
+    public string ListStyleType { get; set; } = "disc";
 
     #endregion CSS Propertier
 
@@ -692,19 +464,19 @@ internal abstract class CssBoxProperties
     /// </summary>
     public RPoint Location
     {
-        get {
+        get
+        {
             if (_location.IsEmpty && Position == CssConstants.Fixed)
             {
                 var left = Left;
                 var top = Top;
 
-                _location = GetActualLocation(Left, Top);
+                _location = GetActualLocation (Left, Top);
             }
+
             return _location;
         }
-        set {
-            _location = value;
-        }
+        set => _location = value;
     }
 
     /// <summary>
@@ -712,33 +484,27 @@ internal abstract class CssBoxProperties
     /// </summary>
     public RSize Size
     {
-        get { return _size; }
-        set { _size = value; }
+        get => _size;
+        set => _size = value;
     }
 
     /// <summary>
     /// Gets the bounds of the box
     /// </summary>
-    public RRect Bounds
-    {
-        get { return new RRect(Location, Size); }
-    }
+    public RRect Bounds => new RRect (Location, Size);
 
     /// <summary>
     /// Gets the width available on the box, counting padding and margin.
     /// </summary>
-    public double AvailableWidth
-    {
-        get { return Size.Width - ActualBorderLeftWidth - ActualPaddingLeft - ActualPaddingRight - ActualBorderRightWidth; }
-    }
+    public double AvailableWidth => Size.Width - ActualBorderLeftWidth - ActualPaddingLeft - ActualPaddingRight - ActualBorderRightWidth;
 
     /// <summary>
     /// Gets the right of the box. When setting, it will affect only the width of the box.
     /// </summary>
     public double ActualRight
     {
-        get { return Location.X + Size.Width; }
-        set { Size = new RSize(value - Location.X, Size.Height); }
+        get => Location.X + Size.Width;
+        set => Size = new RSize (value - Location.X, Size.Height);
     }
 
     /// <summary>
@@ -747,49 +513,34 @@ internal abstract class CssBoxProperties
     /// </summary>
     public double ActualBottom
     {
-        get { return Location.Y + Size.Height; }
-        set { Size = new RSize(Size.Width, value - Location.Y); }
+        get => Location.Y + Size.Height;
+        set => Size = new RSize (Size.Width, value - Location.Y);
     }
 
     /// <summary>
     /// Gets the left of the client rectangle (Where content starts rendering)
     /// </summary>
-    public double ClientLeft
-    {
-        get { return Location.X + ActualBorderLeftWidth + ActualPaddingLeft; }
-    }
+    public double ClientLeft => Location.X + ActualBorderLeftWidth + ActualPaddingLeft;
 
     /// <summary>
     /// Gets the top of the client rectangle (Where content starts rendering)
     /// </summary>
-    public double ClientTop
-    {
-        get { return Location.Y + ActualBorderTopWidth + ActualPaddingTop; }
-    }
+    public double ClientTop => Location.Y + ActualBorderTopWidth + ActualPaddingTop;
 
     /// <summary>
     /// Gets the right of the client rectangle
     /// </summary>
-    public double ClientRight
-    {
-        get { return ActualRight - ActualPaddingRight - ActualBorderRightWidth; }
-    }
+    public double ClientRight => ActualRight - ActualPaddingRight - ActualBorderRightWidth;
 
     /// <summary>
     /// Gets the bottom of the client rectangle
     /// </summary>
-    public double ClientBottom
-    {
-        get { return ActualBottom - ActualPaddingBottom - ActualBorderBottomWidth; }
-    }
+    public double ClientBottom => ActualBottom - ActualPaddingBottom - ActualBorderBottomWidth;
 
     /// <summary>
     /// Gets the client rectangle
     /// </summary>
-    public RRect ClientRectangle
-    {
-        get { return RRect.FromLTRB(ClientLeft, ClientTop, ClientRight, ClientBottom); }
-    }
+    public RRect ClientRectangle => RRect.FromLTRB (ClientLeft, ClientTop, ClientRight, ClientBottom);
 
     /// <summary>
     /// Gets the actual height
@@ -798,10 +549,11 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualHeight))
+            if (double.IsNaN (_actualHeight))
             {
-                _actualHeight = CssValueParser.ParseLength(Height, Size.Height, this);
+                _actualHeight = CssValueParser.ParseLength (Height, Size.Height, this);
             }
+
             return _actualHeight;
         }
     }
@@ -813,10 +565,11 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualWidth))
+            if (double.IsNaN (_actualWidth))
             {
-                _actualWidth = CssValueParser.ParseLength(Width, Size.Width, this);
+                _actualWidth = CssValueParser.ParseLength (Width, Size.Width, this);
             }
+
             return _actualWidth;
         }
     }
@@ -828,10 +581,11 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualPaddingTop))
+            if (double.IsNaN (_actualPaddingTop))
             {
-                _actualPaddingTop = CssValueParser.ParseLength(PaddingTop, Size.Width, this);
+                _actualPaddingTop = CssValueParser.ParseLength (PaddingTop, Size.Width, this);
             }
+
             return _actualPaddingTop;
         }
     }
@@ -843,10 +597,11 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualPaddingLeft))
+            if (double.IsNaN (_actualPaddingLeft))
             {
-                _actualPaddingLeft = CssValueParser.ParseLength(PaddingLeft, Size.Width, this);
+                _actualPaddingLeft = CssValueParser.ParseLength (PaddingLeft, Size.Width, this);
             }
+
             return _actualPaddingLeft;
         }
     }
@@ -858,10 +613,11 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualPaddingBottom))
+            if (double.IsNaN (_actualPaddingBottom))
             {
-                _actualPaddingBottom = CssValueParser.ParseLength(PaddingBottom, Size.Width, this);
+                _actualPaddingBottom = CssValueParser.ParseLength (PaddingBottom, Size.Width, this);
             }
+
             return _actualPaddingBottom;
         }
     }
@@ -873,10 +629,11 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualPaddingRight))
+            if (double.IsNaN (_actualPaddingRight))
             {
-                _actualPaddingRight = CssValueParser.ParseLength(PaddingRight, Size.Width, this);
+                _actualPaddingRight = CssValueParser.ParseLength (PaddingRight, Size.Width, this);
             }
+
             return _actualPaddingRight;
         }
     }
@@ -888,15 +645,22 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualMarginTop))
+            if (double.IsNaN (_actualMarginTop))
             {
                 if (MarginTop == CssConstants.Auto)
+                {
                     MarginTop = "0";
-                var actualMarginTop = CssValueParser.ParseLength(MarginTop, Size.Width, this);
-                if (MarginLeft.EndsWith("%"))
+                }
+
+                var actualMarginTop = CssValueParser.ParseLength (MarginTop, Size.Width, this);
+                if (MarginLeft.EndsWith ("%"))
+                {
                     return actualMarginTop;
+                }
+
                 _actualMarginTop = actualMarginTop;
             }
+
             return _actualMarginTop;
         }
     }
@@ -906,8 +670,8 @@ internal abstract class CssBoxProperties
     /// </summary>
     public double CollapsedMarginTop
     {
-        get { return double.IsNaN(_collapsedMarginTop) ? 0 : _collapsedMarginTop; }
-        set { _collapsedMarginTop = value; }
+        get => double.IsNaN (_collapsedMarginTop) ? 0 : _collapsedMarginTop;
+        set => _collapsedMarginTop = value;
     }
 
     /// <summary>
@@ -917,15 +681,22 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualMarginLeft))
+            if (double.IsNaN (_actualMarginLeft))
             {
                 if (MarginLeft == CssConstants.Auto)
+                {
                     MarginLeft = "0";
-                var actualMarginLeft = CssValueParser.ParseLength(MarginLeft, Size.Width, this);
-                if (MarginLeft.EndsWith("%"))
+                }
+
+                var actualMarginLeft = CssValueParser.ParseLength (MarginLeft, Size.Width, this);
+                if (MarginLeft.EndsWith ("%"))
+                {
                     return actualMarginLeft;
+                }
+
                 _actualMarginLeft = actualMarginLeft;
             }
+
             return _actualMarginLeft;
         }
     }
@@ -937,15 +708,22 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualMarginBottom))
+            if (double.IsNaN (_actualMarginBottom))
             {
                 if (MarginBottom == CssConstants.Auto)
+                {
                     MarginBottom = "0";
-                var actualMarginBottom = CssValueParser.ParseLength(MarginBottom, Size.Width, this);
-                if (MarginLeft.EndsWith("%"))
+                }
+
+                var actualMarginBottom = CssValueParser.ParseLength (MarginBottom, Size.Width, this);
+                if (MarginLeft.EndsWith ("%"))
+                {
                     return actualMarginBottom;
+                }
+
                 _actualMarginBottom = actualMarginBottom;
             }
+
             return _actualMarginBottom;
         }
     }
@@ -957,15 +735,22 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualMarginRight))
+            if (double.IsNaN (_actualMarginRight))
             {
                 if (MarginRight == CssConstants.Auto)
+                {
                     MarginRight = "0";
-                var actualMarginRight = CssValueParser.ParseLength(MarginRight, Size.Width, this);
-                if (MarginLeft.EndsWith("%"))
+                }
+
+                var actualMarginRight = CssValueParser.ParseLength (MarginRight, Size.Width, this);
+                if (MarginLeft.EndsWith ("%"))
+                {
                     return actualMarginRight;
+                }
+
                 _actualMarginRight = actualMarginRight;
             }
+
             return _actualMarginRight;
         }
     }
@@ -977,14 +762,15 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualBorderTopWidth))
+            if (double.IsNaN (_actualBorderTopWidth))
             {
-                _actualBorderTopWidth = CssValueParser.GetActualBorderWidth(BorderTopWidth, this);
-                if (string.IsNullOrEmpty(BorderTopStyle) || BorderTopStyle == CssConstants.None)
+                _actualBorderTopWidth = CssValueParser.GetActualBorderWidth (BorderTopWidth, this);
+                if (string.IsNullOrEmpty (BorderTopStyle) || BorderTopStyle == CssConstants.None)
                 {
                     _actualBorderTopWidth = 0f;
                 }
             }
+
             return _actualBorderTopWidth;
         }
     }
@@ -996,14 +782,15 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualBorderLeftWidth))
+            if (double.IsNaN (_actualBorderLeftWidth))
             {
-                _actualBorderLeftWidth = CssValueParser.GetActualBorderWidth(BorderLeftWidth, this);
-                if (string.IsNullOrEmpty(BorderLeftStyle) || BorderLeftStyle == CssConstants.None)
+                _actualBorderLeftWidth = CssValueParser.GetActualBorderWidth (BorderLeftWidth, this);
+                if (string.IsNullOrEmpty (BorderLeftStyle) || BorderLeftStyle == CssConstants.None)
                 {
                     _actualBorderLeftWidth = 0f;
                 }
             }
+
             return _actualBorderLeftWidth;
         }
     }
@@ -1015,14 +802,15 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualBorderBottomWidth))
+            if (double.IsNaN (_actualBorderBottomWidth))
             {
-                _actualBorderBottomWidth = CssValueParser.GetActualBorderWidth(BorderBottomWidth, this);
-                if (string.IsNullOrEmpty(BorderBottomStyle) || BorderBottomStyle == CssConstants.None)
+                _actualBorderBottomWidth = CssValueParser.GetActualBorderWidth (BorderBottomWidth, this);
+                if (string.IsNullOrEmpty (BorderBottomStyle) || BorderBottomStyle == CssConstants.None)
                 {
                     _actualBorderBottomWidth = 0f;
                 }
             }
+
             return _actualBorderBottomWidth;
         }
     }
@@ -1034,14 +822,15 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualBorderRightWidth))
+            if (double.IsNaN (_actualBorderRightWidth))
             {
-                _actualBorderRightWidth = CssValueParser.GetActualBorderWidth(BorderRightWidth, this);
-                if (string.IsNullOrEmpty(BorderRightStyle) || BorderRightStyle == CssConstants.None)
+                _actualBorderRightWidth = CssValueParser.GetActualBorderWidth (BorderRightWidth, this);
+                if (string.IsNullOrEmpty (BorderRightStyle) || BorderRightStyle == CssConstants.None)
                 {
                     _actualBorderRightWidth = 0f;
                 }
             }
+
             return _actualBorderRightWidth;
         }
     }
@@ -1055,15 +844,16 @@ internal abstract class CssBoxProperties
         {
             if (_actualBorderTopColor.IsEmpty)
             {
-                _actualBorderTopColor = GetActualColor(BorderTopColor);
+                _actualBorderTopColor = GetActualColor (BorderTopColor);
             }
+
             return _actualBorderTopColor;
         }
     }
 
-    protected abstract RPoint GetActualLocation(string X, string Y);
+    protected abstract RPoint GetActualLocation (string X, string Y);
 
-    protected abstract RColor GetActualColor(string colorStr);
+    protected abstract RColor GetActualColor (string colorStr);
 
     /// <summary>
     /// Gets the actual Left border Color
@@ -1074,8 +864,9 @@ internal abstract class CssBoxProperties
         {
             if ((_actualBorderLeftColor.IsEmpty))
             {
-                _actualBorderLeftColor = GetActualColor(BorderLeftColor);
+                _actualBorderLeftColor = GetActualColor (BorderLeftColor);
             }
+
             return _actualBorderLeftColor;
         }
     }
@@ -1089,8 +880,9 @@ internal abstract class CssBoxProperties
         {
             if ((_actualBorderBottomColor.IsEmpty))
             {
-                _actualBorderBottomColor = GetActualColor(BorderBottomColor);
+                _actualBorderBottomColor = GetActualColor (BorderBottomColor);
             }
+
             return _actualBorderBottomColor;
         }
     }
@@ -1104,8 +896,9 @@ internal abstract class CssBoxProperties
         {
             if ((_actualBorderRightColor.IsEmpty))
             {
-                _actualBorderRightColor = GetActualColor(BorderRightColor);
+                _actualBorderRightColor = GetActualColor (BorderRightColor);
             }
+
             return _actualBorderRightColor;
         }
     }
@@ -1117,10 +910,11 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualCornerNw))
+            if (double.IsNaN (_actualCornerNw))
             {
-                _actualCornerNw = CssValueParser.ParseLength(CornerNwRadius, 0, this);
+                _actualCornerNw = CssValueParser.ParseLength (CornerNwRadius, 0, this);
             }
+
             return _actualCornerNw;
         }
     }
@@ -1132,10 +926,11 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualCornerNe))
+            if (double.IsNaN (_actualCornerNe))
             {
-                _actualCornerNe = CssValueParser.ParseLength(CornerNeRadius, 0, this);
+                _actualCornerNe = CssValueParser.ParseLength (CornerNeRadius, 0, this);
             }
+
             return _actualCornerNe;
         }
     }
@@ -1147,10 +942,11 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualCornerSe))
+            if (double.IsNaN (_actualCornerSe))
             {
-                _actualCornerSe = CssValueParser.ParseLength(CornerSeRadius, 0, this);
+                _actualCornerSe = CssValueParser.ParseLength (CornerSeRadius, 0, this);
             }
+
             return _actualCornerSe;
         }
     }
@@ -1162,10 +958,11 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualCornerSw))
+            if (double.IsNaN (_actualCornerSw))
             {
-                _actualCornerSw = CssValueParser.ParseLength(CornerSwRadius, 0, this);
+                _actualCornerSw = CssValueParser.ParseLength (CornerSwRadius, 0, this);
             }
+
             return _actualCornerSw;
         }
     }
@@ -1173,18 +970,12 @@ internal abstract class CssBoxProperties
     /// <summary>
     /// Gets a value indicating if at least one of the corners of the box is rounded
     /// </summary>
-    public bool IsRounded
-    {
-        get { return ActualCornerNe > 0f || ActualCornerNw > 0f || ActualCornerSe > 0f || ActualCornerSw > 0f; }
-    }
+    public bool IsRounded => ActualCornerNe > 0f || ActualCornerNw > 0f || ActualCornerSe > 0f || ActualCornerSw > 0f;
 
     /// <summary>
     /// Gets the actual width of whitespace between words.
     /// </summary>
-    public double ActualWordSpacing
-    {
-        get { return _actualWordSpacing; }
-    }
+    public double ActualWordSpacing { get; private set; } = double.NaN;
 
     /// <summary>
     ///
@@ -1196,7 +987,7 @@ internal abstract class CssBoxProperties
         {
             if (_actualColor.IsEmpty)
             {
-                _actualColor = GetActualColor(Color);
+                _actualColor = GetActualColor (Color);
             }
 
             return _actualColor;
@@ -1212,7 +1003,7 @@ internal abstract class CssBoxProperties
         {
             if (_actualBackgroundColor.IsEmpty)
             {
-                _actualBackgroundColor = GetActualColor(BackgroundColor);
+                _actualBackgroundColor = GetActualColor (BackgroundColor);
             }
 
             return _actualBackgroundColor;
@@ -1228,8 +1019,9 @@ internal abstract class CssBoxProperties
         {
             if (_actualBackgroundGradient.IsEmpty)
             {
-                _actualBackgroundGradient = GetActualColor(BackgroundGradient);
+                _actualBackgroundGradient = GetActualColor (BackgroundGradient);
             }
+
             return _actualBackgroundGradient;
         }
     }
@@ -1241,9 +1033,9 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualBackgroundGradientAngle))
+            if (double.IsNaN (_actualBackgroundGradientAngle))
             {
-                _actualBackgroundGradientAngle = CssValueParser.ParseNumber(BackgroundGradientAngle, 360f);
+                _actualBackgroundGradientAngle = CssValueParser.ParseNumber (BackgroundGradientAngle, 360f);
             }
 
             return _actualBackgroundGradientAngle;
@@ -1253,10 +1045,7 @@ internal abstract class CssBoxProperties
     /// <summary>
     /// Gets the actual font of the parent
     /// </summary>
-    public RFont ActualParentFont
-    {
-        get { return GetParent() == null ? ActualFont : GetParent().ActualFont; }
-    }
+    public RFont ActualParentFont => GetParent() == null ? ActualFont : GetParent().ActualFont;
 
     /// <summary>
     /// Gets the font that should be actually used to paint the text of the box
@@ -1267,32 +1056,36 @@ internal abstract class CssBoxProperties
         {
             if (_actualFont == null)
             {
-                if (string.IsNullOrEmpty(FontFamily))
+                if (string.IsNullOrEmpty (FontFamily))
                 {
                     FontFamily = CssConstants.DefaultFont;
                 }
-                if (string.IsNullOrEmpty(FontSize))
+
+                if (string.IsNullOrEmpty (FontSize))
                 {
-                    FontSize = CssConstants.FontSize.ToString(CultureInfo.InvariantCulture) + "pt";
+                    FontSize = CssConstants.FontSize.ToString (CultureInfo.InvariantCulture) + "pt";
                 }
 
-                RFontStyle st = RFontStyle.Regular;
+                var st = RFontStyle.Regular;
 
                 if (FontStyle == CssConstants.Italic || FontStyle == CssConstants.Oblique)
                 {
                     st |= RFontStyle.Italic;
                 }
 
-                if (FontWeight != CssConstants.Normal && FontWeight != CssConstants.Lighter && !string.IsNullOrEmpty(FontWeight) && FontWeight != CssConstants.Inherit)
+                if (FontWeight != CssConstants.Normal && FontWeight != CssConstants.Lighter &&
+                    !string.IsNullOrEmpty (FontWeight) && FontWeight != CssConstants.Inherit)
                 {
                     st |= RFontStyle.Bold;
                 }
 
                 double fsize;
-                double parentSize = CssConstants.FontSize;
+                var parentSize = CssConstants.FontSize;
 
                 if (GetParent() != null)
+                {
                     parentSize = GetParent().ActualFont.Size;
+                }
 
                 switch (FontSize)
                 {
@@ -1324,7 +1117,7 @@ internal abstract class CssBoxProperties
                         fsize = parentSize + 2;
                         break;
                     default:
-                        fsize = CssValueParser.ParseLength(FontSize, parentSize, parentSize, null, true, true);
+                        fsize = CssValueParser.ParseLength (FontSize, parentSize, parentSize, null, true, true);
                         break;
                 }
 
@@ -1333,13 +1126,14 @@ internal abstract class CssBoxProperties
                     fsize = CssConstants.FontSize;
                 }
 
-                _actualFont = GetCachedFont(FontFamily, fsize, st);
+                _actualFont = GetCachedFont (FontFamily, fsize, st);
             }
+
             return _actualFont;
         }
     }
 
-    protected abstract RFont GetCachedFont(string fontFamily, double fsize, RFontStyle st);
+    protected abstract RFont GetCachedFont (string fontFamily, double fsize, RFontStyle st);
 
     /// <summary>
     /// Gets the line height
@@ -1348,10 +1142,11 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualLineHeight))
+            if (double.IsNaN (_actualLineHeight))
             {
-                _actualLineHeight = .9f * CssValueParser.ParseLength(LineHeight, Size.Height, this);
+                _actualLineHeight = .9f * CssValueParser.ParseLength (LineHeight, Size.Height, this);
             }
+
             return _actualLineHeight;
         }
     }
@@ -1363,9 +1158,9 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualTextIndent))
+            if (double.IsNaN (_actualTextIndent))
             {
-                _actualTextIndent = CssValueParser.ParseLength(TextIndent, Size.Width, this);
+                _actualTextIndent = CssValueParser.ParseLength (TextIndent, Size.Width, this);
             }
 
             return _actualTextIndent;
@@ -1379,9 +1174,9 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualBorderSpacingHorizontal))
+            if (double.IsNaN (_actualBorderSpacingHorizontal))
             {
-                MatchCollection matches = RegexParserUtils.Match(RegexParserUtils.CssLength, BorderSpacing);
+                var matches = RegexParserUtils.Match (RegexParserUtils.CssLength, BorderSpacing);
 
                 if (matches.Count == 0)
                 {
@@ -1389,7 +1184,7 @@ internal abstract class CssBoxProperties
                 }
                 else if (matches.Count > 0)
                 {
-                    _actualBorderSpacingHorizontal = CssValueParser.ParseLength(matches[0].Value, 1, this);
+                    _actualBorderSpacingHorizontal = CssValueParser.ParseLength (matches[0].Value, 1, this);
                 }
             }
 
@@ -1405,9 +1200,9 @@ internal abstract class CssBoxProperties
     {
         get
         {
-            if (double.IsNaN(_actualBorderSpacingVertical))
+            if (double.IsNaN (_actualBorderSpacingVertical))
             {
-                MatchCollection matches = RegexParserUtils.Match(RegexParserUtils.CssLength, BorderSpacing);
+                var matches = RegexParserUtils.Match (RegexParserUtils.CssLength, BorderSpacing);
 
                 if (matches.Count == 0)
                 {
@@ -1415,13 +1210,14 @@ internal abstract class CssBoxProperties
                 }
                 else if (matches.Count == 1)
                 {
-                    _actualBorderSpacingVertical = CssValueParser.ParseLength(matches[0].Value, 1, this);
+                    _actualBorderSpacingVertical = CssValueParser.ParseLength (matches[0].Value, 1, this);
                 }
                 else
                 {
-                    _actualBorderSpacingVertical = CssValueParser.ParseLength(matches[1].Value, 1, this);
+                    _actualBorderSpacingVertical = CssValueParser.ParseLength (matches[1].Value, 1, this);
                 }
             }
+
             return _actualBorderSpacingVertical;
         }
     }
@@ -1445,13 +1241,14 @@ internal abstract class CssBoxProperties
     /// Ensures that the specified length is converted to pixels if necessary
     /// </summary>
     /// <param name="length"></param>
-    protected string NoEms(string length)
+    protected string NoEms (string length)
     {
-        var len = new CssLength(length);
+        var len = new CssLength (length);
         if (len.Unit == CssUnit.Ems)
         {
-            length = len.ConvertEmToPixels(GetEmHeight()).ToString();
+            length = len.ConvertEmToPixels (GetEmHeight()).ToString();
         }
+
         return length;
     }
 
@@ -1462,28 +1259,44 @@ internal abstract class CssBoxProperties
     /// <param name="style">optional: the style to set</param>
     /// <param name="width">optional: the width to set</param>
     /// <param name="color">optional: the color to set</param>
-    protected void SetAllBorders(string style = null, string width = null, string color = null)
+    protected void SetAllBorders
+        (
+            string? style = null,
+            string? width = null,
+            string? color = null
+        )
     {
-        if (style != null)
+        if (style is not null)
+        {
             BorderLeftStyle = BorderTopStyle = BorderRightStyle = BorderBottomStyle = style;
-        if (width != null)
+        }
+
+        if (width is not null)
+        {
             BorderLeftWidth = BorderTopWidth = BorderRightWidth = BorderBottomWidth = width;
-        if (color != null)
+        }
+
+        if (color is not null)
+        {
             BorderLeftColor = BorderTopColor = BorderRightColor = BorderBottomColor = color;
+        }
     }
 
     /// <summary>
     /// Measures the width of whitespace between words (set <see cref="ActualWordSpacing"/>).
     /// </summary>
-    protected void MeasureWordSpacing(RGraphics g)
+    protected void MeasureWordSpacing
+        (
+            RGraphics graphics
+        )
     {
-        if (double.IsNaN(ActualWordSpacing))
+        if (double.IsNaN (ActualWordSpacing))
         {
-            _actualWordSpacing = CssUtils.WhiteSpace(g, this);
+            ActualWordSpacing = CssUtils.WhiteSpace (graphics, this);
             if (WordSpacing != CssConstants.Normal)
             {
-                string len = RegexParserUtils.Search(RegexParserUtils.CssLength, WordSpacing);
-                _actualWordSpacing += CssValueParser.ParseLength(len, 1, this);
+                var len = RegexParserUtils.Search (RegexParserUtils.CssLength, WordSpacing);
+                ActualWordSpacing += CssValueParser.ParseLength (len, 1, this);
             }
         }
     }
@@ -1493,40 +1306,44 @@ internal abstract class CssBoxProperties
     /// </summary>
     /// <param name="everything">Set to true to inherit all CSS properties instead of only the ineritables</param>
     /// <param name="p">Box to inherit the properties</param>
-    protected void InheritStyle(CssBox p, bool everything)
+    protected void InheritStyle
+        (
+            CssBox? p,
+            bool everything
+        )
     {
         if (p != null)
         {
-            _borderSpacing = p._borderSpacing;
-            _borderCollapse = p._borderCollapse;
+            BorderSpacing = p.BorderSpacing;
+            BorderCollapse = p.BorderCollapse;
             _color = p._color;
-            _emptyCells = p._emptyCells;
-            _whiteSpace = p._whiteSpace;
-            _visibility = p._visibility;
+            EmptyCells = p.EmptyCells;
+            WhiteSpace = p.WhiteSpace;
+            Visibility = p.Visibility;
             _textIndent = p._textIndent;
-            _textAlign = p._textAlign;
-            _verticalAlign = p._verticalAlign;
-            _fontFamily = p._fontFamily;
+            TextAlign = p.TextAlign;
+            VerticalAlign = p.VerticalAlign;
+            FontFamily = p.FontFamily;
             _fontSize = p._fontSize;
-            _fontStyle = p._fontStyle;
-            _fontVariant = p._fontVariant;
-            _fontWeight = p._fontWeight;
-            _listStyleImage = p._listStyleImage;
-            _listStylePosition = p._listStylePosition;
-            _listStyleType = p._listStyleType;
-            _listStyle = p._listStyle;
+            FontStyle = p.FontStyle;
+            FontVariant = p.FontVariant;
+            FontWeight = p.FontWeight;
+            ListStyleImage = p.ListStyleImage;
+            ListStylePosition = p.ListStylePosition;
+            ListStyleType = p.ListStyleType;
+            ListStyle = p.ListStyle;
             _lineHeight = p._lineHeight;
-            _wordBreak = p.WordBreak;
-            _direction = p._direction;
+            WordBreak = p.WordBreak;
+            Direction = p.Direction;
 
             if (everything)
             {
-                _backgroundColor = p._backgroundColor;
-                _backgroundGradient = p._backgroundGradient;
-                _backgroundGradientAngle = p._backgroundGradientAngle;
-                _backgroundImage = p._backgroundImage;
-                _backgroundPosition = p._backgroundPosition;
-                _backgroundRepeat = p._backgroundRepeat;
+                BackgroundColor = p.BackgroundColor;
+                BackgroundGradient = p.BackgroundGradient;
+                BackgroundGradientAngle = p.BackgroundGradientAngle;
+                BackgroundImage = p.BackgroundImage;
+                BackgroundPosition = p.BackgroundPosition;
+                BackgroundRepeat = p.BackgroundRepeat;
                 _borderTopWidth = p._borderTopWidth;
                 _borderRightWidth = p._borderRightWidth;
                 _borderBottomWidth = p._borderBottomWidth;
@@ -1535,36 +1352,36 @@ internal abstract class CssBoxProperties
                 _borderRightColor = p._borderRightColor;
                 _borderBottomColor = p._borderBottomColor;
                 _borderLeftColor = p._borderLeftColor;
-                _borderTopStyle = p._borderTopStyle;
-                _borderRightStyle = p._borderRightStyle;
-                _borderBottomStyle = p._borderBottomStyle;
-                _borderLeftStyle = p._borderLeftStyle;
+                BorderTopStyle = p.BorderTopStyle;
+                BorderRightStyle = p.BorderRightStyle;
+                BorderBottomStyle = p.BorderBottomStyle;
+                BorderLeftStyle = p.BorderLeftStyle;
                 _bottom = p._bottom;
-                _cornerNwRadius = p._cornerNwRadius;
-                _cornerNeRadius = p._cornerNeRadius;
-                _cornerSeRadius = p._cornerSeRadius;
-                _cornerSwRadius = p._cornerSwRadius;
+                CornerNwRadius = p.CornerNwRadius;
+                CornerNeRadius = p.CornerNeRadius;
+                CornerSeRadius = p.CornerSeRadius;
+                CornerSwRadius = p.CornerSwRadius;
                 _cornerRadius = p._cornerRadius;
-                _display = p._display;
-                _float = p._float;
-                _height = p._height;
-                _marginBottom = p._marginBottom;
-                _marginLeft = p._marginLeft;
-                _marginRight = p._marginRight;
-                _marginTop = p._marginTop;
+                Display = p.Display;
+                Float = p.Float;
+                Height = p.Height;
+                MarginBottom = p.MarginBottom;
+                MarginLeft = p.MarginLeft;
+                MarginRight = p.MarginRight;
+                MarginTop = p.MarginTop;
                 _left = p._left;
                 _lineHeight = p._lineHeight;
-                _overflow = p._overflow;
+                Overflow = p.Overflow;
                 _paddingLeft = p._paddingLeft;
                 _paddingBottom = p._paddingBottom;
                 _paddingRight = p._paddingRight;
                 _paddingTop = p._paddingTop;
                 _right = p._right;
-                _textDecoration = p._textDecoration;
+                TextDecoration = p.TextDecoration;
                 _top = p._top;
-                _position = p._position;
-                _width = p._width;
-                _maxWidth = p._maxWidth;
+                Position = p.Position;
+                Width = p.Width;
+                MaxWidth = p.MaxWidth;
                 _wordSpacing = p._wordSpacing;
             }
         }

@@ -60,12 +60,12 @@ internal sealed class CssBoxFrame
     /// <summary>
     /// link to the video on the site
     /// </summary>
-    private string _videoLinkUrl;
+    private string? _videoLinkUrl;
 
     /// <summary>
     /// handler used for image loading by source
     /// </summary>
-    private ImageLoadHandler _imageLoadHandler;
+    private ImageLoadHandler? _imageLoadHandler;
 
     /// <summary>
     /// is image load is finished, used to know if no image is found
@@ -80,14 +80,17 @@ internal sealed class CssBoxFrame
     /// </summary>
     /// <param name="parent">the parent box of this box</param>
     /// <param name="tag">the html tag data of this box</param>
-    public CssBoxFrame(CssBox parent, HtmlTag tag)
+    public CssBoxFrame
+        (
+            CssBox? parent,
+            HtmlTag tag
+        )
         : base(parent, tag)
     {
         _imageWord = new CssRectImage(this);
         Words.Add(_imageWord);
 
-        Uri uri;
-        if (Uri.TryCreate(GetAttribute("src"), UriKind.Absolute, out uri))
+        if (Uri.TryCreate(GetAttribute("src"), UriKind.Absolute, out var uri))
         {
             if (uri.Host.IndexOf("youtube.com", StringComparison.InvariantCultureIgnoreCase) > -1)
             {
@@ -110,10 +113,7 @@ internal sealed class CssBoxFrame
     /// <summary>
     /// Is the css box clickable ("a" element is clickable)
     /// </summary>
-    public override bool IsClickable
-    {
-        get { return true; }
-    }
+    public override bool IsClickable => true;
 
     /// <summary>
     /// Get the href link of the box (by default get "href" attribute)

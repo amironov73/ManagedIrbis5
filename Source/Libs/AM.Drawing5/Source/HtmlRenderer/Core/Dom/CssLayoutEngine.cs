@@ -34,17 +34,20 @@ internal static class CssLayoutEngine
     /// If no image exists for the box error icon will be set.
     /// </summary>
     /// <param name="imageWord">the image word to measure</param>
-    public static void MeasureImageSize(CssRectImage imageWord)
+    public static void MeasureImageSize
+        (
+            CssRectImage imageWord
+        )
     {
-        ArgChecker.AssertArgNotNull(imageWord, "imageWord");
-        ArgChecker.AssertArgNotNull(imageWord.OwnerBox, "imageWord.OwnerBox");
+        Sure.NotNull (imageWord);
+        Sure.NotNull (imageWord.OwnerBox);
 
-        var width = new CssLength(imageWord.OwnerBox.Width);
-        var height = new CssLength(imageWord.OwnerBox.Height);
+        var width = new CssLength (imageWord.OwnerBox.Width);
+        var height = new CssLength (imageWord.OwnerBox.Height);
 
-        bool hasImageTagWidth = width.Number > 0 && width.Unit == CssUnit.Pixels;
-        bool hasImageTagHeight = height.Number > 0 && height.Unit == CssUnit.Pixels;
-        bool scaleImageHeight = false;
+        var hasImageTagWidth = width.Number > 0 && width.Unit == CssUnit.Pixels;
+        var hasImageTagHeight = height.Number > 0 && height.Unit == CssUnit.Pixels;
+        var scaleImageHeight = false;
 
         if (hasImageTagWidth)
         {
@@ -57,14 +60,16 @@ internal static class CssLayoutEngine
         }
         else if (imageWord.Image != null)
         {
-            imageWord.Width = imageWord.ImageRectangle == RRect.Empty ? imageWord.Image.Width : imageWord.ImageRectangle.Width;
+            imageWord.Width = imageWord.ImageRectangle == RRect.Empty
+                ? imageWord.Image.Width
+                : imageWord.ImageRectangle.Width;
         }
         else
         {
             imageWord.Width = hasImageTagHeight ? height.Number / 1.14f : 20;
         }
 
-        var maxWidth = new CssLength(imageWord.OwnerBox.MaxWidth);
+        var maxWidth = new CssLength (imageWord.OwnerBox.MaxWidth);
         if (maxWidth.Number > 0)
         {
             double maxWidthVal = -1;
@@ -90,7 +95,9 @@ internal static class CssLayoutEngine
         }
         else if (imageWord.Image != null)
         {
-            imageWord.Height = imageWord.ImageRectangle == RRect.Empty ? imageWord.Image.Height : imageWord.ImageRectangle.Height;
+            imageWord.Height = imageWord.ImageRectangle == RRect.Empty
+                ? imageWord.Image.Height
+                : imageWord.ImageRectangle.Height;
         }
         else
         {
@@ -103,19 +110,21 @@ internal static class CssLayoutEngine
             if ((hasImageTagWidth && !hasImageTagHeight) || scaleImageHeight)
             {
                 // Divide the given tag width with the actual image width, to get the ratio.
-                double ratio = imageWord.Width / imageWord.Image.Width;
+                var ratio = imageWord.Width / imageWord.Image.Width;
                 imageWord.Height = imageWord.Image.Height * ratio;
             }
+
             // If only the height was set in the html tag, ratio the width.
             else if (hasImageTagHeight && !hasImageTagWidth)
             {
                 // Divide the given tag height with the actual image height, to get the ratio.
-                double ratio = imageWord.Height / imageWord.Image.Height;
+                var ratio = imageWord.Height / imageWord.Image.Height;
                 imageWord.Width = imageWord.Image.Width * ratio;
             }
         }
 
-        imageWord.Height += imageWord.OwnerBox.ActualBorderBottomWidth + imageWord.OwnerBox.ActualBorderTopWidth + imageWord.OwnerBox.ActualPaddingTop + imageWord.OwnerBox.ActualPaddingBottom;
+        imageWord.Height += imageWord.OwnerBox.ActualBorderBottomWidth + imageWord.OwnerBox.ActualBorderTopWidth +
+                            imageWord.OwnerBox.ActualPaddingTop + imageWord.OwnerBox.ActualPaddingBottom;
     }
 
     /// <summary>
@@ -123,30 +132,31 @@ internal static class CssLayoutEngine
     /// </summary>
     /// <param name="g"></param>
     /// <param name="blockBox"></param>
-    public static void CreateLineBoxes(RGraphics g, CssBox blockBox)
+    public static void CreateLineBoxes (RGraphics g, CssBox blockBox)
     {
-        ArgChecker.AssertArgNotNull(g, "g");
-        ArgChecker.AssertArgNotNull(blockBox, "blockBox");
+        ArgChecker.AssertArgNotNull (g, "g");
+        ArgChecker.AssertArgNotNull (blockBox, "blockBox");
 
         blockBox.LineBoxes.Clear();
 
-        double limitRight = blockBox.ActualRight - blockBox.ActualPaddingRight - blockBox.ActualBorderRightWidth;
+        var limitRight = blockBox.ActualRight - blockBox.ActualPaddingRight - blockBox.ActualBorderRightWidth;
 
         //Get the start x and y of the blockBox
-        double startx = blockBox.Location.X + blockBox.ActualPaddingLeft - 0 + blockBox.ActualBorderLeftWidth;
-        double starty = blockBox.Location.Y + blockBox.ActualPaddingTop - 0 + blockBox.ActualBorderTopWidth;
-        double curx = startx + blockBox.ActualTextIndent;
-        double cury = starty;
+        var startx = blockBox.Location.X + blockBox.ActualPaddingLeft - 0 + blockBox.ActualBorderLeftWidth;
+        var starty = blockBox.Location.Y + blockBox.ActualPaddingTop - 0 + blockBox.ActualBorderTopWidth;
+        var curx = startx + blockBox.ActualTextIndent;
+        var cury = starty;
 
         //Reminds the maximum bottom reached
-        double maxRight = startx;
-        double maxBottom = starty;
+        var maxRight = startx;
+        var maxBottom = starty;
 
         //First line box
-        CssLineBox line = new CssLineBox(blockBox);
+        var line = new CssLineBox (blockBox);
 
         //Flow words and boxes
-        FlowBox(g, blockBox, blockBox, limitRight, 0, startx, ref line, ref curx, ref cury, ref maxRight, ref maxBottom);
+        FlowBox (g, blockBox, blockBox, limitRight, 0, startx, ref line, ref curx, ref cury, ref maxRight,
+            ref maxBottom);
 
         // if width is not restricted we need to lower it to the actual width
         if (blockBox.ActualRight >= 90999)
@@ -157,17 +167,19 @@ internal static class CssLayoutEngine
         //Gets the rectangles for each line-box
         foreach (var linebox in blockBox.LineBoxes)
         {
-            ApplyHorizontalAlignment(g, linebox);
-            ApplyRightToLeft(blockBox, linebox);
-            BubbleRectangles(blockBox, linebox);
-            ApplyVerticalAlignment(g, linebox);
+            ApplyHorizontalAlignment (g, linebox);
+            ApplyRightToLeft (blockBox, linebox);
+            BubbleRectangles (blockBox, linebox);
+            ApplyVerticalAlignment (g, linebox);
             linebox.AssignRectanglesToBoxes();
         }
 
         blockBox.ActualBottom = maxBottom + blockBox.ActualPaddingBottom + blockBox.ActualBorderBottomWidth;
 
         // handle limiting block height when overflow is hidden
-        if (blockBox.Height != null && blockBox.Height != CssConstants.Auto && blockBox.Overflow == CssConstants.Hidden && blockBox.ActualBottom - blockBox.Location.Y > blockBox.ActualHeight)
+        if (blockBox.Height != null && blockBox.Height != CssConstants.Auto &&
+            blockBox.Overflow == CssConstants.Hidden &&
+            blockBox.ActualBottom - blockBox.Location.Y > blockBox.ActualHeight)
         {
             blockBox.ActualBottom = blockBox.Location.Y + blockBox.ActualHeight;
         }
@@ -178,16 +190,16 @@ internal static class CssLayoutEngine
     /// </summary>
     /// <param name="g"></param>
     /// <param name="cell"></param>
-    public static void ApplyCellVerticalAlignment(RGraphics g, CssBox cell)
+    public static void ApplyCellVerticalAlignment (RGraphics g, CssBox cell)
     {
-        ArgChecker.AssertArgNotNull(g, "g");
-        ArgChecker.AssertArgNotNull(cell, "cell");
+        ArgChecker.AssertArgNotNull (g, "g");
+        ArgChecker.AssertArgNotNull (cell, "cell");
 
         if (cell.VerticalAlign == CssConstants.Top || cell.VerticalAlign == CssConstants.Baseline)
             return;
 
-        double cellbot = cell.ClientBottom;
-        double bottom = cell.GetMaximumBottom(cell, 0f);
+        var cellbot = cell.ClientBottom;
+        var bottom = cell.GetMaximumBottom (cell, 0f);
         double dist = 0f;
 
         if (cell.VerticalAlign == CssConstants.Bottom)
@@ -199,9 +211,9 @@ internal static class CssLayoutEngine
             dist = (cellbot - bottom) / 2;
         }
 
-        foreach (CssBox b in cell.Boxes)
+        foreach (var b in cell.Boxes)
         {
-            b.OffsetTop(dist);
+            b.OffsetTop (dist);
         }
 
         //float top = cell.ClientTop;
@@ -245,7 +257,8 @@ internal static class CssLayoutEngine
     /// <param name="cury">Current y coordinate that will be the top of the next word</param>
     /// <param name="maxRight">Maximum right reached so far</param>
     /// <param name="maxbottom">Maximum bottom reached so far</param>
-    private static void FlowBox(RGraphics g, CssBox blockbox, CssBox box, double limitRight, double linespacing, double startx, ref CssLineBox line, ref double curx, ref double cury, ref double maxRight, ref double maxbottom)
+    private static void FlowBox (RGraphics g, CssBox blockbox, CssBox box, double limitRight, double linespacing,
+        double startx, ref CssLineBox line, ref double curx, ref double cury, ref double maxRight, ref double maxbottom)
     {
         var startX = curx;
         var startY = cury;
@@ -254,19 +267,23 @@ internal static class CssLayoutEngine
         var localMaxRight = maxRight;
         var localmaxbottom = maxbottom;
 
-        foreach (CssBox b in box.Boxes)
+        foreach (var b in box.Boxes)
         {
-            double leftspacing = (b.Position != CssConstants.Absolute && b.Position != CssConstants.Fixed) ? b.ActualMarginLeft + b.ActualBorderLeftWidth + b.ActualPaddingLeft : 0;
-            double rightspacing = (b.Position != CssConstants.Absolute && b.Position != CssConstants.Fixed) ? b.ActualMarginRight + b.ActualBorderRightWidth + b.ActualPaddingRight : 0;
+            var leftspacing = (b.Position != CssConstants.Absolute && b.Position != CssConstants.Fixed)
+                ? b.ActualMarginLeft + b.ActualBorderLeftWidth + b.ActualPaddingLeft
+                : 0;
+            var rightspacing = (b.Position != CssConstants.Absolute && b.Position != CssConstants.Fixed)
+                ? b.ActualMarginRight + b.ActualBorderRightWidth + b.ActualPaddingRight
+                : 0;
 
             b.RectanglesReset();
-            b.MeasureWordsSize(g);
+            b.MeasureWordsSize (g);
 
             curx += leftspacing;
 
             if (b.Words.Count > 0)
             {
-                bool wrapNoWrapBox = false;
+                var wrapNoWrapBox = false;
                 if (b.WhiteSpace == CssConstants.NoWrap && curx > startx)
                 {
                     var boxRight = curx;
@@ -276,7 +293,7 @@ internal static class CssLayoutEngine
                         wrapNoWrapBox = true;
                 }
 
-                if (DomUtils.IsBoxHasWhitespace(b))
+                if (DomUtils.IsBoxHasWhitespace (b))
                     curx += box.ActualWordSpacing;
 
                 foreach (var word in b.Words)
@@ -284,7 +301,8 @@ internal static class CssLayoutEngine
                     if (maxbottom - cury < box.ActualLineHeight)
                         maxbottom += box.ActualLineHeight - (maxbottom - cury);
 
-                    if ((b.WhiteSpace != CssConstants.NoWrap && b.WhiteSpace != CssConstants.Pre && curx + word.Width + rightspacing > limitRight
+                    if ((b.WhiteSpace != CssConstants.NoWrap && b.WhiteSpace != CssConstants.Pre &&
+                         curx + word.Width + rightspacing > limitRight
                          && (b.WhiteSpace != CssConstants.PreWrap || !word.IsSpaces))
                         || word.IsLineBreak || wrapNoWrapBox)
                     {
@@ -292,20 +310,21 @@ internal static class CssLayoutEngine
                         curx = startx;
 
                         // handle if line is wrapped for the first text element where parent has left margin\padding
-                        if (b == box.Boxes[0] && !word.IsLineBreak && (word == b.Words[0] || (box.ParentBox != null && box.ParentBox.IsBlock)))
+                        if (b == box.Boxes[0] && !word.IsLineBreak &&
+                            (word == b.Words[0] || (box.ParentBox != null && box.ParentBox.IsBlock)))
                             curx += box.ActualMarginLeft + box.ActualBorderLeftWidth + box.ActualPaddingLeft;
 
                         cury = maxbottom + linespacing;
 
-                        line = new CssLineBox(blockbox);
+                        line = new CssLineBox (blockbox);
 
-                        if (word.IsImage || word.Equals(b.FirstWord))
+                        if (word.IsImage || word.Equals (b.FirstWord))
                         {
                             curx += leftspacing;
                         }
                     }
 
-                    line.ReportExistanceOf(word);
+                    line.ReportExistanceOf (word);
 
                     word.Left = curx;
                     word.Top = cury;
@@ -317,8 +336,8 @@ internal static class CssLayoutEngine
 
                     curx = word.Left + word.FullWidth;
 
-                    maxRight = Math.Max(maxRight, word.Right);
-                    maxbottom = Math.Max(maxbottom, word.Bottom);
+                    maxRight = Math.Max (maxRight, word.Right);
+                    maxbottom = Math.Max (maxbottom, word.Bottom);
 
                     if (b.Position == CssConstants.Absolute)
                     {
@@ -329,7 +348,8 @@ internal static class CssLayoutEngine
             }
             else
             {
-                FlowBox(g, blockbox, b, limitRight, linespacing, startx, ref line, ref curx, ref cury, ref maxRight, ref maxbottom);
+                FlowBox (g, blockbox, b, limitRight, linespacing, startx, ref line, ref curx, ref cury, ref maxRight,
+                    ref maxbottom);
             }
 
             curx += rightspacing;
@@ -346,11 +366,12 @@ internal static class CssLayoutEngine
         {
             // hack for actual width handling
             curx += box.ActualWidth - (curx - startX);
-            line.Rectangles.Add(box, new RRect(startX, startY, box.ActualWidth, box.ActualHeight));
+            line.Rectangles.Add (box, new RRect (startX, startY, box.ActualWidth, box.ActualHeight));
         }
 
         // handle box that is only a whitespace
-        if (box.Text != null && box.Text.IsWhitespace() && !box.IsImage && box.IsInline && box.Boxes.Count == 0 && box.Words.Count == 0)
+        if (box.Text != null && box.Text.IsWhitespace() && !box.IsImage && box.IsInline && box.Boxes.Count == 0 &&
+            box.Words.Count == 0)
         {
             curx += box.ActualWordSpacing;
         }
@@ -361,7 +382,7 @@ internal static class CssLayoutEngine
             curx = localCurx;
             maxRight = localMaxRight;
             maxbottom = localmaxbottom;
-            AdjustAbsolutePosition(box, 0, 0);
+            AdjustAbsolutePosition (box, 0, 0);
         }
 
         box.LastHostingLineBox = line;
@@ -370,7 +391,7 @@ internal static class CssLayoutEngine
     /// <summary>
     /// Adjust the position of absolute elements by letf and top margins.
     /// </summary>
-    private static void AdjustAbsolutePosition(CssBox box, double left, double top)
+    private static void AdjustAbsolutePosition (CssBox box, double left, double top)
     {
         left += box.ActualMarginLeft;
         top += box.ActualMarginTop;
@@ -385,7 +406,7 @@ internal static class CssLayoutEngine
         else
         {
             foreach (var b in box.Boxes)
-                AdjustAbsolutePosition(b, left, top);
+                AdjustAbsolutePosition (b, left, top);
         }
     }
 
@@ -393,37 +414,40 @@ internal static class CssLayoutEngine
     /// Recursively creates the rectangles of the blockBox, by bubbling from deep to outside of the boxes
     /// in the rectangle structure
     /// </summary>
-    private static void BubbleRectangles(CssBox box, CssLineBox line)
+    private static void BubbleRectangles (CssBox box, CssLineBox line)
     {
         if (box.Words.Count > 0)
         {
             double x = Single.MaxValue, y = Single.MaxValue, r = Single.MinValue, b = Single.MinValue;
-            List<CssRect> words = line.WordsOf(box);
+            var words = line.WordsOf (box);
 
             if (words.Count > 0)
             {
-                foreach (CssRect word in words)
+                foreach (var word in words)
                 {
                     // handle if line is wrapped for the first text element where parent has left margin\padding
                     var left = word.Left;
 
-                    if (box == box.ParentBox.Boxes[0] && word == box.Words[0] && word == line.Words[0] && line != line.OwnerBox.LineBoxes[0] && !word.IsLineBreak)
-                        left -= box.ParentBox.ActualMarginLeft + box.ParentBox.ActualBorderLeftWidth + box.ParentBox.ActualPaddingLeft;
+                    if (box == box.ParentBox.Boxes[0] && word == box.Words[0] && word == line.Words[0] &&
+                        line != line.OwnerBox.LineBoxes[0] && !word.IsLineBreak)
+                        left -= box.ParentBox.ActualMarginLeft + box.ParentBox.ActualBorderLeftWidth +
+                                box.ParentBox.ActualPaddingLeft;
 
 
-                    x = Math.Min(x, left);
-                    r = Math.Max(r, word.Right);
-                    y = Math.Min(y, word.Top);
-                    b = Math.Max(b, word.Bottom);
+                    x = Math.Min (x, left);
+                    r = Math.Max (r, word.Right);
+                    y = Math.Min (y, word.Top);
+                    b = Math.Max (b, word.Bottom);
                 }
-                line.UpdateRectangle(box, x, y, r, b);
+
+                line.UpdateRectangle (box, x, y, r, b);
             }
         }
         else
         {
-            foreach (CssBox b in box.Boxes)
+            foreach (var b in box.Boxes)
             {
-                BubbleRectangles(b, line);
+                BubbleRectangles (b, line);
             }
         }
     }
@@ -433,21 +457,21 @@ internal static class CssLayoutEngine
     /// </summary>
     /// <param name="g"></param>
     /// <param name="lineBox"></param>
-    private static void ApplyHorizontalAlignment(RGraphics g, CssLineBox lineBox)
+    private static void ApplyHorizontalAlignment (RGraphics g, CssLineBox lineBox)
     {
         switch (lineBox.OwnerBox.TextAlign)
         {
             case CssConstants.Right:
-                ApplyRightAlignment(g, lineBox);
+                ApplyRightAlignment (g, lineBox);
                 break;
             case CssConstants.Center:
-                ApplyCenterAlignment(g, lineBox);
+                ApplyCenterAlignment (g, lineBox);
                 break;
             case CssConstants.Justify:
-                ApplyJustifyAlignment(g, lineBox);
+                ApplyJustifyAlignment (g, lineBox);
                 break;
             default:
-                ApplyLeftAlignment(g, lineBox);
+                ApplyLeftAlignment (g, lineBox);
                 break;
         }
     }
@@ -457,11 +481,11 @@ internal static class CssLayoutEngine
     /// </summary>
     /// <param name="blockBox"></param>
     /// <param name="lineBox"></param>
-    private static void ApplyRightToLeft(CssBox blockBox, CssLineBox lineBox)
+    private static void ApplyRightToLeft (CssBox blockBox, CssLineBox lineBox)
     {
         if (blockBox.Direction == CssConstants.Rtl)
         {
-            ApplyRightToLeftOnLine(lineBox);
+            ApplyRightToLeftOnLine (lineBox);
         }
         else
         {
@@ -469,7 +493,7 @@ internal static class CssLayoutEngine
             {
                 if (box.Direction == CssConstants.Rtl)
                 {
-                    ApplyRightToLeftOnSingleBox(lineBox, box);
+                    ApplyRightToLeftOnSingleBox (lineBox, box);
                 }
             }
         }
@@ -479,17 +503,17 @@ internal static class CssLayoutEngine
     /// Applies RTL direction to all the words on the line.
     /// </summary>
     /// <param name="line">the line to apply RTL to</param>
-    private static void ApplyRightToLeftOnLine(CssLineBox line)
+    private static void ApplyRightToLeftOnLine (CssLineBox line)
     {
         if (line.Words.Count > 0)
         {
-            double left = line.Words[0].Left;
-            double right = line.Words[line.Words.Count - 1].Right;
+            var left = line.Words[0].Left;
+            var right = line.Words[line.Words.Count - 1].Right;
 
-            foreach (CssRect word in line.Words)
+            foreach (var word in line.Words)
             {
-                double diff = word.Left - left;
-                double wright = right - diff;
+                var diff = word.Left - left;
+                var wright = right - diff;
                 word.Left = wright - word.Width;
             }
         }
@@ -500,11 +524,11 @@ internal static class CssLayoutEngine
     /// </summary>
     /// <param name="lineBox"></param>
     /// <param name="box"></param>
-    private static void ApplyRightToLeftOnSingleBox(CssLineBox lineBox, CssBox box)
+    private static void ApplyRightToLeftOnSingleBox (CssLineBox lineBox, CssBox box)
     {
-        int leftWordIdx = -1;
-        int rightWordIdx = -1;
-        for (int i = 0; i < lineBox.Words.Count; i++)
+        var leftWordIdx = -1;
+        var rightWordIdx = -1;
+        for (var i = 0; i < lineBox.Words.Count; i++)
         {
             if (lineBox.Words[i].OwnerBox == box)
             {
@@ -516,13 +540,13 @@ internal static class CssLayoutEngine
 
         if (leftWordIdx > -1 && rightWordIdx > leftWordIdx)
         {
-            double left = lineBox.Words[leftWordIdx].Left;
-            double right = lineBox.Words[rightWordIdx].Right;
+            var left = lineBox.Words[leftWordIdx].Left;
+            var right = lineBox.Words[rightWordIdx].Right;
 
-            for (int i = leftWordIdx; i <= rightWordIdx; i++)
+            for (var i = leftWordIdx; i <= rightWordIdx; i++)
             {
-                double diff = lineBox.Words[i].Left - left;
-                double wright = right - diff;
+                var diff = lineBox.Words[i].Left - left;
+                var wright = right - diff;
                 lineBox.Words[i].Left = wright - lineBox.Words[i].Width;
             }
         }
@@ -533,25 +557,25 @@ internal static class CssLayoutEngine
     /// </summary>
     /// <param name="g"></param>
     /// <param name="lineBox"></param>
-    private static void ApplyVerticalAlignment(RGraphics g, CssLineBox lineBox)
+    private static void ApplyVerticalAlignment (RGraphics g, CssLineBox lineBox)
     {
         double baseline = Single.MinValue;
         foreach (var box in lineBox.Rectangles.Keys)
         {
-            baseline = Math.Max(baseline, lineBox.Rectangles[box].Top);
+            baseline = Math.Max (baseline, lineBox.Rectangles[box].Top);
         }
 
-        var boxes = new List<CssBox>(lineBox.Rectangles.Keys);
-        foreach (CssBox box in boxes)
+        var boxes = new List<CssBox> (lineBox.Rectangles.Keys);
+        foreach (var box in boxes)
         {
             //Important notes on http://www.w3.org/TR/CSS21/tables.html#height-layout
             switch (box.VerticalAlign)
             {
                 case CssConstants.Sub:
-                    lineBox.SetBaseLine(g, box, baseline + lineBox.Rectangles[box].Height * .5f);
+                    lineBox.SetBaseLine (g, box, baseline + lineBox.Rectangles[box].Height * .5f);
                     break;
                 case CssConstants.Super:
-                    lineBox.SetBaseLine(g, box, baseline - lineBox.Rectangles[box].Height * .2f);
+                    lineBox.SetBaseLine (g, box, baseline - lineBox.Rectangles[box].Height * .2f);
                     break;
                 case CssConstants.TextTop:
 
@@ -570,7 +594,7 @@ internal static class CssLayoutEngine
                     break;
                 default:
                     //case: baseline
-                    lineBox.SetBaseLine(g, box, baseline);
+                    lineBox.SetBaseLine (g, box, baseline);
                     break;
             }
         }
@@ -581,18 +605,18 @@ internal static class CssLayoutEngine
     /// </summary>
     /// <param name="g"></param>
     /// <param name="lineBox"></param>
-    private static void ApplyJustifyAlignment(RGraphics g, CssLineBox lineBox)
+    private static void ApplyJustifyAlignment (RGraphics g, CssLineBox lineBox)
     {
-        if (lineBox.Equals(lineBox.OwnerBox.LineBoxes[lineBox.OwnerBox.LineBoxes.Count - 1]))
+        if (lineBox.Equals (lineBox.OwnerBox.LineBoxes[lineBox.OwnerBox.LineBoxes.Count - 1]))
             return;
 
-        double indent = lineBox.Equals(lineBox.OwnerBox.LineBoxes[0]) ? lineBox.OwnerBox.ActualTextIndent : 0f;
+        var indent = lineBox.Equals (lineBox.OwnerBox.LineBoxes[0]) ? lineBox.OwnerBox.ActualTextIndent : 0f;
         double textSum = 0f;
         double words = 0f;
-        double availWidth = lineBox.OwnerBox.ClientRectangle.Width - indent;
+        var availWidth = lineBox.OwnerBox.ClientRectangle.Width - indent;
 
         // Gather text sum
-        foreach (CssRect w in lineBox.Words)
+        foreach (var w in lineBox.Words)
         {
             textSum += w.Width;
             words += 1f;
@@ -600,10 +624,10 @@ internal static class CssLayoutEngine
 
         if (words <= 0f)
             return; //Avoid Zero division
-        double spacing = (availWidth - textSum) / words; //Spacing that will be used
-        double curx = lineBox.OwnerBox.ClientLeft + indent;
+        var spacing = (availWidth - textSum) / words; //Spacing that will be used
+        var curx = lineBox.OwnerBox.ClientLeft + indent;
 
-        foreach (CssRect word in lineBox.Words)
+        foreach (var word in lineBox.Words)
         {
             word.Left = curx;
             curx = word.Right + spacing;
@@ -620,29 +644,30 @@ internal static class CssLayoutEngine
     /// </summary>
     /// <param name="g"></param>
     /// <param name="line"></param>
-    private static void ApplyCenterAlignment(RGraphics g, CssLineBox line)
+    private static void ApplyCenterAlignment (RGraphics g, CssLineBox line)
     {
         if (line.Words.Count == 0)
             return;
 
-        CssRect lastWord = line.Words[line.Words.Count - 1];
-        double right = line.OwnerBox.ActualRight - line.OwnerBox.ActualPaddingRight - line.OwnerBox.ActualBorderRightWidth;
-        double diff = right - lastWord.Right - lastWord.OwnerBox.ActualBorderRightWidth - lastWord.OwnerBox.ActualPaddingRight;
+        var lastWord = line.Words[line.Words.Count - 1];
+        var right = line.OwnerBox.ActualRight - line.OwnerBox.ActualPaddingRight - line.OwnerBox.ActualBorderRightWidth;
+        var diff = right - lastWord.Right - lastWord.OwnerBox.ActualBorderRightWidth -
+                   lastWord.OwnerBox.ActualPaddingRight;
         diff /= 2;
 
         if (diff > 0)
         {
-            foreach (CssRect word in line.Words)
+            foreach (var word in line.Words)
             {
                 word.Left += diff;
             }
 
             if (line.Rectangles.Count > 0)
             {
-                foreach (CssBox b in ToList(line.Rectangles.Keys))
+                foreach (var b in ToList (line.Rectangles.Keys))
                 {
-                    RRect r = line.Rectangles[b];
-                    line.Rectangles[b] = new RRect(r.X + diff, r.Y, r.Width, r.Height);
+                    var r = line.Rectangles[b];
+                    line.Rectangles[b] = new RRect (r.X + diff, r.Y, r.Width, r.Height);
                 }
             }
         }
@@ -653,29 +678,30 @@ internal static class CssLayoutEngine
     /// </summary>
     /// <param name="g"></param>
     /// <param name="line"></param>
-    private static void ApplyRightAlignment(RGraphics g, CssLineBox line)
+    private static void ApplyRightAlignment (RGraphics g, CssLineBox line)
     {
         if (line.Words.Count == 0)
             return;
 
 
-        CssRect lastWord = line.Words[line.Words.Count - 1];
-        double right = line.OwnerBox.ActualRight - line.OwnerBox.ActualPaddingRight - line.OwnerBox.ActualBorderRightWidth;
-        double diff = right - lastWord.Right - lastWord.OwnerBox.ActualBorderRightWidth - lastWord.OwnerBox.ActualPaddingRight;
+        var lastWord = line.Words[line.Words.Count - 1];
+        var right = line.OwnerBox.ActualRight - line.OwnerBox.ActualPaddingRight - line.OwnerBox.ActualBorderRightWidth;
+        var diff = right - lastWord.Right - lastWord.OwnerBox.ActualBorderRightWidth -
+                   lastWord.OwnerBox.ActualPaddingRight;
 
         if (diff > 0)
         {
-            foreach (CssRect word in line.Words)
+            foreach (var word in line.Words)
             {
                 word.Left += diff;
             }
 
             if (line.Rectangles.Count > 0)
             {
-                foreach (CssBox b in ToList(line.Rectangles.Keys))
+                foreach (var b in ToList (line.Rectangles.Keys))
                 {
-                    RRect r = line.Rectangles[b];
-                    line.Rectangles[b] = new RRect(r.X + diff, r.Y, r.Width, r.Height);
+                    var r = line.Rectangles[b];
+                    line.Rectangles[b] = new RRect (r.X + diff, r.Y, r.Width, r.Height);
                 }
             }
         }
@@ -686,7 +712,7 @@ internal static class CssLayoutEngine
     /// </summary>
     /// <param name="g"></param>
     /// <param name="line"></param>
-    private static void ApplyLeftAlignment(RGraphics g, CssLineBox line)
+    private static void ApplyLeftAlignment (RGraphics g, CssLineBox line)
     {
         //No alignment needed.
 
@@ -709,13 +735,14 @@ internal static class CssLayoutEngine
     /// <summary>
     /// todo: optimizate, not creating a list each time
     /// </summary>
-    private static List<T> ToList<T>(IEnumerable<T> collection)
+    private static List<T> ToList<T> (IEnumerable<T> collection)
     {
-        List<T> result = new List<T>();
-        foreach (T item in collection)
+        var result = new List<T>();
+        foreach (var item in collection)
         {
-            result.Add(item);
+            result.Add (item);
         }
+
         return result;
     }
 

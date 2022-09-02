@@ -47,7 +47,7 @@ internal abstract class CssRect
     /// <summary>
     /// If the word is selected this points to the selection handler for more data
     /// </summary>
-    private SelectionHandler _selection;
+    private SelectionHandler? _selection;
 
     #endregion
 
@@ -56,7 +56,10 @@ internal abstract class CssRect
     /// Init.
     /// </summary>
     /// <param name="owner">the CSS box owner of the word</param>
-    protected CssRect(CssBox owner)
+    protected CssRect
+        (
+            CssBox owner
+        )
     {
         _ownerBox = owner;
     }
@@ -118,7 +121,12 @@ internal abstract class CssRect
     /// </summary>
     public double ActualWordSpacing
     {
-        get { return (OwnerBox != null ? (HasSpaceAfter ? OwnerBox.ActualWordSpacing : 0) + (IsImage ? OwnerBox.ActualWordSpacing : 0) : 0); }
+        get
+        {
+            return (OwnerBox != null
+                ? (HasSpaceAfter ? OwnerBox.ActualWordSpacing : 0) + (IsImage ? OwnerBox.ActualWordSpacing : 0)
+                : 0);
+        }
     }
 
     /// <summary>
@@ -176,11 +184,13 @@ internal abstract class CssRect
     /// <summary>
     /// Gets the image this words represents (if one exists)
     /// </summary>
-    public virtual RImage Image
+    public virtual RImage? Image
     {
         get { return null; }
+
         // ReSharper disable ValueParameterNotUsed
         set { }
+
         // ReSharper restore ValueParameterNotUsed
     }
 
@@ -230,7 +240,7 @@ internal abstract class CssRect
     /// </summary>
     public int SelectedStartIndex
     {
-        get { return _selection != null ? _selection.GetSelectingStartIndex(this) : -1; }
+        get { return _selection != null ? _selection.GetSelectingStartIndex (this) : -1; }
     }
 
     /// <summary>
@@ -238,7 +248,7 @@ internal abstract class CssRect
     /// </summary>
     public int SelectedEndIndexOffset
     {
-        get { return _selection != null ? _selection.GetSelectedEndIndexOffset(this) : -1; }
+        get { return _selection != null ? _selection.GetSelectedEndIndexOffset (this) : -1; }
     }
 
     /// <summary>
@@ -246,7 +256,7 @@ internal abstract class CssRect
     /// </summary>
     public double SelectedStartOffset
     {
-        get { return _selection != null ? _selection.GetSelectedStartOffset(this) : -1; }
+        get { return _selection != null ? _selection.GetSelectedStartOffset (this) : -1; }
     }
 
     /// <summary>
@@ -254,7 +264,7 @@ internal abstract class CssRect
     /// </summary>
     public double SelectedEndOffset
     {
-        get { return _selection != null ? _selection.GetSelectedEndOffset(this) : -1; }
+        get { return _selection != null ? _selection.GetSelectedEndOffset (this) : -1; }
     }
 
     /// <summary>
@@ -271,7 +281,8 @@ internal abstract class CssRect
     /// <returns></returns>
     public override string ToString()
     {
-        return string.Format("{0} ({1} char{2})", Text.Replace(' ', '-').Replace("\n", "\\n"), Text.Length, Text.Length != 1 ? "s" : string.Empty);
+        return string.Format ("{0} ({1} char{2})", Text.Replace (' ', '-').Replace ("\n", "\\n"), Text.Length,
+            Text.Length != 1 ? "s" : string.Empty);
     }
 
     public bool BreakPage()

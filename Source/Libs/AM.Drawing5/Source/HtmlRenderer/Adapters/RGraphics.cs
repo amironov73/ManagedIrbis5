@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 
 #endregion
 
@@ -28,7 +27,7 @@ namespace AM.Drawing.HtmlRenderer.Adapters;
 /// The core HTML Renderer components use this class for rendering logic, extending this
 /// class in different platform: WinForms, WPF, Metro, PDF, etc.
 /// </summary>
-public abstract class RGraphics 
+public abstract class RGraphics
     : IDisposable
 {
     #region Fields/Consts
@@ -54,9 +53,13 @@ public abstract class RGraphics
     /// <summary>
     /// Init.
     /// </summary>
-    protected RGraphics(RAdapter adapter, RRect initialClip)
+    protected RGraphics
+        (
+            RAdapter adapter,
+            RRect initialClip
+        )
     {
-        ArgChecker.AssertArgNotNull(adapter, "global");
+        Sure.NotNull (adapter);
 
         _adapter = adapter;
         _clipStack.Push(initialClip);

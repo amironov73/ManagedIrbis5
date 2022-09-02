@@ -52,23 +52,19 @@ internal class CssBox
     /// <summary>
     /// the root container for the hierarchy
     /// </summary>
-    protected HtmlContainerInt _htmlContainer;
+    protected HtmlContainerInt? _htmlContainer;
 
     /// <summary>
     /// the html tag that is associated with this css box, null if anonymous box
     /// </summary>
-    private readonly HtmlTag? _htmltag;
+    private readonly HtmlTag? _htmlTag;
 
     private readonly List<CssRect> _boxWords = new ();
-    private readonly List<CssBox> _boxes = new ();
-    private readonly List<CssLineBox> _lineBoxes = new ();
-    private readonly List<CssLineBox> _parentLineBoxes = new ();
-    private readonly Dictionary<CssLineBox, RRect> _rectangles = new ();
 
     /// <summary>
     /// the inner text of the box
     /// </summary>
-    private SubString _text;
+    private SubString? _text;
 
     /// <summary>
     /// Do not use or alter this flag
@@ -79,14 +75,12 @@ internal class CssBox
     internal bool _tableFixed;
 
     protected bool _wordsSizeMeasured;
-    private CssBox _listItemBox;
-    private CssLineBox _firstHostingLineBox;
-    private CssLineBox _lastHostingLineBox;
+    private CssBox? _listItemBox;
 
     /// <summary>
     /// handler for loading background image
     /// </summary>
-    private ImageLoadHandler _imageLoadHandler;
+    private ImageLoadHandler? _imageLoadHandler;
 
     #endregion
 
@@ -103,13 +97,13 @@ internal class CssBox
             HtmlTag? tag
         )
     {
-        if (parentBox != null)
+        if (parentBox is not null)
         {
             _parentBox = parentBox;
             _parentBox.Boxes.Add (this);
         }
 
-        _htmltag = tag;
+        _htmlTag = tag;
     }
 
     #endregion
@@ -120,75 +114,54 @@ internal class CssBox
     /// Gets the HtmlContainer of the Box.
     /// WARNING: May be null.
     /// </summary>
-    public HtmlContainerInt HtmlContainer
+    public HtmlContainerInt? HtmlContainer
     {
-        get { return _htmlContainer ?? (_htmlContainer = _parentBox != null ? _parentBox.HtmlContainer : null); }
-        set { _htmlContainer = value; }
+        get { return _htmlContainer ??= _parentBox?.HtmlContainer; }
+        set => _htmlContainer = value;
     }
 
     /// <summary>
     /// Gets or sets the parent box of this box
     /// </summary>
-    public CssBox ParentBox
+    public CssBox? ParentBox
     {
-        get { return _parentBox; }
+        get => _parentBox;
         set
         {
             //Remove from last parent
-            if (_parentBox != null)
-            {
-                _parentBox.Boxes.Remove (this);
-            }
+            _parentBox?.Boxes.Remove (this);
 
             _parentBox = value;
 
             //Add to new parent
-            if (value != null)
-            {
-                _parentBox.Boxes.Add (this);
-            }
+            _parentBox?.Boxes.Add (this);
         }
     }
 
     /// <summary>
     /// Gets the children boxes of this box
     /// </summary>
-    public List<CssBox> Boxes
-    {
-        get { return _boxes; }
-    }
+    public List<CssBox> Boxes { get; } = new ();
 
     /// <summary>
     /// Is the box is of "br" element.
     /// </summary>
-    public bool IsBrElement
-    {
-        get { return _htmltag != null && _htmltag.Name.Equals ("br", StringComparison.InvariantCultureIgnoreCase); }
-    }
+    public bool IsBrElement => _htmlTag != null && _htmlTag.Name.Equals ("br", StringComparison.InvariantCultureIgnoreCase);
 
     /// <summary>
     /// is the box "Display" is "Inline", is this is an inline box and not block.
     /// </summary>
-    public bool IsInline
-    {
-        get { return (Display == CssConstants.Inline || Display == CssConstants.InlineBlock) && !IsBrElement; }
-    }
+    public bool IsInline => Display is CssConstants.Inline or CssConstants.InlineBlock && !IsBrElement;
 
     /// <summary>
     /// is the box "Display" is "Block", is this is an block box and not inline.
     /// </summary>
-    public bool IsBlock
-    {
-        get { return Display == CssConstants.Block; }
-    }
+    public bool IsBlock => Display == CssConstants.Block;
 
     /// <summary>
     /// Is the css box clickable (by default only "a" element is clickable)
     /// </summary>
-    public virtual bool IsClickable
-    {
-        get { return HtmlTag != null && HtmlTag.Name == HtmlConstants.A && !HtmlTag.HasAttribute ("id"); }
-    }
+    public virtual bool IsClickable => HtmlTag != null && HtmlTag.Name == HtmlConstants.A && !HtmlTag.HasAttribute ("id");
 
     /// <summary>
     /// Gets a value indicating whether this instance or one of its parents has Position = fixed.
@@ -210,7 +183,7 @@ internal class CssBox
                 return false;
             }
 
-            CssBox parent = this;
+            var parent = this;
 
             while (!(parent.ParentBox == null || parent == parent.ParentBox))
             {
@@ -229,10 +202,7 @@ internal class CssBox
     /// <summary>
     /// Get the href link of the box (by default get "href" attribute)
     /// </summary>
-    public virtual string HrefLink
-    {
-        get { return GetAttribute (HtmlConstants.Href); }
-    }
+    public virtual string HrefLink => GetAttribute (HtmlConstants.Href);
 
     /// <summary>
     /// Gets the containing block-box of this box. (The nearest parent box with display=block)
@@ -269,18 +239,12 @@ internal class CssBox
     /// <summary>
     /// Gets the HTMLTag that hosts this box
     /// </summary>
-    public HtmlTag HtmlTag
-    {
-        get { return _htmltag; }
-    }
+    public HtmlTag? HtmlTag => _htmlTag;
 
     /// <summary>
     /// Gets if this box represents an image
     /// </summary>
-    public bool IsImage
-    {
-        get { return Words.Count == 1 && Words[0].IsImage; }
-    }
+    public bool IsImage => Words.Count == 1 && Words[0].IsImage;
 
     /// <summary>
     /// Tells if the box is empty or contains just blank spaces
@@ -291,7 +255,7 @@ internal class CssBox
         {
             if ((Words.Count != 0 || Boxes.Count != 0) && (Words.Count != 1 || !Words[0].IsSpaces))
             {
-                foreach (CssRect word in Words)
+                foreach (var word in Words)
                 {
                     if (!word.IsSpaces)
                     {
@@ -309,7 +273,7 @@ internal class CssBox
     /// </summary>
     public SubString Text
     {
-        get { return _text; }
+        get => _text;
         set
         {
             _text = value;
@@ -320,60 +284,37 @@ internal class CssBox
     /// <summary>
     /// Gets the line-boxes of this box (if block box)
     /// </summary>
-    internal List<CssLineBox> LineBoxes
-    {
-        get { return _lineBoxes; }
-    }
+    internal List<CssLineBox> LineBoxes { get; } = new ();
 
     /// <summary>
     /// Gets the linebox(es) that contains words of this box (if inline)
     /// </summary>
-    internal List<CssLineBox> ParentLineBoxes
-    {
-        get { return _parentLineBoxes; }
-    }
+    internal List<CssLineBox> ParentLineBoxes { get; } = new ();
 
     /// <summary>
     /// Gets the rectangles where this box should be painted
     /// </summary>
-    internal Dictionary<CssLineBox, RRect> Rectangles
-    {
-        get { return _rectangles; }
-    }
+    internal Dictionary<CssLineBox, RRect> Rectangles { get; } = new ();
 
     /// <summary>
     /// Gets the BoxWords of text in the box
     /// </summary>
-    internal List<CssRect> Words
-    {
-        get { return _boxWords; }
-    }
+    internal List<CssRect> Words => _boxWords;
 
     /// <summary>
     /// Gets the first word of the box
     /// </summary>
-    internal CssRect FirstWord
-    {
-        get { return Words[0]; }
-    }
+    internal CssRect FirstWord => Words[0];
 
     /// <summary>
     /// Gets or sets the first linebox where content of this box appear
     /// </summary>
-    internal CssLineBox FirstHostingLineBox
-    {
-        get { return _firstHostingLineBox; }
-        set { _firstHostingLineBox = value; }
-    }
+    internal CssLineBox? FirstHostingLineBox { get; set; }
 
     /// <summary>
     /// Gets or sets the last linebox where content of this box appear
     /// </summary>
-    internal CssLineBox LastHostingLineBox
-    {
-        get { return _lastHostingLineBox; }
-        set { _lastHostingLineBox = value; }
-    }
+    internal CssLineBox? LastHostingLineBox { get; set; }
 
     /// <summary>
     /// Create new css box for the given parent with the given html tag.<br/>
@@ -381,26 +322,29 @@ internal class CssBox
     /// <param name="tag">the html tag to define the box</param>
     /// <param name="parent">the box to add the new box to it as child</param>
     /// <returns>the new box</returns>
-    public static CssBox CreateBox (HtmlTag tag, CssBox? parent = null)
+    public static CssBox CreateBox
+        (
+            HtmlTag tag,
+            CssBox? parent = null
+        )
     {
-        ArgChecker.AssertArgNotNull (tag, "tag");
+        Sure.NotNull (tag);
 
         if (tag.Name == HtmlConstants.Img)
         {
             return new CssBoxImage (parent, tag);
         }
-        else if (tag.Name == HtmlConstants.Iframe)
+
+        if (tag.Name == HtmlConstants.Iframe)
         {
             return new CssBoxFrame (parent, tag);
         }
-        else if (tag.Name == HtmlConstants.Hr)
+        if (tag.Name == HtmlConstants.Hr)
         {
             return new CssBoxHr (parent, tag);
         }
-        else
-        {
-            return new CssBox (parent, tag);
-        }
+
+        return new CssBox (parent, tag);
     }
 
     /// <summary>
@@ -417,13 +361,18 @@ internal class CssBox
     /// <param name="tag">optional: the html tag to define the box</param>
     /// <param name="before">optional: to insert as specific location in parent box</param>
     /// <returns>the new box</returns>
-    public static CssBox CreateBox (CssBox parent, HtmlTag? tag = null, CssBox? before = null)
+    public static CssBox CreateBox
+        (
+            CssBox parent,
+            HtmlTag? tag = null,
+            CssBox? before = null
+        )
     {
         Sure.NotNull (parent);
 
         var newBox = new CssBox (parent, tag);
         newBox.InheritStyle();
-        if (before != null)
+        if (before is not null)
         {
             newBox.SetBeforeBox (before);
         }
@@ -439,6 +388,7 @@ internal class CssBox
     {
         var box = new CssBox (null, null);
         box.Display = CssConstants.Block;
+
         return box;
     }
 
@@ -457,12 +407,18 @@ internal class CssBox
     /// <param name="tag">optional: the html tag to define the box</param>
     /// <param name="before">optional: to insert as specific location in parent box</param>
     /// <returns>the new block box</returns>
-    public static CssBox CreateBlock (CssBox parent, HtmlTag tag = null, CssBox before = null)
+    public static CssBox CreateBlock
+        (
+            CssBox parent,
+            HtmlTag? tag = null,
+            CssBox? before = null
+        )
     {
-        ArgChecker.AssertArgNotNull (parent, "parent");
+        Sure.NotNull (parent);
 
         var newBox = CreateBox (parent, tag, before);
         newBox.Display = CssConstants.Block;
+
         return newBox;
     }
 
@@ -470,12 +426,15 @@ internal class CssBox
     /// Measures the bounds of box and children, recursively.<br/>
     /// Performs layout of the DOM structure creating lines by set bounds restrictions.
     /// </summary>
-    /// <param name="g">Device context to use</param>
-    public void PerformLayout (RGraphics g)
+    /// <param name="graphics">Device context to use</param>
+    public void PerformLayout
+        (
+            RGraphics graphics
+        )
     {
         try
         {
-            PerformLayoutImp (g);
+            PerformLayoutImp (graphics);
         }
         catch (Exception ex)
         {
@@ -500,7 +459,7 @@ internal class CssBox
                 }
 
                 // don't call paint if the rectangle of the box is not in visible rectangle
-                bool visible = Rectangles.Count == 0;
+                var visible = Rectangles.Count == 0;
                 if (!visible)
                 {
                     var clip = g.GetClip();
@@ -543,29 +502,44 @@ internal class CssBox
     /// Set this box in
     /// </summary>
     /// <param name="before"></param>
-    public void SetBeforeBox (CssBox before)
+    public void SetBeforeBox
+        (
+            CssBox before
+        )
     {
-        int index = _parentBox.Boxes.IndexOf (before);
+        Sure.NotNull (before);
+
+        var index = _parentBox?.Boxes.IndexOf (before) ?? -1;
         if (index < 0)
         {
             throw new Exception ("before box doesn't exist on parent");
         }
 
-        _parentBox.Boxes.Remove (this);
-        _parentBox.Boxes.Insert (index, this);
+        if (_parentBox is not null)
+        {
+            _parentBox.Boxes.Remove (this);
+            _parentBox.Boxes.Insert (index, this);
+        }
     }
 
     /// <summary>
     /// Move all child boxes from <paramref name="fromBox"/> to this box.
     /// </summary>
     /// <param name="fromBox">the box to move all its child boxes from</param>
-    public void SetAllBoxes (CssBox fromBox)
+    public void SetAllBoxes
+        (
+            CssBox fromBox
+        )
     {
-        foreach (var childBox in fromBox._boxes)
-            childBox._parentBox = this;
+        Sure.NotNull (fromBox);
 
-        _boxes.AddRange (fromBox._boxes);
-        fromBox._boxes.Clear();
+        foreach (var childBox in fromBox.Boxes)
+        {
+            childBox._parentBox = this;
+        }
+
+        Boxes.AddRange (fromBox.Boxes);
+        fromBox.Boxes.Clear();
     }
 
     /// <summary>
@@ -575,9 +549,9 @@ internal class CssBox
     {
         _boxWords.Clear();
 
-        int startIdx = 0;
-        bool preserveSpaces = WhiteSpace == CssConstants.Pre || WhiteSpace == CssConstants.PreWrap;
-        bool respoctNewline = preserveSpaces || WhiteSpace == CssConstants.PreLine;
+        var startIdx = 0;
+        var preserveSpaces = WhiteSpace == CssConstants.Pre || WhiteSpace == CssConstants.PreWrap;
+        var respoctNewline = preserveSpaces || WhiteSpace == CssConstants.PreLine;
         while (startIdx < _text.Length)
         {
             while (startIdx < _text.Length && _text[startIdx] == '\r')
@@ -642,10 +616,7 @@ internal class CssBox
     /// </summary>
     public virtual void Dispose()
     {
-        if (_imageLoadHandler != null)
-        {
-            _imageLoadHandler.Dispose();
-        }
+        _imageLoadHandler?.Dispose();
 
         foreach (var childBox in Boxes)
         {
@@ -676,9 +647,11 @@ internal class CssBox
             // Because their width and height are set by CssTable
             if (Display != CssConstants.TableCell && Display != CssConstants.Table)
             {
-                double width = ContainingBlock.Size.Width
-                               - ContainingBlock.ActualPaddingLeft - ContainingBlock.ActualPaddingRight
-                               - ContainingBlock.ActualBorderLeftWidth - ContainingBlock.ActualBorderRightWidth;
+                var width = ContainingBlock.Size.Width
+                            - ContainingBlock.ActualPaddingLeft
+                            - ContainingBlock.ActualPaddingRight
+                            - ContainingBlock.ActualBorderLeftWidth
+                            - ContainingBlock.ActualBorderRightWidth;
 
                 if (Width != CssConstants.Auto && !string.IsNullOrEmpty (Width))
                 {
@@ -728,7 +701,7 @@ internal class CssBox
                     ActualBottom = Location.Y;
                     CssLayoutEngine.CreateLineBoxes (g, this); //This will automatically set the bottom of this block
                 }
-                else if (_boxes.Count > 0)
+                else if (Boxes.Count > 0)
                 {
                     foreach (var childBox in Boxes)
                     {
@@ -811,14 +784,14 @@ internal class CssBox
     /// <returns></returns>
     private int GetIndexForList()
     {
-        bool reversed = !string.IsNullOrEmpty (ParentBox.GetAttribute ("reversed"));
+        var reversed = !string.IsNullOrEmpty (ParentBox.GetAttribute ("reversed"));
         int index;
         if (!int.TryParse (ParentBox.GetAttribute ("start"), out index))
         {
             if (reversed)
             {
                 index = 0;
-                foreach (CssBox b in ParentBox.Boxes)
+                foreach (var b in ParentBox.Boxes)
                 {
                     if (b.Display == CssConstants.ListItem)
                     {
@@ -832,7 +805,7 @@ internal class CssBox
             }
         }
 
-        foreach (CssBox b in ParentBox.Boxes)
+        foreach (var b in ParentBox.Boxes)
         {
             if (b.Equals (this))
             {
@@ -917,7 +890,7 @@ internal class CssBox
 
         if (b.Words.Count > 0)
         {
-            foreach (CssRect word in b.Words)
+            foreach (var word in b.Words)
             {
                 if (line.Words.Contains (word))
                 {
@@ -927,20 +900,18 @@ internal class CssBox
 
             return null;
         }
-        else
+
+        foreach (var bb in b.Boxes)
         {
-            foreach (CssBox bb in b.Boxes)
+            var w = FirstWordOccourence (bb, line);
+
+            if (w != null)
             {
-                CssRect w = FirstWordOccourence (bb, line);
-
-                if (w != null)
-                {
-                    return w;
-                }
+                return w;
             }
-
-            return null;
         }
+
+        return null;
     }
 
     /// <summary>
@@ -959,7 +930,11 @@ internal class CssBox
     /// <param name="attribute">Attribute to retrieve</param>
     /// <param name="defaultValue">Value to return if attribute is not specified</param>
     /// <returns>Attribute value or defaultValue if no attribute specified</returns>
-    internal string GetAttribute (string attribute, string defaultValue)
+    internal string? GetAttribute
+        (
+            string attribute,
+            string? defaultValue
+        )
     {
         return HtmlTag != null ? HtmlTag.TryGetAttribute (attribute, defaultValue) : defaultValue;
     }
@@ -973,7 +948,7 @@ internal class CssBox
     internal double GetMinimumWidth()
     {
         double maxWidth = 0;
-        CssRect maxWidthWord = null;
+        CssRect? maxWidthWord = null;
         GetMinimumWidth_LongestWord (this, ref maxWidth, ref maxWidthWord);
 
         double padding = 0f;
@@ -998,11 +973,16 @@ internal class CssBox
     /// <param name="maxWidth"> </param>
     /// <param name="maxWidthWord"> </param>
     /// <returns></returns>
-    private static void GetMinimumWidth_LongestWord (CssBox box, ref double maxWidth, ref CssRect maxWidthWord)
+    private static void GetMinimumWidth_LongestWord
+        (
+            CssBox box,
+            ref double maxWidth,
+            ref CssRect? maxWidthWord
+        )
     {
         if (box.Words.Count > 0)
         {
-            foreach (CssRect cssRect in box.Words)
+            foreach (var cssRect in box.Words)
             {
                 if (cssRect.Width > maxWidth)
                 {
@@ -1013,8 +993,10 @@ internal class CssBox
         }
         else
         {
-            foreach (CssBox childBox in box.Boxes)
+            foreach (var childBox in box.Boxes)
+            {
                 GetMinimumWidth_LongestWord (childBox, ref maxWidth, ref maxWidthWord);
+            }
         }
     }
 
@@ -1023,7 +1005,10 @@ internal class CssBox
     /// </summary>
     /// <param name="box">the box to start calculation from.</param>
     /// <returns>the total margin</returns>
-    private static double GetWidthMarginDeep (CssBox box)
+    private static double GetWidthMarginDeep
+        (
+            CssBox box
+        )
     {
         double sum = 0f;
         if (box.Size.Width > 90999 || (box.ParentBox != null && box.ParentBox.Size.Width > 90999))
@@ -1044,7 +1029,11 @@ internal class CssBox
     /// <param name="startBox"></param>
     /// <param name="currentMaxBottom"></param>
     /// <returns></returns>
-    internal double GetMaximumBottom (CssBox startBox, double currentMaxBottom)
+    internal double GetMaximumBottom
+        (
+            CssBox startBox,
+            double currentMaxBottom
+        )
     {
         foreach (var line in startBox.Rectangles.Keys)
         {
@@ -1064,7 +1053,11 @@ internal class CssBox
     /// </summary>
     /// <param name="minWidth">The minimum width the content must be so it won't overflow (largest word + padding).</param>
     /// <param name="maxWidth">The total width the content can take without line wrapping (with padding).</param>
-    internal void GetMinMaxWidth (out double minWidth, out double maxWidth)
+    internal void GetMinMaxWidth
+        (
+            out double minWidth,
+            out double maxWidth
+        )
     {
         double min = 0f;
         double maxSum = 0f;
@@ -1085,8 +1078,14 @@ internal class CssBox
     /// <param name="paddingSum">the total amount of padding the content has </param>
     /// <param name="marginSum"></param>
     /// <returns></returns>
-    private static void GetMinMaxSumWords (CssBox box, ref double min, ref double maxSum, ref double paddingSum,
-        ref double marginSum)
+    private static void GetMinMaxSumWords
+        (
+            CssBox box,
+            ref double min,
+            ref double maxSum,
+            ref double paddingSum,
+            ref double marginSum
+        )
     {
         double? oldSum = null;
 
@@ -1112,7 +1111,7 @@ internal class CssBox
         if (box.Words.Count > 0)
         {
             // calculate the min and max sum for all the words in the box
-            foreach (CssRect word in box.Words)
+            foreach (var word in box.Words)
             {
                 maxSum += word.FullWidth + (word.HasSpaceBefore ? word.OwnerBox.ActualWordSpacing : 0);
                 min = Math.Max (min, word.Width);
@@ -1127,9 +1126,9 @@ internal class CssBox
         else
         {
             // recursively on all the child boxes
-            for (int i = 0; i < box.Boxes.Count; i++)
+            for (var i = 0; i < box.Boxes.Count; i++)
             {
-                CssBox childBox = box.Boxes[i];
+                var childBox = box.Boxes[i];
                 marginSum += childBox.ActualMarginLeft + childBox.ActualMarginRight;
 
                 //maxSum += childBox.ActualMarginLeft + childBox.ActualMarginRight;
@@ -1166,7 +1165,11 @@ internal class CssBox
     /// <summary>
     /// Inherits inheritable values from parent.
     /// </summary>
-    internal new void InheritStyle (CssBox box = null, bool everything = false)
+    internal new void InheritStyle
+        (
+            CssBox? box = null,
+            bool everything = false
+        )
     {
         base.InheritStyle (box ?? ParentBox, everything);
     }
@@ -1242,10 +1245,8 @@ internal class CssBox
 
             return maxRight + ActualPaddingRight + ActualMarginRight + ActualBorderRightWidth;
         }
-        else
-        {
-            return ActualRight;
-        }
+
+        return ActualRight;
     }
 
     /// <summary>
@@ -1258,12 +1259,12 @@ internal class CssBox
         if (ParentBox != null && ParentBox.Boxes.IndexOf (this) == ParentBox.Boxes.Count - 1 &&
             _parentBox.ActualMarginBottom < 0.1)
         {
-            var lastChildBottomMargin = _boxes[_boxes.Count - 1].ActualMarginBottom;
+            var lastChildBottomMargin = Boxes[Boxes.Count - 1].ActualMarginBottom;
             margin = Height == "auto" ? Math.Max (ActualMarginBottom, lastChildBottomMargin) : lastChildBottomMargin;
         }
 
         return Math.Max (ActualBottom,
-            _boxes[_boxes.Count - 1].ActualBottom + margin + ActualPaddingBottom + ActualBorderBottomWidth);
+            Boxes[Boxes.Count - 1].ActualBottom + margin + ActualPaddingBottom + ActualBorderBottomWidth);
     }
 
     /// <summary>
@@ -1272,30 +1273,29 @@ internal class CssBox
     /// <param name="amount"></param>
     internal void OffsetTop (double amount)
     {
-        List<CssLineBox> lines = new List<CssLineBox>();
-        foreach (CssLineBox line in Rectangles.Keys)
-            lines.Add (line);
-
-        foreach (CssLineBox line in lines)
+        var lines = new List<CssLineBox>();
+        foreach (var line in Rectangles.Keys)
         {
-            RRect r = Rectangles[line];
+            lines.Add (line);
+        }
+
+        foreach (var line in lines)
+        {
+            var r = Rectangles[line];
             Rectangles[line] = new RRect (r.X, r.Y + amount, r.Width, r.Height);
         }
 
-        foreach (CssRect word in Words)
+        foreach (var word in Words)
         {
             word.Top += amount;
         }
 
-        foreach (CssBox b in Boxes)
+        foreach (var b in Boxes)
         {
             b.OffsetTop (amount);
         }
 
-        if (_listItemBox != null)
-        {
-            _listItemBox.OffsetTop (amount);
-        }
+        _listItemBox?.OffsetTop (amount);
 
         Location = new RPoint (Location.X, Location.Y + amount);
     }
@@ -1315,14 +1315,14 @@ internal class CssBox
                 ? new List<RRect> (new[] { Bounds })
                 : new List<RRect> (Rectangles.Values);
             var clip = g.GetClip();
-            RRect[] rects = areas.ToArray();
-            RPoint offset = RPoint.Empty;
+            var rects = areas.ToArray();
+            var offset = RPoint.Empty;
             if (!IsFixed)
             {
                 offset = HtmlContainer.ScrollOffset;
             }
 
-            for (int i = 0; i < rects.Length; i++)
+            for (var i = 0; i < rects.Length; i++)
             {
                 var actualRect = rects[i];
                 actualRect.Offset (offset);
@@ -1336,7 +1336,7 @@ internal class CssBox
 
             PaintWords (g, offset);
 
-            for (int i = 0; i < rects.Length; i++)
+            for (var i = 0; i < rects.Length; i++)
             {
                 var actualRect = rects[i];
                 actualRect.Offset (offset);
@@ -1348,7 +1348,7 @@ internal class CssBox
             }
 
             // split paint to handle z-order
-            foreach (CssBox b in Boxes)
+            foreach (var b in Boxes)
             {
                 if (b.Position != CssConstants.Absolute && !b.IsFixed)
                 {
@@ -1356,7 +1356,7 @@ internal class CssBox
                 }
             }
 
-            foreach (CssBox b in Boxes)
+            foreach (var b in Boxes)
             {
                 if (b.Position == CssConstants.Absolute)
                 {
@@ -1364,7 +1364,7 @@ internal class CssBox
                 }
             }
 
-            foreach (CssBox b in Boxes)
+            foreach (var b in Boxes)
             {
                 if (b.IsFixed)
                 {
@@ -1377,10 +1377,7 @@ internal class CssBox
                 g.PopClip();
             }
 
-            if (_listItemBox != null)
-            {
-                _listItemBox.Paint (g);
-            }
+            _listItemBox?.Paint (g);
         }
     }
 
@@ -1451,10 +1448,7 @@ internal class CssBox
 
                 g.ReturnPreviousSmoothingMode (prevMode);
 
-                if (roundrect != null)
-                {
-                    roundrect.Dispose();
-                }
+                roundrect?.Dispose();
 
                 brush.Dispose();
             }
@@ -1564,13 +1558,13 @@ internal class CssBox
 
         y -= ActualPaddingBottom - ActualBorderBottomWidth;
 
-        double x1 = rectangle.X;
+        var x1 = rectangle.X;
         if (isFirst)
         {
             x1 += ActualPaddingLeft + ActualBorderLeftWidth;
         }
 
-        double x2 = rectangle.Right;
+        var x2 = rectangle.Right;
         if (isLast)
         {
             x2 -= ActualPaddingRight + ActualBorderRightWidth;
@@ -1602,7 +1596,7 @@ internal class CssBox
     /// </summary>
     internal void RectanglesReset()
     {
-        _rectangles.Clear();
+        Rectangles.Clear();
     }
 
     /// <summary>
@@ -1641,15 +1635,11 @@ internal class CssBox
             {
                 return g.GetSolidBrush (RColor.FromArgb (180, backColor.R, backColor.G, backColor.B));
             }
-            else
-            {
-                return g.GetSolidBrush (backColor);
-            }
+
+            return g.GetSolidBrush (backColor);
         }
-        else
-        {
-            return g.GetSolidBrush (CssUtils.DefaultSelectionBackcolor);
-        }
+
+        return g.GetSolidBrush (CssUtils.DefaultSelectionBackcolor);
     }
 
     protected override RFont GetCachedFont (string fontFamily, double fsize, RFontStyle st)
@@ -1682,14 +1672,12 @@ internal class CssBox
             return string.Format ("{0}{1} Block {2}, Children:{3}", ParentBox == null ? "Root: " : string.Empty, tag,
                 FontSize, Boxes.Count);
         }
-        else if (Display == CssConstants.None)
+
+        if (Display == CssConstants.None)
         {
             return string.Format ("{0}{1} None", ParentBox == null ? "Root: " : string.Empty, tag);
         }
-        else
-        {
-            return string.Format ("{0}{1} {2}: {3}", ParentBox == null ? "Root: " : string.Empty, tag, Display, Text);
-        }
+        return string.Format ("{0}{1} {2}: {3}", ParentBox == null ? "Root: " : string.Empty, tag, Display, Text);
     }
 
     #endregion

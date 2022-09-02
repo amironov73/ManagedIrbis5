@@ -12,7 +12,6 @@
 #region Using directives
 
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 
 #endregion
 
@@ -27,26 +26,22 @@ namespace AM.Drawing.HtmlRenderer.Adapters;
 public abstract class RControl
 {
     /// <summary>
-    /// The platform adapter.
-    /// </summary>
-    private readonly RAdapter _adapter;
-
-    /// <summary>
     /// Init control with platform adapter.
     /// </summary>
-    protected RControl(RAdapter adapter)
+    protected RControl
+        (
+            RAdapter adapter
+        )
     {
-        ArgChecker.AssertArgNotNull(adapter, "adapter");
-        _adapter = adapter;
+        Sure.NotNull (adapter);
+
+        Adapter = adapter;
     }
 
     /// <summary>
     /// The platform adapter.
     /// </summary>
-    public RAdapter Adapter
-    {
-        get { return _adapter; }
-    }
+    public RAdapter Adapter { get; }
 
     /// <summary>
     /// Is the left mouse button is currently in pressed state
@@ -92,7 +87,14 @@ public abstract class RControl
     /// <param name="maxWidth">the max width to calculate fit characters</param>
     /// <param name="charFit">the number of characters that will fit under <see cref="maxWidth"/> restriction</param>
     /// <param name="charFitWidth">the width that only the characters that fit into max width take</param>
-    public abstract void MeasureString(string str, RFont font, double maxWidth, out int charFit, out double charFitWidth);
+    public abstract void MeasureString
+        (
+            string str,
+            RFont font,
+            double maxWidth,
+            out int charFit,
+            out double charFitWidth
+        );
 
     /// <summary>
     /// Invalidates the entire surface of the control and causes the control to be redrawn.

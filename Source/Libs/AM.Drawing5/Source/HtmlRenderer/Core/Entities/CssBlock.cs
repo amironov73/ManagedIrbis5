@@ -46,7 +46,7 @@ public sealed class CssBlock
     /// <summary>
     /// additional selectors to used in hierarchy (p className1 > className2)
     /// </summary>
-    private readonly List<CssBlockSelectorItem> _selectors;
+    private readonly List<CssBlockSelectorItem>? _selectors;
 
     /// <summary>
     /// is the css block has :hover pseudo-class
@@ -63,8 +63,13 @@ public sealed class CssBlock
     /// <param name="properties">the CSS block properties and values</param>
     /// <param name="selectors">optional: additional selectors to used in hierarchy</param>
     /// <param name="hover">optional: is the css block has :hover pseudo-class</param>
-    public CssBlock (string @class, Dictionary<string, string> properties, List<CssBlockSelectorItem> selectors = null,
-        bool hover = false)
+    public CssBlock
+        (
+            string @class,
+            Dictionary<string, string> properties,
+            List<CssBlockSelectorItem>? selectors = null,
+            bool hover = false
+        )
     {
         ArgChecker.AssertArgNotNullOrEmpty (@class, "@class");
         ArgChecker.AssertArgNotNull (properties, "properties");
