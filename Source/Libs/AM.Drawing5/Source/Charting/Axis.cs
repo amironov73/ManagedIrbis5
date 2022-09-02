@@ -138,7 +138,7 @@ public abstract class Axis
     /// Allow customization of the title when the scale is very large
     /// Subscribe to this event to handle custom formatting of the scale axis label.
     /// </summary>
-    public event ScaleTitleEventHandler ScaleTitleEvent;
+    public event ScaleTitleEventHandler? ScaleTitleEvent;
 
     #endregion
 
@@ -1396,7 +1396,6 @@ public abstract class Axis
             Title.Text = "";
         }
 
-        // Revision: JCarpenter 10/06
         // Allow customization of the modified title when the scale is very large
         // The event handler can edit the full label.  If the handler returns
         // null, then the title will be the default.

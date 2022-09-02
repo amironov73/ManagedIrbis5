@@ -46,28 +46,13 @@ namespace AM.Drawing.Charting;
 public class OHLCBarItem
     : CurveItem, ICloneable
 {
-    #region Fields
-
-    /// <summary>
-    /// Private field that stores a reference to the <see cref="OHLCBar"/>
-    /// class defined for this <see cref="OHLCBarItem"/>.  Use the public
-    /// property <see cref="OHLCBar"/> to access this value.
-    /// </summary>
-    ///
-    [CLSCompliant (false)] protected OHLCBar _bar;
-
-    #endregion
-
     #region Properties
 
     /// <summary>
     /// Gets a reference to the <see cref="OHLCBar"/> class defined
     /// for this <see cref="OHLCBarItem"/>.
     /// </summary>
-    public OHLCBar Bar
-    {
-        get { return _bar; }
-    }
+    public OHLCBar Bar { get; }
 
     /// <summary>
     /// Gets a flag indicating if the X axis is the independent axis for this <see cref="CurveItem" />
@@ -105,7 +90,7 @@ public class OHLCBarItem
     public OHLCBarItem (string label)
         : base (label)
     {
-        _bar = new OHLCBar();
+        Bar = new OHLCBar();
     }
 
     /// <summary>
@@ -122,7 +107,7 @@ public class OHLCBarItem
     public OHLCBarItem (string label, IPointList points, Color color)
         : base (label, points)
     {
-        _bar = new OHLCBar (color);
+        Bar = new OHLCBar (color);
     }
 
     /// <summary>
@@ -132,7 +117,7 @@ public class OHLCBarItem
     public OHLCBarItem (OHLCBarItem rhs)
         : base (rhs)
     {
-        _bar = rhs._bar.Clone();
+        Bar = rhs.Bar.Clone();
     }
 
     /// <summary>
@@ -181,7 +166,7 @@ public class OHLCBarItem
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema2").NotUsed();
 
-        _bar = (OHLCBar)info.GetValue ("stick", typeof (OHLCBar));
+        Bar = (OHLCBar)info.GetValue ("stick", typeof (OHLCBar));
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -194,7 +179,7 @@ public class OHLCBarItem
         base.GetObjectData (info, context);
 
         info.AddValue ("schema2", schema2);
-        info.AddValue ("stick", _bar);
+        info.AddValue ("stick", Bar);
     }
 
     #endregion
@@ -227,7 +212,7 @@ public class OHLCBarItem
     {
         if (IsVisible)
         {
-            _bar.Draw (graphics, pane, this, BaseAxis (pane),
+            Bar.Draw (graphics, pane, this, BaseAxis (pane),
                 ValueAxis (pane), scaleFactor);
         }
     }
@@ -275,9 +260,9 @@ public class OHLCBarItem
 
         float halfSize = 2.0f * scaleFactor;
 
-        using (Pen pen = new Pen (_bar.Color, _bar._width))
+        using (Pen pen = new Pen (Bar.Color, Bar._width))
         {
-            _bar.Draw (graphics, pane, pane._barSettings.Base == BarBase.X, pixBase, pixHigh,
+            Bar.Draw (graphics, pane, pane._barSettings.Base == BarBase.X, pixBase, pixHigh,
                 pixLow, pixOpen, pixClose, halfSize, pen);
         }
     }
@@ -303,7 +288,7 @@ public class OHLCBarItem
         Axis valueAxis = ValueAxis (pane);
         Axis baseAxis = BaseAxis (pane);
 
-        float halfSize = _bar.Size * pane.CalcScaleFactor();
+        float halfSize = Bar.Size * pane.CalcScaleFactor();
 
         PointPair pt = _points[i];
         double date = pt.X;

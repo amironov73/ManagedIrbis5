@@ -499,7 +499,7 @@ public class GraphPane
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        var sch = info.GetInt32 ("schema2");
 
         _xAxis = (XAxis)info.GetValue ("xAxis", typeof (XAxis));
         if (sch >= 11)
@@ -584,7 +584,7 @@ public class GraphPane
     public void AxisChange()
     {
         using (var img = new Bitmap ((int)Rect.Width, (int)Rect.Height))
-        using (Graphics g = Graphics.FromImage (img))
+        using (var g = Graphics.FromImage (img))
             AxisChange (g);
     }
 
@@ -616,7 +616,7 @@ public class GraphPane
             _isIgnoreInitial, _isBoundedRanges, this);
 
         // Determine the scale factor
-        float scaleFactor = CalcScaleFactor();
+        var scaleFactor = CalcScaleFactor();
 
         // For pie charts, go ahead and turn off the axis displays if it's only pies
         if (CurveList.IsPieOnly)
@@ -666,7 +666,7 @@ public class GraphPane
 
     private void PickScale (Graphics g, float scaleFactor)
     {
-        int maxTics = 0;
+        var maxTics = 0;
 
         _xAxis.Scale.PickScale (this, g, scaleFactor);
         _x2Axis.Scale.PickScale (this, g, scaleFactor);
@@ -676,7 +676,7 @@ public class GraphPane
             axis.Scale.PickScale (this, g, scaleFactor);
             if (axis.Scale.MaxAuto)
             {
-                int nTics = axis.Scale.CalcNumTics();
+                var nTics = axis.Scale.CalcNumTics();
                 maxTics = nTics > maxTics ? nTics : maxTics;
             }
         }
@@ -686,7 +686,7 @@ public class GraphPane
             axis.Scale.PickScale (this, g, scaleFactor);
             if (axis.Scale.MaxAuto)
             {
-                int nTics = axis.Scale.CalcNumTics();
+                var nTics = axis.Scale.CalcNumTics();
                 maxTics = nTics > maxTics ? nTics : maxTics;
             }
         }
@@ -705,7 +705,7 @@ public class GraphPane
     {
         if (axis.Scale.MaxAuto)
         {
-            int nTics = axis.Scale.CalcNumTics();
+            var nTics = axis.Scale.CalcNumTics();
             if (nTics < numTics)
             {
                 axis.Scale._maxLinearized += axis.Scale._majorStep * (numTics - nTics);
@@ -744,7 +744,7 @@ public class GraphPane
         g.SetClip (_rect);
 
         // calculate scaleFactor on "normal" pane size (BaseDimension)
-        float scaleFactor = CalcScaleFactor();
+        var scaleFactor = CalcScaleFactor();
 
 
         // if the size of the ChartRect is determined automatically, then do so
@@ -771,7 +771,7 @@ public class GraphPane
         // if ( _curveList.HasData() &&
         // Go ahead and draw the graph, even without data.  This makes the control
         // version still look like a graph before it is fully set up
-        bool showGraf = AxisRangesValid();
+        var showGraf = AxisRangesValid();
 
         // Setup the axes for graphing - This setup must be done before
         // the GraphObj's are drawn so that the Transform functions are
@@ -871,15 +871,15 @@ public class GraphPane
         _xAxis.DrawGrid (g, this, scaleFactor, 0.0f);
         _x2Axis.DrawGrid (g, this, scaleFactor, 0.0f);
 
-        float shiftPos = 0.0f;
-        foreach (YAxis yAxis in _yAxisList)
+        var shiftPos = 0.0f;
+        foreach (var yAxis in _yAxisList)
         {
             yAxis.DrawGrid (g, this, scaleFactor, shiftPos);
             shiftPos += yAxis._tmpSpace;
         }
 
         shiftPos = 0.0f;
-        foreach (Y2Axis y2Axis in _y2AxisList)
+        foreach (var y2Axis in _y2AxisList)
         {
             y2Axis.DrawGrid (g, this, scaleFactor, shiftPos);
             shiftPos += y2Axis._tmpSpace;
@@ -888,8 +888,8 @@ public class GraphPane
 
     private bool AxisRangesValid()
     {
-        bool showGraf = _xAxis.Scale._min < _xAxis.Scale._max &&
-                        _x2Axis.Scale._min < _x2Axis.Scale._max;
+        var showGraf = _xAxis.Scale._min < _xAxis.Scale._max &&
+                       _x2Axis.Scale._min < _x2Axis.Scale._max;
         foreach (Axis axis in _yAxisList)
             if (axis.Scale._min >= axis.Scale._max)
             {
@@ -947,7 +947,7 @@ public class GraphPane
     {
         // chart rect starts out at the full pane rect less the margins
         //   and less space for the Pane title
-        RectangleF clientRect = CalcClientRect (g, scaleFactor);
+        var clientRect = CalcClientRect (g, scaleFactor);
 
         //float minSpaceX = 0;
         //float minSpaceY = 0;
@@ -976,7 +976,7 @@ public class GraphPane
         foreach (Axis axis in _yAxisList)
         {
             float fixedSpace;
-            float tmp = axis.CalcSpace (g, this, scaleFactor, out fixedSpace);
+            var tmp = axis.CalcSpace (g, this, scaleFactor, out fixedSpace);
 
             //if ( !axis.CrossAuto || axis.Cross < _xAxis.Min )
             if (axis.IsCrossShifted (this))
@@ -990,7 +990,7 @@ public class GraphPane
         foreach (Axis axis in _y2AxisList)
         {
             float fixedSpace;
-            float tmp = axis.CalcSpace (g, this, scaleFactor, out fixedSpace);
+            var tmp = axis.CalcSpace (g, this, scaleFactor, out fixedSpace);
 
             //if ( !axis.CrossAuto || axis.Cross < _xAxis.Min )
             if (axis.IsCrossShifted (this))
@@ -1029,7 +1029,7 @@ public class GraphPane
             axis._tmpSpace = spaceR;
         }
 
-        RectangleF tmpRect = clientRect;
+        var tmpRect = clientRect;
 
         totSpaceL = Math.Max (totSpaceL, minSpaceL);
         totSpaceR = Math.Max (totSpaceR, minSpaceR);
@@ -1051,8 +1051,8 @@ public class GraphPane
         //spaceNorm = 0;
         //spaceAlt = 0;
 
-        float crossFrac = axis.CalcCrossFraction (this);
-        float crossPix = crossFrac * (1 + crossFrac) * (1 + crossFrac * crossFrac) * clientSize;
+        var crossFrac = axis.CalcCrossFraction (this);
+        var crossPix = crossFrac * (1 + crossFrac) * (1 + crossFrac * crossFrac) * clientSize;
 
         if (!axis.IsPrimary (this) && axis.IsCrossShifted (this))
         {
@@ -1133,7 +1133,7 @@ public class GraphPane
     /// <see cref="AddCurve(string,double[],double[],Color)"/> method.</returns>
     public LineItem AddCurve (string label, double[] x, double[] y, Color color)
     {
-        LineItem curve = new LineItem (label, x, y, color, SymbolType.Default);
+        var curve = new LineItem (label, x, y, color, SymbolType.Default);
         _curveList.Add (curve);
 
         return curve;
@@ -1158,7 +1158,7 @@ public class GraphPane
     /// <see cref="AddCurve(string,IPointList,Color)"/> method.</returns>
     public LineItem AddCurve (string label, IPointList points, Color color)
     {
-        LineItem curve = new LineItem (label, points, color, SymbolType.Default);
+        var curve = new LineItem (label, points, color, SymbolType.Default);
         _curveList.Add (curve);
 
         return curve;
@@ -1188,7 +1188,7 @@ public class GraphPane
     public LineItem AddCurve (string label, double[] x, double[] y,
         Color color, SymbolType symbolType)
     {
-        LineItem curve = new LineItem (label, x, y, color, symbolType);
+        var curve = new LineItem (label, x, y, color, symbolType);
         _curveList.Add (curve);
 
         return curve;
@@ -1216,7 +1216,7 @@ public class GraphPane
     public LineItem AddCurve (string label, IPointList points,
         Color color, SymbolType symbolType)
     {
-        LineItem curve = new LineItem (label, points, color, symbolType);
+        var curve = new LineItem (label, points, color, symbolType);
         _curveList.Add (curve);
 
         return curve;
@@ -1243,7 +1243,7 @@ public class GraphPane
     /// <see cref="AddStick(string,double[],double[],Color)"/> method.</returns>
     public StickItem AddStick (string label, double[] x, double[] y, Color color)
     {
-        StickItem curve = new StickItem (label, x, y, color);
+        var curve = new StickItem (label, x, y, color);
         _curveList.Add (curve);
 
         return curve;
@@ -1268,7 +1268,7 @@ public class GraphPane
     /// <see cref="AddStick(string,IPointList,Color)"/> method.</returns>
     public StickItem AddStick (string label, IPointList points, Color color)
     {
-        StickItem curve = new StickItem (label, points, color);
+        var curve = new StickItem (label, points, color);
         _curveList.Add (curve);
 
         return curve;
@@ -1298,7 +1298,7 @@ public class GraphPane
     /// <see cref="AddOHLCBar(string,IPointList,Color)"/> method.</returns>
     public OHLCBarItem AddOHLCBar (string label, IPointList points, Color color)
     {
-        OHLCBarItem curve = new OHLCBarItem (label, points, color);
+        var curve = new OHLCBarItem (label, points, color);
         _curveList.Add (curve);
 
         return curve;
@@ -1326,7 +1326,7 @@ public class GraphPane
     /// <see cref="AddJapaneseCandleStick(string,IPointList)"/> method.</returns>
     public JapaneseCandleStickItem AddJapaneseCandleStick (string label, IPointList points)
     {
-        JapaneseCandleStickItem curve = new JapaneseCandleStickItem (label, points);
+        var curve = new JapaneseCandleStickItem (label, points);
         _curveList.Add (curve);
 
         return curve;
@@ -1357,7 +1357,7 @@ public class GraphPane
     public ErrorBarItem AddErrorBar (string label, double[] x, double[] y,
         double[] baseValue, Color color)
     {
-        ErrorBarItem curve = new ErrorBarItem (label, new PointPairList (x, y, baseValue),
+        var curve = new ErrorBarItem (label, new PointPairList (x, y, baseValue),
             color);
         _curveList.Add (curve);
 
@@ -1383,7 +1383,7 @@ public class GraphPane
     /// <see cref="AddErrorBar(string,IPointList,Color)"/> method.</returns>
     public ErrorBarItem AddErrorBar (string label, IPointList points, Color color)
     {
-        ErrorBarItem curve = new ErrorBarItem (label, points, color);
+        var curve = new ErrorBarItem (label, points, color);
         _curveList.Add (curve);
 
         return curve;
@@ -1407,7 +1407,7 @@ public class GraphPane
     /// <see cref="AddBar(string,IPointList,Color)"/> method.</returns>
     public BarItem AddBar (string label, IPointList points, Color color)
     {
-        BarItem curve = new BarItem (label, points, color);
+        var curve = new BarItem (label, points, color);
         _curveList.Add (curve);
 
         return curve;
@@ -1433,7 +1433,7 @@ public class GraphPane
     /// <see cref="AddBar(string,double[],double[],Color)"/> method.</returns>
     public BarItem AddBar (string label, double[] x, double[] y, Color color)
     {
-        BarItem curve = new BarItem (label, x, y, color);
+        var curve = new BarItem (label, x, y, color);
         _curveList.Add (curve);
 
         return curve;
@@ -1463,7 +1463,7 @@ public class GraphPane
     public HiLowBarItem AddHiLowBar (string label, double[] x, double[] y,
         double[] baseVal, Color color)
     {
-        HiLowBarItem curve = new HiLowBarItem (label, x, y, baseVal, color);
+        var curve = new HiLowBarItem (label, x, y, baseVal, color);
         _curveList.Add (curve);
 
         return curve;
@@ -1487,7 +1487,7 @@ public class GraphPane
     /// <see cref="AddHiLowBar(string,IPointList,Color)"/> method.</returns>
     public HiLowBarItem AddHiLowBar (string label, IPointList points, Color color)
     {
-        HiLowBarItem curve = new HiLowBarItem (label, points, color);
+        var curve = new HiLowBarItem (label, points, color);
         _curveList.Add (curve);
 
         return curve;
@@ -1504,7 +1504,7 @@ public class GraphPane
     /// <returns>a reference to the <see cref="PieItem"/> constructed</returns>
     public PieItem AddPieSlice (double value, Color color, double displacement, string label)
     {
-        PieItem slice = new PieItem (value, color, displacement, label);
+        var slice = new PieItem (value, color, displacement, label);
         CurveList.Add (slice);
         return slice;
     }
@@ -1524,7 +1524,7 @@ public class GraphPane
     public PieItem AddPieSlice (double value, Color color1, Color color2, float fillAngle,
         double displacement, string label)
     {
-        PieItem slice = new PieItem (value, color1, color2, fillAngle, displacement, label);
+        var slice = new PieItem (value, color1, color2, fillAngle, displacement, label);
         CurveList.Add (slice);
         return slice;
     }
@@ -1542,8 +1542,8 @@ public class GraphPane
     /// the Pie Chart.</returns>
     public PieItem[] AddPieSlices (double[] values, string[] labels)
     {
-        PieItem[] slices = new PieItem[values.Length];
-        for (int x = 0; x < values.Length; x++)
+        var slices = new PieItem[values.Length];
+        for (var x = 0; x < values.Length; x++)
         {
             slices[x] = new PieItem (values[x], labels[x]);
             CurveList.Add (slices[x]);
@@ -1759,14 +1759,14 @@ public class GraphPane
         y = new double[_yAxisList.Count];
         y2 = new double[_y2AxisList.Count];
 
-        for (int i = 0; i < _yAxisList.Count; i++)
+        for (var i = 0; i < _yAxisList.Count; i++)
         {
             Axis axis = _yAxisList[i];
             axis.Scale.SetupScaleData (this, axis);
             y[i] = axis.Scale.ReverseTransform (ptF.Y);
         }
 
-        for (int i = 0; i < _y2AxisList.Count; i++)
+        for (var i = 0; i < _y2AxisList.Count; i++)
         {
             Axis axis = _y2AxisList[i];
             axis.Scale.SetupScaleData (this, axis);
@@ -1788,7 +1788,7 @@ public class GraphPane
     /// <returns>the ordinal position (index) in the <see cref="YAxisList" />.</returns>
     public int AddYAxis (string title)
     {
-        YAxis axis = new YAxis (title);
+        var axis = new YAxis (title);
         axis.MajorTic.IsOpposite = false;
         axis.MinorTic.IsOpposite = false;
         axis.MajorTic.IsInside = false;
@@ -1811,7 +1811,7 @@ public class GraphPane
     /// <returns>the ordinal position (index) in the <see cref="Y2AxisList" />.</returns>
     public int AddY2Axis (string title)
     {
-        Y2Axis axis = new Y2Axis (title);
+        var axis = new Y2Axis (title);
         axis.MajorTic.IsOpposite = false;
         axis.MinorTic.IsOpposite = false;
         axis.MajorTic.IsInside = false;
@@ -1837,7 +1837,7 @@ public class GraphPane
     /// <see cref="CurveItem"/> object.
     /// </remarks>
     /// <param name="mousePt">The screen point, in pixel coordinates.</param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -1855,8 +1855,13 @@ public class GraphPane
     /// index will be -1 if no data points are available.</param>
     /// <returns>true if an object was found, false otherwise.</returns>
     /// <seealso cref="FindNearestObject"/>
-    public bool FindNearestObject (PointF mousePt, Graphics g,
-        out object nearestObj, out int index)
+    public bool FindNearestObject
+        (
+            PointF mousePt,
+            Graphics graphics,
+            out object nearestObj,
+            out int index
+        )
     {
         nearestObj = null;
         index = -1;
@@ -1864,22 +1869,22 @@ public class GraphPane
         // Make sure that the axes & data are being drawn
         if (AxisRangesValid())
         {
-            float scaleFactor = CalcScaleFactor();
+            var scaleFactor = CalcScaleFactor();
 
             //int			hStack;
             //float		legendWidth, legendHeight;
             RectangleF tmpRect;
             GraphObj saveGraphItem = null;
-            int saveIndex = -1;
-            ZOrder saveZOrder = ZOrder.H_BehindAll;
+            var saveIndex = -1;
+            var saveZOrder = ZOrder.H_BehindAll;
 
             // Calculate the chart rect, deducting the area for the scales, titles, legend, etc.
-            RectangleF tmpChartRect = CalcChartRect (g, scaleFactor);
+            var tmpChartRect = CalcChartRect (graphics, scaleFactor);
 
             // See if the point is in a GraphObj
             // If so, just save the object and index so we can see if other overlying objects were
             // intersected as well.
-            if (GraphObjList.FindPoint (mousePt, this, g, scaleFactor, out index))
+            if (GraphObjList.FindPoint (mousePt, this, graphics, scaleFactor, out index))
             {
                 saveGraphItem = GraphObjList[index];
                 saveIndex = index;
@@ -1895,7 +1900,7 @@ public class GraphPane
             }
 
             // See if the point is in the Pane Title
-            SizeF paneTitleBox = _title.FontSpec.BoundingBox (g, _title.Text, scaleFactor);
+            var paneTitleBox = _title.FontSpec.BoundingBox (graphics, _title.Text, scaleFactor);
             if (saveZOrder <= ZOrder.H_BehindAll && _title.IsVisible)
             {
                 tmpRect = new RectangleF ((_rect.Left + _rect.Right - paneTitleBox.Width) / 2,
@@ -1908,13 +1913,13 @@ public class GraphPane
                 }
             }
 
-            float left = tmpChartRect.Left;
+            var left = tmpChartRect.Left;
 
             // See if the point is in one of the Y Axes
-            for (int yIndex = 0; yIndex < _yAxisList.Count; yIndex++)
+            for (var yIndex = 0; yIndex < _yAxisList.Count; yIndex++)
             {
                 Axis yAxis = _yAxisList[yIndex];
-                float width = yAxis._tmpSpace;
+                var width = yAxis._tmpSpace;
                 if (width > 0)
                 {
                     tmpRect = new RectangleF (left - width, tmpChartRect.Top,
@@ -1933,10 +1938,10 @@ public class GraphPane
             left = tmpChartRect.Right;
 
             // See if the point is in one of the Y2 Axes
-            for (int yIndex = 0; yIndex < _y2AxisList.Count; yIndex++)
+            for (var yIndex = 0; yIndex < _y2AxisList.Count; yIndex++)
             {
                 Axis y2Axis = _y2AxisList[yIndex];
-                float width = y2Axis._tmpSpace;
+                var width = y2Axis._tmpSpace;
                 if (width > 0)
                 {
                     tmpRect = new RectangleF (left, tmpChartRect.Top,
@@ -1953,7 +1958,7 @@ public class GraphPane
             }
 
             // See if the point is in the X Axis
-            float height = _xAxis._tmpSpace;
+            var height = _xAxis._tmpSpace;
 
             tmpRect = new RectangleF (tmpChartRect.Left, tmpChartRect.Bottom,
                 tmpChartRect.Width, height); //_rect.Bottom - tmpChartRect.Bottom );
@@ -2020,13 +2025,22 @@ public class GraphPane
     /// <returns>true if a point was found and that point lies within
     /// <see cref="Default.NearestTol"/> pixels
     /// of the screen point, false otherwise.</returns>
-    public bool FindNearestPoint (PointF mousePt, CurveItem targetCurve,
-        out CurveItem nearestCurve, out int iNearest)
+    public bool FindNearestPoint
+        (
+            PointF mousePt,
+            CurveItem targetCurve,
+            out CurveItem nearestCurve,
+            out int iNearest
+        )
     {
-        CurveList targetCurveList = new CurveList();
-        targetCurveList.Add (targetCurve);
-        return FindNearestPoint (mousePt, targetCurveList,
-            out nearestCurve, out iNearest);
+        var targetCurveList = new CurveList { targetCurve };
+        return FindNearestPoint
+            (
+                mousePt,
+                targetCurveList,
+                out nearestCurve,
+                out iNearest
+            );
     }
 
     /// <summary>
@@ -2050,8 +2064,12 @@ public class GraphPane
     /// <returns>true if a point was found and that point lies within
     /// <see cref="Default.NearestTol"/> pixels
     /// of the screen point, false otherwise.</returns>
-    public bool FindNearestPoint (PointF mousePt,
-        out CurveItem nearestCurve, out int iNearest)
+    public bool FindNearestPoint
+        (
+            PointF mousePt,
+            out CurveItem nearestCurve,
+            out int iNearest
+        )
     {
         return FindNearestPoint (mousePt, _curveList,
             out nearestCurve, out iNearest);
@@ -2081,11 +2099,16 @@ public class GraphPane
     /// <returns>true if a point was found and that point lies within
     /// <see cref="Default.NearestTol"/> pixels
     /// of the screen point, false otherwise.</returns>
-    public bool FindNearestPoint (PointF mousePt, CurveList targetCurveList,
-        out CurveItem nearestCurve, out int iNearest)
+    public bool FindNearestPoint
+        (
+            PointF mousePt,
+            CurveList targetCurveList,
+            out CurveItem nearestCurve,
+            out int iNearest
+        )
     {
         CurveItem nearestBar = null;
-        int iNearestBar = -1;
+        var iNearestBar = -1;
         nearestCurve = null;
         iNearest = -1;
 
@@ -2107,19 +2130,19 @@ public class GraphPane
             return false;
         }
 
-        ValueHandler valueHandler = new ValueHandler (this, false);
+        var valueHandler = new ValueHandler (this, false);
 
         //double	yPixPerUnit = chartRect.Height / ( yAxis.Max - yAxis.Min );
         //double	y2PixPerUnit; // = chartRect.Height / ( y2Axis.Max - y2Axis.Min );
 
         double yPixPerUnitAct, yAct, yMinAct, yMaxAct, xAct;
-        double minDist = 1e20;
+        var minDist = 1e20;
         double xVal, yVal, dist = 99999, distX, distY;
-        double tolSquared = Default.NearestTol * Default.NearestTol;
+        var tolSquared = Default.NearestTol * Default.NearestTol;
 
-        int iBar = 0;
+        var iBar = 0;
 
-        foreach (CurveItem curve in targetCurveList)
+        foreach (var curve in targetCurveList)
         {
             //test for pie first...if it's a pie rest of method superfluous
             if (curve is PieItem && curve.IsVisible)
@@ -2135,9 +2158,9 @@ public class GraphPane
             }
             else if (curve.IsVisible)
             {
-                int yIndex = curve.GetYAxisIndex (this);
-                Axis yAxis = curve.GetYAxis (this);
-                Axis xAxis = curve.GetXAxis (this);
+                var yIndex = curve.GetYAxisIndex (this);
+                var yAxis = curve.GetYAxis (this);
+                var xAxis = curve.GetXAxis (this);
 
                 if (curve.IsY2Axis)
                 {
@@ -2154,14 +2177,14 @@ public class GraphPane
 
                 yPixPerUnitAct = _chart._rect.Height / (yMaxAct - yMinAct);
 
-                double xPixPerUnit = _chart._rect.Width / (xAxis.Scale._max - xAxis.Scale._min);
+                var xPixPerUnit = _chart._rect.Width / (xAxis.Scale._max - xAxis.Scale._min);
                 xAct = xAxis is XAxis ? x : x2;
 
-                IPointList points = curve.Points;
-                float barWidth = curve.GetBarWidth (this);
+                var points = curve.Points;
+                var barWidth = curve.GetBarWidth (this);
                 double barWidthUserHalf;
-                Axis baseAxis = curve.BaseAxis (this);
-                bool isXBaseAxis = (baseAxis is XAxis || baseAxis is X2Axis);
+                var baseAxis = curve.BaseAxis (this);
+                var isXBaseAxis = (baseAxis is XAxis || baseAxis is X2Axis);
                 if (isXBaseAxis)
                 {
                     barWidthUserHalf = barWidth / xPixPerUnit / 2.0;
@@ -2173,7 +2196,7 @@ public class GraphPane
 
                 if (points != null)
                 {
-                    for (int iPt = 0; iPt < curve.NPts; iPt++)
+                    for (var iPt = 0; iPt < curve.NPts; iPt++)
                     {
                         // xVal is the user scale X value of the current point
                         if (xAxis.Scale.IsAnyOrdinal && !curve.IsOverrideOrdinal)
@@ -2208,14 +2231,14 @@ public class GraphPane
 
                                 if (lowVal > hiVal)
                                 {
-                                    double tmpVal = lowVal;
+                                    var tmpVal = lowVal;
                                     lowVal = hiVal;
                                     hiVal = tmpVal;
                                 }
 
                                 if (isXBaseAxis)
                                 {
-                                    double centerVal =
+                                    var centerVal =
                                         valueHandler.BarCenterValue (curve, barWidth, iPt, xVal, iBar);
 
                                     if (xAct < centerVal - barWidthUserHalf ||
@@ -2227,7 +2250,7 @@ public class GraphPane
                                 }
                                 else
                                 {
-                                    double centerVal =
+                                    var centerVal =
                                         valueHandler.BarCenterValue (curve, barWidth, iPt, yVal, iBar);
 
                                     if (yAct < centerVal - barWidthUserHalf ||
@@ -2279,7 +2302,7 @@ public class GraphPane
 
         if (nearestCurve is LineItem)
         {
-            float halfSymbol = (float)(((LineItem)nearestCurve).Symbol.Size *
+            var halfSymbol = (float)(((LineItem)nearestCurve).Symbol.Size *
                 CalcScaleFactor() / 2);
             minDist -= halfSymbol * halfSymbol;
             if (minDist < 0)
@@ -2312,7 +2335,7 @@ public class GraphPane
     /// items that contain active <see cref="Link" /> objects.
     /// </summary>
     /// <param name="mousePt">The mouse location where the click occurred</param>
-    /// <param name="g">An appropriate <see cref="Graphics" /> instance</param>
+    /// <param name="graphics">An appropriate <see cref="Graphics" /> instance</param>
     /// <param name="scaleFactor">The current scaling factor for drawing operations.</param>
     /// <param name="source">The clickable object that was found.  Typically a type of
     /// <see cref="GraphObj" /> or a type of <see cref="CurveItem" />.</param>
@@ -2323,20 +2346,27 @@ public class GraphPane
     /// <returns>returns true if a clickable link was found under the
     /// <see paramref="mousePt" />, or false otherwise.
     /// </returns>
-    public bool FindLinkableObject (PointF mousePt, Graphics g, float scaleFactor,
-        out object source, out Link link, out int index)
+    public bool FindLinkableObject
+        (
+            PointF mousePt,
+            Graphics graphics,
+            float scaleFactor,
+            out object? source,
+            out Link? link,
+            out int index
+        )
     {
         index = -1;
 
         // First look for graph objects that lie in front of the data points
-        foreach (GraphObj graphObj in _graphObjList)
+        foreach (var graphObj in _graphObjList)
         {
             link = graphObj._link;
-            bool inFront = graphObj.IsInFrontOfData;
+            var inFront = graphObj.IsInFrontOfData;
 
             if (link.IsActive)
             {
-                if (graphObj.PointInBox (mousePt, this, g, scaleFactor))
+                if (graphObj.PointInBox (mousePt, this, graphics, scaleFactor))
                 {
                     source = graphObj;
                     return true;
@@ -2345,7 +2375,7 @@ public class GraphPane
         }
 
         // Second, look at the curve data points
-        foreach (CurveItem curve in _curveList)
+        foreach (var curve in _curveList)
         {
             link = curve._link;
 
@@ -2362,14 +2392,14 @@ public class GraphPane
         }
 
         // Third, look for graph objects that lie behind the data points
-        foreach (GraphObj graphObj in _graphObjList)
+        foreach (var graphObj in _graphObjList)
         {
             link = graphObj._link;
-            bool inFront = graphObj.IsInFrontOfData;
+            var inFront = graphObj.IsInFrontOfData;
 
             if (link.IsActive)
             {
-                if (graphObj.PointInBox (mousePt, this, g, scaleFactor))
+                if (graphObj.PointInBox (mousePt, this, graphics, scaleFactor))
                 {
                     source = graphObj;
                     return true;
@@ -2380,10 +2410,10 @@ public class GraphPane
         source = null;
         link = null;
         index = -1;
+
         return false;
     }
 
-    // Revision: JCarpenter 10/06
     /// <summary>
     /// Find any objects that exist within the specified (screen) rectangle.
     /// This method will search through all of the graph objects, such as
@@ -2392,14 +2422,18 @@ public class GraphPane
     /// and see if the objects' bounding boxes are within the specified (screen) rectangle
     /// This method returns true if any are found.
     /// </summary>
-    public bool FindContainedObjects (RectangleF rectF, Graphics g,
-        out CurveList containedObjs)
+    public bool FindContainedObjects
+        (
+            RectangleF rectF,
+            Graphics graphics,
+            out CurveList containedObjs
+        )
     {
         containedObjs = new CurveList();
 
-        foreach (CurveItem ci in CurveList)
+        foreach (var ci in CurveList)
         {
-            for (int i = 0; i < ci.Points.Count; i++)
+            for (var i = 0; i < ci.Points.Count; i++)
             {
                 if (ci.Points[i].X > rectF.Left &&
                     ci.Points[i].X < rectF.Right &&

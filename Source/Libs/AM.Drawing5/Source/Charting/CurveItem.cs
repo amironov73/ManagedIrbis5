@@ -12,1224 +12,1197 @@
 #region Using directives
 
 using System;
-using System.Drawing;
-using System.Collections;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
-
-#if ( !DOTNET1 ) // Is this a .Net 2 compilation?
 using System.Collections.Generic;
-#endif
+using System.Drawing;
+using System.Runtime.Serialization;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Drawing.Charting
+namespace AM.Drawing.Charting;
+
+/// <summary>
+/// This class contains the data and methods for an individual curve within
+/// a graph pane.  It carries the settings for the curve including the
+/// key and item names, colors, symbols and sizes, linetypes, etc.
+/// </summary>
+[Serializable]
+public abstract class CurveItem
+    : ISerializable, ICloneable
 {
+    #region Fields
+
     /// <summary>
-    /// This class contains the data and methods for an individual curve within
-    /// a graph pane.  It carries the settings for the curve including the
-    /// key and item names, colors, symbols and sizes, linetypes, etc.
+    /// protected field that stores a <see cref="Label" /> instance for this
+    /// <see cref="CurveItem"/>, which is used for the <see cref="Legend" />
+    /// label.  Use the public
+    /// property <see cref="Label"/> to access this value.
     /// </summary>
-    [Serializable]
-    public abstract class CurveItem
-        : ISerializable, ICloneable
+    internal Label _label;
+
+    /// <summary>
+    /// Protected field that stores the boolean value that determines whether this
+    /// <see cref="CurveItem"/> is selected on the graph.
+    /// Use the public property <see cref="IsSelected"/> to access this value.
+    /// Note that this value changes the curve display color, but it does not
+    /// affect the display of the legend entry.  To hide the legend entry, you
+    /// have to set <see cref="Charting.Label.IsVisible"/> to false.
+    /// </summary>
+    protected bool _isSelected;
+
+    /// <summary>
+    /// The <see cref="IPointList"/> of value sets that
+    /// represent this <see cref="CurveItem"/>.
+    /// The size of this list determines the number of points that are
+    /// plotted.  Note that values defined as
+    /// System.Double.MaxValue are considered "missing" values
+    /// (see <see cref="PointPairBase.Missing"/>),
+    /// and are not plotted.  The curve will have a break at these points
+    /// to indicate the values are missing.
+    /// </summary>
+    protected IPointList? _points;
+
+    /// <summary>
+    /// A tag object for use by the user.  This can be used to store additional
+    /// information associated with the <see cref="CurveItem"/>.  ZedGraph does
+    /// not use this value for any purpose.
+    /// </summary>
+    /// <remarks>
+    /// Note that, if you are going to Serialize ZedGraph data, then any type
+    /// that you store in <see cref="Tag"/> must be a serializable type (or
+    /// it will cause an exception).
+    /// </remarks>
+    public object? Tag;
+
+    /// <summary>
+    /// Protected field that stores the hyperlink information for this object.
+    /// </summary>
+    internal Link _link;
+
+    #endregion
+
+    #region Constructors
+
+    /// <summary>
+    /// <see cref="CurveItem"/> constructor the pre-specifies the curve label, the
+    /// x and y data values as a <see cref="IPointList"/>, the curve
+    /// type (Bar or Line/Symbol), the <see cref="Color"/>, and the
+    /// <see cref="SymbolType"/>. Other properties of the curve are
+    /// defaulted to the values in the <see cref="GraphPane.Default"/> class.
+    /// </summary>
+    /// <param name="label">A string label (legend entry) for this curve</param>
+    /// <param name="x">An array of double precision values that define
+    /// the independent (X axis) values for this curve</param>
+    /// <param name="y">An array of double precision values that define
+    /// the dependent (Y axis) values for this curve</param>
+    public CurveItem
+        (
+            string label,
+            double[] x,
+            double[] y
+        )
+        : this (label, new PointPairList (x, y))
     {
-        #region Fields
-
-        /// <summary>
-        /// protected field that stores a <see cref="Label" /> instance for this
-        /// <see cref="CurveItem"/>, which is used for the <see cref="Legend" />
-        /// label.  Use the public
-        /// property <see cref="Label"/> to access this value.
-        /// </summary>
-        internal Label _label;
-
-        // Revision: JCarpenter 10/06
-        /// <summary>
-        /// Protected field that stores the boolean value that determines whether this
-        /// <see cref="CurveItem"/> is selected on the graph.
-        /// Use the public property <see cref="IsSelected"/> to access this value.
-        /// Note that this value changes the curve display color, but it does not
-        /// affect the display of the legend entry.  To hide the legend entry, you
-        /// have to set <see cref="Charting.Label.IsVisible"/> to false.
-        /// </summary>
-        protected bool _isSelected;
-
-        // Revision: JCarpenter 10/06
-
-        /// <summary>
-        /// The <see cref="IPointList"/> of value sets that
-        /// represent this <see cref="CurveItem"/>.
-        /// The size of this list determines the number of points that are
-        /// plotted.  Note that values defined as
-        /// System.Double.MaxValue are considered "missing" values
-        /// (see <see cref="PointPairBase.Missing"/>),
-        /// and are not plotted.  The curve will have a break at these points
-        /// to indicate the values are missing.
-        /// </summary>
-        protected IPointList? _points;
-
-        /// <summary>
-        /// A tag object for use by the user.  This can be used to store additional
-        /// information associated with the <see cref="CurveItem"/>.  ZedGraph does
-        /// not use this value for any purpose.
-        /// </summary>
-        /// <remarks>
-        /// Note that, if you are going to Serialize ZedGraph data, then any type
-        /// that you store in <see cref="Tag"/> must be a serializable type (or
-        /// it will cause an exception).
-        /// </remarks>
-        public object Tag;
-
-        /// <summary>
-        /// Protected field that stores the hyperlink information for this object.
-        /// </summary>
-        internal Link _link;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        /// <see cref="CurveItem"/> constructor the pre-specifies the curve label, the
-        /// x and y data values as a <see cref="IPointList"/>, the curve
-        /// type (Bar or Line/Symbol), the <see cref="Color"/>, and the
-        /// <see cref="SymbolType"/>. Other properties of the curve are
-        /// defaulted to the values in the <see cref="GraphPane.Default"/> class.
-        /// </summary>
-        /// <param name="label">A string label (legend entry) for this curve</param>
-        /// <param name="x">An array of double precision values that define
-        /// the independent (X axis) values for this curve</param>
-        /// <param name="y">An array of double precision values that define
-        /// the dependent (Y axis) values for this curve</param>
-        public CurveItem
-            (
-                string label,
-                double[] x,
-                double[] y
-            )
-            : this (label, new PointPairList (x, y))
-        {
-        }
+    }
 
 /*
 		public CurveItem( string _label, int  y ) : this(  _label, new IPointList( ) )
 		{
 		}
 */
-        /// <summary>
-        /// <see cref="CurveItem"/> constructor the pre-specifies the curve label, the
-        /// x and y data values as a <see cref="IPointList"/>, the curve
-        /// type (Bar or Line/Symbol), the <see cref="Color"/>, and the
-        /// <see cref="SymbolType"/>. Other properties of the curve are
-        /// defaulted to the values in the <see cref="GraphPane.Default"/> class.
-        /// </summary>
-        /// <param name="label">A string label (legend entry) for this curve</param>
-        /// <param name="points">A <see cref="IPointList"/> of double precision value pairs that define
-        /// the X and Y values for this curve</param>
-        public CurveItem
-            (
-                string label,
-                IPointList? points
-            )
+    /// <summary>
+    /// <see cref="CurveItem"/> constructor the pre-specifies the curve label, the
+    /// x and y data values as a <see cref="IPointList"/>, the curve
+    /// type (Bar or Line/Symbol), the <see cref="Color"/>, and the
+    /// <see cref="SymbolType"/>. Other properties of the curve are
+    /// defaulted to the values in the <see cref="GraphPane.Default"/> class.
+    /// </summary>
+    /// <param name="label">A string label (legend entry) for this curve</param>
+    /// <param name="points">A <see cref="IPointList"/> of double precision value pairs that define
+    /// the X and Y values for this curve</param>
+    public CurveItem
+        (
+            string label,
+            IPointList? points
+        )
+    {
+        Init (label);
+
+        if (points == null)
         {
-            Init (label);
+            _points = new PointPairList();
+        }
+        else
 
-            if (points == null)
-            {
-                _points = new PointPairList();
-            }
-            else
+            //this.points = (IPointList) _points.Clone();
+        {
+            _points = points;
+        }
+    }
 
-                //this.points = (IPointList) _points.Clone();
-            {
-                _points = points;
-            }
+    /// <summary>
+    /// Internal initialization routine thats sets some initial values to defaults.
+    /// </summary>
+    /// <param name="label">A string label (legend entry) for this curve</param>
+    private void Init (string label)
+    {
+        _label = new Label (label, null);
+        IsY2Axis = false;
+        IsX2Axis = false;
+        IsVisible = true;
+        IsOverrideOrdinal = false;
+        Tag = null;
+        YAxisIndex = 0;
+        _link = new Link();
+    }
+
+    /// <summary>
+    /// <see cref="CurveItem"/> constructor that specifies the label of the CurveItem.
+    /// This is the same as <c>CurveItem(label, null, null)</c>.
+    /// <seealso cref="CurveItem( string, double[], double[] )"/>
+    /// </summary>
+    /// <param name="label">A string label (legend entry) for this curve</param>
+    public CurveItem (string label) : this (label, null)
+    {
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public CurveItem()
+    {
+        Init (null);
+    }
+
+    /// <summary>
+    /// The Copy Constructor
+    /// </summary>
+    /// <param name="rhs">The CurveItem object from which to copy</param>
+    public CurveItem (CurveItem rhs)
+    {
+        _label = rhs._label.Clone();
+        IsY2Axis = rhs.IsY2Axis;
+        IsX2Axis = rhs.IsX2Axis;
+        IsVisible = rhs.IsVisible;
+        IsOverrideOrdinal = rhs.IsOverrideOrdinal;
+        YAxisIndex = rhs.YAxisIndex;
+
+        if (rhs.Tag is ICloneable)
+        {
+            Tag = ((ICloneable)rhs.Tag).Clone();
+        }
+        else
+        {
+            Tag = rhs.Tag;
         }
 
-        /// <summary>
-        /// Internal initialization routine thats sets some initial values to defaults.
-        /// </summary>
-        /// <param name="label">A string label (legend entry) for this curve</param>
-        private void Init (string label)
+        _points = (IPointList)rhs.Points.Clone();
+
+        _link = rhs._link.Clone();
+    }
+
+    /// <summary>
+    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
+    /// calling the typed version of Clone.
+    /// </summary>
+    /// <remarks>
+    /// Note that this method must be called with an explicit cast to ICloneable, and
+    /// that it is inherently virtual.  For example:
+    /// <code>
+    /// ParentClass foo = new ChildClass();
+    /// ChildClass bar = (ChildClass) ((ICloneable)foo).Clone();
+    /// </code>
+    /// Assume that ChildClass is inherited from ParentClass.  Even though foo is declared with
+    /// ParentClass, it is actually an instance of ChildClass.  Calling the ICloneable implementation
+    /// of Clone() on foo actually calls ChildClass.Clone() as if it were a virtual function.
+    /// </remarks>
+    /// <returns>A deep copy of this object</returns>
+    object ICloneable.Clone()
+    {
+        throw new NotImplementedException (
+            "Can't clone an abstract base type -- child types must implement ICloneable");
+
+        //return new PaneBase( this );
+    }
+
+    #endregion
+
+    #region Serialization
+
+    /// <summary>
+    /// Current schema value that defines the version of the serialized file
+    /// </summary>
+    public const int schema = 11;
+
+    /// <summary>
+    /// Constructor for deserializing objects
+    /// </summary>
+    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data
+    /// </param>
+    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
+    /// </param>
+    protected CurveItem (SerializationInfo info, StreamingContext context)
+    {
+        // The schema value is just a file version parameter.  You can use it to make future versions
+        // backwards compatible as new member variables are added to classes
+        var sch = info.GetInt32 ("schema");
+
+        _label = (Label)info.GetValue ("label", typeof (Label));
+        IsY2Axis = info.GetBoolean ("isY2Axis");
+        if (sch >= 11)
         {
-            _label = new Label (label, null);
-            IsY2Axis = false;
+            IsX2Axis = info.GetBoolean ("isX2Axis");
+        }
+        else
+        {
             IsX2Axis = false;
-            IsVisible = true;
-            IsOverrideOrdinal = false;
-            Tag = null;
-            YAxisIndex = 0;
-            _link = new Link();
         }
 
-        /// <summary>
-        /// <see cref="CurveItem"/> constructor that specifies the label of the CurveItem.
-        /// This is the same as <c>CurveItem(label, null, null)</c>.
-        /// <seealso cref="CurveItem( string, double[], double[] )"/>
-        /// </summary>
-        /// <param name="label">A string label (legend entry) for this curve</param>
-        public CurveItem (string label) : this (label, null)
+        IsVisible = info.GetBoolean ("isVisible");
+
+        IsOverrideOrdinal = info.GetBoolean ("isOverrideOrdinal");
+
+        // Data Points are always stored as a PointPairList, regardless of the
+        // actual original type (which could be anything that supports IPointList).
+        _points = (PointPairList)info.GetValue ("points", typeof (PointPairList));
+
+        Tag = info.GetValue ("Tag", typeof (object));
+
+        YAxisIndex = info.GetInt32 ("yAxisIndex");
+
+        _link = (Link)info.GetValue ("link", typeof (Link));
+    }
+
+    /// <summary>
+    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
+    /// </summary>
+    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
+    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    public virtual void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+    {
+        info.AddValue ("schema", schema);
+        info.AddValue ("label", _label);
+        info.AddValue ("isY2Axis", IsY2Axis);
+        info.AddValue ("isX2Axis", IsX2Axis);
+        info.AddValue ("isVisible", IsVisible);
+        info.AddValue ("isOverrideOrdinal", IsOverrideOrdinal);
+
+        // if points is already a PointPairList, use it
+        // otherwise, create a new PointPairList so it can be serialized
+        PointPairList list;
+        if (_points is PointPairList)
         {
+            list = _points as PointPairList;
+        }
+        else
+        {
+            list = new PointPairList (_points);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        public CurveItem()
-        {
-            Init (null);
-        }
+        info.AddValue ("points", list);
+        info.AddValue ("Tag", Tag);
+        info.AddValue ("yAxisIndex", YAxisIndex);
 
-        /// <summary>
-        /// The Copy Constructor
-        /// </summary>
-        /// <param name="rhs">The CurveItem object from which to copy</param>
-        public CurveItem (CurveItem rhs)
-        {
-            _label = rhs._label.Clone();
-            IsY2Axis = rhs.IsY2Axis;
-            IsX2Axis = rhs.IsX2Axis;
-            IsVisible = rhs.IsVisible;
-            IsOverrideOrdinal = rhs.IsOverrideOrdinal;
-            YAxisIndex = rhs.YAxisIndex;
+        info.AddValue ("link", _link);
+    }
 
-            if (rhs.Tag is ICloneable)
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// A <see cref="Label" /> instance that represents the <see cref="Legend"/>
+    /// entry for the this <see cref="CurveItem"/> object
+    /// </summary>
+    public Label Label
+    {
+        get { return _label; }
+        set { _label = value; }
+    }
+
+    /// <summary>
+    /// The <see cref="Line"/>/<see cref="Symbol"/>/<see cref="Bar"/>
+    /// color (FillColor for the Bar).  This is a common access to
+    /// <see cref="LineBase.Color">Line.Color</see>,
+    /// <see cref="LineBase.Color">Border.Color</see>, and
+    /// <see cref="Fill.Color">Fill.Color</see> properties for this curve.
+    /// </summary>
+    public Color Color
+    {
+        get
+        {
+            return this switch
             {
-                Tag = ((ICloneable)rhs.Tag).Clone();
+                HiLowBarItem hiLowBarItem => hiLowBarItem.Bar.ThrowIfNull().Fill.Color,
+
+                BarItem barItem => barItem.Bar.ThrowIfNull().Fill.Color,
+
+                LineItem visibleLine when visibleLine.Line.IsVisible => visibleLine.Line.Color,
+
+                LineItem lineItem => lineItem.Symbol.Border.Color,
+
+                ErrorBarItem errorBarItem => errorBarItem.Bar.Color,
+
+                _ => Color.Empty
+            };
+        }
+        set
+        {
+            if (this is BarItem)
+            {
+                ((BarItem)this).Bar.Fill.Color = value;
             }
-            else
+            else if (this is LineItem)
             {
-                Tag = rhs.Tag;
+                ((LineItem)this).Line.Color = value;
+                ((LineItem)this).Symbol.Border.Color = value;
+                ((LineItem)this).Symbol.Fill.Color = value;
             }
-
-            _points = (IPointList)rhs.Points.Clone();
-
-            _link = rhs._link.Clone();
-        }
-
-        /// <summary>
-        /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-        /// calling the typed version of Clone.
-        /// </summary>
-        /// <remarks>
-        /// Note that this method must be called with an explicit cast to ICloneable, and
-        /// that it is inherently virtual.  For example:
-        /// <code>
-        /// ParentClass foo = new ChildClass();
-        /// ChildClass bar = (ChildClass) ((ICloneable)foo).Clone();
-        /// </code>
-        /// Assume that ChildClass is inherited from ParentClass.  Even though foo is declared with
-        /// ParentClass, it is actually an instance of ChildClass.  Calling the ICloneable implementation
-        /// of Clone() on foo actually calls ChildClass.Clone() as if it were a virtual function.
-        /// </remarks>
-        /// <returns>A deep copy of this object</returns>
-        object ICloneable.Clone()
-        {
-            throw new NotImplementedException (
-                "Can't clone an abstract base type -- child types must implement ICloneable");
-
-            //return new PaneBase( this );
-        }
-
-        #endregion
-
-        #region Serialization
-
-        /// <summary>
-        /// Current schema value that defines the version of the serialized file
-        /// </summary>
-        public const int schema = 11;
-
-        /// <summary>
-        /// Constructor for deserializing objects
-        /// </summary>
-        /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data
-        /// </param>
-        /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
-        /// </param>
-        protected CurveItem (SerializationInfo info, StreamingContext context)
-        {
-            // The schema value is just a file version parameter.  You can use it to make future versions
-            // backwards compatible as new member variables are added to classes
-            var sch = info.GetInt32 ("schema");
-
-            _label = (Label)info.GetValue ("label", typeof (Label));
-            IsY2Axis = info.GetBoolean ("isY2Axis");
-            if (sch >= 11)
+            else if (this is ErrorBarItem)
             {
-                IsX2Axis = info.GetBoolean ("isX2Axis");
+                ((ErrorBarItem)this).Bar.Color = value;
             }
-            else
+            else if (this is HiLowBarItem)
             {
-                IsX2Axis = false;
-            }
-
-            IsVisible = info.GetBoolean ("isVisible");
-
-            IsOverrideOrdinal = info.GetBoolean ("isOverrideOrdinal");
-
-            // Data Points are always stored as a PointPairList, regardless of the
-            // actual original type (which could be anything that supports IPointList).
-            _points = (PointPairList)info.GetValue ("points", typeof (PointPairList));
-
-            Tag = info.GetValue ("Tag", typeof (object));
-
-            YAxisIndex = info.GetInt32 ("yAxisIndex");
-
-            _link = (Link)info.GetValue ("link", typeof (Link));
-        }
-
-        /// <summary>
-        /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-        /// </summary>
-        /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-        /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-        public virtual void GetObjectData
-            (
-                SerializationInfo info,
-                StreamingContext context
-            )
-        {
-            info.AddValue ("schema", schema);
-            info.AddValue ("label", _label);
-            info.AddValue ("isY2Axis", IsY2Axis);
-            info.AddValue ("isX2Axis", IsX2Axis);
-            info.AddValue ("isVisible", IsVisible);
-            info.AddValue ("isOverrideOrdinal", IsOverrideOrdinal);
-
-            // if points is already a PointPairList, use it
-            // otherwise, create a new PointPairList so it can be serialized
-            PointPairList list;
-            if (_points is PointPairList)
-            {
-                list = _points as PointPairList;
-            }
-            else
-            {
-                list = new PointPairList (_points);
-            }
-
-            info.AddValue ("points", list);
-            info.AddValue ("Tag", Tag);
-            info.AddValue ("yAxisIndex", YAxisIndex);
-
-            info.AddValue ("link", _link);
-        }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// A <see cref="Label" /> instance that represents the <see cref="Legend"/>
-        /// entry for the this <see cref="CurveItem"/> object
-        /// </summary>
-        public Label Label
-        {
-            get { return _label; }
-            set { _label = value; }
-        }
-
-        /// <summary>
-        /// The <see cref="Line"/>/<see cref="Symbol"/>/<see cref="Bar"/>
-        /// color (FillColor for the Bar).  This is a common access to
-        /// <see cref="LineBase.Color">Line.Color</see>,
-        /// <see cref="LineBase.Color">Border.Color</see>, and
-        /// <see cref="Fill.Color">Fill.Color</see> properties for this curve.
-        /// </summary>
-        public Color Color
-        {
-            get
-            {
-                return this switch
-                {
-                    HiLowBarItem hiLowBarItem => hiLowBarItem.Bar.ThrowIfNull().Fill.Color,
-
-                    BarItem barItem => barItem.Bar.ThrowIfNull().Fill.Color,
-
-                    LineItem visibleLine when visibleLine.Line.IsVisible => visibleLine.Line.Color,
-
-                    LineItem lineItem => lineItem.Symbol.Border.Color,
-
-                    ErrorBarItem errorBarItem => errorBarItem.Bar.Color,
-
-                    _ => Color.Empty
-                };
-            }
-            set
-            {
-                if (this is BarItem)
-                {
-                    ((BarItem)this).Bar.Fill.Color = value;
-                }
-                else if (this is LineItem)
-                {
-                    ((LineItem)this).Line.Color = value;
-                    ((LineItem)this).Symbol.Border.Color = value;
-                    ((LineItem)this).Symbol.Fill.Color = value;
-                }
-                else if (this is ErrorBarItem)
-                {
-                    ((ErrorBarItem)this).Bar.Color = value;
-                }
-                else if (this is HiLowBarItem)
-                {
-                    ((HiLowBarItem)this).Bar.Fill.Color = value;
-                }
+                ((HiLowBarItem)this).Bar.Fill.Color = value;
             }
         }
+    }
 
-        /// <summary>
-        /// Determines whether this <see cref="CurveItem"/> is visible on the graph.
-        /// Note that this value turns the curve display on or off, but it does not
-        /// affect the display of the legend entry.  To hide the legend entry, you
-        /// have to set <see cref="Charting.Label.IsVisible"/> to false.
-        /// </summary>
-        public bool IsVisible { get; set; }
+    /// <summary>
+    /// Determines whether this <see cref="CurveItem"/> is visible on the graph.
+    /// Note that this value turns the curve display on or off, but it does not
+    /// affect the display of the legend entry.  To hide the legend entry, you
+    /// have to set <see cref="Charting.Label.IsVisible"/> to false.
+    /// </summary>
+    public bool IsVisible { get; set; }
 
-        // Revision: JCarpenter 10/06
-        /// <summary>
-        /// Determines whether this <see cref="CurveItem"/> is selected on the graph.
-        /// Note that this value changes the curve displayed color, but it does not
-        /// affect the display of the legend entry. To hide the legend entry, you
-        /// have to set <see cref="Charting.Label.IsVisible"/> to false.
-        /// </summary>
-        public bool IsSelected
+    /// <summary>
+    /// Determines whether this <see cref="CurveItem"/> is selected on the graph.
+    /// Note that this value changes the curve displayed color, but it does not
+    /// affect the display of the legend entry. To hide the legend entry, you
+    /// have to set <see cref="Charting.Label.IsVisible"/> to false.
+    /// </summary>
+    public bool IsSelected
+    {
+        get { return _isSelected; }
+        set
         {
-            get { return _isSelected; }
-            set
+            _isSelected = value;
+
+            /*
+            if ( this is BarItem )
             {
-                _isSelected = value;
-
-                /*
-                if ( this is BarItem )
-                {
-                    ( (BarItem)this ).Bar.Fill.UseInactiveColor = !value;
-                }
-                else if ( this is LineItem )
-                {
-                    ( (LineItem)this ).Line.Fill.UseInactiveColor = !value;
-                    ( (LineItem)this ).Symbol.Fill.UseInactiveColor = !value;
-                    ( (LineItem)this ).Symbol.Fill.UseInactiveColor = !value;
-                }
-                else if ( this is HiLowBarItem )
-                    ( (HiLowBarItem)this ).Bar.Fill.UseInactiveColor = !value;
-                else if ( this is PieItem )
-                    ( (PieItem)this ).Fill.UseInactiveColor = !value;
-                */
+                ( (BarItem)this ).Bar.Fill.UseInactiveColor = !value;
             }
-        }
-
-        // Revision: JCarpenter 10/06
-        /// <summary>
-        /// Determines whether this <see cref="CurveItem"/> can be selected in the graph.
-        /// </summary>
-        public bool IsSelectable { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value which allows you to override the normal
-        /// ordinal axis behavior.
-        /// </summary>
-        /// <remarks>
-        /// Normally for an ordinal axis type, the actual data values corresponding to the ordinal
-        /// axis will be ignored (essentially they are replaced by ordinal values, e.g., 1, 2, 3, etc).
-        /// If IsOverrideOrdinal is true, then the user data values will be used (even if they don't
-        /// make sense).  Fractional values are allowed, such that a value of 1.5 is between the first and
-        /// second ordinal position, etc.
-        /// </remarks>
-        /// <seealso cref="AxisType.Ordinal"/>
-        /// <seealso cref="AxisType.Text"/>
-        public bool IsOverrideOrdinal { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value that determines which X axis this <see cref="CurveItem"/>
-        /// is assigned to.
-        /// </summary>
-        /// <remarks>
-        /// The
-        /// <see cref="XAxis"/> is on the bottom side of the graph and the
-        /// <see cref="X2Axis"/> is on the top side.  Assignment to an axis
-        /// determines the scale that is used to draw the curve on the graph.
-        /// </remarks>
-        /// <value>true to assign the curve to the <see cref="X2Axis"/>,
-        /// false to assign the curve to the <see cref="XAxis"/></value>
-        public bool IsX2Axis { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value that determines which Y axis this <see cref="CurveItem"/>
-        /// is assigned to.
-        /// </summary>
-        /// <remarks>
-        /// The
-        /// <see cref="YAxis"/> is on the left side of the graph and the
-        /// <see cref="Y2Axis"/> is on the right side.  Assignment to an axis
-        /// determines the scale that is used to draw the curve on the graph.  Note that
-        /// this value is used in combination with the <see cref="YAxisIndex" /> to determine
-        /// which of the Y Axes (if there are multiples) this curve belongs to.
-        /// </remarks>
-        /// <value>true to assign the curve to the <see cref="Y2Axis"/>,
-        /// false to assign the curve to the <see cref="YAxis"/></value>
-        public bool IsY2Axis { get; set; }
-
-        /// <summary>
-        /// Gets or sets the index number of the Y Axis to which this
-        /// <see cref="CurveItem" /> belongs.
-        /// </summary>
-        /// <remarks>
-        /// This value is essentially an index number into the <see cref="GraphPane.YAxisList" />
-        /// or <see cref="GraphPane.Y2AxisList" />, depending on the setting of
-        /// <see cref="IsY2Axis" />.
-        /// </remarks>
-        public int YAxisIndex { get; set; }
-
-        /// <summary>
-        /// Determines whether this <see cref="CurveItem"/>
-        /// is a <see cref="BarItem"/>.
-        /// </summary>
-        /// <value>true for a bar chart, or false for a line or pie graph</value>
-        public bool IsBar => this is BarItem || this is HiLowBarItem || this is ErrorBarItem;
-
-        /// <summary>
-        /// Determines whether this <see cref="CurveItem"/>
-        /// is a <see cref="PieItem"/>.
-        /// </summary>
-        /// <value>true for a pie chart, or false for a line or bar graph</value>
-        public bool IsPie => this is PieItem;
-
-        /// <summary>
-        /// Determines whether this <see cref="CurveItem"/>
-        /// is a <see cref="LineItem"/>.
-        /// </summary>
-        /// <value>true for a line chart, or false for a bar type</value>
-        public bool IsLine => this is LineItem;
-
-        /// <summary>
-        /// Gets a flag indicating if the Z data range should be included in the axis scaling calculations.
-        /// </summary>
-        /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-        /// </param>
-        /// <value>true if the Z data are included, false otherwise</value>
-        internal abstract bool IsZIncluded (GraphPane pane);
-
-        /// <summary>
-        /// Gets a flag indicating if the X axis is the independent axis for this <see cref="CurveItem" />
-        /// </summary>
-        /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-        /// </param>
-        /// <value>true if the X axis is independent, false otherwise</value>
-        internal abstract bool IsXIndependent (GraphPane pane);
-
-        /// <summary>
-        /// Readonly property that gives the number of points that define this
-        /// <see cref="CurveItem"/> object, which is the number of points in the
-        /// <see cref="Points"/> data collection.
-        /// </summary>
-        public int NPts
-        {
-            get
+            else if ( this is LineItem )
             {
-                if (_points == null)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return _points.Count;
-                }
+                ( (LineItem)this ).Line.Fill.UseInactiveColor = !value;
+                ( (LineItem)this ).Symbol.Fill.UseInactiveColor = !value;
+                ( (LineItem)this ).Symbol.Fill.UseInactiveColor = !value;
             }
+            else if ( this is HiLowBarItem )
+                ( (HiLowBarItem)this ).Bar.Fill.UseInactiveColor = !value;
+            else if ( this is PieItem )
+                ( (PieItem)this ).Fill.UseInactiveColor = !value;
+            */
         }
+    }
 
-        /// <summary>
-        /// The <see cref="IPointList"/> of X,Y point sets that represent this
-        /// <see cref="CurveItem"/>.
-        /// </summary>
-        public IPointList? Points
-        {
-            get { return _points; }
-            set { _points = value; }
-        }
+    /// <summary>
+    /// Determines whether this <see cref="CurveItem"/> can be selected in the graph.
+    /// </summary>
+    public bool IsSelectable { get; set; }
 
-        /// <summary>
-        /// An accessor for the <see cref="PointPair"/> datum for this <see cref="CurveItem"/>.
-        /// Index is the ordinal reference (zero based) of the point.
-        /// </summary>
-        public PointPair this [int index]
-        {
-            get
-            {
-                if (_points == null)
-                {
-                    return new PointPair (PointPairBase.Missing, PointPairBase.Missing);
-                }
-                else
-                {
-                    return (_points)[index];
-                }
-            }
-        }
+    /// <summary>
+    /// Gets or sets a value which allows you to override the normal
+    /// ordinal axis behavior.
+    /// </summary>
+    /// <remarks>
+    /// Normally for an ordinal axis type, the actual data values corresponding to the ordinal
+    /// axis will be ignored (essentially they are replaced by ordinal values, e.g., 1, 2, 3, etc).
+    /// If IsOverrideOrdinal is true, then the user data values will be used (even if they don't
+    /// make sense).  Fractional values are allowed, such that a value of 1.5 is between the first and
+    /// second ordinal position, etc.
+    /// </remarks>
+    /// <seealso cref="AxisType.Ordinal"/>
+    /// <seealso cref="AxisType.Text"/>
+    public bool IsOverrideOrdinal { get; set; }
 
-        /// <summary>
-        /// Gets or sets the hyperlink information for this <see cref="CurveItem" />.
-        /// </summary>
+    /// <summary>
+    /// Gets or sets a value that determines which X axis this <see cref="CurveItem"/>
+    /// is assigned to.
+    /// </summary>
+    /// <remarks>
+    /// The
+    /// <see cref="XAxis"/> is on the bottom side of the graph and the
+    /// <see cref="X2Axis"/> is on the top side.  Assignment to an axis
+    /// determines the scale that is used to draw the curve on the graph.
+    /// </remarks>
+    /// <value>true to assign the curve to the <see cref="X2Axis"/>,
+    /// false to assign the curve to the <see cref="XAxis"/></value>
+    public bool IsX2Axis { get; set; }
 
-        // /// <seealso cref="ZedGraph.Web.IsImageMap" />
-        public Link Link
-        {
-            get { return _link; }
-            set { _link = value; }
-        }
+    /// <summary>
+    /// Gets or sets a value that determines which Y axis this <see cref="CurveItem"/>
+    /// is assigned to.
+    /// </summary>
+    /// <remarks>
+    /// The
+    /// <see cref="YAxis"/> is on the left side of the graph and the
+    /// <see cref="Y2Axis"/> is on the right side.  Assignment to an axis
+    /// determines the scale that is used to draw the curve on the graph.  Note that
+    /// this value is used in combination with the <see cref="YAxisIndex" /> to determine
+    /// which of the Y Axes (if there are multiples) this curve belongs to.
+    /// </remarks>
+    /// <value>true to assign the curve to the <see cref="Y2Axis"/>,
+    /// false to assign the curve to the <see cref="YAxis"/></value>
+    public bool IsY2Axis { get; set; }
 
-        #endregion
+    /// <summary>
+    /// Gets or sets the index number of the Y Axis to which this
+    /// <see cref="CurveItem" /> belongs.
+    /// </summary>
+    /// <remarks>
+    /// This value is essentially an index number into the <see cref="GraphPane.YAxisList" />
+    /// or <see cref="GraphPane.Y2AxisList" />, depending on the setting of
+    /// <see cref="IsY2Axis" />.
+    /// </remarks>
+    public int YAxisIndex { get; set; }
 
-        #region Rendering Methods
+    /// <summary>
+    /// Determines whether this <see cref="CurveItem"/>
+    /// is a <see cref="BarItem"/>.
+    /// </summary>
+    /// <value>true for a bar chart, or false for a line or pie graph</value>
+    public bool IsBar => this is BarItem || this is HiLowBarItem || this is ErrorBarItem;
 
-        /// <summary>
-        /// Do all rendering associated with this <see cref="CurveItem"/> to the specified
-        /// <see cref="Graphics"/> device.  This method is normally only
-        /// called by the Draw method of the parent <see cref="CurveList"/>
-        /// collection object.
-        /// </summary>
-        /// <param name="graphics">
-        /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-        /// PaintEventArgs argument to the Paint() method.
-        /// </param>
-        /// <param name="pane">
-        /// A reference to the <see cref="GraphPane"/> object that is the parent or
-        /// owner of this object.
-        /// </param>
-        /// <param name="pos">The ordinal position of the current <see cref="Bar"/>
-        /// curve.</param>
-        /// <param name="scaleFactor">
-        /// The scaling factor to be used for rendering objects.  This is calculated and
-        /// passed down by the parent <see cref="GraphPane"/> object using the
-        /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-        /// font sizes, etc. according to the actual size of the graph.
-        /// </param>
-        public abstract void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor);
+    /// <summary>
+    /// Determines whether this <see cref="CurveItem"/>
+    /// is a <see cref="PieItem"/>.
+    /// </summary>
+    /// <value>true for a pie chart, or false for a line or bar graph</value>
+    public bool IsPie => this is PieItem;
 
-        /// <summary>
-        /// Draw a legend key entry for this <see cref="CurveItem"/> at the specified location.
-        /// This abstract base method passes through to <see cref="BarItem.DrawLegendKey"/> or
-        /// <see cref="LineItem.DrawLegendKey"/> to do the rendering.
-        /// </summary>
-        /// <param name="graphics">
-        /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-        /// PaintEventArgs argument to the Paint() method.
-        /// </param>
-        /// <param name="pane">
-        /// A reference to the <see cref="GraphPane"/> object that is the parent or
-        /// owner of this object.
-        /// </param>
-        /// <param name="rect">The <see cref="RectangleF"/> struct that specifies the
-        /// location for the legend key</param>
-        /// <param name="scaleFactor">
-        /// The scaling factor to be used for rendering objects.  This is calculated and
-        /// passed down by the parent <see cref="GraphPane"/> object using the
-        /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-        /// font sizes, etc. according to the actual size of the graph.
-        /// </param>
-        public abstract void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor);
+    /// <summary>
+    /// Determines whether this <see cref="CurveItem"/>
+    /// is a <see cref="LineItem"/>.
+    /// </summary>
+    /// <value>true for a line chart, or false for a bar type</value>
+    public bool IsLine => this is LineItem;
 
-        #endregion
+    /// <summary>
+    /// Gets a flag indicating if the Z data range should be included in the axis scaling calculations.
+    /// </summary>
+    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
+    /// </param>
+    /// <value>true if the Z data are included, false otherwise</value>
+    internal abstract bool IsZIncluded (GraphPane pane);
 
-        #region Utility Methods
+    /// <summary>
+    /// Gets a flag indicating if the X axis is the independent axis for this <see cref="CurveItem" />
+    /// </summary>
+    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
+    /// </param>
+    /// <value>true if the X axis is independent, false otherwise</value>
+    internal abstract bool IsXIndependent (GraphPane pane);
 
-        /// <summary>
-        /// Add a single x,y coordinate point to the end of the points collection for this curve.
-        /// </summary>
-        /// <param name="x">The X coordinate value</param>
-        /// <param name="y">The Y coordinate value</param>
-        public void AddPoint (double x, double y)
-        {
-            AddPoint (new PointPair (x, y));
-        }
-
-        /// <summary>
-        /// Add a <see cref="PointPair"/> object to the end of the points collection for this curve.
-        /// </summary>
-        /// <remarks>
-        /// This method will only work if the <see cref="IPointList" /> instance reference
-        /// at <see cref="Points" /> supports the <see cref="IPointListEdit" /> interface.
-        /// Otherwise, it does nothing.
-        /// </remarks>
-        /// <param name="point">A reference to the <see cref="PointPair"/> object to
-        /// be added</param>
-        public void AddPoint (PointPair point)
+    /// <summary>
+    /// Readonly property that gives the number of points that define this
+    /// <see cref="CurveItem"/> object, which is the number of points in the
+    /// <see cref="Points"/> data collection.
+    /// </summary>
+    public int NPts
+    {
+        get
         {
             if (_points == null)
             {
-                Points = new PointPairList();
-            }
-
-            if (_points is IPointListEdit pointListEdit)
-            {
-                pointListEdit.Add (point);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// Clears the points from this <see cref="CurveItem"/>.  This is the same
-        /// as <c>CurveItem.Points.Clear()</c>.
-        /// </summary>
-        /// <remarks>
-        /// This method will only work if the <see cref="IPointList" /> instance reference
-        /// at <see cref="Points" /> supports the <see cref="IPointListEdit" /> interface.
-        /// Otherwise, it does nothing.
-        /// </remarks>
-        public void Clear()
-        {
-            if (_points is IPointListEdit pointListEdit)
-            {
-                pointListEdit.Clear();
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// Removes a single point from this <see cref="CurveItem" />.
-        /// </summary>
-        /// <remarks>
-        /// This method will only work if the <see cref="IPointList" /> instance reference
-        /// at <see cref="Points" /> supports the <see cref="IPointListEdit" /> interface.
-        /// Otherwise, it does nothing.
-        /// </remarks>
-        /// <param name="index">The ordinal position of the point to be removed.</param>
-        public void RemovePoint (int index)
-        {
-            if (_points is IPointListEdit pointListEdit)
-            {
-                pointListEdit.RemoveAt (index);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// Get the X Axis instance (either <see cref="XAxis" /> or <see cref="X2Axis" />) to
-        /// which this <see cref="CurveItem" /> belongs.
-        /// </summary>
-        /// <param name="pane">The <see cref="GraphPane" /> object to which this curve belongs.</param>
-        /// <returns>Either a <see cref="XAxis" /> or <see cref="X2Axis" /> to which this
-        /// <see cref="CurveItem" /> belongs.
-        /// </returns>
-        public Axis GetXAxis (GraphPane pane)
-        {
-            if (IsX2Axis)
-            {
-                return pane.X2Axis;
-            }
-            else
-            {
-                return pane.XAxis;
-            }
-        }
-
-        /// <summary>
-        /// Get the Y Axis instance (either <see cref="YAxis" /> or <see cref="Y2Axis" />) to
-        /// which this <see cref="CurveItem" /> belongs.
-        /// </summary>
-        /// <remarks>
-        /// This method safely retrieves a Y Axis instance from either the <see cref="GraphPane.YAxisList" />
-        /// or the <see cref="GraphPane.Y2AxisList" /> using the values of <see cref="YAxisIndex" /> and
-        /// <see cref="IsY2Axis" />.  If the value of <see cref="YAxisIndex" /> is out of bounds, the
-        /// default <see cref="YAxis" /> or <see cref="Y2Axis" /> is used.
-        /// </remarks>
-        /// <param name="pane">The <see cref="GraphPane" /> object to which this curve belongs.</param>
-        /// <returns>Either a <see cref="YAxis" /> or <see cref="Y2Axis" /> to which this
-        /// <see cref="CurveItem" /> belongs.
-        /// </returns>
-        public Axis GetYAxis (GraphPane pane)
-        {
-            if (IsY2Axis)
-            {
-                if (YAxisIndex < pane.Y2AxisList.Count)
-                {
-                    return pane.Y2AxisList[YAxisIndex];
-                }
-                else
-                {
-                    return pane.Y2AxisList[0];
-                }
-            }
-            else
-            {
-                if (YAxisIndex < pane.YAxisList.Count)
-                {
-                    return pane.YAxisList[YAxisIndex];
-                }
-                else
-                {
-                    return pane.YAxisList[0];
-                }
-            }
-        }
-
-        /// <summary>
-        /// Get the index of the Y Axis in the <see cref="YAxis" /> or <see cref="Y2Axis" /> list to
-        /// which this <see cref="CurveItem" /> belongs.
-        /// </summary>
-        /// <remarks>
-        /// This method safely retrieves a Y Axis index into either the <see cref="GraphPane.YAxisList" />
-        /// or the <see cref="GraphPane.Y2AxisList" /> using the values of <see cref="YAxisIndex" /> and
-        /// <see cref="IsY2Axis" />.  If the value of <see cref="YAxisIndex" /> is out of bounds, the
-        /// default <see cref="YAxis" /> or <see cref="Y2Axis" /> is used, which is index zero.
-        /// </remarks>
-        /// <param name="pane">The <see cref="GraphPane" /> object to which this curve belongs.</param>
-        /// <returns>An integer value indicating which index position in the list applies to this
-        /// <see cref="CurveItem" />
-        /// </returns>
-        public int GetYAxisIndex (GraphPane pane)
-        {
-            if (YAxisIndex >= 0 &&
-                YAxisIndex < (IsY2Axis ? pane.Y2AxisList.Count : pane.YAxisList.Count))
-            {
-                return YAxisIndex;
-            }
-            else
-            {
                 return 0;
             }
+
+            return _points.Count;
         }
+    }
 
-        /// <summary>
-        /// Loads some pseudo unique colors/symbols into this CurveItem.  This
-        /// is the same as <c>MakeUnique(ColorSymbolRotator.StaticInstance)</c>.
-        /// <seealso cref="ColorSymbolRotator.StaticInstance"/>
-        /// <seealso cref="ColorSymbolRotator"/>
-        /// <seealso cref="MakeUnique(ColorSymbolRotator)"/>
-        /// </summary>
-        public void MakeUnique()
+    /// <summary>
+    /// The <see cref="IPointList"/> of X,Y point sets that represent this
+    /// <see cref="CurveItem"/>.
+    /// </summary>
+    public IPointList? Points
+    {
+        get { return _points; }
+        set { _points = value; }
+    }
+
+    /// <summary>
+    /// An accessor for the <see cref="PointPair"/> datum for this <see cref="CurveItem"/>.
+    /// Index is the ordinal reference (zero based) of the point.
+    /// </summary>
+    public PointPair this [int index]
+    {
+        get
         {
-            MakeUnique (ColorSymbolRotator.StaticInstance);
-        }
-
-        /// <summary>
-        /// Loads some pseudo unique colors/symbols into this CurveItem.  This
-        /// is mainly useful for differentiating a set of new CurveItems without
-        /// having to pick your own colors/symbols.
-        /// <seealso cref="MakeUnique(ColorSymbolRotator)"/>
-        /// </summary>
-        /// <param name="rotator">
-        /// The <see cref="ColorSymbolRotator"/> that is used to pick the color
-        ///  and symbol for this method call.
-        /// </param>
-        public virtual void MakeUnique (ColorSymbolRotator rotator)
-        {
-            Color = rotator.NextColor;
-        }
-
-        /// <summary>
-        /// Go through the list of <see cref="PointPair"/> data values for this <see cref="CurveItem"/>
-        /// and determine the minimum and maximum values in the data.
-        /// </summary>
-        /// <param name="xMin">The minimum X value in the range of data</param>
-        /// <param name="xMax">The maximum X value in the range of data</param>
-        /// <param name="yMin">The minimum Y value in the range of data</param>
-        /// <param name="yMax">The maximum Y value in the range of data</param>
-        /// <param name="ignoreInitial">ignoreInitial is a boolean value that
-        /// affects the data range that is considered for the automatic scale
-        /// ranging (see <see cref="GraphPane.IsIgnoreInitial"/>).  If true, then initial
-        /// data points where the Y value is zero are not included when
-        /// automatically determining the scale <see cref="Scale.Min"/>,
-        /// <see cref="Scale.Max"/>, and <see cref="Scale.MajorStep"/> size.  All data after
-        /// the first non-zero Y value are included.
-        /// </param>
-        /// <param name="isBoundedRanges">
-        /// Determines if the auto-scaled axis ranges will subset the
-        /// data points based on any manually set scale range values.
-        /// </param>
-        /// <param name="pane">
-        /// A reference to the <see cref="GraphPane"/> object that is the parent or
-        /// owner of this object.
-        /// </param>
-        /// <seealso cref="GraphPane.IsBoundedRanges"/>
-        public virtual void GetRange
-            (
-                out double xMin,
-                out double xMax,
-                out double yMin,
-                out double yMax,
-                bool ignoreInitial,
-                bool isBoundedRanges,
-                GraphPane pane
-            )
-        {
-            // The lower and upper bounds of allowable data for the X values.  These
-            // values allow you to subset the data values.  If the X range is bounded, then
-            // the resulting range for Y will reflect the Y values for the points within the X
-            // bounds.
-            var xLBound = double.MinValue;
-            var xUBound = double.MaxValue;
-            var yLBound = double.MinValue;
-            var yUBound = double.MaxValue;
-
-            // initialize the values to outrageous ones to start
-            xMin = yMin = double.MaxValue;
-            xMax = yMax = double.MinValue;
-
-            var yAxis = GetYAxis (pane);
-            var xAxis = GetXAxis (pane);
-            if (yAxis == null || xAxis == null)
+            if (_points == null)
             {
-                return;
+                return new PointPair (PointPairBase.Missing, PointPairBase.Missing);
             }
 
-            if (isBoundedRanges)
+            return (_points)[index];
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the hyperlink information for this <see cref="CurveItem" />.
+    /// </summary>
+
+    // /// <seealso cref="ZedGraph.Web.IsImageMap" />
+    public Link Link
+    {
+        get { return _link; }
+        set { _link = value; }
+    }
+
+    #endregion
+
+    #region Rendering Methods
+
+    /// <summary>
+    /// Do all rendering associated with this <see cref="CurveItem"/> to the specified
+    /// <see cref="Graphics"/> device.  This method is normally only
+    /// called by the Draw method of the parent <see cref="CurveList"/>
+    /// collection object.
+    /// </summary>
+    /// <param name="graphics">
+    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
+    /// PaintEventArgs argument to the Paint() method.
+    /// </param>
+    /// <param name="pane">
+    /// A reference to the <see cref="GraphPane"/> object that is the parent or
+    /// owner of this object.
+    /// </param>
+    /// <param name="pos">The ordinal position of the current <see cref="Bar"/>
+    /// curve.</param>
+    /// <param name="scaleFactor">
+    /// The scaling factor to be used for rendering objects.  This is calculated and
+    /// passed down by the parent <see cref="GraphPane"/> object using the
+    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
+    /// font sizes, etc. according to the actual size of the graph.
+    /// </param>
+    public abstract void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor);
+
+    /// <summary>
+    /// Draw a legend key entry for this <see cref="CurveItem"/> at the specified location.
+    /// This abstract base method passes through to <see cref="BarItem.DrawLegendKey"/> or
+    /// <see cref="LineItem.DrawLegendKey"/> to do the rendering.
+    /// </summary>
+    /// <param name="graphics">
+    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
+    /// PaintEventArgs argument to the Paint() method.
+    /// </param>
+    /// <param name="pane">
+    /// A reference to the <see cref="GraphPane"/> object that is the parent or
+    /// owner of this object.
+    /// </param>
+    /// <param name="rect">The <see cref="RectangleF"/> struct that specifies the
+    /// location for the legend key</param>
+    /// <param name="scaleFactor">
+    /// The scaling factor to be used for rendering objects.  This is calculated and
+    /// passed down by the parent <see cref="GraphPane"/> object using the
+    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
+    /// font sizes, etc. according to the actual size of the graph.
+    /// </param>
+    public abstract void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor);
+
+    #endregion
+
+    #region Utility Methods
+
+    /// <summary>
+    /// Add a single x,y coordinate point to the end of the points collection for this curve.
+    /// </summary>
+    /// <param name="x">The X coordinate value</param>
+    /// <param name="y">The Y coordinate value</param>
+    public void AddPoint (double x, double y)
+    {
+        AddPoint (new PointPair (x, y));
+    }
+
+    /// <summary>
+    /// Add a <see cref="PointPair"/> object to the end of the points collection for this curve.
+    /// </summary>
+    /// <remarks>
+    /// This method will only work if the <see cref="IPointList" /> instance reference
+    /// at <see cref="Points" /> supports the <see cref="IPointListEdit" /> interface.
+    /// Otherwise, it does nothing.
+    /// </remarks>
+    /// <param name="point">A reference to the <see cref="PointPair"/> object to
+    /// be added</param>
+    public void AddPoint (PointPair point)
+    {
+        if (_points == null)
+        {
+            Points = new PointPairList();
+        }
+
+        if (_points is IPointListEdit pointListEdit)
+        {
+            pointListEdit.Add (point);
+        }
+        else
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Clears the points from this <see cref="CurveItem"/>.  This is the same
+    /// as <c>CurveItem.Points.Clear()</c>.
+    /// </summary>
+    /// <remarks>
+    /// This method will only work if the <see cref="IPointList" /> instance reference
+    /// at <see cref="Points" /> supports the <see cref="IPointListEdit" /> interface.
+    /// Otherwise, it does nothing.
+    /// </remarks>
+    public void Clear()
+    {
+        if (_points is IPointListEdit pointListEdit)
+        {
+            pointListEdit.Clear();
+        }
+        else
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Removes a single point from this <see cref="CurveItem" />.
+    /// </summary>
+    /// <remarks>
+    /// This method will only work if the <see cref="IPointList" /> instance reference
+    /// at <see cref="Points" /> supports the <see cref="IPointListEdit" /> interface.
+    /// Otherwise, it does nothing.
+    /// </remarks>
+    /// <param name="index">The ordinal position of the point to be removed.</param>
+    public void RemovePoint (int index)
+    {
+        if (_points is IPointListEdit pointListEdit)
+        {
+            pointListEdit.RemoveAt (index);
+        }
+        else
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Get the X Axis instance (either <see cref="XAxis" /> or <see cref="X2Axis" />) to
+    /// which this <see cref="CurveItem" /> belongs.
+    /// </summary>
+    /// <param name="pane">The <see cref="GraphPane" /> object to which this curve belongs.</param>
+    /// <returns>Either a <see cref="XAxis" /> or <see cref="X2Axis" /> to which this
+    /// <see cref="CurveItem" /> belongs.
+    /// </returns>
+    public Axis GetXAxis (GraphPane pane)
+    {
+        if (IsX2Axis)
+        {
+            return pane.X2Axis;
+        }
+
+        return pane.XAxis;
+    }
+
+    /// <summary>
+    /// Get the Y Axis instance (either <see cref="YAxis" /> or <see cref="Y2Axis" />) to
+    /// which this <see cref="CurveItem" /> belongs.
+    /// </summary>
+    /// <remarks>
+    /// This method safely retrieves a Y Axis instance from either the <see cref="GraphPane.YAxisList" />
+    /// or the <see cref="GraphPane.Y2AxisList" /> using the values of <see cref="YAxisIndex" /> and
+    /// <see cref="IsY2Axis" />.  If the value of <see cref="YAxisIndex" /> is out of bounds, the
+    /// default <see cref="YAxis" /> or <see cref="Y2Axis" /> is used.
+    /// </remarks>
+    /// <param name="pane">The <see cref="GraphPane" /> object to which this curve belongs.</param>
+    /// <returns>Either a <see cref="YAxis" /> or <see cref="Y2Axis" /> to which this
+    /// <see cref="CurveItem" /> belongs.
+    /// </returns>
+    public Axis GetYAxis (GraphPane pane)
+    {
+        if (IsY2Axis)
+        {
+            if (YAxisIndex < pane.Y2AxisList.Count)
             {
-                xLBound = xAxis.Scale._lBound;
-                xUBound = xAxis.Scale._uBound;
-                yLBound = yAxis.Scale._lBound;
-                yUBound = yAxis.Scale._uBound;
+                return pane.Y2AxisList[YAxisIndex];
             }
 
+            return pane.Y2AxisList[0];
+        }
 
-            var isZIncluded = IsZIncluded (pane);
-            var isXIndependent = IsXIndependent (pane);
-            var isXLog = xAxis.Scale.IsLog;
-            var isYLog = yAxis.Scale.IsLog;
-            var isXOrdinal = xAxis.Scale.IsAnyOrdinal;
-            var isYOrdinal = yAxis.Scale.IsAnyOrdinal;
-            var isZOrdinal = (isXIndependent ? yAxis : xAxis).Scale.IsAnyOrdinal;
+        if (YAxisIndex < pane.YAxisList.Count)
+        {
+            return pane.YAxisList[YAxisIndex];
+        }
 
-            // Loop over each point in the arrays
-            //foreach ( PointPair point in this.Points )
-            for (var i = 0; i < Points.Count; i++)
+        return pane.YAxisList[0];
+    }
+
+    /// <summary>
+    /// Get the index of the Y Axis in the <see cref="YAxis" /> or <see cref="Y2Axis" /> list to
+    /// which this <see cref="CurveItem" /> belongs.
+    /// </summary>
+    /// <remarks>
+    /// This method safely retrieves a Y Axis index into either the <see cref="GraphPane.YAxisList" />
+    /// or the <see cref="GraphPane.Y2AxisList" /> using the values of <see cref="YAxisIndex" /> and
+    /// <see cref="IsY2Axis" />.  If the value of <see cref="YAxisIndex" /> is out of bounds, the
+    /// default <see cref="YAxis" /> or <see cref="Y2Axis" /> is used, which is index zero.
+    /// </remarks>
+    /// <param name="pane">The <see cref="GraphPane" /> object to which this curve belongs.</param>
+    /// <returns>An integer value indicating which index position in the list applies to this
+    /// <see cref="CurveItem" />
+    /// </returns>
+    public int GetYAxisIndex (GraphPane pane)
+    {
+        if (YAxisIndex >= 0 &&
+            YAxisIndex < (IsY2Axis ? pane.Y2AxisList.Count : pane.YAxisList.Count))
+        {
+            return YAxisIndex;
+        }
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Loads some pseudo unique colors/symbols into this CurveItem.  This
+    /// is the same as <c>MakeUnique(ColorSymbolRotator.StaticInstance)</c>.
+    /// <seealso cref="ColorSymbolRotator.StaticInstance"/>
+    /// <seealso cref="ColorSymbolRotator"/>
+    /// <seealso cref="MakeUnique(ColorSymbolRotator)"/>
+    /// </summary>
+    public void MakeUnique()
+    {
+        MakeUnique (ColorSymbolRotator.StaticInstance);
+    }
+
+    /// <summary>
+    /// Loads some pseudo unique colors/symbols into this CurveItem.  This
+    /// is mainly useful for differentiating a set of new CurveItems without
+    /// having to pick your own colors/symbols.
+    /// <seealso cref="MakeUnique(ColorSymbolRotator)"/>
+    /// </summary>
+    /// <param name="rotator">
+    /// The <see cref="ColorSymbolRotator"/> that is used to pick the color
+    ///  and symbol for this method call.
+    /// </param>
+    public virtual void MakeUnique (ColorSymbolRotator rotator)
+    {
+        Color = rotator.NextColor;
+    }
+
+    /// <summary>
+    /// Go through the list of <see cref="PointPair"/> data values for this <see cref="CurveItem"/>
+    /// and determine the minimum and maximum values in the data.
+    /// </summary>
+    /// <param name="xMin">The minimum X value in the range of data</param>
+    /// <param name="xMax">The maximum X value in the range of data</param>
+    /// <param name="yMin">The minimum Y value in the range of data</param>
+    /// <param name="yMax">The maximum Y value in the range of data</param>
+    /// <param name="ignoreInitial">ignoreInitial is a boolean value that
+    /// affects the data range that is considered for the automatic scale
+    /// ranging (see <see cref="GraphPane.IsIgnoreInitial"/>).  If true, then initial
+    /// data points where the Y value is zero are not included when
+    /// automatically determining the scale <see cref="Scale.Min"/>,
+    /// <see cref="Scale.Max"/>, and <see cref="Scale.MajorStep"/> size.  All data after
+    /// the first non-zero Y value are included.
+    /// </param>
+    /// <param name="isBoundedRanges">
+    /// Determines if the auto-scaled axis ranges will subset the
+    /// data points based on any manually set scale range values.
+    /// </param>
+    /// <param name="pane">
+    /// A reference to the <see cref="GraphPane"/> object that is the parent or
+    /// owner of this object.
+    /// </param>
+    /// <seealso cref="GraphPane.IsBoundedRanges"/>
+    public virtual void GetRange
+        (
+            out double xMin,
+            out double xMax,
+            out double yMin,
+            out double yMax,
+            bool ignoreInitial,
+            bool isBoundedRanges,
+            GraphPane pane
+        )
+    {
+        // The lower and upper bounds of allowable data for the X values.  These
+        // values allow you to subset the data values.  If the X range is bounded, then
+        // the resulting range for Y will reflect the Y values for the points within the X
+        // bounds.
+        var xLBound = double.MinValue;
+        var xUBound = double.MaxValue;
+        var yLBound = double.MinValue;
+        var yUBound = double.MaxValue;
+
+        // initialize the values to outrageous ones to start
+        xMin = yMin = double.MaxValue;
+        xMax = yMax = double.MinValue;
+
+        var yAxis = GetYAxis (pane);
+        var xAxis = GetXAxis (pane);
+        if (yAxis == null || xAxis == null)
+        {
+            return;
+        }
+
+        if (isBoundedRanges)
+        {
+            xLBound = xAxis.Scale._lBound;
+            xUBound = xAxis.Scale._uBound;
+            yLBound = yAxis.Scale._lBound;
+            yUBound = yAxis.Scale._uBound;
+        }
+
+
+        var isZIncluded = IsZIncluded (pane);
+        var isXIndependent = IsXIndependent (pane);
+        var isXLog = xAxis.Scale.IsLog;
+        var isYLog = yAxis.Scale.IsLog;
+        var isXOrdinal = xAxis.Scale.IsAnyOrdinal;
+        var isYOrdinal = yAxis.Scale.IsAnyOrdinal;
+        var isZOrdinal = (isXIndependent ? yAxis : xAxis).Scale.IsAnyOrdinal;
+
+        // Loop over each point in the arrays
+        //foreach ( PointPair point in this.Points )
+        for (var i = 0; i < Points.Count; i++)
+        {
+            var point = Points[i];
+
+            var curX = isXOrdinal ? i + 1 : point.X;
+            var curY = isYOrdinal ? i + 1 : point.Y;
+            var curZ = isZOrdinal ? i + 1 : point.Z;
+
+            var outOfBounds = curX < xLBound || curX > xUBound ||
+                              curY < yLBound || curY > yUBound ||
+                              (isZIncluded && isXIndependent && (curZ < yLBound || curZ > yUBound)) ||
+                              (isZIncluded && !isXIndependent && (curZ < xLBound || curZ > xUBound)) ||
+                              (curX <= 0 && isXLog) || (curY <= 0 && isYLog);
+
+            // ignoreInitial becomes false at the first non-zero
+            // Y value
+            if (ignoreInitial && curY != 0 &&
+                curY != PointPairBase.Missing)
             {
-                var point = Points[i];
+                ignoreInitial = false;
+            }
 
-                var curX = isXOrdinal ? i + 1 : point.X;
-                var curY = isYOrdinal ? i + 1 : point.Y;
-                var curZ = isZOrdinal ? i + 1 : point.Z;
-
-                var outOfBounds = curX < xLBound || curX > xUBound ||
-                                  curY < yLBound || curY > yUBound ||
-                                  (isZIncluded && isXIndependent && (curZ < yLBound || curZ > yUBound)) ||
-                                  (isZIncluded && !isXIndependent && (curZ < xLBound || curZ > xUBound)) ||
-                                  (curX <= 0 && isXLog) || (curY <= 0 && isYLog);
-
-                // ignoreInitial becomes false at the first non-zero
-                // Y value
-                if (ignoreInitial && curY != 0 &&
-                    curY != PointPairBase.Missing)
+            if (!ignoreInitial &&
+                !outOfBounds &&
+                curX != PointPairBase.Missing &&
+                curY != PointPairBase.Missing)
+            {
+                if (curX < xMin)
                 {
-                    ignoreInitial = false;
+                    xMin = curX;
                 }
 
-                if (!ignoreInitial &&
-                    !outOfBounds &&
-                    curX != PointPairBase.Missing &&
-                    curY != PointPairBase.Missing)
+                if (curX > xMax)
                 {
-                    if (curX < xMin)
+                    xMax = curX;
+                }
+
+                if (curY < yMin)
+                {
+                    yMin = curY;
+                }
+
+                if (curY > yMax)
+                {
+                    yMax = curY;
+                }
+
+                if (isZIncluded && isXIndependent && curZ != PointPairBase.Missing)
+                {
+                    if (curZ < yMin)
                     {
-                        xMin = curX;
+                        yMin = curZ;
                     }
 
-                    if (curX > xMax)
+                    if (curZ > yMax)
                     {
-                        xMax = curX;
+                        yMax = curZ;
+                    }
+                }
+                else if (isZIncluded && curZ != PointPairBase.Missing)
+                {
+                    if (curZ < xMin)
+                    {
+                        xMin = curZ;
                     }
 
-                    if (curY < yMin)
+                    if (curZ > xMax)
                     {
-                        yMin = curY;
-                    }
-
-                    if (curY > yMax)
-                    {
-                        yMax = curY;
-                    }
-
-                    if (isZIncluded && isXIndependent && curZ != PointPairBase.Missing)
-                    {
-                        if (curZ < yMin)
-                        {
-                            yMin = curZ;
-                        }
-
-                        if (curZ > yMax)
-                        {
-                            yMax = curZ;
-                        }
-                    }
-                    else if (isZIncluded && curZ != PointPairBase.Missing)
-                    {
-                        if (curZ < xMin)
-                        {
-                            xMin = curZ;
-                        }
-
-                        if (curZ > xMax)
-                        {
-                            xMax = curZ;
-                        }
+                        xMax = curZ;
                     }
                 }
             }
         }
+    }
 
-        /// <summary>Returns a reference to the <see cref="Axis"/> object that is the "base"
-        /// (independent axis) from which the values are drawn. </summary>
-        /// <remarks>
-        /// This property is determined by the value of <see cref="BarSettings.Base"/> for
-        /// <see cref="BarItem"/>, <see cref="ErrorBarItem"/>, and <see cref="HiLowBarItem"/>
-        /// types.  It is always the X axis for regular <see cref="LineItem"/> types.
-        /// Note that the <see cref="BarSettings.Base" /> setting can override the
-        /// <see cref="IsY2Axis" /> and <see cref="YAxisIndex" /> settings for bar types
-        /// (this is because all the bars that are clustered together must share the
-        /// same base axis).
-        /// </remarks>
-        /// <seealso cref="BarBase"/>
-        /// <seealso cref="ValueAxis"/>
-        public virtual Axis BaseAxis
-            (
-                GraphPane pane
-            )
+    /// <summary>Returns a reference to the <see cref="Axis"/> object that is the "base"
+    /// (independent axis) from which the values are drawn. </summary>
+    /// <remarks>
+    /// This property is determined by the value of <see cref="BarSettings.Base"/> for
+    /// <see cref="BarItem"/>, <see cref="ErrorBarItem"/>, and <see cref="HiLowBarItem"/>
+    /// types.  It is always the X axis for regular <see cref="LineItem"/> types.
+    /// Note that the <see cref="BarSettings.Base" /> setting can override the
+    /// <see cref="IsY2Axis" /> and <see cref="YAxisIndex" /> settings for bar types
+    /// (this is because all the bars that are clustered together must share the
+    /// same base axis).
+    /// </remarks>
+    /// <seealso cref="BarBase"/>
+    /// <seealso cref="ValueAxis"/>
+    public virtual Axis BaseAxis
+        (
+            GraphPane pane
+        )
+    {
+        BarBase barBase;
+
+        if (this is BarItem || this is ErrorBarItem || this is HiLowBarItem)
         {
-            BarBase barBase;
-
-            if (this is BarItem || this is ErrorBarItem || this is HiLowBarItem)
-            {
-                barBase = pane._barSettings.Base;
-            }
-            else
-            {
-                barBase = IsX2Axis ? BarBase.X2 : BarBase.X;
-            }
-
-            if (barBase == BarBase.X)
-            {
-                return pane.XAxis;
-            }
-            else if (barBase == BarBase.X2)
-            {
-                return pane.X2Axis;
-            }
-            else if (barBase == BarBase.Y)
-            {
-                return pane.YAxis;
-            }
-            else
-            {
-                return pane.Y2Axis;
-            }
+            barBase = pane._barSettings.Base;
+        }
+        else
+        {
+            barBase = IsX2Axis ? BarBase.X2 : BarBase.X;
         }
 
-        /// <summary>Returns a reference to the <see cref="Axis"/> object that is the "value"
-        /// (dependent axis) from which the points are drawn. </summary>
-        /// <remarks>
-        /// This property is determined by the value of <see cref="BarSettings.Base"/> for
-        /// <see cref="BarItem"/>, <see cref="ErrorBarItem"/>, and <see cref="HiLowBarItem"/>
-        /// types.  It is always the Y axis for regular <see cref="LineItem"/> types.
-        /// </remarks>
-        /// <seealso cref="BarBase"/>
-        /// <seealso cref="BaseAxis"/>
-        public virtual Axis ValueAxis
-            (
-                GraphPane pane
-            )
+        if (barBase == BarBase.X)
         {
-            BarBase barBase;
-
-            if (this is BarItem || this is ErrorBarItem || this is HiLowBarItem)
-            {
-                barBase = pane._barSettings.Base;
-            }
-            else
-            {
-                barBase = BarBase.X;
-            }
-
-            if (barBase == BarBase.X || barBase == BarBase.X2)
-            {
-                return GetYAxis (pane);
-            }
-            else
-            {
-                return GetXAxis (pane);
-            }
+            return pane.XAxis;
         }
 
-        /// <summary>
-        /// Calculate the width of each bar, depending on the actual bar type
-        /// </summary>
-        /// <returns>The width for an individual bar, in pixel units</returns>
-        public float GetBarWidth (GraphPane pane)
+        if (barBase == BarBase.X2)
         {
-            // Total axis width =
-            // npts * ( nbars * ( bar + bargap ) - bargap + clustgap )
-            // cg * bar = cluster gap
-            // npts = max number of points in any curve
-            // nbars = total number of curves that are of type IsBar
-            // bar = bar width
-            // bg * bar = bar gap
-            // therefore:
-            // totwidth = npts * ( nbars * (bar + bg*bar) - bg*bar + cg*bar )
-            // totwidth = bar * ( npts * ( nbars * ( 1 + bg ) - bg + cg ) )
-            // solve for bar
+            return pane.X2Axis;
+        }
+        if (barBase == BarBase.Y)
+        {
+            return pane.YAxis;
+        }
+        return pane.Y2Axis;
+    }
 
-            float barWidth;
+    /// <summary>Returns a reference to the <see cref="Axis"/> object that is the "value"
+    /// (dependent axis) from which the points are drawn. </summary>
+    /// <remarks>
+    /// This property is determined by the value of <see cref="BarSettings.Base"/> for
+    /// <see cref="BarItem"/>, <see cref="ErrorBarItem"/>, and <see cref="HiLowBarItem"/>
+    /// types.  It is always the Y axis for regular <see cref="LineItem"/> types.
+    /// </remarks>
+    /// <seealso cref="BarBase"/>
+    /// <seealso cref="BaseAxis"/>
+    public virtual Axis ValueAxis
+        (
+            GraphPane pane
+        )
+    {
+        BarBase barBase;
 
-            if (this is ErrorBarItem)
-            {
-                barWidth = (float)(((ErrorBarItem)this).Bar.Symbol.Size *
-                                   pane.CalcScaleFactor());
-            }
+        if (this is BarItem || this is ErrorBarItem || this is HiLowBarItem)
+        {
+            barBase = pane._barSettings.Base;
+        }
+        else
+        {
+            barBase = BarBase.X;
+        }
 
-            //			else if ( this is HiLowBarItem && pane._barSettings.Type != BarType.ClusterHiLow )
+        if (barBase == BarBase.X || barBase == BarBase.X2)
+        {
+            return GetYAxis (pane);
+        }
+
+        return GetXAxis (pane);
+    }
+
+    /// <summary>
+    /// Calculate the width of each bar, depending on the actual bar type
+    /// </summary>
+    /// <returns>The width for an individual bar, in pixel units</returns>
+    public float GetBarWidth (GraphPane pane)
+    {
+        // Total axis width =
+        // npts * ( nbars * ( bar + bargap ) - bargap + clustgap )
+        // cg * bar = cluster gap
+        // npts = max number of points in any curve
+        // nbars = total number of curves that are of type IsBar
+        // bar = bar width
+        // bg * bar = bar gap
+        // therefore:
+        // totwidth = npts * ( nbars * (bar + bg*bar) - bg*bar + cg*bar )
+        // totwidth = bar * ( npts * ( nbars * ( 1 + bg ) - bg + cg ) )
+        // solve for bar
+
+        float barWidth;
+
+        if (this is ErrorBarItem)
+        {
+            barWidth = (float)(((ErrorBarItem)this).Bar.Symbol.Size *
+                               pane.CalcScaleFactor());
+        }
+
+        //			else if ( this is HiLowBarItem && pane._barSettings.Type != BarType.ClusterHiLow )
 //				barWidth = (float) ( ((HiLowBarItem)this).Bar.GetBarWidth( pane,
 //						((HiLowBarItem)this).BaseAxis(pane), pane.CalcScaleFactor() ) );
 //				barWidth = (float) ( ((HiLowBarItem)this).Bar.Size *
 //						pane.CalcScaleFactor() );
-            else // BarItem or LineItem
+        else // BarItem or LineItem
+        {
+            // For stacked bar types, the bar width will be based on a single bar
+            var numBars = 1.0F;
+            if (pane._barSettings.Type == BarType.Cluster)
             {
-                // For stacked bar types, the bar width will be based on a single bar
-                var numBars = 1.0F;
-                if (pane._barSettings.Type == BarType.Cluster)
-                {
-                    numBars = pane.CurveList.NumClusterableBars;
-                }
-
-                var denom = numBars * (1.0F + pane._barSettings.MinBarGap) -
-                    pane._barSettings.MinBarGap + pane._barSettings.MinClusterGap;
-                if (denom <= 0)
-                {
-                    denom = 1;
-                }
-
-                barWidth = pane.BarSettings.GetClusterWidth() / denom;
+                numBars = pane.CurveList.NumClusterableBars;
             }
 
-            if (barWidth <= 0)
+            var denom = numBars * (1.0F + pane._barSettings.MinBarGap) -
+                pane._barSettings.MinBarGap + pane._barSettings.MinClusterGap;
+            if (denom <= 0)
+            {
+                denom = 1;
+            }
+
+            barWidth = pane.BarSettings.GetClusterWidth() / denom;
+        }
+
+        if (barWidth <= 0)
+        {
+            return 1;
+        }
+
+        return barWidth;
+    }
+
+    /// <summary>
+    /// Determine the coords for the rectangle associated with a specified point for
+    /// this <see cref="CurveItem" />
+    /// </summary>
+    /// <param name="pane">The <see cref="GraphPane" /> to which this curve belongs</param>
+    /// <param name="i">The index of the point of interest</param>
+    /// <param name="coords">A list of coordinates that represents the "rect" for
+    /// this point (used in an html AREA tag)</param>
+    /// <returns>true if it's a valid point, false otherwise</returns>
+    public abstract bool GetCoords (GraphPane pane, int i, out string coords);
+
+    #endregion
+
+    #region Inner classes
+
+    /// <summary>
+    /// Compares <see cref="CurveItem"/>'s based on the point value at the specified
+    /// index and for the specified axis.
+    /// <seealso cref="System.Collections.ArrayList.Sort()"/>
+    /// </summary>
+    public sealed class Comparer
+        : IComparer<CurveItem>
+    {
+        private readonly int index;
+        private readonly SortType sortType;
+
+        /// <summary>
+        /// Constructor for Comparer.
+        /// </summary>
+        /// <param name="type">The axis type on which to sort.</param>
+        /// <param name="index">The index number of the point on which to sort</param>
+        public Comparer (SortType type, int index)
+        {
+            sortType = type;
+            this.index = index;
+        }
+
+        /// <summary>
+        /// Compares two <see cref="CurveItem"/>s using the previously specified index value
+        /// and axis.  Sorts in descending order.
+        /// </summary>
+        /// <param name="left">Curve to the left.</param>
+        /// <param name="right">Curve to the right.</param>
+        /// <returns>-1, 0, or 1 depending on l.X's relation to r.X</returns>
+        public int Compare
+            (
+                CurveItem? left,
+                CurveItem? right
+            )
+        {
+            if (left is null)
+            {
+                return right is null
+                    ? 0
+                    : -1;
+            }
+
+            if (right is null)
             {
                 return 1;
             }
 
-            return barWidth;
-        }
-
-        /// <summary>
-        /// Determine the coords for the rectangle associated with a specified point for
-        /// this <see cref="CurveItem" />
-        /// </summary>
-        /// <param name="pane">The <see cref="GraphPane" /> to which this curve belongs</param>
-        /// <param name="i">The index of the point of interest</param>
-        /// <param name="coords">A list of coordinates that represents the "rect" for
-        /// this point (used in an html AREA tag)</param>
-        /// <returns>true if it's a valid point, false otherwise</returns>
-        public abstract bool GetCoords (GraphPane pane, int i, out string coords);
-
-        #endregion
-
-        #region Inner classes
-
-        /// <summary>
-        /// Compares <see cref="CurveItem"/>'s based on the point value at the specified
-        /// index and for the specified axis.
-        /// <seealso cref="System.Collections.ArrayList.Sort()"/>
-        /// </summary>
-        public class Comparer : IComparer<CurveItem>
-        {
-            private int index;
-            private SortType sortType;
-
-            /// <summary>
-            /// Constructor for Comparer.
-            /// </summary>
-            /// <param name="type">The axis type on which to sort.</param>
-            /// <param name="index">The index number of the point on which to sort</param>
-            public Comparer (SortType type, int index)
+            if (right.NPts <= index)
             {
-                sortType = type;
-                this.index = index;
+                right = null;
             }
 
-            /// <summary>
-            /// Compares two <see cref="CurveItem"/>s using the previously specified index value
-            /// and axis.  Sorts in descending order.
-            /// </summary>
-            /// <param name="l">Curve to the left.</param>
-            /// <param name="r">Curve to the right.</param>
-            /// <returns>-1, 0, or 1 depending on l.X's relation to r.X</returns>
-            public int Compare (CurveItem l, CurveItem r)
+            if (left.NPts <= index)
             {
-                if (l == null && r == null)
-                {
-                    return 0;
-                }
-                else if (l == null && r != null)
-                {
-                    return -1;
-                }
-                else if (l != null && r == null)
-                {
-                    return 1;
-                }
-
-                if (r != null && r.NPts <= index)
-                {
-                    r = null;
-                }
-
-                if (l != null && l.NPts <= index)
-                {
-                    l = null;
-                }
-
-                double lVal, rVal;
-
-                if (sortType == SortType.XValues)
-                {
-                    lVal = (l != null) ? Math.Abs (l[index].X) : PointPairBase.Missing;
-                    rVal = (r != null) ? Math.Abs (r[index].X) : PointPairBase.Missing;
-                }
-                else
-                {
-                    lVal = (l != null) ? Math.Abs (l[index].Y) : PointPairBase.Missing;
-                    rVal = (r != null) ? Math.Abs (r[index].Y) : PointPairBase.Missing;
-                }
-
-                if (lVal == PointPairBase.Missing || double.IsInfinity (lVal) || double.IsNaN (lVal))
-                {
-                    l = null;
-                }
-
-                if (rVal == PointPairBase.Missing || double.IsInfinity (rVal) || double.IsNaN (rVal))
-                {
-                    r = null;
-                }
-
-                if ((l == null && r == null) || (Math.Abs (lVal - rVal) < 1e-10))
-                {
-                    return 0;
-                }
-                else if (l == null && r != null)
-                {
-                    return -1;
-                }
-                else if (l != null && r == null)
-                {
-                    return 1;
-                }
-                else
-                {
-                    return rVal < lVal ? -1 : 1;
-                }
+                left = null;
             }
-        }
 
-        #endregion
+            double lVal, rVal;
+
+            if (sortType == SortType.XValues)
+            {
+                lVal = (left != null) ? Math.Abs (left[index].X) : PointPairBase.Missing;
+                rVal = (right != null) ? Math.Abs (right[index].X) : PointPairBase.Missing;
+            }
+            else
+            {
+                lVal = (left != null) ? Math.Abs (left[index].Y) : PointPairBase.Missing;
+                rVal = (right != null) ? Math.Abs (right[index].Y) : PointPairBase.Missing;
+            }
+
+            if (lVal == PointPairBase.Missing || double.IsInfinity (lVal) || double.IsNaN (lVal))
+            {
+                left = null;
+            }
+
+            if (rVal == PointPairBase.Missing || double.IsInfinity (rVal) || double.IsNaN (rVal))
+            {
+                right = null;
+            }
+
+            if ((left == null && right == null) || (Math.Abs (lVal - rVal) < 1e-10))
+            {
+                return 0;
+            }
+
+            if (left == null && right != null)
+            {
+                return -1;
+            }
+            if (left != null && right == null)
+            {
+                return 1;
+            }
+            return rVal < lVal ? -1 : 1;
+        }
     }
+
+    #endregion
 }
