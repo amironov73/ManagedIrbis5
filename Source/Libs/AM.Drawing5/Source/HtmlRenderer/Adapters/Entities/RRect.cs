@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* RRect.cs --
+/* RRect.cs -- расположение и размер прямоугольника
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,7 +20,8 @@ using System;
 namespace AM.Drawing.HtmlRenderer.Adapters.Entities;
 
 /// <summary>
-/// Stores a set of four floating-point numbers that represent the location and size of a rectangle.
+/// Хранит набор из четырех чисел с плавающей запятой,
+/// представляющих расположение и размер прямоугольника.
 /// </summary>
 public struct RRect
 {
@@ -29,13 +30,7 @@ public struct RRect
     /// <summary>
     ///     Represents an instance of the <see cref="RRect" /> class with its members uninitialized.
     /// </summary>
-    public static readonly RRect Empty = new RRect();
-
-    private double _height;
-    private double _width;
-
-    private double _x;
-    private double _y;
+    public static readonly RRect Empty = new ();
 
     #endregion
 
@@ -47,12 +42,18 @@ public struct RRect
     /// <param name="y">The y-coordinate of the upper-left corner of the rectangle. </param>
     /// <param name="width">The width of the rectangle. </param>
     /// <param name="height">The height of the rectangle. </param>
-    public RRect(double x, double y, double width, double height)
+    public RRect
+        (
+            double x,
+            double y,
+            double width,
+            double height
+        )
     {
-        _x = x;
-        _y = y;
-        _width = width;
-        _height = height;
+        X = x;
+        Y = y;
+        Width = width;
+        Height = height;
     }
 
     /// <summary>
@@ -60,12 +61,12 @@ public struct RRect
     /// </summary>
     /// <param name="location">A <see cref="RPoint" /> that represents the upper-left corner of the rectangular region.</param>
     /// <param name="size">A <see cref="RSize" /> that represents the width and height of the rectangular region.</param>
-    public RRect(RPoint location, RSize size)
+    public RRect (RPoint location, RSize size)
     {
-        _x = location.X;
-        _y = location.Y;
-        _width = size.Width;
-        _height = size.Height;
+        X = location.X;
+        Y = location.Y;
+        Width = size.Width;
+        Height = size.Height;
     }
 
     /// <summary>
@@ -74,7 +75,7 @@ public struct RRect
     /// <returns>A <see cref="RPoint" /> that represents the upper-left corner of this <see cref="RRect" /> structure.</returns>
     public RPoint Location
     {
-        get { return new RPoint(X, Y); }
+        get => new (X, Y);
         set
         {
             X = value.X;
@@ -88,7 +89,7 @@ public struct RRect
     /// <returns>A <see cref="RSize" /> that represents the width and height of this <see cref="RRect" /> structure.</returns>
     public RSize Size
     {
-        get { return new RSize(Width, Height); }
+        get => new (Width, Height);
         set
         {
             Width = value.Width;
@@ -102,11 +103,7 @@ public struct RRect
     /// <returns>
     ///     The x-coordinate of the upper-left corner of this <see cref="RRect" /> structure.
     /// </returns>
-    public double X
-    {
-        get { return _x; }
-        set { _x = value; }
-    }
+    public double X { get; set; }
 
     /// <summary>
     ///     Gets or sets the y-coordinate of the upper-left corner of this <see cref="RRect" /> structure.
@@ -114,11 +111,7 @@ public struct RRect
     /// <returns>
     ///     The y-coordinate of the upper-left corner of this <see cref="RRect" /> structure.
     /// </returns>
-    public double Y
-    {
-        get { return _y; }
-        set { _y = value; }
-    }
+    public double Y { get; set; }
 
     /// <summary>
     ///     Gets or sets the width of this <see cref="RRect" /> structure.
@@ -126,11 +119,7 @@ public struct RRect
     /// <returns>
     ///     The width of this <see cref="RRect" /> structure.
     /// </returns>
-    public double Width
-    {
-        get { return _width; }
-        set { _width = value; }
-    }
+    public double Width { get; set; }
 
     /// <summary>
     ///     Gets or sets the height of this <see cref="RRect" /> structure.
@@ -138,11 +127,7 @@ public struct RRect
     /// <returns>
     ///     The height of this <see cref="RRect" /> structure.
     /// </returns>
-    public double Height
-    {
-        get { return _height; }
-        set { _height = value; }
-    }
+    public double Height { get; set; }
 
     /// <summary>
     ///     Gets the x-coordinate of the left edge of this <see cref="RRect" /> structure.
@@ -150,10 +135,7 @@ public struct RRect
     /// <returns>
     ///     The x-coordinate of the left edge of this <see cref="RRect" /> structure.
     /// </returns>
-    public double Left
-    {
-        get { return X; }
-    }
+    public double Left => X;
 
     /// <summary>
     ///     Gets the y-coordinate of the top edge of this <see cref="RRect" /> structure.
@@ -161,10 +143,7 @@ public struct RRect
     /// <returns>
     ///     The y-coordinate of the top edge of this <see cref="RRect" /> structure.
     /// </returns>
-    public double Top
-    {
-        get { return Y; }
-    }
+    public double Top => Y;
 
     /// <summary>
     ///     Gets the x-coordinate that is the sum of <see cref="RRect.X" /> and
@@ -178,10 +157,7 @@ public struct RRect
     ///         cref="RRect.Width" />
     ///     of this <see cref="RRect" /> structure.
     /// </returns>
-    public double Right
-    {
-        get { return X + Width; }
-    }
+    public double Right => X + Width;
 
     /// <summary>
     ///     Gets the y-coordinate that is the sum of <see cref="RRect.Y" /> and
@@ -195,10 +171,7 @@ public struct RRect
     ///         cref="RRect.Height" />
     ///     of this <see cref="RRect" /> structure.
     /// </returns>
-    public double Bottom
-    {
-        get { return Y + Height; }
-    }
+    public double Bottom => Y + Height;
 
     /// <summary>
     ///     Tests whether the <see cref="RRect.Width" /> or
@@ -212,16 +185,7 @@ public struct RRect
     ///         cref="RRect.Height" />
     ///     property of this <see cref="RRect" /> has a value of zero; otherwise, false.
     /// </returns>
-    public bool IsEmpty
-    {
-        get
-        {
-            if (Width > 0.0)
-                return Height <= 0.0;
-            else
-                return true;
-        }
-    }
+    public bool IsEmpty => Width <= 0.0 || Height <= 0.0;
 
     /// <summary>
     ///     Tests whether two <see cref="RRect" /> structures have equal location and size.
@@ -236,12 +200,15 @@ public struct RRect
     /// <param name="right">
     ///     The <see cref="RRect" /> structure that is to the right of the equality operator.
     /// </param>
-    public static bool operator ==(RRect left, RRect right)
+    public static bool operator == (RRect left, RRect right)
     {
-        if (Math.Abs(left.X - right.X) < 0.001 && Math.Abs(left.Y - right.Y) < 0.001 && Math.Abs(left.Width - right.Width) < 0.001)
-            return Math.Abs(left.Height - right.Height) < 0.001;
-        else
-            return false;
+        if (Math.Abs (left.X - right.X) < 0.001 && Math.Abs (left.Y - right.Y) < 0.001 &&
+            Math.Abs (left.Width - right.Width) < 0.001)
+        {
+            return Math.Abs (left.Height - right.Height) < 0.001;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -258,7 +225,7 @@ public struct RRect
     /// <param name="right">
     ///     The <see cref="RRect" /> structure that is to the right of the inequality operator.
     /// </param>
-    public static bool operator !=(RRect left, RRect right)
+    public static bool operator != (RRect left, RRect right)
     {
         return !(left == right);
     }
@@ -273,9 +240,9 @@ public struct RRect
     /// <param name="top">The y-coordinate of the upper-left corner of the rectangular region. </param>
     /// <param name="right">The x-coordinate of the lower-right corner of the rectangular region. </param>
     /// <param name="bottom">The y-coordinate of the lower-right corner of the rectangular region. </param>
-    public static RRect FromLTRB(double left, double top, double right, double bottom)
+    public static RRect FromLTRB (double left, double top, double right, double bottom)
     {
-        return new RRect(left, top, right - left, bottom - top);
+        return new RRect (left, top, right - left, bottom - top);
     }
 
     /// <summary>
@@ -289,15 +256,21 @@ public struct RRect
     /// <param name="obj">
     ///     The <see cref="T:System.Object" /> to test.
     /// </param>
-    public override bool Equals(object obj)
+    public override bool Equals (object? obj)
     {
         if (!(obj is RRect))
+        {
             return false;
+        }
+
         var rectangleF = (RRect)obj;
-        if (Math.Abs(rectangleF.X - X) < 0.001 && Math.Abs(rectangleF.Y - Y) < 0.001 && Math.Abs(rectangleF.Width - Width) < 0.001)
-            return Math.Abs(rectangleF.Height - Height) < 0.001;
-        else
-            return false;
+        if (Math.Abs (rectangleF.X - X) < 0.001 && Math.Abs (rectangleF.Y - Y) < 0.001 &&
+            Math.Abs (rectangleF.Width - Width) < 0.001)
+        {
+            return Math.Abs (rectangleF.Height - Height) < 0.001;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -310,12 +283,14 @@ public struct RRect
     /// </returns>
     /// <param name="x">The x-coordinate of the point to test. </param>
     /// <param name="y">The y-coordinate of the point to test. </param>
-    public bool Contains(double x, double y)
+    public bool Contains (double x, double y)
     {
         if (X <= x && x < X + Width && Y <= y)
+        {
             return y < Y + Height;
-        else
-            return false;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -327,9 +302,9 @@ public struct RRect
     ///     structure; otherwise false.
     /// </returns>
     /// <param name="pt">The <see cref="RPoint" /> to test.</param>
-    public bool Contains(RPoint pt)
+    public bool Contains (RPoint pt)
     {
-        return Contains(pt.X, pt.Y);
+        return Contains (pt.X, pt.Y);
     }
 
     /// <summary>
@@ -345,12 +320,14 @@ public struct RRect
     /// <param name="rect">
     ///     The <see cref="RRect" /> to test.
     /// </param>
-    public bool Contains(RRect rect)
+    public bool Contains (RRect rect)
     {
         if (X <= rect.X && rect.X + rect.Width <= X + Width && Y <= rect.Y)
+        {
             return rect.Y + rect.Height <= Y + Height;
-        else
-            return false;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -362,7 +339,7 @@ public struct RRect
     /// <param name="y">
     ///     The amount to inflate this <see cref="RRect" /> structure vertically.
     /// </param>
-    public void Inflate(double x, double y)
+    public void Inflate (double x, double y)
     {
         X -= x;
         Y -= y;
@@ -374,9 +351,9 @@ public struct RRect
     ///     Inflates this <see cref="RRect" /> by the specified amount.
     /// </summary>
     /// <param name="size">The amount to inflate this rectangle. </param>
-    public void Inflate(RSize size)
+    public void Inflate (RSize size)
     {
-        Inflate(size.Width, size.Height);
+        Inflate (size.Width, size.Height);
     }
 
     /// <summary>
@@ -390,10 +367,10 @@ public struct RRect
     /// </param>
     /// <param name="x">The amount to inflate the copy of the rectangle horizontally. </param>
     /// <param name="y">The amount to inflate the copy of the rectangle vertically. </param>
-    public static RRect Inflate(RRect rect, double x, double y)
+    public static RRect Inflate (RRect rect, double x, double y)
     {
         RRect rectangleF = rect;
-        rectangleF.Inflate(x, y);
+        rectangleF.Inflate (x, y);
         return rectangleF;
     }
 
@@ -404,9 +381,9 @@ public struct RRect
     ///     structure.
     /// </summary>
     /// <param name="rect">The rectangle to intersect. </param>
-    public void Intersect(RRect rect)
+    public void Intersect (RRect rect)
     {
-        RRect rectangleF = Intersect(rect, this);
+        RRect rectangleF = Intersect (rect, this);
         X = rectangleF.X;
         Y = rectangleF.Y;
         Width = rectangleF.Width;
@@ -424,16 +401,18 @@ public struct RRect
     /// </returns>
     /// <param name="a">A rectangle to intersect. </param>
     /// <param name="b">A rectangle to intersect. </param>
-    public static RRect Intersect(RRect a, RRect b)
+    public static RRect Intersect (RRect a, RRect b)
     {
-        double x = Math.Max(a.X, b.X);
-        double num1 = Math.Min(a.X + a.Width, b.X + b.Width);
-        double y = Math.Max(a.Y, b.Y);
-        double num2 = Math.Min(a.Y + a.Height, b.Y + b.Height);
+        double x = Math.Max (a.X, b.X);
+        double num1 = Math.Min (a.X + a.Width, b.X + b.Width);
+        double y = Math.Max (a.Y, b.Y);
+        double num2 = Math.Min (a.Y + a.Height, b.Y + b.Height);
         if (num1 >= x && num2 >= y)
-            return new RRect(x, y, num1 - x, num2 - y);
-        else
-            return Empty;
+        {
+            return new RRect (x, y, num1 - x, num2 - y);
+        }
+
+        return Empty;
     }
 
     /// <summary>
@@ -443,12 +422,14 @@ public struct RRect
     ///     This method returns true if there is any intersection.
     /// </returns>
     /// <param name="rect">The rectangle to test. </param>
-    public bool IntersectsWith(RRect rect)
+    public bool IntersectsWith (RRect rect)
     {
         if (rect.X < X + Width && X < rect.X + rect.Width && rect.Y < Y + Height)
+        {
             return Y < rect.Y + rect.Height;
-        else
-            return false;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -459,22 +440,22 @@ public struct RRect
     /// </returns>
     /// <param name="a">A rectangle to union. </param>
     /// <param name="b">A rectangle to union. </param>
-    public static RRect Union(RRect a, RRect b)
+    public static RRect Union (RRect a, RRect b)
     {
-        double x = Math.Min(a.X, b.X);
-        double num1 = Math.Max(a.X + a.Width, b.X + b.Width);
-        double y = Math.Min(a.Y, b.Y);
-        double num2 = Math.Max(a.Y + a.Height, b.Y + b.Height);
-        return new RRect(x, y, num1 - x, num2 - y);
+        double x = Math.Min (a.X, b.X);
+        double num1 = Math.Max (a.X + a.Width, b.X + b.Width);
+        double y = Math.Min (a.Y, b.Y);
+        double num2 = Math.Max (a.Y + a.Height, b.Y + b.Height);
+        return new RRect (x, y, num1 - x, num2 - y);
     }
 
     /// <summary>
     ///     Adjusts the location of this rectangle by the specified amount.
     /// </summary>
     /// <param name="pos">The amount to offset the location. </param>
-    public void Offset(RPoint pos)
+    public void Offset (RPoint pos)
     {
-        Offset(pos.X, pos.Y);
+        Offset (pos.X, pos.Y);
     }
 
     /// <summary>
@@ -482,27 +463,21 @@ public struct RRect
     /// </summary>
     /// <param name="x">The amount to offset the location horizontally. </param>
     /// <param name="y">The amount to offset the location vertically. </param>
-    public void Offset(double x, double y)
+    public void Offset (double x, double y)
     {
         X += x;
         Y += y;
     }
 
-    /// <summary>
-    ///     Gets the hash code for this <see cref="RRect" /> structure. For information about the use of hash codes, see Object.GetHashCode.
-    /// </summary>
-    /// <returns>The hash code for this <see cref="RRect" /></returns>
+    /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
-        return (int)(uint)X ^ ((int)(uint)Y << 13 | (int)((uint)Y >> 19)) ^ ((int)(uint)Width << 26 | (int)((uint)Width >> 6)) ^ ((int)(uint)Height << 7 | (int)((uint)Height >> 25));
+        return (int)(uint)X ^ ((int)(uint)Y << 13 | (int)((uint)Y >> 19)) ^
+               ((int)(uint)Width << 26 | (int)((uint)Width >> 6)) ^
+               ((int)(uint)Height << 7 | (int)((uint)Height >> 25));
     }
 
-    /// <summary>
-    /// Converts the Location and Size of this <see cref="RRect" /> to a human-readable string.
-    /// </summary>
-    /// <returns>
-    /// A string that contains the position, width, and height of this <see cref="RRect" /> structure for example, "{X=20, Y=20, Width=100, Height=50}".
-    /// </returns>
+    /// <inheritdoc cref="ValueType.ToString"/>
     public override string ToString()
     {
         return "{X=" + X + ",Y=" + Y + ",Width=" + Width + ",Height=" + Height + "}";
