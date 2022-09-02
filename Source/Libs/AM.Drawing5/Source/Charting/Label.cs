@@ -71,7 +71,7 @@ public class Label
     public Label
         (
             string? text,
-            FontSpec fontSpec
+            FontSpec? fontSpec
         )
     {
         Text = text ?? string.Empty;

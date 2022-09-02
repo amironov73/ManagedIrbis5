@@ -358,12 +358,12 @@ public class LineItem
     {
         coords = string.Empty;
 
-        if (i < 0 || i >= _points.Count)
+        if (i < 0 || i >= Points.Count)
         {
             return false;
         }
 
-        PointPair pt = _points[i];
+        PointPair pt = Points[i];
         if (pt.IsInvalid)
         {
             return false;

@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* GraphPane.cs --
+/* GraphPane.cs -- панель графика
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,8 +23,9 @@ using System.ComponentModel;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// Class <see cref="GraphPane"/> encapsulates the graph pane, which is all display elements
-/// associated with an individual graph.
+/// Класс <see cref="GraphPane"/> инкапсулирует панель графика,
+/// которая представляет собой все отображаемые элементы,
+/// связанные с отдельным графиком.
 /// </summary>
 /// <remarks>This class is the outside "wrapper"
 /// for the ZedGraph classes, and provides the interface to access the attributes
@@ -975,8 +976,7 @@ public class GraphPane
 
         foreach (Axis axis in _yAxisList)
         {
-            float fixedSpace;
-            var tmp = axis.CalcSpace (g, this, scaleFactor, out fixedSpace);
+            var tmp = axis.CalcSpace (g, this, scaleFactor, out var fixedSpace);
 
             //if ( !axis.CrossAuto || axis.Cross < _xAxis.Min )
             if (axis.IsCrossShifted (this))
@@ -989,8 +989,7 @@ public class GraphPane
 
         foreach (Axis axis in _y2AxisList)
         {
-            float fixedSpace;
-            var tmp = axis.CalcSpace (g, this, scaleFactor, out fixedSpace);
+            var tmp = axis.CalcSpace (g, this, scaleFactor, out var fixedSpace);
 
             //if ( !axis.CrossAuto || axis.Cross < _xAxis.Min )
             if (axis.IsCrossShifted (this))
@@ -1859,7 +1858,7 @@ public class GraphPane
         (
             PointF mousePt,
             Graphics graphics,
-            out object nearestObj,
+            out object? nearestObj,
             out int index
         )
     {
@@ -1874,7 +1873,7 @@ public class GraphPane
             //int			hStack;
             //float		legendWidth, legendHeight;
             RectangleF tmpRect;
-            GraphObj saveGraphItem = null;
+            GraphObj? saveGraphItem = null;
             var saveIndex = -1;
             var saveZOrder = ZOrder.H_BehindAll;
 
@@ -1982,10 +1981,9 @@ public class GraphPane
                 return true;
             }
 
-            CurveItem curve;
-
             // See if it's a data point
-            if (saveZOrder <= ZOrder.E_BehindCurves && FindNearestPoint (mousePt, out curve, out index))
+            if (saveZOrder <= ZOrder.E_BehindCurves
+                && FindNearestPoint (mousePt, out var curve, out index))
             {
                 nearestObj = curve;
                 return true;
@@ -2103,11 +2101,11 @@ public class GraphPane
         (
             PointF mousePt,
             CurveList targetCurveList,
-            out CurveItem nearestCurve,
+            out CurveItem? nearestCurve,
             out int iNearest
         )
     {
-        CurveItem nearestBar = null;
+        CurveItem? nearestBar = null;
         var iNearestBar = -1;
         nearestCurve = null;
         iNearest = -1;
@@ -2118,12 +2116,8 @@ public class GraphPane
             return false;
         }
 
-        double x, x2;
-        double[] y;
-        double[] y2;
-
         //ReverseTransform( mousePt, out x, out y, out y2 );
-        ReverseTransform (mousePt, out x, out x2, out y, out y2);
+        ReverseTransform (mousePt, out var x, out var x2, out double[] y, out var y2);
 
         if (!AxisRangesValid())
         {
@@ -2225,9 +2219,8 @@ public class GraphPane
                                 curve is HiLowBarItem || curve is OHLCBarItem ||
                                 curve is JapaneseCandleStickItem)
                             {
-                                double baseVal, lowVal, hiVal;
-                                valueHandler.GetValues (curve, iPt, out baseVal,
-                                    out lowVal, out hiVal);
+                                valueHandler.GetValues (curve, iPt, out var baseVal,
+                                    out var lowVal, out var hiVal);
 
                                 if (lowVal > hiVal)
                                 {
@@ -2272,8 +2265,7 @@ public class GraphPane
                             {
                                 if (curve is LineItem && _lineType == LineType.Stack)
                                 {
-                                    double zVal;
-                                    valueHandler.GetValues (curve, iPt, out xVal, out zVal, out yVal);
+                                    valueHandler.GetValues (curve, iPt, out xVal, out var zVal, out yVal);
                                 }
 
                                 distX = (xVal - xAct) * xPixPerUnit;
@@ -2381,9 +2373,7 @@ public class GraphPane
 
             if (link.IsActive)
             {
-                CurveItem nearestCurve;
-
-                if (FindNearestPoint (mousePt, curve, out nearestCurve, out index))
+                if (FindNearestPoint (mousePt, curve, out var nearestCurve, out index))
                 {
                     source = curve;
                     return true;

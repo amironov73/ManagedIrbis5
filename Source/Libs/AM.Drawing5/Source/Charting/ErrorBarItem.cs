@@ -13,6 +13,7 @@
 
 using System;
 using System.Drawing;
+using System.Globalization;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 
@@ -227,8 +228,15 @@ public class ErrorBarItem
     {
         if (IsVisible)
         {
-            Bar.Draw (graphics, pane, this, BaseAxis (pane),
-                ValueAxis (pane), scaleFactor);
+            Bar.Draw
+                (
+                    graphics,
+                    pane,
+                    this,
+                    BaseAxis (pane),
+                    ValueAxis (pane),
+                    scaleFactor
+                );
         }
     }
 
@@ -281,11 +289,16 @@ public class ErrorBarItem
     /// <param name="coords">A list of coordinates that represents the "rect" for
     /// this point (used in an html AREA tag)</param>
     /// <returns>true if it's a valid point, false otherwise</returns>
-    public override bool GetCoords (GraphPane pane, int i, out string coords)
+    public override bool GetCoords
+        (
+            GraphPane pane,
+            int i,
+            out string coords
+        )
     {
         coords = string.Empty;
 
-        if (i < 0 || i >= _points.Count)
+        if (i < 0 || Points is null || i >= Points.Count)
         {
             return false;
         }
@@ -298,7 +311,6 @@ public class ErrorBarItem
         // pixBase = pixel value for the bar center on the base axis
         // pixHiVal = pixel value for the bar top on the value axis
         // pixLowVal = pixel value for the bar bottom on the value axis
-        float pixBase, pixHiVal, pixLowVal;
 
         var clusterWidth = pane.BarSettings.GetClusterWidth();
         var barWidth = GetBarWidth (pane);
@@ -308,39 +320,42 @@ public class ErrorBarItem
         // curBase = the scale value on the base axis of the current bar
         // curHiVal = the scale value on the value axis of the current bar
         // curLowVal = the scale value of the bottom of the bar
-        double curBase, curLowVal, curHiVal;
         var valueHandler = new ValueHandler (pane, false);
-        valueHandler.GetValues (this, i, out curBase, out curLowVal, out curHiVal);
+        valueHandler.GetValues (this, i, out var curBase, out var curLowVal, out var curHiVal);
 
         // Any value set to double max is invalid and should be skipped
         // This is used for calculated values that are out of range, divide
-        //   by zero, etc.
+        // by zero, etc.
         // Also, any value <= zero on a log scale is invalid
 
-        if (!_points[i].IsInvalid3D)
+        if (!Points[i].IsInvalid3D)
         {
             // calculate a pixel value for the top of the bar on value axis
-            pixLowVal = valueAxis.Scale.Transform (IsOverrideOrdinal, i, curLowVal);
-            pixHiVal = valueAxis.Scale.Transform (IsOverrideOrdinal, i, curHiVal);
+            var pixLowVal = valueAxis.Scale.Transform (IsOverrideOrdinal, i, curLowVal);
+            var pixHiVal = valueAxis.Scale.Transform (IsOverrideOrdinal, i, curHiVal);
 
             // calculate a pixel value for the center of the bar on the base axis
-            pixBase = baseAxis.Scale.Transform (IsOverrideOrdinal, i, curBase);
+            var pixBase = baseAxis.Scale.Transform (IsOverrideOrdinal, i, curBase);
 
             // Calculate the pixel location for the side of the bar (on the base axis)
             var pixSide = pixBase - scaledSize / 2.0F;
 
             // Draw the bar
-            if (baseAxis is XAxis || baseAxis is X2Axis)
+            if (baseAxis is XAxis or X2Axis)
             {
-                coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
-                    pixSide, pixLowVal,
-                    pixSide + scaledSize, pixHiVal);
+                coords = string.Create
+                    (
+                        CultureInfo.InvariantCulture,
+                        $"{pixSide:f0},{pixLowVal:f0},{pixSide + scaledSize:f0},{pixHiVal:f0}"
+                    );
             }
             else
             {
-                coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
-                    pixLowVal, pixSide,
-                    pixHiVal, pixSide + scaledSize);
+                coords = string.Create
+                    (
+                        CultureInfo.InvariantCulture,
+                        $"{pixLowVal:f0},{pixSide:f0},{pixHiVal:f0},{pixSide + scaledSize:f0}"
+                    );
             }
 
             return true;

@@ -291,7 +291,7 @@ public class JapaneseCandleStickItem
     {
         coords = string.Empty;
 
-        if (i < 0 || i >= _points.Count)
+        if (i < 0 || i >= Points.Count)
         {
             return false;
         }
@@ -301,7 +301,7 @@ public class JapaneseCandleStickItem
 
         float halfSize = Stick.Size * pane.CalcScaleFactor();
 
-        PointPair pt = _points[i];
+        PointPair pt = Points[i];
         double date = pt.X;
         double high = pt.Y;
         double low = pt.Z;

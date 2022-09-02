@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* CurveItem.cs --
+/* CurveItem.cs -- отдельная кривая на панели графика
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,23 +23,16 @@ using System.Runtime.Serialization;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// This class contains the data and methods for an individual curve within
-/// a graph pane.  It carries the settings for the curve including the
-/// key and item names, colors, symbols and sizes, linetypes, etc.
+/// Этот класс содержит данные и методы для отдельной кривой
+/// на панели графика. Он содержит настройки кривой, включая
+/// названия ключей и элементов, цвета, символы и размеры,
+/// типы линий и т. д.
 /// </summary>
 [Serializable]
 public abstract class CurveItem
     : ISerializable, ICloneable
 {
     #region Fields
-
-    /// <summary>
-    /// protected field that stores a <see cref="Label" /> instance for this
-    /// <see cref="CurveItem"/>, which is used for the <see cref="Legend" />
-    /// label.  Use the public
-    /// property <see cref="Label"/> to access this value.
-    /// </summary>
-    internal Label _label;
 
     /// <summary>
     /// Protected field that stores the boolean value that determines whether this
@@ -50,18 +43,6 @@ public abstract class CurveItem
     /// have to set <see cref="Charting.Label.IsVisible"/> to false.
     /// </summary>
     protected bool _isSelected;
-
-    /// <summary>
-    /// The <see cref="IPointList"/> of value sets that
-    /// represent this <see cref="CurveItem"/>.
-    /// The size of this list determines the number of points that are
-    /// plotted.  Note that values defined as
-    /// System.Double.MaxValue are considered "missing" values
-    /// (see <see cref="PointPairBase.Missing"/>),
-    /// and are not plotted.  The curve will have a break at these points
-    /// to indicate the values are missing.
-    /// </summary>
-    protected IPointList? _points;
 
     /// <summary>
     /// A tag object for use by the user.  This can be used to store additional
@@ -78,7 +59,7 @@ public abstract class CurveItem
     /// <summary>
     /// Protected field that stores the hyperlink information for this object.
     /// </summary>
-    internal Link _link;
+    internal Link? _link;
 
     #endregion
 
@@ -104,6 +85,7 @@ public abstract class CurveItem
         )
         : this (label, new PointPairList (x, y))
     {
+        // пустое тело конструктора
     }
 
 /*
@@ -131,13 +113,13 @@ public abstract class CurveItem
 
         if (points == null)
         {
-            _points = new PointPairList();
+            Points = new PointPairList();
         }
         else
 
             //this.points = (IPointList) _points.Clone();
         {
-            _points = points;
+            Points = points;
         }
     }
 
@@ -145,9 +127,12 @@ public abstract class CurveItem
     /// Internal initialization routine thats sets some initial values to defaults.
     /// </summary>
     /// <param name="label">A string label (legend entry) for this curve</param>
-    private void Init (string label)
+    private void Init
+        (
+            string? label
+        )
     {
-        _label = new Label (label, null);
+        Label = new Label (label, null);
         IsY2Axis = false;
         IsX2Axis = false;
         IsVisible = true;
@@ -163,12 +148,17 @@ public abstract class CurveItem
     /// <seealso cref="CurveItem( string, double[], double[] )"/>
     /// </summary>
     /// <param name="label">A string label (legend entry) for this curve</param>
-    public CurveItem (string label) : this (label, null)
+    public CurveItem
+        (
+            string label
+        )
+        : this (label, null)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
-    ///
+    /// Конструктор по умолчанию.
     /// </summary>
     public CurveItem()
     {
@@ -179,27 +169,30 @@ public abstract class CurveItem
     /// The Copy Constructor
     /// </summary>
     /// <param name="rhs">The CurveItem object from which to copy</param>
-    public CurveItem (CurveItem rhs)
+    public CurveItem
+        (
+            CurveItem rhs
+        )
     {
-        _label = rhs._label.Clone();
+        Label = rhs.Label?.Clone();
         IsY2Axis = rhs.IsY2Axis;
         IsX2Axis = rhs.IsX2Axis;
         IsVisible = rhs.IsVisible;
         IsOverrideOrdinal = rhs.IsOverrideOrdinal;
         YAxisIndex = rhs.YAxisIndex;
 
-        if (rhs.Tag is ICloneable)
+        if (rhs.Tag is ICloneable cloneable)
         {
-            Tag = ((ICloneable)rhs.Tag).Clone();
+            Tag = cloneable.Clone();
         }
         else
         {
             Tag = rhs.Tag;
         }
 
-        _points = (IPointList)rhs.Points.Clone();
+        Points = (IPointList?) rhs.Points?.Clone();
 
-        _link = rhs._link.Clone();
+        _link = rhs._link?.Clone();
     }
 
     /// <summary>
@@ -220,8 +213,10 @@ public abstract class CurveItem
     /// <returns>A deep copy of this object</returns>
     object ICloneable.Clone()
     {
-        throw new NotImplementedException (
-            "Can't clone an abstract base type -- child types must implement ICloneable");
+        throw new NotImplementedException
+            (
+            "Can't clone an abstract base type -- child types must implement ICloneable"
+            );
 
         //return new PaneBase( this );
     }
@@ -242,13 +237,17 @@ public abstract class CurveItem
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected CurveItem (SerializationInfo info, StreamingContext context)
+    protected CurveItem
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
         var sch = info.GetInt32 ("schema");
 
-        _label = (Label)info.GetValue ("label", typeof (Label));
+        Label = (Label?) info.GetValue ("label", typeof (Label));
         IsY2Axis = info.GetBoolean ("isY2Axis");
         if (sch >= 11)
         {
@@ -265,13 +264,13 @@ public abstract class CurveItem
 
         // Data Points are always stored as a PointPairList, regardless of the
         // actual original type (which could be anything that supports IPointList).
-        _points = (PointPairList)info.GetValue ("points", typeof (PointPairList));
+        Points = (PointPairList?) info.GetValue ("points", typeof (PointPairList));
 
         Tag = info.GetValue ("Tag", typeof (object));
 
         YAxisIndex = info.GetInt32 ("yAxisIndex");
 
-        _link = (Link)info.GetValue ("link", typeof (Link));
+        _link = (Link?) info.GetValue ("link", typeof (Link));
     }
 
     /// <summary>
@@ -286,7 +285,7 @@ public abstract class CurveItem
         )
     {
         info.AddValue ("schema", schema);
-        info.AddValue ("label", _label);
+        info.AddValue ("label", Label);
         info.AddValue ("isY2Axis", IsY2Axis);
         info.AddValue ("isX2Axis", IsX2Axis);
         info.AddValue ("isVisible", IsVisible);
@@ -295,13 +294,13 @@ public abstract class CurveItem
         // if points is already a PointPairList, use it
         // otherwise, create a new PointPairList so it can be serialized
         PointPairList list;
-        if (_points is PointPairList)
+        if (Points is PointPairList)
         {
-            list = _points as PointPairList;
+            list = Points as PointPairList;
         }
         else
         {
-            list = new PointPairList (_points);
+            list = new PointPairList (Points);
         }
 
         info.AddValue ("points", list);
@@ -319,11 +318,7 @@ public abstract class CurveItem
     /// A <see cref="Label" /> instance that represents the <see cref="Legend"/>
     /// entry for the this <see cref="CurveItem"/> object
     /// </summary>
-    public Label Label
-    {
-        get { return _label; }
-        set { _label = value; }
-    }
+    public Label Label { get; set; }
 
     /// <summary>
     /// The <see cref="Line"/>/<see cref="Symbol"/>/<see cref="Bar"/>
@@ -353,23 +348,33 @@ public abstract class CurveItem
         }
         set
         {
-            if (this is BarItem)
+            switch (this)
             {
-                ((BarItem)this).Bar.Fill.Color = value;
-            }
-            else if (this is LineItem)
-            {
-                ((LineItem)this).Line.Color = value;
-                ((LineItem)this).Symbol.Border.Color = value;
-                ((LineItem)this).Symbol.Fill.Color = value;
-            }
-            else if (this is ErrorBarItem)
-            {
-                ((ErrorBarItem)this).Bar.Color = value;
-            }
-            else if (this is HiLowBarItem)
-            {
-                ((HiLowBarItem)this).Bar.Fill.Color = value;
+                case HiLowBarItem hiLowBarItem:
+                    if (hiLowBarItem.Bar is not null)
+                    {
+                        hiLowBarItem.Bar.Fill.Color = value;
+                    }
+
+                    break;
+
+                case BarItem barItem:
+                    if (barItem.Bar is not null)
+                    {
+                        barItem.Bar.Fill.Color = value;
+                    }
+
+                    break;
+
+                case LineItem lineItem:
+                    lineItem.Line.Color = value;
+                    lineItem.Symbol.Border.Color = value;
+                    lineItem.Symbol.Fill.Color = value;
+                    break;
+
+                case ErrorBarItem errorBarItem:
+                    errorBarItem.Bar.Color = value;
+                    break;
             }
         }
     }
@@ -390,7 +395,7 @@ public abstract class CurveItem
     /// </summary>
     public bool IsSelected
     {
-        get { return _isSelected; }
+        get => _isSelected;
         set
         {
             _isSelected = value;
@@ -517,28 +522,13 @@ public abstract class CurveItem
     /// <see cref="CurveItem"/> object, which is the number of points in the
     /// <see cref="Points"/> data collection.
     /// </summary>
-    public int NPts
-    {
-        get
-        {
-            if (_points == null)
-            {
-                return 0;
-            }
-
-            return _points.Count;
-        }
-    }
+    public int NPts => Points?.Count ?? 0;
 
     /// <summary>
     /// The <see cref="IPointList"/> of X,Y point sets that represent this
     /// <see cref="CurveItem"/>.
     /// </summary>
-    public IPointList? Points
-    {
-        get { return _points; }
-        set { _points = value; }
-    }
+    public IPointList? Points { get; set; }
 
     /// <summary>
     /// An accessor for the <see cref="PointPair"/> datum for this <see cref="CurveItem"/>.
@@ -548,12 +538,12 @@ public abstract class CurveItem
     {
         get
         {
-            if (_points == null)
+            if (Points == null)
             {
                 return new PointPair (PointPairBase.Missing, PointPairBase.Missing);
             }
 
-            return (_points)[index];
+            return Points[index];
         }
     }
 
@@ -628,7 +618,11 @@ public abstract class CurveItem
     /// </summary>
     /// <param name="x">The X coordinate value</param>
     /// <param name="y">The Y coordinate value</param>
-    public void AddPoint (double x, double y)
+    public void AddPoint
+        (
+            double x,
+            double y
+        )
     {
         AddPoint (new PointPair (x, y));
     }
@@ -645,12 +639,12 @@ public abstract class CurveItem
     /// be added</param>
     public void AddPoint (PointPair point)
     {
-        if (_points == null)
+        if (Points == null)
         {
             Points = new PointPairList();
         }
 
-        if (_points is IPointListEdit pointListEdit)
+        if (Points is IPointListEdit pointListEdit)
         {
             pointListEdit.Add (point);
         }
@@ -671,7 +665,7 @@ public abstract class CurveItem
     /// </remarks>
     public void Clear()
     {
-        if (_points is IPointListEdit pointListEdit)
+        if (Points is IPointListEdit pointListEdit)
         {
             pointListEdit.Clear();
         }
@@ -692,7 +686,7 @@ public abstract class CurveItem
     /// <param name="index">The ordinal position of the point to be removed.</param>
     public void RemovePoint (int index)
     {
-        if (_points is IPointListEdit pointListEdit)
+        if (Points is IPointListEdit pointListEdit)
         {
             pointListEdit.RemoveAt (index);
         }
@@ -734,7 +728,10 @@ public abstract class CurveItem
     /// <returns>Either a <see cref="YAxis" /> or <see cref="Y2Axis" /> to which this
     /// <see cref="CurveItem" /> belongs.
     /// </returns>
-    public Axis GetYAxis (GraphPane pane)
+    public Axis GetYAxis
+        (
+            GraphPane pane
+        )
     {
         if (IsY2Axis)
         {
@@ -768,10 +765,13 @@ public abstract class CurveItem
     /// <returns>An integer value indicating which index position in the list applies to this
     /// <see cref="CurveItem" />
     /// </returns>
-    public int GetYAxisIndex (GraphPane pane)
+    public int GetYAxisIndex
+        (
+            GraphPane pane
+        )
     {
-        if (YAxisIndex >= 0 &&
-            YAxisIndex < (IsY2Axis ? pane.Y2AxisList.Count : pane.YAxisList.Count))
+        if (YAxisIndex >= 0
+            && YAxisIndex < (IsY2Axis ? pane.Y2AxisList.Count : pane.YAxisList.Count))
         {
             return YAxisIndex;
         }
@@ -857,27 +857,34 @@ public abstract class CurveItem
 
         var yAxis = GetYAxis (pane);
         var xAxis = GetXAxis (pane);
-        if (yAxis == null || xAxis == null)
+        // if (yAxis is null || xAxis is null)
+        // {
+        //     return;
+        // }
+
+        var xAxisScale = xAxis.Scale;
+        var yAxisScale = yAxis.Scale;
+        if (xAxisScale is null || yAxisScale is null)
         {
             return;
         }
 
         if (isBoundedRanges)
         {
-            xLBound = xAxis.Scale._lBound;
-            xUBound = xAxis.Scale._uBound;
-            yLBound = yAxis.Scale._lBound;
-            yUBound = yAxis.Scale._uBound;
+            xLBound = xAxisScale._lBound;
+            xUBound = xAxisScale._uBound;
+            yLBound = yAxisScale._lBound;
+            yUBound = yAxisScale._uBound;
         }
 
 
         var isZIncluded = IsZIncluded (pane);
         var isXIndependent = IsXIndependent (pane);
-        var isXLog = xAxis.Scale.IsLog;
-        var isYLog = yAxis.Scale.IsLog;
-        var isXOrdinal = xAxis.Scale.IsAnyOrdinal;
-        var isYOrdinal = yAxis.Scale.IsAnyOrdinal;
-        var isZOrdinal = (isXIndependent ? yAxis : xAxis).Scale.IsAnyOrdinal;
+        var isXLog = xAxisScale.IsLog;
+        var isYLog = yAxisScale.IsLog;
+        var isXOrdinal = xAxisScale.IsAnyOrdinal;
+        var isYOrdinal = yAxisScale.IsAnyOrdinal;
+        var isZOrdinal = (isXIndependent ? yAxisScale : xAxisScale).IsAnyOrdinal;
 
         // Loop over each point in the arrays
         //foreach ( PointPair point in this.Points )
@@ -891,9 +898,9 @@ public abstract class CurveItem
 
             var outOfBounds = curX < xLBound || curX > xUBound ||
                               curY < yLBound || curY > yUBound ||
-                              (isZIncluded && isXIndependent && (curZ < yLBound || curZ > yUBound)) ||
-                              (isZIncluded && !isXIndependent && (curZ < xLBound || curZ > xUBound)) ||
-                              (curX <= 0 && isXLog) || (curY <= 0 && isYLog);
+                              isZIncluded && isXIndependent && (curZ < yLBound || curZ > yUBound) ||
+                              isZIncluded && !isXIndependent && (curZ < xLBound || curZ > xUBound) ||
+                              curX <= 0 && isXLog || curY <= 0 && isYLog;
 
             // ignoreInitial becomes false at the first non-zero
             // Y value
@@ -1054,10 +1061,9 @@ public abstract class CurveItem
 
         float barWidth;
 
-        if (this is ErrorBarItem)
+        if (this is ErrorBarItem errorBarItem)
         {
-            barWidth = (float)(((ErrorBarItem)this).Bar.Symbol.Size *
-                               pane.CalcScaleFactor());
+            barWidth = errorBarItem.Bar.Symbol.Size * pane.CalcScaleFactor();
         }
 
         //			else if ( this is HiLowBarItem && pane._barSettings.Type != BarType.ClusterHiLow )
@@ -1168,13 +1174,13 @@ public abstract class CurveItem
 
             if (sortType == SortType.XValues)
             {
-                lVal = (left != null) ? Math.Abs (left[index].X) : PointPairBase.Missing;
-                rVal = (right != null) ? Math.Abs (right[index].X) : PointPairBase.Missing;
+                lVal = left != null ? Math.Abs (left[index].X) : PointPairBase.Missing;
+                rVal = right != null ? Math.Abs (right[index].X) : PointPairBase.Missing;
             }
             else
             {
-                lVal = (left != null) ? Math.Abs (left[index].Y) : PointPairBase.Missing;
-                rVal = (right != null) ? Math.Abs (right[index].Y) : PointPairBase.Missing;
+                lVal = left != null ? Math.Abs (left[index].Y) : PointPairBase.Missing;
+                rVal = right != null ? Math.Abs (right[index].Y) : PointPairBase.Missing;
             }
 
             if (lVal == PointPairBase.Missing || double.IsInfinity (lVal) || double.IsNaN (lVal))
@@ -1187,7 +1193,7 @@ public abstract class CurveItem
                 right = null;
             }
 
-            if ((left == null && right == null) || (Math.Abs (lVal - rVal) < 1e-10))
+            if (left == null && right == null || Math.Abs (lVal - rVal) < 1e-10)
             {
                 return 0;
             }

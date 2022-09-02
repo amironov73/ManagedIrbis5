@@ -421,7 +421,7 @@ public class BarItem
     {
         coords = string.Empty;
 
-        if (i < 0 || i >= _points.Count)
+        if (i < 0 || i >= Points.Count)
         {
             return false;
         }
@@ -451,7 +451,7 @@ public class BarItem
         //   by zero, etc.
         // Also, any value <= zero on a log scale is invalid
 
-        if (!_points[i].IsInvalid3D)
+        if (!Points[i].IsInvalid3D)
         {
             // calculate a pixel value for the top of the bar on value axis
             pixLowVal = valueAxis.Scale.Transform (IsOverrideOrdinal, i, curLowVal);
