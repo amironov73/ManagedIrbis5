@@ -269,7 +269,7 @@ public class MasterPane
 
         _paneList = new PaneList();
 
-        _legend.IsVisible = Default.IsShowLegend;
+        Legend.IsVisible = Default.IsShowLegend;
 
         _isAntiAlias = false;
 
@@ -492,7 +492,7 @@ public class MasterPane
     /// <see cref="SetLayout(Graphics,PaneLayout)"/> has not previously been called,
     /// it will default to <see cref="Default.PaneLayout"/>.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -500,9 +500,9 @@ public class MasterPane
     /// <seealso cref="SetLayout(Graphics,int,int)" />
     /// <seealso cref="SetLayout(Graphics,bool,int[])" />
     /// <seealso cref="SetLayout(Graphics,bool,int[],float[])" />
-    public void ReSize (Graphics g)
+    public void ReSize (Graphics graphics)
     {
-        ReSize (g, _rect);
+        ReSize (graphics, _rect);
     }
 
     /// <summary>
@@ -514,7 +514,7 @@ public class MasterPane
     /// <see cref="SetLayout(Graphics,PaneLayout)"/> has not previously been called,
     /// it will default to <see cref="Default.PaneLayout"/>.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -523,10 +523,10 @@ public class MasterPane
     /// <seealso cref="SetLayout(Graphics,int,int)" />
     /// <seealso cref="SetLayout(Graphics,bool,int[])" />
     /// <seealso cref="SetLayout(Graphics,bool,int[],float[])" />
-    public override void ReSize (Graphics g, RectangleF rect)
+    public override void ReSize (Graphics graphics, RectangleF rect)
     {
         _rect = rect;
-        DoLayout (g);
+        DoLayout (graphics);
         CommonScaleFactor();
     }
 
@@ -575,23 +575,23 @@ public class MasterPane
     /// instantiated <see cref="GraphPane"/> objects that have been added to the list with the
     /// <see cref="Add"/> method.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
-    public override void Draw (Graphics g)
+    public override void Draw (Graphics graphics)
     {
         // Save current AntiAlias mode
-        var sModeSave = g.SmoothingMode;
-        var sHintSave = g.TextRenderingHint;
-        var sCompQual = g.CompositingQuality;
-        var sInterpMode = g.InterpolationMode;
+        var sModeSave = graphics.SmoothingMode;
+        var sHintSave = graphics.TextRenderingHint;
+        var sCompQual = graphics.CompositingQuality;
+        var sInterpMode = graphics.InterpolationMode;
 
-        SetAntiAliasMode (g, _isAntiAlias);
+        SetAntiAliasMode (graphics, _isAntiAlias);
 
         // Draw the pane border & background fill, the title, and the GraphObj objects that lie at
         // ZOrder.GBehindAll
-        base.Draw (g);
+        base.Draw (graphics);
 
 
         if (_rect.Width <= 1 || _rect.Height <= 1)
@@ -602,45 +602,45 @@ public class MasterPane
         var scaleFactor = CalcScaleFactor();
 
         // Clip everything to the rect
-        g.SetClip (_rect);
+        graphics.SetClip (_rect);
 
         // For the MasterPane, All GraphItems go behind the GraphPanes, except those that
         // are explicity declared as ZOrder.AInFront
-        _graphObjList.Draw (g, this, scaleFactor, ZOrder.G_BehindChartFill);
-        _graphObjList.Draw (g, this, scaleFactor, ZOrder.E_BehindCurves);
-        _graphObjList.Draw (g, this, scaleFactor, ZOrder.D_BehindAxis);
-        _graphObjList.Draw (g, this, scaleFactor, ZOrder.C_BehindChartBorder);
+        _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.G_BehindChartFill);
+        _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.E_BehindCurves);
+        _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.D_BehindAxis);
+        _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.C_BehindChartBorder);
 
         // Reset the clipping
-        g.ResetClip();
+        graphics.ResetClip();
 
         foreach (var pane in _paneList)
-            pane.Draw (g);
+            pane.Draw (graphics);
 
         // Clip everything to the rect
-        g.SetClip (_rect);
+        graphics.SetClip (_rect);
 
-        _graphObjList.Draw (g, this, scaleFactor, ZOrder.B_BehindLegend);
+        _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.B_BehindLegend);
 
         // Recalculate the legend rect, just in case it has not yet been done
         // innerRect is the area for the GraphPane's
-        var innerRect = CalcClientRect (g, scaleFactor);
-        _legend.CalcRect (g, this, scaleFactor, ref innerRect);
+        var innerRect = CalcClientRect (graphics, scaleFactor);
+        Legend.CalcRect (graphics, this, scaleFactor, ref innerRect);
 
         //this.legend.SetLocation( this,
 
-        _legend.Draw (g, this, scaleFactor);
+        Legend.Draw (graphics, this, scaleFactor);
 
-        _graphObjList.Draw (g, this, scaleFactor, ZOrder.A_InFront);
+        _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.A_InFront);
 
         // Reset the clipping
-        g.ResetClip();
+        graphics.ResetClip();
 
         // Restore original anti-alias mode
-        g.SmoothingMode = sModeSave;
-        g.TextRenderingHint = sHintSave;
-        g.CompositingQuality = sCompQual;
-        g.InterpolationMode = sInterpMode;
+        graphics.SmoothingMode = sModeSave;
+        graphics.TextRenderingHint = sHintSave;
+        graphics.CompositingQuality = sCompQual;
+        graphics.InterpolationMode = sInterpMode;
     }
 
     /// <summary>
@@ -1081,7 +1081,7 @@ public class MasterPane
 
         // innerRect is the area for the GraphPane's
         var innerRect = CalcClientRect (g, scaleFactor);
-        _legend.CalcRect (g, this, scaleFactor, ref innerRect);
+        Legend.CalcRect (g, this, scaleFactor, ref innerRect);
 
         // scaled InnerGap is the area between the GraphPane.Rect's
         var scaledInnerGap = (float)(_innerPaneGap * scaleFactor);

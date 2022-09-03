@@ -722,11 +722,11 @@ public class GraphPane
     /// features of the graph.  No preparation is required other than an instantiated
     /// <see cref="GraphPane"/> object.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
-    public override void Draw (Graphics g)
+    public override void Draw (Graphics graphics)
     {
         // Calculate the chart rect, deducting the area for the scales, titles, legend, etc.
         //int		hStack;
@@ -734,7 +734,7 @@ public class GraphPane
 
         // Draw the pane border & background fill, the title, and the GraphObj objects that lie at
         // ZOrder.G_BehindAll
-        base.Draw (g);
+        base.Draw (graphics);
 
         if (_rect.Width <= 1 || _rect.Height <= 1)
         {
@@ -742,7 +742,7 @@ public class GraphPane
         }
 
         // Clip everything to the rect
-        g.SetClip (_rect);
+        graphics.SetClip (_rect);
 
         // calculate scaleFactor on "normal" pane size (BaseDimension)
         var scaleFactor = CalcScaleFactor();
@@ -753,13 +753,13 @@ public class GraphPane
         // but leave the ChartRect alone
         if (_chart._isRectAuto)
         {
-            _chart._rect = CalcChartRect (g, scaleFactor);
+            _chart._rect = CalcChartRect (graphics, scaleFactor);
 
             //this.pieRect = PieItem.CalcPieRect( g, this, scaleFactor, this.chartRect );
         }
         else
         {
-            CalcChartRect (g, scaleFactor);
+            CalcChartRect (graphics, scaleFactor);
         }
 
         // do a sanity check on the ChartRect
@@ -788,71 +788,71 @@ public class GraphPane
         // Draw the GraphItems that are behind the Axis objects
         if (showGraf)
         {
-            _graphObjList.Draw (g, this, scaleFactor, ZOrder.G_BehindChartFill);
+            _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.G_BehindChartFill);
         }
 
         // Fill the axis background
-        _chart.Fill.Draw (g, _chart._rect);
+        _chart.Fill.Draw (graphics, _chart._rect);
 
         if (showGraf)
         {
             // Draw the GraphItems that are behind the CurveItems
-            _graphObjList.Draw (g, this, scaleFactor, ZOrder.F_BehindGrid);
+            _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.F_BehindGrid);
 
-            DrawGrid (g, scaleFactor);
+            DrawGrid (graphics, scaleFactor);
 
             // Draw the GraphItems that are behind the CurveItems
-            _graphObjList.Draw (g, this, scaleFactor, ZOrder.E_BehindCurves);
+            _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.E_BehindCurves);
 
             // Clip the points to the actual plot area
-            g.SetClip (_chart._rect);
-            _curveList.Draw (g, this, scaleFactor);
-            g.SetClip (_rect);
+            graphics.SetClip (_chart._rect);
+            _curveList.Draw (graphics, this, scaleFactor);
+            graphics.SetClip (_rect);
         }
 
         if (showGraf)
         {
             // Draw the GraphItems that are behind the Axis objects
-            _graphObjList.Draw (g, this, scaleFactor, ZOrder.D_BehindAxis);
+            _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.D_BehindAxis);
 
             // Draw the Axes
-            _xAxis.Draw (g, this, scaleFactor, 0.0f);
-            _x2Axis.Draw (g, this, scaleFactor, 0.0f);
+            _xAxis.Draw (graphics, this, scaleFactor, 0.0f);
+            _x2Axis.Draw (graphics, this, scaleFactor, 0.0f);
 
             float yPos = 0;
             foreach (Axis axis in _yAxisList)
             {
-                axis.Draw (g, this, scaleFactor, yPos);
+                axis.Draw (graphics, this, scaleFactor, yPos);
                 yPos += axis._tmpSpace;
             }
 
             yPos = 0;
             foreach (Axis axis in _y2AxisList)
             {
-                axis.Draw (g, this, scaleFactor, yPos);
+                axis.Draw (graphics, this, scaleFactor, yPos);
                 yPos += axis._tmpSpace;
             }
 
             // Draw the GraphItems that are behind the Axis border
-            _graphObjList.Draw (g, this, scaleFactor, ZOrder.C_BehindChartBorder);
+            _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.C_BehindChartBorder);
         }
 
         // Border the axis itself
-        _chart.Border.Draw (g, this, scaleFactor, _chart._rect);
+        _chart.Border.Draw (graphics, this, scaleFactor, _chart._rect);
 
         if (showGraf)
         {
             // Draw the GraphItems that are behind the Legend object
-            _graphObjList.Draw (g, this, scaleFactor, ZOrder.B_BehindLegend);
+            _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.B_BehindLegend);
 
-            _legend.Draw (g, this, scaleFactor);
+            Legend.Draw (graphics, this, scaleFactor);
 
             // Draw the GraphItems that are in front of all other items
-            _graphObjList.Draw (g, this, scaleFactor, ZOrder.A_InFront);
+            _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.A_InFront);
         }
 
         // Reset the clipping
-        g.ResetClip();
+        graphics.ResetClip();
 
         // Reset scale data
         // this sets the temp values to NaN to cause an exception if these values are
@@ -1040,7 +1040,7 @@ public class GraphPane
         tmpRect.Height -= spaceT + spaceB;
         tmpRect.Y += spaceT;
 
-        _legend.CalcRect (g, this, scaleFactor, ref tmpRect);
+        Legend.CalcRect (g, this, scaleFactor, ref tmpRect);
 
         return tmpRect;
     }
@@ -1903,7 +1903,7 @@ public class GraphPane
             if (saveZOrder <= ZOrder.H_BehindAll && _title.IsVisible)
             {
                 tmpRect = new RectangleF ((_rect.Left + _rect.Right - paneTitleBox.Width) / 2,
-                    _rect.Top + _margin.Top * scaleFactor,
+                    _rect.Top + Margin.Top * scaleFactor,
                     paneTitleBox.Width, paneTitleBox.Height);
                 if (tmpRect.Contains (mousePt))
                 {

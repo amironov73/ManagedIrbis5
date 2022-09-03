@@ -39,81 +39,16 @@ public abstract class PaneBase
     /// The rectangle that defines the full area into which the pane is rendered.  Units are pixels.
     /// Use the public property <see cref="Rect"/> to access this value.
     /// </summary>
-    [CLSCompliant (false)] protected RectangleF _rect;
+    protected RectangleF _rect;
 
     /// <summary>Private field that holds the main title of the pane.  Use the
     /// public property <see cref="Title"/> to access this value.
     /// </summary>
-    [CLSCompliant (false)] protected GapLabel _title;
-
-    /// <summary>Private field instance of the <see cref="Charting.Legend"/> class.  Use the
-    /// public property <see cref="PaneBase.Legend"/> to access this class.</summary>
-    [CLSCompliant (false)] protected Legend _legend;
-
-    /// <summary>
-    /// Private field that stores the user-defined tag for this <see cref="PaneBase"/>.  This tag
-    /// can be any user-defined value.  If it is a <see cref="String"/> type, it can be used as
-    /// a parameter to the <see cref="PaneList.IndexOfTag"/> method.  Use the public property
-    /// <see cref="Tag"/> to access this value.
-    /// </summary>
-    [CLSCompliant (false)] protected object _tag;
-
-    /// <summary>
-    /// private field to store the margin values for this <see cref="PaneBase" />. Use the
-    /// public property <see cref="Margin" /> to access this property.
-    /// </summary>
-    internal Margin _margin;
-
-    /// <summary>Private field that determines whether or not the fonts, tics, gaps, etc.
-    /// will be scaled according to the actual graph size.  true for font and feature scaling
-    /// with graph size, false for fixed font sizes (scaleFactor = 1.0 constant).
-    /// Use the public property <see cref="IsFontsScaled"/> to access this value. </summary>
-    /// <seealso cref="CalcScaleFactor"/>
-    /// <seealso cref="IsPenWidthScaled"/>
-    [CLSCompliant (false)] protected bool _isFontsScaled;
-
-    /// <summary>
-    /// Private field that controls whether or not pen widths are scaled according to the
-    /// size of the graph.  This value is only applicable if <see cref="IsFontsScaled"/>
-    /// is true.  If <see cref="IsFontsScaled"/> is false, then no scaling will be done,
-    /// regardless of the value of <see cref="IsPenWidthScaled"/>.
-    /// </summary>
-    /// <value>true to scale the pen widths according to the size of the graph,
-    /// false otherwise.</value>
-    /// <seealso cref="IsFontsScaled"/>
-    /// <seealso cref="CalcScaleFactor"/>
-    [CLSCompliant (false)] protected bool _isPenWidthScaled;
-
-    /// <summary>
-    /// Private field that stores the <see cref="Charting.Fill"/> data for the
-    /// <see cref="Rect"/> background.  Use the public property <see cref="Fill"/> to
-    /// access this value.
-    /// </summary>
-    [CLSCompliant (false)] protected Fill _fill;
-
-    /// <summary>
-    /// Private field that stores the <see cref="Charting.Border"/> data for the
-    /// <see cref="Rect"/> border.  Use the public property <see cref="Border"/> to
-    /// access this value.
-    /// </summary>
-    [CLSCompliant (false)] protected Border _border;
+    protected GapLabel _title;
 
     /// <summary>Private field instance of the <see cref="Charting.GraphObjList"/> class.  Use the
     /// public property <see cref="GraphObjList"/> to access this class.</summary>
-    [CLSCompliant (false)] protected GraphObjList _graphObjList;
-
-    /// <summary>Private field that determines the base size of the pane, in inches.
-    /// Fonts, tics, gaps, etc. are scaled according to this base size.
-    /// Use the public property <see cref="BaseDimension"/> to access this value. </summary>
-    /// <seealso cref="_isFontsScaled"/>
-    /// <seealso cref="CalcScaleFactor"/>
-    [CLSCompliant (false)] protected float _baseDimension;
-
-    /// <summary>
-    /// private field that stores the gap between the bottom of the pane title and the
-    /// client area of the pane.  This is expressed as a fraction of the title character height.
-    /// </summary>
-    [CLSCompliant (false)] protected float _titleGap;
+    protected GraphObjList _graphObjList;
 
     #endregion
 
@@ -258,10 +193,7 @@ public abstract class PaneBase
     /// Accesses the <see cref="Legend"/> for this <see cref="PaneBase"/>
     /// </summary>
     /// <value>A reference to a <see cref="Legend"/> object</value>
-    public Legend Legend
-    {
-        get { return _legend; }
-    }
+    public Legend Legend { get; }
 
     /// <summary>
     /// Gets the <see cref="Label" /> instance that contains the text and attributes of the title.
@@ -274,10 +206,7 @@ public abstract class PaneBase
     /// <seealso cref="Default.FontUnderline"/>
     /// <seealso cref="Default.FontFamily"/>
     /// <seealso cref="Default.FontSize"/>
-    public Label Title
-    {
-        get { return _title; }
-    }
+    public Label Title => _title;
 
     /// <summary>
     /// Gets or sets the user-defined tag for this <see cref="PaneBase"/>.  This tag
@@ -289,11 +218,7 @@ public abstract class PaneBase
     /// that you store in <see cref="Tag"/> must be a serializable type (or
     /// it will cause an exception).
     /// </remarks>
-    public object Tag
-    {
-        get { return _tag; }
-        set { _tag = value; }
-    }
+    public object Tag { get; set; }
 
     /// <summary>
     /// Gets or sets the <see cref="Charting.Border"/> class for drawing the border
@@ -301,21 +226,13 @@ public abstract class PaneBase
     /// </summary>
     /// <seealso cref="Default.BorderColor"/>
     /// <seealso cref="Default.BorderPenWidth"/>
-    public Border Border
-    {
-        get { return _border; }
-        set { _border = value; }
-    }
+    public Border Border { get; set; }
 
     /// <summary>
     /// Gets or sets the <see cref="Charting.Fill"/> data for the
     /// filling the background of the <see cref="Rect"/>.
     /// </summary>
-    public Fill Fill
-    {
-        get { return _fill; }
-        set { _fill = value; }
-    }
+    public Fill Fill { get; set; }
 
     /// <summary>
     /// Gets or sets the list of <see cref="GraphObj"/> items for this <see cref="GraphPane"/>
@@ -331,11 +248,7 @@ public abstract class PaneBase
     /// Gets or sets the <see cref="Charting.Margin" /> instance that controls the space between
     /// the edge of the <see cref="PaneBase.Rect" /> and the rendered content of the graph.
     /// </summary>
-    public Margin Margin
-    {
-        get { return _margin; }
-        set { _margin = value; }
-    }
+    public Margin Margin { get; set; }
 
     /// <summary>
     /// BaseDimension is a double precision value that sets "normal" pane size on
@@ -350,22 +263,14 @@ public abstract class PaneBase
     /// <seealso cref="Default.BaseDimension"/>
     /// <seealso cref="IsFontsScaled"/>
     /// <seealso cref="CalcScaleFactor"/>
-    public float BaseDimension
-    {
-        get { return _baseDimension; }
-        set { _baseDimension = value; }
-    }
+    public float BaseDimension { get; set; }
 
     /// <summary>
     /// Gets or sets the gap between the bottom of the pane title and the
     /// client area of the pane.  This is expressed as a fraction of the scaled
     /// <see cref="Title" /> character height.
     /// </summary>
-    public float TitleGap
-    {
-        get { return _titleGap; }
-        set { _titleGap = value; }
-    }
+    public float TitleGap { get; set; }
 
     /// <summary>
     /// Determines if the font sizes, tic sizes, gap sizes, etc. will be scaled according to
@@ -375,11 +280,7 @@ public abstract class PaneBase
     /// </summary>
     /// <value>True to have the fonts and tics scaled, false to have them constant</value>
     /// <seealso cref="PaneBase.CalcScaleFactor"/>
-    public bool IsFontsScaled
-    {
-        get { return _isFontsScaled; }
-        set { _isFontsScaled = value; }
-    }
+    public bool IsFontsScaled { get; set; }
 
     /// <summary>
     /// Gets or sets the property that controls whether or not pen widths are scaled for this
@@ -400,11 +301,7 @@ public abstract class PaneBase
     /// false otherwise.</value>
     /// <seealso cref="IsFontsScaled"/>
     /// <seealso cref="CalcScaleFactor"/>
-    public bool IsPenWidthScaled
-    {
-        get { return _isPenWidthScaled; }
-        set { _isPenWidthScaled = value; }
-    }
+    public bool IsPenWidthScaled { get; set; }
 
     #endregion
 
@@ -413,28 +310,34 @@ public abstract class PaneBase
     /// <summary>
     /// Default constructor for the <see cref="PaneBase"/> class.  Leaves the <see cref="Rect"/> empty.
     /// </summary>
-    public PaneBase() : this ("", new RectangleF (0, 0, 0, 0))
+    public PaneBase()
+        : this ("", new RectangleF (0, 0, 0, 0))
     {
+        // пустое тело класса
     }
 
     /// <summary>
     /// Default constructor for the <see cref="PaneBase"/> class.  Specifies the <see cref="Title"/> of
     /// the <see cref="PaneBase"/>, and the size of the <see cref="Rect"/>.
     /// </summary>
-    public PaneBase (string title, RectangleF paneRect)
+    public PaneBase
+        (
+            string title,
+            RectangleF paneRect
+        )
     {
         _rect = paneRect;
 
-        _legend = new Legend();
+        Legend = new Legend();
 
-        _baseDimension = Default.BaseDimension;
-        _margin = new Margin();
-        _titleGap = Default.TitleGap;
+        BaseDimension = Default.BaseDimension;
+        Margin = new Margin();
+        TitleGap = Default.TitleGap;
 
-        _isFontsScaled = Default.IsFontsScaled;
-        _isPenWidthScaled = Default.IsPenWidthScaled;
-        _fill = new Fill (Default.FillColor);
-        _border = new Border (Default.IsBorderVisible, Default.BorderColor,
+        IsFontsScaled = Default.IsFontsScaled;
+        IsPenWidthScaled = Default.IsPenWidthScaled;
+        Fill = new Fill (Default.FillColor);
+        Border = new Border (Default.IsBorderVisible, Default.BorderColor,
             Default.BorderPenWidth);
 
         _title = new GapLabel (title, Default.FontFamily,
@@ -445,7 +348,7 @@ public abstract class PaneBase
 
         _graphObjList = new GraphObjList();
 
-        _tag = null;
+        Tag = null;
     }
 
     /// <summary>
@@ -455,52 +358,37 @@ public abstract class PaneBase
     public PaneBase (PaneBase rhs)
     {
         // copy over all the value types
-        _isFontsScaled = rhs._isFontsScaled;
-        _isPenWidthScaled = rhs._isPenWidthScaled;
+        IsFontsScaled = rhs.IsFontsScaled;
+        IsPenWidthScaled = rhs.IsPenWidthScaled;
 
-        _titleGap = rhs._titleGap;
-        _baseDimension = rhs._baseDimension;
-        _margin = rhs._margin.Clone();
+        TitleGap = rhs.TitleGap;
+        BaseDimension = rhs.BaseDimension;
+        Margin = rhs.Margin.Clone();
         _rect = rhs._rect;
 
         // Copy the reference types by cloning
-        _fill = rhs._fill.Clone();
-        _border = rhs._border.Clone();
+        Fill = rhs.Fill.Clone();
+        Border = rhs.Border.Clone();
         _title = rhs._title.Clone();
 
-        _legend = rhs.Legend.Clone();
+        Legend = rhs.Legend.Clone();
         _title = rhs._title.Clone();
         _graphObjList = rhs._graphObjList.Clone();
 
-        if (rhs._tag is ICloneable)
+        if (rhs.Tag is ICloneable)
         {
-            _tag = ((ICloneable)rhs._tag).Clone();
+            Tag = ((ICloneable)rhs.Tag).Clone();
         }
         else
         {
-            _tag = rhs._tag;
+            Tag = rhs.Tag;
         }
     }
 
 
     //abstract public object ShallowClone();
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of Clone
-    /// </summary>
-    /// <remarks>
-    /// Note that this method must be called with an explicit cast to ICloneable, and
-    /// that it is inherently virtual.  For example:
-    /// <code>
-    /// ParentClass foo = new ChildClass();
-    /// ChildClass bar = (ChildClass) ((ICloneable)foo).Clone();
-    /// </code>
-    /// Assume that ChildClass is inherited from ParentClass.  Even though foo is declared with
-    /// ParentClass, it is actually an instance of ChildClass.  Calling the ICloneable implementation
-    /// of Clone() on foo actually calls ChildClass.Clone() as if it were a virtual function.
-    /// </remarks>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         throw new NotImplementedException (
@@ -519,7 +407,7 @@ public abstract class PaneBase
     public PaneBase ShallowClone()
     {
         // return a shallow copy
-        return MemberwiseClone() as PaneBase;
+        return (PaneBase) MemberwiseClone();
     }
 
     #endregion
@@ -550,23 +438,23 @@ public abstract class PaneBase
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema").NotUsed();
 
-        _rect = (RectangleF)info.GetValue ("rect", typeof (RectangleF));
-        _legend = (Legend)info.GetValue ("legend", typeof (Legend));
-        _title = (GapLabel)info.GetValue ("title", typeof (GapLabel));
+        _rect = (RectangleF) info.GetValue ("rect", typeof (RectangleF));
+        Legend = (Legend) info.GetValue ("legend", typeof (Legend));
+        _title = (GapLabel) info.GetValue ("title", typeof (GapLabel));
 
         //this.isShowTitle = info.GetBoolean( "isShowTitle" );
-        _isFontsScaled = info.GetBoolean ("isFontsScaled");
-        _isPenWidthScaled = info.GetBoolean ("isPenWidthScaled");
+        IsFontsScaled = info.GetBoolean ("isFontsScaled");
+        IsPenWidthScaled = info.GetBoolean ("isPenWidthScaled");
 
         //this.fontSpec = (FontSpec) info.GetValue( "fontSpec" , typeof(FontSpec) );
-        _titleGap = info.GetSingle ("titleGap");
-        _fill = (Fill)info.GetValue ("fill", typeof (Fill));
-        _border = (Border)info.GetValue ("border", typeof (Border));
-        _baseDimension = info.GetSingle ("baseDimension");
-        _margin = (Margin)info.GetValue ("margin", typeof (Margin));
-        _graphObjList = (GraphObjList)info.GetValue ("graphObjList", typeof (GraphObjList));
+        TitleGap = info.GetSingle ("titleGap");
+        Fill = (Fill) info.GetValue ("fill", typeof (Fill));
+        Border = (Border) info.GetValue ("border", typeof (Border));
+        BaseDimension = info.GetSingle ("baseDimension");
+        Margin = (Margin) info.GetValue ("margin", typeof (Margin));
+        _graphObjList = (GraphObjList) info.GetValue ("graphObjList", typeof (GraphObjList));
 
-        _tag = info.GetValue ("tag", typeof (object));
+        Tag = info.GetValue ("tag", typeof (object));
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -579,22 +467,22 @@ public abstract class PaneBase
         info.AddValue ("schema", schema);
 
         info.AddValue ("rect", _rect);
-        info.AddValue ("legend", _legend);
+        info.AddValue ("legend", Legend);
         info.AddValue ("title", _title);
 
         //info.AddValue( "isShowTitle", isShowTitle );
-        info.AddValue ("isFontsScaled", _isFontsScaled);
-        info.AddValue ("isPenWidthScaled", _isPenWidthScaled);
-        info.AddValue ("titleGap", _titleGap);
+        info.AddValue ("isFontsScaled", IsFontsScaled);
+        info.AddValue ("isPenWidthScaled", IsPenWidthScaled);
+        info.AddValue ("titleGap", TitleGap);
 
         //info.AddValue( "fontSpec", fontSpec );
-        info.AddValue ("fill", _fill);
-        info.AddValue ("border", _border);
-        info.AddValue ("baseDimension", _baseDimension);
-        info.AddValue ("margin", _margin);
+        info.AddValue ("fill", Fill);
+        info.AddValue ("border", Border);
+        info.AddValue ("baseDimension", BaseDimension);
+        info.AddValue ("margin", Margin);
         info.AddValue ("graphObjList", _graphObjList);
 
-        info.AddValue ("tag", _tag);
+        info.AddValue ("tag", Tag);
     }
 
     #endregion
@@ -606,11 +494,14 @@ public abstract class PaneBase
     /// <see cref="Graphics"/> device.  This abstract method is implemented by the child
     /// classes.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
-    public virtual void Draw (Graphics g)
+    public virtual void Draw
+        (
+            Graphics graphics
+        )
     {
         if (_rect.Width <= 1 || _rect.Height <= 1)
         {
@@ -621,22 +512,22 @@ public abstract class PaneBase
         var scaleFactor = CalcScaleFactor();
 
         // Fill the pane background and draw a border around it
-        DrawPaneFrame (g, scaleFactor);
+        DrawPaneFrame (graphics, scaleFactor);
 
         // Clip everything to the rect
-        g.SetClip (_rect);
+        graphics.SetClip (_rect);
 
         // Draw the GraphItems that are behind everything
-        _graphObjList.Draw (g, this, scaleFactor, ZOrder.H_BehindAll);
+        _graphObjList.Draw (graphics, this, scaleFactor, ZOrder.H_BehindAll);
 
         // Draw the Pane Title
-        DrawTitle (g, scaleFactor);
+        DrawTitle (graphics, scaleFactor);
 
         // Draw the Legend
         //this.Legend.Draw( g, this, scaleFactor );
 
         // Reset the clipping
-        g.ResetClip();
+        graphics.ResetClip();
     }
 
     /// <summary>
@@ -647,7 +538,7 @@ public abstract class PaneBase
     /// This method does not take out the area required for the <see cref="PaneBase.Legend"/>.
     /// To do so, you must separately call <see cref="Charting.Legend.CalcRect"/>.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -657,7 +548,11 @@ public abstract class PaneBase
     /// represents a linear multiple to be applied to font sizes, symbol sizes, etc.
     /// </param>
     /// <returns>The calculated chart rect, in pixel coordinates.</returns>
-    public RectangleF CalcClientRect (Graphics g, float scaleFactor)
+    public RectangleF CalcClientRect
+        (
+            Graphics graphics,
+            float scaleFactor
+        )
     {
         // get scaled values for the paneGap and character height
         //float scaledOuterGap = (float) ( Default.OuterPaneGap * scaleFactor );
@@ -666,19 +561,19 @@ public abstract class PaneBase
         // chart rect starts out at the full pane rect.  It gets reduced to make room for the legend,
         // scales, titles, etc.
         var innerRect = new RectangleF (
-            _rect.Left + _margin.Left * scaleFactor,
-            _rect.Top + _margin.Top * scaleFactor,
-            _rect.Width - scaleFactor * (_margin.Left + _margin.Right),
-            _rect.Height - scaleFactor * (_margin.Top + _margin.Bottom));
+            _rect.Left + Margin.Left * scaleFactor,
+            _rect.Top + Margin.Top * scaleFactor,
+            _rect.Width - scaleFactor * (Margin.Left + Margin.Right),
+            _rect.Height - scaleFactor * (Margin.Top + Margin.Bottom));
 
         // Leave room for the title
         if (_title.IsVisible && _title.Text != string.Empty)
         {
-            var titleSize = _title.FontSpec.BoundingBox (g, _title.Text, scaleFactor);
+            var titleSize = _title.FontSpec.BoundingBox (graphics, _title.Text, scaleFactor);
 
             // Leave room for the title height, plus a line spacing of charHeight * _titleGap
-            innerRect.Y += titleSize.Height + charHeight * _titleGap;
-            innerRect.Height -= titleSize.Height + charHeight * _titleGap;
+            innerRect.Y += titleSize.Height + charHeight * TitleGap;
+            innerRect.Height -= titleSize.Height + charHeight * TitleGap;
         }
 
         // Calculate the legend rect, and back it out of the current ChartRect
@@ -690,7 +585,7 @@ public abstract class PaneBase
     /// <summary>
     /// Draw the border _border around the <see cref="Rect"/> area.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -699,10 +594,14 @@ public abstract class PaneBase
     /// scaling factor is calculated by the <see cref="CalcScaleFactor"/> method.  The scale factor
     /// represents a linear multiple to be applied to font sizes, symbol sizes, etc.
     /// </param>
-    public void DrawPaneFrame (Graphics g, float scaleFactor)
+    public void DrawPaneFrame
+        (
+            Graphics graphics,
+            float scaleFactor
+        )
     {
         // Erase the pane background, filling it with the specified brush
-        _fill.Draw (g, _rect);
+        Fill.Draw (graphics, _rect);
 
         // Reduce the rect width and height by 1 pixel so that for a rect of
         // new RectangleF( 0, 0, 100, 100 ), which should be 100 pixels wide, we cover
@@ -710,13 +609,13 @@ public abstract class PaneBase
         // actually 101 pixels wide.
         var rect = new RectangleF (_rect.X, _rect.Y, _rect.Width - 1, _rect.Height - 1);
 
-        _border.Draw (g, this, scaleFactor, rect);
+        Border.Draw (graphics, this, scaleFactor, rect);
     }
 
     /// <summary>
     /// Draw the <see cref="Title"/> on the graph, centered at the top of the pane.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -725,18 +624,22 @@ public abstract class PaneBase
     /// scaling factor is calculated by the <see cref="CalcScaleFactor"/> method.  The scale factor
     /// represents a linear multiple to be applied to font sizes, symbol sizes, etc.
     /// </param>
-    public void DrawTitle (Graphics g, float scaleFactor)
+    public void DrawTitle
+        (
+            Graphics graphics,
+            float scaleFactor
+        )
     {
         // only draw the title if it's required
         if (_title.IsVisible)
         {
-            var size = _title.FontSpec.BoundingBox (g, _title.Text, scaleFactor);
+            var size = _title.FontSpec.BoundingBox (graphics, _title.Text, scaleFactor);
 
             // use the internal fontSpec class to draw the text using user-specified and/or
             // default attributes.
-            _title.FontSpec.Draw (g, this, _title.Text,
+            _title.FontSpec.Draw (graphics, this, _title.Text,
                 (_rect.Left + _rect.Right) / 2,
-                _rect.Top + _margin.Top * (float)scaleFactor + size.Height / 2.0F,
+                _rect.Top + Margin.Top * (float)scaleFactor + size.Height / 2.0F,
                 AlignH.Center, AlignV.Center, scaleFactor);
         }
     }
@@ -745,12 +648,16 @@ public abstract class PaneBase
     /// Change the size of the <see cref="Rect"/>.  Override this method to handle resizing the contents
     /// as required.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
     /// <param name="rect">The new size for the <see cref="Rect"/>.</param>
-    public virtual void ReSize (Graphics g, RectangleF rect)
+    public virtual void ReSize
+        (
+            Graphics graphics,
+            RectangleF rect
+        )
     {
         _rect = rect;
     }
@@ -780,7 +687,7 @@ public abstract class PaneBase
         const float ASPECTLIMIT = 1.5F;
 
         // if font scaling is turned off, then always return a 1.0 scale factor
-        if (!_isFontsScaled)
+        if (!IsFontsScaled)
         {
             return 1.0f;
         }
@@ -808,7 +715,7 @@ public abstract class PaneBase
             length = _rect.Width * ASPECTLIMIT;
         }
 
-        scaleFactor = length / (_baseDimension * 72F);
+        scaleFactor = length / (BaseDimension * 72F);
 
         // Don't let the scaleFactor get ridiculous
         if (scaleFactor < 0.1F)
@@ -832,7 +739,7 @@ public abstract class PaneBase
     /// <returns>The scaled pen width, in world pixels</returns>
     public float ScaledPenWidth (float penWidth, float scaleFactor)
     {
-        if (_isPenWidthScaled)
+        if (IsPenWidthScaled)
         {
             return (float)(penWidth * scaleFactor);
         }

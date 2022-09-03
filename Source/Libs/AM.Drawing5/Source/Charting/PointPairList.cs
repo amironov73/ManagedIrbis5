@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* PointPairList.cs --
+/* PointPairList.cs -- список объектов PointPair
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,8 +21,8 @@ using System.Collections.Generic;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// A collection class containing a list of <see cref="PointPair"/> objects
-/// that define the set of points to be displayed on the curve.
+/// Класс коллекции, содержащий список объектов <see cref="PointPair"/>,
+/// которые определяют набор точек, отображаемых на кривой.
 /// </summary>
 /// <seealso cref="BasicArrayPointList" />
 /// <seealso cref="IPointList" />
@@ -30,16 +30,6 @@ namespace AM.Drawing.Charting;
 public class PointPairList
     : List<PointPair>, IPointListEdit
 {
-    #region Fields
-
-    /// <summary>Private field to maintain the sort status of this
-    /// <see cref="PointPairList"/>.  Use the public property
-    /// <see cref="Sorted"/> to access this value.
-    /// </summary>
-    [CLSCompliant (false)] protected bool _sorted = true;
-
-    #endregion
-
     #region Properties
 
 /*		/// <summary>
@@ -59,10 +49,7 @@ public class PointPairList
     /// true if the list is currently sorted.
     /// </summary>
     /// <seealso cref="Sort()"/>
-    public bool Sorted
-    {
-        get { return _sorted; }
-    }
+    public bool Sorted { get; protected set; }
 
     #endregion
 
@@ -73,18 +60,22 @@ public class PointPairList
     /// </summary>
     public PointPairList()
     {
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
     /// Constructor to initialize the PointPairList from two arrays of
     /// type double.
     /// </summary>
-    public PointPairList (double[] x, double[] y)
+    public PointPairList
+        (
+            double[] x,
+            double[] y
+        )
     {
         Add (x, y);
 
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
@@ -92,11 +83,13 @@ public class PointPairList
     /// </summary>
     public PointPairList (IPointList list)
     {
-        int count = list.Count;
-        for (int i = 0; i < count; i++)
+        var count = list.Count;
+        for (var i = 0; i < count; i++)
+        {
             Add (list[i]);
+        }
 
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
@@ -107,18 +100,21 @@ public class PointPairList
     {
         Add (x, y, baseVal);
 
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
     /// The Copy Constructor
     /// </summary>
     /// <param name="rhs">The PointPairList from which to copy</param>
-    public PointPairList (PointPairList rhs)
+    public PointPairList
+        (
+            PointPairList rhs
+        )
     {
         Add (rhs);
 
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
@@ -152,7 +148,7 @@ public class PointPairList
     /// <returns>The zero-based ordinal index where the point was added in the list.</returns>
     public new void Add (PointPair point)
     {
-        _sorted = false;
+        Sorted = false;
 
         //base.Add( new PointPair( point ) );
         base.Add (point.Clone());
@@ -167,10 +163,10 @@ public class PointPairList
     /// or -1 if no points were added.</returns>
     public void Add (PointPairList pointList)
     {
-        foreach (PointPair point in pointList)
+        foreach (var point in pointList)
             Add (point);
 
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
@@ -186,7 +182,7 @@ public class PointPairList
     /// or -1 if no points were added.</returns>
     public void Add (double[] x, double[] y)
     {
-        int len = 0;
+        var len = 0;
 
         if (x != null)
         {
@@ -198,9 +194,9 @@ public class PointPairList
             len = y.Length;
         }
 
-        for (int i = 0; i < len; i++)
+        for (var i = 0; i < len; i++)
         {
-            PointPair point = new PointPair (0, 0, 0);
+            var point = new PointPair (0, 0, 0);
             if (x == null)
             {
                 point.X = (double)i + 1.0;
@@ -230,7 +226,7 @@ public class PointPairList
             base.Add (point);
         }
 
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
@@ -248,7 +244,7 @@ public class PointPairList
     /// or -1 if no points were added.</returns>
     public void Add (double[] x, double[] y, double[] z)
     {
-        int len = 0;
+        var len = 0;
 
         if (x != null)
         {
@@ -265,9 +261,9 @@ public class PointPairList
             len = z.Length;
         }
 
-        for (int i = 0; i < len; i++)
+        for (var i = 0; i < len; i++)
         {
-            PointPair point = new PointPair();
+            var point = new PointPair();
 
             if (x == null)
             {
@@ -311,7 +307,7 @@ public class PointPairList
             base.Add (point);
         }
 
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
@@ -322,8 +318,8 @@ public class PointPairList
     /// <returns>The zero-based ordinal index where the point was added in the list.</returns>
     public void Add (double x, double y)
     {
-        _sorted = false;
-        PointPair point = new PointPair (x, y);
+        Sorted = false;
+        var point = new PointPair (x, y);
         base.Add (point);
     }
 
@@ -336,8 +332,8 @@ public class PointPairList
     /// <returns>The zero-based ordinal index where the point was added in the list.</returns>
     public void Add (double x, double y, string tag)
     {
-        _sorted = false;
-        PointPair point = new PointPair (x, y, tag);
+        Sorted = false;
+        var point = new PointPair (x, y, tag);
         base.Add (point);
     }
 
@@ -351,8 +347,8 @@ public class PointPairList
     /// in the list.</returns>
     public void Add (double x, double y, double z)
     {
-        _sorted = false;
-        PointPair point = new PointPair (x, y, z);
+        Sorted = false;
+        var point = new PointPair (x, y, z);
         base.Add (point);
     }
 
@@ -367,8 +363,8 @@ public class PointPairList
     /// in the list.</returns>
     public void Add (double x, double y, double z, string tag)
     {
-        _sorted = false;
-        PointPair point = new PointPair (x, y, z, tag);
+        Sorted = false;
+        var point = new PointPair (x, y, z, tag);
         base.Add (point);
     }
 
@@ -384,7 +380,7 @@ public class PointPairList
     /// </param>
     public new void Insert (int index, PointPair point)
     {
-        _sorted = false;
+        Sorted = false;
         base.Insert (index, point);
     }
 
@@ -399,7 +395,7 @@ public class PointPairList
     /// <param name="y">The Y value</param>
     public void Insert (int index, double x, double y)
     {
-        _sorted = false;
+        Sorted = false;
         base.Insert (index, new PointPair (x, y));
     }
 
@@ -415,7 +411,7 @@ public class PointPairList
     /// <param name="z">The Z or lower dependent axis value</param>
     public void Insert (int index, double x, double y, double z)
     {
-        _sorted = false;
+        Sorted = false;
         Insert (index, new PointPair (x, y, z));
     }
 
@@ -460,8 +456,8 @@ public class PointPairList
     /// or -1 if the <see cref="PointPair"/> is not in the list</returns>
     public int IndexOfTag (string label)
     {
-        int iPt = 0;
-        foreach (PointPair p in this)
+        var iPt = 0;
+        foreach (var p in this)
         {
             if (p.Tag is string && string.Compare ((string)p.Tag, label, true) == 0)
             {
@@ -484,13 +480,13 @@ public class PointPairList
     /// <returns>true if the <see cref="PointPairList"/> objects are equal, false otherwise.</returns>
     public override bool Equals (object obj)
     {
-        PointPairList rhs = obj as PointPairList;
+        var rhs = obj as PointPairList;
         if (Count != rhs.Count)
         {
             return false;
         }
 
-        for (int i = 0; i < Count; i++)
+        for (var i = 0; i < Count; i++)
         {
             if (!this[i].Equals (rhs[i]))
             {
@@ -518,7 +514,7 @@ public class PointPairList
     public new bool Sort()
     {
         // if it is already sorted we don't have to sort again
-        if (_sorted)
+        if (Sorted)
         {
             return true;
         }
@@ -538,7 +534,7 @@ public class PointPairList
     public bool Sort (SortType type)
     {
         // if it is already sorted we don't have to sort again
-        if (_sorted)
+        if (Sorted)
         {
             return true;
         }
@@ -565,7 +561,7 @@ public class PointPairList
     /// values in the <see cref="PointPairList"/>.</param>
     public void SetX (double[] x)
     {
-        for (int i = 0; i < x.Length; i++)
+        for (var i = 0; i < x.Length; i++)
         {
             if (i < Count)
             {
@@ -573,7 +569,7 @@ public class PointPairList
             }
         }
 
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
@@ -593,7 +589,7 @@ public class PointPairList
     /// values in the <see cref="PointPairList"/>.</param>
     public void SetY (double[] y)
     {
-        for (int i = 0; i < y.Length; i++)
+        for (var i = 0; i < y.Length; i++)
         {
             if (i < Count)
             {
@@ -601,7 +597,7 @@ public class PointPairList
             }
         }
 
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
@@ -621,7 +617,7 @@ public class PointPairList
     /// values in the <see cref="PointPairList"/>.</param>
     public void SetZ (double[] z)
     {
-        for (int i = 0; i < z.Length; i++)
+        for (var i = 0; i < z.Length; i++)
         {
             if (i < Count)
             {
@@ -629,7 +625,7 @@ public class PointPairList
             }
         }
 
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
@@ -642,7 +638,7 @@ public class PointPairList
     /// be summed into the this <see cref="PointPairList"/>.</param>
     public void SumY (PointPairList sumList)
     {
-        for (int i = 0; i < Count; i++)
+        for (var i = 0; i < Count; i++)
         {
             if (i < sumList.Count)
             {
@@ -663,7 +659,7 @@ public class PointPairList
     /// be summed into the this <see cref="PointPairList"/>.</param>
     public void SumX (PointPairList sumList)
     {
-        for (int i = 0; i < Count; i++)
+        for (var i = 0; i < Count; i++)
         {
             if (i < sumList.Count)
             {
@@ -671,7 +667,7 @@ public class PointPairList
             }
         }
 
-        _sorted = false;
+        Sorted = false;
     }
 
     /// <summary>
@@ -840,7 +836,7 @@ public class PointPairList
             lastY = Y1;
 
         // Do 100 steps to find the result
-        for (double t = 0.01; t <= 1; t += 0.01)
+        for (var t = 0.01; t <= 1; t += 0.01)
         {
             B0 = (1 - t) * (1 - t) * (1 - t);
             B1 = 3.0 * t * (1 - t) * (1 - t);
@@ -947,12 +943,12 @@ public class PointPairList
     /// </returns>
     public PointPairList LinearRegression (IPointList points, int pointCount)
     {
-        double minX = double.MaxValue;
-        double maxX = double.MinValue;
+        var minX = double.MaxValue;
+        var maxX = double.MinValue;
 
-        for (int i = 0; i < points.Count; i++)
+        for (var i = 0; i < points.Count; i++)
         {
-            PointPair pt = points[i];
+            var pt = points[i];
 
             if (!pt.IsInvalid)
             {
@@ -987,9 +983,9 @@ public class PointPairList
         double minX, double maxX)
     {
         double x = 0, y = 0, xx = 0, xy = 0, count = 0;
-        for (int i = 0; i < points.Count; i++)
+        for (var i = 0; i < points.Count; i++)
         {
-            PointPair pt = points[i];
+            var pt = points[i];
             if (!pt.IsInvalid)
             {
                 x += points[i].X;
@@ -1005,13 +1001,13 @@ public class PointPairList
             return null;
         }
 
-        double slope = (count * xy - x * y) / (count * xx - x * x);
-        double intercept = (y - slope * x) / count;
+        var slope = (count * xy - x * y) / (count * xx - x * x);
+        var intercept = (y - slope * x) / count;
 
-        PointPairList newPoints = new PointPairList();
-        double stepSize = (maxX - minX) / pointCount;
-        double value = minX;
-        for (int i = 0; i < pointCount; i++)
+        var newPoints = new PointPairList();
+        var stepSize = (maxX - minX) / pointCount;
+        var value = minX;
+        for (var i = 0; i < pointCount; i++)
         {
             newPoints.Add (new PointPair (value, value * slope + intercept));
             value += stepSize;
