@@ -222,7 +222,13 @@ public class RussiaPaymentOrder
     /// <param name="pattern">A regex pattern to be used for validation</param>
     /// <param name="errorText">An optional error text. If null, a standard error text is generated</param>
     /// <returns>Input value (in case it is valid)</returns>
-    private static string ValidateInput (string input, string fieldname, string pattern, string errorText = null)
+    private static string ValidateInput
+        (
+            string? input,
+            string fieldname,
+            string pattern,
+            string? errorText = null
+        )
     {
         return ValidateInput (input, fieldname, new string[] { pattern }, errorText);
     }
@@ -235,7 +241,13 @@ public class RussiaPaymentOrder
     /// <param name="patterns">An array of regex patterns to be used for validation</param>
     /// <param name="errorText">An optional error text. If null, a standard error text is generated</param>
     /// <returns>Input value (in case it is valid)</returns>
-    private static string ValidateInput (string input, string fieldname, string[] patterns, string errorText = null)
+    private static string ValidateInput
+        (
+            string? input,
+            string fieldname,
+            string[] patterns,
+            string? errorText = null
+        )
     {
         if (input == null)
         {
@@ -268,133 +280,133 @@ public class RussiaPaymentOrder
     /// </summary>
     public class OptionalFields
     {
-        private string _sum;
+        private string? _sum;
 
         /// <summary>
         /// Payment amount, in kopecks (FTI’s Amount.)
         /// <para>Сумма платежа, в копейках</para>
         /// </summary>
-        public string Sum
+        public string? Sum
         {
             get => _sum;
             set => _sum = ValidateInput (value, "Sum", @"^\d{1,18}$");
         }
 
-        private string _purpose;
+        private string? _purpose;
 
         /// <summary>
         /// Payment name (purpose)
         /// <para>Наименование платежа (назначение)</para>
         /// </summary>
-        public string Purpose
+        public string? Purpose
         {
             get => _purpose;
             set => _purpose = ValidateInput (value, "Purpose", @"^.{1,160}$");
         }
 
-        private string _payeeInn;
+        private string? _payeeInn;
 
         /// <summary>
         /// Payee's INN (Resident Tax Identification Number; Text, up to 12 characters.)
         /// <para>ИНН получателя платежа</para>
         /// </summary>
-        public string PayeeINN
+        public string? PayeeINN
         {
             get => _payeeInn;
             set => _payeeInn = ValidateInput (value, "PayeeINN", @"^.{1,12}$");
         }
 
-        private string _payerInn;
+        private string? _payerInn;
 
         /// <summary>
         /// Payer's INN (Resident Tax Identification Number; Text, up to 12 characters.)
         /// <para>ИНН плательщика</para>
         /// </summary>
-        public string PayerINN
+        public string? PayerINN
         {
             get => _payerInn;
             set => _payerInn = ValidateInput (value, "PayerINN", @"^.{1,12}$");
         }
 
-        private string _drawerStatus;
+        private string? _drawerStatus;
 
         /// <summary>
         /// Status compiler payment document
         /// <para>Статус составителя платежного документа</para>
         /// </summary>
-        public string DrawerStatus
+        public string? DrawerStatus
         {
             get => _drawerStatus;
             set => _drawerStatus = ValidateInput (value, "DrawerStatus", @"^.{1,2}$");
         }
 
-        private string _kpp;
+        private string? _kpp;
 
         /// <summary>
         /// KPP of the payee (Tax Registration Code; Text, up to 9 characters.)
         /// <para>КПП получателя платежа</para>
         /// </summary>
-        public string KPP
+        public string? KPP
         {
             get => _kpp;
             set => _kpp = ValidateInput (value, "KPP", @"^.{1,9}$");
         }
 
-        private string _cbc;
+        private string? _cbc;
 
         /// <summary>
         /// CBC
         /// <para>КБК</para>
         /// </summary>
-        public string CBC
+        public string? CBC
         {
             get => _cbc;
             set => _cbc = ValidateInput (value, "CBC", @"^.{1,20}$");
         }
 
-        private string _oktmo;
+        private string? _oktmo;
 
         /// <summary>
         /// All-Russian classifier territories of municipal formations
         /// <para>Общероссийский классификатор территорий муниципальных образований</para>
         /// </summary>
-        public string OKTMO
+        public string? OKTMO
         {
             get => _oktmo;
             set => _oktmo = ValidateInput (value, "OKTMO", @"^.{1,11}$");
         }
 
-        private string _paytReason;
+        private string? _paytReason;
 
         /// <summary>
         /// Basis of tax payment
         /// <para>Основание налогового платежа</para>
         /// </summary>
-        public string PaytReason
+        public string? PaytReason
         {
             get => _paytReason;
             set => _paytReason = ValidateInput (value, "PaytReason", @"^.{1,2}$");
         }
 
-        private string _taxPeriod;
+        private string? _taxPeriod;
 
         /// <summary>
         /// Taxable period
         /// <para>Налоговый период</para>
         /// </summary>
-        public string TaxPeriod
+        public string? TaxPeriod
         {
             get => _taxPeriod;
             set => _taxPeriod = ValidateInput (value, "ТaxPeriod", @"^.{1,10}$");
         }
 
-        private string _docNo;
+        private string? _docNo;
 
         /// <summary>
         /// Document number
         /// <para>Номер документа</para>
         /// </summary>
-        public string DocNo
+        public string? DocNo
         {
             get => _docNo;
             set => _docNo = ValidateInput (value, "DocNo", @"^.{1,15}$");
@@ -406,13 +418,13 @@ public class RussiaPaymentOrder
         /// </summary>
         public DateTime? DocDate { get; set; }
 
-        private string _taxPaytKind;
+        private string? _taxPaytKind;
 
         /// <summary>
         /// Payment type
         /// <para>Тип платежа</para>
         /// </summary>
-        public string TaxPaytKind
+        public string? TaxPaytKind
         {
             get => _taxPaytKind;
             set => _taxPaytKind = ValidateInput (value, "TaxPaytKind", @"^.{1,2}$");
@@ -737,6 +749,7 @@ public class RussiaPaymentOrder
             )
             : base (message)
         {
+            // пустое тело конструктора
         }
 
         #endregion

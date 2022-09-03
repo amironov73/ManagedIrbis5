@@ -162,7 +162,10 @@ public struct XPoint : IFormattable
     /// <summary>
     /// Converts this XPoint to a human readable string.
     /// </summary>
-    public string ToString (IFormatProvider provider)
+    public string ToString
+        (
+            IFormatProvider? provider
+        )
     {
         return ConvertToString (null, provider);
     }
@@ -170,7 +173,11 @@ public struct XPoint : IFormattable
     /// <summary>
     /// Converts this XPoint to a human readable string.
     /// </summary>
-    string IFormattable.ToString (string format, IFormatProvider provider)
+    string IFormattable.ToString
+        (
+            string? format,
+            IFormatProvider? provider
+        )
     {
         return ConvertToString (format, provider);
     }
@@ -178,12 +185,21 @@ public struct XPoint : IFormattable
     /// <summary>
     /// Implements ToString.
     /// </summary>
-    internal string ConvertToString (string? format, IFormatProvider? provider)
+    internal string ConvertToString
+        (
+            string? format,
+            IFormatProvider? provider
+        )
     {
         provider ??= CultureInfo.InvariantCulture;
         var numericListSeparator = TokenizerHelper.GetNumericListSeparator (provider);
+
+        // ReSharper disable FormatStringProblem
+
         return string.Format (provider, "{1:" + format + "}{0}{2:" + format + "}",
             new object[] { numericListSeparator, _x, _y });
+
+        // ReSharper restore FormatStringProblem
     }
 
     /// <summary>

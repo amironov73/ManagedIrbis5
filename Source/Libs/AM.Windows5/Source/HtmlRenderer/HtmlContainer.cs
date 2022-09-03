@@ -36,7 +36,7 @@ namespace AM.Windows.HtmlRenderer;
 /// <see cref="HtmlLabel"/>, <see cref="HtmlToolTip"/> and <see cref="HtmlRender"/>.<br/>
 /// </summary>
 /// <seealso cref="HtmlContainerInt"/>
-public sealed class HtmlContainer 
+public sealed class HtmlContainer
     : IDisposable
 {
     #region Fields and Consts
@@ -54,8 +54,8 @@ public sealed class HtmlContainer
     /// </summary>
     public HtmlContainer()
     {
-        _htmlContainerInt = new HtmlContainerInt(WpfAdapter.Instance);
-        _htmlContainerInt.PageSize = new RSize(99999, 99999);
+        _htmlContainerInt = new HtmlContainerInt (WpfAdapter.Instance);
+        _htmlContainerInt.PageSize = new RSize (99999, 99999);
     }
 
     /// <summary>
@@ -213,8 +213,8 @@ public sealed class HtmlContainer
     /// </example>
     public Point ScrollOffset
     {
-        get { return Utils.Convert(_htmlContainerInt.ScrollOffset); }
-        set { _htmlContainerInt.ScrollOffset = Utils.Convert(value); }
+        get { return Utils.Convert (_htmlContainerInt.ScrollOffset); }
+        set { _htmlContainerInt.ScrollOffset = Utils.Convert (value); }
     }
 
     /// <summary>
@@ -223,8 +223,8 @@ public sealed class HtmlContainer
     /// </summary>
     public Point Location
     {
-        get { return Utils.Convert(_htmlContainerInt.Location); }
-        set { _htmlContainerInt.Location = Utils.Convert(value); }
+        get { return Utils.Convert (_htmlContainerInt.Location); }
+        set { _htmlContainerInt.Location = Utils.Convert (value); }
     }
 
     /// <summary>
@@ -236,8 +236,8 @@ public sealed class HtmlContainer
     /// </summary>
     public Size MaxSize
     {
-        get { return Utils.Convert(_htmlContainerInt.MaxSize); }
-        set { _htmlContainerInt.MaxSize = Utils.Convert(value); }
+        get { return Utils.Convert (_htmlContainerInt.MaxSize); }
+        set { _htmlContainerInt.MaxSize = Utils.Convert (value); }
     }
 
     /// <summary>
@@ -245,8 +245,8 @@ public sealed class HtmlContainer
     /// </summary>
     public Size ActualSize
     {
-        get { return Utils.Convert(_htmlContainerInt.ActualSize); }
-        internal set { _htmlContainerInt.ActualSize = Utils.Convert(value); }
+        get { return Utils.Convert (_htmlContainerInt.ActualSize); }
+        internal set { _htmlContainerInt.ActualSize = Utils.Convert (value); }
     }
 
     /// <summary>
@@ -278,9 +278,9 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="htmlSource">the html to init with, init empty if not given</param>
     /// <param name="baseCssData">optional: the stylesheet to init with, init default if not given</param>
-    public void SetHtml(string htmlSource, CssData baseCssData = null)
+    public void SetHtml (string htmlSource, CssData? baseCssData = null)
     {
-        _htmlContainerInt.SetHtml(htmlSource, baseCssData);
+        _htmlContainerInt.SetHtml (htmlSource, baseCssData);
     }
 
     /// <summary>
@@ -296,9 +296,9 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="styleGen">Optional: controls the way styles are generated when html is generated (default: <see cref="HtmlGenerationStyle.Inline"/>)</param>
     /// <returns>generated html</returns>
-    public string GetHtml(HtmlGenerationStyle styleGen = HtmlGenerationStyle.Inline)
+    public string GetHtml (HtmlGenerationStyle styleGen = HtmlGenerationStyle.Inline)
     {
-        return _htmlContainerInt.GetHtml(styleGen);
+        return _htmlContainerInt.GetHtml (styleGen);
     }
 
     /// <summary>
@@ -308,9 +308,9 @@ public sealed class HtmlContainer
     /// <param name="location">the location to find the attribute at</param>
     /// <param name="attribute">the attribute key to get value by</param>
     /// <returns>found attribute value or null if not found</returns>
-    public string GetAttributeAt(Point location, string attribute)
+    public string GetAttributeAt (Point location, string attribute)
     {
-        return _htmlContainerInt.GetAttributeAt(Utils.Convert(location), attribute);
+        return _htmlContainerInt.GetAttributeAt (Utils.Convert (location), attribute);
     }
 
     /// <summary>
@@ -322,8 +322,9 @@ public sealed class HtmlContainer
         var linkElements = new List<LinkElementData<Rect>>();
         foreach (var link in HtmlContainerInt.GetLinks())
         {
-            linkElements.Add(new LinkElementData<Rect>(link.Id, link.Href, Utils.Convert(link.Rectangle)));
+            linkElements.Add (new LinkElementData<Rect> (link.Id, link.Href, Utils.Convert (link.Rectangle)));
         }
+
         return linkElements;
     }
 
@@ -332,9 +333,9 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="location">the location to find the link at</param>
     /// <returns>css link href if exists or null</returns>
-    public string GetLinkAt(Point location)
+    public string GetLinkAt (Point location)
     {
-        return _htmlContainerInt.GetLinkAt(Utils.Convert(location));
+        return _htmlContainerInt.GetLinkAt (Utils.Convert (location));
     }
 
     /// <summary>
@@ -344,10 +345,10 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="elementId">the id of the element to get its Rect</param>
     /// <returns>the Rect of the element or null if not found</returns>
-    public Rect? GetElementRectangle(string elementId)
+    public Rect? GetElementRectangle (string elementId)
     {
-        var r = _htmlContainerInt.GetElementRectangle(elementId);
-        return r.HasValue ? Utils.Convert(r.Value) : (Rect?)null;
+        var r = _htmlContainerInt.GetElementRectangle (elementId);
+        return r.HasValue ? Utils.Convert (r.Value) : null;
     }
 
     /// <summary>
@@ -357,7 +358,7 @@ public sealed class HtmlContainer
     {
         using (var ig = new GraphicsAdapter())
         {
-            _htmlContainerInt.PerformLayout(ig);
+            _htmlContainerInt.PerformLayout (ig);
         }
     }
 
@@ -366,13 +367,13 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="g">the device to use to render</param>
     /// <param name="clip">the clip rectangle of the html container</param>
-    public void PerformPaint(DrawingContext g, Rect clip)
+    public void PerformPaint (DrawingContext g, Rect clip)
     {
-        ArgChecker.AssertArgNotNull(g, "g");
+        ArgChecker.AssertArgNotNull (g, "g");
 
-        using (var ig = new GraphicsAdapter(g, Utils.Convert(clip)))
+        using (var ig = new GraphicsAdapter (g, Utils.Convert (clip)))
         {
-            _htmlContainerInt.PerformPaint(ig);
+            _htmlContainerInt.PerformPaint (ig);
         }
     }
 
@@ -381,12 +382,12 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="e">the mouse event args</param>
-    public void HandleMouseDown(Control parent, MouseEventArgs e)
+    public void HandleMouseDown (Control parent, MouseEventArgs e)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
-        ArgChecker.AssertArgNotNull(e, "e");
+        ArgChecker.AssertArgNotNull (parent, "parent");
+        ArgChecker.AssertArgNotNull (e, "e");
 
-        _htmlContainerInt.HandleMouseDown(new ControlAdapter(parent), Utils.Convert(e.GetPosition(parent)));
+        _htmlContainerInt.HandleMouseDown (new ControlAdapter (parent), Utils.Convert (e.GetPosition (parent)));
     }
 
     /// <summary>
@@ -394,13 +395,14 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="e">the mouse event args</param>
-    public void HandleMouseUp(Control parent, MouseButtonEventArgs e)
+    public void HandleMouseUp (Control parent, MouseButtonEventArgs e)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
-        ArgChecker.AssertArgNotNull(e, "e");
+        ArgChecker.AssertArgNotNull (parent, "parent");
+        ArgChecker.AssertArgNotNull (e, "e");
 
-        var mouseEvent = new RMouseEvent(e.ChangedButton == MouseButton.Left);
-        _htmlContainerInt.HandleMouseUp(new ControlAdapter(parent), Utils.Convert(e.GetPosition(parent)), mouseEvent);
+        var mouseEvent = new RMouseEvent (e.ChangedButton == MouseButton.Left);
+        _htmlContainerInt.HandleMouseUp (new ControlAdapter (parent), Utils.Convert (e.GetPosition (parent)),
+            mouseEvent);
     }
 
     /// <summary>
@@ -408,12 +410,12 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
     /// <param name="e">mouse event args</param>
-    public void HandleMouseDoubleClick(Control parent, MouseEventArgs e)
+    public void HandleMouseDoubleClick (Control parent, MouseEventArgs e)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
-        ArgChecker.AssertArgNotNull(e, "e");
+        ArgChecker.AssertArgNotNull (parent, "parent");
+        ArgChecker.AssertArgNotNull (e, "e");
 
-        _htmlContainerInt.HandleMouseDoubleClick(new ControlAdapter(parent), Utils.Convert(e.GetPosition(parent)));
+        _htmlContainerInt.HandleMouseDoubleClick (new ControlAdapter (parent), Utils.Convert (e.GetPosition (parent)));
     }
 
     /// <summary>
@@ -421,22 +423,22 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
     /// <param name="mousePos">the mouse event args</param>
-    public void HandleMouseMove(Control parent, Point mousePos)
+    public void HandleMouseMove (Control parent, Point mousePos)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
+        ArgChecker.AssertArgNotNull (parent, "parent");
 
-        _htmlContainerInt.HandleMouseMove(new ControlAdapter(parent), Utils.Convert(mousePos));
+        _htmlContainerInt.HandleMouseMove (new ControlAdapter (parent), Utils.Convert (mousePos));
     }
 
     /// <summary>
     /// Handle mouse leave to handle hover cursor.
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
-    public void HandleMouseLeave(Control parent)
+    public void HandleMouseLeave (Control parent)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
+        ArgChecker.AssertArgNotNull (parent, "parent");
 
-        _htmlContainerInt.HandleMouseLeave(new ControlAdapter(parent));
+        _htmlContainerInt.HandleMouseLeave (new ControlAdapter (parent));
     }
 
     /// <summary>
@@ -444,12 +446,12 @@ public sealed class HtmlContainer
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="e">the pressed key</param>
-    public void HandleKeyDown(Control parent, KeyEventArgs e)
+    public void HandleKeyDown (Control parent, KeyEventArgs e)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
-        ArgChecker.AssertArgNotNull(e, "e");
+        ArgChecker.AssertArgNotNull (parent, "parent");
+        ArgChecker.AssertArgNotNull (e, "e");
 
-        _htmlContainerInt.HandleKeyDown(new ControlAdapter(parent), CreateKeyEevent(e));
+        _htmlContainerInt.HandleKeyDown (new ControlAdapter (parent), CreateKeyEevent (e));
     }
 
     /// <summary>
@@ -466,10 +468,10 @@ public sealed class HtmlContainer
     /// <summary>
     /// Create HtmlRenderer key event from WPF key event.
     /// </summary>
-    private static RKeyEvent CreateKeyEevent(KeyEventArgs e)
+    private static RKeyEvent CreateKeyEevent (KeyEventArgs e)
     {
         var control = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
-        return new RKeyEvent(control, e.Key == Key.A, e.Key == Key.C);
+        return new RKeyEvent (control, e.Key == Key.A, e.Key == Key.C);
     }
 
     #endregion

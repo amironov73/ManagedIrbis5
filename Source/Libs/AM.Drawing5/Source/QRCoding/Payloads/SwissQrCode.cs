@@ -71,15 +71,13 @@ public class SwissQrCode
             string? alternativeProcedure2 = null
         )
     {
+        requestedDateOfPayment.NotUsed();
         _iban = iban;
-
         _creditor = creditor;
-        _ultimateCreditor = ultimateCreditor;
+        _additionalInformation = additionalInformation ?? new AdditionalInformation();
 
-        _additionalInformation =
-            additionalInformation != null ? additionalInformation : new AdditionalInformation();
-
-        if (amount != null && amount.ToString().Length > 12)
+        var length = amount?.ToString().Length ?? 0;
+        if (amount != null && length > 12)
         {
             throw new SwissQrCodeException ("Amount (including decimals) must be shorter than 13 places.");
         }
@@ -87,7 +85,7 @@ public class SwissQrCode
         _amount = amount;
 
         _currency = currency;
-        _requestedDateOfPayment = requestedDateOfPayment;
+        // _requestedDateOfPayment = requestedDateOfPayment;
         _debitor = debitor;
 
         if (iban.IsQrIban && reference.RefType != Reference.ReferenceType.QRR)
@@ -108,7 +106,7 @@ public class SwissQrCode
 
         _reference = reference;
 
-        if (alternativeProcedure1 != null && alternativeProcedure1.Length > 100)
+        if (alternativeProcedure1 is { Length: > 100 })
         {
             throw new SwissQrCodeException
                 (
@@ -117,7 +115,7 @@ public class SwissQrCode
         }
 
         _alternativeProcedure1 = alternativeProcedure1;
-        if (alternativeProcedure2 != null && alternativeProcedure2.Length > 100)
+        if (alternativeProcedure2 is { Length: > 100 })
         {
             throw new SwissQrCodeException
                 (
@@ -133,13 +131,13 @@ public class SwissQrCode
     #region Private members
 
     private readonly string _br = "\r\n";
-    private readonly string _alternativeProcedure1, _alternativeProcedure2;
+    private readonly string? _alternativeProcedure1, _alternativeProcedure2;
     private readonly Iban _iban;
     private readonly decimal? _amount;
     private readonly Contact _creditor;
-    private readonly Contact? _ultimateCreditor, _debitor;
+    private readonly Contact? _debitor;
     private readonly Currency _currency;
-    private readonly DateTime? _requestedDateOfPayment;
+    // private readonly DateTime? _requestedDateOfPayment;
     private readonly Reference _reference;
     private readonly AdditionalInformation _additionalInformation;
 
@@ -268,7 +266,8 @@ public class SwissQrCode
             )
         {
             RefType = referenceType;
-            _referenceTextType = referenceTextType;
+            // _referenceTextType = referenceTextType;
+            referenceTextType.NotUsed();
 
             if (referenceType == ReferenceType.NON && reference != null)
             {
@@ -315,7 +314,7 @@ public class SwissQrCode
         #region Private members
 
         private readonly string? _reference;
-        private readonly ReferenceTextType? _referenceTextType;
+        // private readonly ReferenceTextType? _referenceTextType;
 
         #endregion
 
@@ -327,7 +326,7 @@ public class SwissQrCode
         /// <summary>
         ///
         /// </summary>
-        public string ReferenceText => !string.IsNullOrEmpty (_reference) ? _reference.Replace ("\n", "") : null;
+        public string? ReferenceText => !string.IsNullOrEmpty (_reference) ? _reference.Replace ("\n", "") : null;
 
         /// <summary>
         /// Reference type. When using a QR-IBAN you have to use either "QRR" or "SCOR"
@@ -517,7 +516,7 @@ public class SwissQrCode
     public class Contact
     {
         private static readonly HashSet<string> twoLetterCodes = ValidTwoLetterCodes();
-        private string br = "\r\n";
+        private readonly string br = "\r\n";
         private readonly string name;
         private readonly string? streetOrAddressline1;
         private readonly string? houseNumberOrAddressline2;
@@ -587,14 +586,32 @@ public class SwissQrCode
         {
         }
 
-        public static Contact WithStructuredAddress (string name, string zipCode, string city, string country,
-            string street = null, string houseNumber = null)
+        /// <summary>
+        ///
+        /// </summary>
+        public static Contact WithStructuredAddress
+            (
+                string name,
+                string? zipCode,
+                string? city,
+                string country,
+                string? street = null,
+                string? houseNumber = null
+            )
         {
             return new Contact (name, zipCode, city, country, street, houseNumber, AddressType.StructuredAddress);
         }
 
-        public static Contact WithCombinedAddress (string name, string country, string addressLine1,
-            string addressLine2)
+        /// <summary>
+        ///
+        /// </summary>
+        public static Contact WithCombinedAddress
+            (
+                string name,
+                string country,
+                string addressLine1,
+                string addressLine2
+            )
         {
             return new Contact (name, null, null, country, addressLine1, addressLine2, AddressType.CombinedAddress);
         }
@@ -603,7 +620,7 @@ public class SwissQrCode
         private Contact
             (
                 string name,
-                string zipCode,
+                string? zipCode,
                 string? city,
                 string country,
                 string? streetOrAddressline1,
@@ -857,7 +874,7 @@ public class SwissQrCode
         SwissQrCodePayload += "1" + _br; //Coding
 
         //CdtrInf "logical" element
-        SwissQrCodePayload += _iban.ToString() + _br; //IBAN
+        SwissQrCodePayload += _iban + _br; //IBAN
 
 
         //Cdtr "logical" element

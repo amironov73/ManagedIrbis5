@@ -1,4 +1,5 @@
 #region PDFsharp - A .NET library for processing PDF
+
 //
 // Authors:
 //   Stefan Lange
@@ -23,13 +24,15 @@
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
+
 #endregion
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+
 using PdfSharpCore.Pdf.IO;
 
 namespace PdfSharpCore.Pdf
@@ -37,7 +40,7 @@ namespace PdfSharpCore.Pdf
     /// <summary>
     /// Represents a PDF name value.
     /// </summary>
-    [DebuggerDisplay("({Value})")]
+    [DebuggerDisplay ("({Value})")]
     public sealed class PdfName : PdfItem
     {
         /// <summary>
@@ -45,19 +48,24 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public PdfName()
         {
-            _value = "/";  // Empty name.
+            _value = "/"; // Empty name.
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PdfName"/> class.
         /// Parameter value always must start with a '/'.
         /// </summary>
-        public PdfName(string value)
+        public PdfName (string value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+            {
+                throw new ArgumentNullException ("value");
+            }
+
             if (value.Length == 0 || value[0] != '/')
-                throw new ArgumentException(PSSR.NameMustStartWithSlash);
+            {
+                throw new ArgumentException (PSSR.NameMustStartWithSlash);
+            }
 
             _value = value;
         }
@@ -65,9 +73,9 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Determines whether the specified object is equal to this name.
         /// </summary>
-        public override bool Equals(object obj)
+        public override bool Equals (object? obj)
         {
-            return _value.Equals(obj);
+            return _value.Equals (obj);
         }
 
         /// <summary>
@@ -86,6 +94,7 @@ namespace PdfSharpCore.Pdf
             // This class must behave like a value type. Therefore it cannot be changed (like System.String).
             get { return _value; }
         }
+
         readonly string _value;
 
         /// <summary>
@@ -99,10 +108,12 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Determines whether the specified name and string are equal.
         /// </summary>
-        public static bool operator ==(PdfName name, string str)
+        public static bool operator == (PdfName name, string str)
         {
-            if (ReferenceEquals(name, null))
+            if (ReferenceEquals (name, null))
+            {
                 return str == null;
+            }
 
             return name._value == str;
         }
@@ -110,10 +121,12 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Determines whether the specified name and string are not equal.
         /// </summary>
-        public static bool operator !=(PdfName name, string str)
+        public static bool operator != (PdfName name, string str)
         {
-            if (ReferenceEquals(name, null))
+            if (ReferenceEquals (name, null))
+            {
                 return str != null;
+            }
 
             return name._value != str;
         }
@@ -121,15 +134,15 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Represents the empty name.
         /// </summary>
-        public static readonly PdfName Empty = new PdfName("/");
+        public static readonly PdfName Empty = new PdfName ("/");
 
         /// <summary>
         /// Writes the name including the leading slash.
         /// </summary>
-        internal override void WriteObject(PdfWriter writer)
+        internal override void WriteObject (PdfWriter writer)
         {
-            // TODO: what if unicode character are part of the name? 
-            writer.Write(this);
+            // TODO: what if unicode character are part of the name?
+            writer.Write (this);
         }
 
         /// <summary>
@@ -148,19 +161,25 @@ namespace PdfSharpCore.Pdf
             /// <summary>
             /// Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
             /// </summary>
-            /// <param name="l">The first object to compare.</param>
-            /// <param name="r">The second object to compare.</param>
-            public int Compare(PdfName l, PdfName r)
+            /// <param name="left">The first object to compare.</param>
+            /// <param name="right">The second object to compare.</param>
+            public int Compare (PdfName? left, PdfName? right)
             {
-
-                if (l != null)
+                if (left != null)
                 {
-                    if (r != null)
-                        return String.Compare(l._value, r._value, StringComparison.Ordinal);
+                    if (right != null)
+                    {
+                        return string.Compare (left._value, right._value, StringComparison.Ordinal);
+                    }
+
                     return -1;
                 }
-                if (r != null)
+
+                if (right != null)
+                {
                     return 1;
+                }
+
                 return 0;
             }
         }

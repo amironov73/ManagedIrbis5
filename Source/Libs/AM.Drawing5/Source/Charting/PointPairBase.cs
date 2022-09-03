@@ -209,32 +209,22 @@ public class PointPairBase
 
     #region Methods
 
-    /// <summary>
-    /// Compare two <see cref="PointPairBase"/> objects for equality.  To be equal, X and Y
-    /// must be exactly the same between the two objects.
-    /// </summary>
-    /// <param name="obj">The <see cref="PointPairBase"/> object to be compared with.</param>
-    /// <returns>true if the <see cref="PointPairBase"/> objects are equal, false otherwise</returns>
-    public override bool Equals (object obj)
+    ///<inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals (object? obj)
     {
-        PointPairBase rhs = obj as PointPairBase;
+        var rhs = (PointPairBase) obj.ThrowIfNull();
         return X == rhs.X && Y == rhs.Y;
     }
 
-    /// <summary>
-    /// Return the HashCode from the base class.
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
+        // ReSharper disable BaseObjectGetHashCodeCallInGetHashCode
         return base.GetHashCode();
+        // ReSharper restore BaseObjectGetHashCodeCallInGetHashCode
     }
 
-    /// <summary>
-    /// Format this PointPair value using the default format.  Example:  "( 12.345, -16.876 )".
-    /// The two double values are formatted with the "g" format type.
-    /// </summary>
-    /// <returns>A string representation of the PointPair</returns>
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
         return ToString (DefaultFormat);

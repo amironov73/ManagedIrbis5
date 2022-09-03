@@ -40,7 +40,7 @@ public class ZoomStateStack
     /// <param name="rhs">The <see cref="ZoomStateStack"/> object from which to copy</param>
     public ZoomStateStack (ZoomStateStack rhs)
     {
-        foreach (ZoomState state in rhs)
+        foreach (var state in rhs)
         {
             Add (new ZoomState (state));
         }
@@ -70,10 +70,7 @@ public class ZoomStateStack
     /// Public readonly property that indicates if the stack is empty
     /// </summary>
     /// <value>true for an empty stack, false otherwise</value>
-    public bool IsEmpty
-    {
-        get { return Count == 0; }
-    }
+    public bool IsEmpty => Count == 0;
 
     /// <summary>
     /// Add the scale range information from the specified <see cref="GraphPane"/> object as a
@@ -86,7 +83,7 @@ public class ZoomStateStack
     /// <returns>The resultant <see cref="ZoomState"/> object that was pushed on the stack.</returns>
     public ZoomState Push (GraphPane pane, ZoomState.StateType type)
     {
-        ZoomState state = new ZoomState (pane, type);
+        var state = new ZoomState (pane, type);
         Add (state);
         return state;
     }
@@ -113,20 +110,18 @@ public class ZoomStateStack
     /// <returns>The <see cref="ZoomState"/> object that was "popped" from the stack and applied
     /// to the specified <see cref="GraphPane"/>.  null if no <see cref="ZoomState"/> was
     /// available (the stack was empty).</returns>
-    public ZoomState Pop (GraphPane pane)
+    public ZoomState? Pop (GraphPane pane)
     {
         if (!IsEmpty)
         {
-            ZoomState state = (ZoomState)this[Count - 1];
+            var state = this[Count - 1];
             RemoveAt (Count - 1);
 
             state.ApplyState (pane);
             return state;
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     /// <summary>
@@ -138,21 +133,19 @@ public class ZoomStateStack
     /// <returns>The <see cref="ZoomState"/> object at the bottom of the stack that was applied
     /// to the specified <see cref="GraphPane"/>.  null if no <see cref="ZoomState"/> was
     /// available (the stack was empty).</returns>
-    public ZoomState PopAll (GraphPane pane)
+    public ZoomState? PopAll (GraphPane pane)
     {
         if (!IsEmpty)
         {
-            ZoomState state = (ZoomState)this[0];
+            var state = this[0];
             Clear();
 
             state.ApplyState (pane);
 
             return state;
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     /// <summary>
@@ -160,18 +153,16 @@ public class ZoomStateStack
     /// without actually removing it from the stack.
     /// </summary>
     /// <value>A <see cref="ZoomState"/> object reference, or null if the stack is empty.</value>
-    public ZoomState Top
+    public ZoomState? Top
     {
         get
         {
             if (!IsEmpty)
             {
-                return (ZoomState)this[Count - 1];
+                return this[Count - 1];
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
     }
 }

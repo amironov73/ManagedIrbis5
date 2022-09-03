@@ -134,33 +134,6 @@ public sealed class HtmlContainerInt
     private CssData _cssData;
 
     /// <summary>
-    /// Is content selection is enabled for the rendered html (default - true).<br/>
-    /// If set to 'false' the rendered html will be static only with ability to click on links.
-    /// </summary>
-    private bool _isSelectionEnabled = true;
-
-    /// <summary>
-    /// Is the build-in context menu enabled (default - true)
-    /// </summary>
-    private bool _isContextMenuEnabled = true;
-
-    /// <summary>
-    /// Gets or sets a value indicating if anti-aliasing should be avoided
-    /// for geometry like backgrounds and borders
-    /// </summary>
-    private bool _avoidGeometryAntialias;
-
-    /// <summary>
-    /// Gets or sets a value indicating if image asynchronous loading should be avoided (default - false).<br/>
-    /// </summary>
-    private bool _avoidAsyncImagesLoading;
-
-    /// <summary>
-    /// Gets or sets a value indicating if image loading only when visible should be avoided (default - false).<br/>
-    /// </summary>
-    private bool _avoidImagesLateLoading;
-
-    /// <summary>
     /// is the load of the html document is complete
     /// </summary>
     private bool _loadComplete;
@@ -212,12 +185,12 @@ public sealed class HtmlContainerInt
     /// <summary>
     /// Init.
     /// </summary>
-    public HtmlContainerInt(RAdapter adapter)
+    public HtmlContainerInt (RAdapter adapter)
     {
-        ArgChecker.AssertArgNotNull(adapter, "global");
+        ArgChecker.AssertArgNotNull (adapter, "global");
 
         _adapter = adapter;
-        _cssParser = new CssParser(adapter);
+        _cssParser = new CssParser (adapter);
     }
 
     /// <summary>
@@ -240,13 +213,13 @@ public sealed class HtmlContainerInt
     /// Raised when the set html document has been fully loaded.<br/>
     /// Allows manipulation of the html dom, scroll position, etc.
     /// </summary>
-    public event EventHandler LoadComplete;
+    public event EventHandler? LoadComplete;
 
     /// <summary>
     /// Raised when the user clicks on a link in the html.<br/>
     /// Allows canceling the execution of the link.
     /// </summary>
-    public event EventHandler<HtmlLinkClickedEventArgs> LinkClicked;
+    public event EventHandler<HtmlLinkClickedEventArgs>? LinkClicked;
 
     /// <summary>
     /// Raised when html renderer requires refresh of the control hosting (invalidation and re-layout).
@@ -254,13 +227,13 @@ public sealed class HtmlContainerInt
     /// <remarks>
     /// There is no guarantee that the event will be raised on the main thread, it can be raised on thread-pool thread.
     /// </remarks>
-    public event EventHandler<HtmlRefreshEventArgs> Refresh;
+    public event EventHandler<HtmlRefreshEventArgs>? Refresh;
 
     /// <summary>
     /// Raised when Html Renderer request scroll to specific location.<br/>
     /// This can occur on document anchor click.
     /// </summary>
-    public event EventHandler<HtmlScrollEventArgs> ScrollChange;
+    public event EventHandler<HtmlScrollEventArgs>? ScrollChange;
 
     /// <summary>
     /// Raised when an error occurred during html rendering.<br/>
@@ -268,20 +241,20 @@ public sealed class HtmlContainerInt
     /// <remarks>
     /// There is no guarantee that the event will be raised on the main thread, it can be raised on thread-pool thread.
     /// </remarks>
-    public event EventHandler<HtmlRenderErrorEventArgs> RenderError;
+    public event EventHandler<HtmlRenderErrorEventArgs>? RenderError;
 
     /// <summary>
     /// Raised when a stylesheet is about to be loaded by file path or URI by link element.<br/>
     /// This event allows to provide the stylesheet manually or provide new source (file or Uri) to load from.<br/>
     /// If no alternative data is provided the original source will be used.<br/>
     /// </summary>
-    public event EventHandler<HtmlStylesheetLoadEventArgs> StylesheetLoad;
+    public event EventHandler<HtmlStylesheetLoadEventArgs>? StylesheetLoad;
 
     /// <summary>
     /// Raised when an image is about to be loaded by file path or URI.<br/>
     /// This event allows to provide the image manually, if not handled the image will be loaded from file or download from URI.
     /// </summary>
-    public event EventHandler<HtmlImageLoadEventArgs> ImageLoad;
+    public event EventHandler<HtmlImageLoadEventArgs>? ImageLoad;
 
     /// <summary>
     /// the parsed stylesheet data used for handling the html
@@ -294,11 +267,7 @@ public sealed class HtmlContainerInt
     /// <summary>
     /// Gets or sets a value indicating if anti-aliasing should be avoided for geometry like backgrounds and borders (default - false).
     /// </summary>
-    public bool AvoidGeometryAntialias
-    {
-        get { return _avoidGeometryAntialias; }
-        set { _avoidGeometryAntialias = value; }
-    }
+    public bool AvoidGeometryAntialias { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating if image asynchronous loading should be avoided (default - false).<br/>
@@ -310,11 +279,7 @@ public sealed class HtmlContainerInt
     /// ports to achieve better performance.<br/>
     /// Asynchronously image loading should be avoided when the full html content must be available during render, like render to image.
     /// </remarks>
-    public bool AvoidAsyncImagesLoading
-    {
-        get { return _avoidAsyncImagesLoading; }
-        set { _avoidAsyncImagesLoading = value; }
-    }
+    public bool AvoidAsyncImagesLoading { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating if image loading only when visible should be avoided (default - false).<br/>
@@ -329,30 +294,18 @@ public sealed class HtmlContainerInt
     /// Early image loading may also effect the layout if image without known size above the current scroll location are loaded as they
     /// will push the html elements down.
     /// </remarks>
-    public bool AvoidImagesLateLoading
-    {
-        get { return _avoidImagesLateLoading; }
-        set { _avoidImagesLateLoading = value; }
-    }
+    public bool AvoidImagesLateLoading { get; set; }
 
     /// <summary>
     /// Is content selection is enabled for the rendered html (default - true).<br/>
     /// If set to 'false' the rendered html will be static only with ability to click on links.
     /// </summary>
-    public bool IsSelectionEnabled
-    {
-        get { return _isSelectionEnabled; }
-        set { _isSelectionEnabled = value; }
-    }
+    public bool IsSelectionEnabled { get; set; } = true;
 
     /// <summary>
     /// Is the build-in context menu enabled and will be shown on mouse right click (default - true)
     /// </summary>
-    public bool IsContextMenuEnabled
-    {
-        get { return _isContextMenuEnabled; }
-        set { _isContextMenuEnabled = value; }
-    }
+    public bool IsContextMenuEnabled { get; set; } = true;
 
     /// <summary>
     /// The scroll offset of the html.<br/>
@@ -411,7 +364,9 @@ public sealed class HtmlContainerInt
         set
         {
             if (value > -1)
+            {
                 _marginTop = value;
+            }
         }
     }
 
@@ -424,7 +379,9 @@ public sealed class HtmlContainerInt
         set
         {
             if (value > -1)
+            {
                 _marginBottom = value;
+            }
         }
     }
 
@@ -437,7 +394,9 @@ public sealed class HtmlContainerInt
         set
         {
             if (value > -1)
+            {
                 _marginLeft = value;
+            }
         }
     }
 
@@ -450,7 +409,9 @@ public sealed class HtmlContainerInt
         set
         {
             if (value > -1)
+            {
                 _marginRight = value;
+            }
         }
     }
 
@@ -458,10 +419,12 @@ public sealed class HtmlContainerInt
     /// Set all 4 margins to the given value.
     /// </summary>
     /// <param name="value"></param>
-    public void SetMargins(int value)
+    public void SetMargins (int value)
     {
         if (value > -1)
+        {
             _marginBottom = _marginLeft = _marginTop = _marginRight = value;
+        }
     }
 
     /// <summary>
@@ -518,16 +481,16 @@ public sealed class HtmlContainerInt
         )
     {
         Clear();
-        if (!string.IsNullOrEmpty(htmlSource))
+        if (!string.IsNullOrEmpty (htmlSource))
         {
             _loadComplete = false;
             _cssData = baseCssData ?? _adapter.DefaultCssData;
 
-            DomParser parser = new DomParser(_cssParser);
-            _root = parser.GenerateCssTree(htmlSource, this, ref _cssData);
+            DomParser parser = new DomParser (_cssParser);
+            _root = parser.GenerateCssTree (htmlSource, this, ref _cssData);
             if (_root != null)
             {
-                _selectionHandler = new SelectionHandler(_root);
+                _selectionHandler = new SelectionHandler (_root);
                 _imageDownloader = new ImageDownloader();
             }
         }
@@ -544,11 +507,17 @@ public sealed class HtmlContainerInt
             _root = null;
 
             if (_selectionHandler != null)
+            {
                 _selectionHandler.Dispose();
+            }
+
             _selectionHandler = null;
 
             if (_imageDownloader != null)
+            {
                 _imageDownloader.Dispose();
+            }
+
             _imageDownloader = null;
 
             _hoverBoxes = null;
@@ -563,7 +532,7 @@ public sealed class HtmlContainerInt
         if (_selectionHandler != null)
         {
             _selectionHandler.ClearSelection();
-            RequestRefresh(false);
+            RequestRefresh (false);
         }
     }
 
@@ -572,9 +541,9 @@ public sealed class HtmlContainerInt
     /// </summary>
     /// <param name="styleGen">Optional: controls the way styles are generated when html is generated (default: <see cref="HtmlGenerationStyle.Inline"/>)</param>
     /// <returns>generated html</returns>
-    public string GetHtml(HtmlGenerationStyle styleGen = HtmlGenerationStyle.Inline)
+    public string GetHtml (HtmlGenerationStyle styleGen = HtmlGenerationStyle.Inline)
     {
-        return DomUtils.GenerateHtml(_root, styleGen);
+        return DomUtils.GenerateHtml (_root, styleGen);
     }
 
     /// <summary>
@@ -584,12 +553,12 @@ public sealed class HtmlContainerInt
     /// <param name="location">the location to find the attribute at</param>
     /// <param name="attribute">the attribute key to get value by</param>
     /// <returns>found attribute value or null if not found</returns>
-    public string GetAttributeAt(RPoint location, string attribute)
+    public string GetAttributeAt (RPoint location, string attribute)
     {
-        ArgChecker.AssertArgNotNullOrEmpty(attribute, "attribute");
+        ArgChecker.AssertArgNotNullOrEmpty (attribute, "attribute");
 
-        var cssBox = DomUtils.GetCssBox(_root, OffsetByScroll(location));
-        return cssBox != null ? DomUtils.GetAttribute(cssBox, attribute) : null;
+        var cssBox = DomUtils.GetCssBox (_root, OffsetByScroll (location));
+        return cssBox != null ? DomUtils.GetAttribute (cssBox, attribute) : null;
     }
 
     /// <summary>
@@ -599,13 +568,15 @@ public sealed class HtmlContainerInt
     public List<LinkElementData<RRect>> GetLinks()
     {
         var linkBoxes = new List<CssBox>();
-        DomUtils.GetAllLinkBoxes(_root, linkBoxes);
+        DomUtils.GetAllLinkBoxes (_root, linkBoxes);
 
         var linkElements = new List<LinkElementData<RRect>>();
         foreach (var box in linkBoxes)
         {
-            linkElements.Add(new LinkElementData<RRect>(box.GetAttribute("id"), box.GetAttribute("href"), CommonUtils.GetFirstValueOrDefault(box.Rectangles, box.Bounds)));
+            linkElements.Add (new LinkElementData<RRect> (box.GetAttribute ("id"), box.GetAttribute ("href"),
+                CommonUtils.GetFirstValueOrDefault (box.Rectangles, box.Bounds)));
         }
+
         return linkElements;
     }
 
@@ -614,9 +585,9 @@ public sealed class HtmlContainerInt
     /// </summary>
     /// <param name="location">the location to find the link at</param>
     /// <returns>css link href if exists or null</returns>
-    public string GetLinkAt(RPoint location)
+    public string GetLinkAt (RPoint location)
     {
-        var link = DomUtils.GetLinkBox(_root, OffsetByScroll(location));
+        var link = DomUtils.GetLinkBox (_root, OffsetByScroll (location));
         return link != null ? link.HrefLink : null;
     }
 
@@ -627,36 +598,36 @@ public sealed class HtmlContainerInt
     /// </summary>
     /// <param name="elementId">the id of the element to get its rectangle</param>
     /// <returns>the rectangle of the element or null if not found</returns>
-    public RRect? GetElementRectangle(string elementId)
+    public RRect? GetElementRectangle (string elementId)
     {
-        ArgChecker.AssertArgNotNullOrEmpty(elementId, "elementId");
+        ArgChecker.AssertArgNotNullOrEmpty (elementId, "elementId");
 
-        var box = DomUtils.GetBoxById(_root, elementId.ToLower());
-        return box != null ? CommonUtils.GetFirstValueOrDefault(box.Rectangles, box.Bounds) : (RRect?)null;
+        var box = DomUtils.GetBoxById (_root, elementId.ToLower());
+        return box != null ? CommonUtils.GetFirstValueOrDefault (box.Rectangles, box.Bounds) : (RRect?)null;
     }
 
     /// <summary>
     /// Measures the bounds of box and children, recursively.
     /// </summary>
     /// <param name="g">Device context to draw</param>
-    public void PerformLayout(RGraphics g)
+    public void PerformLayout (RGraphics g)
     {
-        ArgChecker.AssertArgNotNull(g, "g");
+        ArgChecker.AssertArgNotNull (g, "g");
 
         _actualSize = RSize.Empty;
         if (_root != null)
         {
             // if width is not restricted we set it to large value to get the actual later
-            _root.Size = new RSize(_maxSize.Width > 0 ? _maxSize.Width : 99999, 0);
+            _root.Size = new RSize (_maxSize.Width > 0 ? _maxSize.Width : 99999, 0);
             _root.Location = _location;
-            _root.PerformLayout(g);
+            _root.PerformLayout (g);
 
             if (_maxSize.Width <= 0.1)
             {
                 // in case the width is not restricted we need to double layout, first will find the width so second can layout by it (center alignment)
-                _root.Size = new RSize((int)Math.Ceiling(_actualSize.Width), 0);
+                _root.Size = new RSize ((int)Math.Ceiling (_actualSize.Width), 0);
                 _actualSize = RSize.Empty;
-                _root.PerformLayout(g);
+                _root.PerformLayout (g);
             }
 
             if (!_loadComplete)
@@ -664,7 +635,9 @@ public sealed class HtmlContainerInt
                 _loadComplete = true;
                 EventHandler handler = LoadComplete;
                 if (handler != null)
-                    handler(this, EventArgs.Empty);
+                {
+                    handler (this, EventArgs.Empty);
+                }
             }
         }
     }
@@ -673,22 +646,23 @@ public sealed class HtmlContainerInt
     /// Render the html using the given device.
     /// </summary>
     /// <param name="g">the device to use to render</param>
-    public void PerformPaint(RGraphics g)
+    public void PerformPaint (RGraphics g)
     {
-        ArgChecker.AssertArgNotNull(g, "g");
+        ArgChecker.AssertArgNotNull (g, "g");
 
         if (MaxSize.Height > 0)
         {
-            g.PushClip(new RRect(_location.X, _location.Y, Math.Min(_maxSize.Width, PageSize.Width), Math.Min(_maxSize.Height, PageSize.Height)));
+            g.PushClip (new RRect (_location.X, _location.Y, Math.Min (_maxSize.Width, PageSize.Width),
+                Math.Min (_maxSize.Height, PageSize.Height)));
         }
         else
         {
-            g.PushClip(new RRect(MarginLeft, MarginTop, PageSize.Width, PageSize.Height));
+            g.PushClip (new RRect (MarginLeft, MarginTop, PageSize.Width, PageSize.Height));
         }
 
         if (_root != null)
         {
-            _root.Paint(g);
+            _root.Paint (g);
         }
 
         g.PopClip();
@@ -699,18 +673,20 @@ public sealed class HtmlContainerInt
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="location">the location of the mouse</param>
-    public void HandleMouseDown(RControl parent, RPoint location)
+    public void HandleMouseDown (RControl parent, RPoint location)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
+        ArgChecker.AssertArgNotNull (parent, "parent");
 
         try
         {
             if (_selectionHandler != null)
-                _selectionHandler.HandleMouseDown(parent, OffsetByScroll(location), IsMouseInContainer(location));
+            {
+                _selectionHandler.HandleMouseDown (parent, OffsetByScroll (location), IsMouseInContainer (location));
+            }
         }
         catch (Exception ex)
         {
-            ReportError(HtmlRenderErrorType.KeyboardMouse, "Failed mouse down handle", ex);
+            ReportError (HtmlRenderErrorType.KeyboardMouse, "Failed mouse down handle", ex);
         }
     }
 
@@ -720,22 +696,22 @@ public sealed class HtmlContainerInt
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="location">the location of the mouse</param>
     /// <param name="e">the mouse event data</param>
-    public void HandleMouseUp(RControl parent, RPoint location, RMouseEvent e)
+    public void HandleMouseUp (RControl parent, RPoint location, RMouseEvent e)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
+        ArgChecker.AssertArgNotNull (parent, "parent");
 
         try
         {
-            if (_selectionHandler != null && IsMouseInContainer(location))
+            if (_selectionHandler != null && IsMouseInContainer (location))
             {
-                var ignore = _selectionHandler.HandleMouseUp(parent, e.LeftButton);
+                var ignore = _selectionHandler.HandleMouseUp (parent, e.LeftButton);
                 if (!ignore && e.LeftButton)
                 {
-                    var loc = OffsetByScroll(location);
-                    var link = DomUtils.GetLinkBox(_root, loc);
+                    var loc = OffsetByScroll (location);
+                    var link = DomUtils.GetLinkBox (_root, loc);
                     if (link != null)
                     {
-                        HandleLinkClicked(parent, location, link);
+                        HandleLinkClicked (parent, location, link);
                     }
                 }
             }
@@ -746,7 +722,7 @@ public sealed class HtmlContainerInt
         }
         catch (Exception ex)
         {
-            ReportError(HtmlRenderErrorType.KeyboardMouse, "Failed mouse up handle", ex);
+            ReportError (HtmlRenderErrorType.KeyboardMouse, "Failed mouse up handle", ex);
         }
     }
 
@@ -755,18 +731,20 @@ public sealed class HtmlContainerInt
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
     /// <param name="location">the location of the mouse</param>
-    public void HandleMouseDoubleClick(RControl parent, RPoint location)
+    public void HandleMouseDoubleClick (RControl parent, RPoint location)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
+        ArgChecker.AssertArgNotNull (parent, "parent");
 
         try
         {
-            if (_selectionHandler != null && IsMouseInContainer(location))
-                _selectionHandler.SelectWord(parent, OffsetByScroll(location));
+            if (_selectionHandler != null && IsMouseInContainer (location))
+            {
+                _selectionHandler.SelectWord (parent, OffsetByScroll (location));
+            }
         }
         catch (Exception ex)
         {
-            ReportError(HtmlRenderErrorType.KeyboardMouse, "Failed mouse double click handle", ex);
+            ReportError (HtmlRenderErrorType.KeyboardMouse, "Failed mouse double click handle", ex);
         }
     }
 
@@ -775,15 +753,17 @@ public sealed class HtmlContainerInt
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
     /// <param name="location">the location of the mouse</param>
-    public void HandleMouseMove(RControl parent, RPoint location)
+    public void HandleMouseMove (RControl parent, RPoint location)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
+        ArgChecker.AssertArgNotNull (parent, "parent");
 
         try
         {
-            var loc = OffsetByScroll(location);
-            if (_selectionHandler != null && IsMouseInContainer(location))
-                _selectionHandler.HandleMouseMove(parent, loc);
+            var loc = OffsetByScroll (location);
+            if (_selectionHandler != null && IsMouseInContainer (location))
+            {
+                _selectionHandler.HandleMouseMove (parent, loc);
+            }
 
             /*
             if( _hoverBoxes != null )
@@ -808,7 +788,7 @@ public sealed class HtmlContainerInt
         }
         catch (Exception ex)
         {
-            ReportError(HtmlRenderErrorType.KeyboardMouse, "Failed mouse move handle", ex);
+            ReportError (HtmlRenderErrorType.KeyboardMouse, "Failed mouse move handle", ex);
         }
     }
 
@@ -816,18 +796,20 @@ public sealed class HtmlContainerInt
     /// Handle mouse leave to handle hover cursor.
     /// </summary>
     /// <param name="parent">the control hosting the html to set cursor and invalidate</param>
-    public void HandleMouseLeave(RControl parent)
+    public void HandleMouseLeave (RControl parent)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
+        ArgChecker.AssertArgNotNull (parent, "parent");
 
         try
         {
             if (_selectionHandler != null)
-                _selectionHandler.HandleMouseLeave(parent);
+            {
+                _selectionHandler.HandleMouseLeave (parent);
+            }
         }
         catch (Exception ex)
         {
-            ReportError(HtmlRenderErrorType.KeyboardMouse, "Failed mouse leave handle", ex);
+            ReportError (HtmlRenderErrorType.KeyboardMouse, "Failed mouse leave handle", ex);
         }
     }
 
@@ -836,10 +818,10 @@ public sealed class HtmlContainerInt
     /// </summary>
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="e">the pressed key</param>
-    public void HandleKeyDown(RControl parent, RKeyEvent e)
+    public void HandleKeyDown (RControl parent, RKeyEvent e)
     {
-        ArgChecker.AssertArgNotNull(parent, "parent");
-        ArgChecker.AssertArgNotNull(e, "e");
+        ArgChecker.AssertArgNotNull (parent, "parent");
+        ArgChecker.AssertArgNotNull (e, "e");
 
         try
         {
@@ -848,7 +830,7 @@ public sealed class HtmlContainerInt
                 // select all
                 if (e.AKeyCode)
                 {
-                    _selectionHandler.SelectAll(parent);
+                    _selectionHandler.SelectAll (parent);
                 }
 
                 // copy currently selected text
@@ -860,7 +842,7 @@ public sealed class HtmlContainerInt
         }
         catch (Exception ex)
         {
-            ReportError(HtmlRenderErrorType.KeyboardMouse, "Failed key down handle", ex);
+            ReportError (HtmlRenderErrorType.KeyboardMouse, "Failed key down handle", ex);
         }
     }
 
@@ -868,17 +850,19 @@ public sealed class HtmlContainerInt
     /// Raise the stylesheet load event with the given event args.
     /// </summary>
     /// <param name="args">the event args</param>
-    internal void RaiseHtmlStylesheetLoadEvent(HtmlStylesheetLoadEventArgs args)
+    internal void RaiseHtmlStylesheetLoadEvent (HtmlStylesheetLoadEventArgs args)
     {
         try
         {
             EventHandler<HtmlStylesheetLoadEventArgs> handler = StylesheetLoad;
             if (handler != null)
-                handler(this, args);
+            {
+                handler (this, args);
+            }
         }
         catch (Exception ex)
         {
-            ReportError(HtmlRenderErrorType.CssParsing, "Failed stylesheet load event", ex);
+            ReportError (HtmlRenderErrorType.CssParsing, "Failed stylesheet load event", ex);
         }
     }
 
@@ -886,17 +870,19 @@ public sealed class HtmlContainerInt
     /// Raise the image load event with the given event args.
     /// </summary>
     /// <param name="args">the event args</param>
-    internal void RaiseHtmlImageLoadEvent(HtmlImageLoadEventArgs args)
+    internal void RaiseHtmlImageLoadEvent (HtmlImageLoadEventArgs args)
     {
         try
         {
             EventHandler<HtmlImageLoadEventArgs> handler = ImageLoad;
             if (handler != null)
-                handler(this, args);
+            {
+                handler (this, args);
+            }
         }
         catch (Exception ex)
         {
-            ReportError(HtmlRenderErrorType.Image, "Failed image load event", ex);
+            ReportError (HtmlRenderErrorType.Image, "Failed image load event", ex);
         }
     }
 
@@ -904,17 +890,19 @@ public sealed class HtmlContainerInt
     /// Request invalidation and re-layout of the control hosting the renderer.
     /// </summary>
     /// <param name="layout">is re-layout is required for the refresh</param>
-    public void RequestRefresh(bool layout)
+    public void RequestRefresh (bool layout)
     {
         try
         {
             EventHandler<HtmlRefreshEventArgs> handler = Refresh;
             if (handler != null)
-                handler(this, new HtmlRefreshEventArgs(layout));
+            {
+                handler (this, new HtmlRefreshEventArgs (layout));
+            }
         }
         catch (Exception ex)
         {
-            ReportError(HtmlRenderErrorType.General, "Failed refresh request", ex);
+            ReportError (HtmlRenderErrorType.General, "Failed refresh request", ex);
         }
     }
 
@@ -924,16 +912,21 @@ public sealed class HtmlContainerInt
     /// <param name="type">the type of error to report</param>
     /// <param name="message">the error message</param>
     /// <param name="exception">optional: the exception that occured</param>
-    internal void ReportError(HtmlRenderErrorType type, string message, Exception exception = null)
+    internal void ReportError
+        (
+            HtmlRenderErrorType type,
+            string message,
+            Exception? exception = null
+        )
     {
         try
         {
-            EventHandler<HtmlRenderErrorEventArgs> handler = RenderError;
-            if (handler != null)
-                handler(this, new HtmlRenderErrorEventArgs(type, message, exception));
+            var handler = RenderError;
+            handler?.Invoke (this, new HtmlRenderErrorEventArgs (type, message, exception));
         }
         catch
-        { }
+        {
+        }
     }
 
     /// <summary>
@@ -942,44 +935,47 @@ public sealed class HtmlContainerInt
     /// <param name="parent">the control hosting the html to invalidate</param>
     /// <param name="location">the location of the mouse</param>
     /// <param name="link">the link that was clicked</param>
-    internal void HandleLinkClicked(RControl parent, RPoint location, CssBox link)
+    internal void HandleLinkClicked (RControl parent, RPoint location, CssBox link)
     {
         EventHandler<HtmlLinkClickedEventArgs> clickHandler = LinkClicked;
         if (clickHandler != null)
         {
-            var args = new HtmlLinkClickedEventArgs(link.HrefLink, link.HtmlTag.Attributes);
+            var args = new HtmlLinkClickedEventArgs (link.HrefLink, link.HtmlTag.Attributes);
             try
             {
-                clickHandler(this, args);
+                clickHandler (this, args);
             }
             catch (Exception ex)
             {
-                throw new HtmlLinkClickedException("Error in link clicked intercept", ex);
+                throw new HtmlLinkClickedException ("Error in link clicked intercept", ex);
             }
+
             if (args.Handled)
+            {
                 return;
+            }
         }
 
-        if (!string.IsNullOrEmpty(link.HrefLink))
+        if (!string.IsNullOrEmpty (link.HrefLink))
         {
-            if (link.HrefLink.StartsWith("#") && link.HrefLink.Length > 1)
+            if (link.HrefLink.StartsWith ("#") && link.HrefLink.Length > 1)
             {
                 EventHandler<HtmlScrollEventArgs> scrollHandler = ScrollChange;
                 if (scrollHandler != null)
                 {
-                    var rect = GetElementRectangle(link.HrefLink.Substring(1));
+                    var rect = GetElementRectangle (link.HrefLink.Substring (1));
                     if (rect.HasValue)
                     {
-                        scrollHandler(this, new HtmlScrollEventArgs(rect.Value.Location));
-                        HandleMouseMove(parent, location);
+                        scrollHandler (this, new HtmlScrollEventArgs (rect.Value.Location));
+                        HandleMouseMove (parent, location);
                     }
                 }
             }
             else
             {
-                var nfo = new ProcessStartInfo(link.HrefLink);
+                var nfo = new ProcessStartInfo (link.HrefLink);
                 nfo.UseShellExecute = true;
-                Process.Start(nfo);
+                Process.Start (nfo);
             }
         }
     }
@@ -989,15 +985,17 @@ public sealed class HtmlContainerInt
     /// </summary>
     /// <param name="box">the box that has the hover selector</param>
     /// <param name="block">the css block with the css data with the selector</param>
-    internal void AddHoverBox(CssBox box, CssBlock block)
+    internal void AddHoverBox (CssBox box, CssBlock block)
     {
-        ArgChecker.AssertArgNotNull(box, "box");
-        ArgChecker.AssertArgNotNull(block, "block");
+        ArgChecker.AssertArgNotNull (box, "box");
+        ArgChecker.AssertArgNotNull (block, "block");
 
         if (_hoverBoxes == null)
+        {
             _hoverBoxes = new List<HoverBoxBlock>();
+        }
 
-        _hoverBoxes.Add(new HoverBoxBlock(box, block));
+        _hoverBoxes.Add (new HoverBoxBlock (box, block));
     }
 
     /// <summary>
@@ -1015,7 +1013,7 @@ public sealed class HtmlContainerInt
     /// <filterpriority>2</filterpriority>
     public void Dispose()
     {
-        Dispose(true);
+        Dispose (true);
     }
 
 
@@ -1026,24 +1024,26 @@ public sealed class HtmlContainerInt
     /// </summary>
     /// <param name="location">the location to adjust</param>
     /// <returns>the adjusted location</returns>
-    private RPoint OffsetByScroll(RPoint location)
+    private RPoint OffsetByScroll (RPoint location)
     {
-        return new RPoint(location.X - ScrollOffset.X, location.Y - ScrollOffset.Y);
+        return new RPoint (location.X - ScrollOffset.X, location.Y - ScrollOffset.Y);
     }
 
     /// <summary>
     /// Check if the mouse is currently on the html container.<br/>
     /// Relevant if the html container is not filled in the hosted control (location is not zero and the size is not the full size of the control).
     /// </summary>
-    private bool IsMouseInContainer(RPoint location)
+    private bool IsMouseInContainer (RPoint location)
     {
-        return location.X >= _location.X && location.X <= _location.X + _actualSize.Width && location.Y >= _location.Y + ScrollOffset.Y && location.Y <= _location.Y + ScrollOffset.Y + _actualSize.Height;
+        return location.X >= _location.X && location.X <= _location.X + _actualSize.Width &&
+               location.Y >= _location.Y + ScrollOffset.Y &&
+               location.Y <= _location.Y + ScrollOffset.Y + _actualSize.Height;
     }
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
-    private void Dispose(bool all)
+    private void Dispose (bool all)
     {
         try
         {
@@ -1058,14 +1058,21 @@ public sealed class HtmlContainerInt
 
             _cssData = null;
             if (_root != null)
+            {
                 _root.Dispose();
+            }
+
             _root = null;
             if (_selectionHandler != null)
+            {
                 _selectionHandler.Dispose();
+            }
+
             _selectionHandler = null;
         }
         catch
-        { }
+        {
+        }
     }
 
     #endregion

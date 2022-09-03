@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* CollectionPlus.cs --
+/* CollectionPlus.cs -- базовый класс коллекции для элементов диаграммы
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,9 +21,9 @@ using System.Collections;
 namespace AM.Drawing.Charting;
 
 /// <summary>
-/// A collection base class containing basic extra functionality to be inherited
-/// by <see cref="CurveList"/>, <see cref="IPointList"/>,
-/// <see cref="GraphObjList"/>.
+/// Базовый класс коллекции, содержащий базовые дополнительные
+/// функции, которые будут наследоваться <see cref="CurveList"/>,
+/// <see cref="IPointList"/>, <see cref="GraphObjList"/>.
 /// </summary>
 /// <remarks>The methods in this collection operate on basic
 /// <see cref="object"/> types.  Therefore, in order to make sure that
@@ -35,37 +35,27 @@ namespace AM.Drawing.Charting;
 public class CollectionPlus
     : CollectionBase
 {
-    /// <summary>
-    /// Default Constructor
-    /// </summary>
-    public CollectionPlus()
+    #region Public methods
+
+    /// <inheritdoc cref="IList.IndexOf"/>
+    public int IndexOf
+        (
+            object? item
+        )
     {
-        // пустое тело конструктора
+        if (item is not null)
+        {
+            return List.IndexOf (item);
+        }
+
+        return -1;
     }
 
-    /// <summary>
-    /// Return the zero-based position index of the specified object
-    /// in the collection.
-    /// </summary>
-    /// <param name="item">A reference to the object that is to be found.
-    /// </param>
-    /// <returns>The zero-based index of the specified object, or -1 if the
-    /// object is not in the list</returns>
-    /// <seealso cref="IList.IndexOf"/>
-    public int IndexOf (object item)
-    {
-        return List.IndexOf (item);
-    }
-
-    /// <summary>
-    /// Remove an object from the collection at the specified ordinal location.
-    /// </summary>
-    /// <param name="index">
-    /// An ordinal position in the list at which the object to be removed
-    /// is located.
-    /// </param>
-    /// <seealso cref="IList.Remove"/>
-    public void Remove (int index)
+    /// <inheritdoc cref="IList.RemoveAt"/>
+    public void Remove
+        (
+            int index
+        )
     {
         if (index >= 0 && index < List.Count)
         {
@@ -73,15 +63,16 @@ public class CollectionPlus
         }
     }
 
-    /// <summary>
-    /// Remove an object from the collection based on an object reference.
-    /// </summary>
-    /// <param name="item">A reference to the object that is to be
-    /// removed.</param>
-    /// <seealso cref="IList.Remove"/>
-    public void Remove (object item)
+    /// <inheritdoc cref="IList.Remove"/>
+    public void Remove
+        (
+            object? item
+        )
     {
-        List.Remove (item);
+        if (item is not null)
+        {
+            List.Remove (item);
+        }
     }
 
     /// <summary>
@@ -101,7 +92,11 @@ public class CollectionPlus
     /// </param>
     /// <returns>The new position for the object, or -1 if the object
     /// was not found.</returns>
-    public int Move (int index, int relativePos)
+    public int Move
+        (
+            int index,
+            int relativePos
+        )
     {
         if (index < 0 || index >= List.Count)
         {
@@ -124,6 +119,8 @@ public class CollectionPlus
         List.Insert (index, obj);
         return index;
     }
+
+    #endregion
 
     /*
     #region Serialization
@@ -151,8 +148,11 @@ public class CollectionPlus
         /// </summary>
         /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
         /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-        [SecurityPermissionAttribute(SecurityAction.Demand,SerializationFormatter=true)]
-        public virtual void GetObjectData( SerializationInfo info, StreamingContext context )
+        public virtual void GetObjectData
+            (
+                SerializationInfo info,
+                StreamingContext context
+            )
         {
             base.GetObjectData( info, context );
 

@@ -1,4 +1,5 @@
 #region PDFsharp - A .NET library for processing PDF
+
 //
 // Authors:
 //   Stefan Lange
@@ -23,8 +24,9 @@
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
+
 #endregion
 
 // With this define each iref object gets a unique number (uid) to make them distinguishable in the debugger
@@ -33,6 +35,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+
 using PdfSharpCore.Pdf.IO;
 
 namespace PdfSharpCore.Pdf.Advanced
@@ -40,13 +43,13 @@ namespace PdfSharpCore.Pdf.Advanced
     /// <summary>
     /// Represents an indirect reference to a PdfObject.
     /// </summary>
-    [DebuggerDisplay("iref({ObjectNumber}, {GenerationNumber})")]
+    [DebuggerDisplay ("iref({ObjectNumber}, {GenerationNumber})")]
     public sealed class PdfReference : PdfItem
     {
-        // About PdfReference 
-        // 
+        // About PdfReference
+        //
         // * A PdfReference holds either the ObjectID or the PdfObject or both.
-        // 
+        //
         // * Each PdfObject has a PdfReference if and only if it is an indirect object. Direct objects have
         //   no PdfReference, because they are embedded in a parent objects.
         //
@@ -65,10 +68,13 @@ namespace PdfSharpCore.Pdf.Advanced
         /// <summary>
         /// Initializes a new PdfReference instance for the specified indirect object.
         /// </summary>
-        public PdfReference(PdfObject pdfObject)
+        public PdfReference (PdfObject pdfObject)
         {
             if (pdfObject.Reference != null)
-                throw new InvalidOperationException("Must not create iref for an object that already has one.");
+            {
+                throw new InvalidOperationException ("Must not create iref for an object that already has one.");
+            }
+
             _value = pdfObject;
             pdfObject.Reference = this;
 #if UNIQUE_IREF && DEBUG
@@ -79,7 +85,7 @@ namespace PdfSharpCore.Pdf.Advanced
         /// <summary>
         /// Initializes a new PdfReference instance from the specified object identifier and file position.
         /// </summary>
-        public PdfReference(PdfObjectID objectID, long position)
+        public PdfReference (PdfObjectID objectID, long position)
         {
             _objectID = objectID;
             _position = position;
@@ -91,22 +97,22 @@ namespace PdfSharpCore.Pdf.Advanced
         /// <summary>
         /// Writes the object in PDF iref table format.
         /// </summary>
-        internal void WriteXRefEnty(PdfWriter writer)
+        internal void WriteXRefEnty (PdfWriter writer)
         {
             // PDFsharp does not yet support PDF 1.5 object streams.
 
             // Each line must be exactly 20 bytes long, otherwise Acrobat repairs the file.
-            string text = String.Format("{0:0000000000} {1:00000} n\n",
-              _position, _objectID.GenerationNumber); // InUse ? 'n' : 'f');
-            writer.WriteRaw(text);
+            var text = String.Format ("{0:0000000000} {1:00000} n\n",
+                _position, _objectID.GenerationNumber); // InUse ? 'n' : 'f');
+            writer.WriteRaw (text);
         }
 
         /// <summary>
         /// Writes an indirect reference.
         /// </summary>
-        internal override void WriteObject(PdfWriter writer)
+        internal override void WriteObject (PdfWriter writer)
         {
-            writer.Write(this);
+            writer.Write (this);
         }
 
         /// <summary>
@@ -119,7 +125,9 @@ namespace PdfSharpCore.Pdf.Advanced
             {
                 // Ignore redundant invokations.
                 if (_objectID == value)
+                {
                     return;
+                }
 
                 _objectID = value;
                 if (Document != null)
@@ -131,6 +139,7 @@ namespace PdfSharpCore.Pdf.Advanced
                 }
             }
         }
+
         PdfObjectID _objectID;
 
         /// <summary>
@@ -157,6 +166,7 @@ namespace PdfSharpCore.Pdf.Advanced
             get { return _position; }
             set { _position = value; }
         }
+
         long _position;
 
         //public bool InUse
@@ -174,19 +184,22 @@ namespace PdfSharpCore.Pdf.Advanced
             get { return _value; }
             set
             {
-                Debug.Assert(value != null, "The value of a PdfReference must never be null.");
-                Debug.Assert(value.Reference == null || ReferenceEquals(value.Reference, this), "The reference of the value must be null or this.");
+                Debug.Assert (value != null, "The value of a PdfReference must never be null.");
+                Debug.Assert (value.Reference == null || ReferenceEquals (value.Reference, this),
+                    "The reference of the value must be null or this.");
                 _value = value;
+
                 // value must never be null
                 value.Reference = this;
             }
         }
+
         PdfObject _value;
 
         /// <summary>
         /// Hack for dead objects.
         /// </summary>
-        internal void SetObject(PdfObject value)
+        internal void SetObject (PdfObject value)
         {
             _value = value;
         }
@@ -199,6 +212,7 @@ namespace PdfSharpCore.Pdf.Advanced
             get { return _document; }
             set { _document = value; }
         }
+
         PdfDocument _document;
 
         /// <summary>
@@ -219,18 +233,25 @@ namespace PdfSharpCore.Pdf.Advanced
         /// </summary>
         internal class PdfReferenceComparer : IComparer<PdfReference>
         {
-            public int Compare(PdfReference x, PdfReference y)
+            public int Compare (PdfReference? x, PdfReference? y)
             {
-                PdfReference l = x;
-                PdfReference r = y;
-                if (l != null)
+                var left = x;
+                var right = y;
+                if (left != null)
                 {
-                    if (r != null)
-                        return l._objectID.CompareTo(r._objectID);
+                    if (right != null)
+                    {
+                        return left._objectID.CompareTo (right._objectID);
+                    }
+
                     return -1;
                 }
-                if (r != null)
+
+                if (right != null)
+                {
                     return 1;
+                }
+
                 return 0;
             }
         }

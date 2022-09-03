@@ -90,11 +90,14 @@ public static class HtmlRender
     /// If loaded from file then the file must not be deleted.
     /// </remarks>
     /// <param name="fontFamily">The font family to add.</param>
-    public static void AddFontFamily(FontFamily fontFamily)
+    public static void AddFontFamily
+        (
+            FontFamily fontFamily
+        )
     {
-        ArgChecker.AssertArgNotNull(fontFamily, "fontFamily");
+        ArgChecker.AssertArgNotNull (fontFamily, "fontFamily");
 
-        WpfAdapter.Instance.AddFontFamily(new FontFamilyAdapter(fontFamily));
+        WpfAdapter.Instance.AddFontFamily (new FontFamilyAdapter (fontFamily));
     }
 
     /// <summary>
@@ -107,12 +110,16 @@ public static class HtmlRender
     /// </remarks>
     /// <param name="fromFamily">the font family to replace</param>
     /// <param name="toFamily">the font family to replace with</param>
-    public static void AddFontFamilyMapping(string fromFamily, string toFamily)
+    public static void AddFontFamilyMapping
+        (
+            string fromFamily,
+            string toFamily
+        )
     {
-        ArgChecker.AssertArgNotNullOrEmpty(fromFamily, "fromFamily");
-        ArgChecker.AssertArgNotNullOrEmpty(toFamily, "toFamily");
+        ArgChecker.AssertArgNotNullOrEmpty (fromFamily, "fromFamily");
+        ArgChecker.AssertArgNotNullOrEmpty (toFamily, "toFamily");
 
-        WpfAdapter.Instance.AddFontFamilyMapping(fromFamily, toFamily);
+        WpfAdapter.Instance.AddFontFamilyMapping (fromFamily, toFamily);
     }
 
     /// <summary>
@@ -124,9 +131,13 @@ public static class HtmlRender
     /// <param name="stylesheet">the stylesheet source to parse</param>
     /// <param name="combineWithDefault">true - combine the parsed css data with default css data, false - return only the parsed css data</param>
     /// <returns>the parsed css data</returns>
-    public static CssData ParseStyleSheet(string stylesheet, bool combineWithDefault = true)
+    public static CssData ParseStyleSheet
+        (
+            string stylesheet,
+            bool combineWithDefault = true
+        )
     {
-        return CssData.Parse(WpfAdapter.Instance, stylesheet, combineWithDefault);
+        return CssData.Parse (WpfAdapter.Instance, stylesheet, combineWithDefault);
     }
 
     /// <summary>
@@ -140,29 +151,41 @@ public static class HtmlRender
     /// <param name="stylesheetLoad">optional: can be used to overwrite stylesheet resolution logic</param>
     /// <param name="imageLoad">optional: can be used to overwrite image resolution logic</param>
     /// <returns>the size required for the html</returns>
-    public static Size Measure(string html, double maxWidth = 0, CssData cssData = null,
-        EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad = null, EventHandler<HtmlImageLoadEventArgs> imageLoad = null)
+    public static Size Measure
+        (
+            string html,
+            double maxWidth = 0,
+            CssData? cssData = null,
+            EventHandler<HtmlStylesheetLoadEventArgs>? stylesheetLoad = null,
+            EventHandler<HtmlImageLoadEventArgs>? imageLoad = null
+        )
     {
-        Size actualSize = Size.Empty;
-        if (!string.IsNullOrEmpty(html))
+        var actualSize = Size.Empty;
+        if (!string.IsNullOrEmpty (html))
         {
             using (var container = new HtmlContainer())
             {
-                container.MaxSize = new Size(maxWidth, 0);
+                container.MaxSize = new Size (maxWidth, 0);
                 container.AvoidAsyncImagesLoading = true;
                 container.AvoidImagesLateLoading = true;
 
                 if (stylesheetLoad != null)
+                {
                     container.StylesheetLoad += stylesheetLoad;
-                if (imageLoad != null)
-                    container.ImageLoad += imageLoad;
+                }
 
-                container.SetHtml(html, cssData);
+                if (imageLoad != null)
+                {
+                    container.ImageLoad += imageLoad;
+                }
+
+                container.SetHtml (html, cssData);
                 container.PerformLayout();
 
                 actualSize = container.ActualSize;
             }
         }
+
         return actualSize;
     }
 
@@ -172,7 +195,7 @@ public static class HtmlRender
     /// wrap as specified in the html<br/>
     /// Returned is the actual width and height of the rendered html.<br/>
     /// </summary>
-    /// <param name="g">Device to render with</param>
+    /// <param name="drawingContext">Device to render with</param>
     /// <param name="html">HTML source to render</param>
     /// <param name="left">optional: the left most location to start render the html at (default - 0)</param>
     /// <param name="top">optional: the top most location to start render the html at (default - 0)</param>
@@ -181,11 +204,21 @@ public static class HtmlRender
     /// <param name="stylesheetLoad">optional: can be used to overwrite stylesheet resolution logic</param>
     /// <param name="imageLoad">optional: can be used to overwrite image resolution logic</param>
     /// <returns>the actual size of the rendered html</returns>
-    public static Size Render(DrawingContext g, string html, double left = 0, double top = 0, double maxWidth = 0, CssData cssData = null,
-        EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad = null, EventHandler<HtmlImageLoadEventArgs> imageLoad = null)
+    public static Size Render
+        (
+            DrawingContext drawingContext,
+            string html,
+            double left = 0,
+            double top = 0,
+            double maxWidth = 0,
+            CssData? cssData = null,
+            EventHandler<HtmlStylesheetLoadEventArgs>? stylesheetLoad = null,
+            EventHandler<HtmlImageLoadEventArgs>? imageLoad = null
+        )
     {
-        ArgChecker.AssertArgNotNull(g, "g");
-        return RenderClip(g, html, new Point(left, top), new Size(maxWidth, 0), cssData, stylesheetLoad, imageLoad);
+        ArgChecker.AssertArgNotNull (drawingContext, "g");
+
+        return RenderClip (drawingContext, html, new Point (left, top), new Size (maxWidth, 0), cssData, stylesheetLoad, imageLoad);
     }
 
     /// <summary>
@@ -196,7 +229,7 @@ public static class HtmlRender
     /// given max height not rendering the html below it.<br/>
     /// Returned is the actual width and height of the rendered html.<br/>
     /// </summary>
-    /// <param name="g">Device to render with</param>
+    /// <param name="drawingContext">Device to render with</param>
     /// <param name="html">HTML source to render</param>
     /// <param name="location">the top-left most location to start render the html at</param>
     /// <param name="maxSize">the max size of the rendered html (if height above zero it will be clipped)</param>
@@ -204,11 +237,19 @@ public static class HtmlRender
     /// <param name="stylesheetLoad">optional: can be used to overwrite stylesheet resolution logic</param>
     /// <param name="imageLoad">optional: can be used to overwrite image resolution logic</param>
     /// <returns>the actual size of the rendered html</returns>
-    public static Size Render(DrawingContext g, string html, Point location, Size maxSize, CssData cssData = null,
-        EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad = null, EventHandler<HtmlImageLoadEventArgs> imageLoad = null)
+    public static Size Render
+        (
+            DrawingContext drawingContext,
+            string html,
+            Point location,
+            Size maxSize,
+            CssData? cssData = null,
+            EventHandler<HtmlStylesheetLoadEventArgs>? stylesheetLoad = null,
+            EventHandler<HtmlImageLoadEventArgs>? imageLoad = null
+        )
     {
-        ArgChecker.AssertArgNotNull(g, "g");
-        return RenderClip(g, html, location, maxSize, cssData, stylesheetLoad, imageLoad);
+        ArgChecker.AssertArgNotNull (drawingContext, "g");
+        return RenderClip (drawingContext, html, location, maxSize, cssData, stylesheetLoad, imageLoad);
     }
 
     /// <summary>
@@ -221,25 +262,31 @@ public static class HtmlRender
     /// <param name="stylesheetLoad">optional: can be used to overwrite stylesheet resolution logic</param>
     /// <param name="imageLoad">optional: can be used to overwrite image resolution logic</param>
     /// <returns>the generated image of the html</returns>
-    public static BitmapFrame RenderToImage(string html, Size size, CssData cssData = null,
-        EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad = null, EventHandler<HtmlImageLoadEventArgs> imageLoad = null)
+    public static BitmapFrame RenderToImage
+        (
+            string html,
+            Size size,
+            CssData? cssData = null,
+            EventHandler<HtmlStylesheetLoadEventArgs>? stylesheetLoad = null,
+            EventHandler<HtmlImageLoadEventArgs>? imageLoad = null
+        )
     {
-        var renderTarget = new RenderTargetBitmap((int)size.Width, (int)size.Height, 96, 96, PixelFormats.Pbgra32);
+        var renderTarget = new RenderTargetBitmap ((int)size.Width, (int)size.Height, 96, 96, PixelFormats.Pbgra32);
 
-        if (!string.IsNullOrEmpty(html))
+        if (!string.IsNullOrEmpty (html))
         {
             // render HTML into the visual
-            DrawingVisual drawingVisual = new DrawingVisual();
-            using (DrawingContext g = drawingVisual.RenderOpen())
+            var drawingVisual = new DrawingVisual();
+            using (var g = drawingVisual.RenderOpen())
             {
-                RenderHtml(g, html, new Point(), size, cssData, stylesheetLoad, imageLoad);
+                RenderHtml (g, html, new Point(), size, cssData, stylesheetLoad, imageLoad);
             }
 
             // render visual into target bitmap
-            renderTarget.Render(drawingVisual);
+            renderTarget.Render (drawingVisual);
         }
 
-        return BitmapFrame.Create(renderTarget);
+        return BitmapFrame.Create (renderTarget);
     }
 
     /// <summary>
@@ -261,10 +308,19 @@ public static class HtmlRender
     /// <param name="stylesheetLoad">optional: can be used to overwrite stylesheet resolution logic</param>
     /// <param name="imageLoad">optional: can be used to overwrite image resolution logic</param>
     /// <returns>the generated image of the html</returns>
-    public static BitmapFrame RenderToImage(string html, int maxWidth = 0, int maxHeight = 0, Color backgroundColor = new Color(), CssData cssData = null,
-        EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad = null, EventHandler<HtmlImageLoadEventArgs> imageLoad = null)
+    public static BitmapFrame RenderToImage
+        (
+            string html,
+            int maxWidth = 0,
+            int maxHeight = 0,
+            Color backgroundColor = new (),
+            CssData? cssData = null,
+            EventHandler<HtmlStylesheetLoadEventArgs>? stylesheetLoad = null,
+            EventHandler<HtmlImageLoadEventArgs>? imageLoad = null
+        )
     {
-        return RenderToImage(html, Size.Empty, new Size(maxWidth, maxHeight), backgroundColor, cssData, stylesheetLoad, imageLoad);
+        return RenderToImage (html, Size.Empty, new Size (maxWidth, maxHeight), backgroundColor, cssData,
+            stylesheetLoad, imageLoad);
     }
 
     /// <summary>
@@ -287,11 +343,19 @@ public static class HtmlRender
     /// <param name="stylesheetLoad">optional: can be used to overwrite stylesheet resolution logic</param>
     /// <param name="imageLoad">optional: can be used to overwrite image resolution logic</param>
     /// <returns>the generated image of the html</returns>
-    public static BitmapFrame RenderToImage(string html, Size minSize, Size maxSize, Color backgroundColor = new Color(), CssData cssData = null,
-        EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad = null, EventHandler<HtmlImageLoadEventArgs> imageLoad = null)
+    public static BitmapFrame RenderToImage
+        (
+            string html,
+            Size minSize,
+            Size maxSize,
+            Color backgroundColor = new (),
+            CssData? cssData = null,
+            EventHandler<HtmlStylesheetLoadEventArgs>? stylesheetLoad = null,
+            EventHandler<HtmlImageLoadEventArgs>? imageLoad = null
+        )
     {
         RenderTargetBitmap renderTarget;
-        if (!string.IsNullOrEmpty(html))
+        if (!string.IsNullOrEmpty (html))
         {
             using (var container = new HtmlContainer())
             {
@@ -299,35 +363,43 @@ public static class HtmlRender
                 container.AvoidImagesLateLoading = true;
 
                 if (stylesheetLoad != null)
+                {
                     container.StylesheetLoad += stylesheetLoad;
-                if (imageLoad != null)
-                    container.ImageLoad += imageLoad;
-                container.SetHtml(html, cssData);
+                }
 
-                var finalSize = MeasureHtmlByRestrictions(container, minSize, maxSize);
+                if (imageLoad != null)
+                {
+                    container.ImageLoad += imageLoad;
+                }
+
+                container.SetHtml (html, cssData);
+
+                var finalSize = MeasureHtmlByRestrictions (container, minSize, maxSize);
                 container.MaxSize = finalSize;
 
-                renderTarget = new RenderTargetBitmap((int)finalSize.Width, (int)finalSize.Height, 96, 96, PixelFormats.Pbgra32);
+                renderTarget = new RenderTargetBitmap ((int)finalSize.Width, (int)finalSize.Height, 96, 96,
+                    PixelFormats.Pbgra32);
 
                 // render HTML into the visual
-                DrawingVisual drawingVisual = new DrawingVisual();
-                using (DrawingContext g = drawingVisual.RenderOpen())
+                var drawingVisual = new DrawingVisual();
+                using (var g = drawingVisual.RenderOpen())
                 {
-                    container.PerformPaint(g, new Rect(new Size(maxSize.Width > 0 ? maxSize.Width : double.MaxValue, maxSize.Height > 0 ? maxSize.Height : double.MaxValue)));
+                    container.PerformPaint (g,
+                        new Rect (new Size (maxSize.Width > 0 ? maxSize.Width : double.MaxValue,
+                            maxSize.Height > 0 ? maxSize.Height : double.MaxValue)));
                 }
 
                 // render visual into target bitmap
-                renderTarget.Render(drawingVisual);
+                renderTarget.Render (drawingVisual);
             }
         }
         else
         {
-            renderTarget = new RenderTargetBitmap(0, 0, 96, 96, PixelFormats.Pbgra32);
+            renderTarget = new RenderTargetBitmap (0, 0, 96, 96, PixelFormats.Pbgra32);
         }
 
-        return BitmapFrame.Create(renderTarget);
+        return BitmapFrame.Create (renderTarget);
     }
-
 
     #region Private methods
 
@@ -338,15 +410,24 @@ public static class HtmlRender
     /// <param name="minSize">the minimal size of the rendered html (zero - not limit the width/height)</param>
     /// <param name="maxSize">the maximum size of the rendered html, if not zero and html cannot be layout within the limit it will be clipped (zero - not limit the width/height)</param>
     /// <returns>return: the size of the html to be rendered within the min/max limits</returns>
-    private static Size MeasureHtmlByRestrictions(HtmlContainer htmlContainer, Size minSize, Size maxSize)
+    private static Size MeasureHtmlByRestrictions
+        (
+            HtmlContainer htmlContainer,
+            Size minSize, Size
+                maxSize
+        )
     {
         // use desktop created graphics to measure the HTML
         using (var mg = new GraphicsAdapter())
         {
-            var sizeInt = HtmlRendererUtils.MeasureHtmlByRestrictions(mg, htmlContainer.HtmlContainerInt, Utils.Convert(minSize), Utils.Convert(maxSize));
+            var sizeInt = HtmlRendererUtils.MeasureHtmlByRestrictions (mg, htmlContainer.HtmlContainerInt,
+                Utils.Convert (minSize), Utils.Convert (maxSize));
             if (maxSize.Width < 1 && sizeInt.Width > 4096)
+            {
                 sizeInt.Width = 4096;
-            return Utils.ConvertRound(sizeInt);
+            }
+
+            return Utils.ConvertRound (sizeInt);
         }
     }
 
@@ -359,7 +440,7 @@ public static class HtmlRender
     /// Clip the graphics so the html will not be rendered outside the max height bound given.<br/>
     /// Returned is the actual width and height of the rendered html.<br/>
     /// </summary>
-    /// <param name="g">Device to render with</param>
+    /// <param name="drawingContext">Device to render with</param>
     /// <param name="html">HTML source to render</param>
     /// <param name="location">the top-left most location to start render the html at</param>
     /// <param name="maxSize">the max size of the rendered html (if height above zero it will be clipped)</param>
@@ -367,15 +448,28 @@ public static class HtmlRender
     /// <param name="stylesheetLoad">optional: can be used to overwrite stylesheet resolution logic</param>
     /// <param name="imageLoad">optional: can be used to overwrite image resolution logic</param>
     /// <returns>the actual size of the rendered html</returns>
-    private static Size RenderClip(DrawingContext g, string html, Point location, Size maxSize, CssData cssData, EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad, EventHandler<HtmlImageLoadEventArgs> imageLoad)
+    private static Size RenderClip
+        (
+            DrawingContext drawingContext,
+            string html,
+            Point location,
+            Size maxSize,
+            CssData cssData,
+            EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad,
+            EventHandler<HtmlImageLoadEventArgs> imageLoad
+        )
     {
         if (maxSize.Height > 0)
-            g.PushClip(new RectangleGeometry(new Rect(location, maxSize)));
+        {
+            drawingContext.PushClip (new RectangleGeometry (new Rect (location, maxSize)));
+        }
 
-        var actualSize = RenderHtml(g, html, location, maxSize, cssData, stylesheetLoad, imageLoad);
+        var actualSize = RenderHtml (drawingContext, html, location, maxSize, cssData, stylesheetLoad, imageLoad);
 
         if (maxSize.Height > 0)
-            g.Pop();
+        {
+            drawingContext.Pop();
+        }
 
         return actualSize;
     }
@@ -388,7 +482,7 @@ public static class HtmlRender
     /// given max height not rendering the html below it.<br/>
     /// Returned is the actual width and height of the rendered html.<br/>
     /// </summary>
-    /// <param name="g">Device to render with</param>
+    /// <param name="drawingContext">Device to render with</param>
     /// <param name="html">HTML source to render</param>
     /// <param name="location">the top-left most location to start render the html at</param>
     /// <param name="maxSize">the max size of the rendered html (if height above zero it will be clipped)</param>
@@ -396,11 +490,20 @@ public static class HtmlRender
     /// <param name="stylesheetLoad">optional: can be used to overwrite stylesheet resolution logic</param>
     /// <param name="imageLoad">optional: can be used to overwrite image resolution logic</param>
     /// <returns>the actual size of the rendered html</returns>
-    private static Size RenderHtml(DrawingContext g, string html, Point location, Size maxSize, CssData cssData, EventHandler<HtmlStylesheetLoadEventArgs> stylesheetLoad, EventHandler<HtmlImageLoadEventArgs> imageLoad)
+    private static Size RenderHtml
+        (
+            DrawingContext drawingContext,
+            string html,
+            Point location,
+            Size maxSize,
+            CssData cssData,
+            EventHandler<HtmlStylesheetLoadEventArgs>? stylesheetLoad,
+            EventHandler<HtmlImageLoadEventArgs>? imageLoad
+        )
     {
-        Size actualSize = Size.Empty;
+        var actualSize = Size.Empty;
 
-        if (!string.IsNullOrEmpty(html))
+        if (!string.IsNullOrEmpty (html))
         {
             using (var container = new HtmlContainer())
             {
@@ -410,13 +513,18 @@ public static class HtmlRender
                 container.AvoidImagesLateLoading = true;
 
                 if (stylesheetLoad != null)
+                {
                     container.StylesheetLoad += stylesheetLoad;
-                if (imageLoad != null)
-                    container.ImageLoad += imageLoad;
+                }
 
-                container.SetHtml(html, cssData);
+                if (imageLoad != null)
+                {
+                    container.ImageLoad += imageLoad;
+                }
+
+                container.SetHtml (html, cssData);
                 container.PerformLayout();
-                container.PerformPaint(g, new Rect(0, 0, double.MaxValue, double.MaxValue));
+                container.PerformPaint (drawingContext, new Rect (0, 0, double.MaxValue, double.MaxValue));
 
                 actualSize = container.ActualSize;
             }

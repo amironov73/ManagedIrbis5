@@ -164,7 +164,9 @@ public class PointPairList
     public void Add (PointPairList pointList)
     {
         foreach (var point in pointList)
+        {
             Add (point);
+        }
 
         Sorted = false;
     }
@@ -180,7 +182,11 @@ public class PointPairList
     /// <param name="y">A double[] array of Y values</param>
     /// <returns>The zero-based ordinal index where the last point was added in the list,
     /// or -1 if no points were added.</returns>
-    public void Add (double[] x, double[] y)
+    public void Add
+        (
+            double[]? x,
+            double[]? y
+        )
     {
         var len = 0;
 
@@ -199,7 +205,7 @@ public class PointPairList
             var point = new PointPair (0, 0, 0);
             if (x == null)
             {
-                point.X = (double)i + 1.0;
+                point.X = i + 1.0;
             }
             else if (i < x.Length)
             {
@@ -212,7 +218,7 @@ public class PointPairList
 
             if (y == null)
             {
-                point.Y = (double)i + 1.0;
+                point.Y = i + 1.0;
             }
             else if (i < y.Length)
             {
@@ -242,7 +248,12 @@ public class PointPairList
     /// <param name="z">A double[] array of Z or lower-dependent axis values</param>
     /// <returns>The zero-based ordinal index where the last point was added in the list,
     /// or -1 if no points were added.</returns>
-    public void Add (double[] x, double[] y, double[] z)
+    public void Add
+        (
+            double[]? x,
+            double[]? y,
+            double[]? z
+        )
     {
         var len = 0;
 
@@ -267,7 +278,7 @@ public class PointPairList
 
             if (x == null)
             {
-                point.X = (double)i + 1.0;
+                point.X = i + 1.0;
             }
             else if (i < x.Length)
             {
@@ -280,7 +291,7 @@ public class PointPairList
 
             if (y == null)
             {
-                point.Y = (double)i + 1.0;
+                point.Y = i + 1.0;
             }
             else if (i < y.Length)
             {
@@ -293,7 +304,7 @@ public class PointPairList
 
             if (z == null)
             {
-                point.Z = (double)i + 1.0;
+                point.Z = i + 1.0;
             }
             else if (i < z.Length)
             {
@@ -459,7 +470,8 @@ public class PointPairList
         var iPt = 0;
         foreach (var p in this)
         {
-            if (p.Tag is string && string.Compare ((string)p.Tag, label, true) == 0)
+            if (p.Tag is string tag
+                && string.Compare (tag, label, StringComparison.InvariantCultureIgnoreCase) == 0)
             {
                 return iPt;
             }
@@ -475,35 +487,40 @@ public class PointPairList
     /// </summary>
     /// <remarks>Equality is based on equal count of <see cref="PointPair"/> items, and
     /// each individual <see cref="PointPair"/> must be equal (as per the
-    /// <see cref="PointPair.Equals"/> method.</remarks>
+    /// <see cref="PointPair.Equals(object?)"/> method.</remarks>
     /// <param name="obj">The <see cref="PointPairList"/> to be compared with for equality.</param>
     /// <returns>true if the <see cref="PointPairList"/> objects are equal, false otherwise.</returns>
-    public override bool Equals (object obj)
+    public override bool Equals (object? obj)
     {
-        var rhs = obj as PointPairList;
-        if (Count != rhs.Count)
+        if (obj is PointPairList rhs)
         {
-            return false;
-        }
-
-        for (var i = 0; i < Count; i++)
-        {
-            if (!this[i].Equals (rhs[i]))
+            if (Count != rhs.Count)
             {
                 return false;
             }
+
+            for (var i = 0; i < Count; i++)
+            {
+                if (!this[i].Equals (rhs[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
-    /// <summary>
-    /// Return the HashCode from the base class.
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
+        // ReSharper disable BaseObjectGetHashCodeCallInGetHashCode
+
         return base.GetHashCode();
+
+        // ReSharper restore BaseObjectGetHashCodeCallInGetHashCode
     }
 
     /// <summary>
@@ -680,9 +697,13 @@ public class PointPairList
     /// </remarks>
     /// <param name="xTarget">The target X value on which to interpolate</param>
     /// <returns>The Y value that corresponds to the <see paramref="xTarget"/> value.</returns>
-    public double InterpolateX (double xTarget)
+    public double InterpolateX
+        (
+            double xTarget
+        )
     {
-        int lo, mid, hi;
+        int lo;
+        int hi;
         if (Count < 2)
         {
             throw new Exception ("Error: Not enough points in curve to interpolate");
@@ -707,9 +728,9 @@ public class PointPairList
 
             // limit to 1000 loops to avoid an infinite loop problem
             int j;
-            for (j = 0; j < 1000 && hi > lo + 1; j++)
+            for (j = 0; j < 1_000 && hi > lo + 1; j++)
             {
-                mid = (hi + lo) / 2;
+                var mid = (hi + lo) / 2;
                 if (xTarget > this[mid].X)
                 {
                     lo = mid;
@@ -720,7 +741,7 @@ public class PointPairList
                 }
             }
 
-            if (j >= 1000)
+            if (j >= 1_000)
             {
                 throw new Exception ("Error: Infinite loop in interpolation");
             }
@@ -755,7 +776,8 @@ public class PointPairList
         // Scale the tension value to be compatible with the GDI+ values
         tension /= 3.0;
 
-        int lo, mid, hi;
+        int lo;
+        int hi;
         if (Count < 2)
         {
             throw new Exception ("Error: Not enough points in curve to interpolate");
@@ -775,9 +797,9 @@ public class PointPairList
 
             // limit to 1000 loops to avoid an infinite loop problem
             int j;
-            for (j = 0; j < 1000 && hi > lo + 1; j++)
+            for (j = 0; j < 1_000 && hi > lo + 1; j++)
             {
-                mid = (hi + lo) / 2;
+                var mid = (hi + lo) / 2;
                 if (xTarget > this[mid].X)
                 {
                     lo = mid;
@@ -788,7 +810,7 @@ public class PointPairList
                 }
             }
 
-            if (j >= 1000)
+            if (j >= 1_000)
             {
                 throw new Exception ("Error: Infinite loop in interpolation");
             }
@@ -903,7 +925,7 @@ public class PointPairList
 
             // limit to 1000 loops to avoid an infinite loop problem
             int j;
-            for (j = 0; j < 1000 && hi > lo + 1; j++)
+            for (j = 0; j < 1_000 && hi > lo + 1; j++)
             {
                 mid = (hi + lo) / 2;
                 if (yTarget > this[mid].Y)
@@ -916,7 +938,7 @@ public class PointPairList
                 }
             }
 
-            if (j >= 1000)
+            if (j >= 1_000)
             {
                 throw new Exception ("Error: Infinite loop in interpolation");
             }

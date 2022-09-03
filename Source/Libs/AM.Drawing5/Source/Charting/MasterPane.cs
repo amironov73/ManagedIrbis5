@@ -82,7 +82,7 @@ public class MasterPane
     /// <see cref="SetLayout(Graphics,bool,int[],float[])"/> method.  This values will be
     /// null if <see cref="SetLayout(Graphics,bool,int[],float[])"/> was never called.
     /// </summary>
-    internal int[] _countList;
+    internal int[]? _countList;
 
     /// <summary>
     /// private field that stores the row/column size proportional values as specified
@@ -90,7 +90,7 @@ public class MasterPane
     /// value will be null if <see cref="SetLayout(Graphics,bool,int[],float[])"/>
     /// was never called.
     /// </summary>
-    internal float[] _prop;
+    internal float[]? _prop;
 
 /*		/// <summary>
 		/// private field to store the <see cref="PaneLayoutMgr" /> instance, which
@@ -102,7 +102,7 @@ public class MasterPane
     /// private field that determines if anti-aliased drawing will be forced on.  Use the
     /// public property <see cref="IsAntiAlias"/> to access this value.
     /// </summary>
-    private bool _isAntiAlias = false;
+    private bool _isAntiAlias;
 
     #endregion
 
@@ -163,8 +163,8 @@ public class MasterPane
     /// <seealso cref="MasterPane.this[int]"/>
     public PaneList PaneList
     {
-        get { return _paneList; }
-        set { _paneList = value; }
+        get => _paneList;
+        set => _paneList = value;
     }
 
 /*
@@ -193,8 +193,8 @@ public class MasterPane
     /// <value>The value is in points (1/72nd inch).</value>
     public float InnerPaneGap
     {
-        get { return _innerPaneGap; }
-        set { _innerPaneGap = value; }
+        get => _innerPaneGap;
+        set => _innerPaneGap = value;
     }
 
     /// <summary>
@@ -202,8 +202,8 @@ public class MasterPane
     /// </summary>
     public bool IsUniformLegendEntries
     {
-        get { return (_isUniformLegendEntries); }
-        set { _isUniformLegendEntries = value; }
+        get => (_isUniformLegendEntries);
+        set => _isUniformLegendEntries = value;
     }
 
     /// <summary>
@@ -226,8 +226,8 @@ public class MasterPane
     /// <seealso cref="ReSize(Graphics,RectangleF)" />
     public bool IsCommonScaleFactor
     {
-        get { return _isCommonScaleFactor; }
-        set { _isCommonScaleFactor = value; }
+        get => _isCommonScaleFactor;
+        set => _isCommonScaleFactor = value;
     }
 
     /// <summary>
@@ -239,8 +239,8 @@ public class MasterPane
     /// </summary>
     public bool IsAntiAlias
     {
-        get { return _isAntiAlias; }
-        set { _isAntiAlias = value; }
+        get => _isAntiAlias;
+        set => _isAntiAlias = value;
     }
 
     #endregion
@@ -258,7 +258,12 @@ public class MasterPane
     /// Default constructor for the class.  Specifies the <see cref="PaneBase.Title"/> of
     /// the <see cref="MasterPane"/>, and the size of the <see cref="PaneBase.Rect"/>.
     /// </summary>
-    public MasterPane (string title, RectangleF paneRect) : base (title, paneRect)
+    public MasterPane
+        (
+            string title,
+            RectangleF paneRect
+        )
+        : base (title, paneRect)
     {
         _innerPaneGap = Default.InnerPaneGap;
 
@@ -266,11 +271,8 @@ public class MasterPane
 
         _isUniformLegendEntries = Default.IsUniformLegendEntries;
         _isCommonScaleFactor = Default.IsCommonScaleFactor;
-
         _paneList = new PaneList();
-
         Legend.IsVisible = Default.IsShowLegend;
-
         _isAntiAlias = false;
 
         InitLayout();
@@ -355,7 +357,7 @@ public class MasterPane
         // backwards compatible as new member variables are added to classes
         var sch = info.GetInt32 ("schema2");
 
-        _paneList = (PaneList)info.GetValue ("paneList", typeof (PaneList));
+        _paneList = (PaneList) info.GetValue ("paneList", typeof (PaneList));
 
         //_paneLayoutMgr = (PaneLayoutMgr) info.GetValue( "paneLayoutMgr", typeof(PaneLayoutMgr) );
         _innerPaneGap = info.GetSingle ("innerPaneGap");
@@ -405,7 +407,7 @@ public class MasterPane
     /// Respond to the callback when the MasterPane objects are fully initialized.
     /// </summary>
     /// <param name="sender"></param>
-    public void OnDeserialization (object sender)
+    public void OnDeserialization (object? sender)
     {
         var bitmap = new Bitmap (10, 10);
         var g = Graphics.FromImage (bitmap);
@@ -425,8 +427,8 @@ public class MasterPane
     /// <value>A <see cref="GraphPane"/> object reference.</value>
     public GraphPane this [int index]
     {
-        get { return ((GraphPane)_paneList[index]); }
-        set { _paneList[index] = value; }
+        get => _paneList[index];
+        set => _paneList[index] = value;
     }
 
     /// <summary>
@@ -436,10 +438,7 @@ public class MasterPane
     /// <param name="title">The string title of the
     /// <see cref="GraphPane"/> object to be accessed.</param>
     /// <value>A <see cref="GraphPane"/> object reference.</value>
-    public GraphPane this [string title]
-    {
-        get { return _paneList[title]; }
-    }
+    public GraphPane this [string title] => _paneList[title];
 
     /// <summary>
     /// Add a <see cref="GraphPane"/> object to the <see cref="PaneList"/> collection at the end of the list.
@@ -463,23 +462,29 @@ public class MasterPane
     /// </remarks>
     public void AxisChange()
     {
-        using (var img = new Bitmap ((int)Rect.Width, (int)Rect.Height))
-        using (var g = Graphics.FromImage (img))
-            AxisChange (g);
+        using var img = new Bitmap ((int)Rect.Width, (int)Rect.Height);
+        using var g = Graphics.FromImage (img);
+
+        AxisChange (g);
     }
 
     /// <summary>
     /// Call <see cref="GraphPane.AxisChange()"/> for all <see cref="GraphPane"/> objects in the
     /// <see cref="PaneList"/> list.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
-    public void AxisChange (Graphics g)
+    public void AxisChange
+        (
+            Graphics graphics
+        )
     {
         foreach (var pane in _paneList)
-            pane.AxisChange (g);
+        {
+            pane.AxisChange (graphics);
+        }
     }
 
     /// <summary>
@@ -500,30 +505,24 @@ public class MasterPane
     /// <seealso cref="SetLayout(Graphics,int,int)" />
     /// <seealso cref="SetLayout(Graphics,bool,int[])" />
     /// <seealso cref="SetLayout(Graphics,bool,int[],float[])" />
-    public void ReSize (Graphics graphics)
+    public void ReSize
+        (
+            Graphics graphics
+        )
     {
         ReSize (graphics, _rect);
     }
 
-    /// <summary>
-    /// Change the size of the <see cref="PaneBase.Rect"/>, and also handle resizing the
-    /// contents by calling <see cref="DoLayout(Graphics)"/>.
-    /// </summary>
-    /// <remarks>This method will use the pane layout that was specified by a call to
-    /// <see cref="SetLayout(Graphics,PaneLayout)"/>.  If
-    /// <see cref="SetLayout(Graphics,PaneLayout)"/> has not previously been called,
-    /// it will default to <see cref="Default.PaneLayout"/>.
-    /// </remarks>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="rect"></param>
+    /// <inheritdoc cref="PaneBase.ReSize"/>
     /// <seealso cref="SetLayout(Graphics,PaneLayout)" />
     /// <seealso cref="SetLayout(Graphics,int,int)" />
     /// <seealso cref="SetLayout(Graphics,bool,int[])" />
     /// <seealso cref="SetLayout(Graphics,bool,int[],float[])" />
-    public override void ReSize (Graphics graphics, RectangleF rect)
+    public override void ReSize
+        (
+            Graphics graphics,
+            RectangleF rect
+        )
     {
         _rect = rect;
         DoLayout (graphics);
@@ -615,7 +614,9 @@ public class MasterPane
         graphics.ResetClip();
 
         foreach (var pane in _paneList)
+        {
             pane.Draw (graphics);
+        }
 
         // Clip everything to the rect
         graphics.SetClip (_rect);
@@ -973,7 +974,7 @@ public class MasterPane
 
             int rows,
                 cols,
-                root = (int)(Math.Sqrt ((double)count) + 0.9999999);
+                root = (int)(Math.Sqrt (count) + 0.9999999);
 
             //float[] widthList = new float[5];
 
@@ -1084,7 +1085,7 @@ public class MasterPane
         Legend.CalcRect (g, this, scaleFactor, ref innerRect);
 
         // scaled InnerGap is the area between the GraphPane.Rect's
-        var scaledInnerGap = (float)(_innerPaneGap * scaleFactor);
+        var scaledInnerGap = _innerPaneGap * scaleFactor;
 
         var iPane = 0;
 
@@ -1098,7 +1099,7 @@ public class MasterPane
             {
                 var propFactor = _prop == null ? 1.0f / rows : _prop[rowNum];
 
-                var height = (innerRect.Height - (float)(rows - 1) * scaledInnerGap) *
+                var height = (innerRect.Height - (rows - 1) * scaledInnerGap) *
                              propFactor;
 
                 var columns = countList[rowNum];
@@ -1107,8 +1108,8 @@ public class MasterPane
                     columns = 1;
                 }
 
-                var width = (innerRect.Width - (float)(columns - 1) * scaledInnerGap) /
-                            (float)columns;
+                var width = (innerRect.Width - (columns - 1) * scaledInnerGap) /
+                            columns;
 
                 for (var colNum = 0; colNum < columns; colNum++)
                 {
@@ -1138,7 +1139,7 @@ public class MasterPane
             {
                 var propFactor = _prop == null ? 1.0f / columns : _prop[colNum];
 
-                var width = (innerRect.Width - (float)(columns - 1) * scaledInnerGap) *
+                var width = (innerRect.Width - (columns - 1) * scaledInnerGap) *
                             propFactor;
 
                 var rows = countList[colNum];
@@ -1147,7 +1148,7 @@ public class MasterPane
                     rows = 1;
                 }
 
-                var height = (innerRect.Height - (float)(rows - 1) * scaledInnerGap) / (float)rows;
+                var height = (innerRect.Height - (rows - 1) * scaledInnerGap) / rows;
 
                 for (var rowNum = 0; rowNum < rows; rowNum++)
                 {

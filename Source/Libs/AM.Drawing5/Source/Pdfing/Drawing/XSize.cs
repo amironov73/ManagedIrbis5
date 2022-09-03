@@ -30,17 +30,23 @@ namespace PdfSharpCore.Drawing
     /// Represents a pair of floating-point numbers, typically the width and height of a
     /// graphical object.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay}")]
-    [Serializable, StructLayout(LayoutKind.Sequential)] //, ValueSerializer(typeof(SizeValueSerializer)), TypeConverter(typeof(SizeConverter))]
+    [DebuggerDisplay ("{DebuggerDisplay}")]
+    [Serializable,
+     StructLayout (LayoutKind
+         .Sequential)] //, ValueSerializer(typeof(SizeValueSerializer)), TypeConverter(typeof(SizeConverter))]
     public struct XSize : IFormattable
     {
         /// <summary>
         /// Initializes a new instance of the XPoint class with the specified values.
         /// </summary>
-        public XSize(double width, double height)
+        public XSize (double width, double height)
         {
             if (width < 0 || height < 0)
-                throw new ArgumentException("WidthAndHeightCannotBeNegative"); //SR.Get(SRID.Size_WidthAndHeightCannotBeNegative, new object[0]));
+            {
+                throw
+                    new ArgumentException (
+                        "WidthAndHeightCannotBeNegative"); //SR.Get(SRID.Size_WidthAndHeightCannotBeNegative, new object[0]));
+            }
 
             _width = width;
             _height = height;
@@ -49,17 +55,18 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Determines whether two size objects are equal.
         /// </summary>
-        public static bool operator ==(XSize size1, XSize size2)
+        public static bool operator == (XSize size1, XSize size2)
         {
             // ReSharper disable CompareOfFloatsByEqualityOperator
             return size1.Width == size2.Width && size1.Height == size2.Height;
+
             // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
         /// <summary>
         /// Determines whether two size objects are not equal.
         /// </summary>
-        public static bool operator !=(XSize size1, XSize size2)
+        public static bool operator != (XSize size1, XSize size2)
         {
             return !(size1 == size2);
         }
@@ -67,29 +74,30 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Indicates whether this two instance are equal.
         /// </summary>
-        public static bool Equals(XSize size1, XSize size2)
+        public static bool Equals (XSize size1, XSize size2)
         {
             if (size1.IsEmpty)
+            {
                 return size2.IsEmpty;
-            return size1.Width.Equals(size2.Width) && size1.Height.Equals(size2.Height);
+            }
+
+            return size1.Width.Equals (size2.Width) && size1.Height.Equals (size2.Height);
         }
 
         /// <summary>
         /// Indicates whether this instance and a specified object are equal.
         /// </summary>
-        public override bool Equals(object o)
+        public override bool Equals (object? o)
         {
-            if (!(o is XSize))
-                return false;
-            return Equals(this, (XSize)o);
+            return o is XSize size && Equals (this, size);
         }
 
         /// <summary>
         /// Indicates whether this instance and a specified size are equal.
         /// </summary>
-        public bool Equals(XSize value)
+        public bool Equals (XSize value)
         {
-            return Equals(this, value);
+            return Equals (this, value);
         }
 
         /// <summary>
@@ -98,23 +106,32 @@ namespace PdfSharpCore.Drawing
         public override int GetHashCode()
         {
             if (IsEmpty)
+            {
                 return 0;
+            }
+
             return Width.GetHashCode() ^ Height.GetHashCode();
         }
 
         /// <summary>
         /// Parses the size from a string.
         /// </summary>
-        public static XSize Parse(string source)
+        public static XSize Parse (string source)
         {
             XSize empty;
-            CultureInfo cultureInfo = CultureInfo.InvariantCulture;
-            TokenizerHelper helper = new TokenizerHelper(source, cultureInfo);
-            string str = helper.NextTokenRequired();
+            var cultureInfo = CultureInfo.InvariantCulture;
+            var helper = new TokenizerHelper (source, cultureInfo);
+            var str = helper.NextTokenRequired();
             if (str == "Empty")
+            {
                 empty = Empty;
+            }
             else
-                empty = new XSize(Convert.ToDouble(str, cultureInfo), Convert.ToDouble(helper.NextTokenRequired(), cultureInfo));
+            {
+                empty = new XSize (Convert.ToDouble (str, cultureInfo),
+                    Convert.ToDouble (helper.NextTokenRequired(), cultureInfo));
+            }
+
             helper.LastTokenRequired();
             return empty;
         }
@@ -124,7 +141,7 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         public XPoint ToXPoint()
         {
-            return new XPoint(_width, _height);
+            return new XPoint (_width, _height);
         }
 
         /// <summary>
@@ -132,7 +149,7 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         public XVector ToXVector()
         {
-            return new XVector(_width, _height);
+            return new XVector (_width, _height);
         }
 
         /// <summary>
@@ -140,34 +157,50 @@ namespace PdfSharpCore.Drawing
         /// </summary>
         public override string ToString()
         {
-            return ConvertToString(null, null);
+            return ConvertToString (null, null);
         }
 
         /// <summary>
         /// Converts this XSize to a human readable string.
         /// </summary>
-        public string ToString(IFormatProvider provider)
+        public string ToString
+            (
+                IFormatProvider? provider
+            )
         {
-            return ConvertToString(null, provider);
+            return ConvertToString (null, provider);
         }
 
         /// <summary>
         /// Converts this XSize to a human readable string.
         /// </summary>
-        string IFormattable.ToString(string format, IFormatProvider provider)
+        string IFormattable.ToString
+            (
+                string? format,
+                IFormatProvider? provider
+            )
         {
-            return ConvertToString(format, provider);
+            return ConvertToString (format, provider);
         }
 
-        internal string ConvertToString(string format, IFormatProvider provider)
+        internal string ConvertToString
+            (
+                string? format,
+                IFormatProvider? provider
+            )
         {
             if (IsEmpty)
+            {
                 return "Empty";
+            }
 
-            char numericListSeparator = TokenizerHelper.GetNumericListSeparator(provider);
-            provider = provider ?? CultureInfo.InvariantCulture;
+            provider ??= CultureInfo.InvariantCulture;
+            var numericListSeparator = TokenizerHelper.GetNumericListSeparator (provider);
+
             // ReSharper disable FormatStringProblem
-            return string.Format(provider, "{1:" + format + "}{0}{2:" + format + "}", new object[] { numericListSeparator, _width, _height });
+            return string.Format (provider, "{1:" + format + "}{0}{2:" + format + "}",
+                new object[] { numericListSeparator, _width, _height });
+
             // ReSharper restore FormatStringProblem
         }
 
@@ -178,6 +211,7 @@ namespace PdfSharpCore.Drawing
         {
             get { return s_empty; }
         }
+
         static readonly XSize s_empty;
 
         /// <summary>
@@ -197,12 +231,23 @@ namespace PdfSharpCore.Drawing
             set
             {
                 if (IsEmpty)
-                    throw new InvalidOperationException("CannotModifyEmptySize"); //SR.Get(SRID.Size_CannotModifyEmptySize, new object[0]));
+                {
+                    throw
+                        new InvalidOperationException (
+                            "CannotModifyEmptySize"); //SR.Get(SRID.Size_CannotModifyEmptySize, new object[0]));
+                }
+
                 if (value < 0)
-                    throw new ArgumentException("WidthCannotBeNegative"); //SR.Get(SRID.Size_WidthCannotBeNegative, new object[0]));
+                {
+                    throw
+                        new ArgumentException (
+                            "WidthCannotBeNegative"); //SR.Get(SRID.Size_WidthCannotBeNegative, new object[0]));
+                }
+
                 _width = value;
             }
         }
+
         double _width;
 
         /// <summary>
@@ -214,35 +259,48 @@ namespace PdfSharpCore.Drawing
             set
             {
                 if (IsEmpty)
-                    throw new InvalidOperationException("CannotModifyEmptySize"); // SR.Get(SRID.Size_CannotModifyEmptySize, new object[0]));
+                {
+                    throw
+                        new InvalidOperationException (
+                            "CannotModifyEmptySize"); // SR.Get(SRID.Size_CannotModifyEmptySize, new object[0]));
+                }
+
                 if (value < 0)
-                    throw new ArgumentException("HeightCannotBeNegative"); //SR.Get(SRID.Size_HeightCannotBeNegative, new object[0]));
+                {
+                    throw
+                        new ArgumentException (
+                            "HeightCannotBeNegative"); //SR.Get(SRID.Size_HeightCannotBeNegative, new object[0]));
+                }
+
                 _height = value;
             }
         }
+
         double _height;
 
         /// <summary>
         /// Performs an explicit conversion from XSize to XVector.
         /// </summary>
-        public static explicit operator XVector(XSize size)
+        public static explicit operator XVector (XSize size)
         {
-            return new XVector(size._width, size._height);
+            return new XVector (size._width, size._height);
         }
 
         /// <summary>
         /// Performs an explicit conversion from XSize to XPoint.
         /// </summary>
-        public static explicit operator XPoint(XSize size)
+        public static explicit operator XPoint (XSize size)
         {
-            return new XPoint(size._width, size._height);
+            return new XPoint (size._width, size._height);
         }
 
         private static XSize CreateEmptySize()
         {
-            XSize size = new XSize();
-            size._width = double.NegativeInfinity;
-            size._height = double.NegativeInfinity;
+            var size = new XSize
+            {
+                _width = double.NegativeInfinity,
+                _height = double.NegativeInfinity
+            };
             return size;
         }
 
@@ -255,14 +313,16 @@ namespace PdfSharpCore.Drawing
         /// Gets the DebuggerDisplayAttribute text.
         /// </summary>
         /// <value>The debugger display.</value>
+
         // ReSharper disable UnusedMember.Local
         string DebuggerDisplay
-        // ReSharper restore UnusedMember.Local
+
+            // ReSharper restore UnusedMember.Local
         {
             get
             {
                 const string format = Config.SignificantFigures10;
-                return String.Format(CultureInfo.InvariantCulture,
+                return String.Format (CultureInfo.InvariantCulture,
                     "size=({2}{0:" + format + "}, {1:" + format + "})",
                     _width, _height, IsEmpty ? "Empty " : "");
             }

@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* RSize.cs --
+/* RSize.cs -- хранит упорядоченную пару чисел с плавающей запятой, обычно ширину и высоту прямоугольника
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,7 +20,7 @@ using System;
 namespace AM.Drawing.HtmlRenderer.Adapters.Entities;
 
 /// <summary>
-/// Stores an ordered pair of floating-point numbers, typically the width and height of a rectangle.
+/// Хранит упорядоченную пару чисел с плавающей запятой, обычно ширину и высоту прямоугольника.
 /// </summary>
 public struct RSize
 {
@@ -47,9 +47,6 @@ public struct RSize
     /// <filterpriority>1</filterpriority>
     public static readonly RSize Empty = new RSize();
 
-    private double _height;
-    private double _width;
-
     #endregion
 
 
@@ -65,20 +62,20 @@ public struct RSize
     ///         cref="RSize" />
     ///     structure.
     /// </param>
-    public RSize(RSize size)
+    public RSize (RSize size)
     {
-        _width = size._width;
-        _height = size._height;
+        Width = size.Width;
+        Height = size.Height;
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RSize" /> structure from the specified <see cref="RPoint" /> structure.
     /// </summary>
     /// <param name="pt">The <see cref="RPoint" /> structure from which to initialize this <see cref="RSize" /> structure.</param>
-    public RSize(RPoint pt)
+    public RSize (RPoint pt)
     {
-        _width = pt.X;
-        _height = pt.Y;
+        Width = pt.X;
+        Height = pt.Y;
     }
 
     /// <summary>
@@ -90,10 +87,10 @@ public struct RSize
     /// <param name="height">
     ///     The height component of the new <see cref="RSize" /> structure.
     /// </param>
-    public RSize(double width, double height)
+    public RSize (double width, double height)
     {
-        _width = width;
-        _height = height;
+        Width = width;
+        Height = height;
     }
 
     /// <summary>
@@ -107,10 +104,14 @@ public struct RSize
     {
         get
         {
-            if (Math.Abs(_width) < 0.0001)
-                return Math.Abs(_height) < 0.0001;
+            if (Math.Abs (Width) < 0.0001)
+            {
+                return Math.Abs (Height) < 0.0001;
+            }
             else
+            {
                 return false;
+            }
         }
     }
 
@@ -121,11 +122,7 @@ public struct RSize
     ///     The horizontal component of this <see cref="RSize" /> structure, typically measured in pixels.
     /// </returns>
     /// <filterpriority>1</filterpriority>
-    public double Width
-    {
-        get { return _width; }
-        set { _width = value; }
-    }
+    public double Width { get; set; }
 
     /// <summary>
     ///     Gets or sets the vertical component of this <see cref="RSize" /> structure.
@@ -134,11 +131,7 @@ public struct RSize
     ///     The vertical component of this <see cref="RSize" /> structure, typically measured in pixels.
     /// </returns>
     /// <filterpriority>1</filterpriority>
-    public double Height
-    {
-        get { return _height; }
-        set { _height = value; }
-    }
+    public double Height { get; set; }
 
     /// <summary>
     ///     Converts the specified <see cref="RSize" /> structure to a
@@ -147,9 +140,9 @@ public struct RSize
     /// <returns>The <see cref="RPoint" /> structure to which this operator converts.</returns>
     /// <param name="size">The <see cref="RSize" /> structure to be converted
     /// </param>
-    public static explicit operator RPoint(RSize size)
+    public static explicit operator RPoint (RSize size)
     {
-        return new RPoint(size.Width, size.Height);
+        return new RPoint (size.Width, size.Height);
     }
 
     /// <summary>
@@ -168,9 +161,9 @@ public struct RSize
     ///     The second <see cref="RSize" /> structure to add.
     /// </param>
     /// <filterpriority>3</filterpriority>
-    public static RSize operator +(RSize sz1, RSize sz2)
+    public static RSize operator + (RSize sz1, RSize sz2)
     {
-        return Add(sz1, sz2);
+        return Add (sz1, sz2);
     }
 
     /// <summary>
@@ -189,9 +182,9 @@ public struct RSize
     ///     The <see cref="RSize" /> structure on the right side of the subtraction operator.
     /// </param>
     /// <filterpriority>3</filterpriority>
-    public static RSize operator -(RSize sz1, RSize sz2)
+    public static RSize operator - (RSize sz1, RSize sz2)
     {
-        return Subtract(sz1, sz2);
+        return Subtract (sz1, sz2);
     }
 
     /// <summary>
@@ -207,12 +200,16 @@ public struct RSize
     ///     The <see cref="RSize" /> structure on the right of the equality operator.
     /// </param>
     /// <filterpriority>3</filterpriority>
-    public static bool operator ==(RSize sz1, RSize sz2)
+    public static bool operator == (RSize sz1, RSize sz2)
     {
-        if (Math.Abs(sz1.Width - sz2.Width) < 0.001)
-            return Math.Abs(sz1.Height - sz2.Height) < 0.001;
+        if (Math.Abs (sz1.Width - sz2.Width) < 0.001)
+        {
+            return Math.Abs (sz1.Height - sz2.Height) < 0.001;
+        }
         else
+        {
             return false;
+        }
     }
 
     /// <summary>
@@ -231,7 +228,7 @@ public struct RSize
     ///     The <see cref="RSize" /> structure on the right of the inequality operator.
     /// </param>
     /// <filterpriority>3</filterpriority>
-    public static bool operator !=(RSize sz1, RSize sz2)
+    public static bool operator != (RSize sz1, RSize sz2)
     {
         return !(sz1 == sz2);
     }
@@ -251,9 +248,9 @@ public struct RSize
     /// <param name="sz2">
     ///     The second <see cref="RSize" /> structure to add.
     /// </param>
-    public static RSize Add(RSize sz1, RSize sz2)
+    public static RSize Add (RSize sz1, RSize sz2)
     {
-        return new RSize(sz1.Width + sz2.Width, sz1.Height + sz2.Height);
+        return new RSize (sz1.Width + sz2.Width, sz1.Height + sz2.Height);
     }
 
     /// <summary>
@@ -271,9 +268,9 @@ public struct RSize
     /// <param name="sz2">
     ///     The <see cref="RSize" /> structure on the right side of the subtraction operator.
     /// </param>
-    public static RSize Subtract(RSize sz1, RSize sz2)
+    public static RSize Subtract (RSize sz1, RSize sz2)
     {
-        return new RSize(sz1.Width - sz2.Width, sz1.Height - sz2.Height);
+        return new RSize (sz1.Width - sz2.Width, sz1.Height - sz2.Height);
     }
 
     /// <summary>
@@ -292,15 +289,22 @@ public struct RSize
     ///     The <see cref="T:System.Object" /> to test.
     /// </param>
     /// <filterpriority>1</filterpriority>
-    public override bool Equals(object obj)
+    public override bool Equals
+        (
+            object? obj
+        )
     {
-        if (!(obj is RSize))
+        if (obj is not RSize size)
+        {
             return false;
-        var sizeF = (RSize)obj;
-        if (Math.Abs(sizeF.Width - Width) < 0.001 && Math.Abs(sizeF.Height - Height) < 0.001)
-            return sizeF.GetType() == GetType();
-        else
-            return false;
+        }
+
+        if (Math.Abs (size.Width - Width) < 0.001 && Math.Abs (size.Height - Height) < 0.001)
+        {
+            return size.GetType() == GetType();
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -312,7 +316,11 @@ public struct RSize
     /// <filterpriority>1</filterpriority>
     public override int GetHashCode()
     {
+        // ReSharper disable BaseObjectGetHashCodeCallInGetHashCode
+
         return base.GetHashCode();
+
+        // ReSharper restore BaseObjectGetHashCodeCallInGetHashCode
     }
 
     /// <summary>
@@ -340,6 +348,6 @@ public struct RSize
     /// </PermissionSet>
     public override string ToString()
     {
-        return "{Width=" + _width + ", Height=" + _height + "}";
+        return "{Width=" + Width + ", Height=" + Height + "}";
     }
 }

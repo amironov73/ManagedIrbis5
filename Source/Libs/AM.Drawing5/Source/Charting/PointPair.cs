@@ -391,26 +391,27 @@ public class PointPair
         /// <summary>
         /// Compares two <see cref="PointPair"/>s.
         /// </summary>
-        /// <param name="l">Point to the left.</param>
-        /// <param name="r">Point to the right.</param>
+        /// <param name="left">Point to the left.</param>
+        /// <param name="right">Point to the right.</param>
         /// <returns>-1, 0, or 1 depending on l.Y's relation to r.Y</returns>
-        public int Compare (PointPair l, PointPair r)
+        public int Compare (PointPair? left, PointPair? right)
         {
-            if (l == null && r == null)
+            if (left == null && right == null)
             {
                 return 0;
             }
-            else if (l == null && r != null)
+
+            if (left == null && right != null)
             {
                 return -1;
             }
-            else if (l != null && r == null)
+            if (left != null && right == null)
             {
                 return 1;
             }
 
-            var lY = l.Y;
-            var rY = r.Y;
+            var lY = left!.Y;
+            var rY = right!.Y;
 
             if (Math.Abs (lY - rY) < .000000001)
             {
@@ -442,20 +443,21 @@ public class PointPair
         /// <summary>
         /// Compares two <see cref="PointPair"/>s.
         /// </summary>
-        /// <param name="l">Point to the left.</param>
-        /// <param name="r">Point to the right.</param>
+        /// <param name="left">Point to the left.</param>
+        /// <param name="right">Point to the right.</param>
         /// <returns>-1, 0, or 1 depending on l.X's relation to r.X</returns>
-        public int Compare (PointPair l, PointPair r)
+        public int Compare (PointPair? left, PointPair? right)
         {
-            if (l == null && r == null)
+            if (left == null && right == null)
             {
                 return 0;
             }
-            else if (l == null && r != null)
+
+            if (left == null && right != null)
             {
                 return -1;
             }
-            else if (l != null && r == null)
+            if (left != null && right == null)
             {
                 return 1;
             }
@@ -464,41 +466,39 @@ public class PointPair
 
             if (sortType == SortType.XValues)
             {
-                lVal = l.X;
-                rVal = r.X;
+                lVal = left.X;
+                rVal = right.X;
             }
             else
             {
-                lVal = l.Y;
-                rVal = r.Y;
+                lVal = left.Y;
+                rVal = right.Y;
             }
 
             if (lVal == Missing || double.IsInfinity (lVal) || double.IsNaN (lVal))
             {
-                l = null;
+                left = null;
             }
 
             if (rVal == Missing || double.IsInfinity (rVal) || double.IsNaN (rVal))
             {
-                r = null;
+                right = null;
             }
 
-            if ((l == null && r == null) || (Math.Abs (lVal - rVal) < 1e-100))
+            if ((left == null && right == null) || (Math.Abs (lVal - rVal) < 1e-100))
             {
                 return 0;
             }
-            else if (l == null && r != null)
+
+            if (left == null && right != null)
             {
                 return -1;
             }
-            else if (l != null && r == null)
+            if (left != null && right == null)
             {
                 return 1;
             }
-            else
-            {
-                return lVal < rVal ? -1 : 1;
-            }
+            return lVal < rVal ? -1 : 1;
         }
     }
 
@@ -509,9 +509,9 @@ public class PointPair
     #region Methods
 
     /// <inheritdoc cref="Object.Equals(object)"/>
-    public override bool Equals (object obj)
+    public override bool Equals (object? obj)
     {
-        var rhs = obj as PointPair;
+        var rhs = (PointPair) obj!;
         return X == rhs.X && Y == rhs.Y && Z == rhs.Z;
     }
 
