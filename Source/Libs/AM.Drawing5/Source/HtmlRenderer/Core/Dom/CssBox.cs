@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* CssBox.cs --
+/* CssBox.cs -- блок CSS с текстом или замененными элементами
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,7 +29,7 @@ using AM.Drawing.HtmlRenderer.Core.Utils;
 namespace AM.Drawing.HtmlRenderer.Core.Dom;
 
 /// <summary>
-/// Represents a CSS Box of text or replaced elements.
+/// Представляет блок CSS с текстом или замененными элементами.
 /// </summary>
 /// <remarks>
 /// The Box can contains other boxes, that's the way that the CSS Tree
@@ -161,7 +161,7 @@ internal class CssBox
     /// <summary>
     /// Is the css box clickable (by default only "a" element is clickable)
     /// </summary>
-    public virtual bool IsClickable => HtmlTag != null && HtmlTag.Name == HtmlConstants.A && !HtmlTag.HasAttribute ("id");
+    public virtual bool IsClickable => HtmlTag is { Name: HtmlConstants.A } && !HtmlTag.HasAttribute ("id");
 
     /// <summary>
     /// Gets a value indicating whether this instance or one of its parents has Position = fixed.
@@ -178,7 +178,7 @@ internal class CssBox
                 return true;
             }
 
-            if (this.ParentBox == null)
+            if (ParentBox is null)
             {
                 return false;
             }
@@ -211,7 +211,7 @@ internal class CssBox
     {
         get
         {
-            if (ParentBox == null)
+            if (ParentBox is null)
             {
                 return this; //This is the initial containing block.
             }
@@ -227,7 +227,7 @@ internal class CssBox
             }
 
             //Comment this following line to treat always superior box as block
-            if (box == null)
+            if (box is null)
             {
                 throw new Exception ("There's no containing block on the chain");
             }
@@ -453,7 +453,7 @@ internal class CssBox
             if (Display != CssConstants.None && Visibility == CssConstants.Visible)
             {
                 // use initial clip to draw blocks with Position = fixed. I.e. ignrore page margins
-                if (this.Position == CssConstants.Fixed)
+                if (Position == CssConstants.Fixed)
                 {
                     g.SuspendClipping();
                 }
@@ -486,7 +486,7 @@ internal class CssBox
                 }
 
                 // Restore clips
-                if (this.Position == CssConstants.Fixed)
+                if (Position == CssConstants.Fixed)
                 {
                     g.ResumeClipping();
                 }
@@ -734,7 +734,7 @@ internal class CssBox
         if (!IsFixed)
         {
             var actualWidth = Math.Max (GetMinimumWidth() + GetWidthMarginDeep (this),
-                Size.Width < 90999 ? ActualRight - HtmlContainer.Root.Location.X : 0);
+                Size.Width < 90_999 ? ActualRight - HtmlContainer.Root.Location.X : 0);
             HtmlContainer.ActualSize = CommonUtils.Max (HtmlContainer.ActualSize,
                 new RSize (actualWidth, ActualBottom - HtmlContainer.Root.Location.Y));
         }
@@ -878,19 +878,23 @@ internal class CssBox
     /// <summary>
     /// Searches for the first word occurrence inside the box, on the specified linebox
     /// </summary>
-    /// <param name="b"></param>
+    /// <param name="cssBox"></param>
     /// <param name="line"> </param>
     /// <returns></returns>
-    internal CssRect FirstWordOccourence (CssBox b, CssLineBox line)
+    internal CssRect? FirstWordOccourence
+        (
+            CssBox cssBox,
+            CssLineBox line
+        )
     {
-        if (b.Words.Count == 0 && b.Boxes.Count == 0)
+        if (cssBox.Words.Count == 0 && cssBox.Boxes.Count == 0)
         {
             return null;
         }
 
-        if (b.Words.Count > 0)
+        if (cssBox.Words.Count > 0)
         {
-            foreach (var word in b.Words)
+            foreach (var word in cssBox.Words)
             {
                 if (line.Words.Contains (word))
                 {
@@ -901,7 +905,7 @@ internal class CssBox
             return null;
         }
 
-        foreach (var bb in b.Boxes)
+        foreach (var bb in cssBox.Boxes)
         {
             var w = FirstWordOccourence (bb, line);
 
@@ -919,7 +923,7 @@ internal class CssBox
     /// </summary>
     /// <param name="attribute">Attribute to retrieve</param>
     /// <returns>Attribute value or string.Empty if no attribute specified</returns>
-    internal string GetAttribute (string attribute)
+    internal string? GetAttribute (string attribute)
     {
         return GetAttribute (attribute, string.Empty);
     }
@@ -1011,7 +1015,7 @@ internal class CssBox
         )
     {
         double sum = 0f;
-        if (box.Size.Width > 90999 || (box.ParentBox != null && box.ParentBox.Size.Width > 90999))
+        if (box.Size.Width > 90_999 || box.ParentBox is { Size.Width: > 90_999 })
         {
             while (box != null)
             {
@@ -1066,7 +1070,7 @@ internal class CssBox
         GetMinMaxSumWords (this, ref min, ref maxSum, ref paddingSum, ref marginSum);
 
         maxWidth = paddingSum + maxSum;
-        minWidth = paddingSum + (min < 90999 ? min : 0);
+        minWidth = paddingSum + (min < 90_999 ? min : 0);
     }
 
     /// <summary>
@@ -1179,7 +1183,10 @@ internal class CssBox
     /// </summary>
     /// <param name="prevSibling">the previous box under the same parent</param>
     /// <returns>Resulting top margin</returns>
-    protected double MarginTopCollapse (CssBoxProperties prevSibling)
+    protected double MarginTopCollapse
+        (
+            CssBoxProperties? prevSibling
+        )
     {
         double value;
         if (prevSibling != null)
@@ -1209,20 +1216,20 @@ internal class CssBox
 
     public bool BreakPage()
     {
-        var container = this.HtmlContainer;
+        var container = HtmlContainer;
 
-        if (this.Size.Height >= container.PageSize.Height)
+        if (Size.Height >= container.PageSize.Height)
         {
             return false;
         }
 
-        var remTop = (this.Location.Y - container.MarginTop) % container.PageSize.Height;
-        var remBottom = (this.ActualBottom - container.MarginTop) % container.PageSize.Height;
+        var remTop = (Location.Y - container.MarginTop) % container.PageSize.Height;
+        var remBottom = (ActualBottom - container.MarginTop) % container.PageSize.Height;
 
         if (remTop > remBottom)
         {
             var diff = container.PageSize.Height - remTop;
-            this.Location = new RPoint (this.Location.X, this.Location.Y + diff + 1);
+            Location = new RPoint (Location.X, Location.Y + diff + 1);
             return true;
         }
 
@@ -1235,7 +1242,7 @@ internal class CssBox
     /// <returns>the calculated actual right value</returns>
     private double CalculateActualRight()
     {
-        if (ActualRight > 90999)
+        if (ActualRight > 90_999)
         {
             var maxRight = 0d;
             foreach (var box in Boxes)
@@ -1654,8 +1661,8 @@ internal class CssBox
 
     protected override RPoint GetActualLocation (string X, string Y)
     {
-        var left = CssValueParser.ParseLength (X, this.HtmlContainer.PageSize.Width, this, null);
-        var top = CssValueParser.ParseLength (Y, this.HtmlContainer.PageSize.Height, this, null);
+        var left = CssValueParser.ParseLength (X, HtmlContainer.PageSize.Width, this, null);
+        var top = CssValueParser.ParseLength (Y, HtmlContainer.PageSize.Height, this, null);
         return new RPoint (left, top);
     }
 

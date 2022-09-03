@@ -3,21 +3,35 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable InconsistentNaming
 
-/* Border.cs --
+/* Border.cs -- типы границ
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace AM.Drawing.HtmlRenderer.Core.Dom;
 
 /// <summary>
-/// Border types
+/// Типы границ.
 /// </summary>
 internal enum Border
 {
+    /// <summary>
+    /// Верхняя граница.
+    /// </summary>
     Top,
+
+    /// <summary>
+    /// Правая граница.
+    /// </summary>
     Right,
+
+    /// <summary>
+    /// Нижняя граница.
+    /// </summary>
     Bottom,
+
+    /// <summary>
+    /// Левая граница.
+    /// </summary>
     Left
 }

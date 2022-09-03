@@ -46,7 +46,7 @@ namespace AM.Drawing.HtmlRenderer.Core.Handlers;
 /// Disposing image load handler will also cancel download of image from the web.
 /// </para>
 /// </remarks>
-internal sealed class ImageLoadHandler 
+internal sealed class ImageLoadHandler
     : IDisposable
 {
     #region Fields and Consts
@@ -93,13 +93,18 @@ internal sealed class ImageLoadHandler
 
     #endregion
 
+    #region Construction
 
     /// <summary>
     /// Init.
     /// </summary>
     /// <param name="htmlContainer">the container of the html to handle load image for</param>
     /// <param name="loadCompleteCallback">callback raised when image load process is complete with image or without</param>
-    public ImageLoadHandler(HtmlContainerInt htmlContainer, ActionInt<RImage, RRect, bool> loadCompleteCallback)
+    public ImageLoadHandler
+        (
+            HtmlContainerInt? htmlContainer,
+            ActionInt<RImage, RRect, bool> loadCompleteCallback
+        )
     {
         ArgChecker.AssertArgNotNull(htmlContainer, "htmlContainer");
         ArgChecker.AssertArgNotNull(loadCompleteCallback, "loadCompleteCallback");
@@ -107,6 +112,8 @@ internal sealed class ImageLoadHandler
         _htmlContainer = htmlContainer;
         _loadCompleteCallback = loadCompleteCallback;
     }
+
+    #endregion
 
     /// <summary>
     /// the image instance of the loaded image
