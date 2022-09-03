@@ -36,7 +36,6 @@ namespace AM.Drawing.Charting;
 /// the bars will actually be horizontal, since the X axis becomes the
 /// value axis and the Y or Y2 axis becomes the independent axis.</remarks>
 /// <author> John Champion </author>
-/// <version> $Revision: 3.18 $ $Date: 2007-11-03 04:41:28 $ </version>
 [Serializable]
 public class HiLowBarItem
     : BarItem, ICloneable

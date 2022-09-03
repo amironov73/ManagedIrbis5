@@ -27,12 +27,11 @@ namespace AM.Drawing.Charting;
 public class Selection
     : CurveList
 {
-    // Revision: JCarpenter 10/06
     /// <summary>
     /// Subscribe to this event to receive notice
     /// that the list of selected CurveItems has changed
     /// </summary>
-    public event EventHandler SelectionChangedEvent;
+    public event EventHandler? SelectionChangedEvent;
 
     #region static properties
 
@@ -193,10 +192,7 @@ public class Selection
 
         if (sendEvent)
         {
-            if (SelectionChangedEvent != null)
-            {
-                SelectionChangedEvent (this, new EventArgs());
-            }
+            SelectionChangedEvent?.Invoke (this, EventArgs.Empty);
         }
     }
 
@@ -249,10 +245,7 @@ public class Selection
         }
 
         //Send Selection Changed Event
-        if (SelectionChangedEvent != null)
-        {
-            SelectionChangedEvent (this, new EventArgs());
-        }
+        SelectionChangedEvent?.Invoke (this, EventArgs.Empty);
     }
 
     #endregion

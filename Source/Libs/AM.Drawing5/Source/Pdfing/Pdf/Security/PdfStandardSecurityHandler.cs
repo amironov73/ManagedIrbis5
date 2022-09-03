@@ -23,7 +23,7 @@
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
@@ -368,7 +368,7 @@ namespace PdfSharpCore.Pdf.Security
             permission[1] = (byte)(permissions >> 8);
             permission[2] = (byte)(permissions >> 16);
             permission[3] = (byte)(permissions >> 24);
-            
+
             _md5.TransformBlock(permission, 0, 4, permission, 0);
             _md5.TransformBlock(documentID, 0, documentID.Length, documentID, 0);
             _md5.TransformFinalBlock(permission, 0, 0);
@@ -642,17 +642,17 @@ namespace PdfSharpCore.Pdf.Security
         /// <summary>
         /// Predefined keys of this dictionary.
         /// </summary>
-        internal sealed new class Keys : PdfSecurityHandler.Keys
+        internal new sealed class Keys : PdfSecurityHandler.Keys
         {
             /// <summary>
             /// (Required) A number specifying which revision of the standard security handler
             /// should be used to interpret this dictionary:
-            /// • 2 if the document is encrypted with a V value less than 2 and does not have any of
-            ///   the access permissions set (by means of the P entry, below) that are designated 
+            /// ï¿½ 2 if the document is encrypted with a V value less than 2 and does not have any of
+            ///   the access permissions set (by means of the P entry, below) that are designated
             ///   "Revision 3 or greater".
-            /// • 3 if the document is encrypted with a V value of 2 or 3, or has any "Revision 3 or 
+            /// ï¿½ 3 if the document is encrypted with a V value of 2 or 3, or has any "Revision 3 or
             ///   greater" access permissions set.
-            /// • 4 if the document is encrypted with a V value of 4
+            /// ï¿½ 4 if the document is encrypted with a V value of 4
             /// </summary>
             [KeyInfo(KeyType.Integer | KeyType.Required)]
             public const string R = "/R";
@@ -667,7 +667,7 @@ namespace PdfSharpCore.Pdf.Security
 
             /// <summary>
             /// (Required) A 32-byte string, based on the user password, that is used in determining
-            /// whether to prompt the user for a password and, if so, whether a valid user or owner 
+            /// whether to prompt the user for a password and, if so, whether a valid user or owner
             /// password was entered.
             /// </summary>
             [KeyInfo(KeyType.String | KeyType.Required)]
