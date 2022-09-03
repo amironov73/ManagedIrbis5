@@ -5,13 +5,12 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* CssSpacingBox.cs --
+/* CssSpacingBox.cs -- используется для создания пробела в вертикальной комбинации ячеек
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 
 using AM.Drawing.HtmlRenderer.Core.Utils;
@@ -23,59 +22,51 @@ using AM.Drawing.HtmlRenderer.Core.Utils;
 namespace AM.Drawing.HtmlRenderer.Core.Dom;
 
 /// <summary>
-/// Used to make space on vertical cell combination
+/// Используется для создания пробела в вертикальной комбинации ячеек.
 /// </summary>
-internal sealed class CssSpacingBox 
+internal sealed class CssSpacingBox
     : CssBox
 {
-    #region Fields and Consts
-
-    private readonly CssBox _extendedBox;
+    #region Properties
 
     /// <summary>
-    /// the index of the row where box starts
+    /// Расширенный блок.
     /// </summary>
-    private readonly int _startRow;
+    public CssBox ExtendedBox { get; }
 
     /// <summary>
-    /// the index of the row where box ends
+    /// Получает индекс строки, в которой начинается блок.
     /// </summary>
-    private readonly int _endRow;
+    public int StartRow { get; }
+
+    /// <summary>
+    /// Получает индекс строки, где заканчивается блок.
+    /// </summary>
+    public int EndRow { get; }
 
     #endregion
 
     #region Construction
 
-    public CssSpacingBox(CssBox tableBox, ref CssBox extendedBox, int startRow)
-        : base(tableBox, new HtmlTag("none", false, new Dictionary<string, string> { { "colspan", "1" } }))
+    public CssSpacingBox
+        (
+            CssBox tableBox,
+            ref CssBox extendedBox,
+            int startRow
+        )
+        : base
+            (
+                tableBox,
+                new HtmlTag ("none", false, new Dictionary<string, string> { { "colspan", "1" } })
+            )
     {
-        _extendedBox = extendedBox;
+        ExtendedBox = extendedBox;
         Display = CssConstants.None;
 
-        _startRow = startRow;
-        _endRow = startRow + Int32.Parse(extendedBox.GetAttribute("rowspan", "1")) - 1;
+        StartRow = startRow;
+        EndRow = startRow + int.Parse (extendedBox.GetAttribute ("rowspan", "1")!) - 1;
     }
 
     #endregion
 
-    public CssBox ExtendedBox
-    {
-        get { return _extendedBox; }
-    }
-
-    /// <summary>
-    /// Gets the index of the row where box starts
-    /// </summary>
-    public int StartRow
-    {
-        get { return _startRow; }
-    }
-
-    /// <summary>
-    /// Gets the index of the row where box ends
-    /// </summary>
-    public int EndRow
-    {
-        get { return _endRow; }
-    }
 }

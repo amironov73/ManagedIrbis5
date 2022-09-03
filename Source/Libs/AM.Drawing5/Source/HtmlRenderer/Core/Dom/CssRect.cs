@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
 
-/* CssRect.cs --
+/* CssRect.cs -- слово внутри inline-блока
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@ using AM.Drawing.HtmlRenderer.Core.Handlers;
 namespace AM.Drawing.HtmlRenderer.Core.Dom;
 
 /// <summary>
-/// Represents a word inside an inline box
+/// Представляет слово внутри inline-блока.
 /// </summary>
 /// <remarks>
 /// Because of performance, words of text are the most atomic
@@ -37,13 +37,14 @@ internal abstract class CssRect
     /// <summary>
     /// Rectangle
     /// </summary>
-    private RRect _rect;
+    private RRect _rectangle;
 
     #endregion
 
+    #region Construction
 
     /// <summary>
-    /// Init.
+    /// Конструктор.
     /// </summary>
     /// <param name="owner">the CSS box owner of the word</param>
     protected CssRect
@@ -53,6 +54,8 @@ internal abstract class CssRect
     {
         OwnerBox = owner;
     }
+
+    #endregion
 
     /// <summary>
     /// Gets the Box where this word belongs.
@@ -64,8 +67,9 @@ internal abstract class CssRect
     /// </summary>
     public RRect Rectangle
     {
-        get => _rect;
-        set => _rect = value;
+        // нельзя заменять на auto-property!
+        get => _rectangle;
+        set => _rectangle = value;
     }
 
     /// <summary>
@@ -73,8 +77,8 @@ internal abstract class CssRect
     /// </summary>
     public double Left
     {
-        get => _rect.X;
-        set => _rect.X = value;
+        get => _rectangle.X;
+        set => _rectangle.X = value;
     }
 
     /// <summary>
@@ -82,8 +86,8 @@ internal abstract class CssRect
     /// </summary>
     public double Top
     {
-        get => _rect.Y;
-        set => _rect.Y = value;
+        get => _rectangle.Y;
+        set => _rectangle.Y = value;
     }
 
     /// <summary>
@@ -91,30 +95,30 @@ internal abstract class CssRect
     /// </summary>
     public double Width
     {
-        get => _rect.Width;
-        set => _rect.Width = value;
+        get => _rectangle.Width;
+        set => _rectangle.Width = value;
     }
 
     /// <summary>
     /// Get the full width of the word including the spacing.
     /// </summary>
-    public double FullWidth => _rect.Width + ActualWordSpacing;
+    public double FullWidth => Rectangle.Width + ActualWordSpacing;
 
     /// <summary>
     /// Gets the actual width of whitespace between words.
     /// </summary>
     public double ActualWordSpacing =>
-        (OwnerBox != null
+        OwnerBox is not null
             ? (HasSpaceAfter ? OwnerBox.ActualWordSpacing : 0) + (IsImage ? OwnerBox.ActualWordSpacing : 0)
-            : 0);
+            : 0;
 
     /// <summary>
     /// Height of the rectangle
     /// </summary>
     public double Height
     {
-        get => _rect.Height;
-        set => _rect.Height = value;
+        get => _rectangle.Height;
+        set => _rectangle.Height = value;
     }
 
     /// <summary>
@@ -122,7 +126,7 @@ internal abstract class CssRect
     /// </summary>
     public double Right
     {
-        get => Rectangle.Right;
+        get => _rectangle.Right;
         set => Width = value - Left;
     }
 
@@ -131,7 +135,7 @@ internal abstract class CssRect
     /// </summary>
     public double Bottom
     {
-        get => Rectangle.Bottom;
+        get => _rectangle.Bottom;
         set => Height = value - Top;
     }
 
@@ -217,12 +221,20 @@ internal abstract class CssRect
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return $"{Text.Replace (' ', '-').Replace ("\n", "\\n")} ({Text.Length} char{(Text.Length != 1 ? "s" : string.Empty)})";
+        var text = Text is null
+            ? string.Empty
+            : Text.Replace (' ', '-').Replace ("\n", "\\n");
+
+        return $"{text} ({text.Length} char{(text.Length != 1 ? "s" : string.Empty)})";
     }
 
     public bool BreakPage()
     {
-        var container = OwnerBox.HtmlContainer;
+        var container = OwnerBox?.HtmlContainer;
+        if (container is null)
+        {
+            return false;
+        }
 
         if (Height >= container.PageSize.Height)
         {

@@ -21,7 +21,7 @@ using AM.Drawing.HtmlRenderer.Adapters.Entities;
 namespace AM.Drawing.HtmlRenderer.Core.Dom;
 
 /// <summary>
-/// Представляет картинку внутри inline-блока
+/// Представляет картинку внутри inline-блока.
 /// </summary>
 internal sealed class CssRectImage
     : CssRect
