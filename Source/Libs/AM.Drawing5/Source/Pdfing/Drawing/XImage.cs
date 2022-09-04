@@ -332,23 +332,24 @@ namespace PdfSharpCore.Drawing
             _associatedGraphics = null;
         }
 
-        internal XGraphics AssociatedGraphics
+        internal XGraphics? AssociatedGraphics
         {
             get { return _associatedGraphics; }
             set { _associatedGraphics = value; }
         }
-        XGraphics _associatedGraphics;
+
+        private XGraphics? _associatedGraphics;
 
         /// <summary>
         /// If path starts with '*' the image is created from a stream and the path is a GUID.
         /// </summary>
-        internal string _path;
+        internal string? _path;
 
         /// <summary>
         /// Cache PdfImageTable.ImageSelector to speed up finding the right PdfImage
         /// if this image is used more than once.
         /// </summary>
-        internal PdfImageTable.ImageSelector _selector;
-        private IImageSource _source;
+        internal PdfImageTable.ImageSelector? _selector;
+        private IImageSource? _source;
     }
 }

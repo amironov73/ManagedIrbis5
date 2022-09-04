@@ -119,10 +119,10 @@ namespace PdfSharpCore.Drawing
 
         /// <summary>
         /// This function should be called when drawing the content of this form is finished.
-        /// The XGraphics object used for drawing the content is disposed by this function and 
+        /// The XGraphics object used for drawing the content is disposed by this function and
         /// cannot be used for any further drawing operations.
         /// PDFsharp automatically calls this function when this form was used the first time
-        /// in a DrawImage function. 
+        /// in a DrawImage function.
         /// </summary>
         public void DrawingFinished()
         {
@@ -423,7 +423,7 @@ namespace PdfSharpCore.Drawing
         /// The PdfFormXObject gets invalid when PageNumber or transform changed. This is because a modification
         /// of an XPdfForm must not change objects that are already been drawn.
         /// </summary>
-        internal PdfFormXObject _pdfForm;  // TODO: make private
+        internal PdfFormXObject? _pdfForm;  // TODO: make private
 
         internal XGraphicsPdfRenderer PdfRenderer;
 
