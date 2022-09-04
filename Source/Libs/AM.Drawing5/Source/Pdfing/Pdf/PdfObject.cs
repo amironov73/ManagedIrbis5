@@ -23,7 +23,7 @@
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
@@ -48,7 +48,7 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Initializes a new instance of the <see cref="PdfObject"/> class.
         /// </summary>
-        protected PdfObject(PdfDocument document)
+        protected PdfObject(PdfDocument? document)
         {
             // Calling a virtual member in a constructor is dangerous.
             // In PDFsharp Document is overridden in PdfPage and the code is checked to be save
@@ -65,7 +65,9 @@ namespace PdfSharpCore.Pdf
             // If the object that was transformed to an instance of a derived class was an indirect object
             // set the value of the reference to this.
             if (obj._iref != null)
+            {
                 obj._iref.Value = this;
+            }
 #if DEBUG_  // BUG
             else
             {
@@ -136,7 +138,10 @@ namespace PdfSharpCore.Pdf
 
             // TODO: check imported
             if (_iref == null)
+            {
                 _iref = _document._irefTable[objectID];
+            }
+
             if (_iref == null)
             {
                 // ReSharper disable once ObjectCreationAsStatement because the new object is set to this object
@@ -160,21 +165,26 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Sets the PdfDocument this object belongs to.
         /// </summary>
-        internal virtual PdfDocument Document
+        internal virtual PdfDocument? Document
         {
             set
             {
                 if (!ReferenceEquals(_document, value))
                 {
                     if (_document != null)
+                    {
                         throw new InvalidOperationException("Cannot change document.");
+                    }
+
                     _document = value;
                     if (_iref != null)
+                    {
                         _iref.Document = value;
+                    }
                 }
             }
         }
-        internal PdfDocument _document;
+        internal PdfDocument? _document;
 
         /// <summary>
         /// Indicates whether the object is an indirect object.
@@ -557,7 +567,9 @@ namespace PdfSharpCore.Pdf
                     Debug.Assert(value.Owner == owner);
                 }
                 else
+                {
                     Debug.Assert(false, "Should not come here. Object is neither a dictionary nor an array.");
+                }
             }
         }
 
@@ -569,19 +581,39 @@ namespace PdfSharpCore.Pdf
         static void DebugCheckNonObjects(PdfItem item)
         {
             if (item is PdfName)
+            {
                 return;
+            }
+
             if (item is PdfBoolean)
+            {
                 return;
+            }
+
             if (item is PdfInteger)
+            {
                 return;
+            }
+
             if (item is PdfNumber)
+            {
                 return;
+            }
+
             if (item is PdfString)
+            {
                 return;
+            }
+
             if (item is PdfRectangle)
+            {
                 return;
+            }
+
             if (item is PdfNull)
+            {
                 return;
+            }
 
             Type type = item.GetType();
             Debug.Assert(type != null, string.Format("CheckNonObjects: Add {0} to the list.", type.Name));
