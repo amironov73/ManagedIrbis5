@@ -14,6 +14,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics;
 
 #endregion
 
@@ -83,7 +84,7 @@ public sealed class PdfComboBoxField
                 throw new InvalidOperationException ("The field is read only.");
             }
 
-            if (value is PdfString || value is PdfName)
+            if (value is PdfString or PdfName)
             {
                 Elements[Keys.V] = value;
                 SelectedIndex = SelectedIndex; //R080304 !!!
@@ -96,8 +97,9 @@ public sealed class PdfComboBoxField
                         ((PdfArray)(((PdfItem[])(Elements.Values))[2])).Elements.Add (Value);
                         SelectedIndex = SelectedIndex;
                     }
-                    catch
+                    catch (Exception)
                     {
+                        Debug.WriteLine (nameof (Value));
                     }
                 }
             }

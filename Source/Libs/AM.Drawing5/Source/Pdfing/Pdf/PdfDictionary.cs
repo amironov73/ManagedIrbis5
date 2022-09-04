@@ -247,7 +247,7 @@ public class PdfDictionary
     {
         if (key == null)
         {
-            throw new ArgumentNullException ("key");
+            throw new ArgumentNullException (nameof (key));
         }
 
         var item = Elements[key];
@@ -376,19 +376,17 @@ public class PdfDictionary
                 return false;
             }
 
-            if (obj is PdfReference)
+            if (obj is PdfReference reference)
             {
-                obj = ((PdfReference)obj).Value;
+                obj = reference.Value;
             }
 
-            var boolean = obj as PdfBoolean;
-            if (boolean != null)
+            if (obj is PdfBoolean boolean)
             {
                 return boolean.Value;
             }
 
-            var booleanObject = obj as PdfBooleanObject;
-            if (booleanObject != null)
+            if (obj is PdfBooleanObject booleanObject)
             {
                 return booleanObject.Value;
             }
@@ -432,26 +430,22 @@ public class PdfDictionary
                 return 0;
             }
 
-            var reference = obj as PdfReference;
-            if (reference != null)
+            if (obj is PdfReference reference)
             {
                 obj = reference.Value;
             }
 
-            var integer = obj as PdfInteger;
-            if (integer != null)
+            if (obj is PdfInteger integer)
             {
                 return integer.Value;
             }
 
-            var integerObject = obj as PdfIntegerObject;
-            if (integerObject != null)
+            if (obj is PdfIntegerObject integerObject)
             {
                 return integerObject.Value;
             }
 
-            var uinteger = obj as PdfUInteger;
-            if (uinteger != null)
+            if (obj is PdfUInteger uinteger)
             {
                 return (int)uinteger.Value;
             }
@@ -495,32 +489,27 @@ public class PdfDictionary
                 return 0;
             }
 
-            var reference = obj as PdfReference;
-            if (reference != null)
+            if (obj is PdfReference reference)
             {
                 obj = reference.Value;
             }
 
-            var real = obj as PdfReal;
-            if (real != null)
+            if (obj is PdfReal real)
             {
                 return real.Value;
             }
 
-            var realObject = obj as PdfRealObject;
-            if (realObject != null)
+            if (obj is PdfRealObject realObject)
             {
                 return realObject.Value;
             }
 
-            var integer = obj as PdfInteger;
-            if (integer != null)
+            if (obj is PdfInteger integer)
             {
                 return integer.Value;
             }
 
-            var integerObject = obj as PdfIntegerObject;
-            if (integerObject != null)
+            if (obj is PdfIntegerObject integerObject)
             {
                 return integerObject.Value;
             }
@@ -563,20 +552,17 @@ public class PdfDictionary
                 return "";
             }
 
-            var reference = obj as PdfReference;
-            if (reference != null)
+            if (obj is PdfReference reference)
             {
                 obj = reference.Value;
             }
 
-            var str = obj as PdfString;
-            if (str != null)
+            if (obj is PdfString str)
             {
                 return str.Value;
             }
 
-            var strObject = obj as PdfStringObject;
-            if (strObject != null)
+            if (obj is PdfStringObject strObject)
             {
                 return strObject.Value;
             }
@@ -617,14 +603,12 @@ public class PdfDictionary
                 return false;
             }
 
-            var reference = obj as PdfReference;
-            if (reference != null)
+            if (obj is PdfReference reference)
             {
                 obj = reference.Value;
             }
 
-            var str = obj as PdfString;
-            if (str != null)
+            if (obj is PdfString str)
             {
                 value = str.Value;
                 return true;
@@ -676,8 +660,7 @@ public class PdfDictionary
                 return String.Empty;
             }
 
-            var reference = obj as PdfReference;
-            if (reference != null)
+            if (obj is PdfReference reference)
             {
                 obj = reference.Value;
             }
@@ -705,7 +688,7 @@ public class PdfDictionary
         {
             if (value == null)
             {
-                throw new ArgumentNullException ("value");
+                throw new ArgumentNullException (nameof (value));
             }
 
             if (value.Length == 0 || value[0] != '/')
@@ -790,14 +773,12 @@ public class PdfDictionary
                 return value;
             }
 
-            var reference = obj as PdfReference;
-            if (reference != null)
+            if (obj is PdfReference reference)
             {
                 obj = reference.Value;
             }
 
-            var array = obj as PdfArray;
-            if (array != null && array.Elements.Count == 6)
+            if (obj is PdfArray array && array.Elements.Count == 6)
             {
                 value = new XMatrix (array.Elements.GetReal (0), array.Elements.GetReal (1), array.Elements.GetReal (2),
                     array.Elements.GetReal (3), array.Elements.GetReal (4), array.Elements.GetReal (5));
@@ -843,28 +824,24 @@ public class PdfDictionary
                 return defaultValue;
             }
 
-            var reference = obj as PdfReference;
-            if (reference != null)
+            if (obj is PdfReference reference)
             {
                 obj = reference.Value;
             }
 
-            var date = obj as PdfDate;
-            if (date != null)
+            if (obj is PdfDate date)
             {
                 return date.Value;
             }
 
             string strDate;
-            var pdfString = obj as PdfString;
-            if (pdfString != null)
+            if (obj is PdfString pdfString)
             {
                 strDate = pdfString.Value;
             }
             else
             {
-                var stringObject = obj as PdfStringObject;
-                if (stringObject != null)
+                if (obj is PdfStringObject stringObject)
                 {
                     strDate = stringObject.Value;
                 }
@@ -941,7 +918,7 @@ public class PdfDictionary
         /// <summary>
         /// Gets the value for the specified key. If the value does not exist, it is optionally created.
         /// </summary>
-        public PdfItem GetValue (string key, VCF options)
+        public PdfItem? GetValue (string key, VCF options)
         {
             PdfObject obj;
             PdfDictionary dict;
@@ -1076,7 +1053,7 @@ public class PdfDictionary
         /// <summary>
         /// Short cut for GetValue(key, VCF.None).
         /// </summary>
-        public PdfItem GetValue (string key)
+        public PdfItem? GetValue (string key)
         {
             return GetValue (key, VCF.None);
         }
@@ -1086,7 +1063,7 @@ public class PdfDictionary
         /// </summary>
         Type GetValueType (string key) // TODO: move to PdfObject
         {
-            Type type = null;
+            Type? type = null;
             var meta = _ownerDictionary.Meta;
             if (meta != null)
             {
@@ -1105,10 +1082,14 @@ public class PdfDictionary
             return type;
         }
 
-        PdfArray CreateArray (Type type, PdfArray oldArray)
+        PdfArray CreateArray
+            (
+                Type type,
+                PdfArray? oldArray
+            )
         {
             // Rewritten WinRT style.
-            PdfArray array = null;
+            PdfArray? array = null;
             if (oldArray == null)
             {
                 // Use contstructor with signature 'Ctor(PdfDocument owner)'.
@@ -1153,10 +1134,14 @@ public class PdfDictionary
             return array;
         }
 
-        PdfDictionary CreateDictionary (Type type, PdfDictionary oldDictionary)
+        PdfDictionary CreateDictionary
+            (
+                Type type,
+                PdfDictionary? oldDictionary
+            )
         {
             // Rewritten WinRT style.
-            PdfDictionary dict = null;
+            PdfDictionary? dict = null;
             if (oldDictionary == null)
             {
                 // Use contstructor with signature 'Ctor(PdfDocument owner)'.
@@ -1220,9 +1205,8 @@ public class PdfDictionary
             {
                 obj.Reference = oldValue.Reference;
                 obj.Reference.Value = obj;
-                if (obj is PdfDictionary)
+                if (obj is PdfDictionary dict)
                 {
-                    var dict = (PdfDictionary)obj;
                     dict._elements = oldValue._elements;
                 }
             }
@@ -1258,11 +1242,10 @@ public class PdfDictionary
         /// Gets the PdfObject with the specified key, or null, if no such object exists. If the key refers to
         /// a reference, the referenced PdfObject is returned.
         /// </summary>
-        public PdfObject GetObject (string key)
+        public PdfObject? GetObject (string key)
         {
             var item = this[key];
-            var reference = item as PdfReference;
-            if (reference != null)
+            if (item is PdfReference reference)
             {
                 return reference.Value;
             }
@@ -1274,7 +1257,7 @@ public class PdfDictionary
         /// Gets the PdfDictionary with the specified key, or null, if no such object exists. If the key refers to
         /// a reference, the referenced PdfDictionary is returned.
         /// </summary>
-        public PdfDictionary GetDictionary (string key)
+        public PdfDictionary? GetDictionary (string key)
         {
             return GetObject (key) as PdfDictionary;
         }
@@ -1283,7 +1266,7 @@ public class PdfDictionary
         /// Gets the PdfArray with the specified key, or null, if no such object exists. If the key refers to
         /// a reference, the referenced PdfArray is returned.
         /// </summary>
-        public PdfArray GetArray (string key)
+        public PdfArray? GetArray (string key)
         {
             return GetObject (key) as PdfArray;
         }
@@ -1291,7 +1274,7 @@ public class PdfDictionary
         /// <summary>
         /// Gets the PdfReference with the specified key, or null, if no such object exists.
         /// </summary>
-        public PdfReference GetReference (string key)
+        public PdfReference? GetReference (string key)
         {
             var item = this[key];
             return item as PdfReference;
@@ -1305,7 +1288,7 @@ public class PdfDictionary
         {
             if (obj.Reference != null)
             {
-                throw new ArgumentException ("PdfObject must not be an indirect object.", "obj");
+                throw new ArgumentException ("PdfObject must not be an indirect object.", nameof (obj));
             }
 
             this[key] = obj;
@@ -1319,7 +1302,7 @@ public class PdfDictionary
         {
             if (obj.Reference == null)
             {
-                throw new ArgumentException ("PdfObject must be an indirect object.", "obj");
+                throw new ArgumentException ("PdfObject must be an indirect object.", nameof (obj));
             }
 
             this[key] = obj.Reference;
@@ -1332,7 +1315,7 @@ public class PdfDictionary
         {
             if (iref == null)
             {
-                throw new ArgumentNullException ("iref");
+                throw new ArgumentNullException (nameof (iref));
             }
 
             this[key] = iref;
@@ -1366,19 +1349,18 @@ public class PdfDictionary
         /// starting with a slash '/'. This property provides full access to the elements of the
         /// PDF dictionary. Wrong use can lead to errors or corrupt PDF files.
         /// </summary>
-        public PdfItem this [string key]
+        public PdfItem? this [string key]
         {
             get
             {
-                PdfItem item;
-                _elements.TryGetValue (key, out item);
+                _elements.TryGetValue (key, out var item);
                 return item;
             }
             set
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException ("value");
+                    throw new ArgumentNullException (nameof (value));
                 }
 #if DEBUG_
                     if (key == "/MediaBox")
@@ -1410,19 +1392,18 @@ public class PdfDictionary
         /// <summary>
         /// Gets or sets an entry in the dictionary identified by a PdfName object.
         /// </summary>
-        public PdfItem this [PdfName key]
+        public PdfItem? this [PdfName key]
         {
             get { return this[key.Value]; }
             set
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException ("value");
+                    throw new ArgumentNullException (nameof (value));
                 }
 
 #if DEBUG
-                var dictionary = value as PdfDictionary;
-                if (dictionary != null)
+                if (value is PdfDictionary dictionary)
                 {
                     var dict = dictionary;
                     if (dict.Stream != null)
@@ -1432,8 +1413,7 @@ public class PdfDictionary
                 }
 #endif
 
-                var obj = value as PdfObject;
-                if (obj != null && obj.IsIndirect)
+                if (value is PdfObject { IsIndirect: true } obj)
                 {
                     value = obj.Reference;
                 }
@@ -1498,7 +1478,7 @@ public class PdfDictionary
         {
             if (String.IsNullOrEmpty (key))
             {
-                throw new ArgumentNullException ("key");
+                throw new ArgumentNullException (nameof (key));
             }
 
             if (key[0] != '/')
@@ -1507,8 +1487,7 @@ public class PdfDictionary
             }
 
             // If object is indirect automatically convert value to reference.
-            var obj = value as PdfObject;
-            if (obj != null && obj.IsIndirect)
+            if (value is PdfObject { IsIndirect: true } obj)
             {
                 value = obj.Reference;
             }
@@ -1753,7 +1732,7 @@ public class PdfDictionary
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException ("value");
+                    throw new ArgumentNullException (nameof (value));
                 }
 
                 _value = value;

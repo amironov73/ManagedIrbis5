@@ -58,7 +58,7 @@ public abstract class PdfChoiceField
         var opt = Elements.GetArray (Keys.Opt);
 
 #if DEBUG // Check with //R080317 implemention
-        PdfArray opt2 = null;
+        PdfArray? opt2 = null;
         if (Elements[Keys.Opt] is PdfArray)
             opt2 = Elements[Keys.Opt] as PdfArray;
         else if (Elements[Keys.Opt] is Advanced.PdfReference)
