@@ -188,7 +188,10 @@ public class PdfDictionary
         var pdf = new StringBuilder();
         pdf.Append ("<< ");
         foreach (var key in keys)
+        {
             pdf.Append (key + " " + Elements[key] + " ");
+        }
+
         pdf.Append (">>");
 
         return pdf.ToString();
@@ -224,7 +227,10 @@ public class PdfDictionary
 #endif
 
         foreach (var key in keys)
+        {
             WriteDictionaryElement (writer, key);
+        }
+
         if (Stream != null)
         {
             WriteDictionaryStream (writer);

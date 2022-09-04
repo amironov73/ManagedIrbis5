@@ -126,17 +126,14 @@ public abstract class PdfAcroField
     /// <summary>
     /// Gets the field with the specified name.
     /// </summary>
-    public PdfAcroField this [string name]
-    {
-        get { return GetValue (name); }
-    }
+    public PdfAcroField? this [string name] => GetValue (name);
 
     /// <summary>
     /// Gets a child field by name.
     /// </summary>
-    protected virtual PdfAcroField GetValue (string name)
+    protected virtual PdfAcroField? GetValue (string name)
     {
-        if (String.IsNullOrEmpty (name))
+        if (string.IsNullOrEmpty (name))
         {
             return this;
         }
@@ -290,7 +287,7 @@ public abstract class PdfAcroField
             Debug.Assert (t != "");
             if (t.Length > 0)
             {
-                if (!String.IsNullOrEmpty (partialName))
+                if (!string.IsNullOrEmpty (partialName))
                 {
                     partialName += "." + t;
                 }
@@ -308,7 +305,7 @@ public abstract class PdfAcroField
             Debug.Assert (t != "");
             if (t.Length > 0)
             {
-                if (!String.IsNullOrEmpty (partialName))
+                if (!string.IsNullOrEmpty (partialName))
                 {
                     names.Add (partialName + "." + t);
                 }
@@ -431,7 +428,7 @@ public abstract class PdfAcroField
 
         internal PdfAcroField? GetValue (string name)
         {
-            if (String.IsNullOrEmpty (name))
+            if (string.IsNullOrEmpty (name))
             {
                 return null;
             }
