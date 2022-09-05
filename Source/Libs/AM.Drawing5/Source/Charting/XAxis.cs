@@ -155,7 +155,7 @@ public class XAxis
     /// <summary>
     /// Setup the Transform Matrix to handle drawing of this <see cref="XAxis"/>
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -169,11 +169,11 @@ public class XAxis
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void SetTransformMatrix (Graphics g, GraphPane pane, float scaleFactor)
+    public override void SetTransformMatrix (Graphics graphics, GraphPane pane, float scaleFactor)
     {
         // Move the origin to the BottomLeft of the ChartRect, which is the left
         // side of the X axis (facing from the label side)
-        g.TranslateTransform (pane.Chart._rect.Left, pane.Chart._rect.Bottom);
+        graphics.TranslateTransform (pane.Chart._rect.Left, pane.Chart._rect.Bottom);
     }
 
     /// <summary>

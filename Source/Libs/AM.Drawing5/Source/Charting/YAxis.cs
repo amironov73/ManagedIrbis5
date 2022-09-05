@@ -156,7 +156,7 @@ public class YAxis
     /// <summary>
     /// Setup the Transform Matrix to handle drawing of this <see cref="YAxis"/>
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -170,14 +170,14 @@ public class YAxis
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void SetTransformMatrix (Graphics g, GraphPane pane, float scaleFactor)
+    public override void SetTransformMatrix (Graphics graphics, GraphPane pane, float scaleFactor)
     {
         // Move the origin to the TopLeft of the ChartRect, which is the left
         // side of the axis (facing from the label side)
-        g.TranslateTransform (pane.Chart._rect.Left, pane.Chart._rect.Top);
+        graphics.TranslateTransform (pane.Chart._rect.Left, pane.Chart._rect.Top);
 
         // rotate so this axis is in the left-right direction
-        g.RotateTransform (90);
+        graphics.RotateTransform (90);
     }
 
     /// <summary>

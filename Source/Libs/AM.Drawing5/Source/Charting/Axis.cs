@@ -797,7 +797,7 @@ public abstract class Axis
     /// <summary>
     /// Setup the Transform Matrix to handle drawing of this <see cref="Axis"/>
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -811,7 +811,7 @@ public abstract class Axis
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public abstract void SetTransformMatrix (Graphics g, GraphPane pane, float scaleFactor);
+    public abstract void SetTransformMatrix (Graphics graphics, GraphPane pane, float scaleFactor);
 
 
     /// <summary>

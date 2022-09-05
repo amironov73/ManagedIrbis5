@@ -14,7 +14,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -68,6 +67,7 @@ public class X2Axis
     public X2Axis()
         : this ("X2 Axis")
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -92,13 +92,10 @@ public class X2Axis
     public X2Axis (X2Axis rhs)
         : base (rhs)
     {
+        // пустое тело конструктора
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -129,21 +126,24 @@ public class X2Axis
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected X2Axis (SerializationInfo info, StreamingContext context)
+    protected X2Axis
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
         : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        info.GetInt32 ("schema2").NotUsed();
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
@@ -156,7 +156,7 @@ public class X2Axis
     /// <summary>
     /// Setup the Transform Matrix to handle drawing of this <see cref="X2Axis"/>
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -170,15 +170,20 @@ public class X2Axis
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public override void SetTransformMatrix (Graphics g, GraphPane pane, float scaleFactor)
+    public override void SetTransformMatrix
+        (
+            Graphics graphics,
+            GraphPane pane,
+            float scaleFactor
+        )
     {
         // Move the origin to the TopLeft of the ChartRect, which is the left
         // side of the X2 axis (facing from the label side)
-        g.TranslateTransform (pane.Chart._rect.Right, pane.Chart._rect.Top);
+        graphics.TranslateTransform (pane.Chart._rect.Right, pane.Chart._rect.Top);
 
         //g.ScaleTransform( 1.0f, -1.0f );
         // rotate so this axis is in the right-left direction
-        g.RotateTransform (180);
+        graphics.RotateTransform (180);
     }
 
     /// <summary>
@@ -216,7 +221,7 @@ public class X2Axis
     /// <returns>The shift amount measured in pixels</returns>
     internal override float CalcCrossShift (GraphPane pane)
     {
-        double effCross = EffectiveCrossValue (pane);
+        var effCross = EffectiveCrossValue (pane);
 
         if (!CrossAuto)
         {
