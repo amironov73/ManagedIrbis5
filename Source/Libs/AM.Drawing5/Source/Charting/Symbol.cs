@@ -15,7 +15,6 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -84,7 +83,7 @@ public class Symbol
     /// <see cref="Symbol"/>.  Use the public property <see cref="UserSymbol"/> to
     /// access this value.
     /// </summary>
-    private GraphicsPath _userSymbol;
+    private GraphicsPath? _userSymbol;
 
     #endregion
 
@@ -119,7 +118,7 @@ public class Symbol
         /// The default custom brush for filling in this <see cref="Symbol"/>
         /// (<see cref="Fill.Brush"/> property).
         /// </summary>
-        public static Brush FillBrush = null;
+        public static Brush? FillBrush = null;
 
         /// <summary>
         /// The default fill mode for the curve (<see cref="Fill.Type"/> property).
@@ -167,8 +166,8 @@ public class Symbol
     /// <seealso cref="Default.Size"/>
     public float Size
     {
-        get { return _size; }
-        set { _size = value; }
+        get => _size;
+        set => _size = value;
     }
 
     /// <summary>
@@ -178,8 +177,8 @@ public class Symbol
     /// <seealso cref="Default.Type"/>
     public SymbolType Type
     {
-        get { return _type; }
-        set { _type = value; }
+        get => _type;
+        set => _type = value;
     }
 
     /// <summary>
@@ -194,8 +193,8 @@ public class Symbol
     /// </remarks>
     public bool IsAntiAlias
     {
-        get { return _isAntiAlias; }
-        set { _isAntiAlias = value; }
+        get => _isAntiAlias;
+        set => _isAntiAlias = value;
     }
 
     /// <summary>
@@ -205,8 +204,8 @@ public class Symbol
     /// <seealso cref="Default.IsVisible"/>
     public bool IsVisible
     {
-        get { return _isVisible; }
-        set { _isVisible = value; }
+        get => _isVisible;
+        set => _isVisible = value;
     }
 
     /// <summary>
@@ -215,8 +214,8 @@ public class Symbol
     /// </summary>
     public Fill Fill
     {
-        get { return _fill; }
-        set { _fill = value; }
+        get => _fill;
+        set => _fill = value;
     }
 
     /// <summary>
@@ -225,8 +224,8 @@ public class Symbol
     /// </summary>
     public Border Border
     {
-        get { return _border; }
-        set { _border = value; }
+        get => _border;
+        set => _border = value;
     }
 
     /// <summary>
@@ -237,10 +236,10 @@ public class Symbol
     /// This value only applies if <see cref="Symbol.Type">Symbol.Type</see>
     /// is <see cref="SymbolType.UserDefined">SymbolType.UserDefined</see>
     /// </remarks>
-    public GraphicsPath UserSymbol
+    public GraphicsPath? UserSymbol
     {
-        get { return _userSymbol; }
-        set { _userSymbol = value; }
+        get => _userSymbol;
+        set => _userSymbol = value;
     }
 
     #endregion
@@ -251,8 +250,10 @@ public class Symbol
     /// Default constructor that sets all <see cref="Symbol"/> properties to default
     /// values as defined in the <see cref="Default"/> class.
     /// </summary>
-    public Symbol() : this (SymbolType.Default, Color.Empty)
+    public Symbol()
+        : this (SymbolType.Default, Color.Empty)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -266,7 +267,11 @@ public class Symbol
     /// <param name="color">A <see cref="Color"/> value indicating
     /// the color of the symbol
     /// </param>
-    public Symbol (SymbolType type, Color color)
+    public Symbol
+        (
+            SymbolType type,
+            Color color
+        )
     {
         _size = Default.Size;
         _type = type;
@@ -300,11 +305,7 @@ public class Symbol
         }
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -335,11 +336,15 @@ public class Symbol
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected Symbol (SerializationInfo info, StreamingContext context)
+    protected Symbol
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema");
+        var sch = info.GetInt32 ("schema");
 
         _size = info.GetSingle ("size");
         _type = (SymbolType)info.GetValue ("type", typeof (SymbolType));
@@ -350,7 +355,7 @@ public class Symbol
 
         if (sch >= 11)
         {
-            _userSymbol = (GraphicsPath)info.GetValue ("userSymbol", typeof (GraphicsPath));
+            _userSymbol = (GraphicsPath?) info.GetValue ("userSymbol", typeof (GraphicsPath));
         }
         else
         {
@@ -358,13 +363,12 @@ public class Symbol
         }
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public virtual void GetObjectData (SerializationInfo info, StreamingContext context)
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
+    public virtual void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         info.AddValue ("schema", schema);
         info.AddValue ("size", _size);
@@ -398,8 +402,15 @@ public class Symbol
     /// <param name="brush">A <see cref="Brush"/> class representing a default solid brush for this symbol
     /// If this symbol uses a <see cref="LinearGradientBrush"/>, it will be created on the fly for
     /// each point, since it has to be scaled to the individual point coordinates.</param>
-    private void DrawSymbol (Graphics graphics, int x, int y, GraphicsPath path,
-        Pen pen, Brush brush)
+    private void DrawSymbol
+        (
+            Graphics graphics,
+            int x,
+            int y,
+            GraphicsPath path,
+            Pen pen,
+            Brush brush
+        )
     {
         // Only draw if the symbol is visible
         if (_isVisible &&
@@ -407,7 +418,7 @@ public class Symbol
             x < 100000 && x > -100000 &&
             y < 100000 && y > -100000)
         {
-            Matrix saveMatrix = graphics.Transform;
+            var saveMatrix = graphics.Transform;
             graphics.TranslateTransform (x, y);
 
             // Fill or draw the symbol as required
@@ -467,7 +478,7 @@ public class Symbol
             PointPair? dataValue
         )
     {
-        Symbol source = this;
+        var source = this;
         if (isSelected)
         {
             source = Selection.Symbol;
@@ -479,15 +490,15 @@ public class Symbol
             x < 100000 && x > -100000 &&
             y < 100000 && y > -100000)
         {
-            SmoothingMode sModeSave = graphics.SmoothingMode;
+            var sModeSave = graphics.SmoothingMode;
             if (_isAntiAlias)
             {
                 graphics.SmoothingMode = SmoothingMode.HighQuality;
             }
 
-            using (Pen pen = _border.GetPen (pane, scaleFactor, dataValue))
-            using (GraphicsPath path = MakePath (graphics, scaleFactor))
-            using (Brush brush = Fill.MakeBrush (path.GetBounds(), dataValue))
+            using (var pen = _border.GetPen (pane, scaleFactor, dataValue))
+            using (var path = MakePath (graphics, scaleFactor))
+            using (var brush = Fill.MakeBrush (path.GetBounds(), dataValue))
             {
                 DrawSymbol (graphics, x, y, path, pen, brush);
             }
@@ -500,7 +511,7 @@ public class Symbol
     /// Create a <see cref="GraphicsPath"/> struct for the current symbol based on the
     /// specified scaleFactor and assuming the symbol will be centered at position 0,0.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -509,13 +520,17 @@ public class Symbol
     /// scaling factor is calculated by the <see cref="PaneBase.CalcScaleFactor"/> method.  The scale factor
     /// represents a linear multiple to be applied to font sizes, symbol sizes, etc.</param>
     /// <returns>Returns the <see cref="GraphicsPath"/> for the current symbol</returns>
-    public GraphicsPath MakePath (Graphics g, float scaleFactor)
+    public GraphicsPath MakePath
+        (
+            Graphics graphics,
+            float scaleFactor
+        )
     {
-        float scaledSize = (float)(_size * scaleFactor);
+        var scaledSize = _size * scaleFactor;
         float hsize = scaledSize / 2,
             hsize1 = hsize + 1;
 
-        GraphicsPath path = new GraphicsPath();
+        var path = new GraphicsPath();
 
         switch (_type == SymbolType.Default || (_type == SymbolType.UserDefined && _userSymbol == null)
                     ? Default.Type
@@ -527,30 +542,36 @@ public class Symbol
                 path.AddLine (hsize, hsize, -hsize, hsize);
                 path.AddLine (-hsize, hsize, -hsize, -hsize);
                 break;
+
             case SymbolType.Diamond:
                 path.AddLine (0, -hsize, hsize, 0);
                 path.AddLine (hsize, 0, 0, hsize);
                 path.AddLine (0, hsize, -hsize, 0);
                 path.AddLine (-hsize, 0, 0, -hsize);
                 break;
+
             case SymbolType.Triangle:
                 path.AddLine (0, -hsize, hsize, hsize);
                 path.AddLine (hsize, hsize, -hsize, hsize);
                 path.AddLine (-hsize, hsize, 0, -hsize);
                 break;
+
             case SymbolType.Circle:
                 path.AddEllipse (-hsize, -hsize, scaledSize, scaledSize);
                 break;
+
             case SymbolType.XCross:
                 path.AddLine (-hsize, -hsize, hsize1, hsize1);
                 path.StartFigure();
                 path.AddLine (hsize, -hsize, -hsize1, hsize1);
                 break;
+
             case SymbolType.Plus:
                 path.AddLine (0, -hsize, 0, hsize1);
                 path.StartFigure();
                 path.AddLine (-hsize, 0, hsize1, 0);
                 break;
+
             case SymbolType.Star:
                 path.AddLine (0, -hsize, 0, hsize1);
                 path.StartFigure();
@@ -560,20 +581,24 @@ public class Symbol
                 path.StartFigure();
                 path.AddLine (hsize, -hsize, -hsize1, hsize1);
                 break;
+
             case SymbolType.TriangleDown:
                 path.AddLine (0, hsize, hsize, -hsize);
                 path.AddLine (hsize, -hsize, -hsize, -hsize);
                 path.AddLine (-hsize, -hsize, 0, hsize);
                 break;
+
             case SymbolType.HDash:
                 path.AddLine (-hsize, 0, hsize1, 0);
                 break;
+
             case SymbolType.VDash:
                 path.AddLine (0, -hsize, 0, hsize1);
                 break;
+
             case SymbolType.UserDefined:
                 path = _userSymbol.Clone() as GraphicsPath;
-                Matrix scaleTransform = new Matrix (scaledSize, 0.0f, 0.0f, scaledSize, 0.0f, 0.0f);
+                var scaleTransform = new Matrix (scaledSize, 0.0f, 0.0f, scaledSize, 0.0f, 0.0f);
                 path.Transform (scaleTransform);
                 break;
         }
@@ -589,7 +614,7 @@ public class Symbol
     /// is normally only called by the Draw method of the
     /// <see cref="CurveItem"/> object
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -608,10 +633,16 @@ public class Symbol
     /// <param name="isSelected">Indicates that the <see cref="Symbol" /> should be drawn
     /// with attributes from the <see cref="Selection" /> class.
     /// </param>
-    public void Draw (Graphics g, GraphPane pane, LineItem curve, float scaleFactor,
-        bool isSelected)
+    public void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            LineItem curve,
+            float scaleFactor,
+            bool isSelected
+        )
     {
-        Symbol source = this;
+        var source = this;
         if (isSelected)
         {
             source = Selection.Symbol;
@@ -619,49 +650,49 @@ public class Symbol
 
         int tmpX, tmpY;
 
-        int minX = (int)pane.Chart.Rect.Left;
-        int maxX = (int)pane.Chart.Rect.Right;
-        int minY = (int)pane.Chart.Rect.Top;
-        int maxY = (int)pane.Chart.Rect.Bottom;
+        var minX = (int)pane.Chart.Rect.Left;
+        var maxX = (int)pane.Chart.Rect.Right;
+        var minY = (int)pane.Chart.Rect.Top;
+        var maxY = (int)pane.Chart.Rect.Bottom;
 
         // (Dale-a-b) we'll set an element to true when it has been drawn
-        bool[,] isPixelDrawn = new bool[maxX + 1, maxY + 1];
+        var isPixelDrawn = new bool[maxX + 1, maxY + 1];
 
         double curX, curY, lowVal;
-        IPointList points = curve.Points;
+        var points = curve.Points;
 
         if (points != null && (_border.IsVisible || _fill.IsVisible))
         {
-            SmoothingMode sModeSave = g.SmoothingMode;
+            var sModeSave = graphics.SmoothingMode;
             if (_isAntiAlias)
             {
-                g.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
             }
 
             // For the sake of speed, go ahead and create a solid brush and a pen
             // If it's a gradient fill, it will be created on the fly for each symbol
             //SolidBrush	brush = new SolidBrush( this.fill.Color );
 
-            using (Pen pen = source._border.GetPen (pane, scaleFactor))
-            using (GraphicsPath path = MakePath (g, scaleFactor))
+            using (var pen = source._border.GetPen (pane, scaleFactor))
+            using (var path = MakePath (graphics, scaleFactor))
             {
-                RectangleF rect = path.GetBounds();
+                var rect = path.GetBounds();
 
-                using (Brush brush = source.Fill.MakeBrush (rect))
+                using (var brush = source.Fill.MakeBrush (rect))
                 {
-                    ValueHandler valueHandler = new ValueHandler (pane, false);
-                    Scale xScale = curve.GetXAxis (pane).Scale;
-                    Scale yScale = curve.GetYAxis (pane).Scale;
+                    var valueHandler = new ValueHandler (pane, false);
+                    var xScale = curve.GetXAxis (pane).Scale;
+                    var yScale = curve.GetYAxis (pane).Scale;
 
-                    bool xIsLog = xScale.IsLog;
-                    bool yIsLog = yScale.IsLog;
-                    bool xIsOrdinal = xScale.IsAnyOrdinal;
+                    var xIsLog = xScale.IsLog;
+                    var yIsLog = yScale.IsLog;
+                    var xIsOrdinal = xScale.IsAnyOrdinal;
 
-                    double xMin = xScale.Min;
-                    double xMax = xScale.Max;
+                    var xMin = xScale.Min;
+                    var xMax = xScale.Max;
 
                     // Loop over each defined point
-                    for (int i = 0; i < points.Count; i++)
+                    for (var i = 0; i < points.Count; i++)
                     {
                         // Get the user scale values for the current point
                         // use the valueHandler only for stacked types
@@ -721,22 +752,22 @@ public class Symbol
                             // the make a brush corresponding to the appropriate current value
                             if (_fill.IsGradientValueType || _border._gradientFill.IsGradientValueType)
                             {
-                                using (Brush tBrush = _fill.MakeBrush (rect, points[i]))
-                                using (Pen tPen = _border.GetPen (pane, scaleFactor, points[i]))
-                                    DrawSymbol (g, tmpX, tmpY, path, tPen, tBrush);
+                                using (var tBrush = _fill.MakeBrush (rect, points[i]))
+                                using (var tPen = _border.GetPen (pane, scaleFactor, points[i]))
+                                    DrawSymbol (graphics, tmpX, tmpY, path, tPen, tBrush);
                             }
                             else
                             {
                                 // Otherwise, the brush is already defined
                                 // Draw the symbol at the specified pixel location
-                                DrawSymbol (g, tmpX, tmpY, path, pen, brush);
+                                DrawSymbol (graphics, tmpX, tmpY, path, pen, brush);
                             }
                         }
                     }
                 }
             }
 
-            g.SmoothingMode = sModeSave;
+            graphics.SmoothingMode = sModeSave;
         }
     }
 

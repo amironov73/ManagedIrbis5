@@ -14,7 +14,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -145,8 +144,8 @@ public class TextObj
     /// </summary>
     public SizeF LayoutArea
     {
-        get { return _layoutArea; }
-        set { _layoutArea = value; }
+        get => _layoutArea;
+        set => _layoutArea = value;
     }
 
 
@@ -156,8 +155,8 @@ public class TextObj
     /// </summary>
     public string Text
     {
-        get { return _text; }
-        set { _text = value; }
+        get => _text;
+        set => _text = value;
     }
 
     /// <summary>
@@ -172,13 +171,10 @@ public class TextObj
     /// <seealso cref="Default.FontSize"/>
     public FontSpec FontSpec
     {
-        get { return _fontSpec; }
+        get => _fontSpec;
         set
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException ("Uninitialized FontSpec in TextObj");
-            }
+            Sure.NotNull (value);
 
             _fontSpec = value;
         }
@@ -334,11 +330,16 @@ public class TextObj
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected TextObj (SerializationInfo info, StreamingContext context) : base (info, context)
+    protected TextObj
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        info.GetInt32 ("schema2").NotUsed();
 
         _text = info.GetString ("text");
         _fontSpec = (FontSpec)info.GetValue ("fontSpec", typeof (FontSpec));
@@ -347,13 +348,12 @@ public class TextObj
         _layoutArea = (SizeF)info.GetValue ("layoutArea", typeof (SizeF));
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
-    [SecurityPermission (SecurityAction.Demand, SerializationFormatter = true)]
-    public override void GetObjectData (SerializationInfo info, StreamingContext context)
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
+    public override void GetObjectData
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
@@ -378,7 +378,7 @@ public class TextObj
     {
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
-        PointF pix = _location.Transform (pane);
+        var pix = _location.Transform (pane);
 
         // Draw the text on the screen, including any frame and background
         // fill elements
@@ -393,27 +393,7 @@ public class TextObj
         }
     }
 
-    /// <summary>
-    /// Determine if the specified screen point lies inside the bounding box of this
-    /// <see cref="TextObj"/>.  This method takes into account rotation and alignment
-    /// parameters of the text, as specified in the <see cref="FontSpec"/>.
-    /// </summary>
-    /// <param name="point">The screen point, in pixels</param>
-    /// <param name="pane">
-    /// A reference to the <see cref="PaneBase"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    /// <returns>true if the point lies in the bounding box, false otherwise</returns>
+    /// <inheritdoc cref="GraphObj.PointInBox"/>
     public override bool PointInBox
         (
             PointF point,
@@ -429,23 +409,27 @@ public class TextObj
 
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
-        PointF pix = _location.Transform (pane);
+        var pix = _location.Transform (pane);
 
         return _fontSpec.PointInBox (point, graphics, _text, pix.X, pix.Y,
             _location.AlignH, _location.AlignV, scaleFactor, LayoutArea);
     }
 
-    /// <summary>
-    /// Determines the shape type and Coords values for this GraphObj
-    /// </summary>
-    public override void GetCoords (PaneBase pane, Graphics graphics, float scaleFactor,
-        out string shape, out string coords)
+    /// <inheritdoc cref="GraphObj.GetCoords"/>
+    public override void GetCoords
+        (
+            PaneBase pane,
+            Graphics graphics,
+            float scaleFactor,
+            out string shape,
+            out string coords
+        )
     {
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
-        PointF pix = _location.Transform (pane);
+        var pix = _location.Transform (pane);
 
-        PointF[] pts = _fontSpec.GetBox (graphics, _text, pix.X, pix.Y, _location.AlignH,
+        var pts = _fontSpec.GetBox (graphics, _text, pix.X, pix.Y, _location.AlignH,
             _location.AlignV, scaleFactor, new SizeF());
 
         shape = "poly";
