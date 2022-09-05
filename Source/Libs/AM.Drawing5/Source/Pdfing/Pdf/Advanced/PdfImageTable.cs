@@ -89,27 +89,21 @@ internal sealed class PdfImageTable
             image._path ??= "*" + Guid.NewGuid().ToString ("B");
 
             // HACK: just use full path to identify
-            _path = image._path.ToLowerInvariant();
+            Path = image._path.ToLowerInvariant();
         }
 
-        public string? Path
-        {
-            get { return _path; }
-            set { _path = value; }
-        }
-
-        private string? _path;
+        public string? Path { get; set; }
 
         /// <inheritdoc cref="object.Equals(object?)"/>
         public override bool Equals (object? obj)
         {
-            return obj is ImageSelector selector && _path == selector._path;
+            return obj is ImageSelector selector && Path == selector.Path;
         }
 
         /// <inheritdoc cref="object.GetHashCode"/>
         public override int GetHashCode()
         {
-            return _path?.GetHashCode() ?? 0;
+            return Path?.GetHashCode() ?? 0;
         }
     }
 }

@@ -1,49 +1,38 @@
-#region PDFsharp - A .NET library for processing PDF
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharp.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-// DEALINGS IN THE SOFTWARE.
-#endregion
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/* PdfDocument.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
 using System.Diagnostics;
 using System.IO;
+
 using PdfSharpCore.Pdf.Advanced;
 using PdfSharpCore.Pdf.Internal;
 using PdfSharpCore.Pdf.IO;
 using PdfSharpCore.Pdf.AcroForms;
 using PdfSharpCore.Pdf.Security;
 
-// ReSharper disable ConvertPropertyToExpressionBody
+#endregion
+
+#nullable enable
 
 namespace PdfSharpCore.Pdf
 {
     /// <summary>
     /// Represents a PDF document.
     /// </summary>
-    [DebuggerDisplay("(Name={Name})")] // A name makes debugging easier
+    [DebuggerDisplay ("(Name={Name})")] // A name makes debugging easier
     public sealed class PdfDocument : PdfObject, IDisposable
     {
         internal DocumentState _state;
@@ -79,7 +68,7 @@ namespace PdfSharpCore.Pdf
         /// Do not call Save() for documents created with this constructor, just call Close().
         /// To open an existing PDF file and import it, use the PdfReader class.
         /// </summary>
-        public PdfDocument(string filename)
+        public PdfDocument (string filename)
         {
             //PdfDocument.Gob.AttatchDocument(Handle);
 
@@ -99,7 +88,7 @@ namespace PdfSharpCore.Pdf
         /// Do not call Save() for documents created with this constructor, just call Close().
         /// To open an existing PDF file, use the PdfReader class.
         /// </summary>
-        public PdfDocument(Stream outputStream)
+        public PdfDocument (Stream outputStream)
         {
             //PdfDocument.Gob.AttatchDocument(Handle);
 
@@ -111,7 +100,7 @@ namespace PdfSharpCore.Pdf
             _outStream = outputStream;
         }
 
-        internal PdfDocument(Lexer lexer)
+        internal PdfDocument (Lexer lexer)
         {
             //PdfDocument.Gob.AttatchDocument(Handle);
 
@@ -125,17 +114,17 @@ namespace PdfSharpCore.Pdf
             ////_font = new PdfFont();
             //_objects = new PdfObjectTable(this);
             //_trailer = new PdfTrailer(this);
-            _irefTable = new PdfCrossReferenceTable(this);
+            _irefTable = new PdfCrossReferenceTable (this);
             _lexer = lexer;
         }
 
         void Initialize()
         {
             //_info = new PdfInfo(this);
-            _fontTable = new PdfFontTable(this);
-            _imageTable = new PdfImageTable(this);
-            _trailer = new PdfTrailer(this);
-            _irefTable = new PdfCrossReferenceTable(this);
+            _fontTable = new PdfFontTable (this);
+            _imageTable = new PdfImageTable (this);
+            _trailer = new PdfTrailer (this);
+            _irefTable = new PdfCrossReferenceTable (this);
             _trailer.CreateNewDocumentIDs();
         }
 
@@ -151,11 +140,12 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
+            Dispose (true);
+
             //GC.SuppressFinalize(this);
         }
 
-        void Dispose(bool disposing)
+        void Dispose (bool disposing)
         {
             if (_state != DocumentState.Disposed)
             {
@@ -163,8 +153,10 @@ namespace PdfSharpCore.Pdf
                 {
                     // Dispose managed resources.
                 }
+
                 //PdfDocument.Gob.DetatchDocument(Handle);
             }
+
             _state = DocumentState.Disposed;
         }
 
@@ -177,6 +169,7 @@ namespace PdfSharpCore.Pdf
             get { return _tag; }
             set { _tag = value; }
         }
+
         object _tag;
 
         /// <summary>
@@ -188,6 +181,7 @@ namespace PdfSharpCore.Pdf
             get { return _name; }
             set { _name = value; }
         }
+
         string _name = NewName();
 
         /// <summary>
@@ -201,6 +195,7 @@ namespace PdfSharpCore.Pdf
 #endif
             return "Document " + _nameCount++;
         }
+
         static int _nameCount;
 
         internal bool CanModify
@@ -215,7 +210,7 @@ namespace PdfSharpCore.Pdf
         public void Close()
         {
             if (!CanModify)
-                throw new InvalidOperationException(PSSR.CannotModify);
+                throw new InvalidOperationException (PSSR.CannotModify);
 
             if (_outStream != null)
             {
@@ -224,10 +219,10 @@ namespace PdfSharpCore.Pdf
                 if (SecuritySettings.DocumentSecurityLevel != PdfDocumentSecurityLevel.None)
                     securityHandler = SecuritySettings.SecurityHandler;
 
-                PdfWriter writer = new PdfWriter(_outStream, securityHandler);
+                var writer = new PdfWriter (_outStream, securityHandler);
                 try
                 {
-                    DoSave(writer);
+                    DoSave (writer);
                 }
                 finally
                 {
@@ -239,30 +234,30 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Saves the document to the specified path. If a file already exists, it will be overwritten.
         /// </summary>
-        public void Save(string path)
+        public void Save (string path)
         {
             if (!CanModify)
-                throw new InvalidOperationException(PSSR.CannotModify);
+                throw new InvalidOperationException (PSSR.CannotModify);
 
 
-            using (Stream stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (Stream stream = new FileStream (path, FileMode.Create, FileAccess.Write, FileShare.None))
             {
-                Save(stream);
+                Save (stream);
             }
         }
 
         /// <summary>
         /// Saves the document to the specified stream.
         /// </summary>
-        public void Save(Stream stream, bool closeStream)
+        public void Save (Stream stream, bool closeStream)
         {
             if (!CanModify)
-                throw new InvalidOperationException(PSSR.CannotModify);
+                throw new InvalidOperationException (PSSR.CannotModify);
 
             // TODO: more diagnostic checks
-            string message = "";
-            if (!CanSave(ref message))
-                throw new PdfSharpException(message);
+            var message = "";
+            if (!CanSave (ref message))
+                throw new PdfSharpException (message);
 
             // Get security handler if document gets encrypted.
             PdfStandardSecurityHandler securityHandler = null;
@@ -272,8 +267,8 @@ namespace PdfSharpCore.Pdf
             PdfWriter writer = null;
             try
             {
-                writer = new PdfWriter(stream, securityHandler);
-                DoSave(writer);
+                writer = new PdfWriter (stream, securityHandler);
+                DoSave (writer);
             }
             finally
             {
@@ -284,8 +279,9 @@ namespace PdfSharpCore.Pdf
                     else
                         stream.Position = 0; // Reset the stream position if the stream is kept open.
                 }
+
                 if (writer != null)
-                    writer.Close(closeStream);
+                    writer.Close (closeStream);
             }
         }
 
@@ -294,24 +290,26 @@ namespace PdfSharpCore.Pdf
         /// The stream is not closed by this function.
         /// (Older versions of PDFsharp closes the stream. That was not very useful.)
         /// </summary>
-        public void Save(Stream stream)
+        public void Save (Stream stream)
         {
-            Save(stream, false);
+            Save (stream, false);
         }
 
         /// <summary>
         /// Implements saving a PDF file.
         /// </summary>
-        void DoSave(PdfWriter writer)
+        void DoSave (PdfWriter writer)
         {
             if (_pages == null || _pages.Count == 0)
             {
                 if (_outStream != null)
                 {
                     // Give feedback if the wrong constructor was used.
-                    throw new InvalidOperationException("Cannot save a PDF document with no pages. Do not use \"public PdfDocument(string filename)\" or \"public PdfDocument(Stream outputStream)\" if you want to open an existing PDF document from a file or stream; use PdfReader.Open() for that purpose.");
+                    throw new InvalidOperationException (
+                        "Cannot save a PDF document with no pages. Do not use \"public PdfDocument(string filename)\" or \"public PdfDocument(Stream outputStream)\" if you want to open an existing PDF document from a file or stream; use PdfReader.Open() for that purpose.");
                 }
-                throw new InvalidOperationException("Cannot save a PDF document with no pages.");
+
+                throw new InvalidOperationException ("Cannot save a PDF document with no pages.");
             }
 
             try
@@ -320,48 +318,49 @@ namespace PdfSharpCore.Pdf
                 if (_trailer is PdfCrossReferenceStream)
                 {
                     // HACK^2: Preserve the SecurityHandler.
-                    PdfStandardSecurityHandler securityHandler = _securitySettings.SecurityHandler;
-                    _trailer = new PdfTrailer((PdfCrossReferenceStream)_trailer);
+                    var securityHandler = _securitySettings.SecurityHandler;
+                    _trailer = new PdfTrailer ((PdfCrossReferenceStream)_trailer);
                     _trailer._securityHandler = securityHandler;
                 }
 
-                bool encrypt = _securitySettings.DocumentSecurityLevel != PdfDocumentSecurityLevel.None;
+                var encrypt = _securitySettings.DocumentSecurityLevel != PdfDocumentSecurityLevel.None;
                 if (encrypt)
                 {
-                    PdfStandardSecurityHandler securityHandler = _securitySettings.SecurityHandler;
+                    var securityHandler = _securitySettings.SecurityHandler;
                     if (securityHandler.Reference == null)
-                        _irefTable.Add(securityHandler);
+                        _irefTable.Add (securityHandler);
                     else
-                        Debug.Assert(_irefTable.Contains(securityHandler.ObjectID));
+                        Debug.Assert (_irefTable.Contains (securityHandler.ObjectID));
                     _trailer.Elements[PdfTrailer.Keys.Encrypt] = _securitySettings.SecurityHandler.Reference;
                 }
                 else
-                    _trailer.Elements.Remove(PdfTrailer.Keys.Encrypt);
+                    _trailer.Elements.Remove (PdfTrailer.Keys.Encrypt);
 
                 PrepareForSave();
 
                 if (encrypt)
                     _securitySettings.SecurityHandler.PrepareEncryption();
 
-                writer.WriteFileHeader(this);
-                PdfReference[] irefs = _irefTable.AllReferences;
-                int count = irefs.Length;
-                for (int idx = 0; idx < count; idx++)
+                writer.WriteFileHeader (this);
+                var irefs = _irefTable.AllReferences;
+                var count = irefs.Length;
+                for (var idx = 0; idx < count; idx++)
                 {
-                    PdfReference iref = irefs[idx];
+                    var iref = irefs[idx];
 #if DEBUG_
                     if (iref.ObjectNumber == 378)
                         GetType();
 #endif
                     iref.Position = writer.Position;
-                    iref.Value.WriteObject(writer);
+                    iref.Value.WriteObject (writer);
                 }
+
                 var startxref = writer.Position;
-                _irefTable.WriteObject(writer);
-                writer.WriteRaw("trailer\n");
-                _trailer.Elements.SetInteger("/Size", count + 1);
-                _trailer.WriteObject(writer);
-                writer.WriteEof(this, startxref);
+                _irefTable.WriteObject (writer);
+                writer.WriteRaw ("trailer\n");
+                _trailer.Elements.SetInteger ("/Size", count + 1);
+                _trailer.WriteObject (writer);
+                writer.WriteEof (this, startxref);
 
                 //if (encrypt)
                 //{
@@ -374,6 +373,7 @@ namespace PdfSharpCore.Pdf
                 if (writer != null)
                 {
                     writer.Stream.Flush();
+
                     // DO NOT CLOSE WRITER HERE
                     //writer.Close();
                 }
@@ -385,11 +385,11 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         internal override void PrepareForSave()
         {
-            PdfDocumentInformation info = Info;
+            var info = Info;
 
             // Add patch level to producer if it is not '0'.
-            string pdfSharpProducer = VersionInfo.Producer;
-            if (!ProductVersionInfo.VersionPatch.Equals("0"))
+            var pdfSharpProducer = VersionInfo.Producer;
+            if (!ProductVersionInfo.VersionPatch.Equals ("0"))
                 pdfSharpProducer = ProductVersionInfo.Producer2;
 
             // Set Creator if value is undefined.
@@ -397,16 +397,17 @@ namespace PdfSharpCore.Pdf
                 info.Creator = pdfSharpProducer;
 
             // Keep original producer if file was imported.
-            string producer = info.Producer;
+            var producer = info.Producer;
             if (producer.Length == 0)
                 producer = pdfSharpProducer;
             else
             {
                 // Prevent endless concatenation if file is edited with PDFsharp more than once.
-                if (!producer.StartsWith(VersionInfo.Title))
+                if (!producer.StartsWith (VersionInfo.Title))
                     producer = pdfSharpProducer + " (Original: " + producer + ")";
             }
-            info.Elements.SetString(PdfDocumentInformation.Keys.Producer, producer);
+
+            info.Elements.SetString (PdfDocumentInformation.Keys.Producer, producer);
 
             // Prepare used fonts.
             if (_fontTable != null)
@@ -416,10 +417,11 @@ namespace PdfSharpCore.Pdf
             Catalog.PrepareForSave();
 
 #if true
+
             // Remove all unreachable objects (e.g. from deleted pages)
-            int removed = _irefTable.Compact();
+            var removed = _irefTable.Compact();
             if (removed != 0)
-                Debug.WriteLine("PrepareForSave: Number of deleted unreachable objects: " + removed);
+                Debug.WriteLine ("PrepareForSave: Number of deleted unreachable objects: " + removed);
             _irefTable.Renumber();
 #endif
         }
@@ -427,17 +429,17 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Determines whether the document can be saved.
         /// </summary>
-        public bool CanSave(ref string message)
+        public bool CanSave (ref string message)
         {
-            if (!SecuritySettings.CanSave(ref message))
+            if (!SecuritySettings.CanSave (ref message))
                 return false;
 
             return true;
         }
 
-        internal bool HasVersion(string version)
+        internal bool HasVersion (string version)
         {
-            return String.Compare(Catalog.Version, version) >= 0;
+            return String.Compare (Catalog.Version, version) >= 0;
         }
 
         /// <summary>
@@ -448,10 +450,11 @@ namespace PdfSharpCore.Pdf
             get
             {
                 if (_options == null)
-                    _options = new PdfDocumentOptions(this);
+                    _options = new PdfDocumentOptions (this);
                 return _options;
             }
         }
+
         PdfDocumentOptions _options;
 
         /// <summary>
@@ -462,10 +465,11 @@ namespace PdfSharpCore.Pdf
             get
             {
                 if (_settings == null)
-                    _settings = new PdfDocumentSettings(this);
+                    _settings = new PdfDocumentSettings (this);
                 return _settings;
             }
         }
+
         PdfDocumentSettings _settings;
 
         /// <summary>
@@ -486,12 +490,13 @@ namespace PdfSharpCore.Pdf
             set
             {
                 if (!CanModify)
-                    throw new InvalidOperationException(PSSR.CannotModify);
+                    throw new InvalidOperationException (PSSR.CannotModify);
                 if (value < 12 || value > 17) // TODO not really implemented
-                    throw new ArgumentException(PSSR.InvalidVersionNumber, "value");
+                    throw new ArgumentException (PSSR.InvalidVersionNumber, "value");
                 _version = value;
             }
         }
+
         internal int _version;
 
         /// <summary>
@@ -503,9 +508,10 @@ namespace PdfSharpCore.Pdf
             {
                 if (CanModify)
                     return Pages.Count;
+
                 // PdfOpenMode is InformationOnly
-                PdfDictionary pageTreeRoot = (PdfDictionary)Catalog.Elements.GetObject(PdfCatalog.Keys.Pages);
-                return pageTreeRoot.Elements.GetInteger(PdfPages.Keys.Count);
+                var pageTreeRoot = (PdfDictionary)Catalog.Elements.GetObject (PdfCatalog.Keys.Pages);
+                return pageTreeRoot.Elements.GetInteger (PdfPages.Keys.Count);
             }
         }
 
@@ -516,6 +522,7 @@ namespace PdfSharpCore.Pdf
         {
             get { return _fileSize; }
         }
+
         internal long _fileSize; // TODO: make private
 
         /// <summary>
@@ -525,6 +532,7 @@ namespace PdfSharpCore.Pdf
         {
             get { return _fullPath; }
         }
+
         internal string _fullPath = String.Empty; // TODO: make private
 
         /// <summary>
@@ -534,6 +542,7 @@ namespace PdfSharpCore.Pdf
         {
             get { return _guid; }
         }
+
         Guid _guid = Guid.NewGuid();
 
         internal DocumentHandle Handle
@@ -541,10 +550,11 @@ namespace PdfSharpCore.Pdf
             get
             {
                 if (_handle == null)
-                    _handle = new DocumentHandle(this);
+                    _handle = new DocumentHandle (this);
                 return _handle;
             }
         }
+
         DocumentHandle _handle;
 
         /// <summary>
@@ -566,7 +576,7 @@ namespace PdfSharpCore.Pdf
 
         internal Exception DocumentNotImported()
         {
-            return new InvalidOperationException("Document not imported.");
+            return new InvalidOperationException ("Document not imported.");
         }
 
         /// <summary>
@@ -581,7 +591,8 @@ namespace PdfSharpCore.Pdf
                 return _info;
             }
         }
-        PdfDocumentInformation _info;  // never changes if once created
+
+        PdfDocumentInformation _info; // never changes if once created
 
         /// <summary>
         /// This function is intended to be undocumented.
@@ -591,17 +602,18 @@ namespace PdfSharpCore.Pdf
             get
             {
                 if (_customValues == null)
-                    _customValues = PdfCustomValues.Get(Catalog.Elements);
+                    _customValues = PdfCustomValues.Get (Catalog.Elements);
                 return _customValues;
             }
             set
             {
                 if (value != null)
-                    throw new ArgumentException("Only null is allowed to clear all custom values.");
-                PdfCustomValues.Remove(Catalog.Elements);
+                    throw new ArgumentException ("Only null is allowed to clear all custom values.");
+                PdfCustomValues.Remove (Catalog.Elements);
                 _customValues = null;
             }
         }
+
         PdfCustomValues _customValues;
 
         /// <summary>
@@ -616,7 +628,8 @@ namespace PdfSharpCore.Pdf
                 return _pages;
             }
         }
-        PdfPages _pages;  // never changes if once created
+
+        PdfPages _pages; // never changes if once created
 
         /// <summary>
         /// Gets or sets a value specifying the page layout to be used when the document is opened.
@@ -627,7 +640,7 @@ namespace PdfSharpCore.Pdf
             set
             {
                 if (!CanModify)
-                    throw new InvalidOperationException(PSSR.CannotModify);
+                    throw new InvalidOperationException (PSSR.CannotModify);
                 Catalog.PageLayout = value;
             }
         }
@@ -641,7 +654,7 @@ namespace PdfSharpCore.Pdf
             set
             {
                 if (!CanModify)
-                    throw new InvalidOperationException(PSSR.CannotModify);
+                    throw new InvalidOperationException (PSSR.CannotModify);
                 Catalog.PageMode = value;
             }
         }
@@ -677,6 +690,7 @@ namespace PdfSharpCore.Pdf
         {
             get { return Catalog.Language; }
             set { Catalog.Language = value; }
+
             //get { return Catalog.Elements.GetString(PdfCatalog.Keys.Lang); }
             //set { Catalog.Elements.SetString(PdfCatalog.Keys.Lang, value); }
         }
@@ -686,8 +700,9 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public PdfSecuritySettings SecuritySettings
         {
-            get { return _securitySettings ?? (_securitySettings = new PdfSecuritySettings(this)); }
+            get { return _securitySettings ?? (_securitySettings = new PdfSecuritySettings (this)); }
         }
+
         internal PdfSecuritySettings _securitySettings;
 
         /// <summary>
@@ -695,8 +710,9 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         internal PdfFontTable FontTable
         {
-            get { return _fontTable ?? (_fontTable = new PdfFontTable(this)); }
+            get { return _fontTable ?? (_fontTable = new PdfFontTable (this)); }
         }
+
         PdfFontTable _fontTable;
 
         /// <summary>
@@ -707,19 +723,21 @@ namespace PdfSharpCore.Pdf
             get
             {
                 if (_imageTable == null)
-                    _imageTable = new PdfImageTable(this);
+                    _imageTable = new PdfImageTable (this);
                 return _imageTable;
             }
         }
+
         PdfImageTable _imageTable;
 
         /// <summary>
         /// Gets the document form table that holds all form external objects used in the current document.
         /// </summary>
-        internal PdfFormXObjectTable FormTable  // TODO: Rename to ExternalDocumentTable.
+        internal PdfFormXObjectTable FormTable // TODO: Rename to ExternalDocumentTable.
         {
-            get { return _formTable ?? (_formTable = new PdfFormXObjectTable(this)); }
+            get { return _formTable ?? (_formTable = new PdfFormXObjectTable (this)); }
         }
+
         PdfFormXObjectTable _formTable;
 
         /// <summary>
@@ -727,8 +745,9 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         internal PdfExtGStateTable ExtGStateTable
         {
-            get { return _extGStateTable ?? (_extGStateTable = new PdfExtGStateTable(this)); }
+            get { return _extGStateTable ?? (_extGStateTable = new PdfExtGStateTable (this)); }
         }
+
         PdfExtGStateTable _extGStateTable;
 
         /// <summary>
@@ -738,7 +757,8 @@ namespace PdfSharpCore.Pdf
         {
             get { return _catalog ?? (_catalog = _trailer.Root); }
         }
-        PdfCatalog _catalog;  // never changes if once created
+
+        PdfCatalog _catalog; // never changes if once created
 
         /// <summary>
         /// Gets the PdfInternals object of this document, that grants access to some internal structures
@@ -746,20 +766,21 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public new PdfInternals Internals
         {
-            get { return _internals ?? (_internals = new PdfInternals(this)); }
+            get { return _internals ?? (_internals = new PdfInternals (this)); }
         }
+
         PdfInternals _internals;
 
         /// <summary>
         /// Creates a new page and adds it to this document.
-        /// Depending of the IsMetric property of the current region the page size is set to 
+        /// Depending of the IsMetric property of the current region the page size is set to
         /// A4 or Letter respectively. If this size is not appropriate it should be changed before
         /// any drawing operations are performed on the page.
         /// </summary>
         public PdfPage AddPage()
         {
             if (!CanModify)
-                throw new InvalidOperationException(PSSR.CannotModify);
+                throw new InvalidOperationException (PSSR.CannotModify);
             return Catalog.Pages.Add();
         }
 
@@ -768,21 +789,21 @@ namespace PdfSharpCore.Pdf
         /// it is imported to this document. In this case the returned page is not the same
         /// object as the specified one.
         /// </summary>
-        public PdfPage AddPage(PdfPage page, AnnotationCopyingType annotationCopying = AnnotationCopyingType.DoNotCopy)
+        public PdfPage AddPage (PdfPage page, AnnotationCopyingType annotationCopying = AnnotationCopyingType.DoNotCopy)
         {
             if (!CanModify)
-                throw new InvalidOperationException(PSSR.CannotModify);
-            return Catalog.Pages.Add(page, annotationCopying);
+                throw new InvalidOperationException (PSSR.CannotModify);
+            return Catalog.Pages.Add (page, annotationCopying);
         }
 
         /// <summary>
         /// Creates a new page and inserts it in this document at the specified position.
         /// </summary>
-        public PdfPage InsertPage(int index)
+        public PdfPage InsertPage (int index)
         {
             if (!CanModify)
-                throw new InvalidOperationException(PSSR.CannotModify);
-            return Catalog.Pages.Insert(index);
+                throw new InvalidOperationException (PSSR.CannotModify);
+            return Catalog.Pages.Insert (index);
         }
 
         /// <summary>
@@ -790,11 +811,12 @@ namespace PdfSharpCore.Pdf
         /// it is imported to this document. In this case the returned page is not the same
         /// object as the specified one.
         /// </summary>
-        public PdfPage InsertPage(int index, PdfPage page, AnnotationCopyingType annotationCopying = AnnotationCopyingType.DoNotCopy)
+        public PdfPage InsertPage (int index, PdfPage page,
+            AnnotationCopyingType annotationCopying = AnnotationCopyingType.DoNotCopy)
         {
             if (!CanModify)
-                throw new InvalidOperationException(PSSR.CannotModify);
-            return Catalog.Pages.Insert(index, page, annotationCopying);
+                throw new InvalidOperationException (PSSR.CannotModify);
+            return Catalog.Pages.Insert (index, page, annotationCopying);
         }
 
         /// <summary>
@@ -817,16 +839,16 @@ namespace PdfSharpCore.Pdf
         /// <summary>
         /// Occurs when the specified document is not used anymore for importing content.
         /// </summary>
-        internal void OnExternalDocumentFinalized(PdfDocument.DocumentHandle handle)
+        internal void OnExternalDocumentFinalized (PdfDocument.DocumentHandle handle)
         {
             if (tls != null)
             {
                 //PdfDocument[] documents = tls.Documents;
-                tls.DetachDocument(handle);
+                tls.DetachDocument (handle);
             }
 
             if (_formTable != null)
-                _formTable.DetachDocument(handle);
+                _formTable.DetachDocument (handle);
         }
 
         //internal static GlobalObjectTable Gob = new GlobalObjectTable();
@@ -839,16 +861,16 @@ namespace PdfSharpCore.Pdf
         {
             get { return tls ?? (tls = new ThreadLocalStorage()); }
         }
-        [ThreadStatic]
-        static ThreadLocalStorage tls;
 
-        [DebuggerDisplay("(ID={ID}, alive={IsAlive})")]
+        [ThreadStatic] static ThreadLocalStorage tls;
+
+        [DebuggerDisplay ("(ID={ID}, alive={IsAlive})")]
         internal class DocumentHandle
         {
-            public DocumentHandle(PdfDocument document)
+            public DocumentHandle (PdfDocument document)
             {
-                _weakRef = new WeakReference(document);
-                ID = document._guid.ToString("B").ToUpper();
+                _weakRef = new WeakReference (document);
+                ID = document._guid.ToString ("B").ToUpper();
             }
 
             public bool IsAlive
@@ -856,20 +878,18 @@ namespace PdfSharpCore.Pdf
                 get { return _weakRef.IsAlive; }
             }
 
-            public PdfDocument Target
+            public PdfDocument? Target
             {
                 get { return _weakRef.Target as PdfDocument; }
             }
+
             readonly WeakReference _weakRef;
 
             public string ID;
 
-            public override bool Equals(object obj)
+            public override bool Equals (object? obj)
             {
-                DocumentHandle handle = obj as DocumentHandle;
-                if (!ReferenceEquals(handle, null))
-                    return ID == handle.ID;
-                return false;
+                return obj is DocumentHandle handle && ID == handle.ID;
             }
 
             public override int GetHashCode()
@@ -877,14 +897,12 @@ namespace PdfSharpCore.Pdf
                 return ID.GetHashCode();
             }
 
-            public static bool operator ==(DocumentHandle left, DocumentHandle right)
+            public static bool operator == (DocumentHandle? left, DocumentHandle? right)
             {
-                if (ReferenceEquals(left, null))
-                    return ReferenceEquals(right, null);
-                return left.Equals(right);
+                return left?.Equals (right) ?? ReferenceEquals (right, null);
             }
 
-            public static bool operator !=(DocumentHandle left, DocumentHandle right)
+            public static bool operator != (DocumentHandle? left, DocumentHandle? right)
             {
                 return !(left == right);
             }
