@@ -3,7 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 
 /* XDate.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -46,12 +48,6 @@ public struct XDate
     // =========================================================================
     // Internal Variables
     // =========================================================================
-
-    /// <summary>
-    /// The actual date value in MS Excel format.  This is the only data field in
-    /// the <see cref="XDate"/> struct.
-    /// </summary>
-    private double _xlDate;
 
     /// <summary>
     /// The Astronomical Julian Day number that corresponds to XL Date 0.0
@@ -142,7 +138,7 @@ public struct XDate
     /// </param>
     public XDate (double xlDate)
     {
-        _xlDate = xlDate;
+        XLDate = xlDate;
     }
 
     /// <summary>
@@ -153,7 +149,7 @@ public struct XDate
     /// </param>
     public XDate (DateTime dateTime)
     {
-        _xlDate = CalendarDateToXLDate (dateTime.Year, dateTime.Month,
+        XLDate = CalendarDateToXLDate (dateTime.Year, dateTime.Month,
             dateTime.Day, dateTime.Hour, dateTime.Minute, dateTime.Second,
             dateTime.Millisecond);
     }
@@ -171,7 +167,7 @@ public struct XDate
     /// which will rollover to the previous or next year.</param>
     public XDate (int year, int month, int day)
     {
-        _xlDate = CalendarDateToXLDate (year, month, day, 0, 0, 0);
+        XLDate = CalendarDateToXLDate (year, month, day, 0, 0, 0);
     }
 
     /// <summary>
@@ -196,7 +192,7 @@ public struct XDate
     /// will rollover to the previous or next minute.</param>
     public XDate (int year, int month, int day, int hour, int minute, int second)
     {
-        _xlDate = CalendarDateToXLDate (year, month, day, hour, minute, second);
+        XLDate = CalendarDateToXLDate (year, month, day, hour, minute, second);
     }
 
     /// <summary>
@@ -221,7 +217,7 @@ public struct XDate
     /// will rollover to the previous or next minute.</param>
     public XDate (int year, int month, int day, int hour, int minute, double second)
     {
-        _xlDate = CalendarDateToXLDate (year, month, day, hour, minute, second);
+        XLDate = CalendarDateToXLDate (year, month, day, hour, minute, second);
     }
 
     /// <summary>
@@ -249,7 +245,7 @@ public struct XDate
     /// will rollover to the previous or next second.</param>
     public XDate (int year, int month, int day, int hour, int minute, int second, int millisecond)
     {
-        _xlDate = CalendarDateToXLDate (year, month, day, hour, minute, second, millisecond);
+        XLDate = CalendarDateToXLDate (year, month, day, hour, minute, second, millisecond);
     }
 
     /// <summary>
@@ -258,7 +254,7 @@ public struct XDate
     /// <param name="rhs">The GraphPane object from which to copy</param>
     public XDate (XDate rhs)
     {
-        _xlDate = rhs._xlDate;
+        XLDate = rhs.XLDate;
     }
 /*
 		/// <summary>
@@ -292,27 +288,20 @@ public struct XDate
     /// <summary>
     /// Gets or sets the date value for this item in MS Excel format.
     /// </summary>
-    public double XLDate
-    {
-        get { return _xlDate; }
-        set { _xlDate = value; }
-    }
+    public double XLDate { get; set; }
 
     /// <summary>
     /// Returns true if this <see cref="XDate" /> struct is in the valid date range
     /// </summary>
-    public bool IsValidDate
-    {
-        get { return _xlDate >= XLDayMin && _xlDate <= XLDayMax; }
-    }
+    public bool IsValidDate => XLDate >= XLDayMin && XLDate <= XLDayMax;
 
     /// <summary>
     /// Gets or sets the date value for this item in .Net DateTime format.
     /// </summary>
     public DateTime DateTime
     {
-        get { return XLDateToDateTime (_xlDate); }
-        set { _xlDate = DateTimeToXLDate (value); }
+        get => XLDateToDateTime (XLDate);
+        set => XLDate = DateTimeToXLDate (value);
     }
 
     /// <summary>
@@ -323,8 +312,8 @@ public struct XDate
     /// </summary>
     public double JulianDay
     {
-        get { return XLDateToJulianDay (_xlDate); }
-        set { _xlDate = JulianDayToXLDate (value); }
+        get => XLDateToJulianDay (XLDate);
+        set => XLDate = JulianDayToXLDate (value);
     }
 
     /// <summary>
@@ -332,8 +321,8 @@ public struct XDate
     /// </summary>
     public double DecimalYear
     {
-        get { return XLDateToDecimalYear (_xlDate); }
-        set { _xlDate = DecimalYearToXLDate (value); }
+        get => XLDateToDecimalYear (XLDate);
+        set => XLDate = DecimalYearToXLDate (value);
     }
 
     #endregion
@@ -382,7 +371,7 @@ public struct XDate
     {
         int hour, minute, second;
 
-        XLDateToCalendarDate (_xlDate, out year, out month, out day, out hour, out minute, out second);
+        XLDateToCalendarDate (XLDate, out year, out month, out day, out hour, out minute, out second);
     }
 
     /// <summary>
@@ -394,7 +383,7 @@ public struct XDate
     /// 8 for August.</param>
     public void SetDate (int year, int month, int day)
     {
-        _xlDate = CalendarDateToXLDate (year, month, day, 0, 0, 0);
+        XLDate = CalendarDateToXLDate (year, month, day, 0, 0, 0);
     }
 
     /// <summary>
@@ -411,7 +400,7 @@ public struct XDate
     public void GetDate (out int year, out int month, out int day,
         out int hour, out int minute, out int second)
     {
-        XLDateToCalendarDate (_xlDate, out year, out month, out day, out hour, out minute, out second);
+        XLDateToCalendarDate (XLDate, out year, out month, out day, out hour, out minute, out second);
     }
 
     /// <summary>
@@ -426,7 +415,7 @@ public struct XDate
     /// <param name="second">An integer value for the second, e.g. 35.</param>
     public void SetDate (int year, int month, int day, int hour, int minute, int second)
     {
-        _xlDate = CalendarDateToXLDate (year, month, day, hour, minute, second);
+        XLDate = CalendarDateToXLDate (year, month, day, hour, minute, second);
     }
 
     /// <summary>
@@ -436,7 +425,7 @@ public struct XDate
     /// <returns>The day of the year in floating point double format.</returns>
     public double GetDayOfYear()
     {
-        return XLDateToDayOfYear (_xlDate);
+        return XLDateToDayOfYear (XLDate);
     }
 
     #endregion
@@ -1195,7 +1184,7 @@ public struct XDate
     /// </param>
     public void AddMilliseconds (double dMilliseconds)
     {
-        _xlDate += dMilliseconds / MillisecondsPerDay;
+        XLDate += dMilliseconds / MillisecondsPerDay;
     }
 
     /// <summary>
@@ -1206,7 +1195,7 @@ public struct XDate
     /// </param>
     public void AddSeconds (double dSeconds)
     {
-        _xlDate += dSeconds / SecondsPerDay;
+        XLDate += dSeconds / SecondsPerDay;
     }
 
     /// <summary>
@@ -1217,7 +1206,7 @@ public struct XDate
     /// </param>
     public void AddMinutes (double dMinutes)
     {
-        _xlDate += dMinutes / MinutesPerDay;
+        XLDate += dMinutes / MinutesPerDay;
     }
 
     /// <summary>
@@ -1228,7 +1217,7 @@ public struct XDate
     /// </param>
     public void AddHours (double dHours)
     {
-        _xlDate += dHours / HoursPerDay;
+        XLDate += dHours / HoursPerDay;
     }
 
     /// <summary>
@@ -1239,7 +1228,7 @@ public struct XDate
     /// </param>
     public void AddDays (double dDays)
     {
-        _xlDate += dDays;
+        XLDate += dDays;
     }
 
     /// <summary>
@@ -1256,17 +1245,17 @@ public struct XDate
 
         int year, month, day, hour, minute, second;
 
-        XLDateToCalendarDate (_xlDate, out year, out month, out day, out hour, out minute, out second);
+        XLDateToCalendarDate (XLDate, out year, out month, out day, out hour, out minute, out second);
         if (iMon != 0)
         {
             month += iMon;
-            _xlDate = CalendarDateToXLDate (year, month, day, hour, minute, second);
+            XLDate = CalendarDateToXLDate (year, month, day, hour, minute, second);
         }
 
         if (sMon != 0)
         {
             double xlDate2 = CalendarDateToXLDate (year, month + sMon, day, hour, minute, second);
-            _xlDate += (xlDate2 - _xlDate) * monFrac;
+            XLDate += (xlDate2 - XLDate) * monFrac;
         }
     }
 
@@ -1284,17 +1273,17 @@ public struct XDate
 
         int year, month, day, hour, minute, second;
 
-        XLDateToCalendarDate (_xlDate, out year, out month, out day, out hour, out minute, out second);
+        XLDateToCalendarDate (XLDate, out year, out month, out day, out hour, out minute, out second);
         if (iYear != 0)
         {
             year += iYear;
-            _xlDate = CalendarDateToXLDate (year, month, day, hour, minute, second);
+            XLDate = CalendarDateToXLDate (year, month, day, hour, minute, second);
         }
 
         if (sYear != 0)
         {
             double xlDate2 = CalendarDateToXLDate (year + sYear, month, day, hour, minute, second);
-            _xlDate += (xlDate2 - _xlDate) * yearFrac;
+            XLDate += (xlDate2 - XLDate) * yearFrac;
         }
     }
 
@@ -1327,7 +1316,7 @@ public struct XDate
     /// <returns>An XDate with the rhs number of days subtracted</returns>
     public static XDate operator - (XDate lhs, double rhs)
     {
-        lhs._xlDate -= rhs;
+        lhs.XLDate -= rhs;
         return lhs;
     }
 
@@ -1340,7 +1329,7 @@ public struct XDate
     /// <returns>An XDate with the rhs number of days added</returns>
     public static XDate operator + (XDate lhs, double rhs)
     {
-        lhs._xlDate += rhs;
+        lhs.XLDate += rhs;
         return lhs;
     }
 
@@ -1351,7 +1340,7 @@ public struct XDate
     /// <returns>An XDate one day later than the specified date</returns>
     public static XDate operator ++ (XDate xDate)
     {
-        xDate._xlDate += 1.0;
+        xDate.XLDate += 1.0;
         return xDate;
     }
 
@@ -1362,7 +1351,7 @@ public struct XDate
     /// <returns>An XDate one day prior to the specified date</returns>
     public static XDate operator -- (XDate xDate)
     {
-        xDate._xlDate -= 1.0;
+        xDate.XLDate -= 1.0;
         return xDate;
     }
 
@@ -1373,7 +1362,7 @@ public struct XDate
     /// <returns>A double floating point value representing the XL Date</returns>
     public static implicit operator double (XDate xDate)
     {
-        return xDate._xlDate;
+        return xDate.XLDate;
     }
 
     /// <summary>
@@ -1383,7 +1372,7 @@ public struct XDate
     /// <returns>A double floating point value representing the XL Date</returns>
     public static implicit operator float (XDate xDate)
     {
-        return (float)xDate._xlDate;
+        return (float)xDate.XLDate;
     }
 
     /// <summary>
@@ -1424,39 +1413,21 @@ public struct XDate
     // System Stuff
     // =========================================================================
 
-    /// <summary>
-    /// Tests whether <param>obj</param> is either an <see cref="XDate"/> structure or
-    /// a double floating point value that is equal to the same date as this <c>XDate</c>
-    /// struct instance.
-    /// </summary>
-    /// <param name="obj">The object to compare for equality with this XDate instance.
-    /// This object should be either a type XDate or type double.</param>
-    /// <returns>Returns <c>true</c> if <param>obj</param> is the same date as this
-    /// instance; otherwise, <c>false</c></returns>
-    public override bool Equals (object obj)
+    /// <inheritdoc cref="ValueType.Equals(object?)"/>
+    public override bool Equals (object? obj)
     {
-        if (obj is XDate)
+        return obj switch
         {
-            return ((XDate)obj)._xlDate == _xlDate;
-        }
-        else if (obj is double)
-        {
-            return ((double)obj) == _xlDate;
-        }
-        else
-        {
-            return false;
-        }
+            XDate date => date.XLDate == XLDate,
+            double d => d == XLDate,
+            _ => false
+        };
     }
 
-    /// <summary>
-    /// Returns the hash code for this <see cref="XDate"/> structure.  In this case, the
-    /// hash code is simply the equivalent hash code for the floating point double date value.
-    /// </summary>
-    /// <returns>An integer representing the hash code for this XDate value</returns>
+    /// <inheritdoc cref="ValueType.GetHashCode"/>
     public override int GetHashCode()
     {
-        return _xlDate.GetHashCode();
+        return XLDate.GetHashCode();
     }
 
     /// <summary>
@@ -1470,14 +1441,14 @@ public struct XDate
     /// <returns>zero if <paramref name="target" /> is equal to the current instance,
     /// -1 if <paramref name="target"/> is less than the current instance, and
     /// 1 if <paramref name="target"/> is greater than the current instance.</returns>
-    public int CompareTo (object target)
+    public int CompareTo (object? target)
     {
-        if (!(target is XDate))
+        if (target is not XDate date)
         {
             throw new ArgumentException();
         }
 
-        return (XLDate).CompareTo (((XDate)target).XLDate);
+        return (XLDate).CompareTo (date.XLDate);
     }
 
     #endregion
@@ -1530,7 +1501,7 @@ public struct XDate
     /// <returns>A string representation of the date</returns>
     public override string ToString()
     {
-        return ToString (_xlDate, DefaultFormatStr);
+        return ToString (XLDate, DefaultFormatStr);
     }
 
     /// <summary>
@@ -1594,6 +1565,7 @@ public struct XDate
             return "Date Error";
         }
 
+        var invariantCulture = StringComparison.InvariantCulture;
         XLDateToCalendarDate (xlDate, out year, out month, out day, out hour, out minute,
             out second, out millisecond);
         if (year <= 0)
@@ -1602,54 +1574,57 @@ public struct XDate
             fmtStr = fmtStr + " (BC)";
         }
 
-        if (fmtStr.IndexOf ("[d]") >= 0)
+        if (fmtStr.IndexOf ("[d]", invariantCulture) >= 0)
         {
             fmtStr = fmtStr.Replace ("[d]", ((int)xlDate).ToString());
             xlDate -= (int)xlDate;
         }
 
-        if (fmtStr.IndexOf ("[h]") >= 0 || fmtStr.IndexOf ("[hh]") >= 0)
+        if (fmtStr.IndexOf ("[h]", invariantCulture) >= 0
+            || fmtStr.IndexOf ("[hh]", invariantCulture) >= 0)
         {
             fmtStr = fmtStr.Replace ("[h]", ((int)(xlDate * 24)).ToString ("d"));
             fmtStr = fmtStr.Replace ("[hh]", ((int)(xlDate * 24)).ToString ("d2"));
             xlDate = (xlDate * 24 - (int)(xlDate * 24)) / 24.0;
         }
 
-        if (fmtStr.IndexOf ("[m]") >= 0 || fmtStr.IndexOf ("[mm]") >= 0)
+        if (fmtStr.IndexOf ("[m]", invariantCulture) >= 0
+            || fmtStr.IndexOf ("[mm]", invariantCulture) >= 0)
         {
             fmtStr = fmtStr.Replace ("[m]", ((int)(xlDate * 1440)).ToString ("d"));
             fmtStr = fmtStr.Replace ("[mm]", ((int)(xlDate * 1440)).ToString ("d2"));
             xlDate = (xlDate * 1440 - (int)(xlDate * 1440)) / 1440.0;
         }
 
-        if (fmtStr.IndexOf ("[s]") >= 0 || fmtStr.IndexOf ("[ss]") >= 0)
+        if (fmtStr.IndexOf ("[s]", invariantCulture) >= 0
+            || fmtStr.IndexOf ("[ss]", invariantCulture) >= 0)
         {
             fmtStr = fmtStr.Replace ("[s]", ((int)(xlDate * 86400)).ToString ("d"));
             fmtStr = fmtStr.Replace ("[ss]", ((int)(xlDate * 86400)).ToString ("d2"));
             xlDate = (xlDate * 86400 - (int)(xlDate * 86400)) / 86400.0;
         }
 
-        if (fmtStr.IndexOf ("[f]") >= 0)
+        if (fmtStr.IndexOf ("[f]", invariantCulture) >= 0)
         {
             fmtStr = fmtStr.Replace ("[f]", ((int)(xlDate * 864000)).ToString ("d"));
         }
 
-        if (fmtStr.IndexOf ("[ff]") >= 0)
+        if (fmtStr.IndexOf ("[ff]", invariantCulture) >= 0)
         {
             fmtStr = fmtStr.Replace ("[ff]", ((int)(xlDate * 8640000)).ToString ("d"));
         }
 
-        if (fmtStr.IndexOf ("[fff]") >= 0)
+        if (fmtStr.IndexOf ("[fff]", invariantCulture) >= 0)
         {
             fmtStr = fmtStr.Replace ("[fff]", ((int)(xlDate * 86400000)).ToString ("d"));
         }
 
-        if (fmtStr.IndexOf ("[ffff]") >= 0)
+        if (fmtStr.IndexOf ("[ffff]", invariantCulture) >= 0)
         {
             fmtStr = fmtStr.Replace ("[ffff]", ((int)(xlDate * 864000000)).ToString ("d"));
         }
 
-        if (fmtStr.IndexOf ("[fffff]") >= 0)
+        if (fmtStr.IndexOf ("[fffff]", invariantCulture) >= 0)
         {
             fmtStr = fmtStr.Replace ("[fffff]", ((int)(xlDate * 8640000000)).ToString ("d"));
         }

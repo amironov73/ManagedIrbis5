@@ -1040,7 +1040,7 @@ public abstract class Axis
     /// <see cref="_tmpSpace" /> for use by the <see cref="GraphPane.CalcChartRect(Graphics)" />
     /// method.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -1059,7 +1059,13 @@ public abstract class Axis
     /// <see cref="Cross" /> value.</param>
     /// <returns>Returns the space, in pixels, required for this axis (between the
     /// rect and ChartRect)</returns>
-    public float CalcSpace (Graphics g, GraphPane pane, float scaleFactor, out float fixedSpace)
+    public float CalcSpace
+        (
+            Graphics graphics,
+            GraphPane pane,
+            float scaleFactor,
+            out float fixedSpace
+        )
     {
         //fixedSpace = 0;
 
@@ -1115,7 +1121,7 @@ public abstract class Axis
             // space between scale label and axis label is 0.5 tic
 
             // account for the tic labels + 'LabelGap' tic gap between the tic and the label
-            _tmpSpace += Scale.GetScaleMaxSpace (g, pane, scaleFactor, true).Height +
+            _tmpSpace += Scale.GetScaleMaxSpace (graphics, pane, scaleFactor, true).Height +
                          scaledLabelGap;
 
             var str = MakeTitle();
@@ -1126,7 +1132,7 @@ public abstract class Axis
             if (!string.IsNullOrEmpty (str) && Title.IsVisible)
             {
                 //tmpSpace += this.TitleFontSpec.BoundingBox( g, str, scaleFactor ).Height;
-                fixedSpace = Title.FontSpec.BoundingBox (g, str, scaleFactor).Height +
+                fixedSpace = Title.FontSpec.BoundingBox (graphics, str, scaleFactor).Height +
                              scaledTitleGap;
                 _tmpSpace += fixedSpace;
 
@@ -1155,7 +1161,7 @@ public abstract class Axis
                                       pane.XAxis.IsVisible && pane.XAxis.Scale._isVisible))
         {
             // half the width of the widest item, plus a gap of 1/2 the charheight
-            var tmp = pane.XAxis.Scale.GetScaleMaxSpace (g, pane, scaleFactor, true).Width / 2.0F;
+            var tmp = pane.XAxis.Scale.GetScaleMaxSpace (graphics, pane, scaleFactor, true).Width / 2.0F;
 
             //+ charHeight / 2.0F;
             //if ( tmp > tmpSpace )

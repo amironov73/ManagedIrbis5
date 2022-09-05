@@ -1358,10 +1358,8 @@ public class PdfDictionary
             }
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException (nameof (value));
-                }
+                Sure.NotNull (value);
+
 #if DEBUG_
                     if (key == "/MediaBox")
                         key.GetType();
@@ -1379,8 +1377,7 @@ public class PdfDictionary
                             throw new ArgumentException("A dictionary with stream cannot be a direct value.");
                     }
 #endif
-                var obj = value as PdfObject;
-                if (obj != null && obj.IsIndirect)
+                if (value is PdfObject { IsIndirect: true } obj)
                 {
                     value = obj.Reference;
                 }
@@ -1397,10 +1394,7 @@ public class PdfDictionary
             get { return this[key.Value]; }
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException (nameof (value));
-                }
+                Sure.NotNull (value);
 
 #if DEBUG
                 if (value is PdfDictionary dictionary)
@@ -1601,7 +1595,7 @@ public class PdfDictionary
         /// <summary>
         /// The current implementation returns null.
         /// </summary>
-        public object SyncRoot
+        public object? SyncRoot
         {
             get { return null; }
         }
