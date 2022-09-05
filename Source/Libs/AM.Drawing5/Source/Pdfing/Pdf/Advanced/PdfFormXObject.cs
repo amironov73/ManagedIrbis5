@@ -1,116 +1,137 @@
-#region PDFsharp - A .NET library for processing PDF
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharpCore.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-// DEALINGS IN THE SOFTWARE.
-#endregion
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/* PdfFormXObject.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
 using System.Diagnostics;
+
 using PdfSharpCore.Drawing;
 
-namespace PdfSharpCore.Pdf.Advanced
+#endregion
+
+#nullable enable
+
+namespace PdfSharpCore.Pdf.Advanced;
+
+/// <summary>
+/// Represents an external form object (e.g. an imported page).
+/// </summary>
+public sealed class PdfFormXObject
+    : PdfXObject, IContentStream
 {
+    #region Construction
+
     /// <summary>
-    /// Represents an external form object (e.g. an imported page).
+    ///
     /// </summary>
-    public sealed class PdfFormXObject : PdfXObject, IContentStream
+    /// <param name="thisDocument"></param>
+    internal PdfFormXObject
+        (
+            PdfDocument thisDocument
+        )
+        : base (thisDocument)
     {
-        internal PdfFormXObject(PdfDocument thisDocument)
-            : base(thisDocument)
+        Elements.SetName (Keys.Type, "/XObject");
+        Elements.SetName (Keys.Subtype, "/Form");
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="thisDocument"></param>
+    /// <param name="form"></param>
+    internal PdfFormXObject
+        (
+            PdfDocument thisDocument,
+            XForm form
+        )
+        : base (thisDocument)
+    {
+        // BUG: form is not used
+        Elements.SetName (Keys.Type, "/XObject");
+        Elements.SetName (Keys.Subtype, "/Form");
+
+        //if (form.IsTemplate)
+        //{ }
+    }
+
+    #endregion
+
+    internal double DpiX { get; set; } = 72;
+
+    internal double DpiY { get; set; } = 72;
+
+    internal PdfFormXObject
+        (
+            PdfDocument thisDocument,
+            PdfImportedObjectTable importedObjectTable,
+            XPdfForm form
+        )
+        : base (thisDocument)
+    {
+        Debug.Assert (ReferenceEquals (thisDocument, importedObjectTable.Owner));
+        Elements.SetName (Keys.Type, "/XObject");
+        Elements.SetName (Keys.Subtype, "/Form");
+
+        if (form.IsTemplate)
         {
-            Elements.SetName(Keys.Type, "/XObject");
-            Elements.SetName(Keys.Subtype, "/Form");
+            Debug.Assert (importedObjectTable == null);
+
+            // TODO more initialization here???
+            return;
         }
 
-        internal PdfFormXObject(PdfDocument thisDocument, XForm form)
-            : base(thisDocument)
-        {
-            // BUG: form is not used
-            Elements.SetName(Keys.Type, "/XObject");
-            Elements.SetName(Keys.Subtype, "/Form");
+        Debug.Assert (importedObjectTable != null);
 
-            //if (form.IsTemplate)
-            //{ }
+        var pdfForm = form;
+
+        // Get import page
+        var importPages = importedObjectTable.ExternalDocument.Pages;
+        if (pdfForm.PageNumber < 1 || pdfForm.PageNumber > importPages.Count)
+        {
+            PSSR.ImportPageNumberOutOfRange (pdfForm.PageNumber, importPages.Count, form._path);
         }
 
-        internal double DpiX
+        var importPage = importPages[pdfForm.PageNumber - 1];
+
+        // Import resources
+        var res = importPage.Elements["/Resources"];
+        if (res != null) // unlikely but possible
         {
-            get { return _dpiX; }
-            set { _dpiX = value; }
-        }
-        double _dpiX = 72;
-
-        internal double DpiY
-        {
-            get { return _dpiY; }
-            set { _dpiY = value; }
-        }
-        double _dpiY = 72;
-
-        internal PdfFormXObject(PdfDocument thisDocument, PdfImportedObjectTable importedObjectTable, XPdfForm form)
-            : base(thisDocument)
-        {
-            Debug.Assert(ReferenceEquals(thisDocument, importedObjectTable.Owner));
-            Elements.SetName(Keys.Type, "/XObject");
-            Elements.SetName(Keys.Subtype, "/Form");
-
-            if (form.IsTemplate)
-            {
-                Debug.Assert(importedObjectTable == null);
-                // TODO more initialization here???
-                return;
-            }
-            Debug.Assert(importedObjectTable != null);
-
-            XPdfForm pdfForm = form;
-            // Get import page
-            PdfPages importPages = importedObjectTable.ExternalDocument.Pages;
-            if (pdfForm.PageNumber < 1 || pdfForm.PageNumber > importPages.Count)
-                PSSR.ImportPageNumberOutOfRange(pdfForm.PageNumber, importPages.Count, form._path);
-            PdfPage importPage = importPages[pdfForm.PageNumber - 1];
-
-            // Import resources
-            PdfItem res = importPage.Elements["/Resources"];
-            if (res != null) // unlikely but possible
-            {
 #if true
-                // Get root object
-                PdfObject root;
-                if (res is PdfReference)
-                    root = ((PdfReference)res).Value;
-                else
-                    root = (PdfDictionary)res;
 
-                root = ImportClosure(importedObjectTable, thisDocument, root);
-                // If the root was a direct object, make it indirect.
-                if (root.Reference == null)
-                    thisDocument._irefTable.Add(root);
+            // Get root object
+            PdfObject root;
+            if (res is PdfReference)
+            {
+                root = ((PdfReference)res).Value;
+            }
+            else
+            {
+                root = (PdfDictionary)res;
+            }
 
-                Debug.Assert(root.Reference != null);
-                Elements["/Resources"] = root.Reference;
+            root = ImportClosure (importedObjectTable, thisDocument, root);
+
+            // If the root was a direct object, make it indirect.
+            if (root.Reference == null)
+            {
+                thisDocument._irefTable.Add (root);
+            }
+
+            Debug.Assert (root.Reference != null);
+            Elements["/Resources"] = root.Reference;
 #else
                 // Get transitive closure
                 PdfObject[] resources = importPage.Owner.Internals.GetClosure(resourcesRoot);
@@ -188,111 +209,109 @@ namespace PdfSharpCore.Pdf.Advanced
                 // Set resources key to the root of the clones
                 Elements["/Resources"] = resources[0].Reference;
 #endif
-            }
+        }
 
-            // Take /Rotate into account
-            PdfRectangle rect = importPage.Elements.GetRectangle(PdfPage.Keys.MediaBox);
-            int rotate = importPage.Elements.GetInteger(PdfPage.Keys.Rotate);
-            //rotate = 0;
-            if (rotate == 0)
+        // Take /Rotate into account
+        var rect = importPage.Elements.GetRectangle (PdfPage.Keys.MediaBox);
+        var rotate = importPage.Elements.GetInteger (PdfPage.Keys.Rotate);
+
+        //rotate = 0;
+        if (rotate == 0)
+        {
+            // Set bounding box to media box
+            Elements["/BBox"] = rect;
+        }
+        else
+        {
+            // TODO: Have to adjust bounding box? (I think not, but I'm not sure -> wait for problem)
+            Elements["/BBox"] = rect;
+
+            // Rotate the image such that it is upright
+            var matrix = new XMatrix();
+            var width = rect.Width;
+            var height = rect.Height;
+            matrix.RotateAtPrepend (-rotate, new XPoint (width / 2, height / 2));
+
+            // Translate the image such that its center lies on the center of the rotated bounding box
+            var offset = (height - width) / 2;
+            if (height > width)
             {
-                // Set bounding box to media box
-                Elements["/BBox"] = rect;
+                matrix.TranslatePrepend (offset, offset);
             }
             else
             {
-                // TODO: Have to adjust bounding box? (I think not, but I'm not sure -> wait for problem)
-                Elements["/BBox"] = rect;
-
-                // Rotate the image such that it is upright
-                XMatrix matrix = new XMatrix();
-                double width = rect.Width;
-                double height = rect.Height;
-                matrix.RotateAtPrepend(-rotate, new XPoint(width / 2, height / 2));
-
-                // Translate the image such that its center lies on the center of the rotated bounding box
-                double offset = (height - width) / 2;
-                if (height > width)
-                    matrix.TranslatePrepend(offset, offset);
-                else
-                    matrix.TranslatePrepend(-offset, -offset);
-
-                //string item = "[" + PdfEncoders.ToString(matrix) + "]";
-                //Elements[Keys.Matrix] = new PdfLiteral(item);
-                Elements.SetMatrix(Keys.Matrix, matrix);
+                matrix.TranslatePrepend (-offset, -offset);
             }
 
-            // Preserve filter because the content keeps unmodified
-            PdfContent content = importPage.Contents.CreateSingleContent();
+            //string item = "[" + PdfEncoders.ToString(matrix) + "]";
+            //Elements[Keys.Matrix] = new PdfLiteral(item);
+            Elements.SetMatrix (Keys.Matrix, matrix);
+        }
+
+        // Preserve filter because the content keeps unmodified
+        var content = importPage.Contents.CreateSingleContent();
 #if !DEBUG
             content.Compressed = true;
 #endif
-            PdfItem filter = content.Elements["/Filter"];
-            if (filter != null)
-                Elements["/Filter"] = filter.Clone();
-
-            // (no cloning needed because the bytes keep untouched)
-            Stream = content.Stream; // new PdfStream(bytes, this);
-            Elements.SetInteger("/Length", content.Stream.Value.Length);
-        }
-
-        /// <summary>
-        /// Gets the PdfResources object of this form.
-        /// </summary>
-        public PdfResources Resources
+        var filter = content.Elements["/Filter"];
+        if (filter != null)
         {
-            get
-            {
-                if (_resources == null)
-                    _resources = (PdfResources)Elements.GetValue(Keys.Resources, VCF.Create);
-                return _resources;
-            }
-        }
-        PdfResources _resources;
-
-        PdfResources IContentStream.Resources
-        {
-            get { return Resources; }
+            Elements["/Filter"] = filter.Clone();
         }
 
-        internal string GetFontName(XFont font, out PdfFont pdfFont)
-        {
-            pdfFont = _document.FontTable.GetFont(font);
-            Debug.Assert(pdfFont != null);
-            string name = Resources.AddFont(pdfFont);
-            return name;
-        }
+        // (no cloning needed because the bytes keep untouched)
+        Stream = content.Stream; // new PdfStream(bytes, this);
+        Elements.SetInteger ("/Length", content.Stream.Value.Length);
+    }
 
-        string IContentStream.GetFontName(XFont font, out PdfFont pdfFont)
-        {
-            return GetFontName(font, out pdfFont);
-        }
+    /// <summary>
+    /// Gets the PdfResources object of this form.
+    /// </summary>
+    public PdfResources? Resources =>
+        _resources ??= (PdfResources?) Elements.GetValue (Keys.Resources, VCF.Create);
 
-        /// <summary>
-        /// Gets the resource name of the specified font data within this form XObject.
-        /// </summary>
-        internal string GetFontName(string idName, byte[] fontData, out PdfFont pdfFont)
-        {
-            pdfFont = _document.FontTable.GetFont(idName, fontData);
-            Debug.Assert(pdfFont != null);
-            string name = Resources.AddFont(pdfFont);
-            return name;
-        }
+    private PdfResources? _resources;
 
-        string IContentStream.GetFontName(string idName, byte[] fontData, out PdfFont pdfFont)
-        {
-            return GetFontName(idName, fontData, out pdfFont);
-        }
+    PdfResources? IContentStream.Resources => Resources;
 
-        string IContentStream.GetImageName(XImage image)
-        {
-            throw new NotImplementedException();
-        }
+    internal string GetFontName (XFont font, out PdfFont pdfFont)
+    {
+        pdfFont = _document.FontTable.GetFont (font);
+        Debug.Assert (pdfFont != null);
+        var name = Resources.AddFont (pdfFont);
+        return name;
+    }
 
-        string IContentStream.GetFormName(XForm form)
-        {
-            throw new NotImplementedException();
-        }
+    string IContentStream.GetFontName (XFont font, out PdfFont pdfFont)
+    {
+        return GetFontName (font, out pdfFont);
+    }
+
+    /// <summary>
+    /// Gets the resource name of the specified font data within this form XObject.
+    /// </summary>
+    internal string GetFontName (string idName, byte[] fontData, out PdfFont pdfFont)
+    {
+        pdfFont = _document.FontTable.GetFont (idName, fontData);
+        Debug.Assert (pdfFont != null);
+        var name = Resources.AddFont (pdfFont);
+        return name;
+    }
+
+    string IContentStream.GetFontName (string idName, byte[] fontData, out PdfFont pdfFont)
+    {
+        return GetFontName (idName, fontData, out pdfFont);
+    }
+
+    string IContentStream.GetImageName (XImage image)
+    {
+        throw new NotImplementedException();
+    }
+
+    string IContentStream.GetFormName (XForm form)
+    {
+        throw new NotImplementedException();
+    }
 
 #if keep_code_some_time_as_reference
         /// <summary>
@@ -387,103 +406,103 @@ namespace PdfSharpCore.Pdf.Advanced
         }
 #endif
 
-        //    /// <summary>
-        //    /// Returns ???
-        //    /// </summary>
-        //    public override string ToString()
-        //    {
-        //      return "Form";
-        //    }
+    //    /// <summary>
+    //    /// Returns ???
+    //    /// </summary>
+    //    public override string ToString()
+    //    {
+    //      return "Form";
+    //    }
+
+    /// <summary>
+    /// Predefined keys of this dictionary.
+    /// </summary>
+    public new sealed class Keys : PdfXObject.Keys
+    {
+        /// <summary>
+        /// (Optional) The type of PDF object that this dictionary describes; if present,
+        /// must be XObject for a form XObject.
+        /// </summary>
+        [KeyInfo (KeyType.Name | KeyType.Optional)]
+        public const string Type = "/Type";
 
         /// <summary>
-        /// Predefined keys of this dictionary.
+        /// (Required) The type of XObject that this dictionary describes; must be Form
+        /// for a form XObject.
         /// </summary>
-        public sealed new class Keys : PdfXObject.Keys
-        {
-            /// <summary>
-            /// (Optional) The type of PDF object that this dictionary describes; if present,
-            /// must be XObject for a form XObject.
-            /// </summary>
-            [KeyInfo(KeyType.Name | KeyType.Optional)]
-            public const string Type = "/Type";
-
-            /// <summary>
-            /// (Required) The type of XObject that this dictionary describes; must be Form
-            /// for a form XObject.
-            /// </summary>
-            [KeyInfo(KeyType.Name | KeyType.Required)]
-            public const string Subtype = "/Subtype";
-
-            /// <summary>
-            /// (Optional) A code identifying the type of form XObject that this dictionary
-            /// describes. The only valid value defined at the time of publication is 1.
-            /// Default value: 1.
-            /// </summary>
-            [KeyInfo(KeyType.Integer | KeyType.Optional)]
-            public const string FormType = "/FormType";
-
-            /// <summary>
-            /// (Required) An array of four numbers in the form coordinate system, giving the 
-            /// coordinates of the left, bottom, right, and top edges, respectively, of the 
-            /// form XObject’s bounding box. These boundaries are used to clip the form XObject
-            /// and to determine its size for caching.
-            /// </summary>
-            [KeyInfo(KeyType.Rectangle | KeyType.Required)]
-            public const string BBox = "/BBox";
-
-            /// <summary>
-            /// (Optional) An array of six numbers specifying the form matrix, which maps
-            /// form space into user space.
-            /// Default value: the identity matrix [1 0 0 1 0 0].
-            /// </summary>
-            [KeyInfo(KeyType.Array | KeyType.Optional)]
-            public const string Matrix = "/Matrix";
-
-            /// <summary>
-            /// (Optional but strongly recommended; PDF 1.2) A dictionary specifying any
-            /// resources (such as fonts and images) required by the form XObject.
-            /// </summary>
-            [KeyInfo(KeyType.Dictionary | KeyType.Optional, typeof(PdfResources))]
-            public const string Resources = "/Resources";
-
-            /// <summary>
-            /// (Optional; PDF 1.4) A group attributes dictionary indicating that the contents
-            /// of the form XObject are to be treated as a group and specifying the attributes
-            /// of that group (see Section 4.9.2, “Group XObjects”).
-            /// Note: If a Ref entry (see below) is present, the group attributes also apply to the
-            /// external page imported by that entry, which allows such an imported page to be
-            /// treated as a group without further modification.
-            /// </summary>
-            [KeyInfo(KeyType.Dictionary | KeyType.Optional)]
-            public const string Group = "/Group";
-
-            // further keys:
-            //Ref
-            //Metadata
-            //PieceInfo
-            //LastModified
-            //StructParent
-            //StructParents
-            //OPI
-            //OC
-            //Name
-
-            /// <summary>
-            /// Gets the KeysMeta for these keys.
-            /// </summary>
-            internal static DictionaryMeta Meta
-            {
-                get { return _meta ?? (_meta = CreateMeta(typeof(Keys))); }
-            }
-            static DictionaryMeta _meta;
-        }
+        [KeyInfo (KeyType.Name | KeyType.Required)]
+        public const string Subtype = "/Subtype";
 
         /// <summary>
-        /// Gets the KeysMeta of this dictionary type.
+        /// (Optional) A code identifying the type of form XObject that this dictionary
+        /// describes. The only valid value defined at the time of publication is 1.
+        /// Default value: 1.
         /// </summary>
-        internal override DictionaryMeta Meta
+        [KeyInfo (KeyType.Integer | KeyType.Optional)]
+        public const string FormType = "/FormType";
+
+        /// <summary>
+        /// (Required) An array of four numbers in the form coordinate system, giving the
+        /// coordinates of the left, bottom, right, and top edges, respectively, of the
+        /// form XObjectï¿½s bounding box. These boundaries are used to clip the form XObject
+        /// and to determine its size for caching.
+        /// </summary>
+        [KeyInfo (KeyType.Rectangle | KeyType.Required)]
+        public const string BBox = "/BBox";
+
+        /// <summary>
+        /// (Optional) An array of six numbers specifying the form matrix, which maps
+        /// form space into user space.
+        /// Default value: the identity matrix [1 0 0 1 0 0].
+        /// </summary>
+        [KeyInfo (KeyType.Array | KeyType.Optional)]
+        public const string Matrix = "/Matrix";
+
+        /// <summary>
+        /// (Optional but strongly recommended; PDF 1.2) A dictionary specifying any
+        /// resources (such as fonts and images) required by the form XObject.
+        /// </summary>
+        [KeyInfo (KeyType.Dictionary | KeyType.Optional, typeof (PdfResources))]
+        public const string Resources = "/Resources";
+
+        /// <summary>
+        /// (Optional; PDF 1.4) A group attributes dictionary indicating that the contents
+        /// of the form XObject are to be treated as a group and specifying the attributes
+        /// of that group (see Section 4.9.2, ï¿½Group XObjectsï¿½).
+        /// Note: If a Ref entry (see below) is present, the group attributes also apply to the
+        /// external page imported by that entry, which allows such an imported page to be
+        /// treated as a group without further modification.
+        /// </summary>
+        [KeyInfo (KeyType.Dictionary | KeyType.Optional)]
+        public const string Group = "/Group";
+
+        // further keys:
+        //Ref
+        //Metadata
+        //PieceInfo
+        //LastModified
+        //StructParent
+        //StructParents
+        //OPI
+        //OC
+        //Name
+
+        /// <summary>
+        /// Gets the KeysMeta for these keys.
+        /// </summary>
+        internal static DictionaryMeta Meta
         {
-            get { return Keys.Meta; }
+            get { return _meta ??= CreateMeta (typeof (Keys)); }
         }
+
+        static DictionaryMeta? _meta;
+    }
+
+    /// <summary>
+    /// Gets the KeysMeta of this dictionary type.
+    /// </summary>
+    internal override DictionaryMeta Meta
+    {
+        get { return Keys.Meta; }
     }
 }
