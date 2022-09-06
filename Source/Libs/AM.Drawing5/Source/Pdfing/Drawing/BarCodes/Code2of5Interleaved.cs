@@ -80,14 +80,14 @@ namespace PdfSharpCore.Drawing.BarCodes
 
             BarCodeRenderInfo info = new BarCodeRenderInfo(gfx, brush, font, position);
             InitRendering(info);
-            info.CurrPosInString = 0;
+            info.CurrentPositionInString = 0;
             //info.CurrPos = info.Center - Size / 2;
-            info.CurrPos = position - CodeBase.CalcDistance(AnchorType.TopLeft, Anchor, Size);
+            info.CurrentPosition = position - CodeBase.CalcDistance(AnchorType.TopLeft, Anchor, Size);
 
             if (TurboBit)
                 RenderTurboBit(info, true);
             RenderStart(info);
-            while (info.CurrPosInString < Text.Length)
+            while (info.CurrentPositionInString < Text.Length)
                 RenderNextPair(info);
             RenderStop(info);
             if (TurboBit)
@@ -140,8 +140,8 @@ namespace PdfSharpCore.Drawing.BarCodes
         /// </summary>
         private void RenderNextPair(BarCodeRenderInfo info)
         {
-            int digitForLines = int.Parse(Text[info.CurrPosInString].ToString());
-            int digitForGaps = int.Parse(Text[info.CurrPosInString + 1].ToString());
+            int digitForLines = int.Parse(Text[info.CurrentPositionInString].ToString());
+            int digitForGaps = int.Parse(Text[info.CurrentPositionInString + 1].ToString());
             bool[] linesArray = Lines[digitForLines];
             bool[] gapsArray = Lines[digitForGaps];
             for (int idx = 0; idx < 5; ++idx)
@@ -149,7 +149,7 @@ namespace PdfSharpCore.Drawing.BarCodes
                 RenderBar(info, linesArray[idx]);
                 RenderGap(info, gapsArray[idx]);
             }
-            info.CurrPosInString += 2;
+            info.CurrentPositionInString += 2;
         }
 
         /// <summary>

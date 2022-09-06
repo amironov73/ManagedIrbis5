@@ -3,38 +3,83 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* BarcodeRenderInfo.cs --
+/* BarcodeRenderInfo.cs -- вся необходимая информация для рендеринга штрих-кода
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace PdfSharpCore.Drawing.BarCodes
-{
-    /// <summary>
-    /// Holds all temporary information needed during rendering.
-    /// </summary>
-    class BarCodeRenderInfo
-    {
-        public BarCodeRenderInfo(XGraphics gfx, XBrush brush, XFont font, XPoint position)
-        {
-            Gfx = gfx;
-            Brush = brush;
-            Font = font;
-            Position = position;
-        }
+namespace PdfSharpCore.Drawing.BarCodes;
 
-        public XGraphics Gfx;
-        public XBrush Brush;
-        public XFont Font;
-        public XPoint Position;
-        public double BarHeight;
-        public XPoint CurrPos;
-        public int CurrPosInString;
-        public double ThinBarWidth;
+/// <summary>
+/// Вся (временно) необходимая информация для рендеринга штрих-кода.
+/// </summary>
+class BarCodeRenderInfo
+{
+    #region Properties
+
+    /// <summary>
+    /// Канва.
+    /// </summary>
+    public XGraphics Graphics { get; set; }
+
+    /// <summary>
+    /// Кисть.
+    /// </summary>
+    public XBrush Brush { get; set; }
+
+    /// <summary>
+    /// Шрифт.
+    /// </summary>
+    public XFont Font { get; set; }
+
+    /// <summary>
+    /// Позиция.
+    /// </summary>
+    /// <remarks>Структура!</remarks>
+    public XPoint Position;
+
+    /// <summary>
+    /// Высота полоски штрих-кода.
+    /// </summary>
+    public double BarHeight { get; set; }
+
+    /// <summary>
+    /// Текущая позиция.
+    /// </summary>
+    /// <remarks>Структура!</remarks>
+    public XPoint CurrentPosition;
+
+    /// <summary>
+    /// Текущая позиция в строке.
+    /// </summary>
+    public int CurrentPositionInString { get; set; }
+
+    /// <summary>
+    /// Ширина узкой полоски.
+    /// </summary>
+    public double ThinBarWidth { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    public BarCodeRenderInfo
+        (
+            XGraphics graphics,
+            XBrush brush,
+            XFont font,
+            XPoint position
+        )
+    {
+        Graphics = graphics;
+        Brush = brush;
+        Font = font;
+        Position = position;
     }
+
+    #endregion
 }

@@ -53,15 +53,15 @@ namespace PdfSharpCore.Drawing.BarCodes
             switch (Direction)
             {
                 case CodeDirection.RightToLeft:
-                    info.Gfx.RotateAtTransform(180, info.Position);
+                    info.Graphics.RotateAtTransform(180, info.Position);
                     break;
 
                 case CodeDirection.TopToBottom:
-                    info.Gfx.RotateAtTransform(90, info.Position);
+                    info.Graphics.RotateAtTransform(90, info.Position);
                     break;
 
                 case CodeDirection.BottomToTop:
-                    info.Gfx.RotateAtTransform(-90, info.Position);
+                    info.Graphics.RotateAtTransform(-90, info.Position);
                     break;
             }
         }
@@ -91,23 +91,23 @@ namespace PdfSharpCore.Drawing.BarCodes
         {
             double barWidth = GetBarWidth(info, isThick);
             double height = Size.Height;
-            double xPos = info.CurrPos.X;
-            double yPos = info.CurrPos.Y;
+            double xPos = info.CurrentPosition.X;
+            double yPos = info.CurrentPosition.Y;
 
             switch (TextLocation)
             {
                 case TextLocation.AboveEmbedded:
-                    height -= info.Gfx.MeasureString(Text, info.Font).Height;
-                    yPos += info.Gfx.MeasureString(Text, info.Font).Height;
+                    height -= info.Graphics.MeasureString(Text, info.Font).Height;
+                    yPos += info.Graphics.MeasureString(Text, info.Font).Height;
                     break;
                 case TextLocation.BelowEmbedded:
-                    height -= info.Gfx.MeasureString(Text, info.Font).Height;
+                    height -= info.Graphics.MeasureString(Text, info.Font).Height;
                     break;
             }
 
             XRect rect = new XRect(xPos, yPos, barWidth, height);
-            info.Gfx.DrawRectangle(info.Brush, rect);
-            info.CurrPos.X += barWidth;
+            info.Graphics.DrawRectangle(info.Brush, rect);
+            info.CurrentPosition.X += barWidth;
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace PdfSharpCore.Drawing.BarCodes
         /// <param name="isThick">Determines whether a thick or a thin gap is about to be rendered.</param>
         internal void RenderGap(BarCodeRenderInfo info, bool isThick)
         {
-            info.CurrPos.X += GetBarWidth(info, isThick);
+            info.CurrentPosition.X += GetBarWidth(info, isThick);
         }
 
         /// <summary>
@@ -126,14 +126,14 @@ namespace PdfSharpCore.Drawing.BarCodes
         internal void RenderTurboBit(BarCodeRenderInfo info, bool startBit)
         {
             if (startBit)
-                info.CurrPos.X -= 0.5 + GetBarWidth(info, true);
+                info.CurrentPosition.X -= 0.5 + GetBarWidth(info, true);
             else
-                info.CurrPos.X += 0.5; //GetBarWidth(info, true);
+                info.CurrentPosition.X += 0.5; //GetBarWidth(info, true);
 
             RenderBar(info, true);
 
             if (startBit)
-                info.CurrPos.X += 0.5; //GetBarWidth(info, true);
+                info.CurrentPosition.X += 0.5; //GetBarWidth(info, true);
         }
 
         internal void RenderText(BarCodeRenderInfo info)
@@ -145,18 +145,18 @@ namespace PdfSharpCore.Drawing.BarCodes
             switch (TextLocation)
             {
                 case TextLocation.Above:
-                    center = new XPoint(center.X, center.Y - info.Gfx.MeasureString(Text, info.Font).Height);
-                    info.Gfx.DrawString(Text, info.Font, info.Brush, new XRect(center, Size), XStringFormats.TopCenter);
+                    center = new XPoint(center.X, center.Y - info.Graphics.MeasureString(Text, info.Font).Height);
+                    info.Graphics.DrawString(Text, info.Font, info.Brush, new XRect(center, Size), XStringFormats.TopCenter);
                     break;
                 case TextLocation.AboveEmbedded:
-                    info.Gfx.DrawString(Text, info.Font, info.Brush, new XRect(center, Size), XStringFormats.TopCenter);
+                    info.Graphics.DrawString(Text, info.Font, info.Brush, new XRect(center, Size), XStringFormats.TopCenter);
                     break;
                 case TextLocation.Below:
-                    center = new XPoint(center.X, info.Gfx.MeasureString(Text, info.Font).Height + center.Y);
-                    info.Gfx.DrawString(Text, info.Font, info.Brush, new XRect(center, Size), XStringFormats.BottomCenter);
+                    center = new XPoint(center.X, info.Graphics.MeasureString(Text, info.Font).Height + center.Y);
+                    info.Graphics.DrawString(Text, info.Font, info.Brush, new XRect(center, Size), XStringFormats.BottomCenter);
                     break;
                 case TextLocation.BelowEmbedded:
-                    info.Gfx.DrawString(Text, info.Font, info.Brush, new XRect(center, Size), XStringFormats.BottomCenter);
+                    info.Graphics.DrawString(Text, info.Font, info.Brush, new XRect(center, Size), XStringFormats.BottomCenter);
                     break;
             }
         }
