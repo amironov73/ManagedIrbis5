@@ -131,7 +131,7 @@ public abstract class MatrixCode
     /// <summary>
     /// When implemented in a derived class renders the 2D code.
     /// </summary>
-    protected internal abstract void Render (XGraphics gfx, XBrush brush, XPoint center);
+    protected internal abstract void Render (XGraphics graphics, XBrush brush, XPoint center);
 
     /// <summary>
     /// Determines whether the specified string can be used as Text for this matrix code type.

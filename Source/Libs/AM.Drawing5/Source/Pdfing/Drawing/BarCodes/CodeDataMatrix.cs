@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
 /* CodeDataMatrix.cs --
@@ -15,185 +14,347 @@
 
 using System;
 
+using AM;
+
 #endregion
 
 #nullable enable
 
-namespace PdfSharpCore.Drawing.BarCodes
+namespace PdfSharpCore.Drawing.BarCodes;
+
+/// <summary>
+/// Defines the DataMatrix 2D barcode. THIS IS AN EMPIRA INTERNAL IMPLEMENTATION. THE CODE IN
+/// THE OPEN SOURCE VERSION IS A FAKE.
+/// </summary>
+public sealed class CodeDataMatrix
+    : MatrixCode
 {
+    #region Properties
+
     /// <summary>
-    /// Defines the DataMatrix 2D barcode. THIS IS AN EMPIRA INTERNAL IMPLEMENTATION. THE CODE IN
-    /// THE OPEN SOURCE VERSION IS A FAKE.
+    /// Ширина отступа.
     /// </summary>
-    public class CodeDataMatrix : MatrixCode
+    public int QuietZone { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initializes a new instance of CodeDataMatrix.
+    /// </summary>
+    public CodeDataMatrix()
+        : this
+            (
+                code: string.Empty,
+                encoding:string.Empty,
+                rows: 26,
+                columns: 26,
+                quietZone: 0,
+                size: XSize.Empty
+            )
     {
-        /// <summary>
-        /// Initializes a new instance of CodeDataMatrix.
-        /// </summary>
-        public CodeDataMatrix()
-            : this("", "", 26, 26, 0, XSize.Empty)
-        {}
-
-        /// <summary>
-        /// Initializes a new instance of CodeDataMatrix.
-        /// </summary>
-        public CodeDataMatrix(string code, int length)
-            : this(code, "", length, length, 0, XSize.Empty)
-        {}
-
-        /// <summary>
-        /// Initializes a new instance of CodeDataMatrix.
-        /// </summary>
-        public CodeDataMatrix(string code, int length, XSize size)
-            : this(code, "", length, length, 0, size)
-        {}
-
-        /// <summary>
-        /// Initializes a new instance of CodeDataMatrix.
-        /// </summary>
-        public CodeDataMatrix(string code, DataMatrixEncoding dmEncoding, int length, XSize size)
-            : this(code, CreateEncoding(dmEncoding, code.Length), length, length, 0, size)
-        {}
-
-        /// <summary>
-        /// Initializes a new instance of CodeDataMatrix.
-        /// </summary>
-        public CodeDataMatrix(string code, int rows, int columns)
-            : this(code, "", rows, columns, 0, XSize.Empty)
-        {}
-
-        /// <summary>
-        /// Initializes a new instance of CodeDataMatrix.
-        /// </summary>
-        public CodeDataMatrix(string code, int rows, int columns, XSize size)
-            : this(code, "", rows, columns, 0, size)
-        {}
-
-        /// <summary>
-        /// Initializes a new instance of CodeDataMatrix.
-        /// </summary>
-        public CodeDataMatrix(string code, DataMatrixEncoding dmEncoding, int rows, int columns, XSize size)
-            : this(code, CreateEncoding(dmEncoding, code.Length), rows, columns, 0, size)
-        {}
-
-        /// <summary>
-        /// Initializes a new instance of CodeDataMatrix.
-        /// </summary>
-        public CodeDataMatrix(string code, int rows, int columns, int quietZone)
-            : this(code, "", rows, columns, quietZone, XSize.Empty)
-        {}
-
-        /// <summary>
-        /// Initializes a new instance of CodeDataMatrix.
-        /// </summary>
-        public CodeDataMatrix(string code, string encoding, int rows, int columns, int quietZone, XSize size)
-            : base(code, encoding, rows, columns, size)
-        {
-            QuietZone = quietZone;
-        }
-
-        /// <summary>
-        /// Sets the encoding of the DataMatrix.
-        /// </summary>
-        public void SetEncoding(DataMatrixEncoding dmEncoding)
-        {
-            Encoding = CreateEncoding(dmEncoding, Text.Length);
-        }
-
-        static string CreateEncoding(DataMatrixEncoding dmEncoding, int length)
-        {
-            string tempencoding = "";
-            switch (dmEncoding)
-            {
-                case DataMatrixEncoding.Ascii:
-                    tempencoding = new string('a', length);
-                    break;
-                case DataMatrixEncoding.C40:
-                    tempencoding = new string('c', length);
-                    break;
-                case DataMatrixEncoding.Text:
-                    tempencoding = new string('t', length);
-                    break;
-                case DataMatrixEncoding.X12:
-                    tempencoding = new string('x', length);
-                    break;
-                case DataMatrixEncoding.EDIFACT:
-                    tempencoding = new string('e', length);
-                    break;
-                case DataMatrixEncoding.Base256:
-                    tempencoding = new string('b', length);
-                    break;
-            }
-            return tempencoding;
-        }
-
-        /// <summary>
-        /// Gets or sets the size of the Matrix' Quiet Zone.
-        /// </summary>
-        public int QuietZone
-        {
-            get { return _quietZone; }
-            set { _quietZone = value; }
-        }
-        int _quietZone;
-
-        /// <summary>
-        /// Renders the matrix code.
-        /// </summary>
-        protected internal override void Render(XGraphics gfx, XBrush brush, XPoint position)
-        {
-            XGraphicsState state = gfx.Save();
-
-            switch (Direction)
-            {
-                case CodeDirection.RightToLeft:
-                    gfx.RotateAtTransform(180, position);
-                    break;
-
-                case CodeDirection.TopToBottom:
-                    gfx.RotateAtTransform(90, position);
-                    break;
-
-                case CodeDirection.BottomToTop:
-                    gfx.RotateAtTransform(-90, position);
-                    break;
-            }
-
-            XPoint pos = position + CalcDistance(Anchor, AnchorType.TopLeft, Size);
-
-            if (MatrixImage == null)
-                MatrixImage = DataMatrixImage.GenerateMatrixImage(Text, Encoding, Rows, Columns);
-
-            if (QuietZone > 0)
-            {
-                XSize sizeWithZone = new XSize(Size.Width, Size.Height);
-                sizeWithZone.Width = sizeWithZone.Width / (Columns + 2 * QuietZone) * Columns;
-                sizeWithZone.Height = sizeWithZone.Height / (Rows + 2 * QuietZone) * Rows;
-
-                XPoint posWithZone = new XPoint(pos.X, pos.Y);
-                posWithZone.X += Size.Width / (Columns + 2 * QuietZone) * QuietZone;
-                posWithZone.Y += Size.Height / (Rows + 2 * QuietZone) * QuietZone;
-
-                gfx.DrawRectangle(XBrushes.White, pos.X, pos.Y, Size.Width, Size.Height);
-                gfx.DrawImage(MatrixImage, posWithZone.X, posWithZone.Y, sizeWithZone.Width, sizeWithZone.Height);
-            }
-            else
-                gfx.DrawImage(MatrixImage, pos.X, pos.Y, Size.Width, Size.Height);
-
-            gfx.Restore(state);
-        }
-
-        /// <summary>
-        /// Determines whether the specified string can be used as data in the DataMatrix.
-        /// </summary>
-        /// <param name="text">The code to be checked.</param>
-        protected override void CheckCode(string text)
-        {
-            if (text == null)
-                throw new ArgumentNullException("text");
-
-            DataMatrixImage mImage = new DataMatrixImage(Text, Encoding, Rows, Columns);
-            mImage.Iec16022Ecc200(Columns, Rows, Encoding, Text.Length, Text, 0, 0, 0);
-        }
+        // пустое тело конструктора
     }
+
+    /// <summary>
+    /// Initializes a new instance of CodeDataMatrix.
+    /// </summary>
+    public CodeDataMatrix
+        (
+            string code,
+            int length
+        )
+        : this
+            (
+                code,
+                encoding: string.Empty,
+                rows: length,
+                columns: length,
+                quietZone: 0,
+                size: XSize.Empty
+            )
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initializes a new instance of CodeDataMatrix.
+    /// </summary>
+    public CodeDataMatrix
+        (
+            string code,
+            int length,
+            XSize size
+        )
+        : this
+            (
+                code,
+                encoding: string.Empty,
+                rows: length,
+                columns: length,
+                quietZone: 0,
+                size
+            )
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initializes a new instance of CodeDataMatrix.
+    /// </summary>
+    public CodeDataMatrix
+        (
+            string code,
+            DataMatrixEncoding dmEncoding,
+            int length,
+            XSize size
+        )
+        : this
+            (
+                code,
+                encoding: CreateEncoding (dmEncoding, code.Length),
+                rows: length,
+                columns: length,
+                quietZone: 0,
+                size
+            )
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initializes a new instance of CodeDataMatrix.
+    /// </summary>
+    public CodeDataMatrix
+        (
+            string code,
+            int rows,
+            int columns
+        )
+        : this
+            (
+                code,
+                encoding: string.Empty,
+                rows,
+                columns,
+                quietZone: 0,
+                size: XSize.Empty
+            )
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initializes a new instance of CodeDataMatrix.
+    /// </summary>
+    public CodeDataMatrix
+        (
+            string code,
+            int rows,
+            int columns,
+            XSize size
+        )
+        : this
+            (
+                code,
+                encoding: string.Empty,
+                rows,
+                columns,
+                quietZone: 0,
+                size
+            )
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initializes a new instance of CodeDataMatrix.
+    /// </summary>
+    public CodeDataMatrix
+        (
+            string code,
+            DataMatrixEncoding dmEncoding,
+            int rows,
+            int columns,
+            XSize size
+        )
+        : this
+            (
+                code,
+                encoding: CreateEncoding (dmEncoding, code.Length),
+                rows,
+                columns,
+                quietZone: 0,
+                size
+            )
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of CodeDataMatrix.
+    /// </summary>
+    public CodeDataMatrix
+        (
+            string code,
+            int rows,
+            int columns,
+            int quietZone
+        )
+        : this
+            (
+                code,
+                encoding: string.Empty,
+                rows,
+                columns,
+                quietZone,
+                size: XSize.Empty
+            )
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Initializes a new instance of CodeDataMatrix.
+    /// </summary>
+    public CodeDataMatrix
+        (
+            string code,
+            string encoding,
+            int rows,
+            int columns,
+            int quietZone,
+            XSize size
+        )
+        : base (code, encoding, rows, columns, size)
+    {
+        QuietZone = quietZone;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private static string CreateEncoding
+        (
+            DataMatrixEncoding dmEncoding,
+            int length
+        )
+    {
+        var tempencoding = dmEncoding switch
+        {
+            DataMatrixEncoding.Ascii => new string ('a', length),
+            DataMatrixEncoding.C40 => new string ('c', length),
+            DataMatrixEncoding.Text => new string ('t', length),
+            DataMatrixEncoding.X12 => new string ('x', length),
+            DataMatrixEncoding.EDIFACT => new string ('e', length),
+            DataMatrixEncoding.Base256 => new string ('b', length),
+            _ => throw new ApplicationException()
+        };
+
+        return tempencoding;
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Sets the encoding of the DataMatrix.
+    /// </summary>
+    public void SetEncoding
+        (
+            DataMatrixEncoding encoding
+        )
+    {
+        Sure.Defined (encoding);
+
+        Encoding = CreateEncoding (encoding, Text.Length);
+    }
+
+    #endregion
+
+    #region MatrixCode members
+
+    /// <inheritdoc cref="MatrixCode.Render"/>
+    protected internal override void Render
+        (
+            XGraphics graphics,
+            XBrush brush,
+            XPoint position
+        )
+    {
+        Sure.NotNull (graphics);
+
+        var state = graphics.Save();
+
+        switch (Direction)
+        {
+            case CodeDirection.RightToLeft:
+                graphics.RotateAtTransform (180, position);
+                break;
+
+            case CodeDirection.TopToBottom:
+                graphics.RotateAtTransform (90, position);
+                break;
+
+            case CodeDirection.BottomToTop:
+                graphics.RotateAtTransform (-90, position);
+                break;
+        }
+
+        var pos = position + CalcDistance (Anchor, AnchorType.TopLeft, Size);
+        MatrixImage ??= DataMatrixImage.GenerateMatrixImage (Text, Encoding, Rows, Columns);
+
+        if (QuietZone > 0)
+        {
+            var sizeWithZone = new XSize (Size.Width, Size.Height);
+            sizeWithZone.Width = sizeWithZone.Width / (Columns + 2 * QuietZone) * Columns;
+            sizeWithZone.Height = sizeWithZone.Height / (Rows + 2 * QuietZone) * Rows;
+
+            var posWithZone = new XPoint (pos.X, pos.Y);
+            posWithZone.X += Size.Width / (Columns + 2 * QuietZone) * QuietZone;
+            posWithZone.Y += Size.Height / (Rows + 2 * QuietZone) * QuietZone;
+
+            graphics.DrawRectangle (XBrushes.White, pos.X, pos.Y, Size.Width, Size.Height);
+            graphics.DrawImage
+                (
+                    MatrixImage,
+                    posWithZone.X,
+                    posWithZone.Y,
+                    sizeWithZone.Width,
+                    sizeWithZone.Height
+                );
+        }
+        else
+        {
+            graphics.DrawImage (MatrixImage, pos.X, pos.Y, Size.Width, Size.Height);
+        }
+
+        graphics.Restore (state);
+    }
+
+    /// <inheritdoc cref="MatrixCode.CheckCode"/>
+    protected override void CheckCode
+        (
+            string text
+        )
+    {
+        Sure.NotNullNorEmpty (text);
+
+        var image = new DataMatrixImage (Text, Encoding, Rows, Columns);
+        image.Iec16022Ecc200
+            (
+                Columns,
+                Rows,
+                Encoding,
+                Text.Length,
+                Text,
+                0,
+                0,
+                0
+            );
+    }
+
+    #endregion
 }

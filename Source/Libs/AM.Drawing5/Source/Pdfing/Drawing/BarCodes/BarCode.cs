@@ -145,5 +145,5 @@ public abstract class BarCode
     /// <summary>
     /// When defined in a derived class renders the code.
     /// </summary>
-    protected internal abstract void Render (XGraphics gfx, XBrush brush, XFont font, XPoint position);
+    protected internal abstract void Render (XGraphics graphics, XBrush brush, XFont font, XPoint position);
 }

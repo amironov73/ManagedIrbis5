@@ -30,22 +30,22 @@ namespace PdfSharpCore.Drawing.BarCodes
         /// <summary>
         /// Renders the OMR code.
         /// </summary>
-        protected internal override void Render(XGraphics gfx, XBrush brush, XFont font, XPoint position)
+        protected internal override void Render(XGraphics graphics, XBrush brush, XFont font, XPoint position)
         {
-            XGraphicsState state = gfx.Save();
+            XGraphicsState state = graphics.Save();
 
             switch (Direction)
             {
                 case CodeDirection.RightToLeft:
-                    gfx.RotateAtTransform(180, position);
+                    graphics.RotateAtTransform(180, position);
                     break;
 
                 case CodeDirection.TopToBottom:
-                    gfx.RotateAtTransform(90, position);
+                    graphics.RotateAtTransform(90, position);
                     break;
 
                 case CodeDirection.BottomToTop:
-                    gfx.RotateAtTransform(-90, position);
+                    graphics.RotateAtTransform(-90, position);
                     break;
             }
 
@@ -60,7 +60,7 @@ namespace PdfSharpCore.Drawing.BarCodes
             if (_synchronizeCode)
             {
                 XRect rect = new XRect(pt.X, pt.Y, _makerThickness, Size.Height);
-                gfx.DrawRectangle(brush, rect);
+                graphics.DrawRectangle(brush, rect);
                 pt.X += 2 * _makerDistance;
             }
             for (int idx = 0; idx < 32; idx++)
@@ -68,11 +68,11 @@ namespace PdfSharpCore.Drawing.BarCodes
                 if ((value & 1) == 1)
                 {
                     XRect rect = new XRect(pt.X + idx * _makerDistance, pt.Y, _makerThickness, Size.Height);
-                    gfx.DrawRectangle(brush, rect);
+                    graphics.DrawRectangle(brush, rect);
                 }
                 value = value >> 1;
             }
-            gfx.Restore(state);
+            graphics.Restore(state);
         }
 
         /// <summary>

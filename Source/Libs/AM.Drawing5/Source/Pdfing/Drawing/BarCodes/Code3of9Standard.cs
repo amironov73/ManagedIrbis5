@@ -19,243 +19,301 @@ using System;
 
 #nullable enable
 
-namespace PdfSharpCore.Drawing.BarCodes
+namespace PdfSharpCore.Drawing.BarCodes;
+
+/// <summary>
+/// Imlpementation of the Code 3 of 9 bar code.
+/// </summary>
+
+// ReSharper disable once InconsistentNaming
+public class Code3of9Standard
+    : ThickThinBarCode
 {
+    #region Construction
+
     /// <summary>
-    /// Imlpementation of the Code 3 of 9 bar code.
+    /// Initializes a new instance of Standard3of9.
     /// </summary>
-    // ReSharper disable once InconsistentNaming
-    public class Code3of9Standard : ThickThinBarCode
+    public Code3of9Standard()
+        : base ("", XSize.Empty, CodeDirection.LeftToRight)
     {
-        /// <summary>
-        /// Initializes a new instance of Standard3of9.
-        /// </summary>
-        public Code3of9Standard()
-            : base("", XSize.Empty, CodeDirection.LeftToRight)
-        { }
+    }
 
-        /// <summary>
-        /// Initializes a new instance of Standard3of9.
-        /// </summary>
-        public Code3of9Standard(string code)
-            : base(code, XSize.Empty, CodeDirection.LeftToRight)
-        { }
+    /// <summary>
+    /// Initializes a new instance of Standard3of9.
+    /// </summary>
+    public Code3of9Standard (string code)
+        : base (code, XSize.Empty, CodeDirection.LeftToRight)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Initializes a new instance of Standard3of9.
-        /// </summary>
-        public Code3of9Standard(string code, XSize size)
-            : base(code, size, CodeDirection.LeftToRight)
-        { }
+    /// <summary>
+    /// Initializes a new instance of Standard3of9.
+    /// </summary>
+    public Code3of9Standard (string code, XSize size)
+        : base (code, size, CodeDirection.LeftToRight)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Initializes a new instance of Standard3of9.
-        /// </summary>
-        public Code3of9Standard(string code, XSize size, CodeDirection direction)
-            : base(code, size, direction)
-        { }
+    /// <summary>
+    /// Initializes a new instance of Standard3of9.
+    /// </summary>
+    public Code3of9Standard (string code, XSize size, CodeDirection direction)
+        : base (code, size, direction)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Returns an array of size 9 that represents the thick (true) and thin (false) lines and spaces
-        /// representing the specified digit.
-        /// </summary>
-        /// <param name="ch">The character to represent.</param>
-        private static bool[] ThickThinLines(char ch)
+    #endregion
+
+    /// <summary>
+    /// Returns an array of size 9 that represents the thick (true) and thin (false) lines and spaces
+    /// representing the specified digit.
+    /// </summary>
+    /// <param name="ch">The character to represent.</param>
+    private static bool[] ThickThinLines (char ch)
+    {
+        return Lines["0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%*".IndexOf (ch)];
+    }
+
+    static readonly bool[][] Lines =
+    {
+        // '0'
+        new[] { false, false, false, true, true, false, true, false, false },
+
+        // '1'
+        new[] { true, false, false, true, false, false, false, false, true },
+
+        // '2'
+        new[] { false, false, true, true, false, false, false, false, true },
+
+        // '3'
+        new[] { true, false, true, true, false, false, false, false, false },
+
+        // '4'
+        new[] { false, false, false, true, true, false, false, false, true },
+
+        // '5'
+        new[] { true, false, false, true, true, false, false, false, false },
+
+        // '6'
+        new[] { false, false, true, true, true, false, false, false, false },
+
+        // '7'
+        new[] { false, false, false, true, false, false, true, false, true },
+
+        // '8'
+        new[] { true, false, false, true, false, false, true, false, false },
+
+        // '9'
+        new[] { false, false, true, true, false, false, true, false, false },
+
+        // 'A'
+        new[] { true, false, false, false, false, true, false, false, true },
+
+        // 'B'
+        new[] { false, false, true, false, false, true, false, false, true },
+
+        // 'C'
+        new[] { true, false, true, false, false, true, false, false, false },
+
+        // 'D'
+        new[] { false, false, false, false, true, true, false, false, true },
+
+        // 'E'
+        new[] { true, false, false, false, true, true, false, false, false },
+
+        // 'F'
+        new[] { false, false, true, false, true, true, false, false, false },
+
+        // 'G'
+        new[] { false, false, false, false, false, true, true, false, true },
+
+        // 'H'
+        new[] { true, false, false, false, false, true, true, false, false },
+
+        // 'I'
+        new[] { false, false, true, false, false, true, true, false, false },
+
+        // 'J'
+        new[] { false, false, false, false, true, true, true, false, false },
+
+        // 'K'
+        new[] { true, false, false, false, false, false, false, true, true },
+
+        // 'L'
+        new[] { false, false, true, false, false, false, false, true, true },
+
+        // 'M'
+        new[] { true, false, true, false, false, false, false, true, false },
+
+        // 'N'
+        new[] { false, false, false, false, true, false, false, true, true },
+
+        // 'O'
+        new[] { true, false, false, false, true, false, false, true, false },
+
+        // 'P':
+        new[] { false, false, true, false, true, false, false, true, false },
+
+        // 'Q'
+        new[] { false, false, false, false, false, false, true, true, true },
+
+        // 'R'
+        new[] { true, false, false, false, false, false, true, true, false },
+
+        // 'S'
+        new[] { false, false, true, false, false, false, true, true, false },
+
+        // 'T'
+        new[] { false, false, false, false, true, false, true, true, false },
+
+        // 'U'
+        new[] { true, true, false, false, false, false, false, false, true },
+
+        // 'V'
+        new[] { false, true, true, false, false, false, false, false, true },
+
+        // 'W'
+        new[] { true, true, true, false, false, false, false, false, false },
+
+        // 'X'
+        new[] { false, true, false, false, true, false, false, false, true },
+
+        // 'Y'
+        new[] { true, true, false, false, true, false, false, false, false },
+
+        // 'Z'
+        new[] { false, true, true, false, true, false, false, false, false },
+
+        // '-'
+        new[] { false, true, false, false, false, false, true, false, true },
+
+        // '.'
+        new[] { true, true, false, false, false, false, true, false, false },
+
+        // ' '
+        new[] { false, true, true, false, false, false, true, false, false },
+
+        // '$'
+        new[] { false, true, false, true, false, true, false, false, false },
+
+        // '/'
+        new[] { false, true, false, true, false, false, false, true, false },
+
+        // '+'
+        new[] { false, true, false, false, false, true, false, true, false },
+
+        // '%'
+        new[] { false, false, false, true, false, true, false, true, false },
+
+        // '*'
+        new[] { false, true, false, false, true, false, true, false, false },
+    };
+
+
+    /// <summary>
+    /// Calculates the thick and thin line widths,
+    /// taking into account the required rendering size.
+    /// </summary>
+    internal override void CalcThinBarWidth (BarCodeRenderInfo info)
+    {
+        /*
+         * The total width is the sum of the following parts:
+         * Starting lines      = 3 * thick + 7 * thin
+         *  +
+         * Code Representation = (3 * thick + 7 * thin) * code.Length
+         *  +
+         * Stopping lines      =  3 * thick + 6 * thin
+         *
+         * with r = relation ( = thick / thin), this results in
+         *
+         * Total width = (13 + 6 * r + (3 * r + 7) * code.Length) * thin
+         */
+        double thinLineAmount = 13 + 6 * WideNarrowRatio + (3 * WideNarrowRatio + 7) * Text.Length;
+        info.ThinBarWidth = Size.Width / thinLineAmount;
+    }
+
+    /// <summary>
+    /// Checks the code to be convertible into an standard 3 of 9 bar code.
+    /// </summary>
+    /// <param name="text">The code to be checked.</param>
+    protected override void CheckCode (string text)
+    {
+        if (text == null)
+            throw new ArgumentNullException ("text");
+
+        if (text.Length == 0)
+            throw new ArgumentException (BcgSR.Invalid3Of9Code (text));
+
+        foreach (char ch in text)
         {
-            return Lines["0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%*".IndexOf(ch)];
+            if ("0123456789ABCDEFGHIJKLMNOP'QRSTUVWXYZ-. $/+%*".IndexOf (ch) < 0)
+                throw new ArgumentException (BcgSR.Invalid3Of9Code (text));
         }
-        static readonly bool[][] Lines =
-        {
-            // '0'
-            new bool[] {false, false, false, true, true, false, true, false, false},
-            // '1'
-            new bool[] {true, false, false, true, false, false, false, false, true},
-            // '2'
-            new bool[] {false, false, true, true, false, false, false, false, true},
-            // '3'
-            new bool[] {true, false, true, true, false, false, false, false, false},
-            // '4'
-            new bool[] {false, false, false, true, true, false, false, false, true},
-            // '5'
-            new bool[] {true, false, false, true, true, false, false, false, false},
-            // '6'
-            new bool[] {false, false, true, true, true, false, false, false, false},
-            // '7'
-            new bool[] {false, false, false, true, false, false, true, false, true},
-            // '8'
-            new bool[] {true, false, false, true, false, false, true, false, false},
-            // '9'
-            new bool[] {false, false, true, true, false, false, true, false, false},
-            // 'A'
-            new bool[] {true, false, false, false, false, true, false, false, true},
-            // 'B'
-            new bool[] {false, false, true, false, false, true, false, false, true},
-            // 'C'
-            new bool[] {true, false, true, false, false, true, false, false, false},
-            // 'D'
-            new bool[] {false, false, false, false, true, true, false, false, true},
-            // 'E'
-            new bool[] {true, false, false, false, true, true, false, false, false},
-            // 'F'
-            new bool[] {false, false, true, false, true, true, false, false, false},
-            // 'G'
-            new bool[] {false, false, false, false, false, true, true, false, true},
-            // 'H'
-            new bool[] {true, false, false, false, false, true, true, false, false},
-            // 'I'
-            new bool[] {false, false, true, false, false, true, true, false, false},
-            // 'J'
-            new bool[] {false, false, false, false, true, true, true, false, false},
-            // 'K'
-            new bool[] {true, false, false, false, false, false, false, true, true},
-            // 'L'
-            new bool[] {false, false, true, false, false, false, false, true, true},
-            // 'M'
-            new bool[] {true, false, true, false, false, false, false, true, false},
-            // 'N'
-            new bool[] {false, false, false, false, true, false, false, true, true},
-            // 'O'
-            new bool[] {true, false, false, false, true, false, false, true, false},
-            // 'P':
-            new bool[] {false, false, true, false, true, false, false, true, false},
-            // 'Q'
-            new bool[] {false, false, false, false, false, false, true, true, true},
-            // 'R'
-            new bool[] {true, false, false, false, false, false, true, true, false},
-            // 'S'
-            new bool[] {false, false, true, false, false, false, true, true, false},
-            // 'T'
-            new bool[] {false, false, false, false, true, false, true, true, false},
-            // 'U'
-            new bool[] {true, true, false, false, false, false, false, false, true},
-            // 'V'
-            new bool[] {false, true, true, false, false, false, false, false, true},
-            // 'W'
-            new bool[] {true, true, true, false, false, false, false, false, false},
-            // 'X'
-            new bool[] {false, true, false, false, true, false, false, false, true},
-            // 'Y'
-            new bool[] {true, true, false, false, true, false, false, false, false},
-            // 'Z'
-            new bool[] {false, true, true, false, true, false, false, false, false},
-            // '-'
-            new bool[] {false, true, false, false, false, false, true, false, true},
-            // '.'
-            new bool[] {true, true, false, false, false, false, true, false, false},
-            // ' '
-            new bool[] {false, true, true, false, false, false, true, false, false},
-            // '$'
-            new bool[] {false, true, false, true, false, true, false, false, false},
-            // '/'
-            new bool[] {false, true, false, true, false, false, false, true, false},
-            // '+'
-            new bool[] {false, true, false, false, false, true, false, true, false},
-            // '%'
-            new bool[] {false, false, false, true, false, true, false, true, false},
-            // '*'
-            new bool[] {false, true, false, false, true, false, true, false, false},
-        };
+    }
 
+    /// <summary>
+    /// Renders the bar code.
+    /// </summary>
+    protected internal override void Render (XGraphics graphics, XBrush brush, XFont font, XPoint position)
+    {
+        XGraphicsState state = graphics.Save();
 
-        /// <summary>
-        /// Calculates the thick and thin line widths,
-        /// taking into account the required rendering size.
-        /// </summary>
-        internal override void CalcThinBarWidth(BarCodeRenderInfo info)
+        BarCodeRenderInfo info = new BarCodeRenderInfo (graphics, brush, font, position);
+        InitRendering (info);
+        info.CurrentPositionInString = 0;
+
+        //info.CurrPos = Center - Size / 2;
+        info.CurrentPosition = position - CalcDistance (AnchorType.TopLeft, Anchor, Size);
+
+        if (TurboBit)
+            RenderTurboBit (info, true);
+        RenderStart (info);
+        while (info.CurrentPositionInString < Text.Length)
         {
-            /*
-             * The total width is the sum of the following parts:
-             * Starting lines      = 3 * thick + 7 * thin
-             *  +
-             * Code Representation = (3 * thick + 7 * thin) * code.Length
-             *  +
-             * Stopping lines      =  3 * thick + 6 * thin
-             * 
-             * with r = relation ( = thick / thin), this results in
-             * 
-             * Total width = (13 + 6 * r + (3 * r + 7) * code.Length) * thin
-             */
-            double thinLineAmount = 13 + 6 * WideNarrowRatio + (3 * WideNarrowRatio + 7) * Text.Length;
-            info.ThinBarWidth = Size.Width / thinLineAmount;
+            RenderNextChar (info);
+            RenderGap (info, false);
         }
 
-        /// <summary>
-        /// Checks the code to be convertible into an standard 3 of 9 bar code.
-        /// </summary>
-        /// <param name="text">The code to be checked.</param>
-        protected override void CheckCode(string text)
+        RenderStop (info);
+        if (TurboBit)
+            RenderTurboBit (info, false);
+        if (TextLocation != TextLocation.None)
+            RenderText (info);
+
+        graphics.Restore (state);
+    }
+
+    private void RenderNextChar (BarCodeRenderInfo info)
+    {
+        RenderChar (info, Text[info.CurrentPositionInString]);
+        ++info.CurrentPositionInString;
+    }
+
+    private void RenderChar (BarCodeRenderInfo info, char ch)
+    {
+        bool[] thickThinLines = ThickThinLines (ch);
+        int idx = 0;
+        while (idx < 9)
         {
-            if (text == null)
-                throw new ArgumentNullException("text");
-
-            if (text.Length == 0)
-                throw new ArgumentException(BcgSR.Invalid3Of9Code(text));
-
-            foreach (char ch in text)
-            {
-                if ("0123456789ABCDEFGHIJKLMNOP'QRSTUVWXYZ-. $/+%*".IndexOf(ch) < 0)
-                    throw new ArgumentException(BcgSR.Invalid3Of9Code(text));
-            }
+            RenderBar (info, thickThinLines[idx]);
+            if (idx < 8)
+                RenderGap (info, thickThinLines[idx + 1]);
+            idx += 2;
         }
+    }
 
-        /// <summary>
-        /// Renders the bar code.
-        /// </summary>
-        protected internal override void Render(XGraphics gfx, XBrush brush, XFont font, XPoint position)
-        {
-            XGraphicsState state = gfx.Save();
+    private void RenderStart (BarCodeRenderInfo info)
+    {
+        RenderChar (info, '*');
+        RenderGap (info, false);
+    }
 
-            BarCodeRenderInfo info = new BarCodeRenderInfo(gfx, brush, font, position);
-            InitRendering(info);
-            info.CurrentPositionInString = 0;
-            //info.CurrPos = Center - Size / 2;
-            info.CurrentPosition = position - CalcDistance(AnchorType.TopLeft, Anchor, Size);
-
-            if (TurboBit)
-                RenderTurboBit(info, true);
-            RenderStart(info);
-            while (info.CurrentPositionInString < Text.Length)
-            {
-                RenderNextChar(info);
-                RenderGap(info, false);
-            }
-            RenderStop(info);
-            if (TurboBit)
-                RenderTurboBit(info, false);
-            if (TextLocation != TextLocation.None)
-                RenderText(info);
-
-            gfx.Restore(state);
-        }
-
-        private void RenderNextChar(BarCodeRenderInfo info)
-        {
-            RenderChar(info, Text[info.CurrentPositionInString]);
-            ++info.CurrentPositionInString;
-        }
-
-        private void RenderChar(BarCodeRenderInfo info, char ch)
-        {
-            bool[] thickThinLines = ThickThinLines(ch);
-            int idx = 0;
-            while (idx < 9)
-            {
-                RenderBar(info, thickThinLines[idx]);
-                if (idx < 8)
-                    RenderGap(info, thickThinLines[idx + 1]);
-                idx += 2;
-            }
-        }
-
-        private void RenderStart(BarCodeRenderInfo info)
-        {
-            RenderChar(info, '*');
-            RenderGap(info, false);
-        }
-
-        private void RenderStop(BarCodeRenderInfo info)
-        {
-            RenderChar(info, '*');
-        }
+    private void RenderStop (BarCodeRenderInfo info)
+    {
+        RenderChar (info, '*');
     }
 }

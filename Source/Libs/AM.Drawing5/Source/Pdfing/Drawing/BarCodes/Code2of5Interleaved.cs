@@ -13,151 +13,178 @@
 
 #nullable enable
 
-namespace PdfSharpCore.Drawing.BarCodes
+using AM;
+
+namespace PdfSharpCore.Drawing.BarCodes;
+
+/// <summary>
+/// Implementation of the Code 2 of 5 bar code.
+/// </summary>
+public class Code2of5Interleaved
+    : ThickThinBarCode
 {
     /// <summary>
-    /// Implementation of the Code 2 of 5 bar code.
+    /// Initializes a new instance of Interleaved2of5.
     /// </summary>
-    public class Code2of5Interleaved : ThickThinBarCode
+    public Code2of5Interleaved()
+        : base ("", XSize.Empty, CodeDirection.LeftToRight)
     {
-        /// <summary>
-        /// Initializes a new instance of Interleaved2of5.
-        /// </summary>
-        public Code2of5Interleaved()
-            : base("", XSize.Empty, CodeDirection.LeftToRight)
-        {}
+    }
 
-        /// <summary>
-        /// Initializes a new instance of Interleaved2of5.
-        /// </summary>
-        public Code2of5Interleaved(string code)
-            : base(code, XSize.Empty, CodeDirection.LeftToRight)
-        {}
+    /// <summary>
+    /// Initializes a new instance of Interleaved2of5.
+    /// </summary>
+    public Code2of5Interleaved (string code)
+        : base (code, XSize.Empty, CodeDirection.LeftToRight)
+    {
+    }
 
-        /// <summary>
-        /// Initializes a new instance of Interleaved2of5.
-        /// </summary>
-        public Code2of5Interleaved(string code, XSize size)
-            : base(code, size, CodeDirection.LeftToRight)
-        {}
+    /// <summary>
+    /// Initializes a new instance of Interleaved2of5.
+    /// </summary>
+    public Code2of5Interleaved (string code, XSize size)
+        : base (code, size, CodeDirection.LeftToRight)
+    {
+    }
 
-        /// <summary>
-        /// Initializes a new instance of Interleaved2of5.
-        /// </summary>
-        public Code2of5Interleaved(string code, XSize size, CodeDirection direction)
-            : base(code, size, direction)
-        {}
+    /// <summary>
+    /// Initializes a new instance of Interleaved2of5.
+    /// </summary>
+    public Code2of5Interleaved (string code, XSize size, CodeDirection direction)
+        : base (code, size, direction)
+    {
+    }
 
-        /// <summary>
-        /// Returns an array of size 5 that represents the thick (true) and thin (false) lines or spaces
-        /// representing the specified digit.
-        /// </summary>
-        /// <param name="digit">The digit to represent.</param>
-        static bool[] ThickAndThinLines(int digit)
+    /// <summary>
+    /// Returns an array of size 5 that represents the thick (true) and thin (false) lines or spaces
+    /// representing the specified digit.
+    /// </summary>
+    /// <param name="digit">The digit to represent.</param>
+    static bool[] ThickAndThinLines (int digit)
+    {
+        return Lines[digit];
+    }
+
+    static readonly bool[][] Lines =
+    {
+        new[] { false, false, true, true, false },
+        new[] { true, false, false, false, true },
+        new[] { false, true, false, false, true },
+        new[] { true, true, false, false, false },
+        new[] { false, false, true, false, true },
+        new[] { true, false, true, false, false },
+        new[] { false, true, true, false, false },
+        new[] { false, false, false, true, true },
+        new[] { true, false, false, true, false },
+        new[] { false, true, false, true, false },
+    };
+
+    /// <inheritdoc cref="BarCode.Render"/>
+    protected internal override void Render
+        (
+            XGraphics graphics,
+            XBrush brush,
+            XFont font,
+            XPoint position
+        )
+    {
+        var state = graphics.Save();
+
+        var info = new BarCodeRenderInfo (graphics, brush, font, position);
+        InitRendering (info);
+        info.CurrentPositionInString = 0;
+
+        //info.CurrPos = info.Center - Size / 2;
+        info.CurrentPosition = position - CalcDistance (AnchorType.TopLeft, Anchor, Size);
+
+        if (TurboBit)
         {
-            return Lines[digit];
-        }
-        static bool[][] Lines = 
-        {
-            new bool[] {false, false, true, true, false},
-            new bool[] {true, false, false, false, true},
-            new bool[] {false, true, false, false, true},
-            new bool[] {true, true, false, false, false},
-            new bool[] {false, false, true, false, true},
-            new bool[] {true, false, true, false, false},
-            new bool[] {false, true, true, false, false},
-            new bool[] {false, false, false, true, true},
-            new bool[] {true, false, false, true, false},
-            new bool[] {false, true, false, true, false},
-        };
-
-        /// <summary>
-        /// Renders the bar code.
-        /// </summary>
-        protected internal override void Render(XGraphics gfx, XBrush brush, XFont font, XPoint position)
-        {
-            XGraphicsState state = gfx.Save();
-
-            BarCodeRenderInfo info = new BarCodeRenderInfo(gfx, brush, font, position);
-            InitRendering(info);
-            info.CurrentPositionInString = 0;
-            //info.CurrPos = info.Center - Size / 2;
-            info.CurrentPosition = position - CodeBase.CalcDistance(AnchorType.TopLeft, Anchor, Size);
-
-            if (TurboBit)
-                RenderTurboBit(info, true);
-            RenderStart(info);
-            while (info.CurrentPositionInString < Text.Length)
-                RenderNextPair(info);
-            RenderStop(info);
-            if (TurboBit)
-                RenderTurboBit(info, false);
-            if (TextLocation != TextLocation.None)
-                RenderText(info);
-
-            gfx.Restore(state);
+            RenderTurboBit (info, true);
         }
 
-        /// <summary>
-        /// Calculates the thick and thin line widths,
-        /// taking into account the required rendering size.
-        /// </summary>
-        internal override void CalcThinBarWidth(BarCodeRenderInfo info)
+        RenderStart (info);
+        while (info.CurrentPositionInString < Text.Length)
         {
-            /*
-             * The total width is the sum of the following parts:
-             * Starting lines      = 4 * thin
-             *  +
-             * Code Representation = (2 * thick + 3 * thin) * code.Length
-             *  +
-             * Stopping lines      =  1 * thick + 2 * thin
-             * 
-             * with r = relation ( = thick / thin), this results in
-             * 
-             * Total width = (6 + r + (2 * r + 3) * text.Length) * thin
-             */
-            double thinLineAmount = 6 + WideNarrowRatio + (2 * WideNarrowRatio + 3) * Text.Length;
-            info.ThinBarWidth = Size.Width / thinLineAmount;
+            RenderNextPair (info);
         }
 
-        private void RenderStart(BarCodeRenderInfo info)
+        RenderStop (info);
+        if (TurboBit)
         {
-            RenderBar(info, false);
-            RenderGap(info, false);
-            RenderBar(info, false);
-            RenderGap(info, false);
+            RenderTurboBit (info, false);
         }
 
-        private void RenderStop(BarCodeRenderInfo info)
+        if (TextLocation != TextLocation.None)
         {
-            RenderBar(info, true);
-            RenderGap(info, false);
-            RenderBar(info, false);
+            RenderText (info);
         }
 
-        /// <summary>
-        /// Renders the next digit pair as bar code element.
-        /// </summary>
-        private void RenderNextPair(BarCodeRenderInfo info)
+        graphics.Restore (state);
+    }
+
+    /// <inheritdoc cref="ThickThinBarCode.CalcThinBarWidth"/>
+    internal override void CalcThinBarWidth
+        (
+            BarCodeRenderInfo info
+        )
+    {
+        /*
+         * The total width is the sum of the following parts:
+         * Starting lines      = 4 * thin
+         *  +
+         * Code Representation = (2 * thick + 3 * thin) * code.Length
+         *  +
+         * Stopping lines      =  1 * thick + 2 * thin
+         *
+         * with r = relation ( = thick / thin), this results in
+         *
+         * Total width = (6 + r + (2 * r + 3) * text.Length) * thin
+         */
+        var thinLineAmount = 6 + WideNarrowRatio + (2 * WideNarrowRatio + 3) * Text.Length;
+        info.ThinBarWidth = Size.Width / thinLineAmount;
+    }
+
+    private void RenderStart (BarCodeRenderInfo info)
+    {
+        RenderBar (info, false);
+        RenderGap (info, false);
+        RenderBar (info, false);
+        RenderGap (info, false);
+    }
+
+    private void RenderStop (BarCodeRenderInfo info)
+    {
+        RenderBar (info, true);
+        RenderGap (info, false);
+        RenderBar (info, false);
+    }
+
+    /// <summary>
+    /// Renders the next digit pair as bar code element.
+    /// </summary>
+    private void RenderNextPair (BarCodeRenderInfo info)
+    {
+        var digitForLines = int.Parse (Text[info.CurrentPositionInString].ToString());
+        var digitForGaps = int.Parse (Text[info.CurrentPositionInString + 1].ToString());
+        var linesArray = Lines[digitForLines];
+        var gapsArray = Lines[digitForGaps];
+        for (var idx = 0; idx < 5; ++idx)
         {
-            int digitForLines = int.Parse(Text[info.CurrentPositionInString].ToString());
-            int digitForGaps = int.Parse(Text[info.CurrentPositionInString + 1].ToString());
-            bool[] linesArray = Lines[digitForLines];
-            bool[] gapsArray = Lines[digitForGaps];
-            for (int idx = 0; idx < 5; ++idx)
-            {
-                RenderBar(info, linesArray[idx]);
-                RenderGap(info, gapsArray[idx]);
-            }
-            info.CurrentPositionInString += 2;
+            RenderBar (info, linesArray[idx]);
+            RenderGap (info, gapsArray[idx]);
         }
 
-        /// <summary>
-        /// Checks the code to be convertible into an interleaved 2 of 5 bar code.
-        /// </summary>
-        /// <param name="text">The code to be checked.</param>
-        protected override void CheckCode(string text)
-        {
+        info.CurrentPositionInString += 2;
+    }
+
+    /// <inheritdoc cref="CodeBase.CheckCode"/>
+    protected override void CheckCode
+        (
+            string text
+        )
+    {
+        Sure.NotNullNorEmpty (text);
+
 #if true_
       if (text == null)
         throw new ArgumentNullException("text");
@@ -174,6 +201,5 @@ namespace PdfSharpCore.Drawing.BarCodes
           throw new ArgumentException(BcgSR.Invalid2Of5Code(text));
       }
 #endif
-        }
     }
 }
