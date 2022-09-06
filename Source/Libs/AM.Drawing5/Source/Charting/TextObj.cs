@@ -36,7 +36,7 @@ public class TextObj
     /// <see cref="TextObj"/>.  Use the public property <see cref="TextObj.Text"/>
     /// to access this value.
     /// </summary>
-    private string _text;
+    private string? _text;
 
     /// <summary>
     /// Private field to store the <see cref="FontSpec"/> class used to render
@@ -342,7 +342,7 @@ public class TextObj
         info.GetInt32 ("schema2").NotUsed();
 
         _text = info.GetString ("text");
-        _fontSpec = (FontSpec)info.GetValue ("fontSpec", typeof (FontSpec));
+        _fontSpec = (FontSpec) info.GetValue ("fontSpec", typeof (FontSpec));
 
         //isWrapped = info.GetBoolean ("isWrapped") ;
         _layoutArea = (SizeF)info.GetValue ("layoutArea", typeof (SizeF));

@@ -42,7 +42,7 @@ public class YAxisList
     /// <param name="rhs">The <see cref="YAxisList"/> object from which to copy</param>
     public YAxisList (YAxisList rhs)
     {
-        foreach (YAxis item in rhs)
+        foreach (var item in rhs)
         {
             Add (item.Clone());
         }
@@ -78,10 +78,7 @@ public class YAxisList
     /// <param name="index">The ordinal position (zero-based) of the
     /// <see cref="YAxis"/> object to be accessed.</param>
     /// <value>An <see cref="Axis"/> object reference.</value>
-    public new YAxis this [int index]
-    {
-        get { return (((index < 0 || index >= Count) ? null : base[index])); }
-    }
+    public new YAxis? this [int index] => index < 0 || index >= Count ? null : base[index];
 
     /// <summary>
     /// Indexer to access the specified <see cref="Axis"/> object by
@@ -90,19 +87,12 @@ public class YAxisList
     /// <param name="title">The string title of the
     /// <see cref="YAxis"/> object to be accessed.</param>
     /// <value>A <see cref="Axis"/> object reference.</value>
-    public YAxis this [string title]
+    public YAxis? this [string title]
     {
         get
         {
-            int index = IndexOf (title);
-            if (index >= 0)
-            {
-                return this[index];
-            }
-            else
-            {
-                return null;
-            }
+            var index = IndexOf (title);
+            return index >= 0 ? this[index] : null;
         }
     }
 
@@ -120,8 +110,8 @@ public class YAxisList
     /// <seealso cref="IndexOfTag"/>
     public int IndexOf (string title)
     {
-        int index = 0;
-        foreach (YAxis axis in this)
+        var index = 0;
+        foreach (var axis in this)
         {
             if (string.Compare (axis.Title.Text, title, true) == 0)
             {
@@ -148,8 +138,8 @@ public class YAxisList
     /// or -1 if the <see cref="Axis.Tag" /> string is not in the list</returns>
     public int IndexOfTag (string tagStr)
     {
-        int index = 0;
-        foreach (YAxis axis in this)
+        var index = 0;
+        foreach (var axis in this)
         {
             if (axis.Tag is string &&
                 string.Compare ((string)axis.Tag, tagStr, true) == 0)
@@ -173,7 +163,7 @@ public class YAxisList
     /// assign it to this new <see cref="YAxis" />.</returns>
     public int Add (string title)
     {
-        YAxis axis = new YAxis (title);
+        var axis = new YAxis (title);
         Add (axis);
 
         return Count - 1;

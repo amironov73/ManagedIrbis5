@@ -81,7 +81,10 @@ public class XAxis
     {
         IsVisible = Default.IsVisible;
         _majorGrid._isZeroLine = Default.IsZeroLine;
-        Scale._fontSpec.Angle = 0F;
+        if (Scale != null)
+        {
+            Scale._fontSpec.Angle = 0F;
+        }
     }
 
     /// <summary>

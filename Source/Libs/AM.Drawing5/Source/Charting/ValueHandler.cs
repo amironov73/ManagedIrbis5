@@ -94,22 +94,29 @@ public class ValueHandler
     /// value for the dependent axis.</param>
     /// <returns>true if the data point is value, false for
     /// <see cref="PointPairBase.Missing"/>, invalid, etc. data.</returns>
-    public static bool GetValues (GraphPane pane, CurveItem curve, int iPt,
-        out double baseVal, out double lowVal, out double hiVal)
+    public static bool GetValues
+        (
+            GraphPane pane,
+            CurveItem? curve,
+            int iPt,
+            out double baseVal,
+            out double lowVal,
+            out double hiVal
+        )
     {
         hiVal = PointPairBase.Missing;
         lowVal = PointPairBase.Missing;
         baseVal = PointPairBase.Missing;
 
-        if (curve == null || curve.Points.Count <= iPt || !curve.IsVisible)
+        if (curve?.Points is null || curve.Points.Count <= iPt || !curve.IsVisible)
         {
             return false;
         }
 
-        Axis baseAxis = curve.BaseAxis (pane);
-        Axis valueAxis = curve.ValueAxis (pane);
+        var baseAxis = curve.BaseAxis (pane);
+        var valueAxis = curve.ValueAxis (pane);
 
-        if (baseAxis is XAxis || baseAxis is X2Axis)
+        if (baseAxis is XAxis or X2Axis)
         {
             baseVal = curve.Points[iPt].X;
         }
@@ -119,8 +126,7 @@ public class ValueHandler
         }
 
         // is it a stacked bar type?
-        if (curve is BarItem && (pane._barSettings.Type == BarType.Stack ||
-                                 pane._barSettings.Type == BarType.PercentStack))
+        if (curve is BarItem && pane._barSettings.Type is BarType.Stack or BarType.PercentStack)
         {
             double positiveStack = 0;
             double negativeStack = 0;
@@ -128,7 +134,7 @@ public class ValueHandler
 
             // loop through all the curves, summing up the values to get a total (only
             // for the current ordinal position iPt)
-            foreach (CurveItem tmpCurve in pane.CurveList)
+            foreach (var tmpCurve in pane.CurveList)
             {
                 // Sum the value for the current curve only if it is a bar
                 if (tmpCurve.IsBar && tmpCurve.IsVisible)
@@ -138,16 +144,16 @@ public class ValueHandler
                     // For non-ordinal curves, find a matching base value (must match exactly)
                     if (curve.IsOverrideOrdinal || !baseAxis.Scale.IsAnyOrdinal)
                     {
-                        IPointList points = tmpCurve.Points;
+                        var points = tmpCurve.Points;
 
-                        for (int i = 0; i < points.Count; i++)
+                        for (var i = 0; i < points.Count; i++)
                         {
-                            if ((baseAxis is XAxis || baseAxis is X2Axis) && points[i].X == baseVal)
+                            if (baseAxis is XAxis or X2Axis && points[i].X == baseVal)
                             {
                                 curVal = points[i].Y;
                                 break;
                             }
-                            else if (!(baseAxis is XAxis || baseAxis is X2Axis) && points[i].Y == baseVal)
+                            else if (!(baseAxis is XAxis or X2Axis) && points[i].Y == baseVal)
                             {
                                 curVal = points[i].X;
                                 break;
@@ -159,7 +165,7 @@ public class ValueHandler
                     else if (iPt < tmpCurve.Points.Count)
                     {
                         // Get the value for the appropriate value axis
-                        if (baseAxis is XAxis || baseAxis is X2Axis)
+                        if (baseAxis is XAxis or X2Axis)
                         {
                             curVal = tmpCurve.Points[iPt].Y;
                         }
@@ -257,7 +263,7 @@ public class ValueHandler
 
             // loop through all the curves, summing up the values to get a total (only
             // for the current ordinal position iPt)
-            foreach (CurveItem tmpCurve in pane.CurveList)
+            foreach (var tmpCurve in pane.CurveList)
             {
                 // make sure the curve is a Line type
                 if (tmpCurve is LineItem && tmpCurve.IsVisible)
@@ -267,9 +273,9 @@ public class ValueHandler
                     // For non-ordinal curves, find a matching base value (must match exactly)
                     if (curve.IsOverrideOrdinal || !baseAxis.Scale.IsAnyOrdinal)
                     {
-                        IPointList points = tmpCurve.Points;
+                        var points = tmpCurve.Points;
 
-                        for (int i = 0; i < points.Count; i++)
+                        for (var i = 0; i < points.Count; i++)
                         {
                             if (points[i].X == baseVal)
                             {
@@ -340,7 +346,7 @@ public class ValueHandler
                 lowVal = curve.Points[iPt].LowValue;
             }
 
-            if (baseAxis is XAxis || baseAxis is X2Axis)
+            if (baseAxis is XAxis or X2Axis)
             {
                 hiVal = curve.Points[iPt].Y;
             }
@@ -358,8 +364,7 @@ public class ValueHandler
         }
 
         if (baseVal == PointPairBase.Missing || hiVal == PointPairBase.Missing ||
-            (lowVal == PointPairBase.Missing && (curve is ErrorBarItem ||
-                                                 curve is HiLowBarItem)))
+            (lowVal == PointPairBase.Missing && curve is ErrorBarItem or HiLowBarItem))
         {
             return false;
         }
@@ -391,9 +396,8 @@ public class ValueHandler
     public double BarCenterValue (CurveItem curve, float barWidth, int iCluster,
         double val, int iOrdinal)
     {
-        Axis baseAxis = curve.BaseAxis (_pane);
-        if (curve is ErrorBarItem || curve is HiLowBarItem ||
-            curve is OHLCBarItem || curve is JapaneseCandleStickItem)
+        var baseAxis = curve.BaseAxis (_pane);
+        if (curve is ErrorBarItem or HiLowBarItem or OHLCBarItem or JapaneseCandleStickItem)
         {
             if (baseAxis.Scale.IsAnyOrdinal && iCluster >= 0 && !curve.IsOverrideOrdinal)
             {
@@ -406,18 +410,18 @@ public class ValueHandler
         }
         else
         {
-            float clusterWidth = _pane._barSettings.GetClusterWidth();
-            float clusterGap = _pane._barSettings.MinClusterGap * barWidth;
-            float barGap = barWidth * _pane._barSettings.MinBarGap;
+            var clusterWidth = _pane._barSettings.GetClusterWidth();
+            var clusterGap = _pane._barSettings.MinClusterGap * barWidth;
+            var barGap = barWidth * _pane._barSettings.MinBarGap;
 
             if (curve.IsBar && _pane._barSettings.Type != BarType.Cluster)
             {
                 iOrdinal = 0;
             }
 
-            float centerPix = baseAxis.Scale.Transform (curve.IsOverrideOrdinal, iCluster, val)
-                              - clusterWidth / 2.0F + clusterGap / 2.0F +
-                              iOrdinal * (barWidth + barGap) + 0.5F * barWidth;
+            var centerPix = baseAxis.Scale.Transform (curve.IsOverrideOrdinal, iCluster, val)
+                            - clusterWidth / 2.0F + clusterGap / 2.0F +
+                            iOrdinal * (barWidth + barGap) + 0.5F * barWidth;
             return baseAxis.Scale.ReverseTransform (centerPix);
         }
     }

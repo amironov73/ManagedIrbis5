@@ -31,7 +31,7 @@ namespace PdfSharpCore.Fonts.OpenType
     {
         public OpenTypeFontTable(OpenTypeFontface fontData, string tag)
         {
-            _fontData = fontData;
+            FontData = fontData;
             if (fontData != null && fontData.TableDictionary.ContainsKey(tag))
                 DirectoryEntry = fontData.TableDictionary[tag];
             else
@@ -58,11 +58,7 @@ namespace PdfSharpCore.Fonts.OpenType
         /// <summary>
         /// Gets the font image the table belongs to.
         /// </summary>
-        public OpenTypeFontface FontData
-        {
-            get { return _fontData; }
-        }
-        internal OpenTypeFontface _fontData;
+        public OpenTypeFontface? FontData { get; internal set; }
 
         public TableDirectoryEntry DirectoryEntry;
 

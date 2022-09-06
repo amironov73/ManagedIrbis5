@@ -38,45 +38,56 @@ public class ImageSharpImageSource<TPixel>
     : ImageSource
     where TPixel : unmanaged, IPixel<TPixel>
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="image"></param>
+    /// <param name="imgFormat"></param>
+    /// <param name="quality"></param>
+    /// <returns></returns>
     public static IImageSource FromImageSharpImage
         (
             Image<TPixel> image,
             IImageFormat imgFormat,
-            int? quality = 75
+            int quality = 75
         )
     {
         var _path = "*" + Guid.NewGuid().ToString ("B");
 
-        return new ImageSharpImageSourceImpl<TPixel> (_path, image, (int)quality, imgFormat is PngFormat);
+        return new ImageSharpImageSourceImpl<TPixel> (_path, image, quality, imgFormat is PngFormat);
     }
 
+    /// <inheritdoc cref="ImageSource.FromBinaryImpl"/>
     protected override IImageSource FromBinaryImpl
         (
             string name,
             Func<byte[]> imageSource,
-            int? quality = 75
+            int quality = 75
         )
     {
-        var image = Image.Load<TPixel> (imageSource.Invoke(), out IImageFormat imgFormat);
-        return new ImageSharpImageSourceImpl<TPixel> (name, image, (int)quality, imgFormat is PngFormat);
+        var image = Image.Load<TPixel> (imageSource.Invoke(), out var imgFormat);
+        return new ImageSharpImageSourceImpl<TPixel> (name, image, quality, imgFormat is PngFormat);
     }
 
-    protected override IImageSource FromFileImpl (string path, int? quality = 75)
+    /// <inheritdoc cref="ImageSource.FromFileImpl"/>
+    protected override IImageSource FromFileImpl (string path, int quality = 75)
     {
-        var image = Image.Load<TPixel> (path, out IImageFormat imgFormat);
-        return new ImageSharpImageSourceImpl<TPixel> (path, image, (int)quality, imgFormat is PngFormat);
+        var image = Image.Load<TPixel> (path, out var imgFormat);
+        return new ImageSharpImageSourceImpl<TPixel> (path, image, quality, imgFormat is PngFormat);
     }
 
-    protected override IImageSource FromStreamImpl (string name, Func<Stream> imageStream, int? quality = 75)
+    /// <inheritdoc cref="ImageSource.FromStreamImpl"/>
+    protected override IImageSource FromStreamImpl (string name, Func<Stream> imageStream, int quality = 75)
     {
-        using (var stream = imageStream.Invoke())
-        {
-            var image = Image.Load<TPixel> (stream, out IImageFormat imgFormat);
-            return new ImageSharpImageSourceImpl<TPixel> (name, image, (int)quality, imgFormat is PngFormat);
-        }
+        using var stream = imageStream.Invoke();
+        var image = Image.Load<TPixel> (stream, out var imgFormat);
+
+        return new ImageSharpImageSourceImpl<TPixel> (name, image, quality, imgFormat is PngFormat);
     }
 
-    private class ImageSharpImageSourceImpl<TPixel2> : IImageSource where TPixel2 : unmanaged, IPixel<TPixel2>
+    private class ImageSharpImageSourceImpl<TPixel2>
+        : IImageSource, IDisposable
+        where TPixel2: unmanaged, IPixel<TPixel2>
     {
         private Image<TPixel2> Image { get; }
         private readonly int _quality;
@@ -96,9 +107,10 @@ public class ImageSharpImageSource<TPixel>
 
         public void SaveAsJpeg (MemoryStream ms)
         {
-            Image.SaveAsJpeg (ms, new JpegEncoder() { Quality = this._quality });
+            Image.SaveAsJpeg (ms, new JpegEncoder { Quality = _quality });
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
             Image.Dispose();
@@ -106,7 +118,7 @@ public class ImageSharpImageSource<TPixel>
 
         public void SaveAsPdfBitmap (MemoryStream ms)
         {
-            BmpEncoder bmp = new BmpEncoder { BitsPerPixel = BmpBitsPerPixel.Pixel32 };
+            var bmp = new BmpEncoder { BitsPerPixel = BmpBitsPerPixel.Pixel32 };
             Image.Save (ms, bmp);
         }
     }

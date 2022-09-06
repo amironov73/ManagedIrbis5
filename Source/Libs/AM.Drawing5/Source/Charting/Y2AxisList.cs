@@ -42,7 +42,7 @@ public class Y2AxisList
     /// <param name="rhs">The <see cref="Y2AxisList"/> object from which to copy</param>
     public Y2AxisList (Y2AxisList rhs)
     {
-        foreach (Y2Axis item in rhs)
+        foreach (var item in rhs)
         {
             Add (item.Clone());
         }
@@ -78,10 +78,7 @@ public class Y2AxisList
     /// <param name="index">The ordinal position (zero-based) of the
     /// <see cref="YAxis"/> object to be accessed.</param>
     /// <value>An <see cref="Axis"/> object reference.</value>
-    public new Y2Axis this [int index]
-    {
-        get { return (((index < 0 || index >= Count) ? null : base[index])); }
-    }
+    public new Y2Axis? this [int index] => index < 0 || index >= Count ? null : base[index];
 
     /// <summary>
     /// Indexer to access the specified <see cref="Axis"/> object by
@@ -90,11 +87,11 @@ public class Y2AxisList
     /// <param name="title">The string title of the
     /// <see cref="YAxis"/> object to be accessed.</param>
     /// <value>A <see cref="Axis"/> object reference.</value>
-    public Y2Axis this [string title]
+    public Y2Axis? this [string title]
     {
         get
         {
-            int index = IndexOf (title);
+            var index = IndexOf (title);
             if (index >= 0)
             {
                 return this[index];
@@ -120,8 +117,8 @@ public class Y2AxisList
     /// <seealso cref="IndexOfTag"/>
     public int IndexOf (string title)
     {
-        int index = 0;
-        foreach (Y2Axis axis in this)
+        var index = 0;
+        foreach (var axis in this)
         {
             if (string.Compare (axis.Title.Text, title, true) == 0)
             {
@@ -148,8 +145,8 @@ public class Y2AxisList
     /// <seealso cref="IndexOf" />
     public int IndexOfTag (string tagStr)
     {
-        int index = 0;
-        foreach (Y2Axis axis in this)
+        var index = 0;
+        foreach (var axis in this)
         {
             if (axis.Tag is string &&
                 string.Compare ((string)axis.Tag, tagStr, true) == 0)
@@ -174,7 +171,7 @@ public class Y2AxisList
     /// you would also need to set the <see cref="CurveItem.IsY2Axis" /> property to true.</returns>
     public int Add (string title)
     {
-        Y2Axis axis = new Y2Axis (title);
+        var axis = new Y2Axis (title);
         Add (axis);
 
         return Count - 1;
