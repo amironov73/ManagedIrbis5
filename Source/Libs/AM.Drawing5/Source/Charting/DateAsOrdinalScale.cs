@@ -84,7 +84,7 @@ class DateAsOrdinalScale
     /// <inheritdoc cref="Scale.Min"/>
     public override double Min
     {
-        get { return _min; }
+        get => _min;
         set
         {
             _min = XDate.MakeValidDate (value);
@@ -95,7 +95,7 @@ class DateAsOrdinalScale
     /// <inheritdoc cref="Scale.Max"/>
     public override double Max
     {
-        get { return _max; }
+        get => _max;
         set
         {
             _max = XDate.MakeValidDate (value);

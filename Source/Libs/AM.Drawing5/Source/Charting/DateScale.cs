@@ -938,22 +938,7 @@ internal class DateScale
         }
     }
 
-    /// <summary>
-    /// Make a value label for an <see cref="AxisType.Date" /> <see cref="Axis" />.
-    /// </summary>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="index">
-    /// The zero-based, ordinal index of the label to be generated.  For example, a value of 2 would
-    /// cause the third value label on the axis to be generated.
-    /// </param>
-    /// <param name="dVal">
-    /// The numeric value associated with the label.  This value is ignored for log (<see cref="Scale.IsLog"/>)
-    /// and text (<see cref="Scale.IsText"/>) type axes.
-    /// </param>
-    /// <returns>The resulting value label as a <see cref="string" /></returns>
+    /// <inheritdoc cref="Scale.MakeLabel"/>
     internal override string MakeLabel (GraphPane pane, int index, double dVal)
     {
         if (_format == null)
@@ -964,24 +949,10 @@ internal class DateScale
         return XDate.ToString (dVal, _format);
     }
 
-    /// <summary>
-    /// Gets the major unit multiplier for this scale type, if any.
-    /// </summary>
-    /// <remarks>The major unit multiplier will correct the units of
-    /// <see cref="Scale.MajorStep" /> to match the units of <see cref="Scale.Min" />
-    /// and <see cref="Scale.Max" />.  This reflects the setting of
-    /// <see cref="Scale.MajorUnit" />.
-    /// </remarks>
+    /// <inheritdoc cref="Scale.MajorUnitMultiplier"/>
     internal override double MajorUnitMultiplier => GetUnitMultiple (_majorUnit);
 
-    /// <summary>
-    /// Gets the minor unit multiplier for this scale type, if any.
-    /// </summary>
-    /// <remarks>The minor unit multiplier will correct the units of
-    /// <see cref="Scale.MinorStep" /> to match the units of <see cref="Scale.Min" />
-    /// and <see cref="Scale.Max" />.  This reflects the setting of
-    /// <see cref="Scale.MinorUnit" />.
-    /// </remarks>
+    /// <inheritdoc cref="Scale.MinorUnitMultiplier"/>
     internal override double MinorUnitMultiplier => GetUnitMultiple (_minorUnit);
 
     /// <summary>
@@ -994,24 +965,17 @@ internal class DateScale
     /// </returns>
     private double GetUnitMultiple (DateUnit unit)
     {
-        switch (unit)
+        return unit switch
         {
-            case DateUnit.Year:
-            default:
-                return 365.0;
-            case DateUnit.Month:
-                return 30.0;
-            case DateUnit.Day:
-                return 1.0;
-            case DateUnit.Hour:
-                return 1.0 / XDate.HoursPerDay;
-            case DateUnit.Minute:
-                return 1.0 / XDate.MinutesPerDay;
-            case DateUnit.Second:
-                return 1.0 / XDate.SecondsPerDay;
-            case DateUnit.Millisecond:
-                return 1.0 / XDate.MillisecondsPerDay;
-        }
+            DateUnit.Year => 365.0,
+            DateUnit.Month => 30.0,
+            DateUnit.Day => 1.0,
+            DateUnit.Hour => 1.0 / XDate.HoursPerDay,
+            DateUnit.Minute => 1.0 / XDate.MinutesPerDay,
+            DateUnit.Second => 1.0 / XDate.SecondsPerDay,
+            DateUnit.Millisecond => 1.0 / XDate.MillisecondsPerDay,
+            _ => 365.0
+        };
     }
 
     #endregion

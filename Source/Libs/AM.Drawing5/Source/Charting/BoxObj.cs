@@ -312,9 +312,7 @@ public class BoxObj
         return pixRect.Contains (point);
     }
 
-    /// <summary>
-    /// Determines the shape type and Coords values for this GraphObj
-    /// </summary>
+    /// <inheritdoc cref="GraphObj.GetCoords"/>
     public override void GetCoords
         (
             PaneBase pane,

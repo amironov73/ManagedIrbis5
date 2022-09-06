@@ -101,7 +101,7 @@ public abstract class Scale
     /// <summary> Private field for the format of the <see cref="Axis"/> tic labels.
     /// Use the public property <see cref="Format"/> for access to this value. </summary>
     /// <seealso cref="FormatAuto"/>
-    internal string _format;
+    internal string? _format;
 
     /// <summary>
     /// Private fields for Unit types to be used for the major and minor tics.
