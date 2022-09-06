@@ -49,10 +49,6 @@ namespace AM.Drawing.Charting;
 public class JapaneseCandleStickItem
     : CurveItem, ICloneable
 {
-    #region Fields
-
-    #endregion
-
     #region Properties
 
     /// <summary>
@@ -61,26 +57,13 @@ public class JapaneseCandleStickItem
     /// </summary>
     public JapaneseCandleStick Stick { get; }
 
-    /// <summary>
-    /// Gets a flag indicating if the X axis is the independent axis for this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the X axis is independent, false otherwise</value>
+    /// <inheritdoc cref="CurveItem.IsXIndependent"/>
     internal override bool IsXIndependent (GraphPane pane)
     {
         return pane._barSettings.Base == BarBase.X;
     }
 
-    /// <summary>
-    /// Gets a flag indicating if the Z data range should be included in the axis scaling calculations.
-    /// </summary>
-    /// <remarks>
-    /// IsZIncluded is true for <see cref="JapaneseCandleStickItem" /> objects, since the Y and Z
-    /// values are defined as the High and Low values for the day.</remarks>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the Z data are included, false otherwise</value>
+    /// <inheritdoc cref="CurveItem.IsZIncluded"/>
     internal override bool IsZIncluded (GraphPane pane)
     {
         return true;
@@ -171,8 +154,7 @@ public class JapaneseCandleStickItem
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema2").NotUsed();
 
-        Stick = (JapaneseCandleStick)info.GetValue ("stick",
-            typeof (JapaneseCandleStick));
+        Stick = (JapaneseCandleStick) info.GetValue ("stick", typeof (JapaneseCandleStick))!;
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -192,29 +174,14 @@ public class JapaneseCandleStickItem
 
     #region Methods
 
-    /// <summary>
-    /// Do all rendering associated with this <see cref="OHLCBarItem"/> to the specified
-    /// <see cref="Graphics"/> device.  This method is normally only
-    /// called by the Draw method of the parent <see cref="CurveList"/>
-    /// collection object.
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="pos">The ordinal position of the current <see cref="OHLCBarItem"/>
-    /// curve.</param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
+    /// <inheritdoc cref="CurveItem.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            int pos,
+            float scaleFactor
+        )
     {
         if (IsVisible)
         {
@@ -223,27 +190,14 @@ public class JapaneseCandleStickItem
         }
     }
 
-    /// <summary>
-    /// Draw a legend key entry for this <see cref="OHLCBarItem"/> at the specified location
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="rect">The <see cref="RectangleF"/> struct that specifies the
-    /// location for the legend key</param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect,
-        float scaleFactor)
+    /// <inheritdoc cref="CurveItem.DrawLegendKey"/>
+    public override void DrawLegendKey
+        (
+            Graphics graphics,
+            GraphPane pane,
+            RectangleF rect,
+            float scaleFactor
+        )
     {
         float pixBase, pixHigh, pixLow, pixOpen, pixClose;
 
@@ -264,30 +218,38 @@ public class JapaneseCandleStickItem
             pixClose = pixLow + rect.Width / 3;
         }
 
-        Axis baseAxis = BaseAxis (pane);
+        var baseAxis = BaseAxis (pane);
 
         //float halfSize = _stick.GetBarWidth( pane, baseAxis, scaleFactor );
-        float halfSize = 2 * scaleFactor;
+        var halfSize = 2 * scaleFactor;
 
-        using (Pen pen = new Pen (Stick.Color, Stick._width))
-        {
-            Stick.Draw (graphics, pane, pane._barSettings.Base == BarBase.X, pixBase, pixHigh,
-                pixLow, pixOpen, pixClose, halfSize, scaleFactor, pen,
+        using var pen = new Pen (Stick.Color, Stick._width);
+        Stick.Draw
+            (
+                graphics,
+                pane,
+                pane._barSettings.Base == BarBase.X,
+                pixBase,
+                pixHigh,
+                pixLow,
+                pixOpen,
+                pixClose,
+                halfSize,
+                scaleFactor,
+                pen,
                 Stick.RisingFill,
-                Stick.RisingBorder, null);
-        }
+                Stick.RisingBorder,
+                null
+            );
     }
 
-    /// <summary>
-    /// Determine the coords for the rectangle associated with a specified point for
-    /// this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The <see cref="GraphPane" /> to which this curve belongs</param>
-    /// <param name="i">The index of the point of interest</param>
-    /// <param name="coords">A list of coordinates that represents the "rect" for
-    /// this point (used in an html AREA tag)</param>
-    /// <returns>true if it's a valid point, false otherwise</returns>
-    public override bool GetCoords (GraphPane pane, int i, out string coords)
+    /// <inheritdoc cref="CurveItem.GetCoords"/>
+    public override bool GetCoords
+        (
+            GraphPane pane,
+            int i,
+            out string coords
+        )
     {
         coords = string.Empty;
 
@@ -296,15 +258,15 @@ public class JapaneseCandleStickItem
             return false;
         }
 
-        Axis valueAxis = ValueAxis (pane);
-        Axis baseAxis = BaseAxis (pane);
+        var valueAxis = ValueAxis (pane);
+        var baseAxis = BaseAxis (pane);
 
-        float halfSize = Stick.Size * pane.CalcScaleFactor();
+        var halfSize = Stick.Size * pane.CalcScaleFactor();
 
-        PointPair pt = Points[i];
-        double date = pt.X;
-        double high = pt.Y;
-        double low = pt.Z;
+        var pt = Points[i];
+        var date = pt.X;
+        var high = pt.Y;
+        var low = pt.Z;
 
         if (!pt.IsInvalid3D &&
             (date > 0 || !baseAxis.Scale.IsLog) &&
@@ -316,7 +278,7 @@ public class JapaneseCandleStickItem
             pixLow = valueAxis.Scale.Transform (IsOverrideOrdinal, i, low);
 
             // Calculate the pixel location for the side of the bar (on the base axis)
-            float pixSide = pixBase - halfSize;
+            var pixSide = pixBase - halfSize;
 
             // Draw the bar
             if (baseAxis is XAxis || baseAxis is X2Axis)

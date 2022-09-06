@@ -273,8 +273,8 @@ public class FontSpec
     /// <value>A system <see cref="System.Drawing.Color"/> reference.</value>
     public Color FontColor
     {
-        get { return _fontColor; }
-        set { _fontColor = value; }
+        get => _fontColor;
+        set => _fontColor = value;
     }
 
     /// <summary>
@@ -283,7 +283,7 @@ public class FontSpec
     /// <value>A text string with the font family name, e.g., "Arial"</value>
     public string Family
     {
-        get { return _family; }
+        get => _family;
         set
         {
             if (value != _family)
@@ -301,7 +301,7 @@ public class FontSpec
     /// <value>A boolean value, true for bold, false for normal</value>
     public bool IsBold
     {
-        get { return _isBold; }
+        get => _isBold;
         set
         {
             if (value != _isBold)
@@ -319,7 +319,7 @@ public class FontSpec
     /// <value>A boolean value, true for italic, false for normal</value>
     public bool IsItalic
     {
-        get { return _isItalic; }
+        get => _isItalic;
         set
         {
             if (value != _isItalic)
@@ -337,7 +337,7 @@ public class FontSpec
     /// <value>A boolean value, true for underline, false for normal</value>
     public bool IsUnderline
     {
-        get { return _isUnderline; }
+        get => _isUnderline;
         set
         {
             if (value != _isUnderline)
@@ -355,8 +355,8 @@ public class FontSpec
     /// horizontal.  Negative values are permitted.</value>
     public float Angle
     {
-        get { return _angle; }
-        set { _angle = value; }
+        get => _angle;
+        set => _angle = value;
     }
 
     /// <summary>
@@ -367,8 +367,8 @@ public class FontSpec
     /// <value>A <see cref="StringAlignment"/> enumeration.</value>
     public StringAlignment StringAlignment
     {
-        get { return _stringAlignment; }
-        set { _stringAlignment = value; }
+        get => _stringAlignment;
+        set => _stringAlignment = value;
     }
 
     /// <summary>
@@ -377,7 +377,7 @@ public class FontSpec
     /// <value>The size of the font, measured in points (1/72 inch).</value>
     public float Size
     {
-        get { return _size; }
+        get => _size;
         set
         {
             if (value != _size)
@@ -395,8 +395,8 @@ public class FontSpec
     /// </summary>
     public Border Border
     {
-        get { return _border; }
-        set { _border = value; }
+        get => _border;
+        set => _border = value;
     }
 
     /// <summary>
@@ -406,8 +406,8 @@ public class FontSpec
     /// </summary>
     public Fill Fill
     {
-        get { return _fill; }
-        set { _fill = value; }
+        get => _fill;
+        set => _fill = value;
     }
 
     /// <summary>
@@ -423,8 +423,8 @@ public class FontSpec
     /// </remarks>
     public bool IsAntiAlias
     {
-        get { return _isAntiAlias; }
-        set { _isAntiAlias = value; }
+        get => _isAntiAlias;
+        set => _isAntiAlias = value;
     }
 
     /// <summary>
@@ -436,8 +436,8 @@ public class FontSpec
     /// <seealso cref="DropShadowOffset" />
     public bool IsDropShadow
     {
-        get { return _isDropShadow; }
-        set { _isDropShadow = value; }
+        get => _isDropShadow;
+        set => _isDropShadow = value;
     }
 
     /// <summary>
@@ -451,8 +451,8 @@ public class FontSpec
     /// <seealso cref="DropShadowOffset" />
     public Color DropShadowColor
     {
-        get { return _dropShadowColor; }
-        set { _dropShadowColor = value; }
+        get => _dropShadowColor;
+        set => _dropShadowColor = value;
     }
 
     /// <summary>
@@ -468,8 +468,8 @@ public class FontSpec
     /// <seealso cref="DropShadowOffset" />
     public float DropShadowAngle
     {
-        get { return _dropShadowAngle; }
-        set { _dropShadowAngle = value; }
+        get => _dropShadowAngle;
+        set => _dropShadowAngle = value;
     }
 
     /// <summary>
@@ -484,8 +484,8 @@ public class FontSpec
     /// <seealso cref="DropShadowAngle" />
     public float DropShadowOffset
     {
-        get { return _dropShadowOffset; }
-        set { _dropShadowOffset = value; }
+        get => _dropShadowOffset;
+        set => _dropShadowOffset = value;
     }
 
     #endregion

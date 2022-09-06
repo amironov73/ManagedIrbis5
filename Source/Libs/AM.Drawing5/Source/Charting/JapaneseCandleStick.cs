@@ -246,7 +246,7 @@ public class JapaneseCandleStick
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        var sch = info.GetInt32 ("schema2");
 
         _risingFill = (Fill)info.GetValue ("risingFill", typeof (Fill));
         _fallingFill = (Fill)info.GetValue ("fallingFill", typeof (Fill));
@@ -284,7 +284,7 @@ public class JapaneseCandleStick
     /// Draw the <see cref="JapaneseCandleStick"/> to the specified <see cref="Graphics"/>
     /// device at the specified location.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -322,15 +322,28 @@ public class JapaneseCandleStick
     /// <see cref="Fill" />, just in case it's a <see cref="FillType.GradientByX" />,
     /// <see cref="FillType.GradientByY" />, or
     /// <see cref="FillType.GradientByZ" /> <see cref="FillType" /></param>
-    public void Draw (Graphics g, GraphPane pane, bool isXBase,
-        float pixBase, float pixHigh, float pixLow,
-        float pixOpen, float pixClose, float halfSize,
-        float scaleFactor, Pen pen, Fill fill, Border border, PointPair pt)
+    public void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            bool isXBase,
+            float pixBase,
+            float pixHigh,
+            float pixLow,
+            float pixOpen,
+            float pixClose,
+            float halfSize,
+            float scaleFactor,
+            Pen pen,
+            Fill fill,
+            Border border,
+            PointPair? pt
+        )
     {
         //float halfSize = (int) ( _size * scaleFactor / 2.0f + 0.5f );
 
-        if (pixBase != PointPairBase.Missing && Math.Abs (pixLow) < 1000000 &&
-            Math.Abs (pixHigh) < 1000000)
+        if (pixBase != PointPairBase.Missing && Math.Abs (pixLow) < 1_000_000 &&
+            Math.Abs (pixHigh) < 1_000_000)
         {
             RectangleF rect;
             if (isXBase)
@@ -338,18 +351,18 @@ public class JapaneseCandleStick
                 rect = new RectangleF (pixBase - halfSize, Math.Min (pixOpen, pixClose),
                     halfSize * 2.0f, Math.Abs (pixOpen - pixClose));
 
-                g.DrawLine (pen, pixBase, pixHigh, pixBase, pixLow);
+                graphics.DrawLine (pen, pixBase, pixHigh, pixBase, pixLow);
             }
             else
             {
                 rect = new RectangleF (Math.Min (pixOpen, pixClose), pixBase - halfSize,
                     Math.Abs (pixOpen - pixClose), halfSize * 2.0f);
 
-                g.DrawLine (pen, pixHigh, pixBase, pixLow, pixBase);
+                graphics.DrawLine (pen, pixHigh, pixBase, pixLow, pixBase);
             }
 
-            if (IsOpenCloseVisible && Math.Abs (pixOpen) < 1000000 &&
-                Math.Abs (pixClose) < 1000000)
+            if (IsOpenCloseVisible && Math.Abs (pixOpen) < 1_000_000 &&
+                Math.Abs (pixClose) < 1_000_000)
             {
                 if (rect.Width == 0)
                 {
@@ -361,8 +374,8 @@ public class JapaneseCandleStick
                     rect.Height = 1;
                 }
 
-                fill.Draw (g, rect, pt);
-                border.Draw (g, pane, scaleFactor, rect);
+                fill.Draw (graphics, rect, pt);
+                border.Draw (graphics, pane, scaleFactor, rect);
             }
         }
     }
@@ -372,7 +385,7 @@ public class JapaneseCandleStick
     /// Draw all the <see cref="JapaneseCandleStick"/>'s to the specified <see cref="Graphics"/>
     /// device as a candlestick at each defined point.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -392,8 +405,15 @@ public class JapaneseCandleStick
     /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
     /// font sizes, etc. according to the actual size of the graph.
     /// </param>
-    public void Draw (Graphics g, GraphPane pane, JapaneseCandleStickItem curve,
-        Axis baseAxis, Axis valueAxis, float scaleFactor)
+    public void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            JapaneseCandleStickItem curve,
+            Axis baseAxis,
+            Axis valueAxis,
+            float scaleFactor
+        )
     {
         //ValueHandler valueHandler = new ValueHandler( pane, false );
 
@@ -402,15 +422,15 @@ public class JapaneseCandleStick
         if (curve.Points != null)
         {
             //float halfSize = _size * scaleFactor;
-            float halfSize = GetBarWidth (pane, baseAxis, scaleFactor);
+            var halfSize = GetBarWidth (pane, baseAxis, scaleFactor);
 
-            Color tColor = _color;
-            Color tFallingColor = _fallingColor;
-            float tPenWidth = _width;
-            Fill tRisingFill = _risingFill;
-            Fill tFallingFill = _fallingFill;
-            Border tRisingBorder = _risingBorder;
-            Border tFallingBorder = _fallingBorder;
+            var tColor = _color;
+            var tFallingColor = _fallingColor;
+            var tPenWidth = _width;
+            var tRisingFill = _risingFill;
+            var tFallingFill = _fallingFill;
+            var tRisingBorder = _risingBorder;
+            var tFallingBorder = _fallingBorder;
             if (curve.IsSelected)
             {
                 tColor = Selection.Border.Color;
@@ -422,18 +442,18 @@ public class JapaneseCandleStick
                 tFallingBorder = Selection.Border;
             }
 
-            using (Pen risingPen = new Pen (tColor, tPenWidth))
-            using (Pen fallingPen = new Pen (tFallingColor, tPenWidth))
+            using (var risingPen = new Pen (tColor, tPenWidth))
+            using (var fallingPen = new Pen (tFallingColor, tPenWidth))
             {
                 // Loop over each defined point
-                for (int i = 0; i < curve.Points.Count; i++)
+                for (var i = 0; i < curve.Points.Count; i++)
                 {
-                    PointPair pt = curve.Points[i];
-                    double date = pt.X;
-                    double high = pt.Y;
-                    double low = pt.Z;
-                    double open = PointPairBase.Missing;
-                    double close = PointPairBase.Missing;
+                    var pt = curve.Points[i];
+                    var date = pt.X;
+                    var high = pt.Y;
+                    var low = pt.Z;
+                    var open = PointPairBase.Missing;
+                    var close = PointPairBase.Missing;
                     if (pt is StockPoint)
                     {
                         open = (pt as StockPoint).Open;
@@ -474,8 +494,8 @@ public class JapaneseCandleStick
 
                         if (!curve.IsSelected && _gradientFill.IsGradientValueType)
                         {
-                            using (Pen tPen = GetPen (pane, scaleFactor, pt))
-                                Draw (g, pane, baseAxis is XAxis || baseAxis is X2Axis,
+                            using (var tPen = GetPen (pane, scaleFactor, pt))
+                                Draw (graphics, pane, baseAxis is XAxis || baseAxis is X2Axis,
                                     pixBase, pixHigh, pixLow, pixOpen,
                                     pixClose, halfSize, scaleFactor,
                                     (tPen),
@@ -484,7 +504,7 @@ public class JapaneseCandleStick
                         }
                         else
                         {
-                            Draw (g, pane, baseAxis is XAxis || baseAxis is X2Axis,
+                            Draw (graphics, pane, baseAxis is XAxis || baseAxis is X2Axis,
                                 pixBase, pixHigh, pixLow, pixOpen,
                                 pixClose, halfSize, scaleFactor,
                                 (close > open ? risingPen : fallingPen),

@@ -15,7 +15,6 @@ using System.Runtime.Serialization;
 using System.Drawing.Drawing2D;
 using System;
 using System.Drawing;
-using System.Security.Permissions;
 
 #endregion
 
@@ -87,7 +86,7 @@ public class GasGaugeRegion
     /// Private field to hold the GraphicsPath of this <see cref="GasGaugeRegion"/> to be
     /// used for 'hit testing'.
     /// </summary>
-    private GraphicsPath _slicePath;
+    private GraphicsPath? _slicePath;
 
     #endregion
 
@@ -124,11 +123,7 @@ public class GasGaugeRegion
         _slicePath = (GraphicsPath)info.GetValue ("slicePath", typeof (GraphicsPath));
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -300,23 +295,13 @@ public class GasGaugeRegion
         set => _maxValue = value > 0 ? value : 0;
     }
 
-    /// <summary>
-    /// Gets a flag indicating if the Z data range should be included in the axis scaling calculations.
-    /// </summary>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the Z data are included, false otherwise</value>
+    /// <inheritdoc cref="CurveItem.IsZIncluded"/>
     internal override bool IsZIncluded (GraphPane pane)
     {
         return false;
     }
 
-    /// <summary>
-    /// Gets a flag indicating if the X axis is the independent axis for this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the X axis is independent, false otherwise</value>
+    /// <inheritdoc cref="CurveItem.IsXIndependent"/>
     internal override bool IsXIndependent (GraphPane pane)
     {
         return true;
@@ -378,28 +363,14 @@ public class GasGaugeRegion
 
     #region Methods
 
-    /// <summary>
-    /// Do all rendering associated with this <see cref="GasGaugeRegion"/> item to the specified
-    /// <see cref="Graphics"/> device. This method is normally only
-    /// called by the Draw method of the parent <see cref="CurveList"/>
-    /// collection object.
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into. This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="pos">Not used for rendering GasGaugeNeedle</param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects. This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
+    /// <inheritdoc cref="CurveItem.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            int pos,
+            float scaleFactor
+        )
     {
         if (pane.Chart._rect.Width <= 0 && pane.Chart._rect.Height <= 0)
         {
@@ -442,25 +413,14 @@ public class GasGaugeRegion
         }
     }
 
-    /// <summary>
-    /// Render the label for this <see cref="GasGaugeRegion"/>.
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into. This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A graphic device object to be drawn into. This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="rect">Bounding rectangle for this <see cref="GasGaugeRegion"/>.</param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects. This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor)
+    /// <inheritdoc cref="CurveItem.DrawLegendKey"/>
+    public override void DrawLegendKey
+        (
+            Graphics graphics,
+            GraphPane pane,
+            RectangleF rect,
+            float scaleFactor
+        )
     {
         if (!IsVisible)
         {
@@ -486,16 +446,13 @@ public class GasGaugeRegion
         }
     }
 
-    /// <summary>
-    /// Determine the coords for the rectangle associated with a specified point for
-    /// this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The <see cref="GraphPane" /> to which this curve belongs</param>
-    /// <param name="i">The index of the point of interest</param>
-    /// <param name="coords">A list of coordinates that represents the "rect" for
-    /// this point (used in an html AREA tag)</param>
-    /// <returns>true if it's a valid point, false otherwise</returns>
-    public override bool GetCoords (GraphPane pane, int i, out string coords)
+    /// <inheritdoc cref="CurveItem.GetCoords"/>
+    public override bool GetCoords
+        (
+            GraphPane pane,
+            int i,
+            out string coords
+        )
     {
         coords = string.Empty;
         return false;

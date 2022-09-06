@@ -56,12 +56,7 @@ class ExponentScale
     {
     }
 
-    /// <summary>
-    /// Create a new clone of the current item, with a new owner assignment
-    /// </summary>
-    /// <param name="owner">The new <see cref="Axis" /> instance that will be
-    /// the owner of the new Scale</param>
-    /// <returns>A new <see cref="Scale" /> clone.</returns>
+    /// <inheritdoc cref="Scale.Clone"/>
     public override Scale Clone (Axis owner)
     {
         return new ExponentScale (this, owner);
@@ -71,6 +66,7 @@ class ExponentScale
 
     #region properties
 
+    /// <inheritdoc cref="Scale.Type"/>
     public override AxisType Type
     {
         get { return AxisType.Exponent; }
@@ -80,23 +76,7 @@ class ExponentScale
 
     #region methods
 
-    /// <summary>
-    /// Setup some temporary transform values in preparation for rendering the <see cref="Axis"/>.
-    /// </summary>
-    /// <remarks>
-    /// This method is typically called by the parent <see cref="GraphPane"/>
-    /// object as part of the <see cref="GraphPane.Draw"/> method.  It is also
-    /// called by <see cref="GraphPane.GeneralTransform(double,double,CoordType)"/> and
-    /// <see cref="GraphPane.ReverseTransform( PointF, out double, out double )"/>
-    /// methods to setup for coordinate transformations.
-    /// </remarks>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="axis">
-    /// The parent <see cref="Axis" /> for this <see cref="Scale" />
-    /// </param>
+    /// <inheritdoc cref="Scale.SetupScaleData"/>
     public override void SetupScaleData (GraphPane pane, Axis axis)
     {
         base.SetupScaleData (pane, axis);
@@ -113,30 +93,13 @@ class ExponentScale
         }
     }
 
-    /// <summary>
-    /// Convert a value to its linear equivalent for this type of scale.
-    /// </summary>
-    /// <remarks>
-    /// The default behavior is to just return the value unchanged.  However,
-    /// for <see cref="AxisType.Log" /> and <see cref="AxisType.Exponent" />,
-    /// it returns the log or power equivalent.
-    /// </remarks>
-    /// <param name="val">The value to be converted</param>
+    /// <inheritdoc cref="Scale.Linearize"/>
     public override double Linearize (double val)
     {
         return SafeExp (val, _exponent);
     }
 
-    /// <summary>
-    /// Convert a value from its linear equivalent to its actual scale value
-    /// for this type of scale.
-    /// </summary>
-    /// <remarks>
-    /// The default behavior is to just return the value unchanged.  However,
-    /// for <see cref="AxisType.Log" /> and <see cref="AxisType.Exponent" />,
-    /// it returns the anti-log or inverse-power equivalent.
-    /// </remarks>
-    /// <param name="val">The value to be converted</param>
+    /// <inheritdoc cref="Scale.DeLinearize"/>
     public override double DeLinearize (double val)
     {
         return Math.Pow (val, 1 / _exponent);

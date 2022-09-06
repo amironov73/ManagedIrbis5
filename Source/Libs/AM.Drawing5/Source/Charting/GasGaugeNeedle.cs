@@ -15,7 +15,6 @@ using System.Runtime.Serialization;
 using System.Drawing.Drawing2D;
 using System;
 using System.Drawing;
-using System.Security.Permissions;
 
 #endregion
 
@@ -83,7 +82,7 @@ public class GasGaugeNeedle
     /// Private field to hold the GraphicsPath of this <see cref="GasGaugeNeedle"/> to be
     /// used for 'hit testing'.
     /// </summary>
-    private GraphicsPath _slicePath;
+    private GraphicsPath? _slicePath;
 
     #endregion
 
@@ -159,8 +158,8 @@ public class GasGaugeNeedle
     /// </summary>
     public float NeedleWidth
     {
-        get { return _needleWidth; }
-        set { _needleWidth = value; }
+        get => _needleWidth;
+        set => _needleWidth = value;
     }
 
     /// <summary>
@@ -168,25 +167,22 @@ public class GasGaugeNeedle
     /// </summary>
     public Border Border
     {
-        get { return (_border); }
-        set { _border = value; }
+        get => (_border);
+        set => _border = value;
     }
 
     /// <summary>
     /// Gets or Sets the SlicePath of this <see cref="GasGaugeNeedle"/>
     /// </summary>
-    public GraphicsPath SlicePath
-    {
-        get { return _slicePath; }
-    }
+    public GraphicsPath SlicePath => _slicePath;
 
     /// <summary>
     /// Gets or Sets the LableDetail of this <see cref="GasGaugeNeedle"/>
     /// </summary>
     public TextObj LabelDetail
     {
-        get { return _labelDetail; }
-        set { _labelDetail = value; }
+        get => _labelDetail;
+        set => _labelDetail = value;
     }
 
 
@@ -195,7 +191,7 @@ public class GasGaugeNeedle
     /// </summary>
     public Color NeedleColor
     {
-        get { return _color; }
+        get => _color;
         set
         {
             _color = value;
@@ -208,8 +204,8 @@ public class GasGaugeNeedle
     /// </summary>
     public Fill Fill
     {
-        get { return _fill; }
-        set { _fill = value; }
+        get => _fill;
+        set => _fill = value;
     }
 
     /// <summary>
@@ -217,8 +213,8 @@ public class GasGaugeNeedle
     /// </summary>
     private float SweepAngle
     {
-        get { return _sweepAngle; }
-        set { _sweepAngle = value; }
+        get => _sweepAngle;
+        set => _sweepAngle = value;
     }
 
     /// <summary>
@@ -226,27 +222,17 @@ public class GasGaugeNeedle
     /// </summary>
     public double NeedleValue
     {
-        get { return (_needleValue); }
-        set { _needleValue = value > 0 ? value : 0; }
+        get => (_needleValue);
+        set => _needleValue = value > 0 ? value : 0;
     }
 
-    /// <summary>
-    /// Gets a flag indicating if the Z data range should be included in the axis scaling calculations.
-    /// </summary>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the Z data are included, false otherwise</value>
+    /// <inheritdoc cref="CurveItem.IsZIncluded"/>
     internal override bool IsZIncluded (GraphPane pane)
     {
         return false;
     }
 
-    /// <summary>
-    /// Gets a flag indicating if the X axis is the independent axis for this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the X axis is independent, false otherwise</value>
+    /// <inheritdoc cref="CurveItem.IsXIndependent"/>
     internal override bool IsXIndependent (GraphPane pane)
     {
         return true;
@@ -273,7 +259,7 @@ public class GasGaugeNeedle
     {
         // The schema value is just a file version parameter. You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        var sch = info.GetInt32 ("schema2");
 
         _labelDetail = (TextObj)info.GetValue ("labelDetail", typeof (TextObj));
         _fill = (Fill)info.GetValue ("fill", typeof (Fill));
@@ -285,11 +271,7 @@ public class GasGaugeNeedle
         _color = (Color)info.GetValue ("color", typeof (Color));
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -380,23 +362,14 @@ public class GasGaugeNeedle
 
     #region Methods
 
-    /// <summary>
-    /// Do all rendering associated with this <see cref="GasGaugeNeedle"/> item to the specified
-    /// <see cref="Graphics"/> device. This method is normally only
-    /// called by the Draw method of the parent <see cref="CurveList"/>
-    /// collection object.
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into. This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="pos">Not used for rendering GasGaugeNeedle</param>
-    /// <param name="scaleFactor">Not used for rendering GasGaugeNeedle</param>
-    public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
+    /// <inheritdoc cref="CurveItem.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            int pos,
+            float scaleFactor
+        )
     {
         if (pane.Chart._rect.Width <= 0 && pane.Chart._rect.Height <= 0)
         {
@@ -413,18 +386,18 @@ public class GasGaugeNeedle
                 return;
             }
 
-            RectangleF tRect = _boundingRectangle;
+            var tRect = _boundingRectangle;
 
             if (tRect.Width >= 1 && tRect.Height >= 1)
             {
-                SmoothingMode sMode = graphics.SmoothingMode;
+                var sMode = graphics.SmoothingMode;
                 graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-                Matrix matrix = new Matrix();
+                var matrix = new Matrix();
 
                 matrix.Translate (tRect.X + (tRect.Width / 2), tRect.Y + (tRect.Height / 2), MatrixOrder.Prepend);
 
-                PointF[] pts = new PointF[2];
+                var pts = new PointF[2];
                 pts[0] = new PointF (
                     ((tRect.Height * .10f) / 2.0f) * (float)Math.Cos (-SweepAngle * Math.PI / 180.0f),
                     ((tRect.Height * .10f) / 2.0f) * (float)Math.Sin (-SweepAngle * Math.PI / 180.0f));
@@ -433,19 +406,19 @@ public class GasGaugeNeedle
 
                 matrix.TransformPoints (pts);
 
-                Pen p = new Pen (NeedleColor, ((tRect.Height * .10f) / 2.0f));
+                var p = new Pen (NeedleColor, ((tRect.Height * .10f) / 2.0f));
                 p.EndCap = LineCap.ArrowAnchor;
                 graphics.DrawLine (p, pts[0].X, pts[0].Y, pts[1].X, pts[1].Y);
 
                 //Fill center 10% with Black dot;
-                Fill f = new Fill (Color.Black);
-                RectangleF r = new RectangleF ((tRect.X + (tRect.Width / 2)) - 1.0f,
+                var f = new Fill (Color.Black);
+                var r = new RectangleF ((tRect.X + (tRect.Width / 2)) - 1.0f,
                     (tRect.Y + (tRect.Height / 2)) - 1.0f, 1.0f, 1.0f);
                 r.Inflate ((tRect.Height * .10f), (tRect.Height * .10f));
-                Brush b = f.MakeBrush (r);
+                var b = f.MakeBrush (r);
                 graphics.FillPie (b, r.X, r.Y, r.Width, r.Height, 0.0f, -180.0f);
 
-                Pen borderPen = new Pen (Color.White, 2.0f);
+                var borderPen = new Pen (Color.White, 2.0f);
                 graphics.DrawPie (borderPen, r.X, r.Y, r.Width, r.Height, 0.0f, -180.0f);
 
                 graphics.SmoothingMode = sMode;
@@ -453,52 +426,39 @@ public class GasGaugeNeedle
         }
     }
 
-    /// <summary>
-    /// Render the label for this <see cref="GasGaugeNeedle"/>.
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into. This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A graphic device object to be drawn into. This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="rect">Bounding rectangle for this <see cref="GasGaugeNeedle"/>.</param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects. This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor)
+    /// <inheritdoc cref="CurveItem.DrawLegendKey"/>
+    public override void DrawLegendKey
+        (
+            Graphics graphics,
+            GraphPane pane,
+            RectangleF rect,
+            float scaleFactor
+        )
     {
         if (!IsVisible)
         {
             return;
         }
 
-        float yMid = rect.Top + rect.Height / 2.0F;
+        var yMid = rect.Top + rect.Height / 2.0F;
 
-        Pen pen = new Pen (NeedleColor, pane.ScaledPenWidth (NeedleWidth / 2, scaleFactor));
+        var pen = new Pen (NeedleColor, pane.ScaledPenWidth (NeedleWidth / 2, scaleFactor));
         pen.StartCap = LineCap.Round;
         pen.EndCap = LineCap.ArrowAnchor;
         pen.DashStyle = DashStyle.Solid;
         graphics.DrawLine (pen, rect.Left, yMid, rect.Right, yMid);
     }
 
-    /// <summary>
-    /// Determine the coords for the rectangle associated with a specified point for
-    /// this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The <see cref="GraphPane" /> to which this curve belongs</param>
-    /// <param name="i">The index of the point of interest</param>
-    /// <param name="coords">A list of coordinates that represents the "rect" for
-    /// this point (used in an html AREA tag)</param>
-    /// <returns>true if it's a valid point, false otherwise</returns>
-    public override bool GetCoords (GraphPane pane, int i, out string coords)
+    /// <inheritdoc cref="CurveItem.GetCoords"/>
+    public override bool GetCoords
+        (
+            GraphPane pane,
+            int i,
+            out string coords
+        )
     {
         coords = string.Empty;
+
         return false;
     }
 
@@ -512,12 +472,12 @@ public class GasGaugeNeedle
     public static void CalculateGasGaugeParameters (GraphPane pane)
     {
         //loop thru slices and get total value and maxDisplacement
-        double minVal = double.MaxValue;
-        double maxVal = double.MinValue;
-        foreach (CurveItem curve in pane.CurveList)
+        var minVal = double.MaxValue;
+        var maxVal = double.MinValue;
+        foreach (var curve in pane.CurveList)
             if (curve is GasGaugeRegion)
             {
-                GasGaugeRegion ggr = (GasGaugeRegion)curve;
+                var ggr = (GasGaugeRegion)curve;
                 if (maxVal < ggr.MaxValue)
                 {
                     maxVal = ggr.MaxValue;
@@ -530,12 +490,12 @@ public class GasGaugeNeedle
             }
 
         //Set Needle Sweep angle values here based on the min and max values of the GasGuage
-        foreach (CurveItem curve in pane.CurveList)
+        foreach (var curve in pane.CurveList)
         {
             if (curve is GasGaugeNeedle)
             {
-                GasGaugeNeedle ggn = (GasGaugeNeedle)curve;
-                float sweep = ((float)ggn.NeedleValue - (float)minVal) /
+                var ggn = (GasGaugeNeedle)curve;
+                var sweep = ((float)ggn.NeedleValue - (float)minVal) /
                     ((float)maxVal - (float)minVal) * 180.0f;
                 ggn.SweepAngle = sweep;
             }
@@ -567,12 +527,12 @@ public class GasGaugeNeedle
     /// <returns></returns>
     public static RectangleF CalcRectangle (Graphics g, GraphPane pane, float scaleFactor, RectangleF chartRect)
     {
-        RectangleF nonExpRect = chartRect;
+        var nonExpRect = chartRect;
 
         if ((2 * nonExpRect.Height) > nonExpRect.Width)
         {
             //Scale based on width
-            float percentS = ((nonExpRect.Height * 2) - nonExpRect.Width) / (nonExpRect.Height * 2);
+            var percentS = ((nonExpRect.Height * 2) - nonExpRect.Width) / (nonExpRect.Height * 2);
             nonExpRect.Height = ((nonExpRect.Height * 2) - ((nonExpRect.Height * 2) * percentS));
         }
         else
@@ -582,7 +542,7 @@ public class GasGaugeNeedle
 
         nonExpRect.Width = nonExpRect.Height;
 
-        float xDelta = (chartRect.Width / 2) - (nonExpRect.Width / 2);
+        var xDelta = (chartRect.Width / 2) - (nonExpRect.Width / 2);
 
         //Align Horizontally
         nonExpRect.X += xDelta;
@@ -591,11 +551,11 @@ public class GasGaugeNeedle
 
         CalculateGasGaugeParameters (pane);
 
-        foreach (CurveItem curve in pane.CurveList)
+        foreach (var curve in pane.CurveList)
         {
             if (curve is GasGaugeNeedle)
             {
-                GasGaugeNeedle ggn = (GasGaugeNeedle)curve;
+                var ggn = (GasGaugeNeedle)curve;
                 ggn._boundingRectangle = nonExpRect;
             }
         }

@@ -50,7 +50,7 @@ public class GraphPane
     /// <summary>
     /// Subscribe to this event to be notified when <see cref="AxisChange()" /> is called.
     /// </summary>
-    public event AxisChangeEventHandler AxisChangeEvent;
+    public event AxisChangeEventHandler? AxisChangeEvent;
 
     #endregion
 
@@ -380,6 +380,7 @@ public class GraphPane
     public GraphPane()
         : this (new RectangleF (0, 0, 500, 375), "", "", "")
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -394,8 +395,13 @@ public class GraphPane
     /// <param name="title">The <see cref="PaneBase.Title"/> for this <see cref="GraphPane"/></param>
     /// <param name="xTitle">The <see cref="Axis.Title"/> for the <see cref="XAxis"/></param>
     /// <param name="yTitle">The <see cref="Axis.Title"/> for the <see cref="YAxis"/></param>
-    public GraphPane (RectangleF rect, string title,
-        string xTitle, string yTitle)
+    public GraphPane
+        (
+            RectangleF rect,
+            string title,
+            string xTitle,
+            string yTitle
+        )
         : base (title, rect)
     {
         _xAxis = new XAxis (xTitle);
@@ -451,11 +457,7 @@ public class GraphPane
         _zoomStack = new ZoomStateStack (rhs._zoomStack);
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -714,19 +716,11 @@ public class GraphPane
         }
     }
 
-    /// <summary>
-    /// Draw all elements in the <see cref="GraphPane"/> to the specified graphics device.
-    /// </summary>
-    /// <remarks>This method
-    /// should be part of the Paint() update process.  Calling this routine will redraw all
-    /// features of the graph.  No preparation is required other than an instantiated
-    /// <see cref="GraphPane"/> object.
-    /// </remarks>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    public override void Draw (Graphics graphics)
+    /// <inheritdoc cref="PaneBase.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics
+        )
     {
         // Calculate the chart rect, deducting the area for the scales, titles, legend, etc.
         //int		hStack;

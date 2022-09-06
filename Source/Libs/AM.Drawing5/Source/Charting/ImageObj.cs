@@ -15,7 +15,6 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -231,11 +230,7 @@ public class ImageObj
         _isScaled = info.GetBoolean ("isScaled");
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="GraphObj.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -313,8 +308,14 @@ public class ImageObj
     /// <summary>
     /// Determines the shape type and Coords values for this GraphObj
     /// </summary>
-    public override void GetCoords (PaneBase pane, Graphics graphics, float scaleFactor,
-        out string shape, out string coords)
+    public override void GetCoords
+        (
+            PaneBase pane,
+            Graphics graphics,
+            float scaleFactor,
+            out string shape,
+            out string coords
+        )
     {
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
