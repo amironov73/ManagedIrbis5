@@ -1208,7 +1208,7 @@ public abstract class Axis
         )
     {
         // restore the zero line if needed (since the fill tends to cover it up)
-        if (IsVisible && _majorGrid._isZeroLine &&
+        if (IsVisible && _majorGrid.IsZeroLine &&
             Scale._min < 0.0 && Scale._max > 0.0)
         {
             var zeroPix = Scale.Transform (0.0);

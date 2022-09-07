@@ -30,8 +30,6 @@ namespace AM.Drawing.Charting;
 public class MajorGrid
     : MinorGrid, ICloneable
 {
-    internal bool _isZeroLine;
-
     #region Constructors
 
     /// <summary>
@@ -44,7 +42,7 @@ public class MajorGrid
         _penWidth = Default.PenWidth;
         _isVisible = Default.IsVisible;
         _color = Default.Color;
-        _isZeroLine = Default.IsZeroLine;
+        IsZeroLine = Default.IsZeroLine;
     }
 
     /// <summary>
@@ -53,14 +51,10 @@ public class MajorGrid
     /// <param name="rhs">The source <see cref="MajorGrid" /> to be copied.</param>
     public MajorGrid (MajorGrid rhs) : base (rhs)
     {
-        _isZeroLine = rhs._isZeroLine;
+        IsZeroLine = rhs.IsZeroLine;
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -90,11 +84,7 @@ public class MajorGrid
     /// <see cref="Y2Axis.Default.IsZeroLine"/>,
     /// </remarks>
     /// <value>true to show the zero line, false otherwise</value>
-    public bool IsZeroLine
-    {
-        get { return _isZeroLine; }
-        set { _isZeroLine = value; }
-    }
+    public bool IsZeroLine { get; set; }
 
     #endregion
 
@@ -123,7 +113,7 @@ public class MajorGrid
         // backwards compatible as new member variables are added to classes
         info.GetInt32 ("schema2").NotUsed();
 
-        _isZeroLine = info.GetBoolean ("isZeroLine");
+        IsZeroLine = info.GetBoolean ("isZeroLine");
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>
@@ -136,7 +126,7 @@ public class MajorGrid
         base.GetObjectData (info, context);
 
         info.AddValue ("schema2", schema2);
-        info.AddValue ("isZeroLine", _isZeroLine);
+        info.AddValue ("isZeroLine", IsZeroLine);
     }
 
     #endregion

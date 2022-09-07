@@ -80,7 +80,7 @@ public class Y2Axis
         : base (title)
     {
         IsVisible = Default.IsVisible;
-        _majorGrid._isZeroLine = Default.IsZeroLine;
+        _majorGrid.IsZeroLine = Default.IsZeroLine;
         Scale._fontSpec.Angle = -90.0F;
     }
 

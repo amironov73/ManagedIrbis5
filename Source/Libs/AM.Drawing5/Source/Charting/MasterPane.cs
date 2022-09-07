@@ -386,7 +386,6 @@ public class MasterPane
     {
         base.GetObjectData (info, context);
         info.AddValue ("schema2", schema2);
-
         info.AddValue ("paneList", _paneList);
 
         //info.AddValue( "paneLayoutMgr", _paneLayoutMgr );
@@ -564,21 +563,11 @@ public class MasterPane
         }
     }
 
-    /// <summary>
-    /// Render all the <see cref="GraphPane"/> objects in the <see cref="PaneList"/> to the
-    /// specified graphics device.
-    /// </summary>
-    /// <remarks>This method should be part of the Paint() update process.  Calling this routine
-    /// will redraw all
-    /// features of all the <see cref="GraphPane"/> items.  No preparation is required other than
-    /// instantiated <see cref="GraphPane"/> objects that have been added to the list with the
-    /// <see cref="Add"/> method.
-    /// </remarks>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    public override void Draw (Graphics graphics)
+    ///<inheritdoc cref="PaneBase.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics
+        )
     {
         // Save current AntiAlias mode
         var sModeSave = graphics.SmoothingMode;
@@ -667,7 +656,7 @@ public class MasterPane
     /// <see cref="CurveItem"/> object.
     /// </remarks>
     /// <param name="mousePt">The screen point, in pixel coordinates.</param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -686,21 +675,27 @@ public class MasterPane
     /// index will be -1 if no data points are available.</param>
     /// <returns>true if a <see cref="GraphPane"/> was found, false otherwise.</returns>
     /// <seealso cref="GraphPane.FindNearestObject"/>
-    public bool FindNearestPaneObject (PointF mousePt, Graphics g, out GraphPane pane,
-        out object nearestObj, out int index)
+    public bool FindNearestPaneObject
+        (
+            PointF mousePt,
+            Graphics graphics,
+            out GraphPane? pane,
+            out object? nearestObj,
+            out int index
+        )
     {
         pane = null;
         nearestObj = null;
         index = -1;
 
-        GraphObj saveGraphItem = null;
+        GraphObj? saveGraphItem = null;
         var saveIndex = -1;
         var scaleFactor = CalcScaleFactor();
 
         // See if the point is in a GraphObj
         // If so, just save the object and index so we can see if other overlying objects were
         // intersected as well.
-        if (GraphObjList.FindPoint (mousePt, this, g, scaleFactor, out index))
+        if (GraphObjList.FindPoint (mousePt, this, graphics, scaleFactor, out index))
         {
             saveGraphItem = GraphObjList[index];
             saveIndex = index;
@@ -719,7 +714,7 @@ public class MasterPane
             if (tPane.Rect.Contains (mousePt))
             {
                 pane = tPane;
-                return tPane.FindNearestObject (mousePt, g, out nearestObj, out index);
+                return tPane.FindNearestObject (mousePt, graphics, out nearestObj, out index);
             }
         }
 
@@ -741,7 +736,10 @@ public class MasterPane
     /// <param name="mousePt">The mouse point location where you want to search</param>
     /// <returns>A <see cref="GraphPane"/> object that contains the mouse point, or
     /// null if no <see cref="GraphPane"/> was found.</returns>
-    public GraphPane FindPane (PointF mousePt)
+    public GraphPane? FindPane
+        (
+            PointF mousePt
+        )
     {
         foreach (var pane in _paneList)
         {
@@ -761,7 +759,7 @@ public class MasterPane
     /// <param name="mousePt">The mouse point location where you want to search</param>
     /// <returns>A <see cref="GraphPane"/> object that contains the mouse point, or
     /// null if no <see cref="GraphPane"/> was found.</returns>
-    public GraphPane FindChartRect (PointF mousePt)
+    public GraphPane? FindChartRect (PointF mousePt)
     {
         foreach (var pane in _paneList)
         {
@@ -799,20 +797,24 @@ public class MasterPane
     /// to be used.  Overloads are available that provide other layout options</remarks>
     /// <param name="paneLayout">A <see cref="PaneLayout"/> enumeration that describes how
     /// the panes should be laid out within the <see cref="PaneBase.Rect"/>.</param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally created with a call to
     /// the CreateGraphics() method of the Control or Form.
     /// </param>
     /// <seealso cref="SetLayout(Graphics,int,int)" />
     /// <seealso cref="SetLayout(Graphics,bool,int[])" />
     /// <seealso cref="SetLayout(Graphics,bool,int[],float[])" />
-    public void SetLayout (Graphics g, PaneLayout paneLayout)
+    public void SetLayout
+        (
+            Graphics graphics,
+            PaneLayout paneLayout
+        )
     {
         InitLayout();
 
         _paneLayout = paneLayout;
 
-        DoLayout (g);
+        DoLayout (graphics);
     }
 
     /// <summary>
@@ -822,7 +824,7 @@ public class MasterPane
     /// <remarks>This method explicitly specifies the number of rows and columns to use
     /// in the layout, and all <see cref="GraphPane" /> objects will have the same size.
     /// Overloads are available that provide other layout options</remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally created with a call to
     /// the CreateGraphics() method of the Control or Form.
     /// </param>
@@ -833,7 +835,12 @@ public class MasterPane
     /// <seealso cref="SetLayout(Graphics,PaneLayout)" />
     /// <seealso cref="SetLayout(Graphics,bool,int[])" />
     /// <seealso cref="SetLayout(Graphics,bool,int[],float[])" />
-    public void SetLayout (Graphics g, int rows, int columns)
+    public void SetLayout
+        (
+            Graphics graphics,
+            int rows,
+            int columns
+        )
     {
         InitLayout();
 
@@ -852,7 +859,7 @@ public class MasterPane
         for (var i = 0; i < rows; i++)
             countList[i] = columns;
 
-        SetLayout (g, true, countList, null);
+        SetLayout (graphics, true, countList, null);
     }
 
     /// <summary>
@@ -863,7 +870,7 @@ public class MasterPane
     /// columns in each row, allowing for irregular layouts.  Overloads are available that
     /// provide other layout options.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally created with a call to
     /// the CreateGraphics() method of the Control or Form.
     /// </param>
@@ -876,9 +883,14 @@ public class MasterPane
     /// <seealso cref="SetLayout(Graphics,PaneLayout)" />
     /// <seealso cref="SetLayout(Graphics,int,int)" />
     /// <seealso cref="SetLayout(Graphics,bool,int[],float[])" />
-    public void SetLayout (Graphics g, bool isColumnSpecified, int[] countList)
+    public void SetLayout
+        (
+            Graphics graphics,
+            bool isColumnSpecified,
+            int[] countList
+        )
     {
-        SetLayout (g, isColumnSpecified, countList, null);
+        SetLayout (graphics, isColumnSpecified, countList, null);
     }
 
     /// <summary>
@@ -892,7 +904,7 @@ public class MasterPane
     /// <see paramref="proportion" /> parameter is provided that allows varying column or
     /// row sizes.  Overloads for SetLayout() are available that provide other layout options.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally created with a call to
     /// the CreateGraphics() method of the Control or Form.
     /// </param>
@@ -917,12 +929,18 @@ public class MasterPane
     /// <seealso cref="SetLayout(Graphics,PaneLayout)" />
     /// <seealso cref="SetLayout(Graphics,int,int)" />
     /// <seealso cref="SetLayout(Graphics,bool,int[])" />
-    public void SetLayout (Graphics g, bool isColumnSpecified, int[] countList, float[] proportion)
+    public void SetLayout
+        (
+            Graphics graphics,
+            bool isColumnSpecified,
+            int[]? countList,
+            float[]? proportion
+        )
     {
         InitLayout();
 
         // use defaults if the parameters are invalid
-        if (countList != null && countList.Length > 0)
+        if (countList is { Length: > 0 })
         {
             _prop = new float[countList.Length];
 
@@ -943,7 +961,7 @@ public class MasterPane
             _isColumnSpecified = isColumnSpecified;
             _countList = countList;
 
-            DoLayout (g);
+            DoLayout (graphics);
         }
     }
 
@@ -958,11 +976,11 @@ public class MasterPane
     /// <seealso cref="SetLayout(Graphics,int,int)" />
     /// <seealso cref="SetLayout(Graphics,bool,int[])" />
     /// <seealso cref="SetLayout(Graphics,bool,int[],float[])" />
-    public void DoLayout (Graphics g)
+    public void DoLayout (Graphics graphics)
     {
         if (_countList != null)
         {
-            DoLayout (g, _isColumnSpecified, _countList, _prop);
+            DoLayout (graphics, _isColumnSpecified, _countList, _prop);
         }
         else
         {
@@ -983,17 +1001,17 @@ public class MasterPane
                 case PaneLayout.ForceSquare:
                     rows = root;
                     cols = root;
-                    DoLayout (g, rows, cols);
+                    DoLayout (graphics, rows, cols);
                     break;
                 case PaneLayout.SingleColumn:
                     rows = count;
                     cols = 1;
-                    DoLayout (g, rows, cols);
+                    DoLayout (graphics, rows, cols);
                     break;
                 case PaneLayout.SingleRow:
                     rows = 1;
                     cols = count;
-                    DoLayout (g, rows, cols);
+                    DoLayout (graphics, rows, cols);
                     break;
                 default:
                 case PaneLayout.SquareColPreferred:
@@ -1004,7 +1022,7 @@ public class MasterPane
                         rows--;
                     }
 
-                    DoLayout (g, rows, cols);
+                    DoLayout (graphics, rows, cols);
                     break;
                 case PaneLayout.SquareRowPreferred:
                     rows = root;
@@ -1014,31 +1032,39 @@ public class MasterPane
                         cols--;
                     }
 
-                    DoLayout (g, rows, cols);
+                    DoLayout (graphics, rows, cols);
                     break;
+
                 case PaneLayout.ExplicitCol12:
-                    DoLayout (g, true, new int[2] { 1, 2 }, null);
+                    DoLayout (graphics, true, new [] { 1, 2 }, null);
                     break;
+
                 case PaneLayout.ExplicitCol21:
-                    DoLayout (g, true, new int[2] { 2, 1 }, null);
+                    DoLayout (graphics, true, new [] { 2, 1 }, null);
                     break;
+
                 case PaneLayout.ExplicitCol23:
-                    DoLayout (g, true, new int[2] { 2, 3 }, null);
+                    DoLayout (graphics, true, new [] { 2, 3 }, null);
                     break;
+
                 case PaneLayout.ExplicitCol32:
-                    DoLayout (g, true, new int[2] { 3, 2 }, null);
+                    DoLayout (graphics, true, new [] { 3, 2 }, null);
                     break;
+
                 case PaneLayout.ExplicitRow12:
-                    DoLayout (g, false, new int[2] { 1, 2 }, null);
+                    DoLayout (graphics, false, new [] { 1, 2 }, null);
                     break;
+
                 case PaneLayout.ExplicitRow21:
-                    DoLayout (g, false, new int[2] { 2, 1 }, null);
+                    DoLayout (graphics, false, new [] { 2, 1 }, null);
                     break;
+
                 case PaneLayout.ExplicitRow23:
-                    DoLayout (g, false, new int[2] { 2, 3 }, null);
+                    DoLayout (graphics, false, new [] { 2, 3 }, null);
                     break;
+
                 case PaneLayout.ExplicitRow32:
-                    DoLayout (g, false, new int[2] { 3, 2 }, null);
+                    DoLayout (graphics, false, new [] { 3, 2 }, null);
                     break;
             }
         }
@@ -1049,7 +1075,7 @@ public class MasterPane
     /// row and column count.  This method is only called by
     /// <see cref="DoLayout(Graphics)" />.
     /// </summary>
-    internal void DoLayout (Graphics g, int rows, int columns)
+    internal void DoLayout (Graphics graphics, int rows, int columns)
     {
         if (rows < 1)
         {
@@ -1066,7 +1092,7 @@ public class MasterPane
         for (var i = 0; i < rows; i++)
             countList[i] = columns;
 
-        DoLayout (g, true, countList, null);
+        DoLayout (graphics, true, countList, null);
     }
 
     /// <summary>
@@ -1074,15 +1100,20 @@ public class MasterPane
     /// columns per row configuration.  This method is only called by
     /// <see cref="DoLayout(Graphics)" />.
     /// </summary>
-    internal void DoLayout (Graphics g, bool isColumnSpecified, int[] countList,
-        float[] proportion)
+    internal void DoLayout
+        (
+            Graphics graphics,
+            bool isColumnSpecified,
+            int[] countList,
+            float[]? proportion
+        )
     {
         // calculate scaleFactor on "normal" pane size (BaseDimension)
         var scaleFactor = CalcScaleFactor();
 
         // innerRect is the area for the GraphPane's
-        var innerRect = CalcClientRect (g, scaleFactor);
-        Legend.CalcRect (g, this, scaleFactor, ref innerRect);
+        var innerRect = CalcClientRect (graphics, scaleFactor);
+        Legend.CalcRect (graphics, this, scaleFactor, ref innerRect);
 
         // scaled InnerGap is the area between the GraphPane.Rect's
         var scaledInnerGap = _innerPaneGap * scaleFactor;

@@ -61,12 +61,7 @@ class LinearAsOrdinalScale
     }
 
 
-    /// <summary>
-    /// Create a new clone of the current item, with a new owner assignment
-    /// </summary>
-    /// <param name="owner">The new <see cref="Axis" /> instance that will be
-    /// the owner of the new Scale</param>
-    /// <returns>A new <see cref="Scale" /> clone.</returns>
+    /// <inheritdoc cref="Scale.Clone"/>
     public override Scale Clone (Axis owner)
     {
         return new LinearAsOrdinalScale (this, owner);
@@ -76,10 +71,7 @@ class LinearAsOrdinalScale
 
     #region properties
 
-    /// <summary>
-    /// Return the <see cref="AxisType" /> for this <see cref="Scale" />, which is
-    /// <see cref="AxisType.LinearAsOrdinal" />.
-    /// </summary>
+    /// <inheritdoc cref="Scale.Type"/>
     public override AxisType Type
     {
         get { return AxisType.LinearAsOrdinal; }
@@ -89,38 +81,15 @@ class LinearAsOrdinalScale
 
     #region methods
 
-    /// <summary>
-    /// Select a reasonable ordinal axis scale given a range of data values, with the expectation that
-    /// linear values will be displayed.
-    /// </summary>
-    /// <remarks>
-    /// This method only applies to <see cref="AxisType.DateAsOrdinal"/> type axes, and it
-    /// is called by the general <see cref="Scale.PickScale"/> method.  For this type,
-    /// the first curve is the "master", which contains the dates to be applied.
-    /// <para>On Exit:</para>
-    /// <para><see cref="Scale.Min"/> is set to scale minimum (if <see cref="Scale.MinAuto"/> = true)</para>
-    /// <para><see cref="Scale.Max"/> is set to scale maximum (if <see cref="Scale.MaxAuto"/> = true)</para>
-    /// <para><see cref="Scale.MajorStep"/> is set to scale step size (if <see cref="Scale.MajorStepAuto"/> = true)</para>
-    /// <para><see cref="Scale.MinorStep"/> is set to scale minor step size (if <see cref="Scale.MinorStepAuto"/> = true)</para>
-    /// <para><see cref="Scale.Mag"/> is set to a magnitude multiplier according to the data</para>
-    /// <para><see cref="Scale.Format"/> is set to the display format for the values (this controls the
-    /// number of decimal places, whether there are thousands separators, currency types, etc.)</para>
-    /// </remarks>
-    /// <param name="pane">A reference to the <see cref="GraphPane"/> object
-    /// associated with this <see cref="Axis"/></param>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
+    /// <inheritdoc cref="Scale.PickScale"/>
     /// <seealso cref="PickScale"/>
     /// <seealso cref="AxisType.Ordinal"/>
-    public override void PickScale (GraphPane pane, Graphics graphics, float scaleFactor)
+    public override void PickScale
+        (
+            GraphPane pane,
+            Graphics graphics,
+            float scaleFactor
+        )
     {
         // call the base class first
         base.PickScale (pane, graphics, scaleFactor);
@@ -133,7 +102,7 @@ class LinearAsOrdinalScale
         double tMin = 0;
         double tMax = 1;
 
-        foreach (CurveItem curve in pane.CurveList)
+        foreach (var curve in pane.CurveList)
         {
             if ((_ownerAxis is Y2Axis && curve.IsY2Axis) ||
                 (_ownerAxis is YAxis && !curve.IsY2Axis) ||
@@ -154,7 +123,7 @@ class LinearAsOrdinalScale
             }
         }
 
-        double range = Math.Abs (tMax - tMin);
+        var range = Math.Abs (tMax - tMin);
 
         // Now, set the axis range based on a ordinal scale
         base.PickScale (pane, graphics, scaleFactor);
@@ -163,43 +132,26 @@ class LinearAsOrdinalScale
         SetScaleMag (tMin, tMax, range / Default.TargetXSteps);
     }
 
-    /// <summary>
-    /// Make a value label for an <see cref="AxisType.LinearAsOrdinal" /> <see cref="Axis" />.
-    /// </summary>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="index">
-    /// The zero-based, ordinal index of the label to be generated.  For example, a value of 2 would
-    /// cause the third value label on the axis to be generated.
-    /// </param>
-    /// <param name="dVal">
-    /// The numeric value associated with the label.  This value is ignored for log (<see cref="Scale.IsLog"/>)
-    /// and text (<see cref="Scale.IsText"/>) type axes.
-    /// </param>
-    /// <returns>The resulting value label as a <see cref="string" /></returns>
-    internal override string MakeLabel (GraphPane pane, int index, double dVal)
+    /// <inheritdoc cref="Scale.MakeLabel"/>
+    internal override string MakeLabel
+        (
+            GraphPane pane,
+            int index,
+            double dVal
+        )
     {
-        if (_format == null)
-        {
-            _format = Default.Format;
-        }
+        _format ??= Default.Format;
 
-        double val;
-
-        int tmpIndex = (int)dVal - 1;
+        var tmpIndex = (int)dVal - 1;
 
         if (pane.CurveList.Count > 0 && pane.CurveList[0].Points.Count > tmpIndex)
         {
-            val = pane.CurveList[0].Points[tmpIndex].X;
-            double scaleMult = Math.Pow ((double)10.0, _mag);
+            var val = pane.CurveList[0].Points[tmpIndex].X;
+            var scaleMult = Math.Pow (10.0, _mag);
             return (val / scaleMult).ToString (_format);
         }
-        else
-        {
-            return string.Empty;
-        }
+
+        return string.Empty;
     }
 
     #endregion

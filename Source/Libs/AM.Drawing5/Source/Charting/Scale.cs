@@ -2436,7 +2436,7 @@ public abstract class Scale
             }
 
             // Draw a zero-value line if needed
-            if (majorGrid._isZeroLine && _min < 0.0 && _max > 0.0)
+            if (majorGrid.IsZeroLine && _min < 0.0 && _max > 0.0)
             {
                 var zeroPix = LocalTransform (0.0);
                 g.DrawLine (pen, zeroPix, 0.0F, zeroPix, topPix);

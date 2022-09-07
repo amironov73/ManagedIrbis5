@@ -80,7 +80,7 @@ public class YAxis
         : base (title)
     {
         IsVisible = Default.IsVisible;
-        _majorGrid._isZeroLine = Default.IsZeroLine;
+        _majorGrid.IsZeroLine = Default.IsZeroLine;
         if (Scale != null)
         {
             Scale._fontSpec.Angle = 90.0F;

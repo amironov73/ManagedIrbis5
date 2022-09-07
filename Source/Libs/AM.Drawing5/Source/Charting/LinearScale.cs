@@ -56,12 +56,7 @@ class LinearScale
     }
 
 
-    /// <summary>
-    /// Create a new clone of the current item, with a new owner assignment
-    /// </summary>
-    /// <param name="owner">The new <see cref="Axis" /> instance that will be
-    /// the owner of the new Scale</param>
-    /// <returns>A new <see cref="Scale" /> clone.</returns>
+    /// <inheritdoc cref="Scale.Clone"/>
     public override Scale Clone (Axis owner)
     {
         return new LinearScale (this, owner);
@@ -71,56 +66,22 @@ class LinearScale
 
     #region properties
 
-    /// <summary>
-    /// Return the <see cref="AxisType" /> for this <see cref="Scale" />, which is
-    /// <see cref="AxisType.Linear" />.
-    /// </summary>
+    /// <inheritdoc cref="Scale.Type"/>
     public override AxisType Type => AxisType.Linear;
 
     #endregion
 
     #region methods
 
-    /// <summary>
-    /// Select a reasonable linear axis scale given a range of data values.
-    /// </summary>
-    /// <remarks>
-    /// This method only applies to <see cref="AxisType.Linear"/> type axes, and it
-    /// is called by the general <see cref="Scale.PickScale"/> method.  The scale range is chosen
-    /// based on increments of 1, 2, or 5 (because they are even divisors of 10).  This
-    /// method honors the <see cref="Scale.MinAuto"/>, <see cref="Scale.MaxAuto"/>,
-    /// and <see cref="Scale.MajorStepAuto"/> autorange settings.
-    /// In the event that any of the autorange settings are false, the
-    /// corresponding <see cref="Scale.Min"/>, <see cref="Scale.Max"/>, or <see cref="Scale.MajorStep"/>
-    /// setting is explicitly honored, and the remaining autorange settings (if any) will
-    /// be calculated to accomodate the non-autoranged values.  The basic defaults for
-    /// scale selection are defined using <see cref="Scale.Default.ZeroLever"/>,
-    /// <see cref="Scale.Default.TargetXSteps"/>, and <see cref="Scale.Default.TargetYSteps"/>
-    /// from the <see cref="Scale.Default"/> default class.
-    /// <para>On Exit:</para>
-    /// <para><see cref="Scale.Min"/> is set to scale minimum (if <see cref="Scale.MinAuto"/> = true)</para>
-    /// <para><see cref="Scale.Max"/> is set to scale maximum (if <see cref="Scale.MaxAuto"/> = true)</para>
-    /// <para><see cref="Scale.MajorStep"/> is set to scale step size (if <see cref="Scale.MajorStepAuto"/> = true)</para>
-    /// <para><see cref="Scale.MinorStep"/> is set to scale minor step size (if <see cref="Scale.MinorStepAuto"/> = true)</para>
-    /// <para><see cref="Scale.Mag"/> is set to a magnitude multiplier according to the data</para>
-    /// <para><see cref="Scale.Format"/> is set to the display format for the values (this controls the
-    /// number of decimal places, whether there are thousands separators, currency types, etc.)</para>
-    /// </remarks>
-    /// <param name="pane">A reference to the <see cref="GraphPane"/> object
-    /// associated with this <see cref="Axis"/></param>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
+    /// <inheritdoc cref="Scale.PickScale"/>
     /// <seealso cref="PickScale"/>
     /// <seealso cref="AxisType.Linear"/>
-    public override void PickScale (GraphPane pane, Graphics graphics, float scaleFactor)
+    public override void PickScale
+        (
+            GraphPane pane,
+            Graphics graphics,
+            float scaleFactor
+        )
     {
         // call the base class first
         base.PickScale (pane, graphics, scaleFactor);
@@ -130,12 +91,12 @@ class LinearScale
         {
             if (_maxAuto)
             {
-                _max = _max + 0.2 * (_max == 0 ? 1.0 : Math.Abs (_max));
+                _max += 0.2 * (_max == 0 ? 1.0 : Math.Abs (_max));
             }
 
             if (_minAuto)
             {
-                _min = _min - 0.2 * (_min == 0 ? 1.0 : Math.Abs (_min));
+                _min -= 0.2 * (_min == 0 ? 1.0 : Math.Abs (_min));
             }
         }
 
