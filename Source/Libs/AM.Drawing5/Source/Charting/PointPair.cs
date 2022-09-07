@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable InconsistentNaming
 
 /* PointPair.cs --
@@ -15,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.Serialization;
-
 
 #endregion
 
@@ -54,13 +54,14 @@ public class PointPair
 
     #endregion
 
-    #region Constructors
+    #region Construction
 
     /// <summary>
     /// Default Constructor
     /// </summary>
     public PointPair() : this (0, 0, 0, null)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -71,6 +72,7 @@ public class PointPair
     public PointPair (double x, double y)
         : this (x, y, 0, null)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -83,6 +85,7 @@ public class PointPair
     public PointPair (double x, double y, string label)
         : this (x, y, 0, label as object)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -94,6 +97,7 @@ public class PointPair
     public PointPair (double x, double y, double z)
         : this (x, y, z, null)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -107,6 +111,7 @@ public class PointPair
     public PointPair (double x, double y, double z, string? label)
         : this (x, y, z, label as object)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -129,8 +134,10 @@ public class PointPair
     /// </summary>
     /// <param name="pt">The <see cref="PointF"/> struct from which to get the
     /// new <see cref="PointPair"/> values.</param>
-    public PointPair (PointF pt) : this (pt.X, pt.Y, 0, null)
+    public PointPair (PointF pt)
+        : this (pt.X, pt.Y, 0, null)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -151,11 +158,9 @@ public class PointPair
         }
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    #endregion
+
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -169,8 +174,6 @@ public class PointPair
     {
         return new PointPair (this);
     }
-
-    #endregion
 
     #region Serialization
 
@@ -186,22 +189,22 @@ public class PointPair
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected PointPair (SerializationInfo info, StreamingContext context)
+    protected PointPair
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
         : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        var sch = info.GetInt32 ("schema2");
+        info.GetInt32 ("schema2").NotUsed();
 
         Z = info.GetDouble ("Z");
         Tag = info.GetValue ("Tag", typeof (object));
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -225,21 +228,16 @@ public class PointPair
     /// Infinity, or NaN.
     /// </summary>
     /// <returns>true if any value is invalid</returns>
-    public bool IsInvalid3D
-    {
-        get
-        {
-            return X == Missing ||
-                   Y == Missing ||
-                   Z == Missing ||
-                   double.IsInfinity (X) ||
-                   double.IsInfinity (Y) ||
-                   double.IsInfinity (Z) ||
-                   double.IsNaN (X) ||
-                   double.IsNaN (Y) ||
-                   double.IsNaN (Z);
-        }
-    }
+    public bool IsInvalid3D =>
+        X == Missing ||
+        Y == Missing ||
+        Z == Missing ||
+        double.IsInfinity (X) ||
+        double.IsInfinity (Y) ||
+        double.IsInfinity (Z) ||
+        double.IsNaN (X) ||
+        double.IsNaN (Y) ||
+        double.IsNaN (Z);
 
     /// <summary>
     /// The "low" value for this point (lower dependent-axis value).
@@ -248,8 +246,8 @@ public class PointPair
     /// <value>The lower dependent value for this <see cref="PointPair"/>.</value>
     public double LowValue
     {
-        get { return Z; }
-        set { Z = value; }
+        get => Z;
+        set => Z = value;
     }
 
     /// <summary>
@@ -263,130 +261,21 @@ public class PointPair
     /// </remarks>
     public virtual double ColorValue
     {
-        get { return Z; }
-        set { Z = value; }
+        get => Z;
+        set => Z = value;
     }
 
     #endregion
 
     #region Inner classes
 
-#if ( DOTNET1 ) // Is this a .Net 1.1 compilation?
-		/// <summary>
-		/// Compares points based on their y values.  Is setup to be used in an
-		/// ascending order sort.
-		/// <seealso cref="System.Collections.ArrayList.Sort()"/>
-		/// </summary>
-		public class PointPairComparerY : IComparer
-		{
-
-			/// <summary>
-			/// Compares two <see cref="PointPair"/>s.
-			/// </summary>
-			/// <param name="l">Point to the left.</param>
-			/// <param name="r">Point to the right.</param>
-			/// <returns>-1, 0, or 1 depending on l.Y's relation to r.Y</returns>
-			public int Compare( object l, object r )
-			{
-				PointPair pl = (PointPair) l;
-				PointPair pr = (PointPair) r;
-
-				if (pl == null && pr == null)
-				{
-					return 0;
-				}
-				else if (pl == null && pr != null)
-				{
-					return -1;
-				}
-				else if (pl != null && pr == null)
-				{
-					return 1;
-				}
-
-				double lY = pl.Y;
-				double rY = pr.Y;
-
-				if (System.Math.Abs(lY - rY) < .000000001)
-					return 0;
-
-				return lY < rY ? -1 : 1;
-			}
-		}
-
-		/// <summary>
-		/// Compares points based on their x values.  Is setup to be used in an
-		/// ascending order sort.
-		/// <seealso cref="System.Collections.ArrayList.Sort()"/>
-		/// </summary>
-		public class PointPairComparer : IComparer
-		{
-			private SortType sortType;
-
-			/// <summary>
-			/// Constructor for PointPairComparer.
-			/// </summary>
-			/// <param name="type">The axis type on which to sort.</param>
-			public PointPairComparer( SortType type )
-			{
-				this.sortType = type;
-			}
-
-			/// <summary>
-			/// Compares two <see cref="PointPair"/>s.
-			/// </summary>
-			/// <param name="l">Point to the left.</param>
-			/// <param name="r">Point to the right.</param>
-			/// <returns>-1, 0, or 1 depending on l.X's relation to r.X</returns>
-			public int Compare( object l, object r )
-			{
-				PointPair pl = (PointPair) l;
-				PointPair pr = (PointPair) r;
-
-				if ( pl == null && pr == null )
-					return 0;
-				else if ( pl == null && pr != null )
-					return -1;
-				else if ( pl != null && pr == null )
-					return 1;
-
-				double lVal, rVal;
-
-				if ( sortType == SortType.XValues )
-				{
-					lVal = pl.X;
-					rVal = pr.X;
-				}
-				else
-				{
-					lVal = pl.Y;
-					rVal = pr.Y;
-				}
-
-				if ( lVal == PointPair.Missing || Double.IsInfinity( lVal ) || Double.IsNaN( lVal ) )
-					pl = null;
-				if ( rVal == PointPair.Missing || Double.IsInfinity( rVal ) || Double.IsNaN( rVal ) )
-					pr = null;
-
-				if ( ( pl == null && pr == null ) || ( System.Math.Abs( lVal - rVal ) < 1e-10 ) )
-					return 0;
-				else if ( pl == null && pr != null )
-					return -1;
-				else if ( pl != null && pr == null )
-					return 1;
-				else
-					return lVal < rVal ? -1 : 1;
-			}
-		}
-
-#else // Otherwise, it's .Net 2.0, so use generics
-
     /// <summary>
     /// Compares points based on their y values.  Is setup to be used in an
     /// ascending order sort.
     /// <seealso cref="System.Collections.ArrayList.Sort()"/>
     /// </summary>
-    public class PointPairComparerY : IComparer<PointPair>
+    public class PointPairComparerY
+        : IComparer<PointPair>
     {
         /// <summary>
         /// Compares two <see cref="PointPair"/>s.
@@ -501,8 +390,6 @@ public class PointPair
             return lVal < rVal ? -1 : 1;
         }
     }
-
-#endif
 
     #endregion
 

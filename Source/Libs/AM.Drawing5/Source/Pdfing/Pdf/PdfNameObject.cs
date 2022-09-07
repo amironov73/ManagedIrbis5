@@ -49,7 +49,7 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public PdfNameObject()
         {
-            _value = "/"; // Empty name.
+            Value = "/"; // Empty name.
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace PdfSharpCore.Pdf
                 throw new ArgumentException (PSSR.NameMustStartWithSlash);
             }
 
-            _value = value;
+            Value = value;
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public override bool Equals (object? obj)
         {
-            return _value.Equals (obj);
+            return Value.Equals (obj);
         }
 
         /// <summary>
@@ -86,43 +86,35 @@ namespace PdfSharpCore.Pdf
         /// </summary>
         public override int GetHashCode()
         {
-            return _value.GetHashCode();
+            return Value.GetHashCode();
         }
 
         /// <summary>
         /// Gets or sets the name value.
         /// </summary>
-        public string Value
-        {
-            get { return _value; }
-            set { _value = value; }
-        }
+        public string Value { get; set; }
 
-        string _value;
-
-        /// <summary>
-        /// Returns the name. The string always begins with a slash.
-        /// </summary>
+        /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
             // TODO: Encode characters.
-            return _value;
+            return Value;
         }
 
         /// <summary>
         /// Determines whether a name is equal to a string.
         /// </summary>
-        public static bool operator == (PdfNameObject name, string str)
+        public static bool operator == (PdfNameObject? name, string? str)
         {
-            return name._value == str;
+            return name?.Value == str;
         }
 
         /// <summary>
         /// Determines whether a name is not equal to a string.
         /// </summary>
-        public static bool operator != (PdfNameObject name, string str)
+        public static bool operator != (PdfNameObject? name, string? str)
         {
-            return name._value != str;
+            return name?.Value != str;
         }
 
 #if leads_to_ambiguity
@@ -153,7 +145,7 @@ namespace PdfSharpCore.Pdf
         internal override void WriteObject (PdfWriter writer)
         {
             writer.WriteBeginObject (this);
-            writer.Write (new PdfName (_value));
+            writer.Write (new PdfName (Value));
             writer.WriteEndObject();
         }
     }

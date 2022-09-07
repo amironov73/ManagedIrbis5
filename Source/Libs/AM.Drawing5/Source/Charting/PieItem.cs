@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* PieItem.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -112,12 +113,6 @@ public class PieItem
     private PointF _endPoint;
 
     /// <summary>
-    /// Private field to hold the GraphicsPath of this <see cref="PieItem"/> to be
-    /// used for 'hit testing'.
-    /// </summary>
-    private GraphicsPath _slicePath;
-
-    /// <summary>
     /// Private field which holds the angle (in degrees) at which the display of this <see cref="PieItem"/>
     /// object will begin.
     /// </summary>
@@ -196,7 +191,7 @@ public class PieItem
         /// The default custom brush for filling in the PieItem.
         /// (<see cref="Fill.Brush"/> property).
         /// </summary>
-        public static Brush FillBrush = null;
+        public static Brush? FillBrush = null;
 
         /// <summary>
         ///Default value for controlling <see cref="PieItem"/> display.
@@ -238,26 +233,23 @@ public class PieItem
     /// </summary>
     public double Displacement
     {
-        get { return (_displacement); }
-        set { _displacement = value > .5 ? .5 : value; }
+        get => _displacement;
+        set => _displacement = value > .5 ? .5 : value;
     }
 
     /// <summary>
     /// Gets a path representing this <see cref="PieItem"/>
     /// </summary>
-    public GraphicsPath SlicePath
-    {
-        get { return _slicePath; }
-    }
+    public GraphicsPath? SlicePath { get; private set; }
 
     /// <summary>
     /// Gets or sets the <see cref="TextObj"/> to be used
     /// for displaying this <see cref="PieItem"/>'s label.
     /// </summary>
-    public TextObj LabelDetail
+    public TextObj? LabelDetail
     {
-        get { return _labelDetail; }
-        set { _labelDetail = value; }
+        get => _labelDetail;
+        set => _labelDetail = value;
     }
 
     /// <summary>
@@ -266,8 +258,8 @@ public class PieItem
     /// </summary>
     public Border Border
     {
-        get { return (_border); }
-        set { _border = value; }
+        get => _border;
+        set => _border = value;
     }
 
     /// <summary>
@@ -276,8 +268,8 @@ public class PieItem
     /// </summary>
     public Fill Fill
     {
-        get { return _fill; }
-        set { _fill = value; }
+        get => _fill;
+        set => _fill = value;
     }
 
     /// <summary>
@@ -285,8 +277,8 @@ public class PieItem
     /// </summary>
     private float SweepAngle
     {
-        get { return _sweepAngle; }
-        set { _sweepAngle = value; }
+        get => _sweepAngle;
+        set => _sweepAngle = value;
     }
 
     /// <summary>
@@ -294,8 +286,8 @@ public class PieItem
     /// </summary>
     private float StartAngle
     {
-        get { return (_startAngle); }
-        set { _startAngle = value; }
+        get => _startAngle;
+        set => _startAngle = value;
     }
 
     /// <summary>
@@ -304,8 +296,8 @@ public class PieItem
     /// </summary>
     private float MidAngle
     {
-        get { return (_midAngle); }
-        set { _midAngle = value; }
+        get => _midAngle;
+        set => _midAngle = value;
     }
 
     /// <summary>
@@ -314,8 +306,8 @@ public class PieItem
     /// </summary>
     public double Value
     {
-        get { return (_pieValue); }
-        set { _pieValue = value > 0 ? value : 0; }
+        get => _pieValue;
+        set => _pieValue = value > 0 ? value : 0;
     }
 
     /// <summary>
@@ -324,7 +316,7 @@ public class PieItem
     /// </summary>
     public PieLabelType LabelType
     {
-        get { return (_labelType); }
+        get => _labelType;
         set
         {
             _labelType = value;
@@ -345,8 +337,8 @@ public class PieItem
     /// </summary>
     public int ValueDecimalDigits
     {
-        get { return (_valueDecimalDigits); }
-        set { _valueDecimalDigits = value; }
+        get => _valueDecimalDigits;
+        set => _valueDecimalDigits = value;
     }
 
     /// <summary>
@@ -355,8 +347,8 @@ public class PieItem
     /// </summary>
     public int PercentDecimalDigits
     {
-        get { return (_percentDecimalDigits); }
-        set { _percentDecimalDigits = value; }
+        get => _percentDecimalDigits;
+        set => _percentDecimalDigits = value;
     }
 
     /*
@@ -369,23 +361,14 @@ public class PieItem
         set { this.pieType = value; }
     }
 */
-    /// <summary>
-    /// Gets a flag indicating if the Z data range should be included in the axis scaling calculations.
-    /// </summary>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the Z data are included, false otherwise</value>
+
+    /// <inheritdoc cref="CurveItem.IsZIncluded"/>
     internal override bool IsZIncluded (GraphPane pane)
     {
         return false;
     }
 
-    /// <summary>
-    /// Gets a flag indicating if the X axis is the independent axis for this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the X axis is independent, false otherwise</value>
+    /// <inheritdoc cref="CurveItem.IsXIndependent"/>
     internal override bool IsXIndependent (GraphPane pane)
     {
         return true;
@@ -407,8 +390,15 @@ public class PieItem
     /// <param name="displacement">The amount this <see cref="PieItem"/>  instance will be
     /// displaced from the center point.</param>
     /// <param name="label">Text label for this <see cref="PieItem"/> instance.</param>
-    public PieItem (double pieValue, Color color1, Color color2, float fillAngle,
-        double displacement, string label)
+    public PieItem
+        (
+            double pieValue,
+            Color color1,
+            Color color2,
+            float fillAngle,
+            double displacement,
+            string label
+        )
         :
         this (pieValue, color1, displacement, label)
     {
@@ -426,7 +416,13 @@ public class PieItem
     /// <param name="displacement">The amount this <see cref="PieItem"/>  instance will be
     /// displaced from the center point.</param>
     /// <param name="label">Text label for this <see cref="PieItem"/> instance.</param>
-    public PieItem (double pieValue, Color color, double displacement, string label)
+    public PieItem
+        (
+            double pieValue,
+            Color color,
+            double displacement,
+            string label
+        )
         : base (label)
     {
         _pieValue = pieValue;
@@ -438,7 +434,7 @@ public class PieItem
         _labelType = Default.LabelType;
         _valueDecimalDigits = Default.ValueDecimalDigits;
         _percentDecimalDigits = Default.PercentDecimalDigits;
-        _slicePath = null;
+        SlicePath = null;
     }
 
     /// <summary>
@@ -580,14 +576,14 @@ public class PieItem
         if (pane.Chart._rect.Width <= 0 && pane.Chart._rect.Height <= 0)
         {
             //pane.PieRect = RectangleF.Empty;
-            _slicePath = null;
+            SlicePath = null;
         }
         else
         {
             //pane.PieRect = CalcPieRect( g, pane, scaleFactor, pane.ChartRect );
             CalcPieRect (graphics, pane, scaleFactor, pane.Chart._rect);
 
-            _slicePath = new GraphicsPath();
+            SlicePath = new GraphicsPath();
 
             if (!IsVisible)
             {
@@ -615,7 +611,7 @@ public class PieItem
                         SweepAngle);
 
                     //add GraphicsPath for hit testing
-                    _slicePath.AddPie (tRect.X, tRect.Y, tRect.Width, tRect.Height,
+                    SlicePath.AddPie (tRect.X, tRect.Y, tRect.Width, tRect.Height,
                         StartAngle, SweepAngle);
 
                     if (Border.IsVisible)
@@ -952,16 +948,16 @@ public class PieItem
     private void CalculateLinePoints (RectangleF rect, double midAngle)
     {
         //get the point where the explosion radius intersects the this arc
-        var rectCenter = new PointF ((rect.X + rect.Width / 2), (rect.Y + rect.Height / 2));
+        var rectCenter = new PointF (rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
 
         _intersectionPoint = new PointF (
-            (float)(rectCenter.X + (rect.Width / 2 * Math.Cos ((midAngle) * Math.PI / 180))),
-            (float)(rectCenter.Y + (rect.Height / 2 * Math.Sin ((midAngle) * Math.PI / 180))));
+            (float)(rectCenter.X + rect.Width / 2 * Math.Cos (midAngle * Math.PI / 180)),
+            (float)(rectCenter.Y + rect.Height / 2 * Math.Sin (midAngle * Math.PI / 180)));
 
         //draw line from intersection point to pivot point - length to be .05 * pieRect.Width pixels long
         _pivotPoint = new PointF (
-            (float)(_intersectionPoint.X + .05 * rect.Width * Math.Cos ((midAngle) * Math.PI / 180)),
-            (float)(_intersectionPoint.Y + .05 * rect.Width * Math.Sin ((midAngle) * Math.PI / 180)));
+            (float)(_intersectionPoint.X + .05 * rect.Width * Math.Cos (midAngle * Math.PI / 180)),
+            (float)(_intersectionPoint.Y + .05 * rect.Width * Math.Sin (midAngle * Math.PI / 180)));
 
         //add horizontal line to move label away from pie...length to be 5% of rect.Width
         //does line go to left or right....label alignment is to the opposite
@@ -1040,32 +1036,20 @@ public class PieItem
         //go beyond nonExplRect, but want to maintain the same center point...therefore, got to
         //reduce the diameter of the nonexploded pie by the alue of the displacement
 
-        var xDispl = (float)((maxDisplacement * baseRect.Width));
-        var yDispl = (float)((maxDisplacement * baseRect.Height));
+        var xDispl = (float)(maxDisplacement * baseRect.Width);
+        var yDispl = (float)(maxDisplacement * baseRect.Height);
 
-        baseRect.Inflate (-(float)((xDispl / 10)), -(float)((xDispl / 10)));
+        baseRect.Inflate (-(float)(xDispl / 10), -(float)(xDispl / 10));
     }
 
-    /// <summary>
-    /// Draw a legend key entry for this <see cref="PieItem"/> at the specified location
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="rect">The <see cref="RectangleF"/> struct that specifies the
-    /// location for the legend key</param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor)
+    /// <inheritdoc cref="CurveItem.DrawLegendKey"/>
+    public override void DrawLegendKey
+        (
+            Graphics graphics,
+            GraphPane pane,
+            RectangleF rect,
+            float scaleFactor
+        )
     {
         if (!IsVisible)
         {
@@ -1091,15 +1075,7 @@ public class PieItem
         }
     }
 
-    /// <summary>
-    /// Determine the coords for the rectangle associated with a specified point for
-    /// this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The <see cref="GraphPane" /> to which this curve belongs</param>
-    /// <param name="i">The index of the point of interest</param>
-    /// <param name="coords">A list of coordinates that represents the "rect" for
-    /// this point (used in an html AREA tag)</param>
-    /// <returns>true if it's a valid point, false otherwise</returns>
+    /// <inheritdoc cref="CurveItem.GetCoords"/>
     public override bool GetCoords
         (
             GraphPane pane,

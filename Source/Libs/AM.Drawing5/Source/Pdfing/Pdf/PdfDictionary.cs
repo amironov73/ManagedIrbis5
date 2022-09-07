@@ -314,14 +314,14 @@ public class PdfDictionary
         internal DictionaryElements (PdfDictionary ownerDictionary)
         {
             _elements = new Dictionary<string, PdfItem>();
-            _ownerDictionary = ownerDictionary;
+            Owner = ownerDictionary;
         }
 
         object ICloneable.Clone()
         {
             var dictionaryElements = (DictionaryElements)MemberwiseClone();
             dictionaryElements._elements = new Dictionary<string, PdfItem> (dictionaryElements._elements);
-            dictionaryElements._ownerDictionary = null;
+            dictionaryElements.Owner = null;
             return dictionaryElements;
         }
 
@@ -338,25 +338,24 @@ public class PdfDictionary
         /// </summary>
         internal void ChangeOwner (PdfDictionary? ownerDictionary)
         {
-            if (_ownerDictionary != null)
+            if (Owner != null)
             {
                 // ???
             }
 
             // Set new owner.
-            _ownerDictionary = ownerDictionary;
-
-            // Set owners elements to this.
-            ownerDictionary._elements = this;
+            Owner = ownerDictionary;
+            if (ownerDictionary is not null)
+            {
+                // Set owners elements to this.
+                ownerDictionary._elements = this;
+            }
         }
 
         /// <summary>
         /// Gets the dictionary to which this elements object belongs to.
         /// </summary>
-        internal PdfDictionary Owner
-        {
-            get { return _ownerDictionary; }
-        }
+        internal PdfDictionary? Owner { get; private set; }
 
         /// <summary>
         /// Converts the specified value to boolean.
@@ -365,7 +364,7 @@ public class PdfDictionary
         /// </summary>
         public bool GetBoolean (string key, bool create)
         {
-            object obj = this[key];
+            object? obj = this[key];
             if (obj == null)
             {
                 if (create)
@@ -419,7 +418,7 @@ public class PdfDictionary
         /// </summary>
         public int GetInteger (string key, bool create)
         {
-            object obj = this[key];
+            object? obj = this[key];
             if (obj == null)
             {
                 if (create)
@@ -478,7 +477,7 @@ public class PdfDictionary
         /// </summary>
         public double GetReal (string key, bool create)
         {
-            object obj = this[key];
+            object? obj = this[key];
             if (obj == null)
             {
                 if (create)
@@ -541,7 +540,7 @@ public class PdfDictionary
         /// </summary>
         public string GetString (string key, bool create)
         {
-            object obj = this[key];
+            object? obj = this[key];
             if (obj == null)
             {
                 if (create)
@@ -594,10 +593,10 @@ public class PdfDictionary
         /// <summary>
         /// Tries to get the string. TODO: more TryGet...
         /// </summary>
-        public bool TryGetString (string key, out string value)
+        public bool TryGetString (string key, out string? value)
         {
             value = null;
-            object obj = this[key];
+            object? obj = this[key];
             if (obj == null)
             {
                 return false;
@@ -614,8 +613,7 @@ public class PdfDictionary
                 return true;
             }
 
-            var strObject = obj as PdfStringObject;
-            if (strObject != null)
+            if (obj is PdfStringObject strObject)
             {
                 value = strObject.Value;
                 return true;
@@ -884,7 +882,7 @@ public class PdfDictionary
                 throw new ArgumentException ("defaultValue");
             }
 
-            object obj = this[key];
+            object? obj = this[key];
             if (obj == null)
             {
                 if (create)
@@ -950,7 +948,7 @@ public class PdfDictionary
 
                         if (options == VCF.CreateIndirect)
                         {
-                            _ownerDictionary.Owner._irefTable.Add (obj);
+                            Owner.Owner._irefTable.Add (obj);
                             this[key] = obj.Reference;
                         }
                         else
@@ -1064,7 +1062,7 @@ public class PdfDictionary
         Type GetValueType (string key) // TODO: move to PdfObject
         {
             Type? type = null;
-            var meta = _ownerDictionary.Meta;
+            var meta = Owner.Meta;
             if (meta != null)
             {
                 var kd = meta[key];
@@ -1103,7 +1101,7 @@ public class PdfDictionary
                     var parameters = ctorInfo.GetParameters();
                     if (parameters.Length == 1 && parameters[0].ParameterType == typeof (PdfDocument))
                     {
-                        array = ctorInfo.Invoke (new object[] { _ownerDictionary.Owner }) as PdfArray;
+                        array = ctorInfo.Invoke (new object[] { Owner.Owner }) as PdfArray;
                         break;
                     }
                 }
@@ -1155,7 +1153,7 @@ public class PdfDictionary
                     var parameters = ctorInfo.GetParameters();
                     if (parameters.Length == 1 && parameters[0].ParameterType == typeof (PdfDocument))
                     {
-                        dict = ctorInfo.Invoke (new object[] { _ownerDictionary.Owner }) as PdfDictionary;
+                        dict = ctorInfo.Invoke (new object[] { Owner.Owner }) as PdfDictionary;
                         break;
                     }
                 }
@@ -1195,7 +1193,7 @@ public class PdfDictionary
                 var parameters = ctorInfo.GetParameters();
                 if (parameters.Length == 1 && parameters[0].ParameterType == typeof (PdfDocument))
                 {
-                    obj = ctorInfo.Invoke (new object[] { _ownerDictionary.Owner }) as PdfObject;
+                    obj = ctorInfo.Invoke (new object[] { Owner.Owner }) as PdfObject;
                     break;
                 }
             }
@@ -1637,12 +1635,7 @@ public class PdfDictionary
         /// The elements of the dictionary with a string as key.
         /// Because the string is a name it starts always with a '/'.
         /// </summary>
-        Dictionary<string, PdfItem> _elements;
-
-        /// <summary>
-        /// The dictionary this objects belongs to.
-        /// </summary>
-        PdfDictionary? _ownerDictionary;
+        Dictionary<string, PdfItem?> _elements;
     }
 
     /// <summary>

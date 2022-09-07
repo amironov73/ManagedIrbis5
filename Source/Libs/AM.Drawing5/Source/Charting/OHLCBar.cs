@@ -256,10 +256,19 @@ public class OHLCBar
     /// The scaled width of the candlesticks, pixels</param>
     /// <param name="pen">A pen with attributes of <see cref="Color"/> and
     /// <see cref="LineBase.Width"/> for this <see cref="OHLCBar"/></param>
-    public void Draw (Graphics graphics, GraphPane pane, bool isXBase,
-        float pixBase, float pixHigh, float pixLow,
-        float pixOpen, float pixClose,
-        float halfSize, Pen pen)
+    public void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            bool isXBase,
+            float pixBase,
+            float pixHigh,
+            float pixLow,
+            float pixOpen,
+            float pixClose,
+            float halfSize,
+            Pen pen
+        )
     {
         if (pixBase != PointPairBase.Missing)
         {

@@ -37,10 +37,10 @@ namespace AM.Drawing.Charting;
 /// are ignored.
 /// </remarks>
 [Serializable]
-class OrdinalScale
+internal class OrdinalScale
     : Scale
 {
-    #region constructors
+    #region Construction
 
     /// <summary>
     /// Default constructor that defines the owner <see cref="Axis" />
@@ -50,6 +50,7 @@ class OrdinalScale
     public OrdinalScale (Axis owner)
         : base (owner)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -61,7 +62,10 @@ class OrdinalScale
     public OrdinalScale (Scale rhs, Axis owner)
         : base (rhs, owner)
     {
+        // пустое тело конструктора
     }
+
+    #endregion
 
     /// <summary>
     /// Create a new clone of the current item, with a new owner assignment
@@ -74,63 +78,23 @@ class OrdinalScale
         return new OrdinalScale (this, owner);
     }
 
-    #endregion
+    #region Properties
 
-    #region properties
-
-    /// <summary>
-    /// Return the <see cref="AxisType" /> for this <see cref="Scale" />, which is
-    /// <see cref="AxisType.Ordinal" />.
-    /// </summary>
-    public override AxisType Type
-    {
-        get { return AxisType.Ordinal; }
-    }
+    /// <inheritdoc cref="Scale.Type"/>
+    public override AxisType Type => AxisType.Ordinal;
 
     #endregion
 
     #region methods
 
-    /// <summary>
-    /// Select a reasonable ordinal axis scale given a range of data values.
-    /// </summary>
-    /// <remarks>
-    /// This method only applies to <see cref="AxisType.Ordinal"/> type axes, and it
-    /// is called by the general <see cref="Scale.PickScale"/> method.  The scale range is chosen
-    /// based on increments of 1, 2, or 5 (because they are even divisors of 10).
-    /// Being an ordinal axis type, the <see cref="Scale.MajorStep" /> value will always be integral.  This
-    /// method honors the <see cref="Scale.MinAuto" />, <see cref="Scale.MaxAuto" />,
-    /// and <see cref="Scale.MajorStepAuto" /> autorange settings.
-    /// In the event that any of the autorange settings are false, the
-    /// corresponding <see cref="Scale.Min" />, <see cref="Scale.Max" />, or <see cref="Scale.MajorStep" />
-    /// setting is explicitly honored, and the remaining autorange settings (if any) will
-    /// be calculated to accomodate the non-autoranged values.  The basic defaults for
-    /// scale selection are defined using <see cref="Scale.Default.ZeroLever" />,
-    /// <see cref="Scale.Default.TargetXSteps" />, and <see cref="Scale.Default.TargetYSteps" />
-    /// from the <see cref="Scale.Default" /> default class.
-    /// <para>On Exit:</para>
-    /// <para><see cref="Scale.Min"/> is set to scale minimum (if <see cref="Scale.MinAuto"/> = true)</para>
-    /// <para><see cref="Scale.Max"/> is set to scale maximum (if <see cref="Scale.MaxAuto"/> = true)</para>
-    /// <para><see cref="Scale.MajorStep"/> is set to scale step size (if <see cref="Scale.MajorStepAuto"/> = true)</para>
-    /// <para><see cref="Scale.MinorStep"/> is set to scale minor step size (if <see cref="Scale.MinorStepAuto"/> = true)</para>
-    /// <para><see cref="Scale.Mag"/> is set to a magnitude multiplier according to the data</para>
-    /// <para><see cref="Scale.Format"/> is set to the display format for the values (this controls the
-    /// number of decimal places, whether there are thousands separators, currency types, etc.)</para>
-    /// </remarks>
-    /// <param name="pane">A reference to the <see cref="GraphPane"/> object
-    /// associated with this <see cref="Axis"/></param>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
+    /// <inheritdoc cref="Scale.PickScale"/>
     /// <seealso cref="AxisType.Ordinal"/>
-    public override void PickScale (GraphPane pane, Graphics graphics, float scaleFactor)
+    public override void PickScale
+        (
+            GraphPane pane,
+            Graphics graphics,
+            float scaleFactor
+        )
     {
         // call the base class first
         base.PickScale (pane, graphics, scaleFactor);
@@ -138,7 +102,13 @@ class OrdinalScale
         PickScale (pane, graphics, scaleFactor, this);
     }
 
-    internal static void PickScale (GraphPane pane, Graphics graphics, float scaleFactor, Scale scale)
+    internal static void PickScale
+        (
+            GraphPane pane,
+            Graphics graphics,
+            float scaleFactor,
+            Scale scale
+        )
     {
         // Test for trivial condition of range = 0 and pick a suitable default
         if (scale._max - scale._min < 1.0)
@@ -166,10 +136,10 @@ class OrdinalScale
                 if (scale.IsPreventLabelOverlap)
                 {
                     // Calculate the maximum number of labels
-                    double maxLabels = (double)scale.CalcMaxLabels (graphics, pane, scaleFactor);
+                    var maxLabels = (double)scale.CalcMaxLabels (graphics, pane, scaleFactor);
 
                     // Calculate a step size based on the width of the labels
-                    double tmpStep = Math.Ceiling ((scale._max - scale._min) / maxLabels);
+                    var tmpStep = Math.Ceiling ((scale._max - scale._min) / maxLabels);
 
                     // Use the greater of the two step sizes
                     if (tmpStep > scale._majorStep)
