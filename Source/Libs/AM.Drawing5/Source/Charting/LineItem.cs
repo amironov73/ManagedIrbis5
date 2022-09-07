@@ -14,7 +14,6 @@
 using System;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -59,23 +58,13 @@ public class LineItem
         set { _line = value; }
     }
 
-    /// <summary>
-    /// Gets a flag indicating if the Z data range should be included in the axis scaling calculations.
-    /// </summary>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the Z data are included, false otherwise</value>
+    /// <inheritdoc cref="CurveItem.IsZIncluded"/>
     internal override bool IsZIncluded (GraphPane pane)
     {
         return false;
     }
 
-    /// <summary>
-    /// Gets a flag indicating if the X axis is the independent axis for this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The parent <see cref="GraphPane" /> of this <see cref="CurveItem" />.
-    /// </param>
-    /// <value>true if the X axis is independent, false otherwise</value>
+    /// <inheritdoc cref="CurveItem.IsXIndependent"/>
     internal override bool IsXIndependent (GraphPane pane)
     {
         return true;
@@ -89,7 +78,8 @@ public class LineItem
     /// Create a new <see cref="LineItem"/>, specifying only the legend <see cref="CurveItem.Label" />.
     /// </summary>
     /// <param name="label">The _label that will appear in the legend.</param>
-    public LineItem (string label) : base (label)
+    public LineItem (string label)
+        : base (label)
     {
         Symbol = new Symbol();
         _line = new Line();
@@ -112,9 +102,18 @@ public class LineItem
     /// <param name="lineWidth">The width (in points) to be used for the <see cref="Line"/>.  This
     /// width is scaled based on <see cref="PaneBase.CalcScaleFactor"/>.  Use a value of zero to
     /// hide the line (see <see cref="LineBase.IsVisible"/>).</param>
-    public LineItem (string label, double[] x, double[] y, Color color, SymbolType symbolType, float lineWidth)
+    public LineItem
+        (
+            string label,
+            double[] x,
+            double[] y,
+            Color color,
+            SymbolType symbolType,
+            float lineWidth
+        )
         : this (label, new PointPairList (x, y), color, symbolType, lineWidth)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -131,9 +130,17 @@ public class LineItem
     /// <param name="symbolType">A <see cref="SymbolType"/> enum specifying the
     /// type of symbol to use for this <see cref="LineItem"/>.  Use <see cref="SymbolType.None"/>
     /// to hide the symbols.</param>
-    public LineItem (string label, double[] x, double[] y, Color color, SymbolType symbolType)
+    public LineItem
+        (
+            string label,
+            double[] x,
+            double[] y,
+            Color color,
+            SymbolType symbolType
+        )
         : this (label, new PointPairList (x, y), color, symbolType)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -151,7 +158,14 @@ public class LineItem
     /// <param name="lineWidth">The width (in points) to be used for the <see cref="Line"/>.  This
     /// width is scaled based on <see cref="PaneBase.CalcScaleFactor"/>.  Use a value of zero to
     /// hide the line (see <see cref="LineBase.IsVisible"/>).</param>
-    public LineItem (string label, IPointList points, Color color, SymbolType symbolType, float lineWidth)
+    public LineItem
+        (
+            string label,
+            IPointList points,
+            Color color,
+            SymbolType symbolType,
+            float lineWidth
+        )
         : base (label, points)
     {
         _line = new Line (color);
@@ -179,26 +193,35 @@ public class LineItem
     /// <param name="symbolType">A <see cref="SymbolType"/> enum specifying the
     /// type of symbol to use for this <see cref="LineItem"/>.  Use <see cref="SymbolType.None"/>
     /// to hide the symbols.</param>
-    public LineItem (string label, IPointList points, Color color, SymbolType symbolType)
+    public LineItem
+        (
+            string label,
+            IPointList points,
+            Color color,
+            SymbolType symbolType
+        )
         : this (label, points, color, symbolType, LineBase.Default.Width)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
     /// The Copy Constructor
     /// </summary>
     /// <param name="rhs">The <see cref="LineItem"/> object from which to copy</param>
-    public LineItem (LineItem rhs) : base (rhs)
+    public LineItem
+        (
+            LineItem rhs
+        )
+        : base (rhs)
     {
         Symbol = new Symbol (rhs.Symbol);
         _line = new Line (rhs.Line);
     }
 
-    /// <summary>
-    /// Implement the <see cref="ICloneable" /> interface in a typesafe manner by just
-    /// calling the typed version of <see cref="Clone" />
-    /// </summary>
-    /// <returns>A deep copy of this object</returns>
+    #endregion
+
+    /// <inheritdoc cref="ICloneable.Clone"/>
     object ICloneable.Clone()
     {
         return Clone();
@@ -212,8 +235,6 @@ public class LineItem
     {
         return new LineItem (this);
     }
-
-    #endregion
 
     #region Serialization
 
@@ -229,21 +250,22 @@ public class LineItem
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected LineItem (SerializationInfo info, StreamingContext context) : base (info, context)
+    protected LineItem
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        info.GetInt32 ("schema2").NotUsed();
 
         Symbol = (Symbol)info.GetValue ("symbol", typeof (Symbol));
         _line = (Line)info.GetValue ("line", typeof (Line));
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -260,29 +282,14 @@ public class LineItem
 
     #region Methods
 
-    /// <summary>
-    /// Do all rendering associated with this <see cref="LineItem"/> to the specified
-    /// <see cref="Graphics"/> device.  This method is normally only
-    /// called by the Draw method of the parent <see cref="CurveList"/>
-    /// collection object.
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="pos">The ordinal position of the current <see cref="Bar"/>
-    /// curve.</param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    public override void Draw (Graphics graphics, GraphPane pane, int pos, float scaleFactor)
+    /// <inheritdoc cref="CurveItem.Draw"/>
+    public override void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            int pos,
+            float scaleFactor
+        )
     {
         if (IsVisible)
         {
@@ -292,30 +299,18 @@ public class LineItem
         }
     }
 
-    /// <summary>
-    /// Draw a legend key entry for this <see cref="LineItem"/> at the specified location
-    /// </summary>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="rect">The <see cref="RectangleF"/> struct that specifies the
-    /// location for the legend key</param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    public override void DrawLegendKey (Graphics graphics, GraphPane pane, RectangleF rect, float scaleFactor)
+    /// <inheritdoc cref="CurveItem.DrawLegendKey"/>
+    public override void DrawLegendKey
+        (
+            Graphics graphics,
+            GraphPane pane,
+            RectangleF rect,
+            float scaleFactor
+        )
     {
         // Draw a sample curve to the left of the label text
-        int xMid = (int)(rect.Left + rect.Width / 2.0F);
-        int yMid = (int)(rect.Top + rect.Height / 2.0F);
+        var xMid = (int)(rect.Left + rect.Width / 2.0F);
+        var yMid = (int)(rect.Top + rect.Height / 2.0F);
 
         //RectangleF rect2 = rect;
         //rect2.Y = yMid;
@@ -329,32 +324,23 @@ public class LineItem
         Symbol.DrawSymbol (graphics, pane, xMid, yMid, scaleFactor, false, null);
     }
 
-    /// <summary>
-    /// Loads some pseudo unique colors/symbols into this LineItem.  This
-    /// is mainly useful for differentiating a set of new LineItems without
-    /// having to pick your own colors/symbols.
-    /// <seealso cref="CurveItem.MakeUnique( ColorSymbolRotator )"/>
-    /// </summary>
-    /// <param name="rotator">
-    /// The <see cref="ColorSymbolRotator"/> that is used to pick the color
-    ///  and symbol for this method call.
-    /// </param>
-    public override void MakeUnique (ColorSymbolRotator rotator)
+    /// <inheritdoc cref="CurveItem.MakeUnique(AM.Drawing.Charting.ColorSymbolRotator)"/>
+    public override void MakeUnique
+        (
+            ColorSymbolRotator rotator
+        )
     {
         Color = rotator.NextColor;
         Symbol.Type = rotator.NextSymbol;
     }
 
-    /// <summary>
-    /// Determine the coords for the rectangle associated with a specified point for
-    /// this <see cref="CurveItem" />
-    /// </summary>
-    /// <param name="pane">The <see cref="GraphPane" /> to which this curve belongs</param>
-    /// <param name="i">The index of the point of interest</param>
-    /// <param name="coords">A list of coordinates that represents the "rect" for
-    /// this point (used in an html AREA tag)</param>
-    /// <returns>true if it's a valid point, false otherwise</returns>
-    public override bool GetCoords (GraphPane pane, int i, out string coords)
+    /// <inheritdoc cref="CurveItem.GetCoords"/>
+    public override bool GetCoords
+        (
+            GraphPane pane,
+            int i,
+            out string coords
+        )
     {
         coords = string.Empty;
 
@@ -363,20 +349,20 @@ public class LineItem
             return false;
         }
 
-        PointPair pt = Points[i];
+        var pt = Points[i];
         if (pt.IsInvalid)
         {
             return false;
         }
 
         double x, y, z;
-        ValueHandler valueHandler = new ValueHandler (pane, false);
+        var valueHandler = new ValueHandler (pane, false);
         valueHandler.GetValues (this, i, out x, out z, out y);
 
-        Axis yAxis = GetYAxis (pane);
-        Axis xAxis = GetXAxis (pane);
+        var yAxis = GetYAxis (pane);
+        var xAxis = GetXAxis (pane);
 
-        PointF pixPt = new PointF (xAxis.Scale.Transform (IsOverrideOrdinal, i, x),
+        var pixPt = new PointF (xAxis.Scale.Transform (IsOverrideOrdinal, i, x),
             yAxis.Scale.Transform (IsOverrideOrdinal, i, y));
 
         if (!pane.Chart.Rect.Contains (pixPt))
@@ -384,7 +370,7 @@ public class LineItem
             return false;
         }
 
-        float halfSize = Symbol.Size * pane.CalcScaleFactor();
+        var halfSize = Symbol.Size * pane.CalcScaleFactor();
 
         coords = string.Format ("{0:f0},{1:f0},{2:f0},{3:f0}",
             pixPt.X - halfSize, pixPt.Y - halfSize,

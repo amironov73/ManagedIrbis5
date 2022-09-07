@@ -15,7 +15,6 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 #endregion
 
@@ -155,20 +154,21 @@ public class LineObj
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected LineObj (SerializationInfo info, StreamingContext context) : base (info, context)
+    protected LineObj
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        info.GetInt32 ("schema2").NotUsed();
 
-        Line = (LineBase)info.GetValue ("line", typeof (LineBase));
+        Line = (LineBase) info.GetValue ("line", typeof (LineBase));
     }
 
-    /// <summary>
-    /// Populates a <see cref="SerializationInfo"/> instance with the data needed to serialize the target object
-    /// </summary>
-    /// <param name="info">A <see cref="SerializationInfo"/> instance that defines the serialized data</param>
-    /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data</param>
+    /// <inheritdoc cref="ISerializable.GetObjectData"/>
     public override void GetObjectData
         (
             SerializationInfo info,
@@ -178,7 +178,6 @@ public class LineObj
         base.GetObjectData (info, context);
 
         info.AddValue ("schema2", schema2);
-
         info.AddValue ("line", Line);
     }
 
@@ -186,27 +185,7 @@ public class LineObj
 
     #region Rendering Methods
 
-    /// <summary>
-    /// Render this object to the specified <see cref="Graphics"/> device.
-    /// </summary>
-    /// <remarks>
-    /// This method is normally only called by the Draw method
-    /// of the parent <see cref="GraphObjList"/> collection object.
-    /// </remarks>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="pane">
-    /// A reference to the <see cref="PaneBase"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
+    /// <inheritdoc cref="GraphObj.Draw"/>
     public override void Draw
         (
             Graphics graphics,
@@ -216,8 +195,8 @@ public class LineObj
     {
         // Convert the arrow coordinates from the user coordinate system
         // to the screen coordinate system
-        PointF pix1 = Location.TransformTopLeft (pane);
-        PointF pix2 = Location.TransformBottomRight (pane);
+        var pix1 = Location.TransformTopLeft (pane);
+        var pix2 = Location.TransformBottomRight (pane);
 
         if (pix1.X > -10000 && pix1.X < 100000 && pix1.Y > -100000 && pix1.Y < 100000 &&
             pix2.X > -10000 && pix2.X < 100000 && pix2.Y > -100000 && pix2.Y < 100000)
@@ -225,11 +204,11 @@ public class LineObj
             // calculate the length and the angle of the arrow "vector"
             double dy = pix2.Y - pix1.Y;
             double dx = pix2.X - pix1.X;
-            float angle = (float)Math.Atan2 (dy, dx) * 180.0F / (float)Math.PI;
-            float length = (float)Math.Sqrt (dx * dx + dy * dy);
+            var angle = (float)Math.Atan2 (dy, dx) * 180.0F / (float)Math.PI;
+            var length = (float)Math.Sqrt (dx * dx + dy * dy);
 
             // Save the old transform matrix
-            Matrix transform = graphics.Transform;
+            var transform = graphics.Transform;
 
             // Move the coordinate system so it is located at the starting point
             // of this arrow
@@ -240,7 +219,7 @@ public class LineObj
             graphics.RotateTransform (angle);
 
             // get a pen according to this arrow properties
-            using (Pen pen = Line.GetPen (pane, scaleFactor))
+            using (var pen = Line.GetPen (pane, scaleFactor))
 
                 //new Pen( _line._color, pane.ScaledPenWidth( _line._width, scaleFactor ) ) )
             {
@@ -254,29 +233,7 @@ public class LineObj
         }
     }
 
-    /// <summary>
-    /// Determine if the specified screen point lies inside the bounding box of this
-    /// <see cref="LineObj"/>.
-    /// </summary>
-    /// <remarks>The bounding box is calculated assuming a distance
-    /// of <see cref="GraphPane.Default.NearestTol"/> pixels around the arrow segment.
-    /// </remarks>
-    /// <param name="point">The screen point, in pixels</param>
-    /// <param name="pane">
-    /// A reference to the <see cref="PaneBase"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="graphics">
-    /// A graphic device object to be drawn into.  This is normally e.Graphics from the
-    /// PaintEventArgs argument to the Paint() method.
-    /// </param>
-    /// <param name="scaleFactor">
-    /// The scaling factor to be used for rendering objects.  This is calculated and
-    /// passed down by the parent <see cref="GraphPane"/> object using the
-    /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
-    /// font sizes, etc. according to the actual size of the graph.
-    /// </param>
-    /// <returns>true if the point lies in the bounding box, false otherwise</returns>
+    /// <inheritdoc cref="GraphObj.PointInBox"/>
     public override bool PointInBox
         (
             PointF point,
@@ -292,37 +249,38 @@ public class LineObj
 
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
-        PointF pix = _location.TransformTopLeft (pane);
-        PointF pix2 = _location.TransformBottomRight (pane);
+        var pix = _location.TransformTopLeft (pane);
+        var pix2 = _location.TransformBottomRight (pane);
 
-        using (Pen pen = new Pen (Color.Black, (float)GraphPane.Default.NearestTol * 2.0F))
-        {
-            using (GraphicsPath path = new GraphicsPath())
-            {
-                path.AddLine (pix, pix2);
-                return path.IsOutlineVisible (point, pen);
-            }
-        }
+        using var pen = new Pen (Color.Black, (float)GraphPane.Default.NearestTol * 2.0F);
+        using var path = new GraphicsPath();
+        path.AddLine (pix, pix2);
+
+        return path.IsOutlineVisible (point, pen);
     }
 
-    /// <summary>
-    /// Determines the shape type and Coords values for this GraphObj
-    /// </summary>
-    public override void GetCoords (PaneBase pane, Graphics graphics, float scaleFactor,
-        out string shape, out string coords)
+    /// <inheritdoc cref="GraphObj.GetCoords"/>
+    public override void GetCoords
+        (
+            PaneBase pane,
+            Graphics graphics,
+            float scaleFactor,
+            out string shape,
+            out string coords
+        )
     {
         // transform the x,y location from the user-defined
         // coordinate frame to the screen pixel location
-        RectangleF pixRect = _location.TransformRect (pane);
+        var pixRect = _location.TransformRect (pane);
 
-        Matrix matrix = new Matrix();
+        var matrix = new Matrix();
         if (pixRect.Right == 0)
         {
             pixRect.Width = 1;
         }
 
-        float angle = (float)Math.Atan ((pixRect.Top - pixRect.Bottom) /
-                                        (pixRect.Left - pixRect.Right));
+        var angle = (float)Math.Atan ((pixRect.Top - pixRect.Bottom) /
+                                      (pixRect.Left - pixRect.Right));
         matrix.Rotate (angle, MatrixOrder.Prepend);
 
         // Move the coordinate system to local coordinates
@@ -330,7 +288,7 @@ public class LineObj
         // x,y location)
         matrix.Translate (-pixRect.Left, -pixRect.Top, MatrixOrder.Prepend);
 
-        PointF[] pts = new PointF[4];
+        var pts = new PointF[4];
         pts[0] = new PointF (0, 3);
         pts[1] = new PointF (pixRect.Width, 3);
         pts[2] = new PointF (pixRect.Width, -3);

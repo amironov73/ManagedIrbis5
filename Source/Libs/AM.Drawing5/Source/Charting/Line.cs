@@ -363,7 +363,7 @@ public class Line
     /// <see cref="Graphics"/> device.  This method is normally only
     /// called by the Draw method of the parent <see cref="LineItem"/> object.
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -379,7 +379,13 @@ public class Line
     /// </param>
     /// <param name="curve">A <see cref="LineItem"/> representing this
     /// curve.</param>
-    public void Draw (Graphics g, GraphPane pane, CurveItem curve, float scaleFactor)
+    public void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            CurveItem curve,
+            float scaleFactor
+        )
     {
         // If the line is being shown, draw it
         if (IsVisible)
@@ -388,26 +394,26 @@ public class Line
             //if ( isSelected )
             //	GraphPane.Default.SelectedLine.
 
-            var sModeSave = g.SmoothingMode;
+            var sModeSave = graphics.SmoothingMode;
             if (_isAntiAlias)
             {
-                g.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
             }
 
             if (curve is StickItem)
             {
-                DrawSticks (g, pane, curve, scaleFactor);
+                DrawSticks (graphics, pane, curve, scaleFactor);
             }
             else if (IsSmooth || Fill.IsVisible)
             {
-                DrawSmoothFilledCurve (g, pane, curve, scaleFactor);
+                DrawSmoothFilledCurve (graphics, pane, curve, scaleFactor);
             }
             else
             {
-                DrawCurve (g, pane, curve, scaleFactor);
+                DrawCurve (graphics, pane, curve, scaleFactor);
             }
 
-            g.SmoothingMode = sModeSave;
+            graphics.SmoothingMode = sModeSave;
         }
     }
 
@@ -450,10 +456,8 @@ public class Line
     {
         if (_isVisible && !Color.IsEmpty)
         {
-            using (var pen = GetPen (pane, scaleFactor))
-            {
-                graphics.DrawLine (pen, x1, y1, x2, y2);
-            }
+            using var pen = GetPen (pane, scaleFactor);
+            graphics.DrawLine (pen, x1, y1, x2, y2);
         }
     }
 
@@ -549,7 +553,7 @@ public class Line
     /// <see cref="CurveItem"/> object.  Note that the <see cref="StepType"/> property
     /// is ignored for smooth lines (e.g., when <see cref="Line.IsSmooth"/> is true).
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -565,8 +569,13 @@ public class Line
     /// </param>
     /// <param name="curve">A <see cref="LineItem"/> representing this
     /// curve.</param>
-    public void DrawSmoothFilledCurve (Graphics g, GraphPane pane,
-        CurveItem curve, float scaleFactor)
+    public void DrawSmoothFilledCurve
+        (
+            Graphics graphics,
+            GraphPane pane,
+            CurveItem curve,
+            float scaleFactor
+        )
     {
         var source = this;
         if (curve.IsSelected)
@@ -574,12 +583,9 @@ public class Line
             source = Selection.Line;
         }
 
-        PointF[] arrPoints;
-        int count;
         var points = curve.Points;
-
         if (IsVisible && !Color.IsEmpty && points != null &&
-            BuildPointsArray (pane, curve, out arrPoints, out count) &&
+            BuildPointsArray (pane, curve, out var arrPoints, out var count) &&
             count > 2)
         {
             var tension = _isSmooth ? _smoothTension : 0f;
@@ -607,22 +613,22 @@ public class Line
                             tRect.Height = zeroPix - tRect.Top;
                             if (tRect.Height > 0)
                             {
-                                var reg = g.Clip;
-                                g.SetClip (tRect);
-                                g.FillPath (brush, path);
-                                g.SetClip (pane.Chart._rect);
+                                var reg = graphics.Clip;
+                                graphics.SetClip (tRect);
+                                graphics.FillPath (brush, path);
+                                graphics.SetClip (pane.Chart._rect);
                             }
                         }
                         else
                         {
-                            g.FillPath (brush, path);
+                            graphics.FillPath (brush, path);
                         }
 
                         //brush.Dispose();
                     }
 
                     // restore the zero line if needed (since the fill tends to cover it up)
-                    yAxis.FixZeroLine (g, pane, scaleFactor, rect.Left, rect.Right);
+                    yAxis.FixZeroLine (graphics, pane, scaleFactor, rect.Left, rect.Right);
                 }
             }
 
@@ -633,19 +639,23 @@ public class Line
                 using (var pen = GetPen (pane, scaleFactor))
                 {
                     // Stroke the curve
-                    g.DrawCurve (pen, arrPoints, 0, count - 2, tension);
+                    graphics.DrawCurve (pen, arrPoints, 0, count - 2, tension);
 
                     //pen.Dispose();
                 }
             }
             else
             {
-                DrawCurve (g, pane, curve, scaleFactor);
+                DrawCurve (graphics, pane, curve, scaleFactor);
             }
         }
     }
 
-    private bool IsFirstLine (GraphPane pane, CurveItem curve)
+    private bool IsFirstLine
+        (
+            GraphPane pane,
+            CurveItem curve
+        )
     {
         var curveList = pane.CurveList;
 
@@ -672,7 +682,7 @@ public class Line
     /// is normally only called by the Draw method of the
     /// <see cref="CurveItem"/> object
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -688,8 +698,13 @@ public class Line
     /// </param>
     /// <param name="curve">A <see cref="LineItem"/> representing this
     /// curve.</param>
-    public void DrawCurve (Graphics g, GraphPane pane,
-        CurveItem curve, float scaleFactor)
+    public void DrawCurve
+        (
+            Graphics graphics,
+            GraphPane pane,
+            CurveItem curve,
+            float scaleFactor
+        )
     {
         var source = this;
         if (curve.IsSelected)
@@ -808,7 +823,7 @@ public class Line
                                     tmpX > 5000000 || tmpX < -5000000 ||
                                     tmpY > 5000000 || tmpY < -5000000)
                                 {
-                                    InterpolatePoint (g, pane, curve, lastPt, scaleFactor, pen,
+                                    InterpolatePoint (graphics, pane, curve, lastPt, scaleFactor, pen,
                                         lastX, lastY, tmpX, tmpY);
                                 }
                                 else if (!isOut)
@@ -819,25 +834,25 @@ public class Line
                                         {
                                             if (StepType == StepType.NonStep)
                                             {
-                                                g.DrawLine (tPen, lastX, lastY, tmpX, tmpY);
+                                                graphics.DrawLine (tPen, lastX, lastY, tmpX, tmpY);
                                             }
                                             else if (StepType == StepType.ForwardStep)
                                             {
-                                                g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
-                                                g.DrawLine (tPen, tmpX, lastY, tmpX, tmpY);
+                                                graphics.DrawLine (tPen, lastX, lastY, tmpX, lastY);
+                                                graphics.DrawLine (tPen, tmpX, lastY, tmpX, tmpY);
                                             }
                                             else if (StepType == StepType.RearwardStep)
                                             {
-                                                g.DrawLine (tPen, lastX, lastY, lastX, tmpY);
-                                                g.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
+                                                graphics.DrawLine (tPen, lastX, lastY, lastX, tmpY);
+                                                graphics.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
                                             }
                                             else if (StepType == StepType.ForwardSegment)
                                             {
-                                                g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
+                                                graphics.DrawLine (tPen, lastX, lastY, tmpX, lastY);
                                             }
                                             else
                                             {
-                                                g.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
+                                                graphics.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
                                             }
                                         }
                                     }
@@ -845,32 +860,32 @@ public class Line
                                     {
                                         if (StepType == StepType.NonStep)
                                         {
-                                            g.DrawLine (pen, lastX, lastY, tmpX, tmpY);
+                                            graphics.DrawLine (pen, lastX, lastY, tmpX, tmpY);
                                         }
                                         else if (StepType == StepType.ForwardStep)
                                         {
-                                            g.DrawLine (pen, lastX, lastY, tmpX, lastY);
-                                            g.DrawLine (pen, tmpX, lastY, tmpX, tmpY);
+                                            graphics.DrawLine (pen, lastX, lastY, tmpX, lastY);
+                                            graphics.DrawLine (pen, tmpX, lastY, tmpX, tmpY);
                                         }
                                         else if (StepType == StepType.RearwardStep)
                                         {
-                                            g.DrawLine (pen, lastX, lastY, lastX, tmpY);
-                                            g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
+                                            graphics.DrawLine (pen, lastX, lastY, lastX, tmpY);
+                                            graphics.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                                         }
                                         else if (StepType == StepType.ForwardSegment)
                                         {
-                                            g.DrawLine (pen, lastX, lastY, tmpX, lastY);
+                                            graphics.DrawLine (pen, lastX, lastY, tmpX, lastY);
                                         }
                                         else if (StepType == StepType.RearwardSegment)
                                         {
-                                            g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
+                                            graphics.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                                         }
                                     }
                                 }
                             }
                             catch
                             {
-                                InterpolatePoint (g, pane, curve, lastPt, scaleFactor, pen,
+                                InterpolatePoint (graphics, pane, curve, lastPt, scaleFactor, pen,
                                     lastX, lastY, tmpX, tmpY);
                             }
                         }
@@ -896,7 +911,7 @@ public class Line
     /// is normally only called by the Draw method of the
     /// <see cref="CurveItem"/> object
     /// </summary>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -912,8 +927,13 @@ public class Line
     /// </param>
     /// <param name="curve">A <see cref="LineItem"/> representing this
     /// curve.</param>
-    public void DrawCurveOriginal (Graphics g, GraphPane pane,
-        CurveItem curve, float scaleFactor)
+    public void DrawCurveOriginal
+        (
+            Graphics graphics,
+            GraphPane pane,
+            CurveItem curve,
+            float scaleFactor
+        )
     {
         var source = this;
         if (curve.IsSelected)
@@ -1005,7 +1025,7 @@ public class Line
                                     tmpX > 5000000 || tmpX < -5000000 ||
                                     tmpY > 5000000 || tmpY < -5000000)
                                 {
-                                    InterpolatePoint (g, pane, curve, lastPt, scaleFactor, pen,
+                                    InterpolatePoint (graphics, pane, curve, lastPt, scaleFactor, pen,
                                         lastX, lastY, tmpX, tmpY);
                                 }
                                 else if (!isOut)
@@ -1016,25 +1036,25 @@ public class Line
                                         {
                                             if (StepType == StepType.NonStep)
                                             {
-                                                g.DrawLine (tPen, lastX, lastY, tmpX, tmpY);
+                                                graphics.DrawLine (tPen, lastX, lastY, tmpX, tmpY);
                                             }
                                             else if (StepType == StepType.ForwardStep)
                                             {
-                                                g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
-                                                g.DrawLine (tPen, tmpX, lastY, tmpX, tmpY);
+                                                graphics.DrawLine (tPen, lastX, lastY, tmpX, lastY);
+                                                graphics.DrawLine (tPen, tmpX, lastY, tmpX, tmpY);
                                             }
                                             else if (StepType == StepType.RearwardStep)
                                             {
-                                                g.DrawLine (tPen, lastX, lastY, lastX, tmpY);
-                                                g.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
+                                                graphics.DrawLine (tPen, lastX, lastY, lastX, tmpY);
+                                                graphics.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
                                             }
                                             else if (StepType == StepType.ForwardSegment)
                                             {
-                                                g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
+                                                graphics.DrawLine (tPen, lastX, lastY, tmpX, lastY);
                                             }
                                             else
                                             {
-                                                g.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
+                                                graphics.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
                                             }
                                         }
                                     }
@@ -1042,32 +1062,32 @@ public class Line
                                     {
                                         if (StepType == StepType.NonStep)
                                         {
-                                            g.DrawLine (pen, lastX, lastY, tmpX, tmpY);
+                                            graphics.DrawLine (pen, lastX, lastY, tmpX, tmpY);
                                         }
                                         else if (StepType == StepType.ForwardStep)
                                         {
-                                            g.DrawLine (pen, lastX, lastY, tmpX, lastY);
-                                            g.DrawLine (pen, tmpX, lastY, tmpX, tmpY);
+                                            graphics.DrawLine (pen, lastX, lastY, tmpX, lastY);
+                                            graphics.DrawLine (pen, tmpX, lastY, tmpX, tmpY);
                                         }
                                         else if (StepType == StepType.RearwardStep)
                                         {
-                                            g.DrawLine (pen, lastX, lastY, lastX, tmpY);
-                                            g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
+                                            graphics.DrawLine (pen, lastX, lastY, lastX, tmpY);
+                                            graphics.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                                         }
                                         else if (StepType == StepType.ForwardSegment)
                                         {
-                                            g.DrawLine (pen, lastX, lastY, tmpX, lastY);
+                                            graphics.DrawLine (pen, lastX, lastY, tmpX, lastY);
                                         }
                                         else if (StepType == StepType.RearwardSegment)
                                         {
-                                            g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
+                                            graphics.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                                         }
                                     }
                                 }
                             }
                             catch
                             {
-                                InterpolatePoint (g, pane, curve, lastPt, scaleFactor, pen,
+                                InterpolatePoint (graphics, pane, curve, lastPt, scaleFactor, pen,
                                     lastX, lastY, tmpX, tmpY);
                             }
                         }
@@ -1094,8 +1114,19 @@ public class Line
     /// would not see coordinates like this, if you repeatedly zoom in on a ZedGraphControl, eventually
     /// all your points will be way outside the bounds of the plot.
     /// </summary>
-    private void InterpolatePoint (Graphics g, GraphPane pane, CurveItem curve, PointPair lastPt,
-        float scaleFactor, Pen pen, float lastX, float lastY, float tmpX, float tmpY)
+    private void InterpolatePoint
+        (
+            Graphics graphics,
+            GraphPane pane,
+            CurveItem curve,
+            PointPair lastPt,
+            float scaleFactor,
+            Pen pen,
+            float lastX,
+            float lastY,
+            float tmpX,
+            float tmpY
+        )
     {
         try
         {
@@ -1165,25 +1196,25 @@ public class Line
                 {
                     if (StepType == StepType.NonStep)
                     {
-                        g.DrawLine (tPen, lastX, lastY, tmpX, tmpY);
+                        graphics.DrawLine (tPen, lastX, lastY, tmpX, tmpY);
                     }
                     else if (StepType == StepType.ForwardStep)
                     {
-                        g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
-                        g.DrawLine (tPen, tmpX, lastY, tmpX, tmpY);
+                        graphics.DrawLine (tPen, lastX, lastY, tmpX, lastY);
+                        graphics.DrawLine (tPen, tmpX, lastY, tmpX, tmpY);
                     }
                     else if (StepType == StepType.RearwardStep)
                     {
-                        g.DrawLine (tPen, lastX, lastY, lastX, tmpY);
-                        g.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
+                        graphics.DrawLine (tPen, lastX, lastY, lastX, tmpY);
+                        graphics.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
                     }
                     else if (StepType == StepType.ForwardSegment)
                     {
-                        g.DrawLine (tPen, lastX, lastY, tmpX, lastY);
+                        graphics.DrawLine (tPen, lastX, lastY, tmpX, lastY);
                     }
                     else
                     {
-                        g.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
+                        graphics.DrawLine (tPen, lastX, tmpY, tmpX, tmpY);
                     }
                 }
             }
@@ -1191,25 +1222,25 @@ public class Line
             {
                 if (StepType == StepType.NonStep)
                 {
-                    g.DrawLine (pen, lastX, lastY, tmpX, tmpY);
+                    graphics.DrawLine (pen, lastX, lastY, tmpX, tmpY);
                 }
                 else if (StepType == StepType.ForwardStep)
                 {
-                    g.DrawLine (pen, lastX, lastY, tmpX, lastY);
-                    g.DrawLine (pen, tmpX, lastY, tmpX, tmpY);
+                    graphics.DrawLine (pen, lastX, lastY, tmpX, lastY);
+                    graphics.DrawLine (pen, tmpX, lastY, tmpX, tmpY);
                 }
                 else if (StepType == StepType.RearwardStep)
                 {
-                    g.DrawLine (pen, lastX, lastY, lastX, tmpY);
-                    g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
+                    graphics.DrawLine (pen, lastX, lastY, lastX, tmpY);
+                    graphics.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                 }
                 else if (StepType == StepType.ForwardSegment)
                 {
-                    g.DrawLine (pen, lastX, lastY, tmpX, lastY);
+                    graphics.DrawLine (pen, lastX, lastY, tmpX, lastY);
                 }
                 else if (StepType == StepType.RearwardSegment)
                 {
-                    g.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
+                    graphics.DrawLine (pen, lastX, tmpY, tmpX, tmpY);
                 }
             }
         }
@@ -1233,8 +1264,13 @@ public class Line
     /// <param name="count">The number of points contained in the "arrPoints"
     /// parameter.</param>
     /// <returns>true for a successful points array build, false for data problems</returns>
-    public bool BuildPointsArray (GraphPane pane, CurveItem curve,
-        out PointF[] arrPoints, out int count)
+    public bool BuildPointsArray
+        (
+            GraphPane pane,
+            CurveItem curve,
+            out PointF[]? arrPoints,
+            out int count
+        )
     {
         arrPoints = null;
         count = 0;
@@ -1361,8 +1397,13 @@ public class Line
     /// <param name="count">The number of points contained in the "arrPoints"
     /// parameter.</param>
     /// <returns>true for a successful points array build, false for data problems</returns>
-    public bool BuildLowPointsArray (GraphPane pane, CurveItem curve,
-        out PointF[] arrPoints, out int count)
+    public bool BuildLowPointsArray
+        (
+            GraphPane pane,
+            CurveItem curve,
+            out PointF[]? arrPoints,
+            out int count
+        )
     {
         arrPoints = null;
         count = 0;
@@ -1469,8 +1510,15 @@ public class Line
     /// parameter.</param>
     /// <param name="yMin">The Y axis value location where the X axis crosses.</param>
     /// <param name="path">The <see cref="GraphicsPath"/> class that represents the curve.</param>
-    public void CloseCurve (GraphPane pane, CurveItem curve, PointF[] arrPoints,
-        int count, double yMin, GraphicsPath path)
+    public void CloseCurve
+        (
+            GraphPane pane,
+            CurveItem curve,
+            PointF[] arrPoints,
+            int count,
+            double yMin,
+            GraphicsPath path
+        )
     {
         // For non-stacked lines, the fill area is just the area between the curve and the X axis
         if (pane.LineType != LineType.Stack)

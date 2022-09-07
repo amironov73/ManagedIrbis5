@@ -67,10 +67,7 @@ class ExponentScale
     #region properties
 
     /// <inheritdoc cref="Scale.Type"/>
-    public override AxisType Type
-    {
-        get { return AxisType.Exponent; }
-    }
+    public override AxisType Type => AxisType.Exponent;
 
     #endregion
 
@@ -105,22 +102,7 @@ class ExponentScale
         return Math.Pow (val, 1 / _exponent);
     }
 
-    /// <summary>
-    /// Determine the value for any major tic.
-    /// </summary>
-    /// <remarks>
-    /// This method properly accounts for <see cref="Scale.IsLog"/>, <see cref="Scale.IsText"/>,
-    /// and other axis format settings.
-    /// </remarks>
-    /// <param name="baseVal">
-    /// The value of the first major tic (floating point double)
-    /// </param>
-    /// <param name="tic">
-    /// The major tic number (0 = first major tic).  For log scales, this is the actual power of 10.
-    /// </param>
-    /// <returns>
-    /// The specified major tic value (floating point double).
-    /// </returns>
+    /// <inheritdoc cref="Scale.CalcMajorTicValue"/>
     internal override double CalcMajorTicValue (double baseVal, double tic)
     {
         if (_exponent > 0.0)
@@ -129,7 +111,8 @@ class ExponentScale
             //baseVal is got from CalBase..., and it is exp..
             return Math.Pow (Math.Pow (baseVal, 1 / _exponent) + _majorStep * tic, _exponent);
         }
-        else if (_exponent < 0.0)
+
+        if (_exponent < 0.0)
         {
             //baseVal is got from CalBase..., and it is exp..
             return Math.Pow (Math.Pow (baseVal, 1 / _exponent) + _majorStep * tic, _exponent);
@@ -138,69 +121,27 @@ class ExponentScale
         return 1.0;
     }
 
-    /// <summary>
-    /// Determine the value for any minor tic.
-    /// </summary>
-    /// <remarks>
-    /// This method properly accounts for <see cref="Scale.IsLog"/>, <see cref="Scale.IsText"/>,
-    /// and other axis format settings.
-    /// </remarks>
-    /// <param name="baseVal">
-    /// The value of the first major tic (floating point double).  This tic value is the base
-    /// reference for all tics (including minor ones).
-    /// </param>
-    /// <param name="iTic">
-    /// The major tic number (0 = first major tic).  For log scales, this is the actual power of 10.
-    /// </param>
-    /// <returns>
-    /// The specified minor tic value (floating point double).
-    /// </returns>
+    /// <inheritdoc cref="Scale.CalcMinorTicValue"/>
     internal override double CalcMinorTicValue (double baseVal, int iTic)
     {
-        return baseVal + Math.Pow ((double)_majorStep * (double)iTic, _exponent);
+        return baseVal + Math.Pow (_majorStep * iTic, _exponent);
     }
 
-    /// <summary>
-    /// Internal routine to determine the ordinals of the first minor tic mark
-    /// </summary>
-    /// <param name="baseVal">
-    /// The value of the first major tic for the axis.
-    /// </param>
-    /// <returns>
-    /// The ordinal position of the first minor tic, relative to the first major tic.
-    /// This value can be negative (e.g., -3 means the first minor tic is 3 minor step
-    /// increments before the first major tic.
-    /// </returns>
+    /// <inheritdoc cref="Scale.CalcMinorStart"/>
     internal override int CalcMinorStart (double baseVal)
     {
         return (int)((Math.Pow (_min, _exponent) - baseVal) / Math.Pow (_minorStep, _exponent));
     }
 
-    /// <summary>
-    /// Select a reasonable exponential axis scale given a range of data values.
-    /// </summary>
-    /// <remarks>
-    /// This method only applies to <see cref="AxisType.Exponent"/> type axes, and it
-    /// is called by the general <see cref="Scale.PickScale"/> method.  The exponential scale
-    /// relies on the <see cref="Scale.Exponent" /> property to set the scaling exponent.  This
-    /// method honors the <see cref="Scale.MinAuto"/>, <see cref="Scale.MaxAuto"/>,
-    /// and <see cref="Scale.MajorStepAuto"/> autorange settings.
-    /// In the event that any of the autorange settings are false, the
-    /// corresponding <see cref="Scale.Min"/>, <see cref="Scale.Max"/>, or <see cref="Scale.MajorStep"/>
-    /// setting is explicitly honored, and the remaining autorange settings (if any) will
-    /// be calculated to accomodate the non-autoranged values.  For log axes, the MinorStep
-    /// value is not used.
-    /// <para>On Exit:</para>
-    /// <para><see cref="Scale.Min"/> is set to scale minimum (if <see cref="Scale.MinAuto"/> = true)</para>
-    /// <para><see cref="Scale.Max"/> is set to scale maximum (if <see cref="Scale.MaxAuto"/> = true)</para>
-    /// <para><see cref="Scale.MajorStep"/> is set to scale step size (if <see cref="Scale.MajorStepAuto"/> = true)</para>
-    /// <para><see cref="Scale.Mag"/> is set to a magnitude multiplier according to the data</para>
-    /// <para><see cref="Scale.Format"/> is set to the display format for the values (this controls the
-    /// number of decimal places, whether there are thousands separators, currency types, etc.)</para>
-    /// </remarks>
+    /// <inheritdoc cref="Scale.PickScale"/>
     /// <seealso cref="Scale.PickScale"/>
     /// <seealso cref="AxisType.Exponent"/>
-    public override void PickScale (GraphPane pane, Graphics graphics, float scaleFactor)
+    public override void PickScale
+        (
+            GraphPane pane,
+            Graphics graphics,
+            float scaleFactor
+        )
     {
         // call the base class first
         base.PickScale (pane, graphics, scaleFactor);
@@ -210,12 +151,12 @@ class ExponentScale
         {
             if (_maxAuto)
             {
-                _max = _max + 0.2 * (_max == 0 ? 1.0 : Math.Abs (_max));
+                _max += 0.2 * (_max == 0 ? 1.0 : Math.Abs (_max));
             }
 
             if (_minAuto)
             {
-                _min = _min - 0.2 * (_min == 0 ? 1.0 : Math.Abs (_min));
+                _min -= 0.2 * (_min == 0 ? 1.0 : Math.Abs (_min));
             }
         }
 
@@ -239,7 +180,7 @@ class ExponentScale
         // Calculate the new step size
         if (_majorStepAuto)
         {
-            double targetSteps = (_ownerAxis is XAxis || _ownerAxis is X2Axis)
+            var targetSteps = (_ownerAxis is XAxis || _ownerAxis is X2Axis)
                 ? Default.TargetXSteps
                 : Default.TargetYSteps;
 
@@ -249,7 +190,7 @@ class ExponentScale
             if (_isPreventLabelOverlap)
             {
                 // Calculate the maximum number of labels
-                double maxLabels = (double)CalcMaxLabels (graphics, pane, scaleFactor);
+                double maxLabels = CalcMaxLabels (graphics, pane, scaleFactor);
 
                 if (maxLabels < (_max - _min) / _majorStep)
                 {
@@ -314,41 +255,28 @@ class ExponentScale
         // Calculate the appropriate number of dec places to display if required
         if (_formatAuto)
         {
-            int numDec = 0 - (int)(Math.Floor (Math.Log10 (_majorStep)) - _mag);
+            var numDec = 0 - (int)(Math.Floor (Math.Log10 (_majorStep)) - _mag);
             if (numDec < 0)
             {
                 numDec = 0;
             }
 
-            _format = "f" + numDec.ToString();
+            _format = "f" + numDec;
         }
     }
 
-    /// <summary>
-    /// Make a value label for an <see cref="AxisType.Exponent" /> <see cref="Axis" />.
-    /// </summary>
-    /// <param name="pane">
-    /// A reference to the <see cref="GraphPane"/> object that is the parent or
-    /// owner of this object.
-    /// </param>
-    /// <param name="index">
-    /// The zero-based, ordinal index of the label to be generated.  For example, a value of 2 would
-    /// cause the third value label on the axis to be generated.
-    /// </param>
-    /// <param name="dVal">
-    /// The numeric value associated with the label.  This value is ignored for log (<see cref="Scale.IsLog"/>)
-    /// and text (<see cref="Scale.IsText"/>) type axes.
-    /// </param>
-    /// <returns>The resulting value label as a <see cref="string" /></returns>
-    internal override string MakeLabel (GraphPane pane, int index, double dVal)
+    /// <inheritdoc cref="Scale.MakeLabel"/>
+    internal override string MakeLabel
+        (
+            GraphPane pane,
+            int index,
+            double dVal
+        )
     {
-        if (_format == null)
-        {
-            _format = Default.Format;
-        }
+        _format ??= Default.Format;
 
-        double scaleMult = Math.Pow ((double)10.0, _mag);
-        double val = Math.Pow (dVal, 1 / _exponent) / scaleMult;
+        var scaleMult = Math.Pow (10.0, _mag);
+        var val = Math.Pow (dVal, 1 / _exponent) / scaleMult;
         return val.ToString (_format);
     }
 
@@ -368,11 +296,16 @@ class ExponentScale
     /// </param>
     /// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
     /// </param>
-    protected ExponentScale (SerializationInfo info, StreamingContext context) : base (info, context)
+    protected ExponentScale
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
     {
         // The schema value is just a file version parameter.  You can use it to make future versions
         // backwards compatible as new member variables are added to classes
-        int sch = info.GetInt32 ("schema2");
+        info.GetInt32 ("schema2").NotUsed();
     }
 
     /// <inheritdoc cref="ISerializable.GetObjectData"/>

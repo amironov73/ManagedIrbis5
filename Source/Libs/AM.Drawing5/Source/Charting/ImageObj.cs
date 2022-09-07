@@ -38,7 +38,7 @@ public class ImageObj
     /// Private field that stores the image.  Use the public property <see cref="Image"/>
     /// to access this value.
     /// </summary>
-    private Image _image;
+    private Image? _image;
 
     /// <summary>
     /// Private field that determines if the image will be scaled to the output rectangle.
@@ -73,10 +73,10 @@ public class ImageObj
     /// The <see cref="System.Drawing.Image"/> object.
     /// </summary>
     /// <value> A <see cref="System.Drawing.Image"/> class reference. </value>
-    public Image Image
+    public Image? Image
     {
-        get { return _image; }
-        set { _image = value; }
+        get => _image;
+        set => _image = value;
     }
 
     /// <summary>
@@ -87,8 +87,8 @@ public class ImageObj
     /// to the destination rectangle</value>
     public bool IsScaled
     {
-        get { return _isScaled; }
-        set { _isScaled = value; }
+        get => _isScaled;
+        set => _isScaled = value;
     }
 
     #endregion
