@@ -11,42 +11,40 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace PdfSharpCore.Drawing.BarCodes
+namespace PdfSharpCore.Drawing.BarCodes;
+
+/// <summary>
+/// docDaSt
+/// </summary>
+public enum DataMatrixEncoding
 {
     /// <summary>
     /// docDaSt
     /// </summary>
-    public enum DataMatrixEncoding
-    {
-        /// <summary>
-        /// docDaSt
-        /// </summary>
-        Ascii,
+    Ascii,
 
-        /// <summary>
-        /// docDaSt
-        /// </summary>
-        C40,
+    /// <summary>
+    /// docDaSt
+    /// </summary>
+    C40,
 
-        /// <summary>
-        /// docDaSt
-        /// </summary>
-        Text,
+    /// <summary>
+    /// docDaSt
+    /// </summary>
+    Text,
 
-        /// <summary>
-        /// docDaSt
-        /// </summary>
-        X12,
+    /// <summary>
+    /// docDaSt
+    /// </summary>
+    X12,
 
-        /// <summary>
-        /// docDaSt
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        EDIFACT,
+    /// <summary>
+    /// docDaSt
+    /// </summary>
+    EDIFACT,
 
-        /// <summary>
-        /// docDaSt
-        /// </summary>
-        Base256
-    }
+    /// <summary>
+    /// docDaSt
+    /// </summary>
+    Base256
 }

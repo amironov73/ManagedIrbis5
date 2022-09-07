@@ -17,7 +17,7 @@ namespace TreeCollections
         private int _maxRelativeDepth;
         private StringBuilder _builder;
 
-        public TreeHtmlBuilder (HtmlBuildDefinition<TNode> def = null)
+        public TreeHtmlBuilder (HtmlBuildDefinition<TNode>? def = null)
         {
             _def = def ?? new HtmlBuildDefinition<TNode>();
         }

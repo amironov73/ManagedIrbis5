@@ -12,9 +12,9 @@ namespace TreeCollections
             _itemComparer = itemComparer;
         }
 
-        public int Compare (TNode x, TNode y)
+        public int Compare (TNode? x, TNode? y)
         {
-            return _itemComparer.Compare (x.Item, y.Item);
+            return _itemComparer.Compare (x!.Item, y!.Item);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace TreeCollections
@@ -26,9 +27,10 @@ namespace TreeCollections
             _nextGenerationCount = 0;
             _maxDepth = maxRelativeDepth ?? int.MaxValue;
 
-            Current = null;
+            Current = null!;
         }
 
+        /// <inheritdoc cref="IEnumerator.MoveNext"/>
         public bool MoveNext()
         {
             if (Current == null)
@@ -74,17 +76,21 @@ namespace TreeCollections
             _nextGenerationCount = 0;
         }
 
+        /// <inheritdoc cref="IEnumerator{T}.Current"/>
         public TNode Current { get; private set; }
 
-        object IEnumerator.Current => Current;
+        object? IEnumerator.Current => Current;
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
+            // пустое тело метода
         }
 
+        /// <inheritdoc cref="IEnumerator.Reset"/>
         public void Reset()
         {
-            Current = null;
+            Current = null!;
         }
     }
 }

@@ -173,7 +173,7 @@ public static class Algorithms
             throw new ArgumentOutOfRangeException (nameof (list));
         }
 
-        if (start < 0 || start > list.Count || (start == list.Count && count != 0))
+        if (start < 0 || start > list.Count || start == list.Count && count != 0)
         {
             throw new ArgumentOutOfRangeException (nameof (start));
         }
@@ -315,7 +315,7 @@ public static class Algorithms
             throw new ArgumentOutOfRangeException (nameof (array));
         }
 
-        if (start < 0 || start > array.Length || (start == array.Length && count != 0))
+        if (start < 0 || start > array.Length || start == array.Length && count != 0)
         {
             throw new ArgumentOutOfRangeException (nameof (start));
         }
@@ -735,18 +735,14 @@ public static class Algorithms
     /// items of type <typeparamref name="T"/> or a type derived from it. </param>
     /// <returns>A generic IEnumerable&lt;T&gt; wrapper around <paramref name="untypedCollection"/>.
     /// If <paramref name="untypedCollection"/> is null, then null is returned.</returns>
-    public static IEnumerable<T> TypedAs<T> (IEnumerable untypedCollection)
+    public static IEnumerable<T>? TypedAs<T> (IEnumerable? untypedCollection)
     {
-        if (untypedCollection == null)
+        return untypedCollection switch
         {
-            return null;
-        }
-
-        if (untypedCollection is IEnumerable<T>)
-        {
-            return (IEnumerable<T>)untypedCollection;
-        }
-        return new TypedEnumerable<T> (untypedCollection);
+            null => null,
+            IEnumerable<T> enumerable => enumerable,
+            _ => new TypedEnumerable<T> (untypedCollection)
+        };
     }
 
     /// <summary>
@@ -1786,7 +1782,7 @@ public static class Algorithms
         if (i < listCount)
         {
             // remove items from the end.
-            if (list is ArrayWrapper<T> || (list is IList && ((IList)list).IsFixedSize))
+            if (list is ArrayWrapper<T> || list is IList && ((IList)list).IsFixedSize)
             {
                 // An array or similar. Null out the last elements.
                 while (i < listCount)
@@ -4454,7 +4450,7 @@ public static class Algorithms
                     // To do this, we stack one of the lists for later processing, and change l and r to the other list.
                     // If we always stack the larger of the two sub-parts, the stack cannot get greater
                     // than log2(Count) in size; i.e., a 32-element stack is enough for the maximum list size.
-                    if ((j - l) > (r - i))
+                    if (j - l > r - i)
                     {
                         // The right partition is smaller. Stack the left, and get ready to sort the right.
                         leftStack[stackPtr] = l;
@@ -4641,7 +4637,7 @@ public static class Algorithms
                 o1 = order[l];
                 e2 = list[r];
                 o2 = order[r];
-                if ((c = comparer.Compare (e1, e2)) > 0 || (c == 0 && o1 > o2))
+                if ((c = comparer.Compare (e1, e2)) > 0 || c == 0 && o1 > o2)
                 {
                     list[r] = e1;
                     order[r] = o1;
@@ -4659,7 +4655,7 @@ public static class Algorithms
                 var m = l + (r - l) / 2;
                 T e1 = list[l], e2 = list[m], e3 = list[r], temp;
                 int o1 = order[l], o2 = order[m], o3 = order[r], otemp;
-                if ((c = comparer.Compare (e1, e2)) > 0 || (c == 0 && o1 > o2))
+                if ((c = comparer.Compare (e1, e2)) > 0 || c == 0 && o1 > o2)
                 {
                     temp = e1;
                     e1 = e2;
@@ -4669,7 +4665,7 @@ public static class Algorithms
                     o2 = otemp;
                 }
 
-                if ((c = comparer.Compare (e1, e3)) > 0 || (c == 0 && o1 > o3))
+                if ((c = comparer.Compare (e1, e3)) > 0 || c == 0 && o1 > o3)
                 {
                     temp = e3;
                     e3 = e2;
@@ -4680,7 +4676,7 @@ public static class Algorithms
                     o2 = o1;
                     o1 = otemp;
                 }
-                else if ((c = comparer.Compare (e2, e3)) > 0 || (c == 0 && o2 > o3))
+                else if ((c = comparer.Compare (e2, e3)) > 0 || c == 0 && o2 > o3)
                 {
                     temp = e2;
                     e2 = e3;
@@ -4723,7 +4719,7 @@ public static class Algorithms
                             item_i = list[i];
                             order_i = order[i];
                         } while ((c = comparer.Compare (item_i, partition)) < 0 ||
-                                 (c == 0 && order_i < order_partition));
+                                 c == 0 && order_i < order_partition);
 
                         do
                         {
@@ -4731,7 +4727,7 @@ public static class Algorithms
                             item_j = list[j];
                             order_j = order[j];
                         } while ((c = comparer.Compare (item_j, partition)) > 0 ||
-                                 (c == 0 && order_j > order_partition));
+                                 c == 0 && order_j > order_partition);
 
                         if (j < i)
                         {
@@ -4759,7 +4755,7 @@ public static class Algorithms
                     // To do this, we stack one of the lists for later processing, and change l and r to the other list.
                     // If we always stack the larger of the two sub-parts, the stack cannot get greater
                     // than log2(Count) in size; i.e., a 32-element stack is enough for the maximum list size.
-                    if ((j - l) > (r - i))
+                    if (j - l > r - i)
                     {
                         // The right partition is smaller. Stack the left, and get ready to sort the right.
                         leftStack[stackPtr] = l;
@@ -5288,14 +5284,14 @@ public static class Algorithms
             this.comparer = comparer;
         }
 
-        public int Compare (T x, T y)
+        public int Compare (T? x, T? y)
         {
             return -comparer.Compare (x, y);
         }
 
         // For comparing this comparer to others.
 
-        public override bool Equals (object obj)
+        public override bool Equals (object? obj)
         {
             if (obj is ReverseComparerClass<T>)
             {
@@ -5338,9 +5334,9 @@ public static class Algorithms
     private class IdentityComparer<T> : IEqualityComparer<T>
         where T : class
     {
-        public bool Equals (T x, T y)
+        public bool Equals (T? x, T? y)
         {
-            return (x == y);
+            return x == y;
         }
 
         public int GetHashCode (T obj)
@@ -5349,9 +5345,9 @@ public static class Algorithms
         }
 
         // For comparing two IComparers to see if they compare the same thing.
-        public override bool Equals (object obj)
+        public override bool Equals (object? obj)
         {
-            return (obj != null && obj is IdentityComparer<T>);
+            return obj is IdentityComparer<T>;
         }
 
         // For comparing two IComparers to see if they compare the same thing.
@@ -5440,7 +5436,7 @@ public static class Algorithms
             this.equalityComparer = equalityComparer;
         }
 
-        public bool Equals (IEnumerable<T> x, IEnumerable<T> y)
+        public bool Equals (IEnumerable<T>? x, IEnumerable<T>? y)
         {
             return EqualCollections (x, y, equalityComparer);
         }
@@ -5526,9 +5522,9 @@ public static class Algorithms
             this.equalityComparer = equalityComparer;
         }
 
-        public bool Equals (IEnumerable<T> x, IEnumerable<T> y)
+        public bool Equals (IEnumerable<T>? x, IEnumerable<T>? y)
         {
-            return EqualSets (x, y, equalityComparer);
+            return EqualSets (x!, y!, equalityComparer);
         }
 
         public int GetHashCode (IEnumerable<T> obj)
@@ -6114,7 +6110,7 @@ public static class Algorithms
 
             // If both continue1 and continue2 are false, we reached the end of both sequences at the same
             // time and found success. If one is true and one is false, the sequences were of difference lengths -- failure.
-            return (continue1 == continue2);
+            return continue1 == continue2;
         }
     }
 
@@ -6180,7 +6176,7 @@ public static class Algorithms
 
             // If both continue1 and continue2 are false, we reached the end of both sequences at the same
             // time and found success. If one is true and one is false, the sequences were of difference lengths -- failure.
-            return (continue1 == continue2);
+            return continue1 == continue2;
         }
     }
 

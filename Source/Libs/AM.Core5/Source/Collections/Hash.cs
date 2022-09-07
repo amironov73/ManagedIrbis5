@@ -712,7 +712,7 @@ internal class Hash<T> : IEnumerable<T>, ISerializable, IDeserializationCallback
     /// Deserialize the hash table. Called from the serialization infrastructure when
     /// the object graph has finished deserializing.
     /// </summary>
-    void IDeserializationCallback.OnDeserialization (object sender)
+    void IDeserializationCallback.OnDeserialization (object? sender)
     {
         if (serializationInfo == null)
         {

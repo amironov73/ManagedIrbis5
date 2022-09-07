@@ -230,27 +230,34 @@ namespace NetCoreServer
 
         public string ReceiveText()
         {
-            Buffer result = new Buffer();
+            var result = new Buffer();
 
             if (!WebSocket.WsHandshaked)
+            {
                 return result.ExtractString(0, result.Data.Length);
+            }
 
-            Buffer cache = new Buffer();
+            var cache = new Buffer();
 
             // Receive WebSocket frame data
             while (!WebSocket.WsFinalReceived)
             {
                 while (!WebSocket.WsFrameReceived)
                 {
-                    int required = WebSocket.RequiredReceiveFrameSize();
+                    var required = WebSocket.RequiredReceiveFrameSize();
                     cache.Resize(required);
-                    int received = (int)base.Receive(cache.Data, 0, required);
+                    var received = (int)base.Receive(cache.Data, 0, required);
                     if (received != required)
+                    {
                         return result.ExtractString(0, result.Data.Length);
+                    }
+
                     WebSocket.PrepareReceiveFrame(cache.Data, 0, received);
                 }
                 if (!WebSocket.WsFinalReceived)
+                {
                     WebSocket.PrepareReceiveFrame(null, 0, 0);
+                }
             }
 
             // Copy WebSocket frame data
@@ -261,27 +268,34 @@ namespace NetCoreServer
 
         public Buffer ReceiveBinary()
         {
-            Buffer result = new Buffer();
+            var result = new Buffer();
 
             if (!WebSocket.WsHandshaked)
+            {
                 return result;
+            }
 
-            Buffer cache = new Buffer();
+            var cache = new Buffer();
 
             // Receive WebSocket frame data
             while (!WebSocket.WsFinalReceived)
             {
                 while (!WebSocket.WsFrameReceived)
                 {
-                    int required = WebSocket.RequiredReceiveFrameSize();
+                    var required = WebSocket.RequiredReceiveFrameSize();
                     cache.Resize(required);
-                    int received = (int)base.Receive(cache.Data, 0, required);
+                    var received = (int)base.Receive(cache.Data, 0, required);
                     if (received != required)
+                    {
                         return result;
+                    }
+
                     WebSocket.PrepareReceiveFrame(cache.Data, 0, received);
                 }
                 if (!WebSocket.WsFinalReceived)
+                {
                     WebSocket.PrepareReceiveFrame(null, 0, 0);
+                }
             }
 
             // Copy WebSocket frame data
@@ -297,7 +311,9 @@ namespace NetCoreServer
         protected override void OnDisconnecting()
         {
             if (WebSocket.WsHandshaked)
+            {
                 OnWsDisconnecting();
+            }
         }
 
         protected override void OnDisconnected()
@@ -337,7 +353,9 @@ namespace NetCoreServer
         {
             // Check for WebSocket handshaked status
             if (WebSocket.WsHandshaked)
+            {
                 return;
+            }
 
             // Try to perform WebSocket upgrade
             if (!WebSocket.PerformServerUpgrade(request, Response))
