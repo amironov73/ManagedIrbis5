@@ -1,117 +1,73 @@
-#region PDFsharp - A .NET library for processing PDF
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharp.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-// DEALINGS IN THE SOFTWARE.
-#endregion
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/* Calc.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
+
 using PdfSharpCore.Drawing;
 
-namespace PdfSharpCore.Internal
+#endregion
+
+#nullable enable
+
+namespace PdfSharpCore.Internal;
+
+/// <summary>
+/// Some static helper functions for calculations.
+/// </summary>
+internal static class Calc
 {
     /// <summary>
-    /// Some static helper functions for calculations.
+    /// Degree to radiant factor.
     /// </summary>
-    internal static class Calc
+    public const double Deg2Rad = Math.PI / 180;
+
+    ///// <summary>
+    ///// Half of pi.
+    ///// </summary>
+    //public const double πHalf = Math.PI / 2;
+    //// α - β κ
+
+    /// <summary>
+    /// Get page size in point from specified PageSize.
+    /// </summary>
+    public static XSize PageSizeToSize (PageSize value)
     {
-        /// <summary>
-        /// Degree to radiant factor.
-        /// </summary>
-        public const double Deg2Rad = Math.PI / 180;
-
-        ///// <summary>
-        ///// Half of pi.
-        ///// </summary>
-        //public const double πHalf = Math.PI / 2;
-        //// α - β κ
-
-        /// <summary>
-        /// Get page size in point from specified PageSize.
-        /// </summary>
-        public static XSize PageSizeToSize(PageSize value)
+        return value switch
         {
-            switch (value)
-            {
-                case PageSize.A0:
-                    return new XSize(2380, 3368);
+            PageSize.A0 => new XSize (2380, 3368),
+            PageSize.A1 => new XSize (1684, 2380),
+            PageSize.A2 => new XSize (1190, 1684),
+            PageSize.A3 => new XSize (842, 1190),
+            PageSize.A4 => new XSize (595, 842),
+            PageSize.A6 => new XSize (298, 420),
+            PageSize.A5 => new XSize (420, 595),
+            PageSize.B4 => new XSize (729, 1032),
+            PageSize.B5 => new XSize (516, 729),
 
-                case PageSize.A1:
-                    return new XSize(1684, 2380);
+            // The strange sizes from overseas...
+            PageSize.Letter => new XSize (612, 792),
+            PageSize.Legal => new XSize (612, 1008),
+            PageSize.Tabloid => new XSize (792, 1224),
+            PageSize.Ledger => new XSize (1224, 792),
+            PageSize.Statement => new XSize (396, 612),
+            PageSize.Executive => new XSize (540, 720),
+            PageSize.Folio => new XSize (612, 936),
+            PageSize.Quarto => new XSize (610, 780),
+            PageSize.Size10x14 => new XSize (720, 1008),
 
-                case PageSize.A2:
-                    return new XSize(1190, 1684);
-
-                case PageSize.A3:
-                    return new XSize(842, 1190);
-
-                case PageSize.A4:
-                    return new XSize(595, 842);
-
-                case PageSize.A6:
-                    return new XSize(298, 420);
-
-                case PageSize.A5:
-                    return new XSize(420, 595);
-
-                case PageSize.B4:
-                    return new XSize(729, 1032);
-
-                case PageSize.B5:
-                    return new XSize(516, 729);
-
-                // The strange sizes from overseas...
-
-                case PageSize.Letter:
-                    return new XSize(612, 792);
-
-                case PageSize.Legal:
-                    return new XSize(612, 1008);
-
-                case PageSize.Tabloid:
-                    return new XSize(792, 1224);
-
-                case PageSize.Ledger:
-                    return new XSize(1224, 792);
-
-                case PageSize.Statement:
-                    return new XSize(396, 612);
-
-                case PageSize.Executive:
-                    return new XSize(540, 720);
-
-                case PageSize.Folio:
-                    return new XSize(612, 936);
-
-                case PageSize.Quarto:
-                    return new XSize(610, 780);
-
-                case PageSize.Size10x14:
-                    return new XSize(720, 1008);
-            }
-            throw new ArgumentException("Invalid PageSize.");
-        }
+            _ => throw new ArgumentException ("Invalid PageSize.")
+        };
     }
 }

@@ -1,76 +1,76 @@
-#region PDFsharp - A .NET library for processing PDF
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharp.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-// DEALINGS IN THE SOFTWARE.
-#endregion
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/* ColorHelper.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
+
+#endregion
+
+#nullable enable
+
 #pragma warning disable 649
 
-namespace PdfSharpCore.Internal
+namespace PdfSharpCore.Internal;
+
+/// <summary>
+///
+/// </summary>
+struct SColor
 {
-    struct SColor
+    public byte a;
+    public byte r;
+    public byte g;
+    public byte b;
+}
+
+/// <summary>
+///
+/// </summary>
+struct SCColor
+{
+    public float a;
+    public float r;
+    public float g;
+    public float b;
+}
+
+/// <summary>
+///
+/// </summary>
+static class ColorHelper
+{
+    public static float sRgbToScRgb (byte bval)
     {
-        public byte a;
-        public byte r;
-        public byte g;
-        public byte b;
+        var num = bval / 255f;
+
+        return num switch
+        {
+            <= 0.0f => 0f,
+            <= 0.04045f => num / 12.92f,
+            < 1f => MathF.Pow ((num + 0.055f) / 1.055f, 2.4f),
+            _ => 1f
+        };
     }
 
-    struct SCColor
+    public static byte ScRgbTosRgb (float val)
     {
-        public float a;
-        public float r;
-        public float g;
-        public float b;
-    }
-
-    static class ColorHelper
-    {
-        public static float sRgbToScRgb(byte bval)
+        return val switch
         {
-            float num = ((float)bval) / 255f;
-            if (num <= 0.0)
-                return 0f;
-            if (num <= 0.04045)
-                return (num / 12.92f);
-            if (num < 1f)
-                return (float)Math.Pow((num + 0.055) / 1.055, 2.4);
-            return 1f;
-        }
-
-        public static byte ScRgbTosRgb(float val)
-        {
-            if (val <= 0.0)
-                return 0;
-            if (val <= 0.0031308)
-                return (byte)(((255f * val) * 12.92f) + 0.5f);
-            if (val < 1.0)
-                return (byte)((255f * ((1.055f * ((float)Math.Pow((double)val, 0.41666666666666669))) - 0.055f)) + 0.5f);
-            return 0xff;
-        }
+            <= 0.0f => 0,
+            <= 0.0031308f => (byte)(255f * val * 12.92f + 0.5f),
+            <= 1.0f => (byte)(255f * (1.055f * MathF.Pow (val, 0.41666666666666669f) - 0.055f) + 0.5f),
+            _ => 0xff
+        };
     }
 }
