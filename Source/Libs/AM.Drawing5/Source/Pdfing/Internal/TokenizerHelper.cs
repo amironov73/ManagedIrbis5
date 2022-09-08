@@ -1,5 +1,24 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/* TokenizerHelper.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Globalization;
+
+#endregion
+
+#nullable enable
 
 namespace PdfSharpCore.Internal;
 
@@ -87,7 +106,7 @@ internal class TokenizerHelper
             return null;
         }
 
-        return _str.Substring (_currentTokenIndex, _currentTokenLength);
+        return _str?.Substring (_currentTokenIndex, _currentTokenLength);
     }
 
     public void LastTokenRequired()
@@ -118,6 +137,11 @@ internal class TokenizerHelper
 
     public bool NextToken (bool allowQuotedToken, char separator)
     {
+        if (string.IsNullOrEmpty (_str))
+        {
+            return false;
+        }
+
         // Reset index.
         _currentTokenIndex = -1;
         _foundSeparator = false;
@@ -207,6 +231,11 @@ internal class TokenizerHelper
 
     private void ScanToNextToken (char separator)
     {
+        if (string.IsNullOrEmpty (_str))
+        {
+            return;
+        }
+
         // Do nothing if already at end of the string.
         if (_charIndex < _strLen)
         {
@@ -281,6 +310,6 @@ internal class TokenizerHelper
     private int _currentTokenIndex;
     private int _currentTokenLength;
     private char _quoteChar;
-    private string _str;
+    private string? _str;
     private int _strLen;
 }
