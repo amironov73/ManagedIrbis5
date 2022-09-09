@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
@@ -32,19 +33,19 @@ namespace PdfSharpCore.Drawing.Layout;
 /// </summary>
 public class XTextSegmentFormatter
 {
-    private readonly XGraphics _gfx;
+    private readonly XGraphics _graphics;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XTextSegmentFormatter"/> class.
     /// </summary>
     public XTextSegmentFormatter
         (
-            XGraphics gfx
+            XGraphics graphics
         )
     {
-        Sure.NotNull (gfx);
+        Sure.NotNull (graphics);
 
-        _gfx = gfx;
+        _graphics = graphics;
     }
 
     /// <summary>
@@ -109,8 +110,17 @@ public class XTextSegmentFormatter
                 textSegments,
                 layoutRectangle,
                 format,
-                (block, dx, dy) => _gfx.DrawString (block.Text, block.Environment.Font, block.Environment.Brush,
-                    dx + block.Location.X, dy + block.Location.Y),
+                (block, dx, dy) =>
+                {
+                    var environment = block.Environment.ThrowIfNull();
+                    _graphics.DrawString
+                        (
+                            block.Text.ThrowIfNull(),
+                            environment.Font.ThrowIfNull(),
+                            environment.Brush.ThrowIfNull(),
+                            dx + block.Location.X, dy + block.Location.Y
+                        );
+                },
                 false
             );
     }
@@ -188,7 +198,13 @@ public class XTextSegmentFormatter
         var layoutRectangle = new XRect (0, 0, width, 100000000);
         var blocks = new List<Block>();
 
-        ProcessTextSegments (textSegments, layoutRectangle, format, (block, dx, dy) => blocks.Add (block), true);
+        ProcessTextSegments
+            (
+                textSegments,
+                layoutRectangle,
+                format, (block, _, _) => blocks.Add (block),
+                true
+            );
 
         var height = blocks.Any()
             ? blocks.Max (b => b.Location.Y)
@@ -201,7 +217,8 @@ public class XTextSegmentFormatter
                 break;
             }
 
-            maxLineHeight = Math.Max (maxLineHeight, blocks[i].Environment.LineSpace);
+            var blockEnvironment = blocks[i].Environment.ThrowIfNull();
+            maxLineHeight = Math.Max (maxLineHeight, blockEnvironment.LineSpace);
         }
 
         var calculatedWith = blocks.Any()
@@ -276,13 +293,13 @@ public class XTextSegmentFormatter
         for (var index = 0; index < blockUnits.Count; index++)
         {
             var blockUnit = blockUnits[index];
-            var maxCyAscend = blockUnit.Max (b => b.Environment.CyAscent);
+            var maxCyAscend = blockUnit.Max (b => b.Environment.ThrowIfNull().CyAscent);
             var dx = layoutRectangle.Location.X;
             var dy = layoutRectangle.Location.Y + maxCyAscend;
 
             // Check all blocks of the current line in order to move all blocks of the next lines down,
             // when the first block of the current line has not the max cy ascent of the whole line
-            if (!blockUnit.All (b => b.Environment.CyAscent == maxCyAscend))
+            if (!blockUnit.All (b => b.Environment.ThrowIfNull().CyAscent == maxCyAscend))
             {
                 for (var indexSiblings = index + 1; indexSiblings < blockUnits.Count; indexSiblings++)
                 {
@@ -354,7 +371,7 @@ public class XTextSegmentFormatter
                     {
                         var token = textSegment.Text.Substring (startIndex, blockLength);
                         var block = new Block (token, BlockType.Text,
-                            _gfx.MeasureString (token, textSegment.Font).Width);
+                            _graphics.MeasureString (token, textSegment.Font).Width);
                         SetFormatterEnvironment (block, textSegment);
                         block.LineIndent = textSegment.LineIndent;
                         block.SkipParagraphAlignment = textSegment.SkipParagraphAlignment;
@@ -374,7 +391,7 @@ public class XTextSegmentFormatter
                     {
                         var token = textSegment.Text.Substring (startIndex, blockLength).Trim();
                         var block = new Block (token, BlockType.Text,
-                            _gfx.MeasureString (token, textSegment.Font).Width);
+                            _graphics.MeasureString (token, textSegment.Font).Width);
                         SetFormatterEnvironment (block, textSegment);
                         block.LineIndent = textSegment.LineIndent;
                         block.SkipParagraphAlignment = textSegment.SkipParagraphAlignment;
@@ -397,7 +414,7 @@ public class XTextSegmentFormatter
             if (blockLength != 0)
             {
                 var token = textSegment.Text.Substring (startIndex, blockLength);
-                var block = new Block (token, BlockType.Text, _gfx.MeasureString (token, textSegment.Font).Width)
+                var block = new Block (token, BlockType.Text, _graphics.MeasureString (token, textSegment.Font).Width)
                     {
                         LineIndent = textSegment.LineIndent,
                         SkipParagraphAlignment = textSegment.SkipParagraphAlignment
@@ -684,8 +701,8 @@ public class XTextSegmentFormatter
         segment.CyDescent = segment.LineSpace * segment.Font.CellDescent / segment.Font.CellSpace;
 
         // HACK in XTextSegmentFormatter
-        segment.SpaceWidth = _gfx.MeasureString ("x x", segment.Font).Width;
-        segment.SpaceWidth -= _gfx.MeasureString ("xx", segment.Font).Width;
+        segment.SpaceWidth = _graphics.MeasureString ("x x", segment.Font).Width;
+        segment.SpaceWidth -= _graphics.MeasureString ("xx", segment.Font).Width;
     }
 
     // TODO:
