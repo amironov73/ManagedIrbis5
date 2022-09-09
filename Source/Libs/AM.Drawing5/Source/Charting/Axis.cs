@@ -608,8 +608,12 @@ public abstract class Axis
     /// <seealso cref="Charting.Scale.IsReverse"/>
     public AxisType Type
     {
-        get => Scale.Type;
-        set => Scale = Scale.MakeNewScale (Scale, value);
+        get => Scale.ThrowIfNull().Type;
+        set
+        {
+            var scale = Scale.ThrowIfNull();
+            Scale = scale.MakeNewScale (scale, value);
+        }
     }
 
     #endregion
@@ -658,7 +662,7 @@ public abstract class Axis
     /// A reference to the <see cref="GraphPane"/> object that is the parent or
     /// owner of this object.
     /// </param>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -667,18 +671,23 @@ public abstract class Axis
     /// <seealso cref="Charting.Scale.MajorStepAuto"/>
     /// <seealso cref="Charting.Scale.MagAuto"/>
     /// <seealso cref="Charting.Scale.FormatAuto"/>
-    public void ResetAutoScale (GraphPane pane, Graphics g)
+    public void ResetAutoScale
+        (
+            GraphPane pane,
+            Graphics graphics
+        )
     {
-        Scale._minAuto = true;
-        Scale._maxAuto = true;
-        Scale._majorStepAuto = true;
-        Scale._minorStepAuto = true;
+        var scale = Scale.ThrowIfNull();
+        scale._minAuto = true;
+        scale._maxAuto = true;
+        scale._majorStepAuto = true;
+        scale._minorStepAuto = true;
         CrossAuto = true;
-        Scale._magAuto = true;
+        scale._magAuto = true;
 
         //this.numDecAuto = true;
-        Scale._formatAuto = true;
-        pane.AxisChange (g);
+        scale._formatAuto = true;
+        pane.AxisChange (graphics);
     }
 
     /// <summary>
@@ -689,7 +698,7 @@ public abstract class Axis
     /// This method is normally only
     /// called by the Draw method of the parent <see cref="GraphPane"/> object.
     /// </remarks>
-    /// <param name="g">
+    /// <param name="graphics">
     /// A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.
     /// </param>
@@ -707,27 +716,30 @@ public abstract class Axis
     /// The number of pixels to shift to account for non-primary axis position (e.g.,
     /// the second, third, fourth, etc. <see cref="YAxis" /> or <see cref="Y2Axis" />.
     /// </param>
-    public void Draw (Graphics g, GraphPane pane, float scaleFactor, float shiftPos)
+    public void Draw
+        (
+            Graphics graphics,
+            GraphPane pane,
+            float scaleFactor,
+            float shiftPos
+        )
     {
-        var saveMatrix = g.Transform;
+        var saveMatrix = graphics.Transform;
 
-        Scale.SetupScaleData (pane, this);
-
+        var scale = Scale.ThrowIfNull();
+        scale.SetupScaleData (pane, this);
         if (IsVisible)
         {
-            var smode = g.SmoothingMode;
-            g.SmoothingMode = SmoothingMode.None;
-
-            SetTransformMatrix (g, pane, scaleFactor);
-
+            var smode = graphics.SmoothingMode;
+            graphics.SmoothingMode = SmoothingMode.None;
+            SetTransformMatrix (graphics, pane, scaleFactor);
             shiftPos = CalcTotalShift (pane, scaleFactor, shiftPos);
-
-            Scale.Draw (g, pane, scaleFactor, shiftPos);
+            scale.Draw (graphics, pane, scaleFactor, shiftPos);
 
             //DrawTitle( g, pane, scaleFactor );
 
-            g.Transform = saveMatrix;
-            g.SmoothingMode = smode;
+            graphics.Transform = saveMatrix;
+            graphics.SmoothingMode = smode;
         }
     }
 
@@ -742,18 +754,14 @@ public abstract class Axis
         if (IsVisible)
         {
             var saveMatrix = graphics.Transform;
+            var scale = Scale.ThrowIfNull();
             SetTransformMatrix (graphics, pane, scaleFactor);
 
-            var baseVal = Scale.CalcBaseTic();
-            float topPix, rightPix;
-            Scale.GetTopRightPix (pane, out topPix, out rightPix);
-
+            var baseVal = scale.CalcBaseTic();
+            scale.GetTopRightPix (pane, out var topPix, out _);
             shiftPos = CalcTotalShift (pane, scaleFactor, shiftPos);
-
-            Scale.DrawGrid (graphics, pane, baseVal, topPix, scaleFactor);
-
+            scale.DrawGrid (graphics, pane, baseVal, topPix, scaleFactor);
             DrawMinorTics (graphics, pane, baseVal, shiftPos, scaleFactor, topPix);
-
             graphics.Transform = saveMatrix;
         }
     }
@@ -767,7 +775,7 @@ public abstract class Axis
     /// based on current data ranges, font sizes, etc.  The "space" is actually the amount of space
     /// required to fit the tic marks, scale labels, and axis title.
     /// </remarks>
-    /// <param name="g">A graphic device object to be drawn into.  This is normally e.Graphics from the
+    /// <param name="graphics">A graphic device object to be drawn into.  This is normally e.Graphics from the
     /// PaintEventArgs argument to the Paint() method.</param>
     /// <param name="pane">A reference to the <see cref="GraphPane"/> object that is the parent or
     /// owner of this object.</param>
@@ -776,8 +784,13 @@ public abstract class Axis
     /// allow for 20% extra above the currently required space.</param>
     /// <param name="isGrowOnly">If true, then this method will only modify the <see cref="MinSpace"/>
     /// property if the calculated result is more than the current value.</param>
-    public void SetMinSpaceBuffer (Graphics g, GraphPane pane, float bufferFraction,
-        bool isGrowOnly)
+    public void SetMinSpaceBuffer
+        (
+            Graphics graphics,
+            GraphPane pane,
+            float bufferFraction,
+            bool isGrowOnly
+        )
     {
         // save the original value of minSpace
         var oldSpace = MinSpace;
@@ -787,8 +800,7 @@ public abstract class Axis
 
         // Calculate the space required for the current graph assuming scalefactor = 1.0
         // and apply the bufferFraction
-        float fixedSpace;
-        var space = CalcSpace (g, pane, 1.0F, out fixedSpace) * bufferFraction;
+        var space = CalcSpace (graphics, pane, 1.0F, out _) * bufferFraction;
 
         // isGrowOnly indicates the minSpace can grow but not shrink
         if (isGrowOnly)
@@ -866,15 +878,16 @@ public abstract class Axis
         )
     {
         var crossAxis = GetCrossAxis (pane);
+        var crossAxisScale = crossAxis.Scale.ThrowIfNull();
 
         // Use Linearize here instead of _minLinTemp because this method is called
         // as part of CalcRect() before scale is fully setup
-        var min = crossAxis.Scale.Linearize (crossAxis.Scale._min);
-        var max = crossAxis.Scale.Linearize (crossAxis.Scale._max);
+        var min = crossAxisScale.Linearize (crossAxisScale._min);
+        var max = crossAxisScale.Linearize (crossAxisScale._max);
 
         if (CrossAuto)
         {
-            return crossAxis.Scale.IsReverse == (this is Y2Axis || this is X2Axis)
+            return crossAxisScale.IsReverse == (this is Y2Axis || this is X2Axis)
                 ? max
                 : min;
         }
@@ -887,7 +900,10 @@ public abstract class Axis
         {
             return max;
         }
-        return Scale.Linearize (_cross);
+
+        var scale = Scale.ThrowIfNull();
+
+        return scale.Linearize (_cross);
     }
 
     /// <summary>
@@ -903,17 +919,19 @@ public abstract class Axis
         }
 
         var crossAxis = GetCrossAxis (pane);
-        if (((this is XAxis || this is YAxis) && !crossAxis.Scale.IsReverse) ||
-            ((this is X2Axis || this is Y2Axis) && crossAxis.Scale.IsReverse))
+        var crossAxisScale = crossAxis.Scale.ThrowIfNull();
+
+        if ((this is XAxis || this is YAxis) && !crossAxisScale.IsReverse ||
+            (this is X2Axis || this is Y2Axis) && crossAxisScale.IsReverse)
         {
-            if (_cross <= crossAxis.Scale._min)
+            if (_cross <= crossAxisScale._min)
             {
                 return false;
             }
         }
         else
         {
-            if (_cross >= crossAxis.Scale._max)
+            if (_cross >= crossAxisScale._max)
             {
                 return false;
             }
@@ -947,17 +965,19 @@ public abstract class Axis
 
         var effCross = EffectiveCrossValue (pane);
         var crossAxis = GetCrossAxis (pane);
+        var crossAxisScale = crossAxis.Scale.ThrowIfNull();
 
         // Use Linearize here instead of _minLinTemp because this method is called
         // as part of CalcRect() before scale is fully setup
         //			double max = crossAxis._scale._maxLinTemp;
         //			double min = crossAxis._scale._minLinTemp;
-        var max = crossAxis.Scale.Linearize (crossAxis.Scale._min);
-        var min = crossAxis.Scale.Linearize (crossAxis.Scale._max);
+        var max = crossAxisScale.Linearize (crossAxisScale._min);
+        var min = crossAxisScale.Linearize (crossAxisScale._max);
         float frac;
 
-        if (((this is XAxis || this is YAxis) && Scale._isLabelsInside == crossAxis.Scale.IsReverse) ||
-            ((this is X2Axis || this is Y2Axis) && Scale._isLabelsInside != crossAxis.Scale.IsReverse))
+        var scale = Scale.ThrowIfNull();
+        if ((this is XAxis || this is YAxis) && scale._isLabelsInside == crossAxisScale.IsReverse ||
+            (this is X2Axis || this is Y2Axis) && scale._isLabelsInside != crossAxisScale.IsReverse)
         {
             frac = (float)((effCross - min) / (max - min));
         }
@@ -979,7 +999,12 @@ public abstract class Axis
         return frac;
     }
 
-    private float CalcTotalShift (GraphPane pane, float scaleFactor, float shiftPos)
+    private float CalcTotalShift
+        (
+            GraphPane pane,
+            float scaleFactor,
+            float shiftPos
+        )
     {
         if (!IsPrimary (pane))
         {
@@ -1147,18 +1172,18 @@ public abstract class Axis
 
         // for the Y axes, make sure that enough space is left to fit the first
         // and last X axis scale label
-        if (IsPrimary (pane) && ((
-                                          (this is YAxis && (
-                                              (!pane.XAxis.Scale._isSkipFirstLabel &&
-                                               !pane.XAxis.Scale._isReverse) ||
-                                              (!pane.XAxis.Scale._isSkipLastLabel &&
-                                               pane.XAxis.Scale._isReverse))) ||
-                                          (this is Y2Axis && (
-                                              (!pane.XAxis.Scale._isSkipFirstLabel &&
-                                               pane.XAxis.Scale._isReverse) ||
-                                              (!pane.XAxis.Scale._isSkipLastLabel &&
-                                               !pane.XAxis.Scale._isReverse)))) &&
-                                      pane.XAxis.IsVisible && pane.XAxis.Scale._isVisible))
+        if (IsPrimary (pane) && (
+                this is YAxis && (
+                    !pane.XAxis.Scale._isSkipFirstLabel &&
+                    !pane.XAxis.Scale._isReverse ||
+                    !pane.XAxis.Scale._isSkipLastLabel &&
+                    pane.XAxis.Scale._isReverse) ||
+                this is Y2Axis && (
+                    !pane.XAxis.Scale._isSkipFirstLabel &&
+                    pane.XAxis.Scale._isReverse ||
+                    !pane.XAxis.Scale._isSkipLastLabel &&
+                    !pane.XAxis.Scale._isReverse)) &&
+            pane.XAxis.IsVisible && pane.XAxis.Scale._isVisible)
         {
             // half the width of the widest item, plus a gap of 1/2 the charheight
             var tmp = pane.XAxis.Scale.GetScaleMaxSpace (graphics, pane, scaleFactor, true).Width / 2.0F;
@@ -1304,9 +1329,9 @@ public abstract class Axis
                         }
 
                         // Make sure that the current value does not match up with a major tic
-                        if (((Math.Abs (dVal) < 1e-20 && Math.Abs (dVal - majorVal) > 1e-20) ||
-                             (Math.Abs (dVal) > 1e-20 && Math.Abs ((dVal - majorVal) / dVal) > 1e-10)) &&
-                            (dVal >= first && dVal <= last))
+                        if ((Math.Abs (dVal) < 1e-20 && Math.Abs (dVal - majorVal) > 1e-20 ||
+                             Math.Abs (dVal) > 1e-20 && Math.Abs ((dVal - majorVal) / dVal) > 1e-10) &&
+                            dVal >= first && dVal <= last)
                         {
                             pixVal = Scale.LocalTransform (dVal);
 
@@ -1360,11 +1385,11 @@ public abstract class Axis
         //if ( _isVisible && _title._isVisible && str.Length > 0 )
         if (IsVisible && Title.IsVisible && !string.IsNullOrEmpty (str))
         {
-            var hasTic = (Scale._isLabelsInside
-                ? (MajorTic.IsInside || MajorTic._isCrossInside ||
-                   MinorTic.IsInside || MinorTic._isCrossInside)
-                : (MajorTic.IsOutside || MajorTic._isCrossOutside || MinorTic.IsOutside ||
-                   MinorTic._isCrossOutside));
+            var hasTic = Scale._isLabelsInside
+                ? MajorTic.IsInside || MajorTic._isCrossInside ||
+                  MinorTic.IsInside || MinorTic._isCrossInside
+                : MajorTic.IsOutside || MajorTic._isCrossOutside || MinorTic.IsOutside ||
+                  MinorTic._isCrossOutside;
 
             // Calculate the title position in screen coordinates
             var x = (Scale._maxPix - Scale._minPix) / 2;
@@ -1382,10 +1407,10 @@ public abstract class Axis
 
             var gap = scaledTic * (hasTic ? 1.0f : 0.0f) +
                       Title.FontSpec.BoundingBox (graphics, str, scaleFactor).Height / 2.0F;
-            var y = (Scale._isVisible
+            var y = Scale._isVisible
                 ? Scale.GetScaleMaxSpace (graphics, pane, scaleFactor, true).Height
                   + scaledLabelGap
-                : 0);
+                : 0;
 
             if (Scale._isLabelsInside)
             {

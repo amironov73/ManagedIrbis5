@@ -13,19 +13,55 @@
 
 #nullable enable
 
-namespace PdfSharpCore.Drawing.Layout
-{
-	public class TextSegment
-	{
-		public XFont Font { get; set; }
-		public XBrush Brush { get; set; }
-		public string Text { get; set; }
-		public double LineIndent { get; set; }
-		public bool SkipParagraphAlignment { get; set; }
+namespace PdfSharpCore.Drawing.Layout;
 
-		public double LineSpace { get; set; }
-		public double CyAscent { get; set; }
-		public double CyDescent { get; set; }
-		public double SpaceWidth { get; set; }
-	}
+/// <summary>
+///
+/// </summary>
+public class TextSegment
+{
+    /// <summary>
+    ///
+    /// </summary>
+    public XFont? Font { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public XBrush? Brush { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public string? Text { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public double LineIndent { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public bool SkipParagraphAlignment { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public double LineSpace { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public double CyAscent { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public double CyDescent { get; set; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public double SpaceWidth { get; set; }
 }
