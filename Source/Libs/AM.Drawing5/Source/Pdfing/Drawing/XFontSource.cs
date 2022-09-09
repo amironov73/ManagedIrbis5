@@ -102,7 +102,7 @@ internal class XFontSource
         set
         {
             _fontface = value;
-            FontName = value?.name?.FullFontName;
+            FontName = value?._name?.FullFontName;
         }
     }
 

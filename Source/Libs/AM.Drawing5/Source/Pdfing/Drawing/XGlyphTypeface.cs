@@ -46,11 +46,11 @@ namespace PdfSharpCore.Drawing
 
         public XGlyphTypeface(string key, XFontSource fontSource)
         {
-            string familyName = fontSource.Fontface.name.Name;
+            string familyName = fontSource.Fontface._name.Name;
             _fontFamily = new XFontFamily(familyName, false);
             _fontface = fontSource.Fontface;
-            _isBold = _fontface.os2.IsBold;
-            _isItalic = _fontface.os2.IsItalic;
+            _isBold = _fontface._os2.IsBold;
+            _isItalic = _fontface._os2.IsItalic;
 
             _key = key;
             //_fontFamily =xfont  FontFamilyCache.GetFamilyByName(familyName);
@@ -141,11 +141,11 @@ namespace PdfSharpCore.Drawing
 
         void Initialize()
         {
-            _familyName = _fontface.name.Name;
+            _familyName = _fontface._name.Name;
             if (string.IsNullOrEmpty(_faceName) || _faceName.StartsWith("?"))
                 _faceName = _familyName;
-            _styleName = _fontface.name.Style;
-            _displayName = _fontface.name.FullFontName;
+            _styleName = _fontface._name.Style;
+            _displayName = _fontface._name.FullFontName;
             if (string.IsNullOrEmpty(_displayName))
             {
                 _displayName = _familyName;
@@ -154,11 +154,11 @@ namespace PdfSharpCore.Drawing
             }
 
             // Bold, as defined in OS/2 table.
-            _isBold = _fontface.os2.IsBold;
+            _isBold = _fontface._os2.IsBold;
             // Debug.Assert(_isBold == (_fontface.os2.usWeightClass > 400), "Check font weight.");
 
             // Italic, as defined in OS/2 table.
-            _isItalic = _fontface.os2.IsItalic;
+            _isItalic = _fontface._os2.IsItalic;
         }
 
         /// <summary>

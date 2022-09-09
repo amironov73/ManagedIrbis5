@@ -66,14 +66,14 @@ namespace PdfSharpCore.Fonts.OpenType
             {
                 FontFace = new OpenTypeFontface(fontData, idName);
                 // Try to get real name form name table
-                if (idName.Contains("XPS-Font-") && FontFace.name != null && FontFace.name.Name.Length != 0)
+                if (idName.Contains("XPS-Font-") && FontFace._name != null && FontFace._name.Name.Length != 0)
                 {
                     string tag = String.Empty;
                     if (idName.IndexOf('+') == 6)
                         tag = idName.Substring(0, 6);
-                    idName = tag + "+" + FontFace.name.Name;
-                    if (FontFace.name.Style.Length != 0)
-                        idName += "," + FontFace.name.Style;
+                    idName = tag + "+" + FontFace._name.Name;
+                    if (FontFace._name.Style.Length != 0)
+                        idName += "," + FontFace._name.Style;
                     //idName = idName.Replace(" ", "");
                 }
                 FontName = idName;
@@ -94,17 +94,17 @@ namespace PdfSharpCore.Fonts.OpenType
             //bool embeddingRestricted = fontData.os2.fsType == 0x0002;
 
             //fontName = image.n
-            ItalicAngle = FontFace.post.italicAngle;
+            ItalicAngle = FontFace._post.italicAngle;
 
-            XMin = FontFace.head.xMin;
-            YMin = FontFace.head.yMin;
-            XMax = FontFace.head.xMax;
-            YMax = FontFace.head.yMax;
+            XMin = FontFace._head.xMin;
+            YMin = FontFace._head.yMin;
+            XMax = FontFace._head.xMax;
+            YMax = FontFace._head.yMax;
 
-            UnderlinePosition = FontFace.post.underlinePosition;
-            UnderlineThickness = FontFace.post.underlineThickness;
-            StrikeoutPosition = FontFace.os2.yStrikeoutPosition;
-            StrikeoutSize = FontFace.os2.yStrikeoutSize;
+            UnderlinePosition = FontFace._post.underlinePosition;
+            UnderlineThickness = FontFace._post.underlineThickness;
+            StrikeoutPosition = FontFace._os2.yStrikeoutPosition;
+            StrikeoutSize = FontFace._os2.yStrikeoutSize;
 
             // No documetation found how to get the set vertical stems width from the
             // TrueType tables.
@@ -115,24 +115,24 @@ namespace PdfSharpCore.Fonts.OpenType
             StemV = 0;
 
             // PDFlib states that some Apple fonts miss the OS/2 table.
-            Debug.Assert(FontFace.os2 != null, "TrueType font has no OS/2 table.");
+            Debug.Assert(FontFace._os2 != null, "TrueType font has no OS/2 table.");
 
-            UnitsPerEm = FontFace.head.unitsPerEm;
+            UnitsPerEm = FontFace._head.unitsPerEm;
 
             // Calculate Ascent, Descent, Leading and LineSpacing like in WPF Source Code (see FontDriver.ReadBasicMetrics)
 
             // OS/2 is an optional table, but we can't determine if it is existing in this font.
-            bool os2SeemsToBeEmpty = FontFace.os2.sTypoAscender == 0 && FontFace.os2.sTypoDescender == 0 && FontFace.os2.sTypoLineGap == 0;
+            bool os2SeemsToBeEmpty = FontFace._os2.sTypoAscender == 0 && FontFace._os2.sTypoDescender == 0 && FontFace._os2.sTypoLineGap == 0;
             //Debug.Assert(!os2SeemsToBeEmpty); // Are there fonts without OS/2 table?
 
-            bool dontUseWinLineMetrics = (FontFace.os2.fsSelection & 128) != 0;
+            bool dontUseWinLineMetrics = (FontFace._os2.fsSelection & 128) != 0;
             if (!os2SeemsToBeEmpty && dontUseWinLineMetrics)
             {
                 // Comment from WPF: The font specifies that the sTypoAscender, sTypoDescender, and sTypoLineGap fields are valid and
                 // should be used instead of winAscent and winDescent.
-                int typoAscender = FontFace.os2.sTypoAscender;
-                int typoDescender = FontFace.os2.sTypoDescender;
-                int typoLineGap = FontFace.os2.sTypoLineGap;
+                int typoAscender = FontFace._os2.sTypoAscender;
+                int typoDescender = FontFace._os2.sTypoDescender;
+                int typoLineGap = FontFace._os2.sTypoLineGap;
 
                 // Comment from WPF: We include the line gap in the ascent so that white space is distributed above the line. (Note that
                 // the typo line gap is a different concept than "external leading".)
@@ -145,13 +145,13 @@ namespace PdfSharpCore.Fonts.OpenType
             else
             {
                 // Comment from WPF: get the ascender field
-                int ascender = FontFace.hhea.ascender;
+                int ascender = FontFace._hhea.ascender;
                 // Comment from WPF: get the descender field; this is measured in the same direction as ascender and is therefore 
                 // normally negative whereas we want a positive value; however some fonts get the sign wrong
                 // so instead of just negating we take the absolute value.
-                int descender = Math.Abs(FontFace.hhea.descender);
+                int descender = Math.Abs(FontFace._hhea.descender);
                 // Comment from WPF: get the lineGap field and make sure it's >= 0 
-                int lineGap = Math.Max((short)0, FontFace.hhea.lineGap);
+                int lineGap = Math.Max((short)0, FontFace._hhea.lineGap);
 
                 if (!os2SeemsToBeEmpty)
                 {
@@ -160,8 +160,8 @@ namespace PdfSharpCore.Fonts.OpenType
                     // these fields wrong or get them right only for Latin text; therefore we use the more reliable 
                     // platform-specific Windows values. We take the absolute value of the win32descent in case some
                     // fonts get the sign wrong. 
-                    int winAscent = FontFace.os2.usWinAscent;
-                    int winDescent = Math.Abs(FontFace.os2.usWinDescent);
+                    int winAscent = FontFace._os2.usWinAscent;
+                    int winDescent = Math.Abs(FontFace._os2.usWinDescent);
 
                     Ascender = winAscent;
                     Descender = winDescent;
@@ -190,13 +190,13 @@ namespace PdfSharpCore.Fonts.OpenType
             Leading = externalLeading;
 
             // sCapHeight and sxHeight are only valid if Version >= 2
-            if (FontFace.os2.version >= 2 && FontFace.os2.sCapHeight != 0)
-                CapHeight = FontFace.os2.sCapHeight;
+            if (FontFace._os2.version >= 2 && FontFace._os2.sCapHeight != 0)
+                CapHeight = FontFace._os2.sCapHeight;
             else
                 CapHeight = Ascender;
 
-            if (FontFace.os2.version >= 2 && FontFace.os2.sxHeight != 0)
-                XHeight = FontFace.os2.sxHeight;
+            if (FontFace._os2.version >= 2 && FontFace._os2.sxHeight != 0)
+                XHeight = FontFace._os2.sxHeight;
             else
                 XHeight = (int)(0.66 * Ascender);
 
@@ -205,7 +205,7 @@ namespace PdfSharpCore.Fonts.OpenType
             Encoding unicode = Encoding.Unicode;
             byte[] bytes = new byte[256];
 
-            bool symbol = FontFace.cmap.symbol;
+            bool symbol = FontFace._cmap.symbol;
             Widths = new int[256];
             for (int idx = 0; idx < 256; idx++)
             {
@@ -239,7 +239,7 @@ namespace PdfSharpCore.Fonts.OpenType
                 if (symbol)
                 {
                     // Remap ch for symbol fonts.
-                    ch = (char)(ch | (FontFace.os2.usFirstCharIndex & 0xFF00));  // @@@ refactor
+                    ch = (char)(ch | (FontFace._os2.usFirstCharIndex & 0xFF00));  // @@@ refactor
                 }
                 int glyphIndex = CharCodeToGlyphIndex(ch);
                 Widths[idx] = GlyphIndexToPdfWidth(glyphIndex);
@@ -256,7 +256,7 @@ namespace PdfSharpCore.Fonts.OpenType
             {
                 // usWeightClass 700 is Bold
                 //Debug.Assert((fontData.os2.usWeightClass >= 700) == ((fontData.os2.fsSelection & (ushort)OS2Table.FontSelectionFlags.Bold) != 0));
-                return FontFace.os2.IsBold;
+                return FontFace._os2.IsBold;
             }
         }
 
@@ -265,12 +265,12 @@ namespace PdfSharpCore.Fonts.OpenType
         /// </summary>
         public override bool IsItalicFace
         {
-            get { return FontFace.os2.IsItalic; }
+            get { return FontFace._os2.IsItalic; }
         }
 
         internal int DesignUnitsToPdf(double value)
         {
-            return (int)Math.Round(value * 1000.0 / FontFace.head.unitsPerEm);
+            return (int)Math.Round(value * 1000.0 / FontFace._head.unitsPerEm);
         }
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace PdfSharpCore.Fonts.OpenType
         {
             try
             {
-                CMap4 cmap4 = FontFace.cmap.cmap4;
+                CMap4 cmap4 = FontFace._cmap.cmap4;
                 int segCount = cmap4.segCountX2 / 2;
                 int seg;
                 for (seg = 0; seg < segCount; seg++)
@@ -320,14 +320,14 @@ namespace PdfSharpCore.Fonts.OpenType
         {
             try
             {
-                int numberOfHMetrics = FontFace.hhea.numberOfHMetrics;
-                int unitsPerEm = FontFace.head.unitsPerEm;
+                int numberOfHMetrics = FontFace._hhea.numberOfHMetrics;
+                int unitsPerEm = FontFace._head.unitsPerEm;
 
                 // glyphIndex >= numberOfHMetrics means the font is mono-spaced and all glyphs have the same width
                 if (glyphIndex >= numberOfHMetrics)
                     glyphIndex = numberOfHMetrics - 1;
 
-                int width = FontFace.hmtx.Metrics[glyphIndex].advanceWidth;
+                int width = FontFace._hmtx.Metrics[glyphIndex].advanceWidth;
 
                 // Sometimes the unitsPerEm is 1000, sometimes a power of 2.
                 if (unitsPerEm == 1000)
@@ -355,14 +355,14 @@ namespace PdfSharpCore.Fonts.OpenType
         {
             try
             {
-                int numberOfHMetrics = FontFace.hhea.numberOfHMetrics;
-                int unitsPerEm = FontFace.head.unitsPerEm;
+                int numberOfHMetrics = FontFace._hhea.numberOfHMetrics;
+                int unitsPerEm = FontFace._head.unitsPerEm;
 
                 // glyphIndex >= numberOfHMetrics means the font is mono-spaced and all glyphs have the same width
                 if (glyphIndex >= numberOfHMetrics)
                     glyphIndex = numberOfHMetrics - 1;
 
-                int width = FontFace.hmtx.Metrics[glyphIndex].advanceWidth;
+                int width = FontFace._hmtx.Metrics[glyphIndex].advanceWidth;
 
                 return width * emSize / unitsPerEm; // normalize
             }
@@ -380,13 +380,13 @@ namespace PdfSharpCore.Fonts.OpenType
         {
             try
             {
-                int numberOfHMetrics = FontFace.hhea.numberOfHMetrics;
+                int numberOfHMetrics = FontFace._hhea.numberOfHMetrics;
 
                 // glyphIndex >= numberOfHMetrics means the font is mono-spaced and all glyphs have the same width
                 if (glyphIndex >= numberOfHMetrics)
                     glyphIndex = numberOfHMetrics - 1;
 
-                int width = FontFace.hmtx.Metrics[glyphIndex].advanceWidth;
+                int width = FontFace._hmtx.Metrics[glyphIndex].advanceWidth;
                 return width;
             }
             catch (Exception)

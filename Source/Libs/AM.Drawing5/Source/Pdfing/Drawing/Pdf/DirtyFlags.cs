@@ -3,8 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
 /* DirtyFlags.cs --
@@ -17,16 +15,41 @@ using System;
 
 #endregion
 
-namespace PdfSharpCore.Drawing.Pdf
+namespace PdfSharpCore.Drawing.Pdf;
+
+/// <summary>
+///
+/// </summary>
+[Flags]
+internal enum DirtyFlags
 {
-    [Flags]
-    enum DirtyFlags
-    {
-        Ctm = 0x00000001,
-        ClipPath = 0x00000002,
-        LineWidth = 0x00000010,
-        LineJoin = 0x00000020,
-        MiterLimit = 0x00000040,
-        StrokeFill = 0x00000070,
-    }
+    /// <summary>
+    ///
+    /// </summary>
+    Ctm = 0x00000001,
+
+    /// <summary>
+    ///
+    /// </summary>
+    ClipPath = 0x00000002,
+
+    /// <summary>
+    ///
+    /// </summary>
+    LineWidth = 0x00000010,
+
+    /// <summary>
+    ///
+    /// </summary>
+    LineJoin = 0x00000020,
+
+    /// <summary>
+    ///
+    /// </summary>
+    MiterLimit = 0x00000040,
+
+    /// <summary>
+    ///
+    /// </summary>
+    StrokeFill = 0x00000070,
 }

@@ -150,8 +150,8 @@ public sealed class PdfFontDescriptor
     PdfFontDescriptorFlags FlagsFromDescriptor (OpenTypeDescriptor descriptor)
     {
         PdfFontDescriptorFlags flags = 0;
-        _isSymbolFont = descriptor.FontFace.cmap.symbol;
-        flags |= descriptor.FontFace.cmap.symbol ? PdfFontDescriptorFlags.Symbolic : PdfFontDescriptorFlags.Nonsymbolic;
+        _isSymbolFont = descriptor.FontFace._cmap.symbol;
+        flags |= descriptor.FontFace._cmap.symbol ? PdfFontDescriptorFlags.Symbolic : PdfFontDescriptorFlags.Nonsymbolic;
         return flags;
     }
 

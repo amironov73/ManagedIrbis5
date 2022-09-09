@@ -46,7 +46,7 @@ internal class CMapInfo
     {
         if (text != null)
         {
-            var symbol = _descriptor.FontFace.cmap.symbol;
+            var symbol = _descriptor.FontFace._cmap.symbol;
             var length = text.Length;
             for (var idx = 0; idx < length; idx++)
             {
@@ -57,7 +57,7 @@ internal class CMapInfo
                     if (symbol)
                     {
                         // Remap ch for symbol fonts.
-                        ch2 = (char)(ch | (_descriptor.FontFace.os2.usFirstCharIndex & 0xFF00)); // @@@ refactor
+                        ch2 = (char)(ch | (_descriptor.FontFace._os2.usFirstCharIndex & 0xFF00)); // @@@ refactor
                     }
 
                     var glyphIndex = _descriptor.CharCodeToGlyphIndex (ch2);

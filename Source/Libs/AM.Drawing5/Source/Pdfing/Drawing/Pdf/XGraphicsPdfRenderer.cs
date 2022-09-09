@@ -554,14 +554,14 @@ internal class XGraphicsPdfRenderer
         if (font.Unicode)
         {
             var sb = new StringBuilder();
-            var isSymbolFont = descriptor.FontFace.cmap.symbol;
+            var isSymbolFont = descriptor.FontFace._cmap.symbol;
             for (var idx = 0; idx < s.Length; idx++)
             {
                 var ch = s[idx];
                 if (isSymbolFont)
                 {
                     // Remap ch for symbol fonts.
-                    ch = (char)(ch | (descriptor.FontFace.os2.usFirstCharIndex & 0xFF00)); // @@@ refactor
+                    ch = (char)(ch | (descriptor.FontFace._os2.usFirstCharIndex & 0xFF00)); // @@@ refactor
                 }
 
                 var glyphID = descriptor.CharCodeToGlyphIndex (ch);
