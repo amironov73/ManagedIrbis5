@@ -19,7 +19,6 @@ using System.Linq;
 
 using AM;
 
-using PdfSharpCore.Drawing.Layout.enums;
 using PdfSharpCore.Pdf.IO;
 
 #endregion

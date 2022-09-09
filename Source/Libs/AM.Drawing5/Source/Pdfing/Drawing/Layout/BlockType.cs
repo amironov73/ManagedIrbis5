@@ -11,10 +11,30 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace PdfSharpCore.Drawing.Layout.enums
+namespace PdfSharpCore.Drawing.Layout;
+
+/// <summary>
+///
+/// </summary>
+internal enum BlockType
 {
-	internal enum BlockType
-	{
-		Text, Space, Hyphen, LineBreak,
-	}
+    /// <summary>
+    ///
+    /// </summary>
+    Text,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Space,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Hyphen,
+
+    /// <summary>
+    ///
+    /// </summary>
+    LineBreak
 }
