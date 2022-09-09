@@ -34,6 +34,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security.Cryptography;
 
+using AM;
+
 using PdfSharpCore.Pdf.IO;
 using PdfSharpCore.Pdf.Advanced;
 using PdfSharpCore.Pdf.Internal;
@@ -267,7 +269,7 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
     /// Checks the password.
     /// </summary>
     /// <param name="inputPassword">Password or null if no password is provided.</param>
-    public PasswordValidity ValidatePassword (string inputPassword)
+    public PasswordValidity ValidatePassword (string? inputPassword)
     {
         // We can handle 40 and 128 bit standard encryption.
         var filter = Elements.GetName (PdfSecurityHandler.Keys.Filter);
@@ -277,34 +279,34 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
             throw new PdfReaderException (PSSR.UnknownEncryption);
         }
 
-        var documentID = PdfEncoders.RawEncoding.GetBytes (Owner.Internals.FirstDocumentID);
+        var owner = Owner.ThrowIfNull();
+        var document = _document.ThrowIfNull();
+
+        var documentId = PdfEncoders.RawEncoding.GetBytes (owner.Internals.FirstDocumentID);
         var oValue = PdfEncoders.RawEncoding.GetBytes (Elements.GetString (Keys.O));
         var uValue = PdfEncoders.RawEncoding.GetBytes (Elements.GetString (Keys.U));
         var pValue = Elements.GetInteger (Keys.P);
         var rValue = Elements.GetInteger (Keys.R);
 
-        if (inputPassword == null)
-        {
-            inputPassword = "";
-        }
+        inputPassword ??= string.Empty;
 
         var strongEncryption = rValue == 3;
         var keyLength = strongEncryption ? 16 : 32;
 
         // Try owner password first.
         //byte[] password = PdfEncoders.RawEncoding.GetBytes(inputPassword);
-        InitWithOwnerPassword (documentID, inputPassword, oValue, pValue, strongEncryption);
+        InitWithOwnerPassword (documentId, inputPassword, oValue, pValue, strongEncryption);
         if (EqualsKey (uValue, keyLength))
         {
-            _document.SecuritySettings._hasOwnerPermissions = true;
+            document.SecuritySettings._hasOwnerPermissions = true;
             return PasswordValidity.OwnerPassword;
         }
 
-        _document.SecuritySettings._hasOwnerPermissions = false;
+        document.SecuritySettings._hasOwnerPermissions = false;
 
         // Now try user password.
         //password = PdfEncoders.RawEncoding.GetBytes(inputPassword);
-        InitWithUserPassword (documentID, inputPassword, oValue, pValue, strongEncryption);
+        InitWithUserPassword (documentId, inputPassword, oValue, pValue, strongEncryption);
         if (EqualsKey (uValue, keyLength))
         {
             return PasswordValidity.UserPassword;
@@ -318,14 +320,17 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
     {
         var dump = tag + ": ";
         for (var idx = 0; idx < bytes.Length; idx++)
+        {
             dump += String.Format ("{0:X2}", bytes[idx]);
+        }
+
         Debug.WriteLine (dump);
     }
 
     /// <summary>
     /// Pads a password to a 32 byte array.
     /// </summary>
-    static byte[] PadPassword (string password)
+    static byte[] PadPassword (string? password)
     {
         var padded = new byte[32];
         if (password == null)
@@ -354,22 +359,22 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
     /// <summary>
     /// Generates the user key based on the padded user password.
     /// </summary>
-    void InitWithUserPassword (byte[] documentID, string userPassword, byte[] ownerKey, int permissions,
+    void InitWithUserPassword (byte[] documentId, string userPassword, byte[] ownerKey, int permissions,
         bool strongEncryption)
     {
-        InitEncryptionKey (documentID, PadPassword (userPassword), ownerKey, permissions, strongEncryption);
-        SetupUserKey (documentID);
+        InitEncryptionKey (documentId, PadPassword (userPassword), ownerKey, permissions, strongEncryption);
+        SetupUserKey (documentId);
     }
 
     /// <summary>
     /// Generates the user key based on the padded owner password.
     /// </summary>
-    void InitWithOwnerPassword (byte[] documentID, string ownerPassword, byte[] ownerKey, int permissions,
+    void InitWithOwnerPassword (byte[] documentId, string ownerPassword, byte[] ownerKey, int permissions,
         bool strongEncryption)
     {
         var userPad = ComputeOwnerKey (ownerKey, PadPassword (ownerPassword), strongEncryption);
-        InitEncryptionKey (documentID, userPad, ownerKey, permissions, strongEncryption);
-        SetupUserKey (documentID);
+        InitEncryptionKey (documentId, userPad, ownerKey, permissions, strongEncryption);
+        SetupUserKey (documentId);
     }
 
     /// <summary>
@@ -387,14 +392,20 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
 
             // Hash the pad 50 times
             for (var idx = 0; idx < 50; idx++)
+            {
                 digest = _md5.ComputeHash (digest);
+            }
+
             Array.Copy (userPad, 0, ownerKey, 0, 32);
 
             // Encrypt the key
             for (var i = 0; i < 20; i++)
             {
                 for (var j = 0; j < mkey.Length; ++j)
+                {
                     mkey[j] = (byte)(digest[j] ^ i);
+                }
+
                 PrepareRC4Key (mkey);
                 EncryptRC4 (ownerKey);
             }
@@ -450,23 +461,28 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
     /// <summary>
     /// Computes the user key.
     /// </summary>
-    void SetupUserKey (byte[] documentID)
+    void SetupUserKey (byte[] documentId)
     {
         if (_encryptionKey.Length == 16)
         {
             _md5.TransformBlock (PasswordPadding, 0, PasswordPadding.Length, PasswordPadding, 0);
-            _md5.TransformFinalBlock (documentID, 0, documentID.Length);
+            _md5.TransformFinalBlock (documentId, 0, documentId.Length);
             var digest = _md5.Hash;
             _md5.Initialize();
             Array.Copy (digest, 0, _userKey, 0, 16);
             for (var idx = 16; idx < 32; idx++)
+            {
                 _userKey[idx] = 0;
+            }
 
             //Encrypt the key
             for (var i = 0; i < 20; i++)
             {
                 for (var j = 0; j < _encryptionKey.Length; j++)
+                {
                     digest[j] = (byte)(_encryptionKey[j] ^ i);
+                }
+
                 PrepareRC4Key (digest, 0, _encryptionKey.Length);
                 EncryptRC4 (_userKey, 0, 16);
             }
@@ -502,7 +518,10 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
         var idx1 = 0;
         var idx2 = 0;
         for (var idx = 0; idx < 256; idx++)
+        {
             _state[idx] = (byte)idx;
+        }
+
         byte tmp;
         for (var idx = 0; idx < 256; idx++)
         {

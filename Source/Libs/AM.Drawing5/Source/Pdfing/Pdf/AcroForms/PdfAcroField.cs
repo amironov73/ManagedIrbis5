@@ -17,6 +17,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+using AM;
+
 using PdfSharpCore.Pdf.Advanced;
 
 #endregion
@@ -267,18 +269,26 @@ public abstract class PdfAcroField
         }
     }
 
-    static void AppDict2 (PdfDictionary dict, Dictionary<string, object> names)
+    static void AppDict2
+        (
+            PdfDictionary dict,
+            Dictionary<string, object> names
+        )
     {
         foreach (var key in dict.Elements.Keys)
         {
             if (!names.ContainsKey (key))
             {
-                names.Add (key, null);
+                names.Add (key, null!);
             }
         }
     }
 
-    internal virtual void GetDescendantNames (ref List<string> names, string partialName)
+    internal virtual void GetDescendantNames
+        (
+            ref List<string> names,
+            string? partialName
+        )
     {
         if (HasKids)
         {
@@ -326,8 +336,8 @@ public abstract class PdfAcroField
         {
             if (_fields == null)
             {
-                object o = Elements.GetValue (Keys.Kids, VCF.CreateIndirect);
-                _fields = (PdfAcroFieldCollection)o;
+                var o = Elements.GetValue (Keys.Kids, VCF.CreateIndirect);
+                _fields = (PdfAcroFieldCollection) o.ThrowIfNull ();
             }
 
             return _fields;
@@ -339,7 +349,8 @@ public abstract class PdfAcroField
     /// <summary>
     /// Holds a collection of interactive fields.
     /// </summary>
-    public sealed class PdfAcroFieldCollection : PdfArray
+    public sealed class PdfAcroFieldCollection
+        : PdfArray
     {
         PdfAcroFieldCollection (PdfArray array)
             : base (array)
@@ -356,7 +367,10 @@ public abstract class PdfAcroField
                 var count = Elements.Count;
                 var names = new string[count];
                 for (var idx = 0; idx < count; idx++)
+                {
                     names[idx] = ((PdfDictionary)((PdfReference)Elements[idx]).Value).Elements.GetString (Keys.T);
+                }
+
                 return names;
             }
         }
@@ -378,7 +392,11 @@ public abstract class PdfAcroField
             }
         }
 
-        internal void GetDescendantNames (ref List<string> names, string partialName)
+        internal void GetDescendantNames
+            (
+                ref List<string> names,
+                string? partialName
+            )
         {
             var count = Elements.Count;
             for (var idx = 0; idx < count; idx++)

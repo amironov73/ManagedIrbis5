@@ -13,6 +13,8 @@
 
 #nullable enable
 
+using AM;
+
 namespace PdfSharpCore.Pdf.AcroForms;
 
 /// <summary>
@@ -44,21 +46,22 @@ public sealed class PdfAcroForm : PdfDictionary
         {
             if (_fields == null)
             {
-                object o = Elements.GetValue (Keys.Fields, VCF.CreateIndirect);
-                _fields = (PdfAcroField.PdfAcroFieldCollection)o;
+                var o = Elements.GetValue (Keys.Fields, VCF.CreateIndirect);
+                _fields = (PdfAcroField.PdfAcroFieldCollection) o.ThrowIfNull();
             }
 
             return _fields;
         }
     }
 
-    PdfAcroField.PdfAcroFieldCollection _fields;
+    private PdfAcroField.PdfAcroFieldCollection? _fields;
 
     /// <summary>
     /// Predefined keys of this dictionary.
     /// The description comes from PDF 1.4 Reference.
     /// </summary>
-    public sealed class Keys : KeysBase
+    public sealed class Keys
+        : KeysBase
     {
         // ReSharper disable InconsistentNaming
 
@@ -114,17 +117,9 @@ public sealed class PdfAcroForm : PdfDictionary
         /// <summary>
         /// Gets the KeysMeta for these keys.
         /// </summary>
-        internal static DictionaryMeta Meta
-        {
-            get
-            {
-                if (s_meta == null)
-                    s_meta = CreateMeta (typeof (Keys));
-                return s_meta;
-            }
-        }
+        internal static DictionaryMeta Meta => s_meta ??= CreateMeta (typeof (Keys));
 
-        static DictionaryMeta s_meta;
+        static DictionaryMeta? s_meta;
 
         // ReSharper restore InconsistentNaming
     }
@@ -132,8 +127,5 @@ public sealed class PdfAcroForm : PdfDictionary
     /// <summary>
     /// Gets the KeysMeta of this dictionary type.
     /// </summary>
-    internal override DictionaryMeta Meta
-    {
-        get { return Keys.Meta; }
-    }
+    internal override DictionaryMeta Meta => Keys.Meta;
 }

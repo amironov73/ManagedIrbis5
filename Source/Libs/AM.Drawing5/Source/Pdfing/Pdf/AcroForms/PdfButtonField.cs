@@ -52,40 +52,53 @@ public abstract class PdfButtonField
     /// <summary>
     /// Gets the name which represents the opposite of /Off.
     /// </summary>
-    protected string GetNonOffValue()
+    protected string? GetNonOffValue()
     {
         // Try to get the information from the appearance dictionaray.
         // Just return the first key that is not /Off.
         // I'm not sure what is the right solution to get this value.
-        PdfDictionary ap = Elements[PdfAnnotation.Keys.AP] as PdfDictionary;
-        if (ap != null)
+        if (Elements[PdfAnnotation.Keys.AP] is PdfDictionary ap)
         {
-            PdfDictionary n = ap.Elements["/N"] as PdfDictionary;
-            if (n != null)
+            if (ap.Elements["/N"] is PdfDictionary n)
             {
-                foreach (string name in n.Elements.Keys)
+                foreach (var name in n.Elements.Keys)
+                {
                     if (name != "/Off")
+                    {
                         return name;
+                    }
+                }
             }
         }
 
         return null;
     }
 
-    internal override void GetDescendantNames (ref List<string> names, string partialName)
+    internal override void GetDescendantNames
+        (
+            ref List<string> names,
+            string partialName
+        )
     {
-        string t = Elements.GetString (PdfAcroField.Keys.T);
+        var t = Elements.GetString (PdfAcroField.Keys.T);
 
         // HACK: ???
         if (t == "")
+        {
             t = "???";
+        }
+
         Debug.Assert (t != "");
         if (t.Length > 0)
         {
             if (!String.IsNullOrEmpty (partialName))
+            {
                 names.Add (partialName + "." + t);
+            }
             else
+            {
                 names.Add (t);
+            }
         }
     }
 
