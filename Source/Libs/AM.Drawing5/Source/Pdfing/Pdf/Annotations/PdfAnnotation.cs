@@ -1,34 +1,25 @@
-#region PDFsharp - A .NET library for processing PDF
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharpCore.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-// DEALINGS IN THE SOFTWARE.
-#endregion
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
+
 using PdfSharpCore.Drawing;
+
+#endregion
+
+#nullable enable
 
 namespace PdfSharpCore.Pdf.Annotations
 {
@@ -106,7 +97,7 @@ namespace PdfSharpCore.Pdf.Annotations
         }
 
         /// <summary>
-        /// Gets or sets the text label to be displayed in the title bar of the annotation’s
+        /// Gets or sets the text label to be displayed in the title bar of the annotationï¿½s
         /// pop-up window when open and active. By convention, this entry identifies
         /// the user who added the annotation.
         /// </summary>
@@ -136,7 +127,7 @@ namespace PdfSharpCore.Pdf.Annotations
 
         /// <summary>
         /// Gets or sets the text to be displayed for the annotation or, if this type of
-        /// annotation does not display text, an alternate description of the annotation’s
+        /// annotation does not display text, an alternate description of the annotationï¿½s
         /// contents in human-readable form.
         /// </summary>
         public string Contents
@@ -234,9 +225,9 @@ namespace PdfSharpCore.Pdf.Annotations
 
             /// <summary>
             /// (Optional) Text to be displayed for the annotation or, if this type of annotation
-            /// does not display text, an alternate description of the annotation’s contents
+            /// does not display text, an alternate description of the annotationï¿½s contents
             /// in human-readable form. In either case, this text is useful when
-            /// extracting the document’s contents in support of accessibility to users with
+            /// extracting the documentï¿½s contents in support of accessibility to users with
             /// disabilities or for other purposes.
             /// </summary>
             [KeyInfo(KeyType.TextString | KeyType.Optional)]
@@ -253,7 +244,7 @@ namespace PdfSharpCore.Pdf.Annotations
 
             /// <summary>
             /// (Optional; PDF 1.1) The date and time when the annotation was most recently
-            /// modified. The preferred format is a date string, but viewer applications should be 
+            /// modified. The preferred format is a date string, but viewer applications should be
             /// prepared to accept and display a string in any format.
             /// </summary>
             [KeyInfo(KeyType.Date | KeyType.Optional)]
@@ -268,7 +259,7 @@ namespace PdfSharpCore.Pdf.Annotations
 
             /// <summary>
             /// (Optional; PDF 1.2) A border style dictionary specifying the characteristics of
-            /// the annotation’s border.
+            /// the annotationï¿½s border.
             /// </summary>
             [KeyInfo("1.2", KeyType.Dictionary | KeyType.Optional)]
             public const string BS = "/BS";
@@ -283,21 +274,21 @@ namespace PdfSharpCore.Pdf.Annotations
 
             /// <summary>
             /// (Required if the appearance dictionary AP contains one or more subdictionaries; PDF 1.2)
-            /// The annotation’s appearance state, which selects the applicable appearance stream from 
+            /// The annotationï¿½s appearance state, which selects the applicable appearance stream from
             /// an appearance subdictionary.
             /// </summary>
             [KeyInfo("1.2", KeyType.Dictionary | KeyType.Optional)]
             public const string AS = "/AS";
 
             /// <summary>
-            /// (Optional) An array specifying the characteristics of the annotation’s border.
+            /// (Optional) An array specifying the characteristics of the annotationï¿½s border.
             /// The border is specified as a rounded rectangle.
-            /// In PDF 1.0, the array consists of three numbers defining the horizontal corner 
+            /// In PDF 1.0, the array consists of three numbers defining the horizontal corner
             /// radius, vertical corner radius, and border width, all in default user space units.
-            /// If the corner radii are 0, the border has square (not rounded) corners; if the border 
+            /// If the corner radii are 0, the border has square (not rounded) corners; if the border
             /// width is 0, no border is drawn.
-            /// In PDF 1.1, the array may have a fourth element, an optional dash array defining a 
-            /// pattern of dashes and gaps to be used in drawing the border. The dash array is 
+            /// In PDF 1.1, the array may have a fourth element, an optional dash array defining a
+            /// pattern of dashes and gaps to be used in drawing the border. The dash array is
             /// specified in the same format as in the line dash pattern parameter of the graphics state.
             /// For example, a Border value of [0 0 1 [3 2]] specifies a border 1 unit wide, with
             /// square corners, drawn with 3-unit dashes alternating with 2-unit gaps. Note that no
@@ -311,9 +302,9 @@ namespace PdfSharpCore.Pdf.Annotations
             /// (Optional; PDF 1.1) An array of three numbers in the range 0.0 to 1.0, representing
             /// the components of a color in the DeviceRGB color space. This color is used for the
             /// following purposes:
-            /// • The background of the annotation’s icon when closed
-            /// • The title bar of the annotation’s pop-up window
-            /// • The border of a link annotation
+            /// ï¿½ The background of the annotationï¿½s icon when closed
+            /// ï¿½ The title bar of the annotationï¿½s pop-up window
+            /// ï¿½ The border of a link annotation
             /// </summary>
             [KeyInfo("1.1", KeyType.Array | KeyType.Optional)]
             public const string C = "/C";
@@ -333,7 +324,7 @@ namespace PdfSharpCore.Pdf.Annotations
             // ----- Excerpt of entries specific to markup annotations ----------------------------------
 
             /// <summary>
-            /// (Optional; PDF 1.1) The text label to be displayed in the title bar of the annotation’s
+            /// (Optional; PDF 1.1) The text label to be displayed in the title bar of the annotationï¿½s
             /// pop-up window when open and active. By convention, this entry identifies
             /// the user who added the annotation.
             /// </summary>
@@ -354,8 +345,8 @@ namespace PdfSharpCore.Pdf.Annotations
             /// the annotation is opened.
             /// The specified value is not used if the annotation has an appearance stream; in that
             /// case, the appearance stream must specify any transparency. (However, if the viewer
-            /// regenerates the annotation’s appearance stream, it may incorporate the CA value
-            /// into the stream’s content.)
+            /// regenerates the annotationï¿½s appearance stream, it may incorporate the CA value
+            /// into the streamï¿½s content.)
             /// The implicit blend mode is Normal.
             /// Default value: 1.0.
             /// </summary>

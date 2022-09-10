@@ -11,7 +11,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-
 namespace PdfSharpCore.Pdf.Actions;
 
 /// <summary>
