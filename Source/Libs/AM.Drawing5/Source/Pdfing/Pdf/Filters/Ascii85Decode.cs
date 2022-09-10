@@ -136,7 +136,7 @@ public class Ascii85Decode
     public override byte[] Decode
         (
             byte[] data,
-            FilterParms parameters
+            FilterParms? parameters
         )
     {
         Sure.NotNull (data);

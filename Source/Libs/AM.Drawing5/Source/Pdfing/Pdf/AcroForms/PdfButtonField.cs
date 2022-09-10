@@ -77,7 +77,7 @@ public abstract class PdfButtonField
     internal override void GetDescendantNames
         (
             ref List<string> names,
-            string partialName
+            string? partialName
         )
     {
         var t = Elements.GetString (PdfAcroField.Keys.T);

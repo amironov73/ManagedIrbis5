@@ -17,6 +17,8 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 
+using AM;
+
 using PdfSharpCore.Fonts.OpenType;
 using PdfSharpCore.Pdf.Internal;
 
@@ -46,7 +48,10 @@ internal class CMapInfo
     {
         if (text != null)
         {
-            var symbol = _descriptor.FontFace._cmap.symbol;
+            var fontFace = _descriptor.FontFace;
+            var cmap = fontFace._cmap.ThrowIfNull();
+
+            var symbol = cmap.symbol;
             var length = text.Length;
             for (var idx = 0; idx < length; idx++)
             {
@@ -127,6 +132,6 @@ internal class CMapInfo
 
     public char MinChar = char.MaxValue;
     public char MaxChar = char.MinValue;
-    public Dictionary<char, int> CharacterToGlyphIndex = new Dictionary<char, int>();
-    public Dictionary<int, object> GlyphIndices = new Dictionary<int, object>();
+    public Dictionary<char, int> CharacterToGlyphIndex = new ();
+    public Dictionary<int, object?> GlyphIndices = new ();
 }

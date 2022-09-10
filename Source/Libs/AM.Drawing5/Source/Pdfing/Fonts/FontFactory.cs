@@ -50,7 +50,7 @@ internal static class FontFactory
     /// <returns>
     /// Information about the typeface, or null if no typeface can be found.
     /// </returns>
-    public static FontResolverInfo ResolveTypeface
+    public static FontResolverInfo? ResolveTypeface
         (
             string familyName,
             FontResolvingOptions fontResolvingOptions,

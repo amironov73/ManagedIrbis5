@@ -44,7 +44,7 @@ public class LzwDecode
     public override byte[] Decode
         (
             byte[] data,
-            FilterParms parameters
+            FilterParms? parameters
         )
     {
         if (data[0] == 0x00 && data[1] == 0x01)

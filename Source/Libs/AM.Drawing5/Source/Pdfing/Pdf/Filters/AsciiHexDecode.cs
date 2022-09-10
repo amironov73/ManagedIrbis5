@@ -57,7 +57,7 @@ public class AsciiHexDecode
     public override byte[] Decode
         (
             byte[] data,
-            FilterParms parameters
+            FilterParms? parameters
         )
     {
         Sure.NotNull (data);

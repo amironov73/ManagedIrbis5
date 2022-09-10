@@ -126,7 +126,7 @@ public sealed class PdfPage
     /// <summary>
     /// Gets or sets the PdfDocument this page belongs to.
     /// </summary>
-    internal override PdfDocument Document
+    internal override PdfDocument? Document
     {
         set
         {
@@ -143,7 +143,7 @@ public sealed class PdfPage
                     Reference.Document = value;
                 }
 
-                Elements[Keys.Parent] = _document.Pages.Reference;
+                Elements[Keys.Parent] = _document.ThrowIfNull().Pages.Reference;
             }
         }
     }
