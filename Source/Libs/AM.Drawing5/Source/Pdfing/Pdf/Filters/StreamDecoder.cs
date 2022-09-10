@@ -1,60 +1,105 @@
-﻿using PdfSharpCore.Pdf.IO;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/* StreamDecoder.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 
-namespace PdfSharpCore.Pdf.Filters
+using PdfSharpCore.Pdf.IO;
+
+#endregion
+
+#nullable enable
+
+namespace PdfSharpCore.Pdf.Filters;
+
+internal static class StreamDecoder
 {
-    internal static class StreamDecoder
+    // PdfReference, chapter 7.4.4.3
+
+    /// <summary>
+    /// Further decodes a stream of bytes that were processed
+    /// by the Flate- or LZW-decoder.
+    /// </summary>
+    /// <param name="data">The data to decode</param>
+    /// <param name="decodeParms">Parameters for the decoder.
+    /// If this is null, <paramref name="data"/> is returned unchanged</param>
+    /// <returns>The decoded data as a byte-array</returns>
+    /// <exception cref="PdfReaderException"></exception>
+    /// <exception cref="NotImplementedException"></exception>
+    public static byte[] Decode
+        (
+            byte[] data,
+            PdfDictionary? decodeParms
+        )
     {
-        // PdfReference, chapter 7.4.4.3
-
-        /// <summary>
-        /// Further decodes a stream of bytes that were processed by the Flate- or LZW-decoder. 
-        /// </summary>
-        /// <param name="data">The data to decode</param>
-        /// <param name="decodeParms">Parameters for the decoder. If this is null, <paramref name="data"/> is returned unchanged</param>
-        /// <returns>The decoded data as a byte-array</returns>
-        /// <exception cref="PdfReaderException"></exception>
-        /// <exception cref="NotImplementedException"></exception>
-        public static byte[] Decode(byte[] data, PdfDictionary decodeParms)
+        if (decodeParms is null)
         {
-            if (decodeParms == null)
-                return data;
+            return data;
+        }
 
-            var predictor = decodeParms.Elements.GetInteger("/Predictor");
-            var colors = decodeParms.Elements.GetInteger("/Colors");
-            var bpc = decodeParms.Elements.GetInteger("/BitsPerComponent");
-            var columns = decodeParms.Elements.GetInteger("/Columns");
+        var predictor = decodeParms.Elements.GetInteger ("/Predictor");
+        var colors = decodeParms.Elements.GetInteger ("/Colors");
+        var bpc = decodeParms.Elements.GetInteger ("/BitsPerComponent");
+        var columns = decodeParms.Elements.GetInteger ("/Columns");
 
-            // set up defaults according to the spec
-            if (predictor < 1)
-                predictor = 1;
-            if (colors < 1)
-                colors = 1;
-            if (bpc < 1)
-                bpc = 8;
-            if (columns < 1)
-                columns = 1;
+        // set up defaults according to the spec
+        if (predictor < 1)
+        {
+            predictor = 1;
+        }
 
-            if (predictor == 1)     // no prediction, return data as is
-                return data;
+        if (colors < 1)
+        {
+            colors = 1;
+        }
 
-            // TIFF predictor. TODO: implement
-            if (predictor == 2)
-                throw new NotImplementedException("TIFF predictor is not implemented");
+        if (bpc < 1)
+        {
+            bpc = 8;
+        }
 
-            // PNG predictors
-            if (predictor >= 10 && predictor <= 15)
+        if (columns < 1)
+        {
+            columns = 1;
+        }
+
+        if (predictor == 1) // no prediction, return data as is
+        {
+            return data;
+        }
+
+        // TIFF predictor. TODO: implement
+        if (predictor == 2)
+        {
+            throw new NotImplementedException ("TIFF predictor is not implemented");
+        }
+
+        // PNG predictors
+        if (predictor >= 10 && predictor <= 15)
+        {
+            if (bpc != 1 && bpc != 2 && bpc != 4 && bpc != 8 && bpc != 16)
             {
-                if (bpc != 1 && bpc != 2 && bpc != 4 && bpc != 8 && bpc != 16)
-                    throw new PdfReaderException("Invalid number of bits per component");
-                var stride = (bpc * colors * columns + 7) / 8;
-                var rows = data.Length / (stride + 1);
-                var unfilteredData = new byte[rows * stride];
-                PngFilter.Unfilter(stride, (bpc * colors + 7) / 8, data, unfilteredData);
-                return unfilteredData;
+                throw new PdfReaderException ("Invalid number of bits per component");
             }
 
-            throw new PdfReaderException("Invalid predictor " + predictor);
+            var stride = (bpc * colors * columns + 7) / 8;
+            var rows = data.Length / (stride + 1);
+            var unfilteredData = new byte[rows * stride];
+            PngFilter.Unfilter (stride, (bpc * colors + 7) / 8, data, unfilteredData);
+            return unfilteredData;
         }
+
+        throw new PdfReaderException ("Invalid predictor " + predictor);
     }
 }
