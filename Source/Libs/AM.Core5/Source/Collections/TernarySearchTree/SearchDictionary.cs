@@ -34,7 +34,7 @@ public class SearchDictionary<TValue>
     /// <summary>
     /// Root node.
     /// </summary>
-    private Node<TValue> root;
+    private Node<TValue>? root;
 
     /// <summary>
     /// Gets the number of items in the dictionary.
@@ -174,7 +174,7 @@ public class SearchDictionary<TValue>
         var node = Tree.GetNodeWithValue (root, key);
         if (node == null || node.HasValue == false)
         {
-            value = default (TValue);
+            value = default!;
             return false;
         }
 

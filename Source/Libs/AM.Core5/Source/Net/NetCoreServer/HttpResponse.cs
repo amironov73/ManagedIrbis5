@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
+using AM;
 using AM.Text;
 
 #endregion
@@ -140,10 +141,7 @@ namespace NetCoreServer
         /// <summary>
         /// Is the HTTP response empty?
         /// </summary>
-        public bool IsEmpty
-        {
-            get { return (Cache.Size > 0); }
-        }
+        public bool IsEmpty => (Cache.Size > 0);
 
         /// <summary>
         /// Is the HTTP response error flag set?
@@ -158,26 +156,17 @@ namespace NetCoreServer
         /// <summary>
         /// Get the HTTP response status phrase
         /// </summary>
-        public string StatusPhrase
-        {
-            get { return _statusPhrase; }
-        }
+        public string StatusPhrase => _statusPhrase.ThrowIfNull();
 
         /// <summary>
         /// Get the HTTP response protocol version
         /// </summary>
-        public string Protocol
-        {
-            get { return _protocol; }
-        }
+        public string Protocol => _protocol.ThrowIfNull();
 
         /// <summary>
         /// Get the HTTP response headers count
         /// </summary>
-        public long Headers
-        {
-            get { return _headers.Count; }
-        }
+        public long Headers => _headers.Count;
 
         /// <summary>
         /// Get the HTTP response header by index
@@ -194,26 +183,17 @@ namespace NetCoreServer
         /// <summary>
         /// Get the HTTP response body as string
         /// </summary>
-        public string Body
-        {
-            get { return Cache.ExtractString (_bodyIndex, _bodySize); }
-        }
+        public string Body => Cache.ExtractString (_bodyIndex, _bodySize);
 
         /// <summary>
         /// Get the HTTP request body as byte array
         /// </summary>
-        public byte[] BodyBytes
-        {
-            get { return Cache.Data[_bodyIndex..(_bodyIndex + _bodySize)]; }
-        }
+        public byte[] BodyBytes => Cache.Data[_bodyIndex..(_bodyIndex + _bodySize)];
 
         /// <summary>
         /// Get the HTTP request body as read-only byte span
         /// </summary>
-        public ReadOnlySpan<byte> BodySpan
-        {
-            get { return new ReadOnlySpan<byte> (Cache.Data, _bodyIndex, _bodySize); }
-        }
+        public ReadOnlySpan<byte> BodySpan => new ReadOnlySpan<byte> (Cache.Data, _bodyIndex, _bodySize);
 
         /// <summary>
         /// Get the HTTP response body length
@@ -848,13 +828,13 @@ namespace NetCoreServer
         }
 
         // HTTP response status phrase
-        private string _statusPhrase;
+        private string? _statusPhrase;
 
         // HTTP response protocol
-        private string _protocol;
+        private string? _protocol;
 
         // HTTP response headers
-        private List<(string, string)> _headers = new List<(string, string)>();
+        private readonly List<(string, string)> _headers = new ();
 
         // HTTP response body
         private int _bodyIndex;
