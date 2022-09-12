@@ -1,75 +1,75 @@
-#region PDFsharp - A .NET library for processing PDF
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharpCore.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-// DEALINGS IN THE SOFTWARE.
-#endregion
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-using System;
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using AM;
+
 using PdfSharpCore.Drawing;
 
-namespace PdfSharpCore.Pdf.Internal
+#endregion
+
+#nullable enable
+
+namespace PdfSharpCore.Pdf.Internal;
+
+/// <summary>
+/// Helper functions for RGB and CMYK colors.
+/// </summary>
+static class ColorSpaceHelper
 {
     /// <summary>
-    /// Helper functions for RGB and CMYK colors.
+    /// Checks whether a color mode and a color match.
     /// </summary>
-    static class ColorSpaceHelper
+    public static XColor EnsureColorMode (PdfColorMode colorMode, XColor color)
     {
-        /// <summary>
-        /// Checks whether a color mode and a color match.
-        /// </summary>
-        public static XColor EnsureColorMode(PdfColorMode colorMode, XColor color)
+        return colorMode switch
         {
-            if (colorMode == PdfColorMode.Rgb && color.ColorSpace != XColorSpace.Rgb)
-                return XColor.FromArgb((int)(color.A * 255), color.R, color.G, color.B);
+            PdfColorMode.Rgb when color.ColorSpace != XColorSpace.Rgb =>
+                XColor.FromArgb ((int)(color.A * 255), color.R, color.G, color.B),
 
-            if (colorMode == PdfColorMode.Cmyk && color.ColorSpace != XColorSpace.Cmyk)
-                return XColor.FromCmyk(color.A, color.C, color.M, color.Y, color.K);
+            PdfColorMode.Cmyk when color.ColorSpace != XColorSpace.Cmyk =>
+                XColor.FromCmyk (color.A, color.C, color.M, color.Y, color.K),
 
-            return color;
-        }
+            _ => color
+        };
+    }
 
-        /// <summary>
-        /// Checks whether the color mode of a document and a color match.
-        /// </summary>
-        public static XColor EnsureColorMode(PdfDocument document, XColor color)
-        {
-            if (document == null)
-                throw new ArgumentNullException("document");
+    /// <summary>
+    /// Checks whether the color mode of a document and a color match.
+    /// </summary>
+    public static XColor EnsureColorMode
+        (
+            PdfDocument document,
+            XColor color
+        )
+    {
+        Sure.NotNull (document);
 
-            return EnsureColorMode(document.Options.ColorMode, color);
-        }
+        return EnsureColorMode (document.Options.ColorMode, color);
+    }
 
-        /// <summary>
-        /// Determines whether two colors are equal referring to their CMYK color values.
-        /// </summary>
-        public static bool IsEqualCmyk(XColor x, XColor y)
-        {
-            if (x.ColorSpace != XColorSpace.Cmyk || y.ColorSpace != XColorSpace.Cmyk)
-                return false;
-            return x.C == y.C && x.M == y.M && x.Y == y.Y && x.K == y.K;
-        }
+    /// <summary>
+    /// Determines whether two colors are equal referring to their CMYK color values.
+    /// </summary>
+    public static bool IsEqualCmyk (XColor x, XColor y)
+    {
+        return x.ColorSpace == XColorSpace.Cmyk
+               && y.ColorSpace == XColorSpace.Cmyk
+               && x.C == y.C
+               && x.M == y.M
+               && x.Y == y.Y
+               && x.K == y.K;
     }
 }
