@@ -148,17 +148,27 @@ public class Lexer
 #if true_
                 return ScanNumberOrReference();
 #else
+        {
             if (PeekReference())
+            {
                 return _symbol = ScanNumber();
+            }
             else
+            {
                 return _symbol = ScanNumber();
+            }
+        }
 #endif
 
         if (char.IsLetter (ch))
+        {
             return _symbol = ScanKeyword();
+        }
 
         if (ch == Chars.EOF)
+        {
             return _symbol = Symbol.Eof;
+        }
 
         // #???
 
@@ -175,18 +185,26 @@ public class Lexer
 
         // Skip illegal blanks behind �stream�.
         while (_currChar == Chars.SP)
+        {
             ScanNextChar (true);
+        }
 
         // Skip new line behind �stream�.
         if (_currChar == Chars.CR)
         {
             if (_nextChar == Chars.LF)
+            {
                 pos = _idxChar + 2;
+            }
             else
+            {
                 pos = _idxChar + 1;
+            }
         }
         else
+        {
             pos = _idxChar + 1;
+        }
 
         _pdfSteam.Position = pos;
         var bytes = new byte[length];
@@ -221,12 +239,17 @@ public class Lexer
         {
             var ch = AppendAndScanNextChar();
             if (ch == Chars.LF || ch == Chars.EOF)
+            {
                 break;
+            }
         }
 
         // TODO: not correct
         if (_token.ToString().StartsWith ("%%EOF"))
+        {
             return Symbol.Eof;
+        }
+
         return _symbol = Symbol.Comment;
     }
 
@@ -242,7 +265,9 @@ public class Lexer
         {
             var ch = AppendAndScanNextChar();
             if (IsWhiteSpace (ch) || IsDelimiter (ch) || ch == Chars.EOF)
+            {
                 return _symbol = Symbol.Name;
+            }
 
             if (ch == '#')
             {
@@ -290,24 +315,36 @@ public class Lexer
             else if (ch == '.')
             {
                 if (period)
+                {
                     ParserDiagnostics.ThrowParserException ("More than one period in number.");
+                }
 
                 period = true;
                 _token.Append (ch);
             }
             else
+            {
                 break;
+            }
 
             ch = ScanNextChar (true);
         }
 
         if (period)
+        {
             return Symbol.Real;
+        }
+
         var l = Int64.Parse (_token.ToString(), CultureInfo.InvariantCulture);
         if (l >= Int32.MinValue && l <= Int32.MaxValue)
+        {
             return Symbol.Integer;
+        }
+
         if (l >= Int64.MinValue && l <= Int64.MaxValue)
+        {
             return Symbol.Long;
+        }
 
         // Got an AutoCAD PDF file that contains this: /C 264584027963392
         // Best we can do is to convert it to real value.
@@ -332,9 +369,14 @@ public class Lexer
         while (true)
         {
             if (char.IsLetter (ch))
+            {
                 _token.Append (ch);
+            }
             else
+            {
                 break;
+            }
+
             ch = ScanNextChar (false);
         }
 
@@ -463,21 +505,27 @@ public class Lexer
                             {
                                 // Octal character code.
                                 if (ch >= '8')
+                                {
                                     ParserDiagnostics.HandleUnexpectedCharacter (ch);
+                                }
 
                                 var n = ch - '0';
                                 if (char.IsDigit (_nextChar)) // Second octal character.
                                 {
                                     ch = ScanNextChar (false);
                                     if (ch >= '8')
+                                    {
                                         ParserDiagnostics.HandleUnexpectedCharacter (ch);
+                                    }
 
                                     n = n * 8 + ch - '0';
                                     if (char.IsDigit (_nextChar)) // Third octal character.
                                     {
                                         ch = ScanNextChar (false);
                                         if (ch >= '8')
+                                        {
                                             ParserDiagnostics.HandleUnexpectedCharacter (ch);
+                                        }
 
                                         n = n * 8 + ch - '0';
                                     }
@@ -580,12 +628,16 @@ public class Lexer
                 _token.Append (Convert.ToChar (ch));
                 ScanNextChar (true);
                 if (_currChar != '>')
+                {
                     ScanNextChar (true);
+                }
             }
             else
 
                 // prevent endless loop in case _currChar is neither '>' nor a hex-char nor whitespace
+            {
                 ScanNextChar (true);
+            }
         }
 
         var chars = _token.ToString();
@@ -661,36 +713,52 @@ public class Lexer
 
         // Skip digits.
         while (char.IsDigit (_currChar))
+        {
             ScanNextChar (true);
+        }
 
         // Space expected.
         if (_currChar != Chars.SP)
+        {
             goto False;
+        }
 
         // Skip spaces.
         while (_currChar == Chars.SP)
+        {
             ScanNextChar (true);
+        }
 
         // Digit expected.
         if (!char.IsDigit (_currChar))
+        {
             goto False;
+        }
 
         // Skip digits.
         while (char.IsDigit (_currChar))
+        {
             ScanNextChar (true);
+        }
 
         // Space expected.
         if (_currChar != Chars.SP)
+        {
             goto False;
+        }
 
         // Skip spaces.
         while (_currChar == Chars.SP)
+        {
             ScanNextChar (true);
+        }
 
         // "R" expected.
         // We can ignore _nextChar because there is no other valid token that starts with an 'R'.
         if (_currChar != 'R')
+        {
             goto False;
+        }
 
         Position = positon;
         return true;
@@ -706,7 +774,9 @@ public class Lexer
     internal char AppendAndScanNextChar()
     {
         if (_currChar == Chars.EOF)
+        {
             ParserDiagnostics.ThrowParserException ("Undetected EOF reached.");
+        }
 
         _token.Append (_currChar);
         return ScanNextChar (true);
