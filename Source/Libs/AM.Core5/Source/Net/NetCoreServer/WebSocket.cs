@@ -371,7 +371,7 @@ public class WebSocket : IWebSocket
     /// <param name="size">Buffer size</param>
     public void PrepareReceiveFrame
         (
-            byte[] buffer,
+            byte[]? buffer,
             long offset,
             long size
         )
