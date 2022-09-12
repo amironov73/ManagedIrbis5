@@ -19,7 +19,6 @@ using AM.Drawing.HtmlRenderer.Adapters.Entities;
 using AM.Drawing.HtmlRenderer.Core;
 using AM.Drawing.HtmlRenderer.Core.Entities;
 using AM.Drawing.HtmlRenderer.Core.Handlers;
-using AM.Drawing.HtmlRenderer.Core.Utils;
 
 #endregion
 
@@ -62,17 +61,17 @@ public abstract class RAdapter
     /// <summary>
     /// default CSS parsed data singleton
     /// </summary>
-    private CssData _defaultCssData;
+    private CssData? _defaultCssData;
 
     /// <summary>
     /// image used to draw loading image icon
     /// </summary>
-    private RImage _loadImage;
+    private RImage? _loadImage;
 
     /// <summary>
     /// image used to draw error image icon
     /// </summary>
-    private RImage _errorImage;
+    private RImage? _errorImage;
 
     #endregion
 
@@ -92,7 +91,7 @@ public abstract class RAdapter
     {
         get
         {
-            return _defaultCssData ?? (_defaultCssData = CssData.Parse (this, CssDefaults.DefaultStyleSheet, false));
+            return _defaultCssData ??= CssData.Parse (this, CssDefaults.DefaultStyleSheet, false);
         }
     }
 
@@ -103,7 +102,8 @@ public abstract class RAdapter
     /// <returns>color value</returns>
     public RColor GetColor (string colorName)
     {
-        ArgChecker.AssertArgNotNullOrEmpty (colorName, "colorName");
+        Sure.NotNullNorEmpty (colorName);
+
         return GetColorInt (colorName);
     }
 
@@ -114,8 +114,7 @@ public abstract class RAdapter
     /// <returns>pen instance</returns>
     public RPen GetPen (RColor color)
     {
-        RPen pen;
-        if (!_penCache.TryGetValue (color, out pen))
+        if (!_penCache.TryGetValue (color, out var pen))
         {
             _penCache[color] = pen = CreatePen (color);
         }
@@ -130,8 +129,7 @@ public abstract class RAdapter
     /// <returns>brush instance</returns>
     public RBrush GetSolidBrush (RColor color)
     {
-        RBrush brush;
-        if (!_brushesCache.TryGetValue (color, out brush))
+        if (!_brushesCache.TryGetValue (color, out var brush))
         {
             _brushesCache[color] = brush = CreateSolidBrush (color);
         }
@@ -223,14 +221,15 @@ public abstract class RAdapter
     {
         if (_loadImage == null)
         {
-            var stream =
-                typeof (HtmlRendererUtils).Assembly.GetManifestResourceStream (
-                    "AM.Drawing.HtmlRenderer.Core.Utils.ImageLoad.png");
+            var stream = typeof (HtmlRendererUtils).Assembly
+                .GetManifestResourceStream ("AM.Drawing.HtmlRenderer.Core.Utils.ImageLoad.png");
             if (stream != null)
+            {
                 _loadImage = ImageFromStream (stream);
+            }
         }
 
-        return _loadImage;
+        return _loadImage.ThrowIfNull();
     }
 
     /// <summary>
@@ -240,14 +239,15 @@ public abstract class RAdapter
     {
         if (_errorImage == null)
         {
-            var stream =
-                typeof (HtmlRendererUtils).Assembly.GetManifestResourceStream (
-                    "AM.Drawing.HtmlRenderer.Core.Utils.ImageError.png");
+            var stream = typeof (HtmlRendererUtils).Assembly
+                .GetManifestResourceStream ("AM.Drawing.HtmlRenderer.Core.Utils.ImageError.png");
             if (stream != null)
+            {
                 _errorImage = ImageFromStream (stream);
+            }
         }
 
-        return _errorImage;
+        return _errorImage.ThrowIfNull();
     }
 
     /// <summary>
