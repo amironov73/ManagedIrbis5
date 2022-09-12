@@ -44,7 +44,8 @@ public sealed class CssData
     /// <summary>
     /// dictionary of media type to dictionary of css class name to the cssBlocks collection with all the data.
     /// </summary>
-    private readonly Dictionary<string, Dictionary<string, List<CssBlock>>> _mediaBlocks = new Dictionary<string, Dictionary<string, List<CssBlock>>>(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, Dictionary<string, List<CssBlock>>> _mediaBlocks =
+        new Dictionary<string, Dictionary<string, List<CssBlock>>> (StringComparer.InvariantCultureIgnoreCase);
 
     #endregion
 
@@ -54,7 +55,7 @@ public sealed class CssData
     /// </summary>
     internal CssData()
     {
-        _mediaBlocks.Add("all", new Dictionary<string, List<CssBlock>>(StringComparer.InvariantCultureIgnoreCase));
+        _mediaBlocks.Add ("all", new Dictionary<string, List<CssBlock>> (StringComparer.InvariantCultureIgnoreCase));
     }
 
     /// <summary>
@@ -67,19 +68,16 @@ public sealed class CssData
     /// <param name="stylesheet">the stylesheet source to parse</param>
     /// <param name="combineWithDefault">true - combine the parsed css data with default css data, false - return only the parsed css data</param>
     /// <returns>the parsed css data</returns>
-    public static CssData Parse(RAdapter adapter, string stylesheet, bool combineWithDefault = true)
+    public static CssData Parse (RAdapter adapter, string stylesheet, bool combineWithDefault = true)
     {
-        CssParser parser = new CssParser(adapter);
-        return parser.ParseStyleSheet(stylesheet, combineWithDefault);
+        var parser = new CssParser (adapter);
+        return parser.ParseStyleSheet (stylesheet, combineWithDefault);
     }
 
     /// <summary>
     /// dictionary of media type to dictionary of css class name to the cssBlocks collection with all the data
     /// </summary>
-    internal IDictionary<string, Dictionary<string, List<CssBlock>>> MediaBlocks
-    {
-        get { return _mediaBlocks; }
-    }
+    internal IDictionary<string, Dictionary<string, List<CssBlock>>> MediaBlocks => _mediaBlocks;
 
     /// <summary>
     /// Check if there are css blocks for the given class selector.
@@ -87,10 +85,9 @@ public sealed class CssData
     /// <param name="className">the class selector to check for css blocks by</param>
     /// <param name="media">optional: the css media type (default - all)</param>
     /// <returns>true - has css blocks for the class, false - otherwise</returns>
-    public bool ContainsCssBlock(string className, string media = "all")
+    public bool ContainsCssBlock (string className, string media = "all")
     {
-        Dictionary<string, List<CssBlock>> mid;
-        return _mediaBlocks.TryGetValue(media, out mid) && mid.ContainsKey(className);
+        return _mediaBlocks.TryGetValue (media, out var mid) && mid.ContainsKey (className);
     }
 
     /// <summary>
@@ -103,14 +100,14 @@ public sealed class CssData
     /// <param name="className">the class selector to get css blocks by</param>
     /// <param name="media">optional: the css media type (default - all)</param>
     /// <returns>collection of css blocks, empty collection if no blocks exists (never null)</returns>
-    public IEnumerable<CssBlock> GetCssBlock(string className, string media = "all")
+    public IEnumerable<CssBlock> GetCssBlock (string className, string media = "all")
     {
-        List<CssBlock> block = null;
-        Dictionary<string, List<CssBlock>> mid;
-        if (_mediaBlocks.TryGetValue(media, out mid))
+        List<CssBlock>? block = null;
+        if (_mediaBlocks.TryGetValue (media, out var mid))
         {
-            mid.TryGetValue(className, out block);
+            mid.TryGetValue (className, out block);
         }
+
         return block ?? _emptyArray;
     }
 
@@ -128,31 +125,29 @@ public sealed class CssData
     /// </remarks>
     /// <param name="media">the media type to add the CSS to</param>
     /// <param name="cssBlock">the css block to add</param>
-    public void AddCssBlock(string media, CssBlock cssBlock)
+    public void AddCssBlock (string media, CssBlock cssBlock)
     {
-        Dictionary<string, List<CssBlock>> mid;
-        if (!_mediaBlocks.TryGetValue(media, out mid))
+        if (!_mediaBlocks.TryGetValue (media, out var mid))
         {
-            mid = new Dictionary<string, List<CssBlock>>(StringComparer.InvariantCultureIgnoreCase);
-            _mediaBlocks.Add(media, mid);
+            mid = new Dictionary<string, List<CssBlock>> (StringComparer.InvariantCultureIgnoreCase);
+            _mediaBlocks.Add (media, mid);
         }
 
-        if (!mid.ContainsKey(cssBlock.Class))
+        if (!mid.ContainsKey (cssBlock.Class))
         {
-            var list = new List<CssBlock>();
-            list.Add(cssBlock);
+            var list = new List<CssBlock> { cssBlock };
             mid[cssBlock.Class] = list;
         }
         else
         {
-            bool merged = false;
+            var merged = false;
             var list = mid[cssBlock.Class];
             foreach (var block in list)
             {
-                if (block.EqualsSelector(cssBlock))
+                if (block.EqualsSelector (cssBlock))
                 {
                     merged = true;
-                    block.Merge(cssBlock);
+                    block.Merge (cssBlock);
                     break;
                 }
             }
@@ -161,9 +156,13 @@ public sealed class CssData
             {
                 // general block must be first
                 if (cssBlock.Selectors == null)
-                    list.Insert(0, cssBlock);
+                {
+                    list.Insert (0, cssBlock);
+                }
                 else
-                    list.Add(cssBlock);
+                {
+                    list.Add (cssBlock);
+                }
             }
         }
     }
@@ -173,9 +172,9 @@ public sealed class CssData
     /// Merge blocks if exists in both.
     /// </summary>
     /// <param name="other">the CSS data to combine with</param>
-    public void Combine(CssData other)
+    public void Combine (CssData other)
     {
-        ArgChecker.AssertArgNotNull(other, "other");
+        ArgChecker.AssertArgNotNull (other, "other");
 
         // for each media block
         foreach (var mediaBlock in other.MediaBlocks)
@@ -187,7 +186,7 @@ public sealed class CssData
                 foreach (var cssBlock in bla.Value)
                 {
                     // combine with this
-                    AddCssBlock(mediaBlock.Key, cssBlock);
+                    AddCssBlock (mediaBlock.Key, cssBlock);
                 }
             }
         }
@@ -202,18 +201,21 @@ public sealed class CssData
         var clone = new CssData();
         foreach (var mid in _mediaBlocks)
         {
-            var cloneMid = new Dictionary<string, List<CssBlock>>(StringComparer.InvariantCultureIgnoreCase);
+            var cloneMid = new Dictionary<string, List<CssBlock>> (StringComparer.InvariantCultureIgnoreCase);
             foreach (var blocks in mid.Value)
             {
                 var cloneList = new List<CssBlock>();
                 foreach (var cssBlock in blocks.Value)
                 {
-                    cloneList.Add(cssBlock.Clone());
+                    cloneList.Add (cssBlock.Clone());
                 }
+
                 cloneMid[blocks.Key] = cloneList;
             }
+
             clone._mediaBlocks[mid.Key] = cloneMid;
         }
+
         return clone;
     }
 }

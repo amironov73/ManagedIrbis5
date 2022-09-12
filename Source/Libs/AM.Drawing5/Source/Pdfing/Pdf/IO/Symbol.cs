@@ -1,47 +1,155 @@
-#region PDFsharp - A .NET library for processing PDF
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharpCore.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-// DEALINGS IN THE SOFTWARE.
-#endregion
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-namespace PdfSharpCore.Pdf.IO
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+namespace PdfSharpCore.Pdf.IO;
+
+/// <summary>
+/// Terminal symbols recognized by lexer.
+/// </summary>
+public enum Symbol
 {
     /// <summary>
-    /// Terminal symbols recognized by lexer.
+    ///
     /// </summary>
-    public enum Symbol
-    {
-#pragma warning disable 1591
-        None,
-        Comment, Null, Integer, UInteger, Real, Boolean, String, HexString, UnicodeString, UnicodeHexString,
-        Name, Keyword,
-        BeginStream, EndStream,
-        BeginArray, EndArray,
-        BeginDictionary, EndDictionary,
-        Obj, EndObj, R, XRef, Trailer, StartXRef, Eof, Long
-#pragma warning restore 1591
-    }
+    None,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Comment,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Null,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Integer,
+
+    /// <summary>
+    ///
+    /// </summary>
+    UInteger,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Real,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Boolean,
+
+    /// <summary>
+    ///
+    /// </summary>
+    String,
+
+    /// <summary>
+    ///
+    /// </summary>
+    HexString,
+
+    /// <summary>
+    ///
+    /// </summary>
+    UnicodeString,
+
+    /// <summary>
+    ///
+    /// </summary>
+    UnicodeHexString,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Name,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Keyword,
+
+    /// <summary>
+    ///
+    /// </summary>
+    BeginStream,
+
+    /// <summary>
+    ///
+    /// </summary>
+    EndStream,
+
+    /// <summary>
+    ///
+    /// </summary>
+    BeginArray,
+
+    /// <summary>
+    ///
+    /// </summary>
+    EndArray,
+
+    /// <summary>
+    ///
+    /// </summary>
+    BeginDictionary,
+
+    /// <summary>
+    ///
+    /// </summary>
+    EndDictionary,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Obj,
+
+    /// <summary>
+    ///
+    /// </summary>
+    EndObj,
+
+    /// <summary>
+    ///
+    /// </summary>
+    R,
+
+    /// <summary>
+    ///
+    /// </summary>
+    XRef,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Trailer,
+
+    /// <summary>
+    ///
+    /// </summary>
+    StartXRef,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Eof,
+
+    /// <summary>
+    ///
+    /// </summary>
+    Long
 }

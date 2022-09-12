@@ -36,22 +36,17 @@ public sealed class CssBlock
     /// <summary>
     /// the name of the css class of the block
     /// </summary>
-    private readonly string _class;
+    private readonly string? _class;
 
     /// <summary>
     /// the CSS block properties and values
     /// </summary>
-    private readonly Dictionary<string, string> _properties;
+    private Dictionary<string, string>? _properties;
 
     /// <summary>
     /// additional selectors to used in hierarchy (p className1 > className2)
     /// </summary>
     private readonly List<CssBlockSelectorItem>? _selectors;
-
-    /// <summary>
-    /// is the css block has :hover pseudo-class
-    /// </summary>
-    private readonly bool _hover;
 
     #endregion
 
@@ -77,40 +72,28 @@ public sealed class CssBlock
         _class = @class;
         _selectors = selectors;
         _properties = properties;
-        _hover = hover;
+        Hover = hover;
     }
 
     /// <summary>
     /// the name of the css class of the block
     /// </summary>
-    public string Class
-    {
-        get { return _class; }
-    }
+    public string? Class => _class;
 
     /// <summary>
     /// additional selectors to used in hierarchy (p className1 > className2)
     /// </summary>
-    public List<CssBlockSelectorItem> Selectors
-    {
-        get { return _selectors; }
-    }
+    public List<CssBlockSelectorItem>? Selectors => _selectors;
 
     /// <summary>
     /// Gets the CSS block properties and its values
     /// </summary>
-    public IDictionary<string, string> Properties
-    {
-        get { return _properties; }
-    }
+    public IDictionary<string, string>? Properties => _properties;
 
     /// <summary>
     /// is the css block has :hover pseudo-class
     /// </summary>
-    public bool Hover
-    {
-        get { return _hover; }
-    }
+    public bool Hover { get; }
 
     /// <summary>
     /// Merge the other block properties into this css block.<br/>
@@ -119,11 +102,16 @@ public sealed class CssBlock
     /// <param name="other">the css block to merge with</param>
     public void Merge (CssBlock other)
     {
-        ArgChecker.AssertArgNotNull (other, "other");
+        Sure.NotNull (other);
 
-        foreach (var prop in other._properties.Keys)
+        var otherProperties = other._properties;
+        if (otherProperties is not null)
         {
-            _properties[prop] = other._properties[prop];
+            _properties ??= new ();
+            foreach (var prop in otherProperties.Keys)
+            {
+                _properties[prop] = otherProperties[prop];
+            }
         }
     }
 
@@ -133,7 +121,8 @@ public sealed class CssBlock
     /// <returns>new CssBlock with same data</returns>
     public CssBlock Clone()
     {
-        return new CssBlock (_class, new Dictionary<string, string> (_properties),
+        var className = _class.ThrowIfNullOrEmpty();
+        return new CssBlock (className, new Dictionary<string, string> (_properties),
             _selectors != null ? new List<CssBlockSelectorItem> (_selectors) : null);
     }
 
