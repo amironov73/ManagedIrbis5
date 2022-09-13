@@ -1,95 +1,107 @@
-#region PDFsharp - A .NET library for processing PDF
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharp.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-// DEALINGS IN THE SOFTWARE.
-#endregion
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
 
-namespace PdfSharpCore.Pdf
+#endregion
+
+#nullable enable
+
+namespace PdfSharpCore.Pdf;
+
+/// <summary>
+/// This class is intended for empira internal use only and may change or drop in future releases.
+/// </summary>
+public class PdfCustomValues
+    : PdfDictionary
 {
+    #region Construction
+
     /// <summary>
-    /// This class is intended for empira internal use only and may change or drop in future releases.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public class PdfCustomValues : PdfDictionary
+    internal PdfCustomValues()
     {
-        internal PdfCustomValues()
-        { }
+        // пустое тело конструктора
+    }
 
-        internal PdfCustomValues(PdfDocument document)
-            : base(document)
-        { }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="document"></param>
+    internal PdfCustomValues (PdfDocument document)
+        : base (document)
+    {
+        // пустое тело конструктора
+    }
 
-        internal PdfCustomValues(PdfDictionary dict)
-            : base(dict)
-        { }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="dict"></param>
+    internal PdfCustomValues (PdfDictionary dict)
+        : base (dict)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// This function is intended for empira internal use only.
-        /// </summary>
-        public PdfCustomValueCompressionMode CompressionMode
+    #endregion
+
+    /// <summary>
+    /// This function is intended for empira internal use only.
+    /// </summary>
+    public PdfCustomValueCompressionMode CompressionMode
+    {
+        set { throw new NotImplementedException(); }
+    }
+
+    /// <summary>
+    /// This function is intended for empira internal use only.
+    /// </summary>
+    public bool Contains (string key)
+    {
+        return Elements.ContainsKey (key);
+    }
+
+    /// <summary>
+    /// This function is intended for empira internal use only.
+    /// </summary>
+    public PdfCustomValue this [string key]
+    {
+        get
         {
-            set { throw new NotImplementedException(); }
+            var dict = Elements.GetDictionary (key);
+            if (dict == null)
+                return null;
+            var cust = dict as PdfCustomValue;
+            if (cust == null)
+                cust = new PdfCustomValue (dict);
+            return cust;
         }
-
-        /// <summary>
-        /// This function is intended for empira internal use only.
-        /// </summary>
-        public bool Contains(string key)
+        set
         {
-            return Elements.ContainsKey(key);
+            if (value == null)
+            {
+                Elements.Remove (key);
+            }
+            else
+            {
+                Owner.Internals.AddObject (value);
+                Elements.SetReference (key, value);
+            }
         }
-
-        /// <summary>
-        /// This function is intended for empira internal use only.
-        /// </summary>
-        public PdfCustomValue this[string key]
-        {
-            get
-            {
-                PdfDictionary dict = Elements.GetDictionary(key);
-                if (dict == null)
-                    return null;
-                PdfCustomValue cust = dict as PdfCustomValue;
-                if (cust == null)
-                    cust = new PdfCustomValue(dict);
-                return cust;
-            }
-            set
-            {
-                if (value == null)
-                {
-                    Elements.Remove(key);
-                }
-                else
-                {
-                    Owner.Internals.AddObject(value);
-                    Elements.SetReference(key, value);
-                }
-            }
 #if old
             get
             {
@@ -119,43 +131,43 @@ namespace PdfSharpCore.Pdf
                 cust.Value = value;
             }
 #endif
-        }
+    }
 
-        /// <summary>
-        /// This function is intended for empira internal use only.
-        /// </summary>
-        public static void ClearAllCustomValues(PdfDocument document)
+    /// <summary>
+    /// This function is intended for empira internal use only.
+    /// </summary>
+    public static void ClearAllCustomValues (PdfDocument document)
+    {
+        document.CustomValues = null;
+        foreach (var page in document.Pages)
         {
-            document.CustomValues = null;
-            foreach (PdfPage page in document.Pages)
-                page.CustomValues = null;
+            page.CustomValues = null;
         }
+    }
 
-        //public static string Key = "/PdfSharpCore.CustomValue";
+    //public static string Key = "/PdfSharpCore.CustomValue";
 
-        internal static PdfCustomValues Get(DictionaryElements elem)
+    internal static PdfCustomValues Get (DictionaryElements elem)
+    {
+        var key = elem.Owner.Owner.Internals.CustomValueKey;
+        PdfCustomValues customValues;
+        var dict = elem.GetDictionary (key);
+        if (dict == null)
         {
-            string key = elem.Owner.Owner.Internals.CustomValueKey;
-            PdfCustomValues customValues;
-            PdfDictionary dict = elem.GetDictionary(key);
-            if (dict == null)
-            {
-                customValues = new PdfCustomValues();
-                elem.Owner.Owner.Internals.AddObject(customValues);
-                elem.Add(key, customValues);
-            }
-            else
-            {
-                customValues = dict as PdfCustomValues;
-                if (customValues == null)
-                    customValues = new PdfCustomValues(dict);
-            }
-            return customValues;
+            customValues = new PdfCustomValues();
+            elem.Owner.Owner.Internals.AddObject (customValues);
+            elem.Add (key, customValues);
+        }
+        else
+        {
+            customValues = dict as PdfCustomValues ?? new PdfCustomValues (dict);
         }
 
-        internal static void Remove(DictionaryElements elem)
-        {
-            elem.Remove(elem.Owner.Owner.Internals.CustomValueKey);
-        }
+        return customValues;
+    }
+
+    internal static void Remove (DictionaryElements elem)
+    {
+        elem.Remove (elem.Owner.Owner.Internals.CustomValueKey);
     }
 }
