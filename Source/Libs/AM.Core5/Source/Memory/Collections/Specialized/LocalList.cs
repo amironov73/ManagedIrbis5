@@ -35,11 +35,11 @@ public struct LocalList<T>
     private static readonly EqualityComparer<T> ItemComparer = EqualityComparer<T>.Default;
 
     private (T, T) _items;
-    private IList<T> _other;
+    private IList<T>? _other;
 
     // Static lists to store real length (-1 field in struct)
-    private static readonly IList<T> LengthIs1 = new List<T> { default };
-    private static readonly IList<T> LengthIs2 = new List<T> { default, default };
+    private static readonly IList<T> LengthIs1 = new List<T> { default! };
+    private static readonly IList<T> LengthIs2 = new List<T> { default!, default! };
 
     private const int DefaultListCapacity = 8;
     public const int LocalStoreCapacity = 2;
@@ -94,10 +94,10 @@ public struct LocalList<T>
             {
                 _other = new List<T> (DefaultListCapacity);
                 _other.Add (_items.Item1);
-                _items.Item1 = default;
+                _items.Item1 = default!;
 
                 _other.Add (_items.Item2);
-                _items.Item2 = default;
+                _items.Item2 = default!;
             }
 
             _other.Add (item);
@@ -108,8 +108,8 @@ public struct LocalList<T>
     public void Clear()
     {
         _other = null;
-        _items.Item1 = default;
-        _items.Item2 = default;
+        _items.Item1 = default!;
+        _items.Item2 = default!;
     }
 
     /// <inheritdoc cref="ICollection{T}.Contains"/>
@@ -169,7 +169,7 @@ public struct LocalList<T>
 
         if (ReferenceEquals (_other, LengthIs1) && ItemComparer.Equals (_items.Item1, item))
         {
-            _items.Item1 = default;
+            _items.Item1 = default!;
             _other = null;
             return true;
         }
@@ -179,7 +179,7 @@ public struct LocalList<T>
             var done = false;
             if (ItemComparer.Equals (_items.Item2, item))
             {
-                _items.Item2 = default;
+                _items.Item2 = default!;
                 _other = LengthIs1;
                 return true;
             }
@@ -290,7 +290,7 @@ public struct LocalList<T>
             }
             else
             {
-                _items.Item2 = default;
+                _items.Item2 = default!;
                 _other = LengthIs1;
             }
         }

@@ -1,44 +1,30 @@
-#region PDFsharp - A .NET library for processing PDF
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharpCore.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
-#endregion
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security.Cryptography;
 
 using AM;
 
 using PdfSharpCore.Pdf.IO;
-using PdfSharpCore.Pdf.Advanced;
 using PdfSharpCore.Pdf.Internal;
+
+#endregion
+
+#nullable enable
 
 #pragma warning disable 0169
 #pragma warning disable 0649
@@ -50,15 +36,21 @@ namespace PdfSharpCore.Pdf.Security;
 /// </summary>
 public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
 {
+    #region Construction
+
     internal PdfStandardSecurityHandler (PdfDocument document)
         : base (document)
     {
+        // пустое тело конструктора
     }
 
     internal PdfStandardSecurityHandler (PdfDictionary dict)
         : base (dict)
     {
+        // пустое тело конструктора
     }
+
+    #endregion
 
     /// <summary>
     /// Sets the user password of the document. Setting a password automatically sets the
@@ -150,26 +142,20 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
         }
 #endif
 
-        PdfDictionary dict;
-        PdfArray array;
-        PdfStringObject str;
-        if ((dict = value as PdfDictionary) != null)
+        if (value is PdfDictionary dict)
         {
             EncryptDictionary (dict);
         }
-        else if ((array = value as PdfArray) != null)
+        else if (value is PdfArray array)
         {
             EncryptArray (array);
         }
-        else if ((str = value as PdfStringObject) != null)
+        else if (value is PdfStringObject { Length: not 0 } str)
         {
-            if (str.Length != 0)
-            {
-                var bytes = str.EncryptionValue;
-                PrepareKey();
-                EncryptRC4 (bytes);
-                str.EncryptionValue = bytes;
-            }
+            var bytes = str.EncryptionValue;
+            PrepareKey();
+            EncryptRC4 (bytes);
+            str.EncryptionValue = bytes;
         }
     }
 
@@ -298,11 +284,11 @@ public sealed class PdfStandardSecurityHandler : PdfSecurityHandler
         InitWithOwnerPassword (documentId, inputPassword, oValue, pValue, strongEncryption);
         if (EqualsKey (uValue, keyLength))
         {
-            document.SecuritySettings._hasOwnerPermissions = true;
+            document.SecuritySettings.HasOwnerPermissions = true;
             return PasswordValidity.OwnerPassword;
         }
 
-        document.SecuritySettings._hasOwnerPermissions = false;
+        document.SecuritySettings.HasOwnerPermissions = false;
 
         // Now try user password.
         //password = PdfEncoders.RawEncoding.GetBytes(inputPassword);
