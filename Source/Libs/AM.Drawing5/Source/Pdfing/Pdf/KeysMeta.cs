@@ -1,239 +1,236 @@
-#region PDFsharp - A .NET library for processing PDF
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharp.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-// DEALINGS IN THE SOFTWARE.
-#endregion
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace PdfSharpCore.Pdf
+using AM;
+
+#endregion
+
+#nullable enable
+
+namespace PdfSharpCore.Pdf;
+
+/// <summary>
+/// Holds information about the value of a key in a dictionary. This information is used to create
+/// and interpret this value.
+/// </summary>
+internal sealed class KeyDescriptor
 {
+    #region Construction
+
     /// <summary>
-    /// Holds information about the value of a key in a dictionary. This information is used to create
-    /// and interpret this value.
+    /// Initializes a new instance of KeyDescriptor from the specified attribute during a KeysMeta
+    /// initializes itself using reflection.
     /// </summary>
-    internal sealed class KeyDescriptor
+    public KeyDescriptor
+        (
+            KeyInfoAttribute attribute
+        )
     {
-        /// <summary>
-        /// Initializes a new instance of KeyDescriptor from the specified attribute during a KeysMeta
-        /// initializes itself using reflection.
-        /// </summary>
-        public KeyDescriptor(KeyInfoAttribute attribute)
-        {
-            _version = attribute.Version;
-            _keyType = attribute.KeyType;
-            _fixedValue = attribute.FixedValue;
-            _objectType = attribute.ObjectType;
+        Sure.NotNull (attribute);
 
-            if (_version == "")
-                _version = "1.0";
+        Version = attribute.Version;
+        KeyType = attribute.KeyType;
+        FixedValue = attribute.FixedValue;
+        ObjectType = attribute.ObjectType;
+
+        if (Version == "")
+        {
+            Version = "1.0";
         }
+    }
 
-        /// <summary>
-        /// Gets or sets the PDF version starting with the availability of the described key.
-        /// </summary>
-        public string Version
-        {
-            get { return _version; }
-            set { _version = value; }
-        }
-        string _version;
+    #endregion
 
-        public KeyType KeyType
-        {
-            get { return _keyType; }
-            set { _keyType = value; }
-        }
-        KeyType _keyType;
+    /// <summary>
+    /// Gets or sets the PDF version starting with the availability of the described key.
+    /// </summary>
+    public string Version { get; set; }
 
-        public string KeyValue
-        {
-            get { return _keyValue; }
-            set { _keyValue = value; }
-        }
-        string _keyValue;
+    /// <summary>
+    ///
+    /// </summary>
+    public KeyType KeyType { get; set; }
 
-        public string FixedValue
-        {
-            get { return _fixedValue; }
-        }
-        readonly string _fixedValue;
+    /// <summary>
+    ///
+    /// </summary>
+    public string? KeyValue { get; set; }
 
-        public Type ObjectType
-        {
-            get { return _objectType; }
-            set { _objectType = value; }
-        }
-        Type _objectType;
+    /// <summary>
+    ///
+    /// </summary>
+    public string? FixedValue { get; }
 
-        public bool CanBeIndirect
-        {
-            get { return (_keyType & KeyType.MustNotBeIndirect) == 0; }
-        }
+    /// <summary>
+    ///
+    /// </summary>
+    public Type? ObjectType { get; set; }
 
-        /// <summary>
-        /// Returns the type of the object to be created as value for the described key.
-        /// </summary>
-        public Type GetValueType()
+    /// <summary>
+    ///
+    /// </summary>
+    public bool CanBeIndirect => (KeyType & KeyType.MustNotBeIndirect) == 0;
+
+    /// <summary>
+    /// Returns the type of the object to be created as value for the described key.
+    /// </summary>
+    public Type? GetValueType()
+    {
+        var type = ObjectType;
+        if (type is null)
         {
-            Type type = _objectType;
-            if (type == null)
+            // If we have no ObjectType specified, use the KeyType enumeration.
+            switch (KeyType & KeyType.TypeMask)
             {
-                // If we have no ObjectType specified, use the KeyType enumeration.
-                switch (_keyType & KeyType.TypeMask)
-                {
-                    case KeyType.Name:
-                        type = typeof(PdfName);
-                        break;
+                case KeyType.Name:
+                    type = typeof (PdfName);
+                    break;
 
-                    case KeyType.String:
-                        type = typeof(PdfString);
-                        break;
+                case KeyType.String:
+                    type = typeof (PdfString);
+                    break;
 
-                    case KeyType.Boolean:
-                        type = typeof(PdfBoolean);
-                        break;
+                case KeyType.Boolean:
+                    type = typeof (PdfBoolean);
+                    break;
 
-                    case KeyType.Integer:
-                        type = typeof(PdfInteger);
-                        break;
+                case KeyType.Integer:
+                    type = typeof (PdfInteger);
+                    break;
 
-                    case KeyType.Real:
-                        type = typeof(PdfReal);
-                        break;
+                case KeyType.Real:
+                    type = typeof (PdfReal);
+                    break;
 
-                    case KeyType.Date:
-                        type = typeof(PdfDate);
-                        break;
+                case KeyType.Date:
+                    type = typeof (PdfDate);
+                    break;
 
-                    case KeyType.Rectangle:
-                        type = typeof(PdfRectangle);
-                        break;
+                case KeyType.Rectangle:
+                    type = typeof (PdfRectangle);
+                    break;
 
-                    case KeyType.Array:
-                        type = typeof(PdfArray);
-                        break;
+                case KeyType.Array:
+                    type = typeof (PdfArray);
+                    break;
 
-                    case KeyType.Dictionary:
-                        type = typeof(PdfDictionary);
-                        break;
+                case KeyType.Dictionary:
+                    type = typeof (PdfDictionary);
+                    break;
 
-                    case KeyType.Stream:
-                        type = typeof(PdfDictionary);
-                        break;
+                case KeyType.Stream:
+                    type = typeof (PdfDictionary);
+                    break;
 
-                    // The following types are not yet used
+                // The following types are not yet used
 
-                    case KeyType.NumberTree:
-                        throw new NotImplementedException("KeyType.NumberTree");
+                case KeyType.NumberTree:
+                    throw new NotImplementedException ("KeyType.NumberTree");
 
-                    case KeyType.NameOrArray:
-                        throw new NotImplementedException("KeyType.NameOrArray");
+                case KeyType.NameOrArray:
+                    throw new NotImplementedException ("KeyType.NameOrArray");
 
-                    case KeyType.ArrayOrDictionary:
-                        throw new NotImplementedException("KeyType.ArrayOrDictionary");
+                case KeyType.ArrayOrDictionary:
+                    throw new NotImplementedException ("KeyType.ArrayOrDictionary");
 
-                    case KeyType.StreamOrArray:
-                        throw new NotImplementedException("KeyType.StreamOrArray");
+                case KeyType.StreamOrArray:
+                    throw new NotImplementedException ("KeyType.StreamOrArray");
 
-                    case KeyType.ArrayOrNameOrString:
-                        return null; // HACK: Make PdfOutline work
-                                     //throw new NotImplementedException("KeyType.ArrayOrNameOrString");
+                case KeyType.ArrayOrNameOrString:
+                    return null; // HACK: Make PdfOutline work
 
-                    default:
-                        Debug.Assert(false, "Invalid KeyType: " + _keyType);
-                        break;
-                }
+                //throw new NotImplementedException("KeyType.ArrayOrNameOrString");
+
+                default:
+                    Debug.Assert (false, "Invalid KeyType: " + KeyType);
+                    break;
             }
-            return type;
+        }
+
+        return type;
+    }
+}
+
+/// <summary>
+/// Contains meta information about all keys of a PDF dictionary.
+/// </summary>
+internal class DictionaryMeta
+{
+    public DictionaryMeta (Type type)
+    {
+        // Rewritten for WinRT.
+        CollectKeyDescriptors (type);
+
+        //var fields = type.GetRuntimeFields();  // does not work
+        //fields2.GetType();
+        //foreach (FieldInfo field in fields)
+        //{
+        //    var attributes = field.GetCustomAttributes(typeof(KeyInfoAttribute), false);
+        //    foreach (var attribute in attributes)
+        //    {
+        //        KeyDescriptor descriptor = new KeyDescriptor((KeyInfoAttribute)attribute);
+        //        descriptor.KeyValue = (string)field.GetValue(null);
+        //        _keyDescriptors[descriptor.KeyValue] = descriptor;
+        //    }
+        //}
+    }
+
+    // Background: The function GetRuntimeFields gets constant fields only for the specified type,
+    // not for its base types. So we have to walk recursively through base classes.
+    // The docmentation says full trust for the immediate caller is required for property BaseClass.
+    // TODO: Rewrite this stuff for medium trust.
+    void CollectKeyDescriptors (Type type)
+    {
+        // Get fields of the specified type only.
+        var fields = type.GetTypeInfo().DeclaredFields;
+        foreach (var field in fields)
+        {
+            var attributes = field.GetCustomAttributes (typeof (KeyInfoAttribute), false);
+            foreach (var attribute in attributes)
+            {
+                var descriptor = new KeyDescriptor ((KeyInfoAttribute)attribute)
+                {
+                    KeyValue = (string?) field.GetValue (null)
+                };
+                _keyDescriptors[descriptor.KeyValue] = descriptor;
+            }
+        }
+
+        type = type.GetTypeInfo().BaseType;
+        if (type != typeof (object) && type != typeof (PdfObject))
+        {
+            CollectKeyDescriptors (type);
         }
     }
 
     /// <summary>
-    /// Contains meta information about all keys of a PDF dictionary.
+    /// Gets the KeyDescriptor of the specified key, or null if no such descriptor exits.
     /// </summary>
-    internal class DictionaryMeta
+    public KeyDescriptor? this [string key]
     {
-        public DictionaryMeta(Type type)
+        get
         {
-            // Rewritten for WinRT.
-            CollectKeyDescriptors(type);
-            //var fields = type.GetRuntimeFields();  // does not work
-            //fields2.GetType();
-            //foreach (FieldInfo field in fields)
-            //{
-            //    var attributes = field.GetCustomAttributes(typeof(KeyInfoAttribute), false);
-            //    foreach (var attribute in attributes)
-            //    {
-            //        KeyDescriptor descriptor = new KeyDescriptor((KeyInfoAttribute)attribute);
-            //        descriptor.KeyValue = (string)field.GetValue(null);
-            //        _keyDescriptors[descriptor.KeyValue] = descriptor;
-            //    }
-            //}
+            _keyDescriptors.TryGetValue (key, out var keyDescriptor);
+            return keyDescriptor;
         }
-
-        // Background: The function GetRuntimeFields gets constant fields only for the specified type,
-        // not for its base types. So we have to walk recursively through base classes.
-        // The docmentation says full trust for the immediate caller is required for property BaseClass.
-        // TODO: Rewrite this stuff for medium trust.
-        void CollectKeyDescriptors(Type type)
-        {
-            // Get fields of the specified type only.
-            var fields = type.GetTypeInfo().DeclaredFields;
-            foreach (FieldInfo field in fields)
-            {
-                var attributes = field.GetCustomAttributes(typeof(KeyInfoAttribute), false);
-                foreach (var attribute in attributes)
-                {
-                    KeyDescriptor descriptor = new KeyDescriptor((KeyInfoAttribute)attribute);
-                    descriptor.KeyValue = (string)field.GetValue(null);
-                    _keyDescriptors[descriptor.KeyValue] = descriptor;
-                }
-            }
-            type = type.GetTypeInfo().BaseType;
-            if (type != typeof(object) && type != typeof(PdfObject))
-                CollectKeyDescriptors(type);
-        }
-
-        /// <summary>
-        /// Gets the KeyDescriptor of the specified key, or null if no such descriptor exits.
-        /// </summary>
-        public KeyDescriptor this[string key]
-        {
-            get
-            {
-                KeyDescriptor keyDescriptor;
-                _keyDescriptors.TryGetValue(key, out keyDescriptor);
-                return keyDescriptor;
-            }
-        }
-
-        readonly Dictionary<string, KeyDescriptor> _keyDescriptors = new Dictionary<string, KeyDescriptor>();
     }
+
+    readonly Dictionary<string, KeyDescriptor> _keyDescriptors = new ();
 }
