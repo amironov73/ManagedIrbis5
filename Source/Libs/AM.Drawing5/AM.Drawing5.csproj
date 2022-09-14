@@ -40,7 +40,6 @@
 
   <ItemGroup>
     <Folder Include="Source\Pdfing\Pdf\AcroForms\enums" />
-    <Folder Include="Source\Pdfing\Pdf\Actions\enums" />
   </ItemGroup>
 
 </Project>

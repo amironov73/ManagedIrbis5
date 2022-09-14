@@ -13,7 +13,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Globalization;
 
 using AM;
 
@@ -32,6 +31,8 @@ namespace PdfSharpCore.Pdf;
 public sealed class PdfInteger
     : PdfNumber, IConvertible, IFormattable
 {
+    #region Construction
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PdfInteger"/> class.
     /// </summary>
@@ -61,12 +62,12 @@ public sealed class PdfInteger
     /// </remarks>
     public int Value { get; }
 
-    /// <summary>
-    /// Returns the integer as string.
-    /// </summary>
+    #endregion
+
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return Value.ToString (CultureInfo.InvariantCulture);
+        return Value.ToInvariantString();
     }
 
     /// <summary>
