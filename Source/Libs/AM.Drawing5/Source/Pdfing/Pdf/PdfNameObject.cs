@@ -1,152 +1,119 @@
-#region PDFsharp - A .NET library for processing PDF
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharp.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedMember.Global
 
-#endregion
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
 using System.Diagnostics;
 
 using PdfSharpCore.Pdf.IO;
 
-namespace PdfSharpCore.Pdf
+#endregion
+
+#nullable enable
+
+namespace PdfSharpCore.Pdf;
+
+/// <summary>
+/// Represents an indirect name value. This type is not used by PdfSharpCore. If it is imported from
+/// an external PDF file, the value is converted into a direct object. Acrobat sometime uses indirect
+/// names to save space, because an indirect reference to a name may be shorter than a long name.
+/// </summary>
+[DebuggerDisplay ("({Value})")]
+public sealed class PdfNameObject
+    : PdfObject
 {
+    #region Construction
+
     /// <summary>
-    /// Represents an indirect name value. This type is not used by PdfSharpCore. If it is imported from
-    /// an external PDF file, the value is converted into a direct object. Acrobat sometime uses indirect
-    /// names to save space, because an indirect reference to a name may be shorter than a long name.
+    /// Initializes a new instance of the <see cref="PdfNameObject"/> class.
     /// </summary>
-    [DebuggerDisplay ("({Value})")]
-    public sealed class PdfNameObject : PdfObject
+    public PdfNameObject()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PdfNameObject"/> class.
-        /// </summary>
-        public PdfNameObject()
+        Value = "/"; // Empty name.
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PdfNameObject"/> class.
+    /// </summary>
+    /// <param name="document">The document.</param>
+    /// <param name="value">The value.</param>
+    public PdfNameObject (PdfDocument document, string value)
+        : base (document)
+    {
+        if (value == null)
         {
-            Value = "/"; // Empty name.
+            throw new ArgumentNullException (nameof (value));
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PdfNameObject"/> class.
-        /// </summary>
-        /// <param name="document">The document.</param>
-        /// <param name="value">The value.</param>
-        public PdfNameObject (PdfDocument document, string value)
-            : base (document)
+        if (value.Length == 0 || value[0] != '/')
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException (nameof (value));
-            }
-
-            if (value.Length == 0 || value[0] != '/')
-            {
-                throw new ArgumentException (PSSR.NameMustStartWithSlash);
-            }
-
-            Value = value;
+            throw new ArgumentException (PSSR.NameMustStartWithSlash);
         }
 
-        /// <summary>
-        /// Determines whether the specified object is equal to the current object.
-        /// </summary>
-        public override bool Equals (object? obj)
-        {
-            return Value.Equals (obj);
-        }
+        Value = value;
+    }
 
-        /// <summary>
-        /// Serves as a hash function for this type.
-        /// </summary>
-        public override int GetHashCode()
-        {
-            return Value.GetHashCode();
-        }
+    #endregion
 
-        /// <summary>
-        /// Gets or sets the name value.
-        /// </summary>
-        public string Value { get; set; }
+    /// <inheritdoc cref="object.Equals(object?)"/>
+    public override bool Equals (object? obj)
+    {
+        return Value.Equals (obj);
+    }
 
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            // TODO: Encode characters.
-            return Value;
-        }
+    /// <inheritdoc cref="object.GetHashCode"/>
+    public override int GetHashCode()
+    {
+        return Value.GetHashCode();
+    }
 
-        /// <summary>
-        /// Determines whether a name is equal to a string.
-        /// </summary>
-        public static bool operator == (PdfNameObject? name, string? str)
-        {
-            return name?.Value == str;
-        }
+    /// <summary>
+    /// Gets or sets the name value.
+    /// </summary>
+    public string Value { get; set; }
 
-        /// <summary>
-        /// Determines whether a name is not equal to a string.
-        /// </summary>
-        public static bool operator != (PdfNameObject? name, string? str)
-        {
-            return name?.Value != str;
-        }
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        // TODO: Encode characters.
+        return Value;
+    }
 
-#if leads_to_ambiguity
-        public static bool operator ==(string str, PdfName name)
-        {
-            return str == name.value;
-        }
+    /// <summary>
+    /// Determines whether a name is equal to a string.
+    /// </summary>
+    public static bool operator == (PdfNameObject? name, string? str)
+    {
+        return name?.Value == str;
+    }
 
-        public static bool operator !=(string str, PdfName name)
-        {
-            return str == name.value;
-        }
+    /// <summary>
+    /// Determines whether a name is not equal to a string.
+    /// </summary>
+    public static bool operator != (PdfNameObject? name, string? str)
+    {
+        return name?.Value != str;
+    }
 
-        public static bool operator ==(PdfName name1, PdfName name2)
-        {
-            return name1.value == name2.value;
-        }
-
-        public static bool operator !=(PdfName name1, PdfName name2)
-        {
-            return name1.value != name2.value;
-        }
-#endif
-
-        /// <summary>
-        /// Writes the name including the leading slash.
-        /// </summary>
-        internal override void WriteObject (PdfWriter writer)
-        {
-            writer.WriteBeginObject (this);
-            writer.Write (new PdfName (Value));
-            writer.WriteEndObject();
-        }
+    /// <summary>
+    /// Writes the name including the leading slash.
+    /// </summary>
+    internal override void WriteObject (PdfWriter writer)
+    {
+        writer.WriteBeginObject (this);
+        writer.Write (new PdfName (Value));
+        writer.WriteEndObject();
     }
 }
