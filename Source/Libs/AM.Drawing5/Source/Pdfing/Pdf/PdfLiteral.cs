@@ -1,101 +1,91 @@
-#region PDFsharp - A .NET library for processing PDF
-//
-// Authors:
-//   Stefan Lange
-//
-// Copyright (c) 2005-2016 empira Software GmbH, Cologne Area (Germany)
-//
-// http://www.PdfSharp.com
-// http://sourceforge.net/projects/pdfsharp
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-// DEALINGS IN THE SOFTWARE.
-#endregion
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-using System;
-using System.Collections;
-using System.Globalization;
-using System.Text;
-using System.IO;
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using PdfSharpCore.Drawing;
-using PdfSharpCore.Internal;
 using PdfSharpCore.Pdf.IO;
 using PdfSharpCore.Pdf.Internal;
 
-namespace PdfSharpCore.Pdf
+#endregion
+
+namespace PdfSharpCore.Pdf;
+
+/// <summary>
+/// Represents text that is written 'as it is' into the PDF stream. This class can lead to invalid PDF files.
+/// E.g. strings in a literal are not encrypted when the document is saved with a password.
+/// </summary>
+public sealed class PdfLiteral
+    : PdfItem
 {
+    #region Construction
+
     /// <summary>
-    /// Represents text that is written 'as it is' into the PDF stream. This class can lead to invalid PDF files.
-    /// E.g. strings in a literal are not encrypted when the document is saved with a password.
+    /// Initializes a new instance of the <see cref="PdfLiteral"/> class.
     /// </summary>
-    public sealed class PdfLiteral : PdfItem
+    public PdfLiteral()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PdfLiteral"/> class.
-        /// </summary>
-        public PdfLiteral()
-        { }
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Initializes a new instance with the specified string.
-        /// </summary>
-        public PdfLiteral(string value)
-        {
-            _value = value;
-        }
+    /// <summary>
+    /// Initializes a new instance with the specified string.
+    /// </summary>
+    public PdfLiteral
+        (
+            string value
+        )
+    {
+        Value = value;
+    }
 
-        /// <summary>
-        /// Initializes a new instance with the culture invariant formatted specified arguments.
-        /// </summary>
-        public PdfLiteral(string format, params object[] args)
-        {
-            _value = PdfEncoders.Format(format, args);
-        }
+    /// <summary>
+    /// Initializes a new instance with the culture invariant formatted specified arguments.
+    /// </summary>
+    public PdfLiteral
+        (
+            string format,
+            params object[] args
+        )
+    {
+        Value = PdfEncoders.Format (format, args);
+    }
 
-        /// <summary>
-        /// Creates a literal from an XMatrix
-        /// </summary>
-        public static PdfLiteral FromMatrix(XMatrix matrix)
-        {
-            return new PdfLiteral("[" + PdfEncoders.ToString(matrix) + "]");
-        }
+    /// <summary>
+    /// Creates a literal from an XMatrix
+    /// </summary>
+    public static PdfLiteral FromMatrix (XMatrix matrix)
+    {
+        return new PdfLiteral ("[" + PdfEncoders.ToString (matrix) + "]");
+    }
 
-        /// <summary>
-        /// Gets the value as litaral string.
-        /// </summary>
-        public string Value
-        {
-            // This class must behave like a value type. Therefore it cannot be changed (like System.String).
-            get { return _value; }
-        }
-        readonly string _value = String.Empty;
+    #endregion
 
-        /// <summary>
-        /// Returns a string that represents the current value.
-        /// </summary>
-        public override string ToString()
-        {
-            return _value;
-        }
+    /// <summary>
+    /// Gets the value as litaral string.
+    /// </summary>
+    public string Value { get; } = string.Empty;
 
-        internal override void WriteObject(PdfWriter writer)
-        {
-            writer.Write(this);
-        }
+    /// <summary>
+    /// Returns a string that represents the current value.
+    /// </summary>
+    public override string ToString()
+    {
+        return Value;
+    }
+
+    internal override void WriteObject (PdfWriter writer)
+    {
+        writer.Write (this);
     }
 }
