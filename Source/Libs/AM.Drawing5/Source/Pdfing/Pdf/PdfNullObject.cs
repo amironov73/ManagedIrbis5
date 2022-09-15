@@ -29,9 +29,9 @@ namespace PdfSharpCore.Pdf;
 public sealed class PdfNullObject
     : PdfObject
 {
-    #region Construction
-
     // Reference: 3.2.8  Null Object / Page 63
+
+    #region Construction
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PdfNullObject"/> class.

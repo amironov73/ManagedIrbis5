@@ -25,8 +25,6 @@ using System.Collections;
 #nullable enable
 using PdfSharpCore.Drawing;
 
-// Review: CountOpen does not work. - StL/14-10-05
-
 namespace PdfSharpCore.Pdf;
 
 /// <summary>
