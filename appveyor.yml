@@ -5,10 +5,17 @@ image: Visual Studio 2022
 environment:
   DOTNET_CLI_UI_LANGUAGE: en
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
   PATH: C:\Python36-x64;C:\Python36-x64\Scripts;%PATH%
 
 init:
   - git config --global core.autocrlf true
+
+install:
+  - cmd: appveyor DownloadFile https://dot.net/v1/dotnet-install.ps1
+  - ps: .\dotnet-install.ps1 -Version 7.0.100-rc.1.22431.12 -InstallDir $env:ProgramFiles/dotnet
+  - cmd: dotnet tool install --tool-path . nbgv
+  - cmd: dotnet tool install --tool-path . coverlet.console
 
 before_build:
 - systeminfo
@@ -21,11 +28,7 @@ before_build:
 - rem pygount -f summary Source/Libs/AM.Scripting/Source   -s cs -N "*.Designer.cs" -F "obj"
 - rem pygount -f summary Source/Tests                      -s cs -N "*.Designer.cs" -F "obj"
 - rem pygount -f summary Source/Apps                       -s cs -N "*.Designer.cs" -F "obj"
-- appveyor DownloadFile https://dot.net/v1/dotnet-install.ps1
-- powershell -ExecutionPolicy unrestricted ./dotnet-install.ps1 -Version 7.0.100-rc.1.22431.12
 - dotnet --info
-- dotnet tool install --tool-path . nbgv
-- dotnet tool install --tool-path . coverlet.console
 - nbgv cloud
 - dotnet build --configuration Release Source\Utils\Utils-windows.sln
 
