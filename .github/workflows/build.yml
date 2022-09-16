@@ -12,10 +12,10 @@ jobs:
       with:
          fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
         
-    - name: Setup .NET 6
+    - name: Setup .NET 7
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.200
+        dotnet-version: 7.0.100-rc.1
         
     - name: Install coverlet
       run: dotnet tool install --tool-path . coverlet.console
