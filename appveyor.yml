@@ -37,9 +37,9 @@ build_script:
 - dotnet build --configuration Release Source\TinyClient.sln
 
 test_script:
-- dotnet test --no-restore --no-build --configuration Release --settings sequential.runsettings /p:CollectCoverage=true Source\ManagedIrbis5-windows.sln
-- dotnet run  --no-restore --no-build --configuration Release --project                                                 Source\Tests\PftTests\PftTests.csproj
-- dotnet run  --no-restore --no-build --configuration Release --project                                                 Source\Tests\BarsikTestRunner\BarsikTestRunner.csproj
+- dotnet test Source/ManagedIrbis5-windows.sln --no-restore --no-build --configuration Release --settings sequential.runsettings --collect "XPlat Code Coverage"
+- dotnet run  --no-restore --no-build --configuration Release --project Source/Tests/PftTests/PftTests.csproj
+- dotnet run  --no-restore --no-build --configuration Release --project Source/Tests/BarsikTestRunner/BarsikTestRunner.csproj
 
 after_build:
 - dotnet pack    --no-restore --no-build --configuration Release --output NuGet   Source\ManagedIrbis5-publish.sln
