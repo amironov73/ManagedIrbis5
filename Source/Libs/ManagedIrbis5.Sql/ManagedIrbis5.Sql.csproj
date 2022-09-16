@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
@@ -30,5 +30,5 @@
         <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
         <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
     </ItemGroup>
-    
+
 </Project>

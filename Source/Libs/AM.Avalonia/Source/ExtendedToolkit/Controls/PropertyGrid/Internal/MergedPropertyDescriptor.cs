@@ -154,11 +154,17 @@ namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid.Internal
                 }
                 if ((obj2 == null) && type.IsSerializable)
                 {
+                    // TODO придумать, чем заменить BinaryFormatter
+
+                    /*
+
                     BinaryFormatter formatter = new BinaryFormatter();
                     MemoryStream serializationStream = new MemoryStream();
                     formatter.Serialize(serializationStream, value);
                     serializationStream.Position = 0L;
                     obj2 = formatter.Deserialize(serializationStream);
+
+                    */
                 }
                 if (obj2 != null)
                 {

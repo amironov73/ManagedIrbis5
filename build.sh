@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export DOTNET_CLI_UI_LANGUAGE=en
+
 rm -rf NuGet
 rm -rf Publish
 

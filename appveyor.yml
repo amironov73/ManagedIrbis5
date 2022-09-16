@@ -3,6 +3,7 @@ configuration: Debug
 image: Visual Studio 2022
 
 environment:
+  DOTNET_CLI_UI_LANGUAGE: en
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   PATH: C:\Python36-x64;C:\Python36-x64\Scripts;%PATH%
 
@@ -20,6 +21,8 @@ before_build:
 - rem pygount -f summary Source/Libs/AM.Scripting/Source   -s cs -N "*.Designer.cs" -F "obj"
 - rem pygount -f summary Source/Tests                      -s cs -N "*.Designer.cs" -F "obj"
 - rem pygount -f summary Source/Apps                       -s cs -N "*.Designer.cs" -F "obj"
+- appveyor DownloadFile https://dot.net/v1/dotnet-install.ps1
+- powershell -ExecutionPolicy unrestricted ./dotnet-install.ps1 -Version 7.0.100-rc.1.22431.12
 - dotnet --info
 - dotnet tool install --tool-path . nbgv
 - dotnet tool install --tool-path . coverlet.console

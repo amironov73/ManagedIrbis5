@@ -1,15 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <Nullable>enable</Nullable>
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\ManagedIrbis\ManagedIrbis.csproj" />
     </ItemGroup>
-    
+
     <ItemGroup>
       <ProjectReference Include="..\ManagedIrbis.Generators\ManagedIrbis.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>

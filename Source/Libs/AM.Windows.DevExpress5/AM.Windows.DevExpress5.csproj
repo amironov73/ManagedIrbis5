@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AM.DevExpress</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -49,5 +49,5 @@
     <PackageReference Include="DevExpress.Win.TreeList" Version="21.2.4" />
     <PackageReference Include="DevExpress.Win.VerticalGrid" Version="21.2.4" />
   </ItemGroup>
-    
+
 </Project>

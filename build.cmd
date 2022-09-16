@@ -1,5 +1,7 @@
 @echo off
 
+set DOTNET_CLI_UI_LANGUAGE=en
+
 if exist NuGet   rmdir /s /q NuGet
 if exist Publish rmdir /s /q Publish
 
