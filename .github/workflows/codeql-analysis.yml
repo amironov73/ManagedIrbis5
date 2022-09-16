@@ -68,10 +68,10 @@ jobs:
     #   make bootstrap
     #   make release
 
-    - name: Setup .NET 6
+    - name: Setup .NET 7
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.200
+        dotnet-version: 7.0.100-rc.1.22431.12
         
     - run: dotnet build Source/ManagedIrbis5.sln
     
