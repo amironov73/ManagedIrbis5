@@ -3,7 +3,7 @@ using Avalonia.Xaml.Interactivity;
 
 namespace Avalonia.ExtendedToolkit.Helper
 {
-    
+
     #pragma warning disable CS1570 // XML-Comment has invalid chars
     ///<summary>
     /// add log functionality into a style
@@ -25,25 +25,25 @@ namespace Avalonia.ExtendedToolkit.Helper
     public class DebugAction : Trigger<AvaloniaObject>
 #pragma warning restore CS1570 // XML-Kommentar weist ein ungültiges Format auf
     {
-        /// <summary>
-        /// registered PropertyChanged on AssociatedObject 
-        /// </summary>
+        /// <inheritdoc cref="Trigger{T}.OnAttached"/>
         protected override void OnAttached()
         {
             AssociatedObject.PropertyChanged += AssociatedObject_PropertyChanged;
             base.OnAttached();
         }
 
-        /// <summary>
-        /// unregistered PropertyChanged on AssociatedObject 
-        /// </summary>
+        /// <inheritdoc cref="Behavior.OnDetaching"/>
         protected override void OnDetaching()
         {
             AssociatedObject.PropertyChanged -= AssociatedObject_PropertyChanged;
             base.OnDetaching();
         }
 
-        private void AssociatedObject_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+        private void AssociatedObject_PropertyChanged
+            (
+                object? sender,
+                AvaloniaPropertyChangedEventArgs e
+            )
         {
             Debug.WriteLine($"AssociatedObject: {AssociatedObject} Property Name: {e.Property.Name}" +
                 $" New Value: {e.NewValue} Old Value: {e.OldValue}");

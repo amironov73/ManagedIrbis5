@@ -45,7 +45,7 @@ namespace Avalonia.ExtendedToolkit.Behaviours
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SelectingItemsControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SelectingItemsControl_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             var selectedItems = e.AddedItems.OfType<object>().ToList();
 

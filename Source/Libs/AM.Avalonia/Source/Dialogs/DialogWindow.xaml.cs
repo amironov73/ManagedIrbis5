@@ -48,22 +48,34 @@ namespace AM.Avalonia.Dialogs
       {
         Window owner = null;
         if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
-          owner = lifetime.Windows.FirstOrDefault(w => w.IsActive);
+        {
+            owner = lifetime.Windows.FirstOrDefault(w => w.IsActive);
+        }
 
         Owner = owner;
         if (owner != null)
-          this.Icon = owner.Icon;
+        {
+            this.Icon = owner.Icon;
+        }
       }
     }
 
+    /// <inheritdoc cref="InputElement.OnKeyDown"/>
     protected override void OnKeyDown(KeyEventArgs e)
     {
       base.OnKeyDown(e);
       if (e.Key == Key.Escape)
-        Close();
+      {
+          Close();
+      }
     }
 
-    public DialogWindow(IDialog dialog) : this()
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="dialog"></param>
+    public DialogWindow(IDialog dialog)
+        : this()
     {
       DataContext = dialog;
       var sub = dialog.Buttons.Clicked
@@ -77,7 +89,9 @@ namespace AM.Avalonia.Dialogs
       {
         sub?.Dispose();
         if (ResultButton == null)
-          ResultButton = dialog.Buttons.CancelButton;
+        {
+            ResultButton = dialog.Buttons.CancelButton;
+        }
       };
     }
 

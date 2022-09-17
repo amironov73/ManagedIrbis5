@@ -5,7 +5,7 @@ using Avalonia.Controls.Templates;
 namespace Avalonia.Controlz.Controls
 {
     /// <summary>
-    /// status bar 
+    /// status bar
     /// </summary>
     public class StatusBar : ItemsControl
     {
@@ -28,10 +28,7 @@ namespace Avalonia.Controlz.Controls
         //public static readonly StyledProperty<bool> UsesItemContainerTemplateProperty =
         //    AvaloniaProperty.Register<StatusBar, bool>(nameof(UsesItemContainerTemplate));
 
-        /// <summary>
-        /// creates an item container of an <see cref="StatusBarItem"/>
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc cref="ItemsControl.CreateItemContainerGenerator"/>
         protected override IItemContainerGenerator CreateItemContainerGenerator()
         {
             var itemContainer = new ItemContainerGenerator<StatusBarItem>(

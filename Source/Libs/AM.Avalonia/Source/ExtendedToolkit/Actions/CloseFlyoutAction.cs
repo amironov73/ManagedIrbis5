@@ -42,10 +42,7 @@ namespace Avalonia.ExtendedToolkit.Actions
             }
         }
 
-        /// <summary>
-        /// if command parameter is null use the associated object as parameter
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc cref="CommandTriggerAction.GetCommandParameter"/>
         protected override object GetCommandParameter()
         {
             return this.CommandParameter ?? this.AssociatedFlyout;

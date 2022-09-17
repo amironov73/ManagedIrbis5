@@ -31,6 +31,7 @@ namespace Avalonia.ExtendedToolkit.Behaviours
         AvaloniaProperty.Register<SelectTextBoxBehavior, bool>(nameof(IsSelectAll), defaultValue: true);
         private IDisposable _disposable;
 
+        /// <inheritdoc cref="Behavior{T}.OnAttached"/>
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -41,11 +42,16 @@ namespace Avalonia.ExtendedToolkit.Behaviours
 
         }
 
-        private void AssociatedObjectPointerReleased(object sender, PointerReleasedEventArgs e)
+        private void AssociatedObjectPointerReleased
+            (
+                object? sender,
+                PointerReleasedEventArgs e
+            )
         {
             SelectBehavior();
         }
 
+        /// <inheritdoc cref="Behavior.OnDetaching"/>
         protected override void OnDetaching()
         {
             base.OnDetaching();
@@ -55,22 +61,38 @@ namespace Avalonia.ExtendedToolkit.Behaviours
             _disposable?.Dispose();
         }
 
-        private void OnAttachedToVisualTree(object sender, VisualTreeAttachmentEventArgs e)
+        private void OnAttachedToVisualTree
+            (
+                object? sender,
+                VisualTreeAttachmentEventArgs e
+            )
         {
             AssociatedObject.Focus();
         }
 
-        private void OnTapped(object sender, RoutedEventArgs e)
+        private void OnTapped
+            (
+                object? sender,
+                RoutedEventArgs e
+            )
         {
             SelectBehavior();
         }
 
-        private void AssociatedObjectPointerPressed(object sender, PointerPressedEventArgs e)
+        private void AssociatedObjectPointerPressed
+            (
+                object? sender,
+                PointerPressedEventArgs e
+            )
         {
             SelectBehavior();
         }
 
-        private void AssociatedObjectGotFocus(object sender, GotFocusEventArgs e)
+        private void AssociatedObjectGotFocus
+            (
+                object? sender,
+                GotFocusEventArgs e
+            )
         {
 
             SelectBehavior();

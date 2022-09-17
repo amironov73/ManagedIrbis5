@@ -1,5 +1,8 @@
 ﻿using Avalonia.Controls;
+
 using System;
+
+using Avalonia.Layout;
 
 namespace Avalonia.Controlz.Controls
 {
@@ -23,9 +26,9 @@ namespace Avalonia.Controlz.Controls
     /// </summary>
     public class TabPanel : Panel
     {
-        private int _numRows = 1;       // Nubmer of row calculated in measure and used in arrange
-        private int _numHeaders = 0;    // Number of headers excluding the collapsed items
-        private double _rowHeight = 0;  // Maximum of all headers height
+        private int _numRows = 1; // Nubmer of row calculated in measure and used in arrange
+        private int _numHeaders = 0; // Number of headers excluding the collapsed items
+        private double _rowHeight = 0; // Maximum of all headers height
 
         private Dock TabStripPlacement
         {
@@ -39,15 +42,8 @@ namespace Avalonia.Controlz.Controls
             }
         }
 
-        /// <summary>
-        /// Updates DesiredSize of the TabPanel.  Called by parent UIElement.  This is the first pass of layout.
-        /// </summary>
-        /// <remarks>
-        /// TabPanel
-        /// </remarks>
-        /// <param name="constraint">Constraint size is an "upper limit" that TabPanel should not exceed.</param>
-        /// <returns>TabPanel' desired size.</returns>
-        protected override Size MeasureOverride(Size constraint)
+        /// <inheritdoc cref="Layoutable.MeasureOverride"/>
+        protected override Size MeasureOverride (Size constraint)
         {
             Size contentSize = new Size();
             Dock tabAlignment = TabStripPlacement;
@@ -72,14 +68,15 @@ namespace Avalonia.Controlz.Controls
 
                     // Helper measures child, and deals with Min, Max, and base Width & Height properties.
                     // Helper returns the size a child needs to take up (DesiredSize or property specified size).
-                    child.Measure(constraint);
-                    Size childSize = GetDesiredSizeWithoutMargin(child);
+                    child.Measure (constraint);
+                    Size childSize = GetDesiredSizeWithoutMargin (child);
 
                     if (_rowHeight < childSize.Height)
                         _rowHeight = childSize.Height;
 
                     if (currentRowWidth + childSize.Width > constraint.Width && numInCurrentRow > 0)
-                    { // If child does not fit in the current row - create a new row
+                    {
+                        // If child does not fit in the current row - create a new row
                         if (maxRowWidth < currentRowWidth)
                             maxRowWidth = currentRowWidth;
 
@@ -97,13 +94,14 @@ namespace Avalonia.Controlz.Controls
                 if (maxRowWidth < currentRowWidth)
                     maxRowWidth = currentRowWidth;
 
-                contentSize = new Size(contentSize.Width, _rowHeight * _numRows);
+                contentSize = new Size (contentSize.Width, _rowHeight * _numRows);
 
                 // If we don't have constraint or content wisth is smaller than constraint width then size to content
-                if (double.IsInfinity(contentSize.Width) || DoubleUtil.IsNaN(contentSize.Width) || maxRowWidth < constraint.Width)
-                    contentSize = new Size(maxRowWidth, contentSize.Height);
+                if (double.IsInfinity (contentSize.Width) || DoubleUtil.IsNaN (contentSize.Width) ||
+                    maxRowWidth < constraint.Width)
+                    contentSize = new Size (maxRowWidth, contentSize.Height);
                 else
-                    contentSize = new Size(constraint.Width, contentSize.Height);
+                    contentSize = new Size (constraint.Width, contentSize.Height);
             }
             else if (tabAlignment == Dock.Left || tabAlignment == Dock.Right)
             {
@@ -116,14 +114,14 @@ namespace Avalonia.Controlz.Controls
 
                     // Helper measures child, and deals with Min, Max, and base Width & Height properties.
                     // Helper returns the size a child needs to take up (DesiredSize or property specified size).
-                    child.Measure(constraint);
+                    child.Measure (constraint);
 
-                    Size childSize = GetDesiredSizeWithoutMargin(child);
+                    Size childSize = GetDesiredSizeWithoutMargin (child);
 
                     if (contentSize.Width < childSize.Width)
-                        contentSize = new Size(childSize.Width, contentSize.Height);
+                        contentSize = new Size (childSize.Width, contentSize.Height);
 
-                    contentSize = new Size(contentSize.Width, contentSize.Height + childSize.Height);
+                    contentSize = new Size (contentSize.Width, contentSize.Height + childSize.Height);
                 }
             }
 
@@ -131,12 +129,12 @@ namespace Avalonia.Controlz.Controls
             return contentSize;
         }
 
-        private Size GetDesiredSizeWithoutMargin(IControl element)
+        private Size GetDesiredSizeWithoutMargin (IControl element)
         {
-            Thickness margin = (Thickness)element.GetValue(MarginProperty);
-            Size desiredSizeWithoutMargin = new Size(
-             Math.Max(0d, element.DesiredSize.Width - margin.Left - margin.Right),
-             Math.Max(0d, element.DesiredSize.Height - margin.Top - margin.Bottom));
+            Thickness margin = (Thickness)element.GetValue (MarginProperty);
+            Size desiredSizeWithoutMargin = new Size (
+                Math.Max (0d, element.DesiredSize.Width - margin.Left - margin.Right),
+                Math.Max (0d, element.DesiredSize.Height - margin.Top - margin.Bottom));
 
             return desiredSizeWithoutMargin;
         }
@@ -150,14 +148,15 @@ namespace Avalonia.Controlz.Controls
                 if (child.IsVisible == false)
                     continue;
 
-                Size childSize = GetDesiredSizeWithoutMargin(child);
+                Size childSize = GetDesiredSizeWithoutMargin (child);
                 headerSize[childIndex] = childSize.Width;
                 childIndex++;
             }
+
             return headerSize;
         }
 
-        private void ArrangeHorizontal(Size arrangeSize)
+        private void ArrangeHorizontal (Size arrangeSize)
         {
             Dock tabAlignment = TabStripPlacement;
             bool isMultiRow = _numRows > 1;
@@ -169,16 +168,16 @@ namespace Avalonia.Controlz.Controls
             // If we have multirows, then calculate the best header distribution
             if (isMultiRow)
             {
-                solution = CalculateHeaderDistribution(arrangeSize.Width, headerSize);
-                activeRow = GetActiveRow(solution);
+                solution = CalculateHeaderDistribution (arrangeSize.Width, headerSize);
+                activeRow = GetActiveRow (solution);
 
                 // TabPanel starts to layout children depend on activeRow which should be always on bottom (top)
                 // The first row should start from Y = (_numRows - 1 - activeRow) * _rowHeight
                 if (tabAlignment == Dock.Top)
-                    childOffset = new Vector(childOffset.X, (_numRows - 1 - activeRow) * _rowHeight);
+                    childOffset = new Vector (childOffset.X, (_numRows - 1 - activeRow) * _rowHeight);
 
                 if (tabAlignment == Dock.Bottom && activeRow != 0)
-                    childOffset = new Vector(childOffset.X, (_numRows - activeRow) * _rowHeight);
+                    childOffset = new Vector (childOffset.X, (_numRows - activeRow) * _rowHeight);
             }
 
             int childIndex = 0;
@@ -188,42 +187,44 @@ namespace Avalonia.Controlz.Controls
                 if (child.IsVisible == false)
                     continue;
 
-                Thickness margin = (Thickness)child.GetValue(MarginProperty);
+                Thickness margin = (Thickness)child.GetValue (MarginProperty);
                 double leftOffset = margin.Left;
                 double rightOffset = margin.Right;
                 double topOffset = margin.Top;
                 double bottomOffset = margin.Bottom;
 
-                bool lastHeaderInRow = isMultiRow && (separatorIndex < solution.Length && solution[separatorIndex] == childIndex || childIndex == _numHeaders - 1);
+                bool lastHeaderInRow = isMultiRow &&
+                                       (separatorIndex < solution.Length && solution[separatorIndex] == childIndex ||
+                                        childIndex == _numHeaders - 1);
 
                 //Length left, top, right, bottom;
-                Size cellSize = new Size(headerSize[childIndex], _rowHeight);
+                Size cellSize = new Size (headerSize[childIndex], _rowHeight);
 
                 // Align the last header in the row; If headers are not aligned directional nav would not work correctly
                 if (lastHeaderInRow)
                 {
-                    cellSize = new Size(arrangeSize.Width - childOffset.X, cellSize.Height);
+                    cellSize = new Size (arrangeSize.Width - childOffset.X, cellSize.Height);
                 }
 
-                child.Arrange(new Rect(childOffset.X, childOffset.Y, cellSize.Width, cellSize.Height));
+                child.Arrange (new Rect (childOffset.X, childOffset.Y, cellSize.Width, cellSize.Height));
 
                 Size childSize = cellSize;
-                childSize = new Size(Math.Max(0d, childSize.Width - leftOffset - rightOffset),
-                    Math.Max(0d, childSize.Height - topOffset - bottomOffset));
+                childSize = new Size (Math.Max (0d, childSize.Width - leftOffset - rightOffset),
+                    Math.Max (0d, childSize.Height - topOffset - bottomOffset));
 
                 // Calculate the offset for the next child
 
-                childOffset = new Vector(childOffset.X + cellSize.Width, childOffset.Y);
+                childOffset = new Vector (childOffset.X + cellSize.Width, childOffset.Y);
 
                 if (lastHeaderInRow)
                 {
                     if ((separatorIndex == activeRow && tabAlignment == Dock.Top) ||
                         (separatorIndex == activeRow - 1 && tabAlignment == Dock.Bottom))
-                        childOffset = new Vector(childOffset.X, 0d);
+                        childOffset = new Vector (childOffset.X, 0d);
                     else
-                        childOffset = new Vector(childOffset.X, childOffset.Y + _rowHeight);
+                        childOffset = new Vector (childOffset.X, childOffset.Y + _rowHeight);
 
-                    childOffset = new Vector(0d, childOffset.Y);
+                    childOffset = new Vector (0d, childOffset.Y);
 
                     separatorIndex++;
                 }
@@ -232,15 +233,15 @@ namespace Avalonia.Controlz.Controls
             }
         }
 
-        private void ArrangeVertical(Size arrangeSize)
+        private void ArrangeVertical (Size arrangeSize)
         {
             double childOffsetY = 0d;
             foreach (IControl child in Children)
             {
                 if (child.IsVisible)
                 {
-                    Size childSize = GetDesiredSizeWithoutMargin(child);
-                    child.Arrange(new Rect(0, childOffsetY, arrangeSize.Width, childSize.Height));
+                    Size childSize = GetDesiredSizeWithoutMargin (child);
+                    child.Arrange (new Rect (0, childOffsetY, arrangeSize.Width, childSize.Height));
 
                     // Calculate the offset for the next child
                     childOffsetY += childSize.Height;
@@ -249,7 +250,7 @@ namespace Avalonia.Controlz.Controls
         }
 
         // Returns the row which contain the child with IsSelected==true
-        private int GetActiveRow(int[] solution)
+        private int GetActiveRow (int[] solution)
         {
             int activeRow = 0;
             int childIndex = 0;
@@ -318,7 +319,7 @@ namespace Avalonia.Controlz.Controls
 
         // Input: Row width and width of all headers
         // Output: int array which size is the number of separators and contains each separator position
-        private int[] CalculateHeaderDistribution(double rowWidthLimit, double[] headerWidth)
+        private int[] CalculateHeaderDistribution (double rowWidthLimit, double[] headerWidth)
         {
             double bestSolutionMaxRowAverageGap = 0;
             int numHeaders = headerWidth.Length;
@@ -340,14 +341,20 @@ namespace Avalonia.Controlz.Controls
             for (int index = 0; index < numHeaders; index++)
             {
                 if (currentRowWidth + headerWidth[index] > rowWidthLimit && numberOfHeadersInCurrentRow > 0)
-                { // if we cannot add next header - flow to next row
+                {
+                    // if we cannot add next header - flow to next row
                     // Store current row before we go to the next
                     rowWidth[currentRowIndex] = currentRowWidth; // Store the current row width
-                    rowHeaderCount[currentRowIndex] = numberOfHeadersInCurrentRow; // For each row we store the number os headers inside
-                    currentAverageGap = Math.Max(0d, (rowWidthLimit - currentRowWidth) / numberOfHeadersInCurrentRow); // The amout of width that should be added to justify the header
+                    rowHeaderCount[currentRowIndex] =
+                        numberOfHeadersInCurrentRow; // For each row we store the number os headers inside
+                    currentAverageGap =
+                        Math.Max (0d,
+                            (rowWidthLimit - currentRowWidth) /
+                            numberOfHeadersInCurrentRow); // The amout of width that should be added to justify the header
                     rowAverageGap[currentRowIndex] = currentAverageGap;
                     currentSolution[currentRowIndex] = index - 1; // Separator points to the last header in the row
-                    if (bestSolutionMaxRowAverageGap < currentAverageGap) // Remember the maximum of all currentAverageGap
+                    if (bestSolutionMaxRowAverageGap <
+                        currentAverageGap) // Remember the maximum of all currentAverageGap
                         bestSolutionMaxRowAverageGap = currentAverageGap;
 
                     // Iterate to next row
@@ -358,6 +365,7 @@ namespace Avalonia.Controlz.Controls
                 else
                 {
                     currentRowWidth += headerWidth[index]; // Accumulate header widths on the same row
+
                     // Increase the number of headers only if they are not collapsed (width=0)
                     if (headerWidth[index] != 0)
                         numberOfHeadersInCurrentRow++;
@@ -376,8 +384,9 @@ namespace Avalonia.Controlz.Controls
             if (bestSolutionMaxRowAverageGap < currentAverageGap)
                 bestSolutionMaxRowAverageGap = currentAverageGap;
 
-            currentSolution.CopyTo(bestSolution, 0); // Remember the first solution as initial bestSolution
-            rowAverageGap.CopyTo(bestSolutionRowAverageGap, 0); // bestSolutionRowAverageGap is used in ArrangeOverride to calculate header sizes
+            currentSolution.CopyTo (bestSolution, 0); // Remember the first solution as initial bestSolution
+            rowAverageGap.CopyTo (bestSolutionRowAverageGap,
+                0); // bestSolutionRowAverageGap is used in ArrangeOverride to calculate header sizes
 
             // Search for the best solution
             // The exit condition if when we cannot move header to the next row
@@ -435,8 +444,8 @@ namespace Avalonia.Controlz.Controls
                 if (maxAG < bestSolutionMaxRowAverageGap)
                 {
                     bestSolutionMaxRowAverageGap = maxAG;
-                    currentSolution.CopyTo(bestSolution, 0);
-                    rowAverageGap.CopyTo(bestSolutionRowAverageGap, 0);
+                    currentSolution.CopyTo (bestSolution, 0);
+                    rowAverageGap.CopyTo (bestSolutionRowAverageGap, 0);
                 }
             }
 
@@ -448,6 +457,7 @@ namespace Avalonia.Controlz.Controls
                 if (currentRowIndex < numSeparators && bestSolution[currentRowIndex] == index)
                     currentRowIndex++;
             }
+
             // Use the best solution bestSolution[0..numSeparators-1] to layout
             return bestSolution;
         }

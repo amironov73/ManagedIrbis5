@@ -4,20 +4,22 @@ using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+
 using ReactiveUI;
+
 using System;
 using System.Windows.Input;
+
 using DynamicData.Kernel;
 
 namespace Avalonia.Controlz.Controls
 {
-
     // This source file is adapted from the Windows Presentation Foundation project.
     // (https://github.com/dotnet/wpf/)
 
     /// <summary>
     /// slider with a tickbar
-    /// 
+    ///
     /// TODO AutoTooltip missing and some commented code.
     /// </summary>
     public class SliderEx : RangeBaseEx
@@ -29,14 +31,10 @@ namespace Avalonia.Controlz.Controls
         /// <summary>
         /// style key of this control
         /// </summary>
-        public Type StyleKey => typeof(SliderEx);
+        public Type StyleKey => typeof (SliderEx);
 
 
-        internal Track Track
-        {
-            get;
-            set;
-        }
+        internal Track Track { get; set; }
 
         internal TickBar TopTickBar { get; private set; }
         internal TickBar BottomTickBar { get; private set; }
@@ -48,15 +46,16 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         public Orientation Orientation
         {
-            get { return (Orientation)GetValue(OrientationProperty); }
-            set { SetValue(OrientationProperty, value); }
+            get { return (Orientation)GetValue (OrientationProperty); }
+            set { SetValue (OrientationProperty, value); }
         }
 
         /// <summary>
         /// Defines the <see cref="Orientation"/> property.
         /// </summary>
         public static readonly StyledProperty<Orientation> OrientationProperty =
-           AvaloniaProperty.Register<SliderEx, Orientation>(nameof(Orientation), defaultValue: Orientation.Horizontal);
+            AvaloniaProperty.Register<SliderEx, Orientation> (nameof (Orientation),
+                defaultValue: Orientation.Horizontal);
 
         //ScrollBar.OrientationProperty.AddOwner<SliderEx>();
 
@@ -65,15 +64,15 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         public bool IsDirectionReversed
         {
-            get { return (bool)GetValue(IsDirectionReversedProperty); }
-            set { SetValue(IsDirectionReversedProperty, value); }
+            get { return (bool)GetValue (IsDirectionReversedProperty); }
+            set { SetValue (IsDirectionReversedProperty, value); }
         }
 
         /// <summary>
         /// Defines the <see cref="IsDirectionReversed"/> property.
         /// </summary>
         public static readonly StyledProperty<bool> IsDirectionReversedProperty =
-            AvaloniaProperty.Register<SliderEx, bool>(nameof(IsDirectionReversed));
+            AvaloniaProperty.Register<SliderEx, bool> (nameof (IsDirectionReversed));
 
         /// <summary>
         /// Specifies the amount of time, in milliseconds, to wait before repeating begins.
@@ -81,8 +80,8 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         public int Delay
         {
-            get { return (int)GetValue(DelayProperty); }
-            set { SetValue(DelayProperty, value); }
+            get { return (int)GetValue (DelayProperty); }
+            set { SetValue (DelayProperty, value); }
         }
 
         /// <summary>
@@ -99,8 +98,8 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         public int Interval
         {
-            get { return (int)GetValue(IntervalProperty); }
-            set { SetValue(IntervalProperty, value); }
+            get { return (int)GetValue (IntervalProperty); }
+            set { SetValue (IntervalProperty, value); }
         }
 
         /// <summary>
@@ -116,26 +115,25 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         public AutoToolTipPlacement AutoToolTipPlacement
         {
-            get { return (AutoToolTipPlacement)GetValue(AutoToolTipPlacementProperty); }
-            set { SetValue(AutoToolTipPlacementProperty, value); }
+            get { return (AutoToolTipPlacement)GetValue (AutoToolTipPlacementProperty); }
+            set { SetValue (AutoToolTipPlacementProperty, value); }
         }
 
         /// <summary>
         /// Defines the <see cref="AutoToolTipPlacement"/> property.
         /// </summary>
         public static readonly StyledProperty<AutoToolTipPlacement> AutoToolTipPlacementProperty =
-           AvaloniaProperty.Register<SliderEx, AutoToolTipPlacement>(nameof(AutoToolTipPlacement)
-               , defaultValue: AutoToolTipPlacement.None
-
-               );
+            AvaloniaProperty.Register<SliderEx, AutoToolTipPlacement> (nameof (AutoToolTipPlacement)
+                    , defaultValue: AutoToolTipPlacement.None
+                );
 
         /// <summary>
         ///     Get or set number of decimal digits of Slider's Value shown in AutoToolTip
         /// </summary>
         public int AutoToolTipPrecision
         {
-            get { return (int)GetValue(AutoToolTipPrecisionProperty); }
-            set { SetValue(AutoToolTipPrecisionProperty, value); }
+            get { return (int)GetValue (AutoToolTipPrecisionProperty); }
+            set { SetValue (AutoToolTipPrecisionProperty, value); }
         }
 
 
@@ -143,22 +141,22 @@ namespace Avalonia.Controlz.Controls
         /// Defines the <see cref="AutoToolTipPrecision"/> property.
         /// </summary>
         public static readonly StyledProperty<int> AutoToolTipPrecisionProperty =
-            AvaloniaProperty.Register<SliderEx, int>(nameof(AutoToolTipPrecision), defaultValue: 0);
+            AvaloniaProperty.Register<SliderEx, int> (nameof (AutoToolTipPrecision), defaultValue: 0);
 
         /// <summary>
         ///     When 'true', Slider will automatically move the Thumb (and/or change current value) to the closest TickMark.
         /// </summary>
         public bool IsSnapToTickEnabled
         {
-            get { return (bool)GetValue(IsSnapToTickEnabledProperty); }
-            set { SetValue(IsSnapToTickEnabledProperty, value); }
+            get { return (bool)GetValue (IsSnapToTickEnabledProperty); }
+            set { SetValue (IsSnapToTickEnabledProperty, value); }
         }
 
         /// <summary>
         /// Defines the <see cref="IsSnapToTickEnabled"/> property.
         /// </summary>
         public static readonly StyledProperty<bool> IsSnapToTickEnabledProperty =
-            AvaloniaProperty.Register<SliderEx, bool>(nameof(IsSnapToTickEnabled), defaultValue: true);
+            AvaloniaProperty.Register<SliderEx, bool> (nameof (IsSnapToTickEnabled), defaultValue: true);
 
         /// <summary>
         ///     Slider uses this value to determine where to show the Ticks.
@@ -167,15 +165,15 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         public TickPlacement TickPlacement
         {
-            get { return (TickPlacement)GetValue(TickPlacementProperty); }
-            set { SetValue(TickPlacementProperty, value); }
+            get { return (TickPlacement)GetValue (TickPlacementProperty); }
+            set { SetValue (TickPlacementProperty, value); }
         }
 
         /// <summary>
         /// Defines the <see cref="TickPlacement"/> property.
         /// </summary>
         public static readonly StyledProperty<TickPlacement> TickPlacementProperty =
-            AvaloniaProperty.Register<SliderEx, TickPlacement>(nameof(TickPlacement)
+            AvaloniaProperty.Register<SliderEx, TickPlacement> (nameof (TickPlacement)
                 , defaultValue: TickPlacement.None);
 
         /// <summary>
@@ -185,15 +183,15 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         public double TickFrequency
         {
-            get { return (double)GetValue(TickFrequencyProperty); }
-            set { SetValue(TickFrequencyProperty, value); }
+            get { return (double)GetValue (TickFrequencyProperty); }
+            set { SetValue (TickFrequencyProperty, value); }
         }
 
         /// <summary>
         /// Defines the <see cref="TickFrequency"/> property.
         /// </summary>
         public static readonly StyledProperty<double> TickFrequencyProperty =
-            AvaloniaProperty.Register<SliderEx, double>(nameof(TickFrequency), defaultValue: 1.0);
+            AvaloniaProperty.Register<SliderEx, double> (nameof (TickFrequency), defaultValue: 1.0);
 
         /// <summary>
         ///     Slider uses this value to determine where to show the Ticks.
@@ -202,45 +200,46 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         public DoubleCollection Ticks
         {
-            get { return (DoubleCollection)GetValue(TicksProperty); }
-            set { SetValue(TicksProperty, value); }
+            get { return (DoubleCollection)GetValue (TicksProperty); }
+            set { SetValue (TicksProperty, value); }
         }
 
         /// <summary>
         /// Defines the <see cref="Ticks"/> property.
         /// </summary>
         public static readonly StyledProperty<DoubleCollection> TicksProperty =
-            AvaloniaProperty.Register<SliderEx, DoubleCollection>(nameof(Ticks), defaultValue: DoubleCollection.Empty());
+            AvaloniaProperty.Register<SliderEx, DoubleCollection> (nameof (Ticks),
+                defaultValue: DoubleCollection.Empty());
 
         /// <summary>
         ///     Enable or disable selection support on Slider
         /// </summary>
         public bool IsSelectionRangeEnabled
         {
-            get { return (bool)GetValue(IsSelectionRangeEnabledProperty); }
-            set { SetValue(IsSelectionRangeEnabledProperty, value); }
+            get { return (bool)GetValue (IsSelectionRangeEnabledProperty); }
+            set { SetValue (IsSelectionRangeEnabledProperty, value); }
         }
 
         /// <summary>
         /// Defines the <see cref="IsSelectionRangeEnabled"/> property.
         /// </summary>
         public static readonly StyledProperty<bool> IsSelectionRangeEnabledProperty =
-            AvaloniaProperty.Register<SliderEx, bool>(nameof(IsSelectionRangeEnabled));
+            AvaloniaProperty.Register<SliderEx, bool> (nameof (IsSelectionRangeEnabled));
 
         /// <summary>
         ///     Get or set starting value of selection.
         /// </summary>
         public double SelectionStart
         {
-            get { return (double)GetValue(SelectionStartProperty); }
-            set { SetValue(SelectionStartProperty, value); }
+            get { return (double)GetValue (SelectionStartProperty); }
+            set { SetValue (SelectionStartProperty, value); }
         }
 
         /// <summary>
         /// Defines the <see cref="SelectionStart"/> property.
         /// </summary>
         public static readonly StyledProperty<double> SelectionStartProperty =
-            AvaloniaProperty.Register<SliderEx, double>(nameof(SelectionStart)
+            AvaloniaProperty.Register<SliderEx, double> (nameof (SelectionStart)
                 , defaultValue: 0.0d, defaultBindingMode: Data.BindingMode.TwoWay);
 
         /// <summary>
@@ -248,15 +247,15 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         public double SelectionEnd
         {
-            get { return (double)GetValue(SelectionEndProperty); }
-            set { SetValue(SelectionEndProperty, value); }
+            get { return (double)GetValue (SelectionEndProperty); }
+            set { SetValue (SelectionEndProperty, value); }
         }
 
         /// <summary>
         /// Defines the <see cref="SelectionEnd"/> property.
         /// </summary>
         public static readonly StyledProperty<double> SelectionEndProperty =
-            AvaloniaProperty.Register<SliderEx, double>(nameof(SelectionEnd)
+            AvaloniaProperty.Register<SliderEx, double> (nameof (SelectionEnd)
                 , defaultValue: 0.0d, defaultBindingMode: Data.BindingMode.TwoWay);
 
         /// <summary>
@@ -266,25 +265,25 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         public bool IsMoveToPointEnabled
         {
-            get { return (bool)GetValue(IsMoveToPointEnabledProperty); }
-            set { SetValue(IsMoveToPointEnabledProperty, value); }
+            get { return (bool)GetValue (IsMoveToPointEnabledProperty); }
+            set { SetValue (IsMoveToPointEnabledProperty, value); }
         }
 
         /// <summary>
         /// Defines the <see cref="IsMoveToPointEnabled"/> property.
         /// </summary>
         public static readonly StyledProperty<bool> IsMoveToPointEnabledProperty =
-            AvaloniaProperty.Register<SliderEx, bool>(nameof(IsMoveToPointEnabled));
+            AvaloniaProperty.Register<SliderEx, bool> (nameof (IsMoveToPointEnabled));
 
         /// <summary>
-        /// initilize the command 
+        /// initilize the command
         /// and pseudoclass
         /// </summary>
         public SliderEx()
         {
             InitializeCommands();
 
-            UpdatePseudoClassesForOrientation(Orientation);
+            UpdatePseudoClassesForOrientation (Orientation);
         }
 
         /// This is the static constructor for the Slider class.  It
@@ -292,19 +291,25 @@ namespace Avalonia.Controlz.Controls
         /// devices, and defines a default style sheet.
         static SliderEx()
         {
-            Thumb.DragStartedEvent.AddClassHandler<SliderEx>((o, e) => OnThumbDragStarted(o, e), RoutingStrategies.Bubble);
-            Thumb.DragDeltaEvent.AddClassHandler<SliderEx>((o, e) => OnThumbDragDelta(o, e), RoutingStrategies.Bubble);
-            Thumb.DragCompletedEvent.AddClassHandler<SliderEx>((o, e) => OnThumbDragCompleted(o, e), RoutingStrategies.Bubble);
+            Thumb.DragStartedEvent.AddClassHandler<SliderEx> ((o, e) => OnThumbDragStarted (o, e),
+                RoutingStrategies.Bubble);
+            Thumb.DragDeltaEvent.AddClassHandler<SliderEx> ((o, e) => OnThumbDragDelta (o, e),
+                RoutingStrategies.Bubble);
+            Thumb.DragCompletedEvent.AddClassHandler<SliderEx> ((o, e) => OnThumbDragCompleted (o, e),
+                RoutingStrategies.Bubble);
 
-            SelectionStartProperty.Changed.AddClassHandler((Action<SliderEx, AvaloniaPropertyChangedEventArgs>)((o, e) => OnSelectionStartChanged(o, e)));
-            SelectionEndProperty.Changed.AddClassHandler((Action<SliderEx, AvaloniaPropertyChangedEventArgs>)((o, e) => OnSelectionEndChanged(o, e)));
-            ValueProperty.Changed.AddClassHandler((Action<SliderEx, AvaloniaPropertyChangedEventArgs>)((o, e) => OnValueChanged(o, e)));
-            TickPlacementProperty.Changed.AddClassHandler((Action<SliderEx, AvaloniaPropertyChangedEventArgs>)((o, e) => OnTickPlacementChanged(o, e)));
+            SelectionStartProperty.Changed.AddClassHandler (
+                (Action<SliderEx, AvaloniaPropertyChangedEventArgs>)((o, e) => OnSelectionStartChanged (o, e)));
+            SelectionEndProperty.Changed.AddClassHandler (
+                (Action<SliderEx, AvaloniaPropertyChangedEventArgs>)((o, e) => OnSelectionEndChanged (o, e)));
+            ValueProperty.Changed.AddClassHandler (
+                (Action<SliderEx, AvaloniaPropertyChangedEventArgs>)((o, e) => OnValueChanged (o, e)));
+            TickPlacementProperty.Changed.AddClassHandler (
+                (Action<SliderEx, AvaloniaPropertyChangedEventArgs>)((o, e) => OnTickPlacementChanged (o, e)));
         }
 
 
-
-        private static void OnTickPlacementChanged(SliderEx slider, AvaloniaPropertyChangedEventArgs e)
+        private static void OnTickPlacementChanged (SliderEx slider, AvaloniaPropertyChangedEventArgs e)
         {
             if (slider.TopTickBar == null || slider.BottomTickBar == null)
                 return;
@@ -322,12 +327,12 @@ namespace Avalonia.Controlz.Controls
                 switch (slider.Orientation)
                 {
                     case Orientation.Horizontal:
-                        if (DoubleUtil.IsDoubleFinite(slider.Track.Thumb.Width))
+                        if (DoubleUtil.IsDoubleFinite (slider.Track.Thumb.Width))
                             slider.TopTickBar.ReservedSpace = slider.Track.Thumb.Width;
                         break;
 
                     case Orientation.Vertical:
-                        if (DoubleUtil.IsDoubleFinite(slider.Track.Thumb.Height))
+                        if (DoubleUtil.IsDoubleFinite (slider.Track.Thumb.Height))
                             slider.TopTickBar.ReservedSpace = slider.Track.Thumb.Height;
                         break;
                 }
@@ -335,16 +340,20 @@ namespace Avalonia.Controlz.Controls
 
             if (slider.Orientation == Orientation.Horizontal)
             {
-                slider.Track.Thumb.Classes.Set("HorizontalSliderUpThumbStyle", slider.TickPlacement == TickPlacement.TopLeft);
-                slider.Track.Thumb.Classes.Set("HorizontalSliderDownThumbStyle", slider.TickPlacement == TickPlacement.BottomRight);
+                slider.Track.Thumb.Classes.Set ("HorizontalSliderUpThumbStyle",
+                    slider.TickPlacement == TickPlacement.TopLeft);
+                slider.Track.Thumb.Classes.Set ("HorizontalSliderDownThumbStyle",
+                    slider.TickPlacement == TickPlacement.BottomRight);
             }
             else
             {
-                slider.Track.Thumb.Classes.Set("VerticalSliderLeftThumbStyle", slider.TickPlacement == TickPlacement.TopLeft);
-                slider.Track.Thumb.Classes.Set("VerticalSliderRightThumbStyle", slider.TickPlacement == TickPlacement.BottomRight);
+                slider.Track.Thumb.Classes.Set ("VerticalSliderLeftThumbStyle",
+                    slider.TickPlacement == TickPlacement.TopLeft);
+                slider.Track.Thumb.Classes.Set ("VerticalSliderRightThumbStyle",
+                    slider.TickPlacement == TickPlacement.BottomRight);
             }
 
-            TickPlacement tickBarPlacement = (TickPlacement)e.NewValue;
+            var tickBarPlacement = (TickPlacement)e.NewValue;
             switch (tickBarPlacement)
             {
                 case TickPlacement.None:
@@ -356,24 +365,26 @@ namespace Avalonia.Controlz.Controls
                     slider.TopTickBar.IsVisible = true;
                     if (slider.Orientation == Orientation.Horizontal)
                     {
-                        slider.TrackBackground.Margin = new Thickness(5, 2, 5, 0);
+                        slider.TrackBackground.Margin = new Thickness (5, 2, 5, 0);
                     }
                     else
                     {
-                        slider.TrackBackground.Margin = new Thickness(2, 5, 0, 5);
+                        slider.TrackBackground.Margin = new Thickness (2, 5, 0, 5);
                     }
+
                     break;
 
                 case TickPlacement.BottomRight:
                     slider.BottomTickBar.IsVisible = true;
                     if (slider.Orientation == Orientation.Horizontal)
                     {
-                        slider.TrackBackground.Margin = new Thickness(5, 2, 5, 0);
+                        slider.TrackBackground.Margin = new Thickness (5, 2, 5, 0);
                     }
                     else
                     {
-                        slider.TrackBackground.Margin = new Thickness(0, 5, 2, 5);
+                        slider.TrackBackground.Margin = new Thickness (0, 5, 2, 5);
                     }
+
                     break;
 
                 case TickPlacement.Both:
@@ -383,27 +394,26 @@ namespace Avalonia.Controlz.Controls
             }
         }
 
-        private static void OnValueChanged(SliderEx slider, AvaloniaPropertyChangedEventArgs e)
+        private static void OnValueChanged (SliderEx slider, AvaloniaPropertyChangedEventArgs e)
         {
             slider.UpdateSelectionRangeElementPositionAndSize();
 
-            double? oldValue = e.OldValue as double?;
-            double? newValue = e.NewValue as double?;
+            var oldValue = e.OldValue as double?;
+            var newValue = e.NewValue as double?;
 
-            slider.OnValueChanged(oldValue.HasValue ? oldValue.Value : 0.0,
-                                    newValue.HasValue ? newValue.Value : 0.0);
-
+            slider.OnValueChanged (oldValue.HasValue ? oldValue.Value : 0.0,
+                newValue.HasValue ? newValue.Value : 0.0);
         }
 
-        private static void OnSelectionEndChanged(SliderEx slider, AvaloniaPropertyChangedEventArgs e)
+        private static void OnSelectionEndChanged (SliderEx slider, AvaloniaPropertyChangedEventArgs e)
         {
             slider.UpdateSelectionRangeElementPositionAndSize();
         }
 
-        private static void OnSelectionStartChanged(SliderEx slider, AvaloniaPropertyChangedEventArgs e)
+        private static void OnSelectionStartChanged (SliderEx slider, AvaloniaPropertyChangedEventArgs e)
         {
-            double oldValue = (double)e.OldValue;
-            double newValue = (double)e.NewValue;
+            var oldValue = (double)e.OldValue;
+            var newValue = (double)e.NewValue;
             slider.UpdateSelectionRangeElementPositionAndSize();
         }
 
@@ -413,6 +423,7 @@ namespace Avalonia.Controlz.Controls
         /// Increase Slider value
         /// </summary>
         public static ICommand IncreaseLargeCommand { get; private set; }
+
         /// <summary>
         /// Increase Slider value
         /// </summary>
@@ -440,62 +451,67 @@ namespace Avalonia.Controlz.Controls
 
         private void InitializeCommands()
         {
-            IncreaseLargeCommand = ReactiveCommand.Create<object>(x => OnIncreaseLargeCommand(x), outputScheduler: RxApp.MainThreadScheduler);
-            IncreaseSmallCommand = ReactiveCommand.Create<object>(x => OnIncreaseSmallCommand(x), outputScheduler: RxApp.MainThreadScheduler);
+            IncreaseLargeCommand = ReactiveCommand.Create<object> (x => OnIncreaseLargeCommand (x),
+                outputScheduler: RxApp.MainThreadScheduler);
+            IncreaseSmallCommand = ReactiveCommand.Create<object> (x => OnIncreaseSmallCommand (x),
+                outputScheduler: RxApp.MainThreadScheduler);
 
-            DecreaseLargeCommand = ReactiveCommand.Create<object>(x => OnDecreaseLargeCommand(x), outputScheduler: RxApp.MainThreadScheduler);
-            DecreaseSmallCommand = ReactiveCommand.Create<object>(x => OnDecreaseSmallCommand(x), outputScheduler: RxApp.MainThreadScheduler);
+            DecreaseLargeCommand = ReactiveCommand.Create<object> (x => OnDecreaseLargeCommand (x),
+                outputScheduler: RxApp.MainThreadScheduler);
+            DecreaseSmallCommand = ReactiveCommand.Create<object> (x => OnDecreaseSmallCommand (x),
+                outputScheduler: RxApp.MainThreadScheduler);
 
-            MinimizeValueCommand = ReactiveCommand.Create<object>(x => OnMinimizeValueCommand(x), outputScheduler: RxApp.MainThreadScheduler);
-            MaximizeValueCommand = ReactiveCommand.Create<object>(x => OnMaximizeValueCommand(x), outputScheduler: RxApp.MainThreadScheduler);
+            MinimizeValueCommand = ReactiveCommand.Create<object> (x => OnMinimizeValueCommand (x),
+                outputScheduler: RxApp.MainThreadScheduler);
+            MaximizeValueCommand = ReactiveCommand.Create<object> (x => OnMaximizeValueCommand (x),
+                outputScheduler: RxApp.MainThreadScheduler);
         }
 
-        private void OnMinimizeValueCommand(object x)
+        private void OnMinimizeValueCommand (object x)
         {
             OnMinimizeValue();
         }
 
-        private void OnMaximizeValueCommand(object x)
+        private void OnMaximizeValueCommand (object x)
         {
             OnMaximizeValue();
         }
 
-        private void OnDecreaseSmallCommand(object x)
+        private void OnDecreaseSmallCommand (object x)
         {
             OnDecreaseSmall();
         }
 
-        private void OnIncreaseSmallCommand(object x)
+        private void OnIncreaseSmallCommand (object x)
         {
             OnIncreaseSmall();
         }
 
-        private void OnDecreaseLargeCommand(object x)
+        private void OnDecreaseLargeCommand (object x)
         {
             OnDecreaseLarge();
         }
 
-        private void OnIncreaseLargeCommand(object x)
+        private void OnIncreaseLargeCommand (object x)
         {
             OnIncreaseLarge();
         }
 
         #endregion Commands
 
-        /// <summary>
-        /// updates the pseudo classes
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> e)
+        /// <inheritdoc cref="InputElement.OnPropertyChanged{T}"/>
+        protected override void OnPropertyChanged<T>
+            (
+                AvaloniaPropertyChangedEventArgs<T> eventArgs
+            )
         {
-            base.OnPropertyChanged(e);
-            if(e.Property == OrientationProperty && e.NewValue is Orientation newValue)
+            base.OnPropertyChanged (eventArgs);
+            if (eventArgs.Property == OrientationProperty && eventArgs.NewValue is Orientation newValue)
             {
-                UpdatePseudoClassesForOrientation(newValue);
+                UpdatePseudoClassesForOrientation (newValue);
             }
-
-
         }
+
         //protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs e)
         //{
         //    if (e.Property == OrientationProperty && e.NewValue is Orientation newValue)
@@ -509,28 +525,25 @@ namespace Avalonia.Controlz.Controls
         /// sets the pseudo class for orientation
         /// </summary>
         /// <param name="o"></param>
-        private void UpdatePseudoClassesForOrientation(Orientation o)
+        private void UpdatePseudoClassesForOrientation (Orientation o)
         {
-            PseudoClasses.Set(":vertical", o == Orientation.Vertical);
-            PseudoClasses.Set(":horizontal", o == Orientation.Horizontal);
+            PseudoClasses.Set (":vertical", o == Orientation.Vertical);
+            PseudoClasses.Set (":horizontal", o == Orientation.Horizontal);
         }
 
-        /// <summary>
-        /// updates the value if the pointer is over Track.Thumb
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        /// <inheritdoc cref="InputElement.OnPointerPressed"/>
+        protected override void OnPointerPressed (PointerPressedEventArgs e)
         {
-            var result = e.GetCurrentPoint(this);
+            var result = e.GetCurrentPoint (this);
 
             if (IsMoveToPointEnabled && Track != null &&
                 Track.Thumb != null && Track.Thumb.IsPointerOver == false)
             {
-                Point pt = e.GetPosition(Track);
-                double newValue = Track.ValueFromPoint(pt);
-                if (DoubleUtil.IsDoubleFinite(newValue))
+                var pt = e.GetPosition (Track);
+                var newValue = Track.ValueFromPoint (pt);
+                if (DoubleUtil.IsDoubleFinite (newValue))
                 {
-                    UpdateValue(newValue);
+                    UpdateValue (newValue);
                 }
 
                 e.Handled = true;
@@ -538,45 +551,45 @@ namespace Avalonia.Controlz.Controls
 
             if (result.Properties.IsLeftButtonPressed)
             {
-                _OnMouseLeftButtonDown(e);
+                _OnMouseLeftButtonDown (e);
             }
 
-            base.OnPointerPressed(e);
+            base.OnPointerPressed (e);
         }
 
-        private void UpdateValue(double value)
+        private void UpdateValue (double value)
         {
-            double snappedValue = SnapToTick(value);
+            var snappedValue = SnapToTick (value);
 
             if (snappedValue != Value)
             {
-                this.SetValue(ValueProperty, Math.Max(this.Minimum, Math.Min(this.Maximum, snappedValue)));
+                this.SetValue (ValueProperty, Math.Max (this.Minimum, Math.Min (this.Maximum, snappedValue)));
             }
         }
 
-        private static void OnThumbDragCompleted(SliderEx sliderEx, VectorEventArgs args)
+        private static void OnThumbDragCompleted (SliderEx sliderEx, VectorEventArgs args)
         {
-            sliderEx.OnThumbDragCompleted(args);
+            sliderEx.OnThumbDragCompleted (args);
         }
 
-        private static void OnThumbDragDelta(SliderEx sliderEx, VectorEventArgs args)
+        private static void OnThumbDragDelta (SliderEx sliderEx, VectorEventArgs args)
         {
-            sliderEx.OnThumbDragDelta(args);
+            sliderEx.OnThumbDragDelta (args);
         }
 
-        private static void OnThumbDragStarted(SliderEx sliderEx, VectorEventArgs args)
+        private static void OnThumbDragStarted (SliderEx sliderEx, VectorEventArgs args)
         {
-            sliderEx.OnThumbDragStarted(args);
+            sliderEx.OnThumbDragStarted (args);
         }
 
         /// <summary>
-        /// handles the auto tooltip 
+        /// handles the auto tooltip
         /// </summary>
         /// <param name="args"></param>
-        protected virtual void OnThumbDragStarted(VectorEventArgs args)
+        protected virtual void OnThumbDragStarted (VectorEventArgs args)
         {
             // Show AutoToolTip if needed.
-            Thumb thumb = args.Source as Thumb;
+            var thumb = args.Source as Thumb;
 
             if ((thumb == null) || (this.AutoToolTipPlacement == AutoToolTipPlacement.None))
             {
@@ -603,16 +616,17 @@ namespace Avalonia.Controlz.Controls
         /// converts the track coordinate
         /// </summary>
         /// <param name="e"></param>
-        protected virtual void OnThumbDragDelta(VectorEventArgs e)
+        protected virtual void OnThumbDragDelta (VectorEventArgs e)
         {
-            Thumb thumb = e.Source as Thumb;
+            var thumb = e.Source as Thumb;
+
             // Convert to Track's co-ordinate
             if (Track != null && thumb == Track.Thumb)
             {
-                double newValue = Value + Track.ValueFromDistance(e.Vector.X, e.Vector.Y);
-                if (DoubleUtil.IsDoubleFinite(newValue))
+                var newValue = Value + Track.ValueFromDistance (e.Vector.X, e.Vector.Y);
+                if (DoubleUtil.IsDoubleFinite (newValue))
                 {
-                    UpdateValue(newValue);
+                    UpdateValue (newValue);
                 }
 
                 // Show AutoToolTip if needed
@@ -643,10 +657,10 @@ namespace Avalonia.Controlz.Controls
         /// closes the tool tip
         /// </summary>
         /// <param name="e"></param>
-        protected virtual void OnThumbDragCompleted(VectorEventArgs e)
+        protected virtual void OnThumbDragCompleted (VectorEventArgs e)
         {
             // Show AutoToolTip if needed.
-            Thumb thumb = e.Source as Thumb;
+            var thumb = e.Source as Thumb;
 
             if ((thumb == null) || (this.AutoToolTipPlacement == AutoToolTipPlacement.None))
             {
@@ -666,23 +680,25 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         private void UpdateSelectionRangeElementPositionAndSize()
         {
-            Size trackSize = new Size(0d, 0d);
-            Size thumbSize = new Size(0d, 0d);
+            var trackSize = new Size (0d, 0d);
+            var thumbSize = new Size (0d, 0d);
 
-            if (Track == null || DoubleUtil.LessThan(SelectionEnd, SelectionStart))
+            if (Track == null || DoubleUtil.LessThan (SelectionEnd, SelectionStart))
             {
                 return;
             }
 
-            trackSize = Track.DesiredSize;//Track.RenderSize;
-            thumbSize = (Track.Thumb != null) ?
+            trackSize = Track.DesiredSize; //Track.RenderSize;
+            thumbSize = (Track.Thumb != null)
+                ?
                 /*Track.Thumb.RenderSize*/
-                Track.Thumb.DesiredSize : new Size(0d, 0d);
+                Track.Thumb.DesiredSize
+                : new Size (0d, 0d);
 
-            double range = Maximum - Minimum;
+            var range = Maximum - Minimum;
             double valueToSize;
 
-            Layoutable rangeElement = this.SelectionRangeElement as Layoutable;
+            var rangeElement = this.SelectionRangeElement as Layoutable;
 
             if (rangeElement == null)
             {
@@ -692,45 +708,49 @@ namespace Avalonia.Controlz.Controls
             if (Orientation == Orientation.Horizontal)
             {
                 // Calculate part size for HorizontalSlider
-                if (DoubleUtil.AreClose(range, 0d) || (DoubleUtil.AreClose(trackSize.Width, thumbSize.Width)))
+                if (DoubleUtil.AreClose (range, 0d) || (DoubleUtil.AreClose (trackSize.Width, thumbSize.Width)))
                 {
                     valueToSize = 0d;
                 }
                 else
                 {
-                    valueToSize = Math.Max(0.0, (trackSize.Width - thumbSize.Width) / range);
+                    valueToSize = Math.Max (0.0, (trackSize.Width - thumbSize.Width) / range);
                 }
 
                 rangeElement.Width = ((SelectionEnd - SelectionStart) * valueToSize);
                 if (IsDirectionReversed)
                 {
-                    Canvas.SetLeft(rangeElement, (thumbSize.Width * 0.5) + Math.Max(Maximum - SelectionEnd, 0) * valueToSize);
+                    Canvas.SetLeft (rangeElement,
+                        (thumbSize.Width * 0.5) + Math.Max (Maximum - SelectionEnd, 0) * valueToSize);
                 }
                 else
                 {
-                    Canvas.SetLeft(rangeElement, (thumbSize.Width * 0.5) + Math.Max(SelectionStart - Minimum, 0) * valueToSize);
+                    Canvas.SetLeft (rangeElement,
+                        (thumbSize.Width * 0.5) + Math.Max (SelectionStart - Minimum, 0) * valueToSize);
                 }
             }
             else
             {
                 // Calculate part size for VerticalSlider
-                if (DoubleUtil.AreClose(range, 0d) || (DoubleUtil.AreClose(trackSize.Height, thumbSize.Height)))
+                if (DoubleUtil.AreClose (range, 0d) || (DoubleUtil.AreClose (trackSize.Height, thumbSize.Height)))
                 {
                     valueToSize = 0d;
                 }
                 else
                 {
-                    valueToSize = Math.Max(0.0, (trackSize.Height - thumbSize.Height) / range);
+                    valueToSize = Math.Max (0.0, (trackSize.Height - thumbSize.Height) / range);
                 }
 
                 rangeElement.Height = ((SelectionEnd - SelectionStart) * valueToSize);
                 if (IsDirectionReversed)
                 {
-                    Canvas.SetTop(rangeElement, (thumbSize.Height * 0.5) + Math.Max(SelectionStart - Minimum, 0) * valueToSize);
+                    Canvas.SetTop (rangeElement,
+                        (thumbSize.Height * 0.5) + Math.Max (SelectionStart - Minimum, 0) * valueToSize);
                 }
                 else
                 {
-                    Canvas.SetTop(rangeElement, (thumbSize.Height * 0.5) + Math.Max(Maximum - SelectionEnd, 0) * valueToSize);
+                    Canvas.SetTop (rangeElement,
+                        (thumbSize.Height * 0.5) + Math.Max (Maximum - SelectionEnd, 0) * valueToSize);
                 }
             }
         }
@@ -741,18 +761,18 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         /// <param name="value">Value that want to snap to closest Tick.</param>
         /// <returns>Snapped value if IsSnapToTickEnabled is 'true'. Otherwise, returns un-snaped value.</returns>
-        private double SnapToTick(double value)
+        private double SnapToTick (double value)
         {
             if (IsSnapToTickEnabled)
             {
-                double previous = Minimum;
-                double next = Maximum;
+                var previous = Minimum;
+                var next = Maximum;
 
                 // This property is rarely set so let's try to avoid the GetValue
                 // caching of the mutable default value
                 DoubleCollection ticks = null;
 
-                if (GetValue(TicksProperty)
+                if (GetValue (TicksProperty)
                     != null)
                 {
                     ticks = Ticks;
@@ -762,32 +782,32 @@ namespace Avalonia.Controlz.Controls
                 // Note that ticks may be unsorted.
                 if ((ticks != null) && (ticks.Count > 0))
                 {
-                    for (int i = 0; i < ticks.Count; i++)
+                    for (var i = 0; i < ticks.Count; i++)
                     {
-                        double tick = ticks[i];
-                        if (DoubleUtil.AreClose(tick, value))
+                        var tick = ticks[i];
+                        if (DoubleUtil.AreClose (tick, value))
                         {
                             return value;
                         }
 
-                        if (DoubleUtil.LessThan(tick, value) && DoubleUtil.GreaterThan(tick, previous))
+                        if (DoubleUtil.LessThan (tick, value) && DoubleUtil.GreaterThan (tick, previous))
                         {
                             previous = tick;
                         }
-                        else if (DoubleUtil.GreaterThan(tick, value) && DoubleUtil.LessThan(tick, next))
+                        else if (DoubleUtil.GreaterThan (tick, value) && DoubleUtil.LessThan (tick, next))
                         {
                             next = tick;
                         }
                     }
                 }
-                else if (DoubleUtil.GreaterThan(TickFrequency, 0.0))
+                else if (DoubleUtil.GreaterThan (TickFrequency, 0.0))
                 {
-                    previous = Minimum + (Math.Round(((value - Minimum) / TickFrequency)) * TickFrequency);
-                    next = Math.Min(Maximum, previous + TickFrequency);
+                    previous = Minimum + (Math.Round (((value - Minimum) / TickFrequency)) * TickFrequency);
+                    next = Math.Min (Maximum, previous + TickFrequency);
                 }
 
                 // Choose the closest value between previous and next. If tie, snap to 'next'.
-                value = DoubleUtil.GreaterThanOrClose(value, (previous + next) * 0.5) ? next : previous;
+                value = DoubleUtil.GreaterThanOrClose (value, (previous + next) * 0.5) ? next : previous;
             }
 
             return value;
@@ -796,27 +816,27 @@ namespace Avalonia.Controlz.Controls
         // Sets Value = SnapToTick(value+direction), unless the result of SnapToTick is Value,
         // then it searches for the next tick greater(if direction is positive) than value
         // and sets Value to that tick
-        private void MoveToNextTick(double direction)
+        private void MoveToNextTick (double direction)
         {
             if (direction != 0.0)
             {
-                double value = this.Value;
+                var value = this.Value;
 
                 // Find the next value by snapping
-                double next = SnapToTick(Math.Max(this.Minimum, Math.Min(this.Maximum, value + direction)));
+                var next = SnapToTick (Math.Max (this.Minimum, Math.Min (this.Maximum, value + direction)));
 
-                bool greaterThan = direction > 0; //search for the next tick greater than value?
+                var greaterThan = direction > 0; //search for the next tick greater than value?
 
                 // If the snapping brought us back to value, find the next tick point
                 if (next == value
-                    && !(greaterThan && value == Maximum)  // Stop if searching up if already at Max
+                    && !(greaterThan && value == Maximum) // Stop if searching up if already at Max
                     && !(!greaterThan && value == Minimum)) // Stop if searching down if already at Min
                 {
                     // This property is rarely set so let's try to avoid the GetValue
                     // caching of the mutable default value
                     DoubleCollection ticks = null;
 
-                    if (GetValue(TicksProperty)
+                    if (GetValue (TicksProperty)
                         != null)
                     {
                         ticks = Ticks;
@@ -826,22 +846,24 @@ namespace Avalonia.Controlz.Controls
                     // Note that ticks may be unsorted.
                     if ((ticks != null) && (ticks.Count > 0))
                     {
-                        for (int i = 0; i < ticks.Count; i++)
+                        for (var i = 0; i < ticks.Count; i++)
                         {
-                            double tick = ticks[i];
+                            var tick = ticks[i];
 
                             // Find the smallest tick greater than value or the largest tick less than value
-                            if ((greaterThan && DoubleUtil.GreaterThan(tick, value) && (DoubleUtil.LessThan(tick, next) || next == value))
-                             || (!greaterThan && DoubleUtil.LessThan(tick, value) && (DoubleUtil.GreaterThan(tick, next) || next == value)))
+                            if ((greaterThan && DoubleUtil.GreaterThan (tick, value) &&
+                                 (DoubleUtil.LessThan (tick, next) || next == value))
+                                || (!greaterThan && DoubleUtil.LessThan (tick, value) &&
+                                    (DoubleUtil.GreaterThan (tick, next) || next == value)))
                             {
                                 next = tick;
                             }
                         }
                     }
-                    else if (DoubleUtil.GreaterThan(TickFrequency, 0.0))
+                    else if (DoubleUtil.GreaterThan (TickFrequency, 0.0))
                     {
                         // Find the current tick we are at
-                        double tickNumber = Math.Round((value - Minimum) / TickFrequency);
+                        var tickNumber = Math.Round ((value - Minimum) / TickFrequency);
 
                         if (greaterThan)
                             tickNumber += 1.0;
@@ -855,14 +877,14 @@ namespace Avalonia.Controlz.Controls
                 // Update if we've found a better value
                 if (next != value)
                 {
-                    this.SetValue(ValueProperty, next);
+                    this.SetValue (ValueProperty, next);
                 }
             }
         }
 
-        private void _OnMouseLeftButtonDown(PointerPressedEventArgs e)
+        private void _OnMouseLeftButtonDown (PointerPressedEventArgs e)
         {
-            SliderEx sliderEx = e.Source as SliderEx;
+            var sliderEx = e.Source as SliderEx;
 
             // When someone click on the Slider's part, and it's not focusable
             // Slider need to take the focus in order to process keyboard correctly
@@ -873,15 +895,13 @@ namespace Avalonia.Controlz.Controls
             //}
         }
 
-        /// <summary>
-        /// sets the <see cref="TopTickBar"/> width and
-        /// the <see cref="BottomTickBar"/> width
-        /// </summary>
-        /// <param name="finalSize"></param>
-        /// <returns></returns>
-        protected override Size ArrangeOverride(Size finalSize)
+        /// <inheritdoc cref="Layoutable.ArrangeOverride"/>
+        protected override Size ArrangeOverride
+            (
+                Size finalSize
+            )
         {
-            Size size = base.ArrangeOverride(finalSize);
+            var size = base.ArrangeOverride (finalSize);
 
             if (TopTickBar != null)
             {
@@ -902,22 +922,22 @@ namespace Avalonia.Controlz.Controls
         /// gets the controls from style
         /// </summary>
         /// <param name="e"></param>
-        protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+        protected override void OnApplyTemplate (TemplateAppliedEventArgs e)
         {
-            SelectionRangeElement = e.NameScope.Find<AvaloniaObject>(SelectionRangeElementName);
-            Track = e.NameScope.Find<Track>(TrackName);
-            TopTickBar = e.NameScope.Find<TickBar>("TopTick");
-            BottomTickBar = e.NameScope.Find<TickBar>("BottomTick");
+            SelectionRangeElement = e.NameScope.Find<AvaloniaObject> (SelectionRangeElementName);
+            Track = e.NameScope.Find<Track> (TrackName);
+            TopTickBar = e.NameScope.Find<TickBar> ("TopTick");
+            BottomTickBar = e.NameScope.Find<TickBar> ("BottomTick");
 
-            TrackBackground = e.NameScope.Find<Border>("TrackBackground");
+            TrackBackground = e.NameScope.Find<Border> ("TrackBackground");
 
             //if (_autoToolTip != null)
             //{
             //    _autoToolTip.PlacementTarget = Track != null ? Track.Thumb : null;
             //}
 
-            RaisePropertyChanged(TickPlacementProperty, TickPlacement.None, TickPlacement);
-            base.OnApplyTemplate(e);
+            RaisePropertyChanged (TickPlacementProperty, TickPlacement.None, TickPlacement);
+            base.OnApplyTemplate (e);
         }
 
         /// <summary>
@@ -925,7 +945,7 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         protected virtual void OnIncreaseLarge()
         {
-            MoveToNextTick(this.LargeChange);
+            MoveToNextTick (this.LargeChange);
         }
 
         /// <summary>
@@ -933,7 +953,7 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         protected virtual void OnDecreaseLarge()
         {
-            MoveToNextTick(-this.LargeChange);
+            MoveToNextTick (-this.LargeChange);
         }
 
         /// <summary>
@@ -941,7 +961,7 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         protected virtual void OnIncreaseSmall()
         {
-            MoveToNextTick(this.SmallChange);
+            MoveToNextTick (this.SmallChange);
         }
 
         /// <summary>
@@ -949,7 +969,7 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         protected virtual void OnDecreaseSmall()
         {
-            MoveToNextTick(-this.SmallChange);
+            MoveToNextTick (-this.SmallChange);
         }
 
         /// <summary>
@@ -957,7 +977,7 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         protected virtual void OnMaximizeValue()
         {
-            this.SetValue(ValueProperty, this.Maximum);
+            this.SetValue (ValueProperty, this.Maximum);
         }
 
         /// <summary>
@@ -965,7 +985,7 @@ namespace Avalonia.Controlz.Controls
         /// </summary>
         protected virtual void OnMinimizeValue()
         {
-            this.SetValue(ValueProperty, this.Minimum);
+            this.SetValue (ValueProperty, this.Minimum);
         }
     }
 }
