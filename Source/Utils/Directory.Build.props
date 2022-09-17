@@ -13,6 +13,11 @@
         <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     </PropertyGroup>
 
+    <!-- disable NETSDK1057 warning "You are using a preview version" -->
+    <PropertyGroup>
+        <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    </PropertyGroup>
+
     <!-- Icon -->
     <PropertyGroup>
         <ApplicationIcon>..\..\Common\BlueBook.ico</ApplicationIcon>

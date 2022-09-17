@@ -11,6 +11,11 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
+    <!-- disable NETSDK1057 warning "You are using a preview version" -->
+    <PropertyGroup>
+        <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    </PropertyGroup>
+
     <PropertyGroup>
         <IsPackable>false</IsPackable>
     </PropertyGroup>

@@ -16,6 +16,11 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
+    <!-- disable NETSDK1057 warning "You are using a preview version" -->
+    <PropertyGroup>
+        <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
         <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
