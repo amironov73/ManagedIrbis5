@@ -24,7 +24,7 @@ jobs:
       run: dotnet build --configuration Release Source/ManagedIrbis5.sln
 
     - name: Test
-      run: dotnet test --no-build --no-restore --configuration Release /p:CollectCoverage=true Source/ManagedIrbis5.sln
+      run: Source/ManagedIrbis5-windows.sln --no-restore --no-build --configuration Release --settings sequential.runsettings --collect "XPlat Code Coverage"
 
     - name: PFT tests
       run: dotnet run --no-build --no-restore --configuration Release --project Source/Tests/PftTests/PftTests.csproj
