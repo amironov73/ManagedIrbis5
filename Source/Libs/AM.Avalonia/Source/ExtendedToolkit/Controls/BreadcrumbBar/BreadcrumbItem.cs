@@ -46,7 +46,7 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// <returns>DataContext if dataContext is a Breadcrumbitem, otherwhise a new BreadcrumbItem.</returns>
         public static BreadcrumbItem CreateItem(object dataContext)
         {
-            BreadcrumbItem item = dataContext as BreadcrumbItem;
+            var item = dataContext as BreadcrumbItem;
             if (item == null && dataContext != null)
             {
                 item = new BreadcrumbItem();
@@ -62,7 +62,7 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// <returns></returns>
         internal static BreadcrumbItem CreateInitialItem(object dataContext)
         {
-            BreadcrumbItem item = dataContext as BreadcrumbItem;
+            var item = dataContext as BreadcrumbItem;
             if (item == null && dataContext != null)
             {
                 item = new BreadcrumbItem();
@@ -73,20 +73,20 @@ namespace Avalonia.ExtendedToolkit.Controls
 
         private void HeaderPropertyChanged(BreadcrumbItem sender, AvaloniaPropertyChangedEventArgs e)
         {
-            BreadcrumbItem item = sender as BreadcrumbItem;
+            var item = sender as BreadcrumbItem;
         }
 
         private void TracePropertyChanged(BreadcrumbItem sender, AvaloniaPropertyChangedEventArgs e)
         {
-            BreadcrumbItem item = sender as BreadcrumbItem;
+            var item = sender as BreadcrumbItem;
 
-            RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>(e.OldValue, e.NewValue, TraceChangedEvent);
+            var args = new RoutedPropertyChangedEventArgs<object>(e.OldValue, e.NewValue, TraceChangedEvent);
             item.RaiseEvent(args);
         }
 
         private void SelectedBreadcrumbPropertyChanged(BreadcrumbItem sender, AvaloniaPropertyChangedEventArgs e)
         {
-            BreadcrumbItem item = sender as BreadcrumbItem;
+            var item = sender as BreadcrumbItem;
             item.OnSelectedBreadcrumbChanged(e.OldValue, e.NewValue);
         }
 
@@ -97,7 +97,7 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// <param name="e"></param>
         private void OverflowPropertyChanged(BreadcrumbItem o, AvaloniaPropertyChangedEventArgs e)
         {
-            BreadcrumbItem item = o as BreadcrumbItem;
+            var item = o as BreadcrumbItem;
             item.OnOverflowChanged((bool)e.NewValue);
         }
 
@@ -106,7 +106,7 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// </summary>
         protected virtual void OnOverflowChanged(bool newValue)
         {
-            RoutedEventArgs args = new RoutedEventArgs(OverflowChangedEvent);
+            var args = new RoutedEventArgs(OverflowChangedEvent);
             RaiseEvent(args);
         }
 
@@ -121,11 +121,11 @@ namespace Avalonia.ExtendedToolkit.Controls
         {
             if (e.NewValue is bool)
             {
-                bool value = (bool)e.NewValue;
+                var value = (bool)e.NewValue;
                 if (lastValue == value)
                     return;
 
-                BreadcrumbItem item = o as BreadcrumbItem;
+                var item = o as BreadcrumbItem;
                 item.OnDropDownPressedChanged();
 
                 lastValue = value;
@@ -137,7 +137,7 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// </summary>
         protected virtual void OnDropDownPressedChanged()
         {
-            RoutedPropertyChangedEventArgs<object> args = new RoutedPropertyChangedEventArgs<object>
+            var args = new RoutedPropertyChangedEventArgs<object>
                 (IsDropDownPressed, IsDropDownPressed, DropDownPressedChangedEvent);
             RaiseEvent(args);
         }
@@ -166,20 +166,19 @@ namespace Avalonia.ExtendedToolkit.Controls
         //    return item;
         //}
 
-        /// <summary>
-        /// Perform a special measurement that checks whether to collapse the header.
-        /// </summary>
-        /// <param name="constraint"></param>
-        /// <returns></returns>
-        protected override Size MeasureOverride(Size constraint)
+        /// <inheritdoc cref="Layoutable.MeasureOverride"/>
+        protected override Size MeasureOverride
+            (
+                Size constraint
+            )
         {
             if (SelectedItem != null)
             {
                 headerControl.IsVisible = true;
                 headerControl.Measure(constraint);
-                Size size = new Size(constraint.Width - headerControl.DesiredSize.Width, constraint.Height);
+                var size = new Size(constraint.Width - headerControl.DesiredSize.Width, constraint.Height);
                 selectedControl.Measure(new Size(double.PositiveInfinity, constraint.Height));
-                double width = headerControl.DesiredSize.Width + selectedControl.DesiredSize.Width;
+                var width = headerControl.DesiredSize.Width + selectedControl.DesiredSize.Width;
                 if (width > constraint.Width || (IsRoot && SelectedItem != null))
                 {
                     headerControl.IsVisible = false;
@@ -191,7 +190,7 @@ namespace Avalonia.ExtendedToolkit.Controls
             }
             IsOverflow = headerControl != null ? headerControl.IsVisible != true : false;
 
-            Size result = base.MeasureOverride(constraint);
+            var result = base.MeasureOverride(constraint);
             return result;
         }
 
@@ -214,7 +213,7 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// <returns>Item, if item is a BreadcrumbItem, otherwhise a newly created BreadcrumbItem.</returns>
         public BreadcrumbItem ContainerFromItem(object item)
         {
-            BreadcrumbItem result = item as BreadcrumbItem;
+            var result = item as BreadcrumbItem;
             if (result == null)
             {
                 result = CreateItem(item);
@@ -227,31 +226,30 @@ namespace Avalonia.ExtendedToolkit.Controls
             return result;
         }
 
-        /// <summary>
-        /// gets some controls from the style
-        /// calls <see cref="ApplyBinding"/>
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+        /// <inheritdoc cref="SelectingItemsControl.OnApplyTemplate"/>
+        protected override void OnApplyTemplate
+            (
+                TemplateAppliedEventArgs eventArgs
+            )
         {
-            base.OnApplyTemplate(e);
+            base.OnApplyTemplate(eventArgs);
 
-            headerControl = e.NameScope.Find(partHeader) as Layoutable;
-            selectedControl = e.NameScope.Find(partSelected) as Layoutable;
+            headerControl = eventArgs.NameScope.Find(partHeader) as Layoutable;
+            selectedControl = eventArgs.NameScope.Find(partSelected) as Layoutable;
 
             ApplyBinding();
         }
 
         /// <summary>
-        ///  Appies the binding to the breadcrumb item.
+        ///  Applies the binding to the breadcrumb item.
         /// </summary>
         public void ApplyBinding()
         {
-            object item = DataContext;
+            var item = DataContext;
             if (item == null) return;
 
-            BreadcrumbItem root = this;
-            IDataTemplate template = HeaderTemplate;
+            var root = this;
+            var template = HeaderTemplate;
             //DataTemplateSelector templateSelector = HeaderTemplateSelector;
             //if (templateSelector != null)
             //{
@@ -268,7 +266,7 @@ namespace Avalonia.ExtendedToolkit.Controls
 
             root.SelectedItem = null;
 
-            TreeDataTemplate hdt = template as TreeDataTemplate;
+            var hdt = template as TreeDataTemplate;
             if (template != null)
             {
                 //root.Header = template.LoadContent();
@@ -285,7 +283,7 @@ namespace Avalonia.ExtendedToolkit.Controls
                 root.Bind(BreadcrumbItem.ItemsProperty, hdt.ItemsSource);
             }
 
-            BreadcrumbBar bar = BreadcrumbBar;
+            var bar = BreadcrumbBar;
 
             if (bar != null)
             {
@@ -330,7 +328,7 @@ namespace Avalonia.ExtendedToolkit.Controls
 
         private void ApplyProperties(object item)
         {
-            ApplyPropertiesEventArgs e = new ApplyPropertiesEventArgs
+            var e = new ApplyPropertiesEventArgs
                 (item, this, BreadcrumbBar.ApplyPropertiesEvent);
             e.Image = Image;
             e.Trace = Trace;
@@ -346,7 +344,7 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// <returns></returns>
         public string GetTracePathValue()
         {
-            ApplyPropertiesEventArgs e = new ApplyPropertiesEventArgs(DataContext, this, BreadcrumbBar.ApplyPropertiesEvent);
+            var e = new ApplyPropertiesEventArgs(DataContext, this, BreadcrumbBar.ApplyPropertiesEvent);
             e.Trace = Trace;
             e.TraceValue = TraceValue;
             this.RaiseEvent(e);
@@ -361,13 +359,13 @@ namespace Avalonia.ExtendedToolkit.Controls
         public object GetTraceItem(string trace)
         {
             this.ApplyTemplate();
-            foreach (object item in Items)
+            foreach (var item in Items)
             {
-                BreadcrumbItem bcItem = ContainerFromItem(item);
+                var bcItem = ContainerFromItem(item);
                 if (bcItem != null)
                 {
                     ApplyProperties(item);
-                    string value = bcItem.TraceValue;
+                    var value = bcItem.TraceValue;
                     if (value != null && value.Equals(trace, StringComparison.InvariantCultureIgnoreCase)) return item;
                 }
                 else return null;
@@ -392,10 +390,10 @@ namespace Avalonia.ExtendedToolkit.Controls
 
                 if (base.TemplatedParent != null)
                 {
-                    ILogical current = content as ILogical;
+                    var current = content as ILogical;
                     if (current != null)
                     {
-                        ILogical parent = LogicalTree.LogicalExtensions.GetLogicalParent(current);
+                        var parent = LogicalTree.LogicalExtensions.GetLogicalParent(current);
                         if ((parent != null) && (parent != this))
                         {
                             return base.LogicalChildren;

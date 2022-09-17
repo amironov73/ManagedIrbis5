@@ -1,141 +1,116 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable NonReadonlyMemberInGetHashCode
 
-namespace System.ComponentModel
+using System.Diagnostics.CodeAnalysis;
+
+namespace System.ComponentModel;
+
+/// <summary>
+///     This attribute is a "query" attribute.  It is
+///     an attribute that causes the type description provider
+///     to narrow the scope of returned properties.  It differs
+///     from normal attributes in that it cannot actually be
+///     placed on a class as metadata and that the filter mechanism
+///     is code rather than static metadata.
+/// </summary>
+[AttributeUsage (AttributeTargets.Property | AttributeTargets.Method)]
+public sealed class PropertyFilterAttribute
+    : Attribute
 {
+    //------------------------------------------------------
+    //
+    //  Constructors
+    //
+    //------------------------------------------------------
+
+    #region Constructors
+
     /// <summary>
-    ///     This attribute is a "query" attribute.  It is
-    ///     an attribute that causes the type description provider
-    ///     to narrow the scope of returned properties.  It differs
-    ///     from normal attributes in that it cannot actually be
-    ///     placed on a class as metadata and that the filter mechanism
-    ///     is code rather than static metadata.
+    ///     Creates a new attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
-    public sealed class PropertyFilterAttribute : Attribute
+    public PropertyFilterAttribute (PropertyFilterOptions filter)
     {
-        //------------------------------------------------------
-        //
-        //  Constructors
-        //
-        //------------------------------------------------------
+        Filter = filter;
+    }
 
-        #region Constructors
+    #endregion Constructors
 
-        /// <summary>
-        ///     Creates a new attribute.
-        /// </summary>
-        public PropertyFilterAttribute(PropertyFilterOptions filter)
+    //------------------------------------------------------
+    //
+    //  Public Methods
+    //
+    //------------------------------------------------------
+
+    #region Public Methods
+
+    /// <inheritdoc cref="Attribute.Equals(object?)"/>
+    public override bool Equals (object? value)
+    {
+        return value is PropertyFilterAttribute a && a.Filter.Equals (Filter);
+    }
+
+    /// <inheritdoc cref="Attribute.GetHashCode"/>
+    public override int GetHashCode()
+    {
+        return Filter.GetHashCode();
+    }
+
+    /// <inheritdoc cref="Attribute.Match"/>
+    public override bool Match (object? value)
+    {
+        if (value is not PropertyFilterAttribute a)
         {
-            _filter = filter;
-        }
-
-        #endregion Constructors
-
-        //------------------------------------------------------
-        //
-        //  Public Methods
-        //
-        //------------------------------------------------------
-
-        #region Public Methods
-
-        /// <summary>
-        ///     Override of Object.Equals that returns true if the filters
-        ///     contained in both attributes match.
-        /// </summary>
-        public override bool Equals(object value)
-        {
-            PropertyFilterAttribute a = value as PropertyFilterAttribute;
-            if (a != null && a._filter.Equals(_filter))
-            {
-                return true;
-            }
-
             return false;
         }
 
-        /// <summary>
-        ///     Override of Object.GetHashCode.
-        /// </summary>
-        public override int GetHashCode()
-        {
-            return _filter.GetHashCode();
-        }
-
-        /// <summary>
-        ///     Match determines if one attribute "matches" another.  For
-        ///     attributes that store flags, a match may be different from
-        ///     an equals.  For example, a filter of SetValid matches a
-        ///     filter of All, because All is a merge of all filter values.
-        /// </summary>
-        public override bool Match(object value)
-        {
-            PropertyFilterAttribute a = value as PropertyFilterAttribute;
-            if (a == null)
-                return false;
-            return ((_filter & a._filter) == _filter);
-        }
-
-        #endregion Public Methods
-
-        //------------------------------------------------------
-        //
-        //  Public Operators
-        //
-        //------------------------------------------------------
-
-        //------------------------------------------------------
-        //
-        //  Public Properties
-        //
-        //------------------------------------------------------
-
-        #region Public Properties
-
-        /// <summary>
-        ///     The filter value passed into the constructor.
-        /// </summary>
-        public PropertyFilterOptions Filter
-        {
-            get { return _filter; }
-        }
-
-        #endregion Public Properties
-
-        //------------------------------------------------------
-        //
-        //  Public Events
-        //
-        //------------------------------------------------------
-
-        //------------------------------------------------------
-        //
-        //  Public Fields
-        //
-        //------------------------------------------------------
-
-        #region Public Fields
-
-        /// <summary>
-        ///     Attributes may declare a Default field that indicates
-        ///     what should be done if the attribute is not defined.
-        ///     Our default is to return all properties.
-        /// </summary>
-        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly PropertyFilterAttribute Default = new PropertyFilterAttribute(PropertyFilterOptions.All);
-
-        #endregion Public Fields
-
-        //------------------------------------------------------
-        //
-        //  Private Fields
-        //
-        //------------------------------------------------------
-
-        #region Private Fields
-
-        private PropertyFilterOptions _filter;
-
-        #endregion Private Fields
+        return ((Filter & a.Filter) == Filter);
     }
+
+    #endregion Public Methods
+
+    //------------------------------------------------------
+    //
+    //  Public Operators
+    //
+    //------------------------------------------------------
+
+    //------------------------------------------------------
+    //
+    //  Public Properties
+    //
+    //------------------------------------------------------
+
+    #region Public Properties
+
+    /// <summary>
+    ///     The filter value passed into the constructor.
+    /// </summary>
+    public PropertyFilterOptions Filter { get; }
+
+    #endregion Public Properties
+
+    //------------------------------------------------------
+    //
+    //  Public Events
+    //
+    //------------------------------------------------------
+
+    //------------------------------------------------------
+    //
+    //  Public Fields
+    //
+    //------------------------------------------------------
+
+    #region Public Fields
+
+    /// <summary>
+    ///     Attributes may declare a Default field that indicates
+    ///     what should be done if the attribute is not defined.
+    ///     Our default is to return all properties.
+    /// </summary>
+    [SuppressMessage ("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
+    public static readonly PropertyFilterAttribute
+        Default = new PropertyFilterAttribute (PropertyFilterOptions.All);
+
+    #endregion Public Fields
 }

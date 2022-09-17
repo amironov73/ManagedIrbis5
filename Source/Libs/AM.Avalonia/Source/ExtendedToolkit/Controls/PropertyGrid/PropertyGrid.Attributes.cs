@@ -421,8 +421,8 @@ namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid
                     _categories.Sort(CategoryComparer);
 
                 RaisePropertyChanged(HasCategoriesProperty, !HasCategories, HasCategories);
-                RaisePropertyChanged(BrowsablePropertiesProperty, 
-                            new Data.Optional<IEnumerable<PropertyItem>>(), 
+                RaisePropertyChanged(BrowsablePropertiesProperty,
+                            new Data.Optional<IEnumerable<PropertyItem>>(),
                             new Data.BindingValue<IEnumerable<PropertyItem>>(BrowsableProperties));
                 //        OnPropertyChanged("BrowsableCategories");
             }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿// ReSharper disable CheckNamespace
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,6 +14,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -25,7 +28,8 @@ namespace Avalonia.ExtendedToolkit.Controls;
 /// <summary>
 /// A breadcrumb bar the contains breadcrumb items, a dropdown control, additional buttons and a progress bar.
 /// </summary>
-public partial class BreadcrumbBar : ContentControl, IAddChild
+public partial class BreadcrumbBar
+    : ContentControl, IAddChild
 {
     /// <summary>
     /// initialize events for the breadcrump bar
@@ -249,15 +253,15 @@ public partial class BreadcrumbBar : ContentControl, IAddChild
         return value;
     }
 
-    /// <summary>
-    /// calls CheckOverflowImage
-    /// </summary>
-    /// <param name="finalSize"></param>
-    /// <returns></returns>
-    protected override Size ArrangeOverride (Size finalSize)
+    /// <inheritdoc cref="Layoutable.ArrangeOverride"/>
+    protected override Size ArrangeOverride
+        (
+            Size finalSize
+        )
     {
         var size = base.ArrangeOverride (finalSize);
         CheckOverflowImage();
+
         return size;
     }
 
@@ -696,17 +700,17 @@ public partial class BreadcrumbBar : ContentControl, IAddChild
         return entity;
     }
 
-    /// <summary>
-    /// gets the controls from the styles
-    /// </summary>
-    /// <param name="e"></param>
-    protected override void OnApplyTemplate (TemplateAppliedEventArgs e)
+    /// <inheritdoc cref="TemplatedControl.OnApplyTemplate"/>
+    protected override void OnApplyTemplate
+        (
+            TemplateAppliedEventArgs eventArgs
+        )
     {
-        base.OnApplyTemplate (e);
-        comboBox = e.NameScope.Find<ComboBox> (partComboBox);
-        rootButton = e.NameScope.Find<BreadcrumbButton> (partRoot);
+        base.OnApplyTemplate (eventArgs);
+        comboBox = eventArgs.NameScope.Find<ComboBox> (partComboBox);
+        rootButton = eventArgs.NameScope.Find<BreadcrumbButton> (partRoot);
 
-        var toggleButton = e.NameScope.Find<ToggleButton> ("dropDown");
+        var toggleButton = eventArgs.NameScope.Find<ToggleButton> ("dropDown");
 
         //toggleButton.Checked += (o, e) =>
         //{
