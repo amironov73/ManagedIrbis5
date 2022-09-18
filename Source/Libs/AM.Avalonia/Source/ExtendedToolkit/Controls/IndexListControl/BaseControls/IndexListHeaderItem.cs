@@ -1,53 +1,71 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 
-namespace Avalonia.ExtendedToolkit.Controls
+#endregion
+
+#nullable enable
+
+namespace Avalonia.ExtendedToolkit.Controls;
+
+/// <summary>
+/// a headered itemscontrol with <see cref="IndexListItem"/>
+/// </summary>
+public class IndexListHeaderItem : HeaderedItemsControl
 {
     /// <summary>
-    /// a headered itemscontrol with <see cref="IndexListItem"/>
+    /// Gets or sets ShowEmptyItems.
     /// </summary>
-    public class IndexListHeaderItem : HeaderedItemsControl
+    public bool ShowEmptyItems
     {
-        /// <summary>
-        /// Gets or sets ShowEmptyItems.
-        /// </summary>
-        public bool ShowEmptyItems
-        {
-            get { return (bool)GetValue(ShowEmptyItemsProperty); }
-            set { SetValue(ShowEmptyItemsProperty, value); }
-        }
+        get => GetValue (ShowEmptyItemsProperty);
+        set => SetValue (ShowEmptyItemsProperty, value);
+    }
 
-        /// <summary>
-        /// Defines the ShowEmptyItems property.
-        /// </summary>
-        public static readonly StyledProperty<bool> ShowEmptyItemsProperty =
-            //AvaloniaProperty.Register<IndexList, bool>(nameof(ShowEmptyItems));
-            IndexList.ShowEmptyItemsProperty.AddOwner<IndexListHeaderItem>();
+    /// <summary>
+    /// Defines the ShowEmptyItems property.
+    /// </summary>
+    public static readonly StyledProperty<bool> ShowEmptyItemsProperty =
 
-        private static readonly ITemplate<IPanel> DefaultPanel =
-            new FuncTemplate<IPanel>(() => new StackPanel());
+        //AvaloniaProperty.Register<IndexList, bool>(nameof(ShowEmptyItems));
+        IndexList.ShowEmptyItemsProperty.AddOwner<IndexListHeaderItem>();
 
-        /// <summary>
-        /// overrides some default values
-        /// </summary>
-        static IndexListHeaderItem()
-        {
-            FocusableProperty.OverrideDefaultValue<IndexListHeaderItem>(false);
-            ItemsPanelProperty.OverrideDefaultValue<IndexListHeaderItem>(DefaultPanel);
-        }
+    private static readonly ITemplate<IPanel> DefaultPanel =
+        new FuncTemplate<IPanel> (() => new StackPanel());
 
-        /// <summary>
-        /// generates <see cref="IndexListItem"/> subitems
-        /// </summary>
-        /// <returns></returns>
-        protected override IItemContainerGenerator CreateItemContainerGenerator()
-        {
-            return new ItemContainerGenerator<IndexListItem>(
+    /// <summary>
+    /// overrides some default values
+    /// </summary>
+    static IndexListHeaderItem()
+    {
+        FocusableProperty.OverrideDefaultValue<IndexListHeaderItem> (false);
+        ItemsPanelProperty.OverrideDefaultValue<IndexListHeaderItem> (DefaultPanel);
+    }
+
+    /// <inheritdoc cref="ItemsControl.CreateItemContainerGenerator"/>
+    protected override IItemContainerGenerator CreateItemContainerGenerator()
+    {
+        return new ItemContainerGenerator<IndexListItem>
+            (
                 this,
-                IndexListItem.ContentProperty,
-                IndexListItem.ContentTemplateProperty);
-        }
+                ContentControl.ContentProperty,
+                ContentControl.ContentTemplateProperty
+            );
     }
 }

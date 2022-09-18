@@ -1,6 +1,22 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Primitives;
@@ -8,6 +24,10 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+
+#endregion
+
+#nullable enable
 
 namespace Avalonia.ExtendedToolkit.Controls
 {
@@ -21,45 +41,42 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// </summary>
         public bool ShowEmptyItems
         {
-            get { return (bool)GetValue(ShowEmptyItemsProperty); }
-            set { SetValue(ShowEmptyItemsProperty, value); }
+            get => GetValue (ShowEmptyItemsProperty);
+            set => SetValue (ShowEmptyItemsProperty, value);
         }
 
         /// <summary>
         /// Defines the ShowEmptyItems property.
         /// </summary>
         public static readonly StyledProperty<bool> ShowEmptyItemsProperty =
-        AvaloniaProperty.Register<IndexList, bool>(nameof(ShowEmptyItems), defaultValue: true);
+            AvaloniaProperty.Register<IndexList, bool> (nameof (ShowEmptyItems), defaultValue: true);
 
         /// <summary>
         /// Occurs when the control's selection changes.
         /// </summary>
         public event EventHandler<SelectionChangedEventArgs> SelectionChanged
         {
-            add => AddHandler(SelectingItemsControl.SelectionChangedEvent, value);
-            remove => RemoveHandler(SelectingItemsControl.SelectionChangedEvent, value);
+            add => AddHandler (SelectingItemsControl.SelectionChangedEvent, value);
+            remove => RemoveHandler (SelectingItemsControl.SelectionChangedEvent, value);
         }
 
         /// <summary>
         /// Defines the <see cref="SelectedItem"/> property.
         /// </summary>
-        public static readonly DirectProperty<IndexList, object> SelectedItemProperty =
-            SelectingItemsControl.SelectedItemProperty.AddOwner<IndexList>(
+        public static readonly DirectProperty<IndexList, object?> SelectedItemProperty =
+            SelectingItemsControl.SelectedItemProperty.AddOwner<IndexList> (
                 o => o.SelectedItem,
                 (o, v) => o.SelectedItem = v);
 
-        private object _selectedItem;
+        private object? _selectedItem;
 
         /// <summary>
         /// Gets or sets the selected item.
         /// </summary>
-        public object SelectedItem
+        public object? SelectedItem
         {
             get => _selectedItem;
-            set
-            {
-                SetAndRaise(SelectedItemProperty, ref _selectedItem, value);
-            }
+            set => SetAndRaise (SelectedItemProperty, ref _selectedItem, value);
         }
 
         /// <summary>
@@ -73,22 +90,20 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// </summary>
         public bool AutoScrollToSelectedItem
         {
-            get => GetValue(AutoScrollToSelectedItemProperty);
-            set => SetValue(AutoScrollToSelectedItemProperty, value);
+            get => GetValue (AutoScrollToSelectedItemProperty);
+            set => SetValue (AutoScrollToSelectedItemProperty, value);
         }
 
-        /// <summary>
-        /// generator for the <see cref="IndexListHeaderItem"/> subitems
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc cref="ItemsControl.CreateItemContainerGenerator"/>
         protected override IItemContainerGenerator CreateItemContainerGenerator()
         {
-            var result = new IndexListItemGenerator(
-                                    this,
-                                    IndexListHeaderItem.HeaderProperty,
-                                    IndexListHeaderItem.ItemTemplateProperty,
-                                    IndexListHeaderItem.ItemsProperty
-                                    );
+            var result = new IndexListItemGenerator
+                (
+                    this,
+                    HeaderedItemsControl.HeaderProperty,
+                    ItemTemplateProperty,
+                    ItemsProperty
+                );
             result.Materialized += ContainerMaterialized;
 
             return result;
@@ -100,7 +115,11 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ContainerMaterialized(object sender, ItemContainerEventArgs e)
+        private void ContainerMaterialized
+            (
+                object? sender,
+                ItemContainerEventArgs e
+            )
         {
             var selectedItem = SelectedItem;
 
@@ -117,7 +136,7 @@ namespace Avalonia.ExtendedToolkit.Controls
 
                     if (AutoScrollToSelectedItem)
                     {
-                        Dispatcher.UIThread.Post(container.ContainerControl.BringIntoView);
+                        Dispatcher.UIThread.Post (container.ContainerControl.BringIntoView);
                     }
 
                     break;
@@ -129,23 +148,26 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// Scrolls the specified item into view.
         /// </summary>
         /// <param name="item">The item.</param>
-        public void ScrollIntoView(object item)
+        public void ScrollIntoView (object item)
         {
-            int index = Items.OfType<object>().ToList().IndexOf(item);
-            Presenter?.ScrollIntoView(index);
+            var index = Items.OfType<object>().ToList().IndexOf (item);
+            Presenter?.ScrollIntoView (index);
         }
 
-        /// <inheritdoc/>
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        /// <inheritdoc cref="InputElement.OnPointerPressed"/>
+        protected override void OnPointerPressed
+            (
+                PointerPressedEventArgs eventArgs
+            )
         {
-            base.OnPointerPressed(e);
+            base.OnPointerPressed (eventArgs);
 
-            var prop = e.GetCurrentPoint(this).Properties;
+            var prop = eventArgs.GetCurrentPoint (this).Properties;
 
             if (prop.IsLeftButtonPressed || prop.IsRightButtonPressed)
             {
-                e.Handled = UpdateSelectionFromEventSource(
-                    e.Source,
+                eventArgs.Handled = UpdateSelectionFromEventSource (
+                    eventArgs.Source,
                     true);
             }
         }
@@ -157,16 +179,16 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// <param name="eventSource"></param>
         /// <param name="select"></param>
         /// <returns></returns>
-        protected bool UpdateSelectionFromEventSource(
-            IInteractive eventSource,
-            bool select = true
+        protected bool UpdateSelectionFromEventSource (
+                IInteractive eventSource,
+                bool select = true
             )
         {
-            var container = GetContainerFromEventSource(eventSource);
+            var container = GetContainerFromEventSource (eventSource);
 
             if (container != null)
             {
-                UpdateSelectionFromContainer(container, select);
+                UpdateSelectionFromContainer (container, select);
                 return true;
             }
 
@@ -178,11 +200,12 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// </summary>
         /// <param name="eventSource"></param>
         /// <returns></returns>
-        protected IndexListItem GetContainerFromEventSource(IInteractive eventSource)
+        protected IndexListItem? GetContainerFromEventSource (IInteractive eventSource)
         {
             var item = ((IVisual)eventSource).GetSelfAndVisualAncestors()
                 .OfType<IndexListItem>()
                 .FirstOrDefault();
+
             return item;
         }
 
@@ -193,21 +216,22 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// </summary>
         /// <param name="container"></param>
         /// <param name="isSelect"></param>
-        protected void UpdateSelectionFromContainer(
-            IControl container,
-            bool isSelect = true
+        protected void UpdateSelectionFromContainer
+            (
+                IControl container,
+                bool isSelect = true
             )
         {
             if (container is IndexListItem item)
             {
-                List<object> oldItems = new List<object>();
+                var oldItems = new List<object>();
                 if (SelectedItem is IndexListItem lastItem)
                 {
                     lastItem.IsSelected = false;
-                    oldItems.Add(lastItem);
+                    oldItems.Add (lastItem);
                 }
 
-                if (oldItems.Contains(item) == false)
+                if (oldItems.Contains (item) == false)
                 {
                     item.IsSelected = isSelect;
                     SelectedItem = item;
@@ -218,11 +242,11 @@ namespace Avalonia.ExtendedToolkit.Controls
                     SelectedItem = null;
                 }
 
-                var changed = new SelectionChangedEventArgs(
+                var changed = new SelectionChangedEventArgs (
                     SelectingItemsControl.SelectionChangedEvent,
                     new List<object> { SelectedItem },
                     oldItems);
-                RaiseEvent(changed);
+                RaiseEvent (changed);
             }
         }
     }

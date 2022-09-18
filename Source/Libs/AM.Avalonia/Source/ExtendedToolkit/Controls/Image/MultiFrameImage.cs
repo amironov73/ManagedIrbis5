@@ -1,110 +1,129 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Collections.Generic;
+
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 
-namespace Avalonia.ExtendedToolkit.Controls
+#endregion
+
+#nullable enable
+
+namespace Avalonia.ExtendedToolkit.Controls;
+
+//ported from https://github.com/MahApps/MahApps.Metro
+
+/// <summary>
+/// Multi-frame image
+/// </summary>
+public class MultiFrameImage : Image
 {
-    //ported from https://github.com/MahApps/MahApps.Metro
+    // TODO complete implementation
 
     /// <summary>
-    /// Multi-frame image
+    /// style key of this control
     /// </summary>
-    public class MultiFrameImage : Image
+    public Type StyleKey => typeof (MultiFrameImage);
+
+    /// <summary>
+    /// registered sourceproperty changed handler
+    /// </summary>
+    public MultiFrameImage()
     {
-#warning complete implementation
+        SourceProperty.Changed.AddClassHandler<MultiFrameImage> ((o, e) => OnSourceChanged (o, e));
+    }
 
-        /// <summary>
-        /// style key of this control
-        /// </summary>
-        public Type StyleKey => typeof(MultiFrameImage);
+    /// <summary>
+    /// get /sets MultiFrameImageMode
+    /// </summary>
+    public MultiFrameImageMode MultiFrameImageMode
+    {
+        get => GetValue (MultiFrameImageModeProperty);
+        set => SetValue (MultiFrameImageModeProperty, value);
+    }
 
-        /// <summary>
-        /// registered sourceproperty changed handler
-        /// </summary>
-        public MultiFrameImage()
+    /// <summary>
+    /// <see cref="MultiFrameImageMode"/>
+    /// </summary>
+    public static readonly StyledProperty<MultiFrameImageMode> MultiFrameImageModeProperty =
+        AvaloniaProperty.Register<MultiFrameImage, MultiFrameImageMode> (nameof (MultiFrameImageMode));
+
+    private readonly List<IBitmap> _frames = new ();
+
+    private void OnSourceChanged (MultiFrameImage multiFrameImage, AvaloniaPropertyChangedEventArgs e)
+    {
+        multiFrameImage.UpdateFrameList();
+    }
+
+    private void UpdateFrameList()
+    {
+        _frames.Clear();
+
+        //var bitmapFrame = Source as Bitmap;
+        //if (bitmapFrame == null)
+        //{
+        //    return;
+        //}
+
+        //var decoder = bitmapFrame.Decoder;
+        //if (decoder == null || decoder.Frames.Count == 0)
+        //{
+        //    return;
+        //}
+
+        //// order all frames by size, take the frame with the highest color depth per size
+        //_frames.AddRange(
+        //    decoder
+        //        .Frames
+        //        .GroupBy(f => f.PixelWidth * f.PixelHeight)
+        //        .OrderBy(g => g.Key)
+        //        .Select(g => g.OrderByDescending(f => f.Format.BitsPerPixel).First())
+        //        );
+    }
+
+    /// <inheritdoc cref="Image.Render"/>
+    public override void Render
+        (
+            DrawingContext drawingContext
+        )
+    {
+        if (_frames.Count == 0)
         {
-            SourceProperty.Changed.AddClassHandler<MultiFrameImage>((o, e) => OnSourceChanged(o, e));
+            base.Render (drawingContext);
+            return;
         }
 
-        /// <summary>
-        /// get /sets MultiFrameImageMode
-        /// </summary>
-        public MultiFrameImageMode MultiFrameImageMode
+        switch (MultiFrameImageMode)
         {
-            get { return (MultiFrameImageMode)GetValue(MultiFrameImageModeProperty); }
-            set { SetValue(MultiFrameImageModeProperty, value); }
-        }
+            case MultiFrameImageMode.ScaleDownLargerFrame:
+                //var minSize = Math.Max(RenderSize.Width, RenderSize.Height);
+                //var minFrame = _frames.FirstOrDefault(f => f.Width >= minSize && f.Height >= minSize) ?? _frames.Last();
+                //dc.DrawImage(minFrame, new Rect(0, 0, RenderSize.Width, RenderSize.Height));
+                break;
 
-        /// <summary>
-        /// <see cref="MultiFrameImageMode"/>
-        /// </summary>
-        public static readonly StyledProperty<MultiFrameImageMode> MultiFrameImageModeProperty =
-            AvaloniaProperty.Register<MultiFrameImage, MultiFrameImageMode>(nameof(MultiFrameImageMode));
+            case MultiFrameImageMode.NoScaleSmallerFrame:
+                //var maxSize = Math.Min(RenderSize.Width, RenderSize.Height);
+                //var maxFrame = _frames.LastOrDefault(f => f.Width <= maxSize && f.Height <= maxSize) ?? _frames.First();
+                //dc.DrawImage(maxFrame, new Rect((RenderSize.Width - maxFrame.Width) / 2, (RenderSize.Height - maxFrame.Height) / 2, maxFrame.Width, maxFrame.Height));
+                break;
 
-        private readonly List<IBitmap> _frames = new List<IBitmap>();
-
-        private void OnSourceChanged(MultiFrameImage multiFrameImage, AvaloniaPropertyChangedEventArgs e)
-        {
-            multiFrameImage.UpdateFrameList();
-        }
-
-        private void UpdateFrameList()
-        {
-            _frames.Clear();
-
-            //var bitmapFrame = Source as Bitmap;
-            //if (bitmapFrame == null)
-            //{
-            //    return;
-            //}
-
-            //var decoder = bitmapFrame.Decoder;
-            //if (decoder == null || decoder.Frames.Count == 0)
-            //{
-            //    return;
-            //}
-
-            //// order all frames by size, take the frame with the highest color depth per size
-            //_frames.AddRange(
-            //    decoder
-            //        .Frames
-            //        .GroupBy(f => f.PixelWidth * f.PixelHeight)
-            //        .OrderBy(g => g.Key)
-            //        .Select(g => g.OrderByDescending(f => f.Format.BitsPerPixel).First())
-            //        );
-        }
-
-        /// <summary>
-        /// draws the image
-        /// </summary>
-        /// <param name="dc"></param>
-        public override void Render(DrawingContext dc)
-        {
-            if (_frames.Count == 0)
-            {
-                base.Render(dc);
-                return;
-            }
-
-            switch (MultiFrameImageMode)
-            {
-                case MultiFrameImageMode.ScaleDownLargerFrame:
-                    //var minSize = Math.Max(RenderSize.Width, RenderSize.Height);
-                    //var minFrame = _frames.FirstOrDefault(f => f.Width >= minSize && f.Height >= minSize) ?? _frames.Last();
-                    //dc.DrawImage(minFrame, new Rect(0, 0, RenderSize.Width, RenderSize.Height));
-                    break;
-
-                case MultiFrameImageMode.NoScaleSmallerFrame:
-                    //var maxSize = Math.Min(RenderSize.Width, RenderSize.Height);
-                    //var maxFrame = _frames.LastOrDefault(f => f.Width <= maxSize && f.Height <= maxSize) ?? _frames.First();
-                    //dc.DrawImage(maxFrame, new Rect((RenderSize.Width - maxFrame.Width) / 2, (RenderSize.Height - maxFrame.Height) / 2, maxFrame.Width, maxFrame.Height));
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 }
