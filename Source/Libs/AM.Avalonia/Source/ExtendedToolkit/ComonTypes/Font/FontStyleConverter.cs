@@ -24,7 +24,7 @@ public sealed class FontStyleConverter : TypeConverter
             Type t
         )
     {
-        if (t == typeof(string))
+        if (t == typeof (string))
         {
             return true;
         }
@@ -41,12 +41,12 @@ public sealed class FontStyleConverter : TypeConverter
             Type? destinationType
         )
     {
-        if (destinationType == typeof(InstanceDescriptor) || destinationType == typeof(string))
+        if (destinationType == typeof (InstanceDescriptor) || destinationType == typeof (string))
         {
             return true;
         }
 
-        return base.CanConvertTo(context, destinationType);
+        return base.CanConvertTo (context, destinationType);
     }
 
     /// <summary>
@@ -64,37 +64,26 @@ public sealed class FontStyleConverter : TypeConverter
     {
         if (null == value)
         {
-            throw GetConvertFromException(value);
+            throw GetConvertFromException (value);
         }
 
         String s = value as string;
 
         if (null == s)
         {
-            throw new ArgumentException(nameof(value));
+            throw new ArgumentException (nameof (value));
         }
 
         FontStyle fontStyle = new FontStyle();
-        if (!FontStyles.FontStyleStringToKnownStyle(s, ci, ref fontStyle))
+        if (!FontStyles.FontStyleStringToKnownStyle (s, ci, ref fontStyle))
         {
-            throw new FormatException("Parsers_IllegalToken");
+            throw new FormatException ("Parsers_IllegalToken");
         }
 
         return fontStyle;
     }
 
-    /// <summary>
-    /// TypeConverter method implementation.
-    /// </summary>
-    /// <exception cref="NotSupportedException">
-    /// An NotSupportedException is thrown if the example object is null or is not a FontStyle,
-    /// or if the destinationType isn't one of the valid destination types.
-    /// </exception>
-    /// <param name="context">ITypeDescriptorContext</param>
-    /// <param name="culture">current culture (see CLR specs)</param>
-    /// <param name="value">value to convert from</param>
-    /// <param name="destinationType">Type to convert to</param>
-    /// <returns>converted value</returns>
+    /// <inheritdoc cref="TypeConverter.ConvertTo(System.ComponentModel.ITypeDescriptorContext?,System.Globalization.CultureInfo?,object?,System.Type)"/>
     public override object ConvertTo
         (
             ITypeDescriptorContext? context,
@@ -105,20 +94,20 @@ public sealed class FontStyleConverter : TypeConverter
     {
         if (destinationType != null && value is FontStyle)
         {
-            if (destinationType == typeof(InstanceDescriptor))
+            if (destinationType == typeof (InstanceDescriptor))
             {
-                ConstructorInfo ci = typeof(FontStyle).GetConstructor(new Type[] { typeof(int) });
+                ConstructorInfo ci = typeof (FontStyle).GetConstructor (new Type[] { typeof (int) });
                 int c = (int)((FontStyle)value);
-                return new InstanceDescriptor(ci, new object[] { c });
+                return new InstanceDescriptor (ci, new object[] { c });
             }
-            else if (destinationType == typeof(string))
+            else if (destinationType == typeof (string))
             {
                 FontStyle c = (FontStyle)value;
-                return ((IFormattable)c).ToString(null, culture);
+                return ((IFormattable)c).ToString (null, culture);
             }
         }
 
         // Pass unhandled cases to base class (which will throw exceptions for null value or destinationType.)
-        return base.ConvertTo(context, culture, value, destinationType);
+        return base.ConvertTo (context, culture, value, destinationType);
     }
 }
