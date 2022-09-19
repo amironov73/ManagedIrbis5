@@ -1,46 +1,71 @@
-﻿using System.ComponentModel;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System.ComponentModel;
+
 using Avalonia.ExtendedToolkit.Font;
 using Avalonia.Media;
 
-namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid.Converters
+#endregion
+
+#nullable enable
+
+namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid.Converters;
+
+//
+// ported from https://github.com/DenisVuyka/WPG
+//
+
+/// <summary>
+/// Extended <see cref="FontWeightConverter"/> that provides standard values collection.
+/// </summary>
+public class FontWeightConverterDecorator
+    : FontConverterDecorator
 {
-    //
-    // ported from https://github.com/DenisVuyka/WPG
-    //
+    #region Construction
 
     /// <summary>
-    /// Extended <see cref="FontWeightConverter"/> that provides standard values collection.
+    /// Initializes a new instance of the <see cref="FontWeightConverterDecorator"/> class.
     /// </summary>
-    public class FontWeightConverterDecorator : FontConverterDecorator
+    public FontWeightConverterDecorator()
+        : base (new FontWeightConverter())
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FontWeightConverterDecorator"/> class.
-        /// </summary>
-        public FontWeightConverterDecorator() : base(new FontWeightConverter()) { }
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Returns a collection of standard values for the data type this type converter is designed for when provided with a format context.
-        /// </summary>
-        /// <param name="context">An <see cref="ITypeDescriptorContext"/> that provides a format context that can be used to extract additional information about the environment from which this converter is invoked. This parameter or properties of this parameter can be null.</param>
-        /// <returns>
-        /// A <see cref="TypeConverter.StandardValuesCollection"/> that holds a standard set of valid values, or null if the data type does not support a standard set of values.
-        /// </returns>
-        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
-        {
-            return new StandardValuesCollection(
-              new[]
-              {
-                    FontWeight.Thin,
-                    FontWeight.ExtraLight,
-                    FontWeight.Light,
-                    FontWeight.Normal,
-                    FontWeight.Medium,
-                    FontWeight.SemiBold,
-                    FontWeight.Bold,
-                    FontWeight.ExtraBold,
-                    FontWeight.Black,
-                    FontWeight.ExtraBlack
-              });
-        }
+    #endregion
+
+    /// <inheritdoc cref="TypeConverter.GetStandardValues(System.ComponentModel.ITypeDescriptorContext?)"/>
+    public override StandardValuesCollection GetStandardValues
+        (
+            ITypeDescriptorContext? context
+        )
+    {
+        return new StandardValuesCollection (
+            new[]
+            {
+                FontWeight.Thin,
+                FontWeight.ExtraLight,
+                FontWeight.Light,
+                FontWeight.Normal,
+                FontWeight.Medium,
+                FontWeight.SemiBold,
+                FontWeight.Bold,
+                FontWeight.ExtraBold,
+                FontWeight.Black,
+                FontWeight.ExtraBlack
+            });
     }
 }
