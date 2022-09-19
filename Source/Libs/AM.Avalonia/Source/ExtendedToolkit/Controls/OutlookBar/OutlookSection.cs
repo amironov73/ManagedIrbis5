@@ -1,150 +1,185 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
+
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 
-namespace Avalonia.ExtendedToolkit.Controls
+#endregion
+
+#nullable enable
+
+namespace Avalonia.ExtendedToolkit.Controls;
+
+//ported from https://github.com/jogibear9988/OdysseyWPF.git
+
+/// <summary>
+/// Outlook Section
+/// </summary>
+public class OutlookSection
+    : HeaderedContentControl
 {
-    //ported from https://github.com/jogibear9988/OdysseyWPF.git
+    /// <summary>
+    /// style key of this control
+    /// </summary>
+    public Type StyleKey => typeof (OutlookSection);
 
     /// <summary>
-    /// Outlook Section
+    /// Gets or sets the OutlookBar to which this Section is assigned.
     /// </summary>
-    public class OutlookSection : HeaderedContentControl
+    internal OutlookBar? OutlookBar { get; set; }
+
+    /// <summary>
+    /// get/sets the image
+    /// </summary>
+    public IBitmap Image
     {
-        /// <summary>
-        /// style key of this control
-        /// </summary>
-        public Type StyleKey => typeof(OutlookSection);
+        get => GetValue (ImageProperty);
+        set => SetValue (ImageProperty, value);
+    }
 
-        /// <summary>
-        /// Gets or sets the OutlookBar to which this Section is assigned.
-        /// </summary>
-        internal OutlookBar OutlookBar { get; set; }
+    /// <summary>
+    /// <see cref="Image"/>
+    /// </summary>
+    public static readonly StyledProperty<IBitmap> ImageProperty =
+        AvaloniaProperty.Register<OutlookSection, IBitmap> (nameof (Image));
 
-        /// <summary>
-        /// get/sets the image
-        /// </summary>
-        public IBitmap Image
+    /// <summary>
+    /// get/sets IsSelected
+    /// </summary>
+    public bool IsSelected
+    {
+        get => GetValue (IsSelectedProperty);
+        set => SetValue (IsSelectedProperty, value);
+    }
+
+    /// <summary>
+    /// <see cref="IsSelected"/>
+    /// </summary>
+    public static readonly StyledProperty<bool> IsSelectedProperty =
+        AvaloniaProperty.Register<OutlookSection, bool> (nameof (IsSelected));
+
+    /// <summary>
+    /// get/sets IsMaximized
+    /// </summary>
+    public bool IsMaximized
+    {
+        get => GetValue (IsMaximizedProperty);
+        set => SetValue (IsMaximizedProperty, value);
+    }
+
+    /// <summary>
+    /// <see cref="IsMaximized"/>
+    /// </summary>
+    public static readonly StyledProperty<bool> IsMaximizedProperty =
+        AvaloniaProperty.Register<OutlookSection, bool> (nameof (IsMaximized), defaultValue: true);
+
+    /// <summary>
+    /// <see cref="Click"/>
+    /// </summary>
+    public static readonly RoutedEvent<RoutedEventArgs> ClickEvent =
+        RoutedEvent.Register<OutlookSection, RoutedEventArgs> (nameof (ClickEvent), RoutingStrategies.Bubble);
+
+    /// <summary>
+    /// get/set Click event
+    /// </summary>
+    public event EventHandler Click
+    {
+        add => AddHandler (ClickEvent, value);
+        remove => RemoveHandler (ClickEvent, value);
+    }
+
+    /// <summary>
+    /// sets the SelectedSection to the OutlookBar
+    /// and set the pseudo class
+    /// </summary>
+    /// <param name="oldValue"></param>
+    /// <param name="newValue"></param>
+    protected virtual void OnSelectedPropertyChanged
+        (
+            bool oldValue,
+            bool newValue
+        )
+    {
+        if (OutlookBar == null)
         {
-            get { return (IBitmap)GetValue(ImageProperty); }
-            set { SetValue(ImageProperty, value); }
+            return;
         }
 
-        /// <summary>
-        /// <see cref="Image"/>
-        /// </summary>
-        public static readonly StyledProperty<IBitmap> ImageProperty =
-            AvaloniaProperty.Register<OutlookSection, IBitmap>(nameof(Image));
-
-        /// <summary>
-        /// get/sets IsSelected
-        /// </summary>
-        public bool IsSelected
+        if (newValue)
         {
-            get { return (bool)GetValue(IsSelectedProperty); }
-            set { SetValue(IsSelectedProperty, value); }
+            OutlookBar.SelectedSection = this;
         }
 
-        /// <summary>
-        /// <see cref="IsSelected"/>
-        /// </summary>
-        public static readonly StyledProperty<bool> IsSelectedProperty =
-            AvaloniaProperty.Register<OutlookSection, bool>(nameof(IsSelected));
+        PseudoClasses.Set (":checked", newValue);
+    }
 
-        /// <summary>
-        /// get/sets IsMaximized
-        /// </summary>
-        public bool IsMaximized
+    /// <summary>
+    /// registers changed handlers
+    /// </summary>
+    public OutlookSection()
+    {
+        //AddHandler(Button.PointerPressedEvent, buttonClickedEvent);
+        IsSelectedProperty.Changed.AddClassHandler<OutlookSection> ((o, e) => IsSelectedPropertyChanged (o, e));
+    }
+
+    private void IsSelectedPropertyChanged
+        (
+            OutlookSection o,
+            AvaloniaPropertyChangedEventArgs eventArgs
+        )
+    {
+        o.OnSelectedPropertyChanged ((bool)eventArgs.OldValue, (bool)eventArgs.NewValue);
+    }
+
+    private void buttonClickedEvent
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
+    {
+        var bar = OutlookBar;
+        if (eventArgs.Source is ToggleButton b)
         {
-            get { return (bool)GetValue(IsMaximizedProperty); }
-            set { SetValue(IsMaximizedProperty, value); }
+            b.IsChecked = true;
         }
 
-        /// <summary>
-        /// <see cref="IsMaximized"/>
-        /// </summary>
-        public static readonly StyledProperty<bool> IsMaximizedProperty =
-            AvaloniaProperty.Register<OutlookSection, bool>(nameof(IsMaximized), defaultValue: true);
-
-        /// <summary>
-        /// <see cref="Click"/>
-        /// </summary>
-        public static readonly RoutedEvent<RoutedEventArgs> ClickEvent =
-                    RoutedEvent.Register<OutlookSection, RoutedEventArgs>(nameof(ClickEvent), RoutingStrategies.Bubble);
-
-        /// <summary>
-        /// get/set Click event
-        /// </summary>
-        public event EventHandler Click
+        if (bar != null)
         {
-            add
-            {
-                AddHandler(ClickEvent, value);
-            }
-            remove
-            {
-                RemoveHandler(ClickEvent, value);
-            }
+            bar.SelectedSection = this;
         }
 
-        /// <summary>
-        /// sets the SelectedSection to the OutlookBar
-        /// and set the pseudo class
-        /// </summary>
-        /// <param name="oldValue"></param>
-        /// <param name="newValue"></param>
-        protected virtual void OnSelectedPropertyChanged(bool oldValue, bool newValue)
-        {
-            if (OutlookBar == null)
-                return;
+        OnClick();
+    }
 
-            if (newValue) OutlookBar.SelectedSection = this;
+    private void OnClick()
+    {
+        RaiseEvent (new RoutedEventArgs (ClickEvent));
+    }
 
-            PseudoClasses.Set(":checked", newValue);
-        }
-
-        /// <summary>
-        /// registers changed handlers
-        /// </summary>
-        public OutlookSection()
-        {
-            //AddHandler(Button.PointerPressedEvent, buttonClickedEvent);
-            IsSelectedProperty.Changed.AddClassHandler<OutlookSection>((o, e) => IsSelectedPropertyChanged(o, e));
-        }
-
-        private void IsSelectedPropertyChanged(OutlookSection o, AvaloniaPropertyChangedEventArgs e)
-        {
-            o.OnSelectedPropertyChanged((bool)e.OldValue, (bool)e.NewValue);
-        }
-
-        private void buttonClickedEvent(object sender, RoutedEventArgs e)
-        {
-            OutlookBar bar = OutlookBar;
-            ToggleButton b = e.Source as ToggleButton;
-            if (b != null) b.IsChecked = true;
-            if (bar != null)
-            {
-                bar.SelectedSection = this;
-            }
-            OnClick();
-        }
-
-        private void OnClick()
-        {
-            this.RaiseEvent(new RoutedEventArgs(OutlookSection.ClickEvent));
-        }
-
-        /// <summary>
-        /// gets the buttom from the style
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-        {
-            base.OnApplyTemplate(e);
-            Button button=e.NameScope.Find<Button>("button");
-            button.Click += buttonClickedEvent;
-        }
+    /// <inheritdoc cref="TemplatedControl.OnApplyTemplate"/>
+    protected override void OnApplyTemplate
+        (
+            TemplateAppliedEventArgs eventArgs
+        )
+    {
+        base.OnApplyTemplate (eventArgs);
+        var button = eventArgs.NameScope.Find<Button> ("button");
+        button.Click += buttonClickedEvent;
     }
 }
