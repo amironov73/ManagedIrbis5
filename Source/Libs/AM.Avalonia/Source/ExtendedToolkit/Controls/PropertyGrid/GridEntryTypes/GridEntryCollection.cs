@@ -1,8 +1,29 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+
+using AM;
+
+#endregion
+
+#nullable enable
 
 namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid
 {
@@ -23,7 +44,8 @@ namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid
         /// Initializes a new instance of the <see cref="GridEntryCollection&lt;T&gt;"/> class.
         /// </summary>
         public GridEntryCollection()
-        { }
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GridEntryCollection&lt;T&gt;"/> class.
@@ -32,11 +54,14 @@ namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid
         /// <exception cref="ArgumentNullException">
         /// The <paramref name="collection"/> parameter cannot be null.
         /// </exception>
-        public GridEntryCollection(IEnumerable<T> collection)
+        public GridEntryCollection (IEnumerable<T> collection)
         {
             if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
-            CopyFrom(collection);
+            {
+                throw new ArgumentNullException (nameof (collection));
+            }
+
+            CopyFrom (collection);
         }
 
         /// <summary>
@@ -50,9 +75,9 @@ namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid
         /// of the index of the next element that is larger than item or, if there is
         /// no larger element, the bitwise complement of GridEntryCollection&lt;T&gt;.Count.
         /// </returns>
-        public int BinarySearch(T item)
+        public int BinarySearch (T item)
         {
-            return ((List<T>)Items).BinarySearch(item);
+            return ((List<T>)Items).BinarySearch (item);
         }
 
         /// <summary>
@@ -70,9 +95,9 @@ namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid
         /// of the index of the next element that is larger than item or, if there is
         /// no larger element, the bitwise complement of GridEntryCollection&lt;T&gt;.Count.
         /// </returns>
-        public int BinarySearch(T item, IComparer<T> comparer)
+        public int BinarySearch (T item, IComparer<T> comparer)
         {
-            return ((List<T>)Items).BinarySearch(item, comparer);
+            return ((List<T>)Items).BinarySearch (item, comparer);
         }
 
         /// <summary>
@@ -82,111 +107,104 @@ namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid
         /// The System.Collections.Generic.IComparer&lt;T&gt; implementation to use when comparing elements.
         /// -or- null to use the default comparer System.Collections.Generic.Comparer&lt;T&gt;.Default.
         /// </param>
-        public void Sort(IComparer<T> comparer)
+        public void Sort (IComparer<T> comparer)
         {
-            ((List<T>)Items).Sort(comparer);
+            ((List<T>)Items).Sort (comparer);
             OnItemsChanged();
         }
 
         private void OnItemsChanged()
         {
-            base.OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
-            base.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset, null, -1));
+            base.OnPropertyChanged (new PropertyChangedEventArgs ("Item[]"));
+            base.OnCollectionChanged (
+                new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Reset, null, -1));
         }
 
         /// <summary>
         /// Copies values from collection.
         /// </summary>
         /// <param name="collection">The collection.</param>
-        protected void CopyFrom(IEnumerable<T> collection)
+        protected void CopyFrom
+            (
+                IEnumerable<T>? collection
+            )
         {
             if (collection != null)
             {
-                using (IEnumerator<T> enumerator = collection.GetEnumerator())
+                using var enumerator = collection.GetEnumerator();
+                while (enumerator.MoveNext())
                 {
-                    while (enumerator.MoveNext())
-                    {
-                        Add(enumerator.Current);
-                    }
+                    Add (enumerator.Current);
                 }
             }
         }
 
-        /// <summary>
-        /// Inserts an item into the collection at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
-        /// <param name="item">The object to insert.</param>
-        protected override void InsertItem(int index, T item)
+        /// <inheritdoc cref="ObservableCollection{T}.InsertItem"/>
+        protected override void InsertItem (int index, T item)
         {
-            if (item == null)
-                throw new ArgumentNullException(nameof(item));
-            EncacheItem(item);
-            base.InsertItem(index, item);
+            Sure.NotNull (item);
+
+            EncacheItem (item);
+            base.InsertItem (index, item);
         }
 
-        /// <summary>
-        /// Removes the item at the specified index of the collection.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to remove.</param>
-        protected override void RemoveItem(int index)
+        /// <inheritdoc cref="ObservableCollection{T}.RemoveItem"/>
+        protected override void RemoveItem (int index)
         {
-            T item = Items[index];
-            DecacheItem(item);
-            base.RemoveItem(index);
+            var item = Items[index];
+            DecacheItem (item);
+            base.RemoveItem (index);
         }
 
-        /// <summary>
-        /// Removes all items from the collection.
-        /// </summary>
+        /// <inheritdoc cref="ObservableCollection{T}.ClearItems"/>
         protected override void ClearItems()
         {
             _itemsMap.Clear();
             base.ClearItems();
         }
 
-        /// <summary>
-        /// Replaces the element at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to replace.</param>
-        /// <param name="item">The new value for the element at the specified index.</param>
-        protected override void SetItem(int index, T item)
+        /// <inheritdoc cref="ObservableCollection{T}.SetItem"/>
+        protected override void SetItem (int index, T item)
         {
-            DecacheItem(this[index]);
-            EncacheItem(item);
-            base.SetItem(index, item);
+            DecacheItem (this[index]);
+            EncacheItem (item);
+            base.SetItem (index, item);
         }
 
         /// <summary>
         /// Gets the item with the specified name or null if no item with the name specified was found.
         /// </summary>
         /// <value></value>
-        public T this[string name]
+        public T this [string name]
         {
             get
             {
-                if (string.IsNullOrEmpty(name))
-                    return null;
+                if (string.IsNullOrEmpty (name))
+                {
+                    return null!;
+                }
 
-                if (_itemsMap.ContainsKey(name))
-                    return _itemsMap[name];
-                else
-                    return null;
+                return _itemsMap.ContainsKey (name) ? _itemsMap[name] : null!;
             }
         }
 
-        private void EncacheItem(T item)
+        private void EncacheItem (T item)
         {
-            if (_itemsMap.ContainsKey(item.Name))
-                throw new ArgumentException(string.Format("The entry '{0}' is already added to collection!", item.Name));
+            if (_itemsMap.ContainsKey (item.Name))
+            {
+                throw new ArgumentException (string.Format ("The entry '{0}' is already added to collection!",
+                    item.Name));
+            }
 
-            _itemsMap.Add(item.Name, item);
+            _itemsMap.Add (item.Name, item);
         }
 
-        private void DecacheItem(T item)
+        private void DecacheItem (T item)
         {
-            if (_itemsMap.ContainsKey(item.Name))
-                _itemsMap.Remove(item.Name);
+            if (_itemsMap.ContainsKey (item.Name))
+            {
+                _itemsMap.Remove (item.Name);
+            }
         }
     }
 }

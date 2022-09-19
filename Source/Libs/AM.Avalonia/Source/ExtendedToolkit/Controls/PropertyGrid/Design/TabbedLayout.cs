@@ -1,485 +1,544 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.Linq;
 using System.Windows.Input;
+
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.ExtendedToolkit.Controls.PropertyGrid.PropertyTypes;
+
 using ReactiveUI;
 
-namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid.Design
+#endregion
+
+#nullable enable
+
+namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid.Design;
+
+//
+// ported from https://github.com/DenisVuyka/WPG
+//
+
+/// <summary>
+/// The default tabbed layout.
+/// </summary>
+public class TabbedLayout
+    : TabControl
 {
-    //
-    // ported from https://github.com/DenisVuyka/WPG
-    //
+    /// <summary>
+    /// style key of this control
+    /// </summary>
+    public Type StyleKey => typeof (TabbedLayout);
 
     /// <summary>
-    /// The default tabbed layout.
+    /// The fallback header for a tab if no header custom is provided.
     /// </summary>
-    public class TabbedLayout : TabControl
+    public const string DefaultHeader = "Unknown";
+
+    /// <summary>
+    /// Gets or sets the content of the selected tab.
+    /// </summary>
+    /// <value>
+    /// The content of the selected tab.
+    /// </value>
+    ///
+    public new object SelectedContent
     {
+        get => GetValue (SelectedContentProperty);
+        set => SetValue (SelectedContentProperty, value);
+    }
 
-        /// <summary>
-        /// style key of this control
-        /// </summary>
-        public Type StyleKey => typeof(TabbedLayout);
+    /// <summary>
+    /// <see cref="SelectedContent"/>
+    /// </summary>
+    public new static readonly StyledProperty<object> SelectedContentProperty =
+        TabControl.SelectedContentProperty.AddOwner<TabbedLayout>();
 
-        /// <summary>
-        /// The fallback header for a tab if no header custom is provided.
-        /// </summary>
-        public const string DefaultHeader = "Unknown";
+    /// <summary>
+    /// Gets or sets the content template for the selected tab.
+    /// </summary>
+    /// <value>
+    /// The content template of the selected tab.
+    /// </value>
+    public new IDataTemplate SelectedContentTemplate
+    {
+        get => GetValue (SelectedContentTemplateProperty);
+        set => SetValue (SelectedContentTemplateProperty, value);
+    }
 
-        /// <summary>
-        /// Gets or sets the content of the selected tab.
-        /// </summary>
-        /// <value>
-        /// The content of the selected tab.
-        /// </value>
-        ///
-        public new object SelectedContent
+    /// <summary>
+    /// <see cref="SelectedContentTemplate"/>
+    /// </summary>
+    public new static readonly StyledProperty<IDataTemplate> SelectedContentTemplateProperty =
+        TabControl.SelectedContentTemplateProperty.AddOwner<TabbedLayout>();
+
+    /// <summary>
+    /// Initializes the <see cref="TabbedLayout"/> class.
+    /// </summary>
+    static TabbedLayout()
+    {
+        // TODO нужен ли пустой конструктор?
+    }
+
+    /// <summary>
+    /// property grid command
+    /// </summary>
+    public ICommand ClosePropertyTabCommand
+    {
+        get => GetValue (ClosePropertyTabCommandProperty);
+        internal set => SetValue (ClosePropertyTabCommandProperty, value);
+    }
+
+    /// <summary>
+    /// <see cref="ClosePropertyTabCommand"/>
+    /// </summary>
+    public static readonly StyledProperty<ICommand> ClosePropertyTabCommandProperty =
+        AvaloniaProperty.Register<TabbedLayout, ICommand> (nameof (ClosePropertyTabCommand));
+
+    /// <summary>
+    /// property grid command
+    /// </summary>
+    public ICommand ShowExtendedEditorCommand
+    {
+        get => GetValue (ShowExtendedEditorCommandProperty);
+        set => SetValue (ShowExtendedEditorCommandProperty, value);
+    }
+
+    /// <summary>
+    /// <see cref="ShowExtendedEditorCommand"/>
+    /// </summary>
+    public static readonly StyledProperty<ICommand> ShowExtendedEditorCommandProperty =
+        AvaloniaProperty.Register<TabbedLayout, ICommand> (nameof (ShowExtendedEditorCommand));
+
+    /// <summary>
+    /// Gets or sets the item header property.
+    /// </summary>
+    /// <value>The item header property.</value>
+    public string ItemHeaderProperty { get; set; }
+
+    /// <summary>
+    /// CanClose AttachedProperty
+    /// </summary>
+    public static readonly AttachedProperty<bool> CanCloseProperty =
+        AvaloniaProperty.RegisterAttached<TabbedLayout, IControl, bool> ("CanClose");
+
+    /// <summary>
+    /// get CanClose
+    /// </summary>
+    /// <param name="element"></param>
+    /// <returns></returns>
+    public static bool GetCanClose (IControl element)
+    {
+        if (element == null)
         {
-            get { return (object)GetValue(SelectedContentProperty); }
-            set { SetValue(SelectedContentProperty, value); }
+            throw new ArgumentNullException ("obj");
         }
 
-        /// <summary>
-        /// <see cref="SelectedContent"/>
-        /// </summary>
-        public new static readonly StyledProperty<object> SelectedContentProperty =
-            TabControl.SelectedContentProperty.AddOwner<TabbedLayout>();
+        return element.GetValue (CanCloseProperty);
+    }
 
-        /// <summary>
-        /// Gets or sets the content template for the selected tab.
-        /// </summary>
-        /// <value>
-        /// The content template of the selected tab.
-        /// </value>
-        public new IDataTemplate SelectedContentTemplate
+    /// <summary>
+    /// set CanClose
+    /// </summary>
+    /// <param name="element"></param>
+    /// <param name="value"></param>
+    public static void SetCanClose (IControl element, bool value)
+    {
+        if (element == null)
         {
-            get { return (IDataTemplate)GetValue(SelectedContentTemplateProperty); }
-            set { SetValue(SelectedContentTemplateProperty, value); }
+            throw new ArgumentNullException ("obj");
         }
 
-        /// <summary>
-        /// <see cref="SelectedContentTemplate"/>
-        /// </summary>
-        public new static readonly StyledProperty<IDataTemplate> SelectedContentTemplateProperty =
-            TabControl.SelectedContentTemplateProperty.AddOwner<TabbedLayout>();
+        element.SetValue (CanCloseProperty, value);
+    }
 
-        /// <summary>
-        /// Initializes the <see cref="TabbedLayout"/> class.
-        /// </summary>
-        static TabbedLayout()
-        {
-        }
-
-
-        /// <summary>
-        /// property grid command
-        /// </summary>
-        public ICommand ClosePropertyTabCommand
-        {
-            get { return (ICommand)GetValue(ClosePropertyTabCommandProperty); }
-            internal set { SetValue(ClosePropertyTabCommandProperty, value); }
-        }
-
-        /// <summary>
-        /// <see cref="ClosePropertyTabCommand"/>
-        /// </summary>
-        public static readonly StyledProperty<ICommand> ClosePropertyTabCommandProperty =
-            AvaloniaProperty.Register<TabbedLayout, ICommand>(nameof(ClosePropertyTabCommand));
-
-        /// <summary>
-        /// property grid command
-        /// </summary>
-        public ICommand ShowExtendedEditorCommand
-        {
-            get { return (ICommand)GetValue(ShowExtendedEditorCommandProperty); }
-            set { SetValue(ShowExtendedEditorCommandProperty, value); }
-        }
-
-        /// <summary>
-        /// <see cref="ShowExtendedEditorCommand"/>
-        /// </summary>
-        public static readonly StyledProperty<ICommand> ShowExtendedEditorCommandProperty =
-            AvaloniaProperty.Register<TabbedLayout, ICommand>(nameof(ShowExtendedEditorCommand));
-
-        /// <summary>
-        /// Gets or sets the item header property.
-        /// </summary>
-        /// <value>The item header property.</value>
-        public string ItemHeaderProperty { get; set; }
-
-        /// <summary>
-        /// CanClose AttachedProperty
-        /// </summary>
-        public static readonly AttachedProperty<bool> CanCloseProperty =
-            AvaloniaProperty.RegisterAttached<TabbedLayout, IControl, bool>("CanClose");
-
-        /// <summary>
-        /// get CanClose
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        public static bool GetCanClose(IControl element)
-        {
-            if (element == null)
-                throw new ArgumentNullException("obj");
-            return element.GetValue(CanCloseProperty);
-        }
-
-        /// <summary>
-        /// set CanClose
-        /// </summary>
-        /// <param name="element"></param>
-        /// <param name="value"></param>
-        public static void SetCanClose(IControl element, bool value)
-        {
-            if (element == null)
-                throw new ArgumentNullException("obj");
-
-            element.SetValue(CanCloseProperty, value);
-        }
-
-        /// <summary>
-        /// Header AttachedProperty
-        /// </summary>
-        public static readonly AttachedProperty<string> HeaderProperty =
-            AvaloniaProperty.RegisterAttached<TabbedLayout, IControl, string>
+    /// <summary>
+    /// Header AttachedProperty
+    /// </summary>
+    public static readonly AttachedProperty<string> HeaderProperty =
+        AvaloniaProperty.RegisterAttached<TabbedLayout, IControl, string>
             ("Header", defaultValue: "Unknown");
 
-        /// <summary>
-        /// get Header
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        public static string GetHeader(IControl element)
+    /// <summary>
+    /// get Header
+    /// </summary>
+    /// <param name="element"></param>
+    /// <returns></returns>
+    public static string GetHeader (IControl element)
+    {
+        if (element == null)
         {
-            if (element == null)
-                throw new ArgumentNullException("obj");
-            return element.GetValue(HeaderProperty);
+            throw new ArgumentNullException ("obj");
         }
 
-        /// <summary>
-        /// set Header
-        /// </summary>
-        /// <param name="element"></param>
-        /// <param name="value"></param>
-        public static void SetHeader(Control element, string value)
+        return element.GetValue (HeaderProperty);
+    }
+
+    /// <summary>
+    /// set Header
+    /// </summary>
+    /// <param name="element"></param>
+    /// <param name="value"></param>
+    public static void SetHeader (Control element, string value)
+    {
+        if (element == null)
         {
-            if (element == null)
-                throw new ArgumentNullException("obj");
-            if (string.IsNullOrEmpty(value))
-                value = DefaultHeader;
-            element.SetValue(HeaderProperty, value);
+            throw new ArgumentNullException ("obj");
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TabbedLayout"/> class.
-        /// </summary>
-        public TabbedLayout()
+        if (string.IsNullOrEmpty (value))
         {
-            //somehow not refreshed in command
-            var canExecuteClosePropertyTab = this.WhenAny(x => x, (control) => CanCloseExecute());
+            value = DefaultHeader;
+        }
 
-            ClosePropertyTabCommand = ReactiveCommand.Create(
-               () => OnClosePropertyTabCommand()
-               , outputScheduler: RxApp.MainThreadScheduler);
+        element.SetValue (HeaderProperty, value);
+    }
 
-            ShowExtendedEditorCommand = ReactiveCommand.Create<object>(x => OnShowExtendedEditor(x)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TabbedLayout"/> class.
+    /// </summary>
+    public TabbedLayout()
+    {
+        //somehow not refreshed in command
+        var canExecuteClosePropertyTab = this.WhenAny (x => x, (control) => CanCloseExecute());
+
+        ClosePropertyTabCommand = ReactiveCommand.Create (
+            () => OnClosePropertyTabCommand()
             , outputScheduler: RxApp.MainThreadScheduler);
 
-            SelectedContentProperty.Changed.AddClassHandler<TabbedLayout>((o, e) => OnSelectedContentChanged(o, e));
+        ShowExtendedEditorCommand = ReactiveCommand.Create<object> (x => OnShowExtendedEditor (x)
+            , outputScheduler: RxApp.MainThreadScheduler);
 
-            this.ItemContainerGenerator.Materialized += ItemContainerGenerator_Materialized;
+        SelectedContentProperty.Changed.AddClassHandler<TabbedLayout> ((o, e) => OnSelectedContentChanged (o, e));
+
+        this.ItemContainerGenerator.Materialized += ItemContainerGenerator_Materialized;
+    }
+
+    internal bool CanCloseExecute()
+    {
+        var layoutItem = SelectedItem as TabbedLayoutItem;
+        if (layoutItem != null)
+        {
+            return layoutItem.CanClose;
+        }
+        else
+        {
+            var obj = SelectedItem as Control;
+            if (obj != null)
+            {
+                return GetCanClose (obj);
+            }
+
+            return true;
+        }
+    }
+
+    private void OnSelectedContentChanged
+        (
+            TabbedLayout? sender,
+            AvaloniaPropertyChangedEventArgs eventArgs
+        )
+    {
+        var oldTabItem = GetTabbedLayoutItem (eventArgs.OldValue);
+        if (oldTabItem != null)
+        {
+            oldTabItem.IsSelected = false;
         }
 
-        internal bool CanCloseExecute()
+        if (eventArgs.NewValue == null)
         {
-            var layoutItem = SelectedItem as TabbedLayoutItem;
-            if (layoutItem != null)
+            return;
+        }
+
+        var tabItem = GetTabbedLayoutItem (eventArgs.NewValue);
+
+        if (tabItem != null)
+        {
+            if (tabItem.ClosePropertyTabCommand == null)
             {
-                return layoutItem.CanClose;
+                tabItem.ClosePropertyTabCommand = ClosePropertyTabCommand;
+            }
+
+            tabItem.IsSelected = true;
+        }
+    }
+
+    private TabbedLayoutItem? GetTabbedLayoutItem
+        (
+            object item
+        )
+    {
+        var tabItem = item as TabbedLayoutItem ?? (item as IControl)?.Parent as TabbedLayoutItem;
+
+        return tabItem;
+    }
+
+    private void ItemContainerGenerator_Materialized
+        (
+            object sender,
+            ItemContainerEventArgs eventArgs
+        )
+    {
+        var tab = eventArgs.Containers.FirstOrDefault().Item as TabbedLayoutItem;
+
+        if (tab != null)
+        {
+            if (tab.ClosePropertyTabCommand == null)
+            {
+                tab.ClosePropertyTabCommand = ClosePropertyTabCommand;
+                tab.CanClose = true;
+            }
+
+            var item = tab.Content;
+
+            //TODO: Assign PG as DataContext here?
+            //tab.DataContext = item;
+
+            var layout = item as IControl;
+            if (!string.IsNullOrEmpty (ItemHeaderProperty))
+            {
+                var bHeader = new Binding (ItemHeaderProperty)
+                {
+                    Source = item,
+                    Mode = BindingMode.OneWay,
+                };
+
+                tab.Bind (HeaderedContentControl.HeaderProperty, bHeader);
             }
             else
             {
-                var obj = SelectedItem as Control;
-                if (obj != null)
+                if (layout != null)
                 {
-                    return GetCanClose(obj);
+                    //tab.Header = GetHeader(layout);
+                    //tab.CanClose = GetCanClose(layout);
                 }
-                return true;
             }
+
+            if (item is GridEntry)
+            {
+                //var binding = new Binding("IsVisible")
+                //{
+                //    Source = item,
+                //    Mode = BindingMode.OneWay,
+                //};
+                //tab.Bind(Visual.IsVisibleProperty, binding);
+            }
+
+            tab.PropertyChanged -= TabItem_PropertyChanged;
+            tab.PropertyChanged += TabItem_PropertyChanged;
+        }
+    }
+
+    private void TabItem_PropertyChanged
+        (
+            object? sender,
+            AvaloniaPropertyChangedEventArgs eventArgs
+        )
+    {
+        if (eventArgs.Property.Name == nameof (TabItem.IsSelected))
+        {
+            //var propChanged = new AvaloniaPropertyChangedEventArgs
+            //    (sender as AvaloniaObject
+            //    , e.Property
+            //    , e.OldValue
+            //    , e.NewValue
+            //    , e.Priority);
+
+            //OnTabVisibilityChanged(sender, propChanged);
+        }
+    }
+
+    private void OnTabVisibilityChanged (object sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        var tabItem = sender as TabbedLayoutItem;
+        if (tabItem == null || tabItem.DataContext == null)
+        {
+            return;
         }
 
-        private void OnSelectedContentChanged(TabbedLayout o, AvaloniaPropertyChangedEventArgs e)
-        {
-            TabbedLayoutItem oldTabItem = GetTabbedLayoutItem(e.OldValue);
-            if (oldTabItem != null)
-            {
-                oldTabItem.IsSelected = false;
-            }
+        var isVisible = (bool)e.NewValue;
 
-            if (e.NewValue == null)
+        if (isVisible && GetVisibleEntryCount() == 1)
+        {
+            var visibleEntry = GetFirstVisibleEntry();
+            if (SelectedItem != visibleEntry)
+            {
+                SelectedItem = visibleEntry;
+            }
+        }
+        else if (tabItem.IsSelected)
+        {
+            if (GetVisibleEntryCount() == 0)
+            {
+                SelectedItem = null;
                 return;
+            }
 
-            TabbedLayoutItem tabItem = GetTabbedLayoutItem(e.NewValue);
-
-            if (tabItem != null)
+            if (Items.OfType<object>().ToList().IndexOf (tabItem.DataContext) > 0)
             {
-                if (tabItem.ClosePropertyTabCommand == null)
-                {
-                    tabItem.ClosePropertyTabCommand = ClosePropertyTabCommand;
-                }
-
-                tabItem.IsSelected = true;
+                SelectedIndex--;
+            }
+            else if (Items.OfType<object>().Count() > 1)
+            {
+                SelectedIndex++;
             }
         }
+    }
 
-        private TabbedLayoutItem GetTabbedLayoutItem(object item)
+    private void OnClosePropertyTabCommand()
+    {
+        var item = SelectedItem as TabbedLayoutItem;
+
+        if (item != null && item.CanClose && Items.OfType<TabbedLayoutItem>().Count (x => x.IsVisible) > 1)
         {
-            TabbedLayoutItem tabItem = item as TabbedLayoutItem;
-
-            if (tabItem == null)
+            if (item is ExtendedPropertyEditorTab)
             {
-                tabItem = (item as IControl)?.Parent as TabbedLayoutItem;
-            }
-            return tabItem;
-        }
-
-        private void ItemContainerGenerator_Materialized(object sender, ItemContainerEventArgs e)
-        {
-            var tab = e.Containers.FirstOrDefault().Item as TabbedLayoutItem;
-
-            if (tab != null)
-            {
-                if (tab.ClosePropertyTabCommand == null)
-                {
-                    tab.ClosePropertyTabCommand = ClosePropertyTabCommand;
-                    tab.CanClose = true;
-                }
-
-                var item = tab.Content;
-
-                //TODO: Assign PG as DataContext here?
-                //tab.DataContext = item;
-
-                var layout = item as IControl;
-                if (!string.IsNullOrEmpty(ItemHeaderProperty))
-                {
-                    var bHeader = new Binding(ItemHeaderProperty)
-                    {
-                        Source = item,
-                        Mode = BindingMode.OneWay,
-                    };
-
-                    tab.Bind(HeaderedContentControl.HeaderProperty, bHeader);
-                }
-                else
-                {
-                    if (layout != null)
-                    {
-                        //tab.Header = GetHeader(layout);
-                        //tab.CanClose = GetCanClose(layout);
-                    }
-                }
-
-                if (item is GridEntry)
-                {
-                    //var binding = new Binding("IsVisible")
-                    //{
-                    //    Source = item,
-                    //    Mode = BindingMode.OneWay,
-                    //};
-                    //tab.Bind(Visual.IsVisibleProperty, binding);
-                }
-
-                tab.PropertyChanged -= TabItem_PropertyChanged;
-                tab.PropertyChanged += TabItem_PropertyChanged;
-            }
-        }
-
-        private void TabItem_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
-        {
-            if (e.Property.Name == nameof(TabItem.IsSelected))
-            {
-                //var propChanged = new AvaloniaPropertyChangedEventArgs
-                //    (sender as AvaloniaObject
-                //    , e.Property
-                //    , e.OldValue
-                //    , e.NewValue
-                //    , e.Priority);
-
-                //OnTabVisibilityChanged(sender, propChanged);
-            }
-        }
-
-        private void OnTabVisibilityChanged(object sender, AvaloniaPropertyChangedEventArgs e)
-        {
-            var tabItem = sender as TabbedLayoutItem;
-            if (tabItem == null || tabItem.DataContext == null)
-                return;
-
-            bool isVisible = (bool)e.NewValue;
-
-            if (isVisible && GetVisibleEntryCount() == 1)
-            {
-                var visibleEntry = GetFirstVisibleEntry();
-                if (SelectedItem != visibleEntry)
-                    SelectedItem = visibleEntry;
-            }
-            else if (tabItem.IsSelected)
-            {
-                if (GetVisibleEntryCount() == 0)
-                {
-                    SelectedItem = null;
-                    return;
-                }
-
-                if (Items.OfType<object>().ToList().IndexOf(tabItem.DataContext) > 0)
-                    SelectedIndex--;
-                else if (Items.OfType<object>().Count() > 1)
-                    SelectedIndex++;
-            }
-        }
-
-        private void OnClosePropertyTabCommand()
-        {
-            var item = SelectedItem as TabbedLayoutItem;
-
-            if (item != null && item.CanClose && Items.OfType<TabbedLayoutItem>().Count(x=> x.IsVisible) > 1)
-            {
-                if (item is ExtendedPropertyEditorTab)
-                {
-                    //only set is visible to false
-                    //otherwise the editor controls have ui problems (?)
-                    item.IsVisible = false;
-                }
-                else
-                {
-                    var items = Items.OfType<object>().ToList();
-                    items.Remove(item);
-                    Items = items;
-                }
-                SelectedItem = Items.OfType<object>().FirstOrDefault(x=> (x as IControl)?.IsVisible==true);
-            }
-        }
-
-        // TODO: Optimize implementation
-        // TODO: move logic to public api
-        // It should be possible creating/opening extended tabs from code
-        private void OnShowExtendedEditor(object sender /*object sender, ExecutedRoutedEventArgs e*/)
-        {
-            var value = sender as PropertyItemValue;
-            if (value == null)
-                return;
-            var property = value.ParentProperty;
-            if (property == null)
-                return;
-
-            // Try getting already opened extended tab
-            var extendedTab = FindExtendedEditorTab(property);
-            if (extendedTab != null)
-            {
-                // Activate alreay opened tab
-                extendedTab.IsVisible = true;
-                SelectedItem = extendedTab;
+                //only set is visible to false
+                //otherwise the editor controls have ui problems (?)
+                item.IsVisible = false;
             }
             else
             {
-                // TODO: Access the PropertyGrid to get TypeEditor or PropertyEditor ExtendedTemplate here!
-
-                // Check whether property value editor is actually an extended one
-                if (property.Editor.ExtendedTemplate == null)
-                    return;
-
-                // create new extended tab, add to the tabs collection and activate it
-                extendedTab = new ExtendedPropertyEditorTab(property);
-
                 var items = Items.OfType<object>().ToList();
-                // Try inserting extended tab after currently selected one
-                if (SelectedItem != null)
-                {
-                    int index = items.IndexOf(SelectedItem) + 1;
-                    items.Insert(index, extendedTab);
-                }
-                else
-                {
-                    items.Add(extendedTab);
-                }
-
+                items.Remove (item);
                 Items = items;
-
-                // Activate extended tab
-                SelectedItem = extendedTab;
             }
+
+            SelectedItem = Items.OfType<object>().FirstOrDefault (x => (x as IControl)?.IsVisible == true);
+        }
+    }
+
+    // TODO: Optimize implementation
+    // TODO: move logic to public api
+    // It should be possible creating/opening extended tabs from code
+    private void OnShowExtendedEditor (object sender /*object sender, ExecutedRoutedEventArgs e*/)
+    {
+        var value = sender as PropertyItemValue;
+        if (value == null)
+        {
+            return;
         }
 
-        /// <summary>
-        /// Finds the extended editor tab.
-        /// </summary>
-        /// <param name="property">The property.</param>
-        /// <returns>Tab associated with property.</returns>
-        public TabbedLayoutItem FindExtendedEditorTab(PropertyItem property)
+        var property = value.ParentProperty;
+        if (property == null)
         {
-            return Items
-              .OfType<ExtendedPropertyEditorTab>()
-              .FirstOrDefault(tab => tab.Property == property);
+            return;
         }
 
-        /// <summary>
-        /// uses TabItemContainerGenerator as generator
-        /// </summary>
-        /// <returns></returns>
-        protected override IItemContainerGenerator CreateItemContainerGenerator()
+        // Try getting already opened extended tab
+        var extendedTab = FindExtendedEditorTab (property);
+        if (extendedTab != null)
         {
-            return new TabItemContainerGenerator(this);
+            // Activate alreay opened tab
+            extendedTab.IsVisible = true;
+            SelectedItem = extendedTab;
         }
-
-        /// <summary>
-        /// updates selected content
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnContainersMaterialized(ItemContainerEventArgs e)
+        else
         {
-            if (SelectedContent != null || SelectedIndex == -1)
+            // TODO: Access the PropertyGrid to get TypeEditor or PropertyEditor ExtendedTemplate here!
+
+            // Check whether property value editor is actually an extended one
+            if (property.Editor.ExtendedTemplate == null)
             {
                 return;
             }
 
-            var container = ItemContainerGenerator.ContainerFromIndex(SelectedIndex) as TabItem;
+            // create new extended tab, add to the tabs collection and activate it
+            extendedTab = new ExtendedPropertyEditorTab (property);
 
-            if (container == null)
+            var items = Items.OfType<object>().ToList();
+
+            // Try inserting extended tab after currently selected one
+            if (SelectedItem != null)
             {
-                return;
+                var index = items.IndexOf (SelectedItem) + 1;
+                items.Insert (index, extendedTab);
+            }
+            else
+            {
+                items.Add (extendedTab);
             }
 
-            UpdateSelectedContent(container);
-        }
+            Items = items;
 
-        private void UpdateSelectedContent(IContentControl item)
+            // Activate extended tab
+            SelectedItem = extendedTab;
+        }
+    }
+
+    /// <summary>
+    /// Finds the extended editor tab.
+    /// </summary>
+    /// <param name="property">The property.</param>
+    /// <returns>Tab associated with property.</returns>
+    public TabbedLayoutItem FindExtendedEditorTab (PropertyItem property)
+    {
+        return Items
+            .OfType<ExtendedPropertyEditorTab>()
+            .FirstOrDefault (tab => tab.Property == property);
+    }
+
+    /// <inheritdoc cref="TabControl.CreateItemContainerGenerator"/>
+    protected override IItemContainerGenerator CreateItemContainerGenerator()
+    {
+        return new TabItemContainerGenerator (this);
+    }
+
+    /// <inheritdoc cref="TabControl.OnContainersMaterialized"/>
+    protected override void OnContainersMaterialized (ItemContainerEventArgs e)
+    {
+        if (SelectedContent != null || SelectedIndex == -1)
         {
-            if (SelectedContentTemplate != item.ContentTemplate)
-            {
-                SelectedContentTemplate = item.ContentTemplate;
-            }
-
-            if (SelectedContent != item.Content)
-            {
-                SelectedContent = item.Content;
-            }
+            return;
         }
 
-        internal GridEntry GetFirstVisibleEntry()
+        var container = ItemContainerGenerator.ContainerFromIndex (SelectedIndex) as TabItem;
+
+        if (container == null)
         {
-            return Items.OfType<GridEntry>().FirstOrDefault(item => item.IsVisible);
+            return;
         }
 
-        internal int GetVisibleEntryCount()
+        UpdateSelectedContent (container);
+    }
+
+    private void UpdateSelectedContent (IContentControl item)
+    {
+        if (SelectedContentTemplate != item.ContentTemplate)
         {
-            return Items.OfType<GridEntry>().Count(item => item.IsVisible);
+            SelectedContentTemplate = item.ContentTemplate;
         }
+
+        if (SelectedContent != item.Content)
+        {
+            SelectedContent = item.Content;
+        }
+    }
+
+    internal GridEntry? GetFirstVisibleEntry()
+    {
+        return Items.OfType<GridEntry>().FirstOrDefault (item => item.IsVisible);
+    }
+
+    internal int GetVisibleEntryCount()
+    {
+        return Items.OfType<GridEntry>().Count (item => item.IsVisible);
     }
 }
