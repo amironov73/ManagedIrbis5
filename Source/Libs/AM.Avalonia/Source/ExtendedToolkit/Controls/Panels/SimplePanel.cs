@@ -1,51 +1,70 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
+
 using Avalonia.Controls;
+using Avalonia.Layout;
 
-namespace Avalonia.ExtendedToolkit.Controls
+#endregion
+
+#nullable enable
+
+namespace Avalonia.ExtendedToolkit.Controls;
+
+//ported from https://github.com/HandyOrg/HandyControl.git
+
+/// <summary>
+/// panel which size is changed by its children
+/// </summary>
+public class SimplePanel
+    : Panel
 {
-    //ported from https://github.com/HandyOrg/HandyControl.git
-
-    /// <summary>
-    /// panel which size is changed by its children
-    /// </summary>
-    public class SimplePanel : Panel
+    /// <inheritdoc cref="Layoutable.MeasureOverride"/>
+    protected override Size MeasureOverride
+        (
+            Size availableSize
+        )
     {
-        /// <summary>
-        /// calculates the size by its children
-        /// </summary>
-        /// <param name="availableSize"></param>
-        /// <returns></returns>
-        protected override Size MeasureOverride(Size availableSize)
+        var maxSize = new Size();
+
+        foreach (Control child in Children)
         {
-            var maxSize = new Size();
-
-            foreach (Control child in Children)
+            if (child != null)
             {
-                if (child != null)
-                {
-                    child.Measure(availableSize);
-                    double width = Math.Max(maxSize.Width, child.DesiredSize.Width);
-                    double height = Math.Max(maxSize.Height, child.DesiredSize.Height);
-                    maxSize = new Size(width, height);
-                }
+                child.Measure(availableSize);
+                var width = Math.Max(maxSize.Width, child.DesiredSize.Width);
+                var height = Math.Max(maxSize.Height, child.DesiredSize.Height);
+                maxSize = new Size(width, height);
             }
-
-            return maxSize;
         }
 
-        /// <summary>
-        /// arranges the children
-        /// </summary>
-        /// <param name="arrangeSize"></param>
-        /// <returns></returns>
-        protected override Size ArrangeOverride(Size arrangeSize)
-        {
-            foreach (Control child in Children)
-            {
-                child?.Arrange(new Rect(arrangeSize));
-            }
+        return maxSize;
+    }
 
-            return arrangeSize;
+    /// <inheritdoc cref="Layoutable.ArrangeOverride"/>
+    protected override Size ArrangeOverride
+        (
+            Size arrangeSize
+        )
+    {
+        foreach (Control child in Children)
+        {
+            child?.Arrange(new Rect(arrangeSize));
         }
+
+        return arrangeSize;
     }
 }

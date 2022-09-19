@@ -249,7 +249,7 @@ namespace Avalonia.ExtendedToolkit.Controls
         /// <summary>
         /// updates the items
         /// </summary>
-        protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+        protected override void OnApplyTemplate(TemplateAppliedEventArgs eventArgs)
         {
             if (!_isLoaded)
             {
@@ -260,7 +260,7 @@ namespace Avalonia.ExtendedToolkit.Controls
 
             
 
-            base.OnApplyTemplate(e);
+            base.OnApplyTemplate(eventArgs);
         }
 
         /// <summary>
