@@ -1,47 +1,73 @@
-﻿using System;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
 using System.ComponentModel;
 
-namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid.Converters
+#endregion
+
+#nullable enable
+
+namespace Avalonia.ExtendedToolkit.Controls.PropertyGrid.Converters;
+
+//
+// ported from https://github.com/DenisVuyka/WPG
+//
+
+// TODO update if avalonia has a front stretch type
+
+/// <summary>
+/// FontStretchConverter is missing
+/// Extended  that provides standard values collection.
+/// </summary>
+public sealed class FontStretchConverterDecorator
+    : FontConverterDecorator
 {
-    //
-    // ported from https://github.com/DenisVuyka/WPG
-    //
-#warning Todo update if avalonia has a front stretch type
+    #region Construction
 
     /// <summary>
-    /// FontStretchConverter is missing
-    /// Extended  that provides standard values collection.
+    /// Initializes a new instance of the <see cref="FontStretchConverterDecorator"/> class.
     /// </summary>
-    public sealed class FontStretchConverterDecorator : FontConverterDecorator
+    public FontStretchConverterDecorator()
+        : base (null /*new FontStretchConverter()*/)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FontStretchConverterDecorator"/> class.
-        /// </summary>
-        public FontStretchConverterDecorator() : base(null/*new FontStretchConverter()*/) { }
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Returns a collection of standard values for the data type this type converter is designed for when provided with a format context.
-        /// </summary>
-        /// <param name="context">An <see cref="ITypeDescriptorContext"/> that provides a format context that can be used to extract additional information about the environment from which this converter is invoked. This parameter or properties of this parameter can be null.</param>
-        /// <returns>
-        /// A <see cref="TypeConverter.StandardValuesCollection"/> that holds a standard set of valid values, or null if the data type does not support a standard set of values.
-        /// </returns>
-        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
-        {
-            throw new NotImplementedException();
-          //  return new StandardValuesCollection(
-          //    new[]
-          //    {
-          //FontStretches.Condensed,
-          //FontStretches.Expanded,
-          //FontStretches.ExtraCondensed,
-          //FontStretches.ExtraExpanded,
-          //FontStretches.Normal,
-          //FontStretches.SemiCondensed,
-          //FontStretches.SemiExpanded,
-          //FontStretches.UltraCondensed,
-          //FontStretches.UltraExpanded
-          //    });
-        }
+    #endregion
+
+    /// <inheritdoc cref="TypeConverter.GetStandardValues(System.ComponentModel.ITypeDescriptorContext?)"/>
+    public override StandardValuesCollection GetStandardValues
+        (
+            ITypeDescriptorContext? context
+        )
+    {
+        throw new NotImplementedException();
+
+        //  return new StandardValuesCollection(
+        //    new[]
+        //    {
+        //FontStretches.Condensed,
+        //FontStretches.Expanded,
+        //FontStretches.ExtraCondensed,
+        //FontStretches.ExtraExpanded,
+        //FontStretches.Normal,
+        //FontStretches.SemiCondensed,
+        //FontStretches.SemiExpanded,
+        //FontStretches.UltraCondensed,
+        //FontStretches.UltraExpanded
+        //    });
     }
 }
