@@ -80,11 +80,11 @@ public partial class HtmlDocument
     private Crc32 _crc32;
     private HtmlAttribute _currentattribute;
     private HtmlNode _currentnode;
-    private Encoding _declaredencoding;
+    private Encoding? _declaredencoding;
     private HtmlNode _documentnode;
     private bool _fullcomment;
     private int _index;
-    internal Dictionary<string, HtmlNode> Lastnodes = new Dictionary<string, HtmlNode>();
+    internal Dictionary<string, HtmlNode> Lastnodes = new ();
     private HtmlNode _lastparentnode;
     private int _line;
     private int _lineposition, _maxlineposition;
@@ -92,7 +92,7 @@ public partial class HtmlDocument
     private ParseState _oldstate;
     private bool _onlyDetectEncoding;
     internal Dictionary<int, HtmlNode>? Openednodes;
-    private List<HtmlParseError> _parseerrors = new List<HtmlParseError>();
+    private List<HtmlParseError> _parseerrors = new ();
     private string _remainder;
     private int _remainderOffset;
     private ParseState _state;
@@ -239,7 +239,7 @@ public partial class HtmlDocument
 
     internal static readonly string HtmlExceptionClassExists = "Class name already exists";
 
-    internal static readonly Dictionary<string, string[]> HtmlResetters = new Dictionary<string, string[]>()
+    internal static readonly Dictionary<string, string[]> HtmlResetters = new ()
     {
         { "li", new[] { "ul", "ol" } },
         { "tr", new[] { "table" } },
@@ -1179,7 +1179,11 @@ public partial class HtmlDocument
         }
     }
 
-    private HtmlNode FindResetterNode (HtmlNode node, string name)
+    private HtmlNode? FindResetterNode
+        (
+            HtmlNode node,
+            string name
+        )
     {
         var resetter = Utilities.GetDictionaryValueOrDefault (Lastnodes, name);
         if (resetter == null)
@@ -1200,7 +1204,11 @@ public partial class HtmlDocument
         return resetter;
     }
 
-    private bool FindResetterNodes (HtmlNode node, string[] names)
+    private bool FindResetterNodes
+        (
+            HtmlNode node,
+            string[]? names
+        )
     {
         if (names == null)
         {
@@ -1218,7 +1226,11 @@ public partial class HtmlDocument
         return false;
     }
 
-    private void FixNestedTag (string name, string[] resetters)
+    private void FixNestedTag
+        (
+            string name,
+            string[]? resetters
+        )
     {
         if (resetters == null)
         {
@@ -1904,7 +1916,7 @@ public partial class HtmlDocument
 
     // In this moment, we don't have value.
     // Potential: "\"", "'", "[", "]", "<", ">", "-", "|", "/", "\\"
-    private static List<string> BlockAttributes = new List<string>() { "\"", "'" };
+    private static List<string> BlockAttributes = new () { "\"", "'" };
 
     private void PushAttributeNameEnd (int index)
     {

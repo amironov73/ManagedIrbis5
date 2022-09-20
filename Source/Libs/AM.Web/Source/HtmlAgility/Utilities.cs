@@ -26,7 +26,7 @@ namespace HtmlAgilityPack;
 
 internal static class Utilities
 {
-    public static TValue GetDictionaryValueOrDefault<TKey, TValue>
+    public static TValue? GetDictionaryValueOrDefault<TKey, TValue>
         (
             Dictionary<TKey, TValue> dict, TKey key,
             TValue? defaultValue = default

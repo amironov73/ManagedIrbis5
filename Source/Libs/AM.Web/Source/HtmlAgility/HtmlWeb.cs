@@ -1,34 +1,30 @@
-// Description: Html Agility Pack - HTML Parsers, selectors, traversors, manupulators.
-// Website & Documentation: http://html-agility-pack.net
-// Forum & Issues: https://github.com/zzzprojects/html-agility-pack
-// License: https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE
-// More projects: http://www.zzzprojects.com/
-// Copyright © ZZZ Projects Inc. 2014 - 2017. All rights reserved.
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#if !METRO
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedMember.Global
 
-#region
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Security;
-#if !NETSTANDARD
-using System.Security.Permissions;
-#else
 using System.Linq;
-#endif
 using System.Text;
 using System.Xml;
 using Microsoft.Win32;
-#if FX45 || NETSTANDARD
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Concurrent;
-#endif
-#if FX40 || FX45
 using System.Collections;
 using System.Diagnostics;
 using System.Linq;
@@ -36,7 +32,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Reflection;
 
-#endif
+using AM;
 
 #endregion
 
@@ -1070,7 +1066,7 @@ namespace HtmlAgilityPack
         /// <param name="method">The HTTP method used to open the connection, such as GET, POST, PUT, or PROPFIND.</param>
         public void Get(string url, string path, string method)
         {
-            Uri uri = new Uri(url);
+            var uri = new Uri(url);
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
             if ((uri.Scheme == Uri.UriSchemeHttps) ||
                 (uri.Scheme == Uri.UriSchemeHttp))
@@ -1099,7 +1095,7 @@ namespace HtmlAgilityPack
         /// <param name="proxy"></param>
         public void Get(string url, string path, WebProxy proxy, NetworkCredential credentials, string method)
         {
-            Uri uri = new Uri(url);
+            var uri = new Uri(url);
             if ((uri.Scheme == Uri.UriSchemeHttps) ||
                 (uri.Scheme == Uri.UriSchemeHttp))
             {
@@ -1167,11 +1163,11 @@ namespace HtmlAgilityPack
             else
             {
 
-	            string absolutePathWithoutBadChar = uri.AbsolutePath;
+	            var absolutePathWithoutBadChar = uri.AbsolutePath;
 
-	            string invalid = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+	            var invalid = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
 
-	            foreach (char c in invalid)
+	            foreach (var c in invalid)
 	            {
 		            absolutePathWithoutBadChar = absolutePathWithoutBadChar.Replace(c.ToString(), "");
 	            }
@@ -1222,7 +1218,7 @@ namespace HtmlAgilityPack
         public HtmlDocument Load(string url, string proxyHost, int proxyPort, string userId, string password)
         {
             //Create my proxy
-            WebProxy myProxy = new WebProxy(proxyHost, proxyPort);
+            var myProxy = new WebProxy(proxyHost, proxyPort);
             myProxy.BypassProxyOnLocal = true;
 
             //Create my credentials
@@ -1230,7 +1226,7 @@ namespace HtmlAgilityPack
             if ((userId != null) && (password != null))
             {
                 myCreds = new NetworkCredential(userId, password);
-                CredentialCache credCache = new CredentialCache();
+                var credCache = new CredentialCache();
                 //Add the creds
                 credCache.Add(myProxy.Address, "Basic", myCreds);
                 credCache.Add(myProxy.Address, "Digest", myCreds);
@@ -1253,7 +1249,7 @@ namespace HtmlAgilityPack
         public HtmlDocument Load(Uri uri, string proxyHost, int proxyPort, string userId, string password)
         {
             //Create my proxy
-            WebProxy myProxy = new WebProxy(proxyHost, proxyPort);
+            var myProxy = new WebProxy(proxyHost, proxyPort);
             myProxy.BypassProxyOnLocal = true;
 
             //Create my credentials
@@ -1261,7 +1257,7 @@ namespace HtmlAgilityPack
             if ((userId != null) && (password != null))
             {
                 myCreds = new NetworkCredential(userId, password);
-                CredentialCache credCache = new CredentialCache();
+                var credCache = new CredentialCache();
                 //Add the creds
                 credCache.Add(myProxy.Address, "Basic", myCreds);
                 credCache.Add(myProxy.Address, "Digest", myCreds);
@@ -1279,7 +1275,7 @@ namespace HtmlAgilityPack
         /// <returns>A new HTML document.</returns>
         public HtmlDocument Load(string url, string method)
         {
-            Uri uri = new Uri(url);
+            var uri = new Uri(url);
 
             return Load(uri, method);
         }
@@ -1351,7 +1347,7 @@ namespace HtmlAgilityPack
         /// <returns>A new HTML document.</returns>
         public HtmlDocument Load(string url, string method, WebProxy proxy, NetworkCredential credentials)
         {
-            Uri uri = new Uri(url);
+            var uri = new Uri(url);
 
             return Load(uri, method, proxy, credentials);
         }
@@ -1478,7 +1474,7 @@ namespace HtmlAgilityPack
         /// <param name="writer">The XmlTextWriter to which you want to save to.</param>
         public void LoadHtmlAsXml(string htmlUrl, XmlTextWriter writer)
         {
-            HtmlDocument doc = Load(htmlUrl);
+            var doc = Load(htmlUrl);
             doc.Save(writer);
         }
 #endif
@@ -1503,12 +1499,12 @@ namespace HtmlAgilityPack
         {
             if (File.Exists(target))
             {
-                FileAttributes atts = File.GetAttributes(target);
+                var atts = File.GetAttributes(target);
                 File.SetAttributes(target, atts & ~FileAttributes.ReadOnly);
             }
             else
             {
-                string dir = Path.GetDirectoryName(target);
+                var dir = Path.GetDirectoryName(target);
                 if (!Directory.Exists(dir))
                 {
                     Directory.CreateDirectory(dir);
@@ -1536,11 +1532,11 @@ namespace HtmlAgilityPack
 
             long len = 0;
 
-            using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+            using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
             {
-                using (BinaryReader br = new BinaryReader(stream))
+                using (var br = new BinaryReader(stream))
                 {
-                    using (BinaryWriter bw = new BinaryWriter(fs))
+                    using (var bw = new BinaryWriter(fs))
                     {
                         byte[] buffer;
                         do
@@ -1563,14 +1559,20 @@ namespace HtmlAgilityPack
         }
 
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
-        private HttpStatusCode Get(Uri uri, string method, string path, HtmlDocument doc, IWebProxy proxy,
-            ICredentials creds)
+        private HttpStatusCode Get
+            (
+                Uri uri,
+                string method,
+                string? path,
+                HtmlDocument doc,
+                IWebProxy? proxy,
+                ICredentials creds
+            )
         {
-            string cachePath = null;
-            HttpWebRequest req;
-            bool oldFile = false;
+            string? cachePath = null;
+            var oldFile = false;
 
-            req = WebRequest.Create(uri) as HttpWebRequest;
+            var req = (WebRequest.Create(uri) as HttpWebRequest).ThrowIfNull();
             req.Method = method;
             req.UserAgent = UserAgent;
             req.AutomaticDecompression = AutomaticDecompression;
@@ -1598,7 +1600,7 @@ namespace HtmlAgilityPack
 
             _fromCache = false;
             _requestDuration = 0;
-            int tc = Environment.TickCount;
+            var tc = Environment.TickCount;
 
             if (UsingCache)
             {
@@ -1609,7 +1611,7 @@ namespace HtmlAgilityPack
                     oldFile = true;
                 }
             }
-            
+
             if (_cacheOnly || _usingCacheIfExists)
             {
                 if (File.Exists(cachePath))
@@ -1696,8 +1698,8 @@ namespace HtmlAgilityPack
             _requestDuration = Environment.TickCount - tc;
             _responseUri = resp.ResponseUri;
             var statusCode = resp.StatusCode;
-            bool html = IsHtmlContent(resp.ContentType);
-            bool isUnknown = string.IsNullOrEmpty(resp.ContentType);
+            var html = IsHtmlContent(resp.ContentType);
+            var isUnknown = string.IsNullOrEmpty(resp.ContentType);
 
             // keep old code because logic on  ReadDocumentEncoding(HtmlNode node), now use resp.CharacterSet here.
             // for futur maybe harmonise.
@@ -1705,7 +1707,7 @@ namespace HtmlAgilityPack
             // ? Encoding.GetEncoding(resp.ContentEncoding)
             // : null;
 
-            string characterSet = "";
+            var characterSet = "";
             if (!string.IsNullOrEmpty(resp.CharacterSet))
 			{
                 // Example : "\"utf-8\"", no utf or other have " so, just remove...
@@ -1718,12 +1720,12 @@ namespace HtmlAgilityPack
 			{
                 respenc = !string.IsNullOrEmpty(html ? characterSet : resp.ContentEncoding)
                 ? Encoding.GetEncoding(html ? characterSet : resp.ContentEncoding)
-                : null; 
+                : null;
             }
             catch (Exception e )
 			{
 
-			} 
+			}
 
 			if (OverrideEncoding != null)
                 respenc = OverrideEncoding;
@@ -1766,7 +1768,7 @@ namespace HtmlAgilityPack
                 throw new HtmlWebException("Server has send a NotModifed code, without cache enabled.");
             }
 
-            Stream s = resp.GetResponseStream();
+            var s = resp.GetResponseStream();
             if (s != null)
             {
                 if (UsingCache)
@@ -1819,7 +1821,7 @@ namespace HtmlAgilityPack
                         }
                         catch
                         {
-                            // That’s fine, the content type was unknown so probably not HTML
+                            // Thatï¿½s fine, the content type was unknown so probably not HTML
                             // Perhaps trying to figure if the content contains some HTML before would be a better idea.
                         }
                     }
@@ -2045,7 +2047,7 @@ namespace HtmlAgilityPack
                             }
                             catch
                             {
-                                // That’s fine, the content type was unknown so probably not HTML
+                                // Thatï¿½s fine, the content type was unknown so probably not HTML
                                 // Perhaps trying to figure if the content contains some HTML before would be a better idea.
                             }
                         }
@@ -2062,13 +2064,13 @@ namespace HtmlAgilityPack
         {
             // note: some headers are collection (ex: www-authenticate)
             // we don't handle that here
-            XmlDocument doc = new XmlDocument();
+            var doc = new XmlDocument();
 #if NETSTANDARD1_3 || NETSTANDARD1_6
             doc.Load(File.OpenRead(GetCacheHeadersPath(requestUri)));
 #else
             doc.Load(GetCacheHeadersPath(requestUri));
 #endif
-            XmlNode node =
+            var node =
                 doc.SelectSingleNode("//h[translate(@n, 'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='" +
                                      name.ToUpperInvariant() + "']");
             if (node == null)
@@ -2089,7 +2091,7 @@ namespace HtmlAgilityPack
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
         private bool IsCacheHtmlContent(string path)
         {
-            string ct = GetContentTypeForExtension(Path.GetExtension(path), null);
+            var ct = GetContentTypeForExtension(Path.GetExtension(path), null);
             return IsHtmlContent(ct);
         }
 #endif
@@ -2107,7 +2109,7 @@ namespace HtmlAgilityPack
 #if !(NETSTANDARD1_3 || NETSTANDARD1_6)
         private HtmlDocument LoadUrl(Uri uri, string method, WebProxy proxy, NetworkCredential creds)
         {
-            HtmlDocument doc = new HtmlDocument();
+            var doc = new HtmlDocument();
             doc.OptionAutoCloseOnEnd = false;
             doc.OptionFixNestedTags = true;
             _statusCode = Get(uri, method, null, doc, proxy, creds);
@@ -2140,14 +2142,14 @@ namespace HtmlAgilityPack
         private void SaveCacheHeaders(Uri requestUri, HttpWebResponse resp)
         {
             // we cache the original headers aside the cached document.
-            string file = GetCacheHeadersPath(requestUri);
-            XmlDocument doc = new XmlDocument();
+            var file = GetCacheHeadersPath(requestUri);
+            var doc = new XmlDocument();
             doc.LoadXml("<c></c>");
-            XmlNode cache = doc.FirstChild;
+            var cache = doc.FirstChild;
             foreach (string header in resp.Headers)
             {
                 XmlNode entry = doc.CreateElement("h");
-                XmlAttribute att = doc.CreateAttribute("n");
+                var att = doc.CreateAttribute("n");
                 att.Value = header;
                 entry.Attributes.Append(att);
 
@@ -2370,7 +2372,7 @@ namespace HtmlAgilityPack
         public async Task<HtmlDocument> LoadFromWebAsync(Uri uri, Encoding encoding, NetworkCredential credentials, CancellationToken cancellationToken)
         {
             HtmlDocument doc = new HtmlDocument();
-             
+
             var clientHandler = new HttpClientHandler();
             if (credentials == null)
                 clientHandler.UseDefaultCredentials = true;
@@ -2415,7 +2417,7 @@ namespace HtmlAgilityPack
 
             if (html != null)
                 doc.LoadHtml(html);
-            
+
             return doc;
         }
 #endif
@@ -2429,7 +2431,7 @@ namespace HtmlAgilityPack
         private TimeSpan _browserDelay = TimeSpan.FromMilliseconds(100);
 
         /// <summary>Gets or sets the web browser timeout.</summary>
-        /// 
+        ///
         public TimeSpan BrowserTimeout
         {
             get { return _browserTimeout; }
@@ -2455,12 +2457,12 @@ namespace HtmlAgilityPack
         internal string WebBrowserOuterHtml(object webBrowser)
         {
 	        try
-	        { 
+	        {
 		        var responseUriProperty = webBrowser.GetType().GetProperty("Url");
 		        _responseUri = (Uri)responseUriProperty.GetValue(webBrowser, null);
 			}
-	        catch  
-	        { 
+	        catch
+	        {
 				// silence catch
 	        }
 
@@ -2475,7 +2477,7 @@ namespace HtmlAgilityPack
 
             var outerHtmlProperty = firstElement.GetType().GetProperty("OuterHtml");
             var outerHtml = outerHtmlProperty.GetValue(firstElement, null);
-			
+
 			return (string) outerHtml;
         }
 
@@ -2598,7 +2600,7 @@ namespace HtmlAgilityPack
                 }
 
                 var documentText = WebBrowserOuterHtml(webBrowser);
-				 
+
 				doc.LoadHtml(documentText);
             }
 
@@ -2619,6 +2621,4 @@ namespace HtmlAgilityPack
 
         #endregion
     }
-
 }
-#endif

@@ -158,7 +158,8 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (DbInfo)}:: {nameof (database)}={database}"
+                "DbInfo:: database={Database}",
+                database
             );
 
         if (database.IsEmpty())
@@ -200,7 +201,10 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (Format)}:: {nameof (mfn)}={mfn} {nameof (database)}={database} {nameof (format)}={format}"
+                "Format:: mfn={Mfn}, database={Database}, format={Format}",
+                mfn,
+                database,
+                format
             );
 
         if (string.IsNullOrEmpty (mfn))
@@ -262,7 +266,10 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (Inventory)}:: {nameof (number)}={number} {nameof (database)}={database} {nameof (format)}={format}"
+                "Inventory:: number={Number}, database={Database}, format={Format}",
+                number,
+                database,
+                format
             );
 
         if (number.IsEmpty())
@@ -318,7 +325,10 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (Kk)}:: {nameof (number)}={number} {nameof (database)}={database} {nameof (format)}={format}"
+                "Kk:: number={Number}, database={Databae}, format={Format}",
+                number,
+                database,
+                format
             );
 
         if (number.IsEmpty())
@@ -364,7 +374,8 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (ListDb)}:: {nameof (spec)}={spec}"
+                "ListDb:: spec={Specification}",
+                spec
             );
 
         spec = WebUtility.UrlDecode (spec);
@@ -393,7 +404,8 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (ListFiles)}:: {nameof (pattern)}={pattern}"
+                "ListFiles:: pattern={Pattern}",
+                pattern
             );
 
         pattern = WebUtility.UrlDecode (pattern);
@@ -455,7 +467,9 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (ListTerms)}:: {nameof (prefix)}={prefix} {nameof (database)}={database}"
+                "ListTerms:: prefix={Prefix}, database={Database}",
+                prefix,
+                database
             );
 
         if (prefix.IsEmpty())
@@ -494,7 +508,8 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (MaxMfn)}:: {nameof (database)}={database}"
+                "MaxMfn:: database={Database}",
+                database
             );
 
         database = WebUtility.UrlDecode (database);
@@ -531,7 +546,8 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (ReadMenu)}:: {nameof (fileName)}={fileName}"
+                "ReadMenu:: fileName={FileName}",
+                fileName
             );
 
         if (fileName.IsEmpty())
@@ -657,7 +673,10 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (ReadTerms)}:: {nameof (startTerm)}={startTerm} {nameof (count)}={count} {nameof (database)}={database}"
+                "ReadTerms:: startTerm={StartTerm}, count={Count}, database={Database}",
+                startTerm,
+                count,
+                database
             );
 
         if (startTerm.IsEmpty())
@@ -701,7 +720,8 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (ReadTextFile)}:: {nameof (fileName)}={fileName}"
+                "ReadTextFile:: fileName={FileName}",
+                fileName
             );
 
         if (fileName.IsEmpty())
@@ -763,7 +783,8 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (Scenarios)}:: {nameof (database)}={database}"
+                "Scenarios:: database={Database}",
+                database
             );
 
         database = WebUtility.UrlDecode (database);
@@ -798,7 +819,11 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (Search)}:: {nameof (expression)}={expression} {nameof (database)}={database} {nameof (count)}={count} {nameof (start)}={start}"
+                "Search:: expression={Expression}, database={Database}, count={Count}, start={Start}",
+                expression,
+                database,
+                count,
+                start
             );
 
         if (expression.IsEmpty())
@@ -839,7 +864,11 @@ public sealed class IrbisController
 
         var result = FoundItem.ToMfn (found);
 
-        _logger.LogInformation ($"{nameof (Search)}: found {result.Length}");
+        _logger.LogInformation
+            (
+                "Search:: found {Length}",
+                result.Length
+            );
 
         return Ok (result);
     }
@@ -858,7 +887,9 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (SearchCount)}:: {nameof (expression)}={expression} {nameof (database)}={database}"
+                "SearchCount:: expression={Expression}, database={Database}",
+                expression,
+                database
             );
 
         if (expression.IsEmpty())
@@ -890,7 +921,11 @@ public sealed class IrbisController
             return Problem (IrbisException.GetErrorDescription (connection.LastError));
         }
 
-        _logger.LogInformation ($"{nameof (SearchCount)}: found {result}");
+        _logger.LogInformation
+            (
+                "SearchCount:: found {Length}",
+                result
+            );
 
         return Ok (result);
     }
@@ -915,7 +950,12 @@ public sealed class IrbisController
     {
         _logger.LogInformation
             (
-                $"{nameof (SearchFormat)}:: {nameof (expression)}={expression} {nameof (format)}={format} {nameof (database)}={database} {nameof (count)}={count} {nameof (start)}={start}"
+                "SearchFormat:: expression={Expression}, format={Format}, database={Database}, count={Count}, start={Start}",
+                expression,
+                format,
+                database,
+                count,
+                start
             );
 
         if (expression.IsEmpty())
@@ -960,7 +1000,11 @@ public sealed class IrbisController
 
         var result = found.Select (item => item.Text).ToArray();
 
-        _logger.LogInformation ($"{nameof (SearchFormat)}: found {result.Length}");
+        _logger.LogInformation
+            (
+                "SearchFormat:: found {Length}",
+                result.Length
+            );
 
         return Ok (result);
     }
@@ -1040,7 +1084,11 @@ public sealed class IrbisController
             return Problem (IrbisException.GetErrorDescription (connection.LastError));
         }
 
-        _logger.LogInformation ($"Version: {result}");
+        _logger.LogInformation
+            (
+                "Version:: {Version}",
+                result
+            );
 
         return Ok (result);
     }

@@ -1,132 +1,144 @@
-﻿// Description: Html Agility Pack - HTML Parsers, selectors, traversors, manupulators.
-// Website & Documentation: http://html-agility-pack.net
-// Forum & Issues: https://github.com/zzzprojects/html-agility-pack
-// License: https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE
-// More projects: http://www.zzzprojects.com/
-// Copyright © ZZZ Projects Inc. 2014 - 2017. All rights reserved.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#if !METRO
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
 using System.Xml.XPath;
 
-namespace HtmlAgilityPack
+#endregion
+
+#nullable enable
+
+using AM;
+
+namespace HtmlAgilityPack;
+
+public partial class HtmlNode
+    : IXPathNavigable
 {
-    public partial class HtmlNode : IXPathNavigable
+    /// <summary>
+    /// Creates a new XPathNavigator object for navigating this HTML node.
+    /// </summary>
+    /// <returns>An XPathNavigator object. The XPathNavigator is positioned on the node from which the method was called. It is not positioned on the root of the document.</returns>
+    public XPathNavigator CreateNavigator()
     {
-        /// <summary>
-        /// Creates a new XPathNavigator object for navigating this HTML node.
-        /// </summary>
-        /// <returns>An XPathNavigator object. The XPathNavigator is positioned on the node from which the method was called. It is not positioned on the root of the document.</returns>
-        public XPathNavigator CreateNavigator()
+        return new HtmlNodeNavigator (OwnerDocument, this);
+    }
+
+    /// <summary>
+    /// Creates an XPathNavigator using the root of this document.
+    /// </summary>
+    /// <returns></returns>
+    public XPathNavigator CreateRootNavigator()
+    {
+        return new HtmlNodeNavigator (OwnerDocument, OwnerDocument.DocumentNode);
+    }
+
+    /// <summary>
+    /// Selects a list of nodes matching the <see cref="XPath"/> expression.
+    /// </summary>
+    /// <param name="xpath">The XPath expression.</param>
+    /// <returns>An <see cref="HtmlNodeCollection"/> containing a collection of nodes matching the <see cref="XPath"/> query, or <c>null</c> if no node matched the XPath expression.</returns>
+    public HtmlNodeCollection? SelectNodes (string xpath)
+    {
+        var list = new HtmlNodeCollection (null);
+
+        var nav = new HtmlNodeNavigator (OwnerDocument, this);
+        var it = nav.Select (xpath);
+        while (it.MoveNext())
         {
-            return new HtmlNodeNavigator(OwnerDocument, this);
+            var n = (HtmlNodeNavigator)it.Current;
+            list.Add (n.CurrentNode, false);
         }
 
-        /// <summary>
-        /// Creates an XPathNavigator using the root of this document.
-        /// </summary>
-        /// <returns></returns>
-        public XPathNavigator CreateRootNavigator()
+        if (list.Count == 0 && !OwnerDocument.OptionEmptyCollection)
         {
-            return new HtmlNodeNavigator(OwnerDocument, OwnerDocument.DocumentNode);
+            return null;
         }
 
-        /// <summary>
-        /// Selects a list of nodes matching the <see cref="XPath"/> expression.
-        /// </summary>
-        /// <param name="xpath">The XPath expression.</param>
-        /// <returns>An <see cref="HtmlNodeCollection"/> containing a collection of nodes matching the <see cref="XPath"/> query, or <c>null</c> if no node matched the XPath expression.</returns>
-        public HtmlNodeCollection SelectNodes(string xpath)
+        return list;
+    }
+
+    /// <summary>
+    /// Selects a list of nodes matching the <see cref="XPath"/> expression.
+    /// </summary>
+    /// <param name="xpath">The XPath expression.</param>
+    /// <returns>An <see cref="HtmlNodeCollection"/> containing a collection of nodes matching the <see cref="XPath"/> query, or <c>null</c> if no node matched the XPath expression.</returns>
+    public HtmlNodeCollection? SelectNodes (XPathExpression xpath)
+    {
+        var list = new HtmlNodeCollection (null);
+
+        var nav = new HtmlNodeNavigator (OwnerDocument, this);
+        var it = nav.Select (xpath);
+        while (it.MoveNext())
         {
-            HtmlNodeCollection list = new HtmlNodeCollection(null);
-
-            HtmlNodeNavigator nav = new HtmlNodeNavigator(OwnerDocument, this);
-            XPathNodeIterator it = nav.Select(xpath);
-            while (it.MoveNext())
-            {
-                HtmlNodeNavigator n = (HtmlNodeNavigator) it.Current;
-                list.Add(n.CurrentNode, false);
-            }
-
-            if (list.Count == 0 && !OwnerDocument.OptionEmptyCollection)
-            {
-                return null;
-            }
-
-            return list;
+            var n = (HtmlNodeNavigator)it.Current;
+            list.Add (n.CurrentNode, false);
         }
 
-        /// <summary>
-        /// Selects a list of nodes matching the <see cref="XPath"/> expression.
-        /// </summary>
-        /// <param name="xpath">The XPath expression.</param>
-        /// <returns>An <see cref="HtmlNodeCollection"/> containing a collection of nodes matching the <see cref="XPath"/> query, or <c>null</c> if no node matched the XPath expression.</returns>
-        public HtmlNodeCollection SelectNodes(XPathExpression xpath)
-        { 
-            HtmlNodeCollection list = new HtmlNodeCollection(null);
-
-            HtmlNodeNavigator nav = new HtmlNodeNavigator(OwnerDocument, this);
-            XPathNodeIterator it = nav.Select(xpath);
-            while (it.MoveNext())
-            {
-                HtmlNodeNavigator n = (HtmlNodeNavigator) it.Current;
-                list.Add(n.CurrentNode, false);
-            }
-
-            if (list.Count == 0 && !OwnerDocument.OptionEmptyCollection)
-            {
-                return null;
-            }
-
-            return list;
-        }
-
-        /// <summary>
-        /// Selects the first XmlNode that matches the <see cref="XPath"/> expression.
-        /// </summary>
-        /// <param name="xpath">The XPath expression. May not be null.</param>
-        /// <returns>The first <see cref="HtmlNode"/> that matches the XPath query or a null reference if no matching node was found.</returns>
-        public HtmlNode SelectSingleNode(string xpath)
+        if (list.Count == 0 && !OwnerDocument.OptionEmptyCollection)
         {
-            if (xpath == null)
-            {
-                throw new ArgumentNullException("xpath");
-            }
-
-            HtmlNodeNavigator nav = new HtmlNodeNavigator(OwnerDocument, this);
-            XPathNodeIterator it = nav.Select(xpath);
-            if (!it.MoveNext())
-            {
-                return null;
-            }
-
-            HtmlNodeNavigator node = (HtmlNodeNavigator) it.Current;
-            return node.CurrentNode;
+            return null;
         }
 
-        /// <summary>
-        /// Selects the first XmlNode that matches the <see cref="XPath"/> expression.
-        /// </summary>
-        /// <param name="xpath">The XPath expression.</param>
-        /// <returns>An <see cref="HtmlNodeCollection"/> containing a collection of nodes matching the <see cref="XPath"/> query, or <c>null</c> if no node matched the XPath expression.</returns>
-        public HtmlNode SelectSingleNode(XPathExpression xpath)
+        return list;
+    }
+
+    /// <summary>
+    /// Selects the first XmlNode that matches the <see cref="XPath"/> expression.
+    /// </summary>
+    /// <param name="xpath">The XPath expression. May not be null.</param>
+    /// <returns>The first <see cref="HtmlNode"/> that matches the XPath query or a null reference if no matching node was found.</returns>
+    public HtmlNode? SelectSingleNode
+        (
+            string xpath
+        )
+    {
+        Sure.NotNull (xpath);
+
+        var nav = new HtmlNodeNavigator (OwnerDocument, this);
+        var it = nav.Select (xpath);
+        if (!it.MoveNext())
         {
-            if (xpath == null)
-            {
-                throw new ArgumentNullException("xpath");
-            }
-
-            HtmlNodeNavigator nav = new HtmlNodeNavigator(OwnerDocument, this);
-            XPathNodeIterator it = nav.Select(xpath);
-            if (!it.MoveNext())
-            {
-                return null;
-            }
-
-            HtmlNodeNavigator node = (HtmlNodeNavigator)it.Current;
-            return node.CurrentNode;
+            return null;
         }
+
+        var node = (HtmlNodeNavigator)it.Current;
+        return node.CurrentNode;
+    }
+
+    /// <summary>
+    /// Selects the first XmlNode that matches the <see cref="XPath"/> expression.
+    /// </summary>
+    /// <param name="xpath">The XPath expression.</param>
+    /// <returns>An <see cref="HtmlNodeCollection"/> containing a collection of nodes matching the <see cref="XPath"/> query, or <c>null</c> if no node matched the XPath expression.</returns>
+    public HtmlNode SelectSingleNode
+        (
+            XPathExpression xpath
+        )
+    {
+        Sure.NotNull (xpath);
+
+        var nav = new HtmlNodeNavigator (OwnerDocument, this);
+        var it = nav.Select (xpath);
+        if (!it.MoveNext())
+        {
+            return null;
+        }
+
+        var node = (HtmlNodeNavigator)it.Current;
+        return node.CurrentNode;
     }
 }
-#endif
