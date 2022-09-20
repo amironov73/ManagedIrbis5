@@ -6,7 +6,7 @@ Currently supports:
 
 * Windows 7/10/11 x64
 * MacOS 10.14
-* .NET runtime 6.0.0 and higher
+* .NET runtime 7.0.0 and higher
 * .NET SDK 7.0.100 and higher
 
 ```c#
