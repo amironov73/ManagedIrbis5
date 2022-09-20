@@ -13,8 +13,6 @@
 
 using System.Windows;
 
-using AM.Drawing.HtmlRenderer.Core.Utils;
-
 #endregion
 
 #nullable enable
@@ -26,44 +24,68 @@ namespace AM.Windows.HtmlRenderer;
 /// </summary>
 /// <param name="args">the event arguments object</param>
 /// <typeparam name="T">the type of the routed events args data</typeparam>
-public delegate void RoutedEventHandler<T>(object sender, RoutedEventArgs<T> args) where T : class;
+public delegate void RoutedEventHandler<T>
+    (
+        object? sender,
+        RoutedEventArgs<T> args
+    )
+    where T : class;
 
 /// <summary>
 /// HTML Renderer routed event arguments containing event data.
 /// </summary>
-public sealed class RoutedEventArgs<T> 
-    : RoutedEventArgs 
+public sealed class RoutedEventArgs<T>
+    : RoutedEventArgs
     where T : class
 {
+    #region Construction
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="routedEvent"></param>
+    /// <param name="data"></param>
+    public RoutedEventArgs
+        (
+            RoutedEvent routedEvent,
+            T data
+        )
+        : base (routedEvent)
+    {
+        Sure.NotNull (data);
+
+        Data = data;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="routedEvent"></param>
+    /// <param name="source"></param>
+    /// <param name="data"></param>
+    public RoutedEventArgs
+        (
+            RoutedEvent routedEvent,
+            object source,
+            T data
+        )
+        : base (routedEvent, source)
+    {
+        Sure.NotNull (data);
+
+        Data = data;
+    }
+
+    #endregion
+
     /// <summary>
     /// the argument data of the routed event
     /// </summary>
-    private readonly T _data;
+    public T Data { get; }
 
-    public RoutedEventArgs(RoutedEvent routedEvent, T data)
-        : base(routedEvent)
-    {
-        ArgChecker.AssertArgNotNull(data, "args");
-        _data = data;
-    }
-
-    public RoutedEventArgs(RoutedEvent routedEvent, object source, T data)
-        : base(routedEvent, source)
-    {
-        ArgChecker.AssertArgNotNull(data, "args");
-        _data = data;
-    }
-
-    /// <summary>
-    /// the argument data of the routed event
-    /// </summary>
-    public T Data
-    {
-        get { return _data; }
-    }
-
+    /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return string.Format("RoutedEventArgs({0})", _data);
+        return string.Create (null, $"RoutedEventArgs({Data})");
     }
 }

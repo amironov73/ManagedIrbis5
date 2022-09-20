@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 using AM.Drawing.HtmlRenderer.Adapters.Entities;
@@ -37,73 +38,91 @@ namespace AM.Windows.HtmlRenderer;
 /// <remarks>
 /// See <see cref="HtmlControl"/> for more info.
 /// </remarks>
-public class HtmlLabel 
+public class HtmlLabel
     : HtmlControl
 {
     #region Dependency properties
 
-    public static readonly DependencyProperty AutoSizeProperty = DependencyProperty.Register("AutoSize", typeof(bool), typeof(HtmlLabel), new PropertyMetadata(true, OnDependencyProperty_valueChanged));
-    public static readonly DependencyProperty AutoSizeHeightOnlyProperty = DependencyProperty.Register("AutoSizeHeightOnly", typeof(bool), typeof(HtmlLabel), new PropertyMetadata(false, OnDependencyProperty_valueChanged));
+    /// <summary>
+    ///
+    /// </summary>
+    public static readonly DependencyProperty AutoSizeProperty
+        = DependencyProperty.Register (nameof (AutoSize), typeof (bool), typeof (HtmlLabel),
+            new PropertyMetadata (true, OnDependencyProperty_valueChanged));
+
+    /// <summary>
+    ///
+    /// </summary>
+    public static readonly DependencyProperty AutoSizeHeightOnlyProperty
+        = DependencyProperty.Register (nameof (AutoSizeHeightOnly), typeof (bool), typeof (HtmlLabel),
+            new PropertyMetadata (false, OnDependencyProperty_valueChanged));
 
     #endregion
 
+    #region Construction
 
     /// <summary>
     /// Init.
     /// </summary>
     static HtmlLabel()
     {
-        BackgroundProperty.OverrideMetadata(typeof(HtmlLabel), new FrameworkPropertyMetadata(Brushes.Transparent));
+        BackgroundProperty.OverrideMetadata (typeof (HtmlLabel), new FrameworkPropertyMetadata (Brushes.Transparent));
     }
+
+    #endregion
 
     /// <summary>
     /// Automatically sets the size of the label by content size
     /// </summary>
-    [Category("Layout")]
-    [Description("Automatically sets the size of the label by content size.")]
+    [Category ("Layout")]
+    [Description ("Automatically sets the size of the label by content size.")]
     public bool AutoSize
     {
-        get { return (bool)GetValue(AutoSizeProperty); }
-        set { SetValue(AutoSizeProperty, value); }
+        get => (bool)GetValue (AutoSizeProperty);
+        set => SetValue (AutoSizeProperty, value);
     }
 
     /// <summary>
     /// Automatically sets the height of the label by content height (width is not effected).
     /// </summary>
-    [Category("Layout")]
-    [Description("Automatically sets the height of the label by content height (width is not effected)")]
+    [Category ("Layout")]
+    [Description ("Automatically sets the height of the label by content height (width is not effected)")]
     public virtual bool AutoSizeHeightOnly
     {
-        get { return (bool)GetValue(AutoSizeHeightOnlyProperty); }
-        set { SetValue(AutoSizeHeightOnlyProperty, value); }
+        get => (bool)GetValue (AutoSizeHeightOnlyProperty);
+        set => SetValue (AutoSizeHeightOnlyProperty, value);
     }
 
 
     #region Private methods
 
-    /// <summary>
-    /// Perform the layout of the html in the control.
-    /// </summary>
-    protected override Size MeasureOverride(Size constraint)
+    /// <inheritdoc cref="Control.MeasureOverride"/>
+    protected override Size MeasureOverride
+        (
+            Size constraint
+        )
     {
         if (_htmlContainer != null)
         {
-            using (var ig = new GraphicsAdapter())
-            {
-                var horizontal = Padding.Left + Padding.Right + BorderThickness.Left + BorderThickness.Right;
-                var vertical = Padding.Top + Padding.Bottom + BorderThickness.Top + BorderThickness.Bottom;
+            using var graphics = new GraphicsAdapter();
 
-                var size = new RSize(constraint.Width < Double.PositiveInfinity ? constraint.Width - horizontal : 0, constraint.Height < Double.PositiveInfinity ? constraint.Height - vertical : 0);
-                var minSize = new RSize(MinWidth < Double.PositiveInfinity ? MinWidth - horizontal : 0, MinHeight < Double.PositiveInfinity ? MinHeight - vertical : 0);
-                var maxSize = new RSize(MaxWidth < Double.PositiveInfinity ? MaxWidth - horizontal : 0, MaxHeight < Double.PositiveInfinity ? MaxHeight - vertical : 0);
+            var horizontal = Padding.Left + Padding.Right + BorderThickness.Left + BorderThickness.Right;
+            var vertical = Padding.Top + Padding.Bottom + BorderThickness.Top + BorderThickness.Bottom;
 
-                var newSize = HtmlRendererUtils.Layout(ig, _htmlContainer.HtmlContainerInt, size, minSize, maxSize, AutoSize, AutoSizeHeightOnly);
+            var size = new RSize (constraint.Width < Double.PositiveInfinity ? constraint.Width - horizontal : 0,
+                constraint.Height < Double.PositiveInfinity ? constraint.Height - vertical : 0);
+            var minSize = new RSize (MinWidth < Double.PositiveInfinity ? MinWidth - horizontal : 0,
+                MinHeight < Double.PositiveInfinity ? MinHeight - vertical : 0);
+            var maxSize = new RSize (MaxWidth < Double.PositiveInfinity ? MaxWidth - horizontal : 0,
+                MaxHeight < Double.PositiveInfinity ? MaxHeight - vertical : 0);
 
-                constraint = new Size(newSize.Width + horizontal, newSize.Height + vertical);
-            }
+            var newSize = HtmlRendererUtils.Layout (graphics, _htmlContainer.HtmlContainerInt, size, minSize, maxSize,
+                AutoSize, AutoSizeHeightOnly);
+
+            constraint = new Size (newSize.Width + horizontal, newSize.Height + vertical);
         }
 
-        if (double.IsPositiveInfinity(constraint.Width) || double.IsPositiveInfinity(constraint.Height))
+        if (double.IsPositiveInfinity (constraint.Width) || double.IsPositiveInfinity (constraint.Height))
             constraint = Size.Empty;
 
         return constraint;
@@ -112,25 +131,28 @@ public class HtmlLabel
     /// <summary>
     /// Handle when dependency property value changes to update the underline HtmlContainer with the new value.
     /// </summary>
-    private static void OnDependencyProperty_valueChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
+    private static void OnDependencyProperty_valueChanged
+        (
+            DependencyObject dependencyObject,
+            DependencyPropertyChangedEventArgs eventArgs
+        )
     {
-        var control = dependencyObject as HtmlLabel;
-        if (control != null)
+        if (dependencyObject is HtmlLabel control)
         {
-            if (e.Property == AutoSizeProperty)
+            if (eventArgs.Property == AutoSizeProperty)
             {
-                if ((bool)e.NewValue)
+                if ((bool) eventArgs.NewValue)
                 {
-                    dependencyObject.SetValue(AutoSizeHeightOnlyProperty, false);
+                    dependencyObject.SetValue (AutoSizeHeightOnlyProperty, false);
                     control.InvalidateMeasure();
                     control.InvalidateVisual();
                 }
             }
-            else if (e.Property == AutoSizeHeightOnlyProperty)
+            else if (eventArgs.Property == AutoSizeHeightOnlyProperty)
             {
-                if ((bool)e.NewValue)
+                if ((bool) eventArgs.NewValue)
                 {
-                    dependencyObject.SetValue(AutoSizeProperty, false);
+                    dependencyObject.SetValue (AutoSizeProperty, false);
                     control.InvalidateMeasure();
                     control.InvalidateVisual();
                 }

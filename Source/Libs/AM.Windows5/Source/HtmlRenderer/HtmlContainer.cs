@@ -64,8 +64,8 @@ public sealed class HtmlContainer
     /// </summary>
     public event EventHandler LoadComplete
     {
-        add { _htmlContainerInt.LoadComplete += value; }
-        remove { _htmlContainerInt.LoadComplete -= value; }
+        add => _htmlContainerInt.LoadComplete += value;
+        remove => _htmlContainerInt.LoadComplete -= value;
     }
 
     /// <summary>
@@ -74,8 +74,8 @@ public sealed class HtmlContainer
     /// </summary>
     public event EventHandler<HtmlLinkClickedEventArgs> LinkClicked
     {
-        add { _htmlContainerInt.LinkClicked += value; }
-        remove { _htmlContainerInt.LinkClicked -= value; }
+        add => _htmlContainerInt.LinkClicked += value;
+        remove => _htmlContainerInt.LinkClicked -= value;
     }
 
     /// <summary>
@@ -86,8 +86,8 @@ public sealed class HtmlContainer
     /// </remarks>
     public event EventHandler<HtmlRefreshEventArgs> Refresh
     {
-        add { _htmlContainerInt.Refresh += value; }
-        remove { _htmlContainerInt.Refresh -= value; }
+        add => _htmlContainerInt.Refresh += value;
+        remove => _htmlContainerInt.Refresh -= value;
     }
 
     /// <summary>
@@ -96,8 +96,8 @@ public sealed class HtmlContainer
     /// </summary>
     public event EventHandler<HtmlScrollEventArgs> ScrollChange
     {
-        add { _htmlContainerInt.ScrollChange += value; }
-        remove { _htmlContainerInt.ScrollChange -= value; }
+        add => _htmlContainerInt.ScrollChange += value;
+        remove => _htmlContainerInt.ScrollChange -= value;
     }
 
     /// <summary>
@@ -108,8 +108,8 @@ public sealed class HtmlContainer
     /// </remarks>
     public event EventHandler<HtmlRenderErrorEventArgs> RenderError
     {
-        add { _htmlContainerInt.RenderError += value; }
-        remove { _htmlContainerInt.RenderError -= value; }
+        add => _htmlContainerInt.RenderError += value;
+        remove => _htmlContainerInt.RenderError -= value;
     }
 
     /// <summary>
@@ -119,8 +119,8 @@ public sealed class HtmlContainer
     /// </summary>
     public event EventHandler<HtmlStylesheetLoadEventArgs> StylesheetLoad
     {
-        add { _htmlContainerInt.StylesheetLoad += value; }
-        remove { _htmlContainerInt.StylesheetLoad -= value; }
+        add => _htmlContainerInt.StylesheetLoad += value;
+        remove => _htmlContainerInt.StylesheetLoad -= value;
     }
 
     /// <summary>
@@ -129,25 +129,19 @@ public sealed class HtmlContainer
     /// </summary>
     public event EventHandler<HtmlImageLoadEventArgs> ImageLoad
     {
-        add { _htmlContainerInt.ImageLoad += value; }
-        remove { _htmlContainerInt.ImageLoad -= value; }
+        add => _htmlContainerInt.ImageLoad += value;
+        remove => _htmlContainerInt.ImageLoad -= value;
     }
 
     /// <summary>
     /// The internal core html container
     /// </summary>
-    internal HtmlContainerInt HtmlContainerInt
-    {
-        get { return _htmlContainerInt; }
-    }
+    internal HtmlContainerInt HtmlContainerInt => _htmlContainerInt;
 
     /// <summary>
     /// the parsed stylesheet data used for handling the html
     /// </summary>
-    public CssData CssData
-    {
-        get { return _htmlContainerInt.CssData; }
-    }
+    public CssData CssData => _htmlContainerInt.CssData;
 
     /// <summary>
     /// Gets or sets a value indicating if image asynchronous loading should be avoided (default - false).<br/>
@@ -161,8 +155,8 @@ public sealed class HtmlContainer
     /// </remarks>
     public bool AvoidAsyncImagesLoading
     {
-        get { return _htmlContainerInt.AvoidAsyncImagesLoading; }
-        set { _htmlContainerInt.AvoidAsyncImagesLoading = value; }
+        get => _htmlContainerInt.AvoidAsyncImagesLoading;
+        set => _htmlContainerInt.AvoidAsyncImagesLoading = value;
     }
 
     /// <summary>
@@ -180,8 +174,8 @@ public sealed class HtmlContainer
     /// </remarks>
     public bool AvoidImagesLateLoading
     {
-        get { return _htmlContainerInt.AvoidImagesLateLoading; }
-        set { _htmlContainerInt.AvoidImagesLateLoading = value; }
+        get => _htmlContainerInt.AvoidImagesLateLoading;
+        set => _htmlContainerInt.AvoidImagesLateLoading = value;
     }
 
     /// <summary>
@@ -190,8 +184,8 @@ public sealed class HtmlContainer
     /// </summary>
     public bool IsSelectionEnabled
     {
-        get { return _htmlContainerInt.IsSelectionEnabled; }
-        set { _htmlContainerInt.IsSelectionEnabled = value; }
+        get => _htmlContainerInt.IsSelectionEnabled;
+        set => _htmlContainerInt.IsSelectionEnabled = value;
     }
 
     /// <summary>
@@ -199,8 +193,8 @@ public sealed class HtmlContainer
     /// </summary>
     public bool IsContextMenuEnabled
     {
-        get { return _htmlContainerInt.IsContextMenuEnabled; }
-        set { _htmlContainerInt.IsContextMenuEnabled = value; }
+        get => _htmlContainerInt.IsContextMenuEnabled;
+        set => _htmlContainerInt.IsContextMenuEnabled = value;
     }
 
     /// <summary>
@@ -213,8 +207,8 @@ public sealed class HtmlContainer
     /// </example>
     public Point ScrollOffset
     {
-        get { return Utils.Convert (_htmlContainerInt.ScrollOffset); }
-        set { _htmlContainerInt.ScrollOffset = Utils.Convert (value); }
+        get => Utils.Convert (_htmlContainerInt.ScrollOffset);
+        set => _htmlContainerInt.ScrollOffset = Utils.Convert (value);
     }
 
     /// <summary>
@@ -223,8 +217,8 @@ public sealed class HtmlContainer
     /// </summary>
     public Point Location
     {
-        get { return Utils.Convert (_htmlContainerInt.Location); }
-        set { _htmlContainerInt.Location = Utils.Convert (value); }
+        get => Utils.Convert (_htmlContainerInt.Location);
+        set => _htmlContainerInt.Location = Utils.Convert (value);
     }
 
     /// <summary>
@@ -236,8 +230,8 @@ public sealed class HtmlContainer
     /// </summary>
     public Size MaxSize
     {
-        get { return Utils.Convert (_htmlContainerInt.MaxSize); }
-        set { _htmlContainerInt.MaxSize = Utils.Convert (value); }
+        get => Utils.Convert (_htmlContainerInt.MaxSize);
+        set => _htmlContainerInt.MaxSize = Utils.Convert (value);
     }
 
     /// <summary>
@@ -245,25 +239,19 @@ public sealed class HtmlContainer
     /// </summary>
     public Size ActualSize
     {
-        get { return Utils.Convert (_htmlContainerInt.ActualSize); }
-        internal set { _htmlContainerInt.ActualSize = Utils.Convert (value); }
+        get => Utils.Convert (_htmlContainerInt.ActualSize);
+        internal set => _htmlContainerInt.ActualSize = Utils.Convert (value);
     }
 
     /// <summary>
     /// Get the currently selected text segment in the html.
     /// </summary>
-    public string SelectedText
-    {
-        get { return _htmlContainerInt.SelectedText; }
-    }
+    public string SelectedText => _htmlContainerInt.SelectedText;
 
     /// <summary>
     /// Copy the currently selected html segment with style.
     /// </summary>
-    public string SelectedHtml
-    {
-        get { return _htmlContainerInt.SelectedHtml; }
-    }
+    public string SelectedHtml => _htmlContainerInt.SelectedHtml;
 
     /// <summary>
     /// Clear the current selection.
