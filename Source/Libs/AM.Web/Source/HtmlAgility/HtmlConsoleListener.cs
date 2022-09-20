@@ -1,41 +1,82 @@
-// Description: Html Agility Pack - HTML Parsers, selectors, traversors, manupulators.
-// Website & Documentation: http://html-agility-pack.net
-// Forum & Issues: https://github.com/zzzprojects/html-agility-pack
-// License: https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE
-// More projects: http://www.zzzprojects.com/
-// Copyright © ZZZ Projects Inc. 2014 - 2017. All rights reserved.
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#if !NETSTANDARD1_3 && !NETSTANDARD1_6 && !METRO
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedMember.Global
+
+/*
+ * Ars Magna project, http://arsmagna.ru
+ */
+
 using System;
 using System.Diagnostics;
 
-namespace HtmlAgilityPack
+namespace HtmlAgilityPack;
+
+internal class HtmlConsoleListener
+    : TraceListener
 {
-    internal class HtmlConsoleListener : TraceListener
+    #region Public Methods
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="message"></param>
+    public override void Write
+        (
+            string? message
+        )
     {
-#region Public Methods
-
-        public override void Write(string Message)
+        if (!string.IsNullOrEmpty (message))
         {
-            Write(Message, "");
+            Write (message, "");
         }
-
-        public override void Write(string Message, string Category)
-        {
-            Console.Write("T:" + Category + ": " + Message);
-        }
-
-        public override void WriteLine(string Message)
-        {
-            Write(Message + "\n");
-        }
-
-        public override void WriteLine(string Message, string Category)
-        {
-            Write(Message + "\n", Category);
-        }
-
-#endregion
     }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="category"></param>
+    public override void Write
+        (
+            string? message,
+            string? category
+        )
+    {
+        Console.Write ("T:" + category + ": " + message);
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="message"></param>
+    public override void WriteLine
+        (
+            string? message
+        )
+    {
+        Write (message + "\n");
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="category"></param>
+    public override void WriteLine
+        (
+            string? message,
+            string? category
+        )
+    {
+        Write (message + "\n", category);
+    }
+
+    #endregion
 }
-#endif

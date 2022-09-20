@@ -3,7 +3,7 @@
 // Forum & Issues: https://github.com/zzzprojects/html-agility-pack
 // License: https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE
 // More projects: http://www.zzzprojects.com/
-// Copyright © ZZZ Projects Inc. 2014 - 2017. All rights reserved.
+// Copyright ï¿½ ZZZ Projects Inc. 2014 - 2017. All rights reserved.
 
 #if !METRO
 namespace HtmlAgilityPack
@@ -34,15 +34,15 @@ namespace HtmlAgilityPack
             switch (type)
             {
                 case MixedCodeDocumentFragmentType.Text:
-                    Doc._textfragments.Append(this);
+                    Doc.TextFragments.Append(this);
                     break;
 
                 case MixedCodeDocumentFragmentType.Code:
-                    Doc._codefragments.Append(this);
+                    Doc.CodeFragments.Append(this);
                     break;
             }
 
-            Doc._fragments.Append(this);
+            Doc.Fragments.Append(this);
         }
 
         #endregion

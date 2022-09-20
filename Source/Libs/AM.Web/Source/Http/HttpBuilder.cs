@@ -182,7 +182,8 @@ internal class HttpBuilder
     #endregion
 }
 
-internal class HttpBuilder<T> : IRequestBuilder<T>
+internal class HttpBuilder<T>
+    : IRequestBuilder<T>
 {
     public IRequestBuilder Inner { get; }
     public Func<HttpResponseMessage, Task<T>> Handler { get; }
