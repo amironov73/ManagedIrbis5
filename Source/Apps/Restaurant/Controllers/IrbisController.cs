@@ -61,8 +61,11 @@ public sealed class IrbisController
         _configuration = configuration;
         _logger = logger;
 
-        _defaultDatabase = _configuration["default-irbis-database"];
-        _defaultFormat = configuration["default-format"];
+        _defaultDatabase = _configuration["default-irbis-database"]
+            ?? "IBIS";
+
+        _defaultFormat = configuration["default-format"]
+            ?? "@brief";
     }
 
     #endregion

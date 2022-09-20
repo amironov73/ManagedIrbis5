@@ -3,7 +3,7 @@
 // Forum & Issues: https://github.com/zzzprojects/html-agility-pack
 // License: https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE
 // More projects: http://www.zzzprojects.com/
-// Copyright © ZZZ Projects Inc. 2014 - 2017. All rights reserved.
+// Copyright ï¿½ ZZZ Projects Inc. 2014 - 2017. All rights reserved.
 
 namespace HtmlAgilityPack
 {
@@ -20,9 +20,9 @@ namespace HtmlAgilityPack
 
         #region Constructors
 
-        internal HtmlCommentNode(HtmlDocument ownerdocument, int index)
+        internal HtmlCommentNode(HtmlDocument ownerDocument, int index)
             :
-            base(HtmlNodeType.Comment, ownerdocument, index)
+            base(HtmlNodeType.Comment, ownerDocument, index)
         {
         }
 
