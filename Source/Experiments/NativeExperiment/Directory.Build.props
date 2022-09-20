@@ -1,0 +1,26 @@
+<!-- Common properties for libraries -->
+
+<Project>
+
+    <!-- Framework and language -->
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <LangVersion>11</LangVersion>
+        <Nullable>enable</Nullable>
+        <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    </PropertyGroup>
+
+    <!-- disable NETSDK1057 warning "You are using a preview version" -->
+    <PropertyGroup>
+        <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <DefineConstants>CONTRACTS_FULL;COREAPP;TRACE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <DefineConstants>COREAPP;CONTRACTS_FULL</DefineConstants>
+    </PropertyGroup>
+
+</Project>
