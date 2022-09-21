@@ -12,28 +12,26 @@
 
 #nullable enable
 
-namespace ManagedIrbis.Identifiers
+namespace ManagedIrbis.Identifiers;
+
+//
+// https://ru.wikipedia.org/wiki/Crossref
+//
+// Crossref (ранее CrossRef) — официальное агентство
+// регистрации Цифровых Идентификаторов Объекта (DOI)
+// международного DOI фонда. Оно объединяет издателей
+// академических публикаций (журналы, монографии, сборники
+// материалов конференций) и создано в 2000 для создания
+// системы персистентных библиографических ссылок в статьях.
+//
+
+/// <summary>
+/// API for Crossref.org
+/// </summary>
+public sealed class CrossrefApi
 {
-    //
-    // https://ru.wikipedia.org/wiki/Crossref
-    //
-    // Crossref (ранее CrossRef) — официальное агентство
-    // регистрации Цифровых Идентификаторов Объекта (DOI)
-    // международного DOI фонда. Оно объединяет издателей
-    // академических публикаций (журналы, монографии, сборники
-    // материалов конференций) и создано в 2000 для создания
-    // системы персистентных библиографических ссылок в статьях.
-    //
+    #region Public methods
 
-    /// <summary>
-    /// API for Crossref.org
-    /// </summary>
-    public sealed class CrossrefApi
-    {
-        #region Public methods
+    #endregion
 
-        #endregion
-
-    } // class CrossrefApi
-
-} // namespace ManagedIrbis.Identifiers
+}

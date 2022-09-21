@@ -909,7 +909,7 @@ public sealed class AsyncConnection
             FileSpecification specification
         )
     {
-        Sure.NotNull (specification);
+        Sure.VerifyNotNull (specification);
 
         return await ExecuteAsync
                 (
@@ -918,7 +918,7 @@ public sealed class AsyncConnection
                 )
             .TransformNoCheckAsync
                 (
-                    resp => IrbisText.IrbisToWindows (resp.ReadAnsi())
+                    resp => IrbisText.IrbisToWindows (resp.ReadRemainingAnsiText())
                 );
     }
 

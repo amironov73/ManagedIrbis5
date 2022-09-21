@@ -5,6 +5,8 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Local
+// ReSharper disable UnusedMember.Global
 
 /* OsmiUtility.cs -- полезные методы для работы с системой OSMI Cards
  * Ars Magna project, http://arsmagna.ru
@@ -12,7 +14,7 @@
 
 #region Using directives
 
-using System;
+using System.Linq;
 using System.Text;
 using System.Web;
 
@@ -22,207 +24,199 @@ using AM.IO;
 using ManagedIrbis;
 using ManagedIrbis.Readers;
 
+using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json.Linq;
+
 using CM = System.Configuration.ConfigurationManager;
 
 #endregion
 
 #nullable enable
 
-namespace RestfulIrbis.OsmiCards
+namespace RestfulIrbis.OsmiCards;
+
+/// <summary>
+/// Полезные методы для работы с системой OSMI Cards.
+/// </summary>
+public static class OsmiUtility
 {
+    #region Private members
+
     /// <summary>
-    /// Полезные методы для работы с системой OSMI Cards.
+    /// Поиск указанной метки в карточке.
     /// </summary>
-    public static class OsmiUtility
+    private static JObject? FindLabel
+        (
+            JObject obj,
+            string label
+        )
     {
-        #region Private members
-
-        /// <summary>
-        /// Поиск указанной метки в карточке.
-        /// </summary>
-        private static /* JObject? */ object? FindLabel
-            (
-
-                // TODO: implement
-                object obj,
-
-                // JObject obj,
-                string label
-            )
-        {
-            /*
-
-            var result = (JObject?) obj["values"].FirstOrDefault
+        var result = (JObject?)obj["values"].ThrowIfNull()
+            .FirstOrDefault
                 (
-                    b => b["label"].Value<string>() == label
+                    token => token["label"]?.Value<string>() == label
                 );
 
-            if (ReferenceEquals(result, null))
-            {
-                Magna.Info($"Block not found {label}");
-            }
-
-            return result;
-
-            */
-
-            throw new NotImplementedException();
-
-        } // method FindLabel
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Построение карточки для указанного читателя.
-        /// </summary>
-        public static /* JObject */ object BuildCardForReader
-            (
-
-                // TODO: implement
-                object templateObject,
-
-                // JObject templateObject,
-                ReaderInfo reader,
-                string ticket,
-                DicardsConfiguration config
-            )
+        if (result is null)
         {
-            /*
+            Magna.Logger.LogInformation
+                (
+                    "FindLabel:: Block not found: {Label}",
+                    label
+                );
+        }
 
-            var name = reader.FamilyName.ThrowIfNull("name");
-            var fio = reader.FullName.ThrowIfNull("fio");
+        return result;
+    }
 
-            var result = (JObject) templateObject.DeepClone();
+    #endregion
 
-            JObject? block = null;
-            if (!string.IsNullOrEmpty(config.FioField))
-            {
-                block = FindLabel(result, config.FioField);
-            }
-            if (!ReferenceEquals(block, null))
-            {
-                block["value"] = fio;
-            }
+    #region Public methods
 
-            block = null;
-            if (!string.IsNullOrEmpty(config.CabinetField))
-            {
-                block = FindLabel(result, config.CabinetField);
-            }
-            if (!ReferenceEquals(block, null))
-            {
-                var cabinetUrl = config.CabinetUrl;
-                if (string.IsNullOrEmpty(cabinetUrl))
-                {
-                    Magna.Debug("BuildCardForReader: cabinerUrl not specified!");
-                }
-                else
-                {
-                    block["value"] = string.Format
-                        (
-                            cabinetUrl,
-                            UrlEncode(name),
-                            UrlEncode(ticket)
-                        );
-                }
-            }
+    /// <summary>
+    /// Построение карточки для указанного читателя.
+    /// </summary>
+    public static JObject BuildCardForReader
+        (
+            JObject templateObject,
+            ReaderInfo reader,
+            string ticket,
+            DicardsConfiguration config
+        )
+    {
+        var name = reader.FamilyName.ThrowIfNull ("name");
+        var fio = reader.FullName.ThrowIfNull ("fio");
 
-            block = null;
-            if (!string.IsNullOrEmpty(config.CatalogField))
-            {
-                block = FindLabel(result, config.CatalogField);
-            }
-            if (!ReferenceEquals(block, null))
-            {
-                var catalogUrl = config.CatalogUrl;
-                if (string.IsNullOrEmpty(catalogUrl))
-                {
-                    Magna.Debug("BuildCardForReader: catalogUrl not specified!");
-                }
-                else
-                {
-                    block["value"] = string.Format
-                        (
-                            catalogUrl,
-                            UrlEncode(name),
-                            UrlEncode(ticket)
-                        );
-                }
-            }
+        var result = (JObject)templateObject.DeepClone();
 
-            var barcodeField = config.BarcodeField;
-            if (!string.IsNullOrEmpty(barcodeField))
-            {
-                block = (JObject) result[barcodeField];
-                if (!ReferenceEquals(block, null))
-                {
-                    block.Property("messageType")?.Remove();
-                    block.Property("signatureType")?.Remove();
-                    block["message"] = ticket;
-                    block["signature"] = ticket;
-                }
-            }
-
-            return result;
-
-            */
-
-            throw new NotImplementedException();
-
-        } // method BuildCardForReader
-
-        /// <summary>
-        /// Убираем '-empty-'.
-        /// </summary>
-        public static string? NullForEmpty (this string? value) => value.SameString ("-empty-") ? null : value;
-
-        /// <summary>
-        /// Полный путь до <c>dicards.json</c>.
-        /// </summary>
-        public static string DicardsJson() => PathUtility.MapPath ("dicards.json").ThrowIfNull ();
-
-        /// <summary>
-        /// Кодирование URL в UTF-8.
-        /// </summary>
-        public static string UrlEncode (string text) =>
-            HttpUtility.UrlEncode (text, Encoding.UTF8);
-
-        /// <summary>
-        /// Получение идентификатора читателя.
-        /// </summary>
-        public static string GetReaderId
-            (
-                Record record,
-                DicardsConfiguration config
-            )
+        JObject? block = null;
+        if (!string.IsNullOrEmpty (config.FioField))
         {
-            var idTag = config.ReaderId.SafeToInt32 (30);
-            var result = record.FM (idTag).ThrowIfNullOrEmpty ();
+            block = FindLabel (result, config.FioField);
+        }
 
-            return result;
-
-        } // method GetReaderId
-
-        /// <summary>
-        /// Получение идентификатора читателя.
-        /// </summary>
-        public static string GetReaderId
-            (
-                ReaderInfo reader,
-                DicardsConfiguration config
-            )
+        if (!ReferenceEquals (block, null))
         {
-            var record = reader.Record.ThrowIfNull ();
-            var result = GetReaderId (record, config);
+            block["value"] = fio;
+        }
 
-            return result;
+        block = null;
+        if (!string.IsNullOrEmpty (config.CabinetField))
+        {
+            block = FindLabel (result, config.CabinetField);
+        }
 
-        } // method GetReaderId
+        if (!ReferenceEquals (block, null))
+        {
+            var cabinetUrl = config.CabinetUrl;
+            if (string.IsNullOrEmpty (cabinetUrl))
+            {
+                Magna.Logger.LogInformation
+                    (
+                        "BuildCardForReader:: cabinetUrl not specified"
+                    );
+            }
+            else
+            {
+                block["value"] = string.Format
+                    (
+                        cabinetUrl,
+                        UrlEncode (name),
+                        UrlEncode (ticket)
+                    );
+            }
+        }
 
-        #endregion
+        block = null;
+        if (!string.IsNullOrEmpty (config.CatalogField))
+        {
+            block = FindLabel (result, config.CatalogField);
+        }
 
-    } // class OsmiUtility
+        if (!ReferenceEquals (block, null))
+        {
+            var catalogUrl = config.CatalogUrl;
+            if (string.IsNullOrEmpty (catalogUrl))
+            {
+                Magna.Logger.LogInformation
+                    (
+                        "BuildCardForReader:: catalogUrl not specified"
+                    );
+            }
+            else
+            {
+                block["value"] = string.Format
+                    (
+                        catalogUrl,
+                        UrlEncode (name),
+                        UrlEncode (ticket)
+                    );
+            }
+        }
 
-} // namespace RestfulIrbis.OsmiCards
+        var barcodeField = config.BarcodeField;
+        if (!string.IsNullOrEmpty (barcodeField))
+        {
+            block = (JObject?) result[barcodeField];
+            if (block is not null)
+            {
+                block.Property ("messageType")?.Remove();
+                block.Property ("signatureType")?.Remove();
+                block["message"] = ticket;
+                block["signature"] = ticket;
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Убираем '-empty-'.
+    /// </summary>
+    public static string? NullForEmpty (this string? value) =>
+        value.SameString ("-empty-") ? null : value;
+
+    /// <summary>
+    /// Полный путь до <c>dicards.json</c>.
+    /// </summary>
+    public static string DicardsJson() => PathUtility.MapPath ("dicards.json").ThrowIfNull();
+
+    /// <summary>
+    /// Кодирование URL в UTF-8.
+    /// </summary>
+    public static string UrlEncode (string text) =>
+        HttpUtility.UrlEncode (text, Encoding.UTF8);
+
+    /// <summary>
+    /// Получение идентификатора читателя.
+    /// </summary>
+    public static string GetReaderId
+        (
+            Record record,
+            DicardsConfiguration config
+        )
+    {
+        var idTag = config.ReaderId.SafeToInt32 (30);
+        var result = record.FM (idTag).ThrowIfNullOrEmpty();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Получение идентификатора читателя.
+    /// </summary>
+    public static string GetReaderId
+        (
+            ReaderInfo reader,
+            DicardsConfiguration config
+        )
+    {
+        var record = reader.Record.ThrowIfNull();
+        var result = GetReaderId (record, config);
+
+        return result;
+    }
+
+    #endregion
+}

@@ -806,15 +806,26 @@ public class SyncConnection
         using var response = ExecuteSync (query);
 
         return !response.IsGood (false, ConnectionUtility.GoodCodesForReadTerms) ? null : Term.Parse (response);
-    } // method ReadTerms
+    }
 
     /// <inheritdoc cref="IAsyncProvider.ReadTextFileAsync"/>
-    public string? ReadTextFile (FileSpecification specification) =>
-        ExecuteSync (CommandCode.ReadDocument, specification.ToString())
+    public string? ReadTextFile
+        (
+            FileSpecification specification
+        )
+    {
+        Sure.VerifyNotNull (specification);
+
+        return ExecuteSync
+                (
+                    CommandCode.ReadDocument,
+                    specification.ToString()
+                )
             .TransformNoCheck
                 (
-                    resp => IrbisText.IrbisToWindows (resp.ReadAnsi())
+                    resp => IrbisText.IrbisToWindows (resp.ReadRemainingAnsiText())
                 );
+    }
 
     /// <inheritdoc cref="ISyncProvider.ReloadDictionary"/>
     public bool ReloadDictionary (string? databaseName = default) =>
