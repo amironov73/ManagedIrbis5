@@ -1088,7 +1088,7 @@ public static class StreamUtility
         var span = new Span<byte> (buffer, sizeof (int));
         ReadExact (stream, span);
         return IPAddress.NetworkToHostOrder (*(int*)buffer);
-    } // method ReadInt32Network
+    }
 
     /// <summary>
     /// Read integer in host byte order.

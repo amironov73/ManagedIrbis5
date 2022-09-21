@@ -50,8 +50,8 @@ public sealed class DictionaryCounterSingle<TKey>
 
                 return result;
             }
-        } // method get
-    } // property Total
+        }
+    }
 
     #endregion
 

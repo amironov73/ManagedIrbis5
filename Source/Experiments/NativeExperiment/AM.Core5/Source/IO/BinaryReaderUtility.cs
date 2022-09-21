@@ -84,7 +84,8 @@ public static class BinaryReaderUtility
     {
         var length = reader.ReadPackedInt32();
         var result = new byte[length];
-        reader.Read (result, 0, length);
+        length = reader.Read (result, 0, length);
+        Array.Resize (ref result, length);
 
         return result;
     }
@@ -270,7 +271,7 @@ public static class BinaryReaderUtility
     {
         var flag = reader.ReadBoolean();
         return flag
-            ? (byte?)reader.ReadByte()
+            ? reader.ReadByte()
             : null;
     }
 
@@ -284,7 +285,7 @@ public static class BinaryReaderUtility
     {
         var flag = reader.ReadBoolean();
         return flag
-            ? (double?)reader.ReadDouble()
+            ? reader.ReadDouble()
             : null;
     }
 
@@ -299,7 +300,7 @@ public static class BinaryReaderUtility
         var flag = reader.ReadBoolean();
 
         return flag
-            ? (decimal?)reader.ReadDecimal()
+            ? reader.ReadDecimal()
             : null;
     }
 
@@ -313,7 +314,7 @@ public static class BinaryReaderUtility
     {
         var flag = reader.ReadBoolean();
         return flag
-            ? (short?)reader.ReadInt16()
+            ? reader.ReadInt16()
             : null;
     }
 
@@ -327,7 +328,7 @@ public static class BinaryReaderUtility
     {
         var flag = reader.ReadBoolean();
         return flag
-            ? (int?)reader.ReadInt32()
+            ? reader.ReadInt32()
             : null;
     }
 
@@ -366,7 +367,7 @@ public static class BinaryReaderUtility
     {
         var flag = reader.ReadBoolean();
         return flag
-            ? (long?)reader.ReadInt64()
+            ? reader.ReadInt64()
             : null;
     }
 
@@ -404,7 +405,7 @@ public static class BinaryReaderUtility
         }
 
         return result;
-    } // method ReadNullableStringArray
+    }
 
     /// <summary>
     /// Read nullable array of strings.
@@ -426,7 +427,7 @@ public static class BinaryReaderUtility
         }
 
         return result;
-    } // method ReadNullableReadOnlyMemoryArray
+    }
 
     /// <summary>
     /// Read nullable array of objects.

@@ -190,7 +190,7 @@ public static class Sequence
 
             yield return item;
         }
-    } // method Assert
+    }
 
     // /// <summary>
     // /// Нарезает последовательность на куски (массивы)

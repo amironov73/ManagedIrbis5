@@ -63,7 +63,7 @@ public class MemoryReader
 
             return result;
         }
-    } // property Available
+    }
 
     /// <summary>
     /// Достигнут конец?

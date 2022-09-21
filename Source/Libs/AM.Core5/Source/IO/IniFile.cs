@@ -707,7 +707,7 @@ public class IniFile
 
             throw new ArgumentException (nameof (keyName));
         }
-    } // method CheckKeyName
+    }
 
     private static void _SaveSection
         (
@@ -727,7 +727,7 @@ public class IniFile
         {
             line.Write (writer);
         }
-    } // method _SaveSection
+    }
 
     #endregion
 
@@ -865,7 +865,7 @@ public class IniFile
         }
 
         return null;
-    } // method GetSection
+    }
 
     /// <summary>
     /// Get all the sections.
@@ -906,7 +906,7 @@ public class IniFile
             : section.GetValue (keyName, defaultValue);
 
         return result;
-    } // method GetValue
+    }
 
     /// <summary>
     /// Merge the section.
@@ -938,7 +938,7 @@ public class IniFile
                 }
             }
         }
-    } // method MergeSection
+    }
 
     /// <summary>
     /// Remove specified section.
@@ -1103,7 +1103,7 @@ public class IniFile
         }
 
         Modified = false;
-    } // method Save
+    }
 
     /// <summary>
     /// Save the INI-file to specified file.
@@ -1123,7 +1123,7 @@ public class IniFile
                 encoding
             );
         Save (writer);
-    } // method Save
+    }
 
     /// <summary>
     /// Set value for specified section and key.

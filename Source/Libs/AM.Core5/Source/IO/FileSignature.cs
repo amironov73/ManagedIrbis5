@@ -150,7 +150,7 @@ public sealed class FileSignature
         }
 
         _knownSignatures = list.ToArray();
-    } // method _InitializeSignatures
+    }
 
     /// <summary>
     /// Находим алиас для указанного расширения.

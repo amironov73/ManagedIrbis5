@@ -403,7 +403,7 @@ public static class ArrayUtility
         }
 
         return -1;
-    } // method IndexOf
+    }
 
     /// <summary>
     /// Determines whether the specified array is null or empty
