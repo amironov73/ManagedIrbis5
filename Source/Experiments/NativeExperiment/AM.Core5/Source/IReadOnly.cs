@@ -2,43 +2,40 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable UnusedMemberInSuper.Global
-// ReSharper disable UnusedMember.Global
+// ReSharper disable CommentTypo
 
-/* IReadOnly -- common interface for object that can be read-only.
+/* IReadOnly -- общий интерфейс для объектов, поддерживающих состояние "только для чтения"
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Общий интерфейс для объектов, поддерживающих состояние "только для чтения".
+/// </summary>
+public interface IReadOnly<out T>
 {
     /// <summary>
-    /// Common interface for object that can be read-only.
+    /// Получение копии объекта в состоянии "только для чтения".
     /// </summary>
-    public interface IReadOnly<out T>
-    {
-        /// <summary>
-        /// Creates the read-only clone of the object.
-        /// </summary>
-        T AsReadOnly();
+    T AsReadOnly();
 
-        /// <summary>
-        /// Whether the object is read-only.
-        /// </summary>
-        bool ReadOnly { get; }
+    /// <summary>
+    /// В настоящее время объект находится в состоянии "только для чтения"?
+    /// </summary>
+    bool ReadOnly { get; }
 
-        /// <summary>
-        /// Marks the object as read-only.
-        /// </summary>
-        void SetReadOnly();
+    /// <summary>
+    /// Установка состояния "только для чтения".
+    /// Отмена этого состояния не предусмотрена.
+    /// </summary>
+    void SetReadOnly();
 
-        /// <summary>
-        /// Throws <see cref="ReadOnlyException"/>
-        /// if the object is read-only.
-        /// </summary>
-        void ThrowIfReadOnly();
-
-    } // interface IReadOnly
-
-} // namespace AM
+    /// <summary>
+    /// Выброс искоючения <see cref="ReadOnlyException"/>, если объект
+    /// находится в состоянии "только для чтения".
+    /// </summary>
+    void ThrowIfReadOnly();
+}

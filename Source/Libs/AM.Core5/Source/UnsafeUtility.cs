@@ -19,31 +19,28 @@ using static System.Runtime.InteropServices.MemoryMarshal;
 
 #endregion
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Возня вокруг unsafe.
+/// </summary>
+public static class UnsafeUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Возня вокруг unsafe.
+    /// Превращаем ссылку на структуру в спан.
     /// </summary>
-    public static class UnsafeUtility
+    public static Span<byte> AsSpan<T>
+        (
+            ref T value
+        )
+        where T : struct
     {
-        #region Public methods
+        var size = Unsafe.SizeOf<T>();
 
-        /// <summary>
-        /// Превращаем ссылку на структуру в спан.
-        /// </summary>
-        public static Span<byte> AsSpan<T>
-            (
-                ref T value
-            )
-            where T: struct
-        {
-            var size = Unsafe.SizeOf<T>();
+        return AsBytes (CreateSpan (ref value, size));
+    }
 
-            return AsBytes(CreateSpan(ref value, size));
-        }
-
-        #endregion
-
-    } // class UnsafeUtility
-
-} // namespace AM
+    #endregion
+}

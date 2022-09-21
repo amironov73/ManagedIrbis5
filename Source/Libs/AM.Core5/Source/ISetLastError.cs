@@ -3,7 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable UnusedMember.Global
 
 /* ISetLastError.cs -- интерфейс установки кода ошибки
  * Ars Magna project, http://arsmagna.ru
@@ -11,19 +10,16 @@
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Интерфейс установки кода ошибки.
+/// </summary>
+public interface ISetLastError
+    : IGetLastError
 {
     /// <summary>
-    /// Интерфейс установки кода ошибки.
+    /// Установка кода ошибки.
     /// </summary>
-    public interface ISetLastError
-        : IGetLastError
-    {
-        /// <summary>
-        /// Установка кода ошибки.
-        /// </summary>
-        int SetLastError(int code);
-
-    } // interface ISetLastError
-
-} // namespace AM
+    int SetLastError (int code);
+}

@@ -17,29 +17,26 @@ using System;
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Расширенный интерфейс прогресса длительного процесса.
+/// </summary>
+public interface IExtendedProgress<in T>
+    : IProgress<T>
 {
     /// <summary>
-    /// Расширенный интерфейс прогресса.
+    /// Установка ожидаемого максимального значения.
     /// </summary>
-    public interface IExtendedProgress<in T>
-        : IProgress<T>
-    {
-        /// <summary>
-        /// Установка ожидаемого максимального значения.
-        /// </summary>
-        void SetMaximum (T maximum);
+    void SetMaximum (T maximum);
 
-        /// <summary>
-        /// Сообщение о продвижении прогресса.
-        /// </summary>
-        void ExtendedReport (T value, string? message);
+    /// <summary>
+    /// Сообщение о продвижении прогресса.
+    /// </summary>
+    void ExtendedReport (T value, string? message);
 
-        /// <summary>
-        /// Сообщение об ошибке.
-        /// </summary>
-        void ReportError (T value, string? message);
-
-    } // interface IExetendedProgress
-
-} // namespace AM
+    /// <summary>
+    /// Сообщение об ошибке.
+    /// </summary>
+    void ReportError (T value, string? message);
+}

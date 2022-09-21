@@ -4,12 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* Unix.cs -- возня вокруг регистрозависимости имен файлов в системе UNIX
  * Ars Magna project, http://arsmagna.ru
@@ -28,508 +24,488 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Возня вокру регистрозависимости имен файлов
+/// в системе UNIX.
+/// </summary>
+public static class Unix
 {
-    /// <summary>
-    /// Возня вокру регистрозависимости имен файлов
-    /// в системе UNIX.
-    /// </summary>
-    public static class Unix
+    #region Private members
+
+    private static string? _Correct
+        (
+            string parent,
+            string child
+        )
     {
-        #region Private members
-
-        private static string? _Correct
-            (
-                string parent,
-                string child
-            )
+        var combined = Path.Combine (parent, child);
+        if (Directory.Exists (combined))
         {
-            var combined = Path.Combine(parent, child);
-            if (Directory.Exists(combined))
+            return child;
+        }
+
+        var options = new EnumerationOptions
+        {
+            MatchCasing = MatchCasing.CaseInsensitive
+        };
+        foreach (var candidate in
+                 Directory.EnumerateDirectories (parent, child, options))
+        {
+            return Path.GetFileName (candidate);
+        }
+
+        return null;
+    }
+
+    private static string? _FixDirectory
+        (
+            string directory
+        )
+    {
+        if (Directory.Exists (directory))
+        {
+            return directory;
+        }
+
+        directory = directory.ConvertSlashes();
+        var rooted = Path.IsPathRooted (directory);
+        if (rooted)
+        {
+            directory = directory.Substring (1);
+        }
+
+        var trailed = Path.EndsInDirectorySeparator (directory);
+        if (trailed)
+        {
+            directory = directory.Substring (0, directory.Length - 1);
+        }
+
+        var parts = directory.Split (Path.DirectorySeparatorChar);
+        var builder = StringBuilderPool.Shared.Get();
+        if (rooted)
+        {
+            builder.Append (Path.DirectorySeparatorChar);
+        }
+
+        var first = true;
+        foreach (var child in parts)
+        {
+            var parent = builder.ToString();
+            var corrected = _Correct (parent, child);
+            if (corrected is null)
             {
-                return child;
+                return null;
             }
 
-            var options = new EnumerationOptions
+            if (!first)
             {
-                MatchCasing = MatchCasing.CaseInsensitive
-            };
-            foreach (var candidate in
-                Directory.EnumerateDirectories(parent, child, options))
-            {
-                return Path.GetFileName(candidate);
+                builder.Append (Path.DirectorySeparatorChar);
             }
 
+            builder.Append (corrected);
+            first = false;
+        }
+
+        if (trailed)
+        {
+            builder.Append (Path.DirectorySeparatorChar);
+        }
+
+        return builder.ReturnShared();
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Добавление строк в указанный файл.
+    /// </summary>
+    public static void AppendAllLines
+        (
+            string path,
+            IEnumerable<string> lines,
+            Encoding? encoding = default
+        )
+    {
+        encoding ??= Encoding.UTF8;
+        var found = FindFileOrThrow (path);
+
+        File.AppendAllLines (found, lines, encoding);
+    }
+
+    /// <summary>
+    /// Добавление текста в указанный файл.
+    /// </summary>
+    public static void AppendAllText
+        (
+            string path,
+            string text,
+            Encoding? encoding = default
+        )
+    {
+        encoding ??= Encoding.UTF8;
+        var found = FindFileOrThrow (path);
+
+        File.AppendAllText (found, text, encoding);
+    }
+
+    /// <summary>
+    /// Создает <see cref="StreamWriter"/> для добавления текста.
+    /// </summary>
+    public static StreamWriter AppendText
+        (
+            string path,
+            Encoding? encoding = default
+        )
+    {
+        encoding ??= Encoding.UTF8;
+        var found = FindDirectoryOrThrow (path);
+
+        return new StreamWriter (found, true, encoding);
+    }
+
+    /// <summary>
+    /// Удаление файла с указанным именем.
+    /// </summary>
+    public static void DeleteFile
+        (
+            string path
+        )
+    {
+        var found = FindFile (path);
+        if (found is not null)
+        {
+            File.Delete (found);
+        }
+    }
+
+    /// <summary>
+    /// Директория с похожим именем существует?
+    /// </summary>
+    public static bool DirectoryExists (string directoryName) =>
+        FindDirectory (directoryName) is not null;
+
+    /// <summary>
+    /// Файл с похожим именем существует?
+    /// </summary>
+    public static bool FileExists (string fileName) =>
+        FindFile (fileName) is not null;
+
+    /// <summary>
+    /// Поиск директории с подходящим именем.
+    /// </summary>
+    public static string? FindDirectory
+        (
+            string directoryName
+        )
+    {
+        if (Directory.Exists (directoryName))
+        {
+            return directoryName;
+        }
+
+        if (OperatingSystem.IsWindows())
+        {
             return null;
         }
 
-        private static string? _FixDirectory
-            (
-                string directory
-            )
+        var parent = Path.GetDirectoryName (directoryName) ?? ".";
+        parent = _FixDirectory (parent);
+        if (string.IsNullOrEmpty (parent))
         {
-            if (Directory.Exists(directory))
-            {
-                return directory;
-            }
-
-            directory = directory.ConvertSlashes();
-            var rooted = Path.IsPathRooted(directory);
-            if (rooted)
-            {
-                directory = directory.Substring(1);
-            }
-
-            var trailed = Path.EndsInDirectorySeparator(directory);
-            if (trailed)
-            {
-                directory = directory.Substring(0, directory.Length - 1);
-            }
-
-            var parts = directory.Split(Path.DirectorySeparatorChar);
-            var builder = StringBuilderPool.Shared.Get();
-            if (rooted)
-            {
-                builder.Append(Path.DirectorySeparatorChar);
-            }
-
-            var first = true;
-            foreach (var child in parts)
-            {
-                var parent = builder.ToString();
-                var corrected = _Correct(parent, child);
-                if (corrected is null)
-                {
-                    return null;
-                }
-
-                if (!first)
-                {
-                    builder.Append(Path.DirectorySeparatorChar);
-                }
-
-                builder.Append(corrected);
-                first = false;
-            }
-
-            if (trailed)
-            {
-                builder.Append(Path.DirectorySeparatorChar);
-            }
-
-            return builder.ReturnShared();
+            return null;
         }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавление строк в указанный файл.
-        /// </summary>
-        public static void AppendAllLines
-            (
-                string path,
-                IEnumerable<string> lines,
-                Encoding? encoding = default
-            )
+        var options = new EnumerationOptions
         {
-            encoding ??= Encoding.UTF8;
-            var found = FindFileOrThrow(path);
-
-            File.AppendAllLines(found, lines, encoding);
-
-        } // method AppendAllLines
-
-        /// <summary>
-        /// Добавление текста в указанный файл.
-        /// </summary>
-        public static void AppendAllText
+            MatchCasing = MatchCasing.CaseInsensitive
+        };
+        var child = Path.GetFileName (directoryName);
+        var directories = Directory.EnumerateDirectories
             (
-                string path,
-                string text,
-                Encoding? encoding = default
-            )
+                parent,
+                child,
+                options
+            );
+        foreach (var candidate in directories)
         {
-            encoding ??= Encoding.UTF8;
-            var found = FindFileOrThrow(path);
+            if (candidate.SameString (directoryName))
+            {
+                return candidate;
+            }
+        }
 
-            File.AppendAllText(found, text, encoding);
+        return null;
+    }
 
-        } // method AppendAllText
-
-        /// <summary>
-        /// Создает <see cref="StreamWriter"/> для добавления текста.
-        /// </summary>
-        public static StreamWriter AppendText
-            (
-                string path,
-                Encoding? encoding = default
-            )
+    /// <summary>
+    /// Поиск директории с подходящим именем.
+    /// Если директория не найдена, бросается исключение.
+    /// </summary>
+    public static string FindDirectoryOrThrow
+        (
+            string directoryName
+        )
+    {
+        var result = FindDirectory (directoryName);
+        if (string.IsNullOrEmpty (result))
         {
-            encoding ??= Encoding.UTF8;
-            var found = FindDirectoryOrThrow(path);
+            throw new DirectoryNotFoundException (directoryName);
+        }
 
-            return new StreamWriter(found, true, encoding);
+        return result;
+    }
 
-        } // method AppendText
-
-        /// <summary>
-        /// Удаление файла с указанным именем.
-        /// </summary>
-        public static void DeleteFile
-            (
-                string path
-            )
+    /// <summary>
+    /// Поиск файла с подходящим именем.
+    /// </summary>
+    public static string? FindFile
+        (
+            string fileName
+        )
+    {
+        if (File.Exists (fileName))
         {
-            var found = FindFile(path);
-            if (found is not null)
-            {
-                File.Delete(found);
-            }
+            return fileName;
+        }
 
-        } // method DeleteFile
-
-        /// <summary>
-        /// Директория с похожим именем существует?
-        /// </summary>
-        public static bool DirectoryExists (string directoryName) =>
-            FindDirectory (directoryName) is not null;
-
-        /// <summary>
-        /// Файл с похожим именем существует?
-        /// </summary>
-        public static bool FileExists (string fileName) =>
-            FindFile (fileName) is not null;
-
-        /// <summary>
-        /// Поиск директории с подходящим именем.
-        /// </summary>
-        public static string? FindDirectory
-            (
-                string directoryName
-            )
+        if (OperatingSystem.IsWindows())
         {
-            if (Directory.Exists(directoryName))
-            {
-                return directoryName;
-            }
-
-            if (OperatingSystem.IsWindows())
-            {
-                return null;
-            }
-
-            var parent = Path.GetDirectoryName(directoryName) ?? ".";
-            parent = _FixDirectory(parent);
-            if (string.IsNullOrEmpty(parent))
-            {
-                return null;
-            }
-
-            var options = new EnumerationOptions
-            {
-                MatchCasing = MatchCasing.CaseInsensitive
-            };
-            var child = Path.GetFileName(directoryName);
-            foreach (var candidate in
-                Directory.EnumerateDirectories(parent, child, options))
-            {
-                if (candidate.SameString(directoryName))
-                {
-                    return candidate;
-                }
-            }
-
             return null;
+        }
 
-        } // method FindDirectory
-
-        /// <summary>
-        /// Поиск директории с подходящим именем.
-        /// Если директория не найдена, бросается исключение.
-        /// </summary>
-        public static string FindDirectoryOrThrow
-            (
-                string directoryName
-            )
+        var parent = Path.GetDirectoryName (fileName) ?? ".";
+        parent = _FixDirectory (parent);
+        if (string.IsNullOrEmpty (parent))
         {
-            var result = FindDirectory(directoryName);
-            if (string.IsNullOrEmpty(result))
-            {
-                throw new DirectoryNotFoundException(directoryName);
-            }
-
-            return result;
-
-        } // method FindDirectoryOrThrow
-
-        /// <summary>
-        /// Поиск файла с подходящим именем.
-        /// </summary>
-        public static string? FindFile
-            (
-                string fileName
-            )
-        {
-            if (File.Exists(fileName))
-            {
-                return fileName;
-            }
-
-            if (OperatingSystem.IsWindows())
-            {
-                return null;
-            }
-
-            var parent = Path.GetDirectoryName(fileName) ?? ".";
-            parent = _FixDirectory(parent);
-            if (string.IsNullOrEmpty(parent))
-            {
-                return null;
-            }
-
-            var options = new EnumerationOptions
-            {
-                MatchCasing = MatchCasing.CaseInsensitive
-            };
-            var child = Path.GetFileName(fileName);
-            foreach (var candidate in
-                Directory.EnumerateFiles(parent, child, options))
-            {
-                if (candidate.SameString(fileName))
-                {
-                    return candidate;
-                }
-            }
-
             return null;
+        }
 
-        } // method FindFile
-
-        /// <summary>
-        /// Поиск файла с подходящим именем.
-        /// Если файл не найден, бросается исключение.
-        /// </summary>
-        public static string FindFileOrThrow
-            (
-                string fileName
-            )
+        var options = new EnumerationOptions
         {
-            var result = FindFile(fileName);
-            if (string.IsNullOrEmpty(result))
+            MatchCasing = MatchCasing.CaseInsensitive
+        };
+        var child = Path.GetFileName (fileName);
+        foreach (var candidate in
+                 Directory.EnumerateFiles (parent, child, options))
+        {
+            if (candidate.SameString (fileName))
             {
-                throw new FileNotFoundException(fileName);
+                return candidate;
             }
+        }
 
-            return result;
+        return null;
+    }
 
-        } // method FindFileOrThrow
-
-        /// <summary>
-        /// Открытие указанного файла.
-        /// </summary>
-        public static FileStream OpenFile
-            (
-                string path,
-                FileMode mode
-            )
+    /// <summary>
+    /// Поиск файла с подходящим именем.
+    /// Если файл не найден, бросается исключение.
+    /// </summary>
+    public static string FindFileOrThrow
+        (
+            string fileName
+        )
+    {
+        var result = FindFile (fileName);
+        if (string.IsNullOrEmpty (result))
         {
-            var found = FindFileOrThrow(path);
+            throw new FileNotFoundException (fileName);
+        }
 
-            return File.Open(found, mode);
+        return result;
+    }
 
-        } // method OpenFile
+    /// <summary>
+    /// Открытие указанного файла.
+    /// </summary>
+    public static FileStream OpenFile
+        (
+            string path,
+            FileMode mode
+        )
+    {
+        var found = FindFileOrThrow (path);
 
-        /// <summary>
-        /// Открытие указанного файла.
-        /// </summary>
-        public static FileStream OpenFile
-            (
-                string path,
-                FileMode mode,
-                FileAccess access
-            )
-        {
-            var found = FindFileOrThrow(path);
+        return File.Open (found, mode);
+    }
 
-            return File.Open(found, mode, access);
+    /// <summary>
+    /// Открытие указанного файла.
+    /// </summary>
+    public static FileStream OpenFile
+        (
+            string path,
+            FileMode mode,
+            FileAccess access
+        )
+    {
+        var found = FindFileOrThrow (path);
 
-        } // method OpenFile
+        return File.Open (found, mode, access);
+    }
 
-        /// <summary>
-        /// Открытие указанного файла.
-        /// </summary>
-        public static FileStream OpenFile
-            (
-                string path,
-                FileMode mode,
-                FileAccess access,
-                FileShare share
-            )
-        {
-            var found = FindFileOrThrow(path);
+    /// <summary>
+    /// Открытие указанного файла.
+    /// </summary>
+    public static FileStream OpenFile
+        (
+            string path,
+            FileMode mode,
+            FileAccess access,
+            FileShare share
+        )
+    {
+        var found = FindFileOrThrow (path);
 
-            return File.Open(found, mode, access, share);
+        return File.Open (found, mode, access, share);
+    }
 
-        } // method OpenFile
+    /// <summary>
+    /// Открытие файла для чтения.
+    /// </summary>
+    public static FileStream OpenRead
+        (
+            string fileName
+        )
+    {
+        var found = FindFileOrThrow (fileName);
 
-        /// <summary>
-        /// Открытие файла для чтения.
-        /// </summary>
-        public static FileStream OpenRead
-            (
-                string fileName
-            )
-        {
-            var found = FindFileOrThrow(fileName);
+        return File.OpenRead (found);
+    }
 
-            return File.OpenRead(found);
+    /// <summary>
+    /// Открытие текстового файла для чтения.
+    /// </summary>
+    public static StreamReader OpenText
+        (
+            string path
+        )
+    {
+        var found = FindFileOrThrow (path);
 
-        } // method OpenRead
+        return File.OpenText (found);
+    }
 
-        /// <summary>
-        /// Открытие текстового файла для чтения.
-        /// </summary>
-        public static StreamReader OpenText
-            (
-                string path
-            )
-        {
-            var found = FindFileOrThrow(path);
+    /// <summary>
+    /// Открытие файла для чтения/записи.
+    /// </summary>
+    public static FileStream OpenWrite
+        (
+            string fileName
+        )
+    {
+        var found = FindFileOrThrow (fileName);
 
-            return File.OpenText(found);
+        return File.OpenWrite (found);
+    }
 
-        } // method OpenText
+    /// <summary>
+    /// Чтение всех данных из указанного файла.
+    /// </summary>
+    public static byte[] ReadAllBytes
+        (
+            string path
+        )
+    {
+        var found = FindFileOrThrow (path);
 
-        /// <summary>
-        /// Открытие файла для чтения/записи.
-        /// </summary>
-        public static FileStream OpenWrite
-            (
-                string fileName
-            )
-        {
-            var found = FindFileOrThrow(fileName);
+        return File.ReadAllBytes (found);
+    }
 
-            return File.OpenWrite(found);
+    /// <summary>
+    /// Чтение всех строк из указанного файла.
+    /// </summary>
+    public static string[] ReadAllLines
+        (
+            string path,
+            Encoding? encoding = default
+        )
+    {
+        encoding ??= Encoding.UTF8;
+        var found = FindFileOrThrow (path);
 
-        } // method OpenWrite
+        return File.ReadAllLines (found, encoding);
+    }
 
-        /// <summary>
-        /// Чтение всех данных из указанного файла.
-        /// </summary>
-        public static byte[] ReadAllBytes
-            (
-                string path
-            )
-        {
-            var found = FindFileOrThrow(path);
+    /// <summary>
+    /// Чтение всего текста из указанного файла.
+    /// </summary>
+    public static string ReadAllText
+        (
+            string path,
+            Encoding? encoding = default
+        )
+    {
+        encoding ??= Encoding.UTF8;
+        var found = FindFileOrThrow (path);
 
-            return File.ReadAllBytes(found);
+        return File.ReadAllText (found, encoding);
+    }
 
-        } // method ReadAllBytes
+    /// <summary>
+    /// Построчное чтение строк из указанного файла.
+    /// </summary>
+    public static IEnumerable<string> ReadLines
+        (
+            string path,
+            Encoding? encoding = default
+        )
+    {
+        encoding ??= Encoding.UTF8;
+        var found = FindDirectoryOrThrow (path);
 
-        /// <summary>
-        /// Чтение всех строк из указанного файла.
-        /// </summary>
-        public static string[] ReadAllLines
-            (
-                string path,
-                Encoding? encoding = default
-            )
-        {
-            encoding ??= Encoding.UTF8;
-            var found = FindFileOrThrow(path);
+        return File.ReadLines (found, encoding);
+    }
 
-            return File.ReadAllLines(found, encoding);
+    /// <summary>
+    /// Запись данных в указанный файл.
+    /// </summary>
+    public static void WriteAllBytes
+        (
+            string path,
+            byte[] bytes
+        )
+    {
+        var found = FindFileOrThrow (path);
 
-        } // method ReadAllLines
+        File.WriteAllBytes (found, bytes);
+    }
 
-        /// <summary>
-        /// Чтение всего текста из указанного файла.
-        /// </summary>
-        public static string ReadAllText
-            (
-                string path,
-                Encoding? encoding = default
-            )
-        {
-            encoding ??= Encoding.UTF8;
-            var found = FindFileOrThrow(path);
+    /// <summary>
+    /// Запись строк в указанный файл.
+    /// </summary>
+    public static void WriteAllLines
+        (
+            string path,
+            IEnumerable<string> lines,
+            Encoding? encoding = default
+        )
+    {
+        encoding ??= Encoding.UTF8;
+        var found = FindFileOrThrow (path);
 
-            return File.ReadAllText(found, encoding);
+        File.WriteAllLines (found, lines, encoding);
+    }
 
-        } // method ReadAllText
+    /// <summary>
+    /// Запись текста в указанный файл.
+    /// </summary>
+    public static void WriteAllText
+        (
+            string path,
+            string text,
+            Encoding? encoding = default
+        )
+    {
+        encoding ??= Encoding.UTF8;
+        var found = FindFileOrThrow (path);
 
-        /// <summary>
-        /// Построчное чтение строк из указанного файла.
-        /// </summary>
-        public static IEnumerable<string> ReadLines
-            (
-                string path,
-                Encoding? encoding = default
-            )
-        {
-            encoding ??= Encoding.UTF8;
-            var found = FindDirectoryOrThrow(path);
+        File.WriteAllText (found, text, encoding);
+    }
 
-            return File.ReadLines(found, encoding);
-
-        } // method ReadLines
-
-        /// <summary>
-        /// Запись данных в указанный файл.
-        /// </summary>
-        public static void WriteAllBytes
-            (
-                string path,
-                byte[] bytes
-            )
-        {
-            var found = FindFileOrThrow(path);
-
-            File.WriteAllBytes(found, bytes);
-
-        } // method WriteAllBytes
-
-        /// <summary>
-        /// Запись строк в указанный файл.
-        /// </summary>
-        public static void WriteAllLines
-            (
-                string path,
-                IEnumerable<string> lines,
-                Encoding? encoding = default
-            )
-        {
-            encoding ??= Encoding.UTF8;
-            var found = FindFileOrThrow(path);
-
-            File.WriteAllLines(found, lines, encoding);
-
-        } // method WriteAllLines
-
-        /// <summary>
-        /// Запись текста в указанный файл.
-        /// </summary>
-        public static void WriteAllText
-            (
-                string path,
-                string text,
-                Encoding? encoding = default
-            )
-        {
-            encoding ??= Encoding.UTF8;
-            var found = FindFileOrThrow(path);
-
-            File.WriteAllText(found, text, encoding);
-
-        } // method WriteAllText
-
-        #endregion
-
-
-    } // class Unix
-
-} // namespace AM
+    #endregion
+}

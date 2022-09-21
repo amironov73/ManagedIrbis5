@@ -14,48 +14,48 @@ using System;
 
 #endregion
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Specific for IReadOnly interface.
+/// </summary>
+public sealed class ReadOnlyException
+    : ArsMagnaException
 {
+    #region Construction
+
     /// <summary>
-    /// Specific for IReadOnly interface.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public sealed class ReadOnlyException
-        : ArsMagnaException
+    public ReadOnlyException()
     {
-        #region Construction
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ReadOnlyException()
-        {
-        } // constructor
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ReadOnlyException
+        (
+            string message
+        )
+        : base (message)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ReadOnlyException
-            (
-                string message
-            )
-            : base(message)
-        {
-        } // constructor
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ReadOnlyException
+        (
+            string message,
+            Exception innerException
+        )
+        : base (message, innerException)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ReadOnlyException
-            (
-                string message,
-                Exception innerException
-            )
-            : base(message, innerException)
-        {
-        } // constructor
-
-        #endregion
-
-    } // class ReadOnlyException
-
-} // namespace AM
+    #endregion
+}

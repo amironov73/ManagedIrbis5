@@ -3,27 +3,22 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
-/* IAttachmentContainer.cs --
+/* IAttachmentContainer.cs -- список прикрепленных данных
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Контейнер для прикрепленных данных.
+/// </summary>
+public interface IAttachmentContainer
 {
     /// <summary>
-    /// Container of the attachments.
+    /// Список прикрепленных данных.
     /// </summary>
-    public interface IAttachmentContainer
-    {
-        /// <summary>
-        /// List attachments.
-        /// </summary>
-        BinaryAttachment[] ListAttachments();
-
-    } // interface IAttachmentContainer
-
-} // namespace AM
+    BinaryAttachment[] ListAttachments();
+}
