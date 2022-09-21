@@ -49,7 +49,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Превращает объект в видимую строку.
         /// </summary>
-        public static string ToVisibleString<T> (this T? value) where T: class =>
+        public static string ToVisibleString<T> (this T? value) where T : class =>
             value?.ToString() ?? "(null)";
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace ManagedIrbis
         /// Безопасное получение первого символа в строке.
         /// </summary>
         public static char FirstChar (this string? text) =>
-            ReferenceEquals(text, null) || text.Length == 0 ? '\0' : text[0];
+            ReferenceEquals (text, null) || text.Length == 0 ? '\0' : text[0];
 
         /// <summary>
         /// Безопасное получение первого символа в строке.
@@ -86,22 +86,21 @@ namespace ManagedIrbis
         /// Определяет, равен ли данный объект
         /// любому из перечисленных.
         /// </summary>
-        public static bool IsOneOf<T> (this T value, IEnumerable<T> items) where T: IComparable<T>
+        public static bool IsOneOf<T> (this T value, IEnumerable<T> items) where T : IComparable<T>
         {
             foreach (var one in items)
-                if (value.CompareTo(one) == 0)
+                if (value.CompareTo (one) == 0)
                     return true;
 
             return false;
-
-        } // method IsOneOf
+        }
 
         /// <summary>
         /// Разбивка текста на отдельные строки.
         /// </summary>
         /// <remarks>Пустые строки не удаляются.</remarks>
         public static string[] SplitLines (this string text) =>
-            text.Replace("\r\n", "\n").Split('\n');
+            text.Replace ("\r\n", "\n").Split ('\n');
 
         /// <summary>
         /// Обязательное чтение строки.
@@ -109,12 +108,11 @@ namespace ManagedIrbis
         public static string RequireLine (this TextReader reader)
         {
             var result = reader.ReadLine();
-            if (ReferenceEquals(result, null))
+            if (ReferenceEquals (result, null))
                 throw new IrbisException ("Unexpected end of stream");
 
             return result;
-
-        } // method RequireLine
+        }
 
         /// <summary>
         /// Создает текстовый файл в указанной кодировке.
@@ -158,8 +156,7 @@ namespace ManagedIrbis
             }
 
             return result;
-
-        } // method ParseInt32
+        }
 
         /// <summary>
         /// Fast number parsing.
@@ -180,8 +177,7 @@ namespace ManagedIrbis
             }
 
             return result;
-
-        } // method ParseInt32
+        }
 
         /// <summary>
         /// Converts given value to the specified type.
@@ -190,16 +186,16 @@ namespace ManagedIrbis
         /// <returns>Converted value.</returns>
         public static T ConvertTo<T> (object? value)
         {
-            if (ReferenceEquals(value, null))
+            if (ReferenceEquals (value, null))
             {
                 return default!;
             }
 
             var sourceType = value.GetType();
-            var targetType = typeof(T);
+            var targetType = typeof (T);
 
-            if (targetType == typeof(string))
-                return (T)(object) value.ToString()!;
+            if (targetType == typeof (string))
+                return (T)(object)value.ToString()!;
 
             if (targetType.IsAssignableFrom (sourceType))
                 return (T)value;
@@ -209,15 +205,14 @@ namespace ManagedIrbis
 
             var converterFrom = TypeDescriptor.GetConverter (value);
             if (converterFrom.CanConvertTo (targetType))
-                return (T) converterFrom.ConvertTo (value, targetType)!;
+                return (T)converterFrom.ConvertTo (value, targetType)!;
 
             var converterTo = TypeDescriptor.GetConverter (targetType);
             if (converterTo.CanConvertFrom (sourceType))
-                return (T) converterTo.ConvertFrom(value)!;
+                return (T)converterTo.ConvertFrom (value)!;
 
             throw new IrbisException();
-
-        } // method ConvertTo
+        }
 
         /// <summary>
         /// Бросает исключение, если переданное значение пустое,
@@ -233,8 +228,7 @@ namespace ManagedIrbis
                 throw new ArgumentException (message);
 
             return memory;
-
-        } // method ThrowIfEmpty
+        }
 
         /// <summary>
         /// Бросает исключение, если переданное значение пустое,
@@ -252,7 +246,6 @@ namespace ManagedIrbis
             }
 
             return memory;
-
         } // method ThrowIfEmpty
 
         /// <summary>
@@ -264,31 +257,30 @@ namespace ManagedIrbis
                 this T? value,
                 string message
             )
-            where T: class
+            where T : class
         {
-            if (ReferenceEquals(value, null))
+            if (ReferenceEquals (value, null))
             {
                 throw new ArgumentException (message);
             }
 
             return value;
-
-        } // method ThrowIfNull
+        }
 
         /// <summary>
         /// Подстановка значения по умолчанию вместо <c>null</c>.
         /// </summary>
-        public static T IfNull<T>(this T? value, T defaultValue)
-            where T: class
+        public static T IfNull<T> (this T? value, T defaultValue)
+            where T : class
             => value ?? defaultValue;
 
         /// <summary>
         /// Подстановка значения по умолчания вместо пустой строки.
         /// </summary>
-        public static string IfEmpty(this string? value, string defaultValue)
-            => ReferenceEquals(value, null) || value.Length == 0
+        public static string IfEmpty (this string? value, string defaultValue)
+            => ReferenceEquals (value, null) || value.Length == 0
                 ? defaultValue.Length == 0
-                    ? throw new ArgumentNullException(nameof(defaultValue))
+                    ? throw new ArgumentNullException (nameof (defaultValue))
                     : defaultValue
                 : value;
 
@@ -296,7 +288,7 @@ namespace ManagedIrbis
         /// Бросает исключение, если переданное значение равно <c>null</c>,
         /// иначе просто возвращает его.
         /// </summary>
-        public static T ThrowIfNull<T> (this T? value) where T: class =>
+        public static T ThrowIfNull<T> (this T? value) where T : class =>
             ThrowIfNull (value, "Null value detected");
 
         /// <summary>
@@ -308,14 +300,13 @@ namespace ManagedIrbis
                 this string? value
             )
         {
-            if (ReferenceEquals(value, null) || value.Length == 0)
+            if (ReferenceEquals (value, null) || value.Length == 0)
             {
                 throw new ArgumentException();
             }
 
             return value;
-
-        } // method ThrowIfNullOrEmpty
+        }
 
         /// <summary>
         /// Бросает исключение, если переданная строка пустая
@@ -327,13 +318,12 @@ namespace ManagedIrbis
                 string argumentName
             )
         {
-            if (ReferenceEquals(value, null) || value.Length == 0)
+            if (ReferenceEquals (value, null) || value.Length == 0)
             {
-                throw new ArgumentException(argumentName);
+                throw new ArgumentException (argumentName);
             }
 
             return value;
-
         } // method ThrowIfNullOrEmpty
 
         /// <summary>
@@ -351,8 +341,7 @@ namespace ManagedIrbis
             }
 
             return value;
-
-        } // method ThrowIfNullOrEmpty
+        }
 
         /// <summary>
         /// Преобразование целого числа в строку.
@@ -378,13 +367,13 @@ namespace ManagedIrbis
             var length = 0;
             for (; number != 0;)
             {
-                number = Math.DivRem(number, 10, out var rem);
-                buffer[length++] = (byte) ('0' + rem);
+                number = Math.DivRem (number, 10, out var rem);
+                buffer[length++] = (byte)('0' + rem);
             }
 
             if (flag)
             {
-                buffer[length++] = (byte) '-';
+                buffer[length++] = (byte)'-';
             }
 
             var i1 = 0;
@@ -397,8 +386,7 @@ namespace ManagedIrbis
             }
 
             return length;
-
-        } // method Int32ToBytes
+        }
 
         /// <summary>
         /// Проверяет, содержит ли спан указанный символ.
@@ -410,8 +398,7 @@ namespace ManagedIrbis
                     return true;
 
             return false;
-
-        } // method Contains
+        }
 
         /// <summary>
         /// Безопасное преобразование строки в целое.
@@ -424,17 +411,16 @@ namespace ManagedIrbis
                 int maxValue
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
                 return defaultValue;
 
-            if (!int.TryParse(text, out var result))
+            if (!int.TryParse (text, out var result))
                 result = defaultValue;
 
             if (result < minValue || result > maxValue)
                 result = defaultValue;
 
             return result;
-
         } // method SafeToInt32
 
         /// <summary>
@@ -446,19 +432,18 @@ namespace ManagedIrbis
                 int defaultValue
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 return defaultValue;
             }
 
-            if (!int.TryParse(text, out var result))
+            if (!int.TryParse (text, out var result))
             {
                 result = defaultValue;
             }
 
             return result;
-
-        } // method SafeToInt32
+        }
 
         /// <summary>
         /// Безопасное преобразование строки в целое.
@@ -468,34 +453,33 @@ namespace ManagedIrbis
                 this string? text
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 return 0;
             }
 
-            if (!int.TryParse(text, out var result))
+            if (!int.TryParse (text, out var result))
             {
                 result = 0;
             }
 
             return result;
-
-        } // method SafeToInt32
+        }
 
         /// <summary>
         /// Содержит ли строка указанную подстроку?
         /// </summary>
         public static bool SafeContains (this string? text, string? subtext) =>
-            !ReferenceEquals(text, null)
-            && !ReferenceEquals(subtext, null)
-            && text.Contains(subtext);
+            !ReferenceEquals (text, null)
+            && !ReferenceEquals (subtext, null)
+            && text.Contains (subtext);
 
         /// <summary>
         /// Содержит ли строка указанный символ?
         /// </summary>
         public static bool SafeContains (this string? text, char symbol) =>
-            !ReferenceEquals(text, null)
-            && text.Contains(symbol);
+            !ReferenceEquals (text, null)
+            && text.Contains (symbol);
 
         /// <summary>
         /// Содержит ли данная строка одну из перечисленных подстрок?
@@ -507,19 +491,18 @@ namespace ManagedIrbis
                 string? subtext2
             )
         {
-            if (ReferenceEquals(text, null) || text.Length == 0)
+            if (ReferenceEquals (text, null) || text.Length == 0)
             {
                 return false;
             }
 
-            if (!ReferenceEquals(subtext1, null) && text.Contains(subtext1))
+            if (!ReferenceEquals (subtext1, null) && text.Contains (subtext1))
             {
                 return true;
             }
 
-            return !ReferenceEquals(subtext2, null) && text.Contains(subtext2);
-
-        } // method SafeContains
+            return !ReferenceEquals (subtext2, null) && text.Contains (subtext2);
+        }
 
         /// <summary>
         /// Содержит ли данная строка одну из перечисленных подстрок?
@@ -532,18 +515,17 @@ namespace ManagedIrbis
                 string? subtext3
             )
         {
-            if (ReferenceEquals(text, null) || text.Length == 0)
+            if (ReferenceEquals (text, null) || text.Length == 0)
                 return false;
 
-            if (!ReferenceEquals(subtext1, null) && text.Contains(subtext1))
+            if (!ReferenceEquals (subtext1, null) && text.Contains (subtext1))
                 return true;
 
-            if (!ReferenceEquals(subtext2, null) && text.Contains(subtext2))
+            if (!ReferenceEquals (subtext2, null) && text.Contains (subtext2))
                 return true;
 
-            return !ReferenceEquals(subtext3, null) && text.Contains(subtext3);
-
-        } // method SafeContains
+            return !ReferenceEquals (subtext3, null) && text.Contains (subtext3);
+        }
 
         /// <summary>
         /// Содержит ли данная строка одну из перечисленных подстрок?
@@ -554,16 +536,15 @@ namespace ManagedIrbis
                 params string?[] subtexts
             )
         {
-            if (ReferenceEquals(text, null) || text.Length == 0)
+            if (ReferenceEquals (text, null) || text.Length == 0)
                 return false;
 
             foreach (var subtext in subtexts)
-                if (!ReferenceEquals(subtext, null) && text.Contains(subtext))
+                if (!ReferenceEquals (subtext, null) && text.Contains (subtext))
                     return true;
 
             return false;
-
-        } // method SafeContains
+        }
 
         /// <summary>
         /// Сравнивает символы с точностью до регистра
@@ -573,7 +554,7 @@ namespace ManagedIrbis
         /// <param name="two">Второй символ.</param>
         /// <returns>Символы совпадают с точностью до регистра?</returns>
         public static bool SameChar (this char one, char two) =>
-            char.ToUpperInvariant(one) == char.ToUpperInvariant(two);
+            char.ToUpperInvariant (one) == char.ToUpperInvariant (two);
 
         /// <summary>
         /// Сравнивает символы с точностью до регистра.
@@ -589,12 +570,11 @@ namespace ManagedIrbis
                 char three
             )
         {
-            one = char.ToUpperInvariant(one);
+            one = char.ToUpperInvariant (one);
 
-            return one == char.ToUpperInvariant(two)
-                || one == char.ToUpperInvariant(three);
-
-        } // method SameChar
+            return one == char.ToUpperInvariant (two)
+                   || one == char.ToUpperInvariant (three);
+        }
 
         /// <summary>
         /// Сравнивает символы с точностью до регистра
@@ -613,13 +593,12 @@ namespace ManagedIrbis
                 char four
             )
         {
-            one = char.ToUpperInvariant(one);
+            one = char.ToUpperInvariant (one);
 
-            return one == char.ToUpperInvariant(two)
-                || one == char.ToUpperInvariant(three)
-                || one == char.ToUpperInvariant(four);
-
-        } // method SameChar
+            return one == char.ToUpperInvariant (two)
+                   || one == char.ToUpperInvariant (three)
+                   || one == char.ToUpperInvariant (four);
+        }
 
         /// <summary>
         /// Сравнивает символы с точностью до регистра
@@ -637,15 +616,14 @@ namespace ManagedIrbis
         {
             foreach (var two in array)
             {
-                if (char.ToUpperInvariant(one) == char.ToUpperInvariant(two))
+                if (char.ToUpperInvariant (one) == char.ToUpperInvariant (two))
                 {
                     return true;
                 }
             }
 
             return false;
-
-        } // method SameChar
+        }
 
         /// <summary>
         /// Сравнивает символы с точностью до регистра
@@ -663,15 +641,14 @@ namespace ManagedIrbis
         {
             foreach (var two in text)
             {
-                if (char.ToUpperInvariant(one) == char.ToUpperInvariant(two))
+                if (char.ToUpperInvariant (one) == char.ToUpperInvariant (two))
                 {
                     return true;
                 }
             }
 
             return false;
-
-        } // method SameChar
+        }
 
         /// <summary>
         /// Сравнивает символы с точностью до регистра
@@ -689,15 +666,14 @@ namespace ManagedIrbis
         {
             foreach (var two in text)
             {
-                if (char.ToUpperInvariant(one) == char.ToUpperInvariant(two))
+                if (char.ToUpperInvariant (one) == char.ToUpperInvariant (two))
                 {
                     return true;
                 }
             }
 
             return false;
-
-        } // method SameChar
+        }
 
         /// <summary>
         /// Сравнивает строки с точностью до регистра
@@ -716,8 +692,8 @@ namespace ManagedIrbis
         /// <param name="one">Первая строка.</param>
         /// <param name="two">Вторая строка.</param>
         /// <returns>Строки совпадают с точностью до регистра?</returns>
-        public static bool SameString(this ReadOnlyMemory<char> one, string? two) =>
-            one.Span.CompareTo(two.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0;
+        public static bool SameString (this ReadOnlyMemory<char> one, string? two) =>
+            one.Span.CompareTo (two.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0;
 
         /// <summary>
         /// Сравнивает строки с точностью до регистра
@@ -726,8 +702,8 @@ namespace ManagedIrbis
         /// <param name="one">Первая строка.</param>
         /// <param name="two">Вторая строка.</param>
         /// <returns>Строки совпадают с точностью до регистра?</returns>
-        public static bool SameString(this ReadOnlySpan<char> one, ReadOnlySpan<char> two) =>
-            one.CompareTo(two, StringComparison.OrdinalIgnoreCase) == 0;
+        public static bool SameString (this ReadOnlySpan<char> one, ReadOnlySpan<char> two) =>
+            one.CompareTo (two, StringComparison.OrdinalIgnoreCase) == 0;
 
         /// <summary>
         /// Сравнивает строки с точностью до регистра
@@ -749,9 +725,9 @@ namespace ManagedIrbis
         /// <param name="two">Вторая строка.</param>
         /// <param name="three">Третья строка.</param>
         /// <returns>Строки совпадают с точностью до регистра?</returns>
-        public static bool SameString(this ReadOnlyMemory<char> one, string? two, string? three) =>
-            one.Span.CompareTo(two.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0
-            || one.Span.CompareTo(three.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0;
+        public static bool SameString (this ReadOnlyMemory<char> one, string? two, string? three) =>
+            one.Span.CompareTo (two.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0
+            || one.Span.CompareTo (three.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0;
 
         /// <summary>
         /// Сравнивает строки с точностью до регистра
@@ -784,19 +760,18 @@ namespace ManagedIrbis
             foreach (var two in array)
             {
                 if (string.Compare
-                    (
-                        one,
-                        two,
-                        StringComparison.OrdinalIgnoreCase
-                    ) == 0)
+                        (
+                            one,
+                            two,
+                            StringComparison.OrdinalIgnoreCase
+                        ) == 0)
                 {
                     return true;
                 }
             }
 
             return false;
-
-        } // method SameString
+        }
 
         /// <summary>
         /// Сравнивает строки с точностью до регистра
@@ -814,19 +789,18 @@ namespace ManagedIrbis
             foreach (var two in strings)
             {
                 if (string.Compare
-                    (
-                        one,
-                        two,
-                        StringComparison.OrdinalIgnoreCase
-                    ) == 0)
+                        (
+                            one,
+                            two,
+                            StringComparison.OrdinalIgnoreCase
+                        ) == 0)
                 {
                     return true;
                 }
             }
 
             return false;
-
-        } // method SameString
+        }
 
         /// <summary>
         /// Сравнивает строки с точностью до регистра
@@ -844,10 +818,10 @@ namespace ManagedIrbis
             foreach (var two in strings)
             {
                 if (one.Span.CompareTo
-                    (
-                        two.AsSpan(),
-                        StringComparison.OrdinalIgnoreCase
-                    )
+                        (
+                            two.AsSpan(),
+                            StringComparison.OrdinalIgnoreCase
+                        )
                     == 0)
                 {
                     return true;
@@ -855,8 +829,7 @@ namespace ManagedIrbis
             }
 
             return false;
-
-        } // method SameString
+        }
 
         /// <summary>
         /// Отбирает из последовательности только
@@ -870,13 +843,12 @@ namespace ManagedIrbis
         {
             foreach (var item in sequence)
             {
-                if (!ReferenceEquals(item, null))
+                if (!ReferenceEquals (item, null))
                 {
                     yield return item;
                 }
             }
-
-        } // method NonNullItems
+        }
 
         /// <summary>
         /// Отбирает из последовательности только непустые строки.
@@ -888,13 +860,12 @@ namespace ManagedIrbis
         {
             foreach (var line in sequence)
             {
-                if (!string.IsNullOrEmpty(line))
+                if (!string.IsNullOrEmpty (line))
                 {
                     yield return line!;
                 }
             }
-
-        } // method NonEmptyLines
+        }
 
         /// <summary>
         /// Отбирает из последовательности только непустые строки.
@@ -911,25 +882,24 @@ namespace ManagedIrbis
                     yield return line;
                 }
             }
-
-        } // method NonEmptyLines
+        }
 
         /// <summary>
         /// Конвертирует пустую строку в <c>null</c>.
         /// </summary>
         public static string? EmptyToNull (this string? value) =>
-            string.IsNullOrEmpty(value) ? null : value;
+            string.IsNullOrEmpty (value) ? null : value;
 
         /// <summary>
         /// Конвертирует пустую строку в <c>null</c>.
         /// </summary>
-        public static string? EmptyToNull(this ReadOnlySpan<char> value) =>
+        public static string? EmptyToNull (this ReadOnlySpan<char> value) =>
             value.IsEmpty ? null : value.ToString();
 
         /// <summary>
         /// Конвертирует пустую строку в <c>null</c>.
         /// </summary>
-        public static string? EmptyToNull(this ReadOnlyMemory<char> value) =>
+        public static string? EmptyToNull (this ReadOnlyMemory<char> value) =>
             value.IsEmpty ? null : value.ToString();
 
         /// <summary>
@@ -939,14 +909,14 @@ namespace ManagedIrbis
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
         public static string ToInvariantString (this short value) =>
-            value.ToString(CultureInfo.InvariantCulture);
+            value.ToString (CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
         public static string ToInvariantString (this short value, string format) =>
-            value.ToString(format, CultureInfo.InvariantCulture);
+            value.ToString (format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -955,14 +925,14 @@ namespace ManagedIrbis
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
         public static string ToInvariantString (this ushort value) =>
-            value.ToString(CultureInfo.InvariantCulture);
+            value.ToString (CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
         public static string ToInvariantString (this ushort value, string format) =>
-            value.ToString(format, CultureInfo.InvariantCulture);
+            value.ToString (format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -971,14 +941,14 @@ namespace ManagedIrbis
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
         public static string ToInvariantString (this int value) =>
-            value.ToString(CultureInfo.InvariantCulture);
+            value.ToString (CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
         public static string ToInvariantString (this int value, string format) =>
-            value.ToString(format, CultureInfo.InvariantCulture);
+            value.ToString (format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -986,15 +956,15 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
-        public static string ToInvariantString ( this uint value ) =>
-            value.ToString(CultureInfo.InvariantCulture);
+        public static string ToInvariantString (this uint value) =>
+            value.ToString (CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
-        public static string ToInvariantString ( this uint value, string format ) =>
-            value.ToString(format, CultureInfo.InvariantCulture);
+        public static string ToInvariantString (this uint value, string format) =>
+            value.ToString (format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -1003,14 +973,14 @@ namespace ManagedIrbis
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
         public static string ToInvariantString (this long value) =>
-            value.ToString(CultureInfo.InvariantCulture);
+            value.ToString (CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
         public static string ToInvariantString (this long value, string format) =>
-            value.ToString(format, CultureInfo.InvariantCulture);
+            value.ToString (format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -1019,28 +989,28 @@ namespace ManagedIrbis
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
         public static string ToInvariantString (this ulong value) =>
-            value.ToString(CultureInfo.InvariantCulture);
+            value.ToString (CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
         public static string ToInvariantString (this ulong value, string format) =>
-            value.ToString(format, CultureInfo.InvariantCulture);
+            value.ToString (format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
         public static string ToInvariantString (this float value) =>
-            value.ToString(CultureInfo.InvariantCulture);
+            value.ToString (CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
         public static string ToInvariantString (this float value, string format) =>
-            value.ToString(format, CultureInfo.InvariantCulture);
+            value.ToString (format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -1116,18 +1086,17 @@ namespace ManagedIrbis
             }
 
             return -1;
-
-        } // method IndexOf
+        }
 
         /// <summary>
         /// Преобразование переводов строк ИРБИС в Windows.
         /// </summary>
         public static string? IrbisToWindows (string? text)
         {
-            if (ReferenceEquals(text, null) || text.Length == 0)
+            if (ReferenceEquals (text, null) || text.Length == 0)
                 return text;
 
-            if (!text.Contains(Constants.IrbisDelimiter))
+            if (!text.Contains (Constants.IrbisDelimiter))
                 return text;
 
             var result = text.Replace
@@ -1137,8 +1106,7 @@ namespace ManagedIrbis
                 );
 
             return result;
-
-        } // method IrbisToWindows
+        }
 
         /// <summary>
         /// Заменяет переводы строк ИРБИС на Windows.
@@ -1149,20 +1117,19 @@ namespace ManagedIrbis
                 byte[]? text
             )
         {
-            if (ReferenceEquals(text, null) || text.Length == 0)
+            if (ReferenceEquals (text, null) || text.Length == 0)
                 return;
 
             var index = 0;
             while (true)
             {
-                index = IndexOf(text, Constants.IrbisDelimiterBytes, index);
+                index = IndexOf (text, Constants.IrbisDelimiterBytes, index);
                 if (index < 0)
                     break;
 
-                Array.Copy(Constants.WindowsDelimiterBytes, 0, text, index, Constants.WindowsDelimiterBytes.Length);
+                Array.Copy (Constants.WindowsDelimiterBytes, 0, text, index, Constants.WindowsDelimiterBytes.Length);
             }
-
-        } // method IrbisToWindows
+        }
 
         /// <summary>
         /// Разбивает текст на строки в соответствии с ИРБИС-разделителями.
@@ -1172,13 +1139,13 @@ namespace ManagedIrbis
                 string? text
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 return Array.Empty<string>();
             }
 
-            var provenText = IrbisToWindows(text)!;
-            var result = string.IsNullOrEmpty(provenText)
+            var provenText = IrbisToWindows (text)!;
+            var result = string.IsNullOrEmpty (provenText)
                 ? new[] { string.Empty }
                 : provenText.Split
                     (
@@ -1187,8 +1154,7 @@ namespace ManagedIrbis
                     );
 
             return result;
-
-        } // method SplitIrbisToLines
+        }
 
         /// <summary>
         /// Преобразует текст в нижний регистр.
@@ -1198,7 +1164,7 @@ namespace ManagedIrbis
                 string? text
             )
         {
-            if (ReferenceEquals(text, null) || text.Length == 0)
+            if (ReferenceEquals (text, null) || text.Length == 0)
             {
                 return text;
             }
@@ -1206,8 +1172,7 @@ namespace ManagedIrbis
             var result = text.ToLowerInvariant();
 
             return result;
-
-        } // method ToLower
+        }
 
         /// <summary>
         /// Преобразует текст в верхний регистр.
@@ -1217,7 +1182,7 @@ namespace ManagedIrbis
                 string? text
             )
         {
-            if (ReferenceEquals(text, null) || text.Length == 0)
+            if (ReferenceEquals (text, null) || text.Length == 0)
             {
                 return text;
             }
@@ -1225,8 +1190,7 @@ namespace ManagedIrbis
             var result = text.ToUpperInvariant();
 
             return result;
-
-        } // method ToUpper
+        }
 
         /// <summary>
         /// Заменяет переводы строк DOS/Windows на ИРБИС.
@@ -1236,12 +1200,12 @@ namespace ManagedIrbis
                 string? text
             )
         {
-            if (ReferenceEquals(text, null) || text.Length == 0)
+            if (ReferenceEquals (text, null) || text.Length == 0)
             {
                 return text;
             }
 
-            if (!text.Contains(Constants.WindowsDelimiter))
+            if (!text.Contains (Constants.WindowsDelimiter))
             {
                 return text;
             }
@@ -1253,8 +1217,7 @@ namespace ManagedIrbis
                 );
 
             return result;
-
-        } // method WindowsToIrbis
+        }
 
         /// <summary>
         /// Заменяет переводы строк Windows на ИРБИС.
@@ -1265,7 +1228,7 @@ namespace ManagedIrbis
                 byte[]? text
             )
         {
-            if (ReferenceEquals(text, null) || text.Length == 0)
+            if (ReferenceEquals (text, null) || text.Length == 0)
             {
                 return;
             }
@@ -1273,16 +1236,15 @@ namespace ManagedIrbis
             var index = 0;
             while (true)
             {
-                index = IndexOf(text, Constants.WindowsDelimiterBytes, index);
+                index = IndexOf (text, Constants.WindowsDelimiterBytes, index);
                 if (index < 0)
                 {
                     break;
                 }
 
-                Array.Copy(Constants.IrbisDelimiterBytes, 0, text, index, Constants.IrbisDelimiterBytes.Length);
+                Array.Copy (Constants.IrbisDelimiterBytes, 0, text, index, Constants.IrbisDelimiterBytes.Length);
             }
-
-        } // method WindowsToIrbis
+        }
 
         /// <summary>
         /// Проверяем, хороший ли пришел ответ от сервера.
@@ -1294,24 +1256,23 @@ namespace ManagedIrbis
         /// Проверяем, хороший ли пришел ответ от сервера.
         /// </summary>
         public static bool IsGood (this Response? response, params int[] goodCodes) =>
-            response is not null && response.CheckReturnCode((goodCodes));
+            response is not null && response.CheckReturnCode ((goodCodes));
 
         /// <summary>
         /// Трансформация запроса во что-нибудь полезное.
         /// </summary>
         public static T? Transform<T> (this Response? response, Func<Response, T?> transformer) where T : class =>
-            response.IsGood() ? transformer(response!) : null;
+            response.IsGood() ? transformer (response!) : null;
 
         /// <summary>
         /// Трансформация запроса во что-нибудь полезное.
         /// </summary>
-        public static T? TransformNoCheck<T> (this Response? response, Func<Response, T?> transformer)  where T : class
+        public static T? TransformNoCheck<T> (this Response? response, Func<Response, T?> transformer) where T : class
         {
-            var result = response is not null ? transformer(response) : null;
+            var result = response is not null ? transformer (response) : null;
 
             return result;
-
-        } // method TransformNoCheck
+        }
 
         /// <summary>
         /// Remove comments from the format.
@@ -1323,18 +1284,18 @@ namespace ManagedIrbis
         {
             const char zero = '\0';
 
-            if (ReferenceEquals(text, null) || text.Length == 0)
+            if (ReferenceEquals (text, null) || text.Length == 0)
             {
                 return text;
             }
 
-            if (!text.Contains("/*"))
+            if (!text.Contains ("/*"))
             {
                 return text;
             }
 
             int index = 0, length = text.Length;
-            var result = new StringBuilder(length);
+            var result = new StringBuilder (length);
             var state = zero;
 
             while (index < length)
@@ -1350,7 +1311,8 @@ namespace ManagedIrbis
                         {
                             state = zero;
                         }
-                        result.Append(c);
+
+                        result.Append (c);
                         break;
 
                     default:
@@ -1363,7 +1325,7 @@ namespace ManagedIrbis
                                     c = text[index];
                                     if (c == '\r' || c == '\n')
                                     {
-                                        result.Append(c);
+                                        result.Append (c);
                                         break;
                                     }
 
@@ -1372,27 +1334,27 @@ namespace ManagedIrbis
                             }
                             else
                             {
-                                result.Append(c);
+                                result.Append (c);
                             }
                         }
                         else if (c == '\'' || c == '"' || c == '|')
                         {
                             state = c;
-                            result.Append(c);
+                            result.Append (c);
                         }
                         else
                         {
-                            result.Append(c);
+                            result.Append (c);
                         }
+
                         break;
                 }
 
                 index++;
-            } // while
+            }
 
             return result.ToString();
-
-        } // method RemoveComments
+        }
 
         /// <summary>
         /// Prepare the dynamic format string.
@@ -1407,13 +1369,13 @@ namespace ManagedIrbis
                 string? text
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 return text;
             }
 
-            text = RemoveComments(text);
-            if (ReferenceEquals(text, null) || text.Length == 0) //-V3063
+            text = RemoveComments (text);
+            if (ReferenceEquals (text, null) || text.Length == 0) //-V3063
             {
                 return text;
             }
@@ -1434,19 +1396,18 @@ namespace ManagedIrbis
                 return text;
             }
 
-            var result = new StringBuilder(length);
+            var result = new StringBuilder (length);
             for (var i = 0; i < length; i++)
             {
                 var c = text[i];
                 if (c >= ' ')
                 {
-                    result.Append(c);
+                    result.Append (c);
                 }
             }
 
             return result.ToString();
-
-        } // method PrepareFormat
+        }
 
         private static void _AppendIrbisLine
             (
@@ -1455,8 +1416,8 @@ namespace ManagedIrbis
                 params object[] args
             )
         {
-            builder.AppendFormat(format, args);
-            builder.Append(Constants.IrbisDelimiter);
+            builder.AppendFormat (format, args);
+            builder.Append (Constants.IrbisDelimiter);
         }
 
         /// <summary>
@@ -1470,7 +1431,7 @@ namespace ManagedIrbis
         {
             if (subField.RepresentsValue)
             {
-                builder.Append(subField.Value);
+                builder.Append (subField.Value);
             }
             else
             {
@@ -1482,8 +1443,7 @@ namespace ManagedIrbis
                         subField.Value
                     );
             }
-
-        } // method EncodeSubField
+        }
 
         /// <summary>
         /// Кодирование одного поля.
@@ -1509,9 +1469,8 @@ namespace ManagedIrbis
                     );
             }
 
-            builder.Append(Constants.IrbisDelimiter);
-
-        } // method EncodeField
+            builder.Append (Constants.IrbisDelimiter);
+        }
 
         /// <summary>
         /// Кодирование записи в клиентское представление.
@@ -1544,15 +1503,14 @@ namespace ManagedIrbis
             foreach (var field in record.Fields)
             {
                 EncodeField
-                (
-                    result,
-                    field
-                );
+                    (
+                        result,
+                        field
+                    );
             }
 
             return result.ToString();
-
-        } // method EncodeRecord
+        }
 
         private static ReadOnlyMemory<char> _ReadTo
             (
@@ -1569,17 +1527,18 @@ namespace ManagedIrbis
                 {
                     break;
                 }
+
                 var c = (char)next;
                 if (c == delimiter)
                 {
                     break;
                 }
-                result.Append(c);
+
+                result.Append (c);
             }
 
             return result.ToString().AsMemory();
-
-        } // method _ReadTo
+        }
 
         /// <summary>
         /// Разбор одной строки (поля).
@@ -1589,11 +1548,11 @@ namespace ManagedIrbis
                 string line
             )
         {
-            var reader = new StringReader(line);
+            var reader = new StringReader (line);
             var result = new Field
             {
-                Tag = Private.ParseInt32(_ReadTo(reader, '#')),
-                Value = _ReadTo(reader, '^').EmptyToNull()
+                Tag = Private.ParseInt32 (_ReadTo (reader, '#')),
+                Value = _ReadTo (reader, '^').EmptyToNull()
             };
 
             while (true)
@@ -1603,19 +1562,19 @@ namespace ManagedIrbis
                 {
                     break;
                 }
-                var code = char.ToLower((char)next);
-                var text = _ReadTo(reader, '^');
+
+                var code = char.ToLower ((char)next);
+                var text = _ReadTo (reader, '^');
                 var subField = new SubField
                 {
                     Code = code,
                     Value = text.ToString()
                 };
-                result.Subfields.Add(subField);
+                result.Subfields.Add (subField);
             }
 
             return result;
-
-        } // method ParseLine
+        }
 
         /// <summary>
         /// Parse MFN, status and version of the record
@@ -1627,22 +1586,22 @@ namespace ManagedIrbis
                 Record record
             )
         {
-            var regex = new Regex(@"^(-?\d+)\#(\d*)?");
-            var match = regex.Match(line1);
-            record.Mfn = Math.Abs(Private.ParseInt32(match.Groups[1].Value));
+            var regex = new Regex (@"^(-?\d+)\#(\d*)?");
+            var match = regex.Match (line1);
+            record.Mfn = Math.Abs (Private.ParseInt32 (match.Groups[1].Value));
             if (match.Groups[2].Length > 0)
             {
-                record.Status = (RecordStatus) Private.ParseInt32(match.Groups[2].Value);
+                record.Status = (RecordStatus)Private.ParseInt32 (match.Groups[2].Value);
             }
-            match = regex.Match(line2);
+
+            match = regex.Match (line2);
             if (match.Groups[2].Length > 0)
             {
-                record.Version = Private.ParseInt32(match.Groups[2].Value);
+                record.Version = Private.ParseInt32 (match.Groups[2].Value);
             }
 
             return record;
-
-        } // method ParseMfnStatusVersion
+        }
 
         /// <summary>
         /// Parse server response for WriteRecordsCommand.
@@ -1656,7 +1615,7 @@ namespace ManagedIrbis
             record.Fields.Clear();
 
             var whole = response.RequireUtf();
-            var split = whole.Split('\x1E');
+            var split = whole.Split ('\x1E');
 
             ParseMfnStatusVersion
                 (
@@ -1668,16 +1627,15 @@ namespace ManagedIrbis
             for (var i = 2; i < split.Length; i++)
             {
                 var line = split[i];
-                var field = ParseLine(line);
+                var field = ParseLine (line);
                 if (field.Tag > 0)
                 {
-                    record.Fields.Add(field);
+                    record.Fields.Add (field);
                 }
             }
 
             return record;
-
-        } // method ParseResponseForWriteRecords
+        }
 
         /// <summary>
         /// Merges the specified arrays.
@@ -1698,9 +1656,9 @@ namespace ManagedIrbis
             for (var i = 0; i < arrays.Length; i++)
             {
                 var item = arrays[i];
-                if (ReferenceEquals(item, null))
+                if (ReferenceEquals (item, null))
                 {
-                    throw new ArgumentNullException(nameof(arrays));
+                    throw new ArgumentNullException (nameof (arrays));
                 }
 
                 resultLength += item.Length;
@@ -1711,13 +1669,12 @@ namespace ManagedIrbis
             for (var i = 0; i < arrays.Length; i++)
             {
                 var item = arrays[i]!;
-                item.CopyTo(result, offset);
+                item.CopyTo (result, offset);
                 offset += item.Length;
             }
 
             return result;
-
-        } // method Merge
+        }
 
         /// <summary>
         /// Выборка элемента из массива.
@@ -1734,16 +1691,14 @@ namespace ManagedIrbis
 
             occurrence = occurrence >= 0 ? occurrence : length + occurrence;
 
-            var result = default(T);
+            var result = default (T);
 
             if (length != 0 && occurrence >= 0 && occurrence < length)
                 result = array[occurrence];
 
             return result;
-
-        } // method GetOccurrence
-
-    } // class Private
+        }
+    }
 
     /// <summary>
     /// Разнообразные полезные методы расширения.
@@ -1772,33 +1727,32 @@ namespace ManagedIrbis
             [DebuggerStepThrough]
             get
             {
-                if (ReferenceEquals(_windows1251, null))
+                if (ReferenceEquals (_windows1251, null))
                 {
                     RegisterEncodingProviders();
-                    _windows1251 = Encoding.GetEncoding(1251);
+                    _windows1251 = Encoding.GetEncoding (1251);
                 }
 
                 return _windows1251;
             }
-
-        } // property Windows1251
+        }
 
         /// <summary>
         /// Проверка: валиден ли код подполя.
         /// </summary>
-        public static bool IsValidSubFieldCode(char code) =>
+        public static bool IsValidSubFieldCode (char code) =>
             code is >= Constants.FirstCode and <= Constants.LastCode and not '^';
 
         /// <summary>
         /// Верификация кода подполя с выбросом исключения.
         /// </summary>
-        public static bool VerifySubFieldCode(char code, bool trhowOnError = true) =>
-            IsValidSubFieldCode(code) || (trhowOnError ? throw new IrbisException() : false);
+        public static bool VerifySubFieldCode (char code, bool trhowOnError = true) =>
+            IsValidSubFieldCode (code) || (trhowOnError ? throw new IrbisException() : false);
 
         /// <summary>
         /// Нормализация кода подполя.
         /// </summary>
-        public static char NormalizeCode (char code) => char.ToLowerInvariant(code);
+        public static char NormalizeCode (char code) => char.ToLowerInvariant (code);
 
         /// <summary>
         /// Проверка: валидно ли значение подполя.
@@ -1817,14 +1771,13 @@ namespace ManagedIrbis
             }
 
             return true;
-
-        } // method IsValidSubFieldValue
+        }
 
         /// <summary>
         /// Верификация значения подполя с выбромо исключения.
         /// </summary>
-        public static bool VerifySubFieldValue(ReadOnlySpan<char> value, bool throwOnError = true) =>
-            IsValidSubFieldValue(value) || (throwOnError ? throw new IrbisException() : false);
+        public static bool VerifySubFieldValue (ReadOnlySpan<char> value, bool throwOnError = true) =>
+            IsValidSubFieldValue (value) || (throwOnError ? throw new IrbisException() : false);
 
         /// <summary>
         /// Нормализация значения подполя.
@@ -1834,7 +1787,7 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            if (ReferenceEquals(value, null) || value.Length == 0)
+            if (ReferenceEquals (value, null) || value.Length == 0)
             {
                 return value;
             }
@@ -1842,8 +1795,7 @@ namespace ManagedIrbis
             var result = value.Trim();
 
             return result;
-
-        } // method Normalize
+        }
 
         /// <summary>
         /// Первое вхождение подполя с указанным кодом.
@@ -1856,14 +1808,14 @@ namespace ManagedIrbis
         {
             foreach (var subField in subFields)
             {
-                if (subField.Code.SameChar(code))
+                if (subField.Code.SameChar (code))
                 {
                     return subField;
                 }
             }
 
             return null;
-        } // method GetFirstSubField
+        }
 
         /// <summary>
         /// Первое вхождение подполя с одним из указанных кодов.
@@ -1878,7 +1830,7 @@ namespace ManagedIrbis
             {
                 foreach (var code in codes)
                 {
-                    if (subField.Code.SameChar(code))
+                    if (subField.Code.SameChar (code))
                     {
                         return subField;
                     }
@@ -1886,8 +1838,7 @@ namespace ManagedIrbis
             }
 
             return null;
-
-        } // method GetFirstSubField
+        }
 
         /// <summary>
         /// Первое вхождение подполя с указанными кодом
@@ -1902,16 +1853,15 @@ namespace ManagedIrbis
         {
             foreach (var subField in subFields)
             {
-                if (subField.Code.SameChar(code)
-                    && subField.Value.SameString(value))
+                if (subField.Code.SameChar (code)
+                    && subField.Value.SameString (value))
                 {
                     return subField;
                 }
             }
 
             return null;
-
-        } // method GetFirstSubField
+        }
 
         /// <summary>
         /// Фильтрация подполей.
@@ -1925,17 +1875,17 @@ namespace ManagedIrbis
             List<SubField>? result = null;
             foreach (var subField in subFields)
             {
-                if (subField.Code.SameChar(code))
+                if (subField.Code.SameChar (code))
                 {
                     result ??= new List<SubField>();
-                    result.Add(subField);
+                    result.Add (subField);
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
-        } // method GetSubField
+        }
 
         /// <summary>
         /// Фильтрация подполей.
@@ -1949,17 +1899,17 @@ namespace ManagedIrbis
             List<SubField>? result = null;
             foreach (var subField in subFields)
             {
-                if (subField.Code.SameChar(codes))
+                if (subField.Code.SameChar (codes))
                 {
-                    result ??= new();
-                    result.Add(subField);
+                    result ??= new ();
+                    result.Add (subField);
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
-        } // method GetSubField
+        }
 
         /// <summary>
         /// Выполнение неких действий над подполями.
@@ -1972,16 +1922,16 @@ namespace ManagedIrbis
         {
             var result = subFields.ToArray();
 
-            if (!ReferenceEquals(action, null))
+            if (!ReferenceEquals (action, null))
             {
                 foreach (var subField in result)
                 {
-                    action(subField);
+                    action (subField);
                 }
             }
 
             return result;
-        } // method GetSubField
+        }
 
         /// <summary>
         /// Фильтрация подполей.
@@ -1996,23 +1946,23 @@ namespace ManagedIrbis
             List<SubField>? result = null;
             foreach (var field in fields)
             {
-                if (fieldPredicate(field))
+                if (fieldPredicate (field))
                 {
                     foreach (SubField subField in field.Subfields)
                     {
-                        if (subPredicate(subField))
+                        if (subPredicate (subField))
                         {
                             result ??= new List<SubField>();
-                            result.Add(subField);
+                            result.Add (subField);
                         }
                     }
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
-        } // method GetSubField
+        }
 
         /// <summary>
         /// Получение значения подполя.
@@ -2026,18 +1976,17 @@ namespace ManagedIrbis
             foreach (var subField in subFields.NonNullItems())
             {
                 var value = subField.Value;
-                if (!ReferenceEquals(value, null) && value.Length != 0)
+                if (!ReferenceEquals (value, null) && value.Length != 0)
                 {
                     result ??= new List<string>();
-                    result.Add(value);
+                    result.Add (value);
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<string>()
                 : result.ToArray();
-
-        } // method GetSubFieldValue
+        }
 
         /// <summary>
         /// Добавление подполя, при условии, что оно не пустое.
@@ -2049,14 +1998,13 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            if (!string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty (value))
             {
-                field.Add(code, value);
+                field.Add (code, value);
             }
 
             return field;
-
-        } // method AddNonEmptySubField
+        }
 
         /// <summary>
         /// Добавление подполя.
@@ -2069,9 +2017,9 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            if (flag && !string.IsNullOrEmpty(value))
+            if (flag && !string.IsNullOrEmpty (value))
             {
-                field.Add(code, value);
+                field.Add (code, value);
             }
 
             return field;
@@ -2089,7 +2037,7 @@ namespace ManagedIrbis
         {
             if (value.HasValue)
             {
-                field.Add(code, value.Value);
+                field.Add (code, value.Value);
             }
 
             return field;
@@ -2107,7 +2055,7 @@ namespace ManagedIrbis
         {
             if (value.HasValue)
             {
-                field.Add(code, value.Value);
+                field.Add (code, value.Value);
             }
 
             return field;
@@ -2122,11 +2070,11 @@ namespace ManagedIrbis
                 IEnumerable<SubField>? subFields
             )
         {
-            if (!ReferenceEquals(subFields, null))
+            if (!ReferenceEquals (subFields, null))
             {
                 foreach (var subField in subFields)
                 {
-                    field.Subfields.Add(subField);
+                    field.Subfields.Add (subField);
                 }
             }
 
@@ -2144,7 +2092,7 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .SelectMany(field => field.Subfields)
+                .SelectMany (field => field.Subfields)
                 .NonNullItems()
                 .ToArray();
         }
@@ -2164,18 +2112,19 @@ namespace ManagedIrbis
             if (code == SubField.NoCode)
                 return field;
 
-            if (ReferenceEquals(value, null))
+            if (ReferenceEquals (value, null))
             {
-                field.RemoveSubField(code);
+                field.RemoveSubField (code);
             }
             else
             {
-                var subField = field.GetFirstSubField(code);
-                if (ReferenceEquals(subField, null))
+                var subField = field.GetFirstSubField (code);
+                if (ReferenceEquals (subField, null))
                 {
                     subField = new SubField { Code = code };
-                    field.Subfields.Add(subField);
+                    field.Subfields.Add (subField);
                 }
+
                 subField.Value = value.ToString();
             }
 
@@ -2200,16 +2149,17 @@ namespace ManagedIrbis
 
             if (value == false)
             {
-                field.RemoveSubField(code);
+                field.RemoveSubField (code);
             }
             else
             {
-                var subField = field.GetFirstSubField(code);
-                if (ReferenceEquals(subField, null))
+                var subField = field.GetFirstSubField (code);
+                if (ReferenceEquals (subField, null))
                 {
                     subField = new SubField { Code = code };
-                    field.Subfields.Add(subField);
+                    field.Subfields.Add (subField);
                 }
+
                 subField.Value = text;
             }
 
@@ -2231,18 +2181,19 @@ namespace ManagedIrbis
                 return field;
             }
 
-            if (string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty (value))
             {
-                field.RemoveSubField(code);
+                field.RemoveSubField (code);
             }
             else
             {
-                var subField = field.GetFirstSubField(code);
-                if (ReferenceEquals(subField, null))
+                var subField = field.GetFirstSubField (code);
+                if (ReferenceEquals (subField, null))
                 {
                     subField = new SubField { Code = code };
-                    field.Subfields.Add(subField);
+                    field.Subfields.Add (subField);
                 }
+
                 subField.Value = value;
             }
 
@@ -2260,11 +2211,10 @@ namespace ManagedIrbis
                 params char[] codes
             )
         {
-
             return subFields
                 .Where
                     (
-                        subField => subField.Code.IsOneOf(codes)
+                        subField => subField.Code.IsOneOf (codes)
                     )
                 .ToArray();
         }
@@ -2279,7 +2229,7 @@ namespace ManagedIrbis
             )
         {
             return field.Subfields
-                .FilterSubFields(codes);
+                .FilterSubFields (codes);
         }
 
         // ==========================================================
@@ -2294,7 +2244,7 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .Where(field => field.Tag == tag)
+                .Where (field => field.Tag == tag)
                 .ToArray();
         }
 
@@ -2316,6 +2266,7 @@ namespace ManagedIrbis
                     {
                         return field;
                     }
+
                     occurrence--;
                 }
             }
@@ -2333,7 +2284,7 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .Where(field => field.Tag.IsOneOf(tags))
+                .Where (field => field.Tag.IsOneOf (tags))
                 .ToArray();
         }
 
@@ -2380,8 +2331,8 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .GetField(tags)
-                .GetOccurrence(occurrence);
+                .GetField (tags)
+                .GetOccurrence (occurrence);
         }
 
         /// <summary>
@@ -2395,7 +2346,7 @@ namespace ManagedIrbis
         {
             return fields
                 .NonNullItems()
-                .Where(predicate)
+                .Where (predicate)
                 .ToArray();
         }
 
@@ -2409,16 +2360,16 @@ namespace ManagedIrbis
             )
         {
             var result = fields.ToArray();
-            if (!ReferenceEquals(action, null))
+            if (!ReferenceEquals (action, null))
             {
                 foreach (var field in result)
                 {
-                    action(field);
+                    action (field);
                 }
             }
 
             return result;
-        } // method GetField
+        }
 
         /// <summary>
         /// Выполнение неких действий над полями и подполями.
@@ -2431,22 +2382,22 @@ namespace ManagedIrbis
             )
         {
             var result = fields.ToArray();
-            if (!ReferenceEquals(fieldAction, null)
-                || !ReferenceEquals(subFieldAction, null))
+            if (!ReferenceEquals (fieldAction, null)
+                || !ReferenceEquals (subFieldAction, null))
             {
                 foreach (var field in result)
                 {
-                    fieldAction?.Invoke(field);
+                    fieldAction?.Invoke (field);
 
-                    if (!ReferenceEquals(subFieldAction, null))
+                    if (!ReferenceEquals (subFieldAction, null))
                     {
                         foreach (var subField in field.Subfields)
                         {
-                            subFieldAction(subField);
+                            subFieldAction (subField);
                         }
                     }
                 }
-            } // method GetField
+            }
 
             return result;
         }
@@ -2461,13 +2412,13 @@ namespace ManagedIrbis
             )
         {
             var result = fields.ToArray();
-            if (!ReferenceEquals(action, null))
+            if (!ReferenceEquals (action, null))
             {
                 foreach (var field in result)
                 {
                     foreach (var subField in field.Subfields)
                     {
-                        action(subField);
+                        action (subField);
                     }
                 }
             }
@@ -2485,7 +2436,7 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .Where(field => field.Subfields.Any(predicate))
+                .Where (field => field.Subfields.Any (predicate))
                 .ToArray();
         }
 
@@ -2507,8 +2458,8 @@ namespace ManagedIrbis
                             .NonNullItems()
                             .Any
                                 (
-                                    sub => sub.Code.SameChar(codes)
-                                        && predicate(sub)
+                                    sub => sub.Code.SameChar (codes)
+                                           && predicate (sub)
                                 )
                     )
                 .ToArray();
@@ -2530,8 +2481,8 @@ namespace ManagedIrbis
                         field => field.Subfields
                             .Any
                                 (
-                                    sub => sub.Code.SameChar(codes)
-                                        && sub.Value.SameString(values)
+                                    sub => sub.Code.SameChar (codes)
+                                           && sub.Value.SameString (values)
                                 )
                     )
                 .ToArray();
@@ -2553,8 +2504,8 @@ namespace ManagedIrbis
                         field => field.Subfields
                             .Any
                                 (
-                                    sub => sub.Code.SameChar(code)
-                                        && sub.Value.SameString(value)
+                                    sub => sub.Code.SameChar (code)
+                                           && sub.Value.SameString (value)
                                 )
                     )
                 .ToArray();
@@ -2572,14 +2523,14 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .Where(field => field.Tag.IsOneOf(tags))
+                .Where (field => field.Tag.IsOneOf (tags))
                 .Where
                     (
                         field => field.Subfields
                             .Any
                                 (
-                                    sub => sub.Code.SameChar(codes)
-                                        && sub.Value.SameString(values)
+                                    sub => sub.Code.SameChar (codes)
+                                           && sub.Value.SameString (values)
                                 )
                     )
                 .ToArray();
@@ -2596,8 +2547,8 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .Where(fieldPredicate)
-                .Where(field => field.Subfields.Any(subPredicate))
+                .Where (fieldPredicate)
+                .Where (field => field.Subfields.Any (subPredicate))
                 .ToArray();
         }
 
@@ -2621,8 +2572,7 @@ namespace ManagedIrbis
             }
 
             return result;
-
-        } // method GetFieldCount
+        }
 
         /// <summary>
         /// Фильтрация полей.
@@ -2640,17 +2590,16 @@ namespace ManagedIrbis
                         {
                             var tag = field.Tag.ToInvariantString();
 
-                            return !string.IsNullOrEmpty(tag)
-                                && Regex.IsMatch
-                                   (
-                                       tag,
-                                       tagRegex
-                                   );
+                            return !string.IsNullOrEmpty (tag)
+                                   && Regex.IsMatch
+                                       (
+                                           tag,
+                                           tagRegex
+                                       );
                         }
                     )
                 .ToArray();
-
-        } // method GetFieldRegex
+        }
 
         /// <summary>
         /// Фильтрация полей.
@@ -2662,9 +2611,9 @@ namespace ManagedIrbis
                 int occurrence
             )
             =>
-            fields
-                .GetFieldRegex(tagRegex)
-                .GetOccurrence(occurrence);
+                fields
+                    .GetFieldRegex (tagRegex)
+                    .GetOccurrence (occurrence);
 
         /// <summary>
         /// Фильтрация полей.
@@ -2676,17 +2625,17 @@ namespace ManagedIrbis
                 string textRegex
             )
             =>
-            fields
-                .GetField(tags)
-                .Where
-                (
-                    field =>
-                    {
-                        var value = field.Value;
-                        return !ReferenceEquals(value, null) && value.Length != 0
-                                                             && Regex.IsMatch(value, textRegex);
-                    })
-                .ToArray();
+                fields
+                    .GetField (tags)
+                    .Where
+                        (
+                            field =>
+                            {
+                                var value = field.Value;
+                                return !ReferenceEquals (value, null) && value.Length != 0
+                                                                      && Regex.IsMatch (value, textRegex);
+                            })
+                    .ToArray();
 
         /// <summary>
         /// Фильтрация полей.
@@ -2699,9 +2648,9 @@ namespace ManagedIrbis
                 int occurrence
             )
             =>
-            fields
-                .GetFieldRegex(tags, textRegex)
-                .GetOccurrence(occurrence);
+                fields
+                    .GetFieldRegex (tags, textRegex)
+                    .GetOccurrence (occurrence);
 
         /// <summary>
         /// Фильтрация полей.
@@ -2714,20 +2663,19 @@ namespace ManagedIrbis
                 string textRegex
             )
         {
-            var regex = new Regex(textRegex);
+            var regex = new Regex (textRegex);
             return fields
-                .GetField(tags)
-                .Where(field => field.FilterSubFields(codes)
-                    .Any(sub =>
+                .GetField (tags)
+                .Where (field => field.FilterSubFields (codes)
+                    .Any (sub =>
                     {
                         var value = sub.Value;
 
-                        return !ReferenceEquals(value, null) && value.Length != 0
-                            && regex.IsMatch(value);
+                        return !ReferenceEquals (value, null) && value.Length != 0
+                                                              && regex.IsMatch (value);
                     }))
                 .ToArray();
-
-        } // method GetFieldRegex
+        }
 
         /// <summary>
         /// Фильтрация полей.
@@ -2741,9 +2689,9 @@ namespace ManagedIrbis
                 int occurrence
             )
             =>
-            fields
-                .GetFieldRegex(tags, codes, textRegex)
-                .GetOccurrence(occurrence);
+                fields
+                    .GetFieldRegex (tags, codes, textRegex)
+                    .GetOccurrence (occurrence);
 
         /// <summary>
         /// Получение значения поля.
@@ -2751,7 +2699,7 @@ namespace ManagedIrbis
         public static string[] GetFieldValue (this IEnumerable<Field> fields)
             => fields
                 .Select (field => field.Value!)
-                .Where(line => !ReferenceEquals(line, null) && line.Length != 0)
+                .Where (line => !ReferenceEquals (line, null) && line.Length != 0)
                 .ToArray();
 
         /// <summary>
@@ -2765,8 +2713,8 @@ namespace ManagedIrbis
         {
             var result = new List<string>();
             foreach (var field in fields.NonNullItems())
-                if (field.Tag == tag && !ReferenceEquals(field.Value, null) && field.Value.Length != 0)
-                    result.Add(field.Value);
+                if (field.Tag == tag && !ReferenceEquals (field.Value, null) && field.Value.Length != 0)
+                    result.Add (field.Value);
 
             return result.ToArray();
         }
@@ -2789,8 +2737,7 @@ namespace ManagedIrbis
             }
 
             return null;
-
-        } // method GetFirstField
+        }
 
         /// <summary>
         /// Первое вхождение поля с указанным тегом.
@@ -2812,8 +2759,7 @@ namespace ManagedIrbis
             }
 
             return null;
-
-        } // method GetFirstField
+        }
 
         /// <summary>
         /// Первое вхождение поля с указанным тегом.
@@ -2849,7 +2795,7 @@ namespace ManagedIrbis
         {
             foreach (var field in fields)
             {
-                if (field.Tag.IsOneOf(tags))
+                if (field.Tag.IsOneOf (tags))
                 {
                     return field;
                 }
@@ -2897,7 +2843,7 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     return subFields[i];
                 }
@@ -2925,7 +2871,7 @@ namespace ManagedIrbis
                     var count = subFields.Count;
                     for (var i = 0; i < count; i++)
                     {
-                        if (subFields[i].Code.SameChar(code))
+                        if (subFields[i].Code.SameChar (code))
                         {
                             return subFields[i];
                         }
@@ -2949,7 +2895,7 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     return subFields[i].Value;
                 }
@@ -2975,7 +2921,7 @@ namespace ManagedIrbis
                 {
                     foreach (var subField in field.Subfields)
                     {
-                        if (subField.Code.SameChar(code))
+                        if (subField.Code.SameChar (code))
                         {
                             return subField.Value;
                         }
@@ -3002,14 +2948,14 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     result ??= new List<SubField>();
-                    result.Add(subFields[i]);
+                    result.Add (subFields[i]);
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
         }
@@ -3028,12 +2974,13 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     if (occurrence == 0)
                     {
                         return subFields[i];
                     }
+
                     occurrence--;
                 }
             }
@@ -3057,15 +3004,15 @@ namespace ManagedIrbis
                 var count = subFields.Count;
                 for (var i = 0; i < count; i++)
                 {
-                    if (subFields[i].Code.SameChar(code))
+                    if (subFields[i].Code.SameChar (code))
                     {
                         result ??= new List<SubField>();
-                        result.Add(subFields[i]);
+                        result.Add (subFields[i]);
                     }
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
         }
@@ -3086,15 +3033,15 @@ namespace ManagedIrbis
                 var count = subFields.Count;
                 for (var i = 0; i < count; i++)
                 {
-                    if (subFields[i].Code.IsOneOf(codes))
+                    if (subFields[i].Code.IsOneOf (codes))
                     {
                         result ??= new List<SubField>();
-                        result.Add(subFields[i]);
+                        result.Add (subFields[i]);
                     }
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
         }
@@ -3116,16 +3063,16 @@ namespace ManagedIrbis
                 {
                     foreach (var subField in field.Subfields)
                     {
-                        if (subField.Code.SameChar(code))
+                        if (subField.Code.SameChar (code))
                         {
                             result ??= new List<SubField>();
-                            result.Add(subField);
+                            result.Add (subField);
                         }
                     }
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
         }
@@ -3152,12 +3099,13 @@ namespace ManagedIrbis
                         var subCount = subFields.Count;
                         for (var j = 0; j < subCount; j++)
                         {
-                            if (subFields[j].Code.SameChar(code))
+                            if (subFields[j].Code.SameChar (code))
                             {
                                 if (subOccurrence == 0)
                                 {
                                     return subFields[j];
                                 }
+
                                 subOccurrence--;
                             }
                         }
@@ -3189,12 +3137,13 @@ namespace ManagedIrbis
                     var subCount = subFields.Count;
                     for (var j = 0; j < subCount; j++)
                     {
-                        if (subFields[j].Code.SameChar(code))
+                        if (subFields[j].Code.SameChar (code))
                         {
                             if (occurrence == 0)
                             {
                                 return subFields[j];
                             }
+
                             occurrence--;
                         }
                     }
@@ -3202,7 +3151,6 @@ namespace ManagedIrbis
             }
 
             return null;
-
         } // method GetSubField
 
         /// <summary>
@@ -3219,12 +3167,13 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     if (occurrence == 0)
                     {
                         return subFields[i].Value;
                     }
+
                     occurrence--;
                 }
             }
@@ -3251,10 +3200,10 @@ namespace ManagedIrbis
                 {
                     foreach (var subField in field.Subfields)
                     {
-                        if (subField.Code.SameChar(code)
-                            && !ReferenceEquals(subField.Value, null) && subField.Value.Length != 0)
+                        if (subField.Code.SameChar (code)
+                            && !ReferenceEquals (subField.Value, null) && subField.Value.Length != 0)
                         {
-                            result.Add(subField.Value);
+                            result.Add (subField.Value);
                         }
                     }
                 }
@@ -3276,7 +3225,7 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     return true;
                 }
@@ -3299,8 +3248,8 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code)
-                    && subFields[i].Value.SameString(value))
+                if (subFields[i].Code.SameChar (code)
+                    && subFields[i].Value.SameString (value))
                 {
                     return true;
                 }
@@ -3322,7 +3271,7 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(codes))
+                if (subFields[i].Code.SameChar (codes))
                 {
                     return true;
                 }
@@ -3346,7 +3295,7 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     return false;
                 }
@@ -3368,7 +3317,7 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(codes))
+                if (subFields[i].Code.SameChar (codes))
                 {
                     return false;
                 }
@@ -3403,7 +3352,7 @@ namespace ManagedIrbis
                 this IEnumerable<Field> fields
             )
         {
-            return fields .Where(field => !ReferenceEquals(field.Value, null) && field.Value.Length != 0)
+            return fields.Where (field => !ReferenceEquals (field.Value, null) && field.Value.Length != 0)
                 .ToArray();
         }
 
@@ -3423,7 +3372,7 @@ namespace ManagedIrbis
             for (var i = 0; i < count; i++)
             {
                 var subField = subFields[i];
-                if (subField.Code.SameChar(code))
+                if (subField.Code.SameChar (code))
                 {
                     if (subField.Value == oldValue)
                     {
@@ -3450,15 +3399,14 @@ namespace ManagedIrbis
                 (
                     code
                 );
-            var changed = string.CompareOrdinal(oldValue, newValue);
+            var changed = string.CompareOrdinal (oldValue, newValue);
 
             if (changed != 0)
             {
-                field.SetSubFieldValue(code, newValue);
+                field.SetSubFieldValue (code, newValue);
             }
 
             return field;
-
         }
 
         /// <summary>
@@ -3474,14 +3422,14 @@ namespace ManagedIrbis
             foreach (var subField in subFields)
             {
                 if (subField.Code != '\0'
-                    && !subField.Code.SameChar(knownCodes))
+                    && !subField.Code.SameChar (knownCodes))
                 {
                     result ??= new List<SubField>();
-                    result.Add(subField);
+                    result.Add (subField);
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
         }
@@ -3510,7 +3458,7 @@ namespace ManagedIrbis
                 this IEnumerable<Field> fields
             )
         {
-            return fields .Where(field => ReferenceEquals(field.Value, null) || field.Value.Length == 0)
+            return fields.Where (field => ReferenceEquals (field.Value, null) || field.Value.Length == 0)
                 .ToArray();
         }
 
@@ -3530,7 +3478,6 @@ namespace ManagedIrbis
                     return true;
 
             return false;
-
         } // method HaveSubFields
 
         /// <summary>
@@ -3557,12 +3504,12 @@ namespace ManagedIrbis
                     {
                         return field;
                     }
+
                     occurrence--;
                 }
             }
 
-            throw new KeyNotFoundException($"Tag={tag}");
-
+            throw new KeyNotFoundException ($"Tag={tag}");
         } // method RequireField
 
         /// <summary>
@@ -3573,7 +3520,6 @@ namespace ManagedIrbis
             foreach (var field in fields)
                 if (field.Tag == tag)
                     yield return field;
-
         } // method EnumerateField
 
         /// <summary>
@@ -3590,7 +3536,7 @@ namespace ManagedIrbis
             {
                 if (field.Tag == tag)
                 {
-                    if (field.HaveSubField(code))
+                    if (field.HaveSubField (code))
                     {
                         yield return field;
                     }
@@ -3613,14 +3559,13 @@ namespace ManagedIrbis
             {
                 if (field.Tag == tag)
                 {
-                    if (field.HaveSubField(code, value))
+                    if (field.HaveSubField (code, value))
                     {
                         yield return field;
                     }
                 }
             }
         } // method EnumerateField
-
     } // class Utility
 
     /// <summary>
@@ -4003,7 +3948,6 @@ namespace ManagedIrbis
         public static readonly int[] GoodCodesForReadTerms = { -202, -203, -204 };
 
         #endregion
-
     } // class Constants
 
     /// <summary>
@@ -4304,7 +4248,6 @@ namespace ManagedIrbis
         /// Не подключен к серверу.
         /// </summary>
         NotConnected = -100_003,
-
     } // enum ReturnCode
 
     /// <summary>
@@ -4348,14 +4291,13 @@ namespace ManagedIrbis
         /// Внутренний ресурс.
         /// </summary>
         InternalResource = 12
-
     } // enum IrbisPath
 
     /// <summary>
     /// Базовое исключение для всех ситуаций,
     /// специфичных для ИРБИС64.
     /// </summary>
-    [DebuggerDisplay("Code={" + nameof(ErrorCode) + "}, Message={" + nameof(Message) + "}")]
+    [DebuggerDisplay ("Code={" + nameof (ErrorCode) + "}, Message={" + nameof (Message) + "}")]
     public class IrbisException
         : ApplicationException
     {
@@ -4386,10 +4328,9 @@ namespace ManagedIrbis
             (
                 int returnCode
             )
-            : base(GetErrorDescription(returnCode))
+            : base (GetErrorDescription (returnCode))
         {
             ErrorCode = returnCode;
-
         } // constructor
 
         /// <summary>
@@ -4399,7 +4340,7 @@ namespace ManagedIrbis
             (
                 string message
             )
-            : base(message)
+            : base (message)
         {
         } // constructor
 
@@ -4411,7 +4352,7 @@ namespace ManagedIrbis
                 string message,
                 Exception innerException
             )
-            : base(message, innerException)
+            : base (message, innerException)
         {
         } // constructor
 
@@ -4427,8 +4368,8 @@ namespace ManagedIrbis
                 IrbisException exception
             )
         {
-            return string.IsNullOrEmpty(exception.Message)
-                ? GetErrorDescription(exception.ErrorCode)
+            return string.IsNullOrEmpty (exception.Message)
+                ? GetErrorDescription (exception.ErrorCode)
                 : exception.Message;
         }
 
@@ -4637,7 +4578,7 @@ namespace ManagedIrbis
             }
 
             return result;
-       }
+        }
 
         #endregion
 
@@ -4654,7 +4595,6 @@ namespace ManagedIrbis
             );
 
         #endregion
-
     } // class IrbisException
 
     /// <summary>
@@ -4692,7 +4632,7 @@ namespace ManagedIrbis
         public string? Value
         {
             get => _value;
-            set => SetValue(value);
+            set => SetValue (value);
         }
 
         /// <summary>
@@ -4722,11 +4662,10 @@ namespace ManagedIrbis
                 ReadOnlyMemory<char> value = default
             )
         {
-            Utility.VerifySubFieldCode(code);
+            Utility.VerifySubFieldCode (code);
             Code = code;
-            Utility.VerifySubFieldValue(value.Span);
+            Utility.VerifySubFieldValue (value.Span);
             Value = value.ToString();
-
         } // constructor
 
         /// <summary>
@@ -4740,11 +4679,10 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            Utility.VerifySubFieldCode(code);
+            Utility.VerifySubFieldCode (code);
             Code = code;
-            Utility.VerifySubFieldValue(value.AsSpan());
+            Utility.VerifySubFieldValue (value.AsSpan());
             Value = value;
-
         } // constructor
 
         #endregion
@@ -4760,7 +4698,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Клонирование подполя.
         /// </summary>
-        public SubField Clone() => (SubField) MemberwiseClone();
+        public SubField Clone() => (SubField)MemberwiseClone();
 
         /// <summary>
         /// Сравнение двух подполей.
@@ -4772,17 +4710,16 @@ namespace ManagedIrbis
             )
         {
             // сравниваем коды подполей с точностью до регистра символов
-            var result = char.ToUpperInvariant(subField1.Code)
-                .CompareTo(char.ToUpperInvariant(subField2.Code));
+            var result = char.ToUpperInvariant (subField1.Code)
+                .CompareTo (char.ToUpperInvariant (subField2.Code));
             if (result != 0)
             {
                 return result;
             }
 
-            result = string.CompareOrdinal(subField1.Value, subField2.Value);
+            result = string.CompareOrdinal (subField1.Value, subField2.Value);
 
             return result;
-
         } // method Compare
 
         /// <summary>
@@ -4795,11 +4732,11 @@ namespace ManagedIrbis
         {
             if (!text.IsEmpty)
             {
-                var code = char.ToLowerInvariant(text[0]);
-                Utility.VerifySubFieldCode(code);
+                var code = char.ToLowerInvariant (text[0]);
+                Utility.VerifySubFieldCode (code);
                 Code = code;
-                var value = text.Slice(1);
-                Utility.VerifySubFieldValue(value);
+                var value = text.Slice (1);
+                Utility.VerifySubFieldValue (value);
                 Value = value.EmptyToNull();
             }
         } // method Decode
@@ -4812,9 +4749,8 @@ namespace ManagedIrbis
                 ReadOnlySpan<char> value
             )
         {
-            Utility.VerifySubFieldValue(value);
+            Utility.VerifySubFieldValue (value);
             _value = value.ToString();
-
         } // method SetValue
 
         /// <summary>
@@ -4825,9 +4761,8 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            Utility.VerifySubFieldValue(value.AsSpan());
+            Utility.VerifySubFieldValue (value.AsSpan());
             _value = value;
-
         } // method SetValue
 
         #endregion
@@ -4836,11 +4771,10 @@ namespace ManagedIrbis
 
         /// <inheritdoc cref="object.ToString" />
         public override string ToString() => Code == NoCode
-                ? Value ?? string.Empty
-                : "^" + char.ToLowerInvariant(Code) + Value;
+            ? Value ?? string.Empty
+            : "^" + char.ToLowerInvariant (Code) + Value;
 
         #endregion
-
     } // class SubField
 
     /// <summary>
@@ -4894,13 +4828,13 @@ namespace ManagedIrbis
             set
             {
                 Clear();
-                if (value.SafeContains(Delimiter))
+                if (value.SafeContains (Delimiter))
                 {
-                    DecodeBody(value!);
+                    DecodeBody (value!);
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(value))
+                    if (!string.IsNullOrEmpty (value))
                     {
                         CreateValueSubField().Value = value;
                     }
@@ -4970,7 +4904,7 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.Add(subfield1);
+            Subfields.Add (subfield1);
         } // constructor
 
         /// <summary>
@@ -4987,9 +4921,8 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.Add(subfield1);
-            Subfields.Add(subfield2);
-
+            Subfields.Add (subfield1);
+            Subfields.Add (subfield2);
         } // constructor
 
         /// <summary>
@@ -5008,9 +4941,9 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.Add(subfield1);
-            Subfields.Add(subfield2);
-            Subfields.Add(subfield3);
+            Subfields.Add (subfield1);
+            Subfields.Add (subfield2);
+            Subfields.Add (subfield3);
         } // constructor
 
         /// <summary>
@@ -5025,7 +4958,7 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.AddRange(subfields);
+            Subfields.AddRange (subfields);
         } // constructor
 
         /// <summary>
@@ -5042,7 +4975,7 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.Add(new SubField(code1, value1));
+            Subfields.Add (new SubField (code1, value1));
         } // constructor
 
         /// <summary>
@@ -5063,8 +4996,8 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.Add(new SubField(code1, value1));
-            Subfields.Add(new SubField(code2, value2));
+            Subfields.Add (new SubField (code1, value1));
+            Subfields.Add (new SubField (code2, value2));
         } // constructor
 
         /// <summary>
@@ -5089,10 +5022,9 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.Add(new SubField(code1, value1));
-            Subfields.Add(new SubField(code2, value2));
-            Subfields.Add(new SubField(code3, value3));
-
+            Subfields.Add (new SubField (code1, value1));
+            Subfields.Add (new SubField (code2, value2));
+            Subfields.Add (new SubField (code3, value3));
         } // constructor
 
         #endregion
@@ -5108,12 +5040,12 @@ namespace ManagedIrbis
                 params string[] subfields
             )
         {
-            var result = new Field(tag);
+            var result = new Field (tag);
             for (var i = 0; i < subfields.Length; i += 2)
             {
                 var code = subfields[i][0];
                 var value = subfields[i + 1];
-                result.Subfields.Add(new SubField(code, value));
+                result.Subfields.Add (new SubField (code, value));
             }
 
             return result;
@@ -5129,7 +5061,7 @@ namespace ManagedIrbis
                 SubField subfield
             )
         {
-            Subfields.Add(subfield);
+            Subfields.Add (subfield);
             return this;
         } // method Add
 
@@ -5145,7 +5077,7 @@ namespace ManagedIrbis
                 ReadOnlyMemory<char> value
             )
         {
-            Subfields.Add(new SubField(code, value));
+            Subfields.Add (new SubField (code, value));
             return this;
         } // method Add
 
@@ -5161,7 +5093,7 @@ namespace ManagedIrbis
                 string? value = default
             )
         {
-            Subfields.Add(new SubField(code, value));
+            Subfields.Add (new SubField (code, value));
             return this;
         } // method Add
 
@@ -5177,7 +5109,7 @@ namespace ManagedIrbis
             Subfields.Clear();
             foreach (var subField in source.Subfields)
             {
-                Subfields.Add(subField.Clone());
+                Subfields.Add (subField.Clone());
             }
 
             return this;
@@ -5231,7 +5163,6 @@ namespace ManagedIrbis
             }
 
             return result;
-
         } // method Compare
 
         /// <summary>
@@ -5246,16 +5177,15 @@ namespace ManagedIrbis
             if (Subfields.Count == 0)
             {
                 result = new SubField { Code = ValueCode };
-                Subfields.Add(result);
+                Subfields.Add (result);
                 return result;
-
             }
 
             result = Subfields[0];
             if (result.Code != ValueCode)
             {
                 result = new SubField { Code = ValueCode };
-                Subfields.Insert(0, result);
+                Subfields.Insert (0, result);
             }
 
             return result;
@@ -5298,10 +5228,9 @@ namespace ManagedIrbis
 
             var text = value?.ToString();
             var subfield = new SubField { Code = code, Value = text };
-            Subfields.Add(subfield);
+            Subfields.Add (subfield);
 
             return this;
-
         } // method Add
 
         /// <summary>
@@ -5315,11 +5244,10 @@ namespace ManagedIrbis
         {
             if (value is not 0)
             {
-                Add(code, value.ToInvariantString());
+                Add (code, value.ToInvariantString());
             }
 
             return this;
-
         } // method AddNonEmpty
 
         /// <summary>
@@ -5333,11 +5261,10 @@ namespace ManagedIrbis
         {
             if (value is not 0)
             {
-                Add(code, value.ToInvariantString());
+                Add (code, value.ToInvariantString());
             }
 
             return this;
-
         } // method AddNonEmpty
 
         /// <summary>
@@ -5359,10 +5286,10 @@ namespace ManagedIrbis
                 }
 
                 var text = value.ToString();
-                if (!string.IsNullOrEmpty(text))
+                if (!string.IsNullOrEmpty (text))
                 {
                     var subfield = new SubField { Code = code, Value = text };
-                    Subfields.Add(subfield);
+                    Subfields.Add (subfield);
                 }
             }
 
@@ -5384,7 +5311,7 @@ namespace ManagedIrbis
         /// </summary>
         public Field Clone()
         {
-            var result = (Field) MemberwiseClone();
+            var result = (Field)MemberwiseClone();
 
             for (var i = 0; i < Subfields.Count; i++)
             {
@@ -5402,11 +5329,10 @@ namespace ManagedIrbis
                 string line
             )
         {
-            var index = line.IndexOf('#');
-            Tag = line.Substring(0, index).SafeToInt32();
-            line = line.Substring(index + 1);
-            DecodeBody(line);
-
+            var index = line.IndexOf ('#');
+            Tag = line.Substring (0, index).SafeToInt32();
+            line = line.Substring (index + 1);
+            DecodeBody (line);
         } // method Decode
 
         /// <summary>
@@ -5417,7 +5343,7 @@ namespace ManagedIrbis
                 string line
             )
         {
-            var index = line.IndexOf('^');
+            var index = line.IndexOf ('^');
             if (index < 0)
             {
                 Value = line;
@@ -5427,22 +5353,22 @@ namespace ManagedIrbis
 
             if (index != 0)
             {
-                Value = line.Substring(0, index);
+                Value = line.Substring (0, index);
             }
 
-            line = line.Substring(index + 1);
+            line = line.Substring (index + 1);
 
             while (true)
             {
-                index = line.IndexOf('^');
+                index = line.IndexOf ('^');
                 if (index < 0)
                 {
-                    Add(line[0], line.Substring(1));
+                    Add (line[0], line.Substring (1));
                     return;
                 }
 
-                Add(line[0], line.Substring(1, index - 1));
-                line = line.Substring(index + 1);
+                Add (line[0], line.Substring (1, index - 1));
+                line = line.Substring (index + 1);
             }
         } // method DecodeBody
 
@@ -5467,7 +5393,7 @@ namespace ManagedIrbis
 
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code.SameChar (code))
                 {
                     return subfield;
                 }
@@ -5486,7 +5412,7 @@ namespace ManagedIrbis
         {
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code.SameChar (code))
                 {
                     yield return subfield;
                 }
@@ -5505,9 +5431,9 @@ namespace ManagedIrbis
 
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code.SameChar (code))
                 {
-                    result.Add(subfield);
+                    result.Add (subfield);
                 }
             }
 
@@ -5527,19 +5453,18 @@ namespace ManagedIrbis
         {
             if (code == '\0')
             {
-
             }
 
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code.SameChar (code))
                 {
                     return subfield;
                 }
             }
 
             var result = new SubField { Code = code };
-            Subfields.Add(result);
+            Subfields.Add (result);
 
             return result;
         } // method GetOrAddSubField
@@ -5571,7 +5496,7 @@ namespace ManagedIrbis
             if (occurrence < 0)
             {
                 // отрицательные индексы отсчитываются от конца
-                occurrence = Subfields.Count(sf => sf.Code.SameChar(code)) + occurrence;
+                occurrence = Subfields.Count (sf => sf.Code.SameChar (code)) + occurrence;
                 if (occurrence < 0)
                 {
                     return null;
@@ -5580,7 +5505,7 @@ namespace ManagedIrbis
 
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code.SameChar (code))
                 {
                     if (occurrence == 0)
                     {
@@ -5607,7 +5532,7 @@ namespace ManagedIrbis
                 char code,
                 int occurrence = 0
             )
-            => GetSubField(code, occurrence)?.Value ?? default;
+            => GetSubField (code, occurrence)?.Value ?? default;
 
         /// <summary>
         /// For * specification.
@@ -5633,13 +5558,13 @@ namespace ManagedIrbis
             }
             else
             {
-                if (string.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty (value))
                 {
-                    RemoveSubField(code);
+                    RemoveSubField (code);
                 }
                 else
                 {
-                    GetOrAddSubField(code).Value = value;
+                    GetOrAddSubField (code).Value = value;
                 }
             }
 
@@ -5658,9 +5583,9 @@ namespace ManagedIrbis
         {
             SubField? subfield;
 
-            while ((subfield = GetFirstSubField(code)) is not null)
+            while ((subfield = GetFirstSubField (code)) is not null)
             {
-                Subfields.Remove(subfield);
+                Subfields.Remove (subfield);
             }
 
             return this;
@@ -5687,7 +5612,7 @@ namespace ManagedIrbis
             foreach (var subField in Subfields)
             {
                 var subText = subField.ToString();
-                result.Append(subText);
+                result.Append (subText);
             }
 
             return result.ToString();
@@ -5714,21 +5639,20 @@ namespace ManagedIrbis
             var length = 4 + Subfields.Sum
                 (
                     sf => (sf.Value!.Length)
-                    + (sf.Code == ValueCode ? 1 : 2)
+                          + (sf.Code == ValueCode ? 1 : 2)
                 );
             var result = new StringBuilder (length);
-            result.Append(Tag.ToInvariantString())
-                .Append('#');
+            result.Append (Tag.ToInvariantString())
+                .Append ('#');
             foreach (var subfield in Subfields)
             {
-                result.Append(subfield);
+                result.Append (subfield);
             }
 
             return result.ToString();
         } // method ToString
 
         #endregion
-
     } // class Field
 
     /// <summary>
@@ -5786,14 +5710,13 @@ namespace ManagedIrbis
         /// Полный текст не актуализирован.
         /// </summary>
         FullTextNotActualized = 256
-
     } // enum RecordStatus
 
     /// <summary>
     /// Библиографическая запись. Состоит из произвольного количества полей.
     /// </summary>
-    [DebuggerDisplay("[{" + nameof(Database) +
-        "}] MFN={" + nameof(Mfn) + "} ({" + nameof(Version) + "})")]
+    [DebuggerDisplay ("[{" + nameof (Database) +
+                      "}] MFN={" + nameof (Mfn) + "} ({" + nameof (Version) + "})")]
     public sealed class Record
         : IEnumerable<Field>
     {
@@ -5901,15 +5824,15 @@ namespace ManagedIrbis
                 string? value = default
             )
         {
-            var field = new Field(tag);
-            if (!ReferenceEquals(value, null))
+            var field = new Field (tag);
+            if (!ReferenceEquals (value, null))
             {
-                field.DecodeBody(value);
+                field.DecodeBody (value);
             }
-            Fields.Add(field);
+
+            Fields.Add (field);
 
             return this;
-
         } // method Add
 
         /// <summary>
@@ -5924,11 +5847,10 @@ namespace ManagedIrbis
                 SubField subfield1
             )
         {
-            var field = new Field(tag) { subfield1 };
-            Fields.Add(field);
+            var field = new Field (tag) { subfield1 };
+            Fields.Add (field);
 
             return this;
-
         } // method Add
 
         /// <summary>
@@ -5944,11 +5866,10 @@ namespace ManagedIrbis
                 SubField subfield2
             )
         {
-            var field = new Field(tag) { subfield1, subfield2 };
-            Fields.Add(field);
+            var field = new Field (tag) { subfield1, subfield2 };
+            Fields.Add (field);
 
             return this;
-
         } // method Add
 
         /// <summary>
@@ -5965,11 +5886,10 @@ namespace ManagedIrbis
                 SubField subfield3
             )
         {
-            var field = new Field(tag) { subfield1, subfield2, subfield3 };
-            Fields.Add(field);
+            var field = new Field (tag) { subfield1, subfield2, subfield3 };
+            Fields.Add (field);
 
             return this;
-
         } // method Add
 
         /// <summary>
@@ -5984,12 +5904,11 @@ namespace ManagedIrbis
                 params SubField[] subfields
             )
         {
-            var field = new Field(tag);
-            field.Subfields.AddRange(subfields);
-            Fields.Add(field);
+            var field = new Field (tag);
+            field.Subfields.AddRange (subfields);
+            Fields.Add (field);
 
             return this;
-
         } // method Add
 
         /// <summary>
@@ -6006,9 +5925,9 @@ namespace ManagedIrbis
                 string? value = default
             )
         {
-            var field = new Field(tag);
-            field.Subfields.Add(new SubField(code, value));
-            Fields.Add(field);
+            var field = new Field (tag);
+            field.Subfields.Add (new SubField (code, value));
+            Fields.Add (field);
 
             return this;
         } // method Add
@@ -6031,10 +5950,10 @@ namespace ManagedIrbis
                 string? value2 = default
             )
         {
-            var field = new Field(tag);
-            field.Subfields.Add(new SubField(code1, value1));
-            field.Subfields.Add(new SubField(code2, value2));
-            Fields.Add(field);
+            var field = new Field (tag);
+            field.Subfields.Add (new SubField (code1, value1));
+            field.Subfields.Add (new SubField (code2, value2));
+            Fields.Add (field);
 
             return this;
         } // method Add
@@ -6061,14 +5980,13 @@ namespace ManagedIrbis
                 string? value3 = default
             )
         {
-            var field = new Field(tag);
-            field.Subfields.Add(new SubField(code1, value1));
-            field.Subfields.Add(new SubField(code2, value2));
-            field.Subfields.Add(new SubField(code3, value3));
-            Fields.Add(field);
+            var field = new Field (tag);
+            field.Subfields.Add (new SubField (code1, value1));
+            field.Subfields.Add (new SubField (code2, value2));
+            field.Subfields.Add (new SubField (code3, value3));
+            Fields.Add (field);
 
             return this;
-
         } // method Add
 
         /// <summary>
@@ -6083,11 +6001,10 @@ namespace ManagedIrbis
                 string[] subfields
             )
         {
-            var field = Field.WithSubFields(tag, subfields);
-            Fields.Add(field);
+            var field = Field.WithSubFields (tag, subfields);
+            Fields.Add (field);
 
             return this;
-
         } // method Add
 
         /// <summary>
@@ -6099,15 +6016,14 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            if (!ReferenceEquals(value, null))
+            if (!ReferenceEquals (value, null))
             {
                 var field = new Field { Tag = tag };
-                field.DecodeBody(value);
-                Fields.Add(field);
+                field.DecodeBody (value);
+                Fields.Add (field);
             }
 
             return this;
-
         } // method AddNonEmptyField
 
         /// <summary>
@@ -6121,7 +6037,6 @@ namespace ManagedIrbis
             Fields.Clear();
 
             return this;
-
         } // method Clear
 
         /// <summary>
@@ -6129,7 +6044,7 @@ namespace ManagedIrbis
         /// </summary>
         public Record Clone()
         {
-            var result = (Record) MemberwiseClone();
+            var result = (Record)MemberwiseClone();
 
             for (var i = 0; i < result.Fields.Count; i++)
             {
@@ -6137,7 +6052,6 @@ namespace ManagedIrbis
             }
 
             return result;
-
         } // method Clone
 
         /// <summary>
@@ -6152,40 +6066,39 @@ namespace ManagedIrbis
             {
                 var line = response.ReadUtf();
 
-                var first = line.Split('#');
-                Mfn = int.Parse(first[0]);
+                var first = line.Split ('#');
+                Mfn = int.Parse (first[0]);
                 Status = first.Length == 1
                     ? RecordStatus.None
-                    : (RecordStatus) first[1].SafeToInt32();
+                    : (RecordStatus)first[1].SafeToInt32();
 
                 line = response.ReadUtf();
-                var second = line.Split('#');
+                var second = line.Split ('#');
                 Version = second.Length == 1
                     ? 0
-                    : int.Parse(second[1]);
+                    : int.Parse (second[1]);
 
                 while (!response.EOT)
                 {
                     line = response.ReadUtf();
-                    if (string.IsNullOrEmpty(line))
+                    if (string.IsNullOrEmpty (line))
                     {
                         break;
                     }
 
                     var field = new Field();
-                    field.Decode(line);
-                    Fields.Add(field);
+                    field.Decode (line);
+                    Fields.Add (field);
                 }
             }
             catch (Exception exception)
             {
                 throw new IrbisException
                     (
-                        nameof(Record) + "::" + nameof(Decode),
+                        nameof (Record) + "::" + nameof (Decode),
                         exception
                     );
             }
-
         } // method Decode
 
         /// <summary>
@@ -6200,40 +6113,39 @@ namespace ManagedIrbis
             {
                 var line = lines[0];
 
-                var first = line.Split('#');
-                Mfn = int.Parse(first[0]);
+                var first = line.Split ('#');
+                Mfn = int.Parse (first[0]);
                 Status = first.Length == 1
                     ? RecordStatus.None
-                    : (RecordStatus) first[1].SafeToInt32();
+                    : (RecordStatus)first[1].SafeToInt32();
 
                 line = lines[1];
-                var second = line.Split('#');
+                var second = line.Split ('#');
                 Version = second.Length == 1
                     ? 0
-                    : int.Parse(second[1]);
+                    : int.Parse (second[1]);
 
                 for (var i = 2; i < lines.Length; i++)
                 {
                     line = lines[i];
-                    if (string.IsNullOrEmpty(line))
+                    if (string.IsNullOrEmpty (line))
                     {
                         break;
                     }
 
                     var field = new Field();
-                    field.Decode(line);
-                    Fields.Add(field);
+                    field.Decode (line);
+                    Fields.Add (field);
                 }
             }
             catch (Exception exception)
             {
                 throw new IrbisException
                     (
-                        nameof(Record) + "::" + nameof(Decode),
+                        nameof (Record) + "::" + nameof (Decode),
                         exception
                     );
             }
-
         } // method Decode
 
         /// <summary>
@@ -6244,23 +6156,22 @@ namespace ManagedIrbis
                 string? delimiter = Constants.IrbisDelimiter
             )
         {
-            var result = new StringBuilder(512);
+            var result = new StringBuilder (512);
 
-            result.Append(Mfn.ToInvariantString())
-                .Append('#')
-                .Append(((int) Status).ToInvariantString())
-                .Append(delimiter)
-                .Append("0#")
-                .Append(Version.ToInvariantString())
-                .Append(delimiter);
+            result.Append (Mfn.ToInvariantString())
+                .Append ('#')
+                .Append (((int)Status).ToInvariantString())
+                .Append (delimiter)
+                .Append ("0#")
+                .Append (Version.ToInvariantString())
+                .Append (delimiter);
 
             foreach (var field in Fields)
             {
-                result.Append(field).Append(delimiter);
+                result.Append (field).Append (delimiter);
             }
 
             return result.ToString();
-
         } // method Encode
 
         /// <summary>
@@ -6269,7 +6180,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="tag">Метка поля.</param>
         /// <returns>Значение поля или <c>null</c>.</returns>
-        public string? FM ( int tag ) => GetField(tag)?.Value;
+        public string? FM (int tag) => GetField (tag)?.Value;
 
         /// <summary>
         /// Текст первого подполя с указанным тегом и кодом.
@@ -6280,17 +6191,16 @@ namespace ManagedIrbis
                 char code
             )
         {
-            var field = GetField(tag);
+            var field = GetField (tag);
 
-            if (!ReferenceEquals(field, null))
+            if (!ReferenceEquals (field, null))
             {
                 return code == '*'
                     ? field.GetValueOrFirstSubField()
-                    : field.GetSubFieldValue(code);
+                    : field.GetSubFieldValue (code);
             }
 
             return default;
-
         } // method FM
 
         /// <summary>
@@ -6306,14 +6216,13 @@ namespace ManagedIrbis
             foreach (var field in Fields)
             {
                 if (field.Tag == tag
-                    && !ReferenceEquals(field.Value, null))
+                    && !ReferenceEquals (field.Value, null))
                 {
-                    result.Add(field.Value);
+                    result.Add (field.Value);
                 }
             }
 
             return result.ToArray();
-
         } // method FMA
 
         /// <summary>
@@ -6333,16 +6242,15 @@ namespace ManagedIrbis
                 {
                     var value = code == '*'
                         ? field.GetValueOrFirstSubField()
-                        : field.GetSubFieldValue(code);
-                    if (!ReferenceEquals(value, null))
+                        : field.GetSubFieldValue (code);
+                    if (!ReferenceEquals (value, null))
                     {
-                        result.Add(value);
+                        result.Add (value);
                     }
                 }
             }
 
             return result.ToArray();
-
         } // method FMA
 
         /// <summary>
@@ -6368,7 +6276,6 @@ namespace ManagedIrbis
             }
 
             return null;
-
         } // method GetField
 
         /// <summary>
@@ -6387,7 +6294,6 @@ namespace ManagedIrbis
                     yield return field;
                 }
             }
-
         } // method EnumerateField
 
         /// <summary>
@@ -6410,10 +6316,9 @@ namespace ManagedIrbis
             }
 
             var result = new Field { Tag = tag };
-            Fields.Add(result);
+            Fields.Add (result);
 
             return result;
-
         } // method GetOrAddField
 
         /// <summary>
@@ -6433,7 +6338,6 @@ namespace ManagedIrbis
             }
 
             return false;
-
         } // method HaveField
 
         /// <summary>
@@ -6447,13 +6351,12 @@ namespace ManagedIrbis
             )
         {
             Field? field;
-            while ((field = GetField(tag)) is not null)
+            while ((field = GetField (tag)) is not null)
             {
-                Fields.Remove(field);
+                Fields.Remove (field);
             }
 
             return this;
-
         } // method RemoveField
 
         /// <summary>
@@ -6465,21 +6368,22 @@ namespace ManagedIrbis
 
             foreach (var field in Fields)
             {
-                result.AppendFormat("{0}#", field.Tag);
+                result.AppendFormat ("{0}#", field.Tag);
                 foreach (var subField in field.Subfields)
                 {
                     if (subField.Code != SubField.NoCode)
                     {
-                        result.Append('^');
-                        result.Append(subField.Code);
+                        result.Append ('^');
+                        result.Append (subField.Code);
                     }
-                    result.Append(subField.Value);
+
+                    result.Append (subField.Value);
                 }
+
                 result.AppendLine();
             }
 
             return result.ToString();
-
         }
 
         #endregion
@@ -6490,8 +6394,7 @@ namespace ManagedIrbis
         public IEnumerator<Field> GetEnumerator() => Fields.GetEnumerator();
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Encode("\n");
-
+        public override string ToString() => Encode ("\n");
     } // class Record
 
     /// <summary>
@@ -6570,7 +6473,7 @@ namespace ManagedIrbis
                 ArraySegment<byte> chunk
             )
         {
-            _memory.Add(chunk);
+            _memory.Add (chunk);
         }
 
         /// <summary>
@@ -6588,7 +6491,7 @@ namespace ManagedIrbis
         {
             if (GetReturnCode() < 0)
             {
-                if (Array.IndexOf(goodCodes, ReturnCode) < 0)
+                if (Array.IndexOf (goodCodes, ReturnCode) < 0)
                 {
                     // throw new IrbisException(ReturnCode);
                     return false;
@@ -6596,7 +6499,6 @@ namespace ManagedIrbis
             }
 
             return true;
-
         } // method CheckReturnCode
 
         /// <summary>
@@ -6627,7 +6529,6 @@ namespace ManagedIrbis
             }
 
             return false;
-
         } // method FindPreamble
 
         /// <summary>
@@ -6657,7 +6558,6 @@ namespace ManagedIrbis
                 ReadAnsi();
                 ReadAnsi();
             }
-
         } // method Parse
 
         /// <summary>
@@ -6684,7 +6584,6 @@ namespace ManagedIrbis
             }
 
             return _currentChunk.Array![_currentChunk.Offset + _currentOffset];
-
         } // method Peek
 
         /// <summary>
@@ -6728,7 +6627,6 @@ namespace ManagedIrbis
             }
 
             return result;
-
         } // method ReadByte
 
         /// <summary>
@@ -6760,11 +6658,10 @@ namespace ManagedIrbis
                     break;
                 }
 
-                result.WriteByte(one);
+                result.WriteByte (one);
             }
 
             return result.ToArray();
-
         } // method ReadLine
 
         /// <summary>
@@ -6781,8 +6678,7 @@ namespace ManagedIrbis
                 return string.Empty;
             }
 
-            return encoding.GetString(bytes);
-
+            return encoding.GetString (bytes);
         } // method ReadLine
 
         /// <summary>
@@ -6823,12 +6719,11 @@ namespace ManagedIrbis
             for (var i = _currentIndex + 1; i < _memory.Count; i++)
             {
                 var chunk = _memory[i];
-                Array.Copy(_memory[i].Array!, 0, result, offset, _memory[i].Count);
+                Array.Copy (_memory[i].Array!, 0, result, offset, _memory[i].Count);
                 offset += chunk.Count;
             }
 
             return result;
-
         } // method RemainingBytes
 
         /// <summary>
@@ -6845,8 +6740,7 @@ namespace ManagedIrbis
                 return string.Empty;
             }
 
-            return encoding.GetString(bytes);
-
+            return encoding.GetString (bytes);
         } // method RemainingText
 
         /// <summary>
@@ -6863,10 +6757,9 @@ namespace ManagedIrbis
             {
                 foreach (var b in memory)
                 {
-                    writer.Write($" {b:X2}");
+                    writer.Write ($" {b:X2}");
                 }
             }
-
         } // method Debug
 
         /// <summary>
@@ -6877,9 +6770,8 @@ namespace ManagedIrbis
                 string fileName
             )
         {
-            using var writer = File.CreateText(fileName);
-            Debug(writer);
-
+            using var writer = File.CreateText (fileName);
+            Debug (writer);
         } // method Debug
 
         /// <summary>
@@ -6894,9 +6786,8 @@ namespace ManagedIrbis
 
             foreach (var memory in _memory)
             {
-                writer.Write(Encoding.UTF8.GetString(memory.Array!, memory.Offset, memory.Count));
+                writer.Write (Encoding.UTF8.GetString (memory.Array!, memory.Offset, memory.Count));
             }
-
         } // method DebugUtf
 
         /// <summary>
@@ -6907,9 +6798,8 @@ namespace ManagedIrbis
                 string fileName
             )
         {
-            using var writer = File.CreateText(fileName);
-            DebugUtf(writer);
-
+            using var writer = File.CreateText (fileName);
+            DebugUtf (writer);
         } // method DebugUtf
 
         /// <summary>
@@ -6924,9 +6814,8 @@ namespace ManagedIrbis
 
             foreach (var memory in _memory)
             {
-                writer.Write(Utility.Ansi.GetString(memory.Array!, memory.Offset, memory.Count));
+                writer.Write (Utility.Ansi.GetString (memory.Array!, memory.Offset, memory.Count));
             }
-
         } // method DebugAnsi
 
         /// <summary>
@@ -6937,9 +6826,8 @@ namespace ManagedIrbis
                 string fileName
             )
         {
-            using var writer = File.CreateText(fileName);
-            Debug(writer);
-
+            using var writer = File.CreateText (fileName);
+            Debug (writer);
         } // method DebugAnsi
 
         /// <summary>
@@ -6950,18 +6838,17 @@ namespace ManagedIrbis
             ReturnCode = ReadInteger();
 
             return ReturnCode;
-
         } // method GetReturnCode
 
         /// <summary>
         ///
         /// </summary>
-        public string ReadAnsi() => ReadLine(Utility.Ansi);
+        public string ReadAnsi() => ReadLine (Utility.Ansi);
 
         /// <summary>
         ///
         /// </summary>
-        public int ReadInteger() => ReadLine(Utility.Ansi).SafeToInt32();
+        public int ReadInteger() => ReadLine (Utility.Ansi).SafeToInt32();
 
         /// <summary>
         ///
@@ -6971,16 +6858,16 @@ namespace ManagedIrbis
                 int count
             )
         {
-            var result = new List<string>(count);
+            var result = new List<string> (count);
             for (var i = 0; i < count; i++)
             {
                 var line = ReadAnsi();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     return null;
                 }
 
-                result.Add(line);
+                result.Add (line);
             }
 
             return result.ToArray();
@@ -6997,22 +6884,24 @@ namespace ManagedIrbis
                 int count
             )
         {
-            var result = new List<string>(count);
+            var result = new List<string> (count);
             var index = 0;
             string line;
             for (; index < 1; index++)
             {
                 line = ReadAnsi();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     return null;
                 }
-                result.Add(line);
+
+                result.Add (line);
             }
+
             for (; index < count; index++)
             {
                 line = ReadAnsi();
-                result.Add(line);
+                result.Add (line);
             }
 
             return result.ToArray();
@@ -7024,7 +6913,7 @@ namespace ManagedIrbis
         public string RequireAnsi()
         {
             var result = ReadAnsi();
-            if (string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty (result))
             {
                 throw new IrbisException();
             }
@@ -7038,7 +6927,7 @@ namespace ManagedIrbis
         public string RequireUtf()
         {
             var result = ReadUtf();
-            if (string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty (result))
             {
                 throw new IrbisException();
             }
@@ -7052,7 +6941,7 @@ namespace ManagedIrbis
         public int RequireInteger()
         {
             var line = ReadAnsi();
-            var result = int.Parse(line);
+            var result = int.Parse (line);
             return result;
         }
 
@@ -7070,7 +6959,7 @@ namespace ManagedIrbis
                 }
                 catch (Exception exception)
                 {
-                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
                     continue;
                 }
 
@@ -7092,7 +6981,7 @@ namespace ManagedIrbis
                 }
                 catch (Exception exception)
                 {
-                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
                     continue;
                 }
 
@@ -7114,7 +7003,7 @@ namespace ManagedIrbis
                 }
                 catch (Exception exception)
                 {
-                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
                     continue;
                 }
 
@@ -7136,7 +7025,7 @@ namespace ManagedIrbis
                 }
                 catch (Exception exception)
                 {
-                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
                     continue;
                 }
 
@@ -7158,7 +7047,7 @@ namespace ManagedIrbis
                 }
                 catch (Exception exception)
                 {
-                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
                     continue;
                 }
 
@@ -7184,11 +7073,10 @@ namespace ManagedIrbis
                 }
 
                 var line = ReadAnsi();
-                result.Add(line);
+                result.Add (line);
             }
 
             return result.ToArray();
-
         } // method GetAnsiStrings
 
         /// <summary>
@@ -7202,17 +7090,16 @@ namespace ManagedIrbis
             while (!EOT)
             {
                 var line = ReadAnsi();
-                result.Add(line);
+                result.Add (line);
             }
 
             return result.ToArray();
-
         } // method ReadRemainingAnsiLines
 
         /// <summary>
         ///
         /// </summary>
-        public string ReadRemainingAnsiText() => RemainingText(Utility.Ansi);
+        public string ReadRemainingAnsiText() => RemainingText (Utility.Ansi);
 
         /// <summary>
         ///
@@ -7223,8 +7110,8 @@ namespace ManagedIrbis
 
             while (!EOT)
             {
-                string line = ReadLine(Encoding.UTF8);
-                result.Add(line);
+                string line = ReadLine (Encoding.UTF8);
+                result.Add (line);
             }
 
             return result.ToArray();
@@ -7233,12 +7120,12 @@ namespace ManagedIrbis
         /// <summary>
         ///
         /// </summary>
-        public string ReadRemainingUtfText() => RemainingText(Encoding.UTF8);
+        public string ReadRemainingUtfText() => RemainingText (Encoding.UTF8);
 
         /// <summary>
         /// Чтение строки в кодировке UTF-8.
         /// </summary>
-        public string ReadUtf() => ReadLine(Encoding.UTF8);
+        public string ReadUtf() => ReadLine (Encoding.UTF8);
 
         /// <summary>
         /// Чтение целого числа.
@@ -7247,17 +7134,15 @@ namespace ManagedIrbis
         {
             if (EOT)
             {
-                throw new IrbisException("Unexpected end of response");
+                throw new IrbisException ("Unexpected end of response");
             }
 
-            var line = ReadLine(Utility.Ansi);
+            var line = ReadLine (Utility.Ansi);
 
-            return int.Parse(line, CultureInfo.InvariantCulture);
-
+            return int.Parse (line, CultureInfo.InvariantCulture);
         } // method RequireInt32
 
         #endregion
-
     } // class Response
 
     /// <summary>
@@ -7278,20 +7163,19 @@ namespace ManagedIrbis
             )
             : this()
         {
-            _writer = new MemoryStream(2048);
+            _writer = new MemoryStream (2048);
 
             // Заголовок запроса
-            AddAnsi(commandCode);
-            AddAnsi(connection.Workstation);
-            AddAnsi(commandCode);
-            Add(connection.ClientId);
-            Add(connection.QueryId);
-            AddAnsi(connection.Password);
-            AddAnsi(connection.Username);
+            AddAnsi (commandCode);
+            AddAnsi (connection.Workstation);
+            AddAnsi (commandCode);
+            Add (connection.ClientId);
+            Add (connection.QueryId);
+            AddAnsi (connection.Password);
+            AddAnsi (connection.Username);
             NewLine();
             NewLine();
             NewLine();
-
         } // constructor
 
         #endregion
@@ -7313,16 +7197,15 @@ namespace ManagedIrbis
             )
         {
             var buffer = new byte[12];
-            var length = Private.Int32ToBytes(value, buffer);
-            _writer.Write(buffer, 0, length);
+            var length = Private.Int32ToBytes (value, buffer);
+            _writer.Write (buffer, 0, length);
             NewLine();
-
         } // method Add
 
         /// <summary>
         /// Добавление строки с флагом "да-нет".
         /// </summary>
-        public void Add(bool value) => Add(value ? 1 : 0);
+        public void Add (bool value) => Add (value ? 1 : 0);
 
         /// <summary>
         /// Добавление строки в кодировке ANSI (плюс перевод строки).
@@ -7334,12 +7217,11 @@ namespace ManagedIrbis
         {
             if (value is not null)
             {
-                var bytes = Utility.Ansi.GetBytes(value);
-                _writer.Write(bytes, 0, bytes.Length);
+                var bytes = Utility.Ansi.GetBytes (value);
+                _writer.Write (bytes, 0, bytes.Length);
             }
 
             NewLine();
-
         } // method AddAnsi
 
         /// <summary>
@@ -7352,12 +7234,11 @@ namespace ManagedIrbis
         {
             if (value is not null)
             {
-                var bytes = Encoding.UTF8.GetBytes(value);
-                _writer.Write(bytes, 0, bytes.Length);
+                var bytes = Encoding.UTF8.GetBytes (value);
+                _writer.Write (bytes, 0, bytes.Length);
             }
 
             NewLine();
-
         } // method AddUtf
 
         /// <summary>
@@ -7368,31 +7249,30 @@ namespace ManagedIrbis
                 string? format
             )
         {
-            if (ReferenceEquals(format, null) || format.Length == 0)
+            if (ReferenceEquals (format, null) || format.Length == 0)
             {
                 NewLine();
             }
             else
             {
                 format = format.Trim();
-                if (string.IsNullOrEmpty(format))
+                if (string.IsNullOrEmpty (format))
                 {
                     NewLine();
                 }
                 else
                 {
-                    if (format.StartsWith("@"))
+                    if (format.StartsWith ("@"))
                     {
-                        AddAnsi(format);
+                        AddAnsi (format);
                     }
                     else
                     {
-                        var prepared = Private.PrepareFormat(format);
-                        AddUtf("!" + prepared);
+                        var prepared = Private.PrepareFormat (format);
+                        AddUtf ("!" + prepared);
                     }
                 }
             }
-
         } // method AddFormat
 
         /// <summary>
@@ -7408,9 +7288,8 @@ namespace ManagedIrbis
             var span = GetBody();
             foreach (var b in span)
             {
-                writer.Write($" {b:X2}");
+                writer.Write ($" {b:X2}");
             }
-
         } // method Debug
 
         /// <summary>
@@ -7424,7 +7303,6 @@ namespace ManagedIrbis
             writer ??= Console.Out;
 
             writer.WriteLine (Utility.Ansi.GetString (_writer.ToArray()));
-
         } // method DebugUtf
 
         /// <summary>
@@ -7438,7 +7316,6 @@ namespace ManagedIrbis
             writer ??= Console.Out;
 
             writer.WriteLine (Encoding.UTF8.GetString (_writer.ToArray()));
-
         } // method DebugUtf
 
         /// <summary>
@@ -7450,15 +7327,14 @@ namespace ManagedIrbis
         /// <summary>
         /// Подсчет общей длины запроса (в байтах).
         /// </summary>
-        public int GetLength() => unchecked((int)_writer.Length);
+        public int GetLength() => unchecked ((int)_writer.Length);
 
         /// <summary>
         /// Добавление одного перевода строки.
         /// </summary>
-        public void NewLine() => _writer.WriteByte(10);
+        public void NewLine() => _writer.WriteByte (10);
 
         #endregion
-
     } // struct SyncQuery
 
     /// <summary>
@@ -7530,13 +7406,12 @@ namespace ManagedIrbis
         /// </summary>
         public ValueTextNavigator Clone()
         {
-            var result = new ValueTextNavigator(_text)
+            var result = new ValueTextNavigator (_text)
             {
                 _position = _position
             };
 
             return result;
-
         } // method Clone
 
         /// <summary>
@@ -7549,11 +7424,10 @@ namespace ManagedIrbis
             )
         {
             encoding ??= Encoding.UTF8;
-            var text = File.ReadAllText(fileName, encoding);
-            var result = new ValueTextNavigator(text.AsSpan());
+            var text = File.ReadAllText (fileName, encoding);
+            var result = new ValueTextNavigator (text.AsSpan());
 
             return result;
-
         } // method FromFile
 
         /// <summary>
@@ -7563,54 +7437,54 @@ namespace ManagedIrbis
         /// </returns>
         public ReadOnlySpan<char> GetRemainingText() => IsEOF
             ? new ReadOnlySpan<char>()
-            : _text.Slice(_position);
+            : _text.Slice (_position);
 
         /// <summary>
         /// Текущий символ - управляющий?
         /// </summary>
-        public bool IsControl() => char.IsControl(PeekChar());
+        public bool IsControl() => char.IsControl (PeekChar());
 
         /// <summary>
         /// Текущий символ - цифра?
         /// </summary>
-        public bool IsDigit() => char.IsDigit(PeekChar());
+        public bool IsDigit() => char.IsDigit (PeekChar());
 
         /// <summary>
         /// Текущий символ - буква?
         /// </summary>
-        public bool IsLetter() => char.IsLetter(PeekChar());
+        public bool IsLetter() => char.IsLetter (PeekChar());
 
         /// <summary>
         /// Текущий символ - буква или цифра?
         /// </summary>
-        public bool IsLetterOrDigit() => char.IsLetterOrDigit(PeekChar());
+        public bool IsLetterOrDigit() => char.IsLetterOrDigit (PeekChar());
 
         /// <summary>
         /// Текущий символ - часть числа?
         /// </summary>
-        public bool IsNumber() => char.IsNumber(PeekChar());
+        public bool IsNumber() => char.IsNumber (PeekChar());
 
         /// <summary>
         /// Текущий символ - знак пунктуации?
         /// </summary>
-        public bool IsPunctuation() => char.IsPunctuation(PeekChar());
+        public bool IsPunctuation() => char.IsPunctuation (PeekChar());
 
         /// <summary>
         /// Текущий символ - разделитель?
         /// </summary>
-        public bool IsSeparator() => char.IsSeparator(PeekChar());
+        public bool IsSeparator() => char.IsSeparator (PeekChar());
 
         /// <summary>
         /// Текущий символ принадлежит одной
         /// из Unicode категорий: MathSymbol,
         /// CurrencySymbol, ModifierSymbol либо OtherSymbol?
         /// </summary>
-        public bool IsSymbol() => char.IsSymbol(PeekChar());
+        public bool IsSymbol() => char.IsSymbol (PeekChar());
 
         /// <summary>
         /// Текущий символ - пробельный?
         /// </summary>
-        public bool IsWhiteSpace() => char.IsWhiteSpace(PeekChar());
+        public bool IsWhiteSpace() => char.IsWhiteSpace (PeekChar());
 
         /// <summary>
         /// Заглядывание вперёд на одну позицию.
@@ -7625,7 +7499,6 @@ namespace ManagedIrbis
             return ahead >= _text.Length
                 ? EOF
                 : _text[ahead];
-
         } // method LookAhead
 
         /// <summary>
@@ -7641,7 +7514,6 @@ namespace ManagedIrbis
             return ahead >= _text.Length
                 ? EOF
                 : _text[ahead];
-
         } // method LookAhead
 
         /// <summary>
@@ -7668,14 +7540,14 @@ namespace ManagedIrbis
         /// он остановится в крайней (начальной или конечной) позиции.
         /// </remarks>
         public void Move (int distance) =>
-            _position = Math.Max (0, Math.Min(_position + distance, _text.Length));
+            _position = Math.Max (0, Math.Min (_position + distance, _text.Length));
 
         /// <summary>
         /// Подглядывание текущего символа (т. е. символа в текущей позиции).
         /// </summary>
         public char PeekChar() => _position >= _text.Length
-                ? EOF
-                : _text[_position];
+            ? EOF
+            : _text[_position];
 
         /// <summary>
         /// Подглядывание строки вплоть до указанной длины.
@@ -7706,11 +7578,10 @@ namespace ManagedIrbis
                 }
             }
 
-            var result = _text.Slice(start, _position - start);
+            var result = _text.Slice (start, _position - start);
             _position = start;
 
             return result;
-
         } // method PeekString
 
         /// <summary>
@@ -7725,11 +7596,10 @@ namespace ManagedIrbis
             )
         {
             var position = _position;
-            var result = ReadTo(stopChar);
+            var result = ReadTo (stopChar);
             _position = position;
 
             return result;
-
         } // method PeekTo
 
         /// <summary>
@@ -7744,11 +7614,10 @@ namespace ManagedIrbis
             )
         {
             var position = _position;
-            var result = ReadTo(stopChars);
+            var result = ReadTo (stopChars);
             _position = position;
 
             return result;
-
         } // method PeekTo
 
         /// <summary>
@@ -7763,11 +7632,10 @@ namespace ManagedIrbis
             )
         {
             var position = _position;
-            var result = ReadUntil(stopChar);
+            var result = ReadUntil (stopChar);
             _position = position;
 
             return result;
-
         } // method PeekUntil
 
         /// <summary>
@@ -7782,11 +7650,10 @@ namespace ManagedIrbis
             )
         {
             var position = _position;
-            var result = ReadUntil(stopChars);
+            var result = ReadUntil (stopChars);
             _position = position;
 
             return result;
-
         } // metdho PeekUntil
 
         /// <summary>
@@ -7802,7 +7669,6 @@ namespace ManagedIrbis
             }
 
             return _text[_position++];
-
         } // method ReadChar
 
         /// <summary>
@@ -7844,7 +7710,8 @@ namespace ManagedIrbis
                     {
                         throw new FormatException();
                     }
-                    result.Append(c);
+
+                    result.Append (c);
                 }
                 else if (c == stopChar)
                 {
@@ -7852,12 +7719,11 @@ namespace ManagedIrbis
                 }
                 else
                 {
-                    result.Append(c);
+                    result.Append (c);
                 }
             }
 
             return result.ToString();
-
         } // method ReadEscapedUntil
 
         /// <summary>
@@ -7883,6 +7749,7 @@ namespace ManagedIrbis
             {
                 return ReadOnlySpan<char>.Empty;
             }
+
             ReadChar();
 
             while (true)
@@ -7905,7 +7772,6 @@ namespace ManagedIrbis
                     start,
                     _position - start
                 );
-
         } // method ReadFrom
 
         /// <summary>
@@ -7927,10 +7793,11 @@ namespace ManagedIrbis
             }
 
             var start = _position;
-            if (!Private.Contains(openChars, PeekChar()))
+            if (!Private.Contains (openChars, PeekChar()))
             {
                 return ReadOnlySpan<char>.Empty;
             }
+
             ReadChar();
 
             while (true)
@@ -7941,7 +7808,8 @@ namespace ManagedIrbis
                     _position = start;
                     return ReadOnlySpan<char>.Empty;
                 }
-                if (Private.Contains(closeChars, c))
+
+                if (Private.Contains (closeChars, c))
                 {
                     break;
                 }
@@ -7952,7 +7820,6 @@ namespace ManagedIrbis
                     start,
                     _position - start
                 );
-
         } // metdhod ReadFrom
 
         /// <summary>
@@ -7978,7 +7845,6 @@ namespace ManagedIrbis
                     startPosition,
                     _position - startPosition
                 );
-
         } // method ReadInteger
 
         /// <summary>
@@ -7994,6 +7860,7 @@ namespace ManagedIrbis
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -8018,7 +7885,6 @@ namespace ManagedIrbis
                     startPosition,
                     stopPosition - startPosition
                 );
-
         } // method ReadLine
 
         /// <summary>
@@ -8046,7 +7912,6 @@ namespace ManagedIrbis
                     startPosition,
                     _position - startPosition
                 );
-
         } // method ReadString
 
         /// <summary>
@@ -8075,7 +7940,6 @@ namespace ManagedIrbis
                     startPosition,
                     length: _position - startPosition
                 );
-
         } // method ReadTo
 
         /// <summary>
@@ -8115,6 +7979,7 @@ namespace ManagedIrbis
                             goto AGAIN;
                         }
                     }
+
                     break;
                 }
             }
@@ -8124,7 +7989,6 @@ namespace ManagedIrbis
                     savePosition,
                     _position - savePosition - stopString.Length
                 );
-
         } // method ReadTo
 
         /// <summary>
@@ -8143,7 +8007,7 @@ namespace ManagedIrbis
             {
                 var c = ReadChar();
                 if (c == EOF
-                    || Array.IndexOf(stopChars, c) >= 0)
+                    || Array.IndexOf (stopChars, c) >= 0)
                 {
                     break;
                 }
@@ -8154,7 +8018,6 @@ namespace ManagedIrbis
                     start: start,
                     length: _position - start
                 );
-
         } // method ReadTo
 
         /// <summary>
@@ -8176,6 +8039,7 @@ namespace ManagedIrbis
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -8184,7 +8048,6 @@ namespace ManagedIrbis
                     start,
                     _position - start
                 );
-
         } // method ReadUntil
 
         /// <summary>
@@ -8224,6 +8087,7 @@ namespace ManagedIrbis
                             goto AGAIN;
                         }
                     }
+
                     break;
                 }
             }
@@ -8236,7 +8100,6 @@ namespace ManagedIrbis
             _position -= stopString.Length;
 
             return result;
-
         } // method ReadUntil
 
         /// <summary>
@@ -8255,10 +8118,11 @@ namespace ManagedIrbis
             {
                 var c = PeekChar();
                 if (c == EOF
-                    || Array.IndexOf(stopChars, c) >= 0)
+                    || Array.IndexOf (stopChars, c) >= 0)
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -8267,7 +8131,6 @@ namespace ManagedIrbis
                     savePosition,
                     _position - savePosition
                 );
-
         } // method ReadUntil
 
         /// <summary>
@@ -8295,26 +8158,28 @@ namespace ManagedIrbis
                     return ReadOnlySpan<char>.Empty;
                 }
 
-                if (Private.Contains(openChars, c))
+                if (Private.Contains (openChars, c))
                 {
                     level++;
                 }
-                else if (Private.Contains(closeChars, c))
+                else if (Private.Contains (closeChars, c))
                 {
                     if (level == 0
-                        && Private.Contains(stopChars, c))
+                        && Private.Contains (stopChars, c))
                     {
                         break;
                     }
+
                     level--;
                 }
-                else if (Private.Contains(stopChars, c))
+                else if (Private.Contains (stopChars, c))
                 {
                     if (level == 0)
                     {
                         break;
                     }
                 }
+
                 ReadChar();
             }
 
@@ -8323,7 +8188,6 @@ namespace ManagedIrbis
                     start,
                     _position - start
                 );
-
         } // method ReadUntil
 
         /// <summary>
@@ -8345,6 +8209,7 @@ namespace ManagedIrbis
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -8353,7 +8218,6 @@ namespace ManagedIrbis
                     startPosition,
                     _position - startPosition
                 );
-
         } // method ReadWhile
 
         /// <summary>
@@ -8372,10 +8236,11 @@ namespace ManagedIrbis
             {
                 var c = PeekChar();
                 if (c == EOF
-                    || Array.IndexOf(goodChars, c) < 0)
+                    || Array.IndexOf (goodChars, c) < 0)
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -8384,7 +8249,6 @@ namespace ManagedIrbis
                     start,
                     _position - start
                 );
-
         } // method ReadWhile
 
         /// <summary>
@@ -8400,10 +8264,11 @@ namespace ManagedIrbis
             {
                 var c = PeekChar();
                 if (c == EOF
-                    || !char.IsLetterOrDigit(c))
+                    || !char.IsLetterOrDigit (c))
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -8412,7 +8277,6 @@ namespace ManagedIrbis
                     startPosition,
                     _position - startPosition
                 );
-
         } // metdhod ReadWord
 
         /// <summary>
@@ -8433,11 +8297,12 @@ namespace ManagedIrbis
             {
                 var c = PeekChar();
                 if (c == EOF
-                    || !char.IsLetterOrDigit(c)
-                        && Array.IndexOf(additionalWordCharacters, c) < 0)
+                    || !char.IsLetterOrDigit (c)
+                    && Array.IndexOf (additionalWordCharacters, c) < 0)
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -8446,7 +8311,6 @@ namespace ManagedIrbis
                     savePosition,
                     _position - savePosition
                 );
-
         } // method ReadWord
 
         /// <summary>
@@ -8478,7 +8342,6 @@ namespace ManagedIrbis
             }
 
             return Substring (start, length);
-
         } // method RecentText
 
         /// <summary>
@@ -8499,7 +8362,6 @@ namespace ManagedIrbis
             }
 
             return false;
-
         } // method SkipChar
 
         /// <summary>
@@ -8518,7 +8380,6 @@ namespace ManagedIrbis
             }
 
             return !IsEOF;
-
         } // method SkipChar
 
         /// <summary>
@@ -8532,14 +8393,13 @@ namespace ManagedIrbis
                 params char[] allowed
             )
         {
-            if (Array.IndexOf(allowed, PeekChar()) >= 0)
+            if (Array.IndexOf (allowed, PeekChar()) >= 0)
             {
                 ReadChar();
                 return true;
             }
 
             return false;
-
         } // method SkipChar
 
         /// <summary>
@@ -8565,7 +8425,6 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-
         } // method SkipControl
 
         /// <summary>
@@ -8591,7 +8450,6 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-
         } // method SkipPunctuation
 
         /// <summary>
@@ -8609,7 +8467,7 @@ namespace ManagedIrbis
                 }
 
                 var c = PeekChar();
-                if (!char.IsLetterOrDigit(c))
+                if (!char.IsLetterOrDigit (c))
                 {
                     ReadChar();
                 }
@@ -8618,7 +8476,6 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-
         } // method SkipNonWord
 
         /// <summary>
@@ -8639,8 +8496,8 @@ namespace ManagedIrbis
                 }
 
                 var c = PeekChar();
-                if (!char.IsLetterOrDigit(c)
-                    && Array.LastIndexOf(additionalWordCharacters, c) < 0)
+                if (!char.IsLetterOrDigit (c)
+                    && Array.LastIndexOf (additionalWordCharacters, c) < 0)
                 {
                     ReadChar();
                 }
@@ -8649,7 +8506,6 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-
         } // method SkipNonWord
 
         /// <summary>
@@ -8681,7 +8537,6 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-
         } // method SkipRange
 
         /// <summary>
@@ -8711,7 +8566,6 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-
         } // method SkipWhile
 
         /// <summary>
@@ -8732,7 +8586,7 @@ namespace ManagedIrbis
                 }
 
                 var c = PeekChar();
-                if (Array.IndexOf(skipChars, c) >= 0)
+                if (Array.IndexOf (skipChars, c) >= 0)
                 {
                     ReadChar();
                 }
@@ -8741,7 +8595,6 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-
         } // method SkipWhile
 
         /// <summary>
@@ -8770,7 +8623,6 @@ namespace ManagedIrbis
 
                 ReadChar();
             }
-
         } // method SkipTo
 
         /// <summary>
@@ -8791,7 +8643,7 @@ namespace ManagedIrbis
                 }
 
                 var c = PeekChar();
-                if (Array.IndexOf(goodChars, c) < 0)
+                if (Array.IndexOf (goodChars, c) < 0)
                 {
                     ReadChar();
                 }
@@ -8800,7 +8652,6 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-
         } // method SkipWhileNot
 
         /// <summary>
@@ -8824,7 +8675,6 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-
         } // method SkiWhitespace
 
         /// <summary>
@@ -8848,7 +8698,6 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-
         } // method SkipWhitespaceAndPunctuation
 
         /// <summary>
@@ -8860,9 +8709,9 @@ namespace ManagedIrbis
             )
         {
             return offset < 0
-                || offset >= _text.Length
+                   || offset >= _text.Length
                 ? ReadOnlySpan<char>.Empty
-                : _text.Slice(offset);
+                : _text.Slice (offset);
         } // method Substring
 
         /// <summary>
@@ -8880,11 +8729,10 @@ namespace ManagedIrbis
             )
         {
             return offset < 0
-                || offset >= _text.Length
-                || length <= 0
+                   || offset >= _text.Length
+                   || length <= 0
                 ? ReadOnlySpan<char>.Empty
-                : _text.Slice(offset, length);
-
+                : _text.Slice (offset, length);
         } // method Substring
 
         #endregion
@@ -8898,7 +8746,6 @@ namespace ManagedIrbis
         } // method ToString
 
         #endregion
-
     } // struct ValueTextNavigator
 
     /// <summary>
@@ -8943,35 +8790,34 @@ namespace ManagedIrbis
                 string? second
             )
         {
-            if (string.IsNullOrEmpty(first) && string.IsNullOrEmpty(second))
+            if (string.IsNullOrEmpty (first) && string.IsNullOrEmpty (second))
             {
                 return true;
             }
 
-            return first.SameString(second);
-
+            return first.SameString (second);
         } // method CompareDatabases
 
         #endregion
 
-         #region Public methods
+        #region Public methods
 
-         /// <summary>
-         /// Построение спецификации файла по ее компонентам.
-         /// </summary>
-         public static string Build
-             (
+        /// <summary>
+        /// Построение спецификации файла по ее компонентам.
+        /// </summary>
+        public static string Build
+            (
                 IrbisPath path,
                 string database,
                 string fileName
-             )
-         {
-             return ((int) path).ToInvariantString()
-                    + "."
-                    + database
-                    + "."
-                    + fileName;
-         }
+            )
+        {
+            return ((int)path).ToInvariantString()
+                   + "."
+                   + database
+                   + "."
+                   + fileName;
+        }
 
         /// <summary>
         /// Parse the text specification.
@@ -8981,27 +8827,28 @@ namespace ManagedIrbis
                 string text
             )
         {
-            var navigator = new ValueTextNavigator(text.AsSpan());
+            var navigator = new ValueTextNavigator (text.AsSpan());
             var path = int.Parse
                 (
-                    navigator.ReadTo('.').ToString(),
+                    navigator.ReadTo ('.').ToString(),
                     CultureInfo.InvariantCulture
                 );
-            var database = navigator.ReadTo('.').ToString().EmptyToNull();
+            var database = navigator.ReadTo ('.').ToString().EmptyToNull();
             var fileName = navigator.GetRemainingText().ToString();
-            var binaryFile = fileName.StartsWith("@");
+            var binaryFile = fileName.StartsWith ("@");
             if (binaryFile)
             {
-                fileName = fileName.Substring(1);
+                fileName = fileName.Substring (1);
             }
 
             string? content = null;
-            var position = fileName.IndexOf("&", StringComparison.InvariantCulture);
+            var position = fileName.IndexOf ("&", StringComparison.InvariantCulture);
             if (position >= 0)
             {
-                content = fileName.Substring(position + 1);
-                fileName = fileName.Substring(0, position);
+                content = fileName.Substring (position + 1);
+                fileName = fileName.Substring (0, position);
             }
+
             var result = new FileSpecification
             {
                 BinaryFile = binaryFile,
@@ -9012,7 +8859,6 @@ namespace ManagedIrbis
             };
 
             return result;
-
         } // method Parse
 
         #endregion
@@ -9028,14 +8874,14 @@ namespace ManagedIrbis
                 FileSpecification? other
             )
         {
-            if (ReferenceEquals(other, null))
+            if (ReferenceEquals (other, null))
             {
                 throw new ArgumentNullException();
             }
 
             return Path == other.Path
-                   && _CompareDatabases(Database, other.Database)
-                   && FileName.SameString(other.FileName);
+                   && _CompareDatabases (Database, other.Database)
+                   && FileName.SameString (other.FileName);
         }
 
         /// <inheritdoc cref="object.Equals(object)" />
@@ -9044,20 +8890,21 @@ namespace ManagedIrbis
                 object? obj
             )
         {
-            if (ReferenceEquals(null, obj))
+            if (ReferenceEquals (null, obj))
             {
                 return false;
             }
 
-            if (ReferenceEquals(this, obj))
+            if (ReferenceEquals (this, obj))
             {
                 return true;
             }
 
-            return obj is FileSpecification other && Equals(other);
+            return obj is FileSpecification other && Equals (other);
         }
 
         /// <inheritdoc cref="object.GetHashCode" />
+
         // ReSharper disable NonReadonlyMemberInGetHashCode
         public override int GetHashCode()
         {
@@ -9067,11 +8914,10 @@ namespace ManagedIrbis
                 hashCode = (hashCode * 397)
                            ^ (Database != null ? Database.GetHashCode() : 0);
                 hashCode = (hashCode * 397)
-                    ^ (FileName != null ? FileName.GetHashCode() : 0);
+                           ^ (FileName != null ? FileName.GetHashCode() : 0);
 
                 return hashCode;
             }
-
         } // method GetHashCode
 
         // ReSharper restore NonReadonlyMemberInGetHashCode
@@ -9086,7 +8932,7 @@ namespace ManagedIrbis
             }
             else
             {
-                if (!ReferenceEquals(Content, null))
+                if (!ReferenceEquals (Content, null))
                 {
                     fileName = "&" + fileName;
                 }
@@ -9098,40 +8944,38 @@ namespace ManagedIrbis
             {
                 case IrbisPath.System:
                 case IrbisPath.Data:
-                    result = $"{(int) Path}..{fileName}";
+                    result = $"{(int)Path}..{fileName}";
                     break;
 
                 default:
-                    result = $"{(int) Path}.{Database}.{fileName}";
+                    result = $"{(int)Path}.{Database}.{fileName}";
                     break;
             }
 
-            if (!ReferenceEquals(Content, null))
+            if (!ReferenceEquals (Content, null))
             {
-                result = result + "&" + Private.WindowsToIrbis(Content);
+                result = result + "&" + Private.WindowsToIrbis (Content);
             }
 
             return result;
-
         } // method ToString
 
         #endregion
-
-   } // class FileSpecification
+    } // class FileSpecification
 
     /// <summary>
     /// Работа с INI-файлами.
     /// </summary>
     public class IniFile
         : IEnumerable<IniFile.Section>,
-        IDisposable
+            IDisposable
     {
         #region Nested classes
 
         /// <summary>
         /// Line (element) of the INI-file.
         /// </summary>
-        [DebuggerDisplay("{Key}={Value}")]
+        [DebuggerDisplay ("{Key}={Value}")]
         public sealed class Line
         {
             #region Properties
@@ -9180,7 +9024,7 @@ namespace ManagedIrbis
                     string? value
                 )
             {
-                CheckKeyName(key);
+                CheckKeyName (key);
 
                 Key = key;
                 _value = value;
@@ -9196,7 +9040,7 @@ namespace ManagedIrbis
                     bool modified
                 )
             {
-                CheckKeyName(key);
+                CheckKeyName (key);
 
                 Key = key;
                 _value = value;
@@ -9221,9 +9065,9 @@ namespace ManagedIrbis
                     TextWriter writer
                 )
             {
-                if (string.IsNullOrEmpty(Value))
+                if (string.IsNullOrEmpty (Value))
                 {
-                    writer.WriteLine(Key);
+                    writer.WriteLine (Key);
                 }
                 else
                 {
@@ -9285,7 +9129,7 @@ namespace ManagedIrbis
             public string? Name
             {
                 get => _name;
-                set => SetName(value.ThrowIfNull("value"));
+                set => SetName (value.ThrowIfNull ("value"));
             }
 
             /// <summary>
@@ -9296,10 +9140,10 @@ namespace ManagedIrbis
             /// <summary>
             /// Indexer.
             /// </summary>
-            public string? this[string key]
+            public string? this [string key]
             {
-                get => GetValue(key, null);
-                set => SetValue(key, value);
+                get => GetValue (key, null);
+                set => SetValue (key, value);
             }
 
             #endregion
@@ -9338,9 +9182,8 @@ namespace ManagedIrbis
                     string? value
                 )
             {
-                var line = new Line(key, value);
-                Add(line);
-
+                var line = new Line (key, value);
+                Add (line);
             } // method Add
 
             /// <summary>
@@ -9351,14 +9194,13 @@ namespace ManagedIrbis
                     Line line
                 )
             {
-                CheckKeyName(line.Key);
-                if (ContainsKey(line.Key))
+                CheckKeyName (line.Key);
+                if (ContainsKey (line.Key))
                 {
-                    throw new ArgumentException("duplicate key " + line.Key);
+                    throw new ArgumentException ("duplicate key " + line.Key);
                 }
 
-                _lines.Add(line);
-
+                _lines.Add (line);
             } // method Add
 
             /// <summary>
@@ -9373,7 +9215,6 @@ namespace ManagedIrbis
                 {
                     section[line.Key] = line.Value;
                 }
-
             } // method ApplyTo
 
             /// <summary>
@@ -9384,7 +9225,6 @@ namespace ManagedIrbis
                 _lines.Clear();
                 Modified = true;
                 Owner.Modified = true;
-
             } // method Clear
 
             /// <summary>
@@ -9397,14 +9237,13 @@ namespace ManagedIrbis
             {
                 foreach (var line in _lines)
                 {
-                    if (line.Key.SameString(key))
+                    if (line.Key.SameString (key))
                     {
                         return true;
                     }
                 }
 
                 return false;
-
             } // method ContainsKey
 
             /// <summary>
@@ -9416,18 +9255,17 @@ namespace ManagedIrbis
                     string? defaultValue
                 )
             {
-                CheckKeyName(key);
+                CheckKeyName (key);
 
                 foreach (var line in _lines)
                 {
-                    if (line.Key.SameString(key))
+                    if (line.Key.SameString (key))
                     {
                         return line.Value;
                     }
                 }
 
                 return defaultValue;
-
             } // method GetValues
 
             /// <summary>
@@ -9439,13 +9277,13 @@ namespace ManagedIrbis
                     T? defaultValue
                 )
             {
-                var value = GetValue(key, null);
-                if (string.IsNullOrEmpty(value))
+                var value = GetValue (key, null);
+                if (string.IsNullOrEmpty (value))
                 {
                     return defaultValue;
                 }
 
-                var result = Private.ConvertTo<T>(value);
+                var result = Private.ConvertTo<T> (value);
 
                 return result;
             }
@@ -9458,13 +9296,13 @@ namespace ManagedIrbis
                     string key
                 )
             {
-                CheckKeyName(key);
+                CheckKeyName (key);
 
                 foreach (var line in _lines)
                 {
-                    if (line.Key.SameString(key))
+                    if (line.Key.SameString (key))
                     {
-                        _lines.Remove(line);
+                        _lines.Remove (line);
                         Modified = true;
                         Owner.Modified = true;
                         break;
@@ -9496,22 +9334,22 @@ namespace ManagedIrbis
                     string? value
                 )
             {
-                CheckKeyName(key);
+                CheckKeyName (key);
 
                 Line? target = null;
                 foreach (var line in _lines)
                 {
-                    if (line.Key.SameString(key))
+                    if (line.Key.SameString (key))
                     {
                         target = line;
                         break;
                     }
                 }
 
-                if (ReferenceEquals(target, null))
+                if (ReferenceEquals (target, null))
                 {
-                    target = new Line(key, value);
-                    _lines.Add(target);
+                    target = new Line (key, value);
+                    _lines.Add (target);
                 }
 
                 target.Value = value;
@@ -9528,16 +9366,16 @@ namespace ManagedIrbis
                     T value
                 )
             {
-                CheckKeyName(key);
+                CheckKeyName (key);
 
-                if (ReferenceEquals(value, null))
+                if (ReferenceEquals (value, null))
                 {
-                    Remove(key);
+                    Remove (key);
                 }
                 else
                 {
                     var text = value.ToString();
-                    SetValue(key, text);
+                    SetValue (key, text);
                 }
 
                 return this;
@@ -9552,11 +9390,11 @@ namespace ManagedIrbis
                     out string? value
                 )
             {
-                CheckKeyName(key);
+                CheckKeyName (key);
 
                 foreach (var line in _lines)
                 {
-                    if (line.Key.SameString(key))
+                    if (line.Key.SameString (key))
                     {
                         value = line.Value;
                         return true;
@@ -9586,12 +9424,12 @@ namespace ManagedIrbis
             {
                 var result = new StringBuilder();
                 result
-                    .AppendFormat("[{0}]", Name)
+                    .AppendFormat ("[{0}]", Name)
                     .AppendLine();
 
                 foreach (var line in _lines)
                 {
-                    result.AppendLine(line.ToString());
+                    result.AppendLine (line.ToString());
                 }
 
                 return result.ToString();
@@ -9624,7 +9462,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Section indexer.
         /// </summary>
-        public Section? this[string sectionName] => GetSection(sectionName);
+        public Section? this [string sectionName] => GetSection (sectionName);
 
         /// <summary>
         /// Value indexer.
@@ -9635,8 +9473,8 @@ namespace ManagedIrbis
                 string keyName
             ]
         {
-            get => GetValue(sectionName, keyName, null);
-            set => SetValue(sectionName, keyName, value);
+            get => GetValue (sectionName, keyName, null);
+            set => SetValue (sectionName, keyName, value);
         }
 
         /// <summary>
@@ -9685,16 +9523,15 @@ namespace ManagedIrbis
                 string keyName
             )
         {
-            if (string.IsNullOrEmpty(keyName))
+            if (string.IsNullOrEmpty (keyName))
             {
-                throw new ArgumentException(nameof(keyName));
+                throw new ArgumentException (nameof (keyName));
             }
 
-            if (keyName.Contains("="))
+            if (keyName.Contains ("="))
             {
-                throw new ArgumentException(nameof(keyName));
+                throw new ArgumentException (nameof (keyName));
             }
-
         } // method CheckKeyName
 
         private static void _SaveSection
@@ -9703,7 +9540,7 @@ namespace ManagedIrbis
                 Section section
             )
         {
-            if (!string.IsNullOrEmpty(section.Name))
+            if (!string.IsNullOrEmpty (section.Name))
             {
                 writer.WriteLine
                     (
@@ -9713,9 +9550,8 @@ namespace ManagedIrbis
 
             foreach (var line in section)
             {
-                line.Write(writer);
+                line.Write (writer);
             }
-
         } // method _SaveSection
 
         #endregion
@@ -9733,10 +9569,10 @@ namespace ManagedIrbis
             foreach (var thisSection in this)
             {
                 var name = thisSection.Name;
-                if (!ReferenceEquals(name, null) && name.Length != 0)
+                if (!ReferenceEquals (name, null) && name.Length != 0)
                 {
-                    var otherSection = iniFile.GetOrCreateSection(name);
-                    thisSection.ApplyTo(otherSection);
+                    var otherSection = iniFile.GetOrCreateSection (name);
+                    thisSection.ApplyTo (otherSection);
                 }
             }
         }
@@ -9776,11 +9612,11 @@ namespace ManagedIrbis
                 string name
             )
         {
-            CheckKeyName(name);
+            CheckKeyName (name);
 
             foreach (var section in _sections)
             {
-                if (section.Name.SameString(name))
+                if (section.Name.SameString (name))
                 {
                     return true;
                 }
@@ -9797,18 +9633,17 @@ namespace ManagedIrbis
                 string name
             )
         {
-            CheckKeyName(name);
+            CheckKeyName (name);
 
-            if (ContainsSection(name))
+            if (ContainsSection (name))
             {
-                throw new ArgumentException("duplicate name " + name);
+                throw new ArgumentException ("duplicate name " + name);
             }
 
-            var result = new Section(this, name);
-            _sections.Add(result);
+            var result = new Section (this, name);
+            _sections.Add (result);
 
             return result;
-
         } // method CreateSection
 
         /// <summary>
@@ -9819,10 +9654,10 @@ namespace ManagedIrbis
                 string name
             )
         {
-            CheckKeyName(name);
+            CheckKeyName (name);
 
-            var result = GetSection(name)
-                         ?? CreateSection(name);
+            var result = GetSection (name)
+                         ?? CreateSection (name);
 
             return result;
         }
@@ -9835,18 +9670,17 @@ namespace ManagedIrbis
                 string name
             )
         {
-            CheckKeyName(name);
+            CheckKeyName (name);
 
             foreach (var section in _sections)
             {
-                if (section.Name.SameString(name))
+                if (section.Name.SameString (name))
                 {
                     return section;
                 }
             }
 
             return null;
-
         } // method GetSection
 
         /// <summary>
@@ -9864,10 +9698,10 @@ namespace ManagedIrbis
                 string? defaultValue
             )
         {
-            var section = GetSection(sectionName);
-            var result = ReferenceEquals(section, null)
+            var section = GetSection (sectionName);
+            var result = ReferenceEquals (section, null)
                 ? defaultValue
-                : section.GetValue(keyName, defaultValue);
+                : section.GetValue (keyName, defaultValue);
 
             return result;
         }
@@ -9882,13 +9716,12 @@ namespace ManagedIrbis
                 T? defaultValue
             )
         {
-            var section = GetSection(sectionName);
-            var result = ReferenceEquals(section, null)
+            var section = GetSection (sectionName);
+            var result = ReferenceEquals (section, null)
                 ? defaultValue
-                : section.GetValue(keyName, defaultValue);
+                : section.GetValue (keyName, defaultValue);
 
             return result;
-
         } // method GetValue
 
         /// <summary>
@@ -9906,22 +9739,21 @@ namespace ManagedIrbis
                 return;
             }
 
-            var found = GetSection(sectionName);
-            if (ReferenceEquals(found, null))
+            var found = GetSection (sectionName);
+            if (ReferenceEquals (found, null))
             {
-                _sections.Add(section);
+                _sections.Add (section);
             }
             else
             {
                 foreach (var key in section.Keys)
                 {
-                    if (!found.ContainsKey(key))
+                    if (!found.ContainsKey (key))
                     {
                         found[key] = section[key];
                     }
                 }
             }
-
         } // method MergeSection
 
         /// <summary>
@@ -9932,13 +9764,13 @@ namespace ManagedIrbis
                 string name
             )
         {
-            CheckKeyName(name);
+            CheckKeyName (name);
 
             foreach (var section in _sections)
             {
-                if (section.Name.SameString(name))
+                if (section.Name.SameString (name))
                 {
-                    _sections.Remove(section);
+                    _sections.Remove (section);
                     break;
                 }
             }
@@ -9955,8 +9787,8 @@ namespace ManagedIrbis
                 string keyName
             )
         {
-            var section = GetSection(sectionName);
-            section?.Remove(keyName);
+            var section = GetSection (sectionName);
+            section?.Remove (keyName);
 
             return this;
         }
@@ -9966,14 +9798,14 @@ namespace ManagedIrbis
         /// </summary>
         public void Read()
         {
-            if (string.IsNullOrEmpty(FileName))
+            if (string.IsNullOrEmpty (FileName))
             {
                 return;
             }
 
             var encoding = Encoding ?? Encoding.Default;
 
-            Read(FileName.ThrowIfNull(nameof(FileName)), encoding);
+            Read (FileName.ThrowIfNull (nameof (FileName)), encoding);
         }
 
         /// <summary>
@@ -9986,7 +9818,7 @@ namespace ManagedIrbis
             )
         {
             using var reader = Private.OpenRead (fileName, encoding);
-            Read(reader);
+            Read (reader);
         }
 
         /// <summary>
@@ -10005,38 +9837,38 @@ namespace ManagedIrbis
             while ((line = reader.ReadLine()) != null)
             {
                 line = line.Trim();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     continue;
                 }
 
-                if (line.StartsWith("["))
+                if (line.StartsWith ("["))
                 {
-                    if (!line.EndsWith("]"))
+                    if (!line.EndsWith ("]"))
                     {
                         throw new FormatException();
                     }
 
-                    var name = line.Substring(1, line.Length - 2);
-                    section = CreateSection(name);
+                    var name = line.Substring (1, line.Length - 2);
+                    section = CreateSection (name);
                 }
                 else
                 {
                     if (section == null)
                     {
-                        section = new Section(this, null);
-                        _sections.Add(section);
+                        section = new Section (this, null);
+                        _sections.Add (section);
                     }
 
-                    var parts = line.Split(separators, 2);
+                    var parts = line.Split (separators, 2);
 
                     var key = parts[0];
-                    if (!string.IsNullOrEmpty(key))
+                    if (!string.IsNullOrEmpty (key))
                     {
                         var value = parts.Length == 2
                             ? parts[1]
                             : null;
-                        section.SetValue(key, value);
+                        section.SetValue (key, value);
                     }
                 }
             }
@@ -10070,7 +9902,6 @@ namespace ManagedIrbis
             }
 
             Modified = false;
-
         } // method Save
 
         /// <summary>
@@ -10088,8 +9919,7 @@ namespace ManagedIrbis
                     fileName,
                     encoding
                 );
-            Save(writer);
-
+            Save (writer);
         } // method Save
 
         /// <summary>
@@ -10102,8 +9932,8 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            var section = GetOrCreateSection(sectionName);
-            section.SetValue(keyName, value);
+            var section = GetOrCreateSection (sectionName);
+            section.SetValue (keyName, value);
 
             return this;
         }
@@ -10118,8 +9948,8 @@ namespace ManagedIrbis
                 T value
             )
         {
-            var section = GetOrCreateSection(sectionName);
-            section.SetValue(keyName, value);
+            var section = GetOrCreateSection (sectionName);
+            section.SetValue (keyName, value);
 
             return this;
         }
@@ -10136,7 +9966,7 @@ namespace ManagedIrbis
             foreach (var section in _sections)
             {
                 var lines = section
-                    .Where(line => line.Modified)
+                    .Where (line => line.Modified)
                     .ToArray();
 
                 if (lines.Length != 0)
@@ -10146,7 +9976,7 @@ namespace ManagedIrbis
                         writer.WriteLine();
                     }
 
-                    if (!string.IsNullOrEmpty(section.Name))
+                    if (!string.IsNullOrEmpty (section.Name))
                     {
                         writer.WriteLine
                             (
@@ -10157,7 +9987,7 @@ namespace ManagedIrbis
 
                     foreach (var line in lines)
                     {
-                        line.Write(writer);
+                        line.Write (writer);
                     }
 
                     first = false;
@@ -10168,7 +9998,8 @@ namespace ManagedIrbis
                     {
                         writer.WriteLine();
                     }
-                    _SaveSection(writer, section);
+
+                    _SaveSection (writer, section);
                     first = false;
                 }
             }
@@ -10196,14 +10027,13 @@ namespace ManagedIrbis
         {
             if (Writable
                 && Modified
-                && !string.IsNullOrEmpty(FileName))
+                && !string.IsNullOrEmpty (FileName))
             {
-                Save(FileName.ThrowIfNull(nameof(FileName)));
+                Save (FileName.ThrowIfNull (nameof (FileName)));
             }
         }
 
         #endregion
-
     } // class IniFile
 
     /// <summary>
@@ -10283,7 +10113,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Items.
         /// </summary>
-        public List<Item> Items { get; } = new();
+        public List<Item> Items { get; } = new ();
 
         /// <summary>
         /// Search query specification.
@@ -10308,7 +10138,7 @@ namespace ManagedIrbis
         /// <summary>
         /// List of MFN.
         /// </summary>
-        public List<int> MfnList { get; } = new();
+        public List<int> MfnList { get; } = new ();
 
         #endregion
 
@@ -10332,22 +10162,20 @@ namespace ManagedIrbis
             // ""                sequential
             // ""                mfn list
 
-            var items = string.Join(Constants.IrbisDelimiter, Items);
-            var mfns = string.Join(",", MfnList);
-            query.AddAnsi(connection.EnsureDatabase(DatabaseName));
-            query.AddAnsi(items);
-            query.AddUtf(SearchQuery);
-            query.Add(MinMfn);
-            query.Add(MaxMfn);
-            query.AddUtf(SequentialQuery);
+            var items = string.Join (Constants.IrbisDelimiter, Items);
+            var mfns = string.Join (",", MfnList);
+            query.AddAnsi (connection.EnsureDatabase (DatabaseName));
+            query.AddAnsi (items);
+            query.AddUtf (SearchQuery);
+            query.Add (MinMfn);
+            query.Add (MaxMfn);
+            query.AddUtf (SequentialQuery);
 
             // TODO: реализовать список MFN
-            query.AddAnsi(mfns);
-
+            query.AddAnsi (mfns);
         } // method Encode
 
         #endregion
-
     } // class StatDefinition
 
     /// <summary>
@@ -10370,7 +10198,6 @@ namespace ManagedIrbis
         public int Mfn { get; set; }
 
         #endregion
-
     } // class ActualizeRecordParameters
 
     /// <summary>
@@ -10402,7 +10229,6 @@ namespace ManagedIrbis
         public string? Template { get; set; }
 
         #endregion
-
     } // class CreateDatabaseParameters
 
     /// <summary>
@@ -10424,14 +10250,13 @@ namespace ManagedIrbis
         /// Сортировка по комментариям (значениям).
         /// </summary>
         ByComment
-
     } // enum MenuSort
 
     /// <summary>
     /// Пара строк в MNU-файле: код и соответствующее значение
     /// (либо комментарий).
     /// </summary>
-    [DebuggerDisplay("{" + nameof(Code) + "} = {" + nameof(Comment) + "}")]
+    [DebuggerDisplay ("{" + nameof (Code) + "} = {" + nameof (Comment) + "}")]
     public sealed class MenuEntry
     {
         #region Properties
@@ -10459,12 +10284,11 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => string.IsNullOrEmpty(Comment)
+        public override string ToString() => string.IsNullOrEmpty (Comment)
             ? Code.ToVisibleString()
             : $"{Code} - {Comment}";
 
         #endregion
-
     } // class MenuEntry
 
     /// <summary>
@@ -10544,7 +10368,7 @@ namespace ManagedIrbis
                 Code = code,
                 Comment = comment
             };
-            Entries.Add(entry);
+            Entries.Add (entry);
 
             return this;
         } // method Add
@@ -10558,7 +10382,7 @@ namespace ManagedIrbis
             )
         {
             code = code.Trim();
-            var parts = code.Split(MenuSeparators);
+            var parts = code.Split (MenuSeparators);
             if (parts.Length != 0)
             {
                 code = parts[0];
@@ -10571,13 +10395,13 @@ namespace ManagedIrbis
         /// Finds the entry.
         /// </summary>
         public MenuEntry? FindEntry (string code) =>
-            Entries.FirstOrDefault (entry => entry.Code.SameString(code));
+            Entries.FirstOrDefault (entry => entry.Code.SameString (code));
 
         /// <summary>
         /// Finds the entry (case sensitive).
         /// </summary>
         public MenuEntry? FindEntrySensitive (string code) =>
-            Entries.FirstOrDefault(entry => string.CompareOrdinal (entry.Code, code) == 0);
+            Entries.FirstOrDefault (entry => string.CompareOrdinal (entry.Code, code) == 0);
 
         /// <summary>
         /// Finds the entry.
@@ -10587,21 +10411,21 @@ namespace ManagedIrbis
                 string code
             )
         {
-            var result = FindEntry(code);
-            if (!ReferenceEquals(result, null))
+            var result = FindEntry (code);
+            if (!ReferenceEquals (result, null))
             {
                 return result;
             }
 
             code = code.Trim();
-            result = FindEntry(code);
-            if (!ReferenceEquals(result, null))
+            result = FindEntry (code);
+            if (!ReferenceEquals (result, null))
             {
                 return result;
             }
 
-            code = TrimCode(code);
-            result = FindEntry(code);
+            code = TrimCode (code);
+            result = FindEntry (code);
 
             return result;
         } // method GetEntry
@@ -10614,21 +10438,21 @@ namespace ManagedIrbis
                 string code
             )
         {
-            var result = FindEntrySensitive(code);
-            if (!ReferenceEquals(result, null))
+            var result = FindEntrySensitive (code);
+            if (!ReferenceEquals (result, null))
             {
                 return result;
             }
 
             code = code.Trim();
-            result = FindEntrySensitive(code);
-            if (!ReferenceEquals(result, null))
+            result = FindEntrySensitive (code);
+            if (!ReferenceEquals (result, null))
             {
                 return result;
             }
 
-            code = TrimCode(code);
-            result = FindEntrySensitive(code);
+            code = TrimCode (code);
+            result = FindEntrySensitive (code);
 
             return result;
         } // method GetEntrySensitive
@@ -10642,9 +10466,9 @@ namespace ManagedIrbis
                 string? defaultValue = null
             )
         {
-            var found = FindEntry(code);
+            var found = FindEntry (code);
 
-            return ReferenceEquals(found, null)
+            return ReferenceEquals (found, null)
                 ? defaultValue
                 : found.Comment;
         } // method GetString
@@ -10658,9 +10482,9 @@ namespace ManagedIrbis
                 string? defaultValue = null
             )
         {
-            var found = FindEntrySensitive(code);
+            var found = FindEntrySensitive (code);
 
-            return ReferenceEquals(found, null)
+            return ReferenceEquals (found, null)
                 ? defaultValue
                 : found.Comment;
         } // method GetStringSensitive
@@ -10678,12 +10502,12 @@ namespace ManagedIrbis
             while (true)
             {
                 var code = reader.ReadLine();
-                if (ReferenceEquals(code, null))
+                if (ReferenceEquals (code, null))
                 {
                     break;
                 }
 
-                if (code.StartsWith(StopMarker))
+                if (code.StartsWith (StopMarker))
                 {
                     break;
                 }
@@ -10694,11 +10518,10 @@ namespace ManagedIrbis
                     Code = code,
                     Comment = comment
                 };
-                result.Entries.Add(entry);
+                result.Entries.Add (entry);
             }
 
             return result;
-
         } // method ParseStream
 
         /// <summary>
@@ -10715,8 +10538,8 @@ namespace ManagedIrbis
                     fileName,
                     encoding
                 );
-            var result = ParseStream(reader);
-            result.FileName = Path.GetFileName(fileName);
+            var result = ParseStream (reader);
+            result.FileName = Path.GetFileName (fileName);
 
             return result;
         } // method ParseLocalFile
@@ -10724,8 +10547,8 @@ namespace ManagedIrbis
         /// <summary>
         /// Parses the local file.
         /// </summary>
-        public static MenuFile ParseLocalFile ( string fileName ) =>
-            ParseLocalFile(fileName, Utility.Ansi);
+        public static MenuFile ParseLocalFile (string fileName) =>
+            ParseLocalFile (fileName, Utility.Ansi);
 
         /// <summary>
         /// Parse server response.
@@ -10735,8 +10558,8 @@ namespace ManagedIrbis
                 string response
             )
         {
-            var reader = new StringReader(response);
-            var result = ParseStream(reader);
+            var reader = new StringReader (response);
+            var result = ParseStream (reader);
 
             return result;
         } // method Parse
@@ -10750,13 +10573,13 @@ namespace ManagedIrbis
                 FileSpecification fileSpecification
             )
         {
-            var response = connection.ReadTextFile(fileSpecification);
-            if (ReferenceEquals(response, null))
+            var response = connection.ReadTextFile (fileSpecification);
+            if (ReferenceEquals (response, null))
             {
                 return null;
             }
 
-            var result = ParseServerResponse(response);
+            var result = ParseServerResponse (response);
 
             return result;
         } // method ReadFromServer
@@ -10769,7 +10592,7 @@ namespace ManagedIrbis
                 MenuSort sortBy
             )
         {
-            var copy = new List<MenuEntry>(Entries);
+            var copy = new List<MenuEntry> (Entries);
             switch (sortBy)
             {
                 case MenuSort.None:
@@ -10777,15 +10600,15 @@ namespace ManagedIrbis
                     break;
 
                 case MenuSort.ByCode:
-                    copy = copy.OrderBy(entry => entry.Code).ToList();
+                    copy = copy.OrderBy (entry => entry.Code).ToList();
                     break;
 
                 case MenuSort.ByComment:
-                    copy = copy.OrderBy(entry => entry.Comment).ToList();
+                    copy = copy.OrderBy (entry => entry.Comment).ToList();
                     break;
 
                 default:
-                    throw new IrbisException("Unexpected sortBy=" + sortBy);
+                    throw new IrbisException ("Unexpected sortBy=" + sortBy);
             }
 
             return copy.ToArray();
@@ -10800,10 +10623,11 @@ namespace ManagedIrbis
 
             foreach (var entry in Entries)
             {
-                result.AppendLine(entry.Code);
-                result.AppendLine(entry.Comment);
+                result.AppendLine (entry.Code);
+                result.AppendLine (entry.Comment);
             }
-            result.AppendLine(StopMarker);
+
+            result.AppendLine (StopMarker);
 
             return result.ToString();
         } // method ToText
@@ -10816,7 +10640,6 @@ namespace ManagedIrbis
         public override string ToString() => FileName.ToVisibleString();
 
         #endregion
-
     } // class MenuFile
 
     /// <summary>
@@ -10871,14 +10694,13 @@ namespace ManagedIrbis
         /// Не задан.
         /// </summary>
         None = 0
-
     } // enum Workstation
 
     /// <summary>
     /// Информация о зарегистрированном пользователе системы
     /// (по данным client_m.mnu).
     /// </summary>
-    [DebuggerDisplay("{" + nameof(Name) + "}")]
+    [DebuggerDisplay ("{" + nameof (Name) + "}")]
     public sealed class UserInfo
     {
         #region Properties
@@ -10886,7 +10708,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Номер по порядку.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public string? Number { get; set; }
 
         /// <summary>
@@ -10932,7 +10754,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Arbitrary user data.
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -10947,7 +10769,7 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            value ??= GetStandardIni(clientIni, code);
+            value ??= GetStandardIni (clientIni, code);
 
             value = value.EmptyToNull();
 
@@ -10977,7 +10799,6 @@ namespace ManagedIrbis
                     user.Administrator = value;
                     break;
             }
-
         } // method _DecodePair
 
         private static void _DecodeLine
@@ -10987,30 +10808,29 @@ namespace ManagedIrbis
                 string line
             )
         {
-            var pairs = line.Split(Constants.Semicolon);
+            var pairs = line.Split (Constants.Semicolon);
             var dictionary = new Dictionary<char, string>();
             foreach (var pair in pairs)
             {
-                var parts = pair.Split(Constants.EqualSign, 2);
+                var parts = pair.Split (Constants.EqualSign, 2);
                 if (parts.Length != 2 || parts[0].Length != 1)
                 {
                     continue;
                 }
 
-                dictionary[char.ToUpper(parts[0][0])] = parts[1];
+                dictionary[char.ToUpper (parts[0][0])] = parts[1];
             }
 
             char[] codes = { 'C', 'R', 'B', 'M', 'K', 'A' };
             foreach (var code in codes)
             {
-                dictionary.TryGetValue(code, out var value);
-                _DecodePair(user, clientIni, code, value);
+                dictionary.TryGetValue (code, out var value);
+                _DecodePair (user, clientIni, code, value);
             }
+        }
 
-        } // method _DecodeLine
-
-        private string _FormatPair ( string prefix, string? value, string defaultValue ) =>
-            value.SameString(defaultValue) ? string.Empty : $"{prefix}={value};";
+        private string _FormatPair (string prefix, string? value, string defaultValue) =>
+            value.SameString (defaultValue) ? string.Empty : $"{prefix}={value};";
 
         #endregion
 
@@ -11019,6 +10839,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Encode.
         /// </summary>
+
         // ReSharper disable UseStringInterpolation
         public string Encode()
         {
@@ -11027,14 +10848,14 @@ namespace ManagedIrbis
                     "{0}\r\n{1}\r\n{2}{3}{4}{5}{6}{7}",
                     Name,
                     Password,
-                    _FormatPair("C", Cataloger, "irbisc.ini"),
-                    _FormatPair("R", Reader, "irbisr.ini"),
-                    _FormatPair("B", Circulation, "irbisb.ini"),
-                    _FormatPair("M", Acquisitions, "irbisp.ini"),
-                    _FormatPair("K", Provision, "irbisk.ini"),
-                    _FormatPair("A", Administrator, "irbisa.ini")
+                    _FormatPair ("C", Cataloger, "irbisc.ini"),
+                    _FormatPair ("R", Reader, "irbisr.ini"),
+                    _FormatPair ("B", Circulation, "irbisb.ini"),
+                    _FormatPair ("M", Acquisitions, "irbisp.ini"),
+                    _FormatPair ("K", Provision, "irbisk.ini"),
+                    _FormatPair ("A", Administrator, "irbisa.ini")
                 );
-        } // method Encode
+        }
 
         // ReSharper restore UseStringInterpolation
 
@@ -11048,22 +10869,21 @@ namespace ManagedIrbis
                 char workstation
             )
         {
-            var entries = (IList<MenuEntry?>) clientIni.Entries.ThrowIfNull(nameof(clientIni.Entries));
-            var code = (Workstation) char.ToUpper(workstation);
+            var entries = (IList<MenuEntry?>)clientIni.Entries.ThrowIfNull (nameof (clientIni.Entries));
+            var code = (Workstation)char.ToUpper (workstation);
             var result = code switch
             {
-                Workstation.Cataloger => entries.SafeAt(0),
-                Workstation.Reader => entries.SafeAt(1),
-                Workstation.Circulation => entries.SafeAt(2),
-                Workstation.Acquisitions => entries.SafeAt(3),
-                Workstation.Provision => entries.SafeAt(4),
-                Workstation.Administrator => entries.SafeAt(5),
+                Workstation.Cataloger => entries.SafeAt (0),
+                Workstation.Reader => entries.SafeAt (1),
+                Workstation.Circulation => entries.SafeAt (2),
+                Workstation.Acquisitions => entries.SafeAt (3),
+                Workstation.Provision => entries.SafeAt (4),
+                Workstation.Administrator => entries.SafeAt (5),
                 _ => throw new ArgumentOutOfRangeException()
             };
 
             return result.ThrowIfNull().Code.ThrowIfNull();
-
-        } // method GetStandardIni
+        }
 
         /// <summary>
         /// Парсинг текстового представления.
@@ -11073,11 +10893,11 @@ namespace ManagedIrbis
                 string text
             )
         {
-            var lines = text.SplitLines().Skip(2).ToArray();
+            var lines = text.SplitLines().Skip (2).ToArray();
             var result = new List<UserInfo>();
             while (true)
             {
-                var current = lines.Take(9).ToArray();
+                var current = lines.Take (9).ToArray();
                 if (current.Length != 9)
                 {
                     break;
@@ -11095,14 +10915,13 @@ namespace ManagedIrbis
                     Provision = current[7].EmptyToNull(),
                     Administrator = current[8].EmptyToNull()
                 };
-                result.Add(user);
+                result.Add (user);
 
-                lines = lines.Skip(9).ToArray();
+                lines = lines.Skip (9).ToArray();
             }
 
             return result.ToArray();
-
-        } // method Parse
+        }
 
         /// <summary>
         /// Разбор ответа сервера.
@@ -11113,11 +10932,11 @@ namespace ManagedIrbis
             )
         {
             var result = new List<UserInfo>();
-            response.ReadAnsiStrings(2);
+            response.ReadAnsiStrings (2);
             while (true)
             {
-                var lines = response.ReadAnsiStringsPlus(9);
-                if (ReferenceEquals(lines, null))
+                var lines = response.ReadAnsiStringsPlus (9);
+                if (ReferenceEquals (lines, null))
                 {
                     break;
                 }
@@ -11134,12 +10953,11 @@ namespace ManagedIrbis
                     Provision = lines[7].EmptyToNull(),
                     Administrator = lines[8].EmptyToNull()
                 };
-                result.Add(user);
+                result.Add (user);
             }
 
             return result.ToArray();
-
-        } // method Parse
+        }
 
         /// <summary>
         /// Parse the MNU-file from the stream.
@@ -11154,14 +10972,14 @@ namespace ManagedIrbis
             while (true)
             {
                 var line1 = reader.ReadLine();
-                if (ReferenceEquals(line1, null) || line1.StartsWith("***"))
+                if (ReferenceEquals (line1, null) || line1.StartsWith ("***"))
                 {
                     break;
                 }
 
                 var line2 = reader.ReadLine();
                 var line3 = reader.ReadLine();
-                if (ReferenceEquals(line2, null) || ReferenceEquals(line3, null))
+                if (ReferenceEquals (line2, null) || ReferenceEquals (line3, null))
                 {
                     break;
                 }
@@ -11171,13 +10989,12 @@ namespace ManagedIrbis
                     Name = line1,
                     Password = line2
                 };
-                _DecodeLine(user, clientIni, line3);
-                result.Add(user);
+                _DecodeLine (user, clientIni, line3);
+                result.Add (user);
             }
 
             return result.ToArray();
-
-        } // method ParseStream
+        }
 
         /// <summary>
         /// Parse the MNU-file.
@@ -11188,17 +11005,17 @@ namespace ManagedIrbis
                 MenuFile clientIni
             )
         {
-            using var reader = Private.OpenRead(fileName, Utility.Ansi);
+            using var reader = Private.OpenRead (fileName, Utility.Ansi);
 
-            return ParseStream(reader, clientIni);
-
-        } // method ParseFile
+            return ParseStream (reader, clientIni);
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
+
         // ReSharper disable UseStringInterpolation
         public override string ToString() => string.Format
             (
@@ -11220,15 +11037,14 @@ namespace ManagedIrbis
         // ReSharper restore UseStringInterpolation
 
         #endregion
-
-    } // class UserInfo
+    }
 
     /// <summary>
     /// Содержит 0, 1 или много экземпляров ссылочного типа.
     /// </summary>
     public readonly struct SomeValues<T>
         : IList<T>
-        where T: class
+        where T : class
     {
         #region Construction
 
@@ -11242,7 +11058,7 @@ namespace ManagedIrbis
             : this()
         {
             _values = value;
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор: не одно значение: либо 0 (в т. ч. <c>null</c>), либо много.
@@ -11261,7 +11077,7 @@ namespace ManagedIrbis
             {
                 _values = values;
             }
-        } // constructor
+        }
 
         #endregion
 
@@ -11293,11 +11109,10 @@ namespace ManagedIrbis
             }
 
             // Not T, not null, can only be T[]
-            var result2 = Unsafe.As<T[]>(value)!;
+            var result2 = Unsafe.As<T[]> (value)!;
 
             return result2.Length == 0 ? null : result2[0];
-
-        } // method AsSingle
+        }
 
         /// <summary>
         /// Выдать значение как массив.
@@ -11319,9 +11134,8 @@ namespace ManagedIrbis
             }
 
             // Not T, not null, can only be T[]
-            return Unsafe.As<T[]>(value)!;
-
-        } // method AsArray
+            return Unsafe.As<T[]> (value)!;
+        }
 
         /// <summary>
         /// Контейнер пуст?
@@ -11343,23 +11157,22 @@ namespace ManagedIrbis
             }
 
             // Not T, not null, can only be T[]
-            var array = Unsafe.As<T[]>(value)!;
+            var array = Unsafe.As<T[]> (value)!;
 
             return array.Length == 0;
-
-        } // method IsNullOrEmpty
+        }
 
         /// <summary>
         /// Оператор неявного преобразования.
         /// </summary>
         public static implicit operator SomeValues<T> (T value)
-            => new(value);
+            => new (value);
 
         /// <summary>
         /// Оператор неявного преобразования.
         /// </summary>
         public static implicit operator SomeValues<T> (T[] values)
-            => new(values);
+            => new (values);
 
         /// <summary>
         /// Оператор неявного преобразования.
@@ -11370,7 +11183,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Оператор неявного преобразования.
         /// </summary>
-        public static implicit operator T[](SomeValues<T> values)
+        public static implicit operator T[] (SomeValues<T> values)
             => values.AsArray();
 
         #endregion
@@ -11394,19 +11207,19 @@ namespace ManagedIrbis
             else if (value is not null)
             {
                 // Not T, not null, can only be T[]
-                var array = Unsafe.As<T[]>(value)!;
+                var array = Unsafe.As<T[]> (value)!;
 
                 foreach (var one in array)
                 {
                     yield return one;
                 }
             }
-        } // method GetEnumerator
+        }
 
         /// <summary>
         /// Not implemented.
         /// </summary>
-        public void Add(T item) => throw new NotImplementedException();
+        public void Add (T item) => throw new NotImplementedException();
 
         /// <summary>
         /// Not implemented.
@@ -11414,7 +11227,7 @@ namespace ManagedIrbis
         public void Clear() => throw new NotImplementedException();
 
         /// <inheritdoc cref="ICollection{T}.Contains"/>
-        public bool Contains(T item)
+        public bool Contains (T item)
         {
             // Take local copy of _values so type checks remain
             // valid even if the SomeValues is overwritten in memory
@@ -11423,7 +11236,7 @@ namespace ManagedIrbis
 
             if (value is T one)
             {
-                return comparer.Equals(item, one);
+                return comparer.Equals (item, one);
             }
 
             if (value is null)
@@ -11432,17 +11245,17 @@ namespace ManagedIrbis
             }
 
             // Not T, not null, can only be T[]
-            var array = Unsafe.As<T[]>(value)!;
+            var array = Unsafe.As<T[]> (value)!;
             foreach (var other in array)
             {
-                if (comparer.Equals(item, other))
+                if (comparer.Equals (item, other))
                 {
                     return true;
                 }
             }
 
             return false;
-        } // method Contains
+        }
 
         /// <inheritdoc cref="ICollection{T}.CopyTo"/>
         public void CopyTo
@@ -11462,15 +11275,15 @@ namespace ManagedIrbis
             else if (value is not null)
             {
                 // Not T, not null, can only be T[]
-                var many = Unsafe.As<T[]>(value)!;
-                Array.Copy(many, 0, array, arrayIndex, many.Length);
+                var many = Unsafe.As<T[]> (value)!;
+                Array.Copy (many, 0, array, arrayIndex, many.Length);
             }
-        } // method CopyTo
+        }
 
         /// <summary>
         /// Not implemented.
         /// </summary>
-        public bool Remove(T item) => throw new NotImplementedException();
+        public bool Remove (T item) => throw new NotImplementedException();
 
         /// <summary>
         /// <inheritdoc cref="ICollection{T}.Count"/>
@@ -11494,7 +11307,7 @@ namespace ManagedIrbis
                 }
 
                 // Not T, not null, can only be T[]
-                return Unsafe.As<T[]>(value)!.Length;
+                return Unsafe.As<T[]> (value)!.Length;
             }
         }
 
@@ -11514,7 +11327,7 @@ namespace ManagedIrbis
 
             if (value is T one)
             {
-                return comparer.Equals(item, one) ? 0 : -1;
+                return comparer.Equals (item, one) ? 0 : -1;
             }
 
             if (value is null)
@@ -11523,31 +11336,30 @@ namespace ManagedIrbis
             }
 
             // Not T, not null, can only be T[]
-            var array = Unsafe.As<T[]>(value)!;
+            var array = Unsafe.As<T[]> (value)!;
             for (var index = 0; index < array.Length; index++)
             {
-                if (comparer.Equals(item, array[index]))
+                if (comparer.Equals (item, array[index]))
                 {
                     return index;
                 }
             }
 
             return -1;
-
-        } // method IndexOf
+        }
 
         /// <summary>
         /// Not implemented.
         /// </summary>
-        public void Insert(int index, T item) => throw new NotImplementedException();
+        public void Insert (int index, T item) => throw new NotImplementedException();
 
         /// <summary>
         /// Not implemented
         /// </summary>
-        public void RemoveAt(int index) => throw new NotImplementedException();
+        public void RemoveAt (int index) => throw new NotImplementedException();
 
         /// <inheritdoc cref="IList{T}.this"/>
-        public T this[int index]
+        public T this [int index]
         {
             get
             {
@@ -11568,7 +11380,7 @@ namespace ManagedIrbis
                 }
 
                 // Not T, not null, can only be T[]
-                return Unsafe.As<T[]>(value)! [index];
+                return Unsafe.As<T[]> (value)![index];
             }
             set => throw new NotImplementedException();
         }
@@ -11582,8 +11394,7 @@ namespace ManagedIrbis
             => AsSingle()?.ToString() ?? string.Empty;
 
         #endregion
-
-    } // struct SomeValues
+    }
 
     /// <summary>
     /// Параметры форматирования записи на ИРБИС-сервере.
@@ -11629,8 +11440,7 @@ namespace ManagedIrbis
         public Record[]? Records { get; set; }
 
         #endregion
-
-    } // class FormatRecordParameters
+    }
 
     /// <summary>
     /// Один результат полнотекстового поиска.
@@ -11666,9 +11476,9 @@ namespace ManagedIrbis
                 string line
             )
         {
-            var parts = line.Split(Constants.NumberSign, 3);
+            var parts = line.Split (Constants.NumberSign, 3);
             var pages = new List<int>();
-            Mfn = int.Parse(parts[0]);
+            Mfn = int.Parse (parts[0]);
             if (parts.Length == 3)
             {
                 Formatted = parts[2];
@@ -11676,13 +11486,13 @@ namespace ManagedIrbis
 
             if (parts.Length > 1)
             {
-                parts = parts[1].Split('\x1F');
+                parts = parts[1].Split ('\x1F');
                 foreach (var part in parts)
                 {
-                    if (!string.IsNullOrEmpty(part))
+                    if (!string.IsNullOrEmpty (part))
                     {
-                        var page = int.Parse(part);
-                        pages.Add(page);
+                        var page = int.Parse (part);
+                        pages.Add (page);
                     }
                 }
             }
@@ -11702,26 +11512,25 @@ namespace ManagedIrbis
             // response.DebugUtf(Console.Out);
 
             var number = response.ReadInteger(); // количество найденных записей
-            var result = new List<FoundPages>(number);
+            var result = new List<FoundPages> (number);
             for (var i = 0; i < number; i++)
             {
                 var line = response.ReadUtf();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     break;
                 }
 
                 var one = new FoundPages();
-                one.Decode(line);
-                result.Add(one);
+                one.Decode (line);
+                result.Add (one);
             }
 
             return result.ToArray();
         }
 
         #endregion
-
-    } // class FoundPages
+    }
 
     /// <summary>
     /// Один найденный фасет в результатах поиска.
@@ -11754,12 +11563,10 @@ namespace ManagedIrbis
             )
         {
             throw new NotImplementedException();
-
-        } // method Decode
+        }
 
         #endregion
-
-    } // class FoundFacet
+    }
 
     /// <summary>
     /// Результат полнотекстового поиска.
@@ -11786,16 +11593,15 @@ namespace ManagedIrbis
         /// Разбор ответа сервера.
         /// </summary>
         public void Decode
-        (
-            Response response
-        )
+            (
+                Response response
+            )
         {
-            Pages = FoundPages.Decode(response);
+            Pages = FoundPages.Decode (response);
         }
 
         #endregion
-
-    } // class FullTextResult
+    }
 
     /// <summary>
     /// Параметры поискового запроса.
@@ -11864,7 +11670,7 @@ namespace ManagedIrbis
         /// </summary>
         public SearchParameters Clone()
         {
-            return (SearchParameters) MemberwiseClone();
+            return (SearchParameters)MemberwiseClone();
         }
 
         /// <summary>
@@ -11878,18 +11684,17 @@ namespace ManagedIrbis
                 SyncQuery query
             )
         {
-            var database = Database.ThrowIfNull(nameof(Database));
+            var database = Database.ThrowIfNull (nameof (Database));
 
-            query.AddAnsi(database);
-            query.AddUtf(Expression);
-            query.Add(NumberOfRecords);
-            query.Add(FirstRecord);
-            query.AddFormat(Format);
-            query.Add(MinMfn);
-            query.Add(MaxMfn);
-            query.AddAnsi(Sequential);
-
-        } // method Encode
+            query.AddAnsi (database);
+            query.AddUtf (Expression);
+            query.Add (NumberOfRecords);
+            query.Add (FirstRecord);
+            query.AddFormat (Format);
+            query.Add (MinMfn);
+            query.Add (MaxMfn);
+            query.AddAnsi (Sequential);
+        }
 
         #endregion
 
@@ -11900,13 +11705,12 @@ namespace ManagedIrbis
             (Expression ?? Sequential).ToVisibleString();
 
         #endregion
-
-    } // class SearchParameters
+    }
 
     /// <summary>
     /// Параметры полнотекстового поиска для ИРБИС64+.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(Request) + "}")]
+    [DebuggerDisplay ("{" + nameof (Request) + "}")]
     public sealed class TextParameters
     {
         #region Constants
@@ -11980,32 +11784,31 @@ namespace ManagedIrbis
         public string Encode()
         {
             var builder = new StringBuilder();
-            builder.Append(Request);
-            builder.Append(Delimiter);
+            builder.Append (Request);
+            builder.Append (Delimiter);
             builder.Append
                 (
                     Words is not null
-                        ? string.Join(" ", Words)
+                        ? string.Join (" ", Words)
                         : string.Empty
                 );
-            builder.Append(Delimiter);
-            builder.Append(Morphology ? "1" : "0");
-            builder.Append(Delimiter);
-            builder.Append(Prefix);
-            builder.Append(Delimiter);
-            builder.Append(MaxDistanse.ToInvariantString());
-            builder.Append(Delimiter);
-            builder.Append(Context);
-            builder.Append(Delimiter);
-            builder.Append(MaxCount.ToInvariantString());
-            builder.Append(Delimiter);
-            builder.Append(CellType);
-            builder.Append(Delimiter);
-            builder.Append(CellCount.ToInvariantString());
+            builder.Append (Delimiter);
+            builder.Append (Morphology ? "1" : "0");
+            builder.Append (Delimiter);
+            builder.Append (Prefix);
+            builder.Append (Delimiter);
+            builder.Append (MaxDistanse.ToInvariantString());
+            builder.Append (Delimiter);
+            builder.Append (Context);
+            builder.Append (Delimiter);
+            builder.Append (MaxCount.ToInvariantString());
+            builder.Append (Delimiter);
+            builder.Append (CellType);
+            builder.Append (Delimiter);
+            builder.Append (CellCount.ToInvariantString());
 
             return builder.ToString();
-
-        } // method Encode
+        }
 
         /// <summary>
         /// Кодирование в пользовательский запрос.
@@ -12018,18 +11821,16 @@ namespace ManagedIrbis
                 SyncQuery query
             )
         {
-            query.AddUtf(Encode());
-
-        } // method Encode
+            query.AddUtf (Encode());
+        }
 
         #endregion
-
-    } // class TextParameters
+    }
 
     /// <summary>
     /// Одна строка в ответе сервера на поисковый запрос.
     /// </summary>
-    [DebuggerDisplay("{Mfn} {Text}")]
+    [DebuggerDisplay ("{Mfn} {Text}")]
     public sealed class FoundItem
         : IEquatable<FoundItem>
     {
@@ -12070,7 +11871,7 @@ namespace ManagedIrbis
             }
 
             return result;
-        } // method ToMfn
+        }
 
         /// <summary>
         /// Разбор ответа сервера.
@@ -12081,27 +11882,26 @@ namespace ManagedIrbis
             )
         {
             var expected = response.ReadInteger();
-            var result = new List<FoundItem>(expected);
+            var result = new List<FoundItem> (expected);
             while (!response.EOT)
             {
                 var line = response.ReadUtf();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     break;
                 }
 
-                var parts = line.Split(Constants.NumberSign, 2);
+                var parts = line.Split (Constants.NumberSign, 2);
                 var item = new FoundItem
                 {
-                    Mfn = Private.ParseInt32(parts[0]),
+                    Mfn = Private.ParseInt32 (parts[0]),
                     Text = parts.Length == 2 ? parts[1] : string.Empty
                 };
-                result.Add(item);
+                result.Add (item);
             }
 
             return result.ToArray();
-
-        } // method Parse
+        }
 
         /// <summary>
         /// Разбор ответа сервера.
@@ -12112,23 +11912,22 @@ namespace ManagedIrbis
             )
         {
             var expected = response.ReadInteger();
-            var result = new List<int>(expected);
+            var result = new List<int> (expected);
             while (!response.EOT)
             {
                 var line = response.ReadAnsi();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     break;
                 }
 
-                var parts = line.Split(Constants.NumberSign, 2);
-                var mfn = int.Parse(parts[0]);
-                result.Add(mfn);
+                var parts = line.Split (Constants.NumberSign, 2);
+                var mfn = int.Parse (parts[0]);
+                result.Add (mfn);
             }
 
             return result.ToArray();
-
-        } // method ParseMfn
+        }
 
         /// <summary>
         /// Загружаем найденные записи с сервера.
@@ -12143,7 +11942,7 @@ namespace ManagedIrbis
             var array = found.ToArray();
             var length = array.Length;
             var result = new FoundItem[length];
-            var formatted = connection.FormatRecords(array, format);
+            var formatted = connection.FormatRecords (array, format);
             if (formatted is null)
             {
                 return Array.Empty<FoundItem>();
@@ -12160,18 +11959,17 @@ namespace ManagedIrbis
             }
 
             return result;
-
-        } // method Read
+        }
 
         #endregion
 
         #region IEquatable<T> members
 
         /// <inheritdoc cref="IEquatable{T}.Equals(T)" />
-        public bool Equals(FoundItem? other)
+        public bool Equals (FoundItem? other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals (null, other)) return false;
+            if (ReferenceEquals (this, other)) return true;
             return Text == other.Text && Mfn == other.Mfn;
         }
 
@@ -12180,19 +11978,18 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="object.Equals(object)"/>
-        public override bool Equals(object? obj) =>
-            ReferenceEquals(this, obj) || obj is FoundItem other && Equals(other);
+        public override bool Equals (object? obj) =>
+            ReferenceEquals (this, obj) || obj is FoundItem other && Equals (other);
 
         /// <inheritdoc cref="object.GetHashCode"/>
         public override int GetHashCode() =>
-            unchecked(((Text != null ? Text.GetHashCode() : 0) * 397) ^ Mfn);
+            unchecked (((Text != null ? Text.GetHashCode() : 0) * 397) ^ Mfn);
 
         /// <inheritdoc cref="object.ToString" />
         public override string ToString() => $"[{Mfn}] {Text.ToVisibleString()}";
 
         #endregion
-
-    } // class FoundItem
+    }
 
     /// <summary>
     /// Параметры чтения записи с ИРБИС-сервера.
@@ -12239,13 +12036,12 @@ namespace ManagedIrbis
         public override string ToString() => $"MFN={Mfn}";
 
         #endregion
-
-    } // class ReadRecordParameters
+    }
 
     /// <summary>
     /// Термин в поисковом словаре.
     /// </summary>
-    [DebuggerDisplay("{Count} {Text}")]
+    [DebuggerDisplay ("{Count} {Text}")]
     public class Term
         : IEquatable<Term>
     {
@@ -12268,7 +12064,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Clone the <see cref="Term"/>.
         /// </summary>
-        public Term Clone() => (Term) MemberwiseClone();
+        public Term Clone() => (Term)MemberwiseClone();
 
         /// <summary>
         /// Разбор ответа сервера.
@@ -12282,18 +12078,18 @@ namespace ManagedIrbis
             while (!response.EOT)
             {
                 var line = response.ReadUtf();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     break;
                 }
 
-                var parts = line.Split(Constants.NumberSign, 2);
+                var parts = line.Split (Constants.NumberSign, 2);
                 var item = new Term
                 {
-                    Count = int.Parse(parts[0]),
+                    Count = int.Parse (parts[0]),
                     Text = parts.Length == 2 ? parts[1] : string.Empty
                 };
-                result.Add(item);
+                result.Add (item);
             }
 
             return result.ToArray();
@@ -12309,12 +12105,12 @@ namespace ManagedIrbis
             )
         {
             var prefixLength = prefix.Length;
-            var result = new List<Term>(terms.Count);
+            var result = new List<Term> (terms.Count);
             if (prefixLength == 0)
             {
                 foreach (var term in terms)
                 {
-                    result.Add(term.Clone());
+                    result.Add (term.Clone());
                 }
             }
             else
@@ -12322,27 +12118,27 @@ namespace ManagedIrbis
                 foreach (var term in terms)
                 {
                     var item = term.Text;
-                    if (!ReferenceEquals(item, null) && item.StartsWith(prefix))
+                    if (!ReferenceEquals (item, null) && item.StartsWith (prefix))
                     {
-                        item = item.Substring(prefixLength);
+                        item = item.Substring (prefixLength);
                     }
+
                     var clone = term.Clone();
                     clone.Text = item;
-                    result.Add(clone);
+                    result.Add (clone);
                 }
             }
 
             return result.ToArray();
-
-        } // method TrimPrefix
+        }
 
         #endregion
 
         #region IEquatable<T> members
 
         /// <inheritdoc cref="IEquatable{T}.Equals(T)" />
-        public bool Equals(Term? other)
-            => Text?.Equals(other?.Text) ?? false;
+        public bool Equals (Term? other)
+            => Text?.Equals (other?.Text) ?? false;
 
         #endregion
 
@@ -12352,8 +12148,7 @@ namespace ManagedIrbis
         public override string ToString() => $"{Count}#{Text.ToVisibleString()}";
 
         #endregion
-
-    } // class Term
+    }
 
     /// <summary>
     /// Параметры запроса терминов.
@@ -12398,7 +12193,7 @@ namespace ManagedIrbis
         /// </summary>
         public TermParameters Clone()
         {
-            return (TermParameters) MemberwiseClone();
+            return (TermParameters)MemberwiseClone();
         }
 
         /// <summary>
@@ -12412,14 +12207,13 @@ namespace ManagedIrbis
                 SyncQuery query
             )
         {
-            var database = Database.ThrowIfNull(nameof(Database));
+            var database = Database.ThrowIfNull (nameof (Database));
 
-            query.AddAnsi(database);
-            query.AddUtf(StartTerm);
-            query.Add(NumberOfTerms);
-            query.AddFormat(Format);
-
-        } // method Encode
+            query.AddAnsi (database);
+            query.AddUtf (StartTerm);
+            query.Add (NumberOfTerms);
+            query.AddFormat (Format);
+        }
 
         #endregion
 
@@ -12429,8 +12223,7 @@ namespace ManagedIrbis
         public override string ToString() => StartTerm.ToVisibleString();
 
         #endregion
-
-    } // class TermParameters
+    }
 
     /// <summary>
     /// Информация о процессе на сервере ИРБИС64.
@@ -12503,9 +12296,9 @@ namespace ManagedIrbis
             )
         {
             var lines = response.ReadRemainingAnsiLines();
-            var processCount = int.Parse(lines[0]);
-            var linesPerProcess = int.Parse(lines[1]);
-            var result = new List<ProcessInfo>(processCount);
+            var processCount = int.Parse (lines[0]);
+            var linesPerProcess = int.Parse (lines[1]);
+            var result = new List<ProcessInfo> (processCount);
             if (processCount == 0 || linesPerProcess == 0)
             {
                 return result.ToArray();
@@ -12531,19 +12324,18 @@ namespace ManagedIrbis
                     ProcessId = lines[i + 8],
                     State = lines[i + 9]
                 };
-                result.Add(process);
+                result.Add (process);
             }
 
             return result.ToArray();
-
-        } // method Parse
+        }
 
         #endregion
 
         #region IEquatable members
 
         /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
-        public bool Equals(ProcessInfo? other) => Number?.Equals(other?.Number) ?? false;
+        public bool Equals (ProcessInfo? other) => Number?.Equals (other?.Number) ?? false;
 
         #endregion
 
@@ -12553,13 +12345,12 @@ namespace ManagedIrbis
         public override string ToString() => $"{Number} {IpAddress} {Name} {Workstation}";
 
         #endregion
-
-    } // class ProcessInfo
+    }
 
     /// <summary>
     /// Постинг термина.
     /// </summary>
-    [DebuggerDisplay("[{Mfn}] {Tag} {Occurrence} {Count} {Text}")]
+    [DebuggerDisplay ("[{Mfn}] {Tag} {Occurrence} {Count} {Text}")]
     public sealed class TermPosting
         : IEquatable<TermPosting>
     {
@@ -12599,7 +12390,7 @@ namespace ManagedIrbis
         /// </summary>
         public TermPosting Clone()
         {
-            return (TermPosting) MemberwiseClone();
+            return (TermPosting)MemberwiseClone();
         }
 
         /// <summary>
@@ -12614,12 +12405,12 @@ namespace ManagedIrbis
             while (!response.EOT)
             {
                 var line = response.ReadUtf();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     break;
                 }
 
-                var parts = line.Split(Constants.NumberSign, 5);
+                var parts = line.Split (Constants.NumberSign, 5);
                 if (parts.Length < 4)
                 {
                     break;
@@ -12627,13 +12418,13 @@ namespace ManagedIrbis
 
                 var item = new TermPosting
                 {
-                    Mfn = int.Parse(parts[0]),
-                    Tag = int.Parse(parts[1]),
-                    Occurrence = int.Parse(parts[2]),
-                    Count = int.Parse(parts[3]),
+                    Mfn = int.Parse (parts[0]),
+                    Tag = int.Parse (parts[1]),
+                    Occurrence = int.Parse (parts[2]),
+                    Count = int.Parse (parts[3]),
                     Text = parts.Length == 5 ? parts[4] : string.Empty
                 };
-                result.Add(item);
+                result.Add (item);
             }
 
             return result.ToArray();
@@ -12644,7 +12435,7 @@ namespace ManagedIrbis
         #region IEquatable members
 
         /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
-        public bool Equals(TermPosting? other)
+        public bool Equals (TermPosting? other)
         {
             if (other is not null)
             {
@@ -12666,8 +12457,7 @@ namespace ManagedIrbis
         public override string ToString() => $"{Mfn}#{Tag}#{Occurrence}#{Count}#{Text}";
 
         #endregion
-
-    } // class TermPosting
+    }
 
     /// <summary>
     /// Параметры запроса постингов.
@@ -12713,15 +12503,14 @@ namespace ManagedIrbis
         /// </summary>
         public PostingParameters Clone()
         {
-            var result = (PostingParameters) MemberwiseClone();
+            var result = (PostingParameters)MemberwiseClone();
             if (Terms is not null)
             {
-                result.Terms = (string[]?) Terms.Clone();
+                result.Terms = (string[]?)Terms.Clone();
             }
 
             return result;
-
-        } // method Clone
+        }
 
         /// <summary>
         /// Кодирование параметров постингов для клиентского запроса.
@@ -12734,22 +12523,20 @@ namespace ManagedIrbis
                 SyncQuery query
             )
         {
-            var database = connection.EnsureDatabase(Database);
-            query.AddAnsi(database);
-            query.Add(NumberOfPostings);
-            query.Add(FirstPosting);
-            query.AddFormat(Format);
+            var database = connection.EnsureDatabase (Database);
+            query.AddAnsi (database);
+            query.Add (NumberOfPostings);
+            query.Add (FirstPosting);
+            query.AddFormat (Format);
 
             foreach (var term in Terms.ThrowIfNull())
             {
-                query.AddUtf(term);
+                query.AddUtf (term);
             }
-
-        } // method Encode
+        }
 
         #endregion
-
-    } // class PostingParameters
+    }
 
     /// <summary>
     /// Signature for Table command.
@@ -12815,20 +12602,18 @@ namespace ManagedIrbis
                 SyncQuery query
             )
         {
-            query.AddAnsi(Table);
+            query.AddAnsi (Table);
             query.NewLine(); // вместо заголовков
-            query.AddAnsi(Mode);
-            query.AddUtf(SearchQuery);
-            query.Add(MinMfn);
-            query.Add(MaxMfn);
-            query.AddUtf(SequentialQuery);
+            query.AddAnsi (Mode);
+            query.AddUtf (SearchQuery);
+            query.Add (MinMfn);
+            query.Add (MaxMfn);
+            query.AddUtf (SequentialQuery);
             query.NewLine(); // вместо списка MFN
-
-        } // method Encode
+        }
 
         #endregion
-
-    } // class TableDefinition
+    }
 
     /// <summary>
     /// Строка в протоколе выполнения глобальной корректировки.
@@ -12896,10 +12681,10 @@ namespace ManagedIrbis
         {
             Text = line;
             Success = true;
-            var parts = line.Split('#');
+            var parts = line.Split ('#');
             foreach (var part in parts)
             {
-                var p = part.Split('=');
+                var p = part.Split ('=');
                 if (p.Length > 0)
                 {
                     var name = p[0].ToUpper();
@@ -12939,10 +12724,10 @@ namespace ManagedIrbis
                             Error = value;
                             Success = false;
                             break;
-                    } // switch
-                } // if
-            } // foreach
-        } // method Decode
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Parse server response.
@@ -12957,33 +12742,31 @@ namespace ManagedIrbis
             while (true)
             {
                 var line = response.ReadAnsi();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     break;
                 }
 
                 var item = new GblProtocolLine();
-                item.Decode(line);
-                result.Add(item);
-            } // while
+                item.Decode (line);
+                result.Add (item);
+            }
 
             return result.ToArray();
-        } // method Decode
+        }
 
         #endregion
 
         #region Object members
 
-
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
             return Text.ToVisibleString();
-        } // method ToString
+        }
 
         #endregion
-
-    } // class GblProtocolLine
+    }
 
     /// <summary>
     /// Результат исполнения глобальной корректировки.
@@ -13049,11 +12832,11 @@ namespace ManagedIrbis
             var result = new GblResult
             {
                 TimeStarted = DateTime.Now,
-                TimeElapsed = new TimeSpan(0)
+                TimeElapsed = new TimeSpan (0)
             };
 
             return result;
-        } // method GetEmptyResult
+        }
 
         /// <summary>
         /// Merge result.
@@ -13068,7 +12851,7 @@ namespace ManagedIrbis
                 Canceled = intermediateResult.Canceled;
             }
 
-            if (!ReferenceEquals(intermediateResult.Exception, null))
+            if (!ReferenceEquals (intermediateResult.Exception, null))
             {
                 Exception = intermediateResult.Exception;
             }
@@ -13080,7 +12863,7 @@ namespace ManagedIrbis
             var otherLines
                 = intermediateResult.Protocol ?? Array.Empty<GblProtocolLine>();
             Protocol = Private.Merge (Protocol, otherLines);
-        } // method MergeResult
+        }
 
         /// <summary>
         /// Parse server response.
@@ -13090,9 +12873,9 @@ namespace ManagedIrbis
                 Response response
             )
         {
-            Protocol = GblProtocolLine.Decode(response);
+            Protocol = GblProtocolLine.Decode (response);
             RecordsProcessed = Protocol.Length;
-            RecordsSucceeded = Protocol.Count(line => line.Success);
+            RecordsSucceeded = Protocol.Count (line => line.Success);
         }
 
         #endregion
@@ -13103,11 +12886,10 @@ namespace ManagedIrbis
         public override string ToString()
         {
             return $"Records processed: {RecordsProcessed}, Canceled: {Canceled}";
-        } // method ToString
+        }
 
         #endregion
-
-    } // class GblResult
+    }
 
     /// <summary>
     /// Параметры сохранения записи/записей на ИРБИС-сервере.
@@ -13147,14 +12929,13 @@ namespace ManagedIrbis
         public bool DontParse { get; set; }
 
         #endregion
-
     } // class WriteRecordParameters
 
     /// <summary>
     /// Оператор глобальной корректировки со всеми относящимися
     /// к нему данными.
     /// </summary>
-    [DebuggerDisplay("{Command} {Parameter1} {Parameter2}")]
+    [DebuggerDisplay ("{Command} {Parameter1} {Parameter2}")]
     public sealed class GblStatement
     {
         #region Constants
@@ -13204,20 +12985,19 @@ namespace ManagedIrbis
         {
             var result = new StringBuilder();
 
-            result.Append(Command);
-            result.Append(Delimiter);
-            result.Append(Parameter1);
-            result.Append(Delimiter);
-            result.Append(Parameter2);
-            result.Append(Delimiter);
-            result.Append(Format1);
-            result.Append(Delimiter);
-            result.Append(Format2);
-            result.Append(Delimiter);
+            result.Append (Command);
+            result.Append (Delimiter);
+            result.Append (Parameter1);
+            result.Append (Delimiter);
+            result.Append (Parameter2);
+            result.Append (Delimiter);
+            result.Append (Format1);
+            result.Append (Delimiter);
+            result.Append (Format2);
+            result.Append (Delimiter);
 
             return result.ToString();
-
-        } // method EncodeForProtocol
+        }
 
         /// <summary>
         /// Parse the stream.
@@ -13228,7 +13008,7 @@ namespace ManagedIrbis
             )
         {
             var command = reader.ReadLine();
-            if (ReferenceEquals(command, null) || command.Length == 0)
+            if (ReferenceEquals (command, null) || command.Length == 0)
             {
                 return null;
             }
@@ -13243,8 +13023,7 @@ namespace ManagedIrbis
             };
 
             return result;
-
-        } // method ParseStream
+        }
 
         #endregion
 
@@ -13267,11 +13046,10 @@ namespace ManagedIrbis
                     Format2,
                     Environment.NewLine
                 );
-        } // method ToString
+        }
 
         #endregion
-
-    } // class GblStatement
+    }
 
     /// <summary>
     /// Настройки для глобальной корректировки.
@@ -13381,7 +13159,7 @@ namespace ManagedIrbis
                 SyncConnection connection,
                 IEnumerable<GblStatement> statements
             )
-            : this(connection) => Statements.AddRange(statements);
+            : this (connection) => Statements.AddRange (statements);
 
         #endregion
 
@@ -13395,67 +13173,69 @@ namespace ManagedIrbis
                 SyncQuery query
             )
         {
-            query.Add(Actualize ? 1 : 0);
-            if (!string.IsNullOrEmpty(FileName))
+            query.Add (Actualize ? 1 : 0);
+            if (!string.IsNullOrEmpty (FileName))
             {
-                query.AddAnsi("@" + FileName);
+                query.AddAnsi ("@" + FileName);
             }
             else
             {
                 var builder = new StringBuilder();
+
                 // "!" здесь означает, что передавать будем в UTF-8
-                builder.Append('!');
+                builder.Append ('!');
+
                 // не знаю, что тут означает "0"
-                builder.Append('0');
-                builder.Append(Delimiter);
+                builder.Append ('0');
+                builder.Append (Delimiter);
                 foreach (var statement in Statements)
                 {
                     // TODO: сделать подстановку параметров
                     // $encoded .=  $settings->substituteParameters(strval($statement));
-                    builder.Append(statement.EncodeForProtocol());
-                    builder.Append(Delimiter);
+                    builder.Append (statement.EncodeForProtocol());
+                    builder.Append (Delimiter);
                 }
 
-                builder.Append(Delimiter);
-                query.AddUtf(builder.ToString());
+                builder.Append (Delimiter);
+                query.AddUtf (builder.ToString());
             }
 
             // отбор записей на основе поиска
-            query.AddUtf(SearchExpression); // поиск по словарю
-            query.Add(MinMfn); // нижняя граница MFN
-            query.Add(MaxMfn); // верхняя граница MFN
+            query.AddUtf (SearchExpression); // поиск по словарю
+            query.Add (MinMfn); // нижняя граница MFN
+            query.Add (MaxMfn); // верхняя граница MFN
+
             //query.AddUtf(SequentialExpression); // последовательный поиск
 
             // TODO поддержка режима "кроме отмеченных"
             if (MfnList is { Length: not 0 })
             {
-                query.Add(MfnList.Length);
+                query.Add (MfnList.Length);
                 foreach (var mfn in MfnList)
                 {
-                    query.Add(mfn);
+                    query.Add (mfn);
                 }
             }
             else
             {
                 var count = MaxMfn - MinMfn + 1;
-                query.Add(count);
+                query.Add (count);
                 for (var mfn = 0; mfn <= MaxMfn; mfn++)
                 {
-                    query.Add(mfn);
+                    query.Add (mfn);
                 }
             }
 
             if (!FormalControl)
             {
-                query.AddAnsi("*");
+                query.AddAnsi ("*");
             }
 
             if (!Autoin)
             {
-                query.AddAnsi("&");
+                query.AddAnsi ("&");
             }
-
-        } // method Encode
+        }
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -13469,15 +13249,14 @@ namespace ManagedIrbis
                 IEnumerable<GblStatement> statements
             )
         {
-            var result = new GblSettings(connection, statements)
+            var result = new GblSettings (connection, statements)
             {
                 MinMfn = minMfn,
                 MaxMfn = maxMfn
             };
 
             return result;
-
-        } // method ForInterval
+        }
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -13492,7 +13271,7 @@ namespace ManagedIrbis
                 IEnumerable<GblStatement> statements
             )
         {
-            var result = new GblSettings(connection, statements)
+            var result = new GblSettings (connection, statements)
             {
                 Database = database,
                 MinMfn = minMfn,
@@ -13500,8 +13279,7 @@ namespace ManagedIrbis
             };
 
             return result;
-
-        } // method ForInterval
+        }
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -13514,15 +13292,13 @@ namespace ManagedIrbis
                 IEnumerable<GblStatement> statements
             )
         {
-
-            var result = new GblSettings(connection, statements)
+            var result = new GblSettings (connection, statements)
             {
                 MfnList = mfnList.ToArray()
             };
 
             return result;
-
-        } // method ForList
+        }
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -13536,14 +13312,14 @@ namespace ManagedIrbis
                 IEnumerable<GblStatement> statements
             )
         {
-            var result = new GblSettings(connection, statements)
+            var result = new GblSettings (connection, statements)
             {
                 Database = database,
                 MfnList = mfnList.ToArray()
             };
 
             return result;
-        } // method ForList
+        }
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -13556,14 +13332,14 @@ namespace ManagedIrbis
                 IEnumerable<int> mfnList
             )
         {
-            var result = new GblSettings(connection)
+            var result = new GblSettings (connection)
             {
                 Database = database,
                 MfnList = mfnList.ToArray()
             };
 
             return result;
-        } // method ForList
+        }
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -13576,13 +13352,13 @@ namespace ManagedIrbis
                 IEnumerable<GblStatement> statements
             )
         {
-            var result = new GblSettings(connection, statements)
+            var result = new GblSettings (connection, statements)
             {
                 SearchExpression = searchExpression
             };
 
             return result;
-        } // method ForSearchExpression
+        }
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -13596,14 +13372,14 @@ namespace ManagedIrbis
                 IEnumerable<GblStatement> statements
             )
         {
-            var result = new GblSettings(connection, statements)
+            var result = new GblSettings (connection, statements)
             {
                 Database = database,
                 SearchExpression = searchExpression
             };
 
             return result;
-        } // method ForSearchExpression
+        }
 
         /// <summary>
         /// Set (server) file name.
@@ -13616,7 +13392,7 @@ namespace ManagedIrbis
             FileName = fileName;
 
             return this;
-        } // method SetFileName
+        }
 
         /// <summary>
         /// Set first record and number of records
@@ -13632,7 +13408,6 @@ namespace ManagedIrbis
             NumberOfRecords = numberOfRecords;
 
             return this;
-
         } // method SetRange
 
         /// <summary>
@@ -13646,12 +13421,10 @@ namespace ManagedIrbis
             SearchExpression = searchExpression;
 
             return this;
-
-        } // method SetSearchExpression
+        }
 
         #endregion
-
-    } // class GblSettings
+    }
 
     /// <summary>
     /// Информация о базе данных ИРБИС.
@@ -13725,12 +13498,12 @@ namespace ManagedIrbis
                 int[]? mfns
             )
         {
-            writer.Write($"{name}: ");
+            writer.Write ($"{name}: ");
             writer.WriteLine
                 (
                     mfns is null or { Length: 0 }
-                    ? "None"
-                    : string.Join(", ", mfns)
+                        ? "None"
+                        : string.Join (", ", mfns)
                 );
         }
 
@@ -13739,23 +13512,22 @@ namespace ManagedIrbis
                 string? text
             )
         {
-            if (ReferenceEquals(text, null) || text.Length == 0)
+            if (ReferenceEquals (text, null) || text.Length == 0)
             {
                 return Array.Empty<int>();
             }
 
-            var items = text.Split(ItemDelimiter);
+            var items = text.Split (ItemDelimiter);
             var result = new int[items.Length];
             for (var i = 0; i < items.Length; i++)
             {
-                result[i] = int.Parse(items[i]);
+                result[i] = int.Parse (items[i]);
             }
 
-            Array.Sort(result);
+            Array.Sort (result);
 
             return result;
-
-        } // method ParseLine
+        }
 
         #endregion
 
@@ -13773,16 +13545,15 @@ namespace ManagedIrbis
             var result = new DatabaseInfo
             {
                 Name = name,
-                LogicallyDeletedRecords = _ParseLine(response.ReadAnsi()),
-                PhysicallyDeletedRecords = _ParseLine(response.ReadAnsi()),
-                NonActualizedRecords = _ParseLine(response.ReadAnsi()),
-                LockedRecords = _ParseLine(response.ReadAnsi()),
-                MaxMfn = _ParseLine(response.ReadAnsi())[0],
-                DatabaseLocked = _ParseLine(response.ReadAnsi())[0] != 0
+                LogicallyDeletedRecords = _ParseLine (response.ReadAnsi()),
+                PhysicallyDeletedRecords = _ParseLine (response.ReadAnsi()),
+                NonActualizedRecords = _ParseLine (response.ReadAnsi()),
+                LockedRecords = _ParseLine (response.ReadAnsi()),
+                MaxMfn = _ParseLine (response.ReadAnsi())[0],
+                DatabaseLocked = _ParseLine (response.ReadAnsi())[0] != 0
             };
 
             return result;
-
         } // method Parse
 
         /// <summary>
@@ -13799,12 +13570,12 @@ namespace ManagedIrbis
             {
                 var readOnly = false;
                 var name = entry.Code;
-                if (!ReferenceEquals(name, null) && name.Length != 0)
+                if (!ReferenceEquals (name, null) && name.Length != 0)
                 {
                     if (name.FirstChar() == '-')
                     {
                         readOnly = true;
-                        name = name.Substring(1);
+                        name = name.Substring (1);
                     }
 
                     var database = new DatabaseInfo
@@ -13813,13 +13584,12 @@ namespace ManagedIrbis
                         Description = entry.Comment,
                         ReadOnly = readOnly
                     };
-                    result.Add(database);
+                    result.Add (database);
                 }
             }
 
             return result.ToArray();
-
-        } // method ParseMenu
+        }
 
         /// <summary>
         /// Вывод сведений о базе данных.
@@ -13829,15 +13599,14 @@ namespace ManagedIrbis
                 TextWriter writer
             )
         {
-            writer.WriteLine($"Database: {Name}");
-            writer.WriteLine($"Max MFN={MaxMfn}");
-            writer.WriteLine($"Locked={DatabaseLocked}");
-            _Write(writer, "Logically deleted records", LogicallyDeletedRecords);
-            _Write(writer, "Physically deleted records", PhysicallyDeletedRecords);
-            _Write(writer, "Non-actualized records", NonActualizedRecords);
-            _Write(writer, "Locked records", LockedRecords);
-
-        } // method Write
+            writer.WriteLine ($"Database: {Name}");
+            writer.WriteLine ($"Max MFN={MaxMfn}");
+            writer.WriteLine ($"Locked={DatabaseLocked}");
+            _Write (writer, "Logically deleted records", LogicallyDeletedRecords);
+            _Write (writer, "Physically deleted records", PhysicallyDeletedRecords);
+            _Write (writer, "Non-actualized records", NonActualizedRecords);
+            _Write (writer, "Locked records", LockedRecords);
+        }
 
         #endregion
 
@@ -13846,24 +13615,22 @@ namespace ManagedIrbis
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(Description))
+            if (string.IsNullOrEmpty (Description))
             {
                 return Name.ToVisibleString();
             }
 
             return $"{Name} - {Description}";
-
-        } // method ToString
+        }
 
         #endregion
-
-    } // class DatabaseInfo
+    }
 
     /// <summary>
     /// Информация о клиенте, подключенном к серверу ИРБИС
     /// (не обязательно о текущем).
     /// </summary>
-    [DebuggerDisplay("{IPAddress} {Name} {Workstation}")]
+    [DebuggerDisplay ("{IPAddress} {Name} {Workstation}")]
     public sealed class ClientInfo
     {
         #region Properties
@@ -13876,6 +13643,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Адрес клиента
         /// </summary>
+
         // ReSharper disable once InconsistentNaming
         public string? IPAddress { get; set; }
 
@@ -13892,6 +13660,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Идентификатор клиентской программы
         /// </summary>
+
         // ReSharper disable once InconsistentNaming
         public string? ID { get; set; }
 
@@ -13929,8 +13698,7 @@ namespace ManagedIrbis
             $"IP: {IPAddress}, ID: {ID}, {Workstation}";
 
         #endregion
-
-    } // class ClientInfo
+    }
 
     /// <summary>
     /// Статистика работы сервера ИРБИС64.
@@ -13975,10 +13743,10 @@ namespace ManagedIrbis
             var linesPerClient = response.RequireInt32();
             var clients = new List<ClientInfo>();
 
-            for(var i = 0; i < result.ClientCount; i++)
+            for (var i = 0; i < result.ClientCount; i++)
             {
-                var lines = response.GetAnsiStrings(linesPerClient + 1);
-                if (ReferenceEquals(lines, null))
+                var lines = response.GetAnsiStrings (linesPerClient + 1);
+                if (ReferenceEquals (lines, null))
                 {
                     break;
                 }
@@ -14034,14 +13802,13 @@ namespace ManagedIrbis
                     client.CommandNumber = lines[9].EmptyToNull();
                 }
 
-                clients.Add(client);
+                clients.Add (client);
             }
 
             result.RunningClients = clients.ToArray();
 
             return result;
-
-        } // method Parse
+        }
 
         #endregion
 
@@ -14052,26 +13819,23 @@ namespace ManagedIrbis
         {
             var result = new StringBuilder();
 
-            result.AppendFormat("Command executed: {0}", TotalCommandCount);
+            result.AppendFormat ("Command executed: {0}", TotalCommandCount);
             result.AppendLine();
-            result.AppendFormat("Running clients: {0}", ClientCount);
+            result.AppendFormat ("Running clients: {0}", ClientCount);
             result.AppendLine();
-            if (!ReferenceEquals(RunningClients, null))
+            if (!ReferenceEquals (RunningClients, null))
             {
                 foreach (ClientInfo client in RunningClients)
                 {
-                    result.AppendLine(client.ToString());
+                    result.AppendLine (client.ToString());
                 }
-
             }
 
             return result.ToString();
-
-        } // method ToString
+        }
 
         #endregion
-
-    } // class ServerStat
+    }
 
     /// <summary>
     /// Информация о версии сервера ИРБИС64.
@@ -14130,14 +13894,14 @@ namespace ManagedIrbis
             }
 
             return result;
-
-        } // method Parse
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
+
         // ReSharper disable UseStringInterpolation
         public override string ToString() => string.Format
             (
@@ -14148,11 +13912,11 @@ namespace ManagedIrbis
                 ConnectedClients,
                 Organization.ToVisibleString()
             );
+
         // ReSharper restore UseStringInterpolation
 
         #endregion
-
-    } // class ServerVersion
+    }
 
     /// <summary>
     /// Синхронное подключение к серверу ИРБИС64.
@@ -14267,10 +14031,10 @@ namespace ManagedIrbis
         /// <summary>
         /// Подстановка имени текущей базы данных, если она не задана явно.
         /// </summary>
-        public string EnsureDatabase(string? database = null) =>
-            ReferenceEquals(database, null) || database.Length == 0
-                ? ReferenceEquals(Database, null) || Database.Length == 0
-                    ? throw new ArgumentException(nameof(Database))
+        public string EnsureDatabase (string? database = null) =>
+            ReferenceEquals (database, null) || database.Length == 0
+                ? ReferenceEquals (Database, null) || Database.Length == 0
+                    ? throw new ArgumentException (nameof (Database))
                     : Database
                 : database;
 
@@ -14285,8 +14049,7 @@ namespace ManagedIrbis
             }
 
             return Connected;
-
-        } // method CheckProviderState
+        }
 
         /// <summary>
         /// Отправка запроса на сервер по упрощённой схеме.
@@ -14306,17 +14069,16 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, command);
+            var query = new SyncQuery (this, command);
             foreach (var arg in args)
             {
-                query.AddAnsi(arg.ToString());
+                query.AddAnsi (arg.ToString());
             }
 
-            var result = ExecuteSync(query);
+            var result = ExecuteSync (query);
 
             return result;
-
-        } // method ExecuteSync
+        }
 
         /// <summary>
         /// Отправка запроса на сервер по упрощённой схеме.
@@ -14333,12 +14095,11 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, command);
-            var result = ExecuteSync(query);
+            var query = new SyncQuery (this, command);
+            var result = ExecuteSync (query);
 
             return result;
-
-        } // method ExecuteSync
+        }
 
         /// <summary>
         /// Отправка запроса на сервер по упрощённой схеме.
@@ -14357,14 +14118,13 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, command);
-            query.AddAnsi(arg1.ToString());
+            var query = new SyncQuery (this, command);
+            query.AddAnsi (arg1.ToString());
 
-            var result = ExecuteSync(query);
+            var result = ExecuteSync (query);
 
             return result;
-
-        } // method ExecuteSync
+        }
 
         /// <summary>
         /// Выполнение обмена с сервером.
@@ -14374,11 +14134,11 @@ namespace ManagedIrbis
                 SyncQuery query
             )
         {
-            using var client = new TcpClient(AddressFamily.InterNetwork);
+            using var client = new TcpClient (AddressFamily.InterNetwork);
             try
             {
-                var host = Host.ThrowIfNull(nameof(Host));
-                client.Connect(host, Port);
+                var host = Host.ThrowIfNull (nameof (Host));
+                client.Connect (host, Port);
             }
             catch (Exception)
             {
@@ -14390,15 +14150,15 @@ namespace ManagedIrbis
             var socket = client.Client;
             var length = query.GetLength();
             var prefix = new byte[12];
-            length = Private.Int32ToBytes(length, prefix);
+            length = Private.Int32ToBytes (length, prefix);
             prefix[length] = 10; // перевод строки
             var body = query.GetBody();
 
             try
             {
-                socket.Send(prefix, 0, length + 1, SocketFlags.None);
-                socket.Send(body, SocketFlags.None);
-                socket.Shutdown(SocketShutdown.Send);
+                socket.Send (prefix, 0, length + 1, SocketFlags.None);
+                socket.Send (body, SocketFlags.None);
+                socket.Shutdown (SocketShutdown.Send);
             }
             catch (Exception)
             {
@@ -14413,14 +14173,14 @@ namespace ManagedIrbis
                 while (true)
                 {
                     var buffer = new byte[2048];
-                    var read = socket.Receive(buffer, SocketFlags.None);
+                    var read = socket.Receive (buffer, SocketFlags.None);
                     if (read <= 0)
                     {
                         break;
                     }
 
-                    var chunk = new ArraySegment<byte>(buffer, 0, read);
-                    result.Add(chunk);
+                    var chunk = new ArraySegment<byte> (buffer, 0, read);
+                    result.Add (chunk);
                 }
             }
             catch (Exception)
@@ -14431,8 +14191,7 @@ namespace ManagedIrbis
             }
 
             return result;
-
-        } // method TransactSync
+        }
 
         #endregion
 
@@ -14452,12 +14211,11 @@ namespace ManagedIrbis
             Response? result;
             try
             {
-
-                result = TransactSync(query);
+                result = TransactSync (query);
             }
             catch (Exception exception)
             {
-                Debug.WriteLine(exception.Message);
+                Debug.WriteLine (exception.Message);
                 return null;
             }
 
@@ -14467,11 +14225,10 @@ namespace ManagedIrbis
             }
 
             result.Parse();
-            Interlocked.Increment(ref _queryId);
+            Interlocked.Increment (ref _queryId);
 
             return result;
-
-        } // method ExecuteSync
+        }
 
         /// <summary>
         /// Получение статистики по базе данных.
@@ -14486,22 +14243,21 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, Constants.DatabaseStat);
-            definition.Encode(this, query);
+            var query = new SyncQuery (this, Constants.DatabaseStat);
+            definition.Encode (this, query);
 
-            var response = ExecuteSync(query);
+            var response = ExecuteSync (query);
             if (!response.IsGood())
             {
                 return null;
             }
 
             var result = "{\\rtf1 "
-                + response!.ReadRemainingUtfText()
-                + "}";
+                         + response!.ReadRemainingUtfText()
+                         + "}";
 
             return result;
-
-        } // method GetDatabaseStat
+        }
 
         /// <summary>
         /// Переподключение к серверу.
@@ -14517,14 +14273,13 @@ namespace ManagedIrbis
             IniFile = null;
 
             return Connect();
-
-        } // method Reconnect
+        }
 
         /// <summary>
         /// Разблокирование указанной записи (альтернативный вариант).
         /// </summary>
-        public bool UnlockRecordAlt(int mfn) =>
-            ExecuteSync("E", EnsureDatabase(), mfn).IsGood();
+        public bool UnlockRecordAlt (int mfn) =>
+            ExecuteSync ("E", EnsureDatabase(), mfn).IsGood();
 
         #endregion
 
@@ -14535,17 +14290,17 @@ namespace ManagedIrbis
         /// в указанной базе данных.
         /// </summary>
         public bool ActualizeDatabase (string? database = default) =>
-            ActualizeRecord ( new() { Database = database, Mfn = 0 } );
+            ActualizeRecord (new () { Database = database, Mfn = 0 });
 
         /// <summary>
         /// Актуализация записи.
         /// </summary>
         public bool ActualizeRecord (ActualizeRecordParameters parameters) => ExecuteSync
-                (
-                    Constants.ActualizeRecord,
-                    EnsureDatabase(parameters.Database),
-                    parameters.Mfn
-                ).IsGood();
+            (
+                Constants.ActualizeRecord,
+                EnsureDatabase (parameters.Database),
+                parameters.Mfn
+            ).IsGood();
 
         /// <summary>
         /// Подключение к серверу.
@@ -14560,14 +14315,14 @@ namespace ManagedIrbis
             AGAIN:
             LastError = 0;
             QueryId = 1;
-            ClientId = new Random().Next(100000, 999999);
+            ClientId = new Random().Next (100000, 999999);
 
             // нельзя использовать using response из-за goto
-            var query = new SyncQuery(this, Constants.RegisterClient);
-            query.AddAnsi(Username);
-            query.AddAnsi(Password);
+            var query = new SyncQuery (this, Constants.RegisterClient);
+            query.AddAnsi (Username);
+            query.AddAnsi (Password);
 
-            var response = ExecuteSync(query);
+            var response = ExecuteSync (query);
             if (response is null)
             {
                 LastError = -100_500;
@@ -14589,14 +14344,13 @@ namespace ManagedIrbis
             Interval = response.ReadInteger();
 
             IniFile = new IniFile();
-            var remainingText = response.RemainingText(Utility.Ansi);
-            var reader = new StringReader(remainingText);
-            IniFile.Read(reader);
+            var remainingText = response.RemainingText (Utility.Ansi);
+            var reader = new StringReader (remainingText);
+            IniFile.Read (reader);
             Connected = true;
 
             return true;
-
-        } // method Connect
+        }
 
         /// <summary>
         /// Создание базы данных.
@@ -14611,29 +14365,28 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var query = new SyncQuery(this, Constants.CreateDatabase);
-            query.AddAnsi(EnsureDatabase(parameters.Database));
-            query.AddAnsi(parameters.Description);
-            query.Add(parameters.ReaderAccess);
-            var response = ExecuteSync(query);
+            var query = new SyncQuery (this, Constants.CreateDatabase);
+            query.AddAnsi (EnsureDatabase (parameters.Database));
+            query.AddAnsi (parameters.Description);
+            query.Add (parameters.ReaderAccess);
+            var response = ExecuteSync (query);
 
             return response.IsGood();
-
-        } // method CreateDatabase
+        }
 
         /// <summary>
         /// Создание словаря в указанной базе данных.
         /// </summary>
         public bool CreateDictionary (string? databaseName = default) =>
-            ExecuteSync(Constants.CreateDictionary,
-                EnsureDatabase(databaseName)).IsGood();
+            ExecuteSync (Constants.CreateDictionary,
+                EnsureDatabase (databaseName)).IsGood();
 
         /// <summary>
         /// Удаление базы данных на сервере.
         /// </summary>
         public bool DeleteDatabase (string? databaseName = default) =>
-            ExecuteSync(Constants.DeleteDatabase,
-                EnsureDatabase(databaseName)).IsGood();
+            ExecuteSync (Constants.DeleteDatabase,
+                EnsureDatabase (databaseName)).IsGood();
 
         /// <summary>
         /// Удаление записи с указанным MFN.
@@ -14643,7 +14396,7 @@ namespace ManagedIrbis
                 int mfn
             )
         {
-            var record = ReadRecord(mfn);
+            var record = ReadRecord (mfn);
             if (record is null)
             {
                 return false;
@@ -14656,9 +14409,8 @@ namespace ManagedIrbis
 
             record.Status |= RecordStatus.LogicallyDeleted;
 
-            return WriteRecord(record, dontParse: true);
-
-        } // method DeleteRecord
+            return WriteRecord (record, dontParse: true);
+        }
 
         /// <summary>
         /// Отключение от сервера.
@@ -14669,25 +14421,24 @@ namespace ManagedIrbis
             {
                 try
                 {
-                    var _ = ExecuteSync(Constants.UnregisterClient);
+                    var _ = ExecuteSync (Constants.UnregisterClient);
                 }
                 catch (Exception)
                 {
-                    Debug.WriteLine(nameof(SyncConnection) + "::" + nameof(Disconnect) + ": error");
+                    Debug.WriteLine (nameof (SyncConnection) + "::" + nameof (Disconnect) + ": error");
                 }
 
                 Connected = false;
             }
 
             return true;
-
-        } // method Disconnect
+        }
 
         /// <summary>
         /// Файл существует?
         /// </summary>
-        public bool FileExist(FileSpecification specification) =>
-            !string.IsNullOrEmpty(ReadTextFile(specification));
+        public bool FileExist (FileSpecification specification) =>
+            !string.IsNullOrEmpty (ReadTextFile (specification));
 
         /// <summary>
         /// Форматирование указанной записи по ее MFN.
@@ -14703,12 +14454,12 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, Constants.FormatRecord);
-            query.AddAnsi(Database);
-            query.AddFormat(format);
-            query.Add(1);
-            query.Add(mfn);
-            var response = ExecuteSync(query);
+            var query = new SyncQuery (this, Constants.FormatRecord);
+            query.AddAnsi (Database);
+            query.AddFormat (format);
+            query.Add (1);
+            query.Add (mfn);
+            var response = ExecuteSync (query);
             if (!response.IsGood())
             {
                 return null;
@@ -14717,8 +14468,7 @@ namespace ManagedIrbis
             var result = response!.ReadRemainingUtfText().TrimEnd();
 
             return result;
-
-        } // method FormatRecord
+        }
 
         /// <summary>
         /// Форматирование записи.
@@ -14737,44 +14487,44 @@ namespace ManagedIrbis
 
             if (parameters.Mfns.IsNullOrEmpty())
             {
-                parameters.Result = FormatRecord(parameters.Format!, parameters.Mfn)!;
+                parameters.Result = FormatRecord (parameters.Format!, parameters.Mfn)!;
                 return true;
             }
 
-            var query = new SyncQuery(this, Constants.FormatRecord);
-            query.AddAnsi(EnsureDatabase(parameters.Database));
-            query.AddFormat(parameters.Format);
-            query.Add(parameters.Mfns!.Length);
+            var query = new SyncQuery (this, Constants.FormatRecord);
+            query.AddAnsi (EnsureDatabase (parameters.Database));
+            query.AddFormat (parameters.Format);
+            query.Add (parameters.Mfns!.Length);
             foreach (var mfn in parameters.Mfns)
             {
-                query.Add(mfn);
+                query.Add (mfn);
             }
 
-            var response = ExecuteSync(query);
+            var response = ExecuteSync (query);
             if (!response.IsGood())
             {
                 return false;
             }
 
             var lines = response!.ReadRemainingUtfLines();
-            var result = new List<string>(lines.Length);
+            var result = new List<string> (lines.Length);
             if (parameters.Mfns.Length == 1)
             {
-                result.Add(lines[0]);
+                result.Add (lines[0]);
             }
             else
             {
                 foreach (var line in lines)
                 {
-                    if (string.IsNullOrEmpty(line))
+                    if (string.IsNullOrEmpty (line))
                     {
                         continue;
                     }
 
-                    var parts = line.Split(Constants.NumberSign, 2);
+                    var parts = line.Split (Constants.NumberSign, 2);
                     if (parts.Length > 1)
                     {
-                        result.Add(parts[1]);
+                        result.Add (parts[1]);
                     }
                 }
             }
@@ -14782,8 +14532,7 @@ namespace ManagedIrbis
             parameters.Result = result.ToArray();
 
             return true;
-
-        } // method FormatRecords
+        }
 
         /// <summary>
         /// Форматирование записи в клиентском представлении.
@@ -14799,17 +14548,17 @@ namespace ManagedIrbis
                 return null;
             }
 
-            if (string.IsNullOrEmpty(format))
+            if (string.IsNullOrEmpty (format))
             {
                 return string.Empty;
             }
 
-            var query = new SyncQuery(this, Constants.FormatRecord);
-            query.AddAnsi(EnsureDatabase(string.Empty));
-            query.AddFormat(format);
-            query.Add(-2);
-            query.AddUtf(record.Encode());
-            var response = ExecuteSync(query);
+            var query = new SyncQuery (this, Constants.FormatRecord);
+            query.AddAnsi (EnsureDatabase (string.Empty));
+            query.AddFormat (format);
+            query.Add (-2);
+            query.AddUtf (record.Encode());
+            var response = ExecuteSync (query);
             if (!response.IsGood())
             {
                 return null;
@@ -14818,8 +14567,7 @@ namespace ManagedIrbis
             var result = response!.ReadRemainingUtfText().TrimEnd();
 
             return result;
-
-        } // method FormatRecord
+        }
 
         /// <summary>
         /// Форматирование записей по их MFN.
@@ -14837,11 +14585,10 @@ namespace ManagedIrbis
                 Format = format
             };
 
-            return FormatRecords(parameters)
+            return FormatRecords (parameters)
                 ? parameters.Result.AsArray()
                 : null;
-
-        } // method FormatRecords
+        }
 
         /// <summary>
         /// Полнотекстовый поиск.
@@ -14857,28 +14604,27 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, Constants.NewFulltextSearch);
-            searchParameters.Encode(this, query);
-            textParameters.Encode(this, query);
-            var response = ExecuteSync(query);
+            var query = new SyncQuery (this, Constants.NewFulltextSearch);
+            searchParameters.Encode (this, query);
+            textParameters.Encode (this, query);
+            var response = ExecuteSync (query);
             if (!response.IsGood())
             {
                 return null;
             }
 
             var result = new FullTextResult();
-            result.Decode(response!);
+            result.Decode (response!);
 
             return result;
-
-        } // method FullTextSearch
+        }
 
         /// <summary>
         /// Получение информации о базе данных.
         /// </summary>
-        public DatabaseInfo? GetDatabaseInfo(string? databaseName = default) =>
-            ExecuteSync(Constants.RecordList, EnsureDatabase(databaseName))
-                .Transform (resp => DatabaseInfo.Parse (EnsureDatabase(databaseName), resp));
+        public DatabaseInfo? GetDatabaseInfo (string? databaseName = default) =>
+            ExecuteSync (Constants.RecordList, EnsureDatabase (databaseName))
+                .Transform (resp => DatabaseInfo.Parse (EnsureDatabase (databaseName), resp));
 
         /// <summary>
         /// Получение максимального MFN для указанной базы данных.
@@ -14888,23 +14634,22 @@ namespace ManagedIrbis
                 string? databaseName = default
             )
         {
-            var response = ExecuteSync(Constants.GetMaxMfn, EnsureDatabase(databaseName));
+            var response = ExecuteSync (Constants.GetMaxMfn, EnsureDatabase (databaseName));
 
             return response.IsGood() ? response!.ReturnCode : 0;
-
-        } // method GetMaxMfn
+        }
 
         /// <summary>
         /// Получение статистики работы сервера ИРБИС64.
         /// </summary>
         public ServerStat? GetServerStat() =>
-            ExecuteSync(Constants.GetServerStat).Transform(ServerStat.Parse);
+            ExecuteSync (Constants.GetServerStat).Transform (ServerStat.Parse);
 
         /// <summary>
         /// Получение информации о версии сервера.
         /// </summary>
         public ServerVersion? GetServerVersion() =>
-            ExecuteSync(Constants.ServerInfo).Transform(ManagedIrbis.ServerVersion.Parse);
+            ExecuteSync (Constants.ServerInfo).Transform (ManagedIrbis.ServerVersion.Parse);
 
         /// <summary>
         /// Глобальная корректировка.
@@ -14919,23 +14664,22 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var database = EnsureDatabase(settings.Database);
-            var query = new SyncQuery(this, Constants.GlobalCorrection);
-            query.AddAnsi(database);
-            settings.Encode(query);
+            var database = EnsureDatabase (settings.Database);
+            var query = new SyncQuery (this, Constants.GlobalCorrection);
+            query.AddAnsi (database);
+            settings.Encode (query);
 
-            var response = ExecuteSync(query);
+            var response = ExecuteSync (query);
             if (!response.IsGood())
             {
                 return null;
             }
 
             var result = new GblResult();
-            result.Parse(response!);
+            result.Parse (response!);
 
             return result;
-
-        } // method GlobalCorrection
+        }
 
         /// <summary>
         /// Получение списка баз данных.
@@ -14950,11 +14694,10 @@ namespace ManagedIrbis
                 Path = IrbisPath.Data,
                 FileName = listFile
             };
-            var menu = RequireMenuFile(specification);
+            var menu = RequireMenuFile (specification);
 
-            return DatabaseInfo.ParseMenu(menu);
-
-        } // method ListDatabases
+            return DatabaseInfo.ParseMenu (menu);
+        }
 
         /// <summary>
         /// Получение списка файлов из ответа сервера.
@@ -14971,19 +14714,19 @@ namespace ManagedIrbis
 
             var lines = response.ReadRemainingAnsiLines();
             var result = new List<string>();
-            var delimiters = new [] { Constants.WindowsDelimiter };
+            var delimiters = new[] { Constants.WindowsDelimiter };
             foreach (var line in lines)
             {
-                var files = Private.SplitIrbisToLines(line);
+                var files = Private.SplitIrbisToLines (line);
                 foreach (var file1 in files)
                 {
-                    if (!string.IsNullOrEmpty(file1))
+                    if (!string.IsNullOrEmpty (file1))
                     {
-                        foreach (var file2 in file1.Split(delimiters, StringSplitOptions.None))
+                        foreach (var file2 in file1.Split (delimiters, StringSplitOptions.None))
                         {
-                            if (!string.IsNullOrEmpty(file2))
+                            if (!string.IsNullOrEmpty (file2))
                             {
-                                result.Add(file2);
+                                result.Add (file2);
                             }
                         }
                     }
@@ -14991,8 +14734,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-
-        } // method ListFiles
+        }
 
         /// <summary>
         /// Получение списка файлов.
@@ -15012,17 +14754,16 @@ namespace ManagedIrbis
                 return Array.Empty<string>();
             }
 
-            var query = new SyncQuery(this, Constants.ListFiles);
+            var query = new SyncQuery (this, Constants.ListFiles);
             foreach (var specification in specifications)
             {
-                query.AddAnsi(specification.ToString());
+                query.AddAnsi (specification.ToString());
             }
 
-            var response = ExecuteSync(query);
+            var response = ExecuteSync (query);
 
-            return ListFiles(response);
-
-        } // method ListFiles
+            return ListFiles (response);
+        }
 
         /// <summary>
         /// Получение списка файлов, соответствующих спецификации.
@@ -15037,28 +14778,27 @@ namespace ManagedIrbis
                 return null;
             }
 
-            if (string.IsNullOrEmpty(specification))
+            if (string.IsNullOrEmpty (specification))
             {
                 return Array.Empty<string>();
             }
 
-            var response = ExecuteSync(Constants.ListFiles, specification);
+            var response = ExecuteSync (Constants.ListFiles, specification);
 
-            return ListFiles(response);
-
-        } // method ListFiles
+            return ListFiles (response);
+        }
 
         /// <summary>
         /// Список серверных процессов.
         /// </summary>
         public ProcessInfo[]? ListProcesses() =>
-            ExecuteSync(Constants.GetProcessList).Transform(ProcessInfo.Parse);
+            ExecuteSync (Constants.GetProcessList).Transform (ProcessInfo.Parse);
 
         /// <summary>
         /// Список пользователей, зарегистрированных в системе.
         /// </summary>
         public UserInfo[]? ListUsers() =>
-            ExecuteSync(Constants.GetUserList).Transform(UserInfo.Parse);
+            ExecuteSync (Constants.GetUserList).Transform (UserInfo.Parse);
 
         /// <summary>
         /// Блокирование указанной записи.
@@ -15075,28 +14815,26 @@ namespace ManagedIrbis
             };
 
             return ReadRecord (parameters) is not null;
-
-        } // method LockRecord
+        }
 
         /// <summary>
         /// Пустая операция - подтверждение регистрации.
         /// </summary>
-        public bool NoOperation() => ExecuteSync(Constants.Nop).IsGood();
+        public bool NoOperation() => ExecuteSync (Constants.Nop).IsGood();
 
         /// <summary>
         /// Построение таблицы.
         /// </summary>
         public string? PrintTable (TableDefinition definition)
         {
-            var query = new SyncQuery(this, Constants.Print);
-            query.AddAnsi(EnsureDatabase(definition.DatabaseName));
-            definition.Encode(query);
+            var query = new SyncQuery (this, Constants.Print);
+            query.AddAnsi (EnsureDatabase (definition.DatabaseName));
+            definition.Encode (query);
 
-            var response = ExecuteSync(query);
+            var response = ExecuteSync (query);
 
             return response?.ReadRemainingUtfText();
-
-        } // method PrintTable
+        }
 
         /// <summary>
         /// Чтение двоичного файла с сервера.
@@ -15107,34 +14845,32 @@ namespace ManagedIrbis
             )
         {
             specification.BinaryFile = true;
-            var response = ExecuteSync(Constants.ReadDocument, specification.ToString());
+            var response = ExecuteSync (Constants.ReadDocument, specification.ToString());
             if (response is null || !response.FindPreamble())
             {
                 return null;
             }
 
             return response.RemainingBytes();
-
-        } // method ReadBinaryFile
+        }
 
         /// <summary>
         /// Чтение INI-файла как текстового.
         /// </summary>
         public IniFile? ReadIniFile (FileSpecification specification)
         {
-            var content = ReadTextFile(specification);
+            var content = ReadTextFile (specification);
             if (content is null)
             {
                 return default;
             }
 
-            using var reader = new StringReader(content);
+            using var reader = new StringReader (content);
             var result = new IniFile { FileName = specification.FileName };
-            result.Read(reader);
+            result.Read (reader);
 
             return result;
-
-        } // method ReadIniFile
+        }
 
         /// <summary>
         /// Чтение меню как текстового файла.
@@ -15144,19 +14880,18 @@ namespace ManagedIrbis
                 FileSpecification specification
             )
         {
-            var content = ReadTextFile(specification);
+            var content = ReadTextFile (specification);
             if (content is null)
             {
                 return default;
             }
 
-            using var reader = new StringReader(content);
-            var result = MenuFile.ParseStream(reader);
+            using var reader = new StringReader (content);
+            var result = MenuFile.ParseStream (reader);
             result.FileName = specification.FileName;
 
             return result;
-
-        } // method ReadMenuFile
+        }
 
         /// <summary>
         /// Чтение постингов термина.
@@ -15166,18 +14901,17 @@ namespace ManagedIrbis
                 PostingParameters parameters
             )
         {
-            var query = new SyncQuery(this, Constants.ReadPostings);
-            parameters.Encode(this, query);
+            var query = new SyncQuery (this, Constants.ReadPostings);
+            parameters.Encode (this, query);
 
-            var response = ExecuteSync(query);
-            if (!response.IsGood(Constants.GoodCodesForReadTerms))
+            var response = ExecuteSync (query);
+            if (!response.IsGood (Constants.GoodCodesForReadTerms))
             {
                 return null;
             }
 
-            return TermPosting.Parse(response!);
-
-        } // method ReadPosting
+            return TermPosting.Parse (response!);
+        }
 
         /// <summary>
         /// Чтение библиографической записи.
@@ -15191,23 +14925,23 @@ namespace ManagedIrbis
 
             try
             {
-                var database = EnsureDatabase(parameters.Database);
-                var query = new SyncQuery(this, Constants.ReadRecord);
-                query.AddAnsi(database);
-                query.Add(parameters.Mfn);
+                var database = EnsureDatabase (parameters.Database);
+                var query = new SyncQuery (this, Constants.ReadRecord);
+                query.AddAnsi (database);
+                query.Add (parameters.Mfn);
                 if (parameters.Version != 0)
                 {
-                    query.Add(parameters.Version);
+                    query.Add (parameters.Version);
                 }
                 else
                 {
-                    query.Add(parameters.Lock);
+                    query.Add (parameters.Lock);
                 }
 
-                query.AddFormat(parameters.Format);
+                query.AddFormat (parameters.Format);
 
-                var response = ExecuteSync(query);
-                if (!response.IsGood(Constants.GoodCodesForReadRecord))
+                var response = ExecuteSync (query);
+                if (!response.IsGood (Constants.GoodCodesForReadRecord))
                 {
                     return null;
                 }
@@ -15217,7 +14951,7 @@ namespace ManagedIrbis
                     Database = Database
                 };
 
-                switch ((ReturnCode) response!.ReturnCode)
+                switch ((ReturnCode)response!.ReturnCode)
                 {
                     case ReturnCode.PreviousVersionNotExist:
                         result.Status |= RecordStatus.Absent;
@@ -15229,27 +14963,26 @@ namespace ManagedIrbis
                         break;
 
                     default:
-                        result.Decode(response);
+                        result.Decode (response);
                         break;
                 }
 
                 if (parameters.Version != 0)
                 {
-                    UnlockRecords(new [] { parameters.Mfn });
+                    UnlockRecords (new[] { parameters.Mfn });
                 }
             }
             catch (Exception exception)
             {
                 throw new IrbisException
-                (
-                    nameof(ReadRecord) + " " + parameters,
-                    exception
-                );
+                    (
+                        nameof (ReadRecord) + " " + parameters,
+                        exception
+                    );
             }
 
             return result;
-
-        } // method ReadRecord
+        }
 
         /// <summary>
         /// Чтение библиографической записи.
@@ -15265,9 +14998,8 @@ namespace ManagedIrbis
                 Mfn = mfn
             };
 
-            return ReadRecord(parameters);
-
-        } // method ReadRecord
+            return ReadRecord (parameters);
+        }
 
         /// <summary>
         /// Чтение постингов, относящихся к указанной записи.
@@ -15278,19 +15010,18 @@ namespace ManagedIrbis
                 string prefix
             )
         {
-            if (!CheckProviderState() || string.IsNullOrEmpty(prefix))
+            if (!CheckProviderState() || string.IsNullOrEmpty (prefix))
             {
                 return null;
             }
 
-            var query = new SyncQuery(this, Constants.GetRecordPostings);
-            query.AddAnsi(EnsureDatabase(parameters.Database));
-            query.Add(parameters.Mfn);
-            query.AddUtf(prefix);
+            var query = new SyncQuery (this, Constants.GetRecordPostings);
+            query.AddAnsi (EnsureDatabase (parameters.Database));
+            query.Add (parameters.Mfn);
+            query.AddUtf (prefix);
 
-            return ExecuteSync(query).Transform(TermPosting.Parse);
-
-        } // method ReadRecordPostings
+            return ExecuteSync (query).Transform (TermPosting.Parse);
+        }
 
         /// <summary>
         /// Чтение терминов поискового словаря.
@@ -15308,13 +15039,12 @@ namespace ManagedIrbis
             var command = parameters.ReverseOrder
                 ? Constants.ReadTermsReverse
                 : Constants.ReadTerms;
-            var query = new SyncQuery(this, command);
-            parameters.Encode(this, query);
-            var response = ExecuteSync(query);
+            var query = new SyncQuery (this, command);
+            parameters.Encode (this, query);
+            var response = ExecuteSync (query);
 
-            return !response.IsGood(Constants.GoodCodesForReadTerms) ? null : Term.Parse(response!);
-
-        } // method ReadTerms
+            return !response.IsGood (Constants.GoodCodesForReadTerms) ? null : Term.Parse (response!);
+        }
 
         /// <summary>
         /// Чтение терминов словаря.
@@ -15335,86 +15065,88 @@ namespace ManagedIrbis
                 NumberOfTerms = numberOfTerms
             };
 
-            return ReadTerms(parameters);
-
-        } // method ReadTerms
+            return ReadTerms (parameters);
+        }
 
         /// <summary>
         /// Чтение текстового файла с сервера.
         /// </summary>
         public string? ReadTextFile (FileSpecification specification) =>
-            ExecuteSync(Constants.ReadDocument, specification.ToString())
-                .TransformNoCheck (resp => Private.IrbisToWindows(resp.ReadAnsi()));
+            ExecuteSync (Constants.ReadDocument, specification.ToString())
+                .TransformNoCheck (resp => Private.IrbisToWindows (resp.ReadAnsi()));
 
         /// <summary>
         /// Чтение несколькних текстовых файлов с сервера.
         /// </summary>
         public string[]? ReadTextFiles (FileSpecification[] specifications)
         {
-            var query = new SyncQuery(this, Constants.ReadDocument);
+            var query = new SyncQuery (this, Constants.ReadDocument);
             foreach (var specification in specifications)
             {
-                query.AddAnsi(specification.ToString());
+                query.AddAnsi (specification.ToString());
             }
 
-            var response = ExecuteSync(query);
+            var response = ExecuteSync (query);
 
             return response.IsGood() ? response!.ReadRemainingAnsiLines() : null;
-
-        } // method ReadTextFiles
+        }
 
         /// <summary>
         /// Перезагрузка словаря для указанной базы данных.
         /// </summary>
         public bool ReloadDictionary (string? databaseName = default) =>
-            ExecuteSync(Constants.ReloadDictionary, EnsureDatabase(databaseName)).IsGood();
+            ExecuteSync (Constants.ReloadDictionary, EnsureDatabase (databaseName)).IsGood();
 
         /// <summary>
         /// Перезагрузка файла документов в указанной базе данных.
         /// </summary>
         public bool ReloadMasterFile (string? databaseName = default) =>
-            ExecuteSync(Constants.ReloadMasterFile,
-                databaseName ?? Database.ThrowIfNull(nameof(Database))).IsGood();
+            ExecuteSync (Constants.ReloadMasterFile,
+                databaseName ?? Database.ThrowIfNull (nameof (Database))).IsGood();
 
         /// <summary>
         /// Чтение с сервера записи, которая обязательно должна быть.
         /// </summary>
         /// <exception cref="IrbisException">Запись отсутствует или другая ошибка при чтении.</exception>
-        public Record RequireRecord (int mfn) => ReadRecord(mfn)
-            ?? throw new IrbisException($"Record not found: MFN={mfn}");
+        public Record RequireRecord (int mfn) => ReadRecord (mfn)
+                                                 ?? throw new IrbisException ($"Record not found: MFN={mfn}");
 
         /// <summary>
         /// Чтение с сервера записи, которая обязательно должна быть.
         /// </summary>
         /// <exception cref="IrbisException">Запись отсутствует или другая ошибка при чтении.</exception>
-        public Record RequireRecord (string expression) => SearchReadOneRecord(expression)
-            ?? throw new IrbisException($"Record not found: expression={expression}");
+        public Record RequireRecord (string expression) => SearchReadOneRecord (expression)
+                                                           ?? throw new IrbisException (
+                                                               $"Record not found: expression={expression}");
 
         /// <summary>
         /// Чтение с сервера текстового файла, который обязательно должен быть.
         /// </summary>
         /// <exception cref="FileNotFoundException">Файл отсутствует или другая ошибка при чтении.</exception>
-        public string RequireTextFile (FileSpecification specification) => ReadTextFile(specification)
-            ?? throw new IrbisException($"File not found: {specification}");
+        public string RequireTextFile (FileSpecification specification) => ReadTextFile (specification)
+                                                                           ?? throw new IrbisException (
+                                                                               $"File not found: {specification}");
 
         /// <summary>
         /// Чтение с сервера INI-файла, который обязательно должен быть.
         /// </summary>
         /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
-        public IniFile RequireIniFile (FileSpecification specification) => ReadIniFile(specification)
-            ?? throw new IrbisException($"INI not found: {specification}");
+        public IniFile RequireIniFile (FileSpecification specification) => ReadIniFile (specification)
+                                                                           ?? throw new IrbisException (
+                                                                               $"INI not found: {specification}");
 
         /// <summary>
         /// Чтение с сервера файла меню, которое обязательно должно быть.
         /// </summary>
         /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
-        public MenuFile RequireMenuFile (FileSpecification specification) => ReadMenuFile(specification)
-            ?? throw new IrbisException($"Menu not found: {specification}");
+        public MenuFile RequireMenuFile (FileSpecification specification) => ReadMenuFile (specification)
+                                                                             ?? throw new IrbisException (
+                                                                                 $"Menu not found: {specification}");
 
         /// <summary>
         /// Перезапуск сервера.
         /// </summary>
-        public bool RestartServer() => ExecuteSync(Constants.RestartServer).IsGood();
+        public bool RestartServer() => ExecuteSync (Constants.RestartServer).IsGood();
 
         /// <summary>
         /// Поиск записей.
@@ -15426,12 +15158,11 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, Constants.Search);
-            parameters.Encode(this, query);
+            var query = new SyncQuery (this, Constants.Search);
+            parameters.Encode (this, query);
 
-            return ExecuteSync(query).Transform(FoundItem.Parse);
-
-        } // method Search
+            return ExecuteSync (query).Transform (FoundItem.Parse);
+        }
 
         /// <summary>
         /// Упрощенный поиск.
@@ -15445,22 +15176,21 @@ namespace ManagedIrbis
                 return Array.Empty<int>();
             }
 
-            var query = new SyncQuery(this, Constants.Search);
+            var query = new SyncQuery (this, Constants.Search);
             var parameters = new SearchParameters
             {
                 Database = Database,
                 Expression = expression
             };
-            parameters.Encode(this, query);
-            var response = ExecuteSync(query);
+            parameters.Encode (this, query);
+            var response = ExecuteSync (query);
             if (!response.IsGood())
             {
                 return Array.Empty<int>();
             }
 
-            return FoundItem.ParseMfn(response!);
-
-        } // method Search
+            return FoundItem.ParseMfn (response!);
+        }
 
         /// <summary>
         /// Определение количества записей, удовлетворяющих
@@ -15475,15 +15205,15 @@ namespace ManagedIrbis
                 return -1;
             }
 
-            var query = new SyncQuery(this, Constants.Search);
+            var query = new SyncQuery (this, Constants.Search);
             var parameters = new SearchParameters
             {
                 Database = Database,
                 Expression = expression,
                 FirstRecord = 0
             };
-            parameters.Encode(this, query);
-            var response = ExecuteSync(query);
+            parameters.Encode (this, query);
+            var response = ExecuteSync (query);
             if (response is null
                 || !response.CheckReturnCode())
             {
@@ -15491,8 +15221,7 @@ namespace ManagedIrbis
             }
 
             return response.ReadInteger();
-
-        } // method SearchCount
+        }
 
         /// <summary>
         /// Поиск с последующим чтением записей.
@@ -15504,20 +15233,19 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var found = Search(expression);
-            var result = new List<Record>(found.Length);
+            var found = Search (expression);
+            var result = new List<Record> (found.Length);
             foreach (var mfn in found)
             {
-                var record = ReadRecord(mfn);
+                var record = ReadRecord (mfn);
                 if (record is not null)
                 {
-                    result.Add(record);
+                    result.Add (record);
                 }
             }
 
             return result.ToArray();
-
-        } // method SearchRead
+        }
 
         /// <summary>
         /// Поиск с последующим чтением одной записи.
@@ -15532,25 +15260,24 @@ namespace ManagedIrbis
                 Expression = expression,
                 NumberOfRecords = 1
             };
-            var found = Search(parameters);
+            var found = Search (parameters);
 
             return found is { Length: 1 }
-                ? ReadRecord(found[0].Mfn)
+                ? ReadRecord (found[0].Mfn)
                 : default;
-
-        } // method SearchReadOneRecord
+        }
 
         /// <summary>
         /// Очистка базы данных (до нулевой длины).
         /// </summary>
         public bool TruncateDatabase (string? databaseName = default) =>
-            ExecuteSync(Constants.EmptyDatabase, EnsureDatabase(databaseName)).IsGood();
+            ExecuteSync (Constants.EmptyDatabase, EnsureDatabase (databaseName)).IsGood();
 
         /// <summary>
         /// Разблокирование базы данных.
         /// </summary>
         public bool UnlockDatabase (string? databaseName = default) =>
-            ExecuteSync(Constants.UnlockDatabase, EnsureDatabase(databaseName)).IsGood();
+            ExecuteSync (Constants.UnlockDatabase, EnsureDatabase (databaseName)).IsGood();
 
         /// <summary>
         /// Разблокирование записей.
@@ -15561,12 +15288,12 @@ namespace ManagedIrbis
                 string? databaseName = default
             )
         {
-            var query = new SyncQuery(this, Constants.UnlockRecords);
-            query.AddAnsi(EnsureDatabase(databaseName));
+            var query = new SyncQuery (this, Constants.UnlockRecords);
+            query.AddAnsi (EnsureDatabase (databaseName));
             var counter = 0;
             foreach (var mfn in mfnList)
             {
-                query.Add(mfn);
+                query.Add (mfn);
                 ++counter;
             }
 
@@ -15576,22 +15303,21 @@ namespace ManagedIrbis
                 return true;
             }
 
-            return ExecuteSync(query).IsGood();
-
-        } // method UnlockRecords
+            return ExecuteSync (query).IsGood();
+        }
 
         /// <summary>
         /// Обновление сервеного INI-файла.
         /// </summary>
         public bool UpdateIniFile (IEnumerable<string> lines)
         {
-            var query = new SyncQuery(this, Constants.UpdateIniFile);
+            var query = new SyncQuery (this, Constants.UpdateIniFile);
             var counter = 0;
             foreach (var line in lines)
             {
-                if (!string.IsNullOrWhiteSpace(line))
+                if (!string.IsNullOrWhiteSpace (line))
                 {
-                    query.AddAnsi(line);
+                    query.AddAnsi (line);
                     ++counter;
                 }
             }
@@ -15602,9 +15328,8 @@ namespace ManagedIrbis
                 return true;
             }
 
-            return ExecuteSync(query).IsGood();
-
-        } // method UpdateIniFile
+            return ExecuteSync (query).IsGood();
+        }
 
         /// <summary>
         /// Обновление списка зарегистрированных в системе пользователей.
@@ -15616,11 +15341,11 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var query = new SyncQuery(this, Constants.SetUserList);
+            var query = new SyncQuery (this, Constants.SetUserList);
             var counter = 0;
             foreach (var user in users)
             {
-                query.AddAnsi(user.Encode());
+                query.AddAnsi (user.Encode());
                 ++counter;
             }
 
@@ -15630,9 +15355,8 @@ namespace ManagedIrbis
                 return false;
             }
 
-            return ExecuteSync(query).IsGood();
-
-        } // method UpdateUserList
+            return ExecuteSync (query).IsGood();
+        }
 
         /// <summary>
         /// Сохранение записи на сервере.
@@ -15645,14 +15369,14 @@ namespace ManagedIrbis
             var record = parameters.Record;
             if (record is not null)
             {
-                var database = EnsureDatabase(record.Database);
-                var query = new SyncQuery(this, Constants.UpdateRecord);
-                query.AddAnsi(database);
-                query.Add(parameters.Lock);
-                query.Add(parameters.Actualize);
-                query.AddUtf(record.Encode());
+                var database = EnsureDatabase (record.Database);
+                var query = new SyncQuery (this, Constants.UpdateRecord);
+                query.AddAnsi (database);
+                query.Add (parameters.Lock);
+                query.Add (parameters.Actualize);
+                query.AddUtf (record.Encode());
 
-                var response = ExecuteSync(query);
+                var response = ExecuteSync (query);
                 if (!response.IsGood())
                 {
                     return false;
@@ -15662,16 +15386,15 @@ namespace ManagedIrbis
                 if (!parameters.DontParse)
                 {
                     record.Database ??= database;
-                    record.Decode(response);
+                    record.Decode (response);
                 }
 
                 parameters.MaxMfn = result;
 
                 return true;
-
             }
 
-            var records = parameters.Records.ThrowIfNull(nameof(parameters.Records));
+            var records = parameters.Records.ThrowIfNull (nameof (parameters.Records));
             if (records.Length == 0)
             {
                 return true;
@@ -15681,7 +15404,7 @@ namespace ManagedIrbis
             {
                 parameters.Record = records[0];
                 parameters.Records = null;
-                var result2 = WriteRecord(parameters);
+                var result2 = WriteRecord (parameters);
                 parameters.Record = null;
                 parameters.Records = records;
 
@@ -15695,8 +15418,7 @@ namespace ManagedIrbis
                     parameters.Actualize,
                     parameters.DontParse
                 );
-
-        } // method WriteRecord
+        }
 
         /// <summary>
         /// Сохранение/обновление записи в базе данных.
@@ -15717,9 +15439,8 @@ namespace ManagedIrbis
                 DontParse = dontParse
             };
 
-            return WriteRecord(parameters);
-
-        } // method WriteRecord
+            return WriteRecord (parameters);
+        }
 
         /// <summary>
         /// Сохранение записей на сервере.
@@ -15737,17 +15458,17 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var query = new SyncQuery(this, Constants.SaveRecordGroup);
-            query.Add(lockFlag);
-            query.Add(actualize);
+            var query = new SyncQuery (this, Constants.SaveRecordGroup);
+            query.Add (lockFlag);
+            query.Add (actualize);
             var recordList = new List<Record>();
             foreach (var record in records)
             {
-                var line = EnsureDatabase(record.Database)
+                var line = EnsureDatabase (record.Database)
                            + Constants.IrbisDelimiter
-                           + Private.EncodeRecord(record);
-                query.AddUtf(line);
-                recordList.Add(record);
+                           + Private.EncodeRecord (record);
+                query.AddUtf (line);
+                recordList.Add (record);
             }
 
             if (recordList.Count == 0)
@@ -15755,7 +15476,7 @@ namespace ManagedIrbis
                 return true;
             }
 
-            var response = ExecuteSync(query);
+            var response = ExecuteSync (query);
             if (!response.IsGood())
             {
                 return false;
@@ -15765,19 +15486,18 @@ namespace ManagedIrbis
             {
                 foreach (var record in recordList)
                 {
-                    Private.ParseResponseForWriteRecords(response!, record);
+                    Private.ParseResponseForWriteRecords (response!, record);
                 }
             }
 
             return true;
-
-        } // method WriteRecords
+        }
 
         /// <summary>
         /// Сохранение на сервере текстового файла.
         /// </summary>
-        public bool WriteTextFile(FileSpecification specification) =>
-            ExecuteSync(Constants.ReadDocument, specification.ToString()).IsGood();
+        public bool WriteTextFile (FileSpecification specification) =>
+            ExecuteSync (Constants.ReadDocument, specification.ToString()).IsGood();
 
         #endregion
 
@@ -15787,11 +15507,8 @@ namespace ManagedIrbis
         public void Dispose()
         {
             Disconnect();
-
-        } // method Dispose
+        }
 
         #endregion
-
-    } // class SyncConnection
-
-} // namespace ManagedIrbis
+    }
+}
