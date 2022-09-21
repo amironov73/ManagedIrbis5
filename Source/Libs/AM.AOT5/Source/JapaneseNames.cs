@@ -26,12 +26,14 @@ public static class JapaneseNames
     /// <summary>
     /// Японские женские имена.
     /// </summary>
-    public static string[] GetFemalePersonalNames() => System.Array.Empty<string>();
+    public static string[] GetFemalePersonalNames() =>
+        System.Array.Empty<string>();
 
     /// <summary>
     /// Японские мужские имена.
     /// </summary>
-    public static string[] GetMalePersonalNames() => System.Array.Empty<string>();
+    public static string[] GetMalePersonalNames() =>
+        System.Array.Empty<string>();
 
     /// <summary>
     /// Список японских фамилий.
@@ -60,9 +62,7 @@ public static class JapaneseNames
         "Хаттори", "Хаяси", "Хирано", "Хонда", "Хосино", "Цубаки",
         "Эномото", "Юи", "Ямада", "Ямаки", "Яманака", "Ямасаки",
         "Ямамото", "Ямамура", "Ямасита", "Ямаути", "Яно", "Ясуда"
-    }; // method GetSurnames
+    };
 
     #endregion
-} // class JapaneseNames
-
-// namespace AM.AOT
+}

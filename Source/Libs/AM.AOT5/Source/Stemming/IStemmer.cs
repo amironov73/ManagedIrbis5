@@ -25,6 +25,4 @@ public interface IStemmer
     /// Извлечение корня из указанного слова.
     /// </summary>
     string Stem (string word);
-} // interface IStemmer
-
-// namespace AM.AOT.Stemming
+}

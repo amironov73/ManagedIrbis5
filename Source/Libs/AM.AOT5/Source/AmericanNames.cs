@@ -465,7 +465,7 @@ public static class AmericanNames
         "Yvonne", "Zada", "Zaida", "Zana", "Zandra", "Zelda", "Zella", "Zelma", "Zena", "Zenaida", "Zenia",
         "Zenobia", "Zetta", "Zina", "Zita", "Zoe", "Zofia", "Zoila", "Zola", "Zona", "Zonia", "Zora", "Zoraida",
         "Zula", "Zulema", "Zulma"
-    }; // GetFemalePersonalNames
+    };
 
     /// <summary>
     /// Американские мужские имена.
@@ -595,7 +595,7 @@ public static class AmericanNames
         "Willie", "Willis", "Willy", "Wilmer", "Wilson", "Wilton", "Winford", "Winfred", "Winston", "Wm",
         "Woodrow", "Wyatt", "Xavier", "Yong", "Young", "Zachariah", "Zachary", "Zachery", "Zack", "Zackary",
         "Zane"
-    }; // GetMalePersonalNames
+    };
 
     /// <summary>
     /// Список американских фамилий.
@@ -777,9 +777,7 @@ public static class AmericanNames
         "Woodard", "Woods", "Woodward", "Wooten", "Workman", "Wright",
         "Wyatt", "Wynn", "Yang", "Yates", "York", "Young", "Zamora",
         "Zimmerman"
-    }; // method GetSurnames
+    };
 
     #endregion
-} // class AmericanNames
-
-// namespace AM.AOT
+}

@@ -27,98 +27,92 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace AM.Web
+namespace AM.Web;
+
+/// <summary>
+/// Ограничивает доступ к веб-приложению,
+/// организует белый список разрешенных адресов.
+/// </summary>
+public sealed class SecureAccessMiddleware
 {
+    #region Construction
+
     /// <summary>
-    /// Ограничивает доступ к веб-приложению,
-    /// организует белый список разрешенных адресов.
+    /// Конструктор.
     /// </summary>
-    public sealed class SecureAccessMiddleware
+    /// <param name="next">Следующий обработчик.</param>
+    /// <param name="logger">Логгер.</param>
+    /// <param name="safeList">Список разрешенных адресов,
+    /// разделенных точкой с запятой.</param>
+    public SecureAccessMiddleware
+        (
+            RequestDelegate next,
+            ILogger<SecureAccessMiddleware> logger,
+            string safeList
+        )
     {
-        
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="next">Следующий обработчик.</param>
-        /// <param name="logger">Логгер.</param>
-        /// <param name="safeList">Список разрешенных адресов,
-        /// разделенных точкой с запятой.</param>
-        public SecureAccessMiddleware
-            (
-                RequestDelegate next,
-                ILogger<SecureAccessMiddleware> logger,
-                string safeList
-            )
+        _safeAddresses = new List<byte[]>();
+        foreach (var one in safeList.Split (';'))
         {
-            _safeAddresses = new List<byte[]>();
-            foreach (var one in safeList.Split(';'))
-            {
-                var address = IPAddress.Parse(one);
-                _safeAddresses.Add(address.GetAddressBytes());
-            }
+            var address = IPAddress.Parse (one);
+            _safeAddresses.Add (address.GetAddressBytes());
+        }
 
-            _next = next;
-            _logger = logger;
+        _next = next;
+        _logger = logger;
+    }
 
-        } // constructor
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Private members
+    private readonly ILogger _logger;
+    private readonly RequestDelegate _next;
+    private readonly List<byte[]> _safeAddresses;
 
-        private readonly ILogger _logger;
-        private readonly RequestDelegate _next;
-        private readonly List<byte[]> _safeAddresses;
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Public methods
-
-        /// <summary>
-        /// Обработка запроса.
-        /// </summary>
-        /// <param name="context">Контекст запроса.</param>
-        public async Task Invoke
-            (
-                HttpContext context
-            )
+    /// <summary>
+    /// Обработка запроса.
+    /// </summary>
+    /// <param name="context">Контекст запроса.</param>
+    public async Task Invoke
+        (
+            HttpContext context
+        )
+    {
+        var remoteIp = context.Connection.RemoteIpAddress;
+        if (remoteIp is null)
         {
-            var remoteIp = context.Connection.RemoteIpAddress;
-            if (remoteIp is null)
+            _logger.LogWarning ("Unknown remote address");
+            context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            return;
+        }
+
+        _logger.LogInformation ("Request from remote IP address: {RemoteIp}", remoteIp);
+
+        var bytes = remoteIp.GetAddressBytes();
+        var allowed = false;
+        foreach (var one in _safeAddresses)
+        {
+            if (bytes.SequenceEqual (one))
             {
-                _logger.LogWarning("Unknown remote address");
-                context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                return;
+                allowed = true;
+                break;
             }
+        }
 
-            _logger.LogInformation("Request from remote IP address: {RemoteIp}", remoteIp);
+        if (!allowed)
+        {
+            _logger.LogWarning ("This address is not allowed");
+            context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            return;
+        }
 
-            var bytes = remoteIp.GetAddressBytes();
-            var allowed = false;
-            foreach (var one in _safeAddresses)
-            {
-                if (bytes.SequenceEqual(one))
-                {
-                    allowed = true;
-                    break;
-                }
-            }
+        await _next.Invoke (context);
+    }
 
-            if (!allowed)
-            {
-                _logger.LogWarning("This address is not allowed");
-                context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                return;
-            }
-
-            await _next.Invoke(context);
-
-        } // method Invoke
-
-        #endregion
-
-    } // class SecureAccessMiddleware
-
-} // namespace AM.Web
+    #endregion
+}

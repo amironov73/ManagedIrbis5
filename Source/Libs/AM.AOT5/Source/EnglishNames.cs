@@ -115,9 +115,7 @@ public static class EnglishNames
         "Wilkes", "Wilkins", "Wilkinson", "Williams", "Williamson",
         "Willis", "Wills", "Wilson", "Winter", "Wood", "Woods",
         "Woodward", "Wright", "Wyatt", "Yates", "Young"
-    }; // method GetSurnames
+    };
 
     #endregion
-} // class EnglishNames
-
-// namespace AM.AOT
+}

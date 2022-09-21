@@ -11,13 +11,12 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* MystemAnalysis.cs -- анализ слова
+/* MystemAnalysis.cs -- результат анализ слова программой MyStem
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Linq;
 using System.Text.Json.Serialization;
 
@@ -28,7 +27,7 @@ using System.Text.Json.Serialization;
 namespace AM.AOT.Stemming;
 
 /// <summary>
-/// Анализ слова.
+/// Результат Анализа слова программой MyStem.
 /// </summary>
 public sealed class MystemAnalysis
 {
@@ -67,7 +66,7 @@ public sealed class MystemAnalysis
     #region Private members
 
     private string[] Split => string.IsNullOrEmpty (Grammeme)
-        ? new[] { String.Empty }
+        ? new[] { string.Empty }
         : Grammeme.Split (',');
 
     #endregion
@@ -78,6 +77,4 @@ public sealed class MystemAnalysis
     public override string ToString() => $"{Lexeme}, {PartOfSpeech}";
 
     #endregion
-} // class MyStemAnalysis
-
-// namespace AM.AOT.Stemming
+}
