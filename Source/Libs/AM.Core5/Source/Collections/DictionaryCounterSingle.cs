@@ -63,7 +63,8 @@ public sealed class DictionaryCounterSingle<TKey>
     /// </summary>
     public DictionaryCounterSingle()
     {
-    } // constructor
+        // пустое тело конструктора
+    }
 
     /// <summary>
     /// Constructor.
@@ -75,6 +76,7 @@ public sealed class DictionaryCounterSingle<TKey>
         )
         : base (comparer)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -88,6 +90,7 @@ public sealed class DictionaryCounterSingle<TKey>
         )
         : base (capacity)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -101,6 +104,7 @@ public sealed class DictionaryCounterSingle<TKey>
         )
         : base (dictionary)
     {
+        // пустое тело конструктора
     }
 
     #endregion

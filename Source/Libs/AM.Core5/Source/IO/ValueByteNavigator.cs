@@ -80,7 +80,7 @@ public ref struct ValueByteNavigator
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public ValueByteNavigator
         (
@@ -92,7 +92,7 @@ public ref struct ValueByteNavigator
         _position = 0;
         encoding ??= Encoding.Default;
         Decoder = encoding.GetDecoder();
-    } // constructor
+    }
 
     #endregion
 

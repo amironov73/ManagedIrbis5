@@ -84,7 +84,8 @@ public class MemoryReader
     /// </summary>
     public MemoryReader()
     {
-    } // constructor
+        // пустое тело конструктора
+    }
 
     /// <summary>
     /// Конструктор.
@@ -104,7 +105,7 @@ public class MemoryReader
         }
 
         _current = _chunks.First;
-    } // constructor
+    }
 
     #endregion
 

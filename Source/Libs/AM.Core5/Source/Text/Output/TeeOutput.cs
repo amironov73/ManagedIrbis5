@@ -47,7 +47,8 @@ public sealed class TeeOutput
     /// </summary>
     public TeeOutput()
     {
-    } // constructor
+        // пустое тело конструктора
+    }
 
     /// <summary>
     /// Создание объекта с заранее установленным
@@ -59,7 +60,7 @@ public sealed class TeeOutput
         )
     {
         Output.AddRange (children);
-    } // constructor
+    }
 
     #endregion
 

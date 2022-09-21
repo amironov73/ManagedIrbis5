@@ -82,7 +82,7 @@ public sealed class CharSet
         /// <inheritdoc cref="IDisposable.Dispose" />
         public void Dispose()
         {
-            // Nothing to do here
+            // пустое тело метода
         }
 
         /// <inheritdoc cref="IEnumerator{T}.Current" />
@@ -222,7 +222,7 @@ public sealed class CharSet
 
             return result;
         }
-    } // property Count
+    }
 
     #endregion
 
@@ -234,7 +234,8 @@ public sealed class CharSet
     public CharSet()
         : this (DefaultCapacity)
     {
-    } // constructor
+        // пустое тело конструктора
+    }
 
     /// <summary>
     /// Конструктор.
@@ -247,7 +248,7 @@ public sealed class CharSet
         Sure.Positive (capacity);
 
         _data = new BitArray (capacity);
-    } // constructor
+    }
 
     /// <summary>
     /// Конструктор.
@@ -258,10 +259,10 @@ public sealed class CharSet
         )
     {
         _data = new BitArray (data);
-    } // constructor
+    }
 
     /// <summary>
-    /// Copy constructor.
+    /// Копирующий конструктор.
     /// </summary>
     public CharSet
         (
@@ -271,10 +272,10 @@ public sealed class CharSet
         Sure.NotNull (other);
 
         _data = new BitArray (other._data);
-    } // constructor
+    }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public CharSet
         (
@@ -282,7 +283,7 @@ public sealed class CharSet
         )
         : this()
     {
-        Sure.NotNull ((object?)characters);
+        Sure.NotNull ((object?) characters);
 
         foreach (var c in characters)
         {
@@ -291,7 +292,7 @@ public sealed class CharSet
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public CharSet
         (
@@ -303,7 +304,7 @@ public sealed class CharSet
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public CharSet
         (
@@ -322,7 +323,7 @@ public sealed class CharSet
 
     private readonly BitArray _data;
 
-    private void _Add (char[] characters, bool val)
+    private void _Add (IEnumerable<char> characters, bool val)
     {
         foreach (var one in characters)
         {
@@ -390,7 +391,7 @@ public sealed class CharSet
     #region Public methods
 
     /// <summary>
-    /// Add a character.
+    /// Добавление символа в набор.
     /// </summary>
     public CharSet Add
         (
@@ -403,7 +404,7 @@ public sealed class CharSet
     }
 
     /// <summary>
-    /// Add some characters.
+    /// Добавление нескольких симврлов в набор.
     /// </summary>
     public CharSet Add
         (
@@ -791,7 +792,7 @@ public sealed class CharSet
 
         Clear();
         Add (reader.ReadString());
-    } // method RwstoreFromStream
+    }
 
     /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
     public void SaveToStream
@@ -802,7 +803,7 @@ public sealed class CharSet
         Sure.NotNull (writer);
 
         writer.Write (ToString());
-    } // method SaveToStream
+    }
 
     #endregion
 

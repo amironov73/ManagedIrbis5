@@ -55,7 +55,7 @@ public sealed class FileSignature
         /// Алиасы (без точек, нижний регистр).
         /// </summary>
         public string[] Aliases { get; init; }
-    } // class Extensions
+    }
 
     #endregion
 
@@ -72,7 +72,7 @@ public sealed class FileSignature
 
             return _knownSignatures!;
         }
-    } // property KnownSignatures
+    }
 
     /// <summary>
     /// Расширение файла (без точки, нижний регистр).
@@ -106,7 +106,7 @@ public sealed class FileSignature
         Extension = extension;
         Offset = offset;
         Magic = magic;
-    } // constructor
+    }
 
     #endregion
 
@@ -129,7 +129,7 @@ public sealed class FileSignature
         new () { Main = "ogg", Aliases = new[] { "oga", "ogv" } },
         new () { Main = "doc", Aliases = new[] { "xls", "ppt", "msg" } },
         new () { Main = "mkv", Aliases = new[] { "mka", "mks", "mk3d", "webm" } }
-    }; // array _aliases
+    };
 
     private static void _InitializeSignatures()
     {
@@ -177,7 +177,7 @@ public sealed class FileSignature
         }
 
         return extension;
-    } // method _FindAlias
+    }
 
     #endregion
 
