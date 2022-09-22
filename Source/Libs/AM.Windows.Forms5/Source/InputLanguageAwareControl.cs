@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* InputLanguageAwareControl.cs -- контрол, умеющий менять язык ввода по запросу
@@ -17,30 +18,27 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
-{
-    /// <summary>
-    /// Контрол, умеющий менять язык ввода по запросу.
-    /// </summary>
-    public class InputLanguageAwareControl
-        : Control
-    {
-        #region Control members
+namespace AM.Windows.Forms;
 
-        /// <inheritdoc cref="Control.WndProc"/>
-        protected override void WndProc
+/// <summary>
+/// Контрол, умеющий менять язык ввода по запросу.
+/// </summary>
+public class InputLanguageAwareControl
+    : Control
+{
+    #region Control members
+
+    /// <inheritdoc cref="Control.WndProc"/>
+    protected override void WndProc
         (
             ref Message message
         )
+    {
+        if (!InputLanguageUtility.HandleWmInputLanguageRequest (ref message))
         {
-            if (!InputLanguageUtility.HandleWmInputLanguageRequest(ref message))
-            {
-                base.WndProc(ref message);
-            }
-        } // method WndProc
+            base.WndProc (ref message);
+        }
+    }
 
-        #endregion
-
-    } // class InputLanguageAwareControl
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

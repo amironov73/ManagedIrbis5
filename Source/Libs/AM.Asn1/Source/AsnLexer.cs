@@ -614,7 +614,7 @@ public sealed class AsnLexer
         }
 
         return new AsnTokenList (result.ToArray());
-    } // method Tokenize
+    }
 
     #endregion
 }

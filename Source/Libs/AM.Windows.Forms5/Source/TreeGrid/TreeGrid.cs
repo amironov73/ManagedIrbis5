@@ -8,7 +8,7 @@
 // ReSharper disable RedundantNameQualifier
 // ReSharper disable UnusedMember.Global
 
-/* TreeGrid.cs
+/* TreeGrid.cs -- грид, совмещенный с деревом
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,9 +27,8 @@ using System.Windows.Forms;
 namespace AM.Windows.Forms;
 
 /// <summary>
-///
+/// Грид, совмещенный с деревом.
 /// </summary>
-
 [System.ComponentModel.DesignerCategory ("Code")]
 public class TreeGrid
     : SimpleScrollableControl
@@ -134,7 +133,7 @@ public class TreeGrid
 
             _defaultColumn = value;
         }
-    } // property DefaultColumn
+    }
 
     /// <summary>
     /// Gets the default type of the node.
@@ -1013,7 +1012,7 @@ public class TreeGrid
             };
             currentNode.OnMouseDoubleClick (treeGridMouseEventArgs);
         }
-    } // method OnMouseDoubleClick
+    }
 
     /// <inheritdoc cref="System.Windows.Forms.Control.OnMouseWheel"/>
     protected override void OnMouseWheel (MouseEventArgs e)

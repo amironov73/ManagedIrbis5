@@ -4,8 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* StandardValueSuggestor.cs -- стандартный подсказчик значений
@@ -15,65 +14,63 @@
 #region Using directives
 
 using System.Collections;
+
 using Microsoft.VisualBasic;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Стандартный подсказчик значений.
+/// </summary>
+public class StandardValueSuggestor
+    : IValueSuggestor
 {
+    #region Properties
+
+    ///<summary>
+    /// Заранее заданные значения.
+    ///</summary>
+    public ICollection StandardValues { get; }
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Стандартный подсказчик значений.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public class StandardValueSuggestor
-        : IValueSuggestor
+    public StandardValueSuggestor()
     {
-        #region Properties
+        StandardValues = new Collection();
+    }
 
-        ///<summary>
-        /// Заранее заданные значения.
-        ///</summary>
-        public ICollection StandardValues { get; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public StandardValueSuggestor
+        (
+            ICollection values
+        )
+    {
+        StandardValues = values;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region IValueSuggestor members
 
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public StandardValueSuggestor ()
-        {
-            StandardValues = new Collection();
-        } // constructor
+    /// <inheritdoc cref="IValueSuggestor.GetSuggestedValues"/>
+    public virtual ICollection GetSuggestedValues()
+    {
+        ArrayList result = new (StandardValues);
+        result.Insert (0, null);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public StandardValueSuggestor
-            (
-                ICollection values
-            )
-        {
-            StandardValues = values;
-        } // constructor
+        return result;
+    }
 
-        #endregion
-
-        #region IValueSuggestor members
-
-        /// <inheritdoc cref="IValueSuggestor.GetSuggestedValues"/>
-        public virtual ICollection GetSuggestedValues ()
-        {
-            ArrayList result = new (StandardValues);
-            result.Insert(0,null);
-
-            return result;
-        } // method GetSuggestedValues
-
-        #endregion
-
-    } // class StandardSuggestor
-
-} // namespace AM.Windows.Forms
+    #endregion
+}
