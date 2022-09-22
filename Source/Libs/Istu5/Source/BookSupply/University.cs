@@ -32,138 +32,135 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace Istu.BookSupply
+namespace Istu.BookSupply;
+
+/// <summary>
+/// Доступ к данным об университете
+/// (data access level).
+/// </summary>
+public sealed class University
+    : IServiceProvider
 {
+    #region Properties
+
     /// <summary>
-    /// Доступ к данным об университете
-    /// (data access level).
+    /// Используемая конфигурация.
     /// </summary>
-    public sealed class University
-        : IServiceProvider
+    public IConfiguration Configuration => _configuration;
+
+    /// <summary>
+    /// Используемый логгер.
+    /// </summary>
+    public ILogger Logger => _logger;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public University
+        (
+            IServiceProvider serviceProvider,
+            IConfiguration configuration,
+            string? connectionString = null
+        )
     {
-        #region Properties
+        _serviceProvider = serviceProvider;
+        _configuration = configuration;
+        _logger = serviceProvider.GetRequiredService<ILogger<University>>();
 
-        /// <summary>
-        /// Используемая конфигурация.
-        /// </summary>
-        public IConfiguration Configuration => _configuration;
+        _logger.LogTrace (nameof (University) + "::Constructor");
 
-        /// <summary>
-        /// Используемый логгер.
-        /// </summary>
-        public ILogger Logger => _logger;
+        _booksupplyConnectionString = connectionString ?? _configuration["booksupply"];
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Private members
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public University
-            (
-                IServiceProvider serviceProvider,
-                IConfiguration configuration,
-                string? connectionString = null
-            )
-        {
-            _serviceProvider = serviceProvider;
-            _configuration = configuration;
-            _logger = serviceProvider.GetRequiredService<ILogger<University>>();
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IConfiguration _configuration;
+    private readonly string _booksupplyConnectionString;
+    private readonly ILogger _logger;
 
-            _logger.LogTrace (nameof (University) + "::Constructor");
+    #endregion
 
-            _booksupplyConnectionString = connectionString ?? _configuration["booksupply"];
-        }
+    #region Public methods
 
-        #endregion
+    /// <summary>
+    /// Подключается к базе <c>booksupply</c>.
+    /// </summary>
+    public DataConnection GetBookSupply() => SupplyUtility.GetMsSqlConnection (_booksupplyConnectionString);
 
-        #region Private members
+    /// <summary>
+    /// Запрос интерфейса электронного каталога.
+    /// </summary>
+    public ICatalog GetCatalog() => _serviceProvider.GetRequiredService<ICatalog>();
 
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IConfiguration _configuration;
-        private readonly string _booksupplyConnectionString;
-        private readonly ILogger _logger;
+    /// <summary>
+    /// Форматирование записи.
+    /// </summary>
+    public string? FormatRecord
+        (
+            int mfn,
+            string? format = null
+        )
+    {
+        using var catalog = GetCatalog();
 
-        #endregion
+        return catalog.FormatRecord (mfn, format);
+    }
 
-        #region Public methods
+    /// <summary>
+    /// Перечисление терминов словаря с указанным префиксом.
+    /// </summary>
+    public string[] ListTerms
+        (
+            string prefix
+        )
+    {
+        using var catalog = GetCatalog();
 
-        /// <summary>
-        /// Подключается к базе <c>booksupply</c>.
-        /// </summary>
-        public DataConnection GetBookSupply() => SupplyUtility.GetMsSqlConnection (_booksupplyConnectionString);
+        return catalog.ListTerms (prefix);
+    }
 
-        /// <summary>
-        /// Запрос интерфейса электронного каталога.
-        /// </summary>
-        public ICatalog GetCatalog() => _serviceProvider.GetRequiredService<ICatalog>();
+    /// <summary>
+    /// Чтение записи по ее MFN.
+    /// </summary>
+    public Record? ReadRecord
+        (
+            int mfn
+        )
+    {
+        using var catalog = GetCatalog();
 
-        /// <summary>
-        /// Форматирование записи.
-        /// </summary>
-        public string? FormatRecord
-            (
-                int mfn,
-                string? format = null
-            )
-        {
-            using var catalog = GetCatalog();
+        return catalog.ReadRecord (mfn);
+    }
 
-            return catalog.FormatRecord (mfn, format);
-        } // method FormatRecord
+    /// <summary>
+    /// Прямой поиск записей (по поисковому словарю).
+    /// </summary>
+    public int[] SearchRecords
+        (
+            string expression
+        )
+    {
+        using var catalog = GetCatalog();
 
-        /// <summary>
-        /// Перечисление терминов словаря с указанным префиксом.
-        /// </summary>
-        public string[] ListTerms
-            (
-                string prefix
-            )
-        {
-            using var catalog = GetCatalog();
+        return catalog.SearchRecords (expression);
+    }
 
-            return catalog.ListTerms (prefix);
-        } // method ListTerms
+    #endregion
 
-        /// <summary>
-        /// Чтение записи по ее MFN.
-        /// </summary>
-        public Record? ReadRecord
-            (
-                int mfn
-            )
-        {
-            using var catalog = GetCatalog();
+    #region IServiceProvider members
 
-            return catalog.ReadRecord (mfn);
-        } // method ReadRecord
+    /// <inheritdoc cref="IServiceProvider.GetService"/>
+    public object? GetService (Type serviceType)
+    {
+        return _serviceProvider.GetService (serviceType);
+    }
 
-        /// <summary>
-        /// Прямой поиск записей (по поисковому словарю).
-        /// </summary>
-        public int[] SearchRecords
-            (
-                string expression
-            )
-        {
-            using var catalog = GetCatalog();
-
-            return catalog.SearchRecords (expression);
-        } // method SearchRecords
-
-        #endregion
-
-        #region IServiceProvider members
-
-        /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService (Type serviceType)
-        {
-            return _serviceProvider.GetService (serviceType);
-        }
-
-        #endregion
-
-    } // class University
-
-} // namespace Istu.BookSupply
+    #endregion
+}

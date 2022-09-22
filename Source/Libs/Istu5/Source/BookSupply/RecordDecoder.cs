@@ -21,35 +21,32 @@ using ManagedIrbis;
 
 #nullable enable
 
-namespace Istu.BookSupply
+namespace Istu.BookSupply;
+
+/// <summary>
+/// Декодирует библиографическую запись, превращая ее в описание книги.
+/// </summary>
+public sealed class RecordDecoder
 {
+    #region Public methods
+
     /// <summary>
-    /// Декодирует библиографическую запись, превращая ее в описание книги.
+    /// Декодирование библиографической записи.
     /// </summary>
-    public sealed class RecordDecoder
+    public BookInfo DecodeRecord
+        (
+            Record record,
+            University university
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Декодирование библиографической записи.
-        /// </summary>
-        public BookInfo DecodeRecord
-            (
-                Record record,
-                University university
-            )
+        var result = new BookInfo
         {
-            var result = new BookInfo
-            {
-                Description = university.FormatRecord (record.Mfn),
-                Record = record
-            };
+            Description = university.FormatRecord (record.Mfn),
+            Record = record
+        };
 
-            return result;
-        } // method DecodeRecord
+        return result;
+    }
 
-        #endregion
-
-    } // class RecordDecoder
-
-} // namespace Istu.BookSupply
+    #endregion
+}
