@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* DictionaryCounterInt32.cs -- простой словарь-счетчик с 32-битными целыми числами
+/* DictionaryCounter.cs -- простой словарь-счетчик
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 #endregion
 
@@ -28,24 +29,25 @@ using System.Linq;
 namespace AM.Collections;
 
 /// <summary>
-/// Простой словарь-счетчик с 32-битными целыми числами.
+/// Простой словарь-счетчик.
 /// </summary>
-public sealed class DictionaryCounterInt32<TKey>
-    : Dictionary<TKey, int>
+public class DictionaryCounter<TKey, TValue>
+    : Dictionary<TKey, TValue>
     where TKey : notnull
+    where TValue : INumber<TValue>
 {
     #region Properties
 
     /// <summary>
     /// Gets the total.
     /// </summary>
-    public int Total
+    public TValue Total
     {
         get
         {
             lock (SyncRoot)
             {
-                var result = 0;
+                var result = TValue.Zero;
                 foreach (var value in Values)
                 {
                     result += value;
@@ -77,7 +79,7 @@ public sealed class DictionaryCounterInt32<TKey>
     /// <summary>
     /// Конструктор по умолчанию.
     /// </summary>
-    public DictionaryCounterInt32()
+    public DictionaryCounter()
     {
         // пустое тело конструктора
     }
@@ -86,11 +88,11 @@ public sealed class DictionaryCounterInt32<TKey>
     /// Конструктор.
     /// </summary>
     /// <param name="comparer">Сравнение для элементов.</param>
-    public DictionaryCounterInt32
+    public DictionaryCounter
         (
             IEqualityComparer<TKey> comparer
         )
-        : base (comparer.ThrowIfNull ())
+        : base (comparer.ThrowIfNull())
     {
         // пустое тело конструктора
     }
@@ -99,7 +101,7 @@ public sealed class DictionaryCounterInt32<TKey>
     /// Конструктор.
     /// </summary>
     /// <param name="capacity">Начальная емкость.</param>
-    public DictionaryCounterInt32
+    public DictionaryCounter
         (
             int capacity
         )
@@ -112,9 +114,9 @@ public sealed class DictionaryCounterInt32<TKey>
     /// Конструктор.
     /// </summary>
     /// <param name="dictionary">Начальное наполнение словаря.</param>
-    public DictionaryCounterInt32
+    public DictionaryCounter
         (
-            DictionaryCounterInt32<TKey> dictionary
+            DictionaryCounter<TKey, TValue> dictionary
         )
         : base (dictionary)
     {
@@ -125,7 +127,7 @@ public sealed class DictionaryCounterInt32<TKey>
 
     #region Private members
 
-    private object SyncRoot => ((ICollection) this).SyncRoot;
+    private object SyncRoot => ((ICollection)this).SyncRoot;
 
     #endregion
 
@@ -137,16 +139,23 @@ public sealed class DictionaryCounterInt32<TKey>
     /// <param name="key">The key.</param>
     /// <param name="increment">The value.</param>
     /// <returns>New value for given key.</returns>
-    public int Augment
+    public TValue Augment
         (
             TKey key,
-            int increment
+            TValue increment
         )
     {
         lock (SyncRoot)
         {
-            TryGetValue (key, out int value);
-            value += increment;
+            if (TryGetValue (key, out var value))
+            {
+                value += increment;
+            }
+            else
+            {
+                value = increment;
+            }
+
             this[key] = value;
 
             return value;
@@ -156,14 +165,17 @@ public sealed class DictionaryCounterInt32<TKey>
     /// <summary>
     /// Get accumulated value for the specified key.
     /// </summary>
-    public int GetValue
+    public TValue GetValue
         (
             TKey key
         )
     {
         lock (SyncRoot)
         {
-            TryGetValue (key, out int result);
+            if (!TryGetValue (key, out var result))
+            {
+                result = TValue.Zero;
+            }
 
             return result;
         }
@@ -172,12 +184,12 @@ public sealed class DictionaryCounterInt32<TKey>
     /// <summary>
     /// Increment the specified key.
     /// </summary>
-    public int Increment
+    public TValue Increment
         (
             TKey key
         )
     {
-        return Augment (key, 1);
+        return Augment (key, TValue.One);
     }
 
     #endregion
