@@ -48,8 +48,7 @@ public static class ControlUtility
         }
 
         return control;
-
-    } // method FindFocusedControl
+    }
 
     /// <summary>
     /// Invoke specified <paramref name="action"/>

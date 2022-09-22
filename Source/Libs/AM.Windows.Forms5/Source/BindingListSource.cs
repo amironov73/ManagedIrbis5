@@ -33,8 +33,10 @@ namespace AM.Windows.Forms
     /// <remarks>Values added through <see cref="Add"/>
     /// or <see cref="Insert"/> methods can't be <c>null</c>.
     /// </remarks>
+
     // ReSharper disable RedundantNameQualifier
-    [System.ComponentModel.DesignerCategory("Code")]
+    [System.ComponentModel.DesignerCategory ("Code")]
+
     // ReSharper restore RedundantNameQualifier
     public class BindingListSource<T>
         : BindingSource
@@ -68,39 +70,38 @@ namespace AM.Windows.Forms
         public void ResetBindings() => InnerList.ResetBindings();
 
         /// <inheritdoc cref="BindingList{T}.CancelNew"/>
-        public void CancelNew(int itemIndex) => InnerList.CancelNew(itemIndex);
+        public void CancelNew (int itemIndex) => InnerList.CancelNew (itemIndex);
 
         /// <inheritdoc cref="BindingList{T}.EndNew"/>
-        public void EndNew(int itemIndex) => InnerList.EndNew(itemIndex);
+        public void EndNew (int itemIndex) => InnerList.EndNew (itemIndex);
 
         /// <inheritdoc cref="Collection{T}.Add"/>
-        public void Add(T item)
+        public void Add (T item)
         {
             object? value = item;
             if (value == null)
             {
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException (nameof (item));
             }
-            InnerList.Add(item);
-        } // method Add
+
+            InnerList.Add (item);
+        }
 
         /// <inheritdoc cref="Collection{T}.CopyTo"/>
-        public void CopyTo(T[] array, int index) => InnerList.CopyTo(array, index);
+        public void CopyTo (T[] array, int index) => InnerList.CopyTo (array, index);
 
         /// <inheritdoc cref="Collection{T}.Contains"/>
-        public bool Contains(T item) => InnerList.Contains(item);
+        public bool Contains (T item) => InnerList.Contains (item);
 
         /// <inheritdoc cref="Collection{T}.IndexOf"/>
-        public int IndexOf(T item) => InnerList.IndexOf(item);
+        public int IndexOf (T item) => InnerList.IndexOf (item);
 
         /// <inheritdoc cref="Collection{T}.Insert"/>
-        public void Insert(int index, T item) => InnerList.Insert(index, item);
+        public void Insert (int index, T item) => InnerList.Insert (index, item);
 
         /// <inheritdoc cref="Collection{T}.Remove"/>
-        public bool Remove(T item) => InnerList.Remove(item);
+        public bool Remove (T item) => InnerList.Remove (item);
 
         #endregion
-
     } // class BindingListSource
-
 } // namespace AM.Windows.Forms

@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable RedundantNameQualifier
 // ReSharper disable UnusedMember.Global
 
 /* TreeGrid.cs
@@ -28,12 +30,7 @@ namespace AM.Windows.Forms;
 ///
 /// </summary>
 
-// ReSharper disable RedundantNameQualifier
-// ReSharper disable LocalizableElement
 [System.ComponentModel.DesignerCategory ("Code")]
-
-// ReSharper restore LocalizableElement
-// ReSharper restore RedundantNameQualifier
 public class TreeGrid
     : SimpleScrollableControl
 {
@@ -77,16 +74,7 @@ public class TreeGrid
 
     #region Properties
 
-    /// <summary>
-    /// Gets or sets the background color for the control.
-    /// </summary>
-    /// <value></value>
-    /// <returns>
-    /// A <see cref="T:System.Drawing.Color"/> that represents the background color of the control. The default is the value of the <see cref="P:System.Windows.Forms.Control.DefaultBackColor"/> property.
-    /// </returns>
-    /// <PermissionSet>
-    /// 	<IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/>
-    /// </PermissionSet>
+    /// <inheritdoc cref="Control.BackColor"/>
     public override Color BackColor
     {
         get => Palette.Background;
@@ -124,7 +112,7 @@ public class TreeGrid
                 Debug.WriteLine (ex);
             }
         }
-    } // property CurrentNode
+    }
 
     /// <summary>
     /// Gets or sets the default column.
@@ -561,7 +549,7 @@ public class TreeGrid
         }
 
         return Columns.FirstOrDefault (item => item.Editable);
-    } // method FindEditableColumn
+    }
 
     /// <summary>
     ///
@@ -582,13 +570,7 @@ public class TreeGrid
         return base.ProcessKeyEventArgs (ref m);
     }
 
-    /// <summary>
-    /// Processes a dialog key.
-    /// </summary>
-    /// <param name="keyData">One of the <see cref="T:System.Windows.Forms.Keys"/> values that represents the key to process.</param>
-    /// <returns>
-    /// true if the key was processed by the control; otherwise, false.
-    /// </returns>
+    /// <inheritdoc cref="Control.ProcessDialogKey"/>
     protected override bool ProcessDialogKey (Keys keyData)
     {
         switch (keyData)
@@ -596,21 +578,27 @@ public class TreeGrid
             case Keys.Down:
                 GotoLine (CurrentLine + 1);
                 return true;
+
             case Keys.Up:
                 GotoLine (CurrentLine - 1);
                 return true;
+
             case Keys.PageDown:
                 GotoLine (CurrentLine + VisibleNodeCount);
                 return true;
+
             case Keys.PageUp:
                 GotoLine (CurrentLine - VisibleNodeCount);
                 return true;
+
             case Keys.Left:
                 ExpandCurrentNode (false);
                 return true;
+
             case Keys.Right:
                 ExpandCurrentNode (true);
                 return true;
+
             case Keys.Enter:
             {
                 var column = FindEditableColumn();
@@ -656,29 +644,35 @@ public class TreeGrid
         }
 
         return result;
-    } // method GetInitialValue
+    }
 
     /// <inheritdoc cref="Control.OnKeyDown"/>
-    protected override void OnKeyDown (KeyEventArgs e)
+    protected override void OnKeyDown
+        (
+            KeyEventArgs eventArgs
+        )
     {
-        base.OnKeyDown (e);
-        switch (e.KeyData)
+        base.OnKeyDown (eventArgs);
+        switch (eventArgs.KeyData)
         {
             case Keys.Down:
                 GotoLine (CurrentLine + 1);
-                e.Handled = true;
+                eventArgs.Handled = true;
                 break;
+
             case Keys.Up:
                 GotoLine (CurrentLine - 1);
-                e.Handled = true;
+                eventArgs.Handled = true;
                 break;
+
             case Keys.PageDown:
                 GotoLine (CurrentLine + VisibleNodeCount);
-                e.Handled = true;
+                eventArgs.Handled = true;
                 break;
+
             case Keys.PageUp:
                 GotoLine (CurrentLine - VisibleNodeCount);
-                e.Handled = true;
+                eventArgs.Handled = true;
                 break;
         }
     }
@@ -770,7 +764,7 @@ public class TreeGrid
         result._SetTreeGrid (this);
 
         return result;
-    } // method CreateNode
+    }
 
     /// <summary>
     ///
@@ -856,7 +850,11 @@ public class TreeGrid
     /// <param name="columnIndex"></param>
     /// <param name="initialValue"></param>
     /// <returns></returns>
-    public virtual bool BeginEdit (int columnIndex, string? initialValue)
+    public virtual bool BeginEdit
+        (
+            int columnIndex,
+            string? initialValue
+        )
     {
         EndEdit (false);
         var currentNode = CurrentNode;
@@ -898,7 +896,7 @@ public class TreeGrid
         }
 
         return false;
-    } // method BeginEdit
+    }
 
     /// <summary>
     ///
@@ -926,7 +924,7 @@ public class TreeGrid
 
         _editor = null;
         UpdateState();
-    } // method EndEdit
+    }
 
     /// <summary>
     ///
@@ -992,7 +990,7 @@ public class TreeGrid
         {
             currentNode.OnMouseClick (args);
         }
-    } // method OnMouseClick
+    }
 
     /// <inheritdoc cref="Control.OnMouseDoubleClick"/>
     protected override void OnMouseDoubleClick (MouseEventArgs e)
@@ -1088,7 +1086,7 @@ public class TreeGrid
                 _savedCursor = null;
             }
         }
-    } // method OnMouseMove
+    }
 
     /// <summary>
     ///
