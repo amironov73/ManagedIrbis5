@@ -22,73 +22,68 @@ using AM.Json;
 
 #nullable enable
 
-namespace SiberianTests
+namespace SiberianTests;
+
+public sealed class SiberianTest
+    : ISiberianTest
 {
-    public sealed class SiberianTest
-        : ISiberianTest
+    #region Properties
+
+    /// <summary>
+    /// Имя класса с тестом.
+    /// </summary>
+    [XmlAttribute ("class")]
+    [JsonPropertyName ("class")]
+    public string? ClassName { get; set; }
+
+    /// <summary>
+    /// Заголовок.
+    /// </summary>
+    [XmlAttribute ("title")]
+    [JsonPropertyName ("title")]
+    public string? Title { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    public static SiberianTest[] LoadFromFile (string fileName) =>
+        JsonUtility.ReadObjectFromFile<SiberianTest[]> (fileName);
+
+    #endregion
+
+    #region IFormsTest members
+
+    /// <summary>
+    /// Run the test.
+    /// </summary>
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Имя класса с тестом.
-        /// </summary>
-        [XmlAttribute("class")]
-        [JsonPropertyName("class")]
-        public string? ClassName { get; set; }
-
-        /// <summary>
-        /// Заголовок.
-        /// </summary>
-        [XmlAttribute("title")]
-        [JsonPropertyName("title")]
-        public string? Title { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        public static SiberianTest[] LoadFromFile (string fileName) =>
-            JsonUtility.ReadObjectFromFile<SiberianTest[]>(fileName);
-
-        #endregion
-
-        #region IFormsTest members
-
-        /// <summary>
-        /// Run the test.
-        /// </summary>
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
-        {
-            var type = Type.GetType
+        var type = Type.GetType
                 (
-                    ClassName.ThrowIfNull("ClassName"),
+                    ClassName.ThrowIfNull(),
                     true
                 )
-                .ThrowIfNull("Type.GetType");
+            .ThrowIfNull ("Type.GetType");
 
-            var testObject = (ISiberianTest) Activator.CreateInstance(type)
-                .ThrowIfNull("Activator.CreateInstance");
+        var testObject = (ISiberianTest)Activator.CreateInstance (type)
+            .ThrowIfNull ("Activator.CreateInstance");
 
-            testObject.RunTest(ownerWindow);
+        testObject.RunTest (ownerWindow);
 
-            if (testObject is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-
-        } // method RunTest
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => Title.ToVisibleString();
-
-        #endregion
-
+        // ReSharper disable once SuspiciousTypeConversion.Global
+        (testObject as IDisposable)?.Dispose();
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => Title.ToVisibleString();
+
+    #endregion
 }

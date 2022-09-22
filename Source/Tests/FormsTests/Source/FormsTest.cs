@@ -22,74 +22,70 @@ using AM.Json;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class FormsTest
+    : IFormsTest
 {
-    public sealed class FormsTest
-        : IFormsTest
+    #region Properties
+
+    /// <summary>
+    /// Имя класса с тестом.
+    /// </summary>
+    [XmlAttribute ("class")]
+    [JsonPropertyName ("class")]
+    public string? ClassName { get; set; }
+
+    /// <summary>
+    /// Заголовок.
+    /// </summary>
+    [XmlAttribute ("title")]
+    [JsonPropertyName ("title")]
+    public string? Title { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    public static FormsTest[] LoadFromFile (string fileName) =>
+        JsonUtility.ReadObjectFromFile<FormsTest[]> (fileName);
+
+    #endregion
+
+    #region IFormsTest members
+
+    /// <summary>
+    /// Run the test.
+    /// </summary>
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Имя класса с тестом.
-        /// </summary>
-        [XmlAttribute("class")]
-        [JsonPropertyName("class")]
-        public string? ClassName { get; set; }
-
-        /// <summary>
-        /// Заголовок.
-        /// </summary>
-        [XmlAttribute("title")]
-        [JsonPropertyName("title")]
-        public string? Title { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        public static FormsTest[] LoadFromFile (string fileName) =>
-            JsonUtility.ReadObjectFromFile<FormsTest[]>(fileName);
-
-        #endregion
-
-        #region IFormsTest members
-
-        /// <summary>
-        /// Run the test.
-        /// </summary>
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
-        {
-            var type = Type.GetType
+        var type = Type.GetType
                 (
-                    ClassName.ThrowIfNull("ClassName"),
+                    ClassName.ThrowIfNull ("ClassName"),
                     true
                 )
-                .ThrowIfNull("Type.GetType");
+            .ThrowIfNull ("Type.GetType");
 
-            var testObject = (IFormsTest) Activator.CreateInstance(type)
-                .ThrowIfNull("Activator.CreateInstance");
+        var testObject = (IFormsTest)Activator.CreateInstance (type)
+            .ThrowIfNull ("Activator.CreateInstance");
 
-            testObject.RunTest(ownerWindow);
+        testObject.RunTest (ownerWindow);
 
-            if (testObject is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
+        if (testObject is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
+    }
 
-        } // method RunTest
+    #endregion
 
-        #endregion
+    #region Object members
 
-        #region Object members
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => Title.ToVisibleString();
 
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => Title.ToVisibleString();
-
-        #endregion
-
-    } // class FormsTest
-
-} // namespace FormsTest
+    #endregion
+}

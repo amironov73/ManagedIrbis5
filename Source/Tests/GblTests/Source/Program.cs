@@ -24,19 +24,15 @@ using System.Linq;
 
 #nullable enable
 
-namespace GblTests
+namespace GblTests;
+
+internal static class Program
 {
-    static class Program
+    static int Main
+        (
+            string[] args
+        )
     {
-        static int Main
-            (
-                string[] args
-            )
-        {
-            return 0;
-
-        } // method Main
-
-    } // class Program
-
-} // namespace GblTests
+        return 0;
+    }
+}
