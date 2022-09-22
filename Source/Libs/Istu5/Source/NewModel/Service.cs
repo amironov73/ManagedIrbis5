@@ -22,78 +22,71 @@ using System.IO;
 
 #nullable enable
 
-namespace Istu.NewModel
+namespace Istu.NewModel;
+
+/// <summary>
+/// Услуга, оказанная библиотекой.
+/// </summary>
+public sealed class Service
 {
+    #region Properties
+
     /// <summary>
-    /// Услуга, оказанная библиотекой.
+    /// Наименование услуги.
     /// </summary>
-    public sealed class Service
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// Цена за единицу.
+    /// </summary>
+    public decimal Price { get; set; }
+
+    /// <summary>
+    /// Единица измерения.
+    /// </summary>
+    public string? Unit { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Чтение текстового файла с информацией об услугах.
+    /// </summary>
+    public static Service[] ReadFile
+        (
+            string fileName
+        )
     {
-        #region Properties
+        var result = new List<Service>();
 
-        /// <summary>
-        /// Наименование услуги.
-        /// </summary>
-        public string? Title { get; set; }
-
-        /// <summary>
-        /// Цена за единицу.
-        /// </summary>
-        public decimal Price { get; set; }
-
-        /// <summary>
-        /// Единица измерения.
-        /// </summary>
-        public string? Unit { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Чтение текстового файла с информацией об услугах.
-        /// </summary>
-        public static Service[] ReadFile
-            (
-                string fileName
-            )
+        using (var reader = new StreamReader (fileName))
         {
-            var result = new List<Service>();
-
-            using (var reader = new StreamReader (fileName))
+            while (reader.ReadLine() is { } line)
             {
-                string? line;
-                while ((line = reader.ReadLine()) != null)
+                if (string.IsNullOrEmpty (line))
                 {
-                    if (string.IsNullOrEmpty (line))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    var parts = line.Split (';');
-                    if (parts.Length != 3)
-                    {
-                        continue;
-                    }
+                var parts = line.Split (';');
+                if (parts.Length != 3)
+                {
+                    continue;
+                }
 
-                    var service = new Service
-                    {
-                        Title = parts[0],
-                        Price = int.Parse (parts[1]),
-                        Unit = parts[2]
-                    };
-                    result.Add (service);
+                var service = new Service
+                {
+                    Title = parts[0],
+                    Price = int.Parse (parts[1]),
+                    Unit = parts[2]
+                };
+                result.Add (service);
+            }
+        }
 
-                } // while
+        return result.ToArray();
+    }
 
-            } // using
-
-            return result.ToArray();
-
-        } // method ReadFile
-
-        #endregion
-
-    } // class Service
-
-} // namespace Istu.NewModel
+    #endregion
+}

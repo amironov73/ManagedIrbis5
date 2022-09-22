@@ -22,65 +22,62 @@ using LinqToDB.Mapping;
 
 #nullable enable
 
-namespace Istu.NewModel
+namespace Istu.NewModel;
+
+/// <summary>
+/// Оператор системы книговыдачи.
+/// </summary>
+[Table ("operators")]
+public sealed class Operator
+    : IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    /// Оператор системы книговыдачи.
+    /// Идентификатор оператор.
     /// </summary>
-    [Table ("operators")]
-    public sealed class Operator
-        : IVerifiable
+    [Column (IsIdentity = true), PrimaryKey]
+    public int ID { get; set; }
+
+    /// <summary>
+    /// Фамилия, имя, отчество оператора.
+    /// </summary>
+    [Column]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Комментарий в произвольной форме.
+    /// </summary>
+    [Column (CanBeNull = true)]
+    public string? Comment { get; set; }
+
+    /// <summary>
+    /// Штрих-код.
+    /// </summary>
+    [Column]
+    public string? Barcode { get; set; }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
     {
-        #region Properties
+        // TODO: implement
 
-        /// <summary>
-        /// Идентификатор оператор.
-        /// </summary>
-        [Column (IsIdentity = true), PrimaryKey]
-        public int ID { get; set; }
+        return true;
+    }
 
-        /// <summary>
-        /// Фамилия, имя, отчество оператора.
-        /// </summary>
-        [Column]
-        public string? Name { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Комментарий в произвольной форме.
-        /// </summary>
-        [Column (CanBeNull = true)]
-        public string? Comment { get; set; }
+    #region Object members
 
-        /// <summary>
-        /// Штрих-код.
-        /// </summary>
-        [Column]
-        public string? Barcode { get; set; }
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => $"{ID}: {Name}";
 
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            // TODO: implement
-
-            return true;
-        } // method Verify
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => $"{ID}: {Name}";
-
-        #endregion
-
-    } // class Operator
-
-} // namespace Istu.NewModel
+    #endregion
+}
