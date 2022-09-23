@@ -4,8 +4,10 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* BindingListSourceTest.cs --
@@ -24,50 +26,49 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class BindingListSourceTest
+    : IFormsTest
 {
-    public sealed class BindingListSourceTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var source = new BindingListSource<string>();
+        var source = new BindingListSource<string>();
 
-            var button = new Button
-            {
-                Location = new Point(10, 10),
-                Width = 200,
-                Text = "Add an item"
-            };
-            form.Controls.Add(button);
+        var button = new Button
+        {
+            Location = new Point (10, 10),
+            Width = 200,
+            Text = "Add an item"
+        };
+        form.Controls.Add (button);
 
-            var listBox = new ListBox
-            {
-                Location = new Point(220, 10),
-                Size = new Size(200, 200),
-                DataSource = source
-            };
-            form.Controls.Add(listBox);
+        var listBox = new ListBox
+        {
+            Location = new Point (220, 10),
+            Size = new Size (200, 200),
+            DataSource = source
+        };
+        form.Controls.Add (listBox);
 
-            button.Click += (sender, args) =>
-            {
-                var item = DateTime.Now.Ticks.ToString();
-                source.Add(item);
-            };
+        button.Click += (_, _) =>
+        {
+            var item = DateTime.Now.Ticks.ToString();
+            source.Add (item);
+        };
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

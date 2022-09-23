@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* FontComboBoxTest.cs --
@@ -23,45 +24,42 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class FontComboBoxTest
+    : IFormsTest
 {
-    public sealed class FontComboBoxTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
+        using var form = new Form();
+        form.Size = new Size (800, 600);
 
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        var comboBox = new FontComboBox
         {
-            using var form = new Form();
-            form.Size = new Size(800, 600);
+            Location = new Point (10, 10),
+            Width = 200
+        };
+        form.Controls.Add (comboBox);
 
-            var comboBox = new FontComboBox
-            {
-                Location = new Point(10, 10),
-                Width = 200
-            };
-            form.Controls.Add(comboBox);
+        var textBox = new TextBox
+        {
+            Location = new Point (220, 10),
+            Width = 200
+        };
+        form.Controls.Add (textBox);
 
-            var textBox = new TextBox
-            {
-                Location = new Point(220, 10),
-                Width = 200
-            };
-            form.Controls.Add(textBox);
+        comboBox.SelectedValueChanged += (_, _) =>
+        {
+            textBox.Text = comboBox.SelectedFontName;
+        };
 
-            comboBox.SelectedValueChanged += (sender, args) =>
-            {
-                textBox.Text = comboBox.SelectedFontName;
-            };
+        form.ShowDialog (ownerWindow);
+    }
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
-
-    } // class FontComboBoxTest
-
-} // namespace FormsTests
+    #endregion
+}

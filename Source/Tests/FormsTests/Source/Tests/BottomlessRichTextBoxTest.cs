@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* BottomlessTextBoxTest.cs --
@@ -23,33 +24,32 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class BottomlessTextBoxTest
+    : IFormsTest
 {
-    public sealed class BottomlessTextBoxTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var textBox = new BottomlessRichTextBox
-                {
-                    Location = new Point(10, 10),
-                    Size = new Size(200, 20)
-                };
-            form.Controls.Add(textBox);
+        var textBox = new BottomlessRichTextBox
+        {
+            Location = new Point (10, 10),
+            Size = new Size (200, 20)
+        };
+        form.Controls.Add (textBox);
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

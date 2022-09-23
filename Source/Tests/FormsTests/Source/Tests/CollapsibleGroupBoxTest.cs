@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
@@ -23,43 +24,42 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class CollapsibleGroupBoxTest
+    : IFormsTest
 {
-    public sealed class CollapsibleGroupBoxTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size(800, 600)
+        };
 
-            var box1 = new CollapsibleGroupBox
-            {
-                BackColor = Color.DarkSeaGreen,
-                Text = "Group box 1",
-                Location = new Point(10, 10),
-                Size = new Size(400, 200)
-            };
-            form.Controls.Add(box1);
-            var box2 = new CollapsibleGroupBox
-            {
-                BackColor = Color.BlanchedAlmond,
-                Text = "Group box 2",
-                Location = new Point(420, 10),
-                Size = new Size(300, 200)
-            };
-            form.Controls.Add(box2);
+        var box1 = new CollapsibleGroupBox
+        {
+            BackColor = Color.DarkSeaGreen,
+            Text = "Group box 1",
+            Location = new Point(10, 10),
+            Size = new Size(400, 200)
+        };
+        form.Controls.Add(box1);
+        var box2 = new CollapsibleGroupBox
+        {
+            BackColor = Color.BlanchedAlmond,
+            Text = "Group box 2",
+            Location = new Point(420, 10),
+            Size = new Size(300, 200)
+        };
+        form.Controls.Add(box2);
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog(ownerWindow);
     }
+
+    #endregion
 }

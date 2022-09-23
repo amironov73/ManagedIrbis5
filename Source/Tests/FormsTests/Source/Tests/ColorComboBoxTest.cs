@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* ColorComboBoxTest.cs --
@@ -23,47 +24,41 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class ColorComboBoxTest
+    : IFormsTest
 {
-    public sealed class ColorComboBoxTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var colorBox = new ColorComboBox
-            {
-                Location = new Point(10, 10),
-                Width = 200
-            };
-            form.Controls.Add(colorBox);
+        var colorBox = new ColorComboBox
+        {
+            Location = new Point (10, 10),
+            Width = 200
+        };
+        form.Controls.Add (colorBox);
 
-            var textBox = new TextBox
-            {
-                Location = new Point(310, 10),
-                Width = 300
-            };
-            form.Controls.Add(textBox);
+        var textBox = new TextBox
+        {
+            Location = new Point (310, 10),
+            Width = 300
+        };
+        form.Controls.Add (textBox);
 
-            colorBox.SelectedIndexChanged += (sender, args) =>
-            {
-                textBox.Text = colorBox.SelectedColor.ToString();
-            };
+        colorBox.SelectedIndexChanged += (_, _) => { textBox.Text = colorBox.SelectedColor.ToString(); };
 
-            form.ShowDialog(ownerWindow);
-        }
+        form.ShowDialog (ownerWindow);
+    }
 
-        #endregion
-
-    } // class ColorComboBoxTest
-
-} // namespace FormsTests
+    #endregion
+}
