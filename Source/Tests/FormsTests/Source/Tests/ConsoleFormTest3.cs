@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 
 /* ConsoleFormTest3.cs --
@@ -18,38 +19,37 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class ConsoleFormTest3
+    : IFormsTest
 {
-    public sealed class ConsoleFormTest3
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new ConsoleForm
         {
-            using var form = new ConsoleForm
-            {
-                Text = "ConsoleControl in action"
-            };
+            Text = "ConsoleControl in action"
+        };
 
-            var console = form.Console;
+        var console = form.Console;
 
-            console.BackColor = Color.White;
-            console.ForeColor = Color.Blue;
-            console.Clear();
-            console.AllowInput = true;
+        console.BackColor = Color.White;
+        console.ForeColor = Color.Blue;
+        console.Clear();
+        console.AllowInput = true;
 
-            form.Show(ownerWindow);
+        form.Show (ownerWindow);
 
-            var text = console.ReadLine();
+        var text = console.ReadLine();
 
-            form.Close();
-            MessageBox.Show(text);
-        }
-
-        #endregion
+        form.Close();
+        MessageBox.Show (text);
     }
+
+    #endregion
 }

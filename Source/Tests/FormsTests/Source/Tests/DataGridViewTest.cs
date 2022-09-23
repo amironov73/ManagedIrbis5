@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
@@ -23,67 +24,66 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class DataGridViewTest
+    : IFormsTest
 {
-    public sealed class DataGridViewTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
+            Size = new Size (800, 600)
+        };
+
+        var grid = new DataGridView
+        {
+            Dock = DockStyle.Fill
+        };
+        form.Controls.Add (grid);
+
+        var calendarColumn
+            = new DataGridViewCalendarColumn
             {
-                Size = new Size(800, 600)
+                HeaderText = "Calendar"
             };
+        grid.Columns.Add (calendarColumn);
 
-            var grid = new DataGridView
+        var colorColumn
+            = new DataGridViewColorColumn
             {
-                Dock = DockStyle.Fill
+                HeaderText = "Color"
             };
-            form.Controls.Add(grid);
+        grid.Columns.Add (colorColumn);
 
-            var calendarColumn
-                = new DataGridViewCalendarColumn
-                {
-                    HeaderText = "Calendar"
-                };
-            grid.Columns.Add(calendarColumn);
+        var numericColumn
+            = new DataGridViewNumericColumn
+            {
+                HeaderText = "Numeric"
+            };
+        grid.Columns.Add (numericColumn);
 
-            var colorColumn
-                = new DataGridViewColorColumn
-                {
-                    HeaderText = "Color"
-                };
-            grid.Columns.Add(colorColumn);
+        var progressColumn
+            = new DataGridViewProgressColumn
+            {
+                HeaderText = "Progress"
+            };
+        grid.Columns.Add (progressColumn);
 
-            var numericColumn
-                = new DataGridViewNumericColumn
-                {
-                    HeaderText = "Numeric"
-                };
-            grid.Columns.Add(numericColumn);
+        var ratingColumn
+            = new DataGridViewRatingColumn
+            {
+                HeaderText = "Rating"
+            };
+        grid.Columns.Add (ratingColumn);
 
-            var progressColumn
-                = new DataGridViewProgressColumn
-                {
-                    HeaderText = "Progress"
-                };
-            grid.Columns.Add(progressColumn);
-
-            var ratingColumn
-                = new DataGridViewRatingColumn
-                {
-                    HeaderText = "Rating"
-                };
-            grid.Columns.Add(ratingColumn);
-
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }
