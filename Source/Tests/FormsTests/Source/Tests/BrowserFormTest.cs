@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* BrowserFormTest.cs --
@@ -22,26 +23,25 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class BrowserFormTest
+    : IFormsTest
 {
-    public sealed class BrowserFormTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
+        var html = "<h1>Document sample</h1>"
+                   + "<p>This is document sample</p>";
 
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
-        {
-            var html = "<h1>Document sample</h1>"
-                       + "<p>This is document sample</p>";
-
-            using var form = new BrowserForm();
-            form.DocumentText = html;
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        using var form = new BrowserForm();
+        form.DocumentText = html;
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

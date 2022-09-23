@@ -7,6 +7,7 @@
 // ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* BusyControllerTest.cs --
@@ -26,78 +27,68 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class BusyControllerTest
+    : IFormsTest
 {
-    public sealed class BusyControllerTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var firstButton = new Button
-            {
-                Text = "Push me 1",
-                Location = new Point(10, 100)
-            };
-            form.Controls.Add(firstButton);
+        var firstButton = new Button
+        {
+            Text = "Push me 1",
+            Location = new Point (10, 100)
+        };
+        form.Controls.Add (firstButton);
 
-            var secondButton = new Button
-            {
-                Text = "Push me 2",
-                Location = new Point(200, 100)
-            };
-            form.Controls.Add(secondButton);
+        var secondButton = new Button
+        {
+            Text = "Push me 2",
+            Location = new Point (200, 100)
+        };
+        form.Controls.Add (secondButton);
 
-            var state = new BusyState();
+        var state = new BusyState();
 
-            var stripe = new BusyStripe
-            {
-                Dock = DockStyle.Top,
-                ForeColor = Color.LimeGreen,
-                Height = 20,
-                Text = "I am very busy"
-            };
-            stripe.SubscribeTo(state);
-            form.Controls.Add(stripe);
+        var stripe = new BusyStripe
+        {
+            Dock = DockStyle.Top,
+            ForeColor = Color.LimeGreen,
+            Height = 20,
+            Text = "I am very busy"
+        };
+        stripe.SubscribeTo (state);
+        form.Controls.Add (stripe);
 
-            var controller = new BusyController
-            {
-                State = state
-            };
-            controller.Controls.Add(firstButton);
-            controller.Controls.Add(secondButton);
-            controller.ExceptionOccur += (_, args) =>
-            {
-                ExceptionBox.Show(ownerWindow, args.Exception);
-            };
+        var controller = new BusyController
+        {
+            State = state
+        };
+        controller.Controls.Add (firstButton);
+        controller.Controls.Add (secondButton);
+        controller.ExceptionOccur += (_, args) => { ExceptionBox.Show (ownerWindow, args.Exception); };
 
-            void SleepAction()
-            {
-                Thread.Sleep(3000);
-            }
-
-            firstButton.Click += (_, _) =>
-            {
-                controller.Run(SleepAction);
-            };
-
-            secondButton.Click += (_, _) =>
-            {
-                controller.RunAsync(SleepAction);
-            };
-
-            form.ShowDialog(ownerWindow);
+        void SleepAction()
+        {
+            Thread.Sleep (3000);
         }
 
-        #endregion
+        firstButton.Click += (_, _) => { controller.Run (SleepAction); };
+
+        secondButton.Click += (_, _) => { controller.RunAsync (SleepAction); };
+
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

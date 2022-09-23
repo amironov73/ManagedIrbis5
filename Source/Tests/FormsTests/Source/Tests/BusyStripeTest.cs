@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
@@ -56,7 +57,7 @@ public sealed class BusyStripeTest
             Location = new Point(10, 40),
             Width = 100
         };
-        button.Click += (sender, args) =>
+        button.Click += (_, _) =>
         {
             stripe.Moving = !stripe.Moving;
         };
