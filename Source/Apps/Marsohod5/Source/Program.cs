@@ -28,49 +28,44 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace Marsohod5
+namespace Marsohod5;
+
+internal sealed class Program
 {
-    class Program
+    static async Task<int> Main (string[] args)
     {
-        static async Task<int> Main(string[] args)
-        {
-            // включаем конфигурирование в appsettings.json
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: false)
-                .AddCommandLine(args)
-                .Build();
+        // включаем конфигурирование в appsettings.json
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath (AppContext.BaseDirectory)
+            .AddJsonFile ("appsettings.json", optional: false)
+            .AddCommandLine (args)
+            .Build();
 
-            var hostBuilder = Host.CreateDefaultBuilder(args)
-                .ConfigureServices(services =>
-                {
-                    // включаем логирование
-                    services.AddLogging(logging => logging.AddConsole());
+        var hostBuilder = Host.CreateDefaultBuilder (args)
+            .ConfigureServices (services =>
+            {
+                // включаем логирование
+                services.AddLogging (logging => logging.AddConsole());
 
-                    // запоминаем конфигурацию на всякий случай
-                    services.AddSingleton<IConfiguration>(configuration);
+                // запоминаем конфигурацию на всякий случай
+                services.AddSingleton<IConfiguration> (configuration);
 
-                    // регистрируем наш сервис
-                    services.AddHostedService<MarsohodEngine>();
+                // регистрируем наш сервис
+                services.AddHostedService<MarsohodEngine>();
 
-                    // откуда брать настройки
-                    var section = configuration.GetSection("MarsOptions");
-                    services.Configure<MarsOptions>(section);
+                // откуда брать настройки
+                var section = configuration.GetSection ("MarsOptions");
+                services.Configure<MarsOptions> (section);
+            });
 
-                });
+        using var host = hostBuilder.Build();
 
-            using var host = hostBuilder.Build();
+        await host.StartAsync(); // запускаем наш сервис
+        await host.WaitForShutdownAsync(); // ожидаем его окончания
 
-            await host.StartAsync(); // запускаем наш сервис
-            await host.WaitForShutdownAsync(); // ожидаем его окончания
+        // К этому моменту всё успешно выполнено либо произошла ошибка
+        Console.WriteLine ("THAT'S ALL, FOLKS!");
 
-            // К этому моменту всё успешно выполнено либо произошла ошибка
-            Console.WriteLine("THAT'S ALL, FOLKS!");
-
-            return 0;
-
-        } // method Main
-
-    } // class Program
-
-} // namespace Marsohod5
+        return 0;
+    }
+}

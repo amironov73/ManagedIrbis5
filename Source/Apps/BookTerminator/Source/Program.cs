@@ -23,26 +23,22 @@ using AM;
 
 #endregion
 
-namespace BookTerminator
+namespace BookTerminator;
+
+/// <summary>
+/// Класс, содержащий точку входа в приложение.
+/// </summary>
+static class Program
 {
     /// <summary>
-    /// Класс, содержащий точку входа в приложение.
+    /// Точка входа в приложение.
     /// </summary>
-    static class Program
+    [STAThread]
+    static void Main()
     {
-        /// <summary>
-        /// Точка входа в приложение.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            Application.SetHighDpiMode (HighDpiMode.SystemAware);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault (false);
-            Application.Run(new MainForm (Magna.Configuration));
-
-        } // method Main
-
-    } // class Program
-
-} // namespace BookTerminator
+        Application.SetHighDpiMode (HighDpiMode.SystemAware);
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault (false);
+        Application.Run (new MainForm (Magna.Configuration));
+    }
+}

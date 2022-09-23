@@ -22,37 +22,34 @@ using ManagedIrbis;
 
 #nullable enable
 
-namespace Marsohod5
+namespace Marsohod5;
+
+/// <summary>
+/// Запись, подлежащая импорту.
+/// </summary>
+public sealed class MarsohodRecord
 {
+    #region Properties
+
     /// <summary>
-    /// Запись, подлежащая импорту.
+    /// Исходная запись.
     /// </summary>
-    public sealed class MarsohodRecord
-    {
-        #region Properties
+    public Record? SourceRecord { get; set; }
 
-        /// <summary>
-        /// Исходная запись.
-        /// </summary>
-        public Record? SourceRecord { get; set; }
+    /// <summary>
+    /// Конвертированная запись.
+    /// </summary>
+    public Record? ConvertedRecord { get; set; }
 
-        /// <summary>
-        /// Конвертированная запись.
-        /// </summary>
-        public Record? ConvertedRecord { get; set; }
+    /// <summary>
+    /// Текущий выпуск журнала.
+    /// </summary>
+    public string? CurrentIssue { get; set; }
 
-        /// <summary>
-        /// Текущий выпуск журнала.
-        /// </summary>
-        public string? CurrentIssue { get; set; }
+    /// <summary>
+    /// Сведения о журнале.
+    /// </summary>
+    public MarsMagazineInfo? Magazine { get; set; }
 
-        /// <summary>
-        /// Сведения о журнале.
-        /// </summary>
-        public MarsMagazineInfo? Magazine { get; set; }
-
-        #endregion
-
-    } // class MarsohodRecord
-
-} // namespace Marsohod5
+    #endregion
+}
