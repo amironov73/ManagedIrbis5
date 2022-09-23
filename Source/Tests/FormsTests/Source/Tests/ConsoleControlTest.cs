@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 
 /* ConsoleControlTest.cs --
@@ -18,71 +19,72 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class ConsoleControlTest
+    : IFormsTest
 {
-    public sealed class ConsoleControlTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var textBox = new TextBox
-            {
-                Location = new Point(10, 10),
-                Width = 200,
-                Text = "Hello, world! "
-            };
-            form.Controls.Add(textBox);
+        var textBox = new TextBox
+        {
+            Location = new Point (10, 10),
+            Width = 200,
+            Text = "Hello, world! "
+        };
+        form.Controls.Add (textBox);
 
-            var button1 = new Button
-            {
-                Location = new Point(230, 10),
-                Width = 100,
-                Text = "Write"
-            };
-            form.Controls.Add(button1);
+        var button1 = new Button
+        {
+            Location = new Point (230, 10),
+            Width = 100,
+            Text = "Write"
+        };
+        form.Controls.Add (button1);
 
-            var button2 = new Button
-            {
-                Location = new Point(340, 10),
-                Width = 100,
-                Text = "Many"
-            };
-            form.Controls.Add(button2);
+        var button2 = new Button
+        {
+            Location = new Point (340, 10),
+            Width = 100,
+            Text = "Many"
+        };
+        form.Controls.Add (button2);
 
-            var button3 = new Button
-            {
-                Location = new Point(450, 10),
-                Width = 100,
-                Text = "Clear"
-            };
-            form.Controls.Add(button3);
+        var button3 = new Button
+        {
+            Location = new Point (450, 10),
+            Width = 100,
+            Text = "Clear"
+        };
+        form.Controls.Add (button3);
 
-            var console = new ConsoleControl
-            {
-                Location = new Point(10, 50),
-                AllowInput = false,
-                //Size = new Size(580, 300),
-                //Font = new Font("Consolas", 10f)
-            };
-            form.Controls.Add(console);
+        var console = new ConsoleControl
+        {
+            Location = new Point (10, 50),
+            AllowInput = false,
 
-            for (var row = 0; row < 4; row++)
+            //Size = new Size(580, 300),
+            //Font = new Font("Consolas", 10f)
+        };
+        form.Controls.Add (console);
+
+        for (var row = 0; row < 4; row++)
+        {
+            for (var column = 0; column < 80; column++)
             {
-                for (var column = 0; column < 80; column++)
+                if (column % 10 == 0)
                 {
-                    if (column%10 == 0)
-                    {
-                        console.Write
+                    console.Write
                         (
                             row,
                             column,
@@ -91,11 +93,11 @@ namespace FormsTests
                             Color.White,
                             false
                         );
-                    }
-                    else
-                    {
-                        var c = (char)('0' + column%10);
-                        console.Write
+                }
+                else
+                {
+                    var c = (char)('0' + column % 10);
+                    console.Write
                         (
                             row,
                             column,
@@ -104,39 +106,32 @@ namespace FormsTests
                             Color.GreenYellow,
                             false
                         );
-                    }
-
                 }
             }
-            console.CursorTop = 4;
+        }
 
-            button1.Click += (sender, args) =>
-            {
-                console.Write(textBox.Text);
-            };
+        console.CursorTop = 4;
 
-            button2.Click += (sender, args) =>
+        button1.Click += (_, _) => { console.Write (textBox.Text); };
+
+        button2.Click += (_, _) =>
+        {
+            console.ForeColor = Color.LimeGreen;
+            for (var i = 0; i < 100; i++)
             {
-                console.ForeColor = Color.LimeGreen;
-                for (var i = 0; i < 100; i++)
-                {
-                    console.Write
+                console.Write
                     (
                         i % 2 == 0,
                         "Mary has a little lamb. "
                     );
-                    Application.DoEvents();
-                }
-            };
+                Application.DoEvents();
+            }
+        };
 
-            button3.Click += (sender, args) =>
-            {
-                console.Clear();
-            };
+        button3.Click += (_, _) => { console.Clear(); };
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

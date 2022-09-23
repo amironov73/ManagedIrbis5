@@ -19,69 +19,70 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class ConsoleControlTest2
+    : IFormsTest
 {
-    public sealed class ConsoleControlTest2
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var textBox = new TextBox
-            {
-                Location = new Point(10, 10),
-                Width = 100
-            };
-            form.Controls.Add(textBox);
+        var textBox = new TextBox
+        {
+            Location = new Point (10, 10),
+            Width = 100
+        };
+        form.Controls.Add (textBox);
 
-            var console = new ConsoleControl
-            {
-                Location = new Point(10, 50),
-                ForeColor = Color.Yellow,
-                AllowInput = true
-            };
-            form.Controls.Add(console);
+        var console = new ConsoleControl
+        {
+            Location = new Point (10, 50),
+            ForeColor = Color.Yellow,
+            AllowInput = true
+        };
+        form.Controls.Add (console);
 
-            console.WriteLine
+        console.WriteLine
             (
                 Color.LawnGreen,
-                @"#include <stdio.h>
+                """
+                #include <stdio.h>
 
-int main ( int argc, char** argv )
-{
-    printf (""Hello, world!"");
-    return 0;
-}"
+                int main ( int argc, char** argv )
+                {
+                    printf (""Hello, world!"");
+                    return 0;
+                }
+                """
             );
 
-            console.Input += (sender, args) =>
-            {
-                console.WriteLine
+        console.Input += (_, args) =>
+        {
+            console.WriteLine
                 (
                     Color.DeepSkyBlue,
                     "You entered: " + args.Text
                 );
-            };
+        };
 
-            console.TabPressed += (sender, args) =>
-            {
-                var text = DateTime.Now.ToShortTimeString()
-                           + ": " + args.Text;
-                console.SetInput(text);
-            };
+        console.TabPressed += (_, args) =>
+        {
+            var text = DateTime.Now.ToShortTimeString()
+                       + ": " + args.Text;
+            console.SetInput (text);
+        };
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

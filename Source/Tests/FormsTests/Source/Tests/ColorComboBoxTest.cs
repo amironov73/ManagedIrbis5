@@ -55,7 +55,10 @@ public sealed class ColorComboBoxTest
         };
         form.Controls.Add (textBox);
 
-        colorBox.SelectedIndexChanged += (_, _) => { textBox.Text = colorBox.SelectedColor.ToString(); };
+        colorBox.SelectedIndexChanged += (_, _) =>
+        {
+            textBox.Text = colorBox.SelectedColor.ToString();
+        };
 
         form.ShowDialog (ownerWindow);
     }

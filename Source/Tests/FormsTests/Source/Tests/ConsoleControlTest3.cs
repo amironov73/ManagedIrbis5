@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 
 /* ConsoleControlTest3.cs --
@@ -19,57 +20,52 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class ConsoleControlTest3
+    : IFormsTest
 {
-    public sealed class ConsoleControlTest3
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
+            Size = new Size (800, 600)
+        };
+
+        var button = new Button
+        {
+            Location = new Point (10, 10),
+            Text = "Press me"
+        };
+        form.Controls.Add (button);
+
+        var console = new ConsoleControl
+        {
+            Location = new Point (10, 50),
+            ForeColor = Color.LawnGreen
+        };
+        form.Controls.Add (console);
+
+        button.Click += (_, _) =>
+        {
+            for (var i = 0; i < 100; i += 5)
             {
-                Size = new Size(800, 600)
-            };
+                var text = $"\rProcessing files \x1\xE{i}%";
+                console.Write (text);
+                Application.DoEvents();
+                Thread.Sleep (100);
+            }
 
-            var button = new Button
-            {
-                Location = new Point(10, 10),
-                Text = "Press me"
-            };
-            form.Controls.Add(button);
+            console.WriteLine ("\rProcessing files \x1\x000Fdone");
+        };
 
-            var console = new ConsoleControl
-            {
-                Location = new Point(10, 50),
-                ForeColor = Color.LawnGreen
-            };
-            form.Controls.Add(console);
-
-            button.Click += (sender, args) =>
-            {
-                for (var i = 0; i < 100; i += 5)
-                {
-                    var text = string.Format
-                    (
-                        "\rProcessing files \x1\xE{0}%",
-                        i
-                    );
-                    console.Write(text);
-                    Application.DoEvents();
-                    Thread.Sleep(100);
-                }
-
-                console.WriteLine("\rProcessing files \x1\x000Fdone");
-            };
-
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

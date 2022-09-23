@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 
 /* ConsoleControlOutputTest.cs --
@@ -19,56 +20,55 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class ConsoleControlOutputTest
+    : IFormsTest
 {
-    public sealed class ConsoleControlOutputTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var textBox = new TextBox
-            {
-                Location = new Point(10, 10),
-                Width = 200
-            };
-            form.Controls.Add(textBox);
+        var textBox = new TextBox
+        {
+            Location = new Point (10, 10),
+            Width = 200
+        };
+        form.Controls.Add (textBox);
 
-            var button = new Button
-            {
-                Location = new Point(250, 10),
-                Text = "Enter"
-            };
-            form.Controls.Add(button);
+        var button = new Button
+        {
+            Location = new Point (250, 10),
+            Text = "Enter"
+        };
+        form.Controls.Add (button);
 
-            var console = new ConsoleControl
-            {
-                Location = new Point(10, 50),
-                ForeColor = Color.Yellow
-            };
-            form.Controls.Add(console);
+        var console = new ConsoleControl
+        {
+            Location = new Point (10, 50),
+            ForeColor = Color.Yellow
+        };
+        form.Controls.Add (console);
 
-            AbstractOutput output
-                = new ConsoleControlOutput(console);
+        AbstractOutput output
+            = new ConsoleControlOutput (console);
 
-            button.Click += (sender, args) =>
-            {
-                var text = textBox.Text;
-                output.WriteLine(text);
-            };
+        button.Click += (_, _) =>
+        {
+            var text = textBox.Text;
+            output.WriteLine (text);
+        };
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }
