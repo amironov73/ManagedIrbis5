@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* ClocksTest.cs --
@@ -23,35 +24,32 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class ClocksTest
+    : IFormsTest
 {
-    public sealed class ClocksTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var clocks = new Clocks
-            {
-                Location = new Point(10, 10),
-                Size = new Size(100, 100)
-            };
-            form.Controls.Add(clocks);
+        var clocks = new Clocks
+        {
+            Location = new Point (10, 10),
+            Size = new Size (100, 100)
+        };
+        form.Controls.Add (clocks);
 
-            form.ShowDialog(ownerWindow);
-        }
+        form.ShowDialog (ownerWindow);
+    }
 
-        #endregion
-
-    } // class ClocksTest
-
-} // namespace FormsTests
+    #endregion
+}

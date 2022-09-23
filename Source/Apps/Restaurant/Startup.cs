@@ -94,5 +94,5 @@ public class Startup
         }
 
         app.UseEndpoints (endpoints => { endpoints.MapControllers(); });
-    } // method Configure
+    }
 }
