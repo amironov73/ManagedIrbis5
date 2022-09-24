@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* EnumComboBoxTest.cs --
@@ -25,51 +26,50 @@ using ManagedIrbis.Marc;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class EnumComboBoxTest
+    : IFormsTest
 {
-    public sealed class EnumComboBoxTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var comboBox = new EnumComboBox
-            {
-                EnumType = typeof(MarcBibliographicalIndex),
-                Location = new Point(10, 10),
-                Width = 200
-            };
-            form.Controls.Add(comboBox);
+        var comboBox = new EnumComboBox
+        {
+            EnumType = typeof (MarcBibliographicalIndex),
+            Location = new Point (10, 10),
+            Width = 200
+        };
+        form.Controls.Add (comboBox);
 
-            var textBox = new TextBox
-            {
-                Location = new Point(220, 10),
-                Width = 200
-            };
-            form.Controls.Add(textBox);
+        var textBox = new TextBox
+        {
+            Location = new Point (220, 10),
+            Width = 200
+        };
+        form.Controls.Add (textBox);
 
-            comboBox.SelectedValueChanged += (sender, args) =>
-            {
-                var value = comboBox.Value;
-                var text = value == null
-                    ? "(null)"
-                    : ((MarcBibliographicalIndex)value).ToString();
+        comboBox.SelectedValueChanged += (_, _) =>
+        {
+            var value = comboBox.Value;
+            var text = value == null
+                ? "(null)"
+                : ((MarcBibliographicalIndex) value).ToString();
 
-                textBox.Text = text;
-            };
+            textBox.Text = text;
+        };
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

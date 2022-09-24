@@ -35,8 +35,10 @@ public sealed class BrowserFormTest
             IWin32Window? ownerWindow
         )
     {
-        var html = "<h1>Document sample</h1>"
-                   + "<p>This is document sample</p>";
+        var html = """
+            <h1>Document sample</h1>
+            <p>This is document sample</p>
+            """;
 
         using var form = new BrowserForm();
         form.DocumentText = html;

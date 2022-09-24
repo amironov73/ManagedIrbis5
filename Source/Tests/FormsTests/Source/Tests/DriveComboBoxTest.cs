@@ -39,7 +39,7 @@ public sealed class DriveComboBoxTest
         using var form = new Form();
         form.Size = new Size (800, 600);
 
-        var comboBox = new DriveComboBox()
+        var comboBox = new DriveComboBox
         {
             Location = new Point (10, 10)
         };
