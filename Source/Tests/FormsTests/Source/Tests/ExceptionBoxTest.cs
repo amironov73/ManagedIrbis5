@@ -7,6 +7,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* ExceptionBoxTest.cs --
@@ -38,7 +39,8 @@ public sealed class ExceptionBoxTest
     {
         try
         {
-            var exception = new ApplicationException ("Некая ошибка в приложении");
+            const string message = "Некая ошибка в приложении";
+            var exception = new ApplicationException (message);
             throw exception;
         }
         catch (Exception ex)

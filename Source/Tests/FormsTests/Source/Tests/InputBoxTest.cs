@@ -45,7 +45,11 @@ public sealed class InputBoxTest
                 ref theValue
             );
 
-        var text = $"Result: {dialogResult}{Environment.NewLine}Value: {theValue}";
+        var text = string.Create
+            (
+                null,
+                $"Result: {dialogResult}{Environment.NewLine}Value: {theValue}"
+            );
         MessageBox.Show(text);
     }
 
