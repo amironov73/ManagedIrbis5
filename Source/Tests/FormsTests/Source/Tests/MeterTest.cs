@@ -23,50 +23,49 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class MeterTest
+    : IFormsTest
 {
-    public sealed class MeterTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var meter = new Meter
-            {
-                Location = new Point(10, 10),
-                Size = new Size(400, 200),
-                MinimalValue = 0.0f,
-                MaximalValue = 100.0f,
-                Value = 50.0f
-            };
-            form.Controls.Add(meter);
+        var meter = new Meter
+        {
+            Location = new Point (10, 10),
+            Size = new Size (400, 200),
+            MinimalValue = 0.0f,
+            MaximalValue = 100.0f,
+            Value = 50.0f
+        };
+        form.Controls.Add (meter);
 
-            var trackBar = new TrackBar
-            {
-                Location = new Point(10, 230),
-                Size = new Size(400, 30),
-                Minimum = 0,
-                Maximum = 100,
-                Value = 50
-            };
-            form.Controls.Add(trackBar);
-            trackBar.ValueChanged += (sender, args) =>
-            {
-                meter.Value = trackBar.Value;
-            };
+        var trackBar = new TrackBar
+        {
+            Location = new Point (10, 230),
+            Size = new Size (400, 30),
+            Minimum = 0,
+            Maximum = 100,
+            Value = 50
+        };
+        form.Controls.Add (trackBar);
+        trackBar.ValueChanged += (_, _) =>
+        {
+            meter.Value = trackBar.Value;
+        };
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

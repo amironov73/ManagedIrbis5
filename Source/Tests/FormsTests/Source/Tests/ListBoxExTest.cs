@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* ListBoxExTest.cs --
@@ -24,58 +25,57 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class ListBoxExTest
+    : IFormsTest
 {
-    public sealed class ListBoxExTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var listBox = new ListBoxEx
-            {
-                Location = new Point(10, 10),
-                Width = 200
-            };
-            listBox.Items.AddRange(new object[]
-            {
-                "Item1",
-                "Item2",
-                "Item3",
-                "Item4",
-                "Item5",
-                "Item6",
-                "Item7",
-                "Item8",
-                "Item9",
-                "Item10"
-            });
-            form.Controls.Add(listBox);
+        var listBox = new ListBoxEx
+        {
+            Location = new Point (10, 10),
+            Width = 200
+        };
+        listBox.Items.AddRange (new object[]
+        {
+            "Item1",
+            "Item2",
+            "Item3",
+            "Item4",
+            "Item5",
+            "Item6",
+            "Item7",
+            "Item8",
+            "Item9",
+            "Item10"
+        });
+        form.Controls.Add (listBox);
 
-            var textBox = new TextBox
-            {
-                Location = new Point(310, 10),
-                Width = 300
-            };
-            form.Controls.Add(textBox);
+        var textBox = new TextBox
+        {
+            Location = new Point (310, 10),
+            Width = 300
+        };
+        form.Controls.Add (textBox);
 
-            listBox.SelectedIndexChanged += (sender, args) =>
-            {
-                textBox.Text = listBox.SelectedItem.ToVisibleString();
-            };
+        listBox.SelectedIndexChanged += (_, _) =>
+        {
+            textBox.Text = listBox.SelectedItem.ToVisibleString();
+        };
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }
