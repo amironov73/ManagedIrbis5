@@ -75,7 +75,7 @@ public sealed class ConsoleFormTest2
         console.SetInput (text);
     }
 
-    static void HandleInput
+    private static void HandleInput
         (
             object? sender,
             ConsoleInputEventArgs eventArgs

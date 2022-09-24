@@ -48,28 +48,28 @@ public sealed class CheckedGroupBoxTest
             Location = new Point (10, 10),
             Size = new Size (250, 100)
         };
-        form.Controls.Add (@group);
+        form.Controls.Add (group);
 
         var label = new Label
         {
             Text = "Label",
             Location = new Point (10, 20)
         };
-        @group.Controls.Add (label);
+        group.Controls.Add (label);
 
         var textBox = new TextBox
         {
             Text = "Text box",
             Location = new Point (10, 50)
         };
-        @group.Controls.Add (textBox);
+        group.Controls.Add (textBox);
 
         var button = new Button
         {
             Text = "Button",
             Location = new Point (120, 20)
         };
-        @group.Controls.Add (button);
+        group.Controls.Add (button);
 
         form.ShowDialog (ownerWindow);
     }

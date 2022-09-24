@@ -7,6 +7,7 @@
 // ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* DataGridViewTest.cs --
