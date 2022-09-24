@@ -7,6 +7,7 @@
 // ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* PagingDataGridViewTest.cs --
@@ -26,94 +27,95 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class PagingDataGridViewTest
+    : IFormsTest
 {
-    public sealed class PagingDataGridViewTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var grid = new PagingDataGridView
-            {
-                Location = new Point(10, 10),
-                Size = new Size(600, 300)
-            };
-            DataGridViewColumn column1 = new DataGridViewTextBoxColumn
-            {
-                HeaderText = "Column1",
-                DataPropertyName = "Column1",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            };
-            grid.Columns.Add(column1);
-            DataGridViewColumn column2 = new DataGridViewTextBoxColumn
-            {
-                HeaderText = "Column2",
-                DataPropertyName = "Column2",
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            };
-            grid.Columns.Add(column2);
-            form.Controls.Add(grid);
-
-            grid.Paging += Grid_Paging;
-
-            grid.PerformPaging(true, true);
-
-            form.ShowDialog(ownerWindow);
-        }
-
-        private void Grid_Paging
-            (
-                object? sender,
-                PagingDataGridViewEventArgs e
-            )
+        var grid = new PagingDataGridView
         {
-            var grid = (DataGridView) sender.ThrowIfNull(nameof(sender));
+            Location = new Point (10, 10),
+            Size = new Size (600, 300)
+        };
+        DataGridViewColumn column1 = new DataGridViewTextBoxColumn
+        {
+            HeaderText = "Column1",
+            DataPropertyName = "Column1",
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        };
+        grid.Columns.Add (column1);
+        DataGridViewColumn column2 = new DataGridViewTextBoxColumn
+        {
+            HeaderText = "Column2",
+            DataPropertyName = "Column2",
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        };
+        grid.Columns.Add (column2);
+        form.Controls.Add (grid);
 
-            var table = new DataTable();
-            var column3 = new DataColumn("Column1", typeof(int));
-            table.Columns.Add(column3);
-            var column4 = new DataColumn("Column2", typeof(int));
-            table.Columns.Add(column4);
+        grid.Paging += Grid_Paging;
 
-            var counter = 0;
+        grid.PerformPaging (true, true);
 
-            if (e.InitialCall)
-            {
-                for (var i = 0; i < 20; i++)
-                {
-                    var row = table.NewRow();
-                    row[0] = ++counter;
-                    row[1] = ++counter;
-                    table.Rows.Add(row);
-                }
-                grid.DataSource = table;
+        form.ShowDialog (ownerWindow);
+    }
 
-                return;
-            }
+    private static void Grid_Paging
+        (
+            object? sender,
+            PagingDataGridViewEventArgs e
+        )
+    {
+        var grid = (DataGridView)sender.ThrowIfNull (nameof (sender));
 
-            var firstRow = grid.Rows[0];
-            counter = (int) firstRow.Cells[0].Value
-                      + (e.ScrollDown ? 39: -40);
+        var table = new DataTable();
+        var column3 = new DataColumn ("Column1", typeof (int));
+        table.Columns.Add (column3);
+        var column4 = new DataColumn ("Column2", typeof (int));
+        table.Columns.Add (column4);
+
+        var counter = 0;
+
+        if (e.InitialCall)
+        {
             for (var i = 0; i < 20; i++)
             {
                 var row = table.NewRow();
                 row[0] = ++counter;
                 row[1] = ++counter;
-                table.Rows.Add(row);
+                table.Rows.Add (row);
             }
+
             grid.DataSource = table;
+
+            return;
         }
 
-        #endregion
+        var firstRow = grid.Rows[0];
+        counter = (int)firstRow.Cells[0].Value
+                  + (e.ScrollDown ? 39 : -40);
+        for (var i = 0; i < 20; i++)
+        {
+            var row = table.NewRow();
+            row[0] = ++counter;
+            row[1] = ++counter;
+            table.Rows.Add (row);
+        }
+
+        grid.DataSource = table;
     }
+
+    #endregion
 }

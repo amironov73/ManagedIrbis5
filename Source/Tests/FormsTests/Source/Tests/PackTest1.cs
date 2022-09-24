@@ -7,6 +7,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* PackTest1.cs --
@@ -15,7 +16,6 @@
 
 #region Using directives
 
-using System;
 using System.Drawing;
 using System.Windows.Forms;
 

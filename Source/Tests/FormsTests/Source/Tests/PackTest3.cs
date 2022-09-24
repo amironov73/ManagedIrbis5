@@ -38,7 +38,8 @@ public sealed class PackTest3
             IWin32Window? ownerWindow
         )
     {
-        var allButOne = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
+        const AnchorStyles allButOne =
+            AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
 
         const int buttonWidth = 90;
         using var form = new Form()
@@ -52,14 +53,19 @@ public sealed class PackTest3
             .Location (10, 10)
             .Size
                 (
-                    form.WidthMinusPadding (10) - buttonWidth - form.Padding.Horizontal,
+                    form.WidthMinusPadding (10)
+                        - buttonWidth - form.Padding.Horizontal,
                     220
                 )
             .Padding (10);
 
         var buttonBox = new Panel()
             .Location (groupBox.Right + 10, groupBox.Top)
-            .Size (buttonWidth + form.Padding.Horizontal, form.ClientSize.Height - form.Padding.Vertical - 10)
+            .Size
+                (
+                    buttonWidth + form.Padding.Horizontal,
+                    form.ClientSize.Height - form.Padding.Vertical - 10
+                )
             .AnchorAll()
             .Padding (10)
             .BorderStyleNone();
