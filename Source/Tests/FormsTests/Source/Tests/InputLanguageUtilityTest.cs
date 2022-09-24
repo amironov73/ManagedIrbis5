@@ -4,8 +4,10 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* InputLanguageUtilityTest.cs --
@@ -23,63 +25,62 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class InputLanguageUtilityTest
+    : IFormsTest
 {
-    public sealed class InputLanguageUtilityTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var indicator = new InputLanguageIndicator
-                {
-                    Location = new Point(10, 10)
-                };
-            form.Controls.Add(indicator);
+        var indicator = new InputLanguageIndicator
+        {
+            Location = new Point (10, 10)
+        };
+        form.Controls.Add (indicator);
 
-            var englishButton = new Button
-            {
-                Location = new Point(40, 10),
-                Text = "English"
-            };
-            form.Controls.Add(englishButton);
+        var englishButton = new Button
+        {
+            Location = new Point (40, 10),
+            Text = "English"
+        };
+        form.Controls.Add (englishButton);
 
-            var russianButton = new Button
-            {
-                Location = new Point(140, 10),
-                Text = "Russian"
-            };
-            form.Controls.Add(russianButton);
+        var russianButton = new Button
+        {
+            Location = new Point (140, 10),
+            Text = "Russian"
+        };
+        form.Controls.Add (russianButton);
 
-            var textBox = new TextBox
-            {
-                Location = new Point(10, 100),
-                Width = 200
-            };
-            form.Controls.Add(textBox);
+        var textBox = new TextBox
+        {
+            Location = new Point (10, 100),
+            Width = 200
+        };
+        form.Controls.Add (textBox);
 
-            englishButton.Click += (sender, args) =>
-            {
-                InputLanguageUtility.SwitchToEnglish();
-            };
+        englishButton.Click += (_, _) =>
+        {
+            InputLanguageUtility.SwitchToEnglish();
+        };
 
-            russianButton.Click += (sender, args) =>
-            {
-                InputLanguageUtility.SwitchToRussian();
-            };
+        russianButton.Click += (_, _) =>
+        {
+            InputLanguageUtility.SwitchToRussian();
+        };
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

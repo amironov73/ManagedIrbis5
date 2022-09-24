@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* JogControlTest.cs --
@@ -17,51 +18,51 @@
 using System.Drawing;
 using System.Windows.Forms;
 
+using AM;
 using AM.Windows.Forms;
 
 #endregion
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class JogControlTest
+    : IFormsTest
 {
-    public sealed class JogControlTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var jogControl = new JogControl()
-            {
-                Location = new Point(10, 10),
-                Size = new Size(100, 100)
-            };
-            form.Controls.Add(jogControl);
+        var jogControl = new JogControl
+        {
+            Location = new Point (10, 10),
+            Size = new Size (100, 100)
+        };
+        form.Controls.Add (jogControl);
 
-            var textBox = new TextBox
-            {
-                Location = new Point(220, 10),
-                Width = 200
-            };
-            form.Controls.Add(textBox);
+        var textBox = new TextBox
+        {
+            Location = new Point (220, 10),
+            Width = 200
+        };
+        form.Controls.Add (textBox);
 
-            jogControl.AngleChanged += (sender, args) =>
-            {
-                textBox.Text = jogControl.Angle.ToString();
-            };
+        jogControl.AngleChanged += (_, _) =>
+        {
+            textBox.Text = jogControl.Angle.ToInvariantString();
+        };
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

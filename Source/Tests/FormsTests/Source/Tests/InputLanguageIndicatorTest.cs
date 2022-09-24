@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* InputLanguageIndicatorTest.cs --
@@ -23,39 +24,38 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class InputLanguageIndicatorTest
+    : IFormsTest
 {
-    public sealed class InputLanguageIndicatorTest
-        : IFormsTest
+    #region IUITest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IUITest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var textBox = new TextBox
-            {
-                Location = new Point(40, 10),
-                Width = 100
-            };
-            form.Controls.Add(textBox);
+        var textBox = new TextBox
+        {
+            Location = new Point (40, 10),
+            Width = 100
+        };
+        form.Controls.Add (textBox);
 
-            var indicator = new InputLanguageIndicator
-                {
-                    Location = new Point(10, 10)
-                };
-            form.Controls.Add(indicator);
+        var indicator = new InputLanguageIndicator
+        {
+            Location = new Point (10, 10)
+        };
+        form.Controls.Add (indicator);
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }
