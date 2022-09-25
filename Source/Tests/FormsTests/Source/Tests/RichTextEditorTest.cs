@@ -3,10 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
 
 /* RichTextEditorTest.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -23,36 +20,37 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class RichTextEditorTest
+    : IFormsTest
 {
-    public sealed class RichTextEditorTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var richText = @"{\rtf1 Hello, world!
-\par Mary has a {\b little lamb}!}";
+        const string richText = """
+        {\rtf1 Hello, world!
+        \par Mary has a {\b little lamb}!}
+        """;
 
-            var editor = new RichTextEditor
-            {
-                Dock = DockStyle.Fill,
-                Rtf = richText
-            };
-            form.Controls.Add(editor);
+        var editor = new RichTextEditor
+        {
+            Dock = DockStyle.Fill,
+            Rtf = richText
+        };
+        form.Controls.Add (editor);
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

@@ -3,10 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
 
 /* RainbowControlTest.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -23,33 +20,32 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class RainbowControlTest
+    : IFormsTest
 {
-    public sealed class RainbowControlTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var rainbow = new RainbowControl()
-            {
-                Location = new Point(10, 10),
-                Size = new Size(400, 100)
-            };
-            form.Controls.Add(rainbow);
+        var rainbow = new RainbowControl()
+        {
+            Location = new Point (10, 10),
+            Size = new Size (400, 100)
+        };
+        form.Controls.Add (rainbow);
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }
