@@ -1,4 +1,7 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
@@ -18,50 +21,49 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class ThermometerTest
+    : IFormsTest
 {
-    public sealed class ThermometerTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var thermometer = new Thermometer
-            {
-                Location = new Point(10, 10),
-                Size = new Size(50, 200),
-                CurrentTemperature = 36.7
-            };
-            form.Controls.Add(thermometer);
+        var thermometer = new Thermometer
+        {
+            Location = new Point (10, 10),
+            Size = new Size (50, 200),
+            CurrentTemperature = 36.7
+        };
+        form.Controls.Add (thermometer);
 
-            var trackBar = new TrackBar
-            {
-                Location = new Point(100, 10),
-                Width = 300,
-                Minimum = 0,
-                Maximum = 100,
-                Value = 37
-            };
-            form.Controls.Add(trackBar);
+        var trackBar = new TrackBar
+        {
+            Location = new Point (100, 10),
+            Width = 300,
+            Minimum = 0,
+            Maximum = 100,
+            Value = 37
+        };
+        form.Controls.Add (trackBar);
 
-            trackBar.ValueChanged += (sender, args) =>
-            {
-                thermometer.CurrentTemperature = trackBar.Value;
-            };
+        trackBar.ValueChanged += (_, _) =>
+        {
+            thermometer.CurrentTemperature = trackBar.Value;
+        };
 
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }
