@@ -3,11 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* PictureViewFormTest.cs --
  * Ars Magna project, http://arsmagna.ru

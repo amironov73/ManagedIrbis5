@@ -3,13 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable LocalizableElement
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* PackTest4.cs --
  * Ars Magna project, http://arsmagna.ru

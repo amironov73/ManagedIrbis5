@@ -3,12 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable LocalizableElement
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* PlainTextEditorTest.cs --
  * Ars Magna project, http://arsmagna.ru

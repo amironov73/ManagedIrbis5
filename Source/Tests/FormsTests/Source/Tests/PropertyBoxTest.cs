@@ -4,9 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
 
 /* PropertyBoxTest.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -23,22 +21,21 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class PropertyBoxTest
+    : IFormsTest
 {
-    public sealed class PropertyBoxTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
-        {
-            using var font = new Font(FontFamily.GenericSerif, 12);
-            PropertyBox.ShowDialog (ownerWindow, font);
-        }
-
-        #endregion
+        using var font = new Font (FontFamily.GenericSerif, 12);
+        PropertyBox.ShowDialog (ownerWindow, font);
     }
+
+    #endregion
 }
