@@ -1,8 +1,17 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
+
+/* Infrastructure.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System;
 using System.IO;
@@ -14,6 +23,8 @@ using ManagedIrbis;
 using ManagedIrbis.Direct;
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Ast;
+
+#endregion
 
 #nullable enable
 
@@ -106,15 +117,10 @@ static class Infrastructure
         )
         where T : IEquatable<T>
     {
-        if (expected.Equals (actual))
-        {
-            Console.WriteLine ("OK");
-            ;
-        }
-        else
-        {
-            Console.WriteLine ("FAIL");
-        }
+        Console.WriteLine
+            (
+                expected.Equals (actual) ? "OK" : "FAIL"
+            );
     }
 
     public static ISyncProvider GetProvider()
@@ -180,7 +186,7 @@ static class Infrastructure
         var expression = input;
         unifor.Execute (context, null, expression);
         var actual = context.Text.DosToUnix();
-        Infrastructure.AreEqual (expected, actual);
+        AreEqual (expected, actual);
     }
 
 
@@ -261,8 +267,7 @@ static class Infrastructure
         result.Fields.Add (new Field (907, "^A20101208^B1^C"));
         result.Fields.Add (new Field (907, "^A20110408^B1^C"));
         result.Fields.Add (new Field (907, "^A20110908^B1^C"));
-        result.Fields.Add (new Field (951,
-            "^AПример PDF-файла.PDF^TПример внешнего объекта в виде PDF-файла - с постраничным просмотром^N14"));
+        result.Fields.Add (new Field (951, "^AПример PDF-файла.PDF^TПример внешнего объекта в виде PDF-файла - с постраничным просмотром^N14"));
         result.Fields.Add (new Field (907, "^CКТ^A20120522^B1"));
         result.Fields.Add (new Field (907, "^A20120524^B1^C"));
         result.Fields.Add (new Field (907, "^CДК^A20130516^B1"));
@@ -272,12 +277,10 @@ static class Infrastructure
         result.Fields.Add (new Field (692, "^B2008/2009^CO^X!NOFOND^D42^E3^N14.00^G20081218"));
         result.Fields.Add (new Field (692, "^CV^AЗИ^D25^E0^F1^S0^G20140703"));
         result.Fields.Add (new Field (692, "^CV^X!NOFOND^D42^K46^E0^N1.00^S1.00^G20140703"));
-        result.Fields.Add (new Field (691,
-            "^! 3^IАКТ^DАктинометрия^SОПД^BФЭиОЭП^KУМО^AЗИ^Vспц^Oд/о^C310700^F3^WАКТ/3^GОсн^0ЗИ310700спцд/о-S3"));
+        result.Fields.Add (new Field (691, "^! 3^IАКТ^DАктинометрия^SОПД^BФЭиОЭП^KУМО^AЗИ^Vспц^Oд/о^C310700^F3^WАКТ/3^GОсн^0ЗИ310700спцд/о-S3"));
         result.Fields.Add (new Field (907, "^A20140703^B1^C"));
         result.Fields.Add (new Field (701, "^AБабич^BА.М.^U2"));
-        result.Fields.Add (new Field (200,
-            "^AКуда пойти учиться?^EИнформ. - реклам. справ^FЗ. М. Акулова, А. М. Бабич ; ред. А. С. Павловский [и др.]"));
+        result.Fields.Add (new Field (200, "^AКуда пойти учиться?^EИнформ. - реклам. справ^FЗ. М. Акулова, А. М. Бабич ; ред. А. С. Павловский [и др.]"));
         result.Fields.Add (new Field (907, "^CКТ^A20141001^B1"));
         result.Fields.Add (new Field (910, "^A0^B32^C20070104^DБИНТ^E7.50^H107206G^=2^U2004/7^S20070104^!ХР"));
         result.Fields.Add (new Field (910, "^A0^B33^C20070104^DБИНТ^E60.00^H107216G^U2004/7^S20070104^!ХР"));

@@ -22,7 +22,7 @@ using AM.Scripting.Barsik;
 
 #nullable enable
 
-class Program
+internal static class Program
 {
     private static string FindTestRoot
         (

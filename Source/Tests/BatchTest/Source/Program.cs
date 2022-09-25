@@ -15,38 +15,37 @@ using ManagedIrbis.Batch;
 
 #nullable enable
 
-namespace BatchTest
+namespace BatchTest;
+
+internal static class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main()
+        var connectionString = "user=librarian;password=secret;";
+
+        try
         {
-            var connectionString = "user=librarian;password=secret;";
+            using var connection = new SyncConnection();
+            connection.ParseConnectionString (connectionString);
+            connection.Connect();
 
-            try
+            var batch = BatchRecordReader.Interval
+                (
+                    connection,
+                    1,
+                    1000
+                );
+
+            var index = 0;
+            foreach (var record in batch)
             {
-                using var connection = new SyncConnection();
-                connection.ParseConnectionString(connectionString);
-                connection.Connect();
-
-                var batch = BatchRecordReader.Interval
-                    (
-                        connection,
-                        1,
-                        1000
-                    );
-
-                var index = 0;
-                foreach (var record in batch)
-                {
-                    var title = record.FM(200, 'a');
-                    Console.WriteLine($"{++index} => {title}");
-                }
+                var title = record.FM (200, 'a');
+                Console.WriteLine ($"{++index} => {title}");
             }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-            }
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine (exception);
         }
     }
 }
