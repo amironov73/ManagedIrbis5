@@ -4,8 +4,10 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* PlainTextEditorTest.cs --
@@ -23,33 +25,32 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class PlainTextEditorTest
+    : IFormsTest
 {
-    public sealed class PlainTextEditorTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var editor = new PlainTextEditor
-            {
-                Dock = DockStyle.Fill,
-                Text = "Mary has a little lamb"
-            };
-            form.Controls.Add(editor);
+        var editor = new PlainTextEditor
+        {
+            Dock = DockStyle.Fill,
+            Text = "Mary has a little lamb"
+        };
+        form.Controls.Add (editor);
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

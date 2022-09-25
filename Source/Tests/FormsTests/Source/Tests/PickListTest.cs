@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* PickListTest.cs --
@@ -23,42 +24,41 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class PickListTest
+    : IFormsTest
 {
-    public sealed class PickListTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            var pickList = new PickList
-            {
-                Location = new Point(10, 10),
-                Size = new Size(300, 200)
-            };
-            pickList.AvailableItems.AddRange(new object[]
-            {
-                "first",
-                "second",
-                "third",
-                "fourth",
-                "fifth",
-                "sixth"
-            });
-            form.Controls.Add(pickList);
+        var pickList = new PickList
+        {
+            Location = new Point (10, 10),
+            Size = new Size (300, 200)
+        };
+        pickList.AvailableItems.AddRange (new object[]
+        {
+            "first",
+            "second",
+            "third",
+            "fourth",
+            "fifth",
+            "sixth"
+        });
+        form.Controls.Add (pickList);
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

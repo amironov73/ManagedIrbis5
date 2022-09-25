@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* PictureViewFormTest.cs --
@@ -23,29 +24,25 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace FormsTests
+namespace FormsTests;
+
+public sealed class PictureViewFormTest
+    : IFormsTest
 {
-    public sealed class PictureViewFormTest
-        : IFormsTest
+    #region IFormsTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IFormsTest members
-
-        public void RunTest
+        using var image = Image.FromFile ("Images/sherlock.jpg");
+        PictureViewForm.ShowDialog
             (
-                IWin32Window? ownerWindow
-            )
-        {
-            using var image = Image.FromFile
-                (
-                    "Images/sherlock.jpg"
-                );
-            PictureViewForm.ShowDialog
-                (
-                    ownerWindow,
-                    image
-                );
-        }
-
-        #endregion
+                ownerWindow,
+                image
+            );
     }
+
+    #endregion
 }
