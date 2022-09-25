@@ -1,4 +1,7 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable LocalizableElement
@@ -6,9 +9,15 @@
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
 
+/* CommonUnitTest.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
 using System;
-using System.IO;
-using System.Linq;
+
+#endregion
 
 #nullable enable
 
@@ -22,7 +31,7 @@ public class CommonUnitTest
             string actual
         )
     {
-        int index = 0;
+        var index = 0;
         while (index < expected.Length && index < actual.Length)
         {
             if (expected[index] != actual[index])

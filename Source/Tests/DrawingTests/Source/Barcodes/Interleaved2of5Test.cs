@@ -1,14 +1,26 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
 // ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable InconsistentNaming
 // ReSharper disable InvokeAsExtensionMethod
 // ReSharper disable PropertyCanBeMadeInitOnly.Local
+
+/* Interleaved2of5Test.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
 
 using System.Drawing;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Drawing.Barcodes;
+
+#endregion
 
 #nullable enable
 
