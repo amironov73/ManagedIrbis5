@@ -8,6 +8,10 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
 
+/* IrbisFormsTest.cs -- общий предок для тестов визуальных компонентов
+ * Ars Magna project, http://arsmagna.ru
+ */
+
 #region Using directives
 
 using System;
@@ -26,6 +30,9 @@ using ManagedIrbis;
 
 namespace IrbisFormsTests;
 
+/// <summary>
+/// Общий предок для тестов визуальных компонентов ИРБИС (WinForms).
+/// </summary>
 public class IrbisFormsTest
     : IIrbisFormsTest
 {
@@ -78,20 +85,24 @@ public class IrbisFormsTest
     {
         var type = Type.GetType
                 (
-                    ClassName.ThrowIfNull ("ClassName"),
+                    ClassName.ThrowIfNull(),
                     true
                 )
             .ThrowIfNull ("Type.GetType");
 
-        var testObject = (IIrbisFormsTest)Activator.CreateInstance (type)
+        var testObject = (IIrbisFormsTest) Activator.CreateInstance (type)
             .ThrowIfNull ("Activator.CreateInstance");
 
         testObject.RunTest (ownerWindow);
+
+        // ReSharper disable SuspiciousTypeConversion.Global
 
         if (testObject is IDisposable disposable)
         {
             disposable.Dispose();
         }
+
+        // ReSharper restore SuspiciousTypeConversion.Global
     }
 
     #endregion
