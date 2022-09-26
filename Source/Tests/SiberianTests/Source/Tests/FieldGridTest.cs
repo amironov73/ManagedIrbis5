@@ -7,6 +7,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* FieldGridTest.cs --
@@ -28,41 +29,40 @@ using ManagedIrbis.Workspace;
 
 #nullable enable
 
-namespace SiberianTests
+namespace SiberianTests;
+
+public class FieldGridTest
+    : ISiberianTest
 {
-    public class FieldGridTest
-        : ISiberianTest
+    #region ISiberianTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region ISiberianTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new DummyForm
         {
-            using var form = new DummyForm
-            {
-                Width = 800,
-                Height = 600
-            };
+            Width = 800,
+            Height = 600
+        };
 
-            var grid = new SiberianFieldGrid
-            {
-                Dock = DockStyle.Fill
-            };
-            form.Controls.Add(grid);
+        var grid = new SiberianFieldGrid
+        {
+            Dock = DockStyle.Fill
+        };
+        form.Controls.Add (grid);
 
-            var record = PlainText.ReadOneRecord("record.txt", Encoding.UTF8)
-                .ThrowIfNull("record");
-            var worksheet = WsFile.ReadLocalFile("pazk31.ws");
-            var page = worksheet.Pages[1];
+        var record = PlainText
+            .ReadOneRecord ("record.txt", Encoding.UTF8)
+            .ThrowIfNull();
+        var worksheet = WsFile.ReadLocalFile ("pazk31.ws");
+        var page = worksheet.Pages[1];
 
-            grid.Load(page, record);
+        grid.Load (page, record);
 
-            form.ShowDialog(ownerWindow);
-
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

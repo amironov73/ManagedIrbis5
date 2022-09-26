@@ -8,6 +8,10 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
 
+/* SiberianTest.cs -- класс для тестирования SiberianGrid
+ * Ars Magna project, http://arsmagna.ru
+ */
+
 #region Using directives
 
 using System;
@@ -24,6 +28,9 @@ using AM.Json;
 
 namespace SiberianTests;
 
+/// <summary>
+/// Класс для тестирования SiberianGrid
+/// </summary>
 public sealed class SiberianTest
     : ISiberianTest
 {
