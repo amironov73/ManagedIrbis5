@@ -21,18 +21,17 @@ using ManagedIrbis.WinForms;
 
 #nullable enable
 
-namespace IrbisFormsTests
+namespace IrbisFormsTests;
+
+public sealed class IrbisBusyFormTest
+    : IIrbisFormsTest
 {
-    public sealed class IrbisBusyFormTest
-        : IIrbisFormsTest
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
-        {
-            using BusyForm form = new BusyForm();
-            form.ShowDialog(ownerWindow);
-        }
+        using var form = new BusyForm();
+        form.ShowDialog(ownerWindow);
     }
 }

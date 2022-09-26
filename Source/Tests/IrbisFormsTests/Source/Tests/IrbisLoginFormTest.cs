@@ -21,22 +21,21 @@ using ManagedIrbis.WinForms;
 
 #nullable enable
 
-namespace IrbisFormsTests
+namespace IrbisFormsTests;
+
+public sealed class IrbisLoginFormTest
+    : IIrbisFormsTest
 {
-    public sealed class IrbisLoginFormTest
-        : IIrbisFormsTest
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new IrbisLoginForm();
+        if (form.ShowDialog (ownerWindow) == DialogResult.OK)
         {
-            using var form = new IrbisLoginForm();
-            if (form.ShowDialog(ownerWindow) == DialogResult.OK)
-            {
-                var settings = form.GatherSettings();
-                MessageBox.Show(settings.ToString());
-            }
+            var settings = form.GatherSettings();
+            MessageBox.Show (settings.ToString());
         }
     }
 }

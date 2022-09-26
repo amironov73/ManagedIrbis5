@@ -21,18 +21,17 @@ using ManagedIrbis.WinForms;
 
 #nullable enable
 
-namespace IrbisFormsTests
+namespace IrbisFormsTests;
+
+public sealed class WssFormTest
+    : IIrbisFormsTest
 {
-    public sealed class WssFormTest
-        : IIrbisFormsTest
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
-        {
-            var form = new WssForm();
-            form.ShowDialog(ownerWindow);
-        }
+        var form = new WssForm();
+        form.ShowDialog (ownerWindow);
     }
 }
