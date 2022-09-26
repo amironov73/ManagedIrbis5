@@ -23,53 +23,52 @@ using ManagedIrbis.WinForms;
 
 #nullable enable
 
-namespace IrbisFormsTests
+namespace IrbisFormsTests;
+
+public sealed class FieldPainterTest
+    : IIrbisFormsTest
 {
-    public sealed class FieldPainterTest
-        : IIrbisFormsTest
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size (800, 600)
+        };
 
-            form.Paint += form_Paint;
+        form.Paint += form_Paint;
 
-            form.ShowDialog(ownerWindow);
-        }
+        form.ShowDialog (ownerWindow);
+    }
 
-        void form_Paint
+    void form_Paint
+        (
+            object? sender,
+            PaintEventArgs e
+        )
+    {
+        var painter = new FieldPainter
             (
-                object? sender,
-                PaintEventArgs e
-            )
+                Color.Red,
+                Color.Black
+            );
+
+        if (sender is Form form)
         {
-            var painter = new FieldPainter
+            var font = form.Font;
+            var point = new PointF (10, 10);
+            var extent = new SizeF (200, 100);
+            const string text = "Text1^atext2^btext3";
+
+            painter.DrawLine
                 (
-                    Color.Red,
-                    Color.Black
+                    e.Graphics,
+                    font,
+                    new RectangleF (point, extent),
+                    text
                 );
-
-            if (sender is Form form)
-            {
-                var font = form.Font;
-                var point = new PointF(10, 10);
-                var extent = new SizeF(200, 100);
-                var text = "Text1^atext2^btext3";
-
-                painter.DrawLine
-                    (
-                        e.Graphics,
-                        font,
-                        new RectangleF(point, extent),
-                        text
-                    );
-            }
         }
     }
 }

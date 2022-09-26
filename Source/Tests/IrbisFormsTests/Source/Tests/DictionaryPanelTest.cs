@@ -22,51 +22,56 @@ using ManagedIrbis.WinForms;
 
 #nullable enable
 
-namespace IrbisFormsTests
+namespace IrbisFormsTests;
+
+public sealed class DictionaryPanelTest
+    : IIrbisFormsTest
 {
-    public sealed class DictionaryPanelTest
-        : IIrbisFormsTest
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new Form
         {
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
+            Size = new Size(800, 600)
+        };
 
-            using var connection = IrbisFormsTest.GetConnection();
+        using var connection = IrbisFormsTest.GetConnection();
 
-            var adapter = new TermAdapter(connection, "K=");
-            adapter.Fill();
+        var adapter = new TermAdapter(connection, "K=");
+        adapter.Fill();
 
-            var panel = new DictionaryPanel(adapter)
-            {
-                Location = new Point(10, 10),
-                Size = new Size(300, 300),
-            };
-            form.Controls.Add(panel);
+        var panel = new DictionaryPanel(adapter)
+        {
+            Location = new Point(10, 10),
+            Size = new Size(300, 300),
+        };
+        form.Controls.Add(panel);
 
-            var currentBox = new TextBox
-            {
-                Location = new Point(400, 10),
-                Width = 300
-            };
-            form.Controls.Add(currentBox);
+        var currentBox = new TextBox
+        {
+            Location = new Point(400, 10),
+            Width = 300
+        };
+        form.Controls.Add(currentBox);
 
-            var choosedBox = new TextBox
-            {
-                Location = new Point(400, 40),
-                Width = 300
-            };
-            form.Controls.Add(choosedBox);
+        var choosedBox = new TextBox
+        {
+            Location = new Point(400, 40),
+            Width = 300
+        };
+        form.Controls.Add(choosedBox);
 
-            adapter.Source.CurrentChanged += (sender, args) => { currentBox.Text = adapter.FullTerm; };
-            panel.Choosed += (sender, args) => { choosedBox.Text = adapter.CurrentValue; };
+        adapter.Source.CurrentChanged += (_, _) =>
+        {
+            currentBox.Text = adapter.FullTerm;
+        };
+        panel.Choosed += (_, _) =>
+        {
+            choosedBox.Text = adapter.CurrentValue;
+        };
 
-            form.ShowDialog(ownerWindow);
-        }
+        form.ShowDialog(ownerWindow);
     }
 }

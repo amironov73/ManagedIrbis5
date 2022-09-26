@@ -22,31 +22,30 @@ using ManagedIrbis.WinForms;
 
 #nullable enable
 
-namespace IrbisFormsTests
+namespace IrbisFormsTests;
+
+public sealed class DictionaryFormTest
+    : IIrbisFormsTest
 {
-    public sealed class DictionaryFormTest
-        : IIrbisFormsTest
+    #region IUITest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region IUITest members
+        using var connection = IrbisFormsTest.GetConnection();
 
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        var adapter = new TermAdapter (connection, "K=");
+        adapter.Fill();
+
+        using var form = new DictionaryForm (adapter);
+        if (form.ShowDialog (ownerWindow) == DialogResult.OK)
         {
-            using var connection = IrbisFormsTest.GetConnection();
-
-            var adapter = new TermAdapter(connection, "K=");
-            adapter.Fill();
-
-            using var form = new DictionaryForm(adapter);
-            if (form.ShowDialog(ownerWindow) == DialogResult.OK)
-            {
-                var chosenTerm = form.ChosenTerm;
-                MessageBox.Show("Chosen: " + chosenTerm);
-            }
+            var chosenTerm = form.ChosenTerm;
+            MessageBox.Show ("Chosen: " + chosenTerm);
         }
-
-        #endregion
     }
+
+    #endregion
 }

@@ -22,34 +22,33 @@ using ManagedIrbis.WinForms;
 
 #nullable enable
 
-namespace IrbisFormsTests
+namespace IrbisFormsTests;
+
+public sealed class FoundPanelTest
+    : IIrbisFormsTest
 {
-    public sealed class FoundPanelTest
-        : IIrbisFormsTest
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var connection = IrbisFormsTest.GetConnection();
+
+        var adapter = new RecordAdapter (connection);
+
+        using var form = new Form
         {
-            using var connection = IrbisFormsTest.GetConnection();
+            Size = new Size (800, 600)
+        };
 
-            var adapter = new RecordAdapter(connection);
+        var panel = new FoundPanel (adapter)
+        {
+            Location = new Point (10, 10),
+            Size = new Size (600, 200)
+        };
+        form.Controls.Add (panel);
+        panel.Fill();
 
-            using var form = new Form
-            {
-                Size = new Size(800, 600)
-            };
-
-            var panel = new FoundPanel(adapter)
-            {
-                Location = new Point(10, 10),
-                Size = new Size(600, 200)
-            };
-            form.Controls.Add(panel);
-            panel.Fill();
-
-            form.ShowDialog(ownerWindow);
-        }
+        form.ShowDialog (ownerWindow);
     }
 }
