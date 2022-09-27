@@ -22,38 +22,35 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-namespace AM.Win32
+namespace AM.Win32;
+
+/// <summary>
+/// The TRACKMOUSEEVENT structure is used by the TrackMouseEvent
+/// function to track when the mouse pointer leaves a window or
+/// hovers over a window for a specified amount of time.
+/// </summary>
+[StructLayout (LayoutKind.Sequential)]
+public struct TRACKMOUSEEVENT
 {
     /// <summary>
-    /// The TRACKMOUSEEVENT structure is used by the TrackMouseEvent
-    /// function to track when the mouse pointer leaves a window or
-    /// hovers over a window for a specified amount of time.
+    /// Specifies the size of the TRACKMOUSEEVENT structure.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct TRACKMOUSEEVENT
-    {
-        /// <summary>
-        /// Specifies the size of the TRACKMOUSEEVENT structure.
-        /// </summary>
-        public int cbSize;
+    public int cbSize;
 
-        /// <summary>
-        /// Specifies the services requested.
-        /// </summary>
-        public TrackMouseEventFlags dwFlags;
+    /// <summary>
+    /// Specifies the services requested.
+    /// </summary>
+    public TrackMouseEventFlags dwFlags;
 
-        /// <summary>
-        /// Specifies a handle to the window to track.
-        /// </summary>
-        public IntPtr hwndTrack;
+    /// <summary>
+    /// Specifies a handle to the window to track.
+    /// </summary>
+    public IntPtr hwndTrack;
 
-        /// <summary>
-        /// Specifies the hover time-out (if TME_HOVER was specified in
-        /// dwFlags), in milliseconds. Can be HOVER_DEFAULT, which means
-        /// to use the system default hover time-out.
-        /// </summary>
-        public int dwHoverTime;
-
-    } // struct TRACKMOUSEEVENT
-
-} // namespace AM.Win32
+    /// <summary>
+    /// Specifies the hover time-out (if TME_HOVER was specified in
+    /// dwFlags), in milliseconds. Can be HOVER_DEFAULT, which means
+    /// to use the system default hover time-out.
+    /// </summary>
+    public int dwHoverTime;
+}
