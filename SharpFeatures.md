@@ -52,7 +52,7 @@ static Quadrant GetQuadrant (Point point) => point switch
 };
 ```
 
-# readonly-методы
+## readonly-методы
 
 **Начиная с C# 8**
 
@@ -70,7 +70,7 @@ public struct Point
 }
 ```
 
-# Методы с реализацией по умолчанию в интерфейсах
+## Методы с реализацией по умолчанию в интерфейсах
 
 **Начиная с C# 8**
 
@@ -79,15 +79,15 @@ interface ICar
 {
     void GetSpeed();
     void GetMileage();
-    
-    public void SendCommand() 
+
+    public void SendCommand()
     {
         // некая реализация по умолчанию
     }
 }
 ```
 
-# switch-выражения
+## switch-выражения
 
 **Начиная с C# 8**
 
@@ -113,9 +113,9 @@ public static RGBColor FromRainbow (Rainbow colorBand) =>
         Rainbow.Blue   => new RGBColor (0x00, 0x00, 0xFF),
         Rainbow.Indigo => new RGBColor (0x4B, 0x00, 0x82),
         Rainbow.Violet => new RGBColor (0x94, 0x00, 0xD3),
-        _              => throw new ArgumentException 
+        _              => throw new ArgumentException
             (
-                message: "invalid enum value", 
+                message: "invalid enum value",
                 paramName: nameof(colorBand)
             ),
     };
@@ -141,13 +141,13 @@ static int WriteLinesToFile (IEnumerable<string> lines)
             skippedLines++;
         }
     }
-    
+
     return skippedLines;
     // file is disposed here
 }
 ```
 
-# Статические локальные функции
+## Статические локальные функции
 
 **Начиная с C# 8**
 
@@ -203,7 +203,7 @@ public class SomeClass
     {
         // некие действия по очистке
     }
-    
+
     protected virtual void Dispose (bool disposing)
     {
         if (disposing)
@@ -211,7 +211,7 @@ public class SomeClass
             // освобождение managed-ресурсов
         }
     }
-    
+
     public async ValueTask DisposeAsync()
     {
         // Perform async cleanup.
@@ -221,10 +221,10 @@ public class SomeClass
         Dispose (false);
 
         #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
-        
+
         // Suppress finalization.
         GC.SuppressFinalize (this);
-        
+
         #pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
     }
 }
@@ -291,7 +291,7 @@ var point1 = new Point (1, 2);
 var point2 = point1 with { X = 5, Y = 6 };
 ```
 
-# Объявление пространства имен на весь файл
+## Объявление пространства имен на весь файл
 
 **Начиная с C# 10**
 
