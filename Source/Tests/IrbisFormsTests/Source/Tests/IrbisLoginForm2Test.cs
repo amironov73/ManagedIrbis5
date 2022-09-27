@@ -22,25 +22,24 @@ using ManagedIrbis.WinForms;
 
 #nullable enable
 
-namespace IrbisFormsTests
-{
-    public sealed class IrbisLoginForm2Test
-        : IIrbisFormsTest
-    {
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
-        {
-            using var form = new IrbisLoginForm2();
-            var settings = new ConnectionSettings();
-            form.ApplySettings(settings);
+namespace IrbisFormsTests;
 
-            if (form.ShowDialog(ownerWindow) == DialogResult.OK)
-            {
-                settings = form.GatherSettings();
-                MessageBox.Show(settings.ToString());
-            }
+public sealed class IrbisLoginForm2Test
+    : IIrbisFormsTest
+{
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
+    {
+        using var form = new IrbisLoginForm2();
+        var settings = new ConnectionSettings();
+        form.ApplySettings (settings);
+
+        if (form.ShowDialog (ownerWindow) == DialogResult.OK)
+        {
+            settings = form.GatherSettings();
+            MessageBox.Show (settings.ToString());
         }
     }
 }

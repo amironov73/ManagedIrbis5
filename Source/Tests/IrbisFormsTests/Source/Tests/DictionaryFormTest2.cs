@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -21,34 +22,33 @@ using ManagedIrbis.WinForms;
 
 #nullable enable
 
-namespace IrbisFormsTests
-{
-    public sealed class DictionaryFormTest2
-        : IIrbisFormsTest
-    {
-        #region IUITest members
+namespace IrbisFormsTests;
 
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+public sealed class DictionaryFormTest2
+    : IIrbisFormsTest
+{
+    #region IUITest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
+    {
+        using var connection = IrbisFormsTest.GetConnection();
         {
-            using var connection = IrbisFormsTest.GetConnection();
+            var adapter = new TermAdapter (connection, "K=");
+            var chosen = DictionaryForm.ChooseTerm
+                (
+                    ownerWindow,
+                    adapter,
+                    "бетон"
+                );
+            if (!string.IsNullOrEmpty (chosen))
             {
-                var adapter = new TermAdapter(connection, "K=");
-                var chosen = DictionaryForm.ChooseTerm
-                    (
-                        ownerWindow,
-                        adapter,
-                        "бетон"
-                    );
-                if (!string.IsNullOrEmpty(chosen))
-                {
-                    MessageBox.Show("Chosen: " + chosen);
-                }
+                MessageBox.Show ("Chosen: " + chosen);
             }
         }
-
-        #endregion
     }
+
+    #endregion
 }

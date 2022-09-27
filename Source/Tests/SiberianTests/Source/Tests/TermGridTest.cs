@@ -7,6 +7,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* TermGridTest.cs -- тест для грида, отображающего термины поискового словаря
@@ -25,56 +26,55 @@ using ManagedIrbis.WinForms.Grid;
 
 #nullable enable
 
-namespace SiberianTests
+namespace SiberianTests;
+
+/// <summary>
+/// Тест для грида, отображающего термины поискового словаря.
+/// </summary>
+public sealed class TermGridTest
+    : ISiberianTest
 {
-    /// <summary>
-    /// Тест для грида, отображающего термины поискового словаря.
-    /// </summary>
-    public sealed class TermGridTest
-        : ISiberianTest
+    #region ISiberianTest
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region ISiberianTest
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new DummyForm
         {
-            using var form = new DummyForm
-            {
-                Width = 800,
-                Height = 600
-            };
+            Width = 800,
+            Height = 600
+        };
 
-            var grid = new SiberianTermGrid
-            {
-                Dock = DockStyle.Fill
-            };
-            form.Controls.Add(grid);
+        var grid = new SiberianTermGrid
+        {
+            Dock = DockStyle.Fill
+        };
+        form.Controls.Add (grid);
 
-            const string connectionString = "host=127.0.0.1;port=6666;user=librarian;password=secret;";
-            using var connection = ConnectionFactory.Shared.CreateSyncConnection();
-            connection.ParseConnectionString(connectionString);
-            connection.Connect();
+        const string connectionString = "host=127.0.0.1;port=6666;user=librarian;password=secret;";
+        using var connection = ConnectionFactory.Shared.CreateSyncConnection();
+        connection.ParseConnectionString (connectionString);
+        connection.Connect();
 
-            var parameters = new TermParameters
-            {
-                Database = "IBIS",
-                NumberOfTerms = 100,
-                //ReverseOrder = false,
-                StartTerm = "K=",
-                //Format = null
-            };
+        var parameters = new TermParameters
+        {
+            Database = "IBIS",
+            NumberOfTerms = 100,
+            //ReverseOrder = false,
+            StartTerm = "K=",
+            //Format = null
+        };
 
-            var terms = connection.ReadTerms(parameters) ?? Array.Empty<Term>();
-            terms = Term.TrimPrefix(terms, "K=");
-            connection.Disconnect();
+        var terms = connection.ReadTerms (parameters) ?? Array.Empty<Term>();
+        terms = Term.TrimPrefix (terms, "K=");
+        connection.Disconnect();
 
-            grid.Load(terms);
+        grid.Load (terms);
 
-            form.ShowDialog(ownerWindow);
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

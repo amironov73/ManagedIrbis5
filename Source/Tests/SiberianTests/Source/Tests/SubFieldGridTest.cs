@@ -7,6 +7,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* SubFieldGridTest.cs --
@@ -28,41 +29,39 @@ using ManagedIrbis.Workspace;
 
 #nullable enable
 
-namespace SiberianTests
+namespace SiberianTests;
+
+public sealed class SubFieldGridTest
+    : ISiberianTest
 {
-    public sealed class SubFieldGridTest
-        : ISiberianTest
+    #region ISiberianTest members
+
+    public void RunTest
+        (
+            IWin32Window? ownerWindow
+        )
     {
-        #region ISiberianTest members
-
-        public void RunTest
-            (
-                IWin32Window? ownerWindow
-            )
+        using var form = new DummyForm
         {
-            using var form = new DummyForm
-            {
-                Width = 800,
-                Height = 600
-            };
+            Width = 800,
+            Height = 600
+        };
 
-            var grid = new SiberianSubFieldGrid
-            {
-                Dock = DockStyle.Fill
-            };
-            form.Controls.Add(grid);
+        var grid = new SiberianSubFieldGrid
+        {
+            Dock = DockStyle.Fill
+        };
+        form.Controls.Add (grid);
 
-            var record = PlainText.ReadOneRecord("record.txt", Encoding.UTF8)
-                .ThrowIfNull("record");
-            var field = record.GetField(692).ThrowIfNull("record.GetField(692)");
-            var worksheet = WssFile.ReadLocalFile("692.wss");
+        var record = PlainText.ReadOneRecord ("record.txt", Encoding.UTF8)
+            .ThrowIfNull ("record");
+        var field = record.GetField (692).ThrowIfNull ();
+        var worksheet = WssFile.ReadLocalFile ("692.wss");
 
-            grid.Load(worksheet, field);
+        grid.Load (worksheet, field);
 
-            form.ShowDialog(ownerWindow);
-
-        }
-
-        #endregion
+        form.ShowDialog (ownerWindow);
     }
+
+    #endregion
 }

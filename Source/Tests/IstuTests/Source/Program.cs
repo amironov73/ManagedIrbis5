@@ -17,11 +17,11 @@
 #region Using directives
 
 using System;
-using System.IO;
 using System.Linq;
 
 using Istu.OldModel;
 using Istu.OldModel.Implementation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,62 +31,56 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace IstuTests
+namespace IstuTests;
+
+internal static class Program
 {
-    static class Program
+    private static int Main
+        (
+            string[] args
+        )
     {
-        static int Main
-            (
-                string[] args
-            )
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath (AppContext.BaseDirectory)
+            .AddJsonFile ("appsettings.json")
+            .Build();
+
+        var host = Host.CreateDefaultBuilder()
+            .ConfigureServices (services =>
+            {
+                services.AddLogging (logging => { logging.AddConsole(); });
+            })
+            .Build();
+
+        var storehouse = new Storehouse (host.Services, configuration);
+        using var kladovka = storehouse.GetKladovka();
+        var readers = kladovka.GetReaders();
+        var readerCount = readers.Count();
+        Console.WriteLine ($"Total readers = {readerCount}");
+        var attendanceManager = new AttendanceManager (storehouse);
+        var lastAttendance = attendanceManager.GetLastAttendance ("р-1");
+        Console.WriteLine (lastAttendance);
+        var lastReaders = attendanceManager.GetLastReaders();
+        foreach (var reader in lastReaders)
         {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            var host = Host.CreateDefaultBuilder()
-                .ConfigureServices(services =>
-                {
-                    services.AddLogging(logging =>
-                    {
-                        logging.AddConsole();
-                    });
-
-
-                })
-                .Build();
-
-            var storehouse = new Storehouse(host.Services, configuration);
-            using var kladovka = storehouse.GetKladovka();
-            var readers = kladovka.GetReaders();
-            var readerCount = readers.Count();
-            Console.WriteLine($"Total readers = {readerCount}");
-            var attendanceManager = new AttendanceManager(storehouse);
-            var lastAttendance = attendanceManager.GetLastAttendance("р-1");
-            Console.WriteLine(lastAttendance);
-            var lastReaders = attendanceManager.GetLastReaders();
-            foreach (var reader in lastReaders)
-            {
-                Console.WriteLine($"{reader.Ticket}: {reader.Name}");
-            }
-
-            var readerManager = new ReaderManager(storehouse);
-            var oneReader = readerManager.GetReaderByTicket("р-1");
-            Console.WriteLine(oneReader);
-
-            var foundReaders = readerManager.FindReaders
-                (
-                    ReaderSearchCriteria.Ticket,
-                    "р-1",
-                    10
-                );
-            foreach (var foundReader in foundReaders)
-            {
-                Console.WriteLine(foundReader);
-            }
-
-            return 0;
+            Console.WriteLine ($"{reader.Ticket}: {reader.Name}");
         }
+
+        var readerManager = new ReaderManager (storehouse);
+        var oneReader = readerManager.GetReaderByTicket ("р-1");
+        Console.WriteLine (oneReader);
+
+        var foundReaders = readerManager.FindReaders
+            (
+                ReaderSearchCriteria.Ticket,
+                "р-1",
+                10
+            );
+        foreach (var foundReader in foundReaders)
+        {
+            Console.WriteLine (foundReader);
+        }
+
+        return 0;
     }
 }

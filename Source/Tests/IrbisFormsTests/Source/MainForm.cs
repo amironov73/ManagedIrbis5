@@ -22,77 +22,89 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace IrbisFormsTests
+namespace IrbisFormsTests;
+
+/// <summary>
+/// Main form.
+/// </summary>
+public sealed partial class MainForm
+    : Form
 {
+    #region Properties
+
+    public IrbisFormsTest? CurrentTest => _listBox.SelectedItem as IrbisFormsTest;
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Main form.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public partial class MainForm
-        : Form
+    public MainForm()
     {
-        #region Properties
+        InitializeComponent();
+    }
 
-        public IrbisFormsTest? CurrentTest => _listBox.SelectedItem as IrbisFormsTest;
+    #endregion
 
-        #endregion
+    #region Private members
 
-        public MainForm()
+    private void _exitItem_Click
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        Close();
+    }
+
+    private void MainForm_Load
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        var tests = IrbisFormsTest
+            .LoadFromFile ("tests.json")
+            .OrderBy (test => test.Title)
+            .ToArray();
+
+        // ReSharper disable CoVariantArrayConversion
+        _listBox.Items.AddRange (tests);
+
+        // ReSharper restore CoVariantArrayConversion
+    }
+
+    private void _listBox_DoubleClick
+        (
+            object sender,
+            EventArgs eventArgs
+        )
+    {
+        try
         {
-            InitializeComponent();
+            CurrentTest?.RunTest (this);
         }
-
-        private void _exitItem_Click
-            (
-                object sender,
-                EventArgs e
-            )
+        catch (Exception ex)
         {
-            Close();
+            //ExceptionBox.Show(ex);
+            MessageBox.Show (ex.ToString());
         }
+    }
 
-        private void MainForm_Load
-            (
-                object sender,
-                EventArgs e
-            )
+    private void _listBox_KeyDown
+        (
+            object sender,
+            KeyEventArgs eventArgs
+        )
+    {
+        if (eventArgs.KeyData == Keys.Enter)
         {
-            var tests = IrbisFormsTest
-                .LoadFromFile("tests.json")
-                .OrderBy(test => test.Title)
-                .ToArray();
-
-            // ReSharper disable CoVariantArrayConversion
-            _listBox.Items.AddRange(tests);
-            // ReSharper restore CoVariantArrayConversion
+            eventArgs.Handled = true;
+            _listBox_DoubleClick (sender, eventArgs);
         }
+    }
 
-        private void _listBox_DoubleClick
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            try
-            {
-                var test = CurrentTest;
-                test?.RunTest(this);
-            }
-            catch (Exception ex)
-            {
-                //ExceptionBox.Show(ex);
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
-        private void _listBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyData == Keys.Enter)
-            {
-                e.Handled = true;
-                _listBox_DoubleClick(sender, e);
-            }
-        }
-
-    } // class MainForm
-
-} // namespace FormsTests
+    #endregion
+}

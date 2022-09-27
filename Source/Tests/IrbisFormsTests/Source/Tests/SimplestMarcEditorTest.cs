@@ -80,7 +80,7 @@ public sealed class SimplestMarcEditorTest
         form.ShowDialog (ownerWindow);
 
         editor.GetFields (record.Fields);
-        string text = record.ToPlainText();
+        var text = record.ToPlainText();
         PlainTextForm.ShowDialog (form, text);
     }
 }
