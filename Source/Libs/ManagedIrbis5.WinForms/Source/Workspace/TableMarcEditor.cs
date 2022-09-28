@@ -20,62 +20,65 @@
 
 using System;
 
+using AM;
+
 using ManagedIrbis.Workspace;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Workspace
+namespace ManagedIrbis.WinForms.Workspace;
+
+/// <summary>
+/// Ввод значений полей/подполей в таблице.
+/// </summary>
+public sealed class TableMarcEditor
+    : IMarcEditor
 {
+    #region Construction
+
     /// <summary>
-    /// Ввод значений полей/подполей в таблице.
+    /// Конструктор.
     /// </summary>
-    public sealed class TableMarcEditor
-        : IMarcEditor
+    /// <param name="provider">Провайдер сервисов.</param>
+    public TableMarcEditor
+        (
+            IServiceProvider provider
+        )
     {
-        #region Construction
+        Sure.NotNull (provider);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="provider">Провайдер сервисов.</param>
-        public TableMarcEditor
-            (
-                IServiceProvider provider
-            )
-        {
-            _provider = provider;
-        } // constructor
+        _provider = provider;
+    }
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Private members
 
-        private readonly IServiceProvider _provider;
+    private readonly IServiceProvider _provider;
 
-        #endregion
+    #endregion
 
-        #region IMarcEditor
+    #region IMarcEditor
 
-        /// <inheritdoc cref="IMarcEditor.PerformEdit"/>
-        public void PerformEdit
-            (
-                EditContext context
-            )
-        {
-            throw new NotImplementedException();
-        } // method PerformEdit
+    /// <inheritdoc cref="IMarcEditor.PerformEdit"/>
+    public void PerformEdit
+        (
+            EditContext context
+        )
+    {
+        Sure.NotNull (context);
 
-        #endregion
+        throw new NotImplementedException();
+    } // method PerformEdit
 
-        #region IServiveProvider members
+    #endregion
 
-        /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService(Type serviceType) => _provider.GetService(serviceType);
+    #region IServiveProvider members
 
-        #endregion
+    /// <inheritdoc cref="IServiceProvider.GetService"/>
+    public object? GetService (Type serviceType) => _provider.GetService (serviceType);
 
-    } // class TableMarcEditor
-
-} // namespace ManagedIrbis.WinForms.Workspace
+    #endregion
+}
