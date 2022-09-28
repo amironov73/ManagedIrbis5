@@ -60,7 +60,7 @@ namespace AM.Windows.Forms
         {
             InnerList = new BindingList<T>();
             DataSource = InnerList;
-        } // constructor
+        }
 
         #endregion
 
@@ -103,5 +103,5 @@ namespace AM.Windows.Forms
         public bool Remove (T item) => InnerList.Remove (item);
 
         #endregion
-    } // class BindingListSource
-} // namespace AM.Windows.Forms
+    }
+}

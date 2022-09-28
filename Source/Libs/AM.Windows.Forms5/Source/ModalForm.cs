@@ -18,30 +18,28 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Простая болванка для модальной формы.
+/// </summary>
+public class ModalForm
+    : Form
 {
+    #region Construction
+
     /// <summary>
-    /// Простая болванка для модальной формы.
+    /// Конструктор.
     /// </summary>
-    public class ModalForm
-        : Form
+    public ModalForm()
     {
-        #region Construction
+        ShowInTaskbar = false;
+        MinimizeBox = false;
+        MaximizeBox = false;
+        FormBorderStyle = FormBorderStyle.FixedDialog;
+        StartPosition = FormStartPosition.CenterScreen;
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ModalForm()
-        {
-            ShowInTaskbar = false;
-            MinimizeBox = false;
-            MaximizeBox = false;
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            StartPosition = FormStartPosition.CenterScreen;
-        } // constructor
+    #endregion
 
-        #endregion
-
-    } // class ModalForm
-
-} // namespace AM.Windows.Forms
+}

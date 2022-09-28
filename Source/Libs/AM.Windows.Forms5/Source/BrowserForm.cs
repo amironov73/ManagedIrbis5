@@ -24,124 +24,122 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Простая форма с веб-браузером для показа HTML.
+/// </summary>
+public partial class BrowserForm
+    : Form
 {
+    #region Properties
+
     /// <summary>
-    /// Простая форма с веб-браузером для показа HTML.
+    /// HTML отображаемого документа.
     /// </summary>
-    public partial class BrowserForm
-        : Form
+    [DefaultValue (null)]
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public string DocumentText
     {
-        #region Properties
+        get => _webBrowser.DocumentText;
+        set => _webBrowser.DocumentText = value;
+    }
 
-        /// <summary>
-        /// HTML отображаемого документа.
-        /// </summary>
-        [DefaultValue (null)]
-        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public string DocumentText
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public BrowserForm()
+    {
+        InitializeComponent();
+
+    }
+
+    #endregion
+
+    #region Private members
+
+    private void _copyButton_Click
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        Clipboard.SetText (DocumentText, TextDataFormat.Html);
+    }
+
+    private void _openButton_Click
+        (
+            object sender, EventArgs e
+        )
+    {
+        if (_openFileDialog.ShowDialog(this) == DialogResult.OK)
         {
-            get => _webBrowser.DocumentText;
-            set => _webBrowser.DocumentText = value;
+            _webBrowser.Navigate(_openFileDialog.FileName);
+        }
+    }
+
+    private void _saveButton_Click(object sender, EventArgs e)
+    {
+        if (_saveFileDialog.ShowDialog(this)
+            == DialogResult.OK)
+        {
+            File.WriteAllText(_saveFileDialog.FileName, DocumentText);
+        }
+    }
+
+    private void _pageSetupButton_Click
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        _webBrowser.ShowPageSetupDialog();
+    }
+
+    private void _pasteButton_Click
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        var text = Clipboard.GetText(TextDataFormat.Html);
+
+        if (!string.IsNullOrEmpty(text))
+        {
+            DocumentText = text;
+        }
+    }
+
+    private void _printButton_Click
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        _webBrowser.ShowPrintDialog();
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получение документа с DOM.
+    /// </summary>
+    public HtmlDocument GetDocument()
+    {
+        if (_webBrowser.Document == null)
+        {
+            _webBrowser.Navigate("about:blank");
         }
 
-        #endregion
+        return _webBrowser.Document.ThrowIfNull();
+    }
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public BrowserForm()
-        {
-            InitializeComponent();
-
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private void _copyButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            Clipboard.SetText (DocumentText, TextDataFormat.Html);
-        }
-
-        private void _openButton_Click
-            (
-                object sender, EventArgs e
-            )
-        {
-            if (_openFileDialog.ShowDialog(this) == DialogResult.OK)
-            {
-                _webBrowser.Navigate(_openFileDialog.FileName);
-            }
-        }
-
-        private void _saveButton_Click(object sender, EventArgs e)
-        {
-            if (_saveFileDialog.ShowDialog(this)
-                 == DialogResult.OK)
-            {
-                File.WriteAllText(_saveFileDialog.FileName, DocumentText);
-            }
-        }
-
-        private void _pageSetupButton_Click
-            (
-                object? sender,
-                EventArgs e
-            )
-        {
-            _webBrowser.ShowPageSetupDialog();
-        }
-
-        private void _pasteButton_Click
-            (
-                object? sender,
-                EventArgs e
-            )
-        {
-            var text = Clipboard.GetText(TextDataFormat.Html);
-
-            if (!string.IsNullOrEmpty(text))
-            {
-                DocumentText = text;
-            }
-        }
-
-        private void _printButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            _webBrowser.ShowPrintDialog();
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Получение документа с DOM.
-        /// </summary>
-        public HtmlDocument GetDocument()
-        {
-            if (_webBrowser.Document == null)
-            {
-                _webBrowser.Navigate("about:blank");
-            }
-
-            return _webBrowser.Document.ThrowIfNull();
-        }
-
-        #endregion
-
-    } //
-
-} // namespace
+}

@@ -53,7 +53,7 @@ public sealed class HandyGrid
         AllowUserToOrderColumns = false;
         AllowUserToResizeColumns = false;
         ReadOnly = true;
-    } // constructor
+    }
 
     #endregion
 

@@ -27,133 +27,130 @@ using LinqToDB.Data;
 
 #nullable enable
 
-namespace Istu.NewModel.Implementation
+namespace Istu.NewModel.Implementation;
+
+/// <summary>
+/// Менеджер заказов для книговыдачи.
+/// </summary>
+public sealed class OrderManager
+    : IOrderManager
 {
+    #region Properties
+
     /// <summary>
-    /// Менеджер заказов для книговыдачи.
+    /// База данных книговыдачи.
     /// </summary>
-    public sealed class OrderManager
-        : IOrderManager
+    public Storehouse Storehouse { get; }
+
+    /// <summary>
+    /// Таблица с заказами.
+    /// </summary>
+    public ITable<Order> Orders => _GetDb().GetOrders();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public OrderManager
+        (
+            Storehouse storehouse
+        )
     {
-        #region Properties
+        Storehouse = storehouse;
+    }
 
-        /// <summary>
-        /// База данных книговыдачи.
-        /// </summary>
-        public Storehouse Storehouse { get; }
+    #endregion
 
-        /// <summary>
-        /// Таблица с заказами.
-        /// </summary>
-        public ITable<Order> Orders => _GetDb().GetOrders();
+    #region Private members
 
-        #endregion
+    private DataConnection? _dataConnection;
 
-        #region Construction
+    private DataConnection _GetDb() => _dataConnection ??= Storehouse.GetKladovka();
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public OrderManager
-            (
-                Storehouse storehouse
-            )
+    #endregion
+
+    #region IOrderManager members
+
+    /// <inheritdoc cref="IOrderManager.ListAllOrders"/>
+    public Order[] ListAllOrders() => Orders.ToArray();
+
+    /// <inheritdoc cref="IOrderManager.ListOrdersByStatus"/>
+    public Order[] ListOrdersByStatus (string status) =>
+        Orders.Where (order => order.Status == status).ToArray();
+
+    /// <inheritdoc cref="IOrderManager.ListNewOrders"/>
+    public Order[] ListNewOrders() => ListOrdersByStatus (Order.NewOrder);
+
+    /// <inheritdoc cref="IOrderManager.ListOrdersForReader"/>
+    public Order[] ListOrdersForReader (string ticket) =>
+        Orders.Where (order => order.Ticket == ticket).ToArray();
+
+    /// <inheritdoc cref="IOrderManager.CreateOrder"/>
+    public bool CreateOrder
+        (
+            Order order,
+            bool throwOnVerify = true
+        )
+    {
+        if (order.Verify (throwOnVerify))
         {
-            Storehouse = storehouse;
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private DataConnection? _dataConnection;
-
-        private DataConnection _GetDb() => _dataConnection ??= Storehouse.GetKladovka();
-
-        #endregion
-
-        #region IOrderManager members
-
-        /// <inheritdoc cref="IOrderManager.ListAllOrders"/>
-        public Order[] ListAllOrders() => Orders.ToArray();
-
-        /// <inheritdoc cref="IOrderManager.ListOrdersByStatus"/>
-        public Order[] ListOrdersByStatus (string status) =>
-            Orders.Where (order => order.Status == status).ToArray();
-
-        /// <inheritdoc cref="IOrderManager.ListNewOrders"/>
-        public Order[] ListNewOrders() => ListOrdersByStatus (Order.NewOrder);
-
-        /// <inheritdoc cref="IOrderManager.ListOrdersForReader"/>
-        public Order[] ListOrdersForReader (string ticket) =>
-            Orders.Where (order => order.Ticket == ticket).ToArray();
-
-        /// <inheritdoc cref="IOrderManager.CreateOrder"/>
-        public bool CreateOrder
-            (
-                Order order,
-                bool throwOnVerify = true
-            )
-        {
-            if (order.Verify (throwOnVerify))
-            {
-                var db = _GetDb();
-                db.Insert (order);
-
-                return true;
-            }
-
-            return false;
-
-        } // method CreateOrder
-
-        /// <inheritdoc cref="IOrderManager.DeleteOrder"/>
-        public int DeleteOrder (int id) => Orders.Delete (order => order.Id == id);
-
-        /// <inheritdoc cref="IOrderManager.SetOrderStatus"/>
-        public int SetOrderStatus
-            (
-                int id,
-                string status,
-                bool sendEmail = false
-            )
-        {
-            // TODO: implement sendMail
-
             var db = _GetDb();
-            var orders = db.GetOrders();
-            var result = db.Execute
-                (
-                    $"update [{orders.TableName}] set [status] = @status where [id] = @id",
-                    new DataParameter ("status", status),
-                    new DataParameter ("id", id)
-                );
+            db.Insert (order);
 
-            return result;
+            return true;
+        }
 
-        } // method SetOrderStatus
+        return false;
 
-        /// <inheritdoc cref="IOrderManager.UpdateOrder"/>
-        public int UpdateOrder (Order order, bool throwOnVerify = true) =>
-            order.Verify (throwOnVerify) ? _GetDb().Update (order) : -1;
+    } // method CreateOrder
 
-        #endregion
+    /// <inheritdoc cref="IOrderManager.DeleteOrder"/>
+    public int DeleteOrder (int id) => Orders.Delete (order => order.Id == id);
 
-        #region IDisposable members
+    /// <inheritdoc cref="IOrderManager.SetOrderStatus"/>
+    public int SetOrderStatus
+        (
+            int id,
+            string status,
+            bool sendEmail = false
+        )
+    {
+        // TODO: implement sendMail
 
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
+        var db = _GetDb();
+        var orders = db.GetOrders();
+        var result = db.Execute
+            (
+                $"update [{orders.TableName}] set [status] = @status where [id] = @id",
+                new DataParameter ("status", status),
+                new DataParameter ("id", id)
+            );
+
+        return result;
+
+    } // method SetOrderStatus
+
+    /// <inheritdoc cref="IOrderManager.UpdateOrder"/>
+    public int UpdateOrder (Order order, bool throwOnVerify = true) =>
+        order.Verify (throwOnVerify) ? _GetDb().Update (order) : -1;
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        if (_dataConnection is not null)
         {
-            if (_dataConnection is not null)
-            {
-                _dataConnection.Dispose();
-                _dataConnection = null;
-            }
+            _dataConnection.Dispose();
+            _dataConnection = null;
+        }
 
-        } // method Dispose
+    } // method Dispose
 
-        #endregion
-
-    } // class OrderManager
-
-} // namespace Istu.NewModel.Implementation
+    #endregion
+}

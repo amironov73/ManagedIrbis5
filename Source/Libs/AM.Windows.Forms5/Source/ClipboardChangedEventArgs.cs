@@ -17,39 +17,35 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Данные для события отслеживания изменений в буфере обмена.
+/// </summary>
+public sealed class ClipboardChangedEventArgs
+    : EventArgs
 {
+    #region Properties
+
     /// <summary>
-    /// Данные для события отслеживания изменений в буфере обмена.
+    /// Объект данных.
     /// </summary>
-    public sealed class ClipboardChangedEventArgs
-        : EventArgs
+    public IDataObject? DataObject { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ClipboardChangedEventArgs
+        (
+            IDataObject? dataObject
+        )
     {
-        #region Properties
+        DataObject = dataObject;
+    }
 
-        /// <summary>
-        /// Объект данных.
-        /// </summary>
-        public IDataObject? DataObject { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ClipboardChangedEventArgs
-            (
-                IDataObject? dataObject
-            )
-        {
-            DataObject = dataObject;
-
-        } // constructor
-
-        #endregion
-
-    } // class ClipboardChangedEventArgs
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

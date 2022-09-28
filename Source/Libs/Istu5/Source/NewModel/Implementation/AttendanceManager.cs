@@ -58,7 +58,7 @@ public sealed class AttendanceManager
         )
     {
         Storehouse = storehouse;
-    } // constructor
+    }
 
     #endregion
 

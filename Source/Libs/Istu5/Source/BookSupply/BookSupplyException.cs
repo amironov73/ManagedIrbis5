@@ -22,60 +22,61 @@ using System.Runtime.Serialization;
 
 #nullable enable
 
-namespace Istu.BookSupply
+namespace Istu.BookSupply;
+
+/// <summary>
+/// Исключение, специфичное для подсистемы книгообеспеченности.
+/// </summary>
+public class BookSupplyException
+    : ApplicationException
 {
+    #region Construction
+
     /// <summary>
-    /// Исключение, специфичное для подсистемы книгообеспеченности.
+    /// Конструктор по умолчани.
     /// </summary>
-    public class BookSupplyException
-        : ApplicationException
+    public BookSupplyException()
     {
-        #region Construction
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Конструктор по умолчани.
-        /// </summary>
-        public BookSupplyException()
-        {
-        } // constructor
+    /// <summary>
+    /// Конструктор с текстом сообщения.
+    /// </summary>
+    public BookSupplyException
+        (
+            string message
+        )
+        : base (message)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Конструктор с текстом сообщения.
-        /// </summary>
-        public BookSupplyException
-            (
-                string message
-            )
-            : base (message)
-        {
-        } // constructor
+    /// <summary>
+    /// Конструктор с вложенным исключением.
+    /// </summary>
+    public BookSupplyException
+        (
+            string message,
+            Exception innerException
+        )
+        : base (message, innerException)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Конструктор с вложенным исключением.
-        /// </summary>
-        public BookSupplyException
-            (
-                string message,
-                Exception innerException
-            )
-            : base (message, innerException)
-        {
-        } // constructor
+    /// <summary>
+    /// Конструктор, применяемый при десериализации.
+    /// </summary>
+    protected BookSupplyException
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Конструктор, применяемый при десериализации.
-        /// </summary>
-        protected BookSupplyException
-            (
-                SerializationInfo info,
-                StreamingContext context
-            )
-            : base (info, context)
-        {
-        } // constructor
-
-        #endregion
-
-    } // class BookSupplyException
-
-} // namespace Istu.BookSupply
+    #endregion
+}

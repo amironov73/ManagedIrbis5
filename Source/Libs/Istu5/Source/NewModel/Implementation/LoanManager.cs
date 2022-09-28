@@ -17,174 +17,164 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-
-using AM;
 
 using Istu.NewModel.Interfaces;
 using Istu.NewModel.Loans;
-
-using LinqToDB;
-using LinqToDB.Data;
 
 #endregion
 
 #nullable enable
 
-namespace Istu.NewModel.Implementation
+namespace Istu.NewModel.Implementation;
+
+/// <summary>
+/// Менеджер книговыдачи.
+/// </summary>
+public sealed class LoanManager
+    : ILoanManager
 {
+    #region Construction
+
     /// <summary>
-    /// Менеджер книговыдачи.
+    /// Конструктор.
     /// </summary>
-    public sealed class LoanManager
-        : ILoanManager
+    public LoanManager
+        (
+            Storehouse storehouse
+        )
     {
-        #region Construction
+        _storehouse = storehouse;
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public LoanManager
-            (
-                Storehouse storehouse
-            )
-        {
-            _storehouse = storehouse;
+    #endregion
 
-        } // constructor
+    #region Private members
 
-        #endregion
+    private readonly Storehouse _storehouse;
 
-        #region Private members
+    // private DataConnection? _dataConnection;
 
-        private readonly Storehouse _storehouse;
+    // private DataConnection _GetPodsob() => _dataConnection ??= _storehouse.GetKladovka();
 
-        // private DataConnection? _dataConnection;
+    #endregion
 
-        // private DataConnection _GetPodsob() => _dataConnection ??= _storehouse.GetKladovka();
+    #region ILoanManager members
 
-        #endregion
+    /// <inheritdoc cref="ILoanManager.GetLoans"/>
+    public Loan[] GetLoans (string ticket)
+    {
+        throw new NotImplementedException();
+    }
 
-        #region ILoanManager members
+    /// <inheritdoc cref="ILoanManager.GetSciLoan"/>
+    public Loan GetSciLoan (string inventory)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.GetLoans"/>
-        public Loan[] GetLoans (string ticket)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.GetUchLoan"/>
+    public Loan GetUchLoan (string barcode)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.GetSciLoan"/>
-        public Loan GetSciLoan (string inventory)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.GetUchLoanByRfid"/>
+    public Loan GetUchLoanByRfid (string rfid)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.GetUchLoan"/>
-        public Loan GetUchLoan (string barcode)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.GiveBooks"/>
+    public void GiveBooks (Attendance attendance, IEnumerable<Loan> loans)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.GetUchLoanByRfid"/>
-        public Loan GetUchLoanByRfid (string rfid)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.ReturnBooks"/>
+    public void ReturnBooks (Attendance attendance, IEnumerable<Loan> loans)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.GiveBooks"/>
-        public void GiveBooks (Attendance attendance, IEnumerable<Loan> loans)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.WriteOffBooks"/>
+    public void WriteOffBooks (IEnumerable<Loan> loans)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.ReturnBooks"/>
-        public void ReturnBooks (Attendance attendance, IEnumerable<Loan> loans)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.Update"/>
+    public void Update (Loan loan)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.WriteOffBooks"/>
-        public void WriteOffBooks (IEnumerable<Loan> loans)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.GetLongestLoan"/>
+    public DateTime GetLongestLoan (string abonement, Reader reader, DateTime proposed)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.Update"/>
-        public void Update (Loan loan)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.GetMaximumLoans"/>
+    public int GetMaximumLoans (string abonement, Reader reader, int proposed)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.GetLongestLoan"/>
-        public DateTime GetLongestLoan (string abonement, Reader reader, DateTime proposed)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.GetLoanedInventories"/>
+    public int[] GetLoanedInventories (int @from, int to)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.GetMaximumLoans"/>
-        public int GetMaximumLoans (string abonement, Reader reader, int proposed)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.GiveToHands"/>
+    public void GiveToHands (Attendance attendance, IEnumerable<Loan> loans)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.GetLoanedInventories"/>
-        public int[] GetLoanedInventories (int @from, int to)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.ReturnFromHands"/>
+    public void ReturnFromHands (Attendance attendance, IEnumerable<Loan> loans)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.GiveToHands"/>
-        public void GiveToHands (Attendance attendance, IEnumerable<Loan> loans)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.SetAlert"/>
+    public void SetAlert (Loan loan, string text)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.ReturnFromHands"/>
-        public void ReturnFromHands (Attendance attendance, IEnumerable<Loan> loans)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.ListUchLoans"/>
+    public Loan[] ListUchLoans (string cardNumber)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.SetAlert"/>
-        public void SetAlert (Loan loan, string text)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.WriteOffByCard"/>
+    public void WriteOffByCard (string cardNumber)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.ListUchLoans"/>
-        public Loan[] ListUchLoans (string cardNumber)
-        {
-            throw new NotImplementedException();
-        }
+    /// <inheritdoc cref="ILoanManager.SetSeen"/>
+    public void SetSeen (IEnumerable<Loan> loans, DateTime when, int operatorID)
+    {
+        throw new NotImplementedException();
+    }
 
-        /// <inheritdoc cref="ILoanManager.WriteOffByCard"/>
-        public void WriteOffByCard (string cardNumber)
-        {
-            throw new NotImplementedException();
-        }
+    #endregion
 
-        /// <inheritdoc cref="ILoanManager.SetSeen"/>
-        public void SetSeen (IEnumerable<Loan> loans, DateTime when, int operatorID)
-        {
-            throw new NotImplementedException();
-        }
+    #region IDisposable members
 
-        #endregion
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        // if (_dataConnection is not null)
+        // {
+        //     _dataConnection.Dispose();
+        //     _dataConnection = null;
+        // }
+    } // method Dispose
 
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            // if (_dataConnection is not null)
-            // {
-            //     _dataConnection.Dispose();
-            //     _dataConnection = null;
-            // }
-        } // method Dispose
-
-        #endregion
-
-    } // class LoanManager
-
-} // namespace Istu.NewModel.Implementation
+    #endregion
+}

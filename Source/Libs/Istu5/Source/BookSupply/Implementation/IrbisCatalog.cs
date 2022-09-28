@@ -27,90 +27,85 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace Istu.BookSupply.Implementation
+namespace Istu.BookSupply.Implementation;
+
+/// <summary>
+/// Реализация интерфейса электронного каталога
+/// для подисистемы книгообеспеченности
+/// на основе подключения к серверу ИРБИС64.
+/// </summary>
+public sealed class IrbisCatalog
+    : ICatalog
 {
+    #region Properties
+
     /// <summary>
-    /// Реализация интерфейса электронного каталога
-    /// для подисистемы книгообеспеченности
-    /// на основе подключения к серверу ИРБИС64.
+    /// Синхронный провайдер.
     /// </summary>
-    public sealed class IrbisCatalog
-        : ICatalog
+    public ISyncProvider Provider => _provider;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public IrbisCatalog()
     {
-        #region Properties
+        _provider = ConnectionUtility.GetConnectionFromConfig();
+    }
 
-        /// <summary>
-        /// Синхронный провайдер.
-        /// </summary>
-        public ISyncProvider Provider => _provider;
+    /// <summary>
+    /// Конструктор для служебных целей.
+    /// </summary>
+    private IrbisCatalog
+        (
+            ISyncProvider provider
+        )
+    {
+        _provider = provider;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Private members
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public IrbisCatalog()
-        {
-            _provider = ConnectionUtility.GetConnectionFromConfig();
+    private readonly ISyncProvider _provider;
 
-        } // constructor
+    #endregion
 
-        /// <summary>
-        /// Конструктор для служебных целей.
-        /// </summary>
-        private IrbisCatalog
-            (
-                ISyncProvider provider
-            )
-        {
-            _provider = provider;
+    #region Public methods
 
-        } // constructor
+    /// <summary>
+    /// Получение интерфейса из провайдера.
+    /// </summary>
+    public static ICatalog FromProvider (ISyncProvider provider) =>
+        new IrbisCatalog (provider);
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region ICatalog members
 
-        private readonly ISyncProvider _provider;
+    /// <inheritdoc cref="ICatalog.FormatRecord"/>
+    public string? FormatRecord (int mfn, string? format = null) =>
+        _provider.FormatRecord (format ?? IrbisFormat.Brief, mfn);
 
-        #endregion
+    /// <inheritdoc cref="ICatalog.ListTerms"/>
+    public string[] ListTerms (string prefix) => throw new NotImplementedException();
 
-        #region Public methods
+    /// <inheritdoc cref="ICatalog.ReadRecord"/>
+    public Record? ReadRecord (int mfn) => _provider.ReadRecord (mfn);
 
-        /// <summary>
-        /// Получение интерфейса из провайдера.
-        /// </summary>
-        public static ICatalog FromProvider (ISyncProvider provider) =>
-            new IrbisCatalog (provider);
+    /// <inheritdoc cref="ICatalog.SearchRecords"/>
+    public int[] SearchRecords (string expression) => _provider.Search (expression);
 
-        #endregion
+    #endregion
 
-        #region ICatalog members
+    #region IDisposable members
 
-        /// <inheritdoc cref="ICatalog.FormatRecord"/>
-        public string? FormatRecord (int mfn, string? format = null) =>
-            _provider.FormatRecord (format ?? IrbisFormat.Brief, mfn);
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose() => _provider.Dispose();
 
-        /// <inheritdoc cref="ICatalog.ListTerms"/>
-        public string[] ListTerms (string prefix) => throw new NotImplementedException();
-
-        /// <inheritdoc cref="ICatalog.ReadRecord"/>
-        public Record? ReadRecord (int mfn) => _provider.ReadRecord (mfn);
-
-        /// <inheritdoc cref="ICatalog.SearchRecords"/>
-        public int[] SearchRecords (string expression) => _provider.Search (expression);
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => _provider.Dispose();
-
-        #endregion
-
-    } // class IrbisCatalog
-
-} // namespace Istu.BookSupplyImplementation
+    #endregion
+}

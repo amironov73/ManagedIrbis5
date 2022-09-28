@@ -20,39 +20,36 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms;
+
+/// <summary>
+/// Аттрибут, позволяющий задать подсказчик для свойства объекта.
+/// </summary>
+[AttributeUsage (AttributeTargets.Property )]
+public sealed class SuggestorAttribute
+    : Attribute
 {
+    #region Properties
+
+    ///<summary>
+    /// Тип подсказчика.
+    ///</summary>
+    public Type SuggestorType { get; }
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Аттрибут, позволяющий задать подсказчик для свойства объекта.
+    /// Конструктор.
     /// </summary>
-    [AttributeUsage (AttributeTargets.Property )]
-    public sealed class SuggestorAttribute
-        : Attribute
+    public SuggestorAttribute
+        (
+            Type type
+        )
     {
-        #region Properties
+        SuggestorType = type;
+    }
 
-        ///<summary>
-        /// Тип подсказчика.
-        ///</summary>
-        public Type SuggestorType { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SuggestorAttribute
-            (
-                Type type
-            )
-        {
-            SuggestorType = type;
-        } // constructor
-
-        #endregion
-
-    } // class SuggestorAttribute
-
-} // namespace AM.Windows.Forms
+    #endregion
+}
