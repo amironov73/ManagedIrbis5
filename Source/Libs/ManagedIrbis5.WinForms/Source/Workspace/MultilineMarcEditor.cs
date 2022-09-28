@@ -68,8 +68,10 @@ public sealed class MultilineMarcEditor
             EditContext context
         )
     {
+        Sure.NotNull (context);
+
         throw new NotImplementedException();
-    } // method PerformEdit
+    }
 
     #endregion
 

@@ -20,60 +20,65 @@
 
 using System;
 
+using AM;
+
 using ManagedIrbis.Workspace;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Workspace
+namespace ManagedIrbis.WinForms.Workspace;
+
+/// <summary>
+/// Ввод значений полей/подполей с помощью динамического справочника.
+/// </summary>
+public sealed class DynamicMenuMarcEditor
+    : IMarcEditor
 {
+    #region Construction
+
     /// <summary>
-    /// Ввод значений полей/подполей с помощью динамического справочника.
+    /// Конструктор.
     /// </summary>
-    public sealed class DynamicMenuMarcEditor
-        : IMarcEditor
+    /// <param name="provider">Провайдер сервисов.</param>
+    public DynamicMenuMarcEditor
+        (
+            IServiceProvider provider
+        )
     {
-        #region Construction
+        Sure.NotNull (provider);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="provider">Провайдер сервисов.</param>
-        public DynamicMenuMarcEditor
-            (
-                IServiceProvider provider
-            )
-        {
-            _provider = provider;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly IServiceProvider _provider;
-
-        #endregion
-
-        #region IMarcEditor
-
-        /// <inheritdoc cref="IMarcEditor.PerformEdit"/>
-        public void PerformEdit
-            (
-                EditContext context
-            )
-        {
-            throw new NotImplementedException();
-        } // method PerformEdit
-
-        #endregion
-
-        #region IServiveProvider members
-
-        /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService(Type serviceType) => _provider.GetService(serviceType);
-
-        #endregion
+        _provider = provider;
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly IServiceProvider _provider;
+
+    #endregion
+
+    #region IMarcEditor
+
+    /// <inheritdoc cref="IMarcEditor.PerformEdit"/>
+    public void PerformEdit
+        (
+            EditContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    #region IServiveProvider members
+
+    /// <inheritdoc cref="IServiceProvider.GetService"/>
+    public object? GetService (Type serviceType) => _provider.GetService (serviceType);
+
+    #endregion
 }

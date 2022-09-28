@@ -68,6 +68,8 @@ public sealed class FileMarcEditor
             EditContext context
         )
     {
+        Sure.NotNull (context);
+
         throw new NotImplementedException();
     }
 
