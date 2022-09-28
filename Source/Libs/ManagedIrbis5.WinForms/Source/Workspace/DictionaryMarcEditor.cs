@@ -46,7 +46,7 @@ namespace ManagedIrbis.WinForms.Workspace
             )
         {
             _provider = provider;
-        } // constructor
+        }
 
         #endregion
 
@@ -75,7 +75,5 @@ namespace ManagedIrbis.WinForms.Workspace
         public object? GetService(Type serviceType) => _provider.GetService(serviceType);
 
         #endregion
-
-    } // class DictionaryMarcEditor
-
-} // namespace ManagedIrbis.WinForms.Workspace
+    }
+}

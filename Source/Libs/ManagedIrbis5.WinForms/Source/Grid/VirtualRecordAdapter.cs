@@ -22,80 +22,76 @@ using ManagedIrbis.Providers;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Адаптер, предоставляющий записи для виртуального режима грида.
+/// </summary>
+public sealed class VirtualRecordAdapter
+    : IVirtualAdapter<Record>
 {
+    #region Properties
+
     /// <summary>
-    /// Адаптер, предоставляющий записи для виртуального режима грида.
+    /// Провайдер.
     /// </summary>
-    public sealed class VirtualRecordAdapter
-        : IVirtualAdapter<Record>
+    public ISyncProvider Provider { get; }
+
+    /// <summary>
+    /// Текущая база данных.
+    /// </summary>
+    public string Database { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="provider">Провайдер.</param>
+    /// <param name="database">Текущая база данных.</param>
+    public VirtualRecordAdapter
+        (
+            ISyncProvider provider,
+            string database
+        )
     {
-        #region Properties
+        Provider = provider;
+        Database = database;
+    }
 
-        /// <summary>
-        /// Провайдер.
-        /// </summary>
-        public ISyncProvider Provider { get; }
+    #endregion
 
-        /// <summary>
-        /// Текущая база данных.
-        /// </summary>
-        public string Database { get; set; }
+    #region IVirtualAdapter<T> members
 
-        #endregion
+    /// <inheritdoc cref="IVirtualAdapter{T}.TotalLength"/>
+    public int TotalLength => Provider.GetMaxMfn();
 
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="provider">Провайдер.</param>
-        /// <param name="database">Текущая база данных.</param>
-        public VirtualRecordAdapter
-            (
-                ISyncProvider provider,
-                string database
-            )
+    /// <inheritdoc cref="IVirtualAdapter{T}.ReadData"/>
+    public VirtualData<Record>? ReadData
+        (
+            int firstLine,
+            int lineCount
+        )
+    {
+        var batch = Enumerable.Range(firstLine, lineCount);
+        var records = Provider.ReadRecords(Database, batch);
+        if (records is null)
         {
-            Provider = provider;
-            Database = database;
+            return null;
+        }
 
-        } // constructor
-
-        #endregion
-
-        #region IVirtualAdapter<T> members
-
-        /// <inheritdoc cref="IVirtualAdapter{T}.TotalLength"/>
-        public int TotalLength => Provider.GetMaxMfn();
-
-        /// <inheritdoc cref="IVirtualAdapter{T}.ReadData"/>
-        public VirtualData<Record>? ReadData
-            (
-                int firstLine,
-                int lineCount
-            )
+        var result = new VirtualData<Record>
         {
-            var batch = Enumerable.Range(firstLine, lineCount);
-            var records = Provider.ReadRecords(Database, batch);
-            if (records is null)
-            {
-                return null;
-            }
+            FirstLine = firstLine,
+            Length = records.Length,
+            Data = records
+        };
 
-            var result = new VirtualData<Record>
-            {
-                FirstLine = firstLine,
-                Length = records.Length,
-                Data = records
-            };
+        return result;
 
-            return result;
+    } // method ReadData
 
-        } // method ReadData
-
-        #endregion
-
-    } // class VirtualRecordAdapter
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}

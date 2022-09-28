@@ -61,8 +61,7 @@ namespace ManagedIrbis.WinForms.Grid
             Adapter = adapter;
             Count = count != 0 ? count : adapter.TotalLength;
             _cache = null;
-
-        } // constructor
+        }
 
         #endregion
 
@@ -200,7 +199,5 @@ namespace ManagedIrbis.WinForms.Grid
         } // property this
 
         #endregion
-
-    } // class VirtualRowCollection
-
-} // namespace ManagedIrbis.WinForms.Grid
+    }
+}
