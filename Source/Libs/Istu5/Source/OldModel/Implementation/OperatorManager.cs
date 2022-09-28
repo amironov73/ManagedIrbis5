@@ -26,80 +26,77 @@ using LinqToDB.Data;
 
 #nullable enable
 
-namespace Istu.OldModel.Implementation
+namespace Istu.OldModel.Implementation;
+
+/// <summary>
+/// Менеджер операторов книговыдачи.
+/// </summary>
+public sealed class OperatorManager
+    : IOperatorManager
 {
+    #region Properties
+
     /// <summary>
-    /// Менеджер операторов книговыдачи.
+    /// Кладовка.
     /// </summary>
-    public sealed class OperatorManager
-        : IOperatorManager
+    public Storehouse Storehouse { get; }
+
+    /// <summary>
+    /// Таблица <c>operators</c>.
+    /// </summary>
+    public ITable<Operator> Operators => _GetDb().GetOperators();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public OperatorManager
+        (
+            Storehouse storehouse
+        )
     {
-        #region Properties
+        Storehouse = storehouse;
+    }
 
-        /// <summary>
-        /// Кладовка.
-        /// </summary>
-        public Storehouse Storehouse { get; }
+    #endregion
 
-        /// <summary>
-        /// Таблица <c>operators</c>.
-        /// </summary>
-        public ITable<Operator> Operators => _GetDb().GetOperators();
+    #region Private members
 
-        #endregion
+    private DataConnection? _dataConnection;
 
-        #region Construction
+    private DataConnection _GetDb() => _dataConnection ??= Storehouse.GetKladovka();
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public OperatorManager
-            (
-                Storehouse storehouse
-            )
+    #endregion
+
+    #region IOperatorManager members
+
+    /// <inheritdoc cref="IOperatorManager.GetOperatorByBarcode"/>
+    public Operator? GetOperatorByBarcode (string barcode) =>
+        Operators.FirstOrDefault (op => op.Barcode == barcode);
+
+    /// <inheritdoc cref="IOperatorManager.GetOperatorByID"/>
+    public Operator? GetOperatorByID (int id) =>
+        Operators.FirstOrDefault (op => op.ID == id);
+
+    /// <inheritdoc cref="IOperatorManager.ListAllOperators"/>
+    public Operator[] ListAllOperators() => Operators.ToArray();
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        if (_dataConnection is not null)
         {
-            Storehouse = storehouse;
-        } // constructor
+            _dataConnection.Dispose();
+            _dataConnection = null;
+        }
+    } // method Dispose
 
-        #endregion
-
-        #region Private members
-
-        private DataConnection? _dataConnection;
-
-        private DataConnection _GetDb() => _dataConnection ??= Storehouse.GetKladovka();
-
-        #endregion
-
-        #region IOperatorManager members
-
-        /// <inheritdoc cref="IOperatorManager.GetOperatorByBarcode"/>
-        public Operator? GetOperatorByBarcode (string barcode) =>
-            Operators.FirstOrDefault (op => op.Barcode == barcode);
-
-        /// <inheritdoc cref="IOperatorManager.GetOperatorByID"/>
-        public Operator? GetOperatorByID (int id) =>
-            Operators.FirstOrDefault (op => op.ID == id);
-
-        /// <inheritdoc cref="IOperatorManager.ListAllOperators"/>
-        public Operator[] ListAllOperators() => Operators.ToArray();
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            if (_dataConnection is not null)
-            {
-                _dataConnection.Dispose();
-                _dataConnection = null;
-            }
-        } // method Dispose
-
-        #endregion
-
-    } // class OperatorManager
-
-} // namespace Istu.OldModel.Implementation
+    #endregion
+}

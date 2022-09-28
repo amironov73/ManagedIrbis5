@@ -48,10 +48,9 @@ namespace ManagedIrbis.WinForms.Grid
                     new VirtualRowCollection<T>(adapter)
                 )
         {
-        } // constructor
+            // пустое тело конструктора
+        }
 
         #endregion
-
-    } // class VirtualGrid
-
-} // namespace ManagedIrbis.WinForms.Grid
+    }
+}

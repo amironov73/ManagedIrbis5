@@ -88,8 +88,7 @@ namespace ManagedIrbis.WinForms.Grid
         {
             Height = DefaultHeight;
             Cells = new SiberianCellCollection();
-
-        } // constructor
+        }
 
         #endregion
 
@@ -209,7 +208,5 @@ namespace ManagedIrbis.WinForms.Grid
         public override string ToString() => $"Index: {Index}, Data: {Data}";
 
         #endregion
-
-    } // class SiberianRow
-
-} // namespace ManagedIrbis.WinForms.Grid
+    }
+}

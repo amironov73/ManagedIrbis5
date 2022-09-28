@@ -65,8 +65,7 @@ namespace ManagedIrbis.WinForms.Grid
             Provider = provider;
             Database = database;
             Format = format;
-
-        } // constructor
+        }
 
         #endregion
 
@@ -98,7 +97,5 @@ namespace ManagedIrbis.WinForms.Grid
         } // method ReadData
 
         #endregion
-
-    } // class VirtualFoundLineAdapter
-
-} // namespace ManagedIrbis.WinForms.Grid
+    }
+}
