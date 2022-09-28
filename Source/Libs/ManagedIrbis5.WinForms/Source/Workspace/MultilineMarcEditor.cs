@@ -20,62 +20,63 @@
 
 using System;
 
+using AM;
+
 using ManagedIrbis.Workspace;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Workspace
+namespace ManagedIrbis.WinForms.Workspace;
+
+/// <summary>
+/// Многострочный ввод значений полей/подполей.
+/// </summary>
+public sealed class MultilineMarcEditor
+    : IMarcEditor
 {
+    #region Construction
+
     /// <summary>
-    /// Многострочный ввод значений полей/подполей.
+    /// Конструктор.
     /// </summary>
-    public sealed class MultilineMarcEditor
-        : IMarcEditor
+    /// <param name="provider">Провайдер сервисов.</param>
+    public MultilineMarcEditor
+        (
+            IServiceProvider provider
+        )
     {
-        #region Construction
+        Sure.NotNull (provider);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="provider">Провайдер сервисов.</param>
-        public MultilineMarcEditor
-            (
-                IServiceProvider provider
-            )
-        {
-            _provider = provider;
-        } // constructor
+        _provider = provider;
+    }
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Private members
 
-        private readonly IServiceProvider _provider;
+    private readonly IServiceProvider _provider;
 
-        #endregion
+    #endregion
 
-        #region IMarcEditor
+    #region IMarcEditor
 
-        /// <inheritdoc cref="IMarcEditor.PerformEdit"/>
-        public void PerformEdit
-            (
-                EditContext context
-            )
-        {
-            throw new NotImplementedException();
-        } // method PerformEdit
+    /// <inheritdoc cref="IMarcEditor.PerformEdit"/>
+    public void PerformEdit
+        (
+            EditContext context
+        )
+    {
+        throw new NotImplementedException();
+    } // method PerformEdit
 
-        #endregion
+    #endregion
 
-        #region IServiveProvider members
+    #region IServiveProvider members
 
-        /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService(Type serviceType) => _provider.GetService(serviceType);
+    /// <inheritdoc cref="IServiceProvider.GetService"/>
+    public object? GetService (Type serviceType) => _provider.GetService (serviceType);
 
-        #endregion
-
-    } // class MultilineMarcEditor
-
-} // namespace ManagedIrbis.WinForms.Workspace
+    #endregion
+}

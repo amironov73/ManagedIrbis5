@@ -20,62 +20,63 @@
 
 using System;
 
+using AM;
+
 using ManagedIrbis.Workspace;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Workspace
+namespace ManagedIrbis.WinForms.Workspace;
+
+/// <summary>
+/// Ввод значений полей/подполей через обращение к внешнему файлу.
+/// </summary>
+public sealed class FileMarcEditor
+    : IMarcEditor
 {
+    #region Construction
+
     /// <summary>
-    /// Ввод значений полей/подполей через обращение к внешнему файлу.
+    /// Конструктор.
     /// </summary>
-    public sealed class FileMarcEditor
-        : IMarcEditor
+    /// <param name="provider">Провайдер сервисов.</param>
+    public FileMarcEditor
+        (
+            IServiceProvider provider
+        )
     {
-        #region Construction
+        Sure.NotNull (provider);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="provider">Провайдер сервисов.</param>
-        public FileMarcEditor
-            (
-                IServiceProvider provider
-            )
-        {
-            _provider = provider;
-        } // constructor
+        _provider = provider;
+    }
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Private members
 
-        private readonly IServiceProvider _provider;
+    private readonly IServiceProvider _provider;
 
-        #endregion
+    #endregion
 
-        #region IMarcEditor
+    #region IMarcEditor
 
-        /// <inheritdoc cref="IMarcEditor.PerformEdit"/>
-        public void PerformEdit
-            (
-                EditContext context
-            )
-        {
-            throw new NotImplementedException();
-        } // method PerformEdit
+    /// <inheritdoc cref="IMarcEditor.PerformEdit"/>
+    public void PerformEdit
+        (
+            EditContext context
+        )
+    {
+        throw new NotImplementedException();
+    }
 
-        #endregion
+    #endregion
 
-        #region IServiveProvider members
+    #region IServiveProvider members
 
-        /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService(Type serviceType) => _provider.GetService(serviceType);
+    /// <inheritdoc cref="IServiceProvider.GetService"/>
+    public object? GetService (Type serviceType) => _provider.GetService (serviceType);
 
-        #endregion
-
-    } // class FileMarcEditor
-
-} // namespace ManagedIrbis.WinForms.Workspace
+    #endregion
+}
