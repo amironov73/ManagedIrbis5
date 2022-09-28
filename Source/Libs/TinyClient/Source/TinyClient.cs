@@ -246,7 +246,7 @@ namespace ManagedIrbis
             }
 
             return memory;
-        } // method ThrowIfEmpty
+        }
 
         /// <summary>
         /// Бросает исключение, если переданное значение равно <c>null</c>,
@@ -324,7 +324,7 @@ namespace ManagedIrbis
             }
 
             return value;
-        } // method ThrowIfNullOrEmpty
+        }
 
         /// <summary>
         /// Бросает исключение, если переданная строка пустая
@@ -421,7 +421,7 @@ namespace ManagedIrbis
                 result = defaultValue;
 
             return result;
-        } // method SafeToInt32
+        }
 
         /// <summary>
         /// Безопасное преобразование строки в целое.
@@ -2782,7 +2782,7 @@ namespace ManagedIrbis
             }
 
             return null;
-        } // method GetFirstField
+        }
 
         /// <summary>
         /// Первое вхождение поля с любым из перечисленных тегов.
@@ -3151,7 +3151,7 @@ namespace ManagedIrbis
             }
 
             return null;
-        } // method GetSubField
+        }
 
         /// <summary>
         /// Получение текста указанного подполя.
@@ -3478,7 +3478,7 @@ namespace ManagedIrbis
                     return true;
 
             return false;
-        } // method HaveSubFields
+        }
 
         /// <summary>
         /// Фильтрация полей.
@@ -3510,7 +3510,7 @@ namespace ManagedIrbis
             }
 
             throw new KeyNotFoundException ($"Tag={tag}");
-        } // method RequireField
+        }
 
         /// <summary>
         /// Перечисление полей с указанной меткой.
@@ -3520,7 +3520,7 @@ namespace ManagedIrbis
             foreach (var field in fields)
                 if (field.Tag == tag)
                     yield return field;
-        } // method EnumerateField
+        }
 
         /// <summary>
         /// Перечисление полей с указанной меткой.
@@ -3542,7 +3542,7 @@ namespace ManagedIrbis
                     }
                 }
             }
-        } // method EnumerateField
+        }
 
         /// <summary>
         /// Перечисление полей с указанной меткой.
@@ -3565,8 +3565,8 @@ namespace ManagedIrbis
                     }
                 }
             }
-        } // method EnumerateField
-    } // class Utility
+        }
+    }
 
     /// <summary>
     /// Общие для ИРБИС64 константы.
@@ -3948,7 +3948,7 @@ namespace ManagedIrbis
         public static readonly int[] GoodCodesForReadTerms = { -202, -203, -204 };
 
         #endregion
-    } // class Constants
+    }
 
     /// <summary>
     /// Коды возврата, используемые при общении с сервером ИРБИС64.
@@ -4319,7 +4319,7 @@ namespace ManagedIrbis
         /// </summary>
         public IrbisException()
         {
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор с кодом возврата.
@@ -4331,7 +4331,7 @@ namespace ManagedIrbis
             : base (GetErrorDescription (returnCode))
         {
             ErrorCode = returnCode;
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор с сообщением об ошибке.
@@ -4342,7 +4342,7 @@ namespace ManagedIrbis
             )
             : base (message)
         {
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор с сообщением об ошибке и вложенным исключением.
@@ -4354,7 +4354,7 @@ namespace ManagedIrbis
             )
             : base (message, innerException)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -4595,7 +4595,7 @@ namespace ManagedIrbis
             );
 
         #endregion
-    } // class IrbisException
+    }
 
     /// <summary>
     /// Подполе библиографической записи.
@@ -4649,7 +4649,7 @@ namespace ManagedIrbis
         /// </summary>
         public SubField()
         {
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -4666,7 +4666,7 @@ namespace ManagedIrbis
             Code = code;
             Utility.VerifySubFieldValue (value.Span);
             Value = value.ToString();
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -4683,7 +4683,7 @@ namespace ManagedIrbis
             Code = code;
             Utility.VerifySubFieldValue (value.AsSpan());
             Value = value;
-        } // constructor
+        }
 
         #endregion
 
@@ -4720,7 +4720,7 @@ namespace ManagedIrbis
             result = string.CompareOrdinal (subField1.Value, subField2.Value);
 
             return result;
-        } // method Compare
+        }
 
         /// <summary>
         /// Декодирование строки.
@@ -4739,7 +4739,7 @@ namespace ManagedIrbis
                 Utility.VerifySubFieldValue (value);
                 Value = value.EmptyToNull();
             }
-        } // method Decode
+        }
 
         /// <summary>
         /// Установка нового значения подполя.
@@ -4751,7 +4751,7 @@ namespace ManagedIrbis
         {
             Utility.VerifySubFieldValue (value);
             _value = value.ToString();
-        } // method SetValue
+        }
 
         /// <summary>
         /// Установка нового значения подполя.
@@ -4763,7 +4763,7 @@ namespace ManagedIrbis
         {
             Utility.VerifySubFieldValue (value.AsSpan());
             _value = value;
-        } // method SetValue
+        }
 
         #endregion
 
@@ -4775,7 +4775,7 @@ namespace ManagedIrbis
             : "^" + char.ToLowerInvariant (Code) + Value;
 
         #endregion
-    } // class SubField
+    }
 
     /// <summary>
     /// Поле библиографической записи.
@@ -4839,8 +4839,8 @@ namespace ManagedIrbis
                         CreateValueSubField().Value = value;
                     }
                 }
-            } // set
-        } // property Value
+            }
+        }
 
         /// <summary>
         /// Список подполей.
@@ -4874,7 +4874,7 @@ namespace ManagedIrbis
         /// </summary>
         public Field()
         {
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -4890,7 +4890,7 @@ namespace ManagedIrbis
         {
             Tag = tag;
             Value = value;
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -4905,7 +4905,7 @@ namespace ManagedIrbis
         {
             Tag = tag;
             Subfields.Add (subfield1);
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -4923,7 +4923,7 @@ namespace ManagedIrbis
             Tag = tag;
             Subfields.Add (subfield1);
             Subfields.Add (subfield2);
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -4944,7 +4944,7 @@ namespace ManagedIrbis
             Subfields.Add (subfield1);
             Subfields.Add (subfield2);
             Subfields.Add (subfield3);
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -4959,7 +4959,7 @@ namespace ManagedIrbis
         {
             Tag = tag;
             Subfields.AddRange (subfields);
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -4976,7 +4976,7 @@ namespace ManagedIrbis
         {
             Tag = tag;
             Subfields.Add (new SubField (code1, value1));
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -4998,7 +4998,7 @@ namespace ManagedIrbis
             Tag = tag;
             Subfields.Add (new SubField (code1, value1));
             Subfields.Add (new SubField (code2, value2));
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -5025,7 +5025,7 @@ namespace ManagedIrbis
             Subfields.Add (new SubField (code1, value1));
             Subfields.Add (new SubField (code2, value2));
             Subfields.Add (new SubField (code3, value3));
-        } // constructor
+        }
 
         #endregion
 
@@ -5063,7 +5063,7 @@ namespace ManagedIrbis
         {
             Subfields.Add (subfield);
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление подполя в конец списка подполей.
@@ -5079,7 +5079,7 @@ namespace ManagedIrbis
         {
             Subfields.Add (new SubField (code, value));
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление подполя в конец списка подполей.
@@ -5095,7 +5095,7 @@ namespace ManagedIrbis
         {
             Subfields.Add (new SubField (code, value));
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Assign the field from another.
@@ -5113,7 +5113,7 @@ namespace ManagedIrbis
             }
 
             return this;
-        } // method AssignFrom
+        }
 
         /// <summary>
         /// Compares the specified fields.
@@ -5163,7 +5163,7 @@ namespace ManagedIrbis
             }
 
             return result;
-        } // method Compare
+        }
 
         /// <summary>
         /// Если нет подполя, выделенного для хранения
@@ -5189,7 +5189,7 @@ namespace ManagedIrbis
             }
 
             return result;
-        } // method CreateValueSubField
+        }
 
         /// <summary>
         /// Получаем подполе, выделенное для хранения
@@ -5209,7 +5209,7 @@ namespace ManagedIrbis
             }
 
             return null;
-        } // method GetValueSubField
+        }
 
         /// <summary>
         /// Добавление подполя в конец списка подполей.
@@ -5231,7 +5231,7 @@ namespace ManagedIrbis
             Subfields.Add (subfield);
 
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление поля, если переданное значение не равно 0.
@@ -5248,7 +5248,7 @@ namespace ManagedIrbis
             }
 
             return this;
-        } // method AddNonEmpty
+        }
 
         /// <summary>
         /// Добавление поля, если переданное значение не равно 0.
@@ -5265,7 +5265,7 @@ namespace ManagedIrbis
             }
 
             return this;
-        } // method AddNonEmpty
+        }
 
         /// <summary>
         /// Добавление подполя в конец списка подполей
@@ -5294,7 +5294,7 @@ namespace ManagedIrbis
             }
 
             return this;
-        } // method AddNonEmpty
+        }
 
         /// <summary>
         /// Очистка подполей.
@@ -5304,7 +5304,7 @@ namespace ManagedIrbis
             Subfields.Clear();
 
             return this;
-        } // method Clear
+        }
 
         /// <summary>
         /// Клонирование поля.
@@ -5319,7 +5319,7 @@ namespace ManagedIrbis
             }
 
             return result;
-        } // method Clone
+        }
 
         /// <summary>
         /// Декодирование строки.
@@ -5333,7 +5333,7 @@ namespace ManagedIrbis
             Tag = line.Substring (0, index).SafeToInt32();
             line = line.Substring (index + 1);
             DecodeBody (line);
-        } // method Decode
+        }
 
         /// <summary>
         /// Декодирование тела поля.
@@ -5370,7 +5370,7 @@ namespace ManagedIrbis
                 Add (line[0], line.Substring (1, index - 1));
                 line = line.Substring (index + 1);
             }
-        } // method DecodeBody
+        }
 
         /// <summary>
         /// Получение первого подполя с указанным кодом.
@@ -5400,7 +5400,7 @@ namespace ManagedIrbis
             }
 
             return null;
-        } // method GetFirstSubField
+        }
 
         /// <summary>
         /// Перечисление подполей с указанным кодом.
@@ -5417,7 +5417,7 @@ namespace ManagedIrbis
                     yield return subfield;
                 }
             }
-        } // method EnumerateSubFields
+        }
 
         /// <summary>
         /// Получение всех подполей с указанным кодом.
@@ -5438,7 +5438,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        } // method GetSubFields
+        }
 
         /// <summary>
         /// Получение первого подполя с указанным кодом
@@ -5467,7 +5467,7 @@ namespace ManagedIrbis
             Subfields.Add (result);
 
             return result;
-        } // method GetOrAddSubField
+        }
 
         /// <summary>
         /// Указанное повторение подполя с данным кодом.
@@ -5517,7 +5517,7 @@ namespace ManagedIrbis
             }
 
             return null;
-        } // method GetSubField
+        }
 
         /// <summary>
         /// Получение текста указанного подполя.
@@ -5569,7 +5569,7 @@ namespace ManagedIrbis
             }
 
             return this;
-        } // method SetSubFieldValue
+        }
 
         /// <summary>
         /// Удаление подполей с указанным кодом.
@@ -5589,7 +5589,7 @@ namespace ManagedIrbis
             }
 
             return this;
-        } // method RemoveSubField
+        }
 
         /// <summary>
         /// Текстовое представление только значимой части поля.
@@ -5616,7 +5616,7 @@ namespace ManagedIrbis
             }
 
             return result.ToString();
-        } // method ToText
+        }
 
         #endregion
 
@@ -5650,10 +5650,10 @@ namespace ManagedIrbis
             }
 
             return result.ToString();
-        } // method ToString
+        }
 
         #endregion
-    } // class Field
+    }
 
     /// <summary>
     /// Статус библиографической записи (флаги).
@@ -5833,7 +5833,7 @@ namespace ManagedIrbis
             Fields.Add (field);
 
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление поля в конец записи.
@@ -5851,7 +5851,7 @@ namespace ManagedIrbis
             Fields.Add (field);
 
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление полей в конец записи.
@@ -5870,7 +5870,7 @@ namespace ManagedIrbis
             Fields.Add (field);
 
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление полей в конец записи.
@@ -5890,7 +5890,7 @@ namespace ManagedIrbis
             Fields.Add (field);
 
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление полей в конец записи.
@@ -5909,7 +5909,7 @@ namespace ManagedIrbis
             Fields.Add (field);
 
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление поля в конец записи.
@@ -5930,7 +5930,7 @@ namespace ManagedIrbis
             Fields.Add (field);
 
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление поля в конец записи.
@@ -5956,7 +5956,7 @@ namespace ManagedIrbis
             Fields.Add (field);
 
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление поля в конец записи.
@@ -5987,7 +5987,7 @@ namespace ManagedIrbis
             Fields.Add (field);
 
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление поля в конец записи.
@@ -6005,7 +6005,7 @@ namespace ManagedIrbis
             Fields.Add (field);
 
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление в запись непустого поля.
@@ -6024,7 +6024,7 @@ namespace ManagedIrbis
             }
 
             return this;
-        } // method AddNonEmptyField
+        }
 
         /// <summary>
         /// Очистка записи (удаление всех полей).
@@ -6037,7 +6037,7 @@ namespace ManagedIrbis
             Fields.Clear();
 
             return this;
-        } // method Clear
+        }
 
         /// <summary>
         /// Создание глубокой копии записи.
@@ -6052,7 +6052,7 @@ namespace ManagedIrbis
             }
 
             return result;
-        } // method Clone
+        }
 
         /// <summary>
         /// Декодирование ответа сервера.
@@ -6099,7 +6099,7 @@ namespace ManagedIrbis
                         exception
                     );
             }
-        } // method Decode
+        }
 
         /// <summary>
         /// Декодирование ответа сервера.
@@ -6146,7 +6146,7 @@ namespace ManagedIrbis
                         exception
                     );
             }
-        } // method Decode
+        }
 
         /// <summary>
         /// Кодирование записи.
@@ -6172,7 +6172,7 @@ namespace ManagedIrbis
             }
 
             return result.ToString();
-        } // method Encode
+        }
 
         /// <summary>
         /// Получить текст поля до разделителей подполей
@@ -6201,7 +6201,7 @@ namespace ManagedIrbis
             }
 
             return default;
-        } // method FM
+        }
 
         /// <summary>
         /// Текст всех полей с указанным тегом.
@@ -6223,7 +6223,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        } // method FMA
+        }
 
         /// <summary>
         /// Текст всех подполей с указанным тегом и кодом.
@@ -6251,7 +6251,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        } // method FMA
+        }
 
         /// <summary>
         /// Получение заданного повторения поля с указанной меткой.
@@ -6276,7 +6276,7 @@ namespace ManagedIrbis
             }
 
             return null;
-        } // method GetField
+        }
 
         /// <summary>
         /// Перечисление полей с указанной меткой.
@@ -6294,7 +6294,7 @@ namespace ManagedIrbis
                     yield return field;
                 }
             }
-        } // method EnumerateField
+        }
 
         /// <summary>
         /// Получение поля с указанной меткой
@@ -6319,7 +6319,7 @@ namespace ManagedIrbis
             Fields.Add (result);
 
             return result;
-        } // method GetOrAddField
+        }
 
         /// <summary>
         /// Проверка, есть ли в записи поле с указанной меткой.
@@ -6338,7 +6338,7 @@ namespace ManagedIrbis
             }
 
             return false;
-        } // method HaveField
+        }
 
         /// <summary>
         /// Удаление из записи поля с указанной меткой.
@@ -6357,7 +6357,7 @@ namespace ManagedIrbis
             }
 
             return this;
-        } // method RemoveField
+        }
 
         /// <summary>
         /// Формирует плоское текстовое представление записи.
@@ -6395,7 +6395,7 @@ namespace ManagedIrbis
 
         /// <inheritdoc cref="object.ToString" />
         public override string ToString() => Encode ("\n");
-    } // class Record
+    }
 
     /// <summary>
     /// Ответ сервера ИРБИС64.
@@ -6499,7 +6499,7 @@ namespace ManagedIrbis
             }
 
             return true;
-        } // method CheckReturnCode
+        }
 
         /// <summary>
         /// Ищем преамбулу сырых бинарных данных.
@@ -6529,7 +6529,7 @@ namespace ManagedIrbis
             }
 
             return false;
-        } // method FindPreamble
+        }
 
         /// <summary>
         /// Начальный разбор ответа сервера.
@@ -6558,7 +6558,7 @@ namespace ManagedIrbis
                 ReadAnsi();
                 ReadAnsi();
             }
-        } // method Parse
+        }
 
         /// <summary>
         ///
@@ -6584,7 +6584,7 @@ namespace ManagedIrbis
             }
 
             return _currentChunk.Array![_currentChunk.Offset + _currentOffset];
-        } // method Peek
+        }
 
         /// <summary>
         ///
@@ -6627,7 +6627,7 @@ namespace ManagedIrbis
             }
 
             return result;
-        } // method ReadByte
+        }
 
         /// <summary>
         ///
@@ -6662,7 +6662,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        } // method ReadLine
+        }
 
         /// <summary>
         ///
@@ -6679,7 +6679,7 @@ namespace ManagedIrbis
             }
 
             return encoding.GetString (bytes);
-        } // method ReadLine
+        }
 
         /// <summary>
         ///
@@ -6724,7 +6724,7 @@ namespace ManagedIrbis
             }
 
             return result;
-        } // method RemainingBytes
+        }
 
         /// <summary>
         ///
@@ -6741,7 +6741,7 @@ namespace ManagedIrbis
             }
 
             return encoding.GetString (bytes);
-        } // method RemainingText
+        }
 
         /// <summary>
         /// Отладочная печать.
@@ -6760,7 +6760,7 @@ namespace ManagedIrbis
                     writer.Write ($" {b:X2}");
                 }
             }
-        } // method Debug
+        }
 
         /// <summary>
         /// Отладочная печать.
@@ -6772,7 +6772,7 @@ namespace ManagedIrbis
         {
             using var writer = File.CreateText (fileName);
             Debug (writer);
-        } // method Debug
+        }
 
         /// <summary>
         /// Debug dump.
@@ -6788,7 +6788,7 @@ namespace ManagedIrbis
             {
                 writer.Write (Encoding.UTF8.GetString (memory.Array!, memory.Offset, memory.Count));
             }
-        } // method DebugUtf
+        }
 
         /// <summary>
         /// Отладочная печать.
@@ -6800,7 +6800,7 @@ namespace ManagedIrbis
         {
             using var writer = File.CreateText (fileName);
             DebugUtf (writer);
-        } // method DebugUtf
+        }
 
         /// <summary>
         /// Debug dump.
@@ -6816,7 +6816,7 @@ namespace ManagedIrbis
             {
                 writer.Write (Utility.Ansi.GetString (memory.Array!, memory.Offset, memory.Count));
             }
-        } // method DebugAnsi
+        }
 
         /// <summary>
         /// Отладочная печать.
@@ -6828,7 +6828,7 @@ namespace ManagedIrbis
         {
             using var writer = File.CreateText (fileName);
             Debug (writer);
-        } // method DebugAnsi
+        }
 
         /// <summary>
         ///
@@ -6838,7 +6838,7 @@ namespace ManagedIrbis
             ReturnCode = ReadInteger();
 
             return ReturnCode;
-        } // method GetReturnCode
+        }
 
         /// <summary>
         ///
@@ -7077,7 +7077,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        } // method GetAnsiStrings
+        }
 
         /// <summary>
         ///
@@ -7094,7 +7094,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        } // method ReadRemainingAnsiLines
+        }
 
         /// <summary>
         ///
@@ -7140,10 +7140,10 @@ namespace ManagedIrbis
             var line = ReadLine (Utility.Ansi);
 
             return int.Parse (line, CultureInfo.InvariantCulture);
-        } // method RequireInt32
+        }
 
         #endregion
-    } // class Response
+    }
 
     /// <summary>
     /// Клиентский запрос к серверу ИРБИС64
@@ -7176,7 +7176,7 @@ namespace ManagedIrbis
             NewLine();
             NewLine();
             NewLine();
-        } // constructor
+        }
 
         #endregion
 
@@ -7200,7 +7200,7 @@ namespace ManagedIrbis
             var length = Private.Int32ToBytes (value, buffer);
             _writer.Write (buffer, 0, length);
             NewLine();
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление строки с флагом "да-нет".
@@ -7222,7 +7222,7 @@ namespace ManagedIrbis
             }
 
             NewLine();
-        } // method AddAnsi
+        }
 
         /// <summary>
         /// Добавление строки в кодировке UTF-8 (плюс перевод строки).
@@ -7239,7 +7239,7 @@ namespace ManagedIrbis
             }
 
             NewLine();
-        } // method AddUtf
+        }
 
         /// <summary>
         /// Добавление формата.
@@ -7273,7 +7273,7 @@ namespace ManagedIrbis
                     }
                 }
             }
-        } // method AddFormat
+        }
 
         /// <summary>
         /// Отладочная печать.
@@ -7290,7 +7290,7 @@ namespace ManagedIrbis
             {
                 writer.Write ($" {b:X2}");
             }
-        } // method Debug
+        }
 
         /// <summary>
         /// Отладочная печать.
@@ -7303,7 +7303,7 @@ namespace ManagedIrbis
             writer ??= Console.Out;
 
             writer.WriteLine (Utility.Ansi.GetString (_writer.ToArray()));
-        } // method DebugUtf
+        }
 
         /// <summary>
         /// Отладочная печать.
@@ -7316,7 +7316,7 @@ namespace ManagedIrbis
             writer ??= Console.Out;
 
             writer.WriteLine (Encoding.UTF8.GetString (_writer.ToArray()));
-        } // method DebugUtf
+        }
 
         /// <summary>
         /// Получение массива байтов, из которых состоит
@@ -7388,7 +7388,7 @@ namespace ManagedIrbis
         {
             _text = text;
             _position = 0;
-        } // constructor
+        }
 
         #endregion
 
@@ -7412,7 +7412,7 @@ namespace ManagedIrbis
             };
 
             return result;
-        } // method Clone
+        }
 
         /// <summary>
         /// Навигатор по текстовому файлу.
@@ -7428,7 +7428,7 @@ namespace ManagedIrbis
             var result = new ValueTextNavigator (text.AsSpan());
 
             return result;
-        } // method FromFile
+        }
 
         /// <summary>
         /// Выдать остаток текста.
@@ -7499,7 +7499,7 @@ namespace ManagedIrbis
             return ahead >= _text.Length
                 ? EOF
                 : _text[ahead];
-        } // method LookAhead
+        }
 
         /// <summary>
         /// Заглядывание вперёд на указанное количество символов.
@@ -7514,7 +7514,7 @@ namespace ManagedIrbis
             return ahead >= _text.Length
                 ? EOF
                 : _text[ahead];
-        } // method LookAhead
+        }
 
         /// <summary>
         /// Заглядывание назад на одну позицию.
@@ -7582,7 +7582,7 @@ namespace ManagedIrbis
             _position = start;
 
             return result;
-        } // method PeekString
+        }
 
         /// <summary>
         /// Подглядывание вплоть до указанного символа
@@ -7600,7 +7600,7 @@ namespace ManagedIrbis
             _position = position;
 
             return result;
-        } // method PeekTo
+        }
 
         /// <summary>
         /// Подглядывание вплоть до указанных символов
@@ -7618,7 +7618,7 @@ namespace ManagedIrbis
             _position = position;
 
             return result;
-        } // method PeekTo
+        }
 
         /// <summary>
         /// Подглядывание вплоть до указанного символа
@@ -7636,7 +7636,7 @@ namespace ManagedIrbis
             _position = position;
 
             return result;
-        } // method PeekUntil
+        }
 
         /// <summary>
         /// Подглядывание вплоть до указанных символов
@@ -7669,7 +7669,7 @@ namespace ManagedIrbis
             }
 
             return _text[_position++];
-        } // method ReadChar
+        }
 
         /// <summary>
         /// Считывание экранированной строки вплоть до разделителя
@@ -7724,7 +7724,7 @@ namespace ManagedIrbis
             }
 
             return result.ToString();
-        } // method ReadEscapedUntil
+        }
 
         /// <summary>
         /// Считывание начиная с открывающего символа
@@ -7772,7 +7772,7 @@ namespace ManagedIrbis
                     start,
                     _position - start
                 );
-        } // method ReadFrom
+        }
 
         /// <summary>
         /// Считывание начиная с открывающего символа
@@ -7845,7 +7845,7 @@ namespace ManagedIrbis
                     startPosition,
                     _position - startPosition
                 );
-        } // method ReadInteger
+        }
 
         /// <summary>
         /// Чтение до конца строки.
@@ -7885,7 +7885,7 @@ namespace ManagedIrbis
                     startPosition,
                     stopPosition - startPosition
                 );
-        } // method ReadLine
+        }
 
         /// <summary>
         /// Чтение строки вплоть до указанной длины.
@@ -7912,7 +7912,7 @@ namespace ManagedIrbis
                     startPosition,
                     _position - startPosition
                 );
-        } // method ReadString
+        }
 
         /// <summary>
         /// Считывание вплоть до указанного символа
@@ -7940,7 +7940,7 @@ namespace ManagedIrbis
                     startPosition,
                     length: _position - startPosition
                 );
-        } // method ReadTo
+        }
 
         /// <summary>
         /// Считывание вплоть до указанного разделителя
@@ -7989,7 +7989,7 @@ namespace ManagedIrbis
                     savePosition,
                     _position - savePosition - stopString.Length
                 );
-        } // method ReadTo
+        }
 
         /// <summary>
         /// Считывание вплоть до указанного символа
@@ -8018,7 +8018,7 @@ namespace ManagedIrbis
                     start: start,
                     length: _position - start
                 );
-        } // method ReadTo
+        }
 
         /// <summary>
         /// Считывание вплоть до указанного символа
@@ -8048,7 +8048,7 @@ namespace ManagedIrbis
                     start,
                     _position - start
                 );
-        } // method ReadUntil
+        }
 
         /// <summary>
         /// Считывание вплоть до указанного разделителя
@@ -8100,7 +8100,7 @@ namespace ManagedIrbis
             _position -= stopString.Length;
 
             return result;
-        } // method ReadUntil
+        }
 
         /// <summary>
         /// Считывание вплоть до указанных символов
@@ -8131,7 +8131,7 @@ namespace ManagedIrbis
                     savePosition,
                     _position - savePosition
                 );
-        } // method ReadUntil
+        }
 
         /// <summary>
         /// Считывание вплоть до указанных символов
@@ -8188,7 +8188,7 @@ namespace ManagedIrbis
                     start,
                     _position - start
                 );
-        } // method ReadUntil
+        }
 
         /// <summary>
         /// Считывание, пока встречается указанный символ.
@@ -8218,7 +8218,7 @@ namespace ManagedIrbis
                     startPosition,
                     _position - startPosition
                 );
-        } // method ReadWhile
+        }
 
         /// <summary>
         /// Считывание, пока встречается указанные символы.
@@ -8249,7 +8249,7 @@ namespace ManagedIrbis
                     start,
                     _position - start
                 );
-        } // method ReadWhile
+        }
 
         /// <summary>
         /// Считываем слово, начиная с текущей позиции.
@@ -8311,7 +8311,7 @@ namespace ManagedIrbis
                     savePosition,
                     _position - savePosition
                 );
-        } // method ReadWord
+        }
 
         /// <summary>
         /// Получаем недавно считанный текст указанной длины.
@@ -8342,7 +8342,7 @@ namespace ManagedIrbis
             }
 
             return Substring (start, length);
-        } // method RecentText
+        }
 
         /// <summary>
         /// Пропускает один символ, если он совпадает с указанным.
@@ -8362,7 +8362,7 @@ namespace ManagedIrbis
             }
 
             return false;
-        } // method SkipChar
+        }
 
         /// <summary>
         /// Пропускает указанное число символов.
@@ -8380,7 +8380,7 @@ namespace ManagedIrbis
             }
 
             return !IsEOF;
-        } // method SkipChar
+        }
 
         /// <summary>
         /// Пропускает один символ, если он совпадает с любым
@@ -8400,7 +8400,7 @@ namespace ManagedIrbis
             }
 
             return false;
-        } // method SkipChar
+        }
 
         /// <summary>
         /// Пропускаем управляющие символы.
@@ -8425,7 +8425,7 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-        } // method SkipControl
+        }
 
         /// <summary>
         /// Пропускаем пунктуацию.
@@ -8450,7 +8450,7 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-        } // method SkipPunctuation
+        }
 
         /// <summary>
         /// Пропускаем "не-словесные" символы.
@@ -8476,7 +8476,7 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-        } // method SkipNonWord
+        }
 
         /// <summary>
         /// Пропускаем "не-словесные" символы.
@@ -8506,7 +8506,7 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-        } // method SkipNonWord
+        }
 
         /// <summary>
         /// Пропускаем произвольное количество символов
@@ -8537,7 +8537,7 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-        } // method SkipRange
+        }
 
         /// <summary>
         /// Пропустить указанный символ.
@@ -8566,7 +8566,7 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-        } // method SkipWhile
+        }
 
         /// <summary>
         /// Пропустить указанные символы.
@@ -8595,7 +8595,7 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-        } // method SkipWhile
+        }
 
         /// <summary>
         /// Пропустить, пока не встретится указанный стоп-символ.
@@ -8623,7 +8623,7 @@ namespace ManagedIrbis
 
                 ReadChar();
             }
-        } // method SkipTo
+        }
 
         /// <summary>
         /// Пропустить, пока не встретятся указанные символы.
@@ -8652,7 +8652,7 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-        } // method SkipWhileNot
+        }
 
         /// <summary>
         /// Пропускаем пробельные символы.
@@ -8675,7 +8675,7 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-        } // method SkiWhitespace
+        }
 
         /// <summary>
         /// Пропускаем пробельные символы и пунктуацию.
@@ -8698,7 +8698,7 @@ namespace ManagedIrbis
                     return true;
                 }
             }
-        } // method SkipWhitespaceAndPunctuation
+        }
 
         /// <summary>
         /// Извлечение подстроки, начиная с указанного смещения.
@@ -8712,7 +8712,7 @@ namespace ManagedIrbis
                    || offset >= _text.Length
                 ? ReadOnlySpan<char>.Empty
                 : _text.Slice (offset);
-        } // method Substring
+        }
 
         /// <summary>
         /// Извлечение подстроки.
@@ -8733,7 +8733,7 @@ namespace ManagedIrbis
                    || length <= 0
                 ? ReadOnlySpan<char>.Empty
                 : _text.Slice (offset, length);
-        } // method Substring
+        }
 
         #endregion
 
@@ -8743,7 +8743,7 @@ namespace ManagedIrbis
         public override string ToString()
         {
             return $"Position={Position}";
-        } // method ToString
+        }
 
         #endregion
     } // struct ValueTextNavigator
@@ -8796,7 +8796,7 @@ namespace ManagedIrbis
             }
 
             return first.SameString (second);
-        } // method CompareDatabases
+        }
 
         #endregion
 
@@ -8859,7 +8859,7 @@ namespace ManagedIrbis
             };
 
             return result;
-        } // method Parse
+        }
 
         #endregion
 
@@ -8918,7 +8918,7 @@ namespace ManagedIrbis
 
                 return hashCode;
             }
-        } // method GetHashCode
+        }
 
         // ReSharper restore NonReadonlyMemberInGetHashCode
 
@@ -8958,10 +8958,10 @@ namespace ManagedIrbis
             }
 
             return result;
-        } // method ToString
+        }
 
         #endregion
-    } // class FileSpecification
+    }
 
     /// <summary>
     /// Работа с INI-файлами.
@@ -9184,7 +9184,7 @@ namespace ManagedIrbis
             {
                 var line = new Line (key, value);
                 Add (line);
-            } // method Add
+            }
 
             /// <summary>
             /// Add new line to the section.
@@ -9201,7 +9201,7 @@ namespace ManagedIrbis
                 }
 
                 _lines.Add (line);
-            } // method Add
+            }
 
             /// <summary>
             /// Apply to other section.
@@ -9215,7 +9215,7 @@ namespace ManagedIrbis
                 {
                     section[line.Key] = line.Value;
                 }
-            } // method ApplyTo
+            }
 
             /// <summary>
             /// Clear the section.
@@ -9225,7 +9225,7 @@ namespace ManagedIrbis
                 _lines.Clear();
                 Modified = true;
                 Owner.Modified = true;
-            } // method Clear
+            }
 
             /// <summary>
             /// Whether the section have line with given key?
@@ -9244,7 +9244,7 @@ namespace ManagedIrbis
                 }
 
                 return false;
-            } // method ContainsKey
+            }
 
             /// <summary>
             /// Get value associated with specified key.
@@ -9266,7 +9266,7 @@ namespace ManagedIrbis
                 }
 
                 return defaultValue;
-            } // method GetValues
+            }
 
             /// <summary>
             /// Get value associated with given key.
@@ -9532,7 +9532,7 @@ namespace ManagedIrbis
             {
                 throw new ArgumentException (nameof (keyName));
             }
-        } // method CheckKeyName
+        }
 
         private static void _SaveSection
             (
@@ -9552,7 +9552,7 @@ namespace ManagedIrbis
             {
                 line.Write (writer);
             }
-        } // method _SaveSection
+        }
 
         #endregion
 
@@ -9644,7 +9644,7 @@ namespace ManagedIrbis
             _sections.Add (result);
 
             return result;
-        } // method CreateSection
+        }
 
         /// <summary>
         /// Get or create (if not exist) section with given name.
@@ -9681,7 +9681,7 @@ namespace ManagedIrbis
             }
 
             return null;
-        } // method GetSection
+        }
 
         /// <summary>
         /// Get all the sections.
@@ -9722,7 +9722,7 @@ namespace ManagedIrbis
                 : section.GetValue (keyName, defaultValue);
 
             return result;
-        } // method GetValue
+        }
 
         /// <summary>
         /// Merge the section.
@@ -9754,7 +9754,7 @@ namespace ManagedIrbis
                     }
                 }
             }
-        } // method MergeSection
+        }
 
         /// <summary>
         /// Remove specified section.
@@ -9902,7 +9902,7 @@ namespace ManagedIrbis
             }
 
             Modified = false;
-        } // method Save
+        }
 
         /// <summary>
         /// Save the INI-file to specified file.
@@ -9920,7 +9920,7 @@ namespace ManagedIrbis
                     encoding
                 );
             Save (writer);
-        } // method Save
+        }
 
         /// <summary>
         /// Set value for specified section and key.
@@ -10034,7 +10034,7 @@ namespace ManagedIrbis
         }
 
         #endregion
-    } // class IniFile
+    }
 
     /// <summary>
     /// Signature for Stat command.
@@ -10173,10 +10173,10 @@ namespace ManagedIrbis
 
             // TODO: реализовать список MFN
             query.AddAnsi (mfns);
-        } // method Encode
+        }
 
         #endregion
-    } // class StatDefinition
+    }
 
     /// <summary>
     /// Параметры актуализации записи на ИРБИС-сервере.
@@ -10198,7 +10198,7 @@ namespace ManagedIrbis
         public int Mfn { get; set; }
 
         #endregion
-    } // class ActualizeRecordParameters
+    }
 
     /// <summary>
     /// Параметры создания базы данных на ИРБИС-сервере
@@ -10229,7 +10229,7 @@ namespace ManagedIrbis
         public string? Template { get; set; }
 
         #endregion
-    } // class CreateDatabaseParameters
+    }
 
     /// <summary>
     /// Виды сортировки ИРБИС-меню.
@@ -10289,7 +10289,7 @@ namespace ManagedIrbis
             : $"{Code} - {Comment}";
 
         #endregion
-    } // class MenuEntry
+    }
 
     /// <summary>
     /// Работа с MNU-файлами.
@@ -10328,7 +10328,7 @@ namespace ManagedIrbis
         public MenuFile()
         {
             Entries = new List<MenuEntry>();
-        } // constructor
+        }
 
         /// <summary>
         /// Internal constructor.
@@ -10339,7 +10339,7 @@ namespace ManagedIrbis
             )
         {
             Entries = entries;
-        } // constructor
+        }
 
         #endregion
 
@@ -10371,7 +10371,7 @@ namespace ManagedIrbis
             Entries.Add (entry);
 
             return this;
-        } // method Add
+        }
 
         /// <summary>
         /// Trims the code.
@@ -10389,7 +10389,7 @@ namespace ManagedIrbis
             }
 
             return code;
-        } // method TrimCode
+        }
 
         /// <summary>
         /// Finds the entry.
@@ -10428,7 +10428,7 @@ namespace ManagedIrbis
             result = FindEntry (code);
 
             return result;
-        } // method GetEntry
+        }
 
         /// <summary>
         /// Finds the entry (case sensitive).
@@ -10455,7 +10455,7 @@ namespace ManagedIrbis
             result = FindEntrySensitive (code);
 
             return result;
-        } // method GetEntrySensitive
+        }
 
         /// <summary>
         /// Finds comment by the code.
@@ -10471,7 +10471,7 @@ namespace ManagedIrbis
             return ReferenceEquals (found, null)
                 ? defaultValue
                 : found.Comment;
-        } // method GetString
+        }
 
         /// <summary>
         /// Finds comment by the code (case sensitive).
@@ -10487,7 +10487,7 @@ namespace ManagedIrbis
             return ReferenceEquals (found, null)
                 ? defaultValue
                 : found.Comment;
-        } // method GetStringSensitive
+        }
 
         /// <summary>
         /// Parses the specified stream.
@@ -10522,7 +10522,7 @@ namespace ManagedIrbis
             }
 
             return result;
-        } // method ParseStream
+        }
 
         /// <summary>
         /// Parses the local file.
@@ -10542,7 +10542,7 @@ namespace ManagedIrbis
             result.FileName = Path.GetFileName (fileName);
 
             return result;
-        } // method ParseLocalFile
+        }
 
         /// <summary>
         /// Parses the local file.
@@ -10562,7 +10562,7 @@ namespace ManagedIrbis
             var result = ParseStream (reader);
 
             return result;
-        } // method Parse
+        }
 
         /// <summary>
         /// Read <see cref="MenuFile"/> from server.
@@ -10582,7 +10582,7 @@ namespace ManagedIrbis
             var result = ParseServerResponse (response);
 
             return result;
-        } // method ReadFromServer
+        }
 
         /// <summary>
         /// Sorts the entries.
@@ -10612,7 +10612,7 @@ namespace ManagedIrbis
             }
 
             return copy.ToArray();
-        } // method SortEntries
+        }
 
         /// <summary>
         /// Builds text representation.
@@ -10630,7 +10630,7 @@ namespace ManagedIrbis
             result.AppendLine (StopMarker);
 
             return result.ToString();
-        } // method ToText
+        }
 
         #endregion
 
@@ -10640,7 +10640,7 @@ namespace ManagedIrbis
         public override string ToString() => FileName.ToVisibleString();
 
         #endregion
-    } // class MenuFile
+    }
 
     /// <summary>
     /// Коды АРМ ИРБИС64.
@@ -10799,7 +10799,7 @@ namespace ManagedIrbis
                     user.Administrator = value;
                     break;
             }
-        } // method _DecodePair
+        }
 
         private static void _DecodeLine
             (
@@ -12929,7 +12929,7 @@ namespace ManagedIrbis
         public bool DontParse { get; set; }
 
         #endregion
-    } // class WriteRecordParameters
+    }
 
     /// <summary>
     /// Оператор глобальной корректировки со всеми относящимися
@@ -13408,7 +13408,7 @@ namespace ManagedIrbis
             NumberOfRecords = numberOfRecords;
 
             return this;
-        } // method SetRange
+        }
 
         /// <summary>
         /// Set search expression.
@@ -13554,7 +13554,7 @@ namespace ManagedIrbis
             };
 
             return result;
-        } // method Parse
+        }
 
         /// <summary>
         /// Разбор меню со списком баз данных.
