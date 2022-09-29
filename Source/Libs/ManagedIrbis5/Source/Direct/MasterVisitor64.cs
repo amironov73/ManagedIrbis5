@@ -18,155 +18,144 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 using AM;
-using AM.Collections;
-using AM.Logging;
-
-using ManagedIrbis.Records;
-
-using Microsoft.Extensions.Logging;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+/// <summary>
+/// Простой доступ к мастер-файлу ИРБИС64.
+/// </summary>
+public sealed class MasterVisitor64
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Простой доступ к мастер-файлу ИРБИС64.
+    /// Мастер-файл.
     /// </summary>
-    public sealed class MasterVisitor64
-        : IDisposable
+    public MstFile64 Mst { get; }
+
+    /// <summary>
+    /// Файл кросс-ссылок.
+    /// </summary>
+    public XrfFile64 Xrf { get; }
+
+    /// <summary>
+    /// Путь к базе данных.
+    /// </summary>
+    public string Database { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public MasterVisitor64
+        (
+            string masterFile
+        )
     {
-        #region Properties
+        Sure.NotNullNorEmpty (masterFile);
 
-        /// <summary>
-        /// Мастер-файл.
-        /// </summary>
-        public MstFile64 Mst { get; }
+        const DirectAccessMode mode = DirectAccessMode.ReadOnly;
+        var serviceProvider = Magna.Host.Services;
 
-        /// <summary>
-        /// Файл кросс-ссылок.
-        /// </summary>
-        public XrfFile64 Xrf { get; }
-
-        /// <summary>
-        /// Путь к базе данных.
-        /// </summary>
-        public string Database { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public MasterVisitor64
+        Database = Path.GetFileNameWithoutExtension (masterFile)
+            .ThrowIfNullOrEmpty();
+        Mst = new MstFile64
             (
-                string masterFile
-            )
-        {
-            Sure.NotNullNorEmpty (masterFile, nameof(masterFile));
-
-            const DirectAccessMode mode = DirectAccessMode.ReadOnly;
-            var serviceProvider = Magna.Host.Services;
-
-            Database = Path.GetFileNameWithoutExtension (masterFile)
-                .ThrowIfNullOrEmpty();
-            Mst = new MstFile64
-                (
-                    Path.ChangeExtension (masterFile, ".mst"),
-                    mode,
-                    serviceProvider
-                );
-            Xrf = new XrfFile64
-                (
-                    Path.ChangeExtension(masterFile, ".xrf"),
-                    mode,
-                    serviceProvider
-                );
-
-        } // constructor
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Получает реальный максимальный MFN в базе данных.
-        /// НЕ СЛЕДУЮЩИЙ MFN, а именно максимальный!
-        /// </summary>
-        public int GetMaxMfn() => Mst.ControlRecord.NextMfn - 1;
-
-        /// <summary>
-        /// Чтение записи с указанным MFN в виде массива байтов.
-        /// </summary>
-        public byte[]? ReadRecordBytes
+                Path.ChangeExtension (masterFile, ".mst"),
+                mode,
+                serviceProvider
+            );
+        Xrf = new XrfFile64
             (
-                int mfn
-            )
+                Path.ChangeExtension (masterFile, ".xrf"),
+                mode,
+                serviceProvider
+            );
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Получает реальный максимальный MFN в базе данных.
+    /// НЕ СЛЕДУЮЩИЙ MFN, а именно максимальный!
+    /// </summary>
+    public int GetMaxMfn() => Mst.ControlRecord.NextMfn - 1;
+
+    /// <summary>
+    /// Чтение записи с указанным MFN в виде массива байтов.
+    /// </summary>
+    public byte[]? ReadRecordBytes
+        (
+            int mfn
+        )
+    {
+        Sure.Positive (mfn);
+
+        XrfRecord64 xrfRecord;
+        try
         {
-            XrfRecord64 xrfRecord;
-            try
-            {
-                xrfRecord = Xrf.ReadRecord (mfn);
-            }
-            catch
-            {
-                return null;
-            }
-
-            if (xrfRecord.Offset == 0)
-            {
-                return null;
-            }
-
-            return Mst.ReadRecordBytes (xrfRecord.Offset);
-
-        } // method ReadRecordBytes
-
-        /// <summary>
-        /// Посещает все записи в мастер-файле.
-        /// </summary>
-        public bool VisitRecords
-            (
-                Func<int, byte[]?, bool> function
-            )
+            xrfRecord = Xrf.ReadRecord (mfn);
+        }
+        catch
         {
-            var maxMfn = GetMaxMfn();
+            return null;
+        }
 
-            for (var mfn = 1; mfn <= maxMfn; mfn++)
-            {
-                var bytes = ReadRecordBytes (mfn);
-                if (!function(mfn, bytes))
-                {
-                    return false;
-                }
-
-            } // for
-
-            return true;
-
-        } // method VisitRecords
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
+        if (xrfRecord.Offset == 0)
         {
-            Mst.Dispose();
-            Xrf.Dispose();
+            return null;
+        }
 
-        } // method Dispose
+        return Mst.ReadRecordBytes (xrfRecord.Offset);
+    }
 
-        #endregion
+    /// <summary>
+    /// Посещает все записи в мастер-файле.
+    /// </summary>
+    public bool VisitRecords
+        (
+            Func<int, byte[]?, bool> function
+        )
+    {
+        Sure.NotNull (function);
 
-    } // class MasterVisitor64
+        var maxMfn = GetMaxMfn();
 
-} // namespace ManagedIrbis.Direct
+        for (var mfn = 1; mfn <= maxMfn; mfn++)
+        {
+            var bytes = ReadRecordBytes (mfn);
+            if (!function (mfn, bytes))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        Mst.Dispose();
+        Xrf.Dispose();
+    }
+
+    #endregion
+}

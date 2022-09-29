@@ -80,10 +80,10 @@ public class SyncConnection
         Socket = socket ?? new SyncTcp4Socket();
         Socket.Connection = this;
 
-        _performanceCollector = (IPerformanceCollector?)serviceProvider?.GetService (typeof (IPerformanceCollector));
+        _performanceCollector = (IPerformanceCollector?) serviceProvider?.GetService (typeof (IPerformanceCollector));
         _logger = (ILogger?)(serviceProvider?.GetService (typeof (ILogger<SyncConnection>))
                              ?? NullLogger.Instance);
-    } // constructor
+    }
 
     #endregion
 
@@ -116,7 +116,7 @@ public class SyncConnection
         var result = ExecuteSync (query);
 
         return result;
-    } // method ExecuteSync
+    }
 
     /// <summary>
     /// Отправка запроса на сервер по упрощённой схеме.
@@ -137,7 +137,7 @@ public class SyncConnection
         var result = ExecuteSync (query);
 
         return result;
-    } // method ExecuteSync
+    }
 
     /// <summary>
     /// Отправка запроса на сервер по упрощённой схеме.
@@ -162,7 +162,7 @@ public class SyncConnection
         var result = ExecuteSync (query);
 
         return result;
-    } // method ExecuteSync
+    }
 
     #endregion
 
@@ -192,7 +192,7 @@ public class SyncConnection
                 Code = "none", // TODO: нужно где-то прикопать код операции
                 OutgoingSize = query.GetLength()
             };
-        } // if
+        }
 
         SetBusy (true);
 
@@ -263,7 +263,7 @@ public class SyncConnection
         {
             SetBusy (false);
         }
-    } // method ExecuteSync
+    }
 
     /// <summary>
     /// Получение статистики по базе данных.
@@ -292,7 +292,7 @@ public class SyncConnection
                      + "}";
 
         return result;
-    } // method GetDatabaseStat
+    }
 
     /// <summary>
     /// Переподключение к серверу.
@@ -308,7 +308,7 @@ public class SyncConnection
         IniFile = null;
 
         return Connect();
-    } // method Reconnect
+    }
 
     /// <summary>
     /// Остановка сервера (расширенная команда).
@@ -320,7 +320,7 @@ public class SyncConnection
         IsConnected = false;
 
         return result;
-    } // method StopServer
+    }
 
     /// <summary>
     /// Разблокирование указанной записи (альтернативный вариант).
@@ -399,7 +399,7 @@ public class SyncConnection
         }
 
         return true;
-    } // method Connect
+    }
 
     /// <inheritdoc cref="ISyncProvider.CreateDatabase"/>
     public bool CreateDatabase
@@ -419,7 +419,7 @@ public class SyncConnection
         using var response = ExecuteSync (query);
 
         return response.IsGood();
-    } // method CreateDatabase
+    }
 
     /// <inheritdoc cref="ISyncProvider.CreateDictionary"/>
     public bool CreateDictionary (string? databaseName = default) =>
@@ -455,7 +455,7 @@ public class SyncConnection
         }
 
         return true;
-    } // method Disconnect
+    }
 
     /// <inheritdoc cref="ISyncProvider.FileExist"/>
     public bool FileExist (FileSpecification specification) =>
@@ -521,7 +521,7 @@ public class SyncConnection
         parameters.Result = result.ToArray();
 
         return true;
-    } // method FormatRecords
+    }
 
     /// <inheritdoc cref="ISyncProvider.FullTextSearch"/>
     public FullTextResult? FullTextSearch
@@ -548,7 +548,7 @@ public class SyncConnection
         result.Decode (response);
 
         return result;
-    } // method FullTextSearch
+    }
 
     /// <inheritdoc cref="IAsyncProvider.GetDatabaseInfoAsync"/>
     public DatabaseInfo? GetDatabaseInfo (string? databaseName = default) =>
@@ -573,7 +573,7 @@ public class SyncConnection
         response.IsGood();
 
         return response?.ReturnCode ?? LastError;
-    } // method GetMaxMfn
+    }
 
     /// <inheritdoc cref="ISyncProvider.GetServerStat"/>
     public ServerStat? GetServerStat() =>
@@ -609,7 +609,7 @@ public class SyncConnection
         result.Parse (response);
 
         return result;
-    } // method GlobalCorrection
+    }
 
     /// <inheritdoc cref="ISyncProvider.ListFiles"/>
     public string[]? ListFiles
@@ -636,7 +636,7 @@ public class SyncConnection
         using var response = ExecuteSync (query);
 
         return SyncConnectionUtility.ListFiles (response);
-    } // method ListFiles
+    }
 
     /// <inheritdoc cref="ISyncProvider.ListProcesses"/>
     public ProcessInfo[]? ListProcesses() =>

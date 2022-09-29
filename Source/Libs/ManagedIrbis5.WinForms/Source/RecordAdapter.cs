@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -13,143 +14,138 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
+using AM;
 using AM.Windows.Forms;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms
+namespace ManagedIrbis.WinForms;
+
+/// <summary>
+/// Адаптер для отображения записей в гриде.
+/// </summary>
+public class RecordAdapter
+    : VirtualAdapter
 {
+    #region Properties
+
     /// <summary>
-    /// Адаптер для отображения записей в гриде.
+    /// Подключение.
     /// </summary>
-    public class RecordAdapter
-        : VirtualAdapter
+    public ISyncProvider Connection { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public RecordAdapter
+        (
+            ISyncProvider connection
+        )
     {
-        #region Properties
+        Sure.NotNull (connection);
 
-        /// <summary>
-        /// Подключение.
-        /// </summary>
-        public ISyncProvider Connection { get; private set; }
+        Connection = connection;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Private members
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public RecordAdapter
-            (
-                ISyncProvider connection
-            )
-        {
-            Connection = connection;
+    private int[]? _found;
 
-        } // constructor
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Private members
+    /// <summary>
+    /// Ограничение только перечисленными найденными записями.
+    /// </summary>
+    /// <param name="found"></param>
+    public void Fill(int[]? found) => _found = found;
 
-        private int[]? _found;
+    #endregion
 
-        #endregion
+    #region VirtualAdapter methods
 
-        #region Public methods
-
-        /// <summary>
-        /// Ограничение только перечисленными найденными записями.
-        /// </summary>
-        /// <param name="found"></param>
-        public void Fill(int[]? found) => _found = found;
-
-        #endregion
-
-        #region VirtualAdapter methods
-
-        /// <inheritdoc cref="VirtualAdapter.ByIndex"/>
-        public override object? ByIndex (object? value, int index) =>
-            value is not FoundLine found
-                ? default
-                : index switch
-                {
-                    0 => found.Mfn,
-                    1 => found.Selected,
-                    2 => found.Icon,
-                    3 => found.Description,
-                    _ => default
-                };
-
-        /// <inheritdoc cref="VirtualAdapter.Clear"/>
-        public override void Clear()
-        {
-            _found = default;
-        }
-
-        /// <inheritdoc cref="VirtualAdapter.PullData"/>
-        public override VirtualData PullData
-            (
-                int firstLine,
-                int lineCount
-            )
-        {
-            // TODO: отрабатывать случаи lineCount <= 0
-
-            var maxMfn = Connection.GetMaxMfn();
-            if (_found is null)
+    /// <inheritdoc cref="VirtualAdapter.ByIndex"/>
+    public override object? ByIndex (object? value, int index) =>
+        value is not FoundLine found
+            ? default
+            : index switch
             {
-                if (firstLine + lineCount > maxMfn)
-                {
-                    lineCount = maxMfn - firstLine;
-                }
-            }
-            else
-            {
-                var length = _found.Length;
-                if (firstLine + lineCount > length)
-                {
-                    lineCount = length - lineCount;
-                }
-            }
-
-            var mfnList = new List<int>(lineCount);
-            for (var i = 0; i < lineCount; i++)
-            {
-                var mfn = _found is null
-                    ? firstLine + i + 1
-                    : _found[i];
-                mfnList.Add(mfn);
-            }
-
-            var records = FoundLine.Read
-                (
-                    Connection,
-                    "@brief",
-                    mfnList
-                );
-
-            var result = new VirtualData
-            {
-                FirstLine = firstLine,
-                LineCount = records.Length,
-                TotalCount = maxMfn,
-                Lines = records
+                0 => found.Mfn,
+                1 => found.Selected,
+                2 => found.Icon,
+                3 => found.Description,
+                _ => default
             };
 
-            return result;
+    /// <inheritdoc cref="VirtualAdapter.Clear"/>
+    public override void Clear()
+    {
+        _found = default;
+    }
 
-        } // method PullData
+    /// <inheritdoc cref="VirtualAdapter.PullData"/>
+    public override VirtualData PullData
+        (
+            int firstLine,
+            int lineCount
+        )
+    {
+        // TODO: отрабатывать случаи lineCount <= 0
 
-        #endregion
+        var maxMfn = Connection.GetMaxMfn();
+        if (_found is null)
+        {
+            if (firstLine + lineCount > maxMfn)
+            {
+                lineCount = maxMfn - firstLine;
+            }
+        }
+        else
+        {
+            var length = _found.Length;
+            if (firstLine + lineCount > length)
+            {
+                lineCount = length - lineCount;
+            }
+        }
 
-    } // class RecordAdapter
+        var mfnList = new List<int>(lineCount);
+        for (var i = 0; i < lineCount; i++)
+        {
+            var mfn = _found is null
+                ? firstLine + i + 1
+                : _found[i];
+            mfnList.Add(mfn);
+        }
 
-} // namespace ManagedIrbis.WinForms
+        var records = FoundLine.Read
+            (
+                Connection,
+                "@brief",
+                mfnList
+            );
+
+        var result = new VirtualData
+        {
+            FirstLine = firstLine,
+            LineCount = records.Length,
+            TotalCount = maxMfn,
+            Lines = records
+        };
+
+        return result;
+    }
+
+    #endregion
+}
