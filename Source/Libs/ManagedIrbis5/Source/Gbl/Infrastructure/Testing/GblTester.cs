@@ -73,13 +73,13 @@ public sealed class GblTester
             ISyncProvider provider
         )
     {
-        Sure.NotNullNorEmpty (folder, nameof (folder));
+        Sure.NotNullNorEmpty (folder);
 
         Provider = provider;
         Folder = folder;
         Tests = new NonNullCollection<GblTest>();
         Results = new NonNullCollection<GblTestResult>();
-    } // constructor
+    }
 
     #endregion
 

@@ -19,58 +19,56 @@ using System.Diagnostics;
 
 #nullable enable
 
-namespace ManagedIrbis.Mapping
+namespace ManagedIrbis.Mapping;
+
+/// <summary>
+/// Задаёт отображение поля записи на свойство класса.
+/// </summary>
+[DebuggerDisplay ("{" + nameof (Tag) + "}, " + nameof (Code) + "}")]
+[AttributeUsage (AttributeTargets.Field
+                 | AttributeTargets.Property | AttributeTargets.Class)]
+public sealed class FieldAttribute
+    : Attribute
 {
+    #region Properties
+
     /// <summary>
-    /// Задаёт отображение поля записи на свойство класса.
+    /// Тег.
     /// </summary>
-    [DebuggerDisplay("Tag: {" + nameof(Tag) + "}")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class)]
-    public sealed class FieldAttribute
-        : Attribute
+    public int Tag { get; }
+
+    /// <summary>
+    /// Код подполя (опциональный).
+    /// </summary>
+    public char Code { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public FieldAttribute
+        (
+            int tag
+        )
     {
-        #region Properties
+        Tag = tag;
+    }
 
-        /// <summary>
-        /// Тег.
-        /// </summary>
-        public int Tag { get; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public FieldAttribute
+        (
+            int tag,
+            char code
+        )
+    {
+        Tag = tag;
+        Code = code;
+    }
 
-        /// <summary>
-        /// Код подполя (опциональный).
-        /// </summary>
-        public char Code { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public FieldAttribute
-            (
-                int tag
-            )
-        {
-            Tag = tag;
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public FieldAttribute
-            (
-                int tag,
-                char code
-            )
-        {
-            Tag = tag;
-            Code = code;
-        } // constructor
-
-        #endregion
-
-    } // class FieldAttribute
-
-} // namespace ManagedIrbis.Mapping
+    #endregion
+}
