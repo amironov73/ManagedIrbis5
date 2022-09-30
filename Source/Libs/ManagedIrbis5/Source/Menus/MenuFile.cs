@@ -82,7 +82,7 @@ public sealed class MenuFile
     public MenuFile()
     {
         Entries = new NonNullCollection<MenuEntry>();
-    } // constructor
+    }
 
     /// <summary>
     /// Internal constructor.
@@ -92,6 +92,8 @@ public sealed class MenuFile
             NonNullCollection<MenuEntry> entries
         )
     {
+        Sure.NotNull (entries);
+
         Entries = entries;
     }
 
@@ -117,6 +119,8 @@ public sealed class MenuFile
             string? comment
         )
     {
+        Sure.NotNull (code);
+
         var entry = new MenuEntry
         {
             Code = code,
@@ -135,6 +139,8 @@ public sealed class MenuFile
             string code
         )
     {
+        Sure.NotNull (code);
+
         code = code.Trim();
         var parts = code.Split (MenuSeparators);
         if (parts.Length != 0)
@@ -148,16 +154,26 @@ public sealed class MenuFile
     /// <summary>
     /// Поиск записи по ключу с точностью до регистра символов.
     /// </summary>
-    public MenuEntry? FindEntry (string code)
+    public MenuEntry? FindEntry
+        (
+            string code
+        )
     {
+        Sure.NotNull (code);
+
         return Entries.FirstOrDefault (entry => entry.Code.SameString (code));
     }
 
     /// <summary>
     /// Поиск записи по ключу.
     /// </summary>
-    public MenuEntry? FindEntrySensitive (string code)
+    public MenuEntry? FindEntrySensitive
+        (
+            string code
+        )
     {
+        Sure.NotNull (code);
+
         return Entries.FirstOrDefault (entry => string.CompareOrdinal (entry.Code, code) == 0);
     }
 
@@ -169,6 +185,8 @@ public sealed class MenuFile
             string code
         )
     {
+        Sure.NotNull (code);
+
         var result = FindEntry (code);
         if (!ReferenceEquals (result, null))
         {
@@ -196,6 +214,8 @@ public sealed class MenuFile
             string code
         )
     {
+        Sure.NotNull (code);
+
         var result = FindEntrySensitive (code);
         if (!ReferenceEquals (result, null))
         {
@@ -224,6 +244,8 @@ public sealed class MenuFile
             string? defaultValue = null
         )
     {
+        Sure.NotNull (code);
+
         var found = FindEntry (code);
 
         return ReferenceEquals (found, null)
@@ -240,6 +262,8 @@ public sealed class MenuFile
             string? defaultValue = null
         )
     {
+        Sure.NotNull (code);
+
         var found = FindEntrySensitive (code);
 
         return ReferenceEquals (found, null)
@@ -255,6 +279,8 @@ public sealed class MenuFile
             TextReader reader
         )
     {
+        Sure.NotNull (reader);
+
         var result = new MenuFile();
 
         while (true)
@@ -291,6 +317,8 @@ public sealed class MenuFile
             Encoding encoding
         )
     {
+        Sure.NotNull (fileName);
+
         using var reader = TextReaderUtility.OpenRead
             (
                 fileName,
@@ -350,6 +378,10 @@ public sealed class MenuFile
             FileSpecification fileSpecification
         )
     {
+        Sure.NotNull (connection);
+        connection.CheckProviderState();
+        Sure.VerifyNotNull (fileSpecification);
+
         var response = connection.ReadTextFile (fileSpecification);
         if (string.IsNullOrEmpty (response))
         {
@@ -369,6 +401,8 @@ public sealed class MenuFile
             MenuSort sortBy
         )
     {
+        Sure.Defined (sortBy);
+
         var copy = new List<MenuEntry> (Entries);
         switch (sortBy)
         {

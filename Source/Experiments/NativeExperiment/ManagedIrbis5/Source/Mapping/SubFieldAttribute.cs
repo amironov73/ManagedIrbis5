@@ -20,40 +20,37 @@ using System.Diagnostics;
 
 #nullable enable
 
-namespace ManagedIrbis.Mapping
+namespace ManagedIrbis.Mapping;
+
+/// <summary>
+/// Задаёт отображение подполя записи на свойство класса.
+/// </summary>
+[DebuggerDisplay ("Code: {" + nameof (Code) + "}")]
+[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property)]
+public sealed class SubFieldAttribute
+    : Attribute
 {
+    #region Properties
+
     /// <summary>
-    /// Задаёт отображение подполя записи на свойство класса.
+    /// Код.
     /// </summary>
-    [DebuggerDisplay("Code: {" + nameof(Code) + "}")]
-    [AttributeUsage(AttributeTargets.Field|AttributeTargets.Property)]
-    public sealed class SubFieldAttribute
-        : Attribute
+    public char Code { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SubFieldAttribute
+        (
+            char code
+        )
     {
-        #region Properties
+        Code = code;
+    }
 
-        /// <summary>
-        /// Код.
-        /// </summary>
-        public char Code { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SubFieldAttribute
-            (
-                char code
-            )
-        {
-            Code = code;
-        } // constructor
-
-        #endregion
-
-    } // class SubFieldAttribute
-
-} // namespace ManagedIrbis.Mapping
+    #endregion
+}

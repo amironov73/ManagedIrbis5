@@ -45,13 +45,13 @@ namespace ManagedIrbis;
 [Serializable]
 public sealed class FieldCollection
     : Collection<Field>,
-        IHandmadeSerializable,
-        IReadOnly<FieldCollection>
+    IHandmadeSerializable,
+    IReadOnly<FieldCollection>
 {
     #region Properties
 
     /// <summary>
-    /// Record.
+    /// Запись, которой принадлежат поля.
     /// </summary>
     [JsonIgnore]
     public Record? Record { get; internal set; }
@@ -60,15 +60,7 @@ public sealed class FieldCollection
 
     #region Private members
 
-    private List<Field> _GetInnerList()
-    {
-        // ReSharper disable SuspiciousTypeConversion.Global
-        var result = (List<Field>) Items;
-
-        // ReSharper restore SuspiciousTypeConversion.Global
-
-        return result;
-    }
+    private List<Field>? _GetInnerList() => Items as List<Field>;
 
     private bool _dontRenumber;
 
@@ -79,7 +71,7 @@ public sealed class FieldCollection
             return;
         }
 
-        var seen = new DictionaryCounterInt32<int>();
+        var seen = new DictionaryCounter<int, int>();
 
         foreach (var field in this)
         {
@@ -112,11 +104,13 @@ public sealed class FieldCollection
     {
         Sure.Positive (delta);
 
-        var innerList = _GetInnerList();
-        var newCapacity = innerList.Count + delta;
-        if (newCapacity > innerList.Capacity)
+        if (_GetInnerList() is { } innerList)
         {
-            innerList.Capacity = newCapacity;
+            var newCapacity = innerList.Count + delta;
+            if (newCapacity > innerList.Capacity)
+            {
+                innerList.Capacity = newCapacity;
+            }
         }
     }
 
@@ -129,14 +123,15 @@ public sealed class FieldCollection
         )
     {
         Sure.NotNull ((object?) fields);
-
         ThrowIfReadOnly();
 
         if (fields is IList<Field> outer)
         {
-            var inner = _GetInnerList();
-            var newCapacity = inner.Count + outer.Count;
-            EnsureCapacity (newCapacity);
+            if (_GetInnerList() is { } innerList)
+            {
+                var newCapacity = innerList.Count + outer.Count;
+                EnsureCapacity (newCapacity);
+            }
         }
 
         foreach (var field in fields)
@@ -229,8 +224,7 @@ public sealed class FieldCollection
     {
         Sure.NonNegative (capacity);
 
-        var innerList = _GetInnerList();
-        if (innerList.Capacity < capacity)
+        if (_GetInnerList() is { } innerList && innerList.Capacity < capacity)
         {
             innerList.Capacity = capacity;
         }
@@ -382,7 +376,10 @@ public sealed class FieldCollection
     {
         if (ReadOnly)
         {
-            Magna.Logger.LogError (nameof (FieldCollection) + "::" + nameof (ThrowIfReadOnly));
+            Magna.Logger.LogError
+                (
+                    nameof (FieldCollection) + "::" + nameof (ThrowIfReadOnly)
+                );
 
             throw new ReadOnlyException();
         }

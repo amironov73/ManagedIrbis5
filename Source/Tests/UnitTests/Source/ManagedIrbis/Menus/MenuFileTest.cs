@@ -4,42 +4,43 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Local
 
+using System;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Text;
 
-using ManagedIrbis;
 using ManagedIrbis.Menus;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Menus
+namespace UnitTests.ManagedIrbis.Menus;
+
+[TestClass]
+public class MenuFileTest
+    : Common.CommonUnitTest
 {
-    [TestClass]
-    public class MenuFileTest
-        : Common.CommonUnitTest
+    private void _CompareMenu
+        (
+            MenuFile first,
+            MenuFile second
+        )
     {
-        private void _CompareMenu
-            (
-                MenuFile first,
-                MenuFile second
-            )
+        Assert.AreEqual (first.FileName, second.FileName);
+
+        var firstEntries = first.SortEntries (MenuSort.None);
+        var secondEntries = second.SortEntries (MenuSort.None);
+
+        Assert.AreEqual (firstEntries.Length, secondEntries.Length);
+        for (var i = 0; i < firstEntries.Length; i++)
         {
-            Assert.AreEqual(first.FileName, second.FileName);
+            var entry1 = firstEntries[i];
+            var entry2 = secondEntries[i];
 
-            var firstEntries = first.SortEntries(MenuSort.None);
-            var secondEntries = second.SortEntries(MenuSort.None);
-
-            Assert.AreEqual(firstEntries.Length, secondEntries.Length);
-            for (var i = 0; i < firstEntries.Length; i++)
-            {
-                var entry1 = firstEntries[i];
-                var entry2 = secondEntries[i];
-
-                Assert.AreEqual(entry1.Code, entry2.Code);
-                Assert.AreEqual(entry1.Comment, entry2.Comment);
-            }
+            Assert.AreEqual (entry1.Code, entry2.Code);
+            Assert.AreEqual (entry1.Comment, entry2.Comment);
         }
+    }
 
 //        private void _TestSerialization
 //            (
@@ -54,115 +55,115 @@ namespace UnitTests.ManagedIrbis.Menus
 //            _CompareMenu(first, second);
 //        }
 
-        private MenuFile _GetMenu()
-        {
-            var result = new MenuFile();
+    private MenuFile _GetMenu()
+    {
+        var result = new MenuFile();
 
-            result
-                .Add("a", "Comment for a")
-                .Add("b", "Comment for b")
-                .Add("c", "Comment for c");
+        result
+            .Add ("a", "Comment for a")
+            .Add ("b", "Comment for b")
+            .Add ("c", "Comment for c");
 
-            return result;
-        }
+        return result;
+    }
 
-        [TestMethod]
-        public void MenuFile_Constructor_1()
-        {
-            var menu = _GetMenu();
+    [TestMethod]
+    public void MenuFile_Constructor_1()
+    {
+        var menu = _GetMenu();
 
-            Assert.AreEqual(3, menu.Entries.Count);
-            var actual = menu.GetString("c");
-            Assert.AreEqual("Comment for c", actual);
+        Assert.AreEqual (3, menu.Entries.Count);
+        var actual = menu.GetString ("c");
+        Assert.AreEqual ("Comment for c", actual);
 
-            //_TestSerialization(menu);
-        }
+        //_TestSerialization(menu);
+    }
 
-        [TestMethod]
-        public void MenuFile_Static_Constructor_1()
-        {
-            Assert.IsNotNull(MenuFile.MenuSeparators);
-        }
+    [TestMethod]
+    public void MenuFile_Static_Constructor_1()
+    {
+        Assert.IsNotNull (MenuFile.MenuSeparators);
+    }
 
-        [TestMethod]
-        public void MenuFile_TrimCode_1()
-        {
-            Assert.AreEqual("Abc", MenuFile.TrimCode("Abc"));
-            Assert.AreEqual("Abc", MenuFile.TrimCode("Abc-123"));
-            Assert.AreEqual("Abc", MenuFile.TrimCode("Abc 123"));
-        }
+    [TestMethod]
+    public void MenuFile_TrimCode_1()
+    {
+        Assert.AreEqual ("Abc", MenuFile.TrimCode ("Abc"));
+        Assert.AreEqual ("Abc", MenuFile.TrimCode ("Abc-123"));
+        Assert.AreEqual ("Abc", MenuFile.TrimCode ("Abc 123"));
+    }
 
-        [TestMethod]
-        public void MenuFile_FindEntrySensitive_1()
-        {
-            var menu = _GetMenu();
-            Assert.IsNotNull(menu.FindEntrySensitive("a"));
-            Assert.IsNull(menu.FindEntrySensitive("A"));
-        }
+    [TestMethod]
+    public void MenuFile_FindEntrySensitive_1()
+    {
+        var menu = _GetMenu();
+        Assert.IsNotNull (menu.FindEntrySensitive ("a"));
+        Assert.IsNull (menu.FindEntrySensitive ("A"));
+    }
 
-        [TestMethod]
-        public void MenuFile_GetEntry_1()
-        {
-            var menu = _GetMenu();
+    [TestMethod]
+    public void MenuFile_GetEntry_1()
+    {
+        var menu = _GetMenu();
 
-            Assert.IsNotNull(menu.GetEntry("a"));
-            Assert.IsNull(menu.GetEntry("e"));
-            Assert.IsNotNull(menu.GetEntry("A"));
-            Assert.IsNull(menu.GetEntry("E"));
-            Assert.IsNotNull(menu.GetEntry(" a"));
-            Assert.IsNull(menu.GetEntry(" e"));
-            Assert.IsNotNull(menu.GetEntry("a-123"));
-            Assert.IsNull(menu.GetEntry("e-123"));
-            Assert.IsNotNull(menu.GetEntry("A-123"));
-            Assert.IsNull(menu.GetEntry("E-123"));
-        }
+        Assert.IsNotNull (menu.GetEntry ("a"));
+        Assert.IsNull (menu.GetEntry ("e"));
+        Assert.IsNotNull (menu.GetEntry ("A"));
+        Assert.IsNull (menu.GetEntry ("E"));
+        Assert.IsNotNull (menu.GetEntry (" a"));
+        Assert.IsNull (menu.GetEntry (" e"));
+        Assert.IsNotNull (menu.GetEntry ("a-123"));
+        Assert.IsNull (menu.GetEntry ("e-123"));
+        Assert.IsNotNull (menu.GetEntry ("A-123"));
+        Assert.IsNull (menu.GetEntry ("E-123"));
+    }
 
-        [TestMethod]
-        public void MenuFile_GetEntrySensitive_1()
-        {
-            var menu = _GetMenu();
+    [TestMethod]
+    public void MenuFile_GetEntrySensitive_1()
+    {
+        var menu = _GetMenu();
 
-            Assert.IsNotNull(menu.GetEntrySensitive("a"));
-            Assert.IsNull(menu.GetEntrySensitive("e"));
-            Assert.IsNull(menu.GetEntrySensitive("A"));
-            Assert.IsNull(menu.GetEntrySensitive("E"));
-            Assert.IsNotNull(menu.GetEntrySensitive(" a"));
-            Assert.IsNull(menu.GetEntrySensitive(" e"));
-            Assert.IsNull(menu.GetEntrySensitive(" A"));
-            Assert.IsNull(menu.GetEntrySensitive(" E"));
-            Assert.IsNotNull(menu.GetEntrySensitive("a-123"));
-            Assert.IsNull(menu.GetEntrySensitive("e-123"));
-            Assert.IsNull(menu.GetEntrySensitive("A-123"));
-            Assert.IsNull(menu.GetEntrySensitive("E-123"));
-        }
+        Assert.IsNotNull (menu.GetEntrySensitive ("a"));
+        Assert.IsNull (menu.GetEntrySensitive ("e"));
+        Assert.IsNull (menu.GetEntrySensitive ("A"));
+        Assert.IsNull (menu.GetEntrySensitive ("E"));
+        Assert.IsNotNull (menu.GetEntrySensitive (" a"));
+        Assert.IsNull (menu.GetEntrySensitive (" e"));
+        Assert.IsNull (menu.GetEntrySensitive (" A"));
+        Assert.IsNull (menu.GetEntrySensitive (" E"));
+        Assert.IsNotNull (menu.GetEntrySensitive ("a-123"));
+        Assert.IsNull (menu.GetEntrySensitive ("e-123"));
+        Assert.IsNull (menu.GetEntrySensitive ("A-123"));
+        Assert.IsNull (menu.GetEntrySensitive ("E-123"));
+    }
 
-        [TestMethod]
-        public void MenuFile_GetStringSensitive_1()
-        {
-            var defaultValue = "default value";
-            var menu = _GetMenu();
+    [TestMethod]
+    public void MenuFile_GetStringSensitive_1()
+    {
+        var defaultValue = "default value";
+        var menu = _GetMenu();
 
-            Assert.AreEqual("Comment for a", menu.GetStringSensitive("a"));
-            Assert.AreEqual(defaultValue, menu.GetStringSensitive("d", defaultValue));
-        }
+        Assert.AreEqual ("Comment for a", menu.GetStringSensitive ("a"));
+        Assert.AreEqual (defaultValue, menu.GetStringSensitive ("d", defaultValue));
+    }
 
-        // [TestMethod]
-        // public void MenuFile_ParseLocalFile_1()
-        // {
-        //     string fileName = Path.Combine
-        //         (
-        //             TestDataPath,
-        //             "org.mnu"
-        //         );
-        //
-        //     MenuFile menu = MenuFile
-        //         .ParseLocalFile(fileName);
-        //
-        //     Assert.AreEqual(9, menu.Entries.Count);
-        //
-        //     string actual = menu.GetString("1");
-        //     Assert.AreEqual("RU", actual);
-        // }
+    // [TestMethod]
+    // public void MenuFile_ParseLocalFile_1()
+    // {
+    //     string fileName = Path.Combine
+    //         (
+    //             TestDataPath,
+    //             "org.mnu"
+    //         );
+    //
+    //     MenuFile menu = MenuFile
+    //         .ParseLocalFile(fileName);
+    //
+    //     Assert.AreEqual(9, menu.Entries.Count);
+    //
+    //     string actual = menu.GetString("1");
+    //     Assert.AreEqual("RU", actual);
+    // }
 
 //        [TestMethod]
 //        public void MenuFile_ParseServerResponse_1()
@@ -323,59 +324,58 @@ namespace UnitTests.ManagedIrbis.Menus
 //            Assert.AreEqual(expected, actual);
 //        }
 
-        [TestMethod]
-        public void MenuFile_SortEntries_1()
+    [TestMethod]
+    public void MenuFile_SortEntries_1()
+    {
+        var menu = new MenuFile()
+            .Add ("2", "2")
+            .Add ("1", "3")
+            .Add ("3", "1");
+
+        var sorted = menu.SortEntries (MenuSort.None);
+        Assert.AreEqual (3, sorted.Length);
+        Assert.AreEqual ("2", sorted[0].Code);
+        Assert.AreEqual ("1", sorted[1].Code);
+        Assert.AreEqual ("3", sorted[2].Code);
+
+        sorted = menu.SortEntries (MenuSort.ByCode);
+        Assert.AreEqual (3, sorted.Length);
+        Assert.AreEqual ("1", sorted[0].Code);
+        Assert.AreEqual ("2", sorted[1].Code);
+        Assert.AreEqual ("3", sorted[2].Code);
+
+        sorted = menu.SortEntries (MenuSort.ByComment);
+        Assert.AreEqual (3, sorted.Length);
+        Assert.AreEqual ("3", sorted[0].Code);
+        Assert.AreEqual ("2", sorted[1].Code);
+        Assert.AreEqual ("1", sorted[2].Code);
+    }
+
+    [TestMethod]
+    [ExpectedException (typeof (ArgumentOutOfRangeException))]
+    public void MenuFile_SortEntries_2()
+    {
+        var menu = _GetMenu();
+        menu.SortEntries ((MenuSort)333);
+    }
+
+    [TestMethod]
+    public void MenuFile_ToText_1()
+    {
+        var menu = _GetMenu();
+        var expected = "a\nComment for a\nb\nComment for b\nc\nComment for c\n*****\n";
+        var actual = menu.ToText().DosToUnix();
+        Assert.AreEqual (expected, actual);
+    }
+
+    [TestMethod]
+    public void MenuFile_ToString_1()
+    {
+        var fileName = "menu.mnu";
+        var menu = new MenuFile
         {
-            var menu = new MenuFile()
-                .Add("2", "2")
-                .Add("1", "3")
-                .Add("3", "1");
-
-            var sorted = menu.SortEntries(MenuSort.None);
-            Assert.AreEqual(3, sorted.Length);
-            Assert.AreEqual("2", sorted[0].Code);
-            Assert.AreEqual("1", sorted[1].Code);
-            Assert.AreEqual("3", sorted[2].Code);
-
-            sorted = menu.SortEntries(MenuSort.ByCode);
-            Assert.AreEqual(3, sorted.Length);
-            Assert.AreEqual("1", sorted[0].Code);
-            Assert.AreEqual("2", sorted[1].Code);
-            Assert.AreEqual("3", sorted[2].Code);
-
-            sorted = menu.SortEntries(MenuSort.ByComment);
-            Assert.AreEqual(3, sorted.Length);
-            Assert.AreEqual("3", sorted[0].Code);
-            Assert.AreEqual("2", sorted[1].Code);
-            Assert.AreEqual("1", sorted[2].Code);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(IrbisException))]
-        public void MenuFile_SortEntries_2()
-        {
-            var menu = _GetMenu();
-            menu.SortEntries((MenuSort)333);
-        }
-
-        [TestMethod]
-        public void MenuFile_ToText_1()
-        {
-            var menu = _GetMenu();
-            var expected = "a\nComment for a\nb\nComment for b\nc\nComment for c\n*****\n";
-            var actual = menu.ToText().DosToUnix();
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
-        public void MenuFile_ToString_1()
-        {
-            var fileName = "menu.mnu";
-            var menu = new MenuFile
-            {
-                FileName = fileName
-            };
-            Assert.AreEqual(fileName, menu.ToString());
-        }
+            FileName = fileName
+        };
+        Assert.AreEqual (fileName, menu.ToString());
     }
 }

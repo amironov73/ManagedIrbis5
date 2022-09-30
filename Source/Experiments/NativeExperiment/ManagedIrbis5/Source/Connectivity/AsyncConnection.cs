@@ -391,7 +391,7 @@ public sealed class AsyncConnection
         AGAIN:
         LastError = 0;
         QueryId = 1;
-        ClientId = Random.Shared.Next (100000, 999999);
+        ClientId = new Random().Next (100000, 999999);
 
         var query = new AsyncQuery (this, CommandCode.RegisterClient);
         query.AddAnsi (Username);

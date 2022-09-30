@@ -7,16 +7,20 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* DictionaryCounterSingle.cs -- простой словарь-счетчик с дробными числами
+/* DictionaryCounter.cs -- простой словарь-счетчик
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
 #endregion
 
@@ -25,24 +29,25 @@ using System.Collections.Generic;
 namespace AM.Collections;
 
 /// <summary>
-/// Простой словарь-счетчик с дробными числами.
+/// Простой словарь-счетчик.
 /// </summary>
-public sealed class DictionaryCounterSingle<TKey>
-    : Dictionary<TKey, float>
+public class DictionaryCounter<TKey, TValue>
+    : Dictionary<TKey, TValue>
     where TKey : notnull
+    where TValue : INumber<TValue>
 {
     #region Properties
 
     /// <summary>
     /// Gets the total.
     /// </summary>
-    public float Total
+    public TValue Total
     {
         get
         {
             lock (SyncRoot)
             {
-                var result = 0.0f;
+                var result = TValue.Zero;
                 foreach (var value in Values)
                 {
                     result += value;
@@ -53,38 +58,50 @@ public sealed class DictionaryCounterSingle<TKey>
         }
     }
 
+    /// <summary>
+    /// Сортированные ключи.
+    /// </summary>
+    public TKey[] SortedKeys
+    {
+        get
+        {
+            var result = Keys.ToArray();
+            Array.Sort (result);
+
+            return result;
+        }
+    }
+
     #endregion
 
     #region Construction
 
     /// <summary>
-    /// Initializes a new instance of the
-    /// <see cref="DictionaryCounterSingle{TKey}"/> class.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public DictionaryCounterSingle()
+    public DictionaryCounter()
     {
         // пустое тело конструктора
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
-    /// <param name="comparer">The comparer.</param>
-    public DictionaryCounterSingle
+    /// <param name="comparer">Сравнение для элементов.</param>
+    public DictionaryCounter
         (
             IEqualityComparer<TKey> comparer
         )
-        : base (comparer)
+        : base (comparer.ThrowIfNull())
     {
         // пустое тело конструктора
     }
 
     /// <summary>
-    /// Initializes a new instance of the
-    /// <see cref="DictionaryCounterSingle{TKey}"/> class.
+    /// Конструктор.
     /// </summary>
-    /// <param name="capacity">The capacity.</param>
-    public DictionaryCounterSingle
+    /// <param name="capacity">Начальная емкость.</param>
+    public DictionaryCounter
         (
             int capacity
         )
@@ -94,13 +111,12 @@ public sealed class DictionaryCounterSingle<TKey>
     }
 
     /// <summary>
-    /// Initializes a new instance of the
-    /// <see cref="DictionaryCounterSingle{TKey}"/> class.
+    /// Конструктор.
     /// </summary>
-    /// <param name="dictionary">The dictionary.</param>
-    public DictionaryCounterSingle
+    /// <param name="dictionary">Начальное наполнение словаря.</param>
+    public DictionaryCounter
         (
-            DictionaryCounterSingle<TKey> dictionary
+            DictionaryCounter<TKey, TValue> dictionary
         )
         : base (dictionary)
     {
@@ -111,7 +127,7 @@ public sealed class DictionaryCounterSingle<TKey>
 
     #region Private members
 
-    private object SyncRoot => ((ICollection) this).SyncRoot;
+    private object SyncRoot => ((ICollection)this).SyncRoot;
 
     #endregion
 
@@ -123,33 +139,43 @@ public sealed class DictionaryCounterSingle<TKey>
     /// <param name="key">The key.</param>
     /// <param name="increment">The value.</param>
     /// <returns>New value for given key.</returns>
-    public float Augment
+    public TValue Augment
         (
             TKey key,
-            float increment
+            TValue increment
         )
     {
         lock (SyncRoot)
         {
-            TryGetValue (key, out var result);
-            result += increment;
-            this[key] = result;
+            if (TryGetValue (key, out var value))
+            {
+                value += increment;
+            }
+            else
+            {
+                value = increment;
+            }
 
-            return result;
+            this[key] = value;
+
+            return value;
         }
     }
 
     /// <summary>
     /// Get accumulated value for the specified key.
     /// </summary>
-    public float GetValue
+    public TValue GetValue
         (
             TKey key
         )
     {
         lock (SyncRoot)
         {
-            TryGetValue (key, out var result);
+            if (!TryGetValue (key, out var result))
+            {
+                result = TValue.Zero;
+            }
 
             return result;
         }
@@ -158,12 +184,12 @@ public sealed class DictionaryCounterSingle<TKey>
     /// <summary>
     /// Increment the specified key.
     /// </summary>
-    public double Increment
+    public TValue Increment
         (
             TKey key
         )
     {
-        return Augment (key, 1.0f);
+        return Augment (key, TValue.One);
     }
 
     #endregion

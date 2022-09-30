@@ -767,6 +767,156 @@ public class SyncConnection
         return result;
     }
 
+    /// <inheritdoc cref="ISyncProvider.ReadRecord{T}"/>
+    /// <remarks>
+    /// Повтор метода, чтобы появилась возможность делать
+    /// NativeAOT в .NET 7.
+    /// </remarks>
+    public Record? ReadRecord
+        (
+            ReadRecordParameters parameters
+        )
+    {
+        Record? result;
+
+        try
+        {
+            var database = EnsureDatabase (parameters.Database);
+            using var query = new SyncQuery (this, CommandCode.ReadRecord);
+            query.AddAnsi (database);
+            query.Add (parameters.Mfn);
+            if (parameters.Version != 0)
+            {
+                query.Add (parameters.Version);
+            }
+            else
+            {
+                query.Add (parameters.Lock);
+            }
+
+            query.AddFormat (parameters.Format);
+
+            using var response = ExecuteSync (query);
+            if (!response.IsGood (false, ConnectionUtility.GoodCodesForReadRecord))
+            {
+                return null;
+            }
+
+            // TODO: забирать результат расформатирования
+
+            result = new Record
+            {
+                Database = Database
+            };
+
+            switch ((ReturnCode) response.ReturnCode)
+            {
+                case ReturnCode.PreviousVersionNotExist:
+                    result.Status |= RecordStatus.Absent;
+                    break;
+
+                case ReturnCode.PhysicallyDeleted:
+                case ReturnCode.PhysicallyDeleted1:
+                    result.Status |= RecordStatus.PhysicallyDeleted;
+                    break;
+
+                default:
+                    result.Decode (response);
+                    break;
+            }
+
+            if (parameters.Version != 0)
+            {
+                UnlockRecords (new[] { parameters.Mfn });
+            }
+        }
+        catch (Exception exception)
+        {
+            throw new IrbisException
+                (
+                    nameof (ReadRecord) + " " + parameters,
+                    exception
+                );
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc cref="ISyncProvider.ReadRecord{T}"/>
+    /// <remarks>
+    /// Повтор метода, чтобы появилась возможность делать
+    /// NativeAOT в .NET 7.
+    /// </remarks>
+    public RawRecord? ReadRawRecord
+        (
+            ReadRecordParameters parameters
+        )
+    {
+        RawRecord? result;
+
+        try
+        {
+            var database = EnsureDatabase (parameters.Database);
+            using var query = new SyncQuery (this, CommandCode.ReadRecord);
+            query.AddAnsi (database);
+            query.Add (parameters.Mfn);
+            if (parameters.Version != 0)
+            {
+                query.Add (parameters.Version);
+            }
+            else
+            {
+                query.Add (parameters.Lock);
+            }
+
+            query.AddFormat (parameters.Format);
+
+            using var response = ExecuteSync (query);
+            if (!response.IsGood (false, ConnectionUtility.GoodCodesForReadRecord))
+            {
+                return null;
+            }
+
+            // TODO: забирать результат расформатирования
+
+            result = new RawRecord
+            {
+                Database = Database
+            };
+
+            switch ((ReturnCode) response.ReturnCode)
+            {
+                case ReturnCode.PreviousVersionNotExist:
+                    result.Status |= RecordStatus.Absent;
+                    break;
+
+                case ReturnCode.PhysicallyDeleted:
+                case ReturnCode.PhysicallyDeleted1:
+                    result.Status |= RecordStatus.PhysicallyDeleted;
+                    break;
+
+                default:
+                    result.Decode (response);
+                    break;
+            }
+
+            if (parameters.Version != 0)
+            {
+                UnlockRecords (new[] { parameters.Mfn });
+            }
+        }
+        catch (Exception exception)
+        {
+            throw new IrbisException
+                (
+                    nameof (ReadRecord) + " " + parameters,
+                    exception
+                );
+        }
+
+        return result;
+    }
+
     /// <inheritdoc cref="ISyncProvider.ReadRecordPostings"/>
     public TermPosting[]? ReadRecordPostings
         (

@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
@@ -391,6 +392,7 @@ public static class SyncProviderUtility
         Sure.VerifyNotNull (specification);
         provider.EnsureConnected();
 
+        // TODO разобраться с ReadTextFile
         var content = provider.ReadTextFile (specification);
         if (content is null)
         {
@@ -447,6 +449,12 @@ public static class SyncProviderUtility
             Mfn = mfn
         };
 
+        if (connection is SyncConnection syncConnection)
+        {
+            // этот трюк нужен для NativeAOT в .NET 7
+            return syncConnection.ReadRawRecord (parameters);
+        }
+
         return connection.ReadRecord<RawRecord> (parameters);
     }
 
@@ -459,6 +467,12 @@ public static class SyncProviderUtility
             ReadRecordParameters parameters
         )
     {
+        if (connection is SyncConnection syncConnection)
+        {
+            // этот трюк нужен для NativeAOT в .NET 7
+            return syncConnection.ReadRecord (parameters);
+        }
+
         return connection.ReadRecord<Record> (parameters);
     }
 
