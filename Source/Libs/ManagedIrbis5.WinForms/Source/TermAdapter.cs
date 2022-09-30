@@ -17,6 +17,8 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
+using AM;
+
 #endregion
 
 #nullable enable
@@ -95,11 +97,13 @@ public class TermAdapter
             string prefix
         )
     {
+        Sure.NotNull (connection);
+
         Source = new BindingSource (Array.Empty<Term>(), null);
         Portion = 100;
         Connection = connection;
         Prefix = prefix;
-    } // constructor
+    }
 
     #endregion
 
@@ -133,7 +137,10 @@ public class TermAdapter
     /// <summary>
     /// Move to next term.
     /// </summary>
-    public bool MoveNext (int amount)
+    public bool MoveNext
+        (
+            int amount
+        )
     {
         while (amount > 0)
         {
@@ -194,7 +201,7 @@ public class TermAdapter
         )
     {
         var fullTerm = FullTerm;
-        if (!ReferenceEquals (startTerm, null))
+        if (startTerm is not null)
         {
             fullTerm = Prefix + startTerm;
         }
