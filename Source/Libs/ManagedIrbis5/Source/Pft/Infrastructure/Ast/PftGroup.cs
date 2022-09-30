@@ -47,7 +47,7 @@ public sealed class PftGroup
     #region Construction
 
     /// <summary>
-    /// Static constructor.
+    /// Статический конструктор.
     /// </summary>
     static PftGroup()
     {
@@ -55,14 +55,15 @@ public sealed class PftGroup
     }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор по умолчанию.
     /// </summary>
     public PftGroup()
     {
-    } // constructor
+        // пустое тело конструктора.
+    }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public PftGroup
         (
@@ -71,10 +72,10 @@ public sealed class PftGroup
         : base (token)
     {
         token.MustBe (PftTokenKind.LeftParenthesis);
-    } // constructor
+    }
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public PftGroup
         (
@@ -82,7 +83,8 @@ public sealed class PftGroup
         )
         : base (children)
     {
-    } // constructor
+        // пустое тело конструктора
+    }
 
     #endregion
 
@@ -94,6 +96,8 @@ public sealed class PftGroup
             PftCompiler compiler
         )
     {
+        Sure.NotNull (compiler);
+
         compiler.CompileNodes (Children);
 
         var actionName = compiler.CompileAction (Children);
@@ -109,7 +113,7 @@ public sealed class PftGroup
 
         compiler.EndMethod (this);
         compiler.MarkReady (this);
-    } // method Compile
+    }
 
     /// <inheritdoc cref="PftNode.Execute" />
     public override void Execute
@@ -270,10 +274,7 @@ public sealed class PftGroup
         PftUtility.NodesToText (builder, Children);
         builder.Append (')');
 
-        var result = builder.ToString();
-        StringBuilderPool.Shared.Return (builder);
-
-        return result;
+        return builder.ReturnShared();
     }
 
     #endregion

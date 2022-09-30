@@ -68,7 +68,8 @@ public sealed class PftGraveAccent
     /// </summary>
     public PftGraveAccent()
     {
-    } // constructor
+        // пустое тело конструктора
+    }
 
     /// <summary>
     /// Constructor.
@@ -79,7 +80,7 @@ public sealed class PftGraveAccent
         )
     {
         Text = text;
-    } // constructor
+    }
 
     /// <summary>
     /// Constructor.
@@ -118,6 +119,8 @@ public sealed class PftGraveAccent
             PftCompiler compiler
         )
     {
+        Sure.NotNull (compiler);
+
         compiler.StartMethod (this);
         compiler
             .WriteIndent()
@@ -128,7 +131,7 @@ public sealed class PftGraveAccent
                 );
         compiler.EndMethod (this);
         compiler.MarkReady (this);
-    } // method Compile
+    }
 
     /// <inheritdoc cref="PftNode.Execute" />
     public override void Execute
@@ -136,6 +139,8 @@ public sealed class PftGraveAccent
             PftContext context
         )
     {
+        Sure.NotNull (context);
+
         OnBeforeExecution (context);
 
         // TODO just for a while
@@ -156,7 +161,7 @@ public sealed class PftGraveAccent
             );
 
         OnAfterExecution (context);
-    } // method Execute
+    }
 
     /// <inheritdoc cref="PftNode.PrettyPrint" />
     public override void PrettyPrint
@@ -164,10 +169,12 @@ public sealed class PftGraveAccent
             PftPrettyPrinter printer
         )
     {
+        Sure.NotNull (printer);
+
         printer.Write ('`')
             .Write (Text)
             .Write ('`');
-    } // method PrettyPrint
+    }
 
     #endregion
 
@@ -177,6 +184,4 @@ public sealed class PftGraveAccent
     public override string ToString() => '`' + Text + '`';
 
     #endregion
-} // class PftGraveAccent
-
-// namespace ManagedIrbis.Pft.Infrastructure.Ast
+}
