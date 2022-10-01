@@ -13,33 +13,21 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using System.Windows.Forms;
-
-using AM;
-
-#endregion
-
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Интерфейс коллекции ячеек в строке грида.
+/// </summary>
+public interface ISiberianCellCollection
 {
+    #region Public methods
+
     /// <summary>
-    /// Интерфейс коллекции ячеек в строке грида.
+    /// Доступ к ячейкам по индексу.
     /// </summary>
-    public interface ISiberianCellCollection
-    {
-        #region Public methods
+    ISiberianCell this [int index] { get; }
 
-        /// <summary>
-        /// Доступ к ячейкам по индексу.
-        /// </summary>
-        ISiberianCell this [int index] { get; }
-
-        #endregion
-
-    } // interface ISiberianCellCollection
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}
