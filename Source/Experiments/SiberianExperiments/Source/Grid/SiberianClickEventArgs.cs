@@ -20,38 +20,35 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Аргументы события щелчка по гриду.
+/// </summary>
+public sealed class SiberianClickEventArgs
+    : CancelableEventArgs
 {
+    #region Properties
+
     /// <summary>
-    /// Аргументы события щелчка по гриду.
+    /// Ячейка, в которой зафиксирован щелчок (опционально).
     /// </summary>
-    public sealed class SiberianClickEventArgs
-        : CancelableEventArgs
-    {
-        #region Properties
+    public ISiberianCell? Cell { get; internal set; }
 
-        /// <summary>
-        /// Ячейка, в которой зафиксирован щелчок (опционально).
-        /// </summary>
-        public ISiberianCell? Cell { get; internal set; }
+    /// <summary>
+    /// Колонка, в которой зафиксирован щелчок (опционально).
+    /// </summary>
+    public ISiberianColumn? Column { get; internal set; }
 
-        /// <summary>
-        /// Колонка, в которой зафиксирован щелчок (опционально).
-        /// </summary>
-        public ISiberianColumn? Column { get; internal set; }
+    /// <summary>
+    /// Грид, в котором зафиксирован щелчок (обязательно).
+    /// </summary>
+    public ISiberianGrid? Grid { get; internal set; }
 
-        /// <summary>
-        /// Грид, в котором зафиксирован щелчок (обязательно).
-        /// </summary>
-        public ISiberianGrid? Grid { get; internal set; }
+    /// <summary>
+    /// Строка, в которой зафиксирован щелчок (опционально).
+    /// </summary>
+    public ISiberianRow? Row { get; internal set; }
 
-        /// <summary>
-        /// Строка, в которой зафиксирован щелчок (опционально).
-        /// </summary>
-        public ISiberianRow? Row { get; internal set; }
-
-        #endregion
-
-    } // class SiberianClickEventArgs
-
-} // namespace ManagedIrbis.Windows.Grid
+    #endregion
+}

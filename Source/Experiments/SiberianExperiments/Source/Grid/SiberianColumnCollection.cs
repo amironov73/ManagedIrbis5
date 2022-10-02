@@ -25,22 +25,19 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Дефолтная реализация коллекции колонок грида.
+/// </summary>
+public sealed class SiberianColumnCollection
+    : List<ISiberianColumn>,
+    ISiberianColumnCollection
 {
-    /// <summary>
-    /// Дефолтная реализация коллекции колонок грида.
-    /// </summary>
-    public sealed class SiberianColumnCollection
-        : List<ISiberianColumn>,
-        ISiberianColumnCollection
-    {
-        #region List members
+    #region List members
 
-        /// <inheritdoc cref="ISiberianColumnCollection.this"/>
-        public new ISiberianColumn this[int index] => base[index].ThrowIfNull();
+    /// <inheritdoc cref="ISiberianColumnCollection.this"/>
+    public new ISiberianColumn this[int index] => base[index].ThrowIfNull();
 
-        #endregion
-
-    } // class SiberianColumnCollection
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}
