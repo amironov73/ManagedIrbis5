@@ -12,6 +12,7 @@
 // ReSharper disable UnusedType.Global
 
 // Событие никогда не используется
+
 #pragma warning disable CS0067
 
 /* SiberianGrid.cs -- дефолтная реализация грида
@@ -29,48 +30,46 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Дефолтная реализация грида.
+/// </summary>
+[System.ComponentModel.DesignerCategory ("Code")]
+public class SiberianGrid
+    : Control,
+    ISiberianGrid
 {
+    #region Construction
+
     /// <summary>
-    /// Дефолтная реализация грида.
+    /// Конструктор.
     /// </summary>
-    [System.ComponentModel.DesignerCategory("Code")]
-    public class SiberianGrid
-        : Control,
-        ISiberianGrid
+    public SiberianGrid
+        (
+            ISiberianProvider provider,
+            ISiberianColumnCollection? columns,
+            ISiberianRowCollection? rows
+        )
     {
-        #region Construction
+        Sure.NotNull (provider);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SiberianGrid
-            (
-                ISiberianProvider provider,
-                ISiberianColumnCollection? columns,
-                ISiberianRowCollection? rows
-            )
-        {
-            Columns = columns ?? new SiberianColumnCollection();
-            Rows = rows ?? new SiberianRowCollection(this, provider);
+        Columns = columns ?? new SiberianColumnCollection();
+        Rows = rows ?? new SiberianRowCollection (this, provider);
+    }
 
-        } // constructor
+    #endregion
 
-        #endregion
+    #region ISiberianGrid members
 
-        #region ISiberianGrid members
+    /// <inheritdoc cref="ISiberianGrid.GridClick"/>
+    public event EventHandler<SiberianClickEventArgs>? GridClick;
 
-        /// <inheritdoc cref="ISiberianGrid.GridClick"/>
-        public event EventHandler<SiberianClickEventArgs>? GridClick;
+    /// <inheritdoc cref="ISiberianGrid.Columns"/>
+    public ISiberianColumnCollection Columns { get; }
 
-        /// <inheritdoc cref="ISiberianGrid.Columns"/>
-        public ISiberianColumnCollection Columns { get; }
+    /// <inheritdoc cref="ISiberianGrid.Rows"/>
+    public ISiberianRowCollection Rows { get; }
 
-        /// <inheritdoc cref="ISiberianGrid.Rows"/>
-        public ISiberianRowCollection Rows { get; }
-
-        #endregion
-
-    } // class SiberianGrid
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}

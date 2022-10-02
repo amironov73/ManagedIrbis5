@@ -22,38 +22,35 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Данные для события навигации в гриде.
+/// </summary>
+public sealed class SiberianNavigationEventArgs
+    : CancelableEventArgs
 {
+    #region Properties
+
     /// <summary>
-    /// Данные для события навигации в гриде.
+    /// Новая колонка.
     /// </summary>
-    public sealed class SiberianNavigationEventArgs
-        : CancelableEventArgs
-    {
-        #region Properties
+    public int NewColumn { get; set; }
 
-        /// <summary>
-        /// Новая колонка.
-        /// </summary>
-        public int NewColumn { get; set; }
+    /// <summary>
+    /// Новая строка.
+    /// </summary>
+    public int NewRow { get; set; }
 
-        /// <summary>
-        /// Новая строка.
-        /// </summary>
-        public int NewRow { get; set; }
+    /// <summary>
+    /// Старая колонка.
+    /// </summary>
+    public int OlcColumn { get; set; }
 
-        /// <summary>
-        /// Старая колонка.
-        /// </summary>
-        public int OlcColumn { get; set; }
+    /// <summary>
+    /// Старая строка.
+    /// </summary>
+    public int OldRow { get; set; }
 
-        /// <summary>
-        /// Старая строка.
-        /// </summary>
-        public int OldRow { get; set; }
-
-        #endregion
-
-    } // class SiberianNavigationEventArgs
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}
