@@ -25,51 +25,48 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Интерфейс строки грида.
+/// </summary>
+public interface ISiberianRow
 {
+    #region Events
+
     /// <summary>
-    /// Интерфейс строки грида.
+    /// Событие, возникающее при щелчке по строке.
     /// </summary>
-    public interface ISiberianRow
-    {
-        #region Events
+    event EventHandler<SiberianClickEventArgs>? Click;
 
-        /// <summary>
-        /// Событие, возникающее при щелчке по строке.
-        /// </summary>
-        event EventHandler<SiberianClickEventArgs>? Click;
+    #endregion
 
-        #endregion
+    #region Properties
 
-        #region Properties
+    /// <summary>
+    /// Ячейки, образующие строку грида.
+    /// </summary>
+    ISiberianCellCollection Cells { get; }
 
-        /// <summary>
-        /// Ячейки, образующие строку грида.
-        /// </summary>
-        ISiberianCellCollection Cells { get; }
+    /// <summary>
+    /// Данные, общие для строки (опционально).
+    /// </summary>
+    object? Data { get; set; }
 
-        /// <summary>
-        /// Данные, общие для строки (опционально).
-        /// </summary>
-        object? Data { get; set; }
+    /// <summary>
+    /// Грид, которому принадлежит строка.
+    /// </summary>
+    ISiberianGrid Grid { get; }
 
-        /// <summary>
-        /// Грид, которому принадлежит строка.
-        /// </summary>
-        ISiberianGrid Grid { get; }
+    /// <summary>
+    /// Высота строки в пикселах.
+    /// </summary>
+    int Height { get; }
 
-        /// <summary>
-        /// Высота строки в пикселах.
-        /// </summary>
-        int Height { get; }
+    /// <summary>
+    /// Порядковый номер строки (нумерация с 0).
+    /// </summary>
+    int Index { get; }
 
-        /// <summary>
-        /// Порядковый номер строки (нумерация с 0).
-        /// </summary>
-        int Index { get; }
-
-        #endregion
-
-    } // interface ISiberianRow
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}

@@ -13,41 +13,32 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-
-#endregion
-
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Интерфейс провайдера данных для грида.
+/// </summary>
+public interface ISiberianProvider
 {
     /// <summary>
-    /// Интерфейс провайдера данных для грида.
+    /// Добавление данных (в конец).
     /// </summary>
-    public interface ISiberianProvider
-    {
-        /// <summary>
-        /// Добавление данных (в конец).
-        /// </summary>
-        void AddData(object? data);
+    void AddData (object? data);
 
-        /// <summary>
-        /// Общая длина данных в записях.
-        /// </summary>
-        int DataLength { get; }
+    /// <summary>
+    /// Общая длина данных в записях.
+    /// </summary>
+    int DataLength { get; }
 
-        /// <summary>
-        /// Получение данных для строки с указанным индексом.
-        /// </summary>
-        object? GetData(int index);
+    /// <summary>
+    /// Получение данных для строки с указанным индексом.
+    /// </summary>
+    object? GetData (int index);
 
-        /// <summary>
-        /// Обновление данных для строки с указанным индексом.
-        /// </summary>
-        void PutData(int index, object? data);
-
-    } // interface ISiberianProvider
-
-} // namespace ManagedIrbis.WinForms.Grid
+    /// <summary>
+    /// Обновление данных для строки с указанным индексом.
+    /// </summary>
+    void PutData (int index, object? data);
+}

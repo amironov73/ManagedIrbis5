@@ -15,48 +15,36 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using System.Windows.Forms;
-
-using AM;
-
-#endregion
-
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Интерфейс коллекции строк грида.
+/// </summary>
+public interface ISiberianRowCollection
 {
+    #region Public methods
+
     /// <summary>
-    /// Интерфейс коллекции строк грида.
+    /// Добавление строки в коллекцию.
     /// </summary>
-    public interface ISiberianRowCollection
-    {
-        #region Public methods
+    void Add (ISiberianRow row);
 
-        /// <summary>
-        /// Добавление строки в коллекцию.
-        /// </summary>
-        void Add (ISiberianRow row);
+    /// <summary>
+    /// Количество строк в коллекции.
+    /// </summary>
+    int Count { get; }
 
-        /// <summary>
-        /// Количество строк в коллекции.
-        /// </summary>
-        int Count { get; }
+    /// <summary>
+    /// Грид, которому принадлежат строки.
+    /// </summary>
+    ISiberianGrid Grid { get; }
 
-        /// <summary>
-        /// Грид, которому принадлежат строки.
-        /// </summary>
-        ISiberianGrid Grid { get; }
+    /// <summary>
+    /// Доступ по индексу.
+    /// </summary>
+    ISiberianRow this [int index] { get; }
 
-        /// <summary>
-        /// Доступ по индексу.
-        /// </summary>
-        ISiberianRow this [int index] { get; }
-
-        #endregion
-
-    } // interface ISiberianRowCollection
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}
