@@ -12,6 +12,7 @@
 // ReSharper disable UnusedType.Global
 
 // Событие никогда не используется
+
 #pragma warning disable CS0067
 
 /* ISiberianGrid.cs -- интерфейс грида
@@ -27,43 +28,40 @@ using System.Windows.Forms;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Интерфейс грида.
+/// </summary>
+public interface ISiberianGrid
 {
+    #region Events
+
     /// <summary>
-    /// Интерфейс грида.
+    /// Событие, возникающее при щелчке по гриду.
     /// </summary>
-    public interface ISiberianGrid
-    {
-        #region Events
+    event EventHandler<SiberianClickEventArgs>? GridClick;
 
-        /// <summary>
-        /// Событие, возникающее при щелчке по гриду.
-        /// </summary>
-        event EventHandler<SiberianClickEventArgs>? GridClick;
+    #endregion
 
-        #endregion
+    #region Properties
 
-        #region Properties
+    /// <summary>
+    /// Колонки.
+    /// </summary>
+    ISiberianColumnCollection Columns { get; }
 
-        /// <summary>
-        /// Колонки.
-        /// </summary>
-        ISiberianColumnCollection Columns { get; }
+    /// <summary>
+    /// Строки.
+    /// </summary>
+    ISiberianRowCollection Rows { get; }
 
-        /// <summary>
-        /// Строки.
-        /// </summary>
-        ISiberianRowCollection Rows { get; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Public methods
+    /// <inheritdoc cref="Control.Invalidate(System.Drawing.Region)"/>
+    public void Invalidate();
 
-        /// <inheritdoc cref="Control.Invalidate(System.Drawing.Region)"/>
-        public void Invalidate();
-
-        #endregion
-
-    } // interface ISiberianGrid
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}

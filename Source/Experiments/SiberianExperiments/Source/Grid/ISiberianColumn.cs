@@ -23,75 +23,72 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Интерфейс колонки грида.
+/// </summary>
+public interface ISiberianColumn
 {
+    #region Events
+
     /// <summary>
-    /// Интерфейс колонки грида.
+    /// Событие, возникающее при щелчке по колонке.
     /// </summary>
-    public interface ISiberianColumn
-    {
-        #region Events
+    event EventHandler<SiberianClickEventArgs>? Click;
 
-        /// <summary>
-        /// Событие, возникающее при щелчке по колонке.
-        /// </summary>
-        event EventHandler<SiberianClickEventArgs>? Click;
+    #endregion
 
-        #endregion
+    #region Properties
 
-        #region Properties
+    /// <summary>
+    /// Грид, которому принадлежит колонка.
+    /// </summary>
+    ISiberianGrid Grid { get; }
 
-        /// <summary>
-        /// Грид, которому принадлежит колонка.
-        /// </summary>
-        ISiberianGrid Grid { get; }
+    /// <summary>
+    /// Порядковый номер колонки (нумерация с 0).
+    /// </summary>
+    int Index { get; }
 
-        /// <summary>
-        /// Порядковый номер колонки (нумерация с 0).
-        /// </summary>
-        int Index { get; }
+    /// <summary>
+    /// Имя свойства, содержащего данные для отображения/редактирования.
+    /// </summary>
+    string? Member { get; }
 
-        /// <summary>
-        /// Имя свойства, содержащего данные для отображения/редактирования.
-        /// </summary>
-        string? Member { get; }
+    /// <summary>
+    /// Колонка только для чтения?
+    /// </summary>
+    bool ReadOnly { get; }
 
-        /// <summary>
-        /// Колонка только для чтения?
-        /// </summary>
-        bool ReadOnly { get; }
+    /// <summary>
+    /// Заголовок колонки.
+    /// </summary>
+    string? Title { get; }
 
-        /// <summary>
-        /// Заголовок колонки.
-        /// </summary>
-        string? Title { get; }
+    /// <summary>
+    /// Ширина колонки в пикселах.
+    /// </summary>
+    int Width { get; }
 
-        /// <summary>
-        /// Ширина колонки в пикселах.
-        /// </summary>
-        int Width { get; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Public methods
+    /// <summary>
+    /// Создание ячейки соответствующего типа.
+    /// </summary>
+    public ISiberianCell CreateCell (ISiberianRow row);
 
-        /// <summary>
-        /// Создание ячейки соответствующего типа.
-        /// </summary>
-        public ISiberianCell CreateCell(ISiberianRow row);
+    /// <summary>
+    /// Извлечение соответствующего свойства из данных.
+    /// </summary>
+    public object? GetMemberData (object? obj);
 
-        /// <summary>
-        /// Извлечение соответствующего свойства из данных.
-        /// </summary>
-        public object? GetMemberData(object? obj);
+    /// <summary>
+    /// Установка соответствующего свойства в данных.
+    /// </summary>
+    public void PutMemberData (object? obj, object? value);
 
-        /// <summary>
-        /// Установка соответствующего свойства в данных.
-        /// </summary>
-        public void PutMemberData(object? obj, object? value);
-
-        #endregion
-
-    } // interface ISiberianColumn
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}
