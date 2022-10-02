@@ -12,7 +12,6 @@
 // ReSharper disable UnusedType.Global
 
 // Событие никогда не используется
-
 #pragma warning disable CS0067
 
 /* ISiberianGrid.cs -- интерфейс грида

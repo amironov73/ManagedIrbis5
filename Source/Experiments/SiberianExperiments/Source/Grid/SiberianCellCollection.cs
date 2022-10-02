@@ -15,61 +15,51 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using System.Diagnostics.CodeAnalysis;
-
-#endregion
-
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Дефолтная реализация коллекции ячеек.
+/// </summary>
+public class SiberianCellCollection
+    : ISiberianCellCollection
 {
+    #region Properties
+
     /// <summary>
-    /// Дефолтная реализация коллекции ячеек.
+    /// Грид, которому принадлежит коллекция ячеек.
     /// </summary>
-    public class SiberianCellCollection
-        : ISiberianCellCollection
+    public ISiberianGrid Grid { get; }
+
+    /// <summary>
+    /// Строка, которой принадлежит коллекция ячеек.
+    /// </summary>
+    public ISiberianRow Row { get; internal set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SiberianCellCollection
+        (
+            ISiberianGrid grid,
+            ISiberianRow row
+        )
     {
-        #region Properties
+        Grid = grid;
+        Row = row;
+    }
 
-        /// <summary>
-        /// Грид, которому принадлежит коллекция ячеек.
-        /// </summary>
-        public ISiberianGrid Grid { get; }
+    #endregion
 
-        /// <summary>
-        /// Строка, которой принадлежит коллекция ячеек.
-        /// </summary>
-        public ISiberianRow Row { get; internal set; }
+    #region ISiberianCellCollection members
 
-        #endregion
+    /// <inheritdoc cref="ISiberianCellCollection.this"/>
+    public ISiberianCell this [int index] => Grid.Columns[index].CreateCell (Row);
 
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SiberianCellCollection
-            (
-                ISiberianGrid grid,
-                ISiberianRow row
-            )
-        {
-            Grid = grid;
-            Row = row;
-        }
-
-        #endregion
-
-        #region ISiberianCellCollection members
-
-        /// <inheritdoc cref="ISiberianCellCollection.this"/>
-        public ISiberianCell this[int index] => Grid.Columns[index].CreateCell(Row);
-
-        #endregion
-
-    } // class SiberianCellCollection
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}

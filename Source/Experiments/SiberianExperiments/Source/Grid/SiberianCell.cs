@@ -15,52 +15,48 @@
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Дефолтная реализация ячейки грида.
+/// </summary>
+public class SiberianCell
+    : ISiberianCell
 {
+    #region Construction
+
     /// <summary>
-    /// Дефолтная реализация ячейки грида.
+    /// Конструктор.
     /// </summary>
-    public class SiberianCell
-        : ISiberianCell
+    public SiberianCell
+        (
+            ISiberianGrid grid,
+            ISiberianColumn column,
+            ISiberianRow row,
+            object? data
+        )
     {
-        #region Construction
+        Grid = grid;
+        Column = column;
+        Row = row;
+        Data = data;
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SiberianCell
-            (
-                ISiberianGrid grid,
-                ISiberianColumn column,
-                ISiberianRow row,
-                object? data
-            )
-        {
-            Grid = grid;
-            Column = column;
-            Row = row;
-            Data = data;
+    #endregion
 
-        } // constructor
+    #region ISiberianCell members
 
-        #endregion
+    /// <inheritdoc cref="ISiberianCell.Column"/>
+    public ISiberianColumn Column { get; }
 
-        #region ISiberianCell members
+    /// <inheritdoc cref="ISiberianCell.Data"/>
+    public object? Data { get; set; }
 
-        /// <inheritdoc cref="ISiberianCell.Column"/>
-        public ISiberianColumn Column { get; }
+    /// <inheritdoc cref="ISiberianCell.Grid"/>
+    public ISiberianGrid Grid { get; }
 
-        /// <inheritdoc cref="ISiberianCell.Data"/>
-        public object? Data { get; set; }
+    /// <inheritdoc cref="ISiberianCell.Row"/>
+    public ISiberianRow Row { get; }
 
-        /// <inheritdoc cref="ISiberianCell.Grid"/>
-        public ISiberianGrid Grid { get; }
-
-        /// <inheritdoc cref="ISiberianCell.Row"/>
-        public ISiberianRow Row { get; }
-
-        #endregion
-
-    } // class SiberianCell
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}
