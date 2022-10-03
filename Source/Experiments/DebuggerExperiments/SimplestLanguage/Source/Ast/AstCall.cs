@@ -23,60 +23,55 @@ using System.Runtime.Serialization;
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Вызов процедуры.
+/// </summary>
+public sealed class AstCall
+    : AstNode
 {
+    #region Properties
+
     /// <summary>
-    /// Вызов процедуры.
+    /// Имя процедуры.
     /// </summary>
-    public sealed class AstCall
-        : AstNode
+    public string ProcedureName { get; }
+
+    /// <summary>
+    /// Аргументы.
+    /// </summary>
+    public IReadOnlyList<AstValue> Arguments { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public AstCall
+        (
+            string procedureName,
+            IReadOnlyList<AstValue> arguments
+        )
     {
-        #region Properties
+        ProcedureName = procedureName;
+        Arguments = arguments;
+    }
 
-        /// <summary>
-        /// Имя процедуры.
-        /// </summary>
-        public string ProcedureName { get; }
+    #endregion
 
-        /// <summary>
-        /// Аргументы.
-        /// </summary>
-        public IReadOnlyList<AstValue> Arguments { get; }
+    #region AstNode members
 
-        #endregion
+    /// <inheritdoc cref="AstNode.Execute"/>
+    public override void Execute
+        (
+            LanguageContext context
+        )
+    {
+        throw new NotImplementedException();
+    }
 
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public AstCall
-            (
-                string procedureName,
-                IReadOnlyList<AstValue> arguments
-            )
-        {
-            ProcedureName = procedureName;
-            Arguments = arguments;
-
-        } // constructor
-
-        #endregion
-
-        #region AstNode members
-
-        /// <inheritdoc cref="AstNode.Execute"/>
-        public override void Execute
-            (
-                LanguageContext context
-            )
-        {
-            throw new NotImplementedException();
-
-        } // method Execute
-
-        #endregion
-
-    } // method AstCall
-
-} // namespace SimplestLanguage
+    #endregion
+}

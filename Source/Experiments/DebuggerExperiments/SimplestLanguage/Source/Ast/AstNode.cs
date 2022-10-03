@@ -23,104 +23,100 @@
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Элемент синтаксического дерева.
+/// </summary>
+public abstract class AstNode
 {
-    /// <summary>
-    /// Элемент синтаксического дерева.
-    /// </summary>
-    public abstract class AstNode
+    #region Properties
+
+    // /// <summary>
+    // /// Родительский узел.
+    // /// </summary>
+    // public AstNode? Parent { get; internal set; }
+    //
+    // /// <summary>
+    // /// Дочерние узлы.
+    // /// </summary>
+    // public IReadOnlyList<AstNode> Children => _children ?? Empty;
+
+    #endregion
+
+    #region Private members
+
+    // private static readonly IReadOnlyList<AstNode> Empty
+    //     = new ReadOnlyCollection<AstNode> (Array.Empty<AstNode>());
+    // private List<AstNode>? _children;
+
+    #endregion
+
+    #region Construction
+
+    // /// <summary>
+    // /// Конструктор по умолчанию.
+    // /// </summary>
+    // protected AstNode()
+    // {
+    // }
+    //
+    // /// <summary>
+    // /// Конструктор.
+    // /// </summary>
+    // protected AstNode
+    //     (
+    //         IEnumerable<AstNode> children
+    //     )
+    // {
+    //     AppendChildren (children);
+    //
+    // }
+
+    #endregion
+
+    #region Public methods
+
+    // /// <summary>
+    // /// Добавление дочернего узла.
+    // /// </summary>
+    // public AstNode AppendChild
+    //     (
+    //         AstNode child
+    //     )
+    // {
+    //     _children ??= new List<AstNode>();
+    //     _children.Add (child);
+    //
+    //     return this;
+    //
+    // } // method AppendChild
+
+    // /// <summary>
+    // /// Добавление дочерних узлов.
+    // /// </summary>
+    // public AstNode AppendChildren
+    //     (
+    //         IEnumerable<AstNode> children
+    //     )
+    // {
+    //     _children ??= new List<AstNode>();
+    //     _children.AddRange (children);
+    //
+    //     return this;
+    //
+    // }
+
+    public virtual void Execute
+        (
+            LanguageContext context
+        )
     {
-        #region Properties
-
-        // /// <summary>
-        // /// Родительский узел.
-        // /// </summary>
-        // public AstNode? Parent { get; internal set; }
-        //
-        // /// <summary>
-        // /// Дочерние узлы.
-        // /// </summary>
-        // public IReadOnlyList<AstNode> Children => _children ?? Empty;
-
-        #endregion
-
-        #region Private members
-
-        // private static readonly IReadOnlyList<AstNode> Empty
-        //     = new ReadOnlyCollection<AstNode> (Array.Empty<AstNode>());
-        // private List<AstNode>? _children;
-
-        #endregion
-
-        #region Construction
-
-        // /// <summary>
-        // /// Конструктор по умолчанию.
-        // /// </summary>
-        // protected AstNode()
+        // foreach (var child in Children)
         // {
+        //     child.Execute (context);
         // }
-        //
-        // /// <summary>
-        // /// Конструктор.
-        // /// </summary>
-        // protected AstNode
-        //     (
-        //         IEnumerable<AstNode> children
-        //     )
-        // {
-        //     AppendChildren (children);
-        //
-        // } // constructor
+    }
 
-        #endregion
-
-        #region Public methods
-
-        // /// <summary>
-        // /// Добавление дочернего узла.
-        // /// </summary>
-        // public AstNode AppendChild
-        //     (
-        //         AstNode child
-        //     )
-        // {
-        //     _children ??= new List<AstNode>();
-        //     _children.Add (child);
-        //
-        //     return this;
-        //
-        // } // method AppendChild
-
-        // /// <summary>
-        // /// Добавление дочерних узлов.
-        // /// </summary>
-        // public AstNode AppendChildren
-        //     (
-        //         IEnumerable<AstNode> children
-        //     )
-        // {
-        //     _children ??= new List<AstNode>();
-        //     _children.AddRange (children);
-        //
-        //     return this;
-        //
-        // } // method AppendChildren
-
-        public virtual void Execute
-            (
-                LanguageContext context
-            )
-        {
-            // foreach (var child in Children)
-            // {
-            //     child.Execute (context);
-            // }
-
-        } // method Execute
-
-        #endregion
-
-    } // class AstNode
-
-} // namespace SimplestLanguage
+    #endregion
+}

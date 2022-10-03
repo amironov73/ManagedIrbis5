@@ -15,63 +15,58 @@
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Оператор присваивания значения переменной.
+/// </summary>
+public sealed class AstAssignment
+    : AstNode
 {
+    #region Properties
+
     /// <summary>
-    /// Оператор присваивания значения переменной.
+    /// Имя переменной назначения.
     /// </summary>
-    public sealed class AstAssignment
-        : AstNode
+    public string TargetName { get; }
+
+    /// <summary>
+    /// Вычисляемое выражение.
+    /// </summary>
+    public AstValue Expression { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public AstAssignment
+        (
+            string targetName,
+            AstValue expression
+        )
     {
-        #region Properties
+        TargetName = targetName;
+        Expression = expression;
+    }
 
-        /// <summary>
-        /// Имя переменной назначения.
-        /// </summary>
-        public string TargetName { get; }
+    #endregion
 
-        /// <summary>
-        /// Вычисляемое выражение.
-        /// </summary>
-        public AstValue Expression { get; }
+    #region AstNode members
 
-        #endregion
+    /// <inheritdoc cref="AstNode.Execute"/>
+    public override void Execute
+        (
+            LanguageContext context
+        )
+    {
+        var target = context.FindOrCreateVariable (TargetName);
+        var value = Expression.ComputeInt32 (context);
 
-        #region Construction
+        target.Value = value;
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public AstAssignment
-            (
-                string targetName,
-                AstValue expression
-            )
-        {
-            TargetName = targetName;
-            Expression = expression;
-
-        } // constructor
-
-        #endregion
-
-        #region AstNode members
-
-        /// <inheritdoc cref="AstNode.Execute"/>
-        public override void Execute
-            (
-                LanguageContext context
-            )
-        {
-            var target = context.FindOrCreateVariable (TargetName);
-            var value = Expression.ComputeInt32 (context);
-
-            target.Value = value;
-
-        } // method Execute
-
-        #endregion
-
-    } // class AstAssignment
-
-} // namespace SimplestLanguage
+    #endregion
+}
