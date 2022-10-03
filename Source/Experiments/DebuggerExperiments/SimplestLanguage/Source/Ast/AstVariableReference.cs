@@ -23,48 +23,42 @@ using AM;
 
 #nullable enable
 
-namespace SimplestLanguage
+/// <summary>
+/// Ссылка на переменную по ее имени.
+/// </summary>
+public sealed class AstVariableReference
+    : AstValue
 {
+    #region Properties
+
     /// <summary>
-    /// Ссылка на переменную по ее имени.
+    /// Имя переменной.
     /// </summary>
-    public sealed class AstVariableReference
-        : AstValue
+    public string Name { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public AstVariableReference
+        (
+            Token token
+        )
     {
-        #region Properties
+        token.MustBe (TokenKind.Identifier);
+        Name = token.Text.ThrowIfNullOrEmpty();
+    }
 
-        /// <summary>
-        /// Имя переменной.
-        /// </summary>
-        public string Name { get; }
+    #endregion
 
-        #endregion
+    #region AstValue members
 
-        #region Construction
+    /// <inheritdoc cref="AstValue.ComputeInt32"/>
+    public override int ComputeInt32 (LanguageContext context) =>
+        Convert.ToInt32 (context.RequireVariable (Name).Value);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public AstVariableReference
-            (
-                Token token
-            )
-        {
-            token.MustBe (TokenKind.Identifier);
-            Name = token.Text.ThrowIfNullOrEmpty();
-
-        } // constructor
-
-        #endregion
-
-        #region AstValue members
-
-        /// <inheritdoc cref="AstValue.ComputeInt32"/>
-        public override int ComputeInt32 (LanguageContext context) =>
-            Convert.ToInt32 (context.RequireVariable (Name).Value);
-
-        #endregion
-
-    } // class AstVariableReference
-
-} // namespace SimplestLanguage
+    #endregion
+}

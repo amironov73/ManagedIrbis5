@@ -19,44 +19,42 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
+using AM;
+
 #endregion
 
 #nullable enable
 
-namespace SimplestLanguage
+/// <summary>
+/// Программа на языке.
+/// </summary>
+public sealed class LanguageProgram
+    : AstNode
 {
+    #region Properties
+
     /// <summary>
-    /// Программа на языке.
+    /// Последовательность операторов, которые необходимо выполнить.
     /// </summary>
-    public sealed class LanguageProgram
-        : AstNode
+    public List<AstNode> Statements { get; } = new ();
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.Execute"/>
+    public override void Execute
+        (
+            LanguageContext context
+        )
     {
-        #region Properties
+        Sure.NotNull (context);
 
-        /// <summary>
-        /// Последовательность операторов, которые необходимо выполнить.
-        /// </summary>
-        public List<AstNode> Statements { get; } = new ();
-
-        #endregion
-
-        #region AstNode members
-
-        /// <inheritdoc cref="AstNode.Execute"/>
-        public override void Execute
-            (
-                LanguageContext context
-            )
+        foreach (var statement in Statements)
         {
-            foreach (var statement in Statements)
-            {
-                statement.Execute (context);
-            }
+            statement.Execute (context);
+        }
+    }
 
-        } // method Execute
-
-        #endregion
-
-    } // class LanguageProgram
-
-} // namespace SimplestLanguage
+    #endregion
+}
