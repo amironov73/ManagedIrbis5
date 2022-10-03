@@ -25,6 +25,8 @@ using AM;
 
 #nullable enable
 
+namespace SimplestLanguage;
+
 /// <summary>
 /// Программа на языке.
 /// </summary>

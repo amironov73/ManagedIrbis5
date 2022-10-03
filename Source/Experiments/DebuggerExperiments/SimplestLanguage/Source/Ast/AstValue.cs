@@ -15,23 +15,20 @@
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Элемент синтаксического дерева, имеющий численное значение.
+/// </summary>
+public class AstValue
+    : AstNode
 {
+    #region Public methods
+
     /// <summary>
-    /// Элемент синтаксического дерева, имеющий численное значение.
+    /// Вычисление целочисленного значения.
     /// </summary>
-    public class AstValue
-        : AstNode
-    {
-        #region Public methods
+    public virtual int ComputeInt32 (LanguageContext context) => 0;
 
-        /// <summary>
-        /// Вычисление целочисленного значения.
-        /// </summary>
-        public virtual int ComputeInt32 (LanguageContext context) => 0;
-
-        #endregion
-
-    } // class AstValue
-
-} // namespace SimplestLanguage
+    #endregion
+}

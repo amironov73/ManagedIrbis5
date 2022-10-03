@@ -23,6 +23,8 @@ using AM;
 
 #nullable enable
 
+namespace SimplestLanguage;
+
 /// <summary>
 /// Ссылка на переменную по ее имени.
 /// </summary>
