@@ -31,55 +31,54 @@ using AM;
 
 #nullable enable
 
-namespace SiberianExperiments
+namespace SiberianExperiments;
+
+public sealed class SimplestTest
+    : Form
 {
-    public sealed class SimplestTest
-        : Form
+    #region Properties
+
+    public List<Dummy> Values { get; } = new ();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SimplestTest()
     {
-        #region Properties
+        // var grid = new SiberianGrid
+        // {
+        //     Dock = DockStyle.Fill
+        // };
+        // Controls.Add(grid);
+        //
+        // grid.AddPropertyColumn(nameof(Dummy.Number))
+        //     .SetTitle("Number")
+        //     .SetFillWidth(30)
+        //     .SetMinWidth(30);
+        // grid.AddPropertyColumn(nameof(Dummy.Text))
+        //     .SetTitle("Text")
+        //     .SetFillWidth(50)
+        //     .SetMinWidth(30);
+        // grid.AddPropertyColumn(nameof(Dummy.Status))
+        //     .SetTitle("State")
+        //     .SetFillWidth(20)
+        //     .SetMinWidth(30);
+        // grid.AutoSizeColumns();
+        //
+        // for (var i = 0; i < 100; i++)
+        // {
+        //     grid.CreateRow(new Dummy
+        //     {
+        //         Number = i + 1,
+        //         Text = "Text " + (i + 1).ToInvariantString()
+        //     });
+        // }
 
-        public List<Dummy> Values { get; } = new ();
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SimplestTest()
-        {
-            // var grid = new SiberianGrid
-            // {
-            //     Dock = DockStyle.Fill
-            // };
-            // Controls.Add(grid);
-            //
-            // grid.AddPropertyColumn(nameof(Dummy.Number))
-            //     .SetTitle("Number")
-            //     .SetFillWidth(30)
-            //     .SetMinWidth(30);
-            // grid.AddPropertyColumn(nameof(Dummy.Text))
-            //     .SetTitle("Text")
-            //     .SetFillWidth(50)
-            //     .SetMinWidth(30);
-            // grid.AddPropertyColumn(nameof(Dummy.Status))
-            //     .SetTitle("State")
-            //     .SetFillWidth(20)
-            //     .SetMinWidth(30);
-            // grid.AutoSizeColumns();
-            //
-            // for (var i = 0; i < 100; i++)
-            // {
-            //     grid.CreateRow(new Dummy
-            //     {
-            //         Number = i + 1,
-            //         Text = "Text " + (i + 1).ToInvariantString()
-            //     });
-            // }
-
-        } // constructor
-
-        #endregion
     }
+
+    #endregion
 }

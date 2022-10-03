@@ -23,58 +23,59 @@
 
 using System;
 
+using AM;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Дефолтная реализация строки грида.
+/// </summary>
+public class SiberianRow
+    : ISiberianRow
 {
+    #region ISiberianRow members
+
+    /// <inheritdoc cref="ISiberianRow.Click"/>
+    public event EventHandler<SiberianClickEventArgs>? Click;
+
+    /// <inheritdoc cref="ISiberianRow.Cells"/>
+    public ISiberianCellCollection Cells { get; }
+
+    /// <inheritdoc cref="ISiberianRow.Data"/>
+    public object? Data { get; set; }
+
+    /// <inheritdoc cref="Grid"/>
+    public ISiberianGrid Grid { get; }
+
+    /// <inheritdoc cref="ISiberianRow.Height"/>
+    public int Height { get; set; }
+
+    /// <inheritdoc cref="ISiberianRow.Index"/>
+    public int Index { get; set; }
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Дефолтная реализация строки грида.
+    /// Конструктор.
     /// </summary>
-    public class SiberianRow
-        : ISiberianRow
+    public SiberianRow
+        (
+            ISiberianGrid grid,
+            ISiberianCellCollection cells
+        )
     {
-        #region ISiberianRow members
+        Sure.NotNull (grid);
+        Sure.NotNull (cells);
 
-        /// <inheritdoc cref="ISiberianRow.Click"/>
-        public event EventHandler<SiberianClickEventArgs>? Click;
+        Grid = grid;
+        Cells = cells;
+    }
 
-        /// <inheritdoc cref="ISiberianRow.Cells"/>
-        public ISiberianCellCollection Cells { get; }
-
-        /// <inheritdoc cref="ISiberianRow.Data"/>
-        public object? Data { get; set; }
-
-        /// <inheritdoc cref="Grid"/>
-        public ISiberianGrid Grid { get; }
-
-        /// <inheritdoc cref="ISiberianRow.Height"/>
-        public int Height { get; set; }
-
-        /// <inheritdoc cref="ISiberianRow.Index"/>
-        public int Index { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SiberianRow
-            (
-                ISiberianGrid grid,
-                ISiberianCellCollection cells
-            )
-        {
-            Grid = grid;
-            Cells = cells;
-
-        } // constructor
-
-        #endregion
-
-    } // class SiberianRow
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}

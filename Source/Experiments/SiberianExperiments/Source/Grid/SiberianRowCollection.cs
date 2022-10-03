@@ -10,96 +10,91 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using AM.Collections;
-
-#endregion
-
 #nullable enable
 
-namespace ManagedIrbis.WinForms.Grid
+using AM;
+
+namespace ManagedIrbis.WinForms.Grid;
+
+/// <summary>
+/// Коллекция строк грида (реализация по умолчанию).
+/// Фактически не хранит строки, а предоставляет их по требованию.
+/// </summary>
+public class SiberianRowCollection
+    : ISiberianRowCollection
 {
+    #region Properties
+
     /// <summary>
-    /// Коллекция строк грида (реализация по умолчанию).
-    /// Фактически не хранит строки, а предоставляет их по требованию.
+    /// Высота строки по умолчанию.
     /// </summary>
-    public class SiberianRowCollection
-        : ISiberianRowCollection
+    public int RowHeight { get; set; }
+
+    /// <summary>
+    /// Провайдер данных.
+    /// </summary>
+    public ISiberianProvider Provider { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SiberianRowCollection
+        (
+            ISiberianGrid grid,
+            ISiberianProvider provider
+        )
     {
-        #region Properties
+        Sure.NotNull (grid);
+        Sure.NotNull (provider);
 
-        /// <summary>
-        /// Высота строки по умолчанию.
-        /// </summary>
-        public int RowHeight { get; set; }
+        Grid = grid;
+        Provider = provider;
+        RowHeight = 20;
+    }
 
-        /// <summary>
-        /// Провайдер данных.
-        /// </summary>
-        public ISiberianProvider Provider { get; }
+    #endregion
 
-        #endregion
+    #region ISiberianRowCollection members
 
-        #region Construction
+    /// <inheritdoc cref="ISiberianRowCollection.Add"/>
+    public void Add
+        (
+            ISiberianRow row
+        )
+    {
+        Sure.NotNull (row);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SiberianRowCollection
-            (
-                ISiberianGrid grid,
-                ISiberianProvider provider
-            )
+        Provider.AddData (row.Data);
+    }
+
+    /// <inheritdoc cref="ISiberianRowCollection.Count"/>
+    public int Count => Provider.DataLength;
+
+    /// <inheritdoc cref="ISiberianRowCollection.Grid"/>
+    public ISiberianGrid Grid { get; }
+
+    /// <inheritdoc cref="ISiberianRowCollection.this"/>
+    public ISiberianRow this [int index]
+    {
+        get
         {
-            Grid = grid;
-            Provider = provider;
-            RowHeight = 20;
-
-        } // constructor
-
-        #endregion
-
-        #region ISiberianRowCollection members
-
-        /// <inheritdoc cref="ISiberianRowCollection.Add"/>
-        public void Add
-            (
-                ISiberianRow row
-            )
-        {
-            Provider.AddData(row.Data);
-
-        } // method Add
-
-        /// <inheritdoc cref="ISiberianRowCollection.Count"/>
-        public int Count => Provider.DataLength;
-
-        /// <inheritdoc cref="ISiberianRowCollection.Grid"/>
-        public ISiberianGrid Grid { get; }
-
-        /// <inheritdoc cref="ISiberianRowCollection.this"/>
-        public ISiberianRow this[int index]
-        {
-            get
+            var cells = new SiberianCellCollection (Grid, null!);
+            var result = new SiberianRow (Grid, cells)
             {
-                var cells = new SiberianCellCollection(Grid, null!);
-                var result = new SiberianRow(Grid, cells)
-                {
-                    Data = Provider.GetData(index),
-                    Index = index,
-                    Height = RowHeight
-                };
+                Data = Provider.GetData (index),
+                Index = index,
+                Height = RowHeight
+            };
 
-                cells.Row = result;
+            cells.Row = result;
 
-                return result;
-            }
+            return result;
+        }
+    }
 
-        } // property this
-
-#endregion
-
-    } // class SiberianRowCollection
-
-} // namespace ManagedIrbis.WinForms.Grid
+    #endregion
+}
