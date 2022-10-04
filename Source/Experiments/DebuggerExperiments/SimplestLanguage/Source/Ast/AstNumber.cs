@@ -21,47 +21,43 @@ using AM;
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Числовой литерал.
+/// </summary>
+public sealed class AstNumber
+    : AstValue
 {
+    #region Properties
+
     /// <summary>
-    /// Числовой литерал.
+    /// Числовое значение.
     /// </summary>
-    public sealed class AstNumber
-        : AstValue
+    public int Value { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public AstNumber
+        (
+            Token token
+        )
     {
-        #region Properties
+        token.MustBe (TokenKind.NumericLiteral);
+        Value = token.Text.ThrowIfNullOrEmpty().ParseInt32();
+    }
 
-        /// <summary>
-        /// Числовое значение.
-        /// </summary>
-        public int Value { get; }
+    #endregion
 
-        #endregion
+    #region AstValue members
 
-        #region Construction
+    /// <inheritdoc cref="AstValue.ComputeInt32"/>
+    public override int ComputeInt32 (LanguageContext context) => Value;
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public AstNumber
-            (
-                Token token
-            )
-        {
-            token.MustBe (TokenKind.NumericLiteral);
-            Value = token.Text.ThrowIfNullOrEmpty().ParseInt32();
-
-        } // constructor
-
-        #endregion
-
-        #region AstValue members
-
-        /// <inheritdoc cref="AstValue.ComputeInt32"/>
-        public override int ComputeInt32 (LanguageContext context) => Value;
-
-        #endregion
-
-    } // method AstNumber
-
-} // namespace AstNumber
+    #endregion
+}

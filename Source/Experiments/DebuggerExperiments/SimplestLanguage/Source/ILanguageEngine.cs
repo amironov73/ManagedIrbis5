@@ -24,22 +24,19 @@ using System.Runtime.Serialization;
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Интерфейс движка исполнения скриптов.
+/// </summary>
+public interface ILanguageEngine
 {
     /// <summary>
-    /// Интерфейс движка исполнения скриптов.
+    /// Исполнение программы-скрипта в указанном контексте.
     /// </summary>
-    public interface ILanguageEngine
-    {
-        /// <summary>
-        /// Исполнение программы-скрипта в указанном контексте.
-        /// </summary>
-        void ExecuteProgram
-            (
-                LanguageProgram program,
-                LanguageContext context
-            );
-
-    } // interface ILanguageEngine
-
-} // namespace SimplestLanguage
+    void ExecuteProgram
+        (
+            LanguageProgram program,
+            LanguageContext context
+        );
+}
