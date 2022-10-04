@@ -24,114 +24,108 @@ using AM.Text;
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Лексер.
+/// </summary>
+public sealed class Lexer
 {
-    /// <summary>
-    /// Лексер.
-    /// </summary>
-    public sealed class Lexer
+    #region Private members
+
+    private static readonly char[] Identifier =
     {
-        #region Private members
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+        'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+        'y', 'z',
 
-        private static readonly char[] Identifier =
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+        'Y', 'Z',
+
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'
+    };
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Разбиение исходного текста на токены.
+    /// </summary>
+    public TokenList Tokenize
+        (
+            string text
+        )
+    {
+        var tokens = new List<Token>();
+        var navigator = new ValueTextNavigator (text);
+
+        while (!navigator.SkipWhitespace())
         {
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-            'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-            'y', 'z',
+            var c = navigator.ReadChar();
+            Token? token = null;
 
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-            'Y', 'Z',
-
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'
-        };
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Разбиение исходного текста на токены.
-        /// </summary>
-        public TokenList Tokenize
-            (
-                string text
-            )
-        {
-            var tokens = new List<Token>();
-            var navigator = new ValueTextNavigator (text);
-
-            while (!navigator.SkipWhitespace())
+            switch (c)
             {
-                var c = navigator.ReadChar();
-                Token? token = null;
+                case '+':
+                    token = new Token (TokenKind.Plus);
+                    break;
 
-                switch (c)
-                {
-                    case '+':
-                        token = new Token (TokenKind.Plus);
-                        break;
+                case '-':
+                    token = new Token (TokenKind.Minus);
+                    break;
 
-                    case '-':
-                        token = new Token (TokenKind.Minus);
-                        break;
+                case '=':
+                    token = new Token (TokenKind.Equals);
+                    break;
 
-                    case '=':
-                        token = new Token (TokenKind.Equals);
-                        break;
+                case '(':
+                    token = new Token (TokenKind.LeftParenthesis);
+                    break;
 
-                    case '(':
-                        token = new Token (TokenKind.LeftParenthesis);
-                        break;
+                case ')':
+                    token = new Token (TokenKind.RightParenthesis);
+                    break;
 
-                    case ')':
-                        token = new Token (TokenKind.RightParenthesis);
-                        break;
+                case ';':
+                    token = new Token (TokenKind.Semicolon);
+                    break;
 
-                    case ';':
-                        token = new Token (TokenKind.Semicolon);
-                        break;
+                default:
+                    if (c.IsArabicDigit())
+                    {
+                        navigator.Move (-1);
+                        token = new Token
+                            (
+                                TokenKind.NumericLiteral,
+                                navigator.ReadInteger().ToString()
+                            );
+                    }
 
-                    default:
-                        if (c.IsArabicDigit())
-                        {
-                            navigator.Move (-1);
-                            token = new Token
-                                (
-                                    TokenKind.NumericLiteral,
-                                    navigator.ReadInteger().ToString()
-                                );
-                        }
+                    else if (c.IsLatinLetter())
+                    {
+                        navigator.Move (-1);
+                        token = new Token
+                            (
+                                TokenKind.Identifier,
+                                navigator.ReadWhile (Identifier).ToString()
+                            );
+                    }
 
-                        else if (c.IsLatinLetter())
-                        {
-                            navigator.Move (-1);
-                            token = new Token
-                                (
-                                    TokenKind.Identifier,
-                                    navigator.ReadWhile (Identifier).ToString()
-                                );
-                        }
+                    break;
+            }
 
-                        break;
-                }
+            if (token is null)
+            {
+                throw new SyntaxException ("Syntax error");
+            }
 
-                if (token is null)
-                {
-                    throw new SyntaxException ("Syntax error");
-                }
+            tokens.Add (token);
+        }
 
-                tokens.Add (token);
+        return new TokenList (tokens);
+    }
 
-            } // while
-
-            return new TokenList (tokens);
-
-        } // method Tokenize
-
-        #endregion
-
-
-    } // class Lexer
-
-} // namespace SimplestLanguage
+    #endregion
+}

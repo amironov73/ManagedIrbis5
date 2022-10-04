@@ -18,48 +18,55 @@
 using System;
 using System.Runtime.Serialization;
 
+using AM;
+
 #endregion
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Полезные методы.
+/// </summary>
+public static class LanguageUtility
 {
     /// <summary>
-    /// Полезные методы.
+    ///
     /// </summary>
-    public static class LanguageUtility
+    public static T CheckThat<T>
+        (
+            this T obj,
+            Func<T, bool> predicate
+        )
     {
-        public static T CheckThat<T>
-            (
-                this T obj,
-                Func<T, bool> predicate
-            )
+        Sure.NotNull (predicate);
+
+        if (!predicate (obj))
         {
-            if (!predicate(obj))
-            {
-                throw new Exception();
-            }
+            throw new Exception();
+        }
 
-            return obj;
+        return obj;
+    }
 
-        } // method CheckThat
+    /// <summary>
+    ///
+    /// </summary>
+    public static T CheckThat<T, E>
+        (
+            this T obj,
+            Func<T, bool> predicate
+        )
+        where E: Exception, new()
+    {
+        Sure.NotNull (predicate);
 
-        public static T CheckThat<T, E>
-            (
-                this T obj,
-                Func<T, bool> predicate
-            )
-            where E: Exception, new()
+        if (!predicate (obj))
         {
-            if (!predicate(obj))
-            {
-                throw new E();
-            }
+            throw new E();
+        }
 
-            return obj;
-
-        } // method CheckThat
-
-    } // class LanguageUtility
-
-} // namespace SimplestLanguage
+        return obj;
+    }
+}

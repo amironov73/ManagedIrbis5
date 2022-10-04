@@ -22,60 +22,61 @@ using System.Runtime.Serialization;
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Специфичное для языка исключение.
+/// </summary>
+public class LanguageException
+    : ApplicationException
 {
+    #region Construction
+
     /// <summary>
-    /// Специфичное для языка исключение.
+    /// Конструктор.
     /// </summary>
-    public class LanguageException
-        : ApplicationException
+    public LanguageException()
     {
-        #region Construction
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public LanguageException()
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    protected LanguageException
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base (info, context)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        protected LanguageException
-            (
-                SerializationInfo info,
-                StreamingContext context
-            )
-            : base (info, context)
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public LanguageException
+        (
+            string? message
+        )
+        : base (message)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public LanguageException
-            (
-                string? message
-            )
-            : base (message)
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public LanguageException
+        (
+            string? message,
+            Exception? innerException
+        )
+        : base (message, innerException)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public LanguageException
-            (
-                string? message,
-                Exception? innerException
-            )
-            : base (message, innerException)
-        {
-        }
-
-        #endregion
-
-    } // class LanguageException
-
-} // namespace SimplestLanguage
+    #endregion
+}
