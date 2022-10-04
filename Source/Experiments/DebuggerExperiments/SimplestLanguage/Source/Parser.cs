@@ -18,140 +18,135 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+
 using AM;
 
 #endregion
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Парсер.
+/// </summary>
+public sealed class Parser
 {
+    #region Properties
+
     /// <summary>
-    /// Парсер.
+    /// Обрабатываемые токены.
     /// </summary>
-    public sealed class Parser
+    public TokenList Tokens { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Parser
+        (
+            TokenList tokens
+        )
     {
-        #region Properties
+        Sure.NotNull (tokens);
 
-        /// <summary>
-        /// Обрабатываемые токены.
-        /// </summary>
-        public TokenList Tokens { get; }
+        Tokens = tokens;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Private members
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Parser
+    private AstVariableReference ParseVariable()
+    {
+        return new AstVariableReference (new Token (TokenKind.None));
+    }
+
+    private AstValue ParseValue()
+    {
+        Tokens.RequireNext();
+
+        return Tokens.Current.Kind switch
+        {
+            TokenKind.Identifier => ParseVariable(),
+            TokenKind.NumericLiteral => new AstNumber(Tokens.Current),
+            _ => throw new SyntaxException()
+        };
+    }
+
+    private AstOperation ParseExpression()
+    {
+        var leftHand = ParseVariable();
+        var operationCode = '+';
+        var rightHand = ParseVariable();
+
+        return new AstOperation (leftHand, operationCode, rightHand);
+    }
+
+    private AstAssignment ParseAssignment()
+    {
+        var targetName = ParseVariable().Name;
+        var expression = ParseExpression();
+
+        return new AstAssignment
             (
-                TokenList tokens
-            )
-        {
-            Tokens = tokens;
-        }
+                targetName,
+                expression
+            );
+    }
 
-        #endregion
-
-        #region Private members
-
-        private AstVariableReference ParseVariable()
-        {
-            return new AstVariableReference (new Token (TokenKind.None));
-        }
-
-        private AstValue ParseValue()
+    /// <summary>
+    /// Разбор вызова процедуры.
+    /// </summary>
+    private AstNode ParseCall()
+    {
+        Tokens.RequireNext (TokenKind.Identifier);
+        var arguments = new List<AstValue>();
+        var procedureName = Tokens.Current.Text.ThrowIfNullOrEmpty();
+        Tokens.RequireNext (TokenKind.LeftParenthesis);
+        while (Tokens.Peek() != TokenKind.RightParenthesis)
         {
             Tokens.RequireNext();
+        }
+        Tokens.RequireNext (TokenKind.RightParenthesis);
+        Tokens.RequireNext (TokenKind.Semicolon);
 
-            return Tokens.Current.Kind switch
+        return new AstCall (procedureName, arguments);
+    }
+
+    /// <summary>
+    /// Разбор выражения верхнего уровня.
+    /// </summary>
+    private AstNode ParseStatement() =>
+        Tokens.CheckThat (t => t.Length >= 2).Peek (1)
+            switch
             {
-                TokenKind.Identifier => ParseVariable(),
-                TokenKind.NumericLiteral => new AstNumber(Tokens.Current),
-                _ => throw new SyntaxException()
+                TokenKind.Equals => ParseAssignment(),
+                _ => ParseCall()
             };
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Разбор программы (начиная с самого верхнего уровня).
+    /// </summary>
+    public LanguageProgram Parse()
+    {
+        var result = new LanguageProgram();
+
+        while (!Tokens.IsEof)
+        {
+            var statement = ParseStatement();
+            result.Statements.Add (statement);
         }
 
-        private AstOperation ParseExpression()
-        {
-            var leftHand = ParseVariable();
-            var operationCode = '+';
-            var rightHand = ParseVariable();
+        return result;
+    }
 
-            return new AstOperation (leftHand, operationCode, rightHand);
-
-        } // method ParseExpression
-
-        private AstAssignment ParseAssignment()
-        {
-            var targetName = ParseVariable().Name;
-            var expression = ParseExpression();
-
-            return new AstAssignment
-                (
-                    targetName,
-                    expression
-                );
-
-        } // method ParseAssignment
-
-        /// <summary>
-        /// Разбор вызова процедуры.
-        /// </summary>
-        private AstNode ParseCall()
-        {
-            Tokens.RequireNext (TokenKind.Identifier);
-            var arguments = new List<AstValue>();
-            var procedureName = Tokens.Current.Text.ThrowIfNullOrEmpty();
-            Tokens.RequireNext (TokenKind.LeftParenthesis);
-            while (Tokens.Peek() != TokenKind.RightParenthesis)
-            {
-                Tokens.RequireNext();
-            }
-            Tokens.RequireNext (TokenKind.RightParenthesis);
-            Tokens.RequireNext (TokenKind.Semicolon);
-
-            return new AstCall (procedureName, arguments);
-
-        } // method ParseCall
-
-        /// <summary>
-        /// Разбор выражения верхнего уровня.
-        /// </summary>
-        private AstNode ParseStatement() =>
-            Tokens.CheckThat (t => t.Length >= 2).Peek (1)
-                switch
-                {
-                    TokenKind.Equals => ParseAssignment(),
-                    _ => ParseCall()
-                };
-
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Разбор программы (начиная с самого верхнего уровня).
-        /// </summary>
-        public LanguageProgram Parse()
-        {
-            var result = new LanguageProgram();
-
-            while (!Tokens.IsEof)
-            {
-                var statement = ParseStatement();
-                result.Statements.Add (statement);
-            }
-
-            return result;
-
-        } // method Parse
-
-        #endregion
-
-    } // class Parser
-
-} // namespace SimplestLanguage
+    #endregion
+}

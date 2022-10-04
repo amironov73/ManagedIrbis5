@@ -22,61 +22,62 @@ using System.Runtime.Serialization;
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Возбуждается при обнаружении синтаксической ошибки.
+/// </summary>
+public class SyntaxException
+    : LanguageException
 {
+    #region Construction
+
     /// <summary>
-    /// Возбуждается при обнаружении синтаксической ошибки.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public class SyntaxException
-        : LanguageException
+    public SyntaxException()
     {
-        #region Construction
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public SyntaxException()
-        {
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        protected SyntaxException
-            (
-                SerializationInfo info,
-                StreamingContext context
-            )
-            : base(info, context)
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    protected SyntaxException
+        (
+            SerializationInfo info,
+            StreamingContext context
+        )
+        : base(info, context)
+    {
+        // пустое тело конструктора
+    }
 
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SyntaxException
-            (
-                string? message
-            )
-            : base(message)
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SyntaxException
+        (
+            string? message
+        )
+        : base(message)
+    {
+        // пустое тело конструктора
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public SyntaxException
-            (
-                string? message,
-                Exception? innerException
-            )
-            : base(message, innerException)
-        {
-        }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SyntaxException
+        (
+            string? message,
+            Exception? innerException
+        )
+        : base(message, innerException)
+    {
+        // пустое тело конструктора
+    }
 
-        #endregion
-
-    } // class SyntaxException
-
-} // namespace SimplestLanguage
+    #endregion
+}

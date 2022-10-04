@@ -17,81 +17,80 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
 using System.Runtime.Serialization;
+
+using AM;
 
 #endregion
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Синтаксический токен.
+/// </summary>
+public sealed class Token
 {
+    #region Properties
+
     /// <summary>
-    /// Синтаксический токен.
+    /// Вид токена.
     /// </summary>
-    [DebuggerDisplay("{Kind} {Text}")]
-    public sealed class Token
+    public TokenKind Kind { get; }
+
+    /// <summary>
+    /// Текст токена.
+    /// </summary>
+    public string? Text { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Token
+        (
+            TokenKind kind,
+            string? text = null
+        )
     {
-        #region Properties
+        Sure.Defined (kind);
 
-        /// <summary>
-        /// Вид токена.
-        /// </summary>
-        public TokenKind Kind { get; }
+        Kind = kind;
+        Text = text;
+    }
 
-        /// <summary>
-        /// Текст токена.
-        /// </summary>
-        public string? Text { get; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Construction
+    /// <summary>
+    /// Токен должен быть указанного вида.
+    /// </summary>
+    public Token MustBe
+        (
+            TokenKind required
+        )
+    {
+        Sure.Defined (required);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Token
-            (
-                TokenKind kind,
-                string? text = null
-            )
+        if (Kind != required)
         {
-            Kind = kind;
-            Text = text;
+            throw new SyntaxException ($"Token must be {required}, got {Kind} {Text}");
+        }
 
-        } // constructor
+        return this;
+    }
 
-        #endregion
+    #endregion
 
-        #region Public methods
+    #region Object members
 
-        /// <summary>
-        /// Токен должен быть указанного вида.
-        /// </summary>
-        public Token MustBe
-            (
-                TokenKind required
-            )
-        {
-            if (Kind != required)
-            {
-                throw new SyntaxException ($"Token must be {required}, got {Kind} {Text}");
-            }
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => $"{Kind} {Text}";
 
-            return this;
-
-        } // method MustBe
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => $"{Kind} {Text}";
-
-        #endregion
-
-    } // class Token
-
-} // namespace SimplestLanguage
+    #endregion
+}
