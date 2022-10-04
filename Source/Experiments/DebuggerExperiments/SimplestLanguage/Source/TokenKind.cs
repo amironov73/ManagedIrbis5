@@ -13,63 +13,60 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Вид синтаксического токена.
+/// </summary>
+public enum TokenKind
 {
     /// <summary>
-    /// Вид синтаксического токена.
+    /// Нет токена.
     /// </summary>
-    public enum TokenKind
-    {
-        /// <summary>
-        /// Нет токена.
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// Литерал-число.
-        /// </summary>
-        NumericLiteral,
+    /// <summary>
+    /// Литерал-число.
+    /// </summary>
+    NumericLiteral,
 
-        /// <summary>
-        /// Строковый литерал.
-        /// </summary>
-        StringLiteral,
+    /// <summary>
+    /// Строковый литерал.
+    /// </summary>
+    StringLiteral,
 
-        /// <summary>
-        /// Знак "плюс".
-        /// </summary>
-        Plus,
+    /// <summary>
+    /// Знак "плюс".
+    /// </summary>
+    Plus,
 
-        /// <summary>
-        /// Знак "minus".
-        /// </summary>
-        Minus,
+    /// <summary>
+    /// Знак "minus".
+    /// </summary>
+    Minus,
 
-        /// <summary>
-        /// Знак равенства.
-        /// </summary>
-        Equals,
+    /// <summary>
+    /// Знак равенства.
+    /// </summary>
+    Equals,
 
-        /// <summary>
-        /// Идентификатор.
-        /// </summary>
-        Identifier,
+    /// <summary>
+    /// Идентификатор.
+    /// </summary>
+    Identifier,
 
-        /// <summary>
-        /// Открывающая круглая скобка.
-        /// </summary>
-        LeftParenthesis,
+    /// <summary>
+    /// Открывающая круглая скобка.
+    /// </summary>
+    LeftParenthesis,
 
-        /// <summary>
-        /// Закрывающая правая скобка.
-        /// </summary>
-        RightParenthesis,
+    /// <summary>
+    /// Закрывающая правая скобка.
+    /// </summary>
+    RightParenthesis,
 
-        /// <summary>
-        /// Точка с запятой.
-        /// </summary>
-        Semicolon,
-
-    } // enum TokenKind
-
-} // namespace SimplestLanguage
+    /// <summary>
+    /// Точка с запятой.
+    /// </summary>
+    Semicolon,
+}

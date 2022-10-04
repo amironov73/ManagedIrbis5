@@ -15,25 +15,24 @@
 
 #nullable enable
 
-namespace SimplestLanguage
+namespace SimplestLanguage;
+
+/// <summary>
+/// Пара токенов.
+/// </summary>
+internal struct TokenPair
 {
+    #region Properties
+
     /// <summary>
-    /// Пара токенов.
+    /// Открывающий токен.
     /// </summary>
-    struct TokenPair
-    {
-        #region Properties
+    public TokenKind Open { get; set; }
 
-        /// <summary>
-        /// Открывающий токен.
-        /// </summary>
-        public TokenKind Open { get; set; }
+    /// <summary>
+    /// Закрывающий токен.
+    /// </summary>
+    public TokenKind Close { get; set; }
 
-        /// <summary>
-        /// Закрывающий токен.
-        /// </summary>
-        public TokenKind Close { get; set; }
-
-        #endregion
-    }
+    #endregion
 }
