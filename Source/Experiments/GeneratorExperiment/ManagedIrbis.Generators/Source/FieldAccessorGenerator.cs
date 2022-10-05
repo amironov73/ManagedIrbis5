@@ -28,81 +28,88 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 #endregion
 
-namespace ManagedIrbis.Generators
+namespace ManagedIrbis.Generators;
+
+[Generator]
+public class MyGenerator
+    : ISourceGenerator
 {
-    [Generator]
-    public class MyGenerator
-        : ISourceGenerator
+    #region ISourceGenerator members
+
+    public void Initialize(GeneratorInitializationContext context)
     {
-        #region ISourceGenerator members
+        // Nothing to do here
+    }
 
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            // Nothing to do here
-        }
+    public void Execute(GeneratorExecutionContext context)
+    {
+        // foreach (var syntaxTree in context.Compilation.SyntaxTrees)
+        // {
+        //     ProcessSyntaxTree(context, syntaxTree);
+        // }
+    }
 
-        public void Execute(GeneratorExecutionContext context)
-        {
-            // foreach (var syntaxTree in context.Compilation.SyntaxTrees)
-            // {
-            //     ProcessSyntaxTree(context, syntaxTree);
-            // }
-        }
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Private members
-
-        private static bool HasAttribute
+    private static bool HasAttribute
+        (
+            GeneratorExecutionContext context,
+            SemanticModel semanticModel,
+            ClassDeclarationSyntax theClass
+        )
+    {
+        var desiredSymbol = context.Compilation.GetTypeByMetadataName
             (
+                typeof (GenerateAccessorAttribute).FullName!
+            );
+        var classModel = semanticModel.GetDeclaredSymbol (theClass)!;
+        foreach (var attribute in classModel.GetAttributes())
+        {
+            if (ReferenceEquals (attribute.AttributeClass, desiredSymbol))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void GenerateMethods
+        (
                 GeneratorExecutionContext context,
                 SemanticModel semanticModel,
                 ClassDeclarationSyntax theClass
-            )
-        {
-            var desiredSymbol = context.Compilation.GetTypeByMetadataName(typeof(GenerateAccessorAttribute).FullName!);
-            var classModel = semanticModel.GetDeclaredSymbol(theClass)!;
-            foreach (var attribute in classModel.GetAttributes())
-            {
-                if (ReferenceEquals(attribute.AttributeClass, desiredSymbol))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private void GenerateMethods
-            (
-                    GeneratorExecutionContext context,
-                    SemanticModel semanticModel,
-                    ClassDeclarationSyntax theClass
-            )
-        {
-            var classModel = semanticModel.GetDeclaredSymbol(theClass)!;
-            var source = $@"
+        )
+    {
+        var classModel = semanticModel.GetDeclaredSymbol (theClass)!;
+        var source = $@"
 using System;
 using ManagedIrbis;
 
 namespace {classModel.Name}
 ";
-        }
-
-        private void ProcessSyntaxTree(GeneratorExecutionContext context, SyntaxTree syntaxTree)
-        {
-            var semantic = context.Compilation.GetSemanticModel(syntaxTree);
-            var root = syntaxTree.GetCompilationUnitRoot();
-            var choosen = root.DescendantNodes().OfType<ClassDeclarationSyntax>()
-                .Where(type => HasAttribute(context, semantic, type))
-                .ToArray();
-
-            foreach (var theClass in choosen)
-            {
-                GenerateMethods(context, semantic, theClass);
-            }
-        }
-
-        #endregion
     }
+
+    private void ProcessSyntaxTree
+        (
+            GeneratorExecutionContext context,
+            SyntaxTree syntaxTree
+        )
+    {
+        var semantic = context.Compilation.GetSemanticModel (syntaxTree);
+        var root = syntaxTree.GetCompilationUnitRoot();
+        var choosen = root.DescendantNodes().OfType<ClassDeclarationSyntax>()
+            .Where (type => HasAttribute (context, semantic, type))
+            .ToArray();
+
+        foreach (var theClass in choosen)
+        {
+            GenerateMethods (context, semantic, theClass);
+        }
+    }
+
+    #endregion
 }
+

@@ -25,16 +25,28 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis
-{
-    [AttributeUsage(AttributeTargets.Field| AttributeTargets.Property)]
-    public sealed class SubFieldAttribute : Attribute
-    {
-        public char Code { get; }
+namespace ManagedIrbis;
 
-        public SubFieldAttribute(char code)
-        {
-            Code = code;
-        }
+[AttributeUsage (AttributeTargets.Field | AttributeTargets.Property)]
+public sealed class SubFieldAttribute
+    : Attribute
+{
+    #region Properties
+
+    public char Code { get; }
+
+    #endregion
+
+    #region Construction
+
+    public SubFieldAttribute
+        (
+            char code
+        )
+    {
+        Code = code;
     }
+
+    #endregion
 }
+
