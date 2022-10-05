@@ -328,7 +328,6 @@ public static class IrbisEncoding
                     if ((first & 0xF8) == 0xF0)
                     {
                         output.WriteByte ((byte) '?');
-                        output.WriteByte ((byte) '?');
                         offset++;
                         offset++;
                         continue;
@@ -336,8 +335,6 @@ public static class IrbisEncoding
 
                     if ((first & 0xF8) == 0xF8)
                     {
-                        output.WriteByte ((byte) '?');
-                        output.WriteByte ((byte) '?');
                         output.WriteByte ((byte) '?');
                         offset++;
                         offset++;
@@ -347,8 +344,9 @@ public static class IrbisEncoding
 
                     var unicode = (short) (((first & 0x1F) << 6) + (second & 0x3F));
                     var chr = (byte) '?';
-                    for (var i = 0; i < 256; i++)
+                    for (var i = 128; i < 256; i++)
                     {
+                        // начинать с 0 нет смысла, сэкономим немного тактов
                         if (_cp1251_unicode[i] == unicode)
                         {
                             chr = (byte) i;

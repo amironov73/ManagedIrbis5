@@ -24,21 +24,20 @@ using ManagedIrbis;
 
 #endregion
 
-namespace SomeApplication
+namespace SomeApplication;
+
+public class Program
 {
-    public class Program
+    public static void Main (string[] args)
     {
-        public static void Main(string[] args)
-        {
-            var field = new Field(100);
-            field.SubFields.Add(new SubField('a', "Matroskin"));
-            field.SubFields.Add(new SubField('b', "2"));
+        var field = new Field (100);
+        field.SubFields.Add (new SubField ('a', "Matroskin"));
+        field.SubFields.Add (new SubField ('b', "2"));
 
-            var person = new Person();
-            person.FromField(field);
-            Console.WriteLine(person);
+        var person = new Person();
+        person.FromField (field);
+        Console.WriteLine (person);
 
-            Console.WriteLine();
-        }
+        Console.WriteLine();
     }
 }
