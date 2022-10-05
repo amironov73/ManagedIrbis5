@@ -24,10 +24,12 @@ using System;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+[AttributeUsage(AttributeTargets.Class)]
+public sealed class GenerateAccessorAttribute
+    : Attribute
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class GenerateAccessorAttribute : Attribute
-    {
-    }
+    // пустое тело класса
 }
+

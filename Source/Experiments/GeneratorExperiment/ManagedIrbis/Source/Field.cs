@@ -26,60 +26,68 @@ using System.Text;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+public sealed class Field
 {
-    public sealed class Field
+    public int Tag { get; set; }
+    public List<SubField> SubFields { get; } = new ();
+
+    public Field()
     {
-        public int Tag { get; set; }
-        public List<SubField> SubFields { get; } = new ();
+        // пустое тело конструктора
+    }
 
-        public Field()
-        {
-        }
+    public Field(int tag)
+    {
+        Tag = tag;
+    }
 
-        public Field(int tag)
+    public string? GetFirstSubFieldValue
+        (
+            char code
+        )
+    {
+        foreach (var subField in SubFields)
         {
-            Tag = tag;
-        }
-
-        public string? GetFirstSubFieldValue(char code)
-        {
-            foreach (var subField in SubFields)
+            if (subField.Code == code)
             {
-                if (subField.Code == code)
-                {
-                    return subField.Value;
-                }
+                return subField.Value;
             }
-
-            return null;
         }
 
-        public void SetFirstSubFieldValue(char code, string? value)
+        return null;
+    }
+
+    public void SetFirstSubFieldValue
+        (
+            char code,
+            string? value
+        )
+    {
+        foreach (var subField in SubFields)
         {
-            foreach (var subField in SubFields)
+            if (subField.Code == code)
             {
-                if (subField.Code == code)
-                {
-                    subField.Value = value;
-                    return;
-                }
+                subField.Value = value;
+                return;
             }
-
-            var newSubField = new SubField(code, value);
-            SubFields.Add(newSubField);
         }
 
-        public override string ToString()
+        var newSubField = new SubField (code, value);
+        SubFields.Add (newSubField);
+    }
+
+    public override string ToString()
+    {
+        var result = new StringBuilder();
+        result.Append ($"{Tag}#");
+        foreach (var subField in SubFields)
         {
-            var result = new StringBuilder();
-            result.Append($"{Tag}#");
-            foreach (var subField in SubFields)
-            {
-                result.Append(subField);
-            }
-
-            return result.ToString();
+            result.Append(subField);
         }
+
+        return result.ToString();
     }
 }
+

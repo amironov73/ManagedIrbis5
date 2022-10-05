@@ -18,26 +18,31 @@
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+public sealed class SubField
 {
-    public sealed class SubField
+    public char Code { get; set; }
+    public string? Value { get; set; }
+
+    public SubField()
     {
-        public char Code { get; set; }
-        public string? Value { get; set; }
+        // пустое тело конструктора
+    }
 
-        public SubField()
-        {
-        }
+    public SubField
+        (
+            char code,
+            string? value = null
+        )
+    {
+        Code = code;
+        Value = value;
+    }
 
-        public SubField(char code, string? value = null)
-        {
-            Code = code;
-            Value = value;
-        }
-
-        public override string ToString()
-        {
-            return $"^{Code}{Value}";
-        }
+    public override string ToString()
+    {
+        return $"^{Code}{Value}";
     }
 }
+
