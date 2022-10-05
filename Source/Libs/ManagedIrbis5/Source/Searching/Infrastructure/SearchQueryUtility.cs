@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using AM;
+using AM.Linq;
+using AM.Text;
 
 using Microsoft.Extensions.Logging;
 
@@ -89,7 +91,7 @@ public static class SearchQueryUtility
             SearchProgram program
         )
     {
-        Sure.NotNull (program, nameof (program));
+        Sure.NotNull (program);
 
         var nodes = GetDescendants (program);
         var result = nodes
@@ -98,6 +100,43 @@ public static class SearchQueryUtility
 
         return result;
     }
+
+    /// <summary>
+    /// Очистка от поискового префикса.
+    /// </summary>
+    public static string StripTerm
+        (
+            string text
+        )
+    {
+        var navigator = new ValueTextNavigator (text);
+        var found = navigator.ReadTo ('=');
+        var result = found.Length == text.Length
+            ? text
+            : navigator.GetRemainingText().ToString();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Очистка от поисковых префиксов.
+    /// </summary>
+    public static string[] StripTerms
+        (
+            IEnumerable<SearchTerm> terms
+        )
+    {
+        Sure.NotNull ((object?) terms);
+
+        var result = terms
+            .Select (term => term.Term)
+            .NonEmptyLines()
+            .Select (StripTerm)
+            .ToArray();
+
+        return result;
+    }
+
 
     #endregion
 }

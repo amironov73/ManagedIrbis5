@@ -20,7 +20,8 @@ using System.Collections.Generic;
 
 using AM;
 
-using Microsoft.Extensions.DependencyInjection;
+using ManagedIrbis.Infrastructure;
+
 using Microsoft.Extensions.Logging;
 
 #endregion
@@ -45,7 +46,12 @@ public sealed class StandardRelevanceEvaluator
     /// <summary>
     /// Поисковое выражение.
     /// </summary>
-    public string SearchExpression { get; }
+    public string SearchExpression { get; private set; }
+
+    /// <summary>
+    /// Термины поискового запроса.
+    /// </summary>
+    public IReadOnlyList<string> Terms { get; private set; }
 
     /// <summary>
     /// Провайдер сервисов.
@@ -78,14 +84,24 @@ public sealed class StandardRelevanceEvaluator
         Sure.NotNull (serviceProvider);
         Sure.NotNullNorEmpty (searchExpression);
 
-        _logger = serviceProvider.GetRequiredService<ILogger<StandardRelevanceEvaluator>>();
+        // чтобы компилятор не жаловался
+        SearchExpression = string.Empty;
+        Terms = Array.Empty<string>();
+
+        _logger = LoggingUtility.GetLogger
+            (
+                serviceProvider,
+                typeof (StandardRelevanceEvaluator)
+            );
 
         Coefficients = new List<RelevanceCoefficient>();
-        SearchExpression = searchExpression;
+        SetSearchExpression (searchExpression);
         ServiceProvider = serviceProvider;
 
         ExtraneousRelevance = 1;
         Multiplier = 2;
+
+        InitializeForIbis();
     }
 
     #endregion
@@ -94,30 +110,43 @@ public sealed class StandardRelevanceEvaluator
 
     private readonly ILogger _logger;
 
+    private double EvaluateText
+        (
+            string text,
+            string term,
+            double supposedValue
+        )
+    {
+        if (text.Contains (term, StringComparison.OrdinalIgnoreCase))
+        {
+            return string.Compare (text, term, StringComparison.OrdinalIgnoreCase) == 0
+                ? supposedValue * Multiplier
+                : supposedValue;
+        }
+
+        return 0.0;
+    }
+
     private double EvaluateSubfield
         (
             SubField subField,
             double supposedValue
         )
     {
-        var value = subField.Value;
+        var text = subField.Value;
+        var result = 0.0;
 
-        if (string.IsNullOrWhiteSpace (value))
+        if (string.IsNullOrWhiteSpace (text))
         {
             return 0;
         }
 
-        if (value.Contains (SearchExpression))
+        foreach (var term in Terms)
         {
-            if (value.SameString (SearchExpression))
-            {
-                return Multiplier * supposedValue;
-            }
-
-            return supposedValue;
+            result += EvaluateText (text, term, supposedValue);
         }
 
-        return 0.0;
+        return result;
     }
 
     #endregion
@@ -129,6 +158,8 @@ public sealed class StandardRelevanceEvaluator
     /// </summary>
     public void InitializeForIbis()
     {
+        Coefficients.Clear();
+
         // попадание в заглавие или в имя автора
         Coefficients.Add (new (10) { Fields = { 200, 700, 701, 710 }});
 
@@ -136,6 +167,24 @@ public sealed class StandardRelevanceEvaluator
         Coefficients.Add (new (7) { Fields = { 702 }});
 
         // TODO добавить рубрики и ключевые слова
+    }
+
+    /// <summary>
+    /// Установка
+    /// </summary>
+    /// <param name="searchExpression"></param>
+    public void SetSearchExpression
+        (
+            string searchExpression
+        )
+    {
+        Sure.NotNullNorEmpty (searchExpression);
+
+        var program = SearchProgram.Parse (searchExpression);
+        var terms = SearchQueryUtility.ExtractTerms (program);
+        Terms = SearchQueryUtility.StripTerms (terms);
+
+        SearchExpression = searchExpression;
     }
 
     #endregion

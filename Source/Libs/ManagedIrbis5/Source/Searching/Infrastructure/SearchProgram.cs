@@ -50,6 +50,27 @@ public sealed class SearchProgram
 
     #endregion
 
+    #region MyRegion
+
+    /// <summary>
+    /// Разбор поискового запроса.
+    /// </summary>
+    public static SearchProgram Parse
+        (
+            string text
+        )
+    {
+        Sure.NotNullNorEmpty (text);
+
+        var tokens = SearchQueryLexer.Tokenize (text);
+        var parser = new SearchQueryParser (tokens);
+        var result = parser.Parse();
+
+        return result;
+    }
+
+    #endregion
+
     #region ISearchTree members
 
     /// <inheritdoc cref="ISearchTree.Children" />
