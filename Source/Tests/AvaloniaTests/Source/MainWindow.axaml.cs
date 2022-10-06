@@ -38,14 +38,19 @@ using ManagedIrbis.Workspace;
 
 namespace AvaloniaTests;
 
-public partial class MainWindow : Window
+public partial class MainWindow
+    : Window
 {
     public MainWindow()
     {
         InitializeComponent();
     }
 
-    private void FieldEditorButton_OnClick (object? sender, RoutedEventArgs e)
+    private void FieldEditorButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
     {
         var lines = new List<FieldLine>();
         for (var i = 0; i < 100; i++)
@@ -67,20 +72,32 @@ public partial class MainWindow : Window
         window.ShowDialog (this);
     }
 
-    private async void LoginWindowButton_OnClick (object? sender, RoutedEventArgs e)
+    private async void LoginWindowButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
     {
         var window = new LoginWindow();
         var result = await window.ShowDialog<bool> (this);
         Debug.WriteLine ($"Dialog result is {result}");
     }
 
-    private async void AboutWindowButton_OnClick (object? sender, RoutedEventArgs e)
+    private async void AboutWindowButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
     {
         var window = new AboutWindow();
         await window.ShowDialog<bool> (this);
     }
 
-    private async void LabeledTextBoxButton_OnClick (object? sender, RoutedEventArgs e)
+    private async void LabeledTextBoxButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
     {
         var labeledTextBox = new LabeledTextBox
         {
@@ -142,7 +159,11 @@ public partial class MainWindow : Window
         await window.ShowDialog (this);
     }
 
-    private async void ColorComboBoxButton_OnClick (object? sender, RoutedEventArgs e)
+    private async void ColorComboBoxButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
     {
         var window = new Window
         {
@@ -160,7 +181,11 @@ public partial class MainWindow : Window
         await window.ShowDialog<bool> (this);
     }
 
-    private async void BusyStripeButton_OnClick (object? sender, RoutedEventArgs e)
+    private async void BusyStripeButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
     {
         var stripe = new BusyStripe
         {
@@ -216,7 +241,11 @@ public partial class MainWindow : Window
         await window.ShowDialog<bool> (this);
     }
 
-    private async void DriveComboBoxButton_OnClick (object? sender, RoutedEventArgs e)
+    private async void DriveComboBoxButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
     {
         var window = new Window
         {
@@ -241,7 +270,11 @@ public partial class MainWindow : Window
         await window.ShowDialog<bool> (this);
     }
 
-    private async void InputDialogButton_OnClick (object? sender, RoutedEventArgs e)
+    private async void InputDialogButton_OnClick
+        (
+            object? sender,
+            RoutedEventArgs eventArgs
+        )
     {
         var data = new InputData
         {

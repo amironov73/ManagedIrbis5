@@ -24,77 +24,80 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace SiberianTests
+namespace SiberianTests;
+
+/// <summary>
+/// Main form.
+/// </summary>
+public partial class MainForm
+    : Form
 {
-    /// <summary>
-    /// Main form.
-    /// </summary>
-    public partial class MainForm
-        : Form
+    #region Properties
+
+    public SiberianTest? CurrentTest => _listBox.SelectedItem as SiberianTest;
+
+    #endregion
+
+    public MainForm()
     {
-        #region Properties
+        InitializeComponent();
+    }
 
-        public SiberianTest? CurrentTest => _listBox.SelectedItem as SiberianTest;
+    private void _exitItem_Click
+        (
+            object sender,
+            EventArgs eventArgs
+        )
+    {
+        Close();
+    }
 
-        #endregion
+    private void MainForm_Load
+        (
+            object sender,
+            EventArgs eventArgs
+        )
+    {
+        var tests = SiberianTest
+            .LoadFromFile ("tests.json")
+            .OrderBy (test => test.Title)
+            .ToArray();
 
-        public MainForm()
+        // ReSharper disable CoVariantArrayConversion
+        _listBox.Items.AddRange (tests);
+
+        // ReSharper restore CoVariantArrayConversion
+    }
+
+    private void _listBox_DoubleClick
+        (
+            object sender,
+            EventArgs eventArgs
+        )
+    {
+        try
         {
-            InitializeComponent();
+            var test = CurrentTest;
+            test?.RunTest (this);
         }
-
-        private void _exitItem_Click
-            (
-                object sender,
-                EventArgs e
-            )
+        catch (Exception ex)
         {
-            Close();
-        }
+            ExceptionBox.Show (ex);
 
-        private void MainForm_Load
-            (
-                object sender,
-                EventArgs e
-            )
+            // MessageBox.Show(ex.ToString());
+        }
+    }
+
+    private void _listBox_KeyDown
+        (
+            object sender,
+            KeyEventArgs eventArgs
+        )
+    {
+        if (eventArgs.KeyData == Keys.Enter)
         {
-            var tests = SiberianTest
-                .LoadFromFile("tests.json")
-                .OrderBy(test => test.Title)
-                .ToArray();
-
-            // ReSharper disable CoVariantArrayConversion
-            _listBox.Items.AddRange(tests);
-            // ReSharper restore CoVariantArrayConversion
+            eventArgs.Handled = true;
+            _listBox_DoubleClick (sender, eventArgs);
         }
-
-        private void _listBox_DoubleClick
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            try
-            {
-                var test = CurrentTest;
-                test?.RunTest(this);
-            }
-            catch (Exception ex)
-            {
-                ExceptionBox.Show(ex);
-                // MessageBox.Show(ex.ToString());
-            }
-        }
-
-        private void _listBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyData == Keys.Enter)
-            {
-                e.Handled = true;
-                _listBox_DoubleClick(sender, e);
-            }
-        }
-
-    } // class MainForm
-
-} // namespace FormsTests
+    }
+}
