@@ -8,73 +8,88 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Rubricator64
+namespace Rubricator64;
+
+internal class Field
 {
-  internal class Field
+  private readonly List<SubField> _subFields = new List<SubField>();
+
+  public string Tag { get; set; }
+
+  public string Text { get; set; }
+
+  public List<SubField> SubFields => this._subFields;
+
+  public override string ToString()
   {
-    private readonly List<SubField> _subFields = new List<SubField>();
-
-    public string Tag { get; set; }
-
-    public string Text { get; set; }
-
-    public List<SubField> SubFields => this._subFields;
-
-    public override string ToString()
+    var stringBuilder = new StringBuilder();
+    stringBuilder.AppendFormat ("{0}#{1}", (object) this.Tag, (object) this.Text);
+    foreach (SubField subField in this.SubFields)
     {
-      StringBuilder stringBuilder = new StringBuilder();
-      stringBuilder.AppendFormat("{0}#{1}", (object) this.Tag, (object) this.Text);
-      foreach (SubField subField in this.SubFields)
-        stringBuilder.Append(subField.ToString());
-      return stringBuilder.ToString();
+        stringBuilder.Append (subField.ToString());
     }
 
-    private static string ReadTo(StringReader reader, char delimiter)
+    return stringBuilder.ToString();
+  }
+
+  private static string ReadTo
+      (
+          StringReader reader,
+          char delimiter
+      )
+  {
+    var stringBuilder = new StringBuilder();
+    while (true)
     {
-      StringBuilder stringBuilder = new StringBuilder();
-      while (true)
+      int num = reader.Read();
+      if (num >= 0)
       {
-        int num = reader.Read();
-        if (num >= 0)
+        char ch = (char) num;
+        if ((int) ch != (int) delimiter)
         {
-          char ch = (char) num;
-          if ((int) ch != (int) delimiter)
-            stringBuilder.Append(ch);
-          else
+            stringBuilder.Append (ch);
+        }
+        else
+        {
             break;
         }
-        else
+      }
+      else
+      {
           break;
       }
-      return stringBuilder.ToString();
     }
+    return stringBuilder.ToString();
+  }
 
-    public static Field Parse(string line)
+  public static Field Parse
+      (
+          string line
+      )
+  {
+    var reader = new StringReader (line);
+    var field = new Field()
     {
-      StringReader reader = new StringReader(line);
-      Field field = new Field()
+      Tag = Field.ReadTo (reader, '#'),
+      Text = Field.ReadTo (reader, '^')
+    };
+    while (true)
+    {
+      int c = reader.Read();
+      if (c >= 0)
       {
-        Tag = Field.ReadTo(reader, '#'),
-        Text = Field.ReadTo(reader, '^')
-      };
-      while (true)
-      {
-        int c = reader.Read();
-        if (c >= 0)
+        char lower = char.ToLower ((char) c);
+        string str = Field.ReadTo (reader, '^');
+        var subField = new SubField()
         {
-          char lower = char.ToLower((char) c);
-          string str = Field.ReadTo(reader, '^');
-          SubField subField = new SubField()
-          {
-            Code = lower,
-            Text = str
-          };
-          field.SubFields.Add(subField);
-        }
-        else
-          break;
+          Code = lower,
+          Text = str
+        };
+        field.SubFields.Add (subField);
       }
-      return field;
+      else
+        break;
     }
+    return field;
   }
 }

@@ -15,8 +15,9 @@ namespace Rubricator64
     private static int Main()
     {
       Application.EnableVisualStyles();
-      Application.SetCompatibleTextRenderingDefault(false);
-      Application.Run((Form) new MainForm());
+      Application.SetCompatibleTextRenderingDefault (false);
+      Application.Run ((Form) new MainForm());
+
       return MainForm.Flag;
     }
   }

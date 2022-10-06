@@ -203,9 +203,12 @@ namespace Rubricator64
 
     private void FillRubric()
     {
-      if (this._bindingSource.Count == 0)
-        return;
-      Rubric rubric1 = (Rubric) this._bindingSource.Current;
+        if (this._bindingSource.Count == 0)
+        {
+            return;
+        }
+
+      var rubric1 = (Rubric) this._bindingSource.Current;
       if (rubric1 == null)
         return;
       Rubric rubric2 = rubric1;
@@ -217,47 +220,72 @@ namespace Rubricator64
       }
       if (this._record != null)
       {
-        this._record.RemoveField("675", "621", "606");
-        this._record.AddField("675", 'a', rubric2.Udc);
-        this._record.AddField("621", 'a', rubric2.Bbc);
-        this._record.AddField("606", 'a', rubric1.Title);
+        this._record.RemoveField ("675", "621", "606");
+        this._record.AddField ("675", 'a', rubric2.Udc);
+        this._record.AddField ("621", 'a', rubric2.Bbc);
+        this._record.AddField ("606", 'a', rubric1.Title);
         if (rubric3 != null)
-          this._record.AddField("606", 'a', rubric3.Title);
+        {
+            this._record.AddField("606", 'a', rubric3.Title);
+        }
       }
+
       if (!this._WriteRecord())
-        return;
+      {
+          return;
+      }
+
       MainForm.Flag = 1;
       this.Close();
     }
 
     private void _gridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
     {
-      if (e.RowIndex < 0 || ((Rubric) this._bindingSource[e.RowIndex]).Parent != null)
-        return;
-      e.CellStyle.SelectionBackColor = Color.Red;
-      e.CellStyle.BackColor = Color.Yellow;
+        if (e.RowIndex < 0 || ((Rubric)this._bindingSource[e.RowIndex]).Parent != null)
+        {
+            return;
+        }
+
+        e.CellStyle.SelectionBackColor = Color.Red;
+        e.CellStyle.BackColor = Color.Yellow;
     }
 
-    private void _expandButton_Click(object sender, EventArgs e)
+    private void _expandButton_Click
+        (
+            object sender,
+            EventArgs e
+        )
     {
-      Rubric rubric = (Rubric) this._bindingSource.Current;
+      var rubric = (Rubric?) this._bindingSource.Current;
       if (rubric == null)
-        return;
+      {
+          return;
+      }
+
       if (rubric.Parent != null)
-        rubric = rubric.Parent;
-      List<Rubric> rubricList = new List<Rubric>()
+      {
+          rubric = rubric.Parent;
+      }
+
+      var rubricList = new List<Rubric>()
       {
         rubric
       };
-      rubricList.AddRange((IEnumerable<Rubric>) rubric.Children);
+      rubricList.AddRange ((IEnumerable<Rubric>) rubric.Children);
       this._bindingSource.DataSource = (object) rubricList;
     }
 
-    protected override void Dispose(bool disposing)
+    protected override void Dispose
+        (
+            bool disposing
+        )
     {
-      if (disposing && this.components != null)
-        this.components.Dispose();
-      base.Dispose(disposing);
+        if (disposing && this.components != null)
+        {
+            this.components.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 
     private void InitializeComponent()
