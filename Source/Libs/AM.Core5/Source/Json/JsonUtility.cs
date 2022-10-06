@@ -295,6 +295,24 @@ public static class JsonUtility
     */
 
     /// <summary>
+    /// Serialize to indented string.
+    /// </summary>
+    public static string SerializeIndented<T>
+        (
+            T obj
+        )
+    {
+        var options = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = true,
+        };
+        var result = JsonSerializer.Serialize (obj, options);
+
+        return result;
+    }
+
+    /// <summary>
     /// Serialize to short string.
     /// </summary>
     public static string SerializeShort<T>
@@ -321,9 +339,14 @@ public static class JsonUtility
         )
         where T : class
     {
-        var content = File.ReadAllText (fileName);
+        var content = File.ReadAllBytes (fileName);
+        var options = new JsonReaderOptions
+        {
+            CommentHandling = JsonCommentHandling.Skip
+        };
+        var reader = new Utf8JsonReader (content, options);
 
-        return JsonSerializer.Deserialize<T> (content).ThrowIfNull();
+        return JsonSerializer.Deserialize<T> (ref reader).ThrowIfNull();
     }
 
     /// <summary>

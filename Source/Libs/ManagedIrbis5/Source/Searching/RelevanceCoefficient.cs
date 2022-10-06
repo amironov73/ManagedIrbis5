@@ -16,6 +16,7 @@
 #region Using directives
 
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 using AM;
 
@@ -35,11 +36,13 @@ public sealed class RelevanceCoefficient
     /// <summary>
     /// Перечень полей, для которых действует коэффициент.
     /// </summary>
-    public IList<int> Fields { get; } = new List<int>();
+    [JsonPropertyName ("fields")]
+    public IList<int> Fields { get; set; } = new List<int>();
 
     /// <summary>
     /// Значение коэффициента.
     /// </summary>
+    [JsonPropertyName ("value")]
     public double Value { get; }
 
     #endregion

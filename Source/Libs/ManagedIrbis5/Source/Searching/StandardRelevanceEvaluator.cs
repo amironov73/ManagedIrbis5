@@ -98,9 +98,6 @@ public sealed class StandardRelevanceEvaluator
         SetSearchExpression (searchExpression);
         ServiceProvider = serviceProvider;
 
-        ExtraneousRelevance = 1;
-        Multiplier = 2;
-
         InitializeForIbis();
     }
 
@@ -158,15 +155,15 @@ public sealed class StandardRelevanceEvaluator
     /// </summary>
     public void InitializeForIbis()
     {
+        var settings = RelevanceSettings.ForIbis();
+
+        ExtraneousRelevance = settings.ExtraneousRelevance;
+        Multiplier = settings.Multiplier;
         Coefficients.Clear();
-
-        // попадание в заглавие или в имя автора
-        Coefficients.Add (new (10) { Fields = { 200, 700, 701, 710 }});
-
-        // попадание редактора
-        Coefficients.Add (new (7) { Fields = { 702 }});
-
-        // TODO добавить рубрики и ключевые слова
+        foreach (var coefficient in settings.Coefficients)
+        {
+            Coefficients.Add (coefficient);
+        }
     }
 
     /// <summary>
