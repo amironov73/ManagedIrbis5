@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* StopWords.cs -- обертка над списком стоп-слов
@@ -16,6 +17,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -95,9 +97,62 @@ public sealed class StopWords
 
     private readonly CaseInsensitiveDictionary<object?> _dictionary;
 
+    private static readonly string[] _standardStopWords =
+    {
+        "a", "about", "after", "against", "all", "als", "an", "and",
+        "as", "at", "auf", "aus", "aux", "b", "by", "c", "d", "da",
+        "dans", "das", "de", "der", "des", "di", "die", "do", "du",
+        "e", "ein", "eine", "einen", "eines", "einer", "el", "en",
+        "et", "f", "for", "from", "fur", "g", "h", "i", "ihr", "ihre",
+        "im", "in", "into", "its", "j", "k", "l", "la", "las", "le",
+        "les", "los", "m", "mit", "mot", "n", "near", "non", "not",
+        "o", "of", "on", "or", "over", "out", "p", "par", "para",
+        "qui", "r", "s", "some", "sur", "t", "the", "their", "through",
+        "till", "to", "u", "uber", "und", "under", "upon", "used",
+        "using", "v", "van", "w", "when", "with", "x", "y", "your",
+        "z", "а", "ая", "б", "без", "бы", "в", "вблизи", "вдоль",
+        "во", "вокруг", "всех", "г", "го", "д", "для", "до", "е",
+        "его", "ее", "ж", "же", "з", "за", "и", "из", "или", "им",
+        "ими", "их", "к", "как", "ко", "кое", "л", "летию", "ли",
+        "м", "между", "млн", "н", "на", "над", "не", "него", "ним",
+        "них", "о", "об", "от", "п", "по", "под", "после", "при",
+        "р", "с", "со", "т", "та", "так", "такой", "также", "то",
+        "тоже", "у", "ф", "х", "ц", "ч", "ш", "щ", "ы", "ые", "ый",
+        "э", "этих", "этой", "ю", "я",
+    };
+
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Получение списка стандартных стоп-слов.
+    /// </summary>
+    public static IReadOnlyList<string> GetStandardStopWords() => _standardStopWords;
+
+    /// <summary>
+    /// Является ли данный текст стандартным стоп-словом?
+    /// </summary>
+    public static bool IsStandardStopWord
+        (
+            string text
+        )
+    {
+        if (string.IsNullOrWhiteSpace (text))
+        {
+            return true;
+        }
+
+        foreach (var word in _standardStopWords)
+        {
+            if (string.Compare (word, text, StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 //        /// <summary>
 //        /// Load stopword list from server.

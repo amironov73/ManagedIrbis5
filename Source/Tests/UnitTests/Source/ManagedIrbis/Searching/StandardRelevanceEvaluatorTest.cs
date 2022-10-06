@@ -5,12 +5,18 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
+#region Using directives
+
 using AM.ComponentModel;
 
 using ManagedIrbis;
 using ManagedIrbis.Searching;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endregion
+
+#nullable enable
 
 namespace UnitTests.ManagedIrbis.Search;
 

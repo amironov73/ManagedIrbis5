@@ -17,12 +17,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 using AM;
 using AM.Collections;
 using AM.Text;
 
+using ManagedIrbis.Providers;
+
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 #endregion
@@ -42,6 +46,11 @@ public class TeapotSearcher
     /// Список применяемых префиксов.
     /// </summary>
     public IList<string> Prefixes { get; }
+
+    /// <summary>
+    /// Суффикс, присоединяемый к терминам поискового запроса.
+    /// </summary>
+    public string? Suffix { get; set; }
 
     /// <summary>
     /// Провайдер сервисов.
@@ -66,6 +75,7 @@ public class TeapotSearcher
         ServiceProvider = serviceProvider;
         _logger = LoggingUtility.GetLogger (serviceProvider, typeof (TeapotSearcher));
 
+        Suffix = "$";
         Prefixes = new List<string>
         {
             CommonSearches.KeywordPrefix,
@@ -111,8 +121,13 @@ public class TeapotSearcher
 
         var builder = StringBuilderPool.Shared.Get();
         var first = true;
-        foreach (var term in terms)
+        foreach (var term in terms.Keys.Order())
         {
+            if (StopWords.IsStandardStopWord (term))
+            {
+                continue;
+            }
+
             foreach (var prefix in Prefixes)
             {
                 if (!first)
@@ -120,13 +135,77 @@ public class TeapotSearcher
                     builder.Append (" + ");
                 }
 
-                builder.Append (Q.WrapIfNeeded (prefix + term));
+                builder.Append (Q.WrapIfNeeded (prefix + term + Suffix));
 
                 first = false;
             }
         }
 
         return builder.ReturnShared();
+    }
+
+    /// <inheritdoc cref="ITeapotSearcher.Search"/>
+    public int[] Search
+        (
+            ISyncProvider connection,
+            string query,
+            string? database = null,
+            IRelevanceEvaluator? evaluator = null,
+            int limit = 500
+        )
+    {
+        Sure.NotNull (connection);
+        connection.EnsureConnected();
+
+        database = connection.EnsureDatabase (database);
+        if (limit < 1)
+        {
+            limit = 500;
+        }
+
+        var expression = BuildSearchExpression (query);
+        if (string.IsNullOrWhiteSpace (expression))
+        {
+            return Array.Empty<int>();
+        }
+
+        evaluator ??= ServiceProvider.GetService <IRelevanceEvaluator>()
+            ?? new StandardRelevanceEvaluator (ServiceProvider, expression);
+
+        var parameters = new SearchParameters
+        {
+            Database = database,
+            Expression = expression,
+            NumberOfRecords = limit * 2
+        };
+        var found = connection.Search (parameters);
+        if (found is null)
+        {
+            return Array.Empty<int>();
+        }
+
+        var batch = FoundItem.ToMfn (found);
+        var records = connection.ReadRecords (database, batch);
+        if (records.IsNullOrEmpty())
+        {
+            return Array.Empty<int>();
+        }
+
+        var pairs = new List<Pair<int, double>>();
+        foreach (var record in records)
+        {
+            var relevance = evaluator.EvaluateRelevance (record);
+            var pair = new Pair<int, double> (record.Mfn, relevance);
+            pairs.Add (pair);
+        }
+
+        var result = pairs
+            .OrderByDescending (pair => pair.Second)
+            .Take (limit)
+            .Select (pair => pair.First)
+            .ToArray();
+
+        return result;
     }
 
     #endregion

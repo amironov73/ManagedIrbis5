@@ -26,4 +26,16 @@ public interface ITeapotSearcher
     /// Построение поискового выражения по запросу на естественном языке.
     /// </summary>
     string BuildSearchExpression (string query);
+
+    /// <summary>
+    /// Поиск записей, удовлетворяющих запросу на естественном языке.
+    /// </summary>
+    int[] Search
+        (
+            ISyncProvider connection,
+            string query,
+            string? database = null,
+            IRelevanceEvaluator? evaluator = null,
+            int limit = 500
+        );
 }
