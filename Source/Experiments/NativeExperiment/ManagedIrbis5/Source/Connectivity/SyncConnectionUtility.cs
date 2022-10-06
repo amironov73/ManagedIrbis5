@@ -164,7 +164,7 @@ public static class SyncConnectionUtility
         }
 
         return result.ToArray();
-    } // method ListFiles
+    }
 
     /// <summary>
     /// Чтение указанных записей.

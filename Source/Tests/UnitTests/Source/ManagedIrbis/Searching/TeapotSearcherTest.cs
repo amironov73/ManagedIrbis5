@@ -26,7 +26,7 @@ public class TeapotSearcherTest
     public void TeapotSearcher_Construction_1()
     {
         var serviceProvider = ServiceProviderUtility.CreateNullProvider();
-        var searcher = new TeapotSearcher(serviceProvider);
+        var searcher = new TeapotSearcher (serviceProvider);
 
         Assert.AreSame (serviceProvider, searcher.ServiceProvider);
         Assert.IsNotNull (searcher.Prefixes);
@@ -37,7 +37,7 @@ public class TeapotSearcherTest
     public void TeapotSearcher_BuildSearchExpression_1()
     {
         var serviceProvider = ServiceProviderUtility.CreateNullProvider();
-        var searcher = new TeapotSearcher(serviceProvider);
+        var searcher = new TeapotSearcher (serviceProvider);
 
         var expression = searcher.BuildSearchExpression ("concrete");
 
@@ -52,7 +52,7 @@ public class TeapotSearcherTest
     public void TeapotSearcher_BuildSearchExpression_2()
     {
         var serviceProvider = ServiceProviderUtility.CreateNullProvider();
-        var searcher = new TeapotSearcher(serviceProvider);
+        var searcher = new TeapotSearcher (serviceProvider);
 
         var expression = searcher.BuildSearchExpression ("fire and water");
 
@@ -67,7 +67,7 @@ public class TeapotSearcherTest
     public void TeapotSearcher_BuildSearchExpression_3()
     {
         var serviceProvider = ServiceProviderUtility.CreateNullProvider();
-        var searcher = new TeapotSearcher(serviceProvider);
+        var searcher = new TeapotSearcher (serviceProvider);
 
         var expression = searcher.BuildSearchExpression ("1941-1945");
 

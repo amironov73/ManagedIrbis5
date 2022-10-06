@@ -21,67 +21,63 @@ using AM.Collections;
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Direct;
+
+/// <summary>
+/// Создание акцессора "навсегда".
+/// </summary>
+public class PersistentDirectAccess64
+    : IDirectAccess64Strategy
 {
-    /// <summary>
-    /// Создание акцессора "навсегда".
-    /// </summary>
-    public class PersistentDirectAccess64
-        : IDirectAccess64Strategy
+    #region Private members
+
+    private readonly List<Pair<DirectProvider, DirectAccess64>> _active = new();
+
+    #endregion
+
+    #region IDirectAccess64Strategy64 members
+
+    /// <inheritdoc cref="IDirectAccess64Strategy.CreateAccessor"/>
+    public DirectAccessProxy64 CreateAccessor
+        (
+            DirectProvider provider,
+            string? databaseName,
+            IServiceProvider? serviceProvider
+        )
     {
-        #region Private members
+        var result = DirectUtility.CreateAccessor(provider, databaseName, serviceProvider);
+        var pair = new Pair<DirectProvider, DirectAccess64>(provider, result);
+        _active.Add(pair);
 
-        private readonly List<Pair<DirectProvider, DirectAccess64>> _active = new();
+        return new DirectAccessProxy64(this, provider, result);
 
-        #endregion
+    }
 
-        #region IDirectAccess64Strategy64 members
+    /// <inheritdoc cref="IDirectAccess64Strategy.ReleaseAccessor"/>
+    public void ReleaseAccessor
+        (
+            DirectProvider? provider,
+            DirectAccess64 accessor
+        )
+    {
+        // Nothing to do here
+    }
 
-        /// <inheritdoc cref="IDirectAccess64Strategy.CreateAccessor"/>
-        public DirectAccessProxy64 CreateAccessor
-            (
-                DirectProvider provider,
-                string? databaseName,
-                IServiceProvider? serviceProvider
-            )
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        foreach (var pair in _active)
         {
-            var result = DirectUtility.CreateAccessor(provider, databaseName, serviceProvider);
-            var pair = new Pair<DirectProvider, DirectAccess64>(provider, result);
-            _active.Add(pair);
+            var accessor = pair.Second;
+            accessor!.Dispose();
+        }
 
-            return new DirectAccessProxy64(this, provider, result);
+        _active.Clear();
+    }
 
-        } // method CreateAccessor
-
-        /// <inheritdoc cref="IDirectAccess64Strategy.ReleaseAccessor"/>
-        public void ReleaseAccessor
-            (
-                DirectProvider? provider,
-                DirectAccess64 accessor
-            )
-        {
-            // Nothing to do here
-        } // method ReleaseAccessor
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            foreach (var pair in _active)
-            {
-                var accessor = pair.Second;
-                accessor!.Dispose();
-            }
-
-            _active.Clear();
-
-        } // method Dispose
-
-        #endregion
-
-    } // class PersistentDirectAccess64
-
-} // namespace ManagedIrbis.Direct
+    #endregion
+}

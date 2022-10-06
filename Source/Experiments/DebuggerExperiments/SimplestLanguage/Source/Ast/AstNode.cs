@@ -90,7 +90,7 @@ public abstract class AstNode
     //
     //     return this;
     //
-    // } // method AppendChild
+    // }
 
     // /// <summary>
     // /// Добавление дочерних узлов.

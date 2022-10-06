@@ -659,7 +659,7 @@ public class SyncConnection
         using var response = ExecuteSync (query);
 
         return response?.ReadRemainingUtfText();
-    } // method PrintTable
+    }
 
     /// <inheritdoc cref="ISyncProvider.ReadBinaryFile"/>
     public byte[]? ReadBinaryFile

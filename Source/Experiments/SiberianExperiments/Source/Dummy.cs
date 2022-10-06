@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -16,65 +15,62 @@
 #region Using directives
 
 using System.Collections.Generic;
+
 using AM;
 
 #endregion
 
 #nullable enable
 
-namespace SiberianExperiments
+namespace SiberianExperiments;
+
+/// <summary>
+/// Простой класс для тестов.
+/// </summary>
+public class Dummy
 {
+    #region Properties
+
     /// <summary>
-    /// Простой класс для тестов.
+    /// Целое число.
     /// </summary>
-    public class Dummy
+    public int Number { get; set; }
+
+    /// <summary>
+    /// Некий текст.
+    /// </summary>
+    public string? Text { get; set; }
+
+    /// <summary>
+    /// Некий статус (логический).
+    /// </summary>
+    public bool Status => Number % 2 == 0;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Генерация списка.
+    /// </summary>
+    public static IList<Dummy> GenerateList
+        (
+            int length
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Целое число.
-        /// </summary>
-        public int Number { get; set; }
-
-        /// <summary>
-        /// Некий текст.
-        /// </summary>
-        public string? Text { get; set; }
-
-        /// <summary>
-        /// Некий статус (логический).
-        /// </summary>
-        public bool Status => Number % 2 == 0;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Генерация списка.
-        /// </summary>
-        public static IList<Dummy> GenerateList
-            (
-                int length
-            )
+        var result = new List<Dummy> (length);
+        for (var i = 1; i <= length; i++)
         {
-            var result = new List<Dummy>(length);
-            for (var i = 1; i <= length; i++)
+            var dummy = new Dummy
             {
-                var dummy = new Dummy
-                {
-                    Number = i,
-                    Text = "Квадрат: " + (i * i).ToInvariantString()
-                };
-                result.Add(dummy);
-            }
+                Number = i,
+                Text = "Квадрат: " + (i * i).ToInvariantString()
+            };
+            result.Add (dummy);
+        }
 
-            return result;
+        return result;
+    }
 
-        } // method GenerateList
-
-        #endregion
-
-    } // class Dummy
-
-} // namespace SiberianExperiments
+    #endregion
+}
