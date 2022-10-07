@@ -132,7 +132,7 @@ public sealed class Response
         }
 
         return true;
-    } // method CheckReturnCode
+    }
 
     /// <summary>
     /// Проверка кода возврата.
@@ -499,7 +499,7 @@ public sealed class Response
             int count
         )
     {
-        Sure.Positive (count, nameof (count));
+        Sure.Positive (count);
 
         var result = new List<string> (count);
         for (var i = 0; i < count; i++)
@@ -527,7 +527,7 @@ public sealed class Response
             int count
         )
     {
-        Sure.Positive (count, nameof (count));
+        Sure.Positive (count);
 
         var result = new List<string> (count);
         var index = 0;

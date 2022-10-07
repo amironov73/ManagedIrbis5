@@ -26,101 +26,98 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.Menus
+namespace ManagedIrbis.Menus;
+
+/// <summary>
+/// Пара строк в MNU-файле: код и соответствующее значение
+/// (либо комментарий).
+/// </summary>
+[XmlRoot ("entry")]
+[DebuggerDisplay ("{" + nameof(Code) + "} = {" + nameof(Comment) + "}")]
+public sealed class MenuEntry
+    : IHandmadeSerializable,
+    IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    /// Пара строк в MNU-файле: код и соответствующее значение
-    /// (либо комментарий).
+    /// Первая строка - код.
+    /// Коды могут повторяться в рамках одного MNU-файла.
     /// </summary>
-    [XmlRoot("entry")]
-    [DebuggerDisplay("{" + nameof(Code) + "} = {" + nameof(Comment) + "}")]
-    public sealed class MenuEntry
-        : IHandmadeSerializable,
-        IVerifiable
+    [XmlAttribute ("code")]
+    [JsonPropertyName ("code")]
+    public string? Code { get; set; }
+
+    /// <summary>
+    /// Вторая строка - значение либо комментарий.
+    /// Часто бывает пустой.
+    /// </summary>
+    [XmlAttribute ("comment")]
+    [JsonPropertyName ("comment")]
+    public string? Comment { get; set; }
+
+    /// <summary>
+    /// Ссылка на другую пару строк, применяется при построении дерева
+    /// (TRE-файла).
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    public MenuEntry? OtherEntry { get; set; }
+
+    #endregion
+
+    #region IHandmadeSerializable
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
     {
-        #region Properties
+        Code = reader.ReadNullableString();
+        Comment = reader.ReadNullableString();
+    }
 
-        /// <summary>
-        /// Первая строка - код.
-        /// Коды могут повторяться в рамках одного MNU-файла.
-        /// </summary>
-        [XmlAttribute("code")]
-        [JsonPropertyName("code")]
-        public string? Code { get; set; }
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream (BinaryWriter writer) => writer
+        .WriteNullable (Code)
+        .WriteNullable (Comment);
 
-        /// <summary>
-        /// Вторая строка - значение либо комментарий.
-        /// Часто бывает пустой.
-        /// </summary>
-        [XmlAttribute("comment")]
-        [JsonPropertyName("comment")]
-        public string? Comment { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Ссылка на другую пару строк, применяется при построении дерева
-        /// (TRE-файла).
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public MenuEntry? OtherEntry { get; set; }
+    #region Public methods
 
-        #endregion
+    /// <summary>
+    /// Should JSON serialize the comment?
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public bool ShouldSerializeComment() => !string.IsNullOrEmpty (Comment);
 
-        #region IHandmadeSerializable
+    #endregion
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Code = reader.ReadNullableString();
-            Comment = reader.ReadNullableString();
-        } // method RestoreFromStream
+    #region IVerifiable members
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream (BinaryWriter writer) => writer
-            .WriteNullable(Code)
-            .WriteNullable(Comment);
+    /// <inheritdoc cref="IVerifiable.Verify"/>
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<MenuEntry> (this, throwOnError);
 
-        #endregion
+        verifier.NotNullNorEmpty (Code);
 
-        #region Public methods
+        return verifier.Result;
+    }
 
-        /// <summary>
-        /// Should JSON serialize the comment?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeComment() => !string.IsNullOrEmpty(Comment);
+    #endregion
 
-        #endregion
+    #region Object members
 
-        #region IVerifiable members
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString() => string.IsNullOrEmpty (Comment)
+        ? Code.ToVisibleString()
+        : $"{Code} - {Comment}";
 
-        /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<MenuEntry> (this, throwOnError);
-
-            verifier.NotNullNorEmpty (Code);
-
-            return verifier.Result;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => string.IsNullOrEmpty(Comment)
-            ? Code.ToVisibleString()
-            : $"{Code} - {Comment}";
-
-        #endregion
-
-    } // class MenuEntry
-
-} // namespace ManagedIrbis.Menus
+    #endregion
+}

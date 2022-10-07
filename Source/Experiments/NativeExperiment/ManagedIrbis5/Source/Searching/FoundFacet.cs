@@ -28,53 +28,50 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/*
+    Из официальной документации:
+
+    После числа найденных записей идут строки фасетов
+    N#Termin
+    Где N число записей с данным термином, причем термин
+    возвращается вместе с префиксом! Заметим, что N <= CellCount
+
+ */
+
+/// <summary>
+/// Один найденный фасет в результатах поиска.
+/// </summary>
+public sealed class FoundFacet
 {
-    /*
-        Из официальной документации:
-
-        После числа найденных записей идут строки фасетов
-        N#Termin
-        Где N число записей с данным термином, причем термин
-        возвращается вместе с префиксом! Заметим, что N <= CellCount
-
-     */
+    #region Properties
 
     /// <summary>
-    /// Один найденный фасет в результатах поиска.
+    /// Число записей с данным термином.
     /// </summary>
-    public sealed class FoundFacet
+    public int Count { get; set; }
+
+    /// <summary>
+    /// Термин с префиксом.
+    /// </summary>
+    public string? Term { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Разбор строки ответа сервера.
+    /// </summary>
+    /// <param name="line">Строка из ответа сервера.</param>
+    public void Decode
+        (
+            ReadOnlySpan<char> line
+        )
     {
-        #region Properties
+        throw new NotImplementedException();
+    }
 
-        /// <summary>
-        /// Число записей с данным термином.
-        /// </summary>
-        public int Count { get; set; }
-
-        /// <summary>
-        /// Термин с префиксом.
-        /// </summary>
-        public string? Term { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Разбор строки ответа сервера.
-        /// </summary>
-        /// <param name="line">Строка из ответа сервера.</param>
-        public void Decode
-            (
-                ReadOnlySpan<char> line
-            )
-        {
-            throw new NotImplementedException();
-        } // method Decode
-
-        #endregion
-
-    } // class FoundFacet
-
-} // namespace ManagedIrbis
+    #endregion
+}
