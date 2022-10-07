@@ -229,7 +229,7 @@ public sealed class FileSpecification
         }
 
         return verifier.Result;
-    } // method Verify
+    }
 
     #endregion
 
@@ -249,7 +249,7 @@ public sealed class FileSpecification
         return Path == other.Path
                && _CompareDatabases (Database, other.Database)
                && FileName.SameString (other.FileName);
-    } // method Equals
+    }
 
     /// <inheritdoc cref="object.Equals(object)" />
     public override bool Equals
@@ -268,7 +268,7 @@ public sealed class FileSpecification
         }
 
         return obj is FileSpecification other && Equals (other);
-    } // method Equals
+    }
 
     /// <inheritdoc cref="object.GetHashCode" />
     [ExcludeFromCodeCoverage]
@@ -276,13 +276,13 @@ public sealed class FileSpecification
     {
         unchecked
         {
-            var hashCode = (int)Path;
+            var hashCode = (int) Path;
             hashCode = (hashCode * 397) ^ (Database != null ? Database.GetHashCode() : 0);
             hashCode = (hashCode * 397) ^ (FileName != null ? FileName.GetHashCode() : 0);
 
             return hashCode;
         }
-    } // method GetHashCode
+    }
 
     /// <inheritdoc cref="object.ToString" />
     public override string ToString()
@@ -306,11 +306,11 @@ public sealed class FileSpecification
         {
             case IrbisPath.System:
             case IrbisPath.Data:
-                result = $"{(int)Path}..{fileName}";
+                result = $"{(int) Path}..{fileName}";
                 break;
 
             default:
-                result = $"{(int)Path}.{Database}.{fileName}";
+                result = $"{(int) Path}.{Database}.{fileName}";
                 break;
         }
 

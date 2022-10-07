@@ -198,6 +198,8 @@ public sealed class StandardRelevanceEvaluator
 
         _logger.LogTrace (nameof (EvaluateRelevance));
 
+        // TODO сортировка по значению полей, например, год издания
+
         var result = 0.0;
         foreach (var coefficient in Coefficients)
         {
