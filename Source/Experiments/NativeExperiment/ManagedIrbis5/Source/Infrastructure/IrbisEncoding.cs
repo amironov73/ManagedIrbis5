@@ -69,7 +69,7 @@ public static class IrbisEncoding
                 encoderShouldEmitUTF8Identifier: false,
                 throwOnInvalidBytes: true
             );
-    } // static constructor
+    }
 
     #endregion
 
@@ -116,7 +116,7 @@ public static class IrbisEncoding
         var result = Encoding.GetEncoding (name);
 
         return result;
-    } // namespace ByName
+    }
 
     /// <summary>
     /// Get encoding from config file.
@@ -133,7 +133,7 @@ public static class IrbisEncoding
         var result = ByName (name);
 
         return result;
-    } // method FromConfig
+    }
 
     /// <summary>
     /// Relax UTF-8 decoder, do not throw exceptions
@@ -146,7 +146,7 @@ public static class IrbisEncoding
                 encoderShouldEmitUTF8Identifier: false,
                 throwOnInvalidBytes: false
             );
-    } // method RelaxUtf8
+    }
 
     /// <summary>
     /// Strong UTF-8 decoder, throw exceptions
@@ -159,7 +159,7 @@ public static class IrbisEncoding
                 encoderShouldEmitUTF8Identifier: false,
                 throwOnInvalidBytes: true
             );
-    } // method StrongUtf8
+    }
 
     /// <summary>
     /// Override default single-byte encoding.

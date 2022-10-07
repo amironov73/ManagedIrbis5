@@ -28,258 +28,249 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.Infrastructure
+namespace ManagedIrbis.Infrastructure;
+
+/// <summary>
+/// Работа с датой, специфичная для ИРБИС.
+/// </summary>
+public class IrbisDate
+    : IHandmadeSerializable
 {
+    #region Constants
+
     /// <summary>
-    /// Работа с датой, специфичная для ИРБИС.
+    /// Формат конверсии по умолчанию.
     /// </summary>
-    public class IrbisDate
-        : IHandmadeSerializable
+    public const string DefaultFormat = "yyyyMMdd";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Формат конверсии.
+    /// </summary>
+    public static string ConversionFormat = DefaultFormat;
+
+    /// <summary>
+    /// Сегодняшняя дата в формате ИРБИС.
+    /// </summary>
+    public static string TodayText => new IrbisDate().Text;
+
+    /// <summary>
+    /// Дата в виде текста.
+    /// </summary>
+    public string Text { get; private set; }
+
+    /// <summary>
+    /// Дата как дата.
+    /// </summary>
+    public DateTime Date { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <remarks>
+    /// Инициализирует сегодняшней датой.
+    /// </remarks>
+    public IrbisDate()
     {
-        #region Constants
+        Date = DateTime.Today;
+        Text = ConvertDateToString (Date);
+    }
 
-        /// <summary>
-        /// Формат конверсии по умолчанию.
-        /// </summary>
-        public const string DefaultFormat = "yyyyMMdd";
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public IrbisDate
+        (
+            string? text
+        )
+    {
+        Text = text ?? string.Empty;
+        Date = ConvertStringToDate (text);
+    }
 
-        #endregion
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public IrbisDate
+        (
+            DateTime date
+        )
+    {
+        Date = date;
+        Text = ConvertDateToString (date);
+    }
 
-        #region Properties
+    #endregion
 
-        /// <summary>
-        /// Формат конверсии.
-        /// </summary>
-        public static string ConversionFormat = DefaultFormat;
+    #region Public methods
 
-        /// <summary>
-        /// Сегодняшняя дата в формате ИРБИС.
-        /// </summary>
-        public static string TodayText => new IrbisDate().Text;
+    /// <summary>
+    /// Преобразование даты в строку.
+    /// </summary>
+    public static string ConvertDateToString (DateTime date)
+        => date.ToString (ConversionFormat);
 
-        /// <summary>
-        /// Дата в виде текста.
-        /// </summary>
-        public string Text { get; private set; }
-
-        /// <summary>
-        /// Дата как дата.
-        /// </summary>
-        public DateTime Date { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <remarks>
-        /// Инициализирует сегодняшней датой.
-        /// </remarks>
-        public IrbisDate()
+    /// <summary>
+    /// Преобразование строки в дату.
+    /// </summary>
+    public static DateTime ConvertStringToDate
+        (
+            string? date
+        )
+    {
+        if (ReferenceEquals (date, null) || date.Length < 4)
         {
-            Date = DateTime.Today;
-            Text = ConvertDateToString (Date);
+            return DateTime.MinValue;
         }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public IrbisDate
-            (
-                string? text
-            )
+        if (date.Length > 8)
         {
-            // Sure.NotNullNorEmpty(text, nameof(text));
-
-            Text = text ?? string.Empty;
-            Date = ConvertStringToDate (text);
+            var match = Regex.Match (date, @"\d{8}");
+            if (match.Success)
+            {
+                date = match.Value;
+            }
         }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public IrbisDate
+        DateTime.TryParseExact
             (
-                DateTime date
-            )
+                date,
+                ConversionFormat,
+                CultureInfo.CurrentCulture,
+                DateTimeStyles.None,
+                out var result
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Преобразование строки в дату.
+    /// </summary>
+    public static DateTime ConvertStringToDate
+        (
+            ReadOnlySpan<char> date
+        )
+    {
+        // TODO: реализовать оптимально
+
+        if (date.Length < 4)
         {
-            Date = date;
-            Text = ConvertDateToString (date);
+            return DateTime.MinValue;
         }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Преобразование даты в строку.
-        /// </summary>
-        public static string ConvertDateToString (DateTime date)
-            => date.ToString (ConversionFormat);
-
-        /// <summary>
-        /// Преобразование строки в дату.
-        /// </summary>
-        public static DateTime ConvertStringToDate
-            (
-                string? date
-            )
+        if (date.Length > 8)
         {
-            if (ReferenceEquals (date, null) || date.Length < 4)
+            var match = Regex.Match (date.ToString(), @"\d{8}");
+            if (match.Success)
             {
-                return DateTime.MinValue;
+                date = match.Value;
             }
-
-            if (date.Length > 8)
-            {
-                var match = Regex.Match (date, @"\d{8}");
-                if (match.Success)
-                {
-                    date = match.Value;
-                }
-            }
-
-            DateTime.TryParseExact
-                (
-                    date,
-                    ConversionFormat,
-                    CultureInfo.CurrentCulture,
-                    DateTimeStyles.None,
-                    out var result
-                );
-
-            return result;
         }
 
-        /// <summary>
-        /// Преобразование строки в дату.
-        /// </summary>
-        public static DateTime ConvertStringToDate
+        DateTime.TryParseExact
             (
-                ReadOnlySpan<char> date
-            )
+                date,
+                ConversionFormat,
+                CultureInfo.CurrentCulture,
+                DateTimeStyles.None,
+                out var result
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Явное преобразование строки в промежуток времени.
+    /// </summary>
+    public static TimeSpan ConvertStringToTime
+        (
+            string? time
+        )
+    {
+        if (ReferenceEquals (time, null) || time.Length < 4)
         {
-            // TODO: реализовать оптимально
+            return new TimeSpan();
+        }
 
-            if (date.Length < 4)
-            {
-                return DateTime.MinValue;
-            }
+        var hours = int.Parse (time.Substring (0, 2));
+        var minutes = int.Parse (time.Substring (2, 2));
+        var seconds = time.Length < 6
+            ? 0
+            : int.Parse (time.Substring (4, 2));
+        var result = new TimeSpan (hours, minutes, seconds);
 
-            if (date.Length > 8)
-            {
-                var match = Regex.Match (date.ToString(), @"\d{8}");
-                if (match.Success)
-                {
-                    date = match.Value;
-                }
-            }
+        return result;
+    }
 
-            DateTime.TryParseExact
-                (
-                    date,
-                    ConversionFormat,
-                    CultureInfo.CurrentCulture,
-                    DateTimeStyles.None,
-                    out var result
-                );
-
-            return result;
-
-        } // method ConvertStringToDate
-
-        /// <summary>
-        /// Явное преобразование строки в промежуток времени.
-        /// </summary>
-        public static TimeSpan ConvertStringToTime
+    /// <summary>
+    /// Явное преобразование промежутка времени в строку.
+    /// </summary>
+    public static string ConvertTimeToString
+        (
+            TimeSpan time
+        )
+    {
+        return string.Format
             (
-                string? time
-            )
-        {
-            if (ReferenceEquals (time, null) || time.Length < 4)
-            {
-                return new TimeSpan();
-            }
+                CultureInfo.InvariantCulture,
+                "{0:00}{1:00}{2:00}",
+                time.Hours,
+                time.Minutes,
+                time.Seconds
+            );
+    }
 
-            var hours = int.Parse (time.Substring (0, 2));
-            var minutes = int.Parse (time.Substring (2, 2));
-            var seconds = time.Length < 6
-                ? 0
-                : int.Parse (time.Substring (4, 2));
-            var result = new TimeSpan (hours, minutes, seconds);
+    /// <summary>
+    /// Неявное преобразование из строки.
+    /// </summary>
+    public static implicit operator IrbisDate (string text) => new (text);
 
-            return result;
+    /// <summary>
+    /// Неявное преобразование из даты.
+    /// </summary>
+    public static implicit operator IrbisDate (DateTime date) => new (date);
 
-        } // method ConvertStringToTime
+    /// <summary>
+    /// Неявное преобразование в строку.
+    /// </summary>
+    public static implicit operator string (IrbisDate date) => date.Text;
 
-        /// <summary>
-        /// Явное преобразование промежутка времени в строку.
-        /// </summary>
-        public static string ConvertTimeToString
-            (
-                TimeSpan time
-            )
-        {
-            return string.Format
-                (
-                    CultureInfo.InvariantCulture,
-                    "{0:00}{1:00}{2:00}",
-                    time.Hours,
-                    time.Minutes,
-                    time.Seconds
-                );
+    /// <summary>
+    /// Неявное преобразование в дату.
+    /// </summary>
+    public static implicit operator DateTime (IrbisDate date) => date.Date;
 
-        } // method ConvertTimeToString
+    #endregion
 
-        /// <summary>
-        /// Неявное преобразование из строки.
-        /// </summary>
-        public static implicit operator IrbisDate (string text) => new (text);
+    #region IHandmadeSerializable members
 
-        /// <summary>
-        /// Неявное преобразование из даты.
-        /// </summary>
-        public static implicit operator IrbisDate (DateTime date) => new (date);
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Text = reader.ReadString();
+        Date = ConvertStringToDate (Text);
+    }
 
-        /// <summary>
-        /// Неявное преобразование в строку.
-        /// </summary>
-        public static implicit operator string (IrbisDate date) => date.Text;
+    /// <see cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream (BinaryWriter writer) => writer.Write (Text);
 
-        /// <summary>
-        /// Неявное преобразование в дату.
-        /// </summary>
-        public static implicit operator DateTime (IrbisDate date) => date.Date;
+    #endregion
 
-        #endregion
+    #region Object members
 
-        #region IHandmadeSerializable members
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString() => Text.ToVisibleString();
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Text = reader.ReadString();
-            Date = ConvertStringToDate (Text);
-
-        } // method RestoreFromStream
-
-        /// <see cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream (BinaryWriter writer) => writer.Write (Text);
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Text.ToVisibleString();
-
-        #endregion
-
-    } // class IrbisDate
-
-} // namespace ManagedIrbis.Infrastructure
+    #endregion
+}
