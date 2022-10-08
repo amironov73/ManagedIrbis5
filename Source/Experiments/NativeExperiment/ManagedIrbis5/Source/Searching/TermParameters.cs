@@ -102,13 +102,13 @@ namespace ManagedIrbis
             )
             where TQuery : IQuery
         {
-            var database = Database.ThrowIfNull (nameof (Database));
+            var database = Database.ThrowIfNull();
 
             query.AddAnsi (database);
             query.AddUtf (StartTerm);
             query.Add (NumberOfTerms);
             query.AddFormat (Format);
-        } // method Encode
+        }
 
         #endregion
 

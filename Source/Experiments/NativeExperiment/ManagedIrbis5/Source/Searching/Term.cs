@@ -27,208 +27,199 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Термин в поисковом словаре.
+/// </summary>
+[XmlRoot ("term")]
+[DebuggerDisplay ("{Count} {Text}")]
+public class Term
+    : IEquatable<Term>,
+    IHandmadeSerializable,
+    IVerifiable
 {
+    #region Properties
+
     /// <summary>
-    /// Термин в поисковом словаре.
+    /// Количество ссылок.
     /// </summary>
-    [XmlRoot("term")]
-    [DebuggerDisplay("{Count} {Text}")]
-    public class Term
-        : IEquatable<Term>,
-        IHandmadeSerializable,
-        IVerifiable
+    [XmlAttribute ("count")]
+    [JsonPropertyName ("count")]
+    public int Count { get; set; }
+
+    /// <summary>
+    /// Поисковый термин.
+    /// </summary>
+    [XmlAttribute ("text")]
+    [JsonPropertyName ("text")]
+    public string? Text { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Clone the <see cref="Term"/>.
+    /// </summary>
+    public Term Clone() => (Term) MemberwiseClone();
+
+    /// <summary>
+    /// Разбор ответа сервера.
+    /// </summary>
+    public static Term[] Parse
+        (
+            Response response
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Количество ссылок.
-        /// </summary>
-        [XmlAttribute("count")]
-        [JsonPropertyName("count")]
-        public int Count { get; set; }
-
-        /// <summary>
-        /// Поисковый термин.
-        /// </summary>
-        [XmlAttribute("text")]
-        [JsonPropertyName("text")]
-        public string? Text { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Clone the <see cref="Term"/>.
-        /// </summary>
-        public Term Clone() => (Term) MemberwiseClone();
-
-        /// <summary>
-        /// Разбор ответа сервера.
-        /// </summary>
-        public static Term[] Parse
-            (
-                Response response
-            )
+        var result = new List<Term>();
+        while (!response.EOT)
         {
-            var result = new List<Term>();
-            while (!response.EOT)
+            var line = response.ReadUtf();
+            if (string.IsNullOrEmpty(line))
             {
-                var line = response.ReadUtf();
-                if (string.IsNullOrEmpty(line))
-                {
-                    break;
-                }
-
-                var parts = line.Split('#', 2);
-                var item = new Term
-                {
-                    Count = int.Parse(parts[0]),
-                    Text = parts.Length == 2 ? parts[1] : string.Empty
-                };
-                result.Add(item);
+                break;
             }
 
-            return result.ToArray();
-
-        } // method Parse
-
-        /// <summary>
-        /// Удаляет префиксы с терминов.
-        /// </summary>
-        public static Term[] TrimPrefix
-            (
-                ICollection<Term> terms,
-                string prefix
-            )
-        {
-            var prefixLength = prefix.Length;
-            var result = new List<Term>(terms.Count);
-            if (prefixLength == 0)
+            var parts = line.Split ('#', 2);
+            var item = new Term
             {
-                foreach (var term in terms)
+                Count = int.Parse (parts[0]),
+                Text = parts.Length == 2 ? parts[1] : string.Empty
+            };
+            result.Add(item);
+        }
+
+        return result.ToArray();
+    }
+
+    /// <summary>
+    /// Удаляет префиксы с терминов.
+    /// </summary>
+    public static Term[] TrimPrefix
+        (
+            ICollection<Term> terms,
+            string prefix
+        )
+    {
+        var prefixLength = prefix.Length;
+        var result = new List<Term> (terms.Count);
+        if (prefixLength == 0)
+        {
+            foreach (var term in terms)
+            {
+                result.Add (term.Clone());
+            }
+        }
+        else
+        {
+            foreach (var term in terms)
+            {
+                var item = term.Text;
+                if (!string.IsNullOrEmpty (item) && item.StartsWith (prefix))
                 {
-                    result.Add(term.Clone());
+                    item = item.Substring (prefixLength);
+                }
+                var clone = term.Clone();
+                clone.Text = item;
+                result.Add (clone);
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    /// <summary>
+    /// Удаляет префиксы с терминов.
+    /// </summary>
+    public static string[] TrimToString
+        (
+            ICollection<Term> terms,
+            string prefix
+        )
+    {
+        var prefixLength = prefix.Length;
+        var result = new List<string> (terms.Count);
+        if (prefixLength == 0)
+        {
+            foreach (var term in terms)
+            {
+                result.Add (term.Text ?? string.Empty);
+            }
+        }
+        else
+        {
+            foreach (var term in terms)
+            {
+                var item = term.Text;
+                if (!string.IsNullOrEmpty (item) && item.StartsWith (prefix))
+                {
+                    result.Add (item.Substring (prefixLength));
                 }
             }
-            else
-            {
-                foreach (var term in terms)
-                {
-                    var item = term.Text;
-                    if (!string.IsNullOrEmpty(item) && item.StartsWith(prefix))
-                    {
-                        item = item.Substring(prefixLength);
-                    }
-                    var clone = term.Clone();
-                    clone.Text = item;
-                    result.Add(clone);
-                }
-            }
+        }
 
-            return result.ToArray();
+        return result.ToArray();
+    }
 
-        } // method TrimPrefix
+    #endregion
 
-        /// <summary>
-        /// Удаляет префиксы с терминов.
-        /// </summary>
-        public static string[] TrimToString
-            (
-                ICollection<Term> terms,
-                string prefix
-            )
-        {
-            var prefixLength = prefix.Length;
-            var result = new List<string>(terms.Count);
-            if (prefixLength == 0)
-            {
-                foreach (var term in terms)
-                {
-                    result.Add(term.Text ?? string.Empty);
-                }
-            }
-            else
-            {
-                foreach (var term in terms)
-                {
-                    var item = term.Text;
-                    if (!string.IsNullOrEmpty(item) && item.StartsWith(prefix))
-                    {
-                        result.Add(item.Substring(prefixLength));
-                    }
-                }
-            }
+    #region IHandmadeSerializable members
 
-            return result.ToArray();
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public virtual void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Count = reader.ReadPackedInt32();
+        Text = reader.ReadNullableString();
+    }
 
-        } // method TrimPrefix
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public virtual void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        writer
+            .WritePackedInt32(Count)
+            .WriteNullable(Text);
+    }
 
-        #endregion
+    #endregion
 
-        #region IHandmadeSerializable members
+    #region IEquatable<T> members
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public virtual void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Count = reader.ReadPackedInt32();
-            Text = reader.ReadNullableString();
+    /// <inheritdoc cref="IEquatable{T}.Equals(T)" />
+    public bool Equals (Term? other)
+        => Text?.Equals (other?.Text) ?? false;
 
-        } // method RestoreFromStream
+    #endregion
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public virtual void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WritePackedInt32(Count)
-                .WriteNullable(Text);
+    #region IVerifiable members
 
-        } // method SaveToStream
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public virtual bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<Term> (this, throwOnError);
 
-        #endregion
+        verifier
+            .NotNullNorEmpty(Text)
+            .Assert (Count >= 0);
 
-        #region IEquatable<T> members
+        return verifier.Result;
+    }
 
-        /// <inheritdoc cref="IEquatable{T}.Equals(T)" />
-        public bool Equals(Term? other)
-            => Text?.Equals(other?.Text) ?? false;
+    #endregion
 
-        #endregion
+    #region Object members
 
-        #region IVerifiable members
+    /// <inheritdoc cref="Object.ToString"/>
+    public override string ToString() => $"{Count}#{Text.ToVisibleString()}";
 
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public virtual bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<Term>(this, throwOnError);
-
-            verifier
-                .NotNullNorEmpty(Text, "text")
-                .Assert(Count >= 0, "Count");
-
-            return verifier.Result;
-
-        } // method Verify
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="Object.ToString"/>
-        public override string ToString() => $"{Count}#{Text.ToVisibleString()}";
-
-        #endregion
-
-    } // class Term
-
-} // namespace ManagedIrbis
+    #endregion
+}
